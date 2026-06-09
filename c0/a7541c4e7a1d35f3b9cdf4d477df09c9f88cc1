@@ -1,0 +1,28 @@
+Koren/Features/Combo/Combo.cs
+  s_a15720358fc354::t_dfdaafa8530e5d 14-22,26,29-30,33-35,39,41,45,47,50-51
+Koren/Features/Combo/ComboSettings.cs
+  s_a15720358fc354::t_974db8fe37cb31 10-16,21-25,27-30,34,38-50,52,56-61,63-68,70-72,75-76,79-80,84-85,88-116,119-122,124-129,139-140,146-158,168-173,175-177,185-186,192-204,214-219,221-223
+Koren/UI/Factory/Page/PageCombo.cs
+  s_a15720358fc354::t_04ec0972a224d9 10-13,21,29,43-45,47-56,62-63,71,78-94,96-101,104-119,121-175,198,200-205,207,209-228,230-232
+Koren/Features/Combo/ComboOverlay.cs
+  s_a15720358fc354::t_346b959dc089dd 38-41
+  s_a15720358fc354::t_0ddf2d73c77c67 126,128-129
+  s_a15720358fc354::t_11f1b66437b511 195-240
+  s_a15720358fc354::t_ddf20fdf4167da 267-277,286,294,300-302,305
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "c0a7541c4e7a1d35f3b9cdf4d477df09c9f88cc1",
+  "prompts": {},
+  "sessions": {
+    "s_a15720358fc354": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ec96631c-8775-458c-9725-7780d737342e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
