@@ -1,0 +1,86 @@
+Koren/UI/Factory/Page/PageTweaks.cs
+  s_e3cfb1b2c335dc::t_08673f36bff0e9 94
+  s_e3cfb1b2c335dc::t_d39157dd0f8a45 1-93,95-97
+Koren/Resource/ResourceManager.cs
+  s_e3cfb1b2c335dc::t_e533e4311b6ddd 201-202
+  s_e3cfb1b2c335dc::t_de4715b455bc00 37
+Koren/Features/PlanetColors/PlanetColors.cs
+  s_e3cfb1b2c335dc::t_888d923ad67127 1-445
+Koren/UI/Factory/Page/PageVisuals.cs
+  s_e3cfb1b2c335dc::t_fd18b45af76bb3 284-398
+  s_e3cfb1b2c335dc::t_a0078ad2cd1634 4
+  s_e3cfb1b2c335dc::t_47cf76ab72be28 401,440
+  s_e3cfb1b2c335dc::t_005c5bf537db68 283,399-400,402-439,441-473
+  s_e3cfb1b2c335dc::t_aefa08a1b69bef 3
+Koren/Features/PlanetColors/PlanetColorsPatches.cs
+  s_e3cfb1b2c335dc::t_443c20f5aca5f5 1-135
+Koren/UI/Generator/GenerateUI.cs
+  s_e3cfb1b2c335dc::t_fa93aaa2db16e7 640
+Koren/UI/UpdateToast.cs
+  s_e3cfb1b2c335dc::t_2c169a935fa812 132-134,137
+  s_e3cfb1b2c335dc::t_26b4014cb8f0a1 249
+Koren/Features/Tweaks/TweaksSettings.cs
+  s_e3cfb1b2c335dc::t_63a46eb53a653a 1-40
+Koren/UI/UICore.cs
+  s_e3cfb1b2c335dc::t_94d896741e98ae 31
+  s_e3cfb1b2c335dc::t_fd6b5744bdb579 598-599
+  s_e3cfb1b2c335dc::t_034c799f58777f 565-567
+Koren/Features/Tweaks/Tweaks.cs
+  s_e3cfb1b2c335dc::t_22270e4f986cbb 1-11,13-18,22-567
+  s_e3cfb1b2c335dc::t_8ca766c9a15bb5 12,19-21
+Koren/Core/KorenRuntime.cs
+  s_e3cfb1b2c335dc::t_d7c409094fc308 10
+  s_e3cfb1b2c335dc::t_4ba087636b8746 13
+  s_e3cfb1b2c335dc::t_a3ec214ee5d647 177-178,180
+  s_e3cfb1b2c335dc::t_a6fca60304a513 86-90,98,100,102,122,124,126,131
+  s_e3cfb1b2c335dc::t_1c5224bb3e0326 179,181
+  s_e3cfb1b2c335dc::t_01c8395d3ff56b 196,198
+  s_e3cfb1b2c335dc::t_423da82b01c120 197,199
+Koren/UI/Objects/Impl/UIDropdown.cs
+  s_e3cfb1b2c335dc::t_0ce627a19a6381 219,229
+Koren/Resource/Export/Lang/ko-KR.json
+  s_e3cfb1b2c335dc::t_569c29487f0cb4 18
+Koren/Resource/SpriteManager.cs
+  s_e3cfb1b2c335dc::t_624e90d73e6028 343-344
+  s_e3cfb1b2c335dc::t_c596defa7669e5 25
+Koren/UI/Factory/Page/PageSearch.cs
+  s_e3cfb1b2c335dc::t_fa7d7be967694c 129
+Koren/IO/SettingsFile.cs
+  s_e3cfb1b2c335dc::t_6a3ab3585bd870 59-62
+Koren/Koren.csproj
+  s_e3cfb1b2c335dc::t_7b6c56a063b2db 67
+  s_e3cfb1b2c335dc::t_5b03a41079d79f 42
+Koren/Core/RuntimeServices.cs
+  s_e3cfb1b2c335dc::t_cced9f439008df 1-2,12-16,18,20,29
+Koren/Resource/Export/Lang/en-US.json
+  s_e3cfb1b2c335dc::t_569c29487f0cb4 18
+Koren/Features/Tweaks/TweaksPatches.cs
+  s_e3cfb1b2c335dc::t_cbbd955f3321e7 1-241
+Koren/Features/PlanetColors/PlanetColorsSettings.cs
+  s_e3cfb1b2c335dc::t_7d4692b50a5a26 1-110
+Koren/UI/Utility/UnityUtils.cs
+  s_e3cfb1b2c335dc::t_903e7500b888df 1-2,12-33
+Koren/UI/Factory/MenuFactory.cs
+  s_e3cfb1b2c335dc::t_0929d692854a1f 67-69
+  s_e3cfb1b2c335dc::t_bd794ff11c72aa 217
+  s_e3cfb1b2c335dc::t_06d49823f5ae20 5
+  s_e3cfb1b2c335dc::t_f1f8cc693a172f 53
+Koren/UI/Factory/PageFactory.cs
+  s_e3cfb1b2c335dc::t_16fdc6e6797463 38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "d88cfa672eb0bb329c35e71110ff015b569b30cd",
+  "prompts": {},
+  "sessions": {
+    "s_e3cfb1b2c335dc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8456fc78-45c6-4899-8655-bb8be473ba72",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
