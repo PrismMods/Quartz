@@ -1,0 +1,46 @@
+Koren/Features/KeyViewer/KeyViewerSettings.cs
+  s_827bf60bdc097c::t_bf5906eeb9c61c 1-23
+Koren/UI/Factory/Page/PageKeyViewer.cs
+  s_827bf60bdc097c::t_05262b471e155e 1-30
+Koren/UI/Factory/Page/PageSettings.cs
+  s_827bf60bdc097c::t_8b6295e42951cc 431-432
+Koren/UI/Factory/Page/PageOverlay.cs
+  s_827bf60bdc097c::t_a2c7bc82b1a9e2 608
+  s_827bf60bdc097c::t_520de817c5e7a2 564-574
+  s_827bf60bdc097c::t_a4c6bb729b2f12 114
+Koren/UI/Objects/Impl/UIInput.cs
+  s_827bf60bdc097c::t_36fa78614471c9 61-65
+Koren/UI/Factory/Page/PageJudgement.cs
+  s_827bf60bdc097c::t_811b822a876322 49-51
+  s_827bf60bdc097c::t_7b8961d81574e6 34-36
+Koren/Features/KeyViewer/KeyViewerOverlay.cs
+  s_827bf60bdc097c::t_ed285f02298e69 1-25
+Koren/Features/OttoIcon/OttoIcon.cs
+  s_827bf60bdc097c::t_77146bd90a53d2 48-53,57
+  s_827bf60bdc097c::t_95d72d84f4d278 175-177,186-189
+Koren/Features/OttoIcon/OttoIconSettings.cs
+  s_827bf60bdc097c::t_ab5b84ea94e4e4 67-71
+  s_827bf60bdc097c::t_a226d544167b89 83-87
+  s_827bf60bdc097c::t_c54e71e8eee5a8 20-28,46-57
+Koren/UI/Factory/Page/PageVisuals.cs
+  s_827bf60bdc097c::t_24d289493d6623 331-361
+Koren/UI/Factory/Page/PageProgressBar.cs
+  s_827bf60bdc097c::t_819ea4b203f9e5 87-89
+  s_827bf60bdc097c::t_b4300e317854fe 29-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "fc770c7ce6306a18735aca50bf904167318eb41b",
+  "prompts": {},
+  "sessions": {
+    "s_827bf60bdc097c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7085d45d-1be2-41b5-ad07-2e4227737e60",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
