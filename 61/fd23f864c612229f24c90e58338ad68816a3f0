@@ -1,0 +1,30 @@
+Koren/Features/GameOverlayFont/GameOverlayFont.cs
+  s_d9c9c1c9bc5239::t_38afd46bc43846 138-152,165
+  s_d9c9c1c9bc5239::t_f57aa69fd1571c 99-101
+  s_d9c9c1c9bc5239::t_b08473437c6727 40-42
+  s_d9c9c1c9bc5239::t_2c4d9b7270bddd 240
+  s_d9c9c1c9bc5239::t_9391349b56d3ab 349-352
+  s_d9c9c1c9bc5239::t_9fdf81ea68b634 171-172,174-178,192-214
+  s_d9c9c1c9bc5239::t_ef4924f2a8d309 31-32
+  s_d9c9c1c9bc5239::t_27ea611a0ec6a9 39,43
+  s_d9c9c1c9bc5239::t_c03324ea9976cf 153-157,181
+  s_d9c9c1c9bc5239::t_1a419aed2f7619 116,119,121,123,128-137,158-164,166-170,173,179-180,183-188
+Koren/Core/KorenRuntime.cs
+  s_d9c9c1c9bc5239::t_086cdb286c905f 127
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "61fd23f864c612229f24c90e58338ad68816a3f0",
+  "prompts": {},
+  "sessions": {
+    "s_d9c9c1c9bc5239": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "65f36f0e-2b95-437f-a7c0-a51beb95d7b4",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
