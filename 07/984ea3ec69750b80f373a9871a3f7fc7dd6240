@@ -1,0 +1,64 @@
+Koren/Features/Tweaks/TweaksSettings.cs
+  s_fedd6065ab3c09::t_056d2de0755466 19-20
+Koren/IO/ProfileManager.cs
+  s_fedd6065ab3c09::t_4341057015f984 47
+Koren/Features/Judgement/JudgementSettings.cs
+  s_fedd6065ab3c09::t_a2fdd01af1fd16 16-18,21-22,24
+Koren/Features/KeyLimiter/KeyLimiterSettings.cs
+  s_fedd6065ab3c09::t_fcf194d3e15d47 16
+Koren/Features/SongTitle/SongTitleSettings.cs
+  s_fedd6065ab3c09::t_25fcc858e21b69 12
+  s_fedd6065ab3c09::t_0c8c40130015b3 30
+Koren/UI/Factory/Page/PageSearch.cs
+  s_fedd6065ab3c09::t_ea5024e576f823 268-273
+Koren/Features/Panels/PanelsSettings.cs
+  s_fedd6065ab3c09::t_460e57774a38ed 248-250,253-257,259-269,271-281,283-285
+  s_fedd6065ab3c09::t_c982befcd7b557 258,270,282
+  s_fedd6065ab3c09::t_6b8491310815a9 111-113
+Koren/Features/ProgressBar/ProgressBarSettings.cs
+  s_fedd6065ab3c09::t_d54d62213c57f2 14-15,19-20
+  s_fedd6065ab3c09::t_ceb1c87841ada7 26,28
+Koren/IO/CoreSettings.cs
+  s_fedd6065ab3c09::t_57803741add7fb 22
+  s_fedd6065ab3c09::t_8680091088e714 15
+  s_fedd6065ab3c09::t_f83ab7d3ccefa4 65-66
+Koren/Features/Restriction/RestrictionSettings.cs
+  s_fedd6065ab3c09::t_e495c2005a2a5a 19,23
+Koren/Features/Judgement/JudgementPopupHiderSettings.cs
+  s_fedd6065ab3c09::t_eaecba259e80c1 7-9,12
+Koren/Features/KeyViewer/KeyViewerSettings.cs
+  s_fedd6065ab3c09::t_af61eb5467d017 45-46
+  s_fedd6065ab3c09::t_b914b447fe0c28 62
+  s_fedd6065ab3c09::t_610228c83c80be 34-36
+  s_fedd6065ab3c09::t_a38244144031f8 93-94
+  s_fedd6065ab3c09::t_7cd426b7dde691 58
+Koren/Features/PlanetColors/PlanetColorsSettings.cs
+  s_fedd6065ab3c09::t_f4c12300337173 30
+Koren/Features/Panels/PanelsOverlay.cs
+  s_fedd6065ab3c09::t_1967ed0b9fd300 100-111
+  s_fedd6065ab3c09::t_83282ea8681ec9 454
+Koren/Features/Optimizer/OptimizerSettings.cs
+  s_fedd6065ab3c09::t_9c7740c47e71ba 18
+  s_fedd6065ab3c09::t_1927cbd821eac8 23
+  s_fedd6065ab3c09::t_9514502a996a04 32
+  s_fedd6065ab3c09::t_146f7afbc12e3c 28
+Koren/Features/Combo/ComboSettings.cs
+  s_fedd6065ab3c09::t_b3d6d8c5b32a78 58
+  s_fedd6065ab3c09::t_f48479d5272e7e 48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "07984ea3ec69750b80f373a9871a3f7fc7dd6240",
+  "prompts": {},
+  "sessions": {
+    "s_fedd6065ab3c09": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "85a76d1c-6e76-4308-a3e3-08bd24466fdd",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
