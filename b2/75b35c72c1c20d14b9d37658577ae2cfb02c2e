@@ -1,0 +1,96 @@
+Koren/Features/Combo/Combo.cs
+  s_fedd6065ab3c09::t_c304f7f27d247a 89-94
+  s_fedd6065ab3c09::t_d2f5c832e829c5 3
+Koren/Features/Combo/ComboSettings.cs
+  s_fedd6065ab3c09::t_27ed896f841e36 146
+  s_fedd6065ab3c09::t_733891d2d246e3 197
+  s_fedd6065ab3c09::t_0024a302909c09 21-25
+Koren/Features/Status/GameStats.cs
+  s_fedd6065ab3c09::t_8d4e3086299be5 118-131
+  s_fedd6065ab3c09::t_dc855af4409c1a 132-137
+Koren/Features/Interop/UmmInterop.cs
+  s_fedd6065ab3c09::t_0c5dd8d8aa1054 1-124
+Koren/Features/Interop/XPerfectBridge.cs
+  s_fedd6065ab3c09::t_7ebbfc5ec3cc9e 1-160
+Koren/Features/Panels/PanelsSettings.cs
+  s_fedd6065ab3c09::t_27004ea5a66f1e 14-17
+  s_fedd6065ab3c09::t_bf055100cdaf17 32
+  s_fedd6065ab3c09::t_61ead978d7d21d 51
+Koren/Features/GameOverlayFont/GameOverlayFont.cs
+  s_fedd6065ab3c09::t_1c139252715c4b 504-517,519-530
+  s_fedd6065ab3c09::t_89e884944adfba 383
+  s_fedd6065ab3c09::t_19ca79132fc4c7 494-500
+  s_fedd6065ab3c09::t_65e5f8eb3ab41d 299-302
+  s_fedd6065ab3c09::t_d19626a85a004f 340-342
+  s_fedd6065ab3c09::t_099706fa80b882 470-472
+  s_fedd6065ab3c09::t_46c2c0d20dd9a0 502-503,518,531,538-540
+  s_fedd6065ab3c09::t_7b7563da477cf6 386-390
+  s_fedd6065ab3c09::t_2c2f7c97c51c9f 310-337
+Koren/Features/Judgement/JudgementOverlay.cs
+  s_fedd6065ab3c09::t_8255e995e55a32 185-198
+  s_fedd6065ab3c09::t_371112f06f524b 3
+  s_fedd6065ab3c09::t_31a7fa3cb4177d 115
+  s_fedd6065ab3c09::t_aae9db43fad7c9 39-49
+  s_fedd6065ab3c09::t_dddf4e6ae5f3f1 322-373
+  s_fedd6065ab3c09::t_2f92cb90349fb5 221-222
+  s_fedd6065ab3c09::t_d3b1469dd8d5ec 116-124
+  s_fedd6065ab3c09::t_e5c83aa8e9d219 229-231
+  s_fedd6065ab3c09::t_2bb3534a66455e 266-270,273-275,285-288,294-300,304
+  s_fedd6065ab3c09::t_196332d4650995 160-161
+Koren/Core/KorenRuntime.cs
+  s_fedd6065ab3c09::t_7ff8d9240c5aef 179-180
+  s_fedd6065ab3c09::t_11e846c7c1f313 162-167
+  s_fedd6065ab3c09::t_78f48e75e8f3c5 176-178,181-184
+Koren/UI/Factory/Page/PageVisuals.cs
+  s_fedd6065ab3c09::t_602d49b6247901 737-739
+  s_fedd6065ab3c09::t_82ac6bf9e7491d 3
+  s_fedd6065ab3c09::t_c01848fd2a109d 688,706-708,710-712,715,717,721-722,726-736
+Koren/Resource/Export/Lang/en-US.json
+  s_fedd6065ab3c09::t_e2b17e0d21887c 372
+  s_fedd6065ab3c09::t_7fd5bf93ae367e 374
+  s_fedd6065ab3c09::t_de46ac805a2085 381
+  s_fedd6065ab3c09::t_d8a8658da102aa 375
+Koren/Features/Interop/XPerfectRecursionGuard.cs
+  s_fedd6065ab3c09::t_57783ff0d0e809 1-73
+Koren/Features/Combo/ComboOverlay.cs
+  s_fedd6065ab3c09::t_04f87e3e63100b 3
+  s_fedd6065ab3c09::t_ebf20325565d8e 143-149
+Koren/Features/Judgement/JudgementPopupHiderSettings.cs
+  s_fedd6065ab3c09::t_e8771333f6af8e 8-9,12-15
+Koren/UI/Factory/Page/PageOverlay.cs
+  s_fedd6065ab3c09::t_57e252b440d938 892-928
+  s_fedd6065ab3c09::t_ac1f1b971fec2f 860
+Koren/Resource/Export/Lang/ko-KR.json
+  s_fedd6065ab3c09::t_af16e56e8aadac 375
+  s_fedd6065ab3c09::t_74a2c210cb6ca7 374
+  s_fedd6065ab3c09::t_20a2ef8f4e830f 372
+  s_fedd6065ab3c09::t_4708f65485ddf0 381
+Koren/UI/Factory/Page/PageCombo.cs
+  s_fedd6065ab3c09::t_0b480a4fb81a27 3
+  s_fedd6065ab3c09::t_8ea1ffa739bfa0 41-53
+Koren/Features/Judgement/JudgementPopupHider.cs
+  s_fedd6065ab3c09::t_3d4e2ad96cdcba 3
+  s_fedd6065ab3c09::t_e0b5a1d588509e 55-69
+  s_fedd6065ab3c09::t_e7b58301234ab0 21-27
+Koren/Features/Panels/PanelsOverlay.cs
+  s_fedd6065ab3c09::t_644cb5636f3b1a 4
+  s_fedd6065ab3c09::t_81e40804888f87 87-94
+  s_fedd6065ab3c09::t_11f50dced337d7 437-443
+  s_fedd6065ab3c09::t_5fdb6e0f98bb72 72-73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "b275b35c72c1c20d14b9d37658577ae2cfb02c2e",
+  "prompts": {},
+  "sessions": {
+    "s_fedd6065ab3c09": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "85a76d1c-6e76-4308-a3e3-08bd24466fdd",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
