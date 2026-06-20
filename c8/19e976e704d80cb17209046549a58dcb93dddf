@@ -1,0 +1,24 @@
+Koren/Features/Combo/Combo.cs
+  s_a6cbfd42b4eeb5::t_21ca3ea9120ba2 66-83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "c819e976e704d80cb17209046549a58dcb93dddf",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_a6cbfd42b4eeb5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "236b214e-1695-4afc-8323-8af1b2f6d978",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
