@@ -1,0 +1,23 @@
+Koren/Features/KeyViewer/KeyViewerOverlay.cs
+  s_ba5ed9be4409f0::t_5de2cfb38c87f4 1401-1406
+Koren/Features/ChatterBlocker/ChatterBlocker.cs
+  s_ba5ed9be4409f0::t_cf20cc4bf16e71 218-225
+Koren/Features/KeyLimiter/KeyLimiter.cs
+  s_ba5ed9be4409f0::t_98fa5ecddca49f 251-293
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "072052d0ac57cec497e53add514244d7d9e55dd8",
+  "prompts": {},
+  "sessions": {
+    "s_ba5ed9be4409f0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4b065b17-bd39-4b64-a1d3-ff756c2059d9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
