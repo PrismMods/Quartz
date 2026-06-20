@@ -1,0 +1,20 @@
+Koren/Features/Tweaks/Tweaks.cs
+  s_dbad7616a243a7::t_2e37441461ee54 78-79,88-90
+  s_dbad7616a243a7::t_8bef9b25e486c1 110-114,116,119-134,136
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "b71fb9ade3021ce3ca2e57330a5f7b9627134cec",
+  "prompts": {},
+  "sessions": {
+    "s_dbad7616a243a7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d7ab61e8-0cb3-474b-a22e-550ff0cabd96",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
