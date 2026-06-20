@@ -1,0 +1,20 @@
+Koren/UI/Utility/Reorganizer.cs
+  s_09db52be52ce0c::t_309ad3d5a7512c 268
+  s_09db52be52ce0c::t_fad74f9150d9c3 234-238,244-248,251
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "8d2220d495c5994bd2a9e4d1797ac3130d5f811f",
+  "prompts": {},
+  "sessions": {
+    "s_09db52be52ce0c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5a27cad9-abd8-446e-a464-6f45aa9f99b5",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
