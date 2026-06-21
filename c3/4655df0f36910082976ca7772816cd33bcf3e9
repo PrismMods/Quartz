@@ -1,0 +1,26 @@
+Koren/UI/Utility/TMPTextShadow.cs
+  s_c2730355914c1c::t_b7d3103f52eac1 7-8
+  s_c2730355914c1c::t_fcaba84cbadf27 89-104
+Koren/Features/Editor/EditorFloorReadout.cs
+  s_c2730355914c1c::t_0ad50192fc66db 7
+  s_c2730355914c1c::t_a35fc19b7b372f 137,141,145-151,155-173
+  s_c2730355914c1c::t_acdb95d0b20ac2 227-229
+  s_c2730355914c1c::t_5bbbd1d6c8b46d 65-68
+  s_c2730355914c1c::t_8c5aa1c5dc0adc 388-393
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "c34655df0f36910082976ca7772816cd33bcf3e9",
+  "prompts": {},
+  "sessions": {
+    "s_c2730355914c1c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5c0e78bd-d64a-4b17-bde8-42433421789b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
