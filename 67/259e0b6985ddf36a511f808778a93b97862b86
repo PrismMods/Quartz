@@ -1,0 +1,20 @@
+Koren/Features/Combo/ComboOverlay.cs
+  s_67a4078f144550::t_2b1736e30fd627 260-264
+  s_67a4078f144550::t_7e7b99b09d7334 370-382
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "67259e0b6985ddf36a511f808778a93b97862b86",
+  "prompts": {},
+  "sessions": {
+    "s_67a4078f144550": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a6a3625e-b3cb-4857-a2c2-401a79b86a27",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
