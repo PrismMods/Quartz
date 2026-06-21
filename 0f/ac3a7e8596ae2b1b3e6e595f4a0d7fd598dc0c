@@ -1,0 +1,14 @@
+README.md
+  h_6eeb8441a8a159 24,33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "0fac3a7e8596ae2b1b3e6e595f4a0d7fd598dc0c",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
