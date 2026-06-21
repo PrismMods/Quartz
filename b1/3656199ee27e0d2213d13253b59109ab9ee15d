@@ -1,0 +1,19 @@
+Koren/Features/KeyLimiter/KeyLimiter.cs
+  s_67a4078f144550::t_2fb719d0d75b46 201-209
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "b13656199ee27e0d2213d13253b59109ab9ee15d",
+  "prompts": {},
+  "sessions": {
+    "s_67a4078f144550": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a6a3625e-b3cb-4857-a2c2-401a79b86a27",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
