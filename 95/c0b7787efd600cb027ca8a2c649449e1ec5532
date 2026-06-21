@@ -1,0 +1,51 @@
+Koren/Resource/Export/Lang/ko-KR.json
+  s_630648873bfd04::t_64b9a0e8540fdb 71
+  s_630648873bfd04::t_908a813065099c 235
+  s_aa7fbfd666db54::t_86c6f5334b923d 712-772
+  s_aa7fbfd666db54::t_c6540183bf7b77 773-788
+  s_941d24de3a6f13::t_3ac38f5532cd85 73-77,168-172,237
+  s_630648873bfd04::t_e999a7d0d863cb 69-70
+  s_630648873bfd04::t_704cd5527380d0 164-165
+  s_630648873bfd04::t_59bf894838e4e1 166
+Koren/Resource/Export/Lang/en-US.json
+  s_630648873bfd04::t_c97bd5827238f6 235
+  s_630648873bfd04::t_c981c8eacfc54c 69-70
+  s_941d24de3a6f13::t_3ac38f5532cd85 73-77,168-172,237
+  s_630648873bfd04::t_51f98c564ed7a2 166
+  s_aa7fbfd666db54::t_86c6f5334b923d 712-772
+  s_aa7fbfd666db54::t_c6540183bf7b77 773-788
+  s_630648873bfd04::t_5939a18b95161e 164-165
+  s_630648873bfd04::t_5c9c6bc600283d 71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "95c0b7787efd600cb027ca8a2c649449e1ec5532",
+  "prompts": {},
+  "sessions": {
+    "s_630648873bfd04": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0b3dcbc3-cef0-4dbe-aa31-84ae040398e3",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_941d24de3a6f13": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "32c1a0a8-1ebc-438d-a8fe-40a974edf219",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_aa7fbfd666db54": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f97f531e-3ca1-4cc8-8473-fa32ec59b96e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
