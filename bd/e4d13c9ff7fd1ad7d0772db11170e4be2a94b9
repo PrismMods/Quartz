@@ -1,0 +1,34 @@
+Koren/UI/Factory/Page/PageVisuals.cs
+  s_aa7fbfd666db54::t_8ec34a2f64185e 300
+  s_aa7fbfd666db54::t_459e947904f9b4 310-356
+  s_aa7fbfd666db54::t_a052e6acd373a5 86-88,90-95,97,99-100,102-104,107-110
+  s_aa7fbfd666db54::t_ed4deee1b4d9c7 307
+Koren/Features/EffectRemover/EffectRemover.cs
+  s_aa7fbfd666db54::t_2c0edeec2a7e57 368,373-375
+  s_aa7fbfd666db54::t_3f546406525039 43-46
+  s_aa7fbfd666db54::t_b50f5d810552c1 19
+  s_aa7fbfd666db54::t_be786b0d4eb505 48-53
+  s_aa7fbfd666db54::t_bf49af4495c077 369-372
+Koren/Features/EffectRemover/EffectRemoverSettings.cs
+  s_aa7fbfd666db54::t_0de3d50146beee 1,14-32
+  s_aa7fbfd666db54::t_11eaafb3ff6dec 118-124
+  s_aa7fbfd666db54::t_e7d8e76b1cca93 80-86
+Koren/Features/EffectRemover/EffectRemoverSimplePatches.cs
+  s_aa7fbfd666db54::t_fb459d55e46a79 1-127
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "bde4d13c9ff7fd1ad7d0772db11170e4be2a94b9",
+  "prompts": {},
+  "sessions": {
+    "s_aa7fbfd666db54": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f97f531e-3ca1-4cc8-8473-fa32ec59b96e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
