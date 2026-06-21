@@ -1,0 +1,19 @@
+Koren/GTweens/Source/Contexts/GTweensContext.cs
+  s_67a4078f144550::t_d14e259db10f7d 85-91
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "0e3fae6fcb878ac767693c1ca92adea89ff16e6d",
+  "prompts": {},
+  "sessions": {
+    "s_67a4078f144550": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a6a3625e-b3cb-4857-a2c2-401a79b86a27",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
