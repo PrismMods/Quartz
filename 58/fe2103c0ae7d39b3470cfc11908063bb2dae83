@@ -1,0 +1,20 @@
+agents/commits.md
+  s_f5cd5ba9eb06ac::t_8050b48b35ef47 5-8
+  s_f5cd5ba9eb06ac::t_bb84f9a6dbb8d1 1-4,9-114
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "58fe2103c0ae7d39b3470cfc11908063bb2dae83",
+  "prompts": {},
+  "sessions": {
+    "s_f5cd5ba9eb06ac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4f394ae-8c02-470d-a25c-3195f6d9a54e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
