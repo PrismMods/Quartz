@@ -1,0 +1,45 @@
+build.sh
+  s_2ce0cbf934eb7e::t_f1555be00f55aa 2,5-6,65-66,68-69
+agents/i18n.md
+  s_2ce0cbf934eb7e::t_f1555be00f55aa 71
+README.md
+  s_2ce0cbf934eb7e::t_f1555be00f55aa 3,5-7,18,20,27-28
+tools/release.sh
+  s_2ce0cbf934eb7e::t_f1555be00f55aa 2,5,56,155,157,159,161-163,174,177
+.gitignore
+  s_2ce0cbf934eb7e::t_5207e5e44cd033 5
+native/build.sh
+  s_2ce0cbf934eb7e::t_92e94e31963b5f 3
+agents/release.md
+  s_2ce0cbf934eb7e::t_f1555be00f55aa 71
+Quartz/Core/QuartzRuntime.cs
+  s_5bed0999192059::t_82562983662930 144,148,153
+Quartz.Tests/Quartz.Tests.csproj
+  s_2ce0cbf934eb7e::t_b3052d91fb92d3 11-13
+Quartz/UI/Factory/Page/PageCredits.cs
+  s_2ce0cbf934eb7e::t_6b3d9efe11f2c6 20-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "efa964f43be5f9c7bb1a1cdbf9530171b64e1be5",
+  "prompts": {},
+  "sessions": {
+    "s_2ce0cbf934eb7e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3470af4d-a7c9-4642-a941-4138dbbbd47b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_5bed0999192059": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "911621d2-98ba-4759-93f2-3de908c5fb63",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
