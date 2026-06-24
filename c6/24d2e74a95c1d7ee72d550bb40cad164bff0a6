@@ -1,0 +1,23 @@
+native/build_win.sh
+  s_e3fcb3038d72e5::t_671e43c361cf30 1-55,63,65-70
+  s_e3fcb3038d72e5::t_62b3c4af34cc9e 56-62,64
+Quartz/Features/Recorder/Native/QuartzNativeLibrary.cs
+  s_e3fcb3038d72e5::t_dc48368d3799a4 69
+  s_e3fcb3038d72e5::t_24951d6b70be74 28-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.11",
+  "base_commit_sha": "c624d2e74a95c1d7ee72d550bb40cad164bff0a6",
+  "prompts": {},
+  "sessions": {
+    "s_e3fcb3038d72e5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "97b99a6f-a010-4566-9a37-7a16ea09b064",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
