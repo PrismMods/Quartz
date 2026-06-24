@@ -1,0 +1,36 @@
+Quartz/Features/Recorder/RecorderSession.cs
+  s_092788fdbfe004::t_a0eb410a6b4992 236-243
+  s_092788fdbfe004::t_1dc16d55f5af2a 604-625,649
+  s_092788fdbfe004::t_67b338a9e3d77e 670-676,680
+  s_092788fdbfe004::t_c7fee1f95a4d3e 44-46
+  s_092788fdbfe004::t_e36ab2e2b80898 47-48
+  s_092788fdbfe004::t_6d71c2683ba1eb 700
+  s_092788fdbfe004::t_32048f0de9e091 111-119
+  s_092788fdbfe004::t_1b90dbaa47574d 162,164,167-174,178-186
+  s_092788fdbfe004::t_c6ed2d3dd3220d 301,304-337
+  s_092788fdbfe004::t_ab73c5a2dbdad6 13,15-29
+  s_092788fdbfe004::t_edba1562775540 689-690
+  s_092788fdbfe004::t_09d14a52e4f302 73-80
+  s_092788fdbfe004::t_addc563f905b0f 175-177
+  s_092788fdbfe004::t_519b30d4f97dd4 626-648
+  s_092788fdbfe004::t_3a42f73de6fdcf 677-679
+  s_092788fdbfe004::t_b9c9c285992f00 135-136
+  s_092788fdbfe004::t_1d3dac3bb0c49b 666-669
+  s_092788fdbfe004::t_647d5055ec286b 163
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.11",
+  "base_commit_sha": "874241dc39e5594f9a9546b55182bf36c52bbbff",
+  "prompts": {},
+  "sessions": {
+    "s_092788fdbfe004": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2f31b136-9c05-4e24-b372-cf1d28095328",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
