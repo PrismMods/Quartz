@@ -1,0 +1,20 @@
+native/koren_encoder/koren_encoder.c
+  s_cd76c9bd8276e7::t_a381a4db44caa5 169-170,173
+  s_cd76c9bd8276e7::t_4970866faa84b0 133-158
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "eb83ed47c9cdb80242c2e1430ec9f0a1841ac23b",
+  "prompts": {},
+  "sessions": {
+    "s_cd76c9bd8276e7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3d75988a-ecf7-4b48-b5da-742ee4e75d78",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
