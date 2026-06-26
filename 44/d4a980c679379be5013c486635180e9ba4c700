@@ -1,0 +1,21 @@
+Quartz/Features/Recorder/RecorderSettings.cs
+  s_047ee69fcba669::t_0f2ca012c64057 39-44
+Quartz/Features/Recorder/RecorderSession.cs
+  s_047ee69fcba669::t_676bdc89b1b787 119-122
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "44d4a980c679379be5013c486635180e9ba4c700",
+  "prompts": {},
+  "sessions": {
+    "s_047ee69fcba669": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f484365d-43c1-4cec-bc95-d303892e36e0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
