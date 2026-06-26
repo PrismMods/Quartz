@@ -1,0 +1,72 @@
+Quartz/Features/Recorder/RecorderSettings.cs
+  s_82f59ab90c693a::t_20e5450730b074 53-60
+  s_cd76c9bd8276e7::t_fd5273f044b714 12
+  s_cd76c9bd8276e7::t_a33101f21b9896 20
+Quartz/Features/Recorder/RecorderSession.cs
+  s_82f59ab90c693a::t_8400cbc17b3e9f 37
+  s_82f59ab90c693a::t_3c09db2c6436be 508-517,519-522
+  s_82f59ab90c693a::t_26b0472834fa2b 568-574,576-578
+  s_82f59ab90c693a::t_a2898343844d0a 518,523-528,537-553
+  s_82f59ab90c693a::t_993a2b2d05205e 278-279
+  s_82f59ab90c693a::t_1e1407f86b0c73 155-162,164
+  s_82f59ab90c693a::t_212e124e3a99e4 740
+  s_82f59ab90c693a::t_b5d2b4f001f30d 750-752
+  s_82f59ab90c693a::t_fc7c79ca0a3d29 561-563
+  s_82f59ab90c693a::t_d664b6651b6061 478
+  s_82f59ab90c693a::t_3f36e482b62187 479-486,502-505
+  s_82f59ab90c693a::t_c19bb68c544a94 564
+Quartz/Features/Recorder/RecorderReload.cs
+  s_cd76c9bd8276e7::t_3642a1cba00e31 1-71,73-77
+  s_cd76c9bd8276e7::t_cdfb0eac6dd698 72
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_cd76c9bd8276e7::t_61bd6ce90ecabb 78
+  s_cd76c9bd8276e7::t_8f62f80539f877 201
+  s_cd76c9bd8276e7::t_2bcfd6ea2bb8f8 195
+Quartz/Features/Recorder/Recorder.cs
+  s_cd76c9bd8276e7::t_d7b58452906679 268
+  s_cd76c9bd8276e7::t_fbe9bddcdeef81 172
+  s_cd76c9bd8276e7::t_b1a61a90c81ce5 190
+  s_cd76c9bd8276e7::t_0c5656cdd2b2df 225,238
+  s_cd76c9bd8276e7::t_382d6ecb5d7007 13-18,25-26
+  s_cd76c9bd8276e7::t_b8cf83af6b1cd6 142-143,145
+  s_cd76c9bd8276e7::t_97b781957026fa 180
+  s_cd76c9bd8276e7::t_3067c6dcfd0694 107-108,117-124,144,146-154,156-161,163-166,168,171,173
+  s_cd76c9bd8276e7::t_5a39e0fd3b8990 64-68
+  s_cd76c9bd8276e7::t_6a8f609ac8e05e 155,162,167
+Quartz/Resource/Export/Lang/en-US.json
+  s_cd76c9bd8276e7::t_1ac5612e3e7df6 195
+  s_cd76c9bd8276e7::t_06ca544b9e04b1 201
+  s_cd76c9bd8276e7::t_9a3275106b935f 78
+Quartz/UI/Factory/Page/PageEditorRenderer.cs
+  s_cd76c9bd8276e7::t_08e82cfb182ec6 308
+  s_cd76c9bd8276e7::t_3311b592051f45 181
+  s_cd76c9bd8276e7::t_b14af656ab987c 327-328,332
+  s_cd76c9bd8276e7::t_2e561f8d5f169d 356-358
+  s_82f59ab90c693a::t_af97f1338329cd 106-127
+  s_cd76c9bd8276e7::t_ce8c3c1a928eec 285
+  s_cd76c9bd8276e7::t_d80a6cb522e003 161
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "c901aec6c6502b092e14be392ae8869c2cc32a88",
+  "prompts": {},
+  "sessions": {
+    "s_82f59ab90c693a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e6f52322-b787-418c-916f-89f0a6d1af6a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_cd76c9bd8276e7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3d75988a-ecf7-4b48-b5da-742ee4e75d78",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
