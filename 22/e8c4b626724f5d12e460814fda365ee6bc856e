@@ -1,0 +1,35 @@
+Quartz/Features/Judgement/JudgementOverlay.cs
+  s_a959d205f21076::t_58511ed8aeead8 135,137-139,174,176-187,189-191,202-207
+  s_a959d205f21076::t_7c468b49c8d3e8 56-66
+  s_a959d205f21076::t_0b3a7cd268b03d 112,320-328,396-483
+  s_a959d205f21076::t_6718f53031e15b 271
+  s_a959d205f21076::t_ab683b0321dba1 108-111
+  s_a959d205f21076::t_11849f2d006018 35,38-41
+  s_a959d205f21076::t_01424a0ff7b0f2 84
+  s_a959d205f21076::t_7f93382b134d3d 2
+  s_a959d205f21076::t_cbb065c7c31000 287-289
+  s_a959d205f21076::t_969ceb9c23e63e 113-115,132-134
+  s_a959d205f21076::t_68091a8e7f95d5 136
+  s_a959d205f21076::t_721f9fa6a4f5bd 484
+  s_a959d205f21076::t_81d334111eb81a 116-131
+Quartz/Features/Judgement/JudgementSettings.cs
+  s_a959d205f21076::t_22c3d99126b714 15-24
+  s_a959d205f21076::t_75d1bb7a42350a 77
+  s_a959d205f21076::t_5581527bb2b779 58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "22e8c4b626724f5d12e460814fda365ee6bc856e",
+  "prompts": {},
+  "sessions": {
+    "s_a959d205f21076": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6b8b0fc6-d51f-48f8-b5f7-52423c693da0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
