@@ -1,0 +1,29 @@
+Quartz/IO/ProfileManager.cs
+  s_122adc9c92dae1::t_cb8541293f4a4b 29-40
+  s_122adc9c92dae1::t_907dee349ce7be 350-351,358-370
+  s_122adc9c92dae1::t_03e36612d4596c 13-14
+  s_122adc9c92dae1::t_0d748201057442 17-25
+  s_122adc9c92dae1::t_1fea83d828c4f5 284-285,290
+Quartz/UI/Factory/Page/PageProfiles.cs
+  s_122adc9c92dae1::t_70c027e07ac97e 20
+  s_122adc9c92dae1::t_e7dd556dfa6935 352
+  s_122adc9c92dae1::t_1d9d22e22e2ceb 278
+  s_122adc9c92dae1::t_0e670d17669975 144
+  s_122adc9c92dae1::t_2c75f97d46dcce 396
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "8c0e54c7b7dc07110e3a595d6b67aacbfded7f34",
+  "prompts": {},
+  "sessions": {
+    "s_122adc9c92dae1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "71a7211e-533a-4606-849f-ab376e1c9384",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
