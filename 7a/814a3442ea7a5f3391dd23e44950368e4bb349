@@ -1,0 +1,41 @@
+Quartz/IO/ProfileManager.cs
+  s_a959d205f21076::t_33936f419bf64a 82,110-114
+Quartz/Features/Interop/SettingsImporter.cs
+  s_aefa36d9fa5de2::t_d6708146e695bd 19,68,331-380
+Quartz/IO/ProfileNames.cs
+  s_56117c88a60cc8::t_64d9c399977b37 1-46
+Quartz/UI/Factory/Page/PageImport.cs
+  s_aefa36d9fa5de2::t_997fa804799b9e 256,263-269,333,337-339,346-355
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "7a814a3442ea7a5f3391dd23e44950368e4bb349",
+  "prompts": {},
+  "sessions": {
+    "s_56117c88a60cc8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a66d62bebf17a5c8d",
+        "model": "unknown"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_a959d205f21076": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6b8b0fc6-d51f-48f8-b5f7-52423c693da0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_aefa36d9fa5de2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aee7a2d40c80e9c25",
+        "model": "unknown"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
