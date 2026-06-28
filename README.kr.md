@@ -28,7 +28,7 @@
 3. 끝!
 
 > [!NOTE]
-> If on Mac, In the modlist.org app, press "Copy Native Launch Options" in the "Installed" tab and paste it into your Steam launch arguments.
+> 맥 사용자라면 modlist.org app에서 '설치 관리' 탭에서 '네이티브 시작 옵션 복사' 클릭 후 스팀 시작 옵션에 붙여넣어야 MelonLoader가 적용됩니다.
 
 ## 설치 — MelonLoader (수동)
 
