@@ -1,0 +1,14 @@
+build.json
+  h_6eeb8441a8a159 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "b5637469d10c85a92895b6a83ec396938b7bc6fa",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
