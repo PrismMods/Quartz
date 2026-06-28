@@ -30,3 +30,8 @@ Thumbs.db
 # Misc
 *.cache
 *.log
+
+.claude
+.mcp.json
+CLAUDE.MD
+.claude-flow
