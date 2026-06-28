@@ -1,0 +1,14 @@
+agents/commits.md
+  h_6eeb8441a8a159 43-45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "a6e3f0b0f37973e370ee5111d3b9e702777e3d74",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
