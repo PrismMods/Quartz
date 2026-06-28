@@ -38,9 +38,7 @@ public static partial class Nostalgia {
             AccessTools.Method(typeof(EditorDifficultySelector), "SetChangeable"),
         }.Where(m => m != null);
         private static void Postfix() {
-            if(ShouldHideDifficulty) {
-                ToggleDifficulty(false);
-            }
+            if(ShouldHideDifficulty) ToggleDifficulty(false);
         }
     }
 
@@ -61,9 +59,7 @@ public static partial class Nostalgia {
             AccessTools.Method(typeof(scnEditor), "Start"),
         }.Where(m => m != null);
         private static void Postfix() {
-            if(ShouldHideNoFail) {
-                ToggleNoFail(false);
-            }
+            if(ShouldHideNoFail) ToggleNoFail(false);
         }
     }
 
@@ -124,9 +120,7 @@ public static partial class Nostalgia {
     [HarmonyPatch(typeof(scrFloor), "UpdateIconSprite")]
     private static class ShowSpeedChangePatch {
         private static void Prefix(scrFloor __instance) {
-            if(!ShouldShowSmallSpeedChange || scrLevelMaker.instance == null) {
-                return;
-            }
+            if(!ShouldShowSmallSpeedChange || scrLevelMaker.instance == null) return;
             switch(__instance.floorIcon) {
                 case FloorIcon.Rabbit:
                 case FloorIcon.DoubleRabbit:
@@ -170,9 +164,7 @@ public static partial class Nostalgia {
             ?? AccessTools.Method(typeof(scrController), "OnDamage");
         private static bool Prepare() => TargetMethod() != null;
         private static void Postfix() {
-            if(!ShouldLegacyFlash) {
-                return;
-            }
+            if(!ShouldLegacyFlash) return;
             // scrFlash.OnDamage() starts the flash already half-faded
             // (colortimer = colorduration / 2), so only ~0.2s shows. FlashEx
             // starts from full red and fades over the whole duration, so it
@@ -185,9 +177,7 @@ public static partial class Nostalgia {
     [HarmonyPatch(typeof(scrHitTextMesh), "Show")]
     private static class NoJudgeAnimationPatch {
         private static void Postfix(scrHitTextMesh __instance) {
-            if(!ShouldNoJudgeAnimation) {
-                return;
-            }
+            if(!ShouldNoJudgeAnimation) return;
             Renderer meshRenderer = Traverse.Create(__instance).Field("meshRenderer").GetValue<Renderer>();
             __instance.transform.DOKill();
             __instance.transform.localRotation = scrCamera.instance.transform.rotation;
@@ -209,9 +199,7 @@ public static partial class Nostalgia {
     private static class LateJudgementPatch {
         private static bool Prepare() => AccessTools.Method(typeof(scrHitTextManager), "ShowHitText") != null;
         private static void Postfix(scrHitTextManager __instance, HitMargin hitMargin, scrPlanet planet) {
-            if(!ShouldLateJudgement) {
-                return;
-            }
+            if(!ShouldLateJudgement) return;
             switch(hitMargin) {
                 case HitMargin.TooEarly:
                 case HitMargin.TooLate:
@@ -223,24 +211,18 @@ public static partial class Nostalgia {
                 // The other planet's current floor IS the previous tile (the one
                 // just left), so use it directly — no seqID offset.
                 scrFloor other = planet?.other?.currfloor;
-                if(other == null) {
-                    return;
-                }
+                if(other == null) return;
                 Vector3 pos = other.transform.position;
                 pos.y += 1f;
 
                 var cached = Traverse.Create(__instance).Field("cachedHitTexts")
                     .GetValue<Dictionary<HitMargin, scrHitTextMesh[]>>();
-                if(cached == null || !cached.TryGetValue(hitMargin, out scrHitTextMesh[] arr)) {
-                    return;
-                }
+                if(cached == null || !cached.TryGetValue(hitMargin, out scrHitTextMesh[] arr)) return;
                 // The text shown this call is the most recently shown live one.
                 scrHitTextMesh newest = null;
                 int best = int.MinValue;
                 foreach(scrHitTextMesh m in arr) {
-                    if(m == null || m.dead) {
-                        continue;
-                    }
+                    if(m == null || m.dead) continue;
                     int fs = Traverse.Create(m).Field("frameShown").GetValue<int>();
                     if(fs >= best) {
                         best = fs;

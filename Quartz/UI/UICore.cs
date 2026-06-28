@@ -67,7 +67,6 @@ public static class UICore {
 
         canvasScaler = canvasObj.AddComponent<CanvasScaler>();
         canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        //canvasScaler.referenceResolution = new(1920, 1080);
         PanelScale = MainCore.Conf.UIScale;
         canvasScaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
         canvasScaler.matchWidthOrHeight = 0.5f;
@@ -83,15 +82,11 @@ public static class UICore {
         CreateExitReorganizeButton();
 
         _onPageSettings = state => {
-            if(state == TranslationFailState.Success) {
-                PageSettings.OnTranslatorLoadEnd();
-            }
+            if(state == TranslationFailState.Success) PageSettings.OnTranslatorLoadEnd();
         };
 
         _onRefresh = state => {
-            if(state == TranslationFailState.Success) {
-                TextLocalization.RefreshAll();
-            }
+            if(state == TranslationFailState.Success) TextLocalization.RefreshAll();
         };
 
         MainCore.Tr.OnLoadEnd += _onPageSettings;
@@ -103,13 +98,9 @@ public static class UICore {
         // window-specific font is set, re-point the window's texts to it now.
         FontManager.ApplyMenuFont();
 
-        if(MainCore.Conf.IsFirstRun) {
-            MakeFirstRunHelper();
-        }
+        if(MainCore.Conf.IsFirstRun) MakeFirstRunHelper();
 
-        if(MainCore.Conf.ShowOnStartup) {
-            Open(true);
-        }
+        if(MainCore.Conf.ShowOnStartup) Open(true);
     }
 
     private static void CreateExitReorganizeButton() {
@@ -131,9 +122,7 @@ public static class UICore {
         img.color = Color.Lerp(UIColors.MenuHighlight, UIColors.MenuSelected, 0.5f);
 
         var btn = exitReorganizeObj.AddComponent<Button>();
-        btn.onClick.AddListener(() => {
-            ExitReorganize();
-        });
+        btn.onClick.AddListener(() => ExitReorganize());
 
         GameObject textObj = new("Text");
         textObj.transform.SetParent(rect, false);
@@ -149,7 +138,7 @@ public static class UICore {
         label.fontSize = 24f;
         label.color = Color.white;
         label.alignment = TextAlignmentOptions.Center;
-        
+
         label.gameObject.AddComponent<TextLocalization>()
             .Init("EXIT_REORGANIZE", "Exit Reorganize");
 
@@ -160,9 +149,7 @@ public static class UICore {
     // reveal the on-screen draggable overlay elements and fade the floating
     // Exit button in.
     public static void EnterReorganize() {
-        if(IsReorganizing) {
-            return;
-        }
+        if(IsReorganizing) return;
 
         IsReorganizing = true;
 
@@ -171,31 +158,23 @@ public static class UICore {
             panelCanvasGroup.blocksRaycasts = false;
         }
 
-        if(exitReorganizeObj != null) {
-            exitReorganizeObj.SetActive(true);
-        }
+        if(exitReorganizeObj != null) exitReorganizeObj.SetActive(true);
 
-        if(exitReorganizeCanvasGroup != null) {
-            exitReorganizeCanvasGroup.alpha = 0f;
-        }
+        if(exitReorganizeCanvasGroup != null) exitReorganizeCanvasGroup.alpha = 0f;
 
         reorganizeSeq?.Kill();
         reorganizeSeq = GTweenSequenceBuilder.New()
             .Join(panelCanvasGroup.GTFade(0f, 0.2f).SetEasing(Easing.OutSine))
             .Join(exitReorganizeCanvasGroup.GTFade(1f, 0.2f).SetEasing(Easing.OutSine))
             .AppendCallback(() => {
-                if(IsReorganizing && Panel != null) {
-                    Panel.gameObject.SetActive(false);
-                }
+                if(IsReorganizing && Panel != null) Panel.gameObject.SetActive(false);
             })
             .Build();
         MainCore.TC.Play(reorganizeSeq);
     }
 
     public static void ExitReorganize() {
-        if(!IsReorganizing) {
-            return;
-        }
+        if(!IsReorganizing) return;
 
         IsReorganizing = false;
 
@@ -203,9 +182,7 @@ public static class UICore {
         // the per-overlay drag surfaces deactivate on their next Update.
         Reorganizer.Deselect();
 
-        if(Panel != null) {
-            Panel.gameObject.SetActive(true);
-        }
+        if(Panel != null) Panel.gameObject.SetActive(true);
 
         if(panelCanvasGroup != null) {
             panelCanvasGroup.interactable = true;
@@ -217,9 +194,7 @@ public static class UICore {
             .Join(panelCanvasGroup.GTFade(Mathf.Clamp01(MainCore.Conf.PanelOpacity), 0.2f).SetEasing(Easing.OutSine))
             .Join(exitReorganizeCanvasGroup.GTFade(0f, 0.2f).SetEasing(Easing.OutSine))
             .AppendCallback(() => {
-                if(!IsReorganizing && exitReorganizeObj != null) {
-                    exitReorganizeObj.SetActive(false);
-                }
+                if(!IsReorganizing && exitReorganizeObj != null) exitReorganizeObj.SetActive(false);
             })
             .Build();
         MainCore.TC.Play(reorganizeSeq);
@@ -229,13 +204,9 @@ public static class UICore {
     public static void SetPanelOpacity(float value, bool save) {
         MainCore.Conf.PanelOpacity = Mathf.Clamp01(value);
 
-        if(panelCanvasGroup != null && !IsReorganizing) {
-            panelCanvasGroup.alpha = MainCore.Conf.PanelOpacity;
-        }
+        if(panelCanvasGroup != null && !IsReorganizing) panelCanvasGroup.alpha = MainCore.Conf.PanelOpacity;
 
-        if(save) {
-            MainCore.ConfMgr.RequestSave();
-        }
+        if(save) MainCore.ConfMgr.RequestSave();
     }
 
     private static bool firstRunHelperActivated = false;
@@ -348,9 +319,7 @@ public static class UICore {
             .Join(firstRunHelperText.GTAlpha(0f, 2.0f))
 
             .AppendCallback(() => {
-                if(firstRunCanvasObj != null) {
-                    UnityEngine.Object.Destroy(firstRunCanvasObj);
-                }
+                if(firstRunCanvasObj != null) UnityEngine.Object.Destroy(firstRunCanvasObj);
             })
             .Build();
 
@@ -713,9 +682,7 @@ public static class UICore {
     private static Vector2 LoadSavedPanelSize() {
         float w = MainCore.Conf.PanelWidth;
         float h = MainCore.Conf.PanelHeight;
-        if(w <= 0f || h <= 0f) {
-            return DefaultPanelSize;
-        }
+        if(w <= 0f || h <= 0f) return DefaultPanelSize;
 
         float scale = MainCore.Conf.UIScale;
         float minW = ResizeHandle.MIN_WIDTH / scale;
@@ -731,9 +698,7 @@ public static class UICore {
     // Persists the current panel size so a resize is restored next launch. Called
     // when a resize-drag ends.
     public static void SavePanelSize() {
-        if(Panel == null) {
-            return;
-        }
+        if(Panel == null) return;
 
         LastPanelSize = Panel.sizeDelta;
         MainCore.Conf.PanelWidth = Panel.sizeDelta.x;
@@ -742,9 +707,7 @@ public static class UICore {
     }
 
     public static void HandleUpdate() {
-        if(canvasObj == null) {
-            return;
-        }
+        if(canvasObj == null) return;
 
         Keybind.KeyModifier mod = (Keybind.KeyModifier)MainCore.Conf.ToggleModifier;
         KeyCode key = (KeyCode)MainCore.Conf.ToggleKey;
@@ -762,17 +725,13 @@ public static class UICore {
         }
 
         // hold reset
-        if(holdingToggle && pressed) {
-            if(Time.unscaledTime - holdStartTime >= 0.4f) {
-                ResetScalePosition(!isOpen);
-                holdingToggle = false;
-            }
+        if(holdingToggle && pressed && Time.unscaledTime - holdStartTime >= 0.4f) {
+            ResetScalePosition(!isOpen);
+            holdingToggle = false;
         }
 
         // key up
-        if(Input.GetKeyUp(key)) {
-            holdingToggle = false;
-        }
+        if(Input.GetKeyUp(key)) holdingToggle = false;
 
         UIObject.TickAll();
         Tooltip.Tick();
@@ -812,12 +771,7 @@ public static class UICore {
     }
 
     public static void Open(bool noAnimate = false) {
-        if(isOpen) {
-            return;
-        }
-        if(Panel == null) {
-            return;
-        }
+        if(isOpen || Panel == null) return;
 
         isOpen = true;
 
@@ -885,9 +839,7 @@ public static class UICore {
     private static int refreshedAtlasCount = -1;
 
     private static void RefreshAllText() {
-        if(canvasObj == null) {
-            return;
-        }
+        if(canvasObj == null) return;
 
         TMP_FontAsset font = FontManager.Current;
         int fontId = font != null ? font.GetInstanceID() : 0;
@@ -905,14 +857,10 @@ public static class UICore {
             // still repaints all of them — the whole menu, not just the visible tab.
             // Off-screen pages keep laid-out rects, so geometry regenerates at the
             // right width.
-            if(texts[i] != null) {
-                texts[i].ForceMeshUpdate(false, true);
-            }
+            if(texts[i] != null) texts[i].ForceMeshUpdate(false, true);
         }
 
-        if(Panel != null) {
-            LayoutRebuilder.ForceRebuildLayoutImmediate(Panel);
-        }
+        if(Panel != null) LayoutRebuilder.ForceRebuildLayoutImmediate(Panel);
 
         // ForceMeshUpdate can itself add missing menu glyphs to a dynamic atlas;
         // record the post-refresh signature to avoid one redundant refresh later.
@@ -922,9 +870,7 @@ public static class UICore {
     }
 
     public static void Close(bool noAnimate = false) {
-        if(!isOpen) {
-            return;
-        }
+        if(!isOpen) return;
 
         // Leaving reorganize restores the panel so the next open is clean.
         ExitReorganize();
@@ -1094,9 +1040,7 @@ public static class UICore {
 
     private static bool IsThemeExempt(Transform t) {
         for(; t != null; t = t.parent) {
-            if(t.GetComponent<ThemeExempt>() != null) {
-                return true;
-            }
+            if(t.GetComponent<ThemeExempt>() != null) return true;
         }
         return false;
     }
@@ -1137,9 +1081,7 @@ public static class UICore {
     public static void Rebuild() {
         bool wasOpen = isOpen;
 
-        if(wasOpen) {
-            Close(true);
-        }
+        if(wasOpen) Close(true);
 
         // CreatePanel re-seeds these from the new panel, so keep the user's
         // placement across the rebuild.
@@ -1152,9 +1094,7 @@ public static class UICore {
         LastPanelPosition = position;
         LastPanelSize = size;
 
-        if(wasOpen) {
-            Open(true);
-        }
+        if(wasOpen) Open(true);
 
         // Initialize may have opened the panel itself (ShowOnStartup) before
         // the placement was restored — pin it either way.

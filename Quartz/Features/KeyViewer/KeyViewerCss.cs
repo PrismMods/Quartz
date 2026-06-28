@@ -181,9 +181,7 @@ internal sealed class CssBucket {
         var merged = new Dictionary<string, string>(Global, StringComparer.OrdinalIgnoreCase);
         if(Classes.Count > 0) {
             foreach((string[] classes, Dictionary<string, string> decls) in Classes.OrderBy(c => c.classes.Length)) {
-                if(AllPresent(classes, keyClasses)) {
-                    KeyViewerStylesheet.Overlay(merged, decls);
-                }
+                if(AllPresent(classes, keyClasses)) { KeyViewerStylesheet.Overlay(merged, decls); }
             }
         }
         return merged;
@@ -191,9 +189,7 @@ internal sealed class CssBucket {
 
     private static bool AllPresent(string[] classes, HashSet<string> have) {
         for(int i = 0; i < classes.Length; i++) {
-            if(!have.Contains(classes[i])) {
-                return false;
-            }
+            if(!have.Contains(classes[i])) { return false; }
         }
         return true;
     }
@@ -212,9 +208,7 @@ public sealed class KeyViewerStylesheet {
 
     public static KeyViewerStylesheet Parse(string? css) {
         var sheet = new KeyViewerStylesheet();
-        if(string.IsNullOrWhiteSpace(css)) {
-            return sheet;
-        }
+        if(string.IsNullOrWhiteSpace(css)) { return sheet; }
 
         foreach((string prelude, string body) in CssReader.Rules(StripComments(css!))) {
             if(prelude.StartsWith("@", StringComparison.Ordinal)) {
@@ -224,9 +218,7 @@ public sealed class KeyViewerStylesheet {
                 } else if(at.StartsWith("media", StringComparison.OrdinalIgnoreCase)
                     || at.StartsWith("supports", StringComparison.OrdinalIgnoreCase)) {
                     foreach((string p2, string b2) in CssReader.Rules(body)) {
-                        if(!p2.StartsWith("@", StringComparison.Ordinal)) {
-                            sheet.AddRule(p2, ParseDeclarations(b2));
-                        }
+                        if(!p2.StartsWith("@", StringComparison.Ordinal)) { sheet.AddRule(p2, ParseDeclarations(b2)); }
                     }
                 }
                 continue;
@@ -239,15 +231,11 @@ public sealed class KeyViewerStylesheet {
 
     private void AddFontFace(Dictionary<string, string> decls) {
         var face = new CssFontFace();
-        if(decls.TryGetValue("font-family", out string? fam)) {
-            face.Family = fam.Trim().Trim('"', '\'').Trim();
-        }
+        if(decls.TryGetValue("font-family", out string? fam)) { face.Family = fam.Trim().Trim('"', '\'').Trim(); }
         if(decls.TryGetValue("src", out string? src)) {
             foreach(string part in SplitTopLevel(src, ',')) {
                 string url = ExtractUrl(part);
-                if(url.Length > 0) {
-                    face.Srcs.Add(url);
-                }
+                if(url.Length > 0) { face.Srcs.Add(url); }
             }
         }
         if(face.Family.Length > 0 && face.Srcs.Count > 0) {
@@ -258,27 +246,19 @@ public sealed class KeyViewerStylesheet {
 
     private static string ExtractUrl(string part) {
         int u = part.IndexOf("url(", StringComparison.OrdinalIgnoreCase);
-        if(u < 0) {
-            return "";
-        }
+        if(u < 0) { return ""; }
         int lp = u + 3;
         int rp = MatchParen(part, lp);
-        if(rp < 0) {
-            return "";
-        }
+        if(rp < 0) { return ""; }
         return part.Substring(lp + 1, rp - lp - 1).Trim().Trim('"', '\'').Trim();
     }
 
     private void AddRule(string selectorList, Dictionary<string, string> decls) {
-        if(decls.Count == 0) {
-            return;
-        }
+        if(decls.Count == 0) { return; }
 
         foreach(string raw in SplitTopLevel(selectorList, ',')) {
             string sel = raw.Trim();
-            if(sel.Length == 0) {
-                continue;
-            }
+            if(sel.Length == 0) { continue; }
 
             // Pseudo-element → a :before/:after layer on the key it decorates.
             int pseudo = 0; // 0 none, 1 before, 2 after
@@ -292,8 +272,7 @@ public sealed class KeyViewerStylesheet {
                 } else if(tail.Contains("after")) {
                     pseudo = 2;
                 } else {
-                    // A :hover/:focus or similar — not modelled; drop it.
-                    continue;
+                    continue; // A :hover/:focus or similar — not modelled; drop it.
                 }
                 baseSel = sel.Substring(0, sc);
             }
@@ -311,9 +290,7 @@ public sealed class KeyViewerStylesheet {
                 IsEmpty = false;
             }
 
-            if(!counter && !hasState) {
-                continue; // unrecognised key/counter selector (e.g. bare .graph)
-            }
+            if(!counter && !hasState) { continue; } // unrecognised key/counter selector (e.g. bare .graph)
 
             int state = -1; // -1 both, 0 inactive, 1 active
             if(lower.IndexOf("inactive", StringComparison.Ordinal) >= 0) {
@@ -337,25 +314,17 @@ public sealed class KeyViewerStylesheet {
     }
 
     private static void AddTo(CssBucket idle, CssBucket active, int state, string[] classes, Dictionary<string, string> decls) {
-        if(state != 1) {
-            idle.Add(classes, decls);
-        }
-        if(state != 0) {
-            active.Add(classes, decls);
-        }
+        if(state != 1) { idle.Add(classes, decls); }
+        if(state != 0) { active.Add(classes, decls); }
     }
 
     // Every class token in the selector except the structural ".counter".
     private static string[] ExtractClasses(string selector) {
         List<string>? names = null;
         for(int i = 0; i < selector.Length; i++) {
-            if(selector[i] != '.') {
-                continue;
-            }
+            if(selector[i] != '.') { continue; }
             int j = i + 1;
-            while(j < selector.Length && (char.IsLetterOrDigit(selector[j]) || selector[j] is '-' or '_')) {
-                j++;
-            }
+            while(j < selector.Length && (char.IsLetterOrDigit(selector[j]) || selector[j] is '-' or '_')) { j++; }
             string name = selector.Substring(i + 1, j - i - 1);
             if(name.Length > 0 && !name.Equals("counter", StringComparison.OrdinalIgnoreCase)) {
                 (names ??= new List<string>()).Add(name);
@@ -399,9 +368,7 @@ public sealed class KeyViewerStylesheet {
 
     private static bool HasGraphVar(Dictionary<string, string> decls) {
         foreach(string key in decls.Keys) {
-            if(key.StartsWith("--graph-", StringComparison.Ordinal)) {
-                return true;
-            }
+            if(key.StartsWith("--graph-", StringComparison.Ordinal)) { return true; }
         }
         return false;
     }
@@ -442,18 +409,14 @@ public sealed class KeyViewerStylesheet {
             if(!gotWidth && TryLen(p, out float w) && !LooksLikeColor(p)) {
                 s.BorderWidth = w;
                 gotWidth = true;
-            } else if(TryParseColor(p, out CssColor bc)) {
-                s.BorderColor = bc;
-            }
+            } else if(TryParseColor(p, out CssColor bc)) { s.BorderColor = bc; }
         }
     }
 
     private static HashSet<string> ClassSet(string? className) {
         var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         if(!string.IsNullOrWhiteSpace(className)) {
-            foreach(string c in className!.Split(Space, StringSplitOptions.RemoveEmptyEntries)) {
-                set.Add(c);
-            }
+            foreach(string c in className!.Split(Space, StringSplitOptions.RemoveEmptyEntries)) { set.Add(c); }
         }
         return set;
     }
@@ -587,9 +550,7 @@ public sealed class KeyViewerStylesheet {
 
     // :before / :after layer.
     private static CssLayer? MapLayer(Dictionary<string, string> d) {
-        if(d.Count == 0) {
-            return null;
-        }
+        if(d.Count == 0) { return null; }
         var layer = new CssLayer();
         CssGradient? grad = null;
         foreach(KeyValuePair<string, string> kv in d) {
@@ -632,9 +593,7 @@ public sealed class KeyViewerStylesheet {
     }
 
     private static void ApplyAnimation(Dictionary<string, string> d, CssGradient? gradient) {
-        if(gradient == null) {
-            return;
-        }
+        if(gradient == null) { return; }
         if((d.TryGetValue("animation", out string? a) || d.TryGetValue("animation-duration", out a))
             && TryDuration(a, out float seconds) && seconds > 0.01f) {
             gradient.Animated = true;
@@ -672,18 +631,14 @@ public sealed class KeyViewerStylesheet {
         px = 0f;
         string t = v.Trim();
         int i = 0;
-        if(i < t.Length && (t[i] == '+' || t[i] == '-')) {
-            i++;
-        }
+        if(i < t.Length && (t[i] == '+' || t[i] == '-')) { i++; }
         int start = i;
         bool dot = false;
         while(i < t.Length && (char.IsDigit(t[i]) || (t[i] == '.' && !dot))) {
             if(t[i] == '.') { dot = true; }
             i++;
         }
-        if(i == start) {
-            return false;
-        }
+        if(i == start) { return false; }
         string num = (t.Length > 0 && t[0] == '-' ? "-" : "") + t.Substring(start, i - start);
         return float.TryParse(num, NumberStyles.Float, CultureInfo.InvariantCulture, out px);
     }
@@ -722,22 +677,16 @@ public sealed class KeyViewerStylesheet {
             if(!gotWidth && TryLen(p, out float w) && !LooksLikeColor(p)) {
                 s.BorderWidth = w;
                 gotWidth = true;
-            } else if(TryParseColor(p, out CssColor c)) {
-                s.BorderColor = c;
-            }
+            } else if(TryParseColor(p, out CssColor c)) { s.BorderColor = c; }
         }
     }
 
     private static void ParseInset(string v, CssLayer layer) {
         var vals = new List<float>();
         foreach(string tok in v.Split(Space, StringSplitOptions.RemoveEmptyEntries)) {
-            if(TryLen(tok, out float n)) {
-                vals.Add(n);
-            }
+            if(TryLen(tok, out float n)) { vals.Add(n); }
         }
-        if(vals.Count == 0) {
-            return;
-        }
+        if(vals.Count == 0) { return; }
         // CSS shorthand: 1 = all, 2 = T/B + L/R, 3 = T + L/R + B, 4 = T R B L.
         float top = vals[0];
         float right = vals.Count >= 2 ? vals[1] : vals[0];
@@ -749,9 +698,7 @@ public sealed class KeyViewerStylesheet {
 
     private static CssShadow? ParseShadow(string v) {
         string t = v.Trim();
-        if(t.Equals("none", StringComparison.OrdinalIgnoreCase) || t.Length == 0) {
-            return null;
-        }
+        if(t.Equals("none", StringComparison.OrdinalIgnoreCase) || t.Length == 0) { return null; }
         CssShadow? best = null;
         foreach(string layer in SplitTopLevel(t, ',')) {
             float x = 0f, y = 0f, blur = 0f;
@@ -759,9 +706,7 @@ public sealed class KeyViewerStylesheet {
             CssColor color = CssColor.Unset;
             foreach(string tok in SplitTopLevel(layer.Trim(), ' ')) {
                 string p = tok.Trim();
-                if(p.Length == 0 || p.Equals("inset", StringComparison.OrdinalIgnoreCase)) {
-                    continue;
-                }
+                if(p.Length == 0 || p.Equals("inset", StringComparison.OrdinalIgnoreCase)) { continue; }
                 if(LooksLikeColor(p)) {
                     if(TryParseColor(p, out CssColor c)) { color = c; }
                     continue;
@@ -775,13 +720,9 @@ public sealed class KeyViewerStylesheet {
                     lenIdx++;
                 }
             }
-            if(lenIdx == 0) {
-                continue;
-            }
+            if(lenIdx == 0) { continue; }
             var shadow = new CssShadow(x, y, blur, color.Has ? color : new CssColor(0f, 0f, 0f, 1f));
-            if(best == null || blur > best.Value.Blur) {
-                best = shadow;
-            }
+            if(best == null || blur > best.Value.Blur) { best = shadow; }
         }
         return best;
     }
@@ -825,9 +766,7 @@ public sealed class KeyViewerStylesheet {
     private static bool FilterBlur(string v, out float px) {
         px = 0f;
         foreach((string name, string args) in Functions(v)) {
-            if(name.Equals("blur", StringComparison.OrdinalIgnoreCase) && TryLen(args, out px)) {
-                return true;
-            }
+            if(name.Equals("blur", StringComparison.OrdinalIgnoreCase) && TryLen(args, out px)) { return true; }
         }
         return false;
     }
@@ -855,22 +794,16 @@ public sealed class KeyViewerStylesheet {
     private static IEnumerable<(string name, string args)> Functions(string v) {
         int i = 0, n = v.Length;
         while(i < n) {
-            while(i < n && (char.IsWhiteSpace(v[i]) || v[i] == ',')) {
-                i++;
-            }
+            while(i < n && (char.IsWhiteSpace(v[i]) || v[i] == ',')) { i++; }
             int start = i;
-            while(i < n && (char.IsLetterOrDigit(v[i]) || v[i] == '-')) {
-                i++;
-            }
+            while(i < n && (char.IsLetterOrDigit(v[i]) || v[i] == '-')) { i++; }
             if(i >= n || v[i] != '(') {
                 if(i == start) { i++; }
                 continue;
             }
             string name = v.Substring(start, i - start);
             int rp = MatchParen(v, i);
-            if(rp < 0) {
-                yield break;
-            }
+            if(rp < 0) { yield break; }
             string args = v.Substring(i + 1, rp - i - 1);
             yield return (name, args);
             i = rp + 1;
@@ -881,9 +814,7 @@ public sealed class KeyViewerStylesheet {
         var list = new List<float>();
         foreach(string tok in SplitTopLevel(args, ',')) {
             foreach(string sub in tok.Split(Space, StringSplitOptions.RemoveEmptyEntries)) {
-                if(TryLen(sub, out float f)) {
-                    list.Add(f);
-                }
+                if(TryLen(sub, out float f)) { list.Add(f); }
             }
         }
         return list;
@@ -896,35 +827,25 @@ public sealed class KeyViewerStylesheet {
             idx = v.IndexOf("radial-gradient", StringComparison.OrdinalIgnoreCase);
             radial = true;
         }
-        if(idx < 0) {
-            return null;
-        }
+        if(idx < 0) { return null; }
         int lp = v.IndexOf('(', idx);
-        if(lp < 0) {
-            return null;
-        }
+        if(lp < 0) { return null; }
         int rp = MatchParen(v, lp);
-        if(rp < 0) {
-            return null;
-        }
+        if(rp < 0) { return null; }
 
         string inner = v.Substring(lp + 1, rp - lp - 1);
         var grad = new CssGradient();
         bool first = true;
         foreach(string partRaw in SplitTopLevel(inner, ',')) {
             string part = partRaw.Trim();
-            if(part.Length == 0) {
-                continue;
-            }
+            if(part.Length == 0) { continue; }
             if(first && !radial && IsDirection(part)) {
                 grad.AngleDeg = DirectionToAngle(part);
                 first = false;
                 continue;
             }
             first = false;
-            if(TryParseColor(FirstColorToken(part), out CssColor c)) {
-                grad.Stops.Add(c);
-            }
+            if(TryParseColor(FirstColorToken(part), out CssColor c)) { grad.Stops.Add(c); }
         }
         return grad.Stops.Count >= 2 ? grad : null;
     }
@@ -942,9 +863,7 @@ public sealed class KeyViewerStylesheet {
 
     private static bool IsDirection(string p) {
         string t = p.Trim();
-        if(t.StartsWith("to ", StringComparison.OrdinalIgnoreCase)) {
-            return true;
-        }
+        if(t.StartsWith("to ", StringComparison.OrdinalIgnoreCase)) { return true; }
         return t.EndsWith("deg", StringComparison.OrdinalIgnoreCase)
             || t.EndsWith("turn", StringComparison.OrdinalIgnoreCase)
             || t.EndsWith("rad", StringComparison.OrdinalIgnoreCase);
@@ -965,15 +884,9 @@ public sealed class KeyViewerStylesheet {
                 _ => 180f,
             };
         }
-        if(t.EndsWith("deg", StringComparison.OrdinalIgnoreCase) && TryLen(t, out float deg)) {
-            return deg;
-        }
-        if(t.EndsWith("turn", StringComparison.OrdinalIgnoreCase) && TryLen(t, out float turn)) {
-            return turn * 360f;
-        }
-        if(t.EndsWith("rad", StringComparison.OrdinalIgnoreCase) && TryLen(t, out float rad)) {
-            return rad * 57.29578f;
-        }
+        if(t.EndsWith("deg", StringComparison.OrdinalIgnoreCase) && TryLen(t, out float deg)) { return deg; }
+        if(t.EndsWith("turn", StringComparison.OrdinalIgnoreCase) && TryLen(t, out float turn)) { return turn * 360f; }
+        if(t.EndsWith("rad", StringComparison.OrdinalIgnoreCase) && TryLen(t, out float rad)) { return rad * 57.29578f; }
         return 180f;
     }
 
@@ -989,9 +902,7 @@ public sealed class KeyViewerStylesheet {
     public static bool TryParseColor(string v, out CssColor color) {
         color = CssColor.Unset;
         string s = v.Trim();
-        if(s.Length == 0) {
-            return false;
-        }
+        if(s.Length == 0) { return false; }
         if(s.Equals("transparent", StringComparison.OrdinalIgnoreCase)) {
             color = CssColor.Transparent;
             return true;
@@ -1003,13 +914,9 @@ public sealed class KeyViewerStylesheet {
         if(s.StartsWith("rgb", StringComparison.OrdinalIgnoreCase)) {
             int lp = s.IndexOf('(');
             int rp = lp >= 0 ? s.IndexOf(')', lp) : -1;
-            if(lp < 0 || rp < 0) {
-                return false;
-            }
+            if(lp < 0 || rp < 0) { return false; }
             string[] parts = s.Substring(lp + 1, rp - lp - 1).Split(new[] { ',', '/' }, StringSplitOptions.RemoveEmptyEntries);
-            if(parts.Length < 3) {
-                return false;
-            }
+            if(parts.Length < 3) { return false; }
             color = new CssColor(Comp(parts[0], 255f), Comp(parts[1], 255f), Comp(parts[2], 255f),
                 parts.Length >= 4 ? Alpha(parts[3]) : 1f);
             return true;
@@ -1017,13 +924,9 @@ public sealed class KeyViewerStylesheet {
         if(s.StartsWith("hsl", StringComparison.OrdinalIgnoreCase)) {
             int lp = s.IndexOf('(');
             int rp = lp >= 0 ? s.IndexOf(')', lp) : -1;
-            if(lp < 0 || rp < 0) {
-                return false;
-            }
+            if(lp < 0 || rp < 0) { return false; }
             string[] parts = s.Substring(lp + 1, rp - lp - 1).Split(new[] { ',', '/' }, StringSplitOptions.RemoveEmptyEntries);
-            if(parts.Length < 3) {
-                return false;
-            }
+            if(parts.Length < 3) { return false; }
             float h = float.TryParse(parts[0].Trim().Replace("deg", ""), NumberStyles.Float, CultureInfo.InvariantCulture, out float hv) ? hv : 0f;
             float sl = Pct(parts[1]);
             float ll = Pct(parts[2]);
@@ -1128,22 +1031,14 @@ public sealed class KeyViewerStylesheet {
         var d = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach(string declRaw in SplitTopLevel(body, ';')) {
             string decl = declRaw.Trim();
-            if(decl.Length == 0) {
-                continue;
-            }
+            if(decl.Length == 0) { continue; }
             int colon = IndexOfTopLevel(decl, ':');
-            if(colon <= 0) {
-                continue;
-            }
+            if(colon <= 0) { continue; }
             string name = decl.Substring(0, colon).Trim().ToLowerInvariant();
             string value = decl.Substring(colon + 1).Trim();
             int bang = value.IndexOf('!');
-            if(bang >= 0) {
-                value = value.Substring(0, bang).Trim();
-            }
-            if(name.Length > 0 && value.Length > 0) {
-                d[name] = value;
-            }
+            if(bang >= 0) { value = value.Substring(0, bang).Trim(); }
+            if(name.Length > 0 && value.Length > 0) { d[name] = value; }
         }
         return d;
     }
@@ -1153,9 +1048,7 @@ public sealed class KeyViewerStylesheet {
         for(int i = 0; i < css.Length; i++) {
             if(i + 1 < css.Length && css[i] == '/' && css[i + 1] == '*') {
                 int end = css.IndexOf("*/", i + 2, StringComparison.Ordinal);
-                if(end < 0) {
-                    break;
-                }
+                if(end < 0) { break; }
                 i = end + 1;
                 continue;
             }
@@ -1211,12 +1104,8 @@ internal static class CssReader {
     public static IEnumerable<(string prelude, string body)> Rules(string css) {
         int i = 0, n = css.Length;
         while(i < n) {
-            while(i < n && char.IsWhiteSpace(css[i])) {
-                i++;
-            }
-            if(i >= n) {
-                yield break;
-            }
+            while(i < n && char.IsWhiteSpace(css[i])) { i++; }
+            if(i >= n) { yield break; }
 
             int start = i;
             int depth = 0;
@@ -1224,15 +1113,11 @@ internal static class CssReader {
             while(i < n) {
                 char c = css[i];
                 if(c == '{') {
-                    if(depth == 0) {
-                        braceOpen = i;
-                    }
+                    if(depth == 0) { braceOpen = i; }
                     depth++;
                 } else if(c == '}') {
                     depth--;
-                    if(depth == 0) {
-                        break;
-                    }
+                    if(depth == 0) { break; }
                 } else if(c == ';' && depth == 0) {
                     break;
                 }

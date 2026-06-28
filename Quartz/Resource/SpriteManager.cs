@@ -59,18 +59,11 @@ public sealed class SpriteManager(ResourceManager resource) : IDisposable {
         );
 
     public Sprite Get(string assetName) {
-        if(string.IsNullOrEmpty(assetName)) {
-            return null;
-        }
-
-        if(cache.TryGetValue(assetName, out Sprite sprite)) {
-            return sprite;
-        }
+        if(string.IsNullOrEmpty(assetName)) return null;
+        if(cache.TryGetValue(assetName, out Sprite sprite)) return sprite;
 
         Texture2D tex = resource.Get<Texture2D>(assetName);
-        if(tex == null) {
-            return null;
-        }
+        if(tex == null) return null;
 
         sprite = Create(tex);
         cache[assetName] = sprite;
@@ -79,20 +72,14 @@ public sealed class SpriteManager(ResourceManager resource) : IDisposable {
     }
 
     public Sprite GetSliced(string assetName, float ppui, Vector4 border) {
-        if(string.IsNullOrEmpty(assetName)) {
-            return null;
-        }
+        if(string.IsNullOrEmpty(assetName)) return null;
 
         object key = (assetName, ppui, border);
 
-        if(cache.TryGetValue(key, out Sprite sprite)) {
-            return sprite;
-        }
+        if(cache.TryGetValue(key, out Sprite sprite)) return sprite;
 
         Texture2D tex = resource.Get<Texture2D>(assetName);
-        if(tex == null) {
-            return null;
-        }
+        if(tex == null) return null;
 
         sprite = CreateSliced(tex, ppui, border);
         cache[key] = sprite;
@@ -101,14 +88,10 @@ public sealed class SpriteManager(ResourceManager resource) : IDisposable {
     }
 
     public Sprite Get(Asset asset) {
-        if(cache.TryGetValue(asset, out Sprite sprite)) {
-            return sprite;
-        }
+        if(cache.TryGetValue(asset, out Sprite sprite)) return sprite;
 
         Texture2D tex = resource.Get<Texture2D>(asset);
-        if(tex == null) {
-            return null;
-        }
+        if(tex == null) return null;
 
         sprite = Create(tex);
         cache[asset] = sprite;
@@ -119,14 +102,10 @@ public sealed class SpriteManager(ResourceManager resource) : IDisposable {
     public Sprite GetSliced(Asset asset, float ppui, Vector4 border) {
         object key = (asset, ppui, border);
 
-        if(cache.TryGetValue(key, out Sprite sprite)) {
-            return sprite;
-        }
+        if(cache.TryGetValue(key, out Sprite sprite)) return sprite;
 
         Texture2D tex = resource.Get<Texture2D>(asset);
-        if(tex == null) {
-            return null;
-        }
+        if(tex == null) return null;
 
         sprite = CreateSliced(tex, ppui, border);
         cache[key] = sprite;
@@ -143,26 +122,18 @@ public sealed class SpriteManager(ResourceManager resource) : IDisposable {
     public Sprite Get(UISprite sprite, float units) {
         object key = (sprite, units);
 
-        if(cache.TryGetValue(key, out Sprite cached)) {
-            return cached;
-        }
+        if(cache.TryGetValue(key, out Sprite cached)) return cached;
 
-        if(!spriteMap.TryGetValue(sprite, out Asset asset)) {
-            return null;
-        }
+        if(!spriteMap.TryGetValue(sprite, out Asset asset)) return null;
 
         Texture2D source = resource.Get<Texture2D>(asset);
-        if(source == null) {
-            return null;
-        }
+        if(source == null) return null;
 
         int target = Mathf.Max(2, Mathf.RoundToInt(units * UIPixelScale()));
 
         // Only ever downscale — at or above source size the original
         // texture already samples 1:1 or better.
-        if(target >= source.width) {
-            return Get(sprite);
-        }
+        if(target >= source.width) return Get(sprite);
 
         Texture2D tex = Downscale(source, target);
         generated.Add(tex);
@@ -236,9 +207,7 @@ public sealed class SpriteManager(ResourceManager resource) : IDisposable {
     private const float CORNER_UNITS_P2048 = 6.25f;
 
     public Sprite Get(UISliceSprite sprite) {
-        if(cache.TryGetValue(sprite, out Sprite cached)) {
-            return cached;
-        }
+        if(cache.TryGetValue(sprite, out Sprite cached)) return cached;
 
         int r1 = CornerPixels(CORNER_UNITS_P1024);
         int r2 = CornerPixels(CORNER_UNITS_P2048);
@@ -252,9 +221,7 @@ public sealed class SpriteManager(ResourceManager resource) : IDisposable {
             _ => null,
         };
 
-        if(created != null) {
-            cache[sprite] = created;
-        }
+        if(created != null) cache[sprite] = created;
 
         return created;
     }
@@ -288,9 +255,7 @@ public sealed class SpriteManager(ResourceManager resource) : IDisposable {
     public Sprite GetRing(float cornerUnits, float strokeUnits) {
         object key = (cornerUnits, strokeUnits);
 
-        if(cache.TryGetValue(key, out Sprite cached)) {
-            return cached;
-        }
+        if(cache.TryGetValue(key, out Sprite cached)) return cached;
 
         int radius = CornerPixels(cornerUnits);
         int stroke = Mathf.Max(1, Mathf.RoundToInt(strokeUnits * UIPixelScale()));
@@ -313,15 +278,11 @@ public sealed class SpriteManager(ResourceManager resource) : IDisposable {
     private readonly List<Texture2D> generated = [];
 
     public void Dispose() {
-        foreach(Sprite sprite in cache.Values) {
-            Object.Destroy(sprite);
-        }
+        foreach(Sprite sprite in cache.Values) Object.Destroy(sprite);
 
         cache.Clear();
 
-        foreach(Texture2D texture in generated) {
-            Object.Destroy(texture);
-        }
+        foreach(Texture2D texture in generated) Object.Destroy(texture);
 
         generated.Clear();
     }
@@ -347,5 +308,4 @@ public sealed class SpriteManager(ResourceManager resource) : IDisposable {
         [UISprite.Users128] = Asset.Users128,
         [UISprite.ClockRewind128] = Asset.ClockRewind128
     };
-
 }

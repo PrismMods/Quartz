@@ -75,19 +75,14 @@ public sealed class QuartzRuntime {
 
         Version = new Version(Info.Version);
         Assembly = Assembly.GetExecutingAssembly();
-        Logger = new QuartzLogger(
-            host.QuartzLogger
-        );
+        Logger = new QuartzLogger(host.QuartzLogger);
         State = new ModState();
         // QuartzFilePath is the data root verbatim (the host appends any
         // loader-specific suffix): <UserData>/Quartz on MelonLoader, the mod's
         // own self-contained folder on UnityModManager.
         Paths = new PathService(host.QuartzFilePath);
         Config = new SettingsFile<CoreSettings>(Paths.ConfigPath);
-        Resource = new ResourceManager(
-            Assembly,
-            "Quartz.Resource.Embedded."
-        );
+        Resource = new ResourceManager(Assembly, "Quartz.Resource.Embedded.");
         Sprite = new SpriteManager(Resource);
         services = new RuntimeServices();
         ticks = new RuntimeTicks();
@@ -104,35 +99,24 @@ public sealed class QuartzRuntime {
         try {
             string newRoot = Host.QuartzFilePath;          // <UserData>/Quartz (ML)
             string parent = Path.GetDirectoryName(newRoot); // <UserData>
-            if(string.IsNullOrEmpty(parent)) {
-                return;
-            }
+            if(string.IsNullOrEmpty(parent)) return;
             string oldRoot = Path.Combine(parent, "Koren"); // <UserData>/Koren
             if(!Directory.Exists(oldRoot) ||
-               string.Equals(Path.GetFullPath(oldRoot), Path.GetFullPath(newRoot), StringComparison.OrdinalIgnoreCase)) {
-                return;
-            }
+               string.Equals(Path.GetFullPath(oldRoot), Path.GetFullPath(newRoot), StringComparison.OrdinalIgnoreCase)) return;
             Directory.CreateDirectory(newRoot);
             int moved = 0;
             foreach(string entry in Directory.GetFileSystemEntries(oldRoot)) {
                 string dest = Path.Combine(newRoot, Path.GetFileName(entry));
-                if(File.Exists(dest) || Directory.Exists(dest)) {
-                    continue; // keep the newer/shipped copy
-                }
+                if(File.Exists(dest) || Directory.Exists(dest)) continue; // keep the newer/shipped copy
                 try {
-                    if(Directory.Exists(entry)) {
-                        Directory.Move(entry, dest);
-                    } else {
-                        File.Move(entry, dest);
-                    }
+                    if(Directory.Exists(entry)) Directory.Move(entry, dest);
+                    else File.Move(entry, dest);
                     moved++;
                 } catch(Exception e) {
                     Logger.Wrn($"[Startup] migrate '{Path.GetFileName(entry)}' failed: {e.Message}");
                 }
             }
-            if(moved > 0) {
-                Logger.Msg($"[Startup] migrated {moved} item(s) from UserData/Koren to UserData/Quartz");
-            }
+            if(moved > 0) Logger.Msg($"[Startup] migrated {moved} item(s) from UserData/Koren to UserData/Quartz");
         } catch(Exception e) {
             Logger.Wrn($"[Startup] legacy data migration failed: {e.Message}");
         }
@@ -156,11 +140,8 @@ public sealed class QuartzRuntime {
                 bool quartzPresent = File.Exists(Path.Combine(Host.ModsPath, "Quartz.dll"));
                 // Only treat a stray Koren.dll as ours when there's no separate
                 // Quartz.dll already loaded alongside it.
-                if(string.IsNullOrEmpty(dllPath) && File.Exists(probe) && !quartzPresent) {
-                    dllPath = probe;
-                } else {
-                    return;
-                }
+                if(string.IsNullOrEmpty(dllPath) && File.Exists(probe) && !quartzPresent) dllPath = probe;
+                else return;
             }
 
             Logger.Msg("[Startup] running as Koren.dll — fetching Quartz release to migrate install");
@@ -188,9 +169,7 @@ public sealed class QuartzRuntime {
         foreach(string stale in new[] { "Quartz.dll.old", "QuartzUmm.dll.old", "Koren.dll.old" }) {
             try {
                 string oldDll = Path.Combine(Host.ModsPath, stale);
-                if(File.Exists(oldDll)) {
-                    File.Delete(oldDll);
-                }
+                if(File.Exists(oldDll)) File.Delete(oldDll);
             } catch(Exception e) {
                 Logger.Wrn($"[Startup] couldn't remove {stale}: {e.Message}");
             }
@@ -277,11 +256,8 @@ public sealed class QuartzRuntime {
 
         // Detect Unity Mod Manager + its loaded mods (e.g. xperfect). Logs the
         // exact mod ids so interop can target them by id.
-        if(Quartz.Features.Interop.UmmInterop.IsPresent) {
-            Logger.Msg($"[Umm] active mods: [{string.Join(", ", Quartz.Features.Interop.UmmInterop.ActiveModIds())}]");
-        } else {
-            Logger.Msg("[Umm] not present");
-        }
+        if(Quartz.Features.Interop.UmmInterop.IsPresent) Logger.Msg($"[Umm] active mods: [{string.Join(", ", Quartz.Features.Interop.UmmInterop.ActiveModIds())}]");
+        else Logger.Msg("[Umm] not present");
 
         Logger.Msg("Hello");
     }
@@ -345,9 +321,7 @@ public sealed class QuartzRuntime {
     }
 
     public void SetModEnabled(bool enabled, bool isDispose) {
-        if(State.IsEnabled == enabled) {
-            return;
-        }
+        if(State.IsEnabled == enabled) return;
 
         State.IsEnabled = enabled;
 
@@ -408,12 +382,7 @@ public sealed class QuartzRuntime {
     }
 
     private void CreateRootObject() {
-        RootObject = new GameObject(
-            "Quartz"
-        );
-
-        Object.DontDestroyOnLoad(
-            RootObject
-        );
+        RootObject = new GameObject("Quartz");
+        Object.DontDestroyOnLoad(RootObject);
     }
 }

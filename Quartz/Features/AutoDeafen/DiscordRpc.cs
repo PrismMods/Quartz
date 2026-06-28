@@ -32,21 +32,17 @@ internal sealed class DiscordRpc {
     }
 
     internal void Start() {
-        if(running) {
-            return;
-        }
+        if(running) return;
         running = true;
         thread = new Thread(Run) { IsBackground = true, Name = "Quartz-DiscordRpc" };
         thread.Start();
     }
 
-    internal void SetDeaf(bool deaf) {
-        desiredDeaf = deaf;
-    }
+    internal void SetDeaf(bool deaf) => desiredDeaf = deaf;
 
     internal void Stop() {
         running = false;
-        try { if(ready) { ApplyDeaf(false); } } catch { }
+        try { if(ready) ApplyDeaf(false); } catch { }
         try { stream?.Dispose(); } catch { }
         stream = null;
         ready = false;
@@ -104,9 +100,7 @@ internal sealed class DiscordRpc {
                         ?? Environment.GetEnvironmentVariable("TMP")
                         ?? "/tmp";
                     string path = System.IO.Path.Combine(dir.TrimEnd('/'), "discord-ipc-" + i);
-                    if(!File.Exists(path)) {
-                        continue;
-                    }
+                    if(!File.Exists(path)) continue;
                     Socket sock = new(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
                     sock.Connect(new UnixDomainSocketEndPoint(path));
                     return new NetworkStream(sock, true);
@@ -146,9 +140,7 @@ internal sealed class DiscordRpc {
         int off = 0;
         while(off < n) {
             int r = stream.Read(buf, off, n - off);
-            if(r <= 0) {
-                throw new IOException("ipc closed");
-            }
+            if(r <= 0) throw new IOException("ipc closed");
             off += r;
         }
         return buf;
@@ -169,16 +161,12 @@ internal sealed class DiscordRpc {
                 WriteFrame(4, msg.ToString(Formatting.None));
                 continue;
             }
-            if(msg.Value<string>("nonce") == nonce) {
-                return msg;
-            }
+            if(msg.Value<string>("nonce") == nonce) return msg;
         }
     }
 
     private bool TryAuthenticate() {
-        if(string.IsNullOrEmpty(accessToken)) {
-            return false;
-        }
+        if(string.IsNullOrEmpty(accessToken)) return false;
         try {
             JObject r = Command("AUTHENTICATE", new { access_token = accessToken });
             JToken data = r["data"];
@@ -188,7 +176,5 @@ internal sealed class DiscordRpc {
         }
     }
 
-    private void ApplyDeaf(bool deaf) {
-        Command("SET_VOICE_SETTINGS", new { deaf });
-    }
+    private void ApplyDeaf(bool deaf) => Command("SET_VOICE_SETTINGS", new { deaf });
 }

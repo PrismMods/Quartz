@@ -27,13 +27,9 @@ public static partial class PlanetColors {
     public static PlanetColorsSettings Conf => ConfMgr?.Data;
 
     public static void EnsureConf() {
-        if(ConfMgr != null) {
-            return;
-        }
+        if(ConfMgr != null) return;
 
-        ConfMgr = new SettingsFile<PlanetColorsSettings>(
-            Path.Combine(MainCore.Paths.RootPath, "PlanetColors.json")
-        );
+        ConfMgr = new SettingsFile<PlanetColorsSettings>(Path.Combine(MainCore.Paths.RootPath, "PlanetColors.json"));
         ConfMgr.Load();
     }
 
@@ -93,9 +89,7 @@ public static partial class PlanetColors {
         => UnityEngine.Object.FindObjectsByType<T>(FindObjectsSortMode.None);
 
     private static scrPlanet[] GetSystemPlanets(PlanetarySystem system) {
-        if(system == null) {
-            return EmptyPlanets;
-        }
+        if(system == null) return EmptyPlanets;
 
         int count = system.allPlanets != null ? system.allPlanets.Count : 0;
         if(cachedSystemPlanets != null && cachedSystem == system && cachedSystemCount == count) {
@@ -114,9 +108,7 @@ public static partial class PlanetColors {
         try {
             PlanetarySystem system = ADOBase.controller != null ? ADOBase.controller.planetarySystem : null;
             scrPlanet[] planets = GetSystemPlanets(system);
-            if(planets.Length > 0) {
-                return planets;
-            }
+            if(planets.Length > 0) return planets;
         } catch {
         }
 
@@ -130,12 +122,8 @@ public static partial class PlanetColors {
             system ??= ADOBase.controller != null ? ADOBase.controller.planetarySystem : null;
 
             if(system != null) {
-                if(system.planetRed == planet) {
-                    return true;
-                }
-                if(system.planetBlue == planet) {
-                    return false;
-                }
+                if(system.planetRed == planet) return true;
+                if(system.planetBlue == planet) return false;
             }
         } catch {
         }
@@ -145,25 +133,17 @@ public static partial class PlanetColors {
     }
 
     private static int GetPlanetSlot(scrPlanet planet) {
-        if(planet == null) {
-            return 0;
-        }
+        if(planet == null) return 0;
 
         try {
             PlanetarySystem system = planet.planetarySystem;
             system ??= ADOBase.controller != null ? ADOBase.controller.planetarySystem : null;
 
             if(system != null) {
-                if(system.planetRed == planet) {
-                    return 0;
-                }
-                if(system.planetBlue == planet) {
-                    return 1;
-                }
+                if(system.planetRed == planet) return 0;
+                if(system.planetBlue == planet) return 1;
                 int index = system.allPlanets != null ? system.allPlanets.IndexOf(planet) : -1;
-                if(index >= 0) {
-                    return Mathf.Clamp(index, 0, PlanetColorsSettings.Slots - 1);
-                }
+                if(index >= 0) return Mathf.Clamp(index, 0, PlanetColorsSettings.Slots - 1);
             }
         } catch {
         }
@@ -173,9 +153,7 @@ public static partial class PlanetColors {
     }
 
     private static int GetPlanetSlot(PlanetRenderer renderer) {
-        if(renderer == null) {
-            return 0;
-        }
+        if(renderer == null) return 0;
 
         int rendererId = renderer.GetInstanceID();
         if(rendererSlots.TryGetValue(rendererId, out int slot)) {
@@ -183,9 +161,7 @@ public static partial class PlanetColors {
         }
 
         scrPlanet planet = FindPlanetForRenderer(renderer);
-        if(planet == null) {
-            return 0;
-        }
+        if(planet == null) return 0;
 
         slot = GetPlanetSlot(planet);
         rendererSlots[rendererId] = slot;
@@ -193,20 +169,14 @@ public static partial class PlanetColors {
     }
 
     private static scrPlanet FindPlanetForRenderer(PlanetRenderer renderer) {
-        if(renderer == null) {
-            return null;
-        }
+        if(renderer == null) return null;
 
         scrPlanet[] planets = GetPlanets();
         for(int i = 0; i < planets.Length; i++) {
             scrPlanet planet = planets[i];
-            if(planet == null) {
-                continue;
-            }
+            if(planet == null) continue;
             try {
-                if(planet.planetRenderer == renderer) {
-                    return planet;
-                }
+                if(planet.planetRenderer == renderer) return planet;
             } catch {
             }
         }
@@ -215,9 +185,7 @@ public static partial class PlanetColors {
     }
 
     private static void RememberRendererSlot(scrPlanet planet) {
-        if(planet == null) {
-            return;
-        }
+        if(planet == null) return;
         try {
             if(planet.planetRenderer != null) {
                 rendererSlots[planet.planetRenderer.GetInstanceID()] = GetPlanetSlot(planet);
@@ -232,9 +200,7 @@ public static partial class PlanetColors {
     // Re-applies the configured colors to every live planet (mod enable,
     // UI change).
     public static void Refresh() {
-        if(!ShouldChange) {
-            return;
-        }
+        if(!ShouldChange) return;
 
         scrPlanet[] planets = GetPlanets();
         for(int i = 0; i < planets.Length; i++) {
@@ -250,9 +216,7 @@ public static partial class PlanetColors {
         scrPlanet[] planets = GetPlanets();
         for(int i = 0; i < planets.Length; i++) {
             scrPlanet planet = planets[i];
-            if(planet == null || planet.planetRenderer == null) {
-                continue;
-            }
+            if(planet == null || planet.planetRenderer == null) continue;
 
             bool wasApplying = applying;
             applying = true;
@@ -286,9 +250,7 @@ public static partial class PlanetColors {
     }
 
     private static void ApplyLogoColor(scrLogoText logoText) {
-        if(logoText == null || !ShouldChange) {
-            return;
-        }
+        if(logoText == null || !ShouldChange) return;
 
         Color color = LogoColor;
         InvokeLogoColor(logoText, color, true);
@@ -298,9 +260,7 @@ public static partial class PlanetColors {
     private static void InvokeLogoColor(scrLogoText logoText, Color color, bool isFire) {
         try {
             MethodInfo method = GetLogoColorMethod(logoText.GetType());
-            if(method == null) {
-                return;
-            }
+            if(method == null) return;
 
             logoColorInvokeArgs[0] = color;
             logoColorInvokeArgs[1] = isFire;
@@ -310,26 +270,18 @@ public static partial class PlanetColors {
     }
 
     private static MethodInfo GetLogoColorMethod(Type type) {
-        if(logoColorMethodResolved) {
-            return logoColorMethod;
-        }
+        if(logoColorMethodResolved) return logoColorMethod;
         logoColorMethodResolved = true;
 
-        if(type == null) {
-            return null;
-        }
+        if(type == null) return null;
 
         MethodInfo[] methods = type.GetMethods(MemberFlags);
         for(int i = 0; i < methods.Length; i++) {
             MethodInfo method = methods[i];
-            if(method.Name != "ColorLogo") {
-                continue;
-            }
+            if(method.Name != "ColorLogo") continue;
 
             ParameterInfo[] parameters = method.GetParameters();
-            if(parameters.Length != 2 || parameters[1].ParameterType != typeof(bool)) {
-                continue;
-            }
+            if(parameters.Length != 2 || parameters[1].ParameterType != typeof(bool)) continue;
 
             Type colorType = parameters[0].ParameterType;
             if(colorType == typeof(Color) || Nullable.GetUnderlyingType(colorType) == typeof(Color)) {
@@ -342,9 +294,7 @@ public static partial class PlanetColors {
     }
 
     private static void ApplyPlanetColor(scrPlanet planet) {
-        if(planet == null) {
-            return;
-        }
+        if(planet == null) return;
         RememberRendererSlot(planet);
         ApplyPlanetRendererColor(planet.planetRenderer, GetPlanetSlot(planet));
     }
@@ -353,9 +303,7 @@ public static partial class PlanetColors {
         => ApplyPlanetRendererColor(renderer, GetPlanetSlot(renderer));
 
     private static void ApplyPlanetRendererColor(PlanetRenderer renderer, int slot) {
-        if(renderer == null || !ShouldChange || applying) {
-            return;
-        }
+        if(renderer == null || !ShouldChange || applying) return;
 
         applying = true;
         try {
@@ -382,24 +330,18 @@ public static partial class PlanetColors {
     }
 
     private static void ApplyTailParticleColor(PlanetRenderer renderer, Color tailColor) {
-        if(renderer == null) {
-            return;
-        }
+        if(renderer == null) return;
 
         Color startColor = tailColor * TailStartColorMultiplier;
         ParticleSystem tail = GetParticles(renderer, "tailParticles");
         ParticleSystem tailCoop = GetParticles(renderer, "tailParticlesCoop");
 
         ApplyTailParticleSystemColor(renderer, tail, tailColor, startColor);
-        if(tailCoop != tail) {
-            ApplyTailParticleSystemColor(renderer, tailCoop, tailColor, startColor);
-        }
+        if(tailCoop != tail) ApplyTailParticleSystemColor(renderer, tailCoop, tailColor, startColor);
     }
 
     private static void ApplyTailParticleSystemColor(PlanetRenderer renderer, ParticleSystem particles, Color baseColor, Color startColor) {
-        if(renderer == null || particles == null) {
-            return;
-        }
+        if(renderer == null || particles == null) return;
 
         try {
             setParticleSystemColorMethod ??= AccessTools.Method(
@@ -430,28 +372,18 @@ public static partial class PlanetColors {
     // with it on the ring is painted the configured color instead. Skipped for
     // onlyRing planets, where the ring IS the planet.
     private static void ApplyPlanetRing(PlanetRenderer renderer) {
-        if(!ShouldChange || renderer == null) {
-            return;
-        }
+        if(!ShouldChange || renderer == null) return;
 
         LineRenderer ring = GetRing(renderer);
-        if(ring == null) {
-            return;
-        }
+        if(ring == null) return;
 
-        if(IsOnlyRing(renderer)) {
-            return;
-        }
+        if(IsOnlyRing(renderer)) return;
 
         try {
             if(Conf.EnableRingRecolor) {
                 Color rc = Conf.GetRingColor();
-                if(ring.startColor != rc) {
-                    ring.startColor = rc;
-                }
-                if(ring.endColor != rc) {
-                    ring.endColor = rc;
-                }
+                if(ring.startColor != rc) ring.startColor = rc;
+                if(ring.endColor != rc) ring.endColor = rc;
             } else {
                 Color s = ring.startColor;
                 if(s.a != 0f) {
@@ -469,9 +401,7 @@ public static partial class PlanetColors {
     }
 
     private static void EnsureRingAccessors() {
-        if(ringAccessorsResolved) {
-            return;
-        }
+        if(ringAccessorsResolved) return;
         ringAccessorsResolved = true;
         try {
             ringRef = AccessTools.FieldRefAccess<PlanetRenderer, LineRenderer>("ring");
@@ -485,17 +415,13 @@ public static partial class PlanetColors {
 
     private static LineRenderer GetRing(PlanetRenderer renderer) {
         EnsureRingAccessors();
-        if(ringRef != null) {
-            return ringRef(renderer);
-        }
+        if(ringRef != null) return ringRef(renderer);
         return TryGetMemberValue(renderer, "ring", out object ringObj) ? ringObj as LineRenderer : null;
     }
 
     private static bool IsOnlyRing(PlanetRenderer renderer) {
         EnsureRingAccessors();
-        if(onlyRingRef != null) {
-            return onlyRingRef(renderer);
-        }
+        if(onlyRingRef != null) return onlyRingRef(renderer);
         return TryGetMemberValue(renderer, "onlyRing", out object onlyRing) && onlyRing is bool b && b;
     }
 
@@ -518,14 +444,10 @@ public static partial class PlanetColors {
 
     private static bool TryGetMemberValue(object target, string name, out object value) {
         value = null;
-        if(target == null || string.IsNullOrEmpty(name)) {
-            return false;
-        }
+        if(target == null || string.IsNullOrEmpty(name)) return false;
 
         MemberInfo member = GetMember(target.GetType(), name);
-        if(member == null) {
-            return false;
-        }
+        if(member == null) return false;
 
         try {
             if(member is FieldInfo field) {
@@ -544,16 +466,12 @@ public static partial class PlanetColors {
     }
 
     private static MemberInfo GetMember(Type type, string name) {
-        if(type == null || string.IsNullOrEmpty(name)) {
-            return null;
-        }
+        if(type == null || string.IsNullOrEmpty(name)) return null;
         // Tuple key: (Type, string) has structural equality and, as a struct
         // dictionary key, allocates nothing — unlike the old `type.FullName + "."
         // + name` concat that built a throwaway string on every per-frame call.
         var key = (type, name);
-        if(memberCache.TryGetValue(key, out MemberInfo cached)) {
-            return cached;
-        }
+        if(memberCache.TryGetValue(key, out MemberInfo cached)) return cached;
 
         for(Type t = type; t != null; t = t.BaseType) {
             FieldInfo field = t.GetField(name, MemberFlags);

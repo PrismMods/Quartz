@@ -53,11 +53,11 @@ public static partial class KeyViewerOverlay {
 
     // Overrides the graph's inline colours from the resolved --graph-* CSS.
     private static void ApplyGraphCss(DmNoteSpec spec, CssGraphStyle g) {
-        if(g.Bg.Has) { spec.GraphBg = ToColor(g.Bg); }
-        if(g.BorderColor.Has) { spec.GraphBorder = ToColor(g.BorderColor); }
-        if(g.BorderWidth.HasValue) { spec.GraphBorderWidth = Mathf.Clamp(g.BorderWidth.Value, 0f, 20f); }
-        if(g.Radius.HasValue) { spec.GraphBorderRadius = Mathf.Clamp(g.Radius.Value, 0f, 100f); }
-        if(g.Color.Has) { spec.GraphColor = ToColor(g.Color); }
+        if(g.Bg.Has) spec.GraphBg = ToColor(g.Bg);
+        if(g.BorderColor.Has) spec.GraphBorder = ToColor(g.BorderColor);
+        if(g.BorderWidth.HasValue) spec.GraphBorderWidth = Mathf.Clamp(g.BorderWidth.Value, 0f, 20f);
+        if(g.Radius.HasValue) spec.GraphBorderRadius = Mathf.Clamp(g.Radius.Value, 0f, 100f);
+        if(g.Color.Has) spec.GraphColor = ToColor(g.Color);
     }
 
     // The plotted area: a UI mesh of the stat history. Updates itself each frame
@@ -108,21 +108,15 @@ public static partial class KeyViewerOverlay {
             if(_anim && _animStart >= 0f) {
                 float t = Mathf.Clamp01((now - _animStart) / (GraphAnimMs / 1000f));
                 float e = 1f - (1f - t) * (1f - t) * (1f - t); // easeOutCubic
-                for(int i = 0; i < _history.Length; i++) {
-                    _history[i] = Mathf.Lerp(_animFrom[i], _animTo[i], e);
-                }
+                for(int i = 0; i < _history.Length; i++) _history[i] = Mathf.Lerp(_animFrom[i], _animTo[i], e);
                 SetVerticesDirty();
-                if(t >= 1f) {
-                    _animStart = -1f;
-                }
+                if(t >= 1f) _animStart = -1f;
             }
         }
 
         private void Sample() {
             int value = Mathf.Max(0, GraphStatValue(_stat));
-            if(value > _max) {
-                _max = value;
-            }
+            if(value > _max) _max = value;
             if(value > 0) {
                 _sum += value;
                 _samples++;
@@ -130,9 +124,7 @@ public static partial class KeyViewerOverlay {
             _avg = _samples > 0 ? Mathf.RoundToInt(_sum / (float)_samples) : 0;
 
             // Shift the target buffer and push the new sample at the end.
-            for(int i = 0; i < _animTo.Length - 1; i++) {
-                _animTo[i] = _animTo[i + 1];
-            }
+            for(int i = 0; i < _animTo.Length - 1; i++) _animTo[i] = _animTo[i + 1];
             _animTo[_animTo.Length - 1] = value;
 
             // Nothing changed (a flat, idle graph) → don't tween or rebuild the
@@ -153,9 +145,7 @@ public static partial class KeyViewerOverlay {
 
         private static bool Equal(float[] a, float[] b) {
             for(int i = 0; i < a.Length; i++) {
-                if(Mathf.Abs(a[i] - b[i]) > 0.001f) {
-                    return false;
-                }
+                if(Mathf.Abs(a[i] - b[i]) > 0.001f) return false;
             }
             return true;
         }
@@ -163,15 +153,11 @@ public static partial class KeyViewerOverlay {
         protected override void OnPopulateMesh(VertexHelper vh) {
             vh.Clear();
             float[] h = _history;
-            if(h == null || h.Length == 0) {
-                return;
-            }
+            if(h == null || h.Length == 0) return;
 
             Rect r = rectTransform.rect;
             float w = r.width, ht = r.height;
-            if(w <= 1f || ht <= 1f) {
-                return;
-            }
+            if(w <= 1f || ht <= 1f) return;
             float ox = r.xMin, oy = r.yMin;
             float safeMax = Mathf.Max(_max, 1f);
 
@@ -226,9 +212,7 @@ public static partial class KeyViewerOverlay {
                 Vector2 b = new(px[i + 1], py[i + 1]);
                 Vector2 dir = (b - a);
                 float len = dir.magnitude;
-                if(len < 0.0001f) {
-                    continue;
-                }
+                if(len < 0.0001f) continue;
                 Vector2 nrm = new Vector2(-dir.y, dir.x) / len; // 1px each side
                 Color ca = Fade(Mathf.Lerp(0.3f, 1f, i / denom));
                 Color cb = Fade(Mathf.Lerp(0.3f, 1f, (i + 1) / denom));
@@ -244,9 +228,7 @@ public static partial class KeyViewerOverlay {
             for(int i = 0; i < n; i++) {
                 float v = h[i];
                 float norm = Mathf.Min(v / safeMax, 1f);
-                if(norm <= 0f) {
-                    continue;
-                }
+                if(norm <= 0f) continue;
                 float barH = norm * ht;
                 float x = ox + i * (barW + gap);
                 Color c = Fade(Mathf.Lerp(0.3f, 1f, i / denom));

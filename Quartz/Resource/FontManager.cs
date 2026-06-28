@@ -36,9 +36,7 @@ public static class FontManager {
     public static TMP_FontAsset GameOverlayFontAsset {
         get {
             string name = MainCore.Conf?.GameOverlayFontName;
-            return string.IsNullOrEmpty(name) || name == SameAsOverlay
-                ? Current
-                : GetFont(name);
+            return string.IsNullOrEmpty(name) || name == SameAsOverlay ? Current : GetFont(name);
         }
     }
 
@@ -54,9 +52,7 @@ public static class FontManager {
     public static TMP_FontAsset MenuFontAsset {
         get {
             string name = MainCore.Conf?.SettingsFontName;
-            return string.IsNullOrEmpty(name) || name == SameAsOverlay
-                ? Current
-                : GetFont(name);
+            return string.IsNullOrEmpty(name) || name == SameAsOverlay ? Current : GetFont(name);
         }
     }
 
@@ -93,9 +89,7 @@ public static class FontManager {
         string saved = MainCore.Conf.FontName;
         // Treat a saved pick of the default file as "default" so it shows and
         // behaves as the default entry rather than a duplicate.
-        if(!string.IsNullOrEmpty(saved) && saved != DefaultName && saved != DefaultFontFile) {
-            SetFont(saved, false);
-        }
+        if(!string.IsNullOrEmpty(saved) && saved != DefaultName && saved != DefaultFontFile) SetFont(saved, false);
     }
 
     // Builds the default TMP asset from the shipped Cookie Run Bold file, falling
@@ -120,9 +114,7 @@ public static class FontManager {
     }
 
     public static IReadOnlyList<string> GetAvailableFonts() {
-        if(available != null) {
-            return available;
-        }
+        if(available != null) return available;
 
         EnsureScanned();
 
@@ -137,17 +129,13 @@ public static class FontManager {
     }
 
     public static bool IsCustomFont(string name) {
-        if(string.IsNullOrEmpty(name) || name == DefaultName || name == AddSentinel) {
-            return false;
-        }
+        if(string.IsNullOrEmpty(name) || name == DefaultName || name == AddSentinel) return false;
         EnsureScanned();
         return customNames.Contains(name);
     }
 
     private static void EnsureScanned() {
-        if(!scanned) {
-            ScanFontFiles();
-        }
+        if(!scanned) ScanFontFiles();
     }
 
     // Builds the display-name -> file-path map from both font folders. The
@@ -165,20 +153,14 @@ public static class FontManager {
 
     private static void ScanDir(string dir, bool custom) {
         try {
-            if(!Directory.Exists(dir)) {
-                return;
-            }
+            if(!Directory.Exists(dir)) return;
 
             foreach(string path in Directory.GetFiles(dir)) {
                 string ext = Path.GetExtension(path).ToLowerInvariant();
-                if(ext != ".ttf" && ext != ".otf" && ext != ".ttc") {
-                    continue;
-                }
+                if(ext != ".ttf" && ext != ".otf" && ext != ".ttc") continue;
 
                 string name = Path.GetFileNameWithoutExtension(path);
-                if(string.IsNullOrWhiteSpace(name)) {
-                    continue;
-                }
+                if(string.IsNullOrWhiteSpace(name)) continue;
 
                 fontFiles[name] = path;
                 if(custom) {
@@ -217,14 +199,10 @@ public static class FontManager {
     // Copies a picked .ttf/.otf/.ttc into CustomFontPath under a unique name and
     // returns that display name (null on failure). Does not select it.
     public static string ImportFont(string srcPath) {
-        if(string.IsNullOrEmpty(srcPath) || !File.Exists(srcPath)) {
-            return null;
-        }
+        if(string.IsNullOrEmpty(srcPath) || !File.Exists(srcPath)) return null;
 
         string ext = Path.GetExtension(srcPath).ToLowerInvariant();
-        if(ext != ".ttf" && ext != ".otf" && ext != ".ttc") {
-            return null;
-        }
+        if(ext != ".ttf" && ext != ".otf" && ext != ".ttc") return null;
 
         try {
             string dir = MainCore.Paths.CustomFontPath;
@@ -259,9 +237,7 @@ public static class FontManager {
             return false;
         }
 
-        if(string.Equals(clean, oldName, StringComparison.Ordinal)) {
-            return true;
-        }
+        if(string.Equals(clean, oldName, StringComparison.Ordinal)) return true;
 
         if(fontFiles.ContainsKey(clean)) {
             error = "That name is already used.";
@@ -288,24 +264,8 @@ public static class FontManager {
         }
 
         Invalidate();
-        if(wasCurrent) {
-            SetFont(clean, true);
-        }
-        var conf = MainCore.Conf;
-        // Keep a settings-window override that pointed at this font in step.
-        if(conf != null && string.Equals(conf.SettingsFontName, oldName, StringComparison.OrdinalIgnoreCase)) {
-            conf.SettingsFontName = clean;
-            MainCore.ConfMgr.RequestSave();
-            ApplyMenuFont();
-        }
-
-        // Keep the in-game overlay override pointing at the renamed file too.
-        if(conf != null && string.Equals(conf.GameOverlayFontName, oldName, StringComparison.OrdinalIgnoreCase)) {
-            conf.GameOverlayFontName = clean;
-            MainCore.ConfMgr.RequestSave();
-            OnFontChanged?.Invoke();
-        }
-
+        if(wasCurrent) SetFont(clean, true);
+        RetargetFontOverrides(oldName, clean);
         OnFontCatalogChanged?.Invoke();
         return true;
     }
@@ -314,9 +274,7 @@ public static class FontManager {
     public static bool DeleteFont(string name) {
         EnsureScanned();
 
-        if(!customNames.Contains(name) || !fontFiles.TryGetValue(name, out string path)) {
-            return false;
-        }
+        if(!customNames.Contains(name) || !fontFiles.TryGetValue(name, out string path)) return false;
 
         bool wasCurrent = CurrentName == name;
         EvictCache(name);
@@ -333,28 +291,30 @@ public static class FontManager {
         }
 
         Invalidate();
-        if(wasCurrent) {
-            SetFont(DefaultName, true);
-        }
-        var conf = MainCore.Conf;
-        // A settings-window override that pointed at this font reverts to
-        // following the overlay font.
-        if(conf != null && string.Equals(conf.SettingsFontName, name, StringComparison.OrdinalIgnoreCase)) {
-            conf.SettingsFontName = "";
-            MainCore.ConfMgr.RequestSave();
-            ApplyMenuFont();
-        }
-
-        // A game-overlay override that pointed at this file also falls back to
-        // following the overlay font, then immediately refreshes live labels.
-        if(conf != null && string.Equals(conf.GameOverlayFontName, name, StringComparison.OrdinalIgnoreCase)) {
-            conf.GameOverlayFontName = "";
-            MainCore.ConfMgr.RequestSave();
-            OnFontChanged?.Invoke();
-        }
-
+        if(wasCurrent) SetFont(DefaultName, true);
+        RetargetFontOverrides(name, "");
         OnFontCatalogChanged?.Invoke();
         return true;
+    }
+
+    // Keep per-window/game font overrides in step with a managed custom font
+    // rename/delete. Empty replacement means "follow the overlay font".
+    private static void RetargetFontOverrides(string oldName, string replacement) {
+        var conf = MainCore.Conf;
+        if(conf == null) return;
+
+        bool changed = false;
+        if(string.Equals(conf.SettingsFontName, oldName, StringComparison.OrdinalIgnoreCase)) {
+            conf.SettingsFontName = replacement;
+            changed = true;
+            ApplyMenuFont();
+        }
+        if(string.Equals(conf.GameOverlayFontName, oldName, StringComparison.OrdinalIgnoreCase)) {
+            conf.GameOverlayFontName = replacement;
+            changed = true;
+            OnFontChanged?.Invoke();
+        }
+        if(changed) MainCore.ConfMgr.RequestSave();
     }
 
     private static string UniqueName(string baseName) {
@@ -370,9 +330,7 @@ public static class FontManager {
     }
 
     private static string Sanitize(string s) {
-        if(string.IsNullOrWhiteSpace(s)) {
-            return null;
-        }
+        if(string.IsNullOrWhiteSpace(s)) return null;
 
         foreach(char c in Path.GetInvalidFileNameChars()) {
             s = s.Replace(c, ' ');
@@ -427,9 +385,7 @@ public static class FontManager {
     // global re-font. Texts marked FontExempt manage their own font (font-picker
     // rows).
     public static void ApplyToAll() {
-        if(MainCore.Root == null || Current == null) {
-            return;
-        }
+        if(MainCore.Root == null || Current == null) return;
 
         TMP_FontAsset menuFont = MenuFontAsset ?? Current;
         Transform menuRoot = MenuRoot;
@@ -437,9 +393,7 @@ public static class FontManager {
         TMP_Text[] texts = MainCore.Root.GetComponentsInChildren<TMP_Text>(true);
         for(int i = 0; i < texts.Length; i++) {
             TMP_Text text = texts[i];
-            if(text == null || text.GetComponent<FontExempt>() != null) {
-                continue;
-            }
+            if(text == null || text.GetComponent<FontExempt>() != null) continue;
 
             bool isMenu = menuRoot != null
                 && (text.transform == menuRoot || text.transform.IsChildOf(menuRoot));
@@ -452,14 +406,10 @@ public static class FontManager {
     // window-specific font takes hold without disturbing the overlays.
     public static void ApplyMenuFont() {
         Transform menuRoot = MenuRoot;
-        if(menuRoot == null) {
-            return;
-        }
+        if(menuRoot == null) return;
 
         TMP_FontAsset menuFont = MenuFontAsset ?? Current;
-        if(menuFont == null) {
-            return;
-        }
+        if(menuFont == null) return;
 
         TMP_Text[] texts = menuRoot.GetComponentsInChildren<TMP_Text>(true);
         for(int i = 0; i < texts.Length; i++) {
@@ -471,19 +421,13 @@ public static class FontManager {
     }
 
     private static TMP_FontAsset Resolve(string name) {
-        if(string.IsNullOrEmpty(name) || name == DefaultName || name == AddSentinel) {
-            return defaultFont;
-        }
+        if(string.IsNullOrEmpty(name) || name == DefaultName || name == AddSentinel) return defaultFont;
 
-        if(cache.TryGetValue(name, out TMP_FontAsset cached)) {
-            return cached;
-        }
+        if(cache.TryGetValue(name, out TMP_FontAsset cached)) return cached;
 
         EnsureScanned();
 
-        if(!fontFiles.TryGetValue(name, out string path)) {
-            return null;
-        }
+        if(!fontFiles.TryGetValue(name, out string path)) return null;
 
         try {
             Font font = new(path);
@@ -535,13 +479,9 @@ public static class FontManager {
     }
 
     private static void DestroyFontAsset(TMP_FontAsset asset) {
-        if(asset == null) {
-            return;
-        }
+        if(asset == null) return;
 
-        if(asset.material != null) {
-            UnityEngine.Object.Destroy(asset.material);
-        }
+        if(asset.material != null) UnityEngine.Object.Destroy(asset.material);
 
         Texture2D[] atlases = asset.atlasTextures;
         if(atlases != null) {

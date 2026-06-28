@@ -19,9 +19,8 @@ public static partial class Nostalgia {
     private static bool SetUiActive(object instance, string field, bool active) {
         try {
             if(Traverse.Create(instance).Field(field).GetValue() is Component comp
-               && comp != null && comp.gameObject.activeSelf != active) {
+               && comp != null && comp.gameObject.activeSelf != active)
                 comp.gameObject.SetActive(active);
-            }
             return Traverse.Create(instance).Field(field).GetValue() != null;
         } catch {
             return false;
@@ -30,9 +29,8 @@ public static partial class Nostalgia {
 
     private static void SetGoActive(Component comp, bool active) {
         try {
-            if(comp != null && comp.gameObject.activeSelf != active) {
+            if(comp != null && comp.gameObject.activeSelf != active)
                 comp.gameObject.SetActive(active);
-            }
         } catch { }
     }
 
@@ -52,13 +50,9 @@ public static partial class Nostalgia {
             scnEditor editor = scnEditor.instance;
 
             if(show) {
-                if(editor != null) {
-                    SetGoActive(editor.editorDifficultySelector, true);
-                }
+                if(editor != null) SetGoActive(editor.editorDifficultySelector, true);
                 if(ui != null) {
-                    foreach(string f in DifficultyFields) {
-                        SetUiActive(ui, f, true);
-                    }
+                    foreach(string f in DifficultyFields) SetUiActive(ui, f, true);
                 }
                 return;
             }
@@ -68,9 +62,7 @@ public static partial class Nostalgia {
                 try { Traverse.Create(editor.editorDifficultySelector).Method("UpdateDifficultyDisplay").GetValue(); } catch { }
                 SetGoActive(editor.editorDifficultySelector, false);
             }
-            if(ui == null) {
-                return;
-            }
+            if(ui == null) return;
             if(AccessTools.Field(typeof(scrUIController), "currentDifficultyIndex") != null) {
                 try {
                     Traverse.Create(ui).Field("currentDifficultyIndex").SetValue(2);
@@ -80,9 +72,7 @@ public static partial class Nostalgia {
                 try { Traverse.Create(ui).Method("UpdateDifficultyUI", Difficulty.Strict).GetValue(); } catch { }
             }
             try { GCS.difficulty = Difficulty.Strict; } catch { }
-            foreach(string f in DifficultyFields) {
-                SetUiActive(ui, f, false);
-            }
+            foreach(string f in DifficultyFields) SetUiActive(ui, f, false);
         } catch(Exception e) {
             MainCore.Log.Wrn($"[Nostalgia] ToggleDifficulty failed: {e.Message}");
         }
@@ -95,12 +85,8 @@ public static partial class Nostalgia {
             scrUIController ui = scrUIController.instance;
 
             if(show) {
-                if(editor != null) {
-                    SetGoActive(editor.buttonNoFail, true);
-                }
-                if(ui != null) {
-                    SetUiActive(ui, "noFailImage", true);
-                }
+                if(editor != null) SetGoActive(editor.buttonNoFail, true);
+                if(ui != null) SetUiActive(ui, "noFailImage", true);
                 return;
             }
 
@@ -115,9 +101,7 @@ public static partial class Nostalgia {
                 } catch { }
                 SetGoActive(editor.buttonNoFail, false);
             }
-            if(ui != null) {
-                SetUiActive(ui, "noFailImage", false);
-            }
+            if(ui != null) SetUiActive(ui, "noFailImage", false);
         } catch(Exception e) {
             MainCore.Log.Wrn($"[Nostalgia] ToggleNoFail failed: {e.Message}");
         }
@@ -132,23 +116,17 @@ public static partial class Nostalgia {
     public static void RepositionDifficulty() {
         try {
             scnEditor editor = scnEditor.instance;
-            if(editor == null || editor.editorDifficultySelector == null || editor.buttonNoFail == null) {
-                return;
-            }
+            if(editor == null || editor.editorDifficultySelector == null || editor.buttonNoFail == null) return;
             RectTransform diff = editor.editorDifficultySelector.GetComponent<RectTransform>();
             RectTransform nofail = editor.buttonNoFail.GetComponent<RectTransform>();
-            if(diff == null || nofail == null) {
-                return;
-            }
+            if(diff == null || nofail == null) return;
             diffOrigPos ??= diff.anchoredPosition;
 
             bool move = ShouldHideNoFail && !ShouldHideDifficulty;
             Vector2 target = move
                 ? new Vector2(nofail.anchoredPosition.x, diffOrigPos.Value.y)
                 : diffOrigPos.Value;
-            if(diff.anchoredPosition != target) {
-                diff.anchoredPosition = target;
-            }
+            if(diff.anchoredPosition != target) diff.anchoredPosition = target;
         } catch { }
     }
 
@@ -156,33 +134,23 @@ public static partial class Nostalgia {
     public static void ToggleSign(bool show) {
         NewsSign[] newsSigns = Object.FindObjectsByType<NewsSign>(FindObjectsSortMode.None);
         foreach(NewsSign newsSign in newsSigns) {
-            if(!newsSign) {
-                continue;
-            }
-            if(!newsSign.button.button) {
-                newsSign.button.button = newsSign.button.GetComponent<Button>();
-            }
+            if(!newsSign) continue;
+            if(!newsSign.button.button) newsSign.button.button = newsSign.button.GetComponent<Button>();
             newsSign.button.transform.parent.gameObject.SetActive(show);
             SpriteRenderer[] renderers =
                 Traverse.Create(newsSign).Field("spriteRenderers").GetValue<SpriteRenderer[]>();
             if(renderers != null) {
-                foreach(SpriteRenderer renderer in renderers) {
-                    renderer.enabled = show;
-                }
+                foreach(SpriteRenderer renderer in renderers) renderer.enabled = show;
             }
         }
     }
 
     // === Old Background (lobby BG variant A/B/current) ===
     public static void SetBackground(bool forceDefault = false) {
-        if(ADOBase.levelSelect == null) {
-            return;
-        }
+        if(ADOBase.levelSelect == null) return;
         GameObject bg = UnityEngine.SceneManagement.SceneManager
             .GetActiveScene().GetRootGameObjects().FirstOrDefault(g => g.name == "BG");
-        if(!bg || bg.transform.childCount < 3) {
-            return;
-        }
+        if(!bg || bg.transform.childCount < 3) return;
         bool old = !forceDefault && Enabled && Conf.OldBackground;
         int idx = Conf.OldBackgroundIndex;
         for(int i = 0; i < 3; i++) {
@@ -201,9 +169,7 @@ public static partial class Nostalgia {
 
     public static void ChangeEditorButtons(bool change) {
         scnEditor editor = scnEditor.instance;
-        if(editor == null) {
-            return;
-        }
+        if(editor == null) return;
         RectTransform auto = editor.autoImage.GetComponent<RectTransform>();
         RectTransform nofail = editor.buttonNoFail.GetComponent<RectTransform>();
         RectTransform difficulty = editor.editorDifficultySelector.GetComponent<RectTransform>();
@@ -236,9 +202,7 @@ public static partial class Nostalgia {
             nofail.offsetMin = new Vector2(-81.5f, 95);
             difficulty.offsetMin = new Vector2(-200, 10);
         } else {
-            if(!ebInitialized) {
-                return;
-            }
+            if(!ebInitialized) return;
             nofail.pivot = ebNofailPivot;
 
             auto.anchoredPosition = ebAutoPos;
@@ -257,15 +221,11 @@ public static partial class Nostalgia {
 
     public static void RemoveShadowAddOutline(bool rsao) {
         scnEditor editor = scnEditor.instance;
-        if(editor == null) {
-            return;
-        }
+        if(editor == null) return;
         GameObject auto = editor.autoImage.gameObject;
         GameObject nofail = editor.buttonNoFail.gameObject;
         // Already converted to an Outline — nothing to do.
-        if(auto.GetComponent<Shadow>() is Outline) {
-            return;
-        }
+        if(auto.GetComponent<Shadow>() is Outline) return;
         if(rsao) {
             auto.GetComponent<Shadow>().enabled = false;
             auto.GetOrAddComponent<Outline>().effectColor = Color.black;
@@ -274,14 +234,10 @@ public static partial class Nostalgia {
         } else {
             Object.Destroy(auto.GetComponent<Outline>());
             Shadow autoShadow = auto.GetComponent<Shadow>();
-            if(autoShadow != null) {
-                autoShadow.enabled = true;
-            }
+            if(autoShadow != null) autoShadow.enabled = true;
             Object.Destroy(nofail.GetComponent<Outline>());
             Shadow nofailShadow = nofail.GetComponent<Shadow>();
-            if(nofailShadow != null) {
-                nofailShadow.enabled = true;
-            }
+            if(nofailShadow != null) nofailShadow.enabled = true;
         }
     }
 }

@@ -36,31 +36,22 @@ public sealed class StatEntry {
             [nameof(ShowLabel)] = ShowLabel,
         };
 
-        if(!string.IsNullOrEmpty(Text)) {
-            obj[nameof(Text)] = Text;
-        }
-
-        if(Color != null) {
-            obj[nameof(Color)] = Color.Serialize();
-        }
+        if(!string.IsNullOrEmpty(Text)) obj[nameof(Text)] = Text;
+        if(Color != null) obj[nameof(Color)] = Color.Serialize();
 
         return obj;
     }
 
     public static StatEntry Deserialize(JToken token) {
         // Legacy shape: a plain stat-id string.
-        if(token is JValue) {
-            return new StatEntry(token.ToString());
-        }
+        if(token is JValue) return new StatEntry(token.ToString());
 
         StatEntry e = new();
         e.Id = IOUtils.Read(token, nameof(Id), e.Id);
         e.Enabled = IOUtils.Read(token, nameof(Enabled), e.Enabled);
         e.ShowLabel = IOUtils.Read(token, nameof(ShowLabel), e.ShowLabel);
         e.Text = IOUtils.Read(token, nameof(Text), e.Text);
-        if(token[nameof(Color)] is JObject color) {
-            e.Color = StatColor.Deserialize(color);
-        }
+        if(token[nameof(Color)] is JObject color) e.Color = StatColor.Deserialize(color);
         return e;
     }
 }
@@ -149,53 +140,19 @@ public sealed class PanelConfig {
     public float TextShadowB = 0f;
     public float TextShadowA = 0.75f;
 
-    public Color GetTextColor() => new(
-        Mathf.Clamp01(TextR),
-        Mathf.Clamp01(TextG),
-        Mathf.Clamp01(TextB),
-        Mathf.Clamp01(TextA)
-    );
+    public Color GetTextColor() => IOUtils.Rgba(TextR, TextG, TextB, TextA);
+    public void SetTextColor(Color c) => IOUtils.SetRgba(c, ref TextR, ref TextG, ref TextB, ref TextA);
 
-    public void SetTextColor(Color c) {
-        TextR = Mathf.Clamp01(c.r);
-        TextG = Mathf.Clamp01(c.g);
-        TextB = Mathf.Clamp01(c.b);
-        TextA = Mathf.Clamp01(c.a);
-    }
+    public Color GetBackgroundColor() => IOUtils.Rgba(BgR, BgG, BgB, BgA);
+    public void SetBackgroundColor(Color c) => IOUtils.SetRgba(c, ref BgR, ref BgG, ref BgB, ref BgA);
 
-    public Color GetBackgroundColor() => new(
-        Mathf.Clamp01(BgR),
-        Mathf.Clamp01(BgG),
-        Mathf.Clamp01(BgB),
-        Mathf.Clamp01(BgA)
-    );
-
-    public void SetBackgroundColor(Color c) {
-        BgR = Mathf.Clamp01(c.r);
-        BgG = Mathf.Clamp01(c.g);
-        BgB = Mathf.Clamp01(c.b);
-        BgA = Mathf.Clamp01(c.a);
-    }
-
-    public Color GetTextShadowColor() => new(
-        Mathf.Clamp01(TextShadowR),
-        Mathf.Clamp01(TextShadowG),
-        Mathf.Clamp01(TextShadowB),
-        Mathf.Clamp01(TextShadowA)
-    );
-
-    public void SetTextShadowColor(Color c) {
-        TextShadowR = Mathf.Clamp01(c.r);
-        TextShadowG = Mathf.Clamp01(c.g);
-        TextShadowB = Mathf.Clamp01(c.b);
-        TextShadowA = Mathf.Clamp01(c.a);
-    }
+    public Color GetTextShadowColor() => IOUtils.Rgba(TextShadowR, TextShadowG, TextShadowB, TextShadowA);
+    public void SetTextShadowColor(Color c) =>
+        IOUtils.SetRgba(c, ref TextShadowR, ref TextShadowG, ref TextShadowB, ref TextShadowA);
 
     public JToken Serialize() {
         JArray stats = [];
-        foreach(StatEntry e in Stats) {
-            stats.Add(e.Serialize());
-        }
+        foreach(StatEntry e in Stats) stats.Add(e.Serialize());
 
         return new JObject {
             [nameof(Name)] = Name,
@@ -231,9 +188,7 @@ public sealed class PanelConfig {
 
     public static PanelConfig Deserialize(JToken token) {
         PanelConfig p = new();
-        if(token == null) {
-            return p;
-        }
+        if(token == null) return p;
 
         p.Name = IOUtils.Read(token, nameof(Name), p.Name);
         p.Anchor = IOUtils.Read(token, nameof(Anchor), p.Anchor);
@@ -243,9 +198,7 @@ public sealed class PanelConfig {
             p.Stats = [];
             foreach(JToken t in arr) {
                 StatEntry e = StatEntry.Deserialize(t);
-                if(!string.IsNullOrEmpty(e.Id)) {
-                    p.Stats.Add(e);
-                }
+                if(!string.IsNullOrEmpty(e.Id)) p.Stats.Add(e);
             }
         }
         p.Prefix = IOUtils.Read(token, nameof(Prefix), p.Prefix);
@@ -254,25 +207,17 @@ public sealed class PanelConfig {
         p.LabelSeparator = IOUtils.Read(token, nameof(LabelSeparator), p.LabelSeparator);
         p.LineSpacing = IOUtils.Read(token, nameof(LineSpacing), p.LineSpacing);
         p.BackgroundEnabled = IOUtils.Read(token, nameof(BackgroundEnabled), p.BackgroundEnabled);
-        p.BgR = IOUtils.Read(token, nameof(BgR), p.BgR);
-        p.BgG = IOUtils.Read(token, nameof(BgG), p.BgG);
-        p.BgB = IOUtils.Read(token, nameof(BgB), p.BgB);
-        p.BgA = IOUtils.Read(token, nameof(BgA), p.BgA);
+        IOUtils.ReadRgba(token, "Bg", ref p.BgR, ref p.BgG, ref p.BgB, ref p.BgA);
         p.LocalizeStatLabels = IOUtils.Read(token, nameof(LocalizeStatLabels), p.LocalizeStatLabels);
-        p.TextR = IOUtils.Read(token, nameof(TextR), p.TextR);
-        p.TextG = IOUtils.Read(token, nameof(TextG), p.TextG);
-        p.TextB = IOUtils.Read(token, nameof(TextB), p.TextB);
-        p.TextA = IOUtils.Read(token, nameof(TextA), p.TextA);
+        IOUtils.ReadRgba(token, "Text", ref p.TextR, ref p.TextG, ref p.TextB, ref p.TextA);
         p.TextShadowEnabled = IOUtils.Read(token, nameof(TextShadowEnabled), p.TextShadowEnabled);
         p.TextShadowX = IOUtils.Read(token, nameof(TextShadowX), p.TextShadowX);
         p.TextShadowY = IOUtils.Read(token, nameof(TextShadowY), p.TextShadowY);
         p.TextShadowSoftness = IOUtils.Read(token, nameof(TextShadowSoftness), p.TextShadowSoftness);
-        p.TextShadowR = IOUtils.Read(token, nameof(TextShadowR), p.TextShadowR);
-        p.TextShadowG = IOUtils.Read(token, nameof(TextShadowG), p.TextShadowG);
-        p.TextShadowB = IOUtils.Read(token, nameof(TextShadowB), p.TextShadowB);
-        p.TextShadowA = IOUtils.Read(token, nameof(TextShadowA), p.TextShadowA);
+        IOUtils.ReadRgba(token, "TextShadow", ref p.TextShadowR, ref p.TextShadowG, ref p.TextShadowB, ref p.TextShadowA);
         return p;
     }
+
 }
 
 // Persisted config for the panel overlay system. Replaces the old fixed
@@ -327,9 +272,7 @@ public sealed class PanelsSettings : ISettingsFile {
 
     public JToken Serialize() {
         JArray panels = [];
-        foreach(PanelConfig p in Panels) {
-            panels.Add(p.Serialize());
-        }
+        foreach(PanelConfig p in Panels) panels.Add(p.Serialize());
 
         return new JObject {
             [nameof(Enabled)] = Enabled,
@@ -342,9 +285,7 @@ public sealed class PanelsSettings : ISettingsFile {
 
         if(token?[nameof(Panels)] is JArray arr) {
             Panels = [];
-            foreach(JToken t in arr) {
-                Panels.Add(PanelConfig.Deserialize(t));
-            }
+            foreach(JToken t in arr) Panels.Add(PanelConfig.Deserialize(t));
         }
     }
 }

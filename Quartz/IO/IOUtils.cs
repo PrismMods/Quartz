@@ -154,5 +154,18 @@ public static class IOUtils {
 
     public static JArray Write(Color c)
         => new(c.r, c.g, c.b, c.a);
+
+    public static Color Rgba(float r, float g, float b, float a) =>
+        new(Mathf.Clamp01(r), Mathf.Clamp01(g), Mathf.Clamp01(b), Mathf.Clamp01(a));
+
+    public static void SetRgba(Color c, ref float r, ref float g, ref float b, ref float a) {
+        r = Mathf.Clamp01(c.r); g = Mathf.Clamp01(c.g);
+        b = Mathf.Clamp01(c.b); a = Mathf.Clamp01(c.a);
+    }
+
+    public static void ReadRgba(JToken token, string name, ref float r, ref float g, ref float b, ref float a) {
+        r = Read(token, name + "R", r); g = Read(token, name + "G", g);
+        b = Read(token, name + "B", b); a = Read(token, name + "A", a);
+    }
     #endregion
 }

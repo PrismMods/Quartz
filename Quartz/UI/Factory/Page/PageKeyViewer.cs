@@ -53,9 +53,7 @@ internal static class PageKeyViewer {
             simpleBody?.gameObject.SetActive(simple);
             dmNoteBody?.gameObject.SetActive(!simple);
 
-            if(sec.Body != null) {
-                LayoutRebuilder.ForceRebuildLayoutImmediate(sec.Body);
-            }
+            if(sec.Body != null) LayoutRebuilder.ForceRebuildLayoutImmediate(sec.Body);
         }
 
         void SetMode(string mode) {
@@ -170,18 +168,16 @@ internal static class PageKeyViewer {
             "Add a separate foot-pedal element you can drag on its own in Reorganize mode. The keys light on press but don't count."
         );
 
-        var footHint = GenerateUI.AddText(GenerateUI.Row(simpleBody, 30f));
-        GenerateUI.Localize(footHint, "KEYVIEWER_FOOT_HINT", "The foot keys are a separate element — drag them anywhere in Reorganize mode.");
-        footHint.fontSize = 17f;
-        footHint.color = new Color(1f, 1f, 1f, 0.45f);
+        GenerateUI.AddLocalizedMutedText(
+            GenerateUI.Row(simpleBody, 30f), "KEYVIEWER_FOOT_HINT",
+            "The foot keys are a separate element — drag them anywhere in Reorganize mode.");
 
         // === Keys: interactive rebind preview ===
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(simpleBody)), "HEADING_KEYS", "Keys");
 
-        var hint = GenerateUI.AddText(GenerateUI.Row(simpleBody, 30f));
-        GenerateUI.Localize(hint, "KEYVIEWER_KEYS_HINT", "Click a key, then press the new binding. Esc cancels.");
-        hint.fontSize = 17f;
-        hint.color = new Color(1f, 1f, 1f, 0.45f);
+        GenerateUI.AddLocalizedMutedText(
+            GenerateUI.Row(simpleBody, 30f), "KEYVIEWER_KEYS_HINT",
+            "Click a key, then press the new binding. Esc cancels.");
 
         // Sized for the tallest style (20 keys) so switching styles doesn't
         // reflow the page.
@@ -294,9 +290,7 @@ internal static class PageKeyViewer {
         }
 
         rebuildPreview = () => {
-            for(int i = preview.childCount - 1; i >= 0; i--) {
-                Object.Destroy(preview.GetChild(i).gameObject);
-            }
+            GenerateUI.ClearChildren(preview);
             previewBoxes.Clear();
             statBoxes.Clear();
             selectedSlot = -1;
@@ -337,9 +331,7 @@ internal static class PageKeyViewer {
 
                 int captured = slot.Slot;
                 GenerateUI.AddButton(fill.gameObject, btn => {
-                    if(btn == InputButton.Left) {
-                        SelectSlot(captured);
-                    }
+                    if(btn == InputButton.Left) SelectSlot(captured);
                 });
 
                 previewBoxes[slot.Slot] = (fill, border, label);
@@ -371,9 +363,7 @@ internal static class PageKeyViewer {
 
                     int captured = slot.Slot;
                     GenerateUI.AddButton(fill.gameObject, btn => {
-                        if(btn == InputButton.Left) {
-                            SelectSlot(captured);
-                        }
+                        if(btn == InputButton.Left) SelectSlot(captured);
                     });
 
                     previewBoxes[slot.Slot] = (fill, border, label);
@@ -409,19 +399,14 @@ internal static class PageKeyViewer {
         // A focused input field (the key label, slider value editors) means the
         // user is typing, not binding a key.
         runner.ShouldCancel = () => {
-            if(labelInput != null && labelInput.InputField.isFocused) {
-                return true;
-            }
+            if(labelInput != null && labelInput.InputField.isFocused) return true;
             GameObject sel = UnityEngine.EventSystems.EventSystem.current?.currentSelectedGameObject;
             TMP_InputField field = sel != null ? sel.GetComponent<TMP_InputField>() : null;
             return field != null && field.isFocused;
         };
         runner.OnCaptured = key => {
-            if(ghostListening) {
-                OnGhostCaptured(key);
-            } else {
-                OnKeyCaptured(key);
-            }
+            if(ghostListening) OnGhostCaptured(key);
+            else OnKeyCaptured(key);
         };
         runner.OnCancelled = CancelCapture;
 
@@ -475,9 +460,7 @@ internal static class PageKeyViewer {
             GenerateUI.Row(colorsSec.Body),
             false, conf.PerKeyColorEnabled[0],
             v => {
-                if(!SlotValid()) {
-                    return;
-                }
+                if(!SlotValid()) return;
                 conf.PerKeyColorEnabled[selectedSlot] = v;
                 if(v && !conf.PerKeyColorInit[selectedSlot]) {
                     conf.SeedPerKeyColorsFromGlobal(selectedSlot);
@@ -520,9 +503,7 @@ internal static class PageKeyViewer {
             GenerateUI.Row(fontsSec.Body),
             false, conf.PerKeyFontEnabled[0],
             v => {
-                if(!SlotValid()) {
-                    return;
-                }
+                if(!SlotValid()) return;
                 conf.PerKeyFontEnabled[selectedSlot] = v;
                 if(v && !conf.PerKeyFontInit[selectedSlot]) {
                     conf.SeedPerKeyFontFromGlobal(selectedSlot);
@@ -561,9 +542,7 @@ internal static class PageKeyViewer {
         // active whenever a ghost key is set, so the header carries no toggle.
         var ghostSec = GenerateUI.Collapsible(popup, "Ghost Key", startExpanded: false);
 
-        TextMeshProUGUI ghostKeyLabel = GenerateUI.AddText(GenerateUI.Row(ghostSec.Body, 30f));
-        ghostKeyLabel.fontSize = 17f;
-        ghostKeyLabel.color = new Color(1f, 1f, 1f, 0.6f);
+        TextMeshProUGUI ghostKeyLabel = GenerateUI.AddMutedText(GenerateUI.Row(ghostSec.Body, 30f), 17f, 0.6f);
 
         GenerateUI.Button(
             GenerateUI.Row(ghostSec.Body),
@@ -640,12 +619,8 @@ internal static class PageKeyViewer {
 
         refreshPopup = () => {
             bool valid = SlotValid();
-            if(popup.gameObject.activeSelf != valid) {
-                popup.gameObject.SetActive(valid);
-            }
-            if(!valid) {
-                return;
-            }
+            if(popup.gameObject.activeSelf != valid) popup.gameObject.SetActive(valid);
+            if(!valid) return;
 
             int style = Style();
             if(listening) {
@@ -872,9 +847,7 @@ internal static class PageKeyViewer {
         // === DM Note ===
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(dmNoteBody)), "HEADING_DM_NOTE", "DM Note");
 
-        var presetStatus = GenerateUI.AddText(GenerateUI.Row(dmNoteBody, 30f));
-        presetStatus.fontSize = 17f;
-        presetStatus.color = new Color(1f, 1f, 1f, 0.45f);
+        var presetStatus = GenerateUI.AddMutedText(GenerateUI.Row(dmNoteBody, 30f), 17f, 0.45f);
         void RefreshPresetStatus() {
             presetStatus.text = string.IsNullOrWhiteSpace(conf.DmPresetJson)
                 ? MainCore.Tr.Get("KEYVIEWER_DM_NO_PRESET", "No preset loaded")
@@ -911,9 +884,7 @@ internal static class PageKeyViewer {
 
         // --- Custom CSS: an optional stylesheet layered over the preset's
         // per-key styling (colors, border, radius, font, glow, gradients). ---
-        var cssStatus = GenerateUI.AddText(GenerateUI.Row(dmNoteBody, 30f));
-        cssStatus.fontSize = 17f;
-        cssStatus.color = new Color(1f, 1f, 1f, 0.45f);
+        var cssStatus = GenerateUI.AddMutedText(GenerateUI.Row(dmNoteBody, 30f), 17f, 0.45f);
         void RefreshCssStatus() {
             cssStatus.text = string.IsNullOrWhiteSpace(conf.DmCssText)
                 ? MainCore.Tr.Get("KEYVIEWER_DM_CSS_NONE", "No custom CSS")
@@ -1134,15 +1105,7 @@ internal static class PageKeyViewer {
         rect.offsetMin = Vector2.zero;
         rect.offsetMax = Vector2.zero;
 
-        VerticalLayoutGroup layout = obj.AddComponent<VerticalLayoutGroup>();
-        layout.spacing = 8f;
-        layout.childControlWidth = true;
-        layout.childControlHeight = true;
-        layout.childForceExpandWidth = true;
-        layout.childForceExpandHeight = false;
-
-        ContentSizeFitter fitter = obj.AddComponent<ContentSizeFitter>();
-        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        GenerateUI.FitVertical(obj, 8f);
 
         return rect;
     }
@@ -1158,15 +1121,8 @@ internal static class PageKeyViewer {
 
         // Right padding of 250 matches the standard rows' BackGround() inset, so
         // the card's right edge lines up with the toggles/sliders below it.
-        VerticalLayoutGroup holderLayout = holder.AddComponent<VerticalLayoutGroup>();
+        VerticalLayoutGroup holderLayout = GenerateUI.FitVertical(holder, 0f);
         holderLayout.padding = new RectOffset(0, 250, 0, 0);
-        holderLayout.childControlWidth = true;
-        holderLayout.childControlHeight = true;
-        holderLayout.childForceExpandWidth = true;
-        holderLayout.childForceExpandHeight = false;
-
-        ContentSizeFitter holderFitter = holder.AddComponent<ContentSizeFitter>();
-        holderFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
         GameObject obj = new(name);
         obj.transform.SetParent(holder.transform, false);
@@ -1177,16 +1133,8 @@ internal static class PageKeyViewer {
         bg.type = Image.Type.Sliced;
         bg.color = UIColors.ObjectBG;
 
-        VerticalLayoutGroup layout = obj.AddComponent<VerticalLayoutGroup>();
-        layout.spacing = 8f;
+        VerticalLayoutGroup layout = GenerateUI.FitVertical(obj, 8f);
         layout.padding = new RectOffset(16, 16, 16, 16);
-        layout.childControlWidth = true;
-        layout.childControlHeight = true;
-        layout.childForceExpandWidth = true;
-        layout.childForceExpandHeight = false;
-
-        ContentSizeFitter fitter = obj.AddComponent<ContentSizeFitter>();
-        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
         return rect;
     }
@@ -1234,19 +1182,13 @@ internal static class PageKeyViewer {
         label.fontSize = 22f;
 
         GenerateUI.AddButton(obj, btn => {
-            if(btn == InputButton.Left) {
-                onClick?.Invoke();
-            }
+            if(btn == InputButton.Left) onClick?.Invoke();
         });
     }
 
     private static void ApplyModeButton(Image bg, TextMeshProUGUI label, bool selected) {
-        if(bg != null) {
-            bg.color = selected ? UIColors.ObjectActive : UIColors.ObjectBG;
-        }
-        if(label != null) {
-            label.color = selected ? Color.white : new Color(1f, 1f, 1f, 0.6f);
-        }
+        if(bg != null) bg.color = selected ? UIColors.ObjectActive : UIColors.ObjectBG;
+        if(label != null) label.color = selected ? Color.white : new Color(1f, 1f, 1f, 0.6f);
     }
 
     // Polls for the next key press while the preview is armed. Focusing the
@@ -1274,9 +1216,7 @@ internal static class PageKeyViewer {
             prevHookRAlt = hookRAlt;
             prevHookRCtrl = hookRCtrl;
 
-            if(IsListening == null || !IsListening()) {
-                return;
-            }
+            if(IsListening == null || !IsListening()) return;
 
             if(Input.GetKeyDown(KeyCode.Escape) || (ShouldCancel?.Invoke() ?? false)) {
                 OnCancelled?.Invoke();
@@ -1298,9 +1238,7 @@ internal static class PageKeyViewer {
                 return;
             }
 
-            if(!Input.anyKeyDown) {
-                return;
-            }
+            if(!Input.anyKeyDown) return;
 
             // Numpad Enter and Return can land on the same frame on some
             // keyboards; the loop below would bind Return first (lower value),
@@ -1311,9 +1249,7 @@ internal static class PageKeyViewer {
             }
 
             foreach(KeyCode key in allKeys) {
-                if(key == KeyCode.None || (key >= KeyCode.Mouse0 && key <= KeyCode.Mouse6)) {
-                    continue;
-                }
+                if(key == KeyCode.None || (key >= KeyCode.Mouse0 && key <= KeyCode.Mouse6)) continue;
                 if(Input.GetKeyDown(key)) {
                     OnCaptured?.Invoke(key);
                     return;

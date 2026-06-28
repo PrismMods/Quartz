@@ -21,13 +21,9 @@ public static partial class EffectRemover {
     public static EffectRemoverSettings Conf => ConfMgr?.Data;
 
     public static void EnsureConf() {
-        if(ConfMgr != null) {
-            return;
-        }
+        if(ConfMgr != null) return;
 
-        ConfMgr = new SettingsFile<EffectRemoverSettings>(
-            Path.Combine(MainCore.Paths.RootPath, "EffectRemover.json")
-        );
+        ConfMgr = new SettingsFile<EffectRemoverSettings>(Path.Combine(MainCore.Paths.RootPath, "EffectRemover.json"));
         ConfMgr.Load();
     }
 
@@ -78,89 +74,45 @@ public static partial class EffectRemover {
     public static void RestoreEditorSaveButtons() => SetEditorSaveButtons(scnEditor.instance, true);
 
     private static void SetEditorSaveButtons(scnEditor editor, bool enabled) {
-        if(editor == null || SceneManager.GetActiveScene().name != "scnEditor") {
-            return;
-        }
+        if(editor == null || SceneManager.GetActiveScene().name != "scnEditor") return;
 
-        if(editor.popupUnsavedChangesSave != null) {
-            editor.popupUnsavedChangesSave.interactable = enabled;
-        }
-        if(editor.buttonSave != null) {
-            editor.buttonSave.interactable = enabled;
-        }
+        if(editor.popupUnsavedChangesSave != null) editor.popupUnsavedChangesSave.interactable = enabled;
+        if(editor.buttonSave != null) editor.buttonSave.interactable = enabled;
     }
 
     internal static void Remove(LevelData levelData) {
-        if(!Enabled || levelData == null) {
-            return;
-        }
+        if(!Enabled || levelData == null) return;
 
         EffectRemoverSettings conf = Conf;
         List<LevelEventType> events = [];
 
-        if(conf.Decorations) {
-            RemoveDecorations(events, levelData, conf);
-        }
-        if(conf.Filters) {
-            AddFilterEvents(events);
-        }
-        if(conf.AdvancedFilters) {
-            events.Add(Event(25));
-        }
+        if(conf.Decorations) RemoveDecorations(events, levelData, conf);
+        if(conf.Filters) AddFilterEvents(events);
+        if(conf.AdvancedFilters) events.Add(Event(25));
         if(conf.Particles) {
             events.Add(Event(64));
             events.Add(Event(63));
         }
-        if(conf.Backgrounds) {
-            RemoveBackgrounds(events, levelData, conf);
-        }
-        if(conf.Cameras) {
-            RemoveCameras(events, levelData, conf);
-        }
-        if(conf.PlanetOrbit) {
-            events.Add(Event(26));
-        }
-        if(conf.PlanetScale) {
-            events.Add(Event(56));
-        }
-        if(conf.PlanetRadius) {
-            events.Add(Event(52));
-        }
-        if(conf.RepeatEvents) {
-            events.Add(Event(31));
-        }
-        if(conf.FrameRate) {
-            events.Add(Event(61));
-        }
+        if(conf.Backgrounds) RemoveBackgrounds(events, levelData, conf);
+        if(conf.Cameras) RemoveCameras(events, levelData, conf);
+        if(conf.PlanetOrbit) events.Add(Event(26));
+        if(conf.PlanetScale) events.Add(Event(56));
+        if(conf.PlanetRadius) events.Add(Event(52));
+        if(conf.RepeatEvents) events.Add(Event(31));
+        if(conf.FrameRate) events.Add(Event(61));
         if(conf.HitSounds) {
             events.Add(Event(42));
             events.Add(Event(23));
         }
-        if(conf.HoldSounds) {
-            events.Add(Event(34));
-        }
-        if(conf.TrackAnimations) {
-            RemoveTrackAnimations(events, levelData, conf);
-        }
-        if(conf.TrackPositions) {
-            events.Add(Event(30));
-        }
-        if(conf.TrackMoves) {
-            events.Add(Event(18));
-        }
-        if(conf.TrackColors) {
-            RemoveTrackColors(events, levelData, conf);
-        }
-        if(conf.HideIcons) {
-            events.Add(Event(50));
-        }
-        if(conf.LimitTrackOpacity) {
-            LimitTrackOpacityValues(levelData);
-        }
+        if(conf.HoldSounds) events.Add(Event(34));
+        if(conf.TrackAnimations) RemoveTrackAnimations(events, levelData, conf);
+        if(conf.TrackPositions) events.Add(Event(30));
+        if(conf.TrackMoves) events.Add(Event(18));
+        if(conf.TrackColors) RemoveTrackColors(events, levelData, conf);
+        if(conf.HideIcons) events.Add(Event(50));
+        if(conf.LimitTrackOpacity) LimitTrackOpacityValues(levelData);
 
-        if(events.Count == 0) {
-            return;
-        }
+        if(events.Count == 0) return;
 
         HashSet<LevelEventType> eventSet = [.. events];
         levelData.levelEvents.RemoveAll(data => data != null && eventSet.Contains(data.eventType));
@@ -187,17 +139,13 @@ public static partial class EffectRemover {
         // shapes; strip the tile too when the user asked. Keys are read back as
         // levelData.bgShapeType / bgShowDefaultBGTile in scnGame.SetBackground.
         levelData.backgroundSettings["defaultBGShapeType"] = BGShapeType.Disabled;
-        if(conf.RemoveTutorialPatterns) {
-            levelData.backgroundSettings["showDefaultBGTile"] = false;
-        }
+        if(conf.RemoveTutorialPatterns) levelData.backgroundSettings["showDefaultBGTile"] = false;
     }
 
     private static void RemoveCameras(List<LevelEventType> events, LevelData levelData, EffectRemoverSettings conf) {
         events.Add(Event(12));
 
-        if(!conf.SetCameraZoom) {
-            return;
-        }
+        if(!conf.SetCameraZoom) return;
 
         float zoom = Mathf.Clamp(conf.CameraZoomScale, 100f, 1000f);
         conf.CameraZoomScale = zoom;
@@ -237,19 +185,13 @@ public static partial class EffectRemover {
         HashSet<string> tags = [];
 
         foreach(LevelEvent eventData in levelData.levelEvents) {
-            if(eventData == null || eventData.eventType != Event(35)) {
-                continue;
-            }
+            if(eventData == null || eventData.eventType != Event(35)) continue;
 
             foreach(string key in ConditionalTagKeys) {
-                if(!eventData.ContainsKey(key)) {
-                    continue;
-                }
+                if(!eventData.ContainsKey(key)) continue;
 
                 string tag = eventData.GetString(key);
-                if(!string.IsNullOrWhiteSpace(tag) && tag != "None" && tag != "없음") {
-                    tags.Add(tag);
-                }
+                if(!string.IsNullOrWhiteSpace(tag) && tag != "None" && tag != "없음") tags.Add(tag);
             }
         }
 
@@ -260,13 +202,9 @@ public static partial class EffectRemover {
         HashSet<string> tags = [];
 
         foreach(LevelEvent eventData in levelData.levelEvents) {
-            if(!IsDecorationData(eventData) || !HasAnyEventTag(eventData, conditionalEventTags)) {
-                continue;
-            }
+            if(!IsDecorationData(eventData) || !HasAnyEventTag(eventData, conditionalEventTags)) continue;
 
-            foreach(string tag in GetTags(eventData, "tag")) {
-                tags.Add(tag);
-            }
+            foreach(string tag in GetTags(eventData, "tag")) tags.Add(tag);
         }
 
         return tags;
@@ -276,9 +214,7 @@ public static partial class EffectRemover {
         => HasAnyEventTag(eventData, conditionalEventTags) || HasAnyTag(eventData, preservedDecorationTags);
 
     private static bool IsDecorationData(LevelEvent eventData) {
-        if(eventData == null) {
-            return false;
-        }
+        if(eventData == null) return false;
 
         LevelEventType type = eventData.eventType;
         return type == Event(11)
@@ -293,9 +229,7 @@ public static partial class EffectRemover {
 
     private static bool HasAnyEventTag(LevelEvent eventData, HashSet<string> tags) {
         foreach(string eventTag in GetTags(eventData, "eventTag")) {
-            if(tags.Contains(eventTag)) {
-                return true;
-            }
+            if(tags.Contains(eventTag)) return true;
         }
 
         return false;
@@ -303,28 +237,20 @@ public static partial class EffectRemover {
 
     private static bool HasAnyTag(LevelEvent eventData, HashSet<string> tags) {
         foreach(string tag in GetTags(eventData, "tag")) {
-            if(tags.Contains(tag)) {
-                return true;
-            }
+            if(tags.Contains(tag)) return true;
         }
 
         return false;
     }
 
     private static IEnumerable<string> GetTags(LevelEvent eventData, string key) {
-        if(eventData == null || !eventData.ContainsKey(key)) {
-            yield break;
-        }
+        if(eventData == null || !eventData.ContainsKey(key)) yield break;
 
         string tags = eventData.GetString(key);
-        if(string.IsNullOrWhiteSpace(tags)) {
-            yield break;
-        }
+        if(string.IsNullOrWhiteSpace(tags)) yield break;
 
         foreach(string tag in tags.Split(' ')) {
-            if(!string.IsNullOrWhiteSpace(tag)) {
-                yield return tag;
-            }
+            if(!string.IsNullOrWhiteSpace(tag)) yield return tag;
         }
     }
 
@@ -352,16 +278,10 @@ public static partial class EffectRemover {
 
     private static void LimitTrackOpacityValues(LevelData levelData) {
         foreach(LevelEvent eventData in levelData.levelEvents) {
-            if(eventData == null) {
-                continue;
-            }
-            if(eventData.eventType != Event(18) && eventData.eventType != Event(30)) {
-                continue;
-            }
+            if(eventData == null || (eventData.eventType != Event(18) && eventData.eventType != Event(30))) continue;
+
             // Cap at 100% — leave anything already at or below 100 untouched.
-            if(eventData.ContainsKey("opacity") && eventData.GetFloat("opacity") > 100.0f) {
-                eventData["opacity"] = 100.0f;
-            }
+            if(eventData.ContainsKey("opacity") && eventData.GetFloat("opacity") > 100.0f) eventData["opacity"] = 100.0f;
         }
     }
 
@@ -372,9 +292,7 @@ public static partial class EffectRemover {
             // editor, so effects vanish live as the level loads. The stripped
             // copy lives only in memory; the editor's Save is blocked (see
             // EditorSaveEnabled) so the original chart on disk is never touched.
-            if(EnhancedActive) {
-                Remove(__instance);
-            }
+            if(EnhancedActive) Remove(__instance);
         }
     }
 

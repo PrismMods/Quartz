@@ -16,9 +16,8 @@ internal static class NostalgiaUI {
     private static NostalgiaSettings Def => def ??= new NostalgiaSettings();
     private static NostalgiaSettings def;
 
-    private static void Heading(Transform p, string text) {
+    private static void Heading(Transform p, string text) =>
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(p)), "NOSTALGIA", text);
-    }
 
     private static void Toggle(Transform p, bool dft, bool val, Action<bool> set,
                                string label, string id, string desc) {

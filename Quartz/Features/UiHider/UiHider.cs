@@ -24,13 +24,9 @@ public static partial class UiHider {
     internal static readonly Vector3 HiddenPosition = new(123456f, 123456f, 123456f);
 
     public static void EnsureConf() {
-        if(ConfMgr != null) {
-            return;
-        }
+        if(ConfMgr != null) return;
 
-        ConfMgr = new SettingsFile<UiHiderSettings>(
-            Path.Combine(MainCore.Paths.RootPath, "UiHider.json")
-        );
+        ConfMgr = new SettingsFile<UiHiderSettings>(Path.Combine(MainCore.Paths.RootPath, "UiHider.json"));
         ConfMgr.Load();
         EnsureTicker();
     }
@@ -119,9 +115,7 @@ public static partial class UiHider {
         ReconcileHitErrorMeter(hideMeter);
 
         scrUIController uiController = scrUIController.instance;
-        if(uiController == null) {
-            return;
-        }
+        if(uiController == null) return;
 
         if(IsEditingLevel() || scnEditor.instance != null) {
             HideGameplayDifficultyContainer(uiController);
@@ -168,14 +162,10 @@ public static partial class UiHider {
         => IsFeatureActive() && (SelectedProfile.HideEverything || SelectedProfile.HideLastFloorFlash);
 
     private static bool ShouldToggleRecordingMode() {
-        if(!Conf.Enabled || !Conf.UseShortcut || Keybind.Capturing) {
-            return false;
-        }
+        if(!Conf.Enabled || !Conf.UseShortcut || Keybind.Capturing) return false;
 
         KeyCode key = (KeyCode)Conf.ShortcutKey;
-        if(key == KeyCode.None) {
-            return false;
-        }
+        if(key == KeyCode.None) return false;
 
         try {
             return Keybind.ModifierHeld((Keybind.KeyModifier)Conf.ShortcutModifier)
@@ -203,15 +193,11 @@ public static partial class UiHider {
         if(isEditingLevelProperty != null && isEditingLevelGetter != null) {
             try {
                 if(isEditingLevelGetterStatic) {
-                    if(isEditingLevelStaticFunc != null) {
-                        return isEditingLevelStaticFunc();
-                    }
+                    if(isEditingLevelStaticFunc != null) return isEditingLevelStaticFunc();
                     return Convert.ToBoolean(isEditingLevelProperty.GetValue(null, null));
                 }
                 object target = scnEditor.instance;
-                if(target != null) {
-                    return Convert.ToBoolean(isEditingLevelProperty.GetValue(target, null));
-                }
+                if(target != null) return Convert.ToBoolean(isEditingLevelProperty.GetValue(target, null));
             } catch { }
         }
 
@@ -219,9 +205,7 @@ public static partial class UiHider {
     }
 
     private static void EnsureReflection() {
-        if(reflectionReady) {
-            return;
-        }
+        if(reflectionReady) return;
         reflectionReady = true;
 
         Type adoBase = AccessTools.TypeByName("ADOBase");
@@ -248,9 +232,7 @@ public static partial class UiHider {
     private static readonly Dictionary<(Type, string), MemberInfo> memberCache = [];
 
     internal static object GetMemberValue(object owner, string memberName) {
-        if(owner == null || string.IsNullOrEmpty(memberName)) {
-            return null;
-        }
+        if(owner == null || string.IsNullOrEmpty(memberName)) return null;
 
         Type type = owner.GetType();
         var key = (type, memberName);
@@ -261,31 +243,21 @@ public static partial class UiHider {
         }
 
         try {
-            if(member is FieldInfo field) {
-                return field.GetValue(owner);
-            }
-            if(member is PropertyInfo property) {
-                return property.GetValue(owner, null);
-            }
+            if(member is FieldInfo field) return field.GetValue(owner);
+            if(member is PropertyInfo property) return property.GetValue(owner, null);
         } catch { }
 
         return null;
     }
 
     internal static GameObject GetGameObject(object value) {
-        if(value == null) {
-            return null;
-        }
-        if(value is GameObject gameObject) {
-            return gameObject;
-        }
+        if(value == null) return null;
+        if(value is GameObject gameObject) return gameObject;
         return value is Component component ? component.gameObject : null;
     }
 
     private static void SetEnabled(object value, bool enabled) {
-        if(value == null) {
-            return;
-        }
+        if(value == null) return;
 
         if(value is Behaviour behaviour) {
             behaviour.enabled = enabled;
@@ -293,9 +265,7 @@ public static partial class UiHider {
         }
 
         PropertyInfo property = AccessTools.Property(value.GetType(), "enabled");
-        if(property == null || !property.CanWrite) {
-            return;
-        }
+        if(property == null || !property.CanWrite) return;
         try { property.SetValue(value, enabled, null); } catch { }
     }
 
@@ -303,35 +273,22 @@ public static partial class UiHider {
         => SetGameObjectActiveIfMatches(GetGameObject(GetMemberValue(owner, memberName)), hide);
 
     private static void SetGameObjectActiveIfMatches(GameObject gameObject, bool hide) {
-        if(gameObject == null) {
-            return;
-        }
-        if(gameObject.activeSelf == hide) {
-            gameObject.SetActive(!hide);
-        }
+        if(gameObject == null) return;
+        if(gameObject.activeSelf == hide) gameObject.SetActive(!hide);
     }
 
     internal static void HideGameplayDifficultyContainer(scrUIController uiController) {
-        if(uiController == null) {
-            return;
-        }
+        if(uiController == null) return;
 
         try {
-            if(uiController.difficultyContainer != null) {
-                uiController.difficultyContainer.gameObject.SetActive(false);
-            }
+            if(uiController.difficultyContainer != null) uiController.difficultyContainer.gameObject.SetActive(false);
             if(uiController.difficultyFadeContainer != null) {
                 uiController.difficultyFadeContainer.blocksRaycasts = false;
                 uiController.difficultyFadeContainer.gameObject.SetActive(false);
             }
-            if(uiController.difficultyButtonLeft != null) {
-                uiController.difficultyButtonLeft.enabled = false;
-            }
-            if(uiController.difficultyButtonRight != null) {
-                uiController.difficultyButtonRight.enabled = false;
-            }
-        } catch {
-        }
+            if(uiController.difficultyButtonLeft != null) uiController.difficultyButtonLeft.enabled = false;
+            if(uiController.difficultyButtonRight != null) uiController.difficultyButtonRight.enabled = false;
+        } catch { }
     }
 
     // Two-way reconcile for the game's hit-error meter. The hide patches
@@ -342,25 +299,17 @@ public static partial class UiHider {
     // fight its freeroam / results / pause / meter-size-off handling.
     private static void ReconcileHitErrorMeter(bool hide) {
         scrController controller = scrController.instance;
-        if(controller == null || !controller.gameworld) {
-            return;
-        }
+        if(controller == null || !controller.gameworld) return;
 
         GameObject errorMeter = GetGameObject(GetMemberValue(controller, "errorMeter"));
-        if(errorMeter == null) {
-            return;
-        }
+        if(errorMeter == null) return;
 
         if(hide) {
-            if(errorMeter.activeSelf) {
-                errorMeter.SetActive(false);
-            }
+            if(errorMeter.activeSelf) errorMeter.SetActive(false);
             return;
         }
 
-        if(!controller.paused && HitErrorMeterEnabledInGame() && !errorMeter.activeSelf) {
-            errorMeter.SetActive(true);
-        }
+        if(!controller.paused && HitErrorMeterEnabledInGame() && !errorMeter.activeSelf) errorMeter.SetActive(true);
     }
 
     private static bool HitErrorMeterEnabledInGame() {
@@ -383,9 +332,7 @@ public static partial class UiHider {
             betaType = AccessTools.TypeByName("scrEnableIfBeta");
             betaTypeResolved = true;
         }
-        if(betaType == null) {
-            return;
-        }
+        if(betaType == null) return;
 
         // Resources.FindObjectsOfTypeAll scans every loaded object; never run
         // it per-frame. Beta objects are static UI, so cache them per scene.
@@ -395,13 +342,10 @@ public static partial class UiHider {
             catch { cachedBetaObjects = null; }
             cachedBetaScene = scene;
         }
-        if(cachedBetaObjects == null) {
-            return;
-        }
+        if(cachedBetaObjects == null) return;
 
-        for(int i = 0; i < cachedBetaObjects.Length; i++) {
+        for(int i = 0; i < cachedBetaObjects.Length; i++)
             SetGameObjectActiveIfMatches(GetGameObject(cachedBetaObjects[i]), hide);
-        }
     }
 
     // ===== per-frame ticker =====
@@ -409,9 +353,7 @@ public static partial class UiHider {
     private static Ticker ticker;
 
     private static void EnsureTicker() {
-        if(ticker != null || MainCore.Root == null) {
-            return;
-        }
+        if(ticker != null || MainCore.Root == null) return;
         ticker = MainCore.Root.AddComponent<Ticker>();
     }
 

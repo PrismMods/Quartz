@@ -45,9 +45,7 @@ public sealed class GTween {
     /// </summary>
     /// <param name="isCompletingInstantly">Determines if the tween should complete instantly.</param>
     public void Start(bool isCompletingInstantly = false) {
-        if(IsPlaying) {
-            Kill();
-        }
+        if(IsPlaying) Kill();
 
         IsPlaying = true;
         IsCompleted = false;
@@ -66,13 +64,7 @@ public sealed class GTween {
     /// </summary>
     /// <param name="deltaTime">The elapsed time since the last update.</param>
     public void Tick(float deltaTime) {
-        if(!IsPlaying) {
-            return;
-        }
-
-        if(IsPaused) {
-            return;
-        }
+        if(!IsPlaying || IsPaused) return;
 
         float deltaTimeWithTimeScale = TimeScale * deltaTime;
 
@@ -87,9 +79,7 @@ public sealed class GTween {
 
         bool isFinished = Behaviour.GetFinished();
 
-        if(!isFinished) {
-            return;
-        }
+        if(!isFinished) return;
 
         bool needsToLoop = _loopsRemaining > 0 && Behaviour.GetLoopable();
 
@@ -113,9 +103,7 @@ public sealed class GTween {
     /// Instantly reaches the final state of the tween, and stops playing.
     /// </summary>
     public void Complete() {
-        if(!IsPlaying && !IsCompleted) {
-            Start(true);
-        }
+        if(!IsPlaying && !IsCompleted) Start(true);
 
         Behaviour.Complete();
 
@@ -128,9 +116,7 @@ public sealed class GTween {
     /// Kills the tween. This means that the tween will stop playing, leaving it at its current state.
     /// </summary>
     public void Kill() {
-        if(!IsPlaying) {
-            return;
-        }
+        if(!IsPlaying) return;
 
         IsPlaying = false;
         IsCompleted = false;
@@ -263,13 +249,8 @@ public sealed class GTween {
     /// Calculates the time elapsed since the tween started playing.
     /// </summary>
     public float GetElapsed() {
-        if(!IsPlaying && !IsCompleted) {
-            return 0f;
-        }
-
-        if(!IsPlaying && IsCompleted) {
-            return GetDuration();
-        }
+        if(!IsPlaying && !IsCompleted) return 0f;
+        if(!IsPlaying && IsCompleted) return GetDuration();
 
         return Behaviour.GetElapsed();
     }
@@ -278,13 +259,8 @@ public sealed class GTween {
     /// Gets the time left remaining on the tween (duration - elapsed).
     /// </summary>
     public float GetRemaining() {
-        if(!IsPlaying && !IsCompleted) {
-            return GetDuration();
-        }
-
-        if(!IsPlaying && IsCompleted) {
-            return 0f;
-        }
+        if(!IsPlaying && !IsCompleted) return GetDuration();
+        if(!IsPlaying && IsCompleted) return 0f;
 
         return Behaviour.GetRemaining();
     }
@@ -332,9 +308,7 @@ public sealed class GTween {
     void Loop(ResetMode loopResetMode) {
         bool needsToLoop = _loopsRemaining > 0;
 
-        if(!needsToLoop || !Behaviour.GetLoopable()) {
-            return;
-        }
+        if(!needsToLoop || !Behaviour.GetLoopable()) return;
 
         --_loopsRemaining;
 
@@ -350,9 +324,7 @@ public sealed class GTween {
     }
 
     void MarkFinished() {
-        if(!IsPlaying) {
-            return;
-        }
+        if(!IsPlaying) return;
 
         IsPlaying = false;
         IsCompleted = true;

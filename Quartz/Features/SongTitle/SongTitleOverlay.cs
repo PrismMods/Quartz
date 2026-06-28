@@ -50,13 +50,9 @@ public static class SongTitleOverlay {
     private static readonly Dictionary<int, Graphic> hiddenTitleGraphics = [];
 
     public static void EnsureConf() {
-        if(ConfMgr != null) {
-            return;
-        }
+        if(ConfMgr != null) return;
 
-        ConfMgr = new SettingsFile<SongTitleSettings>(
-            Path.Combine(MainCore.Paths.RootPath, "SongTitle.json")
-        );
+        ConfMgr = new SettingsFile<SongTitleSettings>(Path.Combine(MainCore.Paths.RootPath, "SongTitle.json"));
         ConfMgr.Load();
     }
 
@@ -65,18 +61,14 @@ public static class SongTitleOverlay {
     // (EnsureConf lazily loads), so the Harmony patch can call it.
     public static bool TakesOverTitle {
         get {
-            if(!MainCore.IsModEnabled) {
-                return false;
-            }
+            if(!MainCore.IsModEnabled) return false;
             EnsureConf();
             return PanelsOverlay.IsEnabled && Conf.Enabled;
         }
     }
 
     public static void Initialize(GameObject rootObject) {
-        if(canvasObj != null) {
-            return;
-        }
+        if(canvasObj != null) return;
 
         EnsureConf();
 
@@ -146,9 +138,7 @@ public static class SongTitleOverlay {
     // on init and from the settings UI; the text content is driven per-frame by
     // the Updater.
     public static void Apply() {
-        if(root == null) {
-            return;
-        }
+        if(root == null) return;
 
         root.anchoredPosition = OverlayCalibration.Scale(new Vector2(Conf.OffsetX, Conf.OffsetY));
         root.localScale = Vector3.one * Mathf.Max(0.01f, Conf.MasterSize);
@@ -162,9 +152,7 @@ public static class SongTitleOverlay {
     }
 
     public static void ApplyShadow() {
-        if(text == null) {
-            return;
-        }
+        if(text == null) return;
 
         TMPTextShadow.Apply(
             text,
@@ -191,9 +179,7 @@ public static class SongTitleOverlay {
     }
 
     public static void Dispose() {
-        if(canvasObj == null) {
-            return;
-        }
+        if(canvasObj == null) return;
 
         ConfMgr?.Save();
 
@@ -260,9 +246,7 @@ public static class SongTitleOverlay {
         new(@"<color=#([0-9a-fA-F]+)>", RegexOptions.IgnoreCase);
 
     private static string NormalizeColorTags(string s) {
-        if(string.IsNullOrEmpty(s) || s.IndexOf("<color=#", System.StringComparison.OrdinalIgnoreCase) < 0) {
-            return s;
-        }
+        if(string.IsNullOrEmpty(s) || s.IndexOf("<color=#", System.StringComparison.OrdinalIgnoreCase) < 0) return s;
         return HexColorTagRegex.Replace(s, m => {
             string hex = m.Groups[1].Value;
             int valid = hex.Length switch {
@@ -272,9 +256,7 @@ public static class SongTitleOverlay {
                 3 => 3,         // RGB short form
                 _ => 0,         // 1-2 digits: not a color, drop the tag
             };
-            if(valid == 0) {
-                return string.Empty;
-            }
+            if(valid == 0) return string.Empty;
             return valid == hex.Length ? m.Value : $"<color=#{hex.Substring(0, valid)}>";
         });
     }
@@ -283,9 +265,7 @@ public static class SongTitleOverlay {
         private string lastBody;
 
         private void Update() {
-            if(root == null || text == null) {
-                return;
-            }
+            if(root == null || text == null) return;
 
             bool isReorganizing = UICore.IsReorganizing;
             bool show = (PanelsOverlay.IsEnabled && Conf.Enabled && GameStats.InGame) || isReorganizing;
@@ -300,9 +280,7 @@ public static class SongTitleOverlay {
                 dragObj.SetActive(isReorganizing);
             }
 
-            if(!show) {
-                return;
-            }
+            if(!show) return;
 
             // Position only changes while dragging in Reorganize mode.
             if(isReorganizing) {
@@ -340,20 +318,14 @@ public static class SongTitleOverlay {
     private static class HideGameTitlePatch {
         private static void Postfix(scrHUDText __instance) {
             try {
-                if(__instance == null || !__instance.isTitle) {
-                    return;
-                }
-                if(!TakesOverTitle || !GameStats.InGame) {
-                    return;
-                }
+                if(__instance == null || !__instance.isTitle) return;
+                if(!TakesOverTitle || !GameStats.InGame) return;
                 int id = __instance.GetInstanceID();
                 if(!hiddenTitleGraphics.TryGetValue(id, out Graphic g) || g == null) {
                     g = __instance.GetComponent<Graphic>();
                     hiddenTitleGraphics[id] = g;
                 }
-                if(g != null && g.enabled) {
-                    g.enabled = false;
-                }
+                if(g != null && g.enabled) g.enabled = false;
             } catch {
             }
         }

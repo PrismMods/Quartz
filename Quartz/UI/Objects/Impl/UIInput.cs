@@ -65,21 +65,15 @@ public sealed class UIInput : UIObject {
 
         Value = value;
 
-        if(InputField.text != value) {
-            InputField.text = value;
-        }
+        if(InputField.text != value) InputField.text = value;
 
-        if(invoke) {
-            OnChanged?.Invoke(value);
-        }
+        if(invoke) OnChanged?.Invoke(value);
 
         UpdateVisual();
     }
 
     public void Reset() {
-        if(DefaultValue != null) {
-            Set(DefaultValue);
-        }
+        if(DefaultValue != null) Set(DefaultValue);
     }
 
     private void OnValueChanged(string value) {
@@ -166,9 +160,7 @@ public sealed class UIInput : UIObject {
             return;
         }
 
-        if(!caretLooping) {
-            return;
-        }
+        if(!caretLooping) return;
 
         caretLooping = false;
 
@@ -253,9 +245,7 @@ public sealed class UIInput : UIObject {
     public override void Tick() {
         bool focused = InputField.isFocused;
 
-        if(focused == hasFocused) {
-            return;
-        }
+        if(focused == hasFocused) return;
 
         hasFocused = focused;
 

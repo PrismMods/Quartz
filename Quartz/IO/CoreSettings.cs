@@ -78,12 +78,7 @@ public sealed class CoreSettings : ISettingsFile {
     public float AccentG = 0.5995077f;
     public float AccentB = 0.5995077f;
 
-    public Color GetAccentColor() => new(
-        Mathf.Clamp01(AccentR),
-        Mathf.Clamp01(AccentG),
-        Mathf.Clamp01(AccentB),
-        1f
-    );
+    public Color GetAccentColor() => new(Mathf.Clamp01(AccentR), Mathf.Clamp01(AccentG), Mathf.Clamp01(AccentB), 1f);
 
     public void SetAccentColor(Color color) {
         AccentR = Mathf.Clamp01(color.r);
@@ -99,9 +94,7 @@ public sealed class CoreSettings : ISettingsFile {
 
     public JToken Serialize() {
         JObject collapsibleStates = [];
-        foreach(var kvp in CollapsibleStates) {
-            collapsibleStates[kvp.Key] = kvp.Value;
-        }
+        foreach(var kvp in CollapsibleStates) collapsibleStates[kvp.Key] = kvp.Value;
 
         return new JObject {
             [nameof(Active)] = Active,
@@ -159,8 +152,7 @@ public sealed class CoreSettings : ISettingsFile {
             foreach(var prop in collapsibleStates.Properties()) {
                 try {
                     CollapsibleStates[prop.Name] = prop.Value.Value<bool>();
-                } catch {
-                }
+                } catch { }
             }
         }
         AccentR = IOUtils.Read(token, nameof(AccentR), AccentR);

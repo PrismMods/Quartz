@@ -117,9 +117,7 @@ internal static class PageProgressBar {
         RectTransform fillBody = MakeBody(sec.Body, "FillColorBody");
 
         rebuildFill = () => {
-            for(int i = fillBody.childCount - 1; i >= 0; i--) {
-                Object.Destroy(fillBody.GetChild(i).gameObject);
-            }
+            GenerateUI.ClearChildren(fillBody);
 
             if(!grad.Enabled) {
                 GenerateUI.ColorPicker(
@@ -232,15 +230,7 @@ internal static class PageProgressBar {
         rect.offsetMin = Vector2.zero;
         rect.offsetMax = Vector2.zero;
 
-        VerticalLayoutGroup layout = obj.AddComponent<VerticalLayoutGroup>();
-        layout.spacing = 8f;
-        layout.childControlWidth = true;
-        layout.childControlHeight = true;
-        layout.childForceExpandWidth = true;
-        layout.childForceExpandHeight = false;
-
-        ContentSizeFitter fitter = obj.AddComponent<ContentSizeFitter>();
-        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        GenerateUI.FitVertical(obj, 8f);
 
         return rect;
     }

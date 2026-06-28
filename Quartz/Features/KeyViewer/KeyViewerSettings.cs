@@ -230,35 +230,35 @@ public sealed class KeyViewerSettings : ISettingsFile {
         _ => GhostKey16,
     };
 
-    public Color GetGhostRain() => new(GhostRainR, GhostRainG, GhostRainB, GhostRainA);
-    public void SetGhostRain(Color c) { GhostRainR = c.r; GhostRainG = c.g; GhostRainB = c.b; GhostRainA = c.a; }
+    public Color GetGhostRain() => IOUtils.Rgba(GhostRainR, GhostRainG, GhostRainB, GhostRainA);
+    public void SetGhostRain(Color c) => IOUtils.SetRgba(c, ref GhostRainR, ref GhostRainG, ref GhostRainB, ref GhostRainA);
 
-    public Color GetBg() => new(BgR, BgG, BgB, BgA);
-    public void SetBg(Color c) { BgR = c.r; BgG = c.g; BgB = c.b; BgA = c.a; }
+    public Color GetBg() => IOUtils.Rgba(BgR, BgG, BgB, BgA);
+    public void SetBg(Color c) => IOUtils.SetRgba(c, ref BgR, ref BgG, ref BgB, ref BgA);
 
-    public Color GetBgPressed() => new(BgPressedR, BgPressedG, BgPressedB, BgPressedA);
-    public void SetBgPressed(Color c) { BgPressedR = c.r; BgPressedG = c.g; BgPressedB = c.b; BgPressedA = c.a; }
+    public Color GetBgPressed() => IOUtils.Rgba(BgPressedR, BgPressedG, BgPressedB, BgPressedA);
+    public void SetBgPressed(Color c) => IOUtils.SetRgba(c, ref BgPressedR, ref BgPressedG, ref BgPressedB, ref BgPressedA);
 
-    public Color GetOutline() => new(OutlineR, OutlineG, OutlineB, OutlineA);
-    public void SetOutline(Color c) { OutlineR = c.r; OutlineG = c.g; OutlineB = c.b; OutlineA = c.a; }
+    public Color GetOutline() => IOUtils.Rgba(OutlineR, OutlineG, OutlineB, OutlineA);
+    public void SetOutline(Color c) => IOUtils.SetRgba(c, ref OutlineR, ref OutlineG, ref OutlineB, ref OutlineA);
 
-    public Color GetOutlinePressed() => new(OutlinePressedR, OutlinePressedG, OutlinePressedB, OutlinePressedA);
-    public void SetOutlinePressed(Color c) { OutlinePressedR = c.r; OutlinePressedG = c.g; OutlinePressedB = c.b; OutlinePressedA = c.a; }
+    public Color GetOutlinePressed() => IOUtils.Rgba(OutlinePressedR, OutlinePressedG, OutlinePressedB, OutlinePressedA);
+    public void SetOutlinePressed(Color c) => IOUtils.SetRgba(c, ref OutlinePressedR, ref OutlinePressedG, ref OutlinePressedB, ref OutlinePressedA);
 
-    public Color GetText() => new(TextR, TextG, TextB, TextA);
-    public void SetText(Color c) { TextR = c.r; TextG = c.g; TextB = c.b; TextA = c.a; }
+    public Color GetText() => IOUtils.Rgba(TextR, TextG, TextB, TextA);
+    public void SetText(Color c) => IOUtils.SetRgba(c, ref TextR, ref TextG, ref TextB, ref TextA);
 
-    public Color GetTextPressed() => new(TextPressedR, TextPressedG, TextPressedB, TextPressedA);
-    public void SetTextPressed(Color c) { TextPressedR = c.r; TextPressedG = c.g; TextPressedB = c.b; TextPressedA = c.a; }
+    public Color GetTextPressed() => IOUtils.Rgba(TextPressedR, TextPressedG, TextPressedB, TextPressedA);
+    public void SetTextPressed(Color c) => IOUtils.SetRgba(c, ref TextPressedR, ref TextPressedG, ref TextPressedB, ref TextPressedA);
 
-    public Color GetRain() => new(RainR, RainG, RainB, RainA);
-    public void SetRain(Color c) { RainR = c.r; RainG = c.g; RainB = c.b; RainA = c.a; }
+    public Color GetRain() => IOUtils.Rgba(RainR, RainG, RainB, RainA);
+    public void SetRain(Color c) => IOUtils.SetRgba(c, ref RainR, ref RainG, ref RainB, ref RainA);
 
-    public Color GetRain2() => new(Rain2R, Rain2G, Rain2B, Rain2A);
-    public void SetRain2(Color c) { Rain2R = c.r; Rain2G = c.g; Rain2B = c.b; Rain2A = c.a; }
+    public Color GetRain2() => IOUtils.Rgba(Rain2R, Rain2G, Rain2B, Rain2A);
+    public void SetRain2(Color c) => IOUtils.SetRgba(c, ref Rain2R, ref Rain2G, ref Rain2B, ref Rain2A);
 
-    public Color GetRain3() => new(Rain3R, Rain3G, Rain3B, Rain3A);
-    public void SetRain3(Color c) { Rain3R = c.r; Rain3G = c.g; Rain3B = c.b; Rain3A = c.a; }
+    public Color GetRain3() => IOUtils.Rgba(Rain3R, Rain3G, Rain3B, Rain3A);
+    public void SetRain3(Color c) => IOUtils.SetRgba(c, ref Rain3R, ref Rain3G, ref Rain3B, ref Rain3A);
 
     // Per-key resolvers: the slot's override when that slot has opted in and is
     // in range, otherwise the matching global value.
@@ -281,18 +281,14 @@ public sealed class KeyViewerSettings : ISettingsFile {
     // seed the per-key arrays the first time the user enables them so the view
     // doesn't jump, and from the page's "copy from global" buttons.
     public void SeedPerKeyColorsFromGlobal() {
-        for(int i = 0; i < SlotCount; i++) {
-            SeedPerKeyColorsFromGlobal(i);
-        }
+        for(int i = 0; i < SlotCount; i++) SeedPerKeyColorsFromGlobal(i);
     }
 
     // Seed a single slot's colours from the current shared values. Called when a
     // slot first opts in so it keeps the current look rather than snapping to the
     // array defaults.
     public void SeedPerKeyColorsFromGlobal(int slot) {
-        if(slot < 0 || slot >= SlotCount) {
-            return;
-        }
+        if(slot < 0 || slot >= SlotCount) return;
         PerKeyBg[slot] = GetBg();
         PerKeyBgPressed[slot] = GetBgPressed();
         PerKeyOutline[slot] = GetOutline();
@@ -303,15 +299,11 @@ public sealed class KeyViewerSettings : ISettingsFile {
     }
 
     public void SeedPerKeyFontFromGlobal() {
-        for(int i = 0; i < SlotCount; i++) {
-            SeedPerKeyFontFromGlobal(i);
-        }
+        for(int i = 0; i < SlotCount; i++) SeedPerKeyFontFromGlobal(i);
     }
 
     public void SeedPerKeyFontFromGlobal(int slot) {
-        if(slot < 0 || slot >= SlotCount) {
-            return;
-        }
+        if(slot < 0 || slot >= SlotCount) return;
         PerKeyKeyFont[slot] = KeyFontScale;
         PerKeyCounterFont[slot] = CounterFontScale;
     }
@@ -320,9 +312,7 @@ public sealed class KeyViewerSettings : ISettingsFile {
     // "copy this key to all" action makes the whole viewer match the edited key.
     // (The shared-colour seeders above are the inverse — global onto the slots.)
     public void CopyPerKeyColorsToAll(int slot) {
-        if(slot < 0 || slot >= SlotCount) {
-            return;
-        }
+        if(slot < 0 || slot >= SlotCount) return;
         Color bg = PerKeyBg[slot], bgP = PerKeyBgPressed[slot];
         Color ol = PerKeyOutline[slot], olP = PerKeyOutlinePressed[slot];
         Color tx = PerKeyText[slot], txP = PerKeyTextPressed[slot];
@@ -342,25 +332,19 @@ public sealed class KeyViewerSettings : ISettingsFile {
 
     private static float[] Filled(int n, float v) {
         float[] a = new float[n];
-        for(int i = 0; i < n; i++) {
-            a[i] = v;
-        }
+        for(int i = 0; i < n; i++) a[i] = v;
         return a;
     }
 
     private static bool[] Filled(int n, bool v) {
         bool[] a = new bool[n];
-        for(int i = 0; i < n; i++) {
-            a[i] = v;
-        }
+        for(int i = 0; i < n; i++) a[i] = v;
         return a;
     }
 
     private static Color[] FilledColor(int n, Color c) {
         Color[] a = new Color[n];
-        for(int i = 0; i < n; i++) {
-            a[i] = c;
-        }
+        for(int i = 0; i < n; i++) a[i] = c;
         return a;
     }
 
@@ -368,9 +352,7 @@ public sealed class KeyViewerSettings : ISettingsFile {
         key != null && Counts.TryGetValue(key, out int v) ? v : 0;
 
     public void SetCount(string key, int value) {
-        if(!string.IsNullOrEmpty(key)) {
-            Counts[key] = value;
-        }
+        if(!string.IsNullOrEmpty(key)) Counts[key] = value;
     }
 
     public JToken Serialize() {
@@ -558,30 +540,12 @@ public sealed class KeyViewerSettings : ISettingsFile {
         Key8Text = ReadLabels(token, nameof(Key8Text), Key8Text);
         Key14Text = ReadLabels(token, nameof(Key14Text), Key14Text);
 
-        BgR = IOUtils.Read(token, nameof(BgR), BgR);
-        BgG = IOUtils.Read(token, nameof(BgG), BgG);
-        BgB = IOUtils.Read(token, nameof(BgB), BgB);
-        BgA = IOUtils.Read(token, nameof(BgA), BgA);
-        BgPressedR = IOUtils.Read(token, nameof(BgPressedR), BgPressedR);
-        BgPressedG = IOUtils.Read(token, nameof(BgPressedG), BgPressedG);
-        BgPressedB = IOUtils.Read(token, nameof(BgPressedB), BgPressedB);
-        BgPressedA = IOUtils.Read(token, nameof(BgPressedA), BgPressedA);
-        OutlineR = IOUtils.Read(token, nameof(OutlineR), OutlineR);
-        OutlineG = IOUtils.Read(token, nameof(OutlineG), OutlineG);
-        OutlineB = IOUtils.Read(token, nameof(OutlineB), OutlineB);
-        OutlineA = IOUtils.Read(token, nameof(OutlineA), OutlineA);
-        OutlinePressedR = IOUtils.Read(token, nameof(OutlinePressedR), OutlinePressedR);
-        OutlinePressedG = IOUtils.Read(token, nameof(OutlinePressedG), OutlinePressedG);
-        OutlinePressedB = IOUtils.Read(token, nameof(OutlinePressedB), OutlinePressedB);
-        OutlinePressedA = IOUtils.Read(token, nameof(OutlinePressedA), OutlinePressedA);
-        TextR = IOUtils.Read(token, nameof(TextR), TextR);
-        TextG = IOUtils.Read(token, nameof(TextG), TextG);
-        TextB = IOUtils.Read(token, nameof(TextB), TextB);
-        TextA = IOUtils.Read(token, nameof(TextA), TextA);
-        TextPressedR = IOUtils.Read(token, nameof(TextPressedR), TextPressedR);
-        TextPressedG = IOUtils.Read(token, nameof(TextPressedG), TextPressedG);
-        TextPressedB = IOUtils.Read(token, nameof(TextPressedB), TextPressedB);
-        TextPressedA = IOUtils.Read(token, nameof(TextPressedA), TextPressedA);
+        IOUtils.ReadRgba(token, "Bg", ref BgR, ref BgG, ref BgB, ref BgA);
+        IOUtils.ReadRgba(token, "BgPressed", ref BgPressedR, ref BgPressedG, ref BgPressedB, ref BgPressedA);
+        IOUtils.ReadRgba(token, "Outline", ref OutlineR, ref OutlineG, ref OutlineB, ref OutlineA);
+        IOUtils.ReadRgba(token, "OutlinePressed", ref OutlinePressedR, ref OutlinePressedG, ref OutlinePressedB, ref OutlinePressedA);
+        IOUtils.ReadRgba(token, "Text", ref TextR, ref TextG, ref TextB, ref TextA);
+        IOUtils.ReadRgba(token, "TextPressed", ref TextPressedR, ref TextPressedG, ref TextPressedB, ref TextPressedA);
 
         KeyFontScale = IOUtils.Read(token, nameof(KeyFontScale), KeyFontScale);
         CounterFontScale = IOUtils.Read(token, nameof(CounterFontScale), CounterFontScale);
@@ -606,10 +570,7 @@ public sealed class KeyViewerSettings : ISettingsFile {
         PerKeyTextPressed = ReadColors(token, nameof(PerKeyTextPressed), PerKeyTextPressed);
         PerKeyRain = ReadColors(token, nameof(PerKeyRain), PerKeyRain);
 
-        GhostRainR = IOUtils.Read(token, nameof(GhostRainR), GhostRainR);
-        GhostRainG = IOUtils.Read(token, nameof(GhostRainG), GhostRainG);
-        GhostRainB = IOUtils.Read(token, nameof(GhostRainB), GhostRainB);
-        GhostRainA = IOUtils.Read(token, nameof(GhostRainA), GhostRainA);
+        IOUtils.ReadRgba(token, "GhostRain", ref GhostRainR, ref GhostRainG, ref GhostRainB, ref GhostRainA);
         GhostKey8 = ReadKeys(token, nameof(GhostKey8), GhostKey8);
         GhostKey10 = ReadKeys(token, nameof(GhostKey10), GhostKey10);
         GhostKey12 = ReadKeys(token, nameof(GhostKey12), GhostKey12);
@@ -641,9 +602,7 @@ public sealed class KeyViewerSettings : ISettingsFile {
 
     private static JArray WriteLabels(string[] labels) {
         JArray arr = [];
-        foreach(string label in labels) {
-            arr.Add(label ?? "");
-        }
+        foreach(string label in labels) arr.Add(label ?? "");
         return arr;
     }
 
@@ -679,35 +638,11 @@ public sealed class KeyViewerSettings : ISettingsFile {
     }
 
     private static float[] ReadFloats(JToken token, string name, float[] fallback) {
-        if(token[name] is not JArray arr || arr.Count != fallback.Length) {
-            return fallback;
-        }
-
-        try {
-            float[] result = new float[arr.Count];
-            for(int i = 0; i < arr.Count; i++) {
-                result[i] = arr[i].Value<float>();
-            }
-            return result;
-        } catch {
-            return fallback;
-        }
+        return ReadArray(token, name, fallback, t => t.Value<float>());
     }
 
     private static bool[] ReadBools(JToken token, string name, bool[] fallback) {
-        if(token[name] is not JArray arr || arr.Count != fallback.Length) {
-            return fallback;
-        }
-
-        try {
-            bool[] result = new bool[arr.Count];
-            for(int i = 0; i < arr.Count; i++) {
-                result[i] = arr[i].Value<bool>();
-            }
-            return result;
-        } catch {
-            return fallback;
-        }
+        return ReadArray(token, name, fallback, t => t.Value<bool>());
     }
 
     private static string[] ReadLabels(JToken token, string name, string[] fallback) {
@@ -716,22 +651,22 @@ public sealed class KeyViewerSettings : ISettingsFile {
         }
 
         string[] result = new string[arr.Count];
-        for(int i = 0; i < arr.Count; i++) {
-            result[i] = arr[i].Type == JTokenType.String ? arr[i].ToString() : "";
-        }
+        for(int i = 0; i < arr.Count; i++) result[i] = arr[i].Type == JTokenType.String ? arr[i].ToString() : "";
         return result;
     }
 
     private static int[] ReadKeys(JToken token, string name, int[] fallback) {
+        return ReadArray(token, name, fallback, t => t.Value<int>());
+    }
+
+    private static T[] ReadArray<T>(JToken token, string name, T[] fallback, Func<JToken, T> read) {
         if(token[name] is not JArray arr || arr.Count != fallback.Length) {
             return fallback;
         }
 
         try {
-            int[] result = new int[arr.Count];
-            for(int i = 0; i < arr.Count; i++) {
-                result[i] = arr[i].Value<int>();
-            }
+            T[] result = new T[arr.Count];
+            for(int i = 0; i < arr.Count; i++) result[i] = read(arr[i]);
             return result;
         } catch {
             return fallback;

@@ -134,9 +134,7 @@ public static partial class EditorFeature {
             return;
         }
 
-        if(!EnsureLabel(host)) {
-            return;
-        }
+        if(!EnsureLabel(host)) return;
 
         bool dirty = false;
         TMP_FontAsset want = FontManager.GameOverlayFontAsset ?? FontManager.Current;
@@ -163,25 +161,14 @@ public static partial class EditorFeature {
     // scales with the (shrunk) font so it stays proportional. Black at half alpha,
     // crisp (softness 0 → a single layer), matching the HUD overlays' defaults.
     private static void ApplyReadoutShadow() {
-        if(readoutTmp == null) {
-            return;
-        }
+        if(readoutTmp == null) return;
         float offset = readoutTmp.fontSize * 0.12f;
-        TMPTextShadow.Apply(
-            readoutTmp,
-            true,
-            offset,
-            -offset,
-            0f,
-            new Color(0f, 0f, 0f, 0.5f)
-        );
+        TMPTextShadow.Apply(readoutTmp, true, offset, -offset, 0f, new Color(0f, 0f, 0f, 0.5f));
     }
 
     // (Re)build the label on the host tile, reusing it while the host is unchanged.
     private static bool EnsureLabel(scrFloor host) {
-        if(readoutLabel != null && readoutFloor == host && readoutTmp != null) {
-            return true;
-        }
+        if(readoutLabel != null && readoutFloor == host && readoutTmp != null) return true;
 
         ClearReadout();
         return CreateLabel(host);
@@ -189,9 +176,7 @@ public static partial class EditorFeature {
 
     private static bool CreateLabel(scrFloor host) {
         scrLetterPress src = host.editorNumText;
-        if(src == null) {
-            return false;
-        }
+        if(src == null) return false;
 
         // Clone the tile's number object for its world-space canvas + placement,
         // then replace its rendering with our own TMP.
@@ -211,12 +196,8 @@ public static partial class EditorFeature {
             textGo = gameText.gameObject;
             Object.DestroyImmediate(gameText);
         }
-        foreach(scrLetterPress lp in clone.GetComponentsInChildren<scrLetterPress>(true)) {
-            Object.DestroyImmediate(lp);
-        }
-        foreach(BaseMeshEffect fx in clone.GetComponentsInChildren<BaseMeshEffect>(true)) {
-            Object.DestroyImmediate(fx);
-        }
+        foreach(scrLetterPress lp in clone.GetComponentsInChildren<scrLetterPress>(true)) Object.DestroyImmediate(lp);
+        foreach(BaseMeshEffect fx in clone.GetComponentsInChildren<BaseMeshEffect>(true)) Object.DestroyImmediate(fx);
 
         TextMeshProUGUI tmp = textGo.AddComponent<TextMeshProUGUI>();
         textGo.AddComponent<GameFontExclude>();
@@ -245,14 +226,10 @@ public static partial class EditorFeature {
     // selected tile nearest the camera. Mirrors AdofaiTweaks' display-floor pick.
     private static scrFloor PickReadoutFloor(List<scrFloor> selected) {
         scrFloor first = selected[0];
-        if(first != null && first.enabled) {
-            return first;
-        }
+        if(first != null && first.enabled) return first;
 
         scrFloor last = selected[selected.Count - 1];
-        if(last != null && last.enabled) {
-            return last;
-        }
+        if(last != null && last.enabled) return last;
 
         scrCamera camera = scrCamera.instance;
         Vector3 cam = camera != null ? camera.transform.position : Vector3.zero;
@@ -261,9 +238,7 @@ public static partial class EditorFeature {
         float best = float.PositiveInfinity;
         scrFloor nearest = null;
         foreach(scrFloor floor in selected) {
-            if(floor == null || !floor.enabled) {
-                continue;
-            }
+            if(floor == null || !floor.enabled) continue;
             Vector3 p = floor.transform.position;
             p.z = 0f;
             float d = Vector3.Distance(p, cam);
@@ -340,9 +315,7 @@ public static partial class EditorFeature {
             // Pauses and free-roam waits add to the angular length; twirls/holds
             // are already folded into the arc by the game.
             foreach(LevelEvent e in editor.events) {
-                if(e == null || !e.active || e.floor != floor.seqID) {
-                    continue;
-                }
+                if(e == null || !e.active || e.floor != floor.seqID) continue;
                 double extra = e.eventType switch {
                     LevelEventType.Pause => e.GetFloat("duration") * 180d,
                     LevelEventType.FreeRoam => e.GetInt("duration") * 180d,
@@ -352,9 +325,7 @@ public static partial class EditorFeature {
             }
         }
 
-        if(totalAngle == 0d) {
-            return null;
-        }
+        if(totalAngle == 0d) return null;
 
         StringBuilder sb = new();
         bool any = false;
@@ -381,9 +352,7 @@ public static partial class EditorFeature {
     }
 
     private static void Append(StringBuilder sb, ref bool any, string color, string body) {
-        if(any) {
-            sb.Append('\n');
-        }
+        if(any) sb.Append('\n');
         sb.Append("<color=").Append(color).Append('>').Append(body).Append("</color>");
         any = true;
     }
@@ -392,12 +361,8 @@ public static partial class EditorFeature {
         // Tear the shadow's sibling root down first, while the TMP it's keyed to is
         // still alive — editorNumText's Text sits on the clone root, so the shadow
         // root is a SIBLING of the clone, not a child, and wouldn't fall with it.
-        if(readoutTmp != null) {
-            TMPTextShadow.Remove(readoutTmp);
-        }
-        if(readoutLabel != null) {
-            Object.DestroyImmediate(readoutLabel);
-        }
+        if(readoutTmp != null) TMPTextShadow.Remove(readoutTmp);
+        if(readoutLabel != null) Object.DestroyImmediate(readoutLabel);
         readoutLabel = null;
         readoutTmp = null;
         readoutFloor = null;

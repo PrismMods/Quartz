@@ -65,9 +65,7 @@ public static class ProfileManager {
                 JToken token = JToken.Parse(File.ReadAllText(PointerPath));
                 string name = token["Active"]?.Value<string>();
 
-                if(!string.IsNullOrWhiteSpace(name) && Directory.Exists(DirOf(name))) {
-                    Active = name;
-                }
+                if(!string.IsNullOrWhiteSpace(name) && Directory.Exists(DirOf(name))) Active = name;
             }
 
             // First run, or the pointer aimed at a deleted directory: capture
@@ -107,14 +105,10 @@ public static class ProfileManager {
     public static bool Create(string name) {
         name = Sanitize(name);
 
-        if(name == null || Exists(name)) {
-            return false;
-        }
+        if(name == null || Exists(name)) return false;
 
         try {
-            if(!CaptureActive()) {
-                return false;
-            }
+            if(!CaptureActive()) return false;
             CaptureTo(name);
             Active = name;
             SavePointer();
@@ -133,9 +127,7 @@ public static class ProfileManager {
     }
 
     public static bool Delete(string name) {
-        if(name == Active || !Exists(name)) {
-            return false;
-        }
+        if(name == Active || !Exists(name)) return false;
 
         try {
             Directory.Delete(DirOf(name), true);
@@ -153,9 +145,7 @@ public static class ProfileManager {
     // active while they were made.
     public static bool CaptureActive() {
         try {
-            if(!SettingsRegistry.SaveAll()) {
-                return false;
-            }
+            if(!SettingsRegistry.SaveAll()) return false;
             CaptureTo(Active);
             return true;
         } catch(Exception e) {
@@ -168,9 +158,7 @@ public static class ProfileManager {
     // this only swaps files, reloads them and re-applies the runtime side
     // (mod enable state, font, language).
     public static bool Apply(string name) {
-        if(name == Active || !Exists(name)) {
-            return false;
-        }
+        if(name == Active || !Exists(name)) return false;
 
         string previous = Active;
         Dictionary<string, string> previousFiles = null;
@@ -224,12 +212,8 @@ public static class ProfileManager {
                     ApplyRuntimeSettings();
                     Active = previous;
                     SavePointer();
-                    if(runtimeStopped) {
-                        MainCore.Runtime.SetModEnabled(MainCore.Conf.Active, true);
-                    }
-                    if(switchStarted) {
-                        CompleteSwitch();
-                    }
+                    if(runtimeStopped) MainCore.Runtime.SetModEnabled(MainCore.Conf.Active, true);
+                    if(switchStarted) CompleteSwitch();
                 } catch(Exception rollbackError) {
                     MainCore.Log.Err($"[{nameof(ProfileManager)}] Rollback '{previous}' failed: {rollbackError}");
                 }
@@ -242,16 +226,10 @@ public static class ProfileManager {
     // Writes the profile as a single-file bundle: every settings json keyed
     // by filename, plus enough metadata to validate on import.
     public static bool Export(string name, string destPath) {
-        if(!Exists(name) || string.IsNullOrEmpty(destPath)) {
-            return false;
-        }
+        if(!Exists(name) || string.IsNullOrEmpty(destPath)) return false;
 
         try {
-            if(name == Active) {
-                if(!CaptureActive()) {
-                    return false;
-                }
-            }
+            if(name == Active && !CaptureActive()) return false;
 
             JObject files = [];
 
@@ -303,9 +281,7 @@ public static class ProfileManager {
                 // GetFileName guards against path traversal in bundle keys.
                 string fileName = Path.GetFileName(prop.Name);
 
-                if(!fileName.EndsWith(".json", StringComparison.OrdinalIgnoreCase) || excluded.Contains(fileName)) {
-                    continue;
-                }
+                if(!fileName.EndsWith(".json", StringComparison.OrdinalIgnoreCase) || excluded.Contains(fileName)) continue;
 
                 imported[fileName] = System.Text.Encoding.UTF8.GetBytes(prop.Value.ToString());
             }
@@ -321,16 +297,12 @@ public static class ProfileManager {
     }
 
     private static string Uniquify(string name) {
-        if(!Exists(name)) {
-            return name;
-        }
+        if(!Exists(name)) return name;
 
         for(int i = 2; ; i++) {
             string candidate = $"{name} ({i})";
 
-            if(!Exists(candidate)) {
-                return candidate;
-            }
+            if(!Exists(candidate)) return candidate;
         }
     }
 
@@ -352,23 +324,17 @@ public static class ProfileManager {
     public static List<PresetInfo> ListPresets() {
         List<PresetInfo> list = [];
         try {
-            if(!Directory.Exists(PresetsPath)) {
-                return list;
-            }
+            if(!Directory.Exists(PresetsPath)) return list;
             foreach(string ext in ImportExtensions) {
                 foreach(string file in Directory.GetFiles(PresetsPath, "*." + ext)) {
                     string name = null;
                     try {
                         JToken b = JToken.Parse(File.ReadAllText(file));
-                        if(IsProfileBundle(b)) {
-                            name = b["Name"]?.Value<string>();
-                        }
+                        if(IsProfileBundle(b)) name = b["Name"]?.Value<string>();
                     } catch {
                     }
                     name = Sanitize(name) ?? Sanitize(Path.GetFileNameWithoutExtension(file));
-                    if(name != null) {
-                        list.Add(new PresetInfo(file, name));
-                    }
+                    if(name != null) list.Add(new PresetInfo(file, name));
                 }
             }
         } catch(Exception e) {
@@ -385,20 +351,14 @@ public static class ProfileManager {
             JToken bundle = JToken.Parse(File.ReadAllText(presetPath));
             string name = Sanitize(bundle["Name"]?.Value<string>())
                 ?? Sanitize(Path.GetFileNameWithoutExtension(presetPath));
-            if(name == null) {
-                return null;
-            }
+            if(name == null) return null;
 
             if(!Exists(name)) {
                 name = Import(presetPath);
-                if(name == null) {
-                    return null;
-                }
+                if(name == null) return null;
             }
 
-            if(name != Active) {
-                Apply(name);
-            }
+            if(name != Active) Apply(name);
             return name;
         } catch(Exception e) {
             MainCore.Log.Err($"[{nameof(ProfileManager)}] ApplyPreset '{presetPath}' failed: {e}");
@@ -413,9 +373,7 @@ public static class ProfileManager {
         foreach(string file in Directory.GetFiles(MainCore.Paths.RootPath, "*.json")) {
             string fileName = Path.GetFileName(file);
 
-            if(excluded.Contains(fileName)) {
-                continue;
-            }
+            if(excluded.Contains(fileName)) continue;
 
             snapshot[fileName] = File.ReadAllBytes(file);
         }
@@ -425,9 +383,7 @@ public static class ProfileManager {
 
     private static void WriteProfileDirectory(string directory, IReadOnlyDictionary<string, byte[]> files) {
         string parent = Path.GetDirectoryName(directory);
-        if(string.IsNullOrEmpty(parent)) {
-            throw new IOException("profile directory has no parent");
-        }
+        if(string.IsNullOrEmpty(parent)) throw new IOException("profile directory has no parent");
         Directory.CreateDirectory(parent);
 
         string leaf = Path.GetFileName(directory);
@@ -441,16 +397,12 @@ public static class ProfileManager {
             }
 
             bool hadPrevious = Directory.Exists(directory);
-            if(hadPrevious) {
-                Directory.Move(directory, backup);
-            }
+            if(hadPrevious) Directory.Move(directory, backup);
 
             try {
                 Directory.Move(staging, directory);
             } catch {
-                if(hadPrevious && !Directory.Exists(directory) && Directory.Exists(backup)) {
-                    Directory.Move(backup, directory);
-                }
+                if(hadPrevious && !Directory.Exists(directory) && Directory.Exists(backup)) Directory.Move(backup, directory);
                 throw;
             }
 
@@ -472,21 +424,16 @@ public static class ProfileManager {
 
             if(oldMarker > 1 && IsSwapSuffix(name, oldMarker + 5)) {
                 string target = DirOf(name[1..oldMarker]);
-                if(!Directory.Exists(target)) {
-                    Directory.Move(directory, target);
-                } else {
-                    Directory.Delete(directory, true);
-                }
+                if(!Directory.Exists(target)) Directory.Move(directory, target);
+                else Directory.Delete(directory, true);
             } else if(stageMarker > 1 && IsSwapSuffix(name, stageMarker + 7)) {
                 Directory.Delete(directory, true);
             }
         }
     }
 
-    private static bool IsSwapSuffix(string name, int start) {
-        return start < name.Length
-            && Guid.TryParseExact(name[start..], "N", out _);
-    }
+    private static bool IsSwapSuffix(string name, int start)
+        => start < name.Length && Guid.TryParseExact(name[start..], "N", out _);
 
     private static void BeginSwitch(string previous, IReadOnlyDictionary<string, string> previousFiles) {
         Dictionary<string, byte[]> rollback = previousFiles.ToDictionary(
@@ -502,9 +449,7 @@ public static class ProfileManager {
     }
 
     private static void CompleteSwitch() {
-        if(File.Exists(SwitchMarkerPath)) {
-            File.Delete(SwitchMarkerPath);
-        }
+        if(File.Exists(SwitchMarkerPath)) File.Delete(SwitchMarkerPath);
         if(Directory.Exists(SwitchRollbackPath)) {
             try { Directory.Delete(SwitchRollbackPath, true); } catch { }
         }
@@ -512,9 +457,7 @@ public static class ProfileManager {
 
     private static void RecoverInterruptedSwitch() {
         if(!File.Exists(SwitchMarkerPath)) {
-            if(Directory.Exists(SwitchRollbackPath)) {
-                Directory.Delete(SwitchRollbackPath, true);
-            }
+            if(Directory.Exists(SwitchRollbackPath)) Directory.Delete(SwitchRollbackPath, true);
             return;
         }
 
@@ -536,14 +479,10 @@ public static class ProfileManager {
         Dictionary<string, string> files = new(StringComparer.OrdinalIgnoreCase);
         foreach(string file in Directory.GetFiles(directory, "*.json")) {
             string fileName = Path.GetFileName(file);
-            if(excluded.Contains(fileName)) {
-                continue;
-            }
+            if(excluded.Contains(fileName)) continue;
 
             string contents = File.ReadAllText(file);
-            if(validateJson) {
-                JToken.Parse(contents);
-            }
+            if(validateJson) JToken.Parse(contents);
             files[fileName] = contents;
         }
         return files;
@@ -552,9 +491,7 @@ public static class ProfileManager {
     private static void ReplaceLiveSettings(IReadOnlyDictionary<string, string> files) {
         foreach(string live in Directory.GetFiles(MainCore.Paths.RootPath, "*.json")) {
             string fileName = Path.GetFileName(live);
-            if(!excluded.Contains(fileName) && !files.ContainsKey(fileName)) {
-                File.Delete(live);
-            }
+            if(!excluded.Contains(fileName) && !files.ContainsKey(fileName)) File.Delete(live);
         }
 
         foreach(KeyValuePair<string, string> file in files) {

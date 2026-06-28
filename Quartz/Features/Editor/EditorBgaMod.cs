@@ -109,25 +109,17 @@ public static partial class EditorFeature {
         => SetFloorsVisible(ADOBase.lm?.listFloors, visible);
 
     private static void SetFloorsVisible(List<scrFloor> floors, bool visible) {
-        if(floors == null) {
-            return;
-        }
+        if(floors == null) return;
         foreach(scrFloor floor in floors) {
-            if(floor == null) {
-                continue;
-            }
-            if(floor.floorRenderer != null) {
-                Set(floor.floorRenderer.renderer, visible);
-            }
+            if(floor == null) continue;
+            if(floor.floorRenderer != null) Set(floor.floorRenderer.renderer, visible);
             Set(floor.legacyFloorSpriteRenderer, visible);
             Set(floor.iconsprite, visible);
             Set(floor.outlineSprite, visible);
             Set(floor.topGlow, visible);
             Set(floor.bottomGlow, visible);
             Set(floor.multiplanetLine, visible);
-            if(floor.holdRenderer != null) {
-                Set(floor.holdRenderer.m_meshRenderer, visible);
-            }
+            if(floor.holdRenderer != null) Set(floor.holdRenderer.m_meshRenderer, visible);
         }
     }
 
@@ -138,13 +130,9 @@ public static partial class EditorFeature {
                 List<scrPlanet> planets = player != null && player.planetarySystem != null
                     ? player.planetarySystem.planetList
                     : null;
-                if(planets == null) {
-                    continue;
-                }
+                if(planets == null) continue;
                 foreach(scrPlanet planet in planets) {
-                    if(planet != null) {
-                        SetPlanetRendererVisible(planet.planetRenderer, visible);
-                    }
+                    if(planet != null) SetPlanetRendererVisible(planet.planetRenderer, visible);
                 }
             }
         }
@@ -159,9 +147,7 @@ public static partial class EditorFeature {
     }
 
     private static void SetPlanetRendererVisible(PlanetRenderer pr, bool visible) {
-        if(pr == null) {
-            return;
-        }
+        if(pr == null) return;
         // Mirror PlanetRenderer.appearanceRenderers (body, particles, ring, glow)
         // without that property's per-access `new Renderer[6]` allocation — this
         // runs per planet every frame while BGA Mod is active.
@@ -180,9 +166,7 @@ public static partial class EditorFeature {
         => ps != null ? ps.GetComponent<Renderer>() : null;
 
     private static void Set(Renderer r, bool visible) {
-        if(r != null && r.enabled != visible) {
-            r.enabled = visible;
-        }
+        if(r != null && r.enabled != visible) r.enabled = visible;
     }
 
     // --- Decorations ----------------------------------------------------------
@@ -218,13 +202,9 @@ public static partial class EditorFeature {
         if(hide) {
             scrDecorationManager mgr = scrDecorationManager.instance;
             List<scrDecoration> all = mgr != null ? mgr.allDecorations : null;
-            if(all == null) {
-                return;
-            }
+            if(all == null) return;
             foreach(scrDecoration deco in all) {
-                if(deco == null || !Matches(deco, kind) || !deco.GetVisible()) {
-                    continue;
-                }
+                if(deco == null || !Matches(deco, kind) || !deco.GetVisible()) continue;
                 deco.forceHide = true;
                 deco.SetVisible(false);
                 hidden.Add(deco);

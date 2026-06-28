@@ -49,9 +49,7 @@ public static class GameOverlayFont {
     private const float ParagraphScale = 0.9f;
 
     public static void Initialize() {
-        if(hooked) {
-            return;
-        }
+        if(hooked) return;
         hooked = true;
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
@@ -92,14 +90,10 @@ public static class GameOverlayFont {
     // TMP. Re-run periodically by the mirror so text shown after a scene loads
     // (pause menu, popups) is picked up too. Idempotent.
     internal static void TrackScene() {
-        if(!Active) {
-            return;
-        }
+        if(!Active) return;
 
         GameFontMirror mirror = GameFontMirror.Ensure();
-        if(mirror == null) {
-            return;
-        }
+        if(mirror == null) return;
 
         GameObject root = MainCore.Root;
         foreach(Text text in UnityEngine.Object.FindObjectsByType<Text>(FindObjectsSortMode.None)) {
@@ -108,9 +102,7 @@ public static class GameOverlayFont {
             }
         }
         foreach(TMP_Text tmp in UnityEngine.Object.FindObjectsByType<TMP_Text>(FindObjectsSortMode.None)) {
-            if(tmp == null) {
-                continue;
-            }
+            if(tmp == null) continue;
             // A label the game/another mod Instantiated carried a copy of our twin
             // as a child (e.g. TUFPlay cloning the "Calibration" object). That copy
             // is an unmanaged ghost rendering stale mod-font text — destroy it
@@ -130,12 +122,8 @@ public static class GameOverlayFont {
         GameFontMirror.DisposeInstance();
 
         foreach(Capture cap in tmpCaptures.Values) {
-            if(cap.Tmp == null) {
-                continue;
-            }
-            if(cap.Tmp.font != cap.Original) {
-                cap.Tmp.font = cap.Original;
-            }
+            if(cap.Tmp == null) continue;
+            if(cap.Tmp.font != cap.Original) cap.Tmp.font = cap.Original;
             cap.Tmp.enableAutoSizing = cap.OriginalAutoSize;
             cap.Tmp.textWrappingMode = cap.OriginalWrap;
             cap.Tmp.fontSize = cap.OriginalSize;
@@ -148,18 +136,14 @@ public static class GameOverlayFont {
 
     private static void OverrideTmp(TMP_Text tmp) {
         TMP_FontAsset want = FontManager.GameOverlayFontAsset;
-        if(tmp == null || want == null) {
-            return;
-        }
+        if(tmp == null || want == null) return;
 
         // Hit text is short-lived and spawned per-hit; don't capture it (would
         // leak) — just swap its font here; its size is HitTextSizePatch's job.
         bool isHitText = tmp.name.Contains("HitText");
         int id = tmp.GetInstanceID();
 
-        if(!isHitText && !tmpCaptures.ContainsKey(id)) {
-            SizeAndCapture(tmp, want, id);
-        }
+        if(!isHitText && !tmpCaptures.ContainsKey(id)) SizeAndCapture(tmp, want, id);
 
         if(tmp.font != want) {
             tmp.font = want;
@@ -194,9 +178,7 @@ public static class GameOverlayFont {
 
         // Single-line width-fit needs a laid-out box; defer to a later sweep if
         // the rect isn't measured yet so the fit isn't computed against width 0.
-        if(!paragraph && tmp.rectTransform.rect.width <= 0f) {
-            return;
-        }
+        if(!paragraph && tmp.rectTransform.rect.width <= 0f) return;
 
         tmpCaptures[id] = new Capture {
             Tmp = tmp,
@@ -223,9 +205,7 @@ public static class GameOverlayFont {
             tmp.fontSize = gameSize;
             float boxW = tmp.rectTransform.rect.width;
             float wantW = tmp.GetPreferredValues(tmp.text).x;
-            if(boxW > 0f && wantW > boxW) {
-                tmp.fontSize = gameSize * (boxW / wantW) * 0.98f;
-            }
+            if(boxW > 0f && wantW > boxW) tmp.fontSize = gameSize * (boxW / wantW) * 0.98f;
         }
     }
 
@@ -240,14 +220,10 @@ public static class GameOverlayFont {
 
         TMP_FontAsset want = FontManager.GameOverlayFontAsset;
         foreach(Capture cap in tmpCaptures.Values) {
-            if(cap.Tmp == null) {
-                continue;
-            }
+            if(cap.Tmp == null) continue;
             cap.Tmp.font = want;
             cap.Tmp.fontSharedMaterial = want.material;
-            if(!cap.OriginalAutoSize) {
-                ApplySize(cap.Tmp, cap.OriginalSize);
-            }
+            if(!cap.OriginalAutoSize) ApplySize(cap.Tmp, cap.OriginalSize);
         }
 
         // Pick up anything new too.
@@ -263,9 +239,7 @@ public static class GameOverlayFont {
     [HarmonyPatch(typeof(RDString), "SetLocalizedFont", new[] { typeof(TMP_Text) })]
     private static class TmpFontPatch {
         private static void Postfix(TMP_Text text) {
-            if(!Active || IsModUi(text, MainCore.Root) || GameFontMirror.IsTwin(text)) {
-                return;
-            }
+            if(!Active || IsModUi(text, MainCore.Root) || GameFontMirror.IsTwin(text)) return;
             try {
                 OverrideTmp(text);
             } catch {
@@ -282,9 +256,7 @@ public static class GameOverlayFont {
     [HarmonyPatch(typeof(RDString), "SetLocalizedFont", new[] { typeof(Text) })]
     private static class TextFontPatch {
         private static void Postfix(Text text) {
-            if(!Active || IsModUi(text, MainCore.Root)) {
-                return;
-            }
+            if(!Active || IsModUi(text, MainCore.Root)) return;
             try {
                 GameFontMirror.Ensure()?.Track(text);
             } catch {
@@ -309,13 +281,9 @@ public static class GameOverlayFont {
     [HarmonyPatch(typeof(scrHitTextMesh), "Init")]
     private static class HitTextSizePatch {
         private static void Postfix(scrHitTextMesh __instance) {
-            if(!Active) {
-                return;
-            }
+            if(!Active) return;
             try {
-                if(__instance.text != null) {
-                    __instance.text.fontSize *= HitTextScale;
-                }
+                if(__instance.text != null) __instance.text.fontSize *= HitTextScale;
             } catch {
             }
         }
@@ -370,9 +338,7 @@ public sealed class GameFontMirror : MonoBehaviour {
 
     private static void ApplyShadow(TMP_Text twin) {
         Material mat = twin.fontMaterial; // instances the material on first access
-        if(mat == null) {
-            return;
-        }
+        if(mat == null) return;
         mat.EnableKeyword("UNDERLAY_ON");
         mat.SetColor("_UnderlayColor", ShadowColor);
         mat.SetFloat("_UnderlayOffsetX", ShadowOffsetX);
@@ -401,9 +367,7 @@ public sealed class GameFontMirror : MonoBehaviour {
     private readonly HashSet<int> trackedSources = [];
 
     public static GameFontMirror Ensure() {
-        if(instance == null && MainCore.Root != null) {
-            instance = MainCore.Root.AddComponent<GameFontMirror>();
-        }
+        if(instance == null && MainCore.Root != null) instance = MainCore.Root.AddComponent<GameFontMirror>();
         return instance;
     }
 
@@ -419,9 +383,7 @@ public sealed class GameFontMirror : MonoBehaviour {
     }
 
     public void Track(Text source) {
-        if(source == null || !trackedSources.Add(source.GetInstanceID())) {
-            return;
-        }
+        if(source == null || !trackedSources.Add(source.GetInstanceID())) return;
 
         var twinGo = new GameObject(TwinName);
         twinGo.transform.SetParent(source.transform, false);
@@ -475,9 +437,7 @@ public sealed class GameFontMirror : MonoBehaviour {
         // dancing (InGame), gently in menus/pause where popups appear.
         if(burstFrames > 0) {
             burstFrames--;
-            if(burstFrames % BurstScanInterval == 0) {
-                GameOverlayFont.TrackScene();
-            }
+            if(burstFrames % BurstScanInterval == 0) GameOverlayFont.TrackScene();
         } else if(--rescanCountdown <= 0) {
             rescanCountdown = GameStats.InGame ? 300 : 30;
             GameOverlayFont.TrackScene();
@@ -492,21 +452,15 @@ public sealed class GameFontMirror : MonoBehaviour {
     // which doesn't re-run SetLocalizedFont) is hidden behind its twin before it
     // can draw even one frame of the game font. Same work as before, just moved to
     // the latest possible point — no extra cost.
-    private void OnEnable() {
-        Canvas.willRenderCanvases += SyncPairs;
-    }
+    private void OnEnable() => Canvas.willRenderCanvases += SyncPairs;
 
-    private void OnDisable() {
-        Canvas.willRenderCanvases -= SyncPairs;
-    }
+    private void OnDisable() => Canvas.willRenderCanvases -= SyncPairs;
 
     private void SyncPairs() {
         // Unity may raise willRenderCanvases multiple times in one frame. Mirrored
         // values cannot change between those callbacks, so sync once per frame.
         int frame = Time.frameCount;
-        if(lastSyncFrame == frame) {
-            return;
-        }
+        if(lastSyncFrame == frame) return;
         lastSyncFrame = frame;
 
         for(int i = pairs.Count - 1; i >= 0; i--) {
@@ -549,20 +503,12 @@ public sealed class GameFontMirror : MonoBehaviour {
             pair.LastRaw = source.text;
             twin.text = SanitizeMarkup(source.text);
         }
-        if(twin.color != source.color) {
-            twin.color = source.color;
-        }
+        if(twin.color != source.color) twin.color = source.color;
         FontStyles style = MapStyle(source.fontStyle);
-        if(twin.fontStyle != style) {
-            twin.fontStyle = style;
-        }
+        if(twin.fontStyle != style) twin.fontStyle = style;
         TextAlignmentOptions alignment = MapAnchor(source.alignment);
-        if(twin.alignment != alignment) {
-            twin.alignment = alignment;
-        }
-        if(twin.richText != source.supportRichText) {
-            twin.richText = source.supportRichText;
-        }
+        if(twin.alignment != alignment) twin.alignment = alignment;
+        if(twin.richText != source.supportRichText) twin.richText = source.supportRichText;
         // Wrapping mirrors the source: best-fit is orthogonal to wrap (the game
         // best-fits BOTH single-line titles AND wrapped paragraphs like the
         // difficulty blurb), so the line count must come from the source's own
@@ -570,18 +516,14 @@ public sealed class GameFontMirror : MonoBehaviour {
         bool wrap = source.horizontalOverflow == HorizontalWrapMode.Wrap
             && GameOverlayFont.AllowsWrap(source.rectTransform, source.fontSize);
         TextWrappingModes wrapMode = wrap ? TextWrappingModes.Normal : TextWrappingModes.NoWrap;
-        if(twin.textWrappingMode != wrapMode) {
-            twin.textWrappingMode = wrapMode;
-        }
+        if(twin.textWrappingMode != wrapMode) twin.textWrappingMode = wrapMode;
         // Always Overflow, never Truncate. Truncate CULLS any glyph geometry that
         // extends past the rect — and the drop-shadow underlay is part of that same
         // mesh, so a down-right shadow gets sliced off at the rect edge, leaving the
         // text sitting in a hard shadow box. The twin's size already matches the
         // game's, so the text itself never needs clipping; Overflow just lets the
         // shadow bleed out as it should.
-        if(twin.overflowMode != TextOverflowModes.Overflow) {
-            twin.overflowMode = TextOverflowModes.Overflow;
-        }
+        if(twin.overflowMode != TextOverflowModes.Overflow) twin.overflowMode = TextOverflowModes.Overflow;
 
         if(pair.IsSettingRow) {
             // Settings rows (PauseSettingButton label + value) are best-fit UI.Text
@@ -598,19 +540,11 @@ public sealed class GameFontMirror : MonoBehaviour {
             float anchor = source.resizeTextMaxSize > 0 ? source.resizeTextMaxSize
                 : source.fontSize > 0 ? source.fontSize
                 : 24f;
-            if(!twin.enableAutoSizing) {
-                twin.enableAutoSizing = true;
-            }
-            if(twin.textWrappingMode != TextWrappingModes.NoWrap) {
-                twin.textWrappingMode = TextWrappingModes.NoWrap;
-            }
-            if(twin.fontSizeMin != 1f) {
-                twin.fontSizeMin = 1f;
-            }
+            if(!twin.enableAutoSizing) twin.enableAutoSizing = true;
+            if(twin.textWrappingMode != TextWrappingModes.NoWrap) twin.textWrappingMode = TextWrappingModes.NoWrap;
+            if(twin.fontSizeMin != 1f) twin.fontSizeMin = 1f;
             float max = Mathf.Max(1f, anchor * SizeScale);
-            if(twin.fontSizeMax != max) {
-                twin.fontSizeMax = max;
-            }
+            if(twin.fontSizeMax != max) twin.fontSizeMax = max;
 
             int sid = source.GetInstanceID();
             if(diagLogged.Add(sid)) {
@@ -631,29 +565,17 @@ public sealed class GameFontMirror : MonoBehaviour {
             // titles — auto-fit fixes both.) Cap at the game's OWN best-fit ceiling
             // so the twin never overshoots it; min 1 lets it shrink to dodge clips.
             float maxPx = source.resizeTextMaxSize > 0 ? source.resizeTextMaxSize : source.fontSize;
-            if(!twin.enableAutoSizing) {
-                twin.enableAutoSizing = true;
-            }
-            if(twin.fontSizeMin != 1f) {
-                twin.fontSizeMin = 1f;
-            }
+            if(!twin.enableAutoSizing) twin.enableAutoSizing = true;
+            if(twin.fontSizeMin != 1f) twin.fontSizeMin = 1f;
             float max = Mathf.Max(1f, maxPx);
-            if(twin.fontSizeMax != max) {
-                twin.fontSizeMax = max;
-            }
+            if(twin.fontSizeMax != max) twin.fontSizeMax = max;
         } else {
             // Fixed-size game label: copy its size directly.
-            if(twin.enableAutoSizing) {
-                twin.enableAutoSizing = false;
-            }
+            if(twin.enableAutoSizing) twin.enableAutoSizing = false;
             float size = source.fontSize * SizeScale;
-            if(twin.fontSize != size) {
-                twin.fontSize = size;
-            }
+            if(twin.fontSize != size) twin.fontSize = size;
         }
-        if(twin.enabled != source.enabled) {
-            twin.enabled = source.enabled;
-        }
+        if(twin.enabled != source.enabled) twin.enabled = source.enabled;
 
         // Hide the original's pixels without touching its colour/enabled state,
         // so the game's own fade and show/hide logic keeps driving the twin.
@@ -662,12 +584,8 @@ public sealed class GameFontMirror : MonoBehaviour {
 
     private void Clear() {
         foreach(Pair pair in pairs) {
-            if(pair.Twin != null) {
-                Destroy(pair.Twin.gameObject);
-            }
-            if(pair.Source != null) {
-                pair.Source.canvasRenderer.SetAlpha(1f);
-            }
+            if(pair.Twin != null) Destroy(pair.Twin.gameObject);
+            if(pair.Source != null) pair.Source.canvasRenderer.SetAlpha(1f);
         }
         pairs.Clear();
         trackedSources.Clear();
@@ -690,9 +608,7 @@ public sealed class GameFontMirror : MonoBehaviour {
 
     internal static string SanitizeMarkup(string s) {
         // No tags -> nothing to fix; skip the regex work (the common case).
-        if(string.IsNullOrEmpty(s) || s.IndexOf('<') < 0) {
-            return s;
-        }
+        if(string.IsNullOrEmpty(s) || s.IndexOf('<') < 0) return s;
 
         s = SizeTag.Replace(s, "");
         s = ColorHex.Replace(s, m => {

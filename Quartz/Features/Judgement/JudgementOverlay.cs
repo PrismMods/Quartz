@@ -69,20 +69,14 @@ public static class JudgementOverlay {
     private static readonly StringBuilder rowBuilder = new(160);
 
     public static void EnsureConf() {
-        if(ConfMgr != null) {
-            return;
-        }
+        if(ConfMgr != null) return;
 
-        ConfMgr = new SettingsFile<JudgementSettings>(
-            Path.Combine(MainCore.Paths.RootPath, "Judgement.json")
-        );
+        ConfMgr = new SettingsFile<JudgementSettings>(Path.Combine(MainCore.Paths.RootPath, "Judgement.json"));
         ConfMgr.Load();
     }
 
     public static void Initialize(GameObject rootObject) {
-        if(canvasObj != null) {
-            return;
-        }
+        if(canvasObj != null) return;
 
         EnsureConf();
         compact = Conf.CompactRow;
@@ -213,9 +207,7 @@ public static class JudgementOverlay {
     }
 
     public static void Apply() {
-        if(root == null) {
-            return;
-        }
+        if(root == null) return;
 
         root.anchoredPosition = OverlayCalibration.Scale(new Vector2(Conf.OffsetX, BottomMargin + Conf.OffsetY));
 
@@ -239,9 +231,7 @@ public static class JudgementOverlay {
     private static float RowSpacing() => Mathf.Max(3f, FontSize() * 0.07f) + Mathf.Clamp(Conf.Spacing, -20f, 80f);
 
     private static void ApplyTextStyle(TextMeshProUGUI label, float fontSize) {
-        if(label == null) {
-            return;
-        }
+        if(label == null) return;
 
         label.fontSize = fontSize;
         TMPTextShadow.Apply(
@@ -279,9 +269,7 @@ public static class JudgementOverlay {
     }
 
     public static void Dispose() {
-        if(canvasObj == null) {
-            return;
-        }
+        if(canvasObj == null) return;
 
         ConfMgr?.Save();
 
@@ -316,26 +304,16 @@ public static class JudgementOverlay {
         private float lastGapSpacing = float.NaN;
 
         private void Update() {
-            if(root == null) {
-                return;
-            }
+            if(root == null) return;
 
             bool isReorganizing = UICore.IsReorganizing;
             bool show = (Panels.PanelsOverlay.IsEnabled && Conf.Enabled && GameStats.InGame) || isReorganizing;
-            if(raycaster != null && raycaster.enabled != isReorganizing) {
-                raycaster.enabled = isReorganizing;
-            }
-            if(root.gameObject.activeSelf != show) {
-                root.gameObject.SetActive(show);
-            }
+            if(raycaster != null && raycaster.enabled != isReorganizing) raycaster.enabled = isReorganizing;
+            if(root.gameObject.activeSelf != show) root.gameObject.SetActive(show);
 
-            if(dragObj != null && dragObj.activeSelf != isReorganizing) {
-                dragObj.SetActive(isReorganizing);
-            }
+            if(dragObj != null && dragObj.activeSelf != isReorganizing) dragObj.SetActive(isReorganizing);
 
-            if(!show) {
-                return;
-            }
+            if(!show) return;
 
             // Position only changes while dragging in Reorganize mode; mirroring
             // it back into Conf every frame otherwise is a no-op round-trip.
@@ -372,12 +350,8 @@ public static class JudgementOverlay {
             bool changed = !cacheValid || fontSize != lastFontSize || font != lastFont || xpModeChanged;
             for(int i = 0; i < labels.Length; i++) {
                 TextMeshProUGUI label = labels[i];
-                if(label.font != font) {
-                    label.font = font;
-                }
-                if(label.fontSize != fontSize) {
-                    label.fontSize = fontSize;
-                }
+                if(label.font != font) label.font = font;
+                if(label.fontSize != fontSize) label.fontSize = fontSize;
 
                 // Slot 4 shows the X (dead-center) count under XPerfect, the
                 // combined Perfect+Auto count otherwise.
@@ -391,9 +365,7 @@ public static class JudgementOverlay {
 
             UpdateXPerfectLabels(xpMode, xpModeChanged, font, fontSize, ref changed);
 
-            if(xpModeChanged) {
-                labels[PerfectSlot].color = xpMode ? XPerfectColor : Judgement.SlotColors[PerfectSlot];
-            }
+            if(xpModeChanged) labels[PerfectSlot].color = xpMode ? XPerfectColor : Judgement.SlotColors[PerfectSlot];
 
             cacheValid = true;
             lastFontSize = fontSize;
@@ -427,12 +399,8 @@ public static class JudgementOverlay {
         // size / gap changes, then assign it to .text. No per-cell labels, no 9-cell
         // layout solve — the only per-hit work is re-meshing this single label.
         private void UpdateCompact(TMP_FontAsset font, float fontSize) {
-            if(rowLabel.font != font) {
-                rowLabel.font = font;
-            }
-            if(rowLabel.fontSize != fontSize) {
-                rowLabel.fontSize = fontSize;
-            }
+            if(rowLabel.font != font) rowLabel.font = font;
+            if(rowLabel.fontSize != fontSize) rowLabel.fontSize = fontSize;
 
             float rowSpacing = RowSpacing();
             bool xpMode = Conf.ShowXPerfect && XPerfectBridge.Active;
@@ -470,9 +438,7 @@ public static class JudgementOverlay {
             lastXpMode = xpMode;
             lastRowSpacing = rowSpacing;
 
-            if(!changed) {
-                return;
-            }
+            if(!changed) return;
 
             StringBuilder sb = rowBuilder;
             sb.Clear();
@@ -482,9 +448,7 @@ public static class JudgementOverlay {
             }
             string gap = lastGap;
             for(int i = 0; i < Judgement.Slots; i++) {
-                if(i > 0) {
-                    sb.Append("<space=").Append(gap).Append("px>");
-                }
+                if(i > 0) sb.Append("<space=").Append(gap).Append("px>");
 
                 // Under XPerfect the Perfect slot expands into +Perfect / X /
                 // -Perfect (green / cyan / green), matching the multi-label row's
@@ -527,9 +491,7 @@ public static class JudgementOverlay {
         private void UpdateXPerfectLabels(
             bool xpMode, bool xpModeChanged, TMP_FontAsset font, float fontSize, ref bool changed
         ) {
-            if(xPlusLabel == null || xMinusLabel == null) {
-                return;
-            }
+            if(xPlusLabel == null || xMinusLabel == null) return;
 
             if(xPlusLabel.gameObject.activeSelf != xpMode) {
                 xPlusLabel.gameObject.SetActive(xpMode);
@@ -537,22 +499,12 @@ public static class JudgementOverlay {
                 changed = true;
             }
 
-            if(!xpMode) {
-                return;
-            }
+            if(!xpMode) return;
 
-            if(xPlusLabel.font != font) {
-                xPlusLabel.font = font;
-            }
-            if(xMinusLabel.font != font) {
-                xMinusLabel.font = font;
-            }
-            if(xPlusLabel.fontSize != fontSize) {
-                xPlusLabel.fontSize = fontSize;
-            }
-            if(xMinusLabel.fontSize != fontSize) {
-                xMinusLabel.fontSize = fontSize;
-            }
+            if(xPlusLabel.font != font) xPlusLabel.font = font;
+            if(xMinusLabel.font != font) xMinusLabel.font = font;
+            if(xPlusLabel.fontSize != fontSize) xPlusLabel.fontSize = fontSize;
+            if(xMinusLabel.fontSize != fontSize) xMinusLabel.fontSize = fontSize;
 
             int plus = XPerfectBridge.PlusCount();
             if(!cacheValid || plus != cachedPlus || xpModeChanged) {

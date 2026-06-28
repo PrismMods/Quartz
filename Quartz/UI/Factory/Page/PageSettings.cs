@@ -67,53 +67,8 @@ internal static class PageSettings {
         objects.Clear();
         FontManager.OnFontCatalogChanged -= RefreshFontDropdowns;
         FontManager.OnFontCatalogChanged += RefreshFontDropdowns;
-
-        GameObject pad = new("Pad");
-        pad.transform.SetParent(parent, false);
-
-        RectTransform padRect = pad.AddComponent<RectTransform>();
-        padRect.anchorMin = Vector2.zero;
-        padRect.anchorMax = Vector2.one;
-        padRect.pivot = new Vector2(0.5f, 0.5f);
-        padRect.offsetMin = new Vector2(18f, 18f);
-        padRect.offsetMax = new Vector2(-18f, -18f);
-
-        GameObject viewport = new("Viewport");
-        viewport.transform.SetParent(pad.transform, false);
-
-        RectTransform viewportRect = viewport.AddComponent<RectTransform>();
-        viewportRect.anchorMin = Vector2.zero;
-        viewportRect.anchorMax = Vector2.one;
-        viewportRect.offsetMin = Vector2.zero;
-        viewportRect.offsetMax = Vector2.zero;
-        viewportRect.pivot = new Vector2(0.5f, 0.5f);
-
-        viewport.AddComponent<EmptyGraphic>().raycastTarget = true;
-        viewport.AddComponent<RectMask2D>();
-
-        GameObject content = new("Content");
-        content.transform.SetParent(viewport.transform, false);
-
-        RectTransform contentRect = content.AddComponent<RectTransform>();
-        contentRect.anchorMin = new Vector2(0f, 1f);
-        contentRect.anchorMax = new Vector2(1f, 1f);
-        contentRect.pivot = new Vector2(0.5f, 1f);
-        contentRect.offsetMin = Vector2.zero;
-        contentRect.offsetMax = Vector2.zero;
-
-        VerticalLayoutGroup layout = content.AddComponent<VerticalLayoutGroup>();
-        layout.spacing = 12f;
-        layout.childControlWidth = true;
-        layout.childControlHeight = true;
-        layout.childForceExpandWidth = true;
-        layout.childForceExpandHeight = false;
-
-        ContentSizeFitter fitter = content.AddComponent<ContentSizeFitter>();
-        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-
-        scrollController = pad.AddComponent<UIScrollController>();
-        scrollController.SetContent(contentRect, viewportRect);
-        pageContent = contentRect;
+        RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent, out scrollController);
+        pageContent = content;
 
         CoreSettings defSet = new();
 
@@ -140,9 +95,7 @@ internal static class PageSettings {
                 foreach(var (labelLoc, valueTuple) in objects) {
                     var (labelRow, mainRow) = valueTuple;
 
-                    if(labelRow == null || mainRow == null) {
-                        continue;
-                    }
+                    if(labelRow == null || mainRow == null) continue;
 
                     string normalizedTarget = labelLoc != null ? StringUtils.Normalize(labelLoc.Value) : string.Empty;
                     if(MainCore.Conf.Language == "ko-KR" && !string.IsNullOrEmpty(normalizedTarget)) {
@@ -166,7 +119,7 @@ internal static class PageSettings {
                     kvp.Key.SetActive(kvp.Value);
                 }
 
-                LayoutRebuilder.ForceRebuildLayoutImmediate(contentRect);
+                LayoutRebuilder.ForceRebuildLayoutImmediate(content);
             },
             "Find",
             MainCore.Spr.Get(UISprite.MagnifyingGlass128),
@@ -187,15 +140,9 @@ internal static class PageSettings {
             MainCore.Tr.Language,
             langs,
             lang => {
-                if(lang == Translator.FALLBACK_LANGUAGE) {
-                    return "DEFAULT";
-                }
+                if(lang == Translator.FALLBACK_LANGUAGE) return "DEFAULT";
 
-                string native = MainCore.Tr.GetForLanguage(
-                    "0NATIVELANG",
-                    lang,
-                    lang
-                );
+                string native = MainCore.Tr.GetForLanguage("0NATIVELANG", lang, lang);
 
                 return $"{native} ({lang})";
             },
@@ -576,9 +523,7 @@ internal static class PageSettings {
             updateButtonRect,
             () => {
                 string url = UpdateService.Available?.Url;
-                if(!string.IsNullOrEmpty(url)) {
-                    Application.OpenURL(url);
-                }
+                if(!string.IsNullOrEmpty(url)) Application.OpenURL(url);
             },
             "Notes",
             "update_notes"
@@ -639,12 +584,7 @@ internal static class PageSettings {
         GameObject fontGroup = new("FontGroup");
         fontGroup.transform.SetParent(content.transform, false);
         fontGroup.AddComponent<RectTransform>();
-        var fontGroupLayout = fontGroup.AddComponent<VerticalLayoutGroup>();
-        fontGroupLayout.spacing = 8f;
-        fontGroupLayout.childControlWidth = true;
-        fontGroupLayout.childControlHeight = true;
-        fontGroupLayout.childForceExpandWidth = true;
-        fontGroupLayout.childForceExpandHeight = false;
+        GenerateUI.FitVertical(fontGroup, 8f);
 
         var fontRow = GenerateUI.Row(fontGroup.transform);
         fontDropdown = GenerateUI.DropDown(
@@ -716,9 +656,7 @@ internal static class PageSettings {
 
         var fontStatusRowRect = GenerateUI.Row(fontGroup.transform, 28f);
         fontStatusRow = fontStatusRowRect.gameObject;
-        fontStatusText = GenerateUI.AddText(fontStatusRowRect, noPad: true);
-        fontStatusText.fontSize = 16f;
-        fontStatusText.color = new Color(1f, 1f, 1f, 0.5f);
+        fontStatusText = GenerateUI.AddMutedText(fontStatusRowRect, 16f, 0.5f, true);
         fontStatusText.text = "";
         fontStatusRow.SetActive(false);
 
@@ -835,9 +773,7 @@ internal static class PageSettings {
     // The in-game font picker only applies while the feature is on, so hide it
     // when the toggle is off.
     private static void RefreshGameFontRow() {
-        if(gameFontPickerRow != null) {
-            gameFontPickerRow.SetActive(MainCore.Conf.ApplyFontToGameOverlay);
-        }
+        if(gameFontPickerRow != null) gameFontPickerRow.SetActive(MainCore.Conf.ApplyFontToGameOverlay);
     }
 
     // Rebuild every open font picker after an import, rename, or delete. This
@@ -898,9 +834,7 @@ internal static class PageSettings {
             return;
         }
 
-        if(string.IsNullOrEmpty(path)) {
-            return;
-        }
+        if(string.IsNullOrEmpty(path)) return;
 
         string name = FontManager.ImportFont(path);
         if(name == null) {
@@ -915,9 +849,7 @@ internal static class PageSettings {
 
     private static void RenameCurrentFont() {
         string cur = FontManager.CurrentName;
-        if(!FontManager.IsCustomFont(cur)) {
-            return;
-        }
+        if(!FontManager.IsCustomFont(cur)) return;
 
         if(FontManager.RenameFont(cur, pendingFontName, out string error)) {
             fontDropdown.SetValues(BuildFontValues());
@@ -931,9 +863,7 @@ internal static class PageSettings {
 
     private static void DeleteCurrentFont() {
         string cur = FontManager.CurrentName;
-        if(!FontManager.IsCustomFont(cur)) {
-            return;
-        }
+        if(!FontManager.IsCustomFont(cur)) return;
 
         // Two-step delete: first click arms the button (red "Sure?").
         if(!fontDeleteArmed) {
@@ -955,9 +885,7 @@ internal static class PageSettings {
     // Shows the rename/delete row for custom fonts only, refills the rename
     // field, and disarms the delete button.
     private static void RefreshFontManageRow() {
-        if(fontManageRow == null) {
-            return;
-        }
+        if(fontManageRow == null) return;
 
         bool custom = FontManager.IsCustomFont(FontManager.CurrentName);
         fontManageRow.SetActive(custom);
@@ -976,22 +904,16 @@ internal static class PageSettings {
             fontRenameInput?.Set(FontManager.CurrentName, false);
         }
 
-        if(pageContent != null) {
-            LayoutRebuilder.ForceRebuildLayoutImmediate(pageContent);
-        }
+        if(pageContent != null) LayoutRebuilder.ForceRebuildLayoutImmediate(pageContent);
     }
 
     private static void SetFontStatus(string message) {
-        if(fontStatusText == null || fontStatusRow == null) {
-            return;
-        }
+        if(fontStatusText == null || fontStatusRow == null) return;
 
         fontStatusText.text = message ?? "";
         fontStatusRow.SetActive(!string.IsNullOrEmpty(message));
 
-        if(pageContent != null) {
-            LayoutRebuilder.ForceRebuildLayoutImmediate(pageContent);
-        }
+        if(pageContent != null) LayoutRebuilder.ForceRebuildLayoutImmediate(pageContent);
     }
 
     private static string Tr(string key, string def) => MainCore.Tr.Get(key, def);
@@ -999,9 +921,7 @@ internal static class PageSettings {
     // Scrolls the page so the Updates section heading sits at the top of the
     // viewport. Used by the update toast after switching to this page.
     internal static void ScrollToUpdates() {
-        if(scrollController == null || updatesAnchor == null || pageContent == null) {
-            return;
-        }
+        if(scrollController == null || updatesAnchor == null || pageContent == null) return;
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(pageContent);
 
@@ -1014,9 +934,7 @@ internal static class PageSettings {
     // Pulls the latest UpdateService state into the update row. Runs on the
     // main thread (UpdateService raises OnChanged via MainThread).
     internal static void RefreshUpdates() {
-        if(updateStatusText == null || updateActionRow == null || updateButtonRow == null) {
-            return;
-        }
+        if(updateStatusText == null || updateActionRow == null || updateButtonRow == null) return;
 
         UpdateStatus status = UpdateService.Status;
         UpdateInfo info = UpdateService.Available;
@@ -1078,9 +996,7 @@ internal static class PageSettings {
             updateVersionText.text = "";
         }
 
-        if(updateCheckButton != null) {
-            updateCheckButton.SetBlocked(status is UpdateStatus.Checking or UpdateStatus.Installing);
-        }
+        if(updateCheckButton != null) updateCheckButton.SetBlocked(status is UpdateStatus.Checking or UpdateStatus.Installing);
     }
 
     private static bool HasGlyph(char c) {

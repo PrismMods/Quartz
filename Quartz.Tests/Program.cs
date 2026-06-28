@@ -44,9 +44,7 @@ static void TestAtomicFile() {
         Assert(File.ReadAllText(path) == "two", "replacement content");
         Assert(Directory.GetFiles(root, "*.tmp").Length == 0, "temporary files cleaned");
     } finally {
-        if(Directory.Exists(root)) {
-            Directory.Delete(root, true);
-        }
+        if(Directory.Exists(root)) Directory.Delete(root, true);
     }
 }
 
@@ -259,7 +257,5 @@ static HashSet<string> ReadLanguageKeys(string path, string language) {
 }
 
 static void Assert(bool condition, string message) {
-    if(!condition) {
-        throw new InvalidOperationException(message);
-    }
+    if(!condition) throw new InvalidOperationException(message);
 }

@@ -16,15 +16,11 @@ public sealed class ColorPoint {
         SetColor(color);
     }
 
-    public Color GetColor() => new(
-        Mathf.Clamp01(R), Mathf.Clamp01(G), Mathf.Clamp01(B), Mathf.Clamp01(A)
-    );
+    public Color GetColor() => new(Mathf.Clamp01(R), Mathf.Clamp01(G), Mathf.Clamp01(B), Mathf.Clamp01(A));
 
     public void SetColor(Color c) {
-        R = Mathf.Clamp01(c.r);
-        G = Mathf.Clamp01(c.g);
-        B = Mathf.Clamp01(c.b);
-        A = Mathf.Clamp01(c.a);
+        R = Mathf.Clamp01(c.r); G = Mathf.Clamp01(c.g);
+        B = Mathf.Clamp01(c.b); A = Mathf.Clamp01(c.a);
     }
 
     public JToken Serialize() => new JObject {
@@ -62,38 +58,24 @@ public sealed class StatColor {
     private static readonly Color Gold = new(1f, 0.854902f, 0f, 1f);
 
     public Color Evaluate(float ratio) {
-        if(float.IsNaN(ratio) || float.IsInfinity(ratio)) {
-            ratio = 0f;
-        }
+        if(float.IsNaN(ratio) || float.IsInfinity(ratio)) ratio = 0f;
         ratio = Mathf.Clamp01(ratio);
 
-        if(UsePerfect && ratio >= 0.9999f && Perfect != null) {
-            return Perfect.GetColor();
-        }
+        if(UsePerfect && ratio >= 0.9999f && Perfect != null) return Perfect.GetColor();
 
         // Points are kept sorted by the editor / deserializer — Evaluate runs
         // every frame, so no defensive re-sort here.
-        if(Points == null || Points.Count == 0) {
-            return Color.white;
-        }
-        if(Points.Count == 1) {
-            return Points[0].GetColor();
-        }
+        if(Points == null || Points.Count == 0) return Color.white;
+        if(Points.Count == 1) return Points[0].GetColor();
 
-        if(ratio <= Points[0].Pos) {
-            return Points[0].GetColor();
-        }
+        if(ratio <= Points[0].Pos) return Points[0].GetColor();
 
         int last = Points.Count - 1;
-        if(ratio >= Points[last].Pos) {
-            return Points[last].GetColor();
-        }
+        if(ratio >= Points[last].Pos) return Points[last].GetColor();
 
         for(int i = 1; i < Points.Count; i++) {
             ColorPoint high = Points[i];
-            if(ratio > high.Pos) {
-                continue;
-            }
+            if(ratio > high.Pos) continue;
 
             ColorPoint low = Points[i - 1];
             float span = high.Pos - low.Pos;
@@ -154,9 +136,7 @@ public sealed class StatColor {
 
     public JToken Serialize() {
         JArray points = [];
-        foreach(ColorPoint p in Points ?? []) {
-            points.Add(p.Serialize());
-        }
+        foreach(ColorPoint p in Points ?? []) points.Add(p.Serialize());
 
         return new JObject {
             [nameof(Enabled)] = Enabled,
@@ -169,23 +149,17 @@ public sealed class StatColor {
 
     public static StatColor Deserialize(JToken token) {
         StatColor c = new();
-        if(token == null) {
-            return c;
-        }
+        if(token == null) return c;
 
         c.Enabled = IOUtils.Read(token, nameof(Enabled), c.Enabled);
         c.UsePerfect = IOUtils.Read(token, nameof(UsePerfect), c.UsePerfect);
         c.MaxBpm = IOUtils.Read(token, nameof(MaxBpm), c.MaxBpm);
 
-        if(token[nameof(Perfect)] is JObject perfect) {
-            c.Perfect = ColorPoint.Deserialize(perfect);
-        }
+        if(token[nameof(Perfect)] is JObject perfect) c.Perfect = ColorPoint.Deserialize(perfect);
 
         if(token[nameof(Points)] is JArray arr) {
             c.Points = [];
-            foreach(JToken t in arr) {
-                c.Points.Add(ColorPoint.Deserialize(t));
-            }
+            foreach(JToken t in arr) c.Points.Add(ColorPoint.Deserialize(t));
             c.SortPoints();
         }
 

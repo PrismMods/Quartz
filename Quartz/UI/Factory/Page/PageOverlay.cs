@@ -32,51 +32,7 @@ internal static class PageOverlay {
         PanelsOverlay.EnsureConf();
         PanelsSettings conf = PanelsOverlay.Conf;
         PanelsSettings def = new();
-
-        GameObject pad = new("Pad");
-        pad.transform.SetParent(parent, false);
-
-        RectTransform padRect = pad.AddComponent<RectTransform>();
-        padRect.anchorMin = Vector2.zero;
-        padRect.anchorMax = Vector2.one;
-        padRect.pivot = new Vector2(0.5f, 0.5f);
-        padRect.offsetMin = new Vector2(18f, 18f);
-        padRect.offsetMax = new Vector2(-18f, -18f);
-
-        GameObject viewport = new("Viewport");
-        viewport.transform.SetParent(pad.transform, false);
-
-        RectTransform viewportRect = viewport.AddComponent<RectTransform>();
-        viewportRect.anchorMin = Vector2.zero;
-        viewportRect.anchorMax = Vector2.one;
-        viewportRect.offsetMin = Vector2.zero;
-        viewportRect.offsetMax = Vector2.zero;
-        viewportRect.pivot = new Vector2(0.5f, 0.5f);
-
-        viewport.AddComponent<EmptyGraphic>().raycastTarget = true;
-        viewport.AddComponent<RectMask2D>();
-
-        GameObject content = new("Content");
-        content.transform.SetParent(viewport.transform, false);
-
-        RectTransform contentRect = content.AddComponent<RectTransform>();
-        contentRect.anchorMin = new Vector2(0f, 1f);
-        contentRect.anchorMax = new Vector2(1f, 1f);
-        contentRect.pivot = new Vector2(0.5f, 1f);
-        contentRect.offsetMin = Vector2.zero;
-        contentRect.offsetMax = Vector2.zero;
-
-        VerticalLayoutGroup layout = content.AddComponent<VerticalLayoutGroup>();
-        layout.spacing = 12f;
-        layout.childControlWidth = true;
-        layout.childControlHeight = true;
-        layout.childForceExpandWidth = true;
-        layout.childForceExpandHeight = false;
-
-        ContentSizeFitter fitter = content.AddComponent<ContentSizeFitter>();
-        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-
-        pad.AddComponent<UIScrollController>().SetContent(contentRect, viewportRect);
+        RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
 
         // === Top: master toggle + reorganize, no category ===
 
@@ -91,10 +47,7 @@ internal static class PageOverlay {
             GenerateUI.Row(content.transform),
             def.Enabled,
             conf.Enabled,
-            v => {
-                conf.Enabled = v;
-                PanelsOverlay.Save();
-            },
+            v => { conf.Enabled = v; PanelsOverlay.Save(); },
             "Enable Overlays",
             "overlay_enabled"
         ).Rect.AddToolTip(
@@ -139,16 +92,7 @@ internal static class PageOverlay {
         panelsList = new GameObject("PanelsList");
         panelsList.transform.SetParent(panelsSec.Body, false);
         panelsList.AddComponent<RectTransform>();
-
-        VerticalLayoutGroup listLayout = panelsList.AddComponent<VerticalLayoutGroup>();
-        listLayout.spacing = 12f;
-        listLayout.childControlWidth = true;
-        listLayout.childControlHeight = true;
-        listLayout.childForceExpandWidth = true;
-        listLayout.childForceExpandHeight = false;
-
-        ContentSizeFitter listFitter = panelsList.AddComponent<ContentSizeFitter>();
-        listFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        GenerateUI.FitVertical(panelsList);
 
         RebuildPanelsList();
 
@@ -195,21 +139,15 @@ internal static class PageOverlay {
 
     // Rebuilds the per-panel sections (create/delete change the set).
     private static void RebuildPanelsList() {
-        if(panelsList == null) {
-            return;
-        }
+        if(panelsList == null) return;
 
-        for(int i = panelsList.transform.childCount - 1; i >= 0; i--) {
-            Object.Destroy(panelsList.transform.GetChild(i).gameObject);
-        }
+        GenerateUI.ClearChildren(panelsList.transform);
 
         List<PanelConfig> panels = PanelsOverlay.Conf.Panels;
 
         if(panels.Count == 0) {
-            var note = GenerateUI.AddText(GenerateUI.Row(panelsList.transform));
-            GenerateUI.Localize(note, "PANEL_NO_PANELS", "No panels. Create one above.");
-            note.fontSize = 19f;
-            note.color = new Color(1f, 1f, 1f, 0.45f);
+            GenerateUI.AddLocalizedMutedText(
+                GenerateUI.Row(panelsList.transform), "PANEL_NO_PANELS", "No panels. Create one above.", 19f);
             return;
         }
 
@@ -241,9 +179,7 @@ internal static class PageOverlay {
             panel.Name,
             v => {
                 panel.Name = string.IsNullOrWhiteSpace(v) ? "Panel" : v;
-                if(header != null) {
-                    header.text = panel.Name;
-                }
+                if(header != null) header.text = panel.Name;
                 Save();
             },
             "Panel Name",
@@ -285,9 +221,7 @@ internal static class PageOverlay {
             pickerSeq?.Kill();
 
             if(picker == null || pickerLayout == null || pickerFitter == null
-                || pickerLE == null || pickerRect == null || pickerCg == null) {
-                return;
-            }
+                || pickerLE == null || pickerRect == null || pickerCg == null) return;
 
             pickerLayout.enabled = true;
             pickerFitter.enabled = true;
@@ -325,7 +259,7 @@ internal static class PageOverlay {
                         pickerLE.preferredHeight = -1f;
                         LayoutRebuilder.ForceRebuildLayoutImmediate(sec.Section);
                     } else {
-                        ClearChildren(picker.transform);
+                        GenerateUI.ClearChildren(picker.transform);
                         pickerLE.preferredHeight = 0f;
                         onClosed?.Invoke();
                     }
@@ -338,9 +272,7 @@ internal static class PageOverlay {
             List<StatEntry> order = [];
             for(int i = 0; i < rows.transform.childCount; i++) {
                 StatRowMarker marker = rows.transform.GetChild(i).GetComponent<StatRowMarker>();
-                if(marker != null) {
-                    order.Add(marker.Entry);
-                }
+                if(marker != null) order.Add(marker.Entry);
             }
             panel.Stats.Clear();
             panel.Stats.AddRange(order);
@@ -350,16 +282,14 @@ internal static class PageOverlay {
         void ClosePicker(bool animate = true) {
             pickerOpen = false;
             replaceTarget = null;
-            if(addBtn != null) {
-                addBtn.Label.text = MainCore.Tr.Get("PANEL_ADDSTAT", "+ Add Stat");
-            }
+            if(addBtn != null) addBtn.Label.text = MainCore.Tr.Get("PANEL_ADDSTAT", "+ Add Stat");
 
             if(animate) {
                 AnimatePicker(false);
             } else {
                 pickerSeq?.Kill();
                 if(picker != null && pickerLE != null) {
-                    ClearChildren(picker.transform);
+                    GenerateUI.ClearChildren(picker.transform);
                     pickerLE.preferredHeight = 0f;
                 }
             }
@@ -367,9 +297,7 @@ internal static class PageOverlay {
 
         void OpenPickerAnimated() {
             pickerOpen = true;
-            if(addBtn != null) {
-                addBtn.Label.text = MainCore.Tr.Get("CLOSE", "Close");
-            }
+            if(addBtn != null) addBtn.Label.text = MainCore.Tr.Get("CLOSE", "Close");
             BuildPicker();
             AnimatePicker(true);
         }
@@ -420,7 +348,7 @@ internal static class PageOverlay {
                         body.LE.preferredHeight = -1f;
                         LayoutRebuilder.ForceRebuildLayoutImmediate(sec.Section);
                     } else {
-                        ClearChildren(body.Rect);
+                        GenerateUI.ClearChildren(body.Rect);
                         body.LE.preferredHeight = 0f;
                     }
                 })
@@ -429,11 +357,9 @@ internal static class PageOverlay {
         }
 
         void RebuildColorBody(StatEntry entry) {
-            if(!colorBodies.TryGetValue(entry, out StatColorBody body)) {
-                return;
-            }
+            if(!colorBodies.TryGetValue(entry, out StatColorBody body)) return;
 
-            ClearChildren(body.Rect);
+            GenerateUI.ClearChildren(body.Rect);
             BuildStatColorSettings(body.Rect, entry, Save, () => RebuildColorBody(entry), idp);
 
             body.Layout.enabled = true;
@@ -444,9 +370,7 @@ internal static class PageOverlay {
         }
 
         void ToggleColorBody(StatEntry entry) {
-            if(!colorBodies.TryGetValue(entry, out StatColorBody body)) {
-                return;
-            }
+            if(!colorBodies.TryGetValue(entry, out StatColorBody body)) return;
 
             if(colorExpanded.Remove(entry)) {
                 AnimateColorBody(body, false);
@@ -454,23 +378,19 @@ internal static class PageOverlay {
             }
 
             colorExpanded.Add(entry);
-            ClearChildren(body.Rect);
+            GenerateUI.ClearChildren(body.Rect);
             BuildStatColorSettings(body.Rect, entry, Save, () => RebuildColorBody(entry), idp);
             AnimateColorBody(body, true);
         }
 
         void RebuildRows() {
-            if(rows == null) {
-                return;
-            }
-            ClearChildren(rows.transform);
+            if(rows == null) return;
+            GenerateUI.ClearChildren(rows.transform);
             colorBodies.Clear();
 
             if(panel.Stats.Count == 0) {
-                var note = GenerateUI.AddText(GenerateUI.Row(rows.transform));
-                GenerateUI.Localize(note, "PANEL_NO_STATS", "No stats on this panel.");
-                note.fontSize = 19f;
-                note.color = new Color(1f, 1f, 1f, 0.45f);
+                GenerateUI.AddLocalizedMutedText(
+                    GenerateUI.Row(rows.transform), "PANEL_NO_STATS", "No stats on this panel.", 19f);
                 return;
             }
 
@@ -479,9 +399,7 @@ internal static class PageOverlay {
                     CommitOrder();
                     // Reordering moves only the marker rows; rebuild so any
                     // expanded color settings follow their row.
-                    if(colorExpanded.Count > 0) {
-                        RebuildRows();
-                    }
+                    if(colorExpanded.Count > 0) RebuildRows();
                 }, () => {
                     panel.Stats.Remove(entry);
                     colorExpanded.Remove(entry);
@@ -507,10 +425,8 @@ internal static class PageOverlay {
         }
 
         void BuildPicker() {
-            if(picker == null) {
-                return;
-            }
-            ClearChildren(picker.transform);
+            if(picker == null) return;
+            GenerateUI.ClearChildren(picker.transform);
 
             bool any = false;
             string[] categories = ["Accuracy", "Time", "BPM", "Map Stats", "Other"];
@@ -518,27 +434,20 @@ internal static class PageOverlay {
                 bool headerAdded = false;
 
                 foreach(PanelsOverlay.StatDef stat in PanelsOverlay.Catalog) {
-                    if(stat.Category != category) {
-                        continue;
-                    }
+                    if(stat.Category != category) continue;
                     // Skip stats already on the panel (including the one
                     // being replaced — swapping to itself is a no-op). The
                     // "text" stat is exempt: each carries its own custom string,
                     // so any number can sit on one panel.
-                    if(stat.Id != "text" && panel.Stats.Exists(e => e.Id == stat.Id)) {
-                        continue;
-                    }
+                    if(stat.Id != "text" && panel.Stats.Exists(e => e.Id == stat.Id)) continue;
 
                     if(!headerAdded) {
                         headerAdded = true;
-                        var header = GenerateUI.AddText(GenerateUI.Row(picker.transform, 32f));
-                        GenerateUI.Localize(
-                            header,
+                        GenerateUI.AddLocalizedMutedText(
+                            GenerateUI.Row(picker.transform, 32f),
                             GenerateUI.LocaleKeyFromText("PANEL_CATEGORY", category),
                             category
                         );
-                        header.fontSize = 17f;
-                        header.color = new Color(1f, 1f, 1f, 0.45f);
                     }
 
                     any = true;
@@ -568,10 +477,9 @@ internal static class PageOverlay {
             }
 
             if(!any) {
-                var note = GenerateUI.AddText(GenerateUI.Row(picker.transform));
-                GenerateUI.Localize(note, "PANEL_ALL_STATS_ADDED", "All stats are already on this panel.");
-                note.fontSize = 19f;
-                note.color = new Color(1f, 1f, 1f, 0.45f);
+                GenerateUI.AddLocalizedMutedText(
+                    GenerateUI.Row(picker.transform), "PANEL_ALL_STATS_ADDED",
+                    "All stats are already on this panel.", 19f);
             }
         }
 
@@ -822,23 +730,9 @@ internal static class PageOverlay {
         obj.transform.SetParent(parent, false);
         obj.AddComponent<RectTransform>();
 
-        VerticalLayoutGroup layout = obj.AddComponent<VerticalLayoutGroup>();
-        layout.spacing = spacing;
-        layout.childControlWidth = true;
-        layout.childControlHeight = true;
-        layout.childForceExpandWidth = true;
-        layout.childForceExpandHeight = false;
-
-        ContentSizeFitter fitter = obj.AddComponent<ContentSizeFitter>();
-        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        GenerateUI.FitVertical(obj, spacing);
 
         return obj;
-    }
-
-    private static void ClearChildren(Transform t) {
-        for(int i = t.childCount - 1; i >= 0; i--) {
-            Object.Destroy(t.GetChild(i).gameObject);
-        }
     }
 
     // One stat entry row: [⠿ drag] [label] ... [enable dot] [Color] [Swap] [X]
@@ -928,9 +822,7 @@ internal static class PageOverlay {
         ApplyToggleColor();
 
         GenerateUI.AddButton(toggleObj, btn => {
-            if(btn != InputButton.Left) {
-                return;
-            }
+            if(btn != InputButton.Left) return;
             entry.Enabled = !entry.Enabled;
             ApplyToggleColor();
             save();
@@ -965,9 +857,7 @@ internal static class PageOverlay {
         ApplyLabelDotColor();
 
         GenerateUI.AddButton(labelDot, btn => {
-            if(btn != InputButton.Left) {
-                return;
-            }
+            if(btn != InputButton.Left) return;
             entry.ShowLabel = !entry.ShowLabel;
             ApplyLabelDotColor();
             save();
@@ -1164,9 +1054,7 @@ internal static class PageOverlay {
 
     private static string StatDefaultLabel(string id) {
         foreach(PanelsOverlay.StatDef stat in PanelsOverlay.Catalog) {
-            if(stat.Id == id) {
-                return stat.Label;
-            }
+            if(stat.Id == id) return stat.Label;
         }
         return id;
     }
@@ -1193,9 +1081,7 @@ internal static class PageOverlay {
         label.alignment = TextAlignmentOptions.Center;
 
         GenerateUI.AddButton(obj, btn => {
-            if(btn == InputButton.Left) {
-                onClick();
-            }
+            if(btn == InputButton.Left) onClick();
         });
     }
 
@@ -1303,22 +1189,16 @@ internal static class PageOverlay {
     // panel (layer) order, then rebuilds the live panels so the draw order
     // follows. Called after a section is dropped in a new slot.
     private static void CommitPanelOrder() {
-        if(panelsList == null) {
-            return;
-        }
+        if(panelsList == null) return;
 
         List<PanelConfig> order = [];
         for(int i = 0; i < panelsList.transform.childCount; i++) {
             PanelSectionMarker marker =
                 panelsList.transform.GetChild(i).GetComponent<PanelSectionMarker>();
-            if(marker != null && marker.Config != null) {
-                order.Add(marker.Config);
-            }
+            if(marker != null && marker.Config != null) order.Add(marker.Config);
         }
 
-        if(order.Count == 0) {
-            return;
-        }
+        if(order.Count == 0) return;
 
         PanelsOverlay.Conf.Panels.Clear();
         PanelsOverlay.Conf.Panels.AddRange(order);
@@ -1356,9 +1236,7 @@ internal static class PageOverlay {
             reflowCapture.Clear();
             for(int i = 0; i < container.childCount; i++) {
                 Transform child = container.GetChild(i);
-                if(child == Row || !IsSection(child)) {
-                    continue;
-                }
+                if(child == Row || !IsSection(child)) continue;
                 RectTransform rt = (RectTransform)child;
                 reflowCapture.Add((rt, rt.anchoredPosition));
             }
@@ -1367,15 +1245,11 @@ internal static class PageOverlay {
 
             foreach((RectTransform rt, Vector2 oldPos) in reflowCapture) {
                 Vector2 target = rt.anchoredPosition;
-                if((target - oldPos).sqrMagnitude < 0.01f) {
-                    continue;
-                }
+                if((target - oldPos).sqrMagnitude < 0.01f) continue;
 
                 rt.anchoredPosition = oldPos;
 
-                if(rowSlides.TryGetValue(rt, out GTween running)) {
-                    running?.Kill();
-                }
+                if(rowSlides.TryGetValue(rt, out GTween running)) running?.Kill();
 
                 GTween slide = GTweenExtensions.Tween(
                     () => rt.anchoredPosition.y,
@@ -1389,9 +1263,7 @@ internal static class PageOverlay {
         }
 
         public void OnBeginDrag(PointerEventData eventData) {
-            if(Row == null || Row.parent == null) {
-                return;
-            }
+            if(Row == null || Row.parent == null) return;
 
             // A previous drop animation still running: jump it to its end so
             // the placeholder/layout state is clean before re-grabbing.
@@ -1407,9 +1279,7 @@ internal static class PageOverlay {
             // LayoutElement; add an inert one so the section can be lifted out
             // of the list layout (ignoreLayout) while it floats.
             rowLE = Row.GetComponent<LayoutElement>();
-            if(rowLE == null) {
-                rowLE = Row.gameObject.AddComponent<LayoutElement>();
-            }
+            if(rowLE == null) rowLE = Row.gameObject.AddComponent<LayoutElement>();
 
             // Gap that holds the section's slot while it floats.
             GameObject ph = new("DragPlaceholder");
@@ -1429,9 +1299,7 @@ internal static class PageOverlay {
         }
 
         public void OnDrag(PointerEventData eventData) {
-            if(!dragging || Row == null || placeholder == null) {
-                return;
-            }
+            if(!dragging || Row == null || placeholder == null) return;
 
             Vector3 pos = Row.position;
             pos.y = eventData.position.y + grabOffsetY;
@@ -1442,15 +1310,9 @@ internal static class PageOverlay {
             int target = 0;
             for(int i = 0; i < container.childCount; i++) {
                 Transform child = container.GetChild(i);
-                if(child == Row || child == placeholder) {
-                    continue;
-                }
-                if(!IsSection(child)) {
-                    continue;
-                }
-                if(((RectTransform)child).position.y > eventData.position.y) {
-                    target++;
-                }
+                if(child == Row || child == placeholder) continue;
+                if(!IsSection(child)) continue;
+                if(((RectTransform)child).position.y > eventData.position.y) target++;
             }
 
             if(placeholder.GetSiblingIndex() != target) {
@@ -1460,9 +1322,7 @@ internal static class PageOverlay {
         }
 
         public void OnEndDrag(PointerEventData eventData) {
-            if(!dragging || Row == null || placeholder == null) {
-                return;
-            }
+            if(!dragging || Row == null || placeholder == null) return;
 
             dragging = false;
 
@@ -1494,9 +1354,7 @@ internal static class PageOverlay {
                         ph.gameObject.SetActive(false);
                         Object.Destroy(ph.gameObject);
                     }
-                    if(rowLE != null) {
-                        rowLE.ignoreLayout = false;
-                    }
+                    if(rowLE != null) rowLE.ignoreLayout = false;
                     if(Row != null) {
                         Row.SetSiblingIndex(finalIndex);
                         Row.localScale = Vector3.one;
@@ -1509,9 +1367,7 @@ internal static class PageOverlay {
         }
 
         private void PlayScale(float target) {
-            if(Row == null) {
-                return;
-            }
+            if(Row == null) return;
 
             scaleSeq?.Kill();
             scaleSeq = GTweenExtensions.Tween(
@@ -1567,15 +1423,11 @@ internal static class PageOverlay {
 
             foreach((RectTransform rt, Vector2 oldPos) in reflowCapture) {
                 Vector2 target = rt.anchoredPosition;
-                if((target - oldPos).sqrMagnitude < 0.01f) {
-                    continue;
-                }
+                if((target - oldPos).sqrMagnitude < 0.01f) continue;
 
                 rt.anchoredPosition = oldPos;
 
-                if(rowSlides.TryGetValue(rt, out GTween running)) {
-                    running?.Kill();
-                }
+                if(rowSlides.TryGetValue(rt, out GTween running)) running?.Kill();
 
                 GTween slide = GTweenExtensions.Tween(
                     () => rt.anchoredPosition.y,
@@ -1589,9 +1441,7 @@ internal static class PageOverlay {
         }
 
         public void OnBeginDrag(PointerEventData eventData) {
-            if(Row == null || Row.parent == null) {
-                return;
-            }
+            if(Row == null || Row.parent == null) return;
 
             // A previous drop animation still running: jump it to its end so
             // the placeholder/layout state is clean before re-grabbing.
@@ -1614,9 +1464,7 @@ internal static class PageOverlay {
             phLE.minHeight = Row.rect.height;
             placeholder.SetSiblingIndex(Row.GetSiblingIndex());
 
-            if(rowLE != null) {
-                rowLE.ignoreLayout = true;
-            }
+            if(rowLE != null) rowLE.ignoreLayout = true;
             Row.SetAsLastSibling();
 
             grabOffsetY = Row.position.y - eventData.position.y;
@@ -1625,9 +1473,7 @@ internal static class PageOverlay {
         }
 
         public void OnDrag(PointerEventData eventData) {
-            if(!dragging || Row == null || placeholder == null) {
-                return;
-            }
+            if(!dragging || Row == null || placeholder == null) return;
 
             Vector3 pos = Row.position;
             pos.y = eventData.position.y + grabOffsetY;
@@ -1638,15 +1484,9 @@ internal static class PageOverlay {
             int target = 0;
             for(int i = 0; i < container.childCount; i++) {
                 Transform child = container.GetChild(i);
-                if(child == Row || child == placeholder) {
-                    continue;
-                }
-                if(child.GetComponent<StatRowMarker>() == null) {
-                    continue;
-                }
-                if(((RectTransform)child).position.y > eventData.position.y) {
-                    target++;
-                }
+                if(child == Row || child == placeholder) continue;
+                if(child.GetComponent<StatRowMarker>() == null) continue;
+                if(((RectTransform)child).position.y > eventData.position.y) target++;
             }
 
             if(placeholder.GetSiblingIndex() != target) {
@@ -1656,9 +1496,7 @@ internal static class PageOverlay {
         }
 
         public void OnEndDrag(PointerEventData eventData) {
-            if(!dragging || Row == null || placeholder == null) {
-                return;
-            }
+            if(!dragging || Row == null || placeholder == null) return;
 
             dragging = false;
 
@@ -1690,9 +1528,7 @@ internal static class PageOverlay {
                         ph.gameObject.SetActive(false);
                         Object.Destroy(ph.gameObject);
                     }
-                    if(rowLE != null) {
-                        rowLE.ignoreLayout = false;
-                    }
+                    if(rowLE != null) rowLE.ignoreLayout = false;
                     if(Row != null) {
                         Row.SetSiblingIndex(finalIndex);
                         Row.localScale = Vector3.one;
@@ -1708,9 +1544,7 @@ internal static class PageOverlay {
         }
 
         private void PlayScale(float target) {
-            if(Row == null) {
-                return;
-            }
+            if(Row == null) return;
 
             scaleSeq?.Kill();
             scaleSeq = GTweenExtensions.Tween(

@@ -48,26 +48,20 @@ public sealed class ReorganizeHandle : MonoBehaviour {
     private void OnDisable() => Reorganizer.Unregister(this);
 
     private void OnPointerDown(PointerEventData e) {
-        if(e.button != PointerEventData.InputButton.Left || Target == null) {
-            return;
-        }
+        if(e.button != PointerEventData.InputButton.Left || Target == null) return;
 
         // First press selects only; dragging is armed from the next press on,
         // so an unselected element never moves by accident.
         armed = Reorganizer.Selected == this;
         moved = false;
 
-        if(!armed) {
-            Reorganizer.Select(this);
-        }
+        if(!armed) Reorganizer.Select(this);
 
         grabOffset = (Vector2)Target.position - e.position;
     }
 
     private void OnDragInternal(PointerEventData e) {
-        if(!armed || Target == null) {
-            return;
-        }
+        if(!armed || Target == null) return;
 
         Vector3 pos = Target.position;
         Vector2 next = e.position + grabOffset;
@@ -107,22 +101,16 @@ public static class Reorganizer {
     private static GameObject outlineObj;
 
     internal static void Register(ReorganizeHandle handle) {
-        if(!handles.Contains(handle)) {
-            handles.Add(handle);
-        }
+        if(!handles.Contains(handle)) handles.Add(handle);
     }
 
     internal static void Unregister(ReorganizeHandle handle) {
         handles.Remove(handle);
-        if(Selected == handle) {
-            Deselect();
-        }
+        if(Selected == handle) Deselect();
     }
 
     public static void Select(ReorganizeHandle handle) {
-        if(Selected == handle) {
-            return;
-        }
+        if(Selected == handle) return;
 
         ClearOutline();
         Selected = handle;
@@ -144,18 +132,14 @@ public static class Reorganizer {
     public static void Deselect() {
         ClearOutline();
         Selected = null;
-        if(panelObj != null) {
-            panelObj.SetActive(false);
-        }
+        if(panelObj != null) panelObj.SetActive(false);
     }
 
     public static void Dispose() {
         Deselect();
         handles.Clear();
 
-        if(canvasObj != null) {
-            Object.Destroy(canvasObj);
-        }
+        if(canvasObj != null) Object.Destroy(canvasObj);
         canvasObj = null;
         panelObj = null;
         nameLabel = null;
@@ -187,18 +171,14 @@ public static class Reorganizer {
     }
 
     private static void ClearOutline() {
-        if(outlineObj != null) {
-            Object.Destroy(outlineObj);
-        }
+        if(outlineObj != null) Object.Destroy(outlineObj);
         outlineObj = null;
     }
 
     // ===== floating position panel =====
 
     private static void EnsurePanel() {
-        if(panelObj != null) {
-            return;
-        }
+        if(panelObj != null) return;
 
         canvasObj = new GameObject("QuartzReorganizeCanvas");
         canvasObj.transform.SetParent(MainCore.Root.transform, false);
@@ -250,16 +230,8 @@ public static class Reorganizer {
         group.alpha = 0.5f;
         group.blocksRaycasts = true;
 
-        VerticalLayoutGroup layout = panelObj.AddComponent<VerticalLayoutGroup>();
-        layout.spacing = 8f;
+        VerticalLayoutGroup layout = GenerateUI.FitVertical(panelObj, 8f);
         layout.padding = new RectOffset(14, 14, 12, 12);
-        layout.childControlWidth = true;
-        layout.childControlHeight = true;
-        layout.childForceExpandWidth = true;
-        layout.childForceExpandHeight = false;
-
-        ContentSizeFitter fitter = panelObj.AddComponent<ContentSizeFitter>();
-        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
         RectTransform nameRow = GenerateUI.Row(panelObj.transform, 34f);
         nameLabel = GenerateUI.AddText(nameRow, true);
@@ -295,9 +267,7 @@ public static class Reorganizer {
 
     // Mirrors the selected element's center into the sliders (drag → sliders).
     internal static void SyncSelectedSliders() {
-        if(Selected?.Target == null || xSlider == null) {
-            return;
-        }
+        if(Selected?.Target == null || xSlider == null) return;
 
         Vector2 center = ScreenToVirtual(ScreenCenter(Selected.Target));
         xSlider.SetOnlyValue(center.x, true);
@@ -307,20 +277,14 @@ public static class Reorganizer {
     // Slider → element: move the selected element's center to the given
     // virtual-screen coordinate on one axis.
     private static void MoveSelected(float? virtualX, float? virtualY) {
-        if(Selected?.Target == null) {
-            return;
-        }
+        if(Selected?.Target == null) return;
 
         RectTransform rt = Selected.Target;
         Vector2 center = ScreenCenter(rt);
         Vector2 target = center;
 
-        if(virtualX.HasValue) {
-            target.x = virtualX.Value / VirtualW * Screen.width;
-        }
-        if(virtualY.HasValue) {
-            target.y = virtualY.Value / VirtualH * Screen.height;
-        }
+        if(virtualX.HasValue) target.x = virtualX.Value / VirtualW * Screen.width;
+        if(virtualY.HasValue) target.y = virtualY.Value / VirtualH * Screen.height;
 
         Vector3 pos = rt.position;
         pos.x += target.x - center.x;
@@ -333,14 +297,10 @@ public static class Reorganizer {
     // Nudges the dragged element so its edges/center lines up with the screen
     // edges/center or another overlay element, when within threshold.
     internal static void SnapDuringDrag(ReorganizeHandle handle) {
-        if(handle?.Target == null) {
-            return;
-        }
+        if(handle?.Target == null) return;
 
         // Alt = free movement.
-        if(Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)) {
-            return;
-        }
+        if(Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)) return;
 
         GetScreenRect(handle.Target, out float left, out float right, out float bottom, out float top);
         float cx = (left + right) * 0.5f;
@@ -371,9 +331,7 @@ public static class Reorganizer {
         TryY(Screen.height);
 
         foreach(ReorganizeHandle other in handles) {
-            if(other == handle || other.Target == null || !other.isActiveAndEnabled) {
-                continue;
-            }
+            if(other == handle || other.Target == null || !other.isActiveAndEnabled) continue;
 
             GetScreenRect(other.Target, out float l, out float r, out float b, out float t);
             TryX(l);
@@ -396,9 +354,7 @@ public static class Reorganizer {
     }
 
     private static void Consider(float delta, ref float best) {
-        if(Mathf.Abs(delta) < Mathf.Abs(best)) {
-            best = delta;
-        }
+        if(Mathf.Abs(delta) < Mathf.Abs(best)) best = delta;
     }
 
     // ===== screen-space helpers (ScreenSpaceOverlay: world == screen px) =====

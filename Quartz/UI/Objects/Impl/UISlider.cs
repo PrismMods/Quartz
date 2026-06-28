@@ -106,9 +106,7 @@ public class UISlider : UIObject {
     public void Set(float value, bool invoke = true) {
         // Upstream 4b76865: "NaN" parses as a float; don't let it poison the
         // slider (Clamp(NaN) stays NaN and sticks).
-        if(float.IsNaN(value)) {
-            return;
-        }
+        if(float.IsNaN(value)) return;
 
         value = ApplyFilter(value);
 
@@ -122,9 +120,7 @@ public class UISlider : UIObject {
     }
 
     public void SetOnlyValue(float value, bool noAnimate = false) {
-        if(float.IsNaN(value)) {
-            return;
-        }
+        if(float.IsNaN(value)) return;
 
         Value = Mathf.Clamp(ApplyFilter(value), Min, Max);
         UpdateVisual(noAnimate);
@@ -225,9 +221,7 @@ public class UISlider : UIObject {
         var (result, state) = Evaluator.Evaluate(raw, Value, Min, Max);
 
         if(state == EvalState.Error) {
-            if(PreviewLabel != null) {
-                PreviewLabel.text = "";
-            }
+            if(PreviewLabel != null) PreviewLabel.text = "";
 
             SetStateVisuals(MathVisuals.GetStateColor(state), true);
             return;
@@ -238,9 +232,7 @@ public class UISlider : UIObject {
         // clamped) shows the result with a relational symbol.
         bool isLiteral = TryParseLiteral(raw, out float typed) && Mathf.Abs(typed - result) < 0.0001f;
         if(isLiteral) {
-            if(PreviewLabel != null) {
-                PreviewLabel.text = "";
-            }
+            if(PreviewLabel != null) PreviewLabel.text = "";
         } else if(PreviewLabel != null) {
             string symbol = state switch {
                 EvalState.OverRange => "<",
@@ -265,9 +257,7 @@ public class UISlider : UIObject {
             UpdateVisual(true);
         }
 
-        if(PreviewLabel != null) {
-            PreviewLabel.text = "";
-        }
+        if(PreviewLabel != null) PreviewLabel.text = "";
 
         SetStateVisuals(UIColors.ObjectActive, false);
     }

@@ -54,41 +54,21 @@ public static class MenuFactory {
         var settings = CreateItem(parent, "Settings", MainCore.Spr.Get(UISprite.Gear128, iconUnits), (int)OriginalMenuState.Settings);
         var credits = CreateItem(parent, "Credits", MainCore.Spr.Get(UISprite.Star128, iconUnits), (int)OriginalMenuState.Credits);
 
-        overlay.label.gameObject.AddComponent<TextLocalization>()
-            .Init("OVERLAY", "Overlay");
-
-        gameplay.label.gameObject.AddComponent<TextLocalization>()
-            .Init("GAMEPLAY", "Gameplay");
-
-        visuals.label.gameObject.AddComponent<TextLocalization>()
-            .Init("VISUALS", "Visuals");
-
-        tweaks.label.gameObject.AddComponent<TextLocalization>()
-            .Init("TWEAKS", "Tweaks");
-
-        editor.label.gameObject.AddComponent<TextLocalization>()
-            .Init("EDITOR", "Editor");
-
-        profiles.label.gameObject.AddComponent<TextLocalization>()
-            .Init("PROFILES", "Profiles");
-
-        import.label.gameObject.AddComponent<TextLocalization>()
-            .Init("IMPORT", "Import");
-
-        settings.label.gameObject.AddComponent<TextLocalization>()
-            .Init("SETTINGS", "Settings");
-
-        search.label.gameObject.AddComponent<TextLocalization>()
-            .Init("SEARCH", "Search");
-
-        credits.label.gameObject.AddComponent<TextLocalization>()
-            .Init("CREDITS", "Credits");
+        overlay.label.gameObject.AddComponent<TextLocalization>().Init("OVERLAY", "Overlay");
+        gameplay.label.gameObject.AddComponent<TextLocalization>().Init("GAMEPLAY", "Gameplay");
+        visuals.label.gameObject.AddComponent<TextLocalization>().Init("VISUALS", "Visuals");
+        tweaks.label.gameObject.AddComponent<TextLocalization>().Init("TWEAKS", "Tweaks");
+        editor.label.gameObject.AddComponent<TextLocalization>().Init("EDITOR", "Editor");
+        profiles.label.gameObject.AddComponent<TextLocalization>().Init("PROFILES", "Profiles");
+        import.label.gameObject.AddComponent<TextLocalization>().Init("IMPORT", "Import");
+        settings.label.gameObject.AddComponent<TextLocalization>().Init("SETTINGS", "Settings");
+        search.label.gameObject.AddComponent<TextLocalization>().Init("SEARCH", "Search");
+        credits.label.gameObject.AddComponent<TextLocalization>().Init("CREDITS", "Credits");
 
         // Developer tab — only present in "dev" builds.
         if(Info.IsDev) {
             var developer = CreateItem(parent, "Developer", MainCore.Spr.Get(UISprite.Wrench128, iconUnits), (int)OriginalMenuState.Developer);
-            developer.label.gameObject.AddComponent<TextLocalization>()
-                .Init("DEVELOPER", "Developer");
+            developer.label.gameObject.AddComponent<TextLocalization>().Init("DEVELOPER", "Developer");
         }
 
         CreateUpdateBadge(settings.obj.transform);
@@ -123,9 +103,7 @@ public static class MenuFactory {
     }
 
     private static void RefreshUpdateBadge() {
-        if(updateBadge == null) {
-            return;
-        }
+        if(updateBadge == null) return;
 
         updateBadge.SetActive(UpdateService.Status == UpdateStatus.Available);
     }
@@ -190,18 +168,14 @@ public static class MenuFactory {
         var trigger = item.AddComponent<EventTrigger>();
 
         void Add(EventTriggerType type, Action cb) {
-            var e = new EventTrigger.Entry {
-                eventID = type
-            };
+            var e = new EventTrigger.Entry { eventID = type };
 
             e.callback.AddListener(_ => cb());
             trigger.triggers.Add(e);
         }
 
         Add(EventTriggerType.PointerEnter, () => {
-            if(UICore.CurrentMenuState == state) {
-                return;
-            }
+            if(UICore.CurrentMenuState == state) return;
 
             menuItem.hoverSeq?.Kill();
             menuItem.hoverSeq = GTweenSequenceBuilder.New()
@@ -211,9 +185,7 @@ public static class MenuFactory {
         });
 
         Add(EventTriggerType.PointerExit, () => {
-            if(UICore.CurrentMenuState == state) {
-                return;
-            }
+            if(UICore.CurrentMenuState == state) return;
 
             menuItem.hoverSeq?.Kill();
             menuItem.hoverSeq = GTweenSequenceBuilder.New()
@@ -230,9 +202,7 @@ public static class MenuFactory {
     public static void SetState(int to) {
         int from = UICore.CurrentMenuState;
 
-        if(from == to) {
-            return;
-        }
+        if(from == to) return;
 
         UICore.CurrentMenuState = to;
 
@@ -256,8 +226,7 @@ public static class MenuFactory {
                 } else {
                     it.bg.color = UIColors.MenuHighlight;
 
-                    it.hoverSeq = it.bg.GTColor(UIColors.MenuSelected, 0.3f)
-                        .SetEasing(Easing.OutSine);
+                    it.hoverSeq = it.bg.GTColor(UIColors.MenuSelected, 0.3f).SetEasing(Easing.OutSine);
                     MainCore.TC.Play(it.hoverSeq);
                 }
             } else {

@@ -109,9 +109,7 @@ public static class PanelsOverlay {
     );
 
     public static string LocalizedStatLabel(StatDef stat) {
-        if(stat == null) {
-            return "";
-        }
+        if(stat == null) return "";
 
         return CatalogLocaleKeys.TryGetValue(stat.Id, out string key)
             ? MainCore.Tr.Get(key, stat.Label)
@@ -124,9 +122,7 @@ public static class PanelsOverlay {
     //   "|"  (1 ch) -> " | "  (a space added each side)
     //   "::" (2+ ch) -> used verbatim (the user supplied their own spacing)
     internal static string EffectiveSeparator(string raw) {
-        if(string.IsNullOrEmpty(raw)) {
-            return " ";
-        }
+        if(string.IsNullOrEmpty(raw)) return " ";
         return raw.Length == 1 ? " " + raw + " " : raw;
     }
 
@@ -134,18 +130,14 @@ public static class PanelsOverlay {
         => MainCore.Tr.Get(LocaleKey("PANEL_CATEGORY_", category), category);
 
     private static string LocaleKey(string prefix, string id) {
-        if(string.IsNullOrWhiteSpace(id)) {
-            return prefix;
-        }
+        if(string.IsNullOrWhiteSpace(id)) return prefix;
 
         StringBuilder key = new(prefix);
         bool lastUnderscore = false;
         foreach(char raw in id.Trim().ToUpperInvariant()) {
             char c = char.IsLetterOrDigit(raw) ? raw : '_';
             if(c == '_') {
-                if(lastUnderscore) {
-                    continue;
-                }
+                if(lastUnderscore) continue;
                 lastUnderscore = true;
             } else {
                 lastUnderscore = false;
@@ -172,9 +164,7 @@ public static class PanelsOverlay {
     };
 
     private static string Pct(float ratio, PanelConfig p) {
-        if(float.IsNaN(ratio) || float.IsInfinity(ratio)) {
-            ratio = 0f;
-        }
+        if(float.IsNaN(ratio) || float.IsInfinity(ratio)) ratio = 0f;
 
         int d = Mathf.Clamp(p.Decimals, 0, 6);
         return (ratio * 100f).ToString(PctFormats[d], CultureInfo.InvariantCulture) + "%";
@@ -191,9 +181,7 @@ public static class PanelsOverlay {
     private static Updater updater;
 
     public static void EnsureConf() {
-        if(ConfMgr != null) {
-            return;
-        }
+        if(ConfMgr != null) return;
 
         ConfMgr = new SettingsFile<PanelsSettings>(
             Path.Combine(MainCore.Paths.RootPath, "OverlayPanels.json")
@@ -204,9 +192,7 @@ public static class PanelsOverlay {
     public static void Save() => ConfMgr?.RequestSave();
 
     public static void Initialize(GameObject root) {
-        if(canvasObj != null) {
-            return;
-        }
+        if(canvasObj != null) return;
 
         EnsureConf();
 
@@ -231,9 +217,7 @@ public static class PanelsOverlay {
     }
 
     public static void Dispose() {
-        if(canvasObj == null) {
-            return;
-        }
+        if(canvasObj == null) return;
 
         SyncPositionsToConfig();
         ConfMgr?.Save();
@@ -250,16 +234,12 @@ public static class PanelsOverlay {
     // a panel whose config position was just rewritten (anchor change) and
     // must not be clobbered by its live rect's old-anchor position.
     public static void Rebuild(PanelConfig skipPositionSync = null) {
-        if(canvasObj == null) {
-            return;
-        }
+        if(canvasObj == null) return;
 
         SyncPositionsToConfig(skipPositionSync);
 
         foreach(LivePanel p in panels) {
-            if(p.Rect != null) {
-                Object.Destroy(p.Rect.gameObject);
-            }
+            if(p.Rect != null) Object.Destroy(p.Rect.gameObject);
         }
         panels.Clear();
 
@@ -304,9 +284,7 @@ public static class PanelsOverlay {
     }
 
     private static void ApplyPanel(LivePanel p) {
-        if(p?.Config == null) {
-            return;
-        }
+        if(p?.Config == null) return;
 
         if(p.Text != null) {
             p.Text.font = FontManager.Current;
@@ -451,15 +429,11 @@ public static class PanelsOverlay {
         private void Update() {
             bool isReorganizing = UICore.IsReorganizing;
             bool show = (IsEnabled && GameStats.InGame) || isReorganizing;
-            if(raycaster != null && raycaster.enabled != isReorganizing) {
-                raycaster.enabled = isReorganizing;
-            }
+            if(raycaster != null && raycaster.enabled != isReorganizing) raycaster.enabled = isReorganizing;
             float now = Time.unscaledTime;
             bool stateChanged = show != lastShow || isReorganizing != lastReorganizing;
             bool refreshText = stateChanged || now >= nextTextRefresh;
-            if(refreshText) {
-                nextTextRefresh = now + TextRefreshInterval;
-            }
+            if(refreshText) nextTextRefresh = now + TextRefreshInterval;
             lastShow = show;
             lastReorganizing = isReorganizing;
 
@@ -469,25 +443,19 @@ public static class PanelsOverlay {
         }
 
         private void UpdatePanel(LivePanel p, bool show, bool isReorganizing, bool refreshText) {
-            if(p?.Text == null || p.Rect == null) {
-                return;
-            }
+            if(p?.Text == null || p.Rect == null) return;
 
             if(p.DragObj != null && p.DragObj.activeSelf != isReorganizing) {
                 p.DragObj.SetActive(isReorganizing);
             }
 
             if(!show) {
-                if(p.Rect.gameObject.activeSelf) {
-                    p.Rect.gameObject.SetActive(false);
-                }
+                if(p.Rect.gameObject.activeSelf) p.Rect.gameObject.SetActive(false);
                 return;
             }
 
             if(!refreshText) {
-                if(isReorganizing) {
-                    SyncPosition(p);
-                }
+                if(isReorganizing) SyncPosition(p);
                 return;
             }
 
@@ -504,35 +472,25 @@ public static class PanelsOverlay {
                     p.Separator = EffectiveSeparator(c.LabelSeparator);
                 }
                 string separator = p.Separator;
-                if(!string.IsNullOrEmpty(c.Prefix)) {
-                    sb.AppendLine(c.Prefix);
-                }
+                if(!string.IsNullOrEmpty(c.Prefix)) sb.AppendLine(c.Prefix);
 
                 for(int i = 0; i < c.Stats.Count; i++) {
                     StatEntry entry = c.Stats[i];
-                    if(!entry.Enabled) {
-                        continue;
-                    }
+                    if(!entry.Enabled) continue;
 
                     StatDef stat = FindStat(entry.Id);
-                    if(stat == null) {
-                        continue;
-                    }
+                    if(stat == null) continue;
 
                     string value;
                     if(entry.Id == "text") {
                         // The "text" stat renders the entry's own custom string;
                         // an empty one is skipped so it leaves no blank line.
-                        if(string.IsNullOrEmpty(entry.Text)) {
-                            continue;
-                        }
+                        if(string.IsNullOrEmpty(entry.Text)) continue;
                         value = entry.Text;
                     } else {
                         try { value = stat.Value(c); }
                         catch { continue; }
-                        if(value == null) {
-                            continue;
-                        }
+                        if(value == null) continue;
                     }
 
                     // English by default; localized only when this panel opts
@@ -565,29 +523,21 @@ public static class PanelsOverlay {
                 : bodyLength == 0 ? "" : sb.ToString(0, bodyLength);
             // Reorganize mode forces an empty panel to render its name so the
             // user has a hit target to grab.
-            if(isReorganizing && body.Length == 0) {
-                body = p.Config.Name;
-            }
+            if(isReorganizing && body.Length == 0) body = p.Config.Name;
 
             bool active = body.Length > 0 || isReorganizing;
             if(p.Rect.gameObject.activeSelf != active) {
                 p.Rect.gameObject.SetActive(active);
                 // Re-show: shadow layers may have been disabled while hidden, so
                 // force a full text + shadow re-sync on the next applied frame.
-                if(active) {
-                    p.Dirty = true;
-                }
+                if(active) p.Dirty = true;
             }
 
-            if(!active) {
-                return;
-            }
+            if(!active) return;
 
             TMP_FontAsset font = FontManager.Current;
             bool fontChanged = p.Text.font != font;
-            if(fontChanged) {
-                p.Text.font = font;
-            }
+            if(fontChanged) p.Text.font = font;
 
             // Text values are sampled at 20 Hz; only re-tessellate, re-measure,
             // and re-sync the shadow when the sampled body actually changed.
@@ -609,9 +559,7 @@ public static class PanelsOverlay {
 
             // Position only changes in Reorganize mode (drag); writing it back
             // every frame otherwise is a no-op round-trip against Apply()'s value.
-            if(isReorganizing) {
-                SyncPosition(p);
-            }
+            if(isReorganizing) SyncPosition(p);
         }
 
         private static StatDef FindStat(string id) {
@@ -644,20 +592,14 @@ public static class PanelsOverlay {
         // trailing whitespace, then copy once. Byte-identical to the old result.
         private static int TrimmedBodyLength(StringBuilder sb) {
             int len = sb.Length;
-            while(len > 0 && char.IsWhiteSpace(sb[len - 1])) {
-                len--;
-            }
+            while(len > 0 && char.IsWhiteSpace(sb[len - 1])) len--;
             return len;
         }
 
         private static bool BuilderEquals(StringBuilder sb, int length, string value) {
-            if(value == null || value.Length != length) {
-                return false;
-            }
+            if(value == null || value.Length != length) return false;
             for(int i = 0; i < length; i++) {
-                if(sb[i] != value[i]) {
-                    return false;
-                }
+                if(sb[i] != value[i]) return false;
             }
             return true;
         }

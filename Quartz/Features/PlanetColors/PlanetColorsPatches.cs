@@ -16,9 +16,7 @@ public static partial class PlanetColors {
     private static IEnumerable<MethodBase> ExistingMethods(Type type, params string[] names) {
         for(int i = 0; i < names.Length; i++) {
             MethodInfo method = AccessTools.Method(type, names[i]);
-            if(method != null) {
-                yield return method;
-            }
+            if(method != null) yield return method;
         }
     }
 

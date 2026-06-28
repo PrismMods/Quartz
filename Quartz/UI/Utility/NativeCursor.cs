@@ -22,7 +22,6 @@ public enum ResizeCursorShape {
 // (see ResizeHandle.Update): the OS reclaims the cursor on the next mouse-move
 // message, so a one-shot set wouldn't stick.
 public static class NativeCursor {
-
     private static readonly bool isWindows =
         Application.platform == RuntimePlatform.WindowsPlayer
         || Application.platform == RuntimePlatform.WindowsEditor;
@@ -33,13 +32,9 @@ public static class NativeCursor {
 
     public static void Apply(ResizeCursorShape shape) {
         try {
-            if(isWindows) {
-                ApplyWindows(shape);
-            } else if(isMac) {
-                ApplyMac(shape);
-            } else {
-                ApplyTexture(shape);
-            }
+            if(isWindows) ApplyWindows(shape);
+            else if(isMac) ApplyMac(shape);
+            else ApplyTexture(shape);
         } catch {
             // A missing native lib or selector must never break dragging.
             ApplyTexture(shape);
@@ -110,30 +105,19 @@ public static class NativeCursor {
     private static IntPtr respondsSel;
 
     private static IntPtr NSCursorByName(string selName) {
-        if(nsCursorClass == IntPtr.Zero) {
-            nsCursorClass = objc_getClass("NSCursor");
-        }
-        if(nsCursorClass == IntPtr.Zero) {
-            return IntPtr.Zero;
-        }
-
-        if(respondsSel == IntPtr.Zero) {
-            respondsSel = sel_registerName("respondsToSelector:");
-        }
+        if(nsCursorClass == IntPtr.Zero) nsCursorClass = objc_getClass("NSCursor");
+        if(nsCursorClass == IntPtr.Zero) return IntPtr.Zero;
+        if(respondsSel == IntPtr.Zero) respondsSel = sel_registerName("respondsToSelector:");
 
         IntPtr sel = sel_registerName(selName);
         // Sending an unrecognized selector raises an NSException that aborts the
         // process (not a managed exception), so confirm support before sending.
-        if(objc_msgSend_bool(nsCursorClass, respondsSel, sel) == 0) {
-            return IntPtr.Zero;
-        }
+        if(objc_msgSend_bool(nsCursorClass, respondsSel, sel) == 0) return IntPtr.Zero;
         return objc_msgSend(nsCursorClass, sel);
     }
 
     private static void MacSet(IntPtr cursor) {
-        if(cursor != IntPtr.Zero) {
-            objc_msgSend(cursor, sel_registerName("set"));
-        }
+        if(cursor != IntPtr.Zero) objc_msgSend(cursor, sel_registerName("set"));
     }
 
     private static void ApplyMac(ResizeCursorShape shape) {
@@ -169,15 +153,11 @@ public static class NativeCursor {
 
     private static void ApplyTexture(ResizeCursorShape shape) {
         Texture2D tex = GetTexture(Angle(shape));
-        if(tex != null) {
-            Cursor.SetCursor(tex, new Vector2(tex.width * 0.5f, tex.height * 0.5f), CursorMode.Auto);
-        }
+        if(tex != null) Cursor.SetCursor(tex, new Vector2(tex.width * 0.5f, tex.height * 0.5f), CursorMode.Auto);
     }
 
     private static Texture2D GetTexture(int angleDeg) {
-        if(texCache.TryGetValue(angleDeg, out Texture2D cached)) {
-            return cached;
-        }
+        if(texCache.TryGetValue(angleDeg, out Texture2D cached)) return cached;
 
         const int size = 32;
         const float c = (size - 1) * 0.5f;
@@ -198,12 +178,8 @@ public static class NativeCursor {
 
                 Color col = clear;
                 // Black outline first, white core on top.
-                if(IsArrow(u, v, 14f, 6f, 5f, 2.6f)) {
-                    col = Color.black;
-                }
-                if(IsArrow(u, v, 13f, 5f, 4f, 1.5f)) {
-                    col = Color.white;
-                }
+                if(IsArrow(u, v, 14f, 6f, 5f, 2.6f)) col = Color.black;
+                if(IsArrow(u, v, 13f, 5f, 4f, 1.5f)) col = Color.white;
                 tex.SetPixel(x, y, col);
             }
         }
@@ -219,12 +195,8 @@ public static class NativeCursor {
     private static bool IsArrow(float u, float v, float ltip, float hh, float headHalf, float t) {
         float au = Mathf.Abs(u);
         float shaft = ltip - hh;
-        if(au <= shaft) {
-            return Mathf.Abs(v) <= t;
-        }
-        if(au <= ltip) {
-            return Mathf.Abs(v) <= headHalf * (ltip - au) / hh;
-        }
+        if(au <= shaft) return Mathf.Abs(v) <= t;
+        if(au <= ltip) return Mathf.Abs(v) <= headHalf * (ltip - au) / hh;
         return false;
     }
 }

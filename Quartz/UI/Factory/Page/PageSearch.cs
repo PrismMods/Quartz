@@ -36,50 +36,7 @@ internal static class PageSearch {
     private static TextMeshProUGUI statusText;
 
     public static void Create(RectTransform parent) {
-        GameObject pad = new("Pad");
-        pad.transform.SetParent(parent, false);
-
-        RectTransform padRect = pad.AddComponent<RectTransform>();
-        padRect.anchorMin = Vector2.zero;
-        padRect.anchorMax = Vector2.one;
-        padRect.pivot = new Vector2(0.5f, 0.5f);
-        padRect.offsetMin = new Vector2(18f, 18f);
-        padRect.offsetMax = new Vector2(-18f, -18f);
-
-        GameObject viewport = new("Viewport");
-        viewport.transform.SetParent(pad.transform, false);
-
-        RectTransform viewportRect = viewport.AddComponent<RectTransform>();
-        viewportRect.anchorMin = Vector2.zero;
-        viewportRect.anchorMax = Vector2.one;
-        viewportRect.offsetMin = Vector2.zero;
-        viewportRect.offsetMax = Vector2.zero;
-        viewportRect.pivot = new Vector2(0.5f, 0.5f);
-
-        viewport.AddComponent<EmptyGraphic>().raycastTarget = true;
-        viewport.AddComponent<RectMask2D>();
-
-        GameObject content = new("Content");
-        content.transform.SetParent(viewport.transform, false);
-
-        RectTransform contentRect = content.AddComponent<RectTransform>();
-        contentRect.anchorMin = new Vector2(0f, 1f);
-        contentRect.anchorMax = new Vector2(1f, 1f);
-        contentRect.pivot = new Vector2(0.5f, 1f);
-        contentRect.offsetMin = Vector2.zero;
-        contentRect.offsetMax = Vector2.zero;
-
-        VerticalLayoutGroup layout = content.AddComponent<VerticalLayoutGroup>();
-        layout.spacing = 12f;
-        layout.childControlWidth = true;
-        layout.childControlHeight = true;
-        layout.childForceExpandWidth = true;
-        layout.childForceExpandHeight = false;
-
-        ContentSizeFitter fitter = content.AddComponent<ContentSizeFitter>();
-        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-
-        pad.AddComponent<UIScrollController>().SetContent(contentRect, viewportRect);
+        RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
 
         var inputRow = GenerateUI.Row(content.transform);
         var input = GenerateUI.Input(
@@ -95,24 +52,13 @@ internal static class PageSearch {
         input.InputField.characterLimit = 40;
 
         var statusRow = GenerateUI.Row(content.transform, 32f);
-        statusText = GenerateUI.AddText(statusRow);
-        statusText.color = new Color(1f, 1f, 1f, 0.45f);
-        statusText.fontSize = 18f;
+        statusText = GenerateUI.AddMutedText(statusRow, 18f);
 
         GameObject results = new("Results");
         results.transform.SetParent(content.transform, false);
 
         resultsContainer = results.AddComponent<RectTransform>();
-
-        VerticalLayoutGroup resultsLayout = results.AddComponent<VerticalLayoutGroup>();
-        resultsLayout.spacing = 8f;
-        resultsLayout.childControlWidth = true;
-        resultsLayout.childControlHeight = true;
-        resultsLayout.childForceExpandWidth = true;
-        resultsLayout.childForceExpandHeight = false;
-
-        ContentSizeFitter resultsFitter = results.AddComponent<ContentSizeFitter>();
-        resultsFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        GenerateUI.FitVertical(results, 8f);
 
         RunSearch("");
     }
@@ -124,9 +70,8 @@ internal static class PageSearch {
     private static string Norm(string input) {
         string normalized = StringUtils.Normalize(input);
 
-        if(MainCore.Conf.Language == "ko-KR" && !string.IsNullOrEmpty(normalized)) {
+        if(MainCore.Conf.Language == "ko-KR" && !string.IsNullOrEmpty(normalized))
             normalized = StringUtils.NormalizeToHangulChosung(normalized);
-        }
 
         return normalized;
     }
@@ -146,13 +91,9 @@ internal static class PageSearch {
     };
 
     private static void RunSearch(string query) {
-        if(resultsContainer == null) {
-            return;
-        }
+        if(resultsContainer == null) return;
 
-        for(int i = resultsContainer.childCount - 1; i >= 0; i--) {
-            Object.Destroy(resultsContainer.GetChild(i).gameObject);
-        }
+        GenerateUI.ClearChildren(resultsContainer);
 
         string q = Norm(query ?? "");
 
@@ -163,21 +104,15 @@ internal static class PageSearch {
 
         List<Entry> matches = [];
         foreach(Entry e in BuildIndex()) {
-            if(Norm(e.Text).Contains(q)) {
-                matches.Add(e);
-            }
+            if(Norm(e.Text).Contains(q)) matches.Add(e);
         }
 
         // Prefix matches first, categories before plain rows, then A-Z.
         matches.Sort((a, b) => {
             bool ap = Norm(a.Text).StartsWith(q);
             bool bp = Norm(b.Text).StartsWith(q);
-            if(ap != bp) {
-                return ap ? -1 : 1;
-            }
-            if(a.IsCategory != b.IsCategory) {
-                return a.IsCategory ? -1 : 1;
-            }
+            if(ap != bp) return ap ? -1 : 1;
+            if(a.IsCategory != b.IsCategory) return a.IsCategory ? -1 : 1;
             return string.Compare(a.Text, b.Text, StringComparison.OrdinalIgnoreCase);
         });
 
@@ -224,10 +159,7 @@ internal static class PageSearch {
         List<Entry> list = [];
 
         foreach(KeyValuePair<int, RectTransform> page in UICore.Pages) {
-            if(page.Key == (int)OriginalMenuState.Search || page.Value == null) {
-                continue;
-            }
-
+            if(page.Key == (int)OriginalMenuState.Search || page.Value == null) continue;
             Walk(page.Value, page.Key, null, list);
         }
 
@@ -241,9 +173,7 @@ internal static class PageSearch {
 
             // Dropdown option lists would add one entry per option (the font
             // list alone has dozens) — the dropdown's own row already matches.
-            if(name == "List") {
-                continue;
-            }
+            if(name == "List") continue;
 
             if(name.StartsWith("Section_")) {
                 TMP_Text headerLabel = child.Find("Header/Bar/Label")?.GetComponent<TMP_Text>();
@@ -258,9 +188,7 @@ internal static class PageSearch {
                 });
 
                 Transform body = child.Find("Body");
-                if(body != null) {
-                    Walk(body, state, title, list);
-                }
+                if(body != null) Walk(body, state, title, list);
                 continue;
             }
 
@@ -296,9 +224,7 @@ internal static class PageSearch {
         Transform cur = label;
 
         while(cur.parent != null && cur != page) {
-            if(cur.parent.GetComponent<VerticalLayoutGroup>() != null) {
-                return cur as RectTransform;
-            }
+            if(cur.parent.GetComponent<VerticalLayoutGroup>() != null) return cur as RectTransform;
             cur = cur.parent;
         }
 
@@ -306,29 +232,21 @@ internal static class PageSearch {
     }
 
     private static void Navigate(Entry e) {
-        if(e.Target == null) {
-            return;
-        }
+        if(e.Target == null) return;
 
         // Snap open every collapsed section between the page root and the
         // target (instant — the scroll math needs settled layout heights).
         // A category result also opens itself so its contents show.
         foreach(GenerateUI.CollapsibleSection s in GenerateUI.Sections) {
-            if(s.Body == null) {
-                continue;
-            }
-            if(e.Target == s.Section || e.Target.IsChildOf(s.Body)) {
-                s.SetExpanded(true, false, false);
-            }
+            if(s.Body == null) continue;
+            if(e.Target == s.Section || e.Target.IsChildOf(s.Body)) s.SetExpanded(true, false, false);
         }
 
         MenuFactory.SetState(e.State);
 
         RectTransform page = UICore.Pages[e.State];
         UIScrollController scroller = page.GetComponentInChildren<UIScrollController>(true);
-        if(scroller == null || scroller.content == null) {
-            return;
-        }
+        if(scroller == null || scroller.content == null) return;
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(scroller.content);
 
@@ -372,9 +290,7 @@ internal static class PageSearch {
                 0.8f
             ).SetEasing(Easing.OutSine))
             .AppendCallback(() => {
-                if(flash != null) {
-                    Object.Destroy(flash);
-                }
+                if(flash != null) Object.Destroy(flash);
             })
             .Build();
         MainCore.TC.Play(seq);

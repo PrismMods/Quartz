@@ -25,51 +25,7 @@ internal static class PageVisuals {
         EffectRemover.EnsureConf();
         EffectRemoverSettings conf = EffectRemover.Conf;
         EffectRemoverSettings def = new();
-
-        GameObject pad = new("Pad");
-        pad.transform.SetParent(parent, false);
-
-        RectTransform padRect = pad.AddComponent<RectTransform>();
-        padRect.anchorMin = Vector2.zero;
-        padRect.anchorMax = Vector2.one;
-        padRect.pivot = new Vector2(0.5f, 0.5f);
-        padRect.offsetMin = new Vector2(18f, 18f);
-        padRect.offsetMax = new Vector2(-18f, -18f);
-
-        GameObject viewport = new("Viewport");
-        viewport.transform.SetParent(pad.transform, false);
-
-        RectTransform viewportRect = viewport.AddComponent<RectTransform>();
-        viewportRect.anchorMin = Vector2.zero;
-        viewportRect.anchorMax = Vector2.one;
-        viewportRect.offsetMin = Vector2.zero;
-        viewportRect.offsetMax = Vector2.zero;
-        viewportRect.pivot = new Vector2(0.5f, 0.5f);
-
-        viewport.AddComponent<EmptyGraphic>().raycastTarget = true;
-        viewport.AddComponent<RectMask2D>();
-
-        GameObject content = new("Content");
-        content.transform.SetParent(viewport.transform, false);
-
-        RectTransform contentRect = content.AddComponent<RectTransform>();
-        contentRect.anchorMin = new Vector2(0f, 1f);
-        contentRect.anchorMax = new Vector2(1f, 1f);
-        contentRect.pivot = new Vector2(0.5f, 1f);
-        contentRect.offsetMin = Vector2.zero;
-        contentRect.offsetMax = Vector2.zero;
-
-        VerticalLayoutGroup layout = content.AddComponent<VerticalLayoutGroup>();
-        layout.spacing = 12f;
-        layout.childControlWidth = true;
-        layout.childControlHeight = true;
-        layout.childForceExpandWidth = true;
-        layout.childForceExpandHeight = false;
-
-        ContentSizeFitter fitter = content.AddComponent<ContentSizeFitter>();
-        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-
-        pad.AddComponent<UIScrollController>().SetContent(contentRect, viewportRect);
+        RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
 
         void Save() => EffectRemover.Save();
 
@@ -163,9 +119,7 @@ internal static class PageVisuals {
             GenerateUI.Button(
                 GenerateUI.Row(planet.Body),
                 () => {
-                    if(orbit == null || scale == null || radius == null) {
-                        return;
-                    }
+                    if(orbit == null || scale == null || radius == null) return;
                     // v1 semantics: if none are on, turn all on; else all off.
                     bool value = !conf.PlanetOrbit && !conf.PlanetScale && !conf.PlanetRadius;
                     orbit.Set(value);
@@ -196,9 +150,7 @@ internal static class PageVisuals {
             GenerateUI.Button(
                 GenerateUI.Row(track.Body),
                 () => {
-                    if(anims == null || moves == null || positions == null || colors == null) {
-                        return;
-                    }
+                    if(anims == null || moves == null || positions == null || colors == null) return;
                     bool value = !conf.TrackAnimations && !conf.TrackPositions
                         && !conf.TrackMoves && !conf.TrackColors;
                     anims.Set(value);
@@ -572,9 +524,7 @@ internal static class PageVisuals {
         RectTransform[] tailColorRows = new RectTransform[PlanetColorsSettings.Slots];
 
         void RefreshTailRows() {
-            foreach(RectTransform row in tailColorRows) {
-                row?.gameObject.SetActive(conf.SeparateTailColor);
-            }
+            foreach(RectTransform row in tailColorRows) row?.gameObject.SetActive(conf.SeparateTailColor);
         }
 
         GenerateUI.Toggle(
@@ -796,9 +746,7 @@ internal static class PageVisuals {
         List<RectTransform> maskRows = [];
 
         void RefreshMaskRows() {
-            foreach(RectTransform row in maskRows) {
-                row?.gameObject.SetActive(conf.Enabled);
-            }
+            foreach(RectTransform row in maskRows) row?.gameObject.SetActive(conf.Enabled);
         }
 
         var sec = GenerateUI.Collapsible(

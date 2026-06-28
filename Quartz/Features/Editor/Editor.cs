@@ -35,13 +35,9 @@ public static partial class EditorFeature {
     public static EditorSettings Conf => ConfMgr?.Data;
 
     public static void EnsureConf() {
-        if(ConfMgr != null) {
-            return;
-        }
+        if(ConfMgr != null) return;
 
-        ConfMgr = new SettingsFile<EditorSettings>(
-            Path.Combine(MainCore.Paths.RootPath, "Editor.json")
-        );
+        ConfMgr = new SettingsFile<EditorSettings>(Path.Combine(MainCore.Paths.RootPath, "Editor.json"));
         ConfMgr.Load();
     }
 
@@ -79,9 +75,7 @@ public static partial class EditorFeature {
     // Hard revert, used when the mod is disabled / torn down so the shared
     // template doesn't stay flipped after the mod stops running.
     public static void Restore() {
-        if(applied) {
-            DisableHorizontal();
-        }
+        if(applied) DisableHorizontal();
         ClearReadout();
         RestoreBga();
     }
@@ -117,9 +111,7 @@ public static partial class EditorFeature {
 
     private static LeSnapshot ApplyLe(GameObject go, float min, float pref, float flex) {
         LeSnapshot s = default;
-        if(go == null) {
-            return s;
-        }
+        if(go == null) return s;
 
         LayoutElement le = go.GetComponent<LayoutElement>();
         if(le == null) {
@@ -170,9 +162,7 @@ public static partial class EditorFeature {
 
     private static void EnableHorizontal() {
         GameObject template = ADOBase.gc?.prefab_property;
-        if(template == null) {
-            return; // controller not up yet; a later tick retries.
-        }
+        if(template == null) return; // controller not up yet; a later tick retries.
 
         VerticalLayoutGroup vertical = template.GetComponent<VerticalLayoutGroup>();
         if(vertical != null) {
@@ -223,9 +213,7 @@ public static partial class EditorFeature {
         GameObject template = ADOBase.gc?.prefab_property;
         if(template != null) {
             HorizontalLayoutGroup horizontal = template.GetComponent<HorizontalLayoutGroup>();
-            if(horizontal != null) {
-                Object.DestroyImmediate(horizontal);
-            }
+            if(horizontal != null) Object.DestroyImmediate(horizontal);
 
             RestoreLe(ref labelLe);
             RestoreLe(ref controlLe);
@@ -254,15 +242,11 @@ public static partial class EditorFeature {
     private static void RebuildInspector() {
         try {
             scnEditor editor = scnEditor.instance;
-            if(editor == null) {
-                return;
-            }
+            if(editor == null) return;
 
             InspectorPanel settings = editor.settingsPanel;
             InspectorPanel events = editor.levelEventsPanel;
-            if(settings == null || events == null) {
-                return;
-            }
+            if(settings == null || events == null) return;
 
             RebuildPanel(settings, GCS.settingsInfo, isLevelEvents: false);
             RebuildPanel(events, GCS.levelEventsInfo, isLevelEvents: true);
@@ -282,17 +266,13 @@ public static partial class EditorFeature {
     ) {
         if(panel.panelsList != null) {
             foreach(PropertiesPanel built in panel.panelsList) {
-                if(built != null) {
-                    Object.DestroyImmediate(built.gameObject);
-                }
+                if(built != null) Object.DestroyImmediate(built.gameObject);
             }
         }
 
         RectTransform tabs = panel.tabs;
         if(tabs != null) {
-            for(int i = tabs.childCount - 1; i >= 0; i--) {
-                Object.DestroyImmediate(tabs.GetChild(i).gameObject);
-            }
+            for(int i = tabs.childCount - 1; i >= 0; i--) Object.DestroyImmediate(tabs.GetChild(i).gameObject);
         }
 
         panel.Init(infos, isLevelEvents);

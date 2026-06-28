@@ -104,12 +104,8 @@ public static class UpdateService {
         Status = status;
         Message = message ?? "";
 
-        if(status != UpdateStatus.Failed) {
-            Failure = UpdateFailure.None;
-        }
-        if(status != UpdateStatus.Installing) {
-            Progress = -1f;
-        }
+        if(status != UpdateStatus.Failed) Failure = UpdateFailure.None;
+        if(status != UpdateStatus.Installing) Progress = -1f;
 
         MainThread.Enqueue(() => OnChanged?.Invoke());
     }
@@ -124,13 +120,9 @@ public static class UpdateService {
         // On hosts that don't self-update (UnityModManager owns updates via its
         // Repository mechanism), never check or offer in-mod updates — the UI
         // hides the update surface, and a stray call here stays a no-op.
-        if(!MainCore.Host.SupportsSelfUpdate) {
-            return;
-        }
+        if(!MainCore.Host.SupportsSelfUpdate) return;
 
-        if(Status is UpdateStatus.Checking or UpdateStatus.Installing) {
-            return;
-        }
+        if(Status is UpdateStatus.Checking or UpdateStatus.Installing) return;
 
         // An update downloaded this session is just waiting for a restart — keep
         // reporting that rather than re-checking and re-offering it.
@@ -189,25 +181,17 @@ public static class UpdateService {
 
         UpdateInfo best = null;
         foreach(JToken rel in releases) {
-            if((bool?)rel["draft"] == true) {
-                continue;
-            }
+            if((bool?)rel["draft"] == true) continue;
 
             string tag = (string)rel["tag_name"];
-            if(string.IsNullOrEmpty(tag) || (!forceLatest && tag == skipped)) {
-                continue;
-            }
-            if(!SemVer.TryParse(tag, out SemVer v)) {
-                continue;
-            }
+            if(string.IsNullOrEmpty(tag) || (!forceLatest && tag == skipped)) continue;
+            if(!SemVer.TryParse(tag, out SemVer v)) continue;
             // Only builds on the chosen channel (or more stable) and strictly
             // newer than what's running. The legacy-rename path (forceLatest)
             // drops the "strictly newer" gate: the running build may already BE
             // the newest version, and its job is the filename/layout fix, not a
             // version bump.
-            if(!MainCore.Conf.AcceptsChannel(v.Channel) || (!forceLatest && v.CompareTo(current) <= 0)) {
-                continue;
-            }
+            if(!MainCore.Conf.AcceptsChannel(v.Channel) || (!forceLatest && v.CompareTo(current) <= 0)) continue;
 
             // Prefer the loader's full zip (Quartz.zip on MelonLoader,
             // QuartzUmm.zip on UnityModManager — DLL + lang + fonts). The bare
@@ -229,9 +213,7 @@ public static class UpdateService {
             }
             string assetUrl = zipUrl ?? dllUrl;
             // A release without an installable asset can't be applied; skip it.
-            if(assetUrl == null) {
-                continue;
-            }
+            if(assetUrl == null) continue;
 
             if(best == null || v.CompareTo(best.Version) > 0) {
                 best = new UpdateInfo {
@@ -252,13 +234,9 @@ public static class UpdateService {
         // The in-mod installer assumes the MelonLoader file layout (Mods/Quartz.dll
         // + UserData/Quartz). On UnityModManager it would corrupt the self-contained
         // mod folder, so refuse — UMM updates through its own Repository mechanism.
-        if(!MainCore.Host.SupportsSelfUpdate) {
-            return;
-        }
+        if(!MainCore.Host.SupportsSelfUpdate) return;
 
-        if(info == null || Status == UpdateStatus.Installing) {
-            return;
-        }
+        if(info == null || Status == UpdateStatus.Installing) return;
 
         // A dev-simulated update has no real assets — play a fake download
         // through the same Installing/Progress states the real path uses, so
@@ -299,9 +277,7 @@ public static class UpdateService {
     // through the same Installing/Installed states the manual update uses, so
     // the Settings page shows progress and the "restart to finish" prompt.
     public static async void InstallLegacyRename(string legacyDllPath) {
-        if(Status == UpdateStatus.Installing) {
-            return;
-        }
+        if(Status == UpdateStatus.Installing) return;
 
         lastPercent = -1;
         Progress = 0f;
@@ -309,9 +285,7 @@ public static class UpdateService {
 
         try {
             UpdateInfo info = await Task.Run(() => FetchLatest(forceLatest: true));
-            if(info == null) {
-                throw new System.Exception("no installable Quartz release found");
-            }
+            if(info == null) throw new System.Exception("no installable Quartz release found");
 
             await Task.Run(() => Download(info));
             RetireLegacyDll(legacyDllPath);
@@ -330,9 +304,7 @@ public static class UpdateService {
         string staging = Path.Combine(MainCore.Paths.TempPath, "Update");
 
         // Clear any half-finished prior attempt.
-        if(Directory.Exists(staging)) {
-            Directory.Delete(staging, true);
-        }
+        if(Directory.Exists(staging)) Directory.Delete(staging, true);
         Directory.CreateDirectory(staging);
 
         // Download to staging first so a failure can't leave half-written files
@@ -362,9 +334,7 @@ public static class UpdateService {
     // and their own custom fonts aren't in the zip, so they're left untouched.
     private static void ExtractOverInstall(string zipPath) {
         string gameRoot = MainCore.Host.UpdateExtractRoot;
-        if(string.IsNullOrEmpty(gameRoot)) {
-            throw new System.Exception("couldn't resolve update extract root");
-        }
+        if(string.IsNullOrEmpty(gameRoot)) throw new System.Exception("couldn't resolve update extract root");
 
         string rootFull = Path.GetFullPath(gameRoot);
         string rootPrefix = rootFull.EndsWith(Path.DirectorySeparatorChar.ToString())
@@ -374,9 +344,7 @@ public static class UpdateService {
         using ZipArchive archive = ZipFile.OpenRead(zipPath);
         foreach(ZipArchiveEntry entry in archive.Entries) {
             // Directory entries carry an empty Name.
-            if(string.IsNullOrEmpty(entry.Name)) {
-                continue;
-            }
+            if(string.IsNullOrEmpty(entry.Name)) continue;
 
             string dest = Path.GetFullPath(Path.Combine(gameRoot, entry.FullName));
 
@@ -393,9 +361,7 @@ public static class UpdateService {
             // MelonLoader and can't be overwritten directly (Win32 1224).
             string tmp = dest + ".krnew";
             try {
-                if(File.Exists(tmp)) {
-                    File.Delete(tmp);
-                }
+                if(File.Exists(tmp)) File.Delete(tmp);
             } catch {
             }
             entry.ExtractToFile(tmp, true);
@@ -417,9 +383,7 @@ public static class UpdateService {
             } catch {
                 string old = dest + ".old";
                 try {
-                    if(File.Exists(old)) {
-                        File.Delete(old);
-                    }
+                    if(File.Exists(old)) File.Delete(old);
                 } catch {
                 }
                 File.Move(dest, old);
@@ -434,17 +398,13 @@ public static class UpdateService {
     // rename it aside instead (cleaned up next launch by QuartzRuntime, same as
     // Quartz.dll.old). On macOS/Linux the delete just succeeds.
     private static void RetireLegacyDll(string path) {
-        if(string.IsNullOrEmpty(path) || !File.Exists(path)) {
-            return;
-        }
+        if(string.IsNullOrEmpty(path) || !File.Exists(path)) return;
         try {
             File.Delete(path);
         } catch {
             string old = path + ".old";
             try {
-                if(File.Exists(old)) {
-                    File.Delete(old);
-                }
+                if(File.Exists(old)) File.Delete(old);
             } catch {
             }
             try {
@@ -457,9 +417,7 @@ public static class UpdateService {
 
     private static void DeleteIfExists(string path) {
         try {
-            if(File.Exists(path)) {
-                File.Delete(path);
-            }
+            if(File.Exists(path)) File.Delete(path);
         } catch(System.Exception ex) {
             MainCore.Log.Wrn($"[Update] couldn't remove stale file {path}: {ex.Message}");
         }
@@ -494,9 +452,7 @@ public static class UpdateService {
         while((n = await src.ReadAsync(buffer, 0, buffer.Length)) > 0) {
             dst.Write(buffer, 0, n);
             done += n;
-            if(total > 0) {
-                ReportProgress(from + ((to - from) * done / total));
-            }
+            if(total > 0) ReportProgress(from + ((to - from) * done / total));
         }
     }
 
@@ -504,9 +460,7 @@ public static class UpdateService {
     // main thread isn't flooded with redraws.
     private static void ReportProgress(float value) {
         int percent = (int)(value * 100f);
-        if(percent == lastPercent) {
-            return;
-        }
+        if(percent == lastPercent) return;
 
         lastPercent = percent;
         Progress = value;
@@ -515,9 +469,7 @@ public static class UpdateService {
 
     // Remembers this version as skipped so it's no longer offered.
     public static void Skip(UpdateInfo info) {
-        if(info == null) {
-            return;
-        }
+        if(info == null) return;
 
         MainCore.Conf.SkippedVersion = info.Tag;
         MainCore.ConfMgr.RequestSave();

@@ -30,13 +30,9 @@ public static partial class Tweaks {
     public static TweaksSettings Conf => ConfMgr?.Data;
 
     public static void EnsureConf() {
-        if(ConfMgr != null) {
-            return;
-        }
+        if(ConfMgr != null) return;
 
-        ConfMgr = new SettingsFile<TweaksSettings>(
-            Path.Combine(MainCore.Paths.RootPath, "Tweaks.json")
-        );
+        ConfMgr = new SettingsFile<TweaksSettings>(Path.Combine(MainCore.Paths.RootPath, "Tweaks.json"));
         ConfMgr.Load();
     }
 
@@ -67,9 +63,7 @@ public static partial class Tweaks {
     private static bool ShouldDisableMenuMusic => Enabled && Conf.DisableMenuMusic;
 
     internal static string FilterDetailedResults(string result) {
-        if(!ShouldHideAnyDetailedResultLabel || string.IsNullOrEmpty(result)) {
-            return result;
-        }
+        if(!ShouldHideAnyDetailedResultLabel || string.IsNullOrEmpty(result)) return result;
 
         List<string> labels = [];
         AddResultLabel(labels, Conf.HideResultXAccuracy, "xAccuracy");
@@ -78,31 +72,23 @@ public static partial class Tweaks {
         // In practice mode the checkpoints slot is labelled "practiceAttempts".
         AddResultLabel(labels, Conf.HideResultCheckpoints, "practiceAttempts");
         AddResultLabel(labels, Conf.HideResultMaximumUsedKeys, "maximumUsedKeys");
-        if(labels.Count == 0) {
-            return result;
-        }
+        if(labels.Count == 0) return result;
 
         string[] rows = result.Split('\n');
         List<string> kept = new(rows.Length);
         for(int i = 0; i < rows.Length; i++) {
             string filtered = FilterDetailedResultRow(rows[i], labels);
-            if(filtered != null) {
-                kept.Add(filtered);
-            }
+            if(filtered != null) kept.Add(filtered);
         }
         return string.Join("\n", kept.ToArray());
     }
 
     private static void AddResultLabel(List<string> labels, bool enabled, string key) {
-        if(!enabled) {
-            return;
-        }
+        if(!enabled) return;
 
         try {
             string label = RDString.Get("status.results." + key);
-            if(!string.IsNullOrEmpty(label)) {
-                labels.Add(label + ": ");
-            }
+            if(!string.IsNullOrEmpty(label)) labels.Add(label + ": ");
         } catch {
         }
     }
@@ -112,30 +98,22 @@ public static partial class Tweaks {
     // columns whose label matches so hiding one stat can't take its row-mate
     // with it. Returns null when no column survives (row removed entirely).
     private static string FilterDetailedResultRow(string row, List<string> labels) {
-        if(string.IsNullOrEmpty(row)) {
-            return row;
-        }
+        if(string.IsNullOrEmpty(row)) return row;
 
         string[] cells = row.Split(new[] { "     " }, StringSplitOptions.None);
         List<string> kept = new(cells.Length);
         for(int i = 0; i < cells.Length; i++) {
-            if(!CellMatchesLabel(cells[i], labels)) {
-                kept.Add(cells[i]);
-            }
+            if(!CellMatchesLabel(cells[i], labels)) kept.Add(cells[i]);
         }
 
-        if(kept.Count == 0) {
-            return null;
-        }
+        if(kept.Count == 0) return null;
         return string.Join("     ", kept.ToArray());
     }
 
     private static bool CellMatchesLabel(string cell, List<string> labels) {
         string trimmed = cell.TrimStart();
         for(int i = 0; i < labels.Count; i++) {
-            if(trimmed.StartsWith(labels[i], StringComparison.Ordinal)) {
-                return true;
-            }
+            if(trimmed.StartsWith(labels[i], StringComparison.Ordinal)) return true;
         }
 
         return false;
@@ -153,13 +131,9 @@ public static partial class Tweaks {
 
     // Sets the resting (slow) speed when the menu's rabbit floor spawns.
     internal static void ApplyInitialMenuBpm() {
-        if(!ShouldCustomMenuBpm) {
-            return;
-        }
+        if(!ShouldCustomMenuBpm) return;
         scrConductor cond = ADOBase.conductor;
-        if(cond == null || cond.bpm <= 0f) {
-            return;
-        }
+        if(cond == null || cond.bpm <= 0f) return;
         menuFast = false;
         SetAllPlayerSpeed(Conf.MenuSlowBpm / cond.bpm);
         SetMenuSong2(false);
@@ -168,13 +142,9 @@ public static partial class Tweaks {
     // Replaces the rabbit toggle. Returns true when handled (the original
     // StartEffect should be skipped).
     internal static bool HandleMenuBpmToggle(scrFloor floor) {
-        if(!ShouldCustomMenuBpm || floor == null) {
-            return false;
-        }
+        if(!ShouldCustomMenuBpm || floor == null) return false;
         scrConductor cond = ADOBase.conductor;
-        if(cond == null || cond.bpm <= 0f) {
-            return false;
-        }
+        if(cond == null || cond.bpm <= 0f) return false;
 
         menuFast = !menuFast;
         SetAllPlayerSpeed((menuFast ? Conf.MenuHighBpm : Conf.MenuSlowBpm) / cond.bpm);
@@ -188,9 +158,7 @@ public static partial class Tweaks {
     private static void SetAllPlayerSpeed(double speed) {
         try {
             foreach(scrPlayer p in ADOBase.playerManager) {
-                if(p != null && p.planetarySystem != null) {
-                    p.planetarySystem.speed = speed;
-                }
+                if(p != null && p.planetarySystem != null) p.planetarySystem.speed = speed;
             }
         } catch {
         }
@@ -199,9 +167,7 @@ public static partial class Tweaks {
     private static void SetMenuSong2(bool fast) {
         try {
             AudioSource song2 = ADOBase.conductor?.song2;
-            if(song2 != null) {
-                song2.volume = fast ? 0.7f : 0f;
-            }
+            if(song2 != null) song2.volume = fast ? 0.7f : 0f;
         } catch {
         }
     }
@@ -211,21 +177,15 @@ public static partial class Tweaks {
     // lots of places (level data, ducking, fades) but never touches mute, so
     // this can't be overwritten and unwinds instantly when toggled off.
     internal static void ApplyMenuMusicMute(scrConductor conductor) {
-        if(conductor == null) {
-            return;
-        }
+        if(conductor == null) return;
 
         bool target;
         try { target = ShouldDisableMenuMusic && ADOBase.isLevelSelect; }
         catch { return; }
 
         try {
-            if(conductor.song != null && conductor.song.mute != target) {
-                conductor.song.mute = target;
-            }
-            if(conductor.song2 != null && conductor.song2.mute != target) {
-                conductor.song2.mute = target;
-            }
+            if(conductor.song != null && conductor.song.mute != target) conductor.song.mute = target;
+            if(conductor.song2 != null && conductor.song2.mute != target) conductor.song2.mute = target;
         } catch {
         }
     }
@@ -268,27 +228,21 @@ public static partial class Tweaks {
     private static void InvalidateFloorCache() => cachedFloors = null;
 
     private static ffxCheckpoint[] GetCheckpoints() {
-        if(cachedCheckpoints != null) {
-            return cachedCheckpoints;
-        }
+        if(cachedCheckpoints != null) return cachedCheckpoints;
         try { cachedCheckpoints = FindObjectsCompat<ffxCheckpoint>(); }
         catch { cachedCheckpoints = EmptyCheckpoints; }
         return cachedCheckpoints ?? EmptyCheckpoints;
     }
 
     private static PlanetRenderer[] GetPlanetRenderers() {
-        if(cachedRenderers != null) {
-            return cachedRenderers;
-        }
+        if(cachedRenderers != null) return cachedRenderers;
         try { cachedRenderers = FindObjectsCompat<PlanetRenderer>(); }
         catch { cachedRenderers = EmptyRenderers; }
         return cachedRenderers ?? EmptyRenderers;
     }
 
     private static scrFloor[] GetFloors() {
-        if(cachedFloors != null) {
-            return cachedFloors;
-        }
+        if(cachedFloors != null) return cachedFloors;
         try { cachedFloors = FindObjectsCompat<scrFloor>(); }
         catch { cachedFloors = EmptyFloors; }
         return cachedFloors ?? EmptyFloors;
@@ -309,9 +263,7 @@ public static partial class Tweaks {
     }
 
     public static void RefreshCheckpointTweak() {
-        if(!ShouldRemoveCheckpoints) {
-            return;
-        }
+        if(!ShouldRemoveCheckpoints) return;
 
         ffxCheckpoint[] checkpoints = GetCheckpoints();
 
@@ -331,21 +283,15 @@ public static partial class Tweaks {
     }
 
     private static void ApplyPlanetGlowTweak(PlanetRenderer renderer, bool forceRestore = false) {
-        if(renderer == null) {
-            return;
-        }
+        if(renderer == null) return;
 
         SpriteRenderer glow;
         try { glow = renderer.glow; } catch { return; }
-        if(glow == null) {
-            return;
-        }
+        if(glow == null) return;
 
         int id = glow.GetInstanceID();
         if(ShouldRemovePlanetGlow && !forceRestore) {
-            if(!planetGlowEnabledStates.ContainsKey(id)) {
-                planetGlowEnabledStates[id] = glow.enabled;
-            }
+            if(!planetGlowEnabledStates.ContainsKey(id)) planetGlowEnabledStates[id] = glow.enabled;
             glow.enabled = false;
         } else if(planetGlowEnabledStates.TryGetValue(id, out bool wasEnabled)) {
             glow.enabled = wasEnabled;
@@ -354,9 +300,7 @@ public static partial class Tweaks {
     }
 
     public static void RefreshTileHitGlowTweak() {
-        if(!ShouldDisableTileHitGlow) {
-            return;
-        }
+        if(!ShouldDisableTileHitGlow) return;
 
         scrFloor[] floors = GetFloors();
 
@@ -366,18 +310,14 @@ public static partial class Tweaks {
     }
 
     private static void RemoveCheckpointVisual(ffxCheckpoint checkpoint) {
-        if(checkpoint == null) {
-            return;
-        }
+        if(checkpoint == null) return;
 
         scrFloor floor = null;
         try { floor = checkpoint.floor; } catch { }
         if(floor == null) {
             try { floor = checkpoint.GetComponent<scrFloor>(); } catch { }
         }
-        if(floor == null) {
-            return;
-        }
+        if(floor == null) return;
 
         try {
             if(floor.floorIcon == FloorIcon.Checkpoint) {
@@ -399,9 +339,7 @@ public static partial class Tweaks {
     }
 
     private static void ApplyBallCoreParticlesTweak(PlanetRenderer renderer, bool forceRestore = false) {
-        if(renderer == null) {
-            return;
-        }
+        if(renderer == null) return;
         ApplyPlanetParticleTweak(GetCoreParticles(renderer), forceRestore);
         ApplyPlanetParticleTweak(GetSparks(renderer), forceRestore);
     }
@@ -420,14 +358,10 @@ public static partial class Tweaks {
     // the lookup per (type, name).
     private static bool TryGetPlanetRendererMemberValue(PlanetRenderer renderer, string name, out object value) {
         value = null;
-        if(renderer == null || string.IsNullOrEmpty(name)) {
-            return false;
-        }
+        if(renderer == null || string.IsNullOrEmpty(name)) return false;
 
         MemberInfo member = GetPlanetRendererMember(renderer.GetType(), name);
-        if(member == null) {
-            return false;
-        }
+        if(member == null) return false;
 
         try {
             if(member is FieldInfo field) {
@@ -446,9 +380,7 @@ public static partial class Tweaks {
     }
 
     private static MemberInfo GetPlanetRendererMember(Type type, string name) {
-        if(type == null || string.IsNullOrEmpty(name)) {
-            return null;
-        }
+        if(type == null || string.IsNullOrEmpty(name)) return null;
         // Tuple key: (Type, string) has structural equality and, as a struct
         // dictionary key, allocates nothing — unlike the old `type.FullName + "."
         // + name` concat that built a throwaway string on every per-frame call.
@@ -476,27 +408,19 @@ public static partial class Tweaks {
     }
 
     private static bool IsRemovedPlanetParticle(PlanetRenderer renderer, ParticleSystem particles) {
-        if(renderer == null || particles == null) {
-            return false;
-        }
+        if(renderer == null || particles == null) return false;
         return particles == GetCoreParticles(renderer) || particles == GetSparks(renderer);
     }
 
     private static void ApplyPlanetParticleTweak(ParticleSystem particles, bool forceRestore) {
-        if(particles == null) {
-            return;
-        }
+        if(particles == null) return;
         GameObject particleObject = particles.gameObject;
-        if(particleObject == null) {
-            return;
-        }
+        if(particleObject == null) return;
 
         if(ShouldRemoveBallCoreParticles && !forceRestore) {
             try {
                 int rootId = particleObject.GetInstanceID();
-                if(particleActiveStates.ContainsKey(rootId) && !particleObject.activeSelf) {
-                    return;
-                }
+                if(particleActiveStates.ContainsKey(rootId) && !particleObject.activeSelf) return;
             } catch {
             }
             DisableParticleSystemTree(particles, particleObject);
@@ -507,9 +431,7 @@ public static partial class Tweaks {
     }
 
     private static void SuppressFloorHitGlow(scrFloor floor) {
-        if(floor == null) {
-            return;
-        }
+        if(floor == null) return;
 
         HideFloorGlowObject(floor.topGlow);
         HideFloorGlowObject(floor.bottomGlow);
@@ -517,21 +439,15 @@ public static partial class Tweaks {
     }
 
     private static void HideFloorGlowObject(SpriteRenderer glow) {
-        if(glow == null) {
-            return;
-        }
+        if(glow == null) return;
         try { glow.gameObject.SetActive(false); } catch { }
     }
 
     private static void RestoreFloorHitColor(scrFloor floor) {
-        if(floor == null) {
-            return;
-        }
+        if(floor == null) return;
 
         try {
-            if(floor.floorRenderer == null) {
-                return;
-            }
+            if(floor.floorRenderer == null) return;
             // Floors with a dynamic track colour drive floorRenderer.color from their OWN
             // scrFloor.Update every frame. Overwriting it here fights that effect — and for
             // Rainbow it is PERMANENT: the rainbow update reads the colour's saturation
@@ -565,9 +481,7 @@ public static partial class Tweaks {
             ParticleSystem[] children = particleObject.GetComponentsInChildren<ParticleSystem>(true);
             for(int i = 0; i < children.Length; i++) {
                 ParticleSystem child = children[i];
-                if(child == null) {
-                    continue;
-                }
+                if(child == null) continue;
                 RememberActiveState(child.gameObject);
                 try { child.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear); } catch { }
                 try { child.Clear(true); } catch { }
@@ -582,36 +496,24 @@ public static partial class Tweaks {
     private static void DisableParticleSystemEmission(ParticleSystem particles) {
         int id = particles.GetInstanceID();
         ParticleSystem.EmissionModule emission = particles.emission;
-        if(!particleEmissionEnabledStates.ContainsKey(id)) {
-            particleEmissionEnabledStates[id] = emission.enabled;
-        }
-        if(!particleEmissionRateStates.ContainsKey(id)) {
-            particleEmissionRateStates[id] = emission.rateOverTime;
-        }
+        if(!particleEmissionEnabledStates.ContainsKey(id)) particleEmissionEnabledStates[id] = emission.enabled;
+        if(!particleEmissionRateStates.ContainsKey(id)) particleEmissionRateStates[id] = emission.rateOverTime;
         emission.enabled = false;
         emission.rateOverTime = 0f;
         ParticleSystem.MainModule main = particles.main;
-        if(!particleMaxParticleStates.ContainsKey(id)) {
-            particleMaxParticleStates[id] = main.maxParticles;
-        }
+        if(!particleMaxParticleStates.ContainsKey(id)) particleMaxParticleStates[id] = main.maxParticles;
         main.maxParticles = 0;
     }
 
     private static void DisableRenderers(GameObject root) {
-        if(root == null) {
-            return;
-        }
+        if(root == null) return;
         try {
             Renderer[] renderers = root.GetComponentsInChildren<Renderer>(true);
             for(int i = 0; i < renderers.Length; i++) {
                 Renderer renderer = renderers[i];
-                if(renderer == null) {
-                    continue;
-                }
+                if(renderer == null) continue;
                 int id = renderer.GetInstanceID();
-                if(!particleRendererEnabledStates.ContainsKey(id)) {
-                    particleRendererEnabledStates[id] = renderer.enabled;
-                }
+                if(!particleRendererEnabledStates.ContainsKey(id)) particleRendererEnabledStates[id] = renderer.enabled;
                 renderer.enabled = false;
             }
         } catch {
@@ -619,9 +521,7 @@ public static partial class Tweaks {
     }
 
     private static void RestoreParticleSystemTree(GameObject particleObject) {
-        if(particleObject == null) {
-            return;
-        }
+        if(particleObject == null) return;
 
         try {
             GameObject[] objects = CollectGameObjects(particleObject);
@@ -644,13 +544,9 @@ public static partial class Tweaks {
             Renderer[] renderers = particleObject.GetComponentsInChildren<Renderer>(true);
             for(int i = 0; i < renderers.Length; i++) {
                 Renderer renderer = renderers[i];
-                if(renderer == null) {
-                    continue;
-                }
+                if(renderer == null) continue;
                 int id = renderer.GetInstanceID();
-                if(!particleRendererEnabledStates.TryGetValue(id, out bool wasEnabled)) {
-                    continue;
-                }
+                if(!particleRendererEnabledStates.TryGetValue(id, out bool wasEnabled)) continue;
                 renderer.enabled = wasEnabled;
                 particleRendererEnabledStates.Remove(id);
             }
@@ -659,9 +555,7 @@ public static partial class Tweaks {
     }
 
     private static void RestoreParticleSystemSettings(ParticleSystem particles) {
-        if(particles == null) {
-            return;
-        }
+        if(particles == null) return;
         int id = particles.GetInstanceID();
 
         try {
@@ -697,23 +591,15 @@ public static partial class Tweaks {
     }
 
     private static void RememberActiveState(GameObject obj) {
-        if(obj == null) {
-            return;
-        }
+        if(obj == null) return;
         int id = obj.GetInstanceID();
-        if(!particleActiveStates.ContainsKey(id)) {
-            particleActiveStates[id] = obj.activeSelf;
-        }
+        if(!particleActiveStates.ContainsKey(id)) particleActiveStates[id] = obj.activeSelf;
     }
 
     private static void RestoreActiveState(GameObject obj) {
-        if(obj == null) {
-            return;
-        }
+        if(obj == null) return;
         int id = obj.GetInstanceID();
-        if(!particleActiveStates.TryGetValue(id, out bool wasActive)) {
-            return;
-        }
+        if(!particleActiveStates.TryGetValue(id, out bool wasActive)) return;
         try { obj.SetActive(wasActive); } catch { }
         particleActiveStates.Remove(id);
     }
@@ -727,17 +613,11 @@ public static partial class Tweaks {
             System.Diagnostics.StackTrace st = new(2, false);
             for(int i = 0; i < st.FrameCount; i++) {
                 MethodBase m = st.GetFrame(i).GetMethod();
-                if(m == null) {
-                    continue;
-                }
+                if(m == null) continue;
                 Type dt = m.DeclaringType;
-                if(dt == null) {
-                    continue;
-                }
+                if(dt == null) continue;
                 string name = m.Name;
-                if(dt == typeof(scnGame) && name == "ResetScene") {
-                    return true;
-                }
+                if(dt == typeof(scnGame) && name == "ResetScene") return true;
                 if(dt == typeof(scnEditor)) {
                     if(name == "SwitchToEditMode" || name == "TogglePause" ||
                         name == "ResetScene" || name == "SwitchToPlayMode" ||
@@ -745,9 +625,7 @@ public static partial class Tweaks {
                         return true;
                     }
                 }
-                if(dt == typeof(PauseMenu)) {
-                    return true;
-                }
+                if(dt == typeof(PauseMenu)) return true;
             }
         } catch { }
         return false;
@@ -759,13 +637,9 @@ public static partial class Tweaks {
     private static void ResetEditorPlayModePauseState() {
         try {
             scnEditor editor = ADOBase.editor;
-            if(editor == null) {
-                return;
-            }
+            if(editor == null) return;
             editor.pausedInPlayMode = false;
-            if(editor.buttonAuto != null) {
-                editor.buttonAuto.interactable = true;
-            }
+            if(editor.buttonAuto != null) editor.buttonAuto.interactable = true;
         } catch { }
     }
 }

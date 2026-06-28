@@ -26,13 +26,9 @@ public static class KeyLimiter {
     public static event Action Changed;
 
     public static void EnsureConf() {
-        if(ConfMgr != null) {
-            return;
-        }
+        if(ConfMgr != null) return;
 
-        ConfMgr = new SettingsFile<KeyLimiterSettings>(
-            Path.Combine(MainCore.Paths.RootPath, "KeyLimiter.json")
-        );
+        ConfMgr = new SettingsFile<KeyLimiterSettings>(Path.Combine(MainCore.Paths.RootPath, "KeyLimiter.json"));
         ConfMgr.Load();
         EnsureTicker();
     }
@@ -68,12 +64,8 @@ public static class KeyLimiter {
         SetCachedPlayerControl(false);
         try {
             scrController controller = scrController.instance;
-            if(controller == null) {
-                return false;
-            }
-            if(controller.paused || !controller.gameworld) {
-                return false;
-            }
+            if(controller == null) return false;
+            if(controller.paused || !controller.gameworld) return false;
             SetCachedPlayerControl(((StateBehaviour)controller).stateMachine.GetState() is States state
                 && state == States.PlayerControl);
             return cachedPlayerControl;
@@ -98,9 +90,7 @@ public static class KeyLimiter {
 
     public static bool IsAllowedKey(KeyCode key) {
         int[] allowed = Conf?.AllowedKeys;
-        if(allowed == null) {
-            return false;
-        }
+        if(allowed == null) return false;
 
         if(!ReferenceEquals(allowed, cachedAllowedSource) || allowed.Length != cachedAllowedLength) {
             cachedAllowedKeys.Clear();
@@ -124,9 +114,7 @@ public static class KeyLimiter {
         EnsureConf();
 
         key = NormalizeKey(key);
-        if(key == KeyCode.None || IsMouseKey(key)) {
-            return;
-        }
+        if(key == KeyCode.None || IsMouseKey(key)) return;
 
         List<int> keys = [.. Conf.AllowedKeys];
         if(!keys.Remove((int)key)) {
@@ -134,8 +122,7 @@ public static class KeyLimiter {
         }
 
         Conf.AllowedKeys = [.. keys];
-        Save();
-        Changed?.Invoke();
+        PersistChange();
     }
 
     // Wholesale replacement of the allowed list — used by the key viewer's
@@ -144,8 +131,7 @@ public static class KeyLimiter {
         EnsureConf();
 
         Conf.AllowedKeys = keys ?? [];
-        Save();
-        Changed?.Invoke();
+        PersistChange();
     }
 
     // ===== profiles =====
@@ -165,15 +151,12 @@ public static class KeyLimiter {
 
     public static void SwitchProfile(int index) {
         EnsureConf();
-        if(index < 0 || index >= Conf.Profiles.Count || index == Conf.ActiveProfile) {
-            return;
-        }
+        if(index < 0 || index >= Conf.Profiles.Count || index == Conf.ActiveProfile) return;
 
         // A pending key capture targets the old profile's list — drop it.
         CancelCapture();
         Conf.ActiveProfile = index;
-        Save();
-        Changed?.Invoke();
+        PersistChange();
     }
 
     // Adds an empty profile and makes it active so it can be configured.
@@ -184,32 +167,25 @@ public static class KeyLimiter {
             Keys = [],
         });
         Conf.ActiveProfile = Conf.Profiles.Count - 1;
-        Save();
-        Changed?.Invoke();
+        PersistChange();
     }
 
     // Removes the active profile. The last profile can't be removed — the
     // limiter always needs one set to enforce.
     public static void RemoveActiveProfile() {
         EnsureConf();
-        if(Conf.Profiles.Count <= 1) {
-            return;
-        }
+        if(Conf.Profiles.Count <= 1) return;
 
         CancelCapture();
         Conf.Profiles.RemoveAt(Conf.ActiveProfile);
-        if(Conf.ActiveProfile >= Conf.Profiles.Count) {
-            Conf.ActiveProfile = Conf.Profiles.Count - 1;
-        }
-        Save();
-        Changed?.Invoke();
+        if(Conf.ActiveProfile >= Conf.Profiles.Count) Conf.ActiveProfile = Conf.Profiles.Count - 1;
+        PersistChange();
     }
 
     public static void RenameActiveProfile(string name) {
         EnsureConf();
         Conf.ActiveProfileOrDefault().Name = name ?? "";
-        Save();
-        Changed?.Invoke();
+        PersistChange();
     }
 
     // ===== key normalization (ported from v1's KeyCodeCompat) =====
@@ -220,16 +196,12 @@ public static class KeyLimiter {
 
     public static KeyCode NormalizeKey(KeyCode key) {
         key = NormalizeLegacyAsyncKey(key);
-        if(key == KeyCode.AltGr) {
-            return KeyCode.RightAlt;
-        }
+        if(key == KeyCode.AltGr) return KeyCode.RightAlt;
         // Unity's legacy Input reports the numpad Enter as Return and can't tell
         // them apart, while the SkyHook hook gives the distinct KeypadEnter.
         // Fold them together so an allowed-key set captured one way still matches
         // a press detected the other way (the numpad Enter was getting blocked).
-        if(key == KeyCode.KeypadEnter) {
-            return KeyCode.Return;
-        }
+        if(key == KeyCode.KeypadEnter) return KeyCode.Return;
         return key;
     }
 
@@ -242,18 +214,14 @@ public static class KeyLimiter {
     public static KeyCode NormalizeNumericKey(int numeric) {
         if(numeric >= 0 && numeric <= 0xFF) {
             KeyCode vk = WindowsVirtualKeyToUnityKey((ushort)numeric);
-            if(vk != KeyCode.None) {
-                return vk;
-            }
+            if(vk != KeyCode.None) return vk;
         }
         return NormalizeKey((KeyCode)numeric);
     }
 
     private static KeyCode NormalizeLegacyAsyncKey(KeyCode key) {
         int raw = (int)key;
-        if(raw < LegacyAsyncKeyOffset || raw > LegacyAsyncKeyMax) {
-            return key;
-        }
+        if(raw < LegacyAsyncKeyOffset || raw > LegacyAsyncKeyMax) return key;
 
         KeyCode mapped = WindowsVirtualKeyToUnityKey((ushort)(raw - LegacyAsyncKeyOffset));
         return mapped == KeyCode.None ? key : mapped;
@@ -261,42 +229,21 @@ public static class KeyLimiter {
 
     // ===== async (SkyHook) key mapping, ported from v1 =====
 
-    public static bool IsMouseLabel(KeyLabel label) {
-        // Switch on the enum value, not label.ToString(): Mono's Enum.ToString does
-        // a reflective name lookup and allocates a fresh string every call, and this
-        // runs on the SkyHook hook thread for every key edge.
-        switch(label) {
-            case KeyLabel.MouseLeft:
-            case KeyLabel.MouseRight:
-            case KeyLabel.MouseMiddle:
-            case KeyLabel.MouseX1:
-            case KeyLabel.MouseX2:
-                return true;
-            default:
-                return false;
-        }
-    }
+    // Switch on the enum value, not label.ToString(): Mono's Enum.ToString does
+    // a reflective name lookup and allocates a fresh string every call, and this
+    // runs on the SkyHook hook thread for every key edge.
+    public static bool IsMouseLabel(KeyLabel label) => label is
+        KeyLabel.MouseLeft or KeyLabel.MouseRight or KeyLabel.MouseMiddle or KeyLabel.MouseX1 or KeyLabel.MouseX2;
 
     public static bool ShouldBlockAsyncKeyFromHook(ushort key, KeyLabel label) {
-        if(!IsActive() || !InPlayerControlCached()) {
-            return false;
-        }
-        if(IsMouseLabel(label)) {
-            return false;
-        }
+        if(!IsActive() || !InPlayerControlCached() || IsMouseLabel(label)) return false;
 
         KeyCode unityKey = HookKeyToPhysicalUnityKey(key, label);
-        if(IsMouseKey(unityKey)) {
-            return false;
-        }
-        if(unityKey != KeyCode.None && IsAllowedKey(unityKey)) {
-            return false;
-        }
+        if(IsMouseKey(unityKey)) return false;
+        if(unityKey != KeyCode.None && IsAllowedKey(unityKey)) return false;
 
         KeyCode mappedKey = SkyHookKeyMapper.SkyHookKeyToUnityKey(label);
-        if(mappedKey == KeyCode.None && IsAllowedGenericModifierVirtualKey(key)) {
-            return false;
-        }
+        if(mappedKey == KeyCode.None && IsAllowedGenericModifierVirtualKey(key)) return false;
 
         return mappedKey == KeyCode.None || !IsAllowedKey(mappedKey);
     }
@@ -342,9 +289,7 @@ public static class KeyLimiter {
     private static volatile bool hookActive;
 
     public static void NoteHookEvent(KeyCode key, bool pressed) {
-        if(key == KeyCode.None) {
-            return;
-        }
+        if(key == KeyCode.None) return;
         lock(hookHeldUntil) {
             if(pressed) {
                 hookHeldUntil[key] = Environment.TickCount + HookHeldWindowMs;
@@ -358,9 +303,7 @@ public static class KeyLimiter {
     public static bool HookKeyHeld(KeyCode key) {
         // Lock-free fast reject for the overwhelmingly common no-hook-keys-held
         // case (volatile read, no lock acquired per un-pressed key per frame).
-        if(!hookActive || key == KeyCode.None) {
-            return false;
-        }
+        if(!hookActive || key == KeyCode.None) return false;
         lock(hookHeldUntil) {
             // Unchecked (until - now) keeps the right sign across the ~49-day
             // Environment.TickCount wrap.
@@ -371,52 +314,25 @@ public static class KeyLimiter {
 
     public static KeyCode HookKeyToPhysicalUnityKey(ushort key, KeyLabel label) {
         KeyCode labelKey = SkyHookKeyMapper.SkyHookKeyToUnityKey(label);
-        if(IsNumpadOrArrowKey(labelKey)) {
-            return labelKey;
-        }
+        if(IsNumpadOrArrowKey(labelKey)) return labelKey;
 
         if(IsWindowsRuntime()) {
             KeyCode hookKey = WindowsVirtualKeyToUnityKey(key);
-            if(hookKey != KeyCode.None) {
-                return hookKey;
-            }
+            if(hookKey != KeyCode.None) return hookKey;
         }
 
         KeyCode mapped = AsyncLabelToPhysicalUnityKey(label);
-        if(mapped != KeyCode.None) {
-            return mapped;
-        }
+        if(mapped != KeyCode.None) return mapped;
 
         return KeyCode.None;
     }
 
-    private static bool IsNumpadOrArrowKey(KeyCode key) {
-        switch(key) {
-            case KeyCode.UpArrow:
-            case KeyCode.DownArrow:
-            case KeyCode.LeftArrow:
-            case KeyCode.RightArrow:
-            case KeyCode.Keypad0:
-            case KeyCode.Keypad1:
-            case KeyCode.Keypad2:
-            case KeyCode.Keypad3:
-            case KeyCode.Keypad4:
-            case KeyCode.Keypad5:
-            case KeyCode.Keypad6:
-            case KeyCode.Keypad7:
-            case KeyCode.Keypad8:
-            case KeyCode.Keypad9:
-            case KeyCode.KeypadPeriod:
-            case KeyCode.KeypadDivide:
-            case KeyCode.KeypadMultiply:
-            case KeyCode.KeypadMinus:
-            case KeyCode.KeypadPlus:
-            case KeyCode.KeypadEnter:
-                return true;
-            default:
-                return false;
-        }
-    }
+    private static bool IsNumpadOrArrowKey(KeyCode key) => key is
+        KeyCode.UpArrow or KeyCode.DownArrow or KeyCode.LeftArrow or KeyCode.RightArrow or
+        KeyCode.Keypad0 or KeyCode.Keypad1 or KeyCode.Keypad2 or KeyCode.Keypad3 or KeyCode.Keypad4 or
+        KeyCode.Keypad5 or KeyCode.Keypad6 or KeyCode.Keypad7 or KeyCode.Keypad8 or KeyCode.Keypad9 or
+        KeyCode.KeypadPeriod or KeyCode.KeypadDivide or KeyCode.KeypadMultiply or KeyCode.KeypadMinus or
+        KeyCode.KeypadPlus or KeyCode.KeypadEnter;
 
     private static bool IsWindowsRuntime() {
         RuntimePlatform platform = Application.platform;
@@ -434,9 +350,7 @@ public static class KeyLimiter {
     private static readonly Dictionary<KeyLabel, KeyCode> asyncLabelCache = new();
 
     private static KeyCode AsyncLabelToPhysicalUnityKey(KeyLabel label) {
-        if(asyncLabelCache.TryGetValue(label, out KeyCode cached)) {
-            return cached;
-        }
+        if(asyncLabelCache.TryGetValue(label, out KeyCode cached)) return cached;
         KeyCode resolved = ResolveAsyncLabelToPhysicalUnityKey(label);
         asyncLabelCache[label] = resolved;
         return resolved;
@@ -453,165 +367,124 @@ public static class KeyLimiter {
             return (KeyCode)((int)KeyCode.Alpha0 + (name[5] - '0'));
         }
 
-        if(name.Length >= 2 && name[0] == 'F') {
-            if(int.TryParse(name[1..], out int functionKey) && functionKey >= 1 && functionKey <= 15) {
-                return (KeyCode)((int)KeyCode.F1 + (functionKey - 1));
-            }
+        if(name.Length >= 2 && name[0] == 'F'
+            && int.TryParse(name[1..], out int functionKey) && functionKey >= 1 && functionKey <= 15) {
+            return (KeyCode)((int)KeyCode.F1 + (functionKey - 1));
         }
 
         if(name.Length == 7 && name.StartsWith("Keypad") && name[6] >= '0' && name[6] <= '9') {
             return (KeyCode)((int)KeyCode.Keypad0 + (name[6] - '0'));
         }
 
-        switch(name) {
-            case "Escape": return KeyCode.Escape;
-            case "Grave": return KeyCode.BackQuote;
-            case "Minus": return KeyCode.Minus;
-            case "Equal": return KeyCode.Equals;
-            case "Backspace": return KeyCode.Backspace;
-            case "Tab": return KeyCode.Tab;
-            case "LeftBrace": return KeyCode.LeftBracket;
-            case "RightBrace": return KeyCode.RightBracket;
-            case "BackSlash": return KeyCode.Backslash;
-            case "CapsLock": return KeyCode.CapsLock;
-            case "Semicolon": return KeyCode.Semicolon;
-            case "Apostrophe": return KeyCode.Quote;
-            case "Enter": return KeyCode.Return;
-            case "LShift": return KeyCode.LeftShift;
-            case "LeftShift": return KeyCode.LeftShift;
-            case "Comma": return KeyCode.Comma;
-            case "Dot": return KeyCode.Period;
-            case "Slash": return KeyCode.Slash;
-            case "RShift": return KeyCode.RightShift;
-            case "RightShift": return KeyCode.RightShift;
-            case "LControl": return KeyCode.LeftControl;
-            case "LCtrl": return KeyCode.LeftControl;
-            case "LeftControl": return KeyCode.LeftControl;
-            case "LeftCtrl": return KeyCode.LeftControl;
-            case "Super": return KeyCode.LeftCommand;
-            case "LWin": return KeyCode.LeftWindows;
-            case "LeftWin": return KeyCode.LeftWindows;
-            case "LeftWindows": return KeyCode.LeftWindows;
-            case "LAlt": return KeyCode.LeftAlt;
-            case "Space": return KeyCode.Space;
-            case "RAlt": return KeyCode.RightAlt;
-            case "AltGr": return KeyCode.RightAlt;
-            case "Hangul": return KeyCode.RightAlt;
-            case "RControl": return KeyCode.RightControl;
-            case "RCtrl": return KeyCode.RightControl;
-            case "RightControl": return KeyCode.RightControl;
-            case "RightCtrl": return KeyCode.RightControl;
-            case "Hanja": return KeyCode.RightControl;
-            case "RWin": return KeyCode.RightWindows;
-            case "RightWin": return KeyCode.RightWindows;
-            case "RightWindows": return KeyCode.RightWindows;
-            case "PrintScreen": return KeyCode.Print;
-            case "ScrollLock": return KeyCode.ScrollLock;
-            case "PauseBreak": return KeyCode.Pause;
-            case "Insert": return KeyCode.Insert;
-            case "Home": return KeyCode.Home;
-            case "PageUp": return KeyCode.PageUp;
-            case "Delete": return KeyCode.Delete;
-            case "End": return KeyCode.End;
-            case "PageDown": return KeyCode.PageDown;
-            case "ArrowUp": return KeyCode.UpArrow;
-            case "ArrowLeft": return KeyCode.LeftArrow;
-            case "ArrowDown": return KeyCode.DownArrow;
-            case "ArrowRight": return KeyCode.RightArrow;
-            case "NumLock": return KeyCode.Numlock;
-            case "KeypadSlash": return KeyCode.KeypadDivide;
-            case "KeypadAsterisk": return KeyCode.KeypadMultiply;
-            case "KeypadMinus": return KeyCode.KeypadMinus;
-            case "KeypadDot": return KeyCode.KeypadPeriod;
-            case "KeypadPlus": return KeyCode.KeypadPlus;
-            case "KeypadEnter": return KeyCode.KeypadEnter;
-            case "Application": return KeyCode.Menu;
-            case "Apps": return KeyCode.Menu;
-            case "Menu": return KeyCode.Menu;
-            case "MouseLeft": return KeyCode.Mouse0;
-            case "MouseRight": return KeyCode.Mouse1;
-            case "MouseMiddle": return KeyCode.Mouse2;
-            case "MouseX1": return KeyCode.Mouse3;
-            case "MouseX2": return KeyCode.Mouse4;
-        }
-
-        return SkyHookKeyMapper.SkyHookKeyToUnityKey(label);
+        return name switch {
+            "Escape" => KeyCode.Escape,
+            "Grave" => KeyCode.BackQuote,
+            "Minus" => KeyCode.Minus,
+            "Equal" => KeyCode.Equals,
+            "Backspace" => KeyCode.Backspace,
+            "Tab" => KeyCode.Tab,
+            "LeftBrace" => KeyCode.LeftBracket,
+            "RightBrace" => KeyCode.RightBracket,
+            "BackSlash" => KeyCode.Backslash,
+            "CapsLock" => KeyCode.CapsLock,
+            "Semicolon" => KeyCode.Semicolon,
+            "Apostrophe" => KeyCode.Quote,
+            "Enter" => KeyCode.Return,
+            "LShift" or "LeftShift" => KeyCode.LeftShift,
+            "RShift" or "RightShift" => KeyCode.RightShift,
+            "Comma" => KeyCode.Comma,
+            "Dot" => KeyCode.Period,
+            "Slash" => KeyCode.Slash,
+            "LControl" or "LCtrl" or "LeftControl" or "LeftCtrl" => KeyCode.LeftControl,
+            "RControl" or "RCtrl" or "RightControl" or "RightCtrl" or "Hanja" => KeyCode.RightControl,
+            "Super" => KeyCode.LeftCommand,
+            "LWin" or "LeftWin" or "LeftWindows" => KeyCode.LeftWindows,
+            "RWin" or "RightWin" or "RightWindows" => KeyCode.RightWindows,
+            "LAlt" => KeyCode.LeftAlt,
+            "RAlt" or "AltGr" or "Hangul" => KeyCode.RightAlt,
+            "Space" => KeyCode.Space,
+            "PrintScreen" => KeyCode.Print,
+            "ScrollLock" => KeyCode.ScrollLock,
+            "PauseBreak" => KeyCode.Pause,
+            "Insert" => KeyCode.Insert,
+            "Home" => KeyCode.Home,
+            "PageUp" => KeyCode.PageUp,
+            "Delete" => KeyCode.Delete,
+            "End" => KeyCode.End,
+            "PageDown" => KeyCode.PageDown,
+            "ArrowUp" => KeyCode.UpArrow,
+            "ArrowLeft" => KeyCode.LeftArrow,
+            "ArrowDown" => KeyCode.DownArrow,
+            "ArrowRight" => KeyCode.RightArrow,
+            "NumLock" => KeyCode.Numlock,
+            "KeypadSlash" => KeyCode.KeypadDivide,
+            "KeypadAsterisk" => KeyCode.KeypadMultiply,
+            "KeypadMinus" => KeyCode.KeypadMinus,
+            "KeypadDot" => KeyCode.KeypadPeriod,
+            "KeypadPlus" => KeyCode.KeypadPlus,
+            "KeypadEnter" => KeyCode.KeypadEnter,
+            "Application" or "Apps" or "Menu" => KeyCode.Menu,
+            "MouseLeft" => KeyCode.Mouse0,
+            "MouseRight" => KeyCode.Mouse1,
+            "MouseMiddle" => KeyCode.Mouse2,
+            "MouseX1" => KeyCode.Mouse3,
+            "MouseX2" => KeyCode.Mouse4,
+            _ => SkyHookKeyMapper.SkyHookKeyToUnityKey(label),
+        };
     }
 
-    private static KeyCode WindowsVirtualKeyToUnityKey(ushort key) {
-        switch(key) {
-            case 0x15:
-            case 0xA5:
-                return KeyCode.RightAlt;
-            case 0x19:
-            case 0xA3:
-                return KeyCode.RightControl;
-            case 0x5D: return KeyCode.Menu;
-            case 0x08: return KeyCode.Backspace;
-            case 0x09: return KeyCode.Tab;
-            case 0x0D: return KeyCode.Return;
-            case 0x10:
-            case 0xA0:
-                return KeyCode.LeftShift;
-            case 0x11:
-            case 0xA2:
-                return KeyCode.LeftControl;
-            case 0x12:
-            case 0xA4:
-                return KeyCode.LeftAlt;
-            case 0x13: return KeyCode.Pause;
-            case 0x14: return KeyCode.CapsLock;
-            case 0x1B: return KeyCode.Escape;
-            case 0x20: return KeyCode.Space;
-            case 0x21: return KeyCode.PageUp;
-            case 0x22: return KeyCode.PageDown;
-            case 0x23: return KeyCode.End;
-            case 0x24: return KeyCode.Home;
-            case 0x25: return KeyCode.LeftArrow;
-            case 0x26: return KeyCode.UpArrow;
-            case 0x27: return KeyCode.RightArrow;
-            case 0x28: return KeyCode.DownArrow;
-            case 0x2C: return KeyCode.Print;
-            case 0x2D: return KeyCode.Insert;
-            case 0x2E: return KeyCode.Delete;
-            case 0x5B: return KeyCode.LeftWindows;
-            case 0x5C: return KeyCode.RightWindows;
-            case 0x6A: return KeyCode.KeypadMultiply;
-            case 0x6B: return KeyCode.KeypadPlus;
-            case 0x6D: return KeyCode.KeypadMinus;
-            case 0x6E: return KeyCode.KeypadPeriod;
-            case 0x6F: return KeyCode.KeypadDivide;
-            case 0x90: return KeyCode.Numlock;
-            case 0x91: return KeyCode.ScrollLock;
-            case 0xA1: return KeyCode.RightShift;
-            case 0xBA: return KeyCode.Semicolon;
-            case 0xBB: return KeyCode.Equals;
-            case 0xBC: return KeyCode.Comma;
-            case 0xBD: return KeyCode.Minus;
-            case 0xBE: return KeyCode.Period;
-            case 0xBF: return KeyCode.Slash;
-            case 0xC0: return KeyCode.BackQuote;
-            case 0xDB: return KeyCode.LeftBracket;
-            case 0xDC: return KeyCode.Backslash;
-            case 0xDD: return KeyCode.RightBracket;
-            case 0xDE: return KeyCode.Quote;
-        }
-
-        if(key >= 0x30 && key <= 0x39) {
-            return (KeyCode)((int)KeyCode.Alpha0 + (key - 0x30));
-        }
-        if(key >= 0x41 && key <= 0x5A) {
-            return (KeyCode)((int)KeyCode.A + (key - 0x41));
-        }
-        if(key >= 0x60 && key <= 0x69) {
-            return (KeyCode)((int)KeyCode.Keypad0 + (key - 0x60));
-        }
-        if(key >= 0x70 && key <= 0x7E) {
-            return (KeyCode)((int)KeyCode.F1 + (key - 0x70));
-        }
-
-        return KeyCode.None;
-    }
+    private static KeyCode WindowsVirtualKeyToUnityKey(ushort key) => key switch {
+        0x15 or 0xA5 => KeyCode.RightAlt,
+        0x19 or 0xA3 => KeyCode.RightControl,
+        0x10 or 0xA0 => KeyCode.LeftShift,
+        0x11 or 0xA2 => KeyCode.LeftControl,
+        0x12 or 0xA4 => KeyCode.LeftAlt,
+        >= 0x30 and <= 0x39 => (KeyCode)((int)KeyCode.Alpha0 + (key - 0x30)),
+        >= 0x41 and <= 0x5A => (KeyCode)((int)KeyCode.A + (key - 0x41)),
+        >= 0x60 and <= 0x69 => (KeyCode)((int)KeyCode.Keypad0 + (key - 0x60)),
+        >= 0x70 and <= 0x7E => (KeyCode)((int)KeyCode.F1 + (key - 0x70)),
+        0x5D => KeyCode.Menu,
+        0x08 => KeyCode.Backspace,
+        0x09 => KeyCode.Tab,
+        0x0D => KeyCode.Return,
+        0x13 => KeyCode.Pause,
+        0x14 => KeyCode.CapsLock,
+        0x1B => KeyCode.Escape,
+        0x20 => KeyCode.Space,
+        0x21 => KeyCode.PageUp,
+        0x22 => KeyCode.PageDown,
+        0x23 => KeyCode.End,
+        0x24 => KeyCode.Home,
+        0x25 => KeyCode.LeftArrow,
+        0x26 => KeyCode.UpArrow,
+        0x27 => KeyCode.RightArrow,
+        0x28 => KeyCode.DownArrow,
+        0x2C => KeyCode.Print,
+        0x2D => KeyCode.Insert,
+        0x2E => KeyCode.Delete,
+        0x5B => KeyCode.LeftWindows,
+        0x5C => KeyCode.RightWindows,
+        0x6A => KeyCode.KeypadMultiply,
+        0x6B => KeyCode.KeypadPlus,
+        0x6D => KeyCode.KeypadMinus,
+        0x6E => KeyCode.KeypadPeriod,
+        0x6F => KeyCode.KeypadDivide,
+        0x90 => KeyCode.Numlock,
+        0x91 => KeyCode.ScrollLock,
+        0xA1 => KeyCode.RightShift,
+        0xBA => KeyCode.Semicolon,
+        0xBB => KeyCode.Equals,
+        0xBC => KeyCode.Comma,
+        0xBD => KeyCode.Minus,
+        0xBE => KeyCode.Period,
+        0xBF => KeyCode.Slash,
+        0xC0 => KeyCode.BackQuote,
+        0xDB => KeyCode.LeftBracket,
+        0xDC => KeyCode.Backslash,
+        0xDD => KeyCode.RightBracket,
+        0xDE => KeyCode.Quote,
+        _ => KeyCode.None,
+    };
 
     // ===== capture mode =====
     //
@@ -639,9 +512,7 @@ public static class KeyLimiter {
     public static void CancelCapture() => EndCapture(KeyCode.None);
 
     private static void EndCapture(KeyCode key) {
-        if(!IsCapturing) {
-            return;
-        }
+        if(!IsCapturing) return;
 
         IsCapturing = false;
         Keybind.Capturing = false;
@@ -651,9 +522,7 @@ public static class KeyLimiter {
         captureOnKey = null;
         captureOnEnded = null;
 
-        if(key != KeyCode.None && key != KeyCode.Escape) {
-            onKey?.Invoke(key);
-        }
+        if(key != KeyCode.None && key != KeyCode.Escape) onKey?.Invoke(key);
         onEnded?.Invoke();
         Changed?.Invoke();
     }
@@ -661,8 +530,7 @@ public static class KeyLimiter {
     public static void ClearAllowedKeys() {
         EnsureConf();
         Conf.AllowedKeys = [];
-        Save();
-        Changed?.Invoke();
+        PersistChange();
     }
 
     // Rebinds one allowed-list entry in place (keeps its position). If the
@@ -673,9 +541,7 @@ public static class KeyLimiter {
 
         oldKey = NormalizeKey(oldKey);
         newKey = NormalizeKey(newKey);
-        if(newKey == KeyCode.None || IsMouseKey(newKey)) {
-            return;
-        }
+        if(newKey == KeyCode.None || IsMouseKey(newKey)) return;
 
         List<int> keys = [.. Conf.AllowedKeys];
         int index = keys.IndexOf((int)oldKey);
@@ -691,8 +557,7 @@ public static class KeyLimiter {
         }
 
         Conf.AllowedKeys = [.. keys];
-        Save();
-        Changed?.Invoke();
+        PersistChange();
     }
 
     // ===== per-frame ticker =====
@@ -703,12 +568,15 @@ public static class KeyLimiter {
     private static bool IsHookOnlyModifier(KeyCode key)
         => key is KeyCode.RightControl or KeyCode.RightAlt;
 
+    private static void PersistChange() {
+        Save();
+        Changed?.Invoke();
+    }
+
     private static Ticker ticker;
 
     private static void EnsureTicker() {
-        if(ticker != null || MainCore.Root == null) {
-            return;
-        }
+        if(ticker != null || MainCore.Root == null) return;
         ticker = MainCore.Root.AddComponent<Ticker>();
     }
 
@@ -718,18 +586,11 @@ public static class KeyLimiter {
 
     private static KeyCode[] CaptureCandidates {
         get {
-            if(captureCandidates != null) {
-                return captureCandidates;
-            }
+            if(captureCandidates != null) return captureCandidates;
 
             List<KeyCode> list = [];
             foreach(KeyCode key in Enum.GetValues(typeof(KeyCode))) {
-                if(key == KeyCode.None || IsMouseKey(key)) {
-                    continue;
-                }
-                if(key >= KeyCode.JoystickButton0) {
-                    continue;
-                }
+                if(key == KeyCode.None || IsMouseKey(key) || key >= KeyCode.JoystickButton0) continue;
                 list.Add(key);
             }
             captureCandidates = [.. list];
@@ -750,9 +611,7 @@ public static class KeyLimiter {
 
             if(!IsCapturing) {
                 wasCapturing = false;
-                if(prevHeld.Count > 0) {
-                    prevHeld.Clear();
-                }
+                if(prevHeld.Count > 0) prevHeld.Clear();
                 return;
             }
 
@@ -776,9 +635,7 @@ public static class KeyLimiter {
                 // path that sees them, still forwarded during capture), mirroring
                 // the KeyViewer's KeyHeld. Scoped to those modifiers so normal keys
                 // and the NumLock-off numpad keep using Input alone.
-                if(!held && IsHookOnlyModifier(key)) {
-                    held = HookKeyHeld(key);
-                }
+                if(!held && IsHookOnlyModifier(key)) held = HookKeyHeld(key);
 
                 if(held && !priming && !prevHeld.Contains(key)) {
                     prevHeld.Add(key);

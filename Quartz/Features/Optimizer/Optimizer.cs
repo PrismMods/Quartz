@@ -49,12 +49,8 @@ public static class Optimizer {
     private static bool loggedGcStrategy;
 
     public static void EnsureConf() {
-        if(ConfMgr != null) {
-            return;
-        }
-        ConfMgr = new SettingsFile<OptimizerSettings>(
-            Path.Combine(MainCore.Paths.RootPath, "Optimizer.json")
-        );
+        if(ConfMgr != null) return;
+        ConfMgr = new SettingsFile<OptimizerSettings>(Path.Combine(MainCore.Paths.RootPath, "Optimizer.json"));
         ConfMgr.Load();
     }
 
@@ -79,9 +75,7 @@ public static class Optimizer {
     }
 
     private static void CaptureDefaults() {
-        if(defaultsCaptured) {
-            return;
-        }
+        if(defaultsCaptured) return;
         defaultRunInBackground = Application.runInBackground;
         try {
             defaultPriority = Process.GetCurrentProcess().PriorityClass;
@@ -109,9 +103,7 @@ public static class Optimizer {
 
         // If Smooth GC was switched off (or the mod disabled) while a run still
         // had the GC deferred, hand scheduling back now.
-        if(gcDeferred && !(on && Conf.SmoothGC && GameStats.InGame)) {
-            ResumeGC();
-        }
+        if(gcDeferred && !(on && Conf.SmoothGC && GameStats.InGame)) ResumeGC();
 
         // Global lightweight-shadow toggle for the overlay text shadows. Read on
         // each TMPTextShadow.Apply; existing labels pick it up on their next
@@ -123,9 +115,7 @@ public static class Optimizer {
 
     // Restores every engine default. Called when the mod is disabled.
     public static void Restore() {
-        if(gcDeferred) {
-            ResumeGC();
-        }
+        if(gcDeferred) ResumeGC();
         Application.runInBackground = defaultRunInBackground;
         SetPriority(defaultPriority);
     }
@@ -147,26 +137,20 @@ public static class Optimizer {
     private static void SetPriority(ProcessPriorityClass priority) {
         try {
             Process proc = Process.GetCurrentProcess();
-            if(proc.PriorityClass != priority) {
-                proc.PriorityClass = priority;
-            }
+            if(proc.PriorityClass != priority) proc.PriorityClass = priority;
         } catch {
             // Not supported / not permitted on this platform — ignore.
         }
     }
 
     private static void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
-        if(Active && Conf.CollectOnLevelLoad) {
-            GC.Collect();
-        }
+        if(Active && Conf.CollectOnLevelLoad) GC.Collect();
     }
 
     // Drop the scene-load subscription on full mod unload (UMM in-process reload).
     // Not done in Restore(): the subscription is idempotent + inert when disabled,
     // and Initialize (which re-adds it) only runs at startup, not on re-enable.
-    public static void Unhook() {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
+    public static void Unhook() => SceneManager.sceneLoaded -= OnSceneLoaded;
 
     private static void Tick() {
         // Bracket the run with manual GC: entering gameplay defers collection so

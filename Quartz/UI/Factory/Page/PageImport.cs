@@ -34,58 +34,13 @@ internal static class PageImport {
     ];
 
     public static void Create(RectTransform parent) {
-        GameObject pad = new("Pad");
-        pad.transform.SetParent(parent, false);
-
-        RectTransform padRect = pad.AddComponent<RectTransform>();
-        padRect.anchorMin = Vector2.zero;
-        padRect.anchorMax = Vector2.one;
-        padRect.pivot = new Vector2(0.5f, 0.5f);
-        padRect.offsetMin = new Vector2(18f, 18f);
-        padRect.offsetMax = new Vector2(-18f, -18f);
-
-        GameObject viewport = new("Viewport");
-        viewport.transform.SetParent(pad.transform, false);
-
-        RectTransform viewportRect = viewport.AddComponent<RectTransform>();
-        viewportRect.anchorMin = Vector2.zero;
-        viewportRect.anchorMax = Vector2.one;
-        viewportRect.offsetMin = Vector2.zero;
-        viewportRect.offsetMax = Vector2.zero;
-        viewportRect.pivot = new Vector2(0.5f, 0.5f);
-
-        viewport.AddComponent<EmptyGraphic>().raycastTarget = true;
-        viewport.AddComponent<RectMask2D>();
-
-        GameObject content = new("Content");
-        content.transform.SetParent(viewport.transform, false);
-
-        RectTransform contentRect = content.AddComponent<RectTransform>();
-        contentRect.anchorMin = new Vector2(0f, 1f);
-        contentRect.anchorMax = new Vector2(1f, 1f);
-        contentRect.pivot = new Vector2(0.5f, 1f);
-        contentRect.offsetMin = Vector2.zero;
-        contentRect.offsetMax = Vector2.zero;
-
-        VerticalLayoutGroup layout = content.AddComponent<VerticalLayoutGroup>();
-        layout.spacing = 12f;
-        layout.childControlWidth = true;
-        layout.childControlHeight = true;
-        layout.childForceExpandWidth = true;
-        layout.childForceExpandHeight = false;
-
-        ContentSizeFitter fitter = content.AddComponent<ContentSizeFitter>();
-        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-
-        pad.AddComponent<UIScrollController>().SetContent(contentRect, viewportRect);
+        RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
 
         TextMeshProUGUI headerText = GenerateUI.AddTextH1(GenerateUI.Row(content.transform));
         GenerateUI.Localize(headerText, "IMPORT_HEADER", "Import from other mods");
 
         var hintRow = GenerateUI.Row(content.transform, 96f);
-        var hintText = GenerateUI.AddText(hintRow, noPad: true);
-        hintText.fontSize = 17f;
-        hintText.color = new Color(1f, 1f, 1f, 0.45f);
+        var hintText = GenerateUI.AddMutedText(hintRow, 17f, 0.45f, true);
         // CreateText stretches the rect to the row's full width and leaves TMP
         // at NoWrap. Enable wrapping and inset the right edge by 250 (the same
         // gutter BackGround() rows use) so the copy wraps instead of running off
@@ -112,25 +67,14 @@ internal static class PageImport {
         rescanBtn.Rect.AddToolTip("DESC_IMPORT_RESCAN", "Re-scan for supported mods loaded through Unity Mod Manager.");
 
         var statusRow = GenerateUI.Row(content.transform, 32f);
-        statusText = GenerateUI.AddText(statusRow, noPad: true);
-        statusText.fontSize = 18f;
-        statusText.color = new Color(1f, 1f, 1f, 0.45f);
+        statusText = GenerateUI.AddMutedText(statusRow, 18f, 0.45f, true);
         statusText.text = "";
 
         GameObject list = new("Mods");
         list.transform.SetParent(content.transform, false);
 
         listContainer = list.AddComponent<RectTransform>();
-
-        VerticalLayoutGroup listLayout = list.AddComponent<VerticalLayoutGroup>();
-        listLayout.spacing = 16f;
-        listLayout.childControlWidth = true;
-        listLayout.childControlHeight = true;
-        listLayout.childForceExpandWidth = true;
-        listLayout.childForceExpandHeight = false;
-
-        ContentSizeFitter listFitter = list.AddComponent<ContentSizeFitter>();
-        listFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        GenerateUI.FitVertical(list, 16f);
 
         RebuildList();
 
@@ -138,7 +82,7 @@ internal static class PageImport {
         // one-line mesh at a stale (full) width and never re-wrap. Force the
         // layout now so every row gets its real width and the text re-wraps —
         // same trick DropDown uses after building its popup.
-        LayoutRebuilder.ForceRebuildLayoutImmediate(contentRect);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(content);
     }
 
     private static string Tr(string key, string def) => MainCore.Tr.Get(key, def);
@@ -151,13 +95,9 @@ internal static class PageImport {
     }
 
     private static void RebuildList() {
-        if(listContainer == null) {
-            return;
-        }
+        if(listContainer == null) return;
 
-        for(int i = listContainer.childCount - 1; i >= 0; i--) {
-            Object.Destroy(listContainer.GetChild(i).gameObject);
-        }
+        GenerateUI.ClearChildren(listContainer);
 
         List<SettingsImportOption> options = SettingsImporter.GetAvailableOptions();
         List<InstalledModInfo> installed = SettingsImporter.GetAllInstalledMods();
@@ -165,22 +105,16 @@ internal static class PageImport {
         // Compatible = Quartz has an importer for it (an option). Every other
         // installed UMM mod is shown below, tagged "Not Compatible".
         HashSet<string> compatIds = new(StringComparer.OrdinalIgnoreCase);
-        foreach(SettingsImportOption opt in options) {
-            compatIds.Add(opt.Id);
-        }
+        foreach(SettingsImportOption opt in options) compatIds.Add(opt.Id);
 
         List<InstalledModInfo> incompatible = [];
         foreach(InstalledModInfo mod in installed) {
-            if(!compatIds.Contains(mod.Id)) {
-                incompatible.Add(mod);
-            }
+            if(!compatIds.Contains(mod.Id)) incompatible.Add(mod);
         }
 
         if(options.Count == 0 && incompatible.Count == 0) {
             var emptyRow = GenerateUI.Row(listContainer, 96f);
-            var emptyText = GenerateUI.AddText(emptyRow, noPad: true);
-            emptyText.fontSize = 18f;
-            emptyText.color = new Color(1f, 1f, 1f, 0.6f);
+            var emptyText = GenerateUI.AddMutedText(emptyRow, 18f, 0.6f, true);
             emptyText.textWrappingMode = TextWrappingModes.Normal;
             emptyText.rectTransform.offsetMax = new Vector2(-250f, 0f);
             GenerateUI.Localize(
@@ -196,12 +130,8 @@ internal static class PageImport {
         options.Sort((a, b) => string.Compare(a.Label, b.Label, StringComparison.OrdinalIgnoreCase));
         incompatible.Sort((a, b) => string.Compare(a.Label, b.Label, StringComparison.OrdinalIgnoreCase));
 
-        foreach(SettingsImportOption option in options) {
-            CreateOptionCard(option);
-        }
-        foreach(InstalledModInfo mod in incompatible) {
-            CreateIncompatibleCard(mod);
-        }
+        foreach(SettingsImportOption option in options) CreateOptionCard(option);
+        foreach(InstalledModInfo mod in incompatible) CreateIncompatibleCard(mod);
     }
 
     // A muted row for an installed mod Quartz has no importer for: name on the
@@ -224,10 +154,8 @@ internal static class PageImport {
         label.gameObject.AddComponent<LayoutElement>().flexibleWidth = 1f;
         label.text = mod.Label;
 
-        var tag = GenerateUI.AddText(row, noPad: true);
-        tag.fontSize = 17f;
+        var tag = GenerateUI.AddMutedText(row, 17f, 0.4f, true);
         tag.alignment = TextAlignmentOptions.MidlineRight;
-        tag.color = new Color(1f, 1f, 1f, 0.4f);
         LayoutElement tagLe = tag.gameObject.AddComponent<LayoutElement>();
         tagLe.preferredWidth = 170f;
         tagLe.minWidth = 170f;
@@ -267,17 +195,13 @@ internal static class PageImport {
             "Copy this mod's settings into a new Quartz profile, leaving the current profile selected."
         );
 
-        if(!SettingsImporter.HasKeyViewerPayload(option.Source)) {
-            return;
-        }
+        if(!SettingsImporter.HasKeyViewerPayload(option.Source)) return;
 
         // KeyViewer replace mode + (for "Replace certain") the group toggles.
         SettingsImportReplaceMode mode = modes.TryGetValue(option.OptionId, out var m) ? m : SettingsImportReplaceMode.ReplaceAll;
 
         var modeHeaderRow = GenerateUI.Row(listContainer, 30f);
-        var modeHeader = GenerateUI.AddText(modeHeaderRow, noPad: true);
-        modeHeader.fontSize = 16f;
-        modeHeader.color = new Color(1f, 1f, 1f, 0.55f);
+        var modeHeader = GenerateUI.AddMutedText(modeHeaderRow, 16f, 0.55f, true);
         GenerateUI.Localize(modeHeader, "IMPORT_KV_MODE", "KeyViewer import");
 
         IReadOnlyList<SettingsImportReplaceMode> modeValues = new[] {
@@ -300,9 +224,7 @@ internal static class PageImport {
             "import_mode_" + option.OptionId
         );
 
-        if(mode != SettingsImportReplaceMode.ReplaceCertain) {
-            return;
-        }
+        if(mode != SettingsImportReplaceMode.ReplaceCertain) return;
 
         SettingsImportKeyViewerPart selected = parts.TryGetValue(option.OptionId, out var p) ? p : SettingsImportKeyViewerPart.All;
 

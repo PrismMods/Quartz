@@ -34,20 +34,14 @@ public static class ComboOverlay {
     private const float CaptionGap = 24f;
 
     public static void EnsureConf() {
-        if(ConfMgr != null) {
-            return;
-        }
+        if(ConfMgr != null) return;
 
-        ConfMgr = new SettingsFile<ComboSettings>(
-            Path.Combine(MainCore.Paths.RootPath, "Combo.json")
-        );
+        ConfMgr = new SettingsFile<ComboSettings>(Path.Combine(MainCore.Paths.RootPath, "Combo.json"));
         ConfMgr.Load();
     }
 
     public static void Initialize(GameObject rootObject) {
-        if(canvasObj != null) {
-            return;
-        }
+        if(canvasObj != null) return;
 
         EnsureConf();
 
@@ -115,9 +109,7 @@ public static class ComboOverlay {
     }
 
     public static void Apply() {
-        if(root == null) {
-            return;
-        }
+        if(root == null) return;
 
         ApplyFont();
         root.anchoredPosition = GetDefaultPosition();
@@ -129,25 +121,17 @@ public static class ComboOverlay {
 
     private static void ApplyFont() {
         TMP_FontAsset font = FontManager.Current;
-        if(valueText != null) {
-            valueText.font = font;
-        }
-        if(captionText != null) {
-            captionText.font = font;
-        }
+        if(valueText != null) valueText.font = font;
+        if(captionText != null) captionText.font = font;
     }
 
     private static void ApplyCaption() {
-        if(captionText == null) {
-            return;
-        }
+        if(captionText == null) return;
 
         // XPerfect combo mode prefixes the caption with "X" (e.g. "XCombo") to
         // signal only dead-center perfects are being counted.
         string caption = Conf.CaptionText ?? "Combo";
-        if(Conf.XPerfectComboEnabled && XPerfectBridge.Active) {
-            caption = "X" + caption;
-        }
+        if(Conf.XPerfectComboEnabled && XPerfectBridge.Active) caption = "X" + caption;
         captionText.text = caption;
         captionText.gameObject.SetActive(Conf.ShowCaption);
     }
@@ -174,9 +158,7 @@ public static class ComboOverlay {
     public static void ApplyCaptionShadow() => ApplyCaptionMaterial();
 
     public static void Dispose() {
-        if(canvasObj == null) {
-            return;
-        }
+        if(canvasObj == null) return;
 
         if(root != null) {
             Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
@@ -207,9 +189,7 @@ public static class ComboOverlay {
     }
 
     private static void ApplyValueMaterial() {
-        if(valueText == null) {
-            return;
-        }
+        if(valueText == null) return;
         ApplyThickness(valueText, Conf.CountThickness);
         TMPTextShadow.Apply(
             valueText,
@@ -222,9 +202,7 @@ public static class ComboOverlay {
     }
 
     private static void ApplyCaptionMaterial() {
-        if(captionText == null) {
-            return;
-        }
+        if(captionText == null) return;
         TMPTextShadow.Apply(
             captionText,
             Conf.CaptionShadowEnabled,
@@ -238,9 +216,7 @@ public static class ComboOverlay {
     // TMP face dilate — thickens the glyph strokes. 0 = native weight.
     private static void ApplyThickness(TextMeshProUGUI text, float dilate) {
         Material mat = text.fontMaterial;
-        if(mat == null) {
-            return;
-        }
+        if(mat == null) return;
         mat.SetFloat("_FaceDilate", Mathf.Clamp(dilate, -1f, 1f));
     }
 
@@ -267,27 +243,17 @@ public static class ComboOverlay {
         private string lastCaptionText;
 
         private void Update() {
-            if(root == null || valueText == null) {
-                return;
-            }
+            if(root == null || valueText == null) return;
 
             bool isReorganizing = UICore.IsReorganizing;
             // Gated by the master Overlay enable as well as Combo's own toggle.
             bool show = (Panels.PanelsOverlay.IsEnabled && Conf.Enabled && GameStats.InGame) || isReorganizing;
-            if(raycaster != null && raycaster.enabled != isReorganizing) {
-                raycaster.enabled = isReorganizing;
-            }
-            if(root.gameObject.activeSelf != show) {
-                root.gameObject.SetActive(show);
-            }
+            if(raycaster != null && raycaster.enabled != isReorganizing) raycaster.enabled = isReorganizing;
+            if(root.gameObject.activeSelf != show) root.gameObject.SetActive(show);
 
-            if(dragObj != null && dragObj.activeSelf != isReorganizing) {
-                dragObj.SetActive(isReorganizing);
-            }
+            if(dragObj != null && dragObj.activeSelf != isReorganizing) dragObj.SetActive(isReorganizing);
 
-            if(!show) {
-                return;
-            }
+            if(!show) return;
 
             // Position only changes while dragging in Reorganize mode; mirroring
             // it into Conf every frame otherwise is a no-op round-trip.

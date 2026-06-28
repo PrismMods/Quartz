@@ -135,14 +135,10 @@ public sealed class UIColorPicker : UIObject {
     public void Set(Color color, bool invoke = true) {
         Value = Normalize(color);
         Color.RGBToHSV(Value, out float h, out saturation, out brightness);
-        if(saturation > 0.0001f || brightness > 0.0001f) {
-            hue = h;
-        }
+        if(saturation > 0.0001f || brightness > 0.0001f) hue = h;
 
         BuildSvTexture();
-        if(invoke) {
-            OnChanged?.Invoke(Value);
-        }
+        if(invoke) OnChanged?.Invoke(Value);
         UpdateVisual();
     }
 
@@ -158,9 +154,7 @@ public sealed class UIColorPicker : UIObject {
 
         // Kept active and faded via the CanvasGroup so the open/close animates
         // both ways (alpha 0 hides the panel while it overflows the row).
-        if(body != null && !body.activeSelf) {
-            body.SetActive(true);
-        }
+        if(body != null && !body.activeSelf) body.SetActive(true);
 
         float targetHeight = expanded ? expandedHeight : 50f;
         float targetAlpha = expanded ? 1f : 0f;
@@ -177,12 +171,8 @@ public sealed class UIColorPicker : UIObject {
                 rowLayout.preferredHeight = targetHeight;
                 rowLayout.minHeight = 50f;
             }
-            if(bodyCanvasGroup != null) {
-                bodyCanvasGroup.alpha = targetAlpha;
-            }
-            if(rootRect != null) {
-                LayoutRebuilder.ForceRebuildLayoutImmediate(rootRect);
-            }
+            if(bodyCanvasGroup != null) bodyCanvasGroup.alpha = targetAlpha;
+            if(rootRect != null) LayoutRebuilder.ForceRebuildLayoutImmediate(rootRect);
             return;
         }
 
@@ -217,9 +207,7 @@ public sealed class UIColorPicker : UIObject {
     }
 
     public void SetFromSvPointer(Vector2 screenPosition) {
-        if(!RectTransformUtility.ScreenPointToLocalPointInRectangle(svRect, screenPosition, null, out Vector2 local)) {
-            return;
-        }
+        if(!RectTransformUtility.ScreenPointToLocalPointInRectangle(svRect, screenPosition, null, out Vector2 local)) return;
 
         Rect rect = svRect.rect;
         saturation = Mathf.Clamp01(Mathf.InverseLerp(rect.xMin, rect.xMax, local.x));
@@ -228,9 +216,7 @@ public sealed class UIColorPicker : UIObject {
     }
 
     public void SetFromHuePointer(Vector2 screenPosition) {
-        if(!RectTransformUtility.ScreenPointToLocalPointInRectangle(hueRect, screenPosition, null, out Vector2 local)) {
-            return;
-        }
+        if(!RectTransformUtility.ScreenPointToLocalPointInRectangle(hueRect, screenPosition, null, out Vector2 local)) return;
 
         Rect rect = hueRect.rect;
         hue = Mathf.Clamp01(Mathf.InverseLerp(rect.yMin, rect.yMax, local.y));
@@ -301,9 +287,7 @@ public sealed class UIColorPicker : UIObject {
     }
 
     private void SetupHexInput() {
-        if(hexInput == null) {
-            return;
-        }
+        if(hexInput == null) return;
 
         hexInput.lineType = TMP_InputField.LineType.SingleLine;
         hexInput.richText = false;
@@ -312,13 +296,9 @@ public sealed class UIColorPicker : UIObject {
         hexInput.caretColor = Color.white;
         hexInput.selectionColor = UIColors.MenuHover;
         hexInput.onValueChanged.AddListener(value => {
-            if(suppressHexInput) {
-                return;
-            }
+            if(suppressHexInput) return;
 
-            if(TryParseHex(value, out Color parsed)) {
-                Set(parsed);
-            }
+            if(TryParseHex(value, out Color parsed)) Set(parsed);
         });
         hexInput.onEndEdit.AddListener(value => {
             if(TryParseHex(value, out Color parsed)) {
@@ -334,9 +314,7 @@ public sealed class UIColorPicker : UIObject {
     private void UpdateChannelSliders() {
         // Skipped while a channel slider is the source of the change, so its own
         // UpdateVisual doesn't snap the value back mid-drag.
-        if(suppressChannelSync) {
-            return;
-        }
+        if(suppressChannelSync) return;
 
         for(int i = 0; i < channelSliders.Length; i++) {
             ChannelSlider slider = channelSliders[i];
@@ -414,9 +392,7 @@ public sealed class UIColorPicker : UIObject {
 
     private static bool TryParseHex(string value, out Color color) {
         color = Color.white;
-        if(string.IsNullOrWhiteSpace(value)) {
-            return false;
-        }
+        if(string.IsNullOrWhiteSpace(value)) return false;
 
         string hex = value.Trim().TrimStart('#');
 

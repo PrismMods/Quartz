@@ -135,9 +135,7 @@ public static class SettingsImporter {
     // disk fallback), so it must still be ACTIVE for its assembly to be loaded.
     public static List<SettingsImportOption> GetAvailableOptions() {
         List<SettingsImportOption> options = [];
-        if(!UmmInterop.IsPresent) {
-            return options;
-        }
+        if(!UmmInterop.IsPresent) return options;
 
         List<string> activeIds = UmmInterop.ActiveModIds();
         List<string> installedIds = UmmInterop.InstalledModIds();
@@ -145,9 +143,7 @@ public static class SettingsImporter {
             List<string> ids = spec.Source == SettingsImportSource.JipperResourcePack ? activeIds : installedIds;
             foreach(string id in ids) {
                 object entry = UmmInterop.FindMod(id);
-                if(entry == null || !EntryMatches(entry, id, spec)) {
-                    continue;
-                }
+                if(entry == null || !EntryMatches(entry, id, spec)) continue;
 
                 string display = StripRichText(ReadNested(entry, "Info", "DisplayName") as string);
                 // v1's own DisplayName is the lowercase "koren resource pack",
@@ -174,9 +170,7 @@ public static class SettingsImporter {
         // folder on disk for its Info.json + Settings.xml directly.
         if(!options.Any(o => o.Source == SettingsImportSource.KorenResourcePackV1)) {
             SettingsImportOption diskV1 = ScanDiskForKorenV1();
-            if(diskV1 != null) {
-                options.Add(diskV1);
-            }
+            if(diskV1 != null) options.Add(diskV1);
         }
 
         return options;
@@ -188,15 +182,11 @@ public static class SettingsImporter {
     // the ones with no Quartz importer as "Not Compatible".
     public static List<InstalledModInfo> GetAllInstalledMods() {
         List<InstalledModInfo> mods = [];
-        if(!UmmInterop.IsPresent) {
-            return mods;
-        }
+        if(!UmmInterop.IsPresent) return mods;
 
         HashSet<string> seen = new(StringComparer.OrdinalIgnoreCase);
         foreach(string id in UmmInterop.InstalledModIds()) {
-            if(string.IsNullOrEmpty(id) || !seen.Add(id)) {
-                continue;
-            }
+            if(string.IsNullOrEmpty(id) || !seen.Add(id)) continue;
             object entry = UmmInterop.FindMod(id);
             string display = StripRichText(ReadNested(entry, "Info", "DisplayName") as string);
             mods.Add(new InstalledModInfo {
@@ -212,16 +202,12 @@ public static class SettingsImporter {
     // Settings.xml to read. Independent of whether v1 is enabled/loaded in UMM.
     private static SettingsImportOption ScanDiskForKorenV1() {
         ImportSpec spec = Array.Find(Specs, s => s.Source == SettingsImportSource.KorenResourcePackV1);
-        if(spec == null) {
-            return null;
-        }
+        if(spec == null) return null;
 
         foreach(string root in UmmModsRoots()) {
             string[] dirs;
             try {
-                if(string.IsNullOrEmpty(root) || !Directory.Exists(root)) {
-                    continue;
-                }
+                if(string.IsNullOrEmpty(root) || !Directory.Exists(root)) continue;
                 dirs = Directory.GetDirectories(root);
             } catch {
                 continue;
@@ -230,12 +216,8 @@ public static class SettingsImporter {
             foreach(string dir in dirs) {
                 string id = ReadInfoJsonId(dir);
                 string folder = Path.GetFileName(dir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
-                if(!V1FolderMatches(spec, id, folder)) {
-                    continue;
-                }
-                if(!File.Exists(Path.Combine(dir, "Settings.xml"))) {
-                    continue; // nothing to import from
-                }
+                if(!V1FolderMatches(spec, id, folder)) continue;
+                if(!File.Exists(Path.Combine(dir, "Settings.xml"))) continue; // nothing to import from
 
                 string resolvedId = string.IsNullOrEmpty(id) ? "KorenResourcePack" : id;
                 return new SettingsImportOption {
@@ -257,19 +239,13 @@ public static class SettingsImporter {
     private static IEnumerable<string> UmmModsRoots() {
         HashSet<string> seen = new(StringComparer.OrdinalIgnoreCase);
         string modsPath = UmmInterop.ModsPath();
-        if(!string.IsNullOrEmpty(modsPath) && seen.Add(modsPath)) {
-            yield return modsPath;
-        }
+        if(!string.IsNullOrEmpty(modsPath) && seen.Add(modsPath)) yield return modsPath;
         foreach(string id in UmmInterop.InstalledModIds()) {
             object entry = UmmInterop.FindMod(id);
             string dir = ResolveDirectory(ReadMember(entry, "Path") as string);
-            if(string.IsNullOrEmpty(dir)) {
-                continue;
-            }
+            if(string.IsNullOrEmpty(dir)) continue;
             string parent = Path.GetDirectoryName(dir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
-            if(!string.IsNullOrEmpty(parent) && seen.Add(parent)) {
-                yield return parent;
-            }
+            if(!string.IsNullOrEmpty(parent) && seen.Add(parent)) yield return parent;
         }
     }
 
@@ -278,9 +254,7 @@ public static class SettingsImporter {
         string nFolder = NormalizeModToken(folder);
         foreach(string alias in spec.Aliases) {
             string a = NormalizeModToken(alias);
-            if((nId.Length > 0 && nId == a) || (nFolder.Length > 0 && nFolder == a)) {
-                return true;
-            }
+            if((nId.Length > 0 && nId == a) || (nFolder.Length > 0 && nFolder == a)) return true;
         }
         return false;
     }
@@ -294,20 +268,15 @@ public static class SettingsImporter {
                     && obj.TryGetValue("Id", StringComparison.OrdinalIgnoreCase, out JToken t)) {
                     return t?.ToString();
                 }
-            } catch {
-            }
+            } catch { }
         }
         return null;
     }
 
     public static SettingsImportOption FindOption(List<SettingsImportOption> options, string optionId) {
-        if(options == null || string.IsNullOrEmpty(optionId)) {
-            return null;
-        }
+        if(options == null || string.IsNullOrEmpty(optionId)) return null;
         foreach(SettingsImportOption option in options) {
-            if(string.Equals(option.OptionId, optionId, StringComparison.Ordinal)) {
-                return option;
-            }
+            if(string.Equals(option.OptionId, optionId, StringComparison.Ordinal)) return option;
         }
         return null;
     }
@@ -364,9 +333,7 @@ public static class SettingsImporter {
         } catch(Exception ex) {
             MainCore.Log.Err($"[SettingsImporter] profile import failed: {ex}");
             RestorePreviousProfile(previous);
-            if(!string.IsNullOrEmpty(profile)) {
-                ProfileManager.Delete(profile);
-            }
+            if(!string.IsNullOrEmpty(profile)) ProfileManager.Delete(profile);
             result.Message = ex.Message;
             return result;
         }
@@ -465,9 +432,7 @@ public static class SettingsImporter {
             }
         }
 
-        if(count == 0 || !importedKeys) {
-            count += ImportChatterBlockerXml(option, count == 0, !importedKeys);
-        }
+        if(count == 0 || !importedKeys) count += ImportChatterBlockerXml(option, count == 0, !importedKeys);
 
         if(count > 0) {
             Features.ChatterBlocker.ChatterBlocker.EnsureConf();
@@ -480,9 +445,7 @@ public static class SettingsImporter {
 
     private static int ImportChatterBlockerXml(SettingsImportOption option, bool importBasics, bool importKeys) {
         XDocument doc = LoadXml(option, "Setting.xml");
-        if(doc == null) {
-            return 0;
-        }
+        if(doc == null) return 0;
 
         int count = 0;
         if(importBasics) {
@@ -516,15 +479,11 @@ public static class SettingsImporter {
         SettingsImportReplaceMode mode,
         SettingsImportKeyViewerPart parts
     ) {
-        if(mode == SettingsImportReplaceMode.KeepOld) {
-            return 0;
-        }
+        if(mode == SettingsImportReplaceMode.KeepOld) return 0;
 
         ImportedKeyViewer imported = null;
         object runtime = GetStaticMember(FindType(option, "JipperKeyViewer.KeyViewer.KeyViewer"), "Settings");
-        if(runtime != null) {
-            imported = ReadKeyViewerFromObject(runtime);
-        }
+        if(runtime != null) imported = ReadKeyViewerFromObject(runtime);
         if(imported == null || imported.Available == SettingsImportKeyViewerPart.None) {
             string json = ReadFirstText(JkvConfigPaths(option));
             if(!string.IsNullOrEmpty(json)) {
@@ -532,9 +491,7 @@ public static class SettingsImporter {
             }
         }
 
-        if(imported == null || imported.Available == SettingsImportKeyViewerPart.None) {
-            return 0;
-        }
+        if(imported == null || imported.Available == SettingsImportKeyViewerPart.None) return 0;
 
         return ApplyKeyViewerImport(imported, mode, parts);
     }
@@ -558,14 +515,10 @@ public static class SettingsImporter {
     private static int ImportJrpProgressBar(SettingsImportOption option) {
         object settings = GetStaticMember(FindType(option, "JipperResourcePack.OverlayContents.Status"), "Settings")
             ?? GetStaticMember(FindType(option, "JipperResourcePack.Jongyeol.JStatus"), "Settings");
-        if(settings == null) {
-            return 0;
-        }
+        if(settings == null) return 0;
 
         // Only the progress-BAR data maps; v2 has no flat text-stat toggles.
-        if(!TryGetBool(settings, "ShowProgressBar", out bool barOn)) {
-            return 0;
-        }
+        if(!TryGetBool(settings, "ShowProgressBar", out bool barOn)) return 0;
 
         int count = 0;
         ProgressBarOverlay.EnsureConf();
@@ -590,9 +543,7 @@ public static class SettingsImporter {
     private static int ImportJrpCombo(SettingsImportOption option) {
         object settings = GetStaticMember(FindType(option, "JipperResourcePack.OverlayContents.Combo"), "Settings")
             ?? GetStaticMember(FindType(option, "JipperResourcePack.Jongyeol.JCombo"), "Settings");
-        if(settings == null) {
-            return 0;
-        }
+        if(settings == null) return 0;
 
         int count = 0;
         ComboOverlay.EnsureConf();
@@ -616,9 +567,7 @@ public static class SettingsImporter {
 
     private static int ImportJrpJudgement(SettingsImportOption option) {
         object settings = GetStaticMember(FindType(option, "JipperResourcePack.OverlayContents.Judgement"), "Settings");
-        if(settings == null) {
-            return 0;
-        }
+        if(settings == null) return 0;
 
         int count = 0;
         JudgementOverlay.EnsureConf();
@@ -633,9 +582,7 @@ public static class SettingsImporter {
 
     private static int ImportJrpResourceChanger(SettingsImportOption option) {
         object settings = GetStaticMember(FindType(option, "JipperResourcePack.ResourceChanger"), "_settings");
-        if(settings == null) {
-            return 0;
-        }
+        if(settings == null) return 0;
 
         int count = 0;
         if(TryGetBool(settings, "ChangeRabbit", out bool otto)) {
@@ -656,19 +603,13 @@ public static class SettingsImporter {
         SettingsImportReplaceMode mode,
         SettingsImportKeyViewerPart parts
     ) {
-        if(mode == SettingsImportReplaceMode.KeepOld) {
-            return 0;
-        }
+        if(mode == SettingsImportReplaceMode.KeepOld) return 0;
 
         object settings = GetStaticMember(FindType(option, "JipperResourcePack.KeyViewerContents.KeyViewer"), "Settings");
-        if(settings == null) {
-            return 0;
-        }
+        if(settings == null) return 0;
 
         ImportedKeyViewer imported = ReadKeyViewerFromObject(settings);
-        if(imported == null || imported.Available == SettingsImportKeyViewerPart.None) {
-            return 0;
-        }
+        if(imported == null || imported.Available == SettingsImportKeyViewerPart.None) return 0;
         return ApplyKeyViewerImport(imported, mode, parts);
     }
 
@@ -684,9 +625,7 @@ public static class SettingsImporter {
     }
 
     private static int ImportAdofaiTweaksSettingsObject(object settings) {
-        if(settings == null) {
-            return 0;
-        }
+        if(settings == null) return 0;
         return settings.GetType().Name switch {
             "KeyLimiterSettings" => ImportAdofaiKeyLimiterObject(settings),
             "KeyViewerSettings" => ImportAdofaiKeyViewerObject(settings),
@@ -715,9 +654,7 @@ public static class SettingsImporter {
     private static int ImportAdofaiKeyViewerObject(object settings) {
         object profile = GetActiveIndexedProfile(settings, "Profiles", "ProfileIndex");
         int[] keys = ReadKeyCodesFromMember(profile, "ActiveKeys");
-        if(keys.Length == 0) {
-            return 0;
-        }
+        if(keys.Length == 0) return 0;
         Features.KeyLimiter.KeyLimiter.SetAllowedKeys(keys);
         return 1;
     }
@@ -733,9 +670,7 @@ public static class SettingsImporter {
     }
 
     private static int ImportAdofaiHideUiObject(object settings) {
-        if(!TryGetBool(settings, "IsEnabled", out bool enabled) || !enabled) {
-            return 0;
-        }
+        if(!TryGetBool(settings, "IsEnabled", out bool enabled) || !enabled) return 0;
 
         Features.UiHider.UiHider.EnsureConf();
         int count = 0;
@@ -768,17 +703,11 @@ public static class SettingsImporter {
     }
 
     private static int ImportAdofaiRestrictObject(object settings) {
-        if(!TryGetBool(settings, "IsEnabled", out bool enabled) || !enabled) {
-            return 0;
-        }
-        if(!TryGetBool(settings, "RestrictJudgment", out bool restrict) || !restrict) {
-            return 0;
-        }
+        if(!TryGetBool(settings, "IsEnabled", out bool enabled) || !enabled) return 0;
+        if(!TryGetBool(settings, "RestrictJudgment", out bool restrict) || !restrict) return 0;
 
         bool[] restricted = ReadBoolArray(GetMemberValue(settings, "RestrictedJudgments"));
-        if(restricted.Length == 0) {
-            return 0;
-        }
+        if(restricted.Length == 0) return 0;
 
         return ApplyRestrictMask(restricted);
     }
@@ -874,9 +803,7 @@ public static class SettingsImporter {
     private static int ImportEnhancedEffectRemover(SettingsImportOption option) {
         int count = 0;
         object settings = GetStaticMember(FindType(option, "EnhancedEffectRemover.Settings"), "Instance");
-        if(settings != null) {
-            count += ApplyEffectRemover(name => GetMemberValue(settings, name));
-        }
+        if(settings != null) count += ApplyEffectRemover(name => GetMemberValue(settings, name));
 
         if(count == 0) {
             string json = ReadFirstText([Path.Combine(option.Directory ?? "", "Settings.json")]);
@@ -969,9 +896,7 @@ public static class SettingsImporter {
         // (e.g. the mod's static settings weren't reachable).
         if(count == 0) {
             XDocument doc = LoadXml(option, "Settings.xml");
-            if(doc?.Root != null) {
-                count += ApplyV1Common(V1FromXml(doc.Root), keyViewerMode, keyViewerParts);
-            }
+            if(doc?.Root != null) count += ApplyV1Common(V1FromXml(doc.Root), keyViewerMode, keyViewerParts);
         }
 
         return count;
@@ -1243,9 +1168,7 @@ public static class SettingsImporter {
 
     private static bool AnyGhost(params int[][] arrays) {
         foreach(int[] arr in arrays) {
-            if(arr != null && arr.Any(k => k != 0)) {
-                return true;
-            }
+            if(arr != null && arr.Any(k => k != 0)) return true;
         }
         return false;
     }
@@ -1266,9 +1189,7 @@ public static class SettingsImporter {
     // for allow-lists), these arrays are slot-indexed — a 0 means "no key for
     // this slot" and duplicates/positions must be preserved.
     private static int[] ReadPositionalKeys(object value) {
-        if(value is not IEnumerable enumerable || value is string) {
-            return null;
-        }
+        if(value is not IEnumerable enumerable || value is string) return null;
         List<int> result = [];
         foreach(object item in enumerable) {
             result.Add(TryConvertKeyCode(item, out int key) ? key : 0);
@@ -1278,9 +1199,7 @@ public static class SettingsImporter {
 
     private static int[] ReadPositionalKeysXml(XElement root, string name) {
         XElement list = FindFirstDescendant(root, name);
-        if(list == null) {
-            return null;
-        }
+        if(list == null) return null;
         List<int> result = [];
         foreach(XElement item in list.Elements()) {
             result.Add(TryConvertKeyCode(item.Value, out int key) ? key : 0);
@@ -1290,9 +1209,7 @@ public static class SettingsImporter {
 
     private static string[] ReadPositionalLabelsXml(XElement root, string name) {
         XElement list = FindFirstDescendant(root, name);
-        if(list == null) {
-            return null;
-        }
+        if(list == null) return null;
         XNamespace xsi = "http://www.w3.org/2001/XMLSchema-instance";
         List<string> result = [];
         foreach(XElement item in list.Elements()) {
@@ -1388,9 +1305,7 @@ public static class SettingsImporter {
     }
 
     private static ImportedKeyViewer ReadKeyViewerFromJson(JObject src) {
-        if(src == null) {
-            return null;
-        }
+        if(src == null) return null;
         ImportedKeyViewer kv = new();
 
         if(TryParseKvStyle(JsonValue(src, "KeyViewerStyle"), out int style)) {
@@ -1449,16 +1364,12 @@ public static class SettingsImporter {
         SettingsImportReplaceMode mode,
         SettingsImportKeyViewerPart parts
     ) {
-        if(kv == null || mode == SettingsImportReplaceMode.KeepOld) {
-            return 0;
-        }
+        if(kv == null || mode == SettingsImportReplaceMode.KeepOld) return 0;
 
         SettingsImportKeyViewerPart effective = mode == SettingsImportReplaceMode.ReplaceCertain
             ? parts & kv.Available
             : kv.Available;
-        if(effective == SettingsImportKeyViewerPart.None) {
-            return 0;
-        }
+        if(effective == SettingsImportKeyViewerPart.None) return 0;
 
         KeyViewerOverlay.EnsureConf();
         KeyViewerSettings target = KeyViewerOverlay.Conf;
@@ -1544,9 +1455,7 @@ public static class SettingsImporter {
     // 3=20. Map by the key count embedded in the name; fall back to the raw int.
     private static bool TryParseKvStyle(object value, out int style) {
         style = 0;
-        if(value == null) {
-            return false;
-        }
+        if(value == null) return false;
         string text = value.ToString();
         string digits = new(text.Where(char.IsDigit).ToArray());
         if(int.TryParse(digits, out int keys)) {
@@ -1589,13 +1498,17 @@ public static class SettingsImporter {
 
     // ===== UI-hiding profile copy =====
 
-    private static int ApplyAdofaiHideUiProfile(object profile, UiHiderProfile target) {
-        if(profile == null || target == null) {
-            return 0;
-        }
+    private static int ApplyAdofaiHideUiProfile(object profile, UiHiderProfile target) =>
+        profile == null ? 0 : ApplyHideUiProfile(name => TryGetBool(profile, name, out bool v) ? v : null, target);
+
+    private static int ApplyAdofaiHideUiProfileXml(XElement profile, UiHiderProfile target) =>
+        profile == null ? 0 : ApplyHideUiProfile(name => TryReadXmlBool(profile, name, out bool v) ? v : null, target);
+
+    private static int ApplyHideUiProfile(Func<string, bool?> read, UiHiderProfile target) {
+        if(target == null) return 0;
         int count = 0;
         void Flag(string name, Action<bool> set) {
-            if(TryGetBool(profile, name, out bool v)) { set(v); count++; }
+            if(read(name) is { } v) { set(v); count++; }
         }
         Flag("HideEverything", v => target.HideEverything = v);
         Flag("HideJudgment", v => target.HideJudgment = v);
@@ -1611,66 +1524,31 @@ public static class SettingsImporter {
         return count;
     }
 
-    private static int ApplyAdofaiHideUiProfileXml(XElement profile, UiHiderProfile target) {
-        if(profile == null || target == null) {
-            return 0;
-        }
-        int count = 0;
-        void Flag(string name, Action<bool> set) {
-            if(TryReadXmlBool(profile, name, out bool v)) { set(v); count++; }
-        }
-        Flag("HideEverything", v => target.HideEverything = v);
-        Flag("HideJudgment", v => target.HideJudgment = v);
-        Flag("HideMissIndicators", v => target.HideMissIndicators = v);
-        Flag("HideTitle", v => target.HideTitle = v);
-        Flag("HideOtto", v => target.HideOtto = v);
-        Flag("HideTimingTarget", v => target.HideTimingTarget = v);
-        Flag("HideNoFailIcon", v => target.HideNoFailIcon = v);
-        Flag("HideBeta", v => target.HideBeta = v);
-        Flag("HideResult", v => target.HideResult = v);
-        Flag("HideHitErrorMeter", v => target.HideHitErrorMeter = v);
-        Flag("HideLastFloorFlash", v => target.HideLastFloorFlash = v);
-        return count;
-    }
+    private static void ApplyShortcutModifier(object shortcut) =>
+        SetShortcutModifier(name => TryGetBool(shortcut, name, out bool v) && v);
 
-    private static void ApplyShortcutModifier(object shortcut) {
-        if(TryGetBool(shortcut, "PressCtrl", out bool ctrl) && ctrl) {
-            Features.UiHider.UiHider.Conf.ShortcutModifier = (int)Keybind.KeyModifier.Ctrl;
-        } else if(TryGetBool(shortcut, "PressAlt", out bool alt) && alt) {
-            Features.UiHider.UiHider.Conf.ShortcutModifier = (int)Keybind.KeyModifier.Alt;
-        } else if(TryGetBool(shortcut, "PressShift", out bool shift) && shift) {
-            Features.UiHider.UiHider.Conf.ShortcutModifier = (int)Keybind.KeyModifier.Shift;
-        } else {
-            Features.UiHider.UiHider.Conf.ShortcutModifier = (int)Keybind.KeyModifier.None;
-        }
-    }
+    private static void ApplyShortcutModifierXml(XElement shortcut) =>
+        SetShortcutModifier(name => TryReadXmlBool(shortcut, name, out bool v) && v);
 
-    private static void ApplyShortcutModifierXml(XElement shortcut) {
-        if(TryReadXmlBool(shortcut, "PressCtrl", out bool ctrl) && ctrl) {
-            Features.UiHider.UiHider.Conf.ShortcutModifier = (int)Keybind.KeyModifier.Ctrl;
-        } else if(TryReadXmlBool(shortcut, "PressAlt", out bool alt) && alt) {
-            Features.UiHider.UiHider.Conf.ShortcutModifier = (int)Keybind.KeyModifier.Alt;
-        } else if(TryReadXmlBool(shortcut, "PressShift", out bool shift) && shift) {
-            Features.UiHider.UiHider.Conf.ShortcutModifier = (int)Keybind.KeyModifier.Shift;
-        } else {
-            Features.UiHider.UiHider.Conf.ShortcutModifier = (int)Keybind.KeyModifier.None;
-        }
+    private static void SetShortcutModifier(Func<string, bool> pressed) {
+        Features.UiHider.UiHider.Conf.ShortcutModifier = (int)(
+            pressed("PressCtrl") ? Keybind.KeyModifier.Ctrl
+            : pressed("PressAlt") ? Keybind.KeyModifier.Alt
+            : pressed("PressShift") ? Keybind.KeyModifier.Shift
+            : Keybind.KeyModifier.None
+        );
     }
 
     // ===== matching / discovery =====
 
     private static bool EntryMatches(object entry, string id, ImportSpec spec) {
-        if(entry == null) {
-            return false;
-        }
+        if(entry == null) return false;
         string normId = NormalizeModToken(id);
         string normDisplay = NormalizeModToken(StripRichText(ReadNested(entry, "Info", "DisplayName") as string));
         string normFolder = NormalizeModToken(Path.GetFileName(ResolveDirectory(ReadMember(entry, "Path") as string) ?? ""));
         foreach(string alias in spec.Aliases) {
             string normAlias = NormalizeModToken(alias);
-            if(normId == normAlias || normDisplay == normAlias || normFolder == normAlias) {
-                return true;
-            }
+            if(normId == normAlias || normDisplay == normAlias || normFolder == normAlias) return true;
         }
         return false;
     }
@@ -1679,13 +1557,9 @@ public static class SettingsImporter {
         Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
         foreach(Assembly asm in assemblies) {
             string name = NormalizeModToken(asm.GetName().Name);
-            if(name == NormalizeModToken(id)) {
-                return asm;
-            }
+            if(name == NormalizeModToken(id)) return asm;
             foreach(string alias in spec.Aliases) {
-                if(name == NormalizeModToken(alias)) {
-                    return asm;
-                }
+                if(name == NormalizeModToken(alias)) return asm;
             }
         }
         return null;
@@ -1693,9 +1567,7 @@ public static class SettingsImporter {
 
     private static Type FindType(SettingsImportOption option, string fullName) {
         Type type = option.Assembly?.GetType(fullName, false);
-        if(type != null) {
-            return type;
-        }
+        if(type != null) return type;
         // Fallback: an assembly loaded from the mod's folder.
         if(!string.IsNullOrEmpty(option.Directory)) {
             foreach(Assembly asm in AppDomain.CurrentDomain.GetAssemblies()) {
@@ -1704,9 +1576,7 @@ public static class SettingsImporter {
                     if(!string.IsNullOrEmpty(loc)
                         && loc.StartsWith(option.Directory, StringComparison.OrdinalIgnoreCase)) {
                         Type t = asm.GetType(fullName, false);
-                        if(t != null) {
-                            return t;
-                        }
+                        if(t != null) return t;
                     }
                 } catch { }
             }
@@ -1717,41 +1587,29 @@ public static class SettingsImporter {
     // ===== reflection helpers =====
 
     private static object GetStaticMember(Type type, string name) {
-        if(type == null || string.IsNullOrEmpty(name)) {
-            return null;
-        }
+        if(type == null || string.IsNullOrEmpty(name)) return null;
         FieldInfo field = type.GetField(name, AllMembers);
-        if(field != null) {
-            return field.GetValue(null);
-        }
+        if(field != null) return field.GetValue(null);
         PropertyInfo prop = type.GetProperty(name, AllMembers);
         return prop?.GetValue(null, null);
     }
 
     private static object GetMemberValue(object obj, string name) {
-        if(obj == null || string.IsNullOrEmpty(name)) {
-            return null;
-        }
+        if(obj == null || string.IsNullOrEmpty(name)) return null;
         Type type = obj as Type ?? obj.GetType();
         object instance = obj is Type ? null : obj;
         FieldInfo field = type.GetField(name, AllMembers);
-        if(field != null) {
-            return field.GetValue(instance);
-        }
+        if(field != null) return field.GetValue(instance);
         PropertyInfo prop = type.GetProperty(name, AllMembers);
         return prop?.GetValue(instance, null);
     }
 
     private static object ReadMember(object target, string name) {
-        if(target == null) {
-            return null;
-        }
+        if(target == null) return null;
         try {
             Type t = target.GetType();
             FieldInfo f = t.GetField(name, BindingFlags.Public | BindingFlags.Instance);
-            if(f != null) {
-                return f.GetValue(target);
-            }
+            if(f != null) return f.GetValue(target);
             PropertyInfo p = t.GetProperty(name, BindingFlags.Public | BindingFlags.Instance);
             return p?.GetValue(target);
         } catch {
@@ -1777,9 +1635,7 @@ public static class SettingsImporter {
                 return true;
         }
         string text = obj.ToString();
-        if(bool.TryParse(text, out value)) {
-            return true;
-        }
+        if(bool.TryParse(text, out value)) return true;
         if(int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out int i)) {
             value = i != 0;
             return true;
@@ -1791,9 +1647,7 @@ public static class SettingsImporter {
 
     private static bool TryConvertInt(object raw, out int value) {
         value = 0;
-        if(raw == null) {
-            return false;
-        }
+        if(raw == null) return false;
         try {
             value = Convert.ToInt32(raw is JValue jv ? jv.Value : raw, CultureInfo.InvariantCulture);
             return true;
@@ -1806,9 +1660,7 @@ public static class SettingsImporter {
 
     private static bool TryConvertFloat(object raw, out float value) {
         value = 0f;
-        if(raw == null) {
-            return false;
-        }
+        if(raw == null) return false;
         try {
             value = Convert.ToSingle(raw is JValue jv ? jv.Value : raw, CultureInfo.InvariantCulture);
             return true;
@@ -1819,9 +1671,7 @@ public static class SettingsImporter {
 
     private static bool TryGetColor(object value, out Color color) {
         color = Color.white;
-        if(value == null) {
-            return false;
-        }
+        if(value == null) return false;
         if(value is Color c) {
             color = c;
             return true;
@@ -1839,9 +1689,7 @@ public static class SettingsImporter {
     // the lowest- and highest-progress points as the low/high endpoints.
     private static bool TryGetColorRangeEndpoints(object value, out Color low, out Color high) {
         low = high = Color.white;
-        if(value == null) {
-            return false;
-        }
+        if(value == null) return false;
 
         List<(float progress, Color color)> points = [];
         if(GetMemberValue(value, "List") is IEnumerable list) {
@@ -1871,9 +1719,7 @@ public static class SettingsImporter {
     private static int[] ReadKeyCodesFromMember(object obj, string member) => ReadKeyCodeEnumerable(GetMemberValue(obj, member));
 
     private static int[] ReadKeyCodeEnumerable(object value) {
-        if(value is not IEnumerable enumerable || value is string) {
-            return [];
-        }
+        if(value is not IEnumerable enumerable || value is string) return [];
         List<int> result = [];
         foreach(object item in enumerable) {
             if(TryConvertKeyCode(item, out int key) && !result.Contains(key)) {
@@ -1884,9 +1730,7 @@ public static class SettingsImporter {
     }
 
     private static int[] ReadKeyCodesFromJson(JToken token) {
-        if(token is not JArray arr) {
-            return [];
-        }
+        if(token is not JArray arr) return [];
         List<int> result = [];
         foreach(JToken t in arr) {
             if(TryConvertKeyCode(t is JValue jv ? jv.Value : t, out int key) && !result.Contains(key)) {
@@ -1898,9 +1742,7 @@ public static class SettingsImporter {
 
     private static bool TryConvertKeyCode(object value, out int key) {
         key = 0;
-        if(value == null) {
-            return false;
-        }
+        if(value == null) return false;
         if(value is KeyCode kc) {
             key = NormalizeKeyInt((int)kc);
             return true;
@@ -1926,9 +1768,7 @@ public static class SettingsImporter {
     private static int NormalizeKeyInt(int raw) => (int)Features.KeyLimiter.KeyLimiter.NormalizeKey((KeyCode)raw);
 
     private static string[] ReadStringArray(object value) {
-        if(value is not IEnumerable enumerable || value is string) {
-            return null;
-        }
+        if(value is not IEnumerable enumerable || value is string) return null;
         List<string> result = [];
         foreach(object item in enumerable) {
             result.Add(item?.ToString() ?? "");
@@ -1937,9 +1777,7 @@ public static class SettingsImporter {
     }
 
     private static string[] ReadStringArrayJson(JToken token) {
-        if(token is not JArray arr || arr.Count == 0) {
-            return null;
-        }
+        if(token is not JArray arr || arr.Count == 0) return null;
         string[] result = new string[arr.Count];
         for(int i = 0; i < arr.Count; i++) {
             result[i] = arr[i].Type == JTokenType.String ? arr[i].ToString() : "";
@@ -1948,9 +1786,7 @@ public static class SettingsImporter {
     }
 
     private static Color? ReadJsonColor(JToken token) {
-        if(token is not JObject obj) {
-            return null;
-        }
+        if(token is not JObject obj) return null;
         if(TryConvertFloat(JsonValue(obj, "r"), out float r)
             && TryConvertFloat(JsonValue(obj, "g"), out float g)
             && TryConvertFloat(JsonValue(obj, "b"), out float b)) {
@@ -1964,14 +1800,10 @@ public static class SettingsImporter {
         obj != null && obj.TryGetValue(name, StringComparison.OrdinalIgnoreCase, out JToken t) ? t : null;
 
     private static bool[] ReadBoolArray(object value) {
-        if(value is not IEnumerable enumerable || value is string) {
-            return [];
-        }
+        if(value is not IEnumerable enumerable || value is string) return [];
         List<bool> values = [];
         foreach(object item in enumerable) {
-            if(TryConvertBool(item, out bool b)) {
-                values.Add(b);
-            }
+            if(TryConvertBool(item, out bool b)) values.Add(b);
         }
         return [.. values];
     }
@@ -1990,9 +1822,7 @@ public static class SettingsImporter {
         AddChatterBlockerKeys(result, ReadKeyCodesFromXml(profile, "allowedKeys"));
         if(profile != null && FindFirstDescendant(profile, "allowedAsyncKeys") is XElement asyncList) {
             foreach(XElement item in asyncList.Elements()) {
-                if(int.TryParse(item.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int vk)) {
-                    AddVk(result, vk);
-                }
+                if(int.TryParse(item.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int vk)) AddVk(result, vk);
             }
         }
         return [.. result];
@@ -2001,34 +1831,24 @@ public static class SettingsImporter {
     private static void AddChatterBlockerKeys(List<int> result, int[] keys) {
         foreach(int raw in keys) {
             int key = raw;
-            if(key == (int)KeyCode.None || Features.KeyLimiter.KeyLimiter.IsMouseKey((KeyCode)key) || result.Contains(key)) {
-                continue;
-            }
+            if(key == (int)KeyCode.None || Features.KeyLimiter.KeyLimiter.IsMouseKey((KeyCode)key) || result.Contains(key)) continue;
             result.Add(key);
         }
     }
 
     private static void AddChatterBlockerVkKeys(List<int> result, object value) {
-        if(value is not IEnumerable enumerable || value is string) {
-            return;
-        }
+        if(value is not IEnumerable enumerable || value is string) return;
         foreach(object item in enumerable) {
-            if(TryConvertInt(item, out int vk)) {
-                AddVk(result, vk);
-            }
+            if(TryConvertInt(item, out int vk)) AddVk(result, vk);
         }
     }
 
     private static void AddVk(List<int> result, int vk) {
-        if(vk is < ushort.MinValue or > ushort.MaxValue) {
-            return;
-        }
+        if(vk is < ushort.MinValue or > ushort.MaxValue) return;
         // Route the Windows VK through the legacy-async path so it lands on the
         // matching Unity KeyCode.
         int key = (int)Features.KeyLimiter.KeyLimiter.NormalizeNumericKey(LegacyAsyncKeyOffset + vk);
-        if(key == (int)KeyCode.None || Features.KeyLimiter.KeyLimiter.IsMouseKey((KeyCode)key) || result.Contains(key)) {
-            return;
-        }
+        if(key == (int)KeyCode.None || Features.KeyLimiter.KeyLimiter.IsMouseKey((KeyCode)key) || result.Contains(key)) return;
         result.Add(key);
     }
 
@@ -2037,45 +1857,33 @@ public static class SettingsImporter {
     private static List<object> GetAdofaiTweaksRuntimeSettings(SettingsImportOption option) {
         List<object> settings = [];
         object runners = GetStaticMember(FindType(option, "AdofaiTweaks.AdofaiTweaks"), "tweakRunners");
-        if(runners is not IEnumerable enumerable) {
-            return settings;
-        }
+        if(runners is not IEnumerable enumerable) return settings;
         foreach(object runner in enumerable) {
             object value = GetMemberValue(runner, "Settings");
-            if(value != null) {
-                settings.Add(value);
-            }
+            if(value != null) settings.Add(value);
         }
         return settings;
     }
 
     private static object GetActiveIndexedProfile(object settings, string listMember, string indexMember) {
-        if(GetMemberValue(settings, listMember) is not IEnumerable enumerable) {
-            return null;
-        }
+        if(GetMemberValue(settings, listMember) is not IEnumerable enumerable) return null;
         int index = TryGetInt(settings, indexMember, out int i) ? i : 0;
         int n = 0;
         object first = null;
         foreach(object item in enumerable) {
             first ??= item;
-            if(n == index) {
-                return item;
-            }
+            if(n == index) return item;
             n++;
         }
         return first;
     }
 
     private static object FindSelectedProfile(object profiles) {
-        if(profiles is not IEnumerable enumerable) {
-            return null;
-        }
+        if(profiles is not IEnumerable enumerable) return null;
         object first = null;
         foreach(object profile in enumerable) {
             first ??= profile;
-            if(TryGetBool(profile, "isSelected", out bool selected) && selected) {
-                return profile;
-            }
+            if(TryGetBool(profile, "isSelected", out bool selected) && selected) return profile;
         }
         return first;
     }
@@ -2083,40 +1891,26 @@ public static class SettingsImporter {
     private static int[] ReadAdofaiKeyViewerXmlKeys(XDocument doc) {
         TryReadXmlInt(doc, "ProfileIndex", out int profileIndex);
         XElement profiles = FindFirstDescendant(doc, "Profiles");
-        if(profiles == null) {
-            return [];
-        }
+        if(profiles == null) return [];
         List<XElement> list = profiles.Elements().ToList();
-        if(list.Count == 0) {
-            return [];
-        }
-        if(profileIndex < 0 || profileIndex >= list.Count) {
-            profileIndex = 0;
-        }
+        if(list.Count == 0) return [];
+        if(profileIndex < 0 || profileIndex >= list.Count) profileIndex = 0;
         return ReadKeyCodesFromXml(list[profileIndex], "ActiveKeys");
     }
 
     // ===== XML / file helpers =====
 
     private static XDocument LoadXml(SettingsImportOption option, string fileName) {
-        if(string.IsNullOrEmpty(option.Directory)) {
-            return null;
-        }
+        if(string.IsNullOrEmpty(option.Directory)) return null;
         string path = Path.Combine(option.Directory, fileName);
-        if(!File.Exists(path)) {
-            return null;
-        }
+        if(!File.Exists(path)) return null;
         try { return XDocument.Load(path); } catch { return null; }
     }
 
     private static int[] ReadKeyCodesFromXml(XElement parent, string listName) {
-        if(parent == null) {
-            return [];
-        }
+        if(parent == null) return [];
         XElement list = FindFirstDescendant(parent, listName);
-        if(list == null) {
-            return [];
-        }
+        if(list == null) return [];
         List<int> result = [];
         foreach(XElement item in list.Elements()) {
             if(TryConvertKeyCode(item.Value, out int key) && !result.Contains(key)) {
@@ -2128,14 +1922,10 @@ public static class SettingsImporter {
 
     private static bool[] ReadXmlBoolArray(XDocument doc, string arrayName) {
         XElement parent = FindFirstDescendant(doc, arrayName);
-        if(parent == null) {
-            return [];
-        }
+        if(parent == null) return [];
         List<bool> values = [];
         foreach(XElement item in parent.Elements()) {
-            if(TryParseBool(item.Value, out bool b)) {
-                values.Add(b);
-            }
+            if(TryParseBool(item.Value, out bool b)) values.Add(b);
         }
         return [.. values];
     }
@@ -2155,20 +1945,14 @@ public static class SettingsImporter {
     private static bool TryReadXmlKeyCode(XContainer root, string name, out int value) {
         value = 0;
         XElement element = FindFirstDescendant(root, name);
-        if(element == null) {
-            return false;
-        }
-        if(int.TryParse(element.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out value)) {
-            return true;
-        }
+        if(element == null) return false;
+        if(int.TryParse(element.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out value)) return true;
         try { value = (int)(KeyCode)Enum.Parse(typeof(KeyCode), element.Value, true); return true; } catch { return false; }
     }
 
     private static bool TryParseBool(string text, out bool value) {
         value = false;
-        if(bool.TryParse(text, out value)) {
-            return true;
-        }
+        if(bool.TryParse(text, out value)) return true;
         if(int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out int i)) {
             value = i != 0;
             return true;
@@ -2177,31 +1961,23 @@ public static class SettingsImporter {
     }
 
     private static XElement FindFirstDescendant(XContainer root, string name) {
-        if(root == null || string.IsNullOrEmpty(name)) {
-            return null;
-        }
+        if(root == null || string.IsNullOrEmpty(name)) return null;
         return root.Descendants().FirstOrDefault(e => e.Name.LocalName == name);
     }
 
     private static XElement FindSelectedProfileElement(XDocument doc, string profileName) {
-        if(doc == null) {
-            return null;
-        }
+        if(doc == null) return null;
         XElement first = null;
         foreach(XElement profile in doc.Descendants().Where(e => e.Name.LocalName == profileName)) {
             first ??= profile;
-            if(TryReadXmlBool(profile, "isSelected", out bool selected) && selected) {
-                return profile;
-            }
+            if(TryReadXmlBool(profile, "isSelected", out bool selected) && selected) return profile;
         }
         return first;
     }
 
     private static IEnumerable<string> JkvConfigPaths(SettingsImportOption option) {
         string dir = option.Directory;
-        if(string.IsNullOrEmpty(dir)) {
-            yield break;
-        }
+        if(string.IsNullOrEmpty(dir)) yield break;
         string parent = Path.GetDirectoryName(dir);
         yield return Path.Combine(dir, "config", "settings.json");
         yield return Path.Combine(dir, "settings.json");
@@ -2223,9 +1999,7 @@ public static class SettingsImporter {
     }
 
     private static string ResolveDirectory(string path) {
-        if(string.IsNullOrEmpty(path)) {
-            return null;
-        }
+        if(string.IsNullOrEmpty(path)) return null;
         try {
             return File.Exists(path)
                 ? Path.GetDirectoryName(path)
@@ -2236,23 +2010,17 @@ public static class SettingsImporter {
     }
 
     private static string NormalizeModToken(string text) {
-        if(string.IsNullOrEmpty(text)) {
-            return "";
-        }
+        if(string.IsNullOrEmpty(text)) return "";
         StringBuilder sb = new(text.Length);
         foreach(char ch in text) {
             char c = char.ToLowerInvariant(ch);
-            if(char.IsLetterOrDigit(c)) {
-                sb.Append(c);
-            }
+            if(char.IsLetterOrDigit(c)) sb.Append(c);
         }
         return sb.ToString();
     }
 
     private static string StripRichText(string text) {
-        if(string.IsNullOrEmpty(text)) {
-            return "";
-        }
+        if(string.IsNullOrEmpty(text)) return "";
         StringBuilder sb = new(text.Length);
         bool inTag = false;
         foreach(char c in text) {

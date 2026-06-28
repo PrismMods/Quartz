@@ -29,9 +29,7 @@ public static partial class Nostalgia {
         scnCLS.instance == null ? null : Traverse.Create(scnCLS.instance).Field("optionsPanels").GetValue();
 
     private static void CreateInputField() {
-        if(clsSearchField || scnCLS.instance == null) {
-            return;
-        }
+        if(clsSearchField || scnCLS.instance == null) return;
         NostalgiaImages.EnsureLoaded();
 
         GameObject container = new("Search Field Container");
@@ -112,17 +110,13 @@ public static partial class Nostalgia {
     }
 
     internal static void ToggleSearchModeCLS(bool search) {
-        if(scnCLS.instance != null) {
-            scnCLS.instance.StartCoroutine(ToggleSearchModeCo(search));
-        }
+        if(scnCLS.instance != null) scnCLS.instance.StartCoroutine(ToggleSearchModeCo(search));
     }
 
     private static IEnumerator ToggleSearchModeCo(bool search) {
         Traverse.Create(OptionsPanels).Field("searchMode").SetValue(clsSearchMode = search);
         if(search && RDC.runningOnSteamDeck) {
-            while(!SteamWorkshop.ShowTextInput()) {
-                yield return null;
-            }
+            while(!SteamWorkshop.ShowTextInput()) yield return null;
         }
         clsSearchSeq?.Kill(false);
         const float duration = 0.33f;
@@ -141,30 +135,24 @@ public static partial class Nostalgia {
     }
 
     private static void ToggleCLS(bool active) {
-        if(OptionsPanelsCLS == null || scnCLS.instance == null || (!active && !clsSearchField)) {
-            return;
-        }
+        if(OptionsPanelsCLS == null || scnCLS.instance == null || (!active && !clsSearchField)) return;
         try {
             object optionsPanels = OptionsPanels;
             ADOBase optionsPanelsBase = optionsPanels as ADOBase;
             if(active) {
                 scnCLS.instance.gameObject.GetOrAddComponent<WorkshopShortcut>();
                 CreateInputField();
-                if(Traverse.Create(optionsPanels).Field("showingLeftPanel").GetValue<bool>()) {
+                if(Traverse.Create(optionsPanels).Field("showingLeftPanel").GetValue<bool>())
                     Traverse.Create(optionsPanels).Method("TogglePanel", true, false).GetValue();
-                }
-                if(Traverse.Create(optionsPanels).Field("showingRightPanel").GetValue<bool>()) {
+                if(Traverse.Create(optionsPanels).Field("showingRightPanel").GetValue<bool>())
                     Traverse.Create(optionsPanels).Method("TogglePanel", false, false).GetValue();
-                }
                 clsSearchField.text = Traverse.Create(optionsPanels).Field("searchInputField").GetValue<InputField>().text;
             } else {
                 ToggleSearchModeCLS(false);
                 InputField modern = Traverse.Create(optionsPanels).Field("searchInputField").GetValue<InputField>();
                 modern.text = clsSearchField.text;
             }
-            if(optionsPanelsBase != null) {
-                optionsPanelsBase.gameObject.SetActive(!active);
-            }
+            if(optionsPanelsBase != null) optionsPanelsBase.gameObject.SetActive(!active);
             scnCLS.instance.transform.Find("LevelInfoCanvas")?.Find("HelpContainer")?.gameObject.SetActive(active);
         } catch(Exception e) {
             MainCore.Log.Wrn($"[Nostalgia] LegacyCLS toggle failed: {e.Message}");
@@ -176,18 +164,14 @@ public static partial class Nostalgia {
     private static class LegacyClsAwakePatch {
         private static bool Prepare() => OptionsPanelsCLS != null;
         private static void Postfix() {
-            if(!Enabled) {
-                return;
-            }
+            if(!Enabled) return;
             try {
                 scnCLS.instance.gameObject.GetOrAddComponent<WorkshopShortcut>();
                 Transform helpOrder = scnCLS.instance.transform
                     .Find("LevelInfoCanvas")?.Find("HelpContainer")?.Find("HelpOrder");
                 if(helpOrder != null) {
                     Component changer = helpOrder.GetComponent("scrTextChanger") as Component;
-                    if(changer != null) {
-                        Object.Destroy(changer);
-                    }
+                    if(changer != null) Object.Destroy(changer);
                 }
                 Traverse.Create(OptionsPanels).Method("UpdateOrderText").GetValue();
                 ToggleCLS(ShouldLegacyCLS);
@@ -204,9 +188,7 @@ public static partial class Nostalgia {
         private static MethodBase TargetMethod() => AccessTools.Method(OptionsPanelsCLS, "ToggleSearchMode");
         private static bool Prepare() => AccessTools.Method(OptionsPanelsCLS, "ToggleSearchMode") != null;
         private static bool Prefix(bool search) {
-            if(!ShouldLegacyCLS) {
-                return true;
-            }
+            if(!ShouldLegacyCLS) return true;
             ToggleSearchModeCLS(search);
             return false;
         }

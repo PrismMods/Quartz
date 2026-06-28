@@ -22,13 +22,9 @@ public static class OttoIcon {
     public static OttoIconSettings Conf => ConfMgr?.Data;
 
     public static void EnsureConf() {
-        if(ConfMgr != null) {
-            return;
-        }
+        if(ConfMgr != null) return;
 
-        ConfMgr = new SettingsFile<OttoIconSettings>(
-            Path.Combine(MainCore.Paths.RootPath, "OttoIcon.json")
-        );
+        ConfMgr = new SettingsFile<OttoIconSettings>(Path.Combine(MainCore.Paths.RootPath, "OttoIcon.json"));
         ConfMgr.Load();
     }
 
@@ -100,26 +96,18 @@ public static class OttoIcon {
     }
 
     internal static void Apply() {
-        if(!ShouldChange) {
-            return;
-        }
+        if(!ShouldChange) return;
 
         scnEditor editor = scnEditor.instance;
-        if(editor == null) {
-            return;
-        }
+        if(editor == null) return;
 
         Image autoImage = editor.autoImage;
-        if(autoImage == null) {
-            return;
-        }
+        if(autoImage == null) return;
 
         Sprite replacement = resolvedReplacement;
         if(replacement == null) {
             replacement = MainCore.Spr.Get(Asset.OttoAuto);
-            if(replacement == null) {
-                return;
-            }
+            if(replacement == null) return;
             resolvedReplacement = replacement;
         }
 
@@ -138,30 +126,18 @@ public static class OttoIcon {
             hasOriginalTransform = true;
         }
 
-        if(ApplyStateMatches(editor, autoImage, replacement, autoState, targetColor, targetPosition, targetScale)) {
-            return;
-        }
+        if(ApplyStateMatches(editor, autoImage, replacement, autoState, targetColor, targetPosition, targetScale)) return;
 
-        if(autoImage.sprite != replacement) {
-            originalSprite = autoImage.sprite;
-        }
+        if(autoImage.sprite != replacement) originalSprite = autoImage.sprite;
 
         OverrideAutoSpriteArray(editor, replacement);
-        if(autoImage.sprite != replacement) {
-            autoImage.sprite = replacement;
-        }
+        if(autoImage.sprite != replacement) autoImage.sprite = replacement;
         OverrideAutoButtonSpriteState(autoImage, replacement);
 
-        if(autoImage.color != targetColor) {
-            autoImage.color = targetColor;
-        }
+        if(autoImage.color != targetColor) autoImage.color = targetColor;
 
-        if(rt.anchoredPosition != targetPosition) {
-            rt.anchoredPosition = targetPosition;
-        }
-        if(rt.localScale != targetScale) {
-            rt.localScale = targetScale;
-        }
+        if(rt.anchoredPosition != targetPosition) rt.anchoredPosition = targetPosition;
+        if(rt.localScale != targetScale) rt.localScale = targetScale;
 
         applyStateValid = true;
         cachedEditor = editor;
@@ -177,9 +153,7 @@ public static class OttoIcon {
         scnEditor editor, Image autoImage, Sprite replacement,
         bool autoState, Color targetColor, Vector2 targetPosition, Vector3 targetScale
     ) {
-        if(!applyStateValid) {
-            return false;
-        }
+        if(!applyStateValid) return false;
         // Live color/transform must be checked too: OttoUpdate reasserts
         // autoImage.color every frame, so a cache hit on intent alone would
         // skip the re-apply and let the game's color win.
@@ -198,9 +172,7 @@ public static class OttoIcon {
     }
 
     private static void OverrideAutoSpriteArray(scnEditor editor, Sprite replacement) {
-        if(editor == null || editor.autoSprites == null || replacement == null) {
-            return;
-        }
+        if(editor == null || editor.autoSprites == null || replacement == null) return;
         if(trackedAutoSprites != editor.autoSprites ||
             originalAutoSprites == null ||
             originalAutoSprites.Length != editor.autoSprites.Length) {
@@ -209,33 +181,23 @@ public static class OttoIcon {
         }
 
         for(int i = 0; i < editor.autoSprites.Length; i++) {
-            if(editor.autoSprites[i] != replacement) {
-                editor.autoSprites[i] = replacement;
-            }
+            if(editor.autoSprites[i] != replacement) editor.autoSprites[i] = replacement;
         }
     }
 
     private static void OverrideAutoButtonSpriteState(Image autoImage, Sprite replacement) {
-        if(autoImage == null || replacement == null) {
-            return;
-        }
+        if(autoImage == null || replacement == null) return;
 
         Button btn;
         if(spriteStateImage == autoImage && spriteStateButton != null) {
             btn = spriteStateButton;
         } else {
             btn = autoImage.GetComponent<Button>();
-            if(btn == null) {
-                btn = autoImage.GetComponentInParent<Button>();
-            }
-            if(btn != null) {
-                spriteStateImage = autoImage;
-            }
+            if(btn == null) btn = autoImage.GetComponentInParent<Button>();
+            if(btn != null) spriteStateImage = autoImage;
         }
 
-        if(btn == null) {
-            return;
-        }
+        if(btn == null) return;
 
         if(!hasOriginalSpriteState || spriteStateButton != btn) {
             originalSpriteState = btn.spriteState;
@@ -247,9 +209,7 @@ public static class OttoIcon {
         if(state.highlightedSprite == replacement &&
             state.pressedSprite == replacement &&
             state.selectedSprite == replacement &&
-            state.disabledSprite == replacement) {
-            return;
-        }
+            state.disabledSprite == replacement) return;
 
         state.highlightedSprite = replacement;
         state.pressedSprite = replacement;
@@ -262,13 +222,9 @@ public static class OttoIcon {
         InvalidateApplyState();
         try {
             scnEditor editor = scnEditor.instance;
-            if(editor == null || editor.autoImage == null) {
-                return;
-            }
+            if(editor == null || editor.autoImage == null) return;
 
-            if(originalSprite != null) {
-                editor.autoImage.sprite = originalSprite;
-            }
+            if(originalSprite != null) editor.autoImage.sprite = originalSprite;
 
             if(originalAutoSprites != null &&
                 editor.autoSprites != null &&
@@ -280,12 +236,8 @@ public static class OttoIcon {
             }
 
             Button btn = editor.autoImage.GetComponent<Button>();
-            if(btn == null) {
-                btn = editor.autoImage.GetComponentInParent<Button>();
-            }
-            if(btn != null && hasOriginalSpriteState) {
-                btn.spriteState = originalSpriteState;
-            }
+            if(btn == null) btn = editor.autoImage.GetComponentInParent<Button>();
+            if(btn != null && hasOriginalSpriteState) btn.spriteState = originalSpriteState;
 
             if(hasOriginalTransform && trackedTransformImage == editor.autoImage) {
                 RectTransform rt = editor.autoImage.rectTransform;

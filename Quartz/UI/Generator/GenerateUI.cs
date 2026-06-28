@@ -34,6 +34,23 @@ public static partial class GenerateUI {
         return rect;
     }
 
+    public static VerticalLayoutGroup FitVertical(GameObject obj, float spacing = 12f) {
+        VerticalLayoutGroup layout = obj.AddComponent<VerticalLayoutGroup>();
+        layout.spacing = spacing;
+        layout.childControlWidth = true;
+        layout.childControlHeight = true;
+        layout.childForceExpandWidth = true;
+        layout.childForceExpandHeight = false;
+
+        ContentSizeFitter fitter = obj.AddComponent<ContentSizeFitter>();
+        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        return layout;
+    }
+
+    public static void ClearChildren(Transform t) {
+        for(int i = t.childCount - 1; i >= 0; i--) UnityEngine.Object.Destroy(t.GetChild(i).gameObject);
+    }
+
     public static UIToggle Toggle(
         Transform parent,
         bool defaultValue,
@@ -83,10 +100,7 @@ public static partial class GenerateUI {
                     break;
 
                 case InputButton.Middle:
-                    if(
-                        MainCore.Conf.MiddleClickToDefault &&
-                        toggle.Value != toggle.DefaultValue
-                    ) {
+                    if(MainCore.Conf.MiddleClickToDefault && toggle.Value != toggle.DefaultValue) {
                         toggle.Reset();
                     }
 
@@ -123,9 +137,7 @@ public static partial class GenerateUI {
         );
 
         AddButton(rect.gameObject, btn => {
-            if(btn == InputButton.Left) {
-                button.Click();
-            }
+            if(btn == InputButton.Left) button.Click();
         }, false);
 
         EventTrigger trigger = rect.gameObject.GetComponent<EventTrigger>()
@@ -262,9 +274,7 @@ public static partial class GenerateUI {
                     break;
 
                 case InputButton.Middle:
-                    if(!MainCore.Conf.MiddleClickToDefault) {
-                        break;
-                    }
+                    if(!MainCore.Conf.MiddleClickToDefault) break;
                     slider.Set(Apply(defaultValue));
                     slider.OnComplete?.Invoke(slider.Value);
                     break;
@@ -278,9 +288,7 @@ public static partial class GenerateUI {
 
         UnityUtils.AddEvent(EventTriggerType.BeginDrag, _ => {
             // Upstream 170cb0e: only the left button drags the slider.
-            if(!UnityEngine.Input.GetMouseButton(0)) {
-                return;
-            }
+            if(!UnityEngine.Input.GetMouseButton(0)) return;
             isDragging = true;
             SetFromMouse();
         }, trigger);
@@ -361,9 +369,7 @@ public static partial class GenerateUI {
         bool editing = false;
 
         void EndEdit(string raw) {
-            if(!editing) {
-                return;
-            }
+            if(!editing) return;
             editing = false;
 
             editObj.SetActive(false);
@@ -375,9 +381,7 @@ public static partial class GenerateUI {
         }
 
         void BeginEdit() {
-            if(editing) {
-                return;
-            }
+            if(editing) return;
             editing = true;
 
             valueText.gameObject.SetActive(false);
@@ -426,9 +430,7 @@ public static partial class GenerateUI {
 
         // Hover tint on the number as the "this is editable" affordance.
         UnityUtils.AddEvent(EventTriggerType.PointerEnter, _ => {
-            if(!editing) {
-                valueText.color = UIColors.ObjectActiveLightBright;
-            }
+            if(!editing) valueText.color = UIColors.ObjectActiveLightBright;
         }, zoneTrigger);
 
         UnityUtils.AddEvent(EventTriggerType.PointerExit, _ => {
@@ -577,13 +579,8 @@ public static partial class GenerateUI {
         LayoutElement parentLayout = parent.GetComponent<LayoutElement>();
 
         void RebuildParentLayouts() {
-            if(rootRect != null) {
-                LayoutRebuilder.ForceRebuildLayoutImmediate(rootRect);
-            }
-
-            if(parentRect != null) {
-                LayoutRebuilder.ForceRebuildLayoutImmediate(parentRect);
-            }
+            if(rootRect != null) LayoutRebuilder.ForceRebuildLayoutImmediate(rootRect);
+            if(parentRect != null) LayoutRebuilder.ForceRebuildLayoutImmediate(parentRect);
 
             Transform current = parent.parent;
             while(current != null) {
@@ -771,10 +768,7 @@ public static partial class GenerateUI {
         AddButton(rect.gameObject, btn => {
             switch(btn) {
                 case InputButton.Middle:
-                    if(
-                        MainCore.Conf.MiddleClickToDefault &&
-                        input.Value != input.DefaultValue
-                    ) {
+                    if(MainCore.Conf.MiddleClickToDefault && input.Value != input.DefaultValue) {
                         input.Reset();
                     }
 
@@ -880,12 +874,26 @@ public static partial class GenerateUI {
 
     public static TextMeshProUGUI AddText(Transform parent, bool noPad = false) => CreateText(parent, 24f, false, noPad);
 
+    public static TextMeshProUGUI AddMutedText(Transform parent, float size = 17f, float alpha = 0.45f, bool noPad = false) {
+        TextMeshProUGUI text = AddText(parent, noPad);
+        text.fontSize = size;
+        text.color = new Color(1f, 1f, 1f, alpha);
+        return text;
+    }
+
+    public static TextMeshProUGUI AddLocalizedMutedText(
+        Transform parent,
+        string key,
+        string defaultValue,
+        float size = 17f,
+        float alpha = 0.45f,
+        bool noPad = false
+    ) => Localize(AddMutedText(parent, size, alpha, noPad), key, defaultValue);
+
     public static TextMeshProUGUI AddTextH1(Transform parent) => CreateText(parent, 32f, true, true);
 
     public static TextMeshProUGUI Localize(TextMeshProUGUI text, string key, string defaultValue) {
-        if(text == null) {
-            return null;
-        }
+        if(text == null) return null;
 
         text.text = defaultValue;
         text.gameObject.AddComponent<TextLocalization>().Init(key, defaultValue);
@@ -899,25 +907,19 @@ public static partial class GenerateUI {
         string suffix = null
     ) {
         string key = LocaleKeyFromId(id, suffix);
-        if(string.IsNullOrEmpty(key) || string.IsNullOrEmpty(defaultValue)) {
-            return text;
-        }
+        if(string.IsNullOrEmpty(key) || string.IsNullOrEmpty(defaultValue)) return text;
 
         return Localize(text, key, defaultValue);
     }
 
     public static string LocaleKeyFromId(string id, string suffix = null) {
-        if(string.IsNullOrWhiteSpace(id)) {
-            return null;
-        }
+        if(string.IsNullOrWhiteSpace(id)) return null;
 
         string key = NormalizeLocaleKey(id);
 
         if(key.StartsWith("PANEL")) {
             int i = "PANEL".Length;
-            while(i < key.Length && char.IsDigit(key[i])) {
-                i++;
-            }
+            while(i < key.Length && char.IsDigit(key[i])) i++;
 
             if(i > "PANEL".Length && i < key.Length && key[i] == '_') {
                 key = "PANEL" + key[i..];
@@ -928,9 +930,7 @@ public static partial class GenerateUI {
             key = "PANEL_STAT_" + key["PANEL_PICK_".Length..];
         }
 
-        if(!string.IsNullOrEmpty(suffix)) {
-            key += "_" + NormalizeLocaleKey(suffix);
-        }
+        if(!string.IsNullOrEmpty(suffix)) key += "_" + NormalizeLocaleKey(suffix);
 
         return key;
     }
@@ -941,9 +941,7 @@ public static partial class GenerateUI {
     }
 
     private static string NormalizeLocaleKey(string value) {
-        if(string.IsNullOrWhiteSpace(value)) {
-            return null;
-        }
+        if(string.IsNullOrWhiteSpace(value)) return null;
 
         List<char> chars = [];
         bool lastUnderscore = false;
@@ -951,9 +949,7 @@ public static partial class GenerateUI {
         foreach(char raw in value.Trim().ToUpperInvariant()) {
             char c = char.IsLetterOrDigit(raw) ? raw : '_';
             if(c == '_') {
-                if(lastUnderscore) {
-                    continue;
-                }
+                if(lastUnderscore) continue;
                 lastUnderscore = true;
             } else {
                 lastUnderscore = false;
@@ -961,9 +957,7 @@ public static partial class GenerateUI {
             chars.Add(c);
         }
 
-        while(chars.Count > 0 && chars[^1] == '_') {
-            chars.RemoveAt(chars.Count - 1);
-        }
+        while(chars.Count > 0 && chars[^1] == '_') chars.RemoveAt(chars.Count - 1);
 
         return chars.Count == 0 ? null : new string(chars.ToArray());
     }
@@ -1050,9 +1044,7 @@ internal sealed class DropdownLanguageRefresh : MonoBehaviour {
         refresh = refreshAction;
         onLanguageChanged = _ => refresh?.Invoke();
         onLoadEnd = state => {
-            if(state == TranslationFailState.Success) {
-                refresh?.Invoke();
-            }
+            if(state == TranslationFailState.Success) refresh?.Invoke();
         };
 
         MainCore.Tr.OnLanguageChanged += onLanguageChanged;
@@ -1060,12 +1052,7 @@ internal sealed class DropdownLanguageRefresh : MonoBehaviour {
     }
 
     private void OnDestroy() {
-        if(onLanguageChanged != null) {
-            MainCore.Tr.OnLanguageChanged -= onLanguageChanged;
-        }
-
-        if(onLoadEnd != null) {
-            MainCore.Tr.OnLoadEnd -= onLoadEnd;
-        }
+        if(onLanguageChanged != null) MainCore.Tr.OnLanguageChanged -= onLanguageChanged;
+        if(onLoadEnd != null) MainCore.Tr.OnLoadEnd -= onLoadEnd;
     }
 }

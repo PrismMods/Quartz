@@ -79,62 +79,30 @@ public sealed class ComboSettings : ISettingsFile {
     public float PulseDuration = 0.099999994f;
     public float LabelPulseOffsetY = 7f;
 
-    public Color GetColorLow() => new(
-        Mathf.Clamp01(ColorLowR), Mathf.Clamp01(ColorLowG),
-        Mathf.Clamp01(ColorLowB), Mathf.Clamp01(ColorLowA));
+    public Color GetColorLow() => IOUtils.Rgba(ColorLowR, ColorLowG, ColorLowB, ColorLowA);
+    public void SetColorLow(Color c) => IOUtils.SetRgba(c, ref ColorLowR, ref ColorLowG, ref ColorLowB, ref ColorLowA);
 
-    public void SetColorLow(Color c) {
-        ColorLowR = Mathf.Clamp01(c.r); ColorLowG = Mathf.Clamp01(c.g);
-        ColorLowB = Mathf.Clamp01(c.b); ColorLowA = Mathf.Clamp01(c.a);
-    }
+    public Color GetColorHigh() => IOUtils.Rgba(ColorHighR, ColorHighG, ColorHighB, ColorHighA);
+    public void SetColorHigh(Color c) => IOUtils.SetRgba(c, ref ColorHighR, ref ColorHighG, ref ColorHighB, ref ColorHighA);
 
-    public Color GetColorHigh() => new(
-        Mathf.Clamp01(ColorHighR), Mathf.Clamp01(ColorHighG),
-        Mathf.Clamp01(ColorHighB), Mathf.Clamp01(ColorHighA));
+    public Color GetPerfectColor() => IOUtils.Rgba(PerfectR, PerfectG, PerfectB, PerfectA);
+    public void SetPerfectColor(Color c) => IOUtils.SetRgba(c, ref PerfectR, ref PerfectG, ref PerfectB, ref PerfectA);
 
-    public void SetColorHigh(Color c) {
-        ColorHighR = Mathf.Clamp01(c.r); ColorHighG = Mathf.Clamp01(c.g);
-        ColorHighB = Mathf.Clamp01(c.b); ColorHighA = Mathf.Clamp01(c.a);
-    }
+    public Color GetCaptionShadowColor() => IOUtils.Rgba(CaptionShadowR, CaptionShadowG, CaptionShadowB, CaptionShadowA);
+    public void SetCaptionShadowColor(Color c) =>
+        IOUtils.SetRgba(c, ref CaptionShadowR, ref CaptionShadowG, ref CaptionShadowB, ref CaptionShadowA);
 
-    public Color GetPerfectColor() => new(
-        Mathf.Clamp01(PerfectR), Mathf.Clamp01(PerfectG),
-        Mathf.Clamp01(PerfectB), Mathf.Clamp01(PerfectA));
-
-    public void SetPerfectColor(Color c) {
-        PerfectR = Mathf.Clamp01(c.r); PerfectG = Mathf.Clamp01(c.g);
-        PerfectB = Mathf.Clamp01(c.b); PerfectA = Mathf.Clamp01(c.a);
-    }
-
-    public Color GetCaptionShadowColor() => new(
-        Mathf.Clamp01(CaptionShadowR), Mathf.Clamp01(CaptionShadowG),
-        Mathf.Clamp01(CaptionShadowB), Mathf.Clamp01(CaptionShadowA));
-
-    public void SetCaptionShadowColor(Color c) {
-        CaptionShadowR = Mathf.Clamp01(c.r); CaptionShadowG = Mathf.Clamp01(c.g);
-        CaptionShadowB = Mathf.Clamp01(c.b); CaptionShadowA = Mathf.Clamp01(c.a);
-    }
-
-    public Color GetCountShadowColor() => new(
-        Mathf.Clamp01(CountShadowR), Mathf.Clamp01(CountShadowG),
-        Mathf.Clamp01(CountShadowB), Mathf.Clamp01(CountShadowA));
-
-    public void SetCountShadowColor(Color c) {
-        CountShadowR = Mathf.Clamp01(c.r); CountShadowG = Mathf.Clamp01(c.g);
-        CountShadowB = Mathf.Clamp01(c.b); CountShadowA = Mathf.Clamp01(c.a);
-    }
+    public Color GetCountShadowColor() => IOUtils.Rgba(CountShadowR, CountShadowG, CountShadowB, CountShadowA);
+    public void SetCountShadowColor(Color c) =>
+        IOUtils.SetRgba(c, ref CountShadowR, ref CountShadowG, ref CountShadowB, ref CountShadowA);
 
     // Resolves the value color for a given count:
     //   PerfectColor (enabled, count >= ColorMax) → perfect color
     //   SolidColor                                 → low color
     //   otherwise                                  → low→high lerp by count/ColorMax
     public Color GetComboColor(int combo) {
-        if(PerfectColorEnabled && ColorMax > 0 && combo >= ColorMax) {
-            return GetPerfectColor();
-        }
-        if(SolidColor) {
-            return GetColorLow();
-        }
+        if(PerfectColorEnabled && ColorMax > 0 && combo >= ColorMax) return GetPerfectColor();
+        if(SolidColor) return GetColorLow();
         float t = ColorMax <= 0 ? 0f : Mathf.Clamp01((float)combo / ColorMax);
         return Color.Lerp(GetColorLow(), GetColorHigh(), t);
     }
@@ -204,43 +172,26 @@ public sealed class ComboSettings : ISettingsFile {
         CaptionText = IOUtils.Read(token, nameof(CaptionText), CaptionText);
         CaptionOffsetY = IOUtils.Read(token, nameof(CaptionOffsetY), CaptionOffsetY);
         bool hasCaptionShadowEnabled = token?[nameof(CaptionShadowEnabled)] != null;
-        bool hasCaptionShadowOffset =
-            token?[nameof(CaptionShadowX)] != null || token?[nameof(CaptionShadowY)] != null;
+        bool hasCaptionShadowOffset = token?[nameof(CaptionShadowX)] != null || token?[nameof(CaptionShadowY)] != null;
         CaptionShadowEnabled = IOUtils.Read(token, nameof(CaptionShadowEnabled), CaptionShadowEnabled);
         CaptionShadowX = IOUtils.Read(token, nameof(CaptionShadowX), CaptionShadowX);
         CaptionShadowY = IOUtils.Read(token, nameof(CaptionShadowY), CaptionShadowY);
         CaptionShadowSoftness = IOUtils.Read(token, nameof(CaptionShadowSoftness), CaptionShadowSoftness);
-        CaptionShadowR = IOUtils.Read(token, nameof(CaptionShadowR), CaptionShadowR);
-        CaptionShadowG = IOUtils.Read(token, nameof(CaptionShadowG), CaptionShadowG);
-        CaptionShadowB = IOUtils.Read(token, nameof(CaptionShadowB), CaptionShadowB);
-        CaptionShadowA = IOUtils.Read(token, nameof(CaptionShadowA), CaptionShadowA);
+        IOUtils.ReadRgba(token, "CaptionShadow", ref CaptionShadowR, ref CaptionShadowG, ref CaptionShadowB, ref CaptionShadowA);
         CountThickness = IOUtils.Read(token, nameof(CountThickness), CountThickness);
         bool hasCountShadowEnabled = token?[nameof(CountShadowEnabled)] != null;
-        bool hasCountShadowOffset =
-            token?[nameof(CountShadowX)] != null || token?[nameof(CountShadowY)] != null;
+        bool hasCountShadowOffset = token?[nameof(CountShadowX)] != null || token?[nameof(CountShadowY)] != null;
         CountShadowEnabled = IOUtils.Read(token, nameof(CountShadowEnabled), CountShadowEnabled);
         CountShadowX = IOUtils.Read(token, nameof(CountShadowX), CountShadowX);
         CountShadowY = IOUtils.Read(token, nameof(CountShadowY), CountShadowY);
         CountShadowSoftness = IOUtils.Read(token, nameof(CountShadowSoftness), CountShadowSoftness);
-        CountShadowR = IOUtils.Read(token, nameof(CountShadowR), CountShadowR);
-        CountShadowG = IOUtils.Read(token, nameof(CountShadowG), CountShadowG);
-        CountShadowB = IOUtils.Read(token, nameof(CountShadowB), CountShadowB);
-        CountShadowA = IOUtils.Read(token, nameof(CountShadowA), CountShadowA);
+        IOUtils.ReadRgba(token, "CountShadow", ref CountShadowR, ref CountShadowG, ref CountShadowB, ref CountShadowA);
         ColorMax = IOUtils.Read(token, nameof(ColorMax), ColorMax);
-        ColorLowR = IOUtils.Read(token, nameof(ColorLowR), ColorLowR);
-        ColorLowG = IOUtils.Read(token, nameof(ColorLowG), ColorLowG);
-        ColorLowB = IOUtils.Read(token, nameof(ColorLowB), ColorLowB);
-        ColorLowA = IOUtils.Read(token, nameof(ColorLowA), ColorLowA);
-        ColorHighR = IOUtils.Read(token, nameof(ColorHighR), ColorHighR);
-        ColorHighG = IOUtils.Read(token, nameof(ColorHighG), ColorHighG);
-        ColorHighB = IOUtils.Read(token, nameof(ColorHighB), ColorHighB);
-        ColorHighA = IOUtils.Read(token, nameof(ColorHighA), ColorHighA);
+        IOUtils.ReadRgba(token, "ColorLow", ref ColorLowR, ref ColorLowG, ref ColorLowB, ref ColorLowA);
+        IOUtils.ReadRgba(token, "ColorHigh", ref ColorHighR, ref ColorHighG, ref ColorHighB, ref ColorHighA);
         SolidColor = IOUtils.Read(token, nameof(SolidColor), SolidColor);
         PerfectColorEnabled = IOUtils.Read(token, nameof(PerfectColorEnabled), PerfectColorEnabled);
-        PerfectR = IOUtils.Read(token, nameof(PerfectR), PerfectR);
-        PerfectG = IOUtils.Read(token, nameof(PerfectG), PerfectG);
-        PerfectB = IOUtils.Read(token, nameof(PerfectB), PerfectB);
-        PerfectA = IOUtils.Read(token, nameof(PerfectA), PerfectA);
+        IOUtils.ReadRgba(token, "Perfect", ref PerfectR, ref PerfectG, ref PerfectB, ref PerfectA);
         NoPopAnim = IOUtils.Read(token, nameof(NoPopAnim), NoPopAnim);
         CountPulseScale = IOUtils.Read(token, nameof(CountPulseScale), CountPulseScale);
         PulseDuration = IOUtils.Read(token, nameof(PulseDuration), PulseDuration);

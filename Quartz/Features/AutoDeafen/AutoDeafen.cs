@@ -35,13 +35,9 @@ public static class AutoDeafen {
     private const string TutorialUrl = "https://www.youtube.com/watch?v=1q4gB0ArypQ";
 
     public static void EnsureConf() {
-        if(ConfMgr != null) {
-            return;
-        }
+        if(ConfMgr != null) return;
 
-        ConfMgr = new SettingsFile<AutoDeafenSettings>(
-            Path.Combine(MainCore.Paths.RootPath, "AutoDeafen.json")
-        );
+        ConfMgr = new SettingsFile<AutoDeafenSettings>(Path.Combine(MainCore.Paths.RootPath, "AutoDeafen.json"));
         ConfMgr.Load();
         EnsureTicker();
     }
@@ -68,9 +64,7 @@ public static class AutoDeafen {
 
             string rpcStatus = rpc != null ? rpc.Status : status;
             string oauthStatus = DiscordOAuthServer.Status;
-            if(!string.IsNullOrEmpty(Trim(Conf?.DiscordAccessToken)) && !DiscordOAuthServer.Running) {
-                oauthStatus = "authorized";
-            }
+            if(!string.IsNullOrEmpty(Trim(Conf?.DiscordAccessToken)) && !DiscordOAuthServer.Running) oauthStatus = "authorized";
             string combined = oauthStatus + " / " + rpcStatus;
             return desiredDeaf ? combined + " / deaf" : combined;
         }
@@ -78,14 +72,12 @@ public static class AutoDeafen {
 
     // Human-readable chord ("Ctrl+Shift+D") for the status readout.
     public static string ChordText() {
-        if(Conf == null) {
-            return "";
-        }
+        if(Conf == null) return "";
         System.Text.StringBuilder sb = new();
-        if(Conf.ShortcutCtrl) { sb.Append("Ctrl+"); }
-        if(Conf.ShortcutShift) { sb.Append("Shift+"); }
-        if(Conf.ShortcutAlt) { sb.Append("Alt+"); }
-        if(Conf.ShortcutMeta) { sb.Append(Keybind.IsMac ? "Cmd+" : "Win+"); }
+        if(Conf.ShortcutCtrl) sb.Append("Ctrl+");
+        if(Conf.ShortcutShift) sb.Append("Shift+");
+        if(Conf.ShortcutAlt) sb.Append("Alt+");
+        if(Conf.ShortcutMeta) sb.Append(Keybind.IsMac ? "Cmd+" : "Win+");
         sb.Append(Keybind.KeyName((KeyCode)Conf.ShortcutKey));
         return sb.ToString();
     }
@@ -105,12 +97,8 @@ public static class AutoDeafen {
             // Shortcut mode needs no Discord app or token — tear down anything
             // left running from bot mode so a runtime switch doesn't leak a
             // socket or listener.
-            if(rpc != null) {
-                StopRpc();
-            }
-            if(DiscordOAuthServer.Running) {
-                DiscordOAuthServer.Stop();
-            }
+            if(rpc != null) StopRpc();
+            if(DiscordOAuthServer.Running) DiscordOAuthServer.Stop();
         } else {
             if(string.IsNullOrWhiteSpace(Conf.DiscordAccessToken)) {
                 StopRpc();
@@ -198,9 +186,7 @@ public static class AutoDeafen {
 
     internal static void MarkInject(IEnumerable<KeyCode> normalizedKeys) {
         injectedKeys.Clear();
-        foreach(KeyCode k in normalizedKeys) {
-            injectedKeys.Add(k);
-        }
+        foreach(KeyCode k in normalizedKeys) injectedKeys.Add(k);
         injectBypassUntil = Environment.TickCount + InjectWindowMs;
     }
 
@@ -225,9 +211,7 @@ public static class AutoDeafen {
     }
 
     private static void Undeafen() {
-        if(!desiredDeaf) {
-            return;
-        }
+        if(!desiredDeaf) return;
         desiredDeaf = false;
         try { ApplyDeaf(false); } catch { }
     }
@@ -236,9 +220,7 @@ public static class AutoDeafen {
         // Release any active deafen first (while rpc is still live for bot mode,
         // or by tapping the toggle once for shortcut mode) before tearing down.
         Undeafen();
-        if(rpc != null) {
-            StopRpc();
-        }
+        if(rpc != null) StopRpc();
         DiscordOAuthServer.Stop();
         desiredDeaf = false;
         configClientId = null;
@@ -282,9 +264,7 @@ public static class AutoDeafen {
     }
 
     private static void StopRpc() {
-        if(rpc == null) {
-            return;
-        }
+        if(rpc == null) return;
         try { rpc.SetDeaf(false); } catch { }
         try { rpc.Stop(); } catch { }
         rpc = null;
@@ -294,16 +274,12 @@ public static class AutoDeafen {
     }
 
     internal static void SaveAccessToken(string token) {
-        if(string.IsNullOrEmpty(token) || Conf == null) {
-            return;
-        }
+        if(string.IsNullOrEmpty(token) || Conf == null) return;
 
         // OAuth callback runs on its listener thread. Keep config mutation and
         // serialization on Unity's main thread like every settings UI path.
         MainThread.Enqueue(() => {
-            if(Conf == null || string.Equals(Conf.DiscordAccessToken, token, StringComparison.Ordinal)) {
-                return;
-            }
+            if(Conf == null || string.Equals(Conf.DiscordAccessToken, token, StringComparison.Ordinal)) return;
             Conf.DiscordAccessToken = token;
             try { ConfMgr.Save(); } catch { }
         });
@@ -316,9 +292,7 @@ public static class AutoDeafen {
     private static Ticker ticker;
 
     private static void EnsureTicker() {
-        if(ticker != null || MainCore.Root == null) {
-            return;
-        }
+        if(ticker != null || MainCore.Root == null) return;
         ticker = MainCore.Root.AddComponent<Ticker>();
     }
 
@@ -334,31 +308,22 @@ public static class AutoDeafen {
     [HarmonyPatch(typeof(scnGame), "Play")]
     private static class RunStartPatch {
         private static void Postfix() {
-            if(MainCore.IsModEnabled) {
-                OnRunReset();
-            }
+            if(MainCore.IsModEnabled) OnRunReset();
         }
     }
 
     [HarmonyPatch(typeof(StateBehaviour), "ChangeState", new[] { typeof(Enum) })]
     private static class RunEndPatch {
         private static void Postfix(Enum newState) {
-            if(!MainCore.IsModEnabled || newState is not States state) {
-                return;
-            }
-
-            if(state == States.Fail2 || state == States.Won) {
-                OnRunEnded();
-            }
+            if(!MainCore.IsModEnabled || newState is not States state) return;
+            if(state == States.Fail2 || state == States.Won) OnRunEnded();
         }
     }
 
     [HarmonyPatch(typeof(scrController), "StartLoadingScene")]
     private static class RunHidePatch {
         private static void Postfix() {
-            if(MainCore.IsModEnabled) {
-                OnRunHide();
-            }
+            if(MainCore.IsModEnabled) OnRunHide();
         }
     }
 }

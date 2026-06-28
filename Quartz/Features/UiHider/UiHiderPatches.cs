@@ -16,9 +16,7 @@ public static partial class UiHider {
     [HarmonyPatch(typeof(scrHitTextMesh), "Show")]
     private static class JudgmentTextShowPatch {
         private static void Prefix(ref Vector3 position) {
-            if(ShouldHideJudgementText()) {
-                position = HiddenPosition;
-            }
+            if(ShouldHideJudgementText()) position = HiddenPosition;
         }
     }
 

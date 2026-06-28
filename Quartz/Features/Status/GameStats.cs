@@ -42,9 +42,7 @@ public static class GameStats {
     public static bool InGame {
         get {
             int frame = Time.frameCount;
-            if(inGameFrame == frame) {
-                return inGameValue;
-            }
+            if(inGameFrame == frame) return inGameValue;
             inGameFrame = frame;
             try {
                 scrController c = scrController.instance;
@@ -65,14 +63,11 @@ public static class GameStats {
     public static float Progress {
         get {
             int frame = Time.frameCount;
-            if(progressFrame == frame) {
-                return progressValue;
-            }
+            if(progressFrame == frame) return progressValue;
             progressFrame = frame;
             try {
                 scrController c = scrController.instance;
-                if (c == null) return progressValue = 0f;
-                if (c.currentSeqID == 0) return progressValue = 0f;
+                if (c == null || c.currentSeqID == 0) return progressValue = 0f;
                 return progressValue = c.percentComplete;
             } catch {
                 return progressValue = 0f;
@@ -83,9 +78,7 @@ public static class GameStats {
     public static float Accuracy {
         get {
             int frame = Time.frameCount;
-            if(accuracyFrame == frame) {
-                return accuracyValue;
-            }
+            if(accuracyFrame == frame) return accuracyValue;
             accuracyFrame = frame;
             try {
                 return accuracyValue = MistakesAccess.PercentAcc(MistakesAccess.Get());
@@ -98,9 +91,7 @@ public static class GameStats {
     public static float XAccuracy {
         get {
             int frame = Time.frameCount;
-            if(xAccuracyFrame == frame) {
-                return xAccuracyValue;
-            }
+            if(xAccuracyFrame == frame) return xAccuracyValue;
             xAccuracyFrame = frame;
             try {
                 return xAccuracyValue = MistakesAccess.PercentXAcc(MistakesAccess.Get());
@@ -115,19 +106,14 @@ public static class GameStats {
     public static float MaxAccuracy {
         get {
             int frame = Time.frameCount;
-            if(maxAccuracyFrame == frame) {
-                return maxAccuracyValue;
-            }
+            if(maxAccuracyFrame == frame) return maxAccuracyValue;
             maxAccuracyFrame = frame;
             try {
                 scrMistakesManager m = MistakesAccess.Get();
                 float acc = MistakesAccess.PercentAcc(m);
                 float prog = MistakesAccess.PercentComplete(m);
                 float r = acc * prog + (1f - prog);
-                if(float.IsNaN(r) || float.IsInfinity(r)) {
-                    return maxAccuracyValue = 1f;
-                }
-
+                if(float.IsNaN(r) || float.IsInfinity(r)) return maxAccuracyValue = 1f;
                 return maxAccuracyValue = Mathf.Clamp01(r);
             } catch {
                 return maxAccuracyValue = 1f;
@@ -138,9 +124,7 @@ public static class GameStats {
     public static float MaxXAccuracy {
         get {
             int frame = Time.frameCount;
-            if(maxXAccuracyFrame == frame) {
-                return maxXAccuracyValue;
-            }
+            if(maxXAccuracyFrame == frame) return maxXAccuracyValue;
             maxXAccuracyFrame = frame;
             try {
                 return maxXAccuracyValue = XAccuracyCalc.MaxRatio();
@@ -153,9 +137,7 @@ public static class GameStats {
     public static int CheckpointCount {
         get {
             int frame = Time.frameCount;
-            if(checkpointFrame == frame) {
-                return checkpointValue;
-            }
+            if(checkpointFrame == frame) return checkpointValue;
             checkpointFrame = frame;
             try {
                 return checkpointValue = scnGame.instance != null ? scnGame.instance.checkpointsUsed : 0;
@@ -167,9 +149,7 @@ public static class GameStats {
 
     // Tile BPM (chart tempo * pitch * speed) and Current BPM (derived from the
     // current floor's nextfloor entry time). See Bpm.cs for details.
-    public static void GetBpm(out float tileBpm, out float currentBpm) {
-        Bpm.GetBpmValues(out tileBpm, out currentBpm);
-    }
+    public static void GetBpm(out float tileBpm, out float currentBpm) => Bpm.GetBpmValues(out tileBpm, out currentBpm);
 
     public static string HoldBehaviorLabel => Hold.GetHoldBehaviorLabel();
 
@@ -185,9 +165,7 @@ public static class GameStats {
     public static float Pitch {
         get {
             int frame = Time.frameCount;
-            if(pitchFrame == frame) {
-                return pitchValue;
-            }
+            if(pitchFrame == frame) return pitchValue;
             pitchFrame = frame;
             try {
                 scrConductor c = scrConductor.instance;
@@ -214,9 +192,7 @@ public static class GameStats {
     public static string SongArtist {
         get {
             int frame = Time.frameCount;
-            if(songArtistFrame == frame) {
-                return songArtistValue;
-            }
+            if(songArtistFrame == frame) return songArtistValue;
             songArtistFrame = frame;
             try {
                 var g = scnGame.instance;
@@ -230,9 +206,7 @@ public static class GameStats {
     public static string SongTitle {
         get {
             int frame = Time.frameCount;
-            if(songTitleFrame == frame) {
-                return songTitleValue;
-            }
+            if(songTitleFrame == frame) return songTitleValue;
             songTitleFrame = frame;
             try {
                 var g = scnGame.instance;
@@ -248,9 +222,7 @@ public static class GameStats {
     public static string SongTitleRaw {
         get {
             int frame = Time.frameCount;
-            if(songTitleRawFrame == frame) {
-                return songTitleRawValue;
-            }
+            if(songTitleRawFrame == frame) return songTitleRawValue;
             songTitleRawFrame = frame;
             try {
                 scrController c = scrController.instance;
@@ -286,10 +258,7 @@ public static class GameStats {
         get {
             try {
                 AudioSource a = scrConductor.instance != null ? scrConductor.instance.song : null;
-                if(a == null || a.clip == null) {
-                    return "0:00 / 0:00";
-                }
-
+                if(a == null || a.clip == null) return "0:00 / 0:00";
                 int curSec = (int)Mathf.Max(0f, a.time);
                 int lenSec = (int)Mathf.Max(0f, a.clip.length);
                 if(curSec != musicTimeCurSec || lenSec != musicTimeLenSec) {
@@ -310,15 +279,11 @@ public static class GameStats {
     public static float MusicTimeRatio {
         get {
             int frame = Time.frameCount;
-            if(musicRatioFrame == frame) {
-                return musicRatioValue;
-            }
+            if(musicRatioFrame == frame) return musicRatioValue;
             musicRatioFrame = frame;
             try {
                 AudioSource song = scrConductor.instance != null ? scrConductor.instance.song : null;
-                if(song == null || song.clip == null || song.clip.length <= 0f) {
-                    return musicRatioValue = 0f;
-                }
+                if(song == null || song.clip == null || song.clip.length <= 0f) return musicRatioValue = 0f;
                 return musicRatioValue = Mathf.Clamp01(song.time / song.clip.length);
             } catch {
                 return musicRatioValue = 0f;
@@ -329,21 +294,14 @@ public static class GameStats {
     public static float MapTimeRatio {
         get {
             int frame = Time.frameCount;
-            if(mapRatioFrame == frame) {
-                return mapRatioValue;
-            }
+            if(mapRatioFrame == frame) return mapRatioValue;
             mapRatioFrame = frame;
             try {
                 scrConductor cd = scrConductor.instance;
-                if(cd == null) {
-                    return mapRatioValue = 0f;
-                }
-
+                if(cd == null) return mapRatioValue = 0f;
                 float time = (float)(cd.addoffset + cd.songposition_minusi);
                 float total = MapTotalSeconds();
-                if(total <= 0f) {
-                    return mapRatioValue = 0f;
-                }
+                if(total <= 0f) return mapRatioValue = 0f;
                 return mapRatioValue = Mathf.Clamp01(time / total);
             } catch {
                 return mapRatioValue = 0f;
@@ -355,20 +313,12 @@ public static class GameStats {
         get {
             try {
                 scrConductor cd = scrConductor.instance;
-                if(cd == null) {
-                    return "0:00";
-                }
-
+                if(cd == null) return "0:00";
                 float t = (float)(cd.addoffset + cd.songposition_minusi);
                 float total = MapTotalSeconds();
 
-                if(t < 0f) {
-                    t = 0f;
-                }
-
-                if(total > 0f && t > total) {
-                    t = total;
-                }
+                if(t < 0f) t = 0f;
+                if(total > 0f && t > total) t = total;
 
                 int tSec = (int)t;
                 int totalSec = total > 0f ? (int)total : -1;
@@ -396,9 +346,7 @@ public static class GameStats {
     public static int Fps {
         get {
             int frame = Time.frameCount;
-            if(fpsFrame == frame) {
-                return fpsFrameValue;
-            }
+            if(fpsFrame == frame) return fpsFrameValue;
             fpsFrame = frame;
 
             float dt = Time.unscaledDeltaTime;
@@ -432,16 +380,11 @@ public static class GameStats {
 
     private static float MapTotalSeconds() {
         int frame = Time.frameCount;
-        if(mapTotalFrame == frame) {
-            return mapTotalValue;
-        }
+        if(mapTotalFrame == frame) return mapTotalValue;
         mapTotalFrame = frame;
         try {
             scrLevelMaker lm = scrLevelMaker.instance;
-            if(lm == null || lm.listFloors == null || lm.listFloors.Count == 0) {
-                return mapTotalValue = 0f;
-            }
-
+            if(lm == null || lm.listFloors == null || lm.listFloors.Count == 0) return mapTotalValue = 0f;
             scrFloor last = lm.listFloors[lm.listFloors.Count - 1];
             return mapTotalValue = last != null ? (float)last.entryTime : 0f;
         } catch {
@@ -450,10 +393,7 @@ public static class GameStats {
     }
 
     private static string FormatTime(float seconds, bool forceHour = false) {
-        if(seconds < 0f) {
-            seconds = 0f;
-        }
-
+        if(seconds < 0f) seconds = 0f;
         int total = (int)seconds;
         if(forceHour || total >= 3600) {
             return (total / 3600).ToString(CultureInfo.InvariantCulture)

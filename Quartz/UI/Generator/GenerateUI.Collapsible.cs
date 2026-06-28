@@ -40,9 +40,7 @@ public static partial class GenerateUI {
         public void SetExpanded(bool v, bool animate) => SetExpanded(v, animate, true);
 
         public void SetExpanded(bool v, bool animate, bool save) {
-            if(Expanded == v) {
-                return;
-            }
+            if(Expanded == v) return;
             Expanded = v;
             if(save && !string.IsNullOrEmpty(stateKey)) {
                 MainCore.Conf.SetCollapsibleExpanded(stateKey, v);
@@ -68,10 +66,7 @@ public static partial class GenerateUI {
         Transform current = parent;
         while(current != null) {
             string name = current.name;
-            if(name.StartsWith("Page") || name.StartsWith("Section_")) {
-                parts.Add(name);
-            }
-
+            if(name.StartsWith("Page") || name.StartsWith("Section_")) parts.Add(name);
             current = current.parent;
         }
 
@@ -107,15 +102,7 @@ public static partial class GenerateUI {
 
         RectTransform sectionRect = sectionObj.AddComponent<RectTransform>();
 
-        VerticalLayoutGroup sectionLayout = sectionObj.AddComponent<VerticalLayoutGroup>();
-        sectionLayout.spacing = 6f;
-        sectionLayout.childControlWidth = true;
-        sectionLayout.childControlHeight = true;
-        sectionLayout.childForceExpandWidth = true;
-        sectionLayout.childForceExpandHeight = false;
-
-        ContentSizeFitter sectionFitter = sectionObj.AddComponent<ContentSizeFitter>();
-        sectionFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        GenerateUI.FitVertical(sectionObj, 6f);
 
         // Header.
         GameObject headerObj = new("Header");
@@ -188,9 +175,7 @@ public static partial class GenerateUI {
             GTween dotSeq = null;
             EventTrigger zoneTrigger = toggleZone.AddComponent<EventTrigger>();
             UnityUtils.AddClickEvent(zoneTrigger, e => {
-                if(e.button != InputButton.Left) {
-                    return;
-                }
+                if(e.button != InputButton.Left) return;
 
                 on = !on;
                 onToggle(on);
@@ -220,9 +205,7 @@ public static partial class GenerateUI {
         label.text = title;
         label.characterSpacing = -3f;
         label.raycastTarget = false;
-        if(parent == null || parent.name != "PanelsList") {
-            Localize(label, LocaleKeyFromText("SECTION", title), title);
-        }
+        if(parent == null || parent.name != "PanelsList") Localize(label, LocaleKeyFromText("SECTION", title), title);
 
         // Body: lays out the caller's rows and sizes to them. A RectMask2D
         // clips the slide during the open/close animation; once open we hand
@@ -232,15 +215,9 @@ public static partial class GenerateUI {
         bodyObj.transform.SetParent(sectionRect, false);
         RectTransform bodyRect = bodyObj.AddComponent<RectTransform>();
 
-        VerticalLayoutGroup bodyLayout = bodyObj.AddComponent<VerticalLayoutGroup>();
-        bodyLayout.spacing = 8f;
+        VerticalLayoutGroup bodyLayout = GenerateUI.FitVertical(bodyObj, 8f);
         bodyLayout.padding = new RectOffset(20, 0, 0, 0);
-        bodyLayout.childControlWidth = true;
-        bodyLayout.childControlHeight = true;
-        bodyLayout.childForceExpandWidth = true;
-        bodyLayout.childForceExpandHeight = false;
-
-        ContentSizeFitter bodyFitter = bodyObj.AddComponent<ContentSizeFitter>();
+        ContentSizeFitter bodyFitter = bodyObj.GetComponent<ContentSizeFitter>();
         bodyFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
         LayoutElement bodyLE = bodyObj.AddComponent<LayoutElement>();
@@ -363,9 +340,7 @@ public static partial class GenerateUI {
         Apply(false);
 
         AddButton(barObj, btn => {
-            if(btn == InputButton.Left) {
-                c.SetExpanded(!c.Expanded, true, true);
-            }
+            if(btn == InputButton.Left) c.SetExpanded(!c.Expanded, true, true);
         });
 
         return c;

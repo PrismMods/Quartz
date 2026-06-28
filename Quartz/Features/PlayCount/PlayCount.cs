@@ -45,14 +45,7 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
     // high-water mark, not just the value at death/clear. Gated on InGame
     // and IsModEnabled so non-play scenes don't drift the counter.
     public void Tick() {
-        if(!MainCore.IsModEnabled) {
-            return;
-        }
-
-        if(!Status.GameStats.InGame) {
-            return;
-        }
-
+        if(!MainCore.IsModEnabled || !Status.GameStats.InGame) return;
         ObserveProgress(Status.GameStats.Progress);
     }
 
@@ -67,10 +60,7 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
     public static int SessionAttempts => sessionAttempts;
 
     public static int TotalAttemptsForCurrentMap() {
-        if(string.IsNullOrEmpty(currentMapKey)) {
-            return 0;
-        }
-
+        if(string.IsNullOrEmpty(currentMapKey)) return 0;
         return playDatas.TryGetValue(currentMapKey, out PlayData d) ? d.TotalAttempts : 0;
     }
 
@@ -78,10 +68,7 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
     // reached the farthest tile. A 0%–30% run (span 30%) beats a 90%–100% run
     // (span 10%). Returns the end (high-water mark) of whichever run wins.
     public static float BestForCurrentMap() {
-        if(string.IsNullOrEmpty(currentMapKey)) {
-            return 0f;
-        }
-
+        if(string.IsNullOrEmpty(currentMapKey)) return 0f;
         playDatas.TryGetValue(currentMapKey, out PlayData d);
         float storedStart = d?.BestStartProgress ?? 0f;
         float storedEnd = d?.BestProgress ?? 0f;
@@ -92,10 +79,7 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
     // span beats the stored best's span, that's the live run's start; otherwise
     // the start recorded with the stored best.
     public static float BestStartForCurrentMap() {
-        if(string.IsNullOrEmpty(currentMapKey)) {
-            return 0f;
-        }
-
+        if(string.IsNullOrEmpty(currentMapKey)) return 0f;
         playDatas.TryGetValue(currentMapKey, out PlayData d);
         float storedStart = d?.BestStartProgress ?? 0f;
         float storedEnd = d?.BestProgress ?? 0f;
@@ -124,18 +108,11 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
     public static void ObserveProgress(float progress) {
         // Once the run has failed, the clean high-water mark is frozen: no
         // progress past the first Miss/Overload counts toward Best.
-        if(runHadFail) {
-            return;
-        }
-
-        if(float.IsNaN(progress) || float.IsInfinity(progress)) {
-            return;
-        }
+        if(runHadFail) return;
+        if(float.IsNaN(progress) || float.IsInfinity(progress)) return;
 
         progress = Mathf.Clamp01(progress);
-        if(progress > bestObservedThisRun) {
-            bestObservedThisRun = progress;
-        }
+        if(progress > bestObservedThisRun) bestObservedThisRun = progress;
     }
 
     private static void OnRunStart() {
@@ -155,9 +132,7 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
     }
 
     private static void OnRunDeath() {
-        if(string.IsNullOrEmpty(currentMapKey)) {
-            return;
-        }
+        if(string.IsNullOrEmpty(currentMapKey)) return;
 
         // If the run never registered a Miss/Overload (e.g. a hold/timeout
         // fail), everything up to here was clean, so capture the death point.
@@ -165,9 +140,7 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
         // fail — don't let the death point push it higher.
         if(!runHadFail) {
             float progress = CurrentProgress();
-            if(progress > bestObservedThisRun) {
-                bestObservedThisRun = progress;
-            }
+            if(progress > bestObservedThisRun) bestObservedThisRun = progress;
         }
 
         PlayData d = For(currentMapKey);
@@ -182,9 +155,7 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
     }
 
     private static void OnRunClear() {
-        if(string.IsNullOrEmpty(currentMapKey)) {
-            return;
-        }
+        if(string.IsNullOrEmpty(currentMapKey)) return;
 
         PlayData d = For(currentMapKey);
         float runStart = CurrentRunStart();
@@ -249,9 +220,7 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
         if(isOfficial) {
             try {
                 string official = ADOBase.currentLevel;
-                if(!string.IsNullOrEmpty(official)) {
-                    return "official:" + official;
-                }
+                if(!string.IsNullOrEmpty(official)) return "official:" + official;
             } catch {
             }
         }
@@ -261,17 +230,13 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
         // Hashed at most once per file version (cached by path+mtime+size) on a
         // worker thread, so starting a large custom level cannot block a frame.
         string fileMapKey = TryGetLevelFileMapKey();
-        if(!string.IsNullOrEmpty(fileMapKey)) {
-            return fileMapKey;
-        }
+        if(!string.IsNullOrEmpty(fileMapKey)) return fileMapKey;
 
         // File couldn't be read — hash whatever level data is resident in memory.
         try {
             scrLevelMaker lm = scrLevelMaker.instance;
             if(lm != null) {
-                if(lm.isOldLevel && !string.IsNullOrEmpty(lm.leveldata)) {
-                    return "old:" + Sha256(lm.leveldata);
-                }
+                if(lm.isOldLevel && !string.IsNullOrEmpty(lm.leveldata)) return "old:" + Sha256(lm.leveldata);
 
                 if(lm.floorAngles != null) {
                     // Hash the FULL angle list. The previous code sampled only
@@ -301,18 +266,14 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
     private static string TryGetLevelFileMapKey() {
         try {
             string path = ADOBase.levelPath;
-            if(string.IsNullOrEmpty(path) || !File.Exists(path)) {
-                return null;
-            }
+            if(string.IsNullOrEmpty(path) || !File.Exists(path)) return null;
 
             FileInfo info = new(path);
             string cacheKey = path + "|"
                 + info.LastWriteTimeUtc.Ticks.ToString(CultureInfo.InvariantCulture) + "|"
                 + info.Length.ToString(CultureInfo.InvariantCulture);
             lock(hashGate) {
-                if(fileHashCache.TryGetValue(cacheKey, out string cachedHash)) {
-                    return "custom:" + cachedHash;
-                }
+                if(fileHashCache.TryGetValue(cacheKey, out string cachedHash)) return "custom:" + cachedHash;
             }
 
             // Use a stable temporary key immediately, then hash the file off-thread
@@ -322,9 +283,7 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
             lock(hashGate) {
                 start = hashesInFlight.Add(cacheKey);
             }
-            if(start) {
-                _ = Task.Run(() => HashLevelFile(path, cacheKey, pendingKey));
-            }
+            if(start) _ = Task.Run(() => HashLevelFile(path, cacheKey, pendingKey));
             return pendingKey;
         } catch {
             return null;
@@ -345,9 +304,7 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
         MainThread.Enqueue(() => {
             lock(hashGate) {
                 hashesInFlight.Remove(cacheKey);
-                if(hash != null) {
-                    fileHashCache[cacheKey] = hash;
-                }
+                if(hash != null) fileHashCache[cacheKey] = hash;
             }
 
             if(hash == null) {
@@ -360,9 +317,7 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
     }
 
     private static void MigratePendingMapKey(string pendingKey, string finalKey) {
-        if(pendingKey == finalKey) {
-            return;
-        }
+        if(pendingKey == finalKey) return;
 
         if(playDatas.TryGetValue(pendingKey, out PlayData pending)) {
             PlayData final = For(finalKey);
@@ -375,9 +330,7 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
             dirty = true;
         }
 
-        if(currentMapKey == pendingKey) {
-            currentMapKey = finalKey;
-        }
+        if(currentMapKey == pendingKey) currentMapKey = finalKey;
     }
 
     private static string Sha256(string s) => Sha256(Encoding.UTF8.GetBytes(s));
@@ -407,37 +360,27 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
 
         try {
             string path = FilePath;
-            if(!File.Exists(path)) {
-                return;
-            }
+            if(!File.Exists(path)) return;
 
             string raw = File.ReadAllText(path);
             JObject root = JObject.Parse(raw);
             JObject maps = root["maps"] as JObject;
-            if(maps == null) {
-                return;
-            }
+            if(maps == null) return;
 
-            foreach(KeyValuePair<string, JToken> kv in maps) {
-                playDatas[kv.Key] = PlayData.Deserialize(kv.Value);
-            }
+            foreach(KeyValuePair<string, JToken> kv in maps) playDatas[kv.Key] = PlayData.Deserialize(kv.Value);
         } catch(Exception e) {
             MainCore.Log.Wrn("PlayCount load failed: " + e.Message);
         }
     }
 
     private static void FlushIfDirty() {
-        if(dirty) {
-            Save();
-        }
+        if(dirty) Save();
     }
 
     public static void Save() {
         try {
             JObject maps = new();
-            foreach(KeyValuePair<string, PlayData> kv in playDatas) {
-                maps[kv.Key] = kv.Value.Serialize();
-            }
+            foreach(KeyValuePair<string, PlayData> kv in playDatas) maps[kv.Key] = kv.Value.Serialize();
 
             JObject root = new() {
                 ["maps"] = maps,
@@ -453,9 +396,7 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
     [HarmonyPatch(typeof(scnGame), "Play")]
     private static class ScnGamePlayPatch {
         private static void Postfix() {
-            if(!MainCore.IsModEnabled) {
-                return;
-            }
+            if(!MainCore.IsModEnabled) return;
             OnRunStart();
         }
     }
@@ -467,19 +408,11 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
     [HarmonyPatch(typeof(StateBehaviour), "ChangeState", new[] { typeof(Enum) })]
     private static class StateChangePatch {
         private static void Postfix(Enum newState) {
-            if(!MainCore.IsModEnabled) {
-                return;
-            }
+            if(!MainCore.IsModEnabled) return;
+            if(newState is not States state) return;
 
-            if(newState is not States state) {
-                return;
-            }
-
-            if(state == States.Fail2) {
-                OnRunDeath();
-            } else if(state == States.Won) {
-                OnRunClear();
-            }
+            if(state == States.Fail2) OnRunDeath();
+            else if(state == States.Won) OnRunClear();
         }
     }
 
@@ -491,13 +424,7 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
     [HarmonyPatch(typeof(scrMarginTracker), "AddHit", typeof(HitMargin))]
     private static class AddHitPatch {
         private static void Postfix(HitMargin hit) {
-            if(!MainCore.IsModEnabled) {
-                return;
-            }
-
-            if(runHadFail) {
-                return;
-            }
+            if(!MainCore.IsModEnabled || runHadFail) return;
 
             if(hit == HitMargin.FailMiss || hit == HitMargin.FailOverload) {
                 // Capture progress up to the failing tile before freezing, so a

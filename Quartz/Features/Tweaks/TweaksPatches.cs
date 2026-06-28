@@ -16,9 +16,7 @@ public static partial class Tweaks {
     [HarmonyPatch(typeof(ffxCheckpoint), "get_runOnHit")]
     private static class CheckpointRunOnHitPatch {
         private static bool Prefix(ref bool __result) {
-            if(!ShouldRemoveCheckpoints) {
-                return true;
-            }
+            if(!ShouldRemoveCheckpoints) return true;
             __result = false;
             return false;
         }
@@ -26,30 +24,23 @@ public static partial class Tweaks {
 
     [HarmonyPatch(typeof(ffxCheckpoint), "Awake")]
     private static class CheckpointAwakePatch {
-        private static void Postfix(ffxCheckpoint __instance) {
-            InvalidateCheckpointCache();
-            if(ShouldRemoveCheckpoints) {
-                RemoveCheckpointVisual(__instance);
-            }
-        }
+        private static void Postfix(ffxCheckpoint __instance) => CheckpointSpawned(__instance);
     }
 
     [HarmonyPatch(typeof(ffxCheckpoint), "Decode")]
     private static class CheckpointDecodePatch {
-        private static void Postfix(ffxCheckpoint __instance) {
-            InvalidateCheckpointCache();
-            if(ShouldRemoveCheckpoints) {
-                RemoveCheckpointVisual(__instance);
-            }
-        }
+        private static void Postfix(ffxCheckpoint __instance) => CheckpointSpawned(__instance);
+    }
+
+    private static void CheckpointSpawned(ffxCheckpoint checkpoint) {
+        InvalidateCheckpointCache();
+        if(ShouldRemoveCheckpoints) RemoveCheckpointVisual(checkpoint);
     }
 
     [HarmonyPatch(typeof(ffxCheckpoint), "StartEffect")]
     private static class CheckpointStartEffectPatch {
         private static bool Prefix(ffxCheckpoint __instance) {
-            if(!ShouldRemoveCheckpoints) {
-                return true;
-            }
+            if(!ShouldRemoveCheckpoints) return true;
             RemoveCheckpointVisual(__instance);
             return false;
         }
@@ -68,9 +59,7 @@ public static partial class Tweaks {
     [HarmonyPatch(typeof(scrFloor), "LightUp")]
     private static class FloorLightUpPatch {
         private static void Prefix(scrFloor __instance) {
-            if(!ShouldDisableTileHitGlow || __instance == null) {
-                return;
-            }
+            if(!ShouldDisableTileHitGlow || __instance == null) return;
 
             lightUpDepth++;
             try {
@@ -84,13 +73,9 @@ public static partial class Tweaks {
         }
 
         private static void Postfix(scrFloor __instance) {
-            if(__instance == null) {
-                return;
-            }
+            if(__instance == null) return;
 
-            if(lightUpDepth > 0) {
-                lightUpDepth--;
-            }
+            if(lightUpDepth > 0) lightUpDepth--;
 
             int id;
             try { id = __instance.GetInstanceID(); }
@@ -104,9 +89,7 @@ public static partial class Tweaks {
             } catch {
             }
 
-            if(!ShouldDisableTileHitGlow) {
-                return;
-            }
+            if(!ShouldDisableTileHitGlow) return;
 
             suppressNextRandomColorFloorIds.Add(id);
             SuppressFloorHitGlow(__instance);
@@ -116,17 +99,13 @@ public static partial class Tweaks {
     [HarmonyPatch(typeof(scrFloor), "SetToRandomColor")]
     private static class FloorSetToRandomColorPatch {
         private static bool Prefix(scrFloor __instance) {
-            if(!ShouldDisableTileHitGlow || __instance == null) {
-                return true;
-            }
+            if(!ShouldDisableTileHitGlow || __instance == null) return true;
 
             int id;
             try { id = __instance.GetInstanceID(); }
             catch { return true; }
 
-            if(lightUpDepth <= 0 && !suppressNextRandomColorFloorIds.Remove(id)) {
-                return true;
-            }
+            if(lightUpDepth <= 0 && !suppressNextRandomColorFloorIds.Remove(id)) return true;
 
             SuppressFloorHitGlow(__instance);
             return false;
@@ -151,26 +130,20 @@ public static partial class Tweaks {
 
     [HarmonyPatch(typeof(PlanetRenderer), "PlayParticles")]
     private static class PlanetRendererPlayParticlesPatch {
-        private static void Postfix(PlanetRenderer __instance) {
-            ApplyBallCoreParticlesTweak(__instance);
-        }
+        private static void Postfix(PlanetRenderer __instance) => ApplyBallCoreParticlesTweak(__instance);
     }
 
     [HarmonyPatch(typeof(PlanetRenderer), "LateUpdate")]
     private static class PlanetRendererLateUpdatePatch {
         private static void Postfix(PlanetRenderer __instance) {
-            if(ShouldRemoveBallCoreParticles) {
-                ApplyBallCoreParticlesTweak(__instance);
-            }
+            if(ShouldRemoveBallCoreParticles) ApplyBallCoreParticlesTweak(__instance);
         }
     }
 
     [HarmonyPatch(typeof(PlanetRenderer), "SetCoreColor")]
     private static class PlanetRendererSetCoreColorPatch {
         private static bool Prefix(PlanetRenderer __instance) {
-            if(!ShouldRemoveBallCoreParticles) {
-                return true;
-            }
+            if(!ShouldRemoveBallCoreParticles) return true;
             ApplyBallCoreParticlesTweak(__instance);
             return false;
         }
@@ -179,9 +152,7 @@ public static partial class Tweaks {
     [HarmonyPatch(typeof(PlanetRenderer), "SetParticleSystemColor")]
     private static class PlanetRendererSetParticleSystemColorPatch {
         private static bool Prefix(PlanetRenderer __instance, ParticleSystem particleSystem) {
-            if(!ShouldRemoveBallCoreParticles || !IsRemovedPlanetParticle(__instance, particleSystem)) {
-                return true;
-            }
+            if(!ShouldRemoveBallCoreParticles || !IsRemovedPlanetParticle(__instance, particleSystem)) return true;
 
             ApplyPlanetParticleTweak(particleSystem, false);
             return false;
@@ -203,27 +174,19 @@ public static partial class Tweaks {
     [HarmonyPatch(typeof(scrController), "TogglePauseGame")]
     private static class DisableAutoPauseTogglePatch {
         private static bool Prefix(scrController __instance, ref bool __result) {
-            if(!ShouldDisableAutoPause || __instance == null) {
-                return true;
-            }
+            if(!ShouldDisableAutoPause || __instance == null) return true;
 
             bool autoOn;
             try { autoOn = RDC.auto; }
             catch { return true; }
-            if(!autoOn) {
-                return true;
-            }
+            if(!autoOn) return true;
 
             bool currentlyPaused;
             try { currentlyPaused = __instance.paused; }
             catch { return true; }
-            if(currentlyPaused) {
-                return true;
-            }
+            if(currentlyPaused) return true;
 
-            if(IsSafePauseCallSite()) {
-                return true;
-            }
+            if(IsSafePauseCallSite()) return true;
 
             // In the level editor the play-mode space-pause sets
             // scnEditor.pausedInPlayMode (and greys the autoplay button) before
@@ -240,9 +203,7 @@ public static partial class Tweaks {
     [HarmonyPatch(typeof(RDInput), "get_mouseScrollDelta")]
     private static class BlockMouseWheelScrollPatch {
         private static void Postfix(ref Vector2 __result) {
-            if(ShouldBlockMouseWheelScroll) {
-                __result = Vector2.zero;
-            }
+            if(ShouldBlockMouseWheelScroll) __result = Vector2.zero;
         }
     }
 
@@ -257,10 +218,8 @@ public static partial class Tweaks {
     [HarmonyPatch(typeof(ffxMenuPlanetSpeedChange), "Start")]
     private static class MenuBpmInitPatch {
         private static void Postfix() {
-            try {
-                ApplyInitialMenuBpm();
-            } catch {
-            }
+            try { ApplyInitialMenuBpm(); }
+            catch { }
         }
     }
 
@@ -278,8 +237,6 @@ public static partial class Tweaks {
 
     [HarmonyPatch(typeof(DetailedResults), "GenerateResults")]
     private static class DetailedResultsGeneratePatch {
-        private static void Postfix(ref string __result) {
-            __result = FilterDetailedResults(__result);
-        }
+        private static void Postfix(ref string __result) => __result = FilterDetailedResults(__result);
     }
 }

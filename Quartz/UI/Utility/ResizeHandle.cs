@@ -61,9 +61,7 @@ public class ResizeHandle : MonoBehaviour {
             if(Panel != null && Panel.sizeDelta != startSize) {
                 UICore.SavePanelSize();
             }
-            if(!hovered) {
-                NativeCursor.Reset();
-            }
+            if(!hovered) NativeCursor.Reset();
         });
         trigger.triggers.Add(upEntry);
 
@@ -74,9 +72,7 @@ public class ResizeHandle : MonoBehaviour {
         var exitEntry = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
         exitEntry.callback.AddListener(_ => {
             hovered = false;
-            if(!dragging) {
-                NativeCursor.Reset();
-            }
+            if(!dragging) NativeCursor.Reset();
         });
         trigger.triggers.Add(exitEntry);
     }
@@ -84,9 +80,7 @@ public class ResizeHandle : MonoBehaviour {
     // The OS reclaims the cursor on every mouse-move message, so re-assert it
     // each frame while this handle is hovered or being dragged.
     private void Update() {
-        if(hovered || dragging) {
-            NativeCursor.Apply(Shape);
-        }
+        if(hovered || dragging) NativeCursor.Apply(Shape);
     }
 
     private void OnDisable() {
@@ -318,9 +312,7 @@ public sealed class ResizeFrame : MonoBehaviour {
     private bool hasApplied;
 
     private void LateUpdate() {
-        if(Panel == null || Self == null) {
-            return;
-        }
+        if(Panel == null || Self == null) return;
 
         Vector2 panelPos = Panel.anchoredPosition;
         Vector2 panelSize = Panel.sizeDelta;
@@ -336,8 +328,6 @@ public sealed class ResizeFrame : MonoBehaviour {
             && UICore.IsOpen
             && !UICore.IsReorganizing;
 
-        if(Handles != null && Handles.activeSelf != show) {
-            Handles.SetActive(show);
-        }
+        if(Handles != null && Handles.activeSelf != show) Handles.SetActive(show);
     }
 }

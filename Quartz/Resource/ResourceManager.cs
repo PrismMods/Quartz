@@ -41,20 +41,13 @@ public sealed class ResourceManager(Assembly assembly, string resourcePath) : ID
     private readonly List<Font> sourceFonts = [];
 
     public byte[] Load(string path) {
-        if(string.IsNullOrWhiteSpace(path)) {
-            return null;
-        }
+        if(string.IsNullOrWhiteSpace(path)) return null;
 
         try {
             using Stream stream = assembly.GetManifestResourceStream(resourcePath + path);
 
-            if(stream == null) {
-                return null;
-            }
-
-            if(stream.Length <= 0) {
-                return [];
-            }
+            if(stream == null) return null;
+            if(stream.Length <= 0) return [];
 
             byte[] data = new byte[stream.Length];
             int offset = 0;
@@ -62,9 +55,7 @@ public sealed class ResourceManager(Assembly assembly, string resourcePath) : ID
             while(offset < data.Length) {
                 int read = stream.Read(data, offset, data.Length - offset);
 
-                if(read <= 0) {
-                    break;
-                }
+                if(read <= 0) break;
 
                 offset += read;
             }
@@ -76,15 +67,11 @@ public sealed class ResourceManager(Assembly assembly, string resourcePath) : ID
     }
 
     public Texture2D LoadTexture(string path, FilterMode filter = FilterMode.Trilinear) {
-        if(cache.TryGetValue(path, out object cached)) {
-            return cached as Texture2D;
-        }
+        if(cache.TryGetValue(path, out object cached)) return cached as Texture2D;
 
         byte[] data = Load(path);
 
-        if(data == null || data.Length == 0) {
-            return null;
-        }
+        if(data == null || data.Length == 0) return null;
 
         // Mip chain on: the UI draws these (e.g. 256px circle corners) far
         // below native size, and minification without mips aliases into
@@ -108,26 +95,18 @@ public sealed class ResourceManager(Assembly assembly, string resourcePath) : ID
     }
 
     public TMP_FontAsset LoadFont(string path, string tempPath) {
-        if(cache.TryGetValue(path, out object cached)) {
-            return cached as TMP_FontAsset;
-        }
+        if(cache.TryGetValue(path, out object cached)) return cached as TMP_FontAsset;
 
         byte[] data = Load(path);
 
-        if(data == null) {
-            return null;
-        }
+        if(data == null) return null;
 
         string directory = Path.GetDirectoryName(tempPath);
-        if(!string.IsNullOrEmpty(directory)) {
-            Directory.CreateDirectory(directory);
-        }
+        if(!string.IsNullOrEmpty(directory)) Directory.CreateDirectory(directory);
 
         // Only rewrite the temp file when it's missing or a different size —
         // CreateFontAsset only needs the bytes on disk once.
-        if(!File.Exists(tempPath) || new FileInfo(tempPath).Length != data.Length) {
-            File.WriteAllBytes(tempPath, data);
-        }
+        if(!File.Exists(tempPath) || new FileInfo(tempPath).Length != data.Length) File.WriteAllBytes(tempPath, data);
 
         Font font = new(tempPath);
         TMP_FontAsset asset = TMP_FontAsset.CreateFontAsset(font);
@@ -138,22 +117,20 @@ public sealed class ResourceManager(Assembly assembly, string resourcePath) : ID
     }
 
     public T Get<T>(Asset asset) where T : class {
-        if(!assetMap.TryGetValue(asset, out string path)) {
-            return null;
-        }
+        if(!assetMap.TryGetValue(asset, out string path)) return null;
 
         return GetInternal<T>(path, asset.ToString());
     }
 
     public T Get<T>(string path) where T : class {
-        if(string.IsNullOrWhiteSpace(path)) {
-            return null;
-        }
+        if(string.IsNullOrWhiteSpace(path)) return null;
 
         string fileName = Path.GetFileNameWithoutExtension(path);
         return GetInternal<T>(path, fileName);
     }
+
     public TMP_FontAsset GetFont(string path, string customTempPath) => LoadFont(path, customTempPath);
+
     private T GetInternal<T>(string path, string assetNameForFont) where T : class {
         object result = null;
 
@@ -177,15 +154,11 @@ public sealed class ResourceManager(Assembly assembly, string resourcePath) : ID
                 case TMP_FontAsset font:
                     // Destroy the generated atlas + material too — they're
                     // separate Unity objects not freed by destroying the asset.
-                    if(font.material != null) {
-                        Object.Destroy(font.material);
-                    }
+                    if(font.material != null) Object.Destroy(font.material);
                     Texture2D[] atlases = font.atlasTextures;
                     if(atlases != null) {
                         foreach(Texture2D tex in atlases) {
-                            if(tex != null) {
-                                Object.Destroy(tex);
-                            }
+                            if(tex != null) Object.Destroy(tex);
                         }
                     }
                     Object.Destroy(font);
@@ -194,9 +167,7 @@ public sealed class ResourceManager(Assembly assembly, string resourcePath) : ID
         }
 
         foreach(Font font in sourceFonts) {
-            if(font != null) {
-                Object.Destroy(font);
-            }
+            if(font != null) Object.Destroy(font);
         }
         sourceFonts.Clear();
 

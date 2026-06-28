@@ -58,17 +58,13 @@ public static partial class KeyViewerOverlay {
 
         try {
             KeyViewerStylesheet sheet = GetStylesheet(Conf.DmCssText);
-            if(sheet.IsEmpty) {
-                return;
-            }
+            if(sheet.IsEmpty) return;
 
             EnsureFontFaces(sheet);
 
             foreach(DmNoteSpec spec in specs) {
                 if(spec.IsGraph) {
-                    if(!spec.GraphInlineStyles) {
-                        ApplyGraphCss(spec, sheet.ResolveGraph(spec.ClassName));
-                    }
+                    if(!spec.GraphInlineStyles) ApplyGraphCss(spec, sheet.ResolveGraph(spec.ClassName));
                     continue;
                 }
                 ApplyKeyStyle(spec, sheet.ResolveKey(spec.ClassName));
@@ -82,36 +78,36 @@ public static partial class KeyViewerOverlay {
     private static void ApplyKeyStyle(DmNoteSpec spec, CssKeyStyleSet set) {
         CssKeyStyle i = set.Idle, a = set.Active;
 
-        if(i.Radius.HasValue) { spec.BorderRadius = Mathf.Clamp(i.Radius.Value, 0f, 100f); }
-        if(a.Radius.HasValue) { spec.BorderRadius = Mathf.Clamp(a.Radius.Value, 0f, 100f); }
-        if(i.FontSize.HasValue) { spec.FontSize = Mathf.Max(1, Mathf.RoundToInt(i.FontSize.Value)); }
-        if(a.FontSize.HasValue) { spec.FontSize = Mathf.Max(1, Mathf.RoundToInt(a.FontSize.Value)); }
-        if(i.Bold.HasValue) { spec.Bold = i.Bold.Value; }
-        if(a.Bold.HasValue) { spec.Bold = a.Bold.Value; }
+        if(i.Radius.HasValue) spec.BorderRadius = Mathf.Clamp(i.Radius.Value, 0f, 100f);
+        if(a.Radius.HasValue) spec.BorderRadius = Mathf.Clamp(a.Radius.Value, 0f, 100f);
+        if(i.FontSize.HasValue) spec.FontSize = Mathf.Max(1, Mathf.RoundToInt(i.FontSize.Value));
+        if(a.FontSize.HasValue) spec.FontSize = Mathf.Max(1, Mathf.RoundToInt(a.FontSize.Value));
+        if(i.Bold.HasValue) spec.Bold = i.Bold.Value;
+        if(a.Bold.HasValue) spec.Bold = a.Bold.Value;
         float? borderW = a.BorderWidth ?? i.BorderWidth;
-        if(borderW.HasValue) { spec.BoxBorderWidth = Mathf.Clamp(borderW.Value, 0f, 20f); }
+        if(borderW.HasValue) spec.BoxBorderWidth = Mathf.Clamp(borderW.Value, 0f, 20f);
 
-        if(i.Bg.Has) { spec.Bg = ToColor(i.Bg); }
-        if(i.BorderColor.Has) { spec.Outline = ToColor(i.BorderColor); }
-        if(i.TextColor.Has) { spec.Text = ToColor(i.TextColor); }
+        if(i.Bg.Has) spec.Bg = ToColor(i.Bg);
+        if(i.BorderColor.Has) spec.Outline = ToColor(i.BorderColor);
+        if(i.TextColor.Has) spec.Text = ToColor(i.TextColor);
         spec.FillGradient = AssignGradient(ToGradient(i.BgGradient), ref spec.Bg);
         spec.LabelGradient = AssignGradient(ToGradient(i.TextGradient), ref spec.Text);
-        if(i.TextShadow.On) { spec.LabelGlow = ToGlow(i.TextShadow); }
-        if(i.BoxShadow.On) { spec.BoxGlow = ToGlow(i.BoxShadow); }
+        if(i.TextShadow.On) spec.LabelGlow = ToGlow(i.TextShadow);
+        if(i.BoxShadow.On) spec.BoxGlow = ToGlow(i.BoxShadow);
 
-        if(a.Bg.Has) { spec.ActiveBg = ToColor(a.Bg); }
-        if(a.BorderColor.Has) { spec.ActiveOutline = ToColor(a.BorderColor); }
-        if(a.TextColor.Has) { spec.ActiveText = ToColor(a.TextColor); }
+        if(a.Bg.Has) spec.ActiveBg = ToColor(a.Bg);
+        if(a.BorderColor.Has) spec.ActiveOutline = ToColor(a.BorderColor);
+        if(a.TextColor.Has) spec.ActiveText = ToColor(a.TextColor);
         spec.ActiveFillGradient = AssignGradient(ToGradient(a.BgGradient), ref spec.ActiveBg);
         spec.ActiveLabelGradient = AssignGradient(ToGradient(a.TextGradient), ref spec.ActiveText);
-        if(a.TextShadow.On) { spec.ActiveLabelGlow = ToGlow(a.TextShadow); }
-        if(a.BoxShadow.On) { spec.ActiveBoxGlow = ToGlow(a.BoxShadow); }
+        if(a.TextShadow.On) spec.ActiveLabelGlow = ToGlow(a.TextShadow);
+        if(a.BoxShadow.On) spec.ActiveBoxGlow = ToGlow(a.BoxShadow);
 
         // transform: translate folds into the offset; --key-offset-* adds on top.
         spec.IdleOffset = Translate(i) ;
         spec.ActiveOffset = Translate(a);
-        if(a.OffsetX.HasValue) { spec.ActiveOffset.x += a.OffsetX.Value; }
-        if(a.OffsetY.HasValue) { spec.ActiveOffset.y += a.OffsetY.Value; }
+        if(a.OffsetX.HasValue) spec.ActiveOffset.x += a.OffsetX.Value;
+        if(a.OffsetY.HasValue) spec.ActiveOffset.y += a.OffsetY.Value;
         // Legacy fields kept in sync so NeedsCssState / older paths still see them.
         spec.ActiveOffsetX = spec.ActiveOffset.x;
         spec.ActiveOffsetY = spec.ActiveOffset.y;
@@ -123,8 +119,8 @@ public static partial class KeyViewerOverlay {
         spec.ActiveFilter = FilterColor(a.Filter);
         // filter: drop-shadow() reuses the box-shadow halo path when no
         // box-shadow already claims it.
-        if(i.Filter?.DropShadow.On == true && !spec.BoxGlow.On) { spec.BoxGlow = ToGlow(i.Filter.DropShadow); }
-        if(a.Filter?.DropShadow.On == true && !spec.ActiveBoxGlow.On) { spec.ActiveBoxGlow = ToGlow(a.Filter.DropShadow); }
+        if(i.Filter?.DropShadow.On == true && !spec.BoxGlow.On) spec.BoxGlow = ToGlow(i.Filter.DropShadow);
+        if(a.Filter?.DropShadow.On == true && !spec.ActiveBoxGlow.On) spec.ActiveBoxGlow = ToGlow(a.Filter.DropShadow);
         spec.IdleBackdrop = i.BackdropBlur ?? 0f;
         spec.ActiveBackdrop = a.BackdropBlur ?? 0f;
         spec.TransitionSec = Mathf.Max(a.TransitionSeconds ?? 0f, i.TransitionSeconds ?? 0f);
@@ -136,7 +132,7 @@ public static partial class KeyViewerOverlay {
 
         // font-family / @font-face — active wins; only override when resolved.
         TMP_FontAsset font = ResolveFont(a.FontFamily) ?? ResolveFont(i.FontFamily);
-        if(font != null) { spec.CssFont = font; }
+        if(font != null) spec.CssFont = font;
 
         if(spec.BoxBorderWidth <= 0.01f) {
             spec.Outline.a = 0f;
@@ -147,22 +143,22 @@ public static partial class KeyViewerOverlay {
     private static void ApplyCounterStyle(DmNoteSpec spec, CssCounterStyleSet set) {
         CssCounterStyle i = set.Idle, a = set.Active;
 
-        if(i.FontSize.HasValue) { spec.CounterFontSize = Mathf.Max(1, Mathf.RoundToInt(i.FontSize.Value)); }
-        if(a.FontSize.HasValue) { spec.CounterFontSize = Mathf.Max(1, Mathf.RoundToInt(a.FontSize.Value)); }
-        if(i.Bold.HasValue) { spec.CounterBold = i.Bold.Value; }
-        if(a.Bold.HasValue) { spec.CounterBold = a.Bold.Value; }
+        if(i.FontSize.HasValue) spec.CounterFontSize = Mathf.Max(1, Mathf.RoundToInt(i.FontSize.Value));
+        if(a.FontSize.HasValue) spec.CounterFontSize = Mathf.Max(1, Mathf.RoundToInt(a.FontSize.Value));
+        if(i.Bold.HasValue) spec.CounterBold = i.Bold.Value;
+        if(a.Bold.HasValue) spec.CounterBold = a.Bold.Value;
 
-        if(i.Color.Has) { spec.CounterText = ToColor(i.Color); }
-        if(a.Color.Has) { spec.ActiveCounterText = ToColor(a.Color); }
-        if(i.StrokeColor.Has) { spec.CounterStroke = ToColor(i.StrokeColor); }
-        if(a.StrokeColor.Has) { spec.ActiveCounterStroke = ToColor(a.StrokeColor); }
+        if(i.Color.Has) spec.CounterText = ToColor(i.Color);
+        if(a.Color.Has) spec.ActiveCounterText = ToColor(a.Color);
+        if(i.StrokeColor.Has) spec.CounterStroke = ToColor(i.StrokeColor);
+        if(a.StrokeColor.Has) spec.ActiveCounterStroke = ToColor(a.StrokeColor);
         float? strokeW = a.StrokeWidth ?? i.StrokeWidth;
-        if(strokeW.HasValue) { spec.CounterStrokeWidth = strokeW.Value; }
+        if(strokeW.HasValue) spec.CounterStrokeWidth = strokeW.Value;
 
         spec.CounterGradient = AssignGradient(ToGradient(i.Gradient), ref spec.CounterText);
         spec.ActiveCounterGradient = AssignGradient(ToGradient(a.Gradient), ref spec.ActiveCounterText);
-        if(i.TextShadow.On) { spec.CounterGlow = ToGlow(i.TextShadow); }
-        if(a.TextShadow.On) { spec.ActiveCounterGlow = ToGlow(a.TextShadow); }
+        if(i.TextShadow.On) spec.CounterGlow = ToGlow(i.TextShadow);
+        if(a.TextShadow.On) spec.ActiveCounterGlow = ToGlow(a.TextShadow);
     }
 
     private static Vector2 Translate(CssKeyStyle s) =>
@@ -176,9 +172,7 @@ public static partial class KeyViewerOverlay {
     // tint without the source pixels, so it only nudges the multiply. white =
     // identity (no filter).
     private static Color FilterColor(CssFilter f) {
-        if(f == null) {
-            return Color.white;
-        }
+        if(f == null) return Color.white;
         float m = Mathf.Clamp(f.Brightness * f.Contrast, 0f, 4f);
         // A low saturate dims slightly toward grey; a high one brightens a touch.
         m *= Mathf.Lerp(0.92f, 1.05f, Mathf.Clamp01(f.Saturate * 0.5f));
@@ -187,9 +181,7 @@ public static partial class KeyViewerOverlay {
     }
 
     private static CssAnimGradient AssignGradient(CssAnimGradient grad, ref Color solidFallback) {
-        if(grad != null && grad.Stops.Length > 0) {
-            solidFallback = grad.Stops[0];
-        }
+        if(grad != null && grad.Stops.Length > 0) solidFallback = grad.Stops[0];
         return grad;
     }
 
@@ -199,9 +191,7 @@ public static partial class KeyViewerOverlay {
         new(s.X, -s.Y, s.Blur, new Color(s.Color.R, s.Color.G, s.Color.B, s.Color.A));
 
     private static CssAnimGradient ToGradient(CssGradient g) {
-        if(g == null || g.Stops.Count == 0) {
-            return null;
-        }
+        if(g == null || g.Stops.Count == 0) return null;
         Color[] stops = new Color[g.Stops.Count];
         for(int i = 0; i < stops.Length; i++) {
             CssColor c = g.Stops[i];
@@ -211,9 +201,7 @@ public static partial class KeyViewerOverlay {
     }
 
     private static CssLayerRt ToLayer(CssLayer layer) {
-        if(layer == null) {
-            return null;
-        }
+        if(layer == null) return null;
         var rt = new CssLayerRt {
             Bg = layer.Bg.Has ? ToColor(layer.Bg) : new Color(0f, 0f, 0f, 0f),
             Radius = layer.Radius ?? -1f,
@@ -248,8 +236,8 @@ public static partial class KeyViewerOverlay {
             if(box.Label != null) { box.Label.font = spec.CssFont; Exempt(box.Label); }
             if(box.Value != null) { box.Value.font = spec.CssFont; Exempt(box.Value); }
         }
-        if(spec.Bold && box.Label != null) { box.Label.fontStyle |= FontStyles.Bold; }
-        if(spec.CounterBold && box.Value != null) { box.Value.fontStyle |= FontStyles.Bold; }
+        if(spec.Bold && box.Label != null) box.Label.fontStyle |= FontStyles.Bold;
+        if(spec.CounterBold && box.Value != null) box.Value.fontStyle |= FontStyles.Bold;
 
         // A gradient owns its text's colour, so neutralise the base tint.
         if((spec.LabelGradient != null || spec.ActiveLabelGradient != null) && box.Label != null) {
@@ -275,15 +263,11 @@ public static partial class KeyViewerOverlay {
     }
 
     private static void Exempt(Component c) {
-        if(c.GetComponent<FontExempt>() == null) {
-            c.gameObject.AddComponent<FontExempt>();
-        }
+        if(c.GetComponent<FontExempt>() == null) c.gameObject.AddComponent<FontExempt>();
     }
 
     private static void BuildBoxGlow(Box box, DmNoteSpec spec) {
-        if(!spec.BoxGlow.On && !spec.ActiveBoxGlow.On) {
-            return;
-        }
+        if(!spec.BoxGlow.On && !spec.ActiveBoxGlow.On) return;
         float blur = Mathf.Max(spec.BoxGlow.Blur, spec.ActiveBoxGlow.Blur);
         float pad = Mathf.Max(2f, blur + spec.BoxBorderWidth);
         GameObject obj = new("CssGlow");
@@ -304,9 +288,7 @@ public static partial class KeyViewerOverlay {
     // the CSS angle and scrolls seamlessly.
     private static void BuildFillGradient(Box box, DmNoteSpec spec) {
         CssAnimGradient g = spec.FillGradient ?? spec.ActiveFillGradient;
-        if(g == null || box.Fill == null) {
-            return;
-        }
+        if(g == null || box.Fill == null) return;
         // Mask the rounded fill so the gradient keeps the corner radius.
         Mask mask = box.Fill.GetComponent<Mask>() ?? box.Fill.gameObject.AddComponent<Mask>();
         mask.showMaskGraphic = true;
@@ -331,9 +313,7 @@ public static partial class KeyViewerOverlay {
     }
 
     private static RawImage BuildPseudo(Box box, DmNoteSpec spec, CssLayerRt layer, bool isBefore) {
-        if(layer == null) {
-            return null;
-        }
+        if(layer == null) return null;
         bool behind = layer.Z < 0;
         GameObject obj = new(isBefore ? "CssBefore" : "CssAfter");
         // Behind the box (Z<0) → the shared glow layer, free to spill (a glow).
@@ -387,9 +367,7 @@ public static partial class KeyViewerOverlay {
     private static bool LayerAnimated(CssLayerRt layer) => layer is { HasGradient: true, GradPeriod: > 0.01f };
 
     private static RectTransform EnsureGlowLayer() {
-        if(cssGlowLayer != null) {
-            return cssGlowLayer;
-        }
+        if(cssGlowLayer != null) return cssGlowLayer;
         GameObject obj = new("CssGlowLayer");
         obj.transform.SetParent(root, false);
         RectTransform rt = obj.AddComponent<RectTransform>();
@@ -443,7 +421,7 @@ public static partial class KeyViewerOverlay {
         if(box.Glow != null) {
             CssGlow g = pressed ? spec.ActiveBoxGlow : spec.BoxGlow;
             box.Glow.enabled = g.On;
-            if(g.On) { box.Glow.color = g.Color; }
+            if(g.On) box.Glow.color = g.Color;
         }
 
         // transform: offset + scale + rotation on the box.
@@ -480,9 +458,7 @@ public static partial class KeyViewerOverlay {
         }
 
         // Begin a colour/transform transition if one is configured.
-        if(spec.TransitionSec > 0.01f) {
-            box.TransStart = Time.unscaledTime;
-        }
+        if(spec.TransitionSec > 0.01f) box.TransStart = Time.unscaledTime;
     }
 
     private static void ApplyFilterTint(Box box, Color f, bool pressed) {
@@ -492,23 +468,19 @@ public static partial class KeyViewerOverlay {
         if(box.Value != null && (pressed ? box.Dm.ActiveCounterGradient : box.Dm.CounterGradient) == null) {
             box.Value.color = Mul(box.Value.color, f);
         }
-        if(box.Border != null) { box.Border.color = Mul(box.Border.color, f); }
+        if(box.Border != null) box.Border.color = Mul(box.Border.color, f);
     }
 
     private static Color Mul(Color a, Color b) => new(a.r * b.r, a.g * b.g, a.b * b.b, a.a);
 
     private static void ApplyPseudoState(RawImage layer, CssLayerRt rt) {
-        if(layer == null) {
-            return;
-        }
+        if(layer == null) return;
         if(rt == null) {
             layer.enabled = false;
             return;
         }
         layer.enabled = true;
-        if(!rt.HasGradient) {
-            layer.color = rt.Bg;
-        }
+        if(!rt.HasGradient) layer.color = rt.Bg;
     }
 
     // ---- per-frame tick -----------------------------------------------------
@@ -516,9 +488,7 @@ public static partial class KeyViewerOverlay {
     private static void CssTick(float time) {
         for(int i = 0; i < cssFx.Count; i++) {
             Box box = cssFx[i];
-            if(box?.Dm == null) {
-                continue;
-            }
+            if(box?.Dm == null) continue;
             try {
                 TickBox(box, time);
             } catch {
@@ -579,18 +549,14 @@ public static partial class KeyViewerOverlay {
             box.Label.color = Color.Lerp(pressed ? spec.Text : spec.ActiveText,
                 pressed ? spec.ActiveText : spec.Text, t);
         }
-        if(t >= 1f) {
-            box.TransStart = -1f;
-        }
+        if(t >= 1f) box.TransStart = -1f;
     }
 
     // Writes per-glyph gradient colours into the text mesh. Only forces a mesh
     // rebuild when the string changed; otherwise it recolours the existing verts
     // and uploads just the colour stream.
     private static void ApplyGlyphGradient(TMP_Text tmp, CssAnimGradient g, float time, ref string lastText) {
-        if(g.Stops.Length == 0) {
-            return;
-        }
+        if(g.Stops.Length == 0) return;
         string text = tmp.text;
         if(!string.Equals(text, lastText, StringComparison.Ordinal)) {
             tmp.ForceMeshUpdate();
@@ -598,9 +564,7 @@ public static partial class KeyViewerOverlay {
         }
 
         TMP_TextInfo info = tmp.textInfo;
-        if(info == null || info.characterCount == 0) {
-            return;
-        }
+        if(info == null || info.characterCount == 0) return;
 
         float scroll = g.Period > 0.01f ? (time / g.Period) % 1f : 0f;
         int count = info.characterCount;
@@ -608,9 +572,7 @@ public static partial class KeyViewerOverlay {
         // the whole word rather than per character.
         for(int i = 0; i < count; i++) {
             TMP_CharacterInfo ch = info.characterInfo[i];
-            if(!ch.isVisible) {
-                continue;
-            }
+            if(!ch.isVisible) continue;
             float u = count > 1 ? (float)i / (count - 1) : 0f;
             Color32 col = SampleGradient(g.Stops, u + scroll);
             int mat = ch.materialReferenceIndex;
@@ -627,9 +589,7 @@ public static partial class KeyViewerOverlay {
     // Samples a looping stop list at position p (wraps), last→first seamless.
     private static Color SampleGradient(Color[] stops, float p) {
         int n = stops.Length;
-        if(n == 1) {
-            return stops[0];
-        }
+        if(n == 1) return stops[0];
         p -= Mathf.Floor(p);
         float scaled = p * n;
         int idx = (int)scaled % n;
@@ -643,9 +603,7 @@ public static partial class KeyViewerOverlay {
     // cached by content. Width 256, height 8 (cheap; stretched by the quad).
     private static Texture2D GradientTexture(Color[] stops, float blur) {
         string key = GradKey(stops, blur);
-        if(gradTex.TryGetValue(key, out Texture2D cached) && cached != null) {
-            return cached;
-        }
+        if(gradTex.TryGetValue(key, out Texture2D cached) && cached != null) return cached;
 
         const int w = 256, h = 8;
         Color[] row = new Color[w];
@@ -656,14 +614,10 @@ public static partial class KeyViewerOverlay {
             int next = (idx + 1) % n;
             row[x] = Color.Lerp(stops[idx], stops[next], p - Mathf.Floor(p));
         }
-        if(blur > 0.5f) {
-            row = BoxBlur(row, Mathf.Clamp(Mathf.RoundToInt(blur * 2f), 1, 32));
-        }
+        if(blur > 0.5f) row = BoxBlur(row, Mathf.Clamp(Mathf.RoundToInt(blur * 2f), 1, 32));
 
         Color[] px = new Color[w * h];
-        for(int y = 0; y < h; y++) {
-            Array.Copy(row, 0, px, y * w, w);
-        }
+        for(int y = 0; y < h; y++) Array.Copy(row, 0, px, y * w, w);
         Texture2D tex = new(w, h, TextureFormat.RGBA32, false) {
             wrapMode = TextureWrapMode.Repeat,
             filterMode = FilterMode.Bilinear,
@@ -692,17 +646,13 @@ public static partial class KeyViewerOverlay {
 
     private static string GradKey(Color[] stops, float blur) {
         var sb = new StringBuilder(stops.Length * 8 + 4);
-        foreach(Color c in stops) {
-            sb.Append(ColorUtility.ToHtmlStringRGBA(c));
-        }
+        foreach(Color c in stops) sb.Append(ColorUtility.ToHtmlStringRGBA(c));
         sb.Append('|').Append(Mathf.RoundToInt(blur));
         return sb.ToString();
     }
 
     private static Sprite GlowSprite() {
-        if(glowSprite != null) {
-            return glowSprite;
-        }
+        if(glowSprite != null) return glowSprite;
         const int size = 64, margin = 22;
         Texture2D tex = new(size, size, TextureFormat.RGBA32, false) {
             filterMode = FilterMode.Bilinear,
@@ -734,13 +684,9 @@ public static partial class KeyViewerOverlay {
     private static void EnsureFontFaces(KeyViewerStylesheet sheet) {
         foreach(CssFontFace face in sheet.FontFaces) {
             try {
-                if(cssFonts.ContainsKey(face.Family)) {
-                    continue;
-                }
+                if(cssFonts.ContainsKey(face.Family)) continue;
                 lock(cssFontLock) {
-                    if(cssFontPending.Contains(face.Family)) {
-                        continue;
-                    }
+                    if(cssFontPending.Contains(face.Family)) continue;
                 }
                 string path = CachedFontPath(face);
                 if(path != null && File.Exists(path)) {
@@ -755,12 +701,8 @@ public static partial class KeyViewerOverlay {
     }
 
     private static TMP_FontAsset ResolveFont(string family) {
-        if(string.IsNullOrEmpty(family)) {
-            return null;
-        }
-        if(cssFonts.TryGetValue(family, out TMP_FontAsset asset)) {
-            return asset;
-        }
+        if(string.IsNullOrEmpty(family)) return null;
+        if(cssFonts.TryGetValue(family, out TMP_FontAsset asset)) return asset;
         // A bare font-family (no @font-face) may name a font already in the mod's
         // catalogue; reuse it rather than downloading.
         foreach(string name in FontManager.GetAvailableFonts()) {
@@ -784,22 +726,16 @@ public static partial class KeyViewerOverlay {
     // serves the same path as .ttf.
     private static string CachedFontPath(CssFontFace face) {
         string url = PickFontUrl(face);
-        if(url == null) {
-            return null;
-        }
+        if(url == null) return null;
         string ext = Path.GetExtension(new Uri(url).AbsolutePath);
-        if(ext != ".ttf" && ext != ".otf" && ext != ".ttc") {
-            ext = ".ttf";
-        }
+        if(ext != ".ttf" && ext != ".otf" && ext != ".ttc") ext = ".ttf";
         return Path.Combine(FontCacheDir(), Hash(face.Family + "|" + url) + ext);
     }
 
     private static string PickFontUrl(CssFontFace face) {
         foreach(string s in face.Srcs) {
             string e = s.ToLowerInvariant();
-            if(e.EndsWith(".ttf") || e.EndsWith(".otf") || e.EndsWith(".ttc")) {
-                return s;
-            }
+            if(e.EndsWith(".ttf") || e.EndsWith(".otf") || e.EndsWith(".ttc")) return s;
         }
         // No native source — take the first and try it as .ttf.
         return face.Srcs.Count > 0 ? SwapToTtf(face.Srcs[0]) : null;
@@ -825,9 +761,7 @@ public static partial class KeyViewerOverlay {
     private static void StartFontDownload(CssFontFace face) {
         string url = PickFontUrl(face);
         string path = CachedFontPath(face);
-        if(url == null || path == null) {
-            return;
-        }
+        if(url == null || path == null) return;
         lock(cssFontLock) {
             cssFontPending.Add(face.Family);
         }
@@ -854,9 +788,7 @@ public static partial class KeyViewerOverlay {
         using var md5 = MD5.Create();
         byte[] h = md5.ComputeHash(Encoding.UTF8.GetBytes(s));
         var sb = new StringBuilder(h.Length * 2);
-        foreach(byte b in h) {
-            sb.Append(b.ToString("x2"));
-        }
+        foreach(byte b in h) sb.Append(b.ToString("x2"));
         return sb.ToString();
     }
 }

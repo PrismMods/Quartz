@@ -54,9 +54,7 @@ public abstract class Tweener<T> : ITweener {
     }
 
     public void Start() {
-        if(IsPlaying) {
-            return;
-        }
+        if(IsPlaying) return;
 
         IsPlaying = true;
         IsCompleted = false;
@@ -114,9 +112,7 @@ public abstract class Tweener<T> : ITweener {
     }
 
     public void Tick(float deltaTime) {
-        if(!IsPlaying) {
-            return;
-        }
+        if(!IsPlaying) return;
 
         bool valid = Validate();
 
@@ -130,12 +126,7 @@ public abstract class Tweener<T> : ITweener {
         if(Elapsed < Duration) {
             float timeNormalized = MathExtensions.SafeDivide(Elapsed, Duration);
 
-            _currentValue = _interpolator.Evaluate(
-                _initialValue,
-                _finalValue,
-                timeNormalized,
-                _easingFunction
-            );
+            _currentValue = _interpolator.Evaluate(_initialValue, _finalValue, timeNormalized, _easingFunction);
 
             _setter(_currentValue);
         } else {
@@ -146,18 +137,11 @@ public abstract class Tweener<T> : ITweener {
     public void Complete() {
         bool valid = Validate();
 
-        if(!valid) {
-            return;
-        }
+        if(!valid) return;
 
         GetFirstTimeValues();
 
-        T newValue = _interpolator.Evaluate(
-            _initialValue,
-            _finalValue,
-            1.0f,
-            _easingFunction
-        );
+        T newValue = _interpolator.Evaluate(_initialValue, _finalValue, 1.0f, _easingFunction);
 
         _setter(newValue);
 
@@ -173,23 +157,17 @@ public abstract class Tweener<T> : ITweener {
     public void SetEasing(EasingDelegate easingFunction) => _easingFunction = easingFunction;
 
     void CompleteIfInstant() {
-        if(!IsPlaying) {
-            return;
-        }
+        if(!IsPlaying) return;
 
         bool isInstant = Duration == 0.0f;
 
-        if(isInstant) {
-            Complete();
-        }
+        if(isInstant) Complete();
     }
 
     bool Validate() => _validation.Invoke();
 
     void GetFirstTimeValues() {
-        if(_hasFirstTimeValues) {
-            return;
-        }
+        if(_hasFirstTimeValues) return;
 
         _hasFirstTimeValues = true;
 

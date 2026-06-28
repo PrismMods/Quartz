@@ -51,16 +51,12 @@ internal static class XPerfectBridge {
 
     public static bool Active {
         get {
-            if(!Installed) {
-                return false;
-            }
+            if(!Installed) return false;
             // Installed implies XPerfect is resolved. JudgementOverlay polls Active
             // on the default hit path, so memoize the reflective enabled-prop read
             // (a boxed PropertyInfo.GetValue) per frame. Installed still runs its
             // EnsureResolved rescan above each call, so a runtime enable is picked up.
-            if(activeFrame == UnityEngine.Time.frameCount) {
-                return activeCache;
-            }
+            if(activeFrame == UnityEngine.Time.frameCount) return activeCache;
             bool result;
             try {
                 result = enabledProp == null || (enabledProp.GetValue(null, null) is bool b && b);
@@ -86,14 +82,10 @@ internal static class XPerfectBridge {
     public static int MinusCount() => ReadIntMember(minusCountMember);
 
     private static Judge ReadJudge(MemberInfo member, Judge fallback) {
-        if(!Installed || member == null) {
-            return fallback;
-        }
+        if(!Installed || member == null) return fallback;
         try {
             object v = ReadStaticMember(member);
-            if(v == null) {
-                return Judge.None;
-            }
+            if(v == null) return Judge.None;
             int i = System.Convert.ToInt32(v);
             return i is < 0 or > 3 ? Judge.None : (Judge)i;
         } catch {
@@ -102,9 +94,7 @@ internal static class XPerfectBridge {
     }
 
     private static int ReadIntMember(MemberInfo member) {
-        if(!Installed || member == null) {
-            return 0;
-        }
+        if(!Installed || member == null) return 0;
         try {
             object v = ReadStaticMember(member);
             return v == null ? 0 : System.Convert.ToInt32(v);
@@ -114,9 +104,7 @@ internal static class XPerfectBridge {
     }
 
     private static object ReadStaticMember(MemberInfo member) {
-        if(member is PropertyInfo property) {
-            return property.GetValue(null, null);
-        }
+        if(member is PropertyInfo property) return property.GetValue(null, null);
         return member is FieldInfo field ? field.GetValue(null) : null;
     }
 
@@ -126,9 +114,7 @@ internal static class XPerfectBridge {
         const BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
 
         PropertyInfo property = type.GetProperty(name, flags);
-        if(property != null && property.GetGetMethod(true) != null) {
-            return property;
-        }
+        if(property != null && property.GetGetMethod(true) != null) return property;
 
         FieldInfo field = type.GetField(name, flags);
         return field ?? type.GetField("<" + name + ">k__BackingField", flags);
@@ -137,9 +123,7 @@ internal static class XPerfectBridge {
     private static void OnAssemblyLoad(object sender, AssemblyLoadEventArgs args) => assembliesChanged = true;
 
     private static void EnsureResolved() {
-        if(installed) {
-            return;
-        }
+        if(installed) return;
 
         // XPerfect can load AFTER Quartz first queries the bridge: UMM loads its
         // mods on its own schedule, and the user can enable XPerfect from the UMM
@@ -154,9 +138,7 @@ internal static class XPerfectBridge {
                 AppDomain.CurrentDomain.AssemblyLoad += OnAssemblyLoad;
             } catch { }
         }
-        if(!assembliesChanged) {
-            return;
-        }
+        if(!assembliesChanged) return;
         assembliesChanged = false;
 
         try {
@@ -167,14 +149,10 @@ internal static class XPerfectBridge {
                     break;
                 }
             }
-            if(xpAsm == null) {
-                return;
-            }
+            if(xpAsm == null) return;
 
             Type accuracyStateType = xpAsm.GetType("XPerfect.AccuracyState");
-            if(accuracyStateType == null) {
-                return;
-            }
+            if(accuracyStateType == null) return;
 
             lastJudgeMember = GetStaticReadable(accuracyStateType, "LastJudge");
             lastJudgeForTextMember = GetStaticReadable(accuracyStateType, "LastJudgeForText");

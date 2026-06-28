@@ -28,50 +28,7 @@ internal static class PageGameplay {
     private static Action syncLockChangedHandler;
 
     public static void Create(RectTransform parent) {
-        GameObject pad = new("Pad");
-        pad.transform.SetParent(parent, false);
-
-        RectTransform padRect = pad.AddComponent<RectTransform>();
-        padRect.anchorMin = Vector2.zero;
-        padRect.anchorMax = Vector2.one;
-        padRect.pivot = new Vector2(0.5f, 0.5f);
-        padRect.offsetMin = new Vector2(18f, 18f);
-        padRect.offsetMax = new Vector2(-18f, -18f);
-
-        GameObject viewport = new("Viewport");
-        viewport.transform.SetParent(pad.transform, false);
-
-        RectTransform viewportRect = viewport.AddComponent<RectTransform>();
-        viewportRect.anchorMin = Vector2.zero;
-        viewportRect.anchorMax = Vector2.one;
-        viewportRect.offsetMin = Vector2.zero;
-        viewportRect.offsetMax = Vector2.zero;
-        viewportRect.pivot = new Vector2(0.5f, 0.5f);
-
-        viewport.AddComponent<EmptyGraphic>().raycastTarget = true;
-        viewport.AddComponent<RectMask2D>();
-
-        GameObject content = new("Content");
-        content.transform.SetParent(viewport.transform, false);
-
-        RectTransform contentRect = content.AddComponent<RectTransform>();
-        contentRect.anchorMin = new Vector2(0f, 1f);
-        contentRect.anchorMax = new Vector2(1f, 1f);
-        contentRect.pivot = new Vector2(0.5f, 1f);
-        contentRect.offsetMin = Vector2.zero;
-        contentRect.offsetMax = Vector2.zero;
-
-        VerticalLayoutGroup layout = content.AddComponent<VerticalLayoutGroup>();
-        layout.spacing = 12f;
-        layout.childControlWidth = true;
-        layout.childControlHeight = true;
-        layout.childForceExpandWidth = true;
-        layout.childForceExpandHeight = false;
-
-        ContentSizeFitter fitter = content.AddComponent<ContentSizeFitter>();
-        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-
-        pad.AddComponent<UIScrollController>().SetContent(contentRect, viewportRect);
+        RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
 
         CreateKeyLimiter(content.transform);
         CreateChatterBlocker(content.transform);
@@ -121,11 +78,9 @@ internal static class PageGameplay {
                 "Mode"
             );
         } else {
-            var note = GenerateUI.AddText(GenerateUI.Row(sec.Body, 30f));
-            GenerateUI.Localize(note, "AD_SHORTCUT_WINDOWS_ONLY",
+            GenerateUI.AddLocalizedMutedText(
+                GenerateUI.Row(sec.Body, 30f), "AD_SHORTCUT_WINDOWS_ONLY",
                 "Shortcut mode is Windows-only — using Bot mode.");
-            note.fontSize = 17f;
-            note.color = new Color(1f, 1f, 1f, 0.45f);
         }
 
         // Common rows (both modes).
@@ -162,20 +117,16 @@ internal static class PageGameplay {
         }
 
         var statusRow = GenerateUI.Row(sec.Body);
-        var statusText = GenerateUI.AddText(statusRow);
-        statusText.fontSize = 19f;
-        statusText.color = new Color(1f, 1f, 1f, 0.6f);
+        var statusText = GenerateUI.AddMutedText(statusRow, 19f, 0.6f);
         statusRow.gameObject.AddComponent<AutoDeafenStatusLabel>().Label = statusText;
     }
 
     // Shortcut mode: tap the chord that matches Discord's "Toggle Deafen" global
     // shortcut. Four independent modifier toggles + a base key, matching v1.
     private static void CreateAutoDeafenShortcut(Transform body, AutoDeafenSettings conf) {
-        var hint = GenerateUI.AddText(GenerateUI.Row(body, 30f));
-        GenerateUI.Localize(hint, "AD_SHORTCUT_HINT",
-            "Set this to match your Discord 'Toggle Deafen' keybind.");
-        hint.fontSize = 16f;
-        hint.color = new Color(1f, 1f, 1f, 0.45f);
+        GenerateUI.AddLocalizedMutedText(
+            GenerateUI.Row(body, 30f), "AD_SHORTCUT_HINT",
+            "Set this to match your Discord 'Toggle Deafen' keybind.", 16f);
 
         GenerateUI.Toggle(
             GenerateUI.Row(body), true, conf.ShortcutCtrl,
@@ -219,9 +170,7 @@ internal static class PageGameplay {
             GenerateUI.Row(body),
             () => {
                 string url = AutoDeafen.AuthorizeUrl();
-                if(!string.IsNullOrEmpty(url)) {
-                    GUIUtility.systemCopyBuffer = url;
-                }
+                if(!string.IsNullOrEmpty(url)) GUIUtility.systemCopyBuffer = url;
             },
             "Copy Authorize URL",
             "ad_copy_url"
@@ -294,9 +243,7 @@ internal static class PageGameplay {
         private static readonly KeyCode[] AllKeys = (KeyCode[])System.Enum.GetValues(typeof(KeyCode));
 
         public void Begin() {
-            if(listening) {
-                return;
-            }
+            if(listening) return;
             listening = true;
             Keybind.Capturing = true;
             Display.text = MainCore.Tr.Get("PRESS_A_KEY", "Press a key...");
@@ -311,15 +258,11 @@ internal static class PageGameplay {
         }
 
         private void OnDisable() {
-            if(listening) {
-                Cancel();
-            }
+            if(listening) Cancel();
         }
 
         private void Update() {
-            if(!listening) {
-                return;
-            }
+            if(!listening) return;
 
             if(Input.GetKeyDown(KeyCode.Escape)) {
                 Cancel();
@@ -328,12 +271,8 @@ internal static class PageGameplay {
 
             for(int i = 0; i < AllKeys.Length; i++) {
                 KeyCode kc = AllKeys[i];
-                if(kc == KeyCode.None || (int)kc >= (int)KeyCode.Mouse0 || Keybind.IsModifier(kc)) {
-                    continue;
-                }
-                if(!Input.GetKeyDown(kc)) {
-                    continue;
-                }
+                if(kc == KeyCode.None || (int)kc >= (int)KeyCode.Mouse0 || Keybind.IsModifier(kc)) continue;
+                if(!Input.GetKeyDown(kc)) continue;
 
                 Conf.ShortcutKey = (int)kc;
                 listening = false;
@@ -352,15 +291,11 @@ internal static class PageGameplay {
         private float nextPoll;
 
         private void Update() {
-            if(Label == null || Time.unscaledTime < nextPoll) {
-                return;
-            }
+            if(Label == null || Time.unscaledTime < nextPoll) return;
             nextPoll = Time.unscaledTime + 0.25f;
 
             string text = MainCore.Tr.Get("STATUS_PREFIX", "Status: ") + AutoDeafen.Status;
-            if(Label.text != text) {
-                Label.text = text;
-            }
+            if(Label.text != text) Label.text = text;
         }
     }
 
@@ -466,15 +401,11 @@ internal static class PageGameplay {
                     return;
                 }
 
-                if(captureBtn?.Label != null) {
-                    captureBtn.Label.text = MainCore.Tr.Get("PRESS_A_KEY", "Press a key...");
-                }
+                if(captureBtn?.Label != null) captureBtn.Label.text = MainCore.Tr.Get("PRESS_A_KEY", "Press a key...");
                 KeyLimiter.StartCapture(
                     key => KeyLimiter.ToggleAllowedKey(key),
                     () => {
-                        if(captureBtn?.Label != null) {
-                            captureBtn.Label.text = MainCore.Tr.Get("KL_CAPTURE", "Add / Remove Key");
-                        }
+                        if(captureBtn?.Label != null) captureBtn.Label.text = MainCore.Tr.Get("KL_CAPTURE", "Add / Remove Key");
                     }
                 );
             },
@@ -496,14 +427,11 @@ internal static class PageGameplay {
         // While the key viewer syncs its keys here, the allowed list is not
         // user-editable — the sync would overwrite any change on the next
         // rebuild anyway.
-        var syncNote = GenerateUI.AddText(GenerateUI.Row(sec.Body, 30f));
-        GenerateUI.Localize(
-            syncNote,
+        var syncNote = GenerateUI.AddLocalizedMutedText(
+            GenerateUI.Row(sec.Body, 30f),
             "KL_SYNC_LOCKED",
             "Keys are managed by the Key Viewer (Sync Keys to Key Limiter is on)."
         );
-        syncNote.fontSize = 17f;
-        syncNote.color = new Color(1f, 1f, 1f, 0.45f);
 
         // Allowed-keys list, rebuilt on every change — v1 KrpPages layout:
         // an "Allowed Keys" header and one Remove button per key (or a "No
@@ -511,32 +439,17 @@ internal static class PageGameplay {
         GameObject list = new("AllowedKeysList");
         list.transform.SetParent(sec.Body, false);
         list.AddComponent<RectTransform>();
-
-        VerticalLayoutGroup listLayout = list.AddComponent<VerticalLayoutGroup>();
-        listLayout.spacing = 6f;
-        listLayout.childControlWidth = true;
-        listLayout.childControlHeight = true;
-        listLayout.childForceExpandWidth = true;
-        listLayout.childForceExpandHeight = false;
-
-        ContentSizeFitter listFitter = list.AddComponent<ContentSizeFitter>();
-        listFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        GenerateUI.FitVertical(list, 6f);
 
         void RebuildKeysList() {
-            if(list == null) {
-                return;
-            }
+            if(list == null) return;
 
-            for(int i = list.transform.childCount - 1; i >= 0; i--) {
-                Object.Destroy(list.transform.GetChild(i).gameObject);
-            }
+            GenerateUI.ClearChildren(list.transform);
 
             int[] keys = KeyLimiter.Conf?.AllowedKeys ?? [];
             if(keys.Length == 0) {
-                var note = GenerateUI.AddText(GenerateUI.Row(list.transform));
-                GenerateUI.Localize(note, "KL_NO_ALLOWED_KEYS", "No allowed keys.");
-                note.fontSize = 19f;
-                note.color = new Color(1f, 1f, 1f, 0.45f);
+                GenerateUI.AddLocalizedMutedText(
+                    GenerateUI.Row(list.transform), "KL_NO_ALLOWED_KEYS", "No allowed keys.", 19f);
                 return;
             }
 
@@ -551,9 +464,7 @@ internal static class PageGameplay {
         void ApplySyncLock() {
             bool locked = KeyViewerOverlay.IsSyncingToKeyLimiter;
 
-            if(locked && KeyLimiter.IsCapturing) {
-                KeyLimiter.CancelCapture();
-            }
+            if(locked && KeyLimiter.IsCapturing) KeyLimiter.CancelCapture();
 
             captureBtn.SetBlocked(locked, true);
             clearBtn.SetBlocked(locked, true);
@@ -561,15 +472,11 @@ internal static class PageGameplay {
             RebuildKeysList();
         }
 
-        if(keysChangedHandler != null) {
-            KeyLimiter.Changed -= keysChangedHandler;
-        }
+        if(keysChangedHandler != null) KeyLimiter.Changed -= keysChangedHandler;
         keysChangedHandler = RebuildKeysList;
         KeyLimiter.Changed += keysChangedHandler;
 
-        if(syncLockChangedHandler != null) {
-            KeyViewerOverlay.SyncSettingChanged -= syncLockChangedHandler;
-        }
+        if(syncLockChangedHandler != null) KeyViewerOverlay.SyncSettingChanged -= syncLockChangedHandler;
         syncLockChangedHandler = ApplySyncLock;
         KeyViewerOverlay.SyncSettingChanged += syncLockChangedHandler;
 
@@ -594,9 +501,7 @@ internal static class PageGameplay {
         var label = GenerateUI.AddText(bg);
         label.text = KeyName(key);
 
-        if(locked) {
-            return;
-        }
+        if(locked) return;
 
         bool settingThis = setCaptureKey == key && KeyLimiter.IsCapturing;
         MiniButton(bg, settingThis ? "..." : "Set", settingThis ? null : "SET", -106f, 90f, () => {
@@ -632,11 +537,8 @@ internal static class PageGameplay {
         img.color = UIColors.ObjectButton;
 
         var label = GenerateUI.AddText(obj.transform, true);
-        if(string.IsNullOrEmpty(key)) {
-            label.text = text;
-        } else {
-            GenerateUI.Localize(label, key, text);
-        }
+        if(string.IsNullOrEmpty(key)) label.text = text;
+        else GenerateUI.Localize(label, key, text);
         label.fontSize = 18f;
         label.alignment = TextAlignmentOptions.Center;
 
@@ -649,9 +551,7 @@ internal static class PageGameplay {
 
     private static string KeyName(KeyCode key) {
         string name = key.ToString();
-        if(name.Length == 6 && name.StartsWith("Alpha")) {
-            return name[5..];
-        }
+        if(name.Length == 6 && name.StartsWith("Alpha")) return name[5..];
 
         return name switch {
             "LeftShift" => "LShift",
@@ -737,11 +637,8 @@ internal static class PageGameplay {
 
         void RefreshConditionalRows() {
             accuracyRow?.gameObject.SetActive(conf.JRestrictMode == 0);
-            if(maskRows != null) {
-                foreach(RectTransform row in maskRows) {
-                    row?.gameObject.SetActive(conf.JRestrictMode == 3);
-                }
-            }
+            if(maskRows == null) return;
+            foreach(RectTransform row in maskRows) row?.gameObject.SetActive(conf.JRestrictMode == 3);
         }
 
         // XPure Perfect (mode 2) only appears when the XPerfect mod is present.
@@ -829,9 +726,7 @@ internal static class PageGameplay {
         );
 
         var hintRow = GenerateUI.Row(sec.Body, 30f);
-        var hint = GenerateUI.AddText(hintRow);
-        hint.fontSize = 16f;
-        hint.color = new Color(1f, 1f, 1f, 0.45f);
+        var hint = GenerateUI.AddMutedText(hintRow, 16f, 0.45f);
         GenerateUI.Localize(hint, "JR_MESSAGE_HINT", "Use {judgement} for the judgement you broke.");
 
         RefreshConditionalRows();

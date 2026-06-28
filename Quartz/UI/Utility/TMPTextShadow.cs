@@ -33,14 +33,10 @@ public static class TMPTextShadow {
         Color color,
         bool isolateCanvas = false
     ) {
-        if(text == null) {
-            return;
-        }
+        if(text == null) return;
 
         ShadowRoot root = GetOrCreateRoot(text);
-        if(root == null) {
-            return;
-        }
+        if(root == null) return;
 
         bool on = enabled && text.gameObject.activeSelf && color.a > 0.001f;
 
@@ -76,9 +72,7 @@ public static class TMPTextShadow {
         }
 
         shadowRoot.gameObject.SetActive(on);
-        if(!on) {
-            return;
-        }
+        if(!on) return;
 
         SyncRootRect(text.rectTransform, shadowRoot);
         KeepRootBehindTarget(text, shadowRoot);
@@ -95,9 +89,7 @@ public static class TMPTextShadow {
             TextMeshProUGUI layer = layers[i];
             bool active = i < layerCount;
             layer.gameObject.SetActive(active);
-            if(!active) {
-                continue;
-            }
+            if(!active) continue;
 
             Color layerColor = color;
             Vector2 layerOffset = baseOffset;
@@ -115,16 +107,10 @@ public static class TMPTextShadow {
     // own GameObject is the shadow root's PARENT's sibling rather than its
     // ancestor — destroying the text alone would orphan the root. Idempotent.
     public static void Remove(TextMeshProUGUI text) {
-        if(text == null) {
-            return;
-        }
+        if(text == null) return;
         ShadowLink link = text.GetComponent<ShadowLink>();
-        if(link == null) {
-            return;
-        }
-        if(link.Root != null) {
-            Object.Destroy(link.Root.gameObject);
-        }
+        if(link == null) return;
+        if(link.Root != null) Object.Destroy(link.Root.gameObject);
         Object.Destroy(link);
     }
 
@@ -141,9 +127,7 @@ public static class TMPTextShadow {
         }
 
         Transform parent = text.transform.parent;
-        if(parent == null) {
-            return null;
-        }
+        if(parent == null) return null;
 
         ShadowRoot root = null;
 
@@ -185,9 +169,7 @@ public static class TMPTextShadow {
         root.Layers.Clear();
         for(int i = 0; i < root.Rect.childCount; i++) {
             TextMeshProUGUI tmp = root.Rect.GetChild(i).GetComponent<TextMeshProUGUI>();
-            if(tmp != null) {
-                root.Layers.Add(tmp);
-            }
+            if(tmp != null) root.Layers.Add(tmp);
         }
     }
 
@@ -338,9 +320,7 @@ public static class TMPTextShadow {
         Color color
     ) {
         Material mat = text.fontMaterial;
-        if(mat == null) {
-            return;
-        }
+        if(mat == null) return;
 
         if(!on) {
             mat.DisableKeyword("UNDERLAY_ON");

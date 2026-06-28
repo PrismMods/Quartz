@@ -67,9 +67,7 @@ public class Tooltip {
     }
 
     public static void Tick() {
-        if(!MainCore.Conf.Tooltip || !visible || obj == null) {
-            return;
-        }
+        if(!MainCore.Conf.Tooltip || !visible || obj == null) return;
 
         float scale = MainCore.Conf.UIScale;
 
@@ -86,20 +84,13 @@ public class Tooltip {
         target.x = Mathf.Clamp(target.x, 0f, maxX);
         target.y = Mathf.Clamp(target.y, 0f, maxY);
 
-        rect.position = Vector2.SmoothDamp(
-            rect.position,
-            target,
-            ref velocity,
-            0.02f
-        );
+        rect.position = Vector2.SmoothDamp(rect.position, target, ref velocity, 0.02f);
     }
 
     private static GTween seq;
 
     public static void Show(string tip) {
-        if(!MainCore.Conf.Tooltip || obj == null) {
-            return;
-        }
+        if(!MainCore.Conf.Tooltip || obj == null) return;
 
         seq?.Kill();
 
@@ -116,22 +107,13 @@ public class Tooltip {
 
         seq = GTweenSequenceBuilder.New()
             .AppendTime(0.14f)
-            .Append(
-                GTweenExtensions.Tween(
-                    () => canvas.alpha,
-                    x => canvas.alpha = x,
-                    1f,
-                    0.16f
-                ).SetEasing(Easing.OutSine)
-            )
+            .Append(GTweenExtensions.Tween(() => canvas.alpha, x => canvas.alpha = x, 1f, 0.16f).SetEasing(Easing.OutSine))
             .Build();
         MainCore.TC.Play(seq);
     }
 
     public static void Hide() {
-        if(!MainCore.Conf.Tooltip || obj == null) {
-            return;
-        }
+        if(!MainCore.Conf.Tooltip || obj == null) return;
 
         seq?.Kill();
         seq = GTweenSequenceBuilder.New()

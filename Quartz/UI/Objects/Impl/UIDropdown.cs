@@ -100,9 +100,7 @@ public class UIDropDown<T> : UIObject {
 
         Label.text = Display(Value);
 
-        if(invoke) {
-            OnChanged?.Invoke(value);
-        }
+        if(invoke) OnChanged?.Invoke(value);
 
         UpdateVisual();
 
@@ -114,10 +112,8 @@ public class UIDropDown<T> : UIObject {
 
         RebuildList();
 
-        if(!Values.Contains(Value)) {
-            if(Values.Count > 0) {
-                Set(Values[0], false);
-            }
+        if(!Values.Contains(Value) && Values.Count > 0) {
+            Set(Values[0], false);
         }
 
         OnLayoutChanged?.Invoke();
@@ -126,9 +122,7 @@ public class UIDropDown<T> : UIObject {
     public void Reset() => Set(DefaultValue);
 
     public void RefreshLanguage() {
-        if(Label != null) {
-            Label.text = Display(Value);
-        }
+        if(Label != null) Label.text = Display(Value);
 
         RebuildList();
     }
@@ -136,9 +130,7 @@ public class UIDropDown<T> : UIObject {
     public void SetExpanded(bool expanded) {
         Expanded = expanded;
 
-        if(expanded) {
-            ApplyItemFonts();
-        }
+        if(expanded) ApplyItemFonts();
 
         ListObject?.SetActive(expanded);
 
@@ -148,23 +140,15 @@ public class UIDropDown<T> : UIObject {
     }
 
     private void ApplyItemFonts() {
-        if(ItemFont == null) {
-            return;
-        }
+        if(ItemFont == null) return;
 
         foreach((T item, TextMeshProUGUI text) in rowTexts) {
-            if(text == null) {
-                continue;
-            }
+            if(text == null) continue;
 
             TMP_FontAsset font = ItemFont(item);
-            if(font == null) {
-                continue;
-            }
+            if(font == null) continue;
 
-            if(text.font != font) {
-                text.font = font;
-            }
+            if(text.font != font) text.font = font;
 
             // Keep FontManager.ApplyToAll from resetting the row to the
             // global font when the user picks one.
@@ -218,9 +202,7 @@ public class UIDropDown<T> : UIObject {
     }
 
     public void RebuildList() {
-        if(ListObject == null) {
-            return;
-        }
+        if(ListObject == null) return;
 
         foreach(Transform child in ListObject.transform) {
             Object.Destroy(child.gameObject);
@@ -267,9 +249,7 @@ public class UIDropDown<T> : UIObject {
             }, trigger);
 
             UnityUtils.AddClickEvent(trigger, e => {
-                if(e.button != PointerEventData.InputButton.Left) {
-                    return;
-                }
+                if(e.button != PointerEventData.InputButton.Left) return;
 
                 Set(item);
 
@@ -279,9 +259,7 @@ public class UIDropDown<T> : UIObject {
             });
         }
 
-        if(Expanded) {
-            ApplyItemFonts();
-        }
+        if(Expanded) ApplyItemFonts();
     }
 
     public override void SetBlocked(bool blocked, bool noAnimate = false) {

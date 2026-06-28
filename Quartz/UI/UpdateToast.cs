@@ -49,9 +49,7 @@ public static class UpdateToast {
     private static Action<string> _onLanguageChanged;
 
     public static void Initialize() {
-        if(canvasObj != null) {
-            return;
-        }
+        if(canvasObj != null) return;
 
         Build();
 
@@ -133,10 +131,7 @@ public static class UpdateToast {
         Utility.UnityUtils.AddClickEvent(trigger, _ => OpenSettings());
 
         void Add(EventTriggerType type, Action cb) {
-            var e = new EventTrigger.Entry {
-                eventID = type
-            };
-
+            var e = new EventTrigger.Entry { eventID = type };
             e.callback.AddListener(_ => cb());
             trigger.triggers.Add(e);
         }
@@ -151,9 +146,7 @@ public static class UpdateToast {
         });
 
         Add(EventTriggerType.PointerExit, () => {
-            if(visible) {
-                StartAutoHide();
-            }
+            if(visible) StartAutoHide();
 
             hoverSeq?.Kill();
             hoverSeq = bg.GTColor(UIColors.TopBar, 0.25f)
@@ -245,10 +238,7 @@ public static class UpdateToast {
             Utility.UnityUtils.AddClickEvent(closeTrigger, _ => Dismiss());
 
             void AddClose(EventTriggerType type, Action cb) {
-                var e = new EventTrigger.Entry {
-                    eventID = type
-                };
-
+                var e = new EventTrigger.Entry { eventID = type };
                 e.callback.AddListener(_ => cb());
                 closeTrigger.triggers.Add(e);
             }
@@ -263,30 +253,21 @@ public static class UpdateToast {
     // Pulls UpdateService state. Runs on the main thread (UpdateService raises
     // OnChanged via MainThread).
     private static void Refresh() {
-        if(canvasObj == null) {
-            return;
-        }
+        if(canvasObj == null) return;
 
         UpdateStatus status = UpdateService.Status;
         UpdateInfo info = UpdateService.Available;
 
         // Idle only happens before the first check or when the dev simulate
         // toggle turns off — forget the dismissal so re-simulating re-shows.
-        if(status == UpdateStatus.Idle) {
-            dismissedTag = null;
-        }
+        if(status == UpdateStatus.Idle) dismissedTag = null;
 
-        if(status == UpdateStatus.Available && info != null && info.Tag != dismissedTag) {
-            Show(info.Tag);
-        } else {
-            Hide();
-        }
+        if(status == UpdateStatus.Available && info != null && info.Tag != dismissedTag) Show(info.Tag);
+        else Hide();
     }
 
     private static void Show(string tag) {
-        if(visible && shownTag == tag) {
-            return;
-        }
+        if(visible && shownTag == tag) return;
 
         shownTag = tag;
         RenderText();
@@ -318,9 +299,7 @@ public static class UpdateToast {
     }
 
     private static void Hide() {
-        if(!visible) {
-            return;
-        }
+        if(!visible) return;
 
         visible = false;
         autoHideSeq?.Kill();
@@ -330,9 +309,7 @@ public static class UpdateToast {
             .Join(toastRect.GTAnchorPos(HiddenPos, 0.35f).SetEasing(Easing.OutExpo))
             .Join(group.GTFade(0f, 0.25f).SetEasing(Easing.OutSine))
             .AppendCallback(() => {
-                if(!visible && toastObj != null) {
-                    toastObj.SetActive(false);
-                }
+                if(!visible && toastObj != null) toastObj.SetActive(false);
             })
             .Build();
         MainCore.TC.Play(moveSeq);
@@ -346,9 +323,7 @@ public static class UpdateToast {
     private static void OpenSettings() {
         Hide();
 
-        if(UICore.IsReorganizing) {
-            UICore.ExitReorganize();
-        }
+        if(UICore.IsReorganizing) UICore.ExitReorganize();
 
         UICore.Open();
         MenuFactory.SetState((int)OriginalMenuState.Settings);
@@ -356,9 +331,7 @@ public static class UpdateToast {
     }
 
     private static void RenderText() {
-        if(titleText == null) {
-            return;
-        }
+        if(titleText == null) return;
 
         titleText.text = $"{MainCore.Tr.Get("UPDATE_AVAILABLE", "Update available:")} {shownTag}";
         hintText.text = MainCore.Tr.Get("UPDATE_TOAST_HINT", "Click to open Settings");

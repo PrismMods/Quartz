@@ -26,13 +26,9 @@ public static class ChatterBlocker {
     public static ChatterBlockerSettings Conf => ConfMgr?.Data;
 
     public static void EnsureConf() {
-        if(ConfMgr != null) {
-            return;
-        }
+        if(ConfMgr != null) return;
 
-        ConfMgr = new SettingsFile<ChatterBlockerSettings>(
-            Path.Combine(MainCore.Paths.RootPath, "ChatterBlocker.json")
-        );
+        ConfMgr = new SettingsFile<ChatterBlockerSettings>(Path.Combine(MainCore.Paths.RootPath, "ChatterBlocker.json"));
         ConfMgr.Load();
     }
 
@@ -64,9 +60,7 @@ public static class ChatterBlocker {
     private static readonly bool DebugLog = false;
 
     private static bool AcceptNormalKey(KeyCode key, long now, long thresholdMs, bool active) {
-        if(!active) {
-            return true;
-        }
+        if(!active) return true;
 
         if(!lastKeyPress.TryGetValue(key, out long last)) {
             lastKeyPress[key] = now;
@@ -79,18 +73,14 @@ public static class ChatterBlocker {
             return true;
         }
 
-        if(DebugLog) {
-            MainCore.Log.Msg($"[ChatterBlocker] Blocked Key: {key} time: {elapsed}ms.");
-        }
+        if(DebugLog) MainCore.Log.Msg($"[ChatterBlocker] Blocked Key: {key} time: {elapsed}ms.");
         return false;
     }
 
     private static void RecordKeyStats(scrController controller, object key) {
         try {
             scrPlayer player = controller != null ? controller.playerOne : null;
-            if(player == null || player.keyFrequency == null) {
-                return;
-            }
+            if(player == null || player.keyFrequency == null) return;
             player.keyFrequency[key] = player.keyFrequency.ContainsKey(key)
                 ? player.keyFrequency[key] + 1
                 : 1; // first press is one occurrence, not zero (kept keyTotal in step)
@@ -100,16 +90,12 @@ public static class ChatterBlocker {
     }
 
     private static void ResetKeyLimiterOverCounter(scrController controller) {
-        if(controller != null && controller.playerOne != null) {
-            controller.playerOne.keyLimiterOverCounter = 0;
-        }
+        if(controller != null && controller.playerOne != null) controller.playerOne.keyLimiterOverCounter = 0;
     }
 
     private static int CountValidKeysPressed() {
         scrController controller = scrController.instance;
-        if(controller == null) {
-            return 0;
-        }
+        if(controller == null) return 0;
         ResetKeyLimiterOverCounter(controller);
 
         bool chatterActive = IsActive();
@@ -125,32 +111,22 @@ public static class ChatterBlocker {
                 reportedKeysThisFrame.Add(normalized);
                 // Drop the Auto Deafen shortcut chord's own injected keypress so
                 // it never scores a hit mid-run (it still reaches Discord).
-                if(AutoDeafen.AutoDeafen.IsInjectedKey(normalized)) {
-                    continue;
-                }
-                if(KeyLimiter.KeyLimiter.ShouldBlockKey(key)) {
-                    continue;
-                }
+                if(AutoDeafen.AutoDeafen.IsInjectedKey(normalized)) continue;
+                if(KeyLimiter.KeyLimiter.ShouldBlockKey(key)) continue;
 
                 RecordKeyStats(controller, key);
-                if(AcceptNormalKey(key, now, threshold, chatterActive)) {
-                    count++;
-                }
+                if(AcceptNormalKey(key, now, threshold, chatterActive)) count++;
             } else if(value is AsyncKeyCode asyncKey) {
                 // Same Auto Deafen injected-chord drop on the async path.
                 if(AutoDeafen.AutoDeafen.IsInjectedKey(KeyLimiter.KeyLimiter.NormalizeKey(
-                        KeyLimiter.KeyLimiter.HookKeyToPhysicalUnityKey(asyncKey.key, asyncKey.label)))) {
-                    continue;
-                }
+                        KeyLimiter.KeyLimiter.HookKeyToPhysicalUnityKey(asyncKey.key, asyncKey.label)))) continue;
                 // Async keys are normally blocked at the SkyHook hook (it swallows the
                 // event), but that only works where the OS hook can SUPPRESS — on macOS
                 // the tap observes without reliably suppressing, so a disallowed key
                 // still reaches the game's async input and was counted unconditionally
                 // here, defeating the limiter. Apply the same allow-list check the hook
                 // uses so the key is dropped regardless of whether it was suppressed.
-                if(KeyLimiter.KeyLimiter.ShouldBlockAsyncKeyFromHook(asyncKey.key, asyncKey.label)) {
-                    continue;
-                }
+                if(KeyLimiter.KeyLimiter.ShouldBlockAsyncKeyFromHook(asyncKey.key, asyncKey.label)) continue;
                 RecordKeyStats(controller, asyncKey);
                 count++;
             }
@@ -183,9 +159,7 @@ public static class ChatterBlocker {
         int injected = 0;
         for(int i = 0; i < allowed.Length; i++) {
             KeyCode key = KeyLimiter.KeyLimiter.NormalizeKey((KeyCode)allowed[i]);
-            if(key == KeyCode.None || KeyLimiter.KeyLimiter.IsMouseKey(key)) {
-                continue;
-            }
+            if(key == KeyCode.None || KeyLimiter.KeyLimiter.IsMouseKey(key)) continue;
 
             // Game already reported it this frame: count handled above. Mark
             // it held so a lagging held-state read can't re-fire the edge
@@ -201,9 +175,7 @@ public static class ChatterBlocker {
 
             if(held && !injectedKeyHeldPrev.Contains(key)) {
                 RecordKeyStats(controller, key);
-                if(AcceptNormalKey(key, now, threshold, chatterActive)) {
-                    injected++;
-                }
+                if(AcceptNormalKey(key, now, threshold, chatterActive)) injected++;
             }
 
             if(held) {
@@ -219,9 +191,7 @@ public static class ChatterBlocker {
     [HarmonyPatch(typeof(scrPlayer), "CountValidKeysPressed")]
     private static class CountValidKeysPressedPatch {
         private static bool Prefix(ref int __result) {
-            if(!HasAnyFilter()) {
-                return true;
-            }
+            if(!HasAnyFilter()) return true;
 
             __result = CountValidKeysPressed();
             return false;
@@ -248,9 +218,7 @@ public static class ChatterBlocker {
         private static bool PrefixCore(SkyHookEvent __0) {
             SkyHookEvent ev = __0;
 
-            if(KeyLimiter.KeyLimiter.IsMouseLabel(ev.Label)) {
-                return true;
-            }
+            if(KeyLimiter.KeyLimiter.IsMouseLabel(ev.Label)) return true;
 
             // Forward every key edge to the viewer's hook-held tracker before the
             // KeyReleased early-out below. Unity's Input can't see Hangul/Hanja,
@@ -260,30 +228,20 @@ public static class ChatterBlocker {
                 KeyLimiter.KeyLimiter.HookKeyToPhysicalUnityKey(ev.Key, ev.Label),
                 ev.Type == SkyHook.EventType.KeyPressed);
 
-            if(ev.Type == SkyHook.EventType.KeyReleased || ev.Key == 27) {
-                return true;
-            }
+            if(ev.Type == SkyHook.EventType.KeyReleased || ev.Key == 27) return true;
 
             // While the Auto Deafen shortcut chord is being injected, never
             // suppress: the keystroke has to reach Discord's global shortcut
             // listener even when the Key Limiter would otherwise eat it.
-            if(AutoDeafen.AutoDeafen.InjectBypassActive) {
-                return true;
-            }
+            if(AutoDeafen.AutoDeafen.InjectBypassActive) return true;
 
-            if(KeyLimiter.KeyLimiter.ShouldBlockAsyncKeyFromHook(ev.Key, ev.Label)) {
-                return false;
-            }
+            if(KeyLimiter.KeyLimiter.ShouldBlockAsyncKeyFromHook(ev.Key, ev.Label)) return false;
 
-            if(!IsActive()) {
-                return true;
-            }
+            if(!IsActive()) return true;
 
             long now = NowMs();
             long threshold = ThresholdMs();
-            if(!lastAsyncKeyPress.TryGetValue(ev.Key, out long last)) {
-                last = 0L;
-            }
+            if(!lastAsyncKeyPress.TryGetValue(ev.Key, out long last)) last = 0L;
 
             long elapsed = now - last;
             if(elapsed > threshold) {
@@ -291,9 +249,7 @@ public static class ChatterBlocker {
                 return true;
             }
 
-            if(DebugLog) {
-                MainCore.Log.Msg($"[ChatterBlocker] Blocked Async Key: {ev.Label} time: {elapsed}ms.");
-            }
+            if(DebugLog) MainCore.Log.Msg($"[ChatterBlocker] Blocked Async Key: {ev.Label} time: {elapsed}ms.");
             return false;
         }
     }

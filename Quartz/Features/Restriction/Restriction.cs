@@ -21,13 +21,9 @@ public static class Restriction {
     public static RestrictionSettings Conf => ConfMgr?.Data;
 
     public static void EnsureConf() {
-        if(ConfMgr != null) {
-            return;
-        }
+        if(ConfMgr != null) return;
 
-        ConfMgr = new SettingsFile<RestrictionSettings>(
-            Path.Combine(MainCore.Paths.RootPath, "Restriction.json")
-        );
+        ConfMgr = new SettingsFile<RestrictionSettings>(Path.Combine(MainCore.Paths.RootPath, "Restriction.json"));
         ConfMgr.Load();
     }
 
@@ -46,13 +42,9 @@ public static class Restriction {
     private static void TriggerFail(string reason) {
         try {
             scrController c = scrController.instance;
-            if(c == null || failTriggered) {
-                return;
-            }
+            if(c == null || failTriggered) return;
             scrPlayer p = c.playerOne;
-            if(p == null) {
-                return;
-            }
+            if(p == null) return;
             failTriggered = true;
             p.DieByHitbox(reason ?? "");
         } catch { }
@@ -83,9 +75,7 @@ public static class Restriction {
     // Substitutes the {judgement} tag in the fail message with the judgement
     // that broke the restriction. Also accepts the US spelling {judgment}.
     private static string FormatJrMessage(string msg, HitMargin hit) {
-        if(string.IsNullOrEmpty(msg)) {
-            return msg;
-        }
+        if(string.IsNullOrEmpty(msg)) return msg;
 
         string name = JudgementName(hit);
         return msg.Replace("{judgement}", name).Replace("{judgment}", name);
@@ -102,12 +92,8 @@ public static class Restriction {
             // pass. With XPerfect absent/inactive there are no X grades, so every
             // Perfect is accepted rather than failing the whole run.
             case 2: {
-                if(marginInt != (int)HitMargin.Perfect) {
-                    return true;
-                }
-                if(!XPerfectBridge.Active) {
-                    return false;
-                }
+                if(marginInt != (int)HitMargin.Perfect) return true;
+                if(!XPerfectBridge.Active) return false;
                 XPerfectBridge.Judge xj = XPerfectBridge.LastJudge();
                 return xj != XPerfectBridge.Judge.None && xj != XPerfectBridge.Judge.X;
             }
@@ -117,9 +103,7 @@ public static class Restriction {
             // "everything fails", like v1.
             case 3: {
                 int mask = Conf.JRestrictAllowedMask;
-                if(mask == 0) {
-                    return false;
-                }
+                if(mask == 0) return false;
                 int bit = 1 << marginInt;
                 return (mask & bit) == 0;
             }
@@ -133,13 +117,9 @@ public static class Restriction {
             default: {
                 try {
                     scrMistakesManager m = MistakesAccess.Get();
-                    if(m == null) {
-                        return false;
-                    }
+                    if(m == null) return false;
                     float acc = MistakesAccess.PercentAcc(m);
-                    if(float.IsNaN(acc) || float.IsInfinity(acc)) {
-                        return false;
-                    }
+                    if(float.IsNaN(acc) || float.IsInfinity(acc)) return false;
                     return acc * 100f < Conf.JRestrictAccuracy;
                 } catch {
                     return false;
@@ -157,9 +137,7 @@ public static class Restriction {
 
         bool jrOn = Conf.JRestrictEnabled;
         bool dlOn = Conf.DeathLimitEnabled;
-        if(!jrOn && !dlOn) {
-            return;
-        }
+        if(!jrOn && !dlOn) return;
 
         if(hit == HitMargin.FailMiss) {
             missCount++;
@@ -174,15 +152,9 @@ public static class Restriction {
 
         if(dlOn) {
             int deaths = missCount + overloadCount;
-            if(Conf.MaxDeathsOn && deaths > Conf.MaxDeaths) {
-                TriggerFail(Conf.DeathLimitMessage);
-                return;
-            }
-            if(Conf.MaxMissesOn && missCount > Conf.MaxMisses) {
-                TriggerFail(Conf.DeathLimitMessage);
-                return;
-            }
-            if(Conf.MaxOverloadsOn && overloadCount > Conf.MaxOverloads) {
+            if((Conf.MaxDeathsOn && deaths > Conf.MaxDeaths)
+                || (Conf.MaxMissesOn && missCount > Conf.MaxMisses)
+                || (Conf.MaxOverloadsOn && overloadCount > Conf.MaxOverloads)) {
                 TriggerFail(Conf.DeathLimitMessage);
             }
         }

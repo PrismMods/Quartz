@@ -32,23 +32,17 @@ public static class SettingsRegistry {
     }
 
     public static ISettingsHandle[] Snapshot() {
-        lock(sync) {
-            return [.. handles];
-        }
+        lock(sync) return [.. handles];
     }
 
     public static bool SaveAll() {
         bool success = true;
-        foreach(ISettingsHandle handle in Snapshot()) {
-            success &= handle.Save();
-        }
+        foreach(ISettingsHandle handle in Snapshot()) success &= handle.Save();
         return success;
     }
 
     public static void CancelPendingSaves() {
-        foreach(ISettingsHandle handle in Snapshot()) {
-            handle.CancelPendingSave();
-        }
+        foreach(ISettingsHandle handle in Snapshot()) handle.CancelPendingSave();
     }
 
     // Re-reads every registered file from disk; files that don't exist reset
@@ -80,9 +74,7 @@ public sealed class SettingsFile<T> : ISettingsHandle where T : class, ISettings
 
     public bool Load() {
         try {
-            if(!File.Exists(Path)) {
-                return false;
-            }
+            if(!File.Exists(Path)) return false;
 
             string json = File.ReadAllText(Path);
             JToken token = JToken.Parse(json);
@@ -90,10 +82,7 @@ public sealed class SettingsFile<T> : ISettingsHandle where T : class, ISettings
 
             return true;
         } catch(Exception e) {
-            MainCore.Log.Err(
-                $"[{nameof(SettingsFile<>)}] Failed to load settings '{Path}': {e}"
-            );
-
+            MainCore.Log.Err($"[{nameof(SettingsFile<>)}] Failed to load settings '{Path}': {e}");
             return false;
         }
     }
@@ -102,16 +91,12 @@ public sealed class SettingsFile<T> : ISettingsHandle where T : class, ISettings
     // serialized state. Used when switching profiles: a file absent from the
     // applied profile must not leak the previous profile's values.
     public void LoadOrDefaults() {
-        if(Load()) {
-            return;
-        }
+        if(Load()) return;
 
         try {
             Data.Deserialize(new T().Serialize());
         } catch(Exception e) {
-            MainCore.Log.Err(
-                $"[{nameof(SettingsFile<>)}] Failed to reset settings '{Path}': {e}"
-            );
+            MainCore.Log.Err($"[{nameof(SettingsFile<>)}] Failed to reset settings '{Path}': {e}");
         }
     }
 
@@ -125,19 +110,14 @@ public sealed class SettingsFile<T> : ISettingsHandle where T : class, ISettings
             try {
                 string dir = System.IO.Path.GetDirectoryName(Path);
 
-                if(!string.IsNullOrEmpty(dir)) {
-                    Directory.CreateDirectory(dir);
-                }
+                if(!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
 
                 string json = Data.Serialize().ToString();
                 AtomicFile.WriteAllText(Path, json);
 
                 return true;
             } catch(Exception e) {
-                MainCore.Log.Err(
-                    $"[{nameof(SettingsFile<>)}] Failed to save settings '{Path}': {e}"
-                );
-
+                MainCore.Log.Err($"[{nameof(SettingsFile<>)}] Failed to save settings '{Path}': {e}");
                 return false;
             }
         }
@@ -147,9 +127,7 @@ public sealed class SettingsFile<T> : ISettingsHandle where T : class, ISettings
     // schedules its own. (An earlier version reused the pending task but had
     // already cancelled its token — a second request inside the delay window
     // could silently drop the save.)
-    public void RequestSave(
-        int delay = 500
-    ) {
+    public void RequestSave(int delay = 500) {
         CancellationTokenSource request = new();
         CancellationTokenSource previous;
         lock(requestLock) {
@@ -179,33 +157,23 @@ public sealed class SettingsFile<T> : ISettingsHandle where T : class, ISettings
                 bool isCurrent;
                 lock(requestLock) {
                     isCurrent = ReferenceEquals(saveCts, request);
-                    if(isCurrent) {
-                        saveCts = null;
-                    }
+                    if(isCurrent) saveCts = null;
                 }
 
-                if(isCurrent && !token.IsCancellationRequested) {
-                    SaveCore();
-                }
+                if(isCurrent && !token.IsCancellationRequested) SaveCore();
                 request.Dispose();
             });
         } catch(OperationCanceledException) {
             lock(requestLock) {
-                if(ReferenceEquals(saveCts, request)) {
-                    saveCts = null;
-                }
+                if(ReferenceEquals(saveCts, request)) saveCts = null;
             }
             request.Dispose();
         } catch(Exception e) {
             lock(requestLock) {
-                if(ReferenceEquals(saveCts, request)) {
-                    saveCts = null;
-                }
+                if(ReferenceEquals(saveCts, request)) saveCts = null;
             }
             request.Dispose();
-            MainCore.Log.Err(
-                $"[{nameof(SettingsFile<>)}] Failed to request save '{Path}': {e}"
-            );
+            MainCore.Log.Err($"[{nameof(SettingsFile<>)}] Failed to request save '{Path}': {e}");
         }
     }
 
@@ -219,8 +187,6 @@ public sealed class SettingsFile<T> : ISettingsHandle where T : class, ISettings
     }
 
     public void Dispose() {
-        if(Data is IDisposable disposable) {
-            disposable.Dispose();
-        }
+        if(Data is IDisposable disposable) disposable.Dispose();
     }
 }

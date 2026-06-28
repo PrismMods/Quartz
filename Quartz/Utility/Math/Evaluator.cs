@@ -18,9 +18,7 @@ public enum EvalState {
 // of functions. Case-insensitive, culture-invariant numbers.
 public static class Evaluator {
     public static (float result, EvalState state) Evaluate(string exprStr, float currentVal, float? min = null, float? max = null) {
-        if(string.IsNullOrWhiteSpace(exprStr)) {
-            return (currentVal, EvalState.Error);
-        }
+        if(string.IsNullOrWhiteSpace(exprStr)) return (currentVal, EvalState.Error);
 
         double evaluated;
         try {
@@ -29,25 +27,16 @@ public static class Evaluator {
             return (currentVal, EvalState.Error);
         }
 
-        if(double.IsNaN(evaluated) || double.IsInfinity(evaluated)) {
-            return (currentVal, EvalState.Error);
-        }
+        if(double.IsNaN(evaluated) || double.IsInfinity(evaluated)) return (currentVal, EvalState.Error);
 
         float result = (float)evaluated;
 
         if(min.HasValue && max.HasValue) {
-            if(result < min.Value) {
-                return (min.Value, EvalState.UnderRange);
-            }
-
-            if(result > max.Value) {
-                return (max.Value, EvalState.OverRange);
-            }
+            if(result < min.Value) return (min.Value, EvalState.UnderRange);
+            if(result > max.Value) return (max.Value, EvalState.OverRange);
         }
 
-        if(UnityEngine.Mathf.Approximately(result, currentVal)) {
-            return (result, EvalState.Same);
-        }
+        if(UnityEngine.Mathf.Approximately(result, currentVal)) return (result, EvalState.Same);
 
         return (result, EvalState.OK);
     }
@@ -69,18 +58,12 @@ public static class Evaluator {
 
         public double Parse() {
             double v = ParseExpr();
-            if(Peek() != '\0') {
-                throw new FormatException("trailing input");
-            }
-
+            if(Peek() != '\0') throw new FormatException("trailing input");
             return v;
         }
 
         private char Peek() {
-            while(pos < s.Length && char.IsWhiteSpace(s[pos])) {
-                pos++;
-            }
-
+            while(pos < s.Length && char.IsWhiteSpace(s[pos])) pos++;
             return pos < s.Length ? s[pos] : '\0';
         }
 
@@ -149,42 +132,27 @@ public static class Evaluator {
             if(c == '(') {
                 pos++;
                 double v = ParseExpr();
-                if(Peek() != ')') {
-                    throw new FormatException("missing ')'");
-                }
-
+                if(Peek() != ')') throw new FormatException("missing ')'");
                 pos++;
                 return v;
             }
 
-            if(char.IsLetter(c)) {
-                return ParseIdent();
-            }
-
+            if(char.IsLetter(c)) return ParseIdent();
             return ParseNumber();
         }
 
         private double ParseNumber() {
             Peek();
             int start = pos;
-            while(pos < s.Length && (char.IsDigit(s[pos]) || s[pos] == '.')) {
-                pos++;
-            }
-
-            if(pos == start) {
-                throw new FormatException("expected number");
-            }
-
+            while(pos < s.Length && (char.IsDigit(s[pos]) || s[pos] == '.')) pos++;
+            if(pos == start) throw new FormatException("expected number");
             return double.Parse(s.Substring(start, pos - start), CultureInfo.InvariantCulture);
         }
 
         private double ParseIdent() {
             Peek();
             int start = pos;
-            while(pos < s.Length && char.IsLetter(s[pos])) {
-                pos++;
-            }
-
+            while(pos < s.Length && char.IsLetter(s[pos])) pos++;
             string name = s.Substring(start, pos - start).ToLowerInvariant();
 
             switch(name) {
@@ -193,9 +161,7 @@ public static class Evaluator {
                 case "tau": return System.Math.PI * 2d;
             }
 
-            if(Peek() != '(') {
-                throw new FormatException("unknown identifier '" + name + "'");
-            }
+            if(Peek() != '(') throw new FormatException("unknown identifier '" + name + "'");
 
             pos++;
             List<double> args = [];
@@ -207,9 +173,7 @@ public static class Evaluator {
                 }
             }
 
-            if(Peek() != ')') {
-                throw new FormatException("missing ')' for '" + name + "'");
-            }
+            if(Peek() != ')') throw new FormatException("missing ')' for '" + name + "'");
 
             pos++;
             return ApplyFunc(name, args);
@@ -240,9 +204,7 @@ public static class Evaluator {
         }
 
         private static void Require(List<double> a, int n) {
-            if(a.Count != n) {
-                throw new FormatException("wrong argument count");
-            }
+            if(a.Count != n) throw new FormatException("wrong argument count");
         }
     }
 }

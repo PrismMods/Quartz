@@ -28,60 +28,14 @@ internal static class PageProfiles {
 
     public static void Create(RectTransform parent) {
         pendingName = "";
-
-        GameObject pad = new("Pad");
-        pad.transform.SetParent(parent, false);
-
-        RectTransform padRect = pad.AddComponent<RectTransform>();
-        padRect.anchorMin = Vector2.zero;
-        padRect.anchorMax = Vector2.one;
-        padRect.pivot = new Vector2(0.5f, 0.5f);
-        padRect.offsetMin = new Vector2(18f, 18f);
-        padRect.offsetMax = new Vector2(-18f, -18f);
-
-        GameObject viewport = new("Viewport");
-        viewport.transform.SetParent(pad.transform, false);
-
-        RectTransform viewportRect = viewport.AddComponent<RectTransform>();
-        viewportRect.anchorMin = Vector2.zero;
-        viewportRect.anchorMax = Vector2.one;
-        viewportRect.offsetMin = Vector2.zero;
-        viewportRect.offsetMax = Vector2.zero;
-        viewportRect.pivot = new Vector2(0.5f, 0.5f);
-
-        viewport.AddComponent<EmptyGraphic>().raycastTarget = true;
-        viewport.AddComponent<RectMask2D>();
-
-        GameObject content = new("Content");
-        content.transform.SetParent(viewport.transform, false);
-
-        RectTransform contentRect = content.AddComponent<RectTransform>();
-        contentRect.anchorMin = new Vector2(0f, 1f);
-        contentRect.anchorMax = new Vector2(1f, 1f);
-        contentRect.pivot = new Vector2(0.5f, 1f);
-        contentRect.offsetMin = Vector2.zero;
-        contentRect.offsetMax = Vector2.zero;
-
-        VerticalLayoutGroup layout = content.AddComponent<VerticalLayoutGroup>();
-        layout.spacing = 12f;
-        layout.childControlWidth = true;
-        layout.childControlHeight = true;
-        layout.childForceExpandWidth = true;
-        layout.childForceExpandHeight = false;
-
-        ContentSizeFitter fitter = content.AddComponent<ContentSizeFitter>();
-        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-
-        pad.AddComponent<UIScrollController>().SetContent(contentRect, viewportRect);
+        RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
 
         var headerRow = GenerateUI.Row(content.transform);
         var headerText = GenerateUI.AddTextH1(headerRow);
         headerText.gameObject.AddComponent<TextLocalization>().Init("PROFILES", "Profiles");
 
         var hintRow = GenerateUI.Row(content.transform, 54f);
-        var hintText = GenerateUI.AddText(hintRow, noPad: true);
-        hintText.fontSize = 17f;
-        hintText.color = new Color(1f, 1f, 1f, 0.45f);
+        var hintText = GenerateUI.AddMutedText(hintRow, 17f, 0.45f, true);
         hintText.gameObject.AddComponent<TextLocalization>().Init(
             "PROFILE_HINT",
             "Every setting lives in the active profile. Export a profile before updating the mod manually, then import it back if your UserData gets replaced."
@@ -103,12 +57,7 @@ internal static class PageProfiles {
         nameInput.Placeholder.gameObject.AddComponent<TextLocalization>().Init("PROFILE_NAME", "Profile Name");
         nameInput.InputField.characterLimit = 32;
 
-        UIButton addBtn = GenerateUI.Button(
-            addRow,
-            AddProfile,
-            "Add Profile",
-            "profile_add"
-        );
+        UIButton addBtn = GenerateUI.Button(addRow, AddProfile, "Add Profile", "profile_add");
         {
             var br = addBtn.Rect;
             br.pivot = new(1f, 1f);
@@ -132,12 +81,7 @@ internal static class PageProfiles {
         ioLayout.childForceExpandHeight = true;
         ioLayout.childAlignment = TextAnchor.MiddleLeft;
 
-        UIButton importBtn = GenerateUI.Button(
-            ioRow,
-            ImportProfile,
-            "Import",
-            "profile_import"
-        );
+        UIButton importBtn = GenerateUI.Button(ioRow, ImportProfile, "Import", "profile_import");
         FixWidth(importBtn, 160f);
         importBtn.Rect.AddToolTip(
             "DESC_PROFILE_IMPORT",
@@ -159,12 +103,7 @@ internal static class PageProfiles {
         ).SetSecondary();
         FixWidth(folderBtn, 160f);
 
-        UIButton recalibBtn = GenerateUI.Button(
-            ioRow,
-            RecalibrateDisplay,
-            "Recalibrate Display",
-            "profile_recalibrate"
-        ).SetSecondary();
+        UIButton recalibBtn = GenerateUI.Button(ioRow, RecalibrateDisplay, "Recalibrate Display", "profile_recalibrate").SetSecondary();
         FixWidth(recalibBtn, 220f);
         recalibBtn.Rect.AddToolTip(
             "DESC_PROFILE_RECALIBRATE",
@@ -175,25 +114,14 @@ internal static class PageProfiles {
         BuildPresetsSection(content.transform);
 
         var statusRow = GenerateUI.Row(content.transform, 32f);
-        statusText = GenerateUI.AddText(statusRow, noPad: true);
-        statusText.fontSize = 18f;
-        statusText.color = new Color(1f, 1f, 1f, 0.45f);
+        statusText = GenerateUI.AddMutedText(statusRow, 18f, 0.45f, true);
         statusText.text = "";
 
         GameObject list = new("Profiles");
         list.transform.SetParent(content.transform, false);
 
         listContainer = list.AddComponent<RectTransform>();
-
-        VerticalLayoutGroup listLayout = list.AddComponent<VerticalLayoutGroup>();
-        listLayout.spacing = 8f;
-        listLayout.childControlWidth = true;
-        listLayout.childControlHeight = true;
-        listLayout.childForceExpandWidth = true;
-        listLayout.childForceExpandHeight = false;
-
-        ContentSizeFitter listFitter = list.AddComponent<ContentSizeFitter>();
-        listFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        GenerateUI.FitVertical(list, 8f);
 
         RebuildList();
     }
@@ -279,9 +207,7 @@ internal static class PageProfiles {
     // Hidden entirely when none ship. Each name is localized via PRESET_<NAME>.
     private static void BuildPresetsSection(Transform content) {
         List<ProfileManager.PresetInfo> presets = ProfileManager.ListPresets();
-        if(presets.Count == 0) {
-            return;
-        }
+        if(presets.Count == 0) return;
 
         TextMeshProUGUI header = GenerateUI.AddTextH1(GenerateUI.Row(content));
         GenerateUI.Localize(header, "PRESETS", "Presets");
@@ -368,9 +294,7 @@ internal static class PageProfiles {
             return;
         }
 
-        if(string.IsNullOrEmpty(path)) {
-            return;
-        }
+        if(string.IsNullOrEmpty(path)) return;
 
         string name = ProfileManager.Import(path);
 
@@ -399,9 +323,7 @@ internal static class PageProfiles {
             return;
         }
 
-        if(string.IsNullOrEmpty(path)) {
-            return;
-        }
+        if(string.IsNullOrEmpty(path)) return;
 
         if(!path.EndsWith($".{ProfileManager.EXPORT_EXTENSION}", StringComparison.OrdinalIgnoreCase)
             && !path.EndsWith($".{ProfileManager.LEGACY_EXTENSION}", StringComparison.OrdinalIgnoreCase)
@@ -429,13 +351,9 @@ internal static class PageProfiles {
     }
 
     private static void RebuildList() {
-        if(listContainer == null) {
-            return;
-        }
+        if(listContainer == null) return;
 
-        for(int i = listContainer.childCount - 1; i >= 0; i--) {
-            Object.Destroy(listContainer.GetChild(i).gameObject);
-        }
+        GenerateUI.ClearChildren(listContainer);
 
         foreach(string name in ProfileManager.List()) {
             CreateProfileRow(name, name == ProfileManager.Active);
@@ -469,21 +387,11 @@ internal static class PageProfiles {
 
         if(!active) {
             UIButton selectBtn = null;
-            selectBtn = GenerateUI.Button(
-                row,
-                () => SelectProfile(name, selectBtn),
-                "Select",
-                "profile_select"
-            );
+            selectBtn = GenerateUI.Button(row, () => SelectProfile(name, selectBtn), "Select", "profile_select");
             FixWidth(selectBtn, 110f);
         }
 
-        UIButton exportBtn = GenerateUI.Button(
-            row,
-            () => ExportProfile(name),
-            "Export",
-            "profile_export"
-        ).SetSecondary();
+        UIButton exportBtn = GenerateUI.Button(row, () => ExportProfile(name), "Export", "profile_export").SetSecondary();
         FixWidth(exportBtn, 110f);
 
         if(!active) {
@@ -494,9 +402,7 @@ internal static class PageProfiles {
             deleteBtn = GenerateUI.Button(
                 row,
                 () => {
-                    if(deleteBtn == null) {
-                        return;
-                    }
+                    if(deleteBtn == null) return;
                     if(!armed) {
                         armed = true;
                         deleteBtn.Label.text = Tr("PROFILE_DELETE_CONFIRM", "Sure?");

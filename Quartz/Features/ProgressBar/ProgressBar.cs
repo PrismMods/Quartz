@@ -44,20 +44,14 @@ public static class ProgressBarOverlay {
     private static Updater updater;
 
     public static void EnsureConf() {
-        if(ConfMgr != null) {
-            return;
-        }
+        if(ConfMgr != null) return;
 
-        ConfMgr = new SettingsFile<ProgressBarSettings>(
-            Path.Combine(MainCore.Paths.RootPath, "ProgressBar.json")
-        );
+        ConfMgr = new SettingsFile<ProgressBarSettings>(Path.Combine(MainCore.Paths.RootPath, "ProgressBar.json"));
         ConfMgr.Load();
     }
 
     public static void Initialize(GameObject root) {
-        if(canvasObj != null) {
-            return;
-        }
+        if(canvasObj != null) return;
 
         EnsureConf();
 
@@ -141,9 +135,7 @@ public static class ProgressBarOverlay {
     }
 
     public static void Apply() {
-        if(bar == null) {
-            return;
-        }
+        if(bar == null) return;
 
         bar.sizeDelta = new Vector2(Conf.Width, Conf.Height);
         bar.anchoredPosition = OverlayCalibration.Scale(new Vector2(Conf.OffsetX, -Conf.TopOffset));
@@ -151,9 +143,7 @@ public static class ProgressBarOverlay {
         ApplyRounding(back, Conf.Rounding);
         ApplyRounding(fill, Conf.Rounding);
 
-        if(back != null) {
-            back.color = Conf.GetBackColor();
-        }
+        if(back != null) back.color = Conf.GetBackColor();
 
         if(fill != null) {
             // The gradient (if on) is driven by live progress each frame in the
@@ -175,9 +165,7 @@ public static class ProgressBarOverlay {
     }
 
     public static void Dispose() {
-        if(canvasObj == null) {
-            return;
-        }
+        if(canvasObj == null) return;
 
         ConfMgr?.Save();
 
@@ -194,9 +182,7 @@ public static class ProgressBarOverlay {
     }
 
     private static void ApplyRounding(Image img, float rounding) {
-        if(img == null) {
-            return;
-        }
+        if(img == null) return;
 
         if(rounding <= 0.5f) {
             img.sprite = null;
@@ -211,19 +197,13 @@ public static class ProgressBarOverlay {
     }
 
     private static void ApplyOutline() {
-        if(border == null || borderImg == null) {
-            return;
-        }
+        if(border == null || borderImg == null) return;
 
         float t = Mathf.Max(0f, Conf.OutlineThickness);
         bool on = t > 0.01f;
-        if(border.gameObject.activeSelf != on) {
-            border.gameObject.SetActive(on);
-        }
+        if(border.gameObject.activeSelf != on) border.gameObject.SetActive(on);
 
-        if(!on) {
-            return;
-        }
+        if(!on) return;
 
         border.offsetMin = new Vector2(-t, -t);
         border.offsetMax = new Vector2(t, t);
@@ -241,25 +221,17 @@ public static class ProgressBarOverlay {
         private float lastGradientNow = float.NaN;
 
         private void Update() {
-            if(bar == null) {
-                return;
-            }
+            if(bar == null) return;
 
             // Progress Bar is anchored to the top and is not part of reorganize
             // mode, so it never becomes draggable. Gated by the master Overlay
             // enable as well as its own toggle.
             bool show = Panels.PanelsOverlay.IsEnabled && Conf.Enabled && GameStats.InGame;
-            if(bar.gameObject.activeSelf != show) {
-                bar.gameObject.SetActive(show);
-            }
+            if(bar.gameObject.activeSelf != show) bar.gameObject.SetActive(show);
 
-            if(dragObj != null && dragObj.activeSelf) {
-                dragObj.SetActive(false);
-            }
+            if(dragObj != null && dragObj.activeSelf) dragObj.SetActive(false);
 
-            if(!show) {
-                return;
-            }
+            if(!show) return;
 
             // No position writeback here: the bar is never draggable (dragObj is
             // force-disabled above), so anchoredPosition only ever equals what
@@ -268,9 +240,7 @@ public static class ProgressBarOverlay {
 
             float start = Mathf.Clamp01(GameStats.RunStartProgress);
             float now = Mathf.Clamp01(GameStats.Progress);
-            if(now < start) {
-                now = start;
-            }
+            if(now < start) now = start;
 
             // PrefillStart: a mid-chart run starts with the bar already filled
             // up to the start point, instead of an empty bar growing from it.

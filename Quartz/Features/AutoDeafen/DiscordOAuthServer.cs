@@ -35,9 +35,7 @@ internal static class DiscordOAuthServer {
     internal static bool EnsureStarted(Action<string> tokenSaver) {
         lock(gate) {
             saveToken = tokenSaver;
-            if(running) {
-                return true;
-            }
+            if(running) return true;
 
             StopLocked();
             return StartLocked();
@@ -61,9 +59,7 @@ internal static class DiscordOAuthServer {
 
     internal static void OpenAuthorizeUrl() {
         string url = AuthorizeUrl();
-        if(string.IsNullOrEmpty(url)) {
-            return;
-        }
+        if(string.IsNullOrEmpty(url)) return;
         OpenUrl(url);
         status = "waiting for discord";
     }
@@ -78,14 +74,10 @@ internal static class DiscordOAuthServer {
         // callback handler verifies (returnedState != expectedState -> reject).
         // Guid "N" is hex, so URL-safe without escaping.
         string state = Guid.NewGuid().ToString("N");
-        lock(gate) {
-            expectedState = state;
-        }
+        lock(gate) { expectedState = state; }
 
         if(!EnsureStarted(AutoDeafen.SaveAccessToken)) {
-            lock(gate) {
-                expectedState = "";
-            }
+            lock(gate) { expectedState = ""; }
             return "";
         }
 
@@ -139,9 +131,7 @@ internal static class DiscordOAuthServer {
             try {
                 for(int i = 0; i < listeners.Count; i++) {
                     TcpListener listener = listeners[i];
-                    if(!listener.Pending()) {
-                        continue;
-                    }
+                    if(!listener.Pending()) continue;
                     using TcpClient client = listener.AcceptTcpClient();
                     Handle(client);
                 }
@@ -194,9 +184,7 @@ internal static class DiscordOAuthServer {
 
             string returnedState = jo["state"]?.ToString();
             string stateToCheck;
-            lock(gate) {
-                stateToCheck = expectedState;
-            }
+            lock(gate) { stateToCheck = expectedState; }
             // No authorization request means no token is ever accepted. This also
             // closes the short post-success window before the listener shuts down.
             if(string.IsNullOrEmpty(stateToCheck) || returnedState != stateToCheck) {
@@ -206,9 +194,7 @@ internal static class DiscordOAuthServer {
             }
 
             saveToken?.Invoke(token);
-            lock(gate) {
-                expectedState = "";
-            }
+            lock(gate) { expectedState = ""; }
             status = "token saved";
             WriteJson(client, "200 OK", "{\"ok\":true}");
             StopAfterResponse();
@@ -224,24 +210,18 @@ internal static class DiscordOAuthServer {
         int offset = 0;
         while(offset < buffer.Length) {
             int read = stream.Read(buffer, offset, buffer.Length - offset);
-            if(read <= 0) {
-                break;
-            }
+            if(read <= 0) break;
             offset += read;
             string header = Encoding.UTF8.GetString(buffer, 0, offset);
             int headerEnd = header.IndexOf("\r\n\r\n", StringComparison.Ordinal);
-            if(headerEnd < 0) {
-                continue;
-            }
+            if(headerEnd < 0) continue;
 
             int contentLength = ContentLength(header);
             int bodyStart = headerEnd + 4;
             int available = offset - bodyStart;
             while(available < contentLength && offset < buffer.Length) {
                 read = stream.Read(buffer, offset, Math.Min(buffer.Length - offset, contentLength - available));
-                if(read <= 0) {
-                    break;
-                }
+                if(read <= 0) break;
                 offset += read;
                 available += read;
             }
@@ -256,9 +236,7 @@ internal static class DiscordOAuthServer {
     }
 
     private static Request ParseRequest(string header, string body) {
-        if(string.IsNullOrEmpty(header)) {
-            return new Request("GET", "/", body);
-        }
+        if(string.IsNullOrEmpty(header)) return new Request("GET", "/", body);
         int lineEnd = header.IndexOf("\r\n", StringComparison.Ordinal);
         string line = lineEnd >= 0 ? header[..lineEnd] : header;
         string[] parts = line.Split(' ');
@@ -269,13 +247,9 @@ internal static class DiscordOAuthServer {
         string[] lines = header.Split(["\r\n"], StringSplitOptions.None);
         for(int i = 0; i < lines.Length; i++) {
             int sep = lines[i].IndexOf(':');
-            if(sep < 0) {
-                continue;
-            }
+            if(sep < 0) continue;
             string name = lines[i][..sep].Trim();
-            if(!string.Equals(name, "Content-Length", StringComparison.OrdinalIgnoreCase)) {
-                continue;
-            }
+            if(!string.Equals(name, "Content-Length", StringComparison.OrdinalIgnoreCase)) continue;
             return int.TryParse(lines[i][(sep + 1)..].Trim(), out int value) ? Math.Max(0, value) : 0;
         }
         return 0;
@@ -295,15 +269,11 @@ internal static class DiscordOAuthServer {
     private static Dictionary<string, string> ParseQuery(string target) {
         Dictionary<string, string> result = [];
         int q = target.IndexOf('?');
-        if(q < 0 || q + 1 >= target.Length) {
-            return result;
-        }
+        if(q < 0 || q + 1 >= target.Length) return result;
 
         string[] pairs = target[(q + 1)..].Split('&');
         for(int i = 0; i < pairs.Length; i++) {
-            if(string.IsNullOrEmpty(pairs[i])) {
-                continue;
-            }
+            if(string.IsNullOrEmpty(pairs[i])) continue;
             int eq = pairs[i].IndexOf('=');
             string key = eq >= 0 ? pairs[i][..eq] : pairs[i];
             string val = eq >= 0 ? pairs[i][(eq + 1)..] : "";
