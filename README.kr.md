@@ -1,6 +1,6 @@
 <p align="center">
-  <a>🇺🇸 English</a> |
-  <a href="README.kr.md">🇰🇷 한국어</a> |
+  <a href="README.md">🇺🇸 English</a> |
+  <a>🇰🇷 한국어</a> |
   <a href="CREDITS.md">⭐️ Credits</a>
 </p>
 <div align="center">
