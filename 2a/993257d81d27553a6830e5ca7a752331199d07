@@ -1,0 +1,12 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "2a993257d81d27553a6830e5ca7a752331199d07",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
