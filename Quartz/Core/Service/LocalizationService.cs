@@ -1,3 +1,4 @@
+using Quartz.Async;
 using Quartz.Compat;
 using Quartz.Compat.Interface;
 using Quartz.IO;
@@ -13,12 +14,15 @@ public sealed class LocalizationService(
     public Translator Translator { get; } = new();
 
     public void Initialize() {
-        Translator.Language =
-            configFile.Data.Language;
+        Translator.SetLog(logger.Msg);
 
-        Translator.SetLog(
-            logger.Msg
-        );
+        // Route OnLoadEnd / OnLanguageChanged onto the main thread. Load() runs
+        // as a background Task whose continuation is not guaranteed to resume on
+        // the main thread; its UI-rebuilding subscribers must. MainThread's
+        // dispatcher MonoBehaviour is created earlier in runtime startup.
+        Translator.SetDispatcher(MainThread.Enqueue);
+
+        Translator.Language = configFile.Data.Language;
 
         _ = Translator.Load(langPath);
     }

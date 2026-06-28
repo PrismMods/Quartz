@@ -56,12 +56,11 @@ public class Translator {
     public string Language {
         get;
         set {
-            if(field == value) {
-                return;
-            }
+            if(field == value) return;
 
             field = value;
-            OnLanguageChanged.Invoke(field);
+            string lang = field;
+            Post(() => OnLanguageChanged.Invoke(lang));
         }
     } = FALLBACK_LANGUAGE;
 
@@ -74,12 +73,24 @@ public class Translator {
 
     public void SetLog(Action<string> action) => logAction = action;
 
-    private void Log(string message) {
-        if(logAction == null) {
-            return;
-        }
-        logAction(message);
+    // Marshals the event callbacks (OnLoadEnd / OnLanguageChanged) onto the
+    // host's main thread. Load() runs as a background Task, so its completion —
+    // and the UI rebuilds wired to these events — can fire on the Task
+    // continuation thread, where any Unity API touch is a hard native crash
+    // (no managed exception, no dump). Defaults to inline so the class stays
+    // Unity-free and usable without a host (tests); a host injects
+    // MainThread.Enqueue.
+    private Action<Action> dispatcher;
+
+    public void SetDispatcher(Action<Action> action) => dispatcher = action;
+
+    private void Post(Action action) {
+        Action<Action> d = dispatcher;
+        if(d == null) action();
+        else d(action);
     }
+
+    private void Log(string message) => logAction?.Invoke(message);
 
     public const string LOG_PREFIX = "[Translator] ";
     public const string LOG_PREFIX_WARNING = "[Translator Warning] ";
@@ -149,9 +160,7 @@ public class Translator {
     /// <param name="baseLangFolderPath">The path to the folder containing the language JSON files.</param>
     /// <returns>A Task representing the asynchronous operation.</returns>
     public async Task Load(string baseLangFolderPath) {
-        if(IsLoading) {
-            return;
-        }
+        if(IsLoading) return;
 
         OnLoadStart.Invoke();
         IsLoading = true;
@@ -264,11 +273,17 @@ public class Translator {
 
         IsLoading = false;
 
-        try {
-            OnLoadEnd.Invoke(FailState);
-        } catch(Exception e) {
-            Log($"{LOG_PREFIX_EXCEPTION}Exception during OnLoadEnd event: {e.GetType().Name}: {e.Message}");
-        }
+        // Marshal onto the main thread: subscribers rebuild Unity UI, and Finish
+        // runs on Load()'s background Task continuation. State above is already
+        // published, so IsDefault reads false by the time this pump runs.
+        TranslationFailState state = FailState;
+        Post(() => {
+            try {
+                OnLoadEnd.Invoke(state);
+            } catch(Exception e) {
+                Log($"{LOG_PREFIX_EXCEPTION}Exception during OnLoadEnd event: {e.GetType().Name}: {e.Message}");
+            }
+        });
     }
 
     /// <summary>
@@ -279,23 +294,10 @@ public class Translator {
     /// <param name="key">Translation key to check.</param>
     /// <returns>True if the key exists for the current language; otherwise false.</returns>
     public bool HasKey(string key) {
-        if(IsDefault) {
-            return false;
-        }
+        if(IsDefault || string.IsNullOrEmpty(key)) return false;
 
-        if(string.IsNullOrEmpty(key)) {
-            return false;
-        }
-
-        if(translations.TryGetValue(Language, out var langDict) && langDict.ContainsKey(key)) {
-            return true;
-        }
-
-        if(translationsArr.TryGetValue(Language, out var langArr) && langArr.ContainsKey(key)) {
-            return true;
-        }
-
-        return false;
+        return (translations.TryGetValue(Language, out var langDict) && langDict.ContainsKey(key))
+            || (translationsArr.TryGetValue(Language, out var langArr) && langArr.ContainsKey(key));
     }
 
     /// <summary>
@@ -306,23 +308,10 @@ public class Translator {
     /// <param name="language">Language code to check.</param>
     /// <returns>True if the key exists for the specified language; otherwise false.</returns>
     public bool HasKeyForLanguage(string key, string language) {
-        if(string.IsNullOrEmpty(language) || language == FALLBACK_LANGUAGE) {
-            return false;
-        }
+        if(string.IsNullOrEmpty(language) || language == FALLBACK_LANGUAGE || string.IsNullOrEmpty(key)) return false;
 
-        if(string.IsNullOrEmpty(key)) {
-            return false;
-        }
-
-        if(translations.TryGetValue(language, out var langDict) && langDict.ContainsKey(key)) {
-            return true;
-        }
-
-        if(translationsArr.TryGetValue(language, out var langArr) && langArr.ContainsKey(key)) {
-            return true;
-        }
-
-        return false;
+        return (translations.TryGetValue(language, out var langDict) && langDict.ContainsKey(key))
+            || (translationsArr.TryGetValue(language, out var langArr) && langArr.ContainsKey(key));
     }
 
     /// <summary>
@@ -332,15 +321,9 @@ public class Translator {
     /// <param name="defaultValue">The default value to return if translation is not found.</param>
     /// <returns>The translated value or the default value if not found.</returns>
     public string Get(string key, string defaultValue) {
-        if(IsDefault) {
-            return defaultValue;
-        }
+        if(IsDefault) return defaultValue;
 
-        if(translations.TryGetValue(Language, out var langDict)) {
-            if(langDict.TryGetValue(key, out var val)) {
-                return val;
-            }
-        }
+        if(translations.TryGetValue(Language, out var langDict) && langDict.TryGetValue(key, out var val)) return val;
 
         return defaultValue;
     }
@@ -353,15 +336,9 @@ public class Translator {
     /// <param name="defaultValue">The default value to return if translation is not found.</param>
     /// <returns>The translated value or the default value if not found.</returns>
     public string GetForLanguage(string key, string language, string defaultValue) {
-        if(string.IsNullOrEmpty(language) || language == FALLBACK_LANGUAGE) {
-            return defaultValue;
-        }
+        if(string.IsNullOrEmpty(language) || language == FALLBACK_LANGUAGE) return defaultValue;
 
-        if(translations.TryGetValue(language, out var langDict)) {
-            if(langDict.TryGetValue(key, out var val)) {
-                return val;
-            }
-        }
+        if(translations.TryGetValue(language, out var langDict) && langDict.TryGetValue(key, out var val)) return val;
 
         return defaultValue;
     }
@@ -373,9 +350,7 @@ public class Translator {
     public string[] GetLanguages() {
         List<string> languages = [];
 
-        if(IsFail) {
-            languages.Add(FALLBACK_LANGUAGE);
-        }
+        if(IsFail) languages.Add(FALLBACK_LANGUAGE);
 
         languages.AddRange(translations.Keys);
 
@@ -389,15 +364,11 @@ public class Translator {
     public string[] GetLanguageNativeNames() {
         List<string> names = [];
 
-        if(IsFail) {
-            names.Add(FALLBACK_LANGUAGE);
-        }
+        if(IsFail) names.Add(FALLBACK_LANGUAGE);
 
         names.AddRange(translations.Keys
             .OrderBy(k => k, StringComparer.OrdinalIgnoreCase)
-            .Select(lang => GetForLanguage("0NATIVELANG", lang, lang))
-            .ToList()
-        );
+            .Select(lang => GetForLanguage("0NATIVELANG", lang, lang)));
 
         return [.. names];
     }
@@ -410,16 +381,12 @@ public class Translator {
     /// <param name="defaultValue">The default value to return if translation is not found.</param>
     /// <returns>The translated value or the default value if not found.</returns>
     public string GetArr(string key, int index, string defaultValue) {
-        if(IsDefault) {
-            return defaultValue;
-        }
+        if(IsDefault) return defaultValue;
 
-        if(translationsArr.TryGetValue(Language, out var lang)) {
-            if(lang.TryGetValue(key, out var values)) {
-                if(index >= 0 && index < values.Length) {
-                    return values[index];
-                }
-            }
+        if(translationsArr.TryGetValue(Language, out var lang)
+            && lang.TryGetValue(key, out var values)
+            && index >= 0 && index < values.Length) {
+            return values[index];
         }
         return defaultValue;
     }
@@ -430,15 +397,9 @@ public class Translator {
     /// <param name="key">The key for the translation.</param>
     /// <returns>The count of elements for the key, or 0 if not found or translations are not ready.</returns>
     public int GetArrCount(string key) {
-        if(IsDefault) {
-            return 0;
-        }
+        if(IsDefault) return 0;
 
-        if(translationsArr.TryGetValue(Language, out var lang)) {
-            if(lang.TryGetValue(key, out var values)) {
-                return values.Length;
-            }
-        }
+        if(translationsArr.TryGetValue(Language, out var lang) && lang.TryGetValue(key, out var values)) return values.Length;
         return 0;
     }
 
