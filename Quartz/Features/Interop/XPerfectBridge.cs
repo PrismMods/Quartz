@@ -46,19 +46,30 @@ internal static class XPerfectBridge {
     // True only when XPerfect is installed AND its own feature toggle is on, so
     // Quartz mirrors XPerfect's enabled state rather than overriding it. If
     // XPerfect exposes no toggle, "installed" implies active.
+    private static int activeFrame = -1;
+    private static bool activeCache;
+
     public static bool Active {
         get {
             if(!Installed) {
                 return false;
             }
-            try {
-                if(enabledProp == null) {
-                    return true;
-                }
-                return enabledProp.GetValue(null, null) is bool b && b;
-            } catch {
-                return false;
+            // Installed implies XPerfect is resolved. JudgementOverlay polls Active
+            // on the default hit path, so memoize the reflective enabled-prop read
+            // (a boxed PropertyInfo.GetValue) per frame. Installed still runs its
+            // EnsureResolved rescan above each call, so a runtime enable is picked up.
+            if(activeFrame == UnityEngine.Time.frameCount) {
+                return activeCache;
             }
+            bool result;
+            try {
+                result = enabledProp == null || (enabledProp.GetValue(null, null) is bool b && b);
+            } catch {
+                result = false;
+            }
+            activeFrame = UnityEngine.Time.frameCount;
+            activeCache = result;
+            return result;
         }
     }
 
