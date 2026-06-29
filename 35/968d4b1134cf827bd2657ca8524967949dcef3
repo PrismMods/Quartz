@@ -1,0 +1,253 @@
+Quartz/Features/UiHider/UiHider.cs
+  s_5d2da5e81f5b45::t_43bd5588c03c31 135
+  s_1750901d37fdc6::t_fe3a5e020d5564 76
+Quartz/UI/Factory/Page/PageGameplay.cs
+  s_5d2da5e81f5b45::t_ac0690afef5629 229
+  s_5d2da5e81f5b45::t_2d89e704e74adb 615
+  s_5d2da5e81f5b45::t_c39f593ab39541 368
+  s_5d2da5e81f5b45::t_8d1bebba1970d6 541
+Quartz/Features/KeyViewer/KeyViewerOverlay.cs
+  s_5d2da5e81f5b45::t_f29587acd59ad2 566
+  s_5d2da5e81f5b45::t_b1f58ff5173abc 476
+  s_5d2da5e81f5b45::t_730897a189adad 2274
+  s_5d2da5e81f5b45::t_deedc757a6ff62 936,938
+  s_5d2da5e81f5b45::t_fa8805c8751642 1122-1123
+  s_5d2da5e81f5b45::t_d08dd31fce7dd8 2192
+  s_5d2da5e81f5b45::t_3dd3a313807a8b 2241
+  s_5d2da5e81f5b45::t_02208da16a9896 839
+  s_5d2da5e81f5b45::t_5aff84b0524b23 1773
+  s_5d2da5e81f5b45::t_f212c97a8ab9d2 627
+  s_5d2da5e81f5b45::t_3a764e5b2a4488 2358
+  s_5d2da5e81f5b45::t_ed3bd813c3ebcd 2559
+  s_5d2da5e81f5b45::t_6f97e9a18c97a4 827,829
+  s_5d2da5e81f5b45::t_b8793422832a73 2312
+  s_5d2da5e81f5b45::t_c44e8c32aa9acc 571
+  s_5d2da5e81f5b45::t_b4f74d8d8cce18 834-835
+  s_5d2da5e81f5b45::t_9552e6389b51e0 2068
+  s_5d2da5e81f5b45::t_cad29b8321233d 524
+  s_5d2da5e81f5b45::t_bdd7ddce2681c2 2267
+  s_5d2da5e81f5b45::t_3a5fd70bdd2067 659
+  s_5d2da5e81f5b45::t_b9a91c3761230d 912
+  s_5d2da5e81f5b45::t_5826ae914b7000 2308
+  s_5d2da5e81f5b45::t_7539ac5cfb92ca 545
+  s_5d2da5e81f5b45::t_66678a8710793c 2415
+  s_5d2da5e81f5b45::t_83937b9df89b41 1112
+  s_5d2da5e81f5b45::t_ad4725df64299a 588
+  s_5d2da5e81f5b45::t_e73d5e208d756c 921,924
+  s_5d2da5e81f5b45::t_cb15e721905abd 406-407
+  s_5d2da5e81f5b45::t_70673002a6455e 497
+  s_5d2da5e81f5b45::t_0157fd83382b48 2278
+  s_5d2da5e81f5b45::t_9d7974079e3772 2424-2425,2427,2432,2435
+  s_5d2da5e81f5b45::t_4bce4cc2f85db7 2469
+  s_5d2da5e81f5b45::t_a883cb8f3d22b5 415
+  s_5d2da5e81f5b45::t_684fc46e866890 1638,1641-1642
+  s_5d2da5e81f5b45::t_dff5a4daed2a12 1666
+  s_5d2da5e81f5b45::t_f79d3aa6a481e0 1354-1355,1360-1361
+  s_5d2da5e81f5b45::t_063197822679fa 456
+  s_5d2da5e81f5b45::t_423e9873941aff 1740
+  s_5d2da5e81f5b45::t_30bc0c2ab8dca6 2164
+  s_5d2da5e81f5b45::t_9f4692aa6716a6 2511,2515
+  s_5d2da5e81f5b45::t_c3a1e9312e9a5d 2218
+  s_5d2da5e81f5b45::t_31472c73c268c4 973,976
+Quartz/UI/Factory/Page/PageKeyViewer.cs
+  s_5d2da5e81f5b45::t_eb3d21fd0c801f 850-852
+  s_5d2da5e81f5b45::t_9cb0c3915fc0a5 1059
+  s_5d2da5e81f5b45::t_771d252a47c0f5 885-887
+Quartz/UI/Generator/GenerateUI.cs
+  s_5d2da5e81f5b45::t_ebc37496535fd0 103
+  s_5d2da5e81f5b45::t_703eb8ed4debf5 770
+  s_5d2da5e81f5b45::t_f5b24a54b48f07 922
+Quartz/GTweens/Source/TweenBehaviours/CallbackTweenBehaviour.cs
+  s_5d2da5e81f5b45::t_dd0e214472a2a8 15
+Quartz/Features/Nostalgia/NostalgiaSettings.cs
+  s_5d2da5e81f5b45::t_c96745e38bf9b3 55-56
+Quartz/Features/Status/GameStats.cs
+  s_5d2da5e81f5b45::t_042e3eddd39109 196
+  s_5d2da5e81f5b45::t_d0d011a4939287 92
+  s_5d2da5e81f5b45::t_82e76a48ed7432 360
+  s_5d2da5e81f5b45::t_d5d276faf44c89 70
+  s_5d2da5e81f5b45::t_331fc9365a2c23 264
+  s_5d2da5e81f5b45::t_36d6dfeb10c3b9 280
+  s_5d2da5e81f5b45::t_fabdce2c6aa64d 57
+  s_5d2da5e81f5b45::t_a87480594b9a79 110
+  s_5d2da5e81f5b45::t_efd9681dcb7f69 121
+  s_5d2da5e81f5b45::t_81eb68fd328350 132
+  s_5d2da5e81f5b45::t_0e45739cd8d473 308
+  s_5d2da5e81f5b45::t_c82585fdea5772 184
+  s_5d2da5e81f5b45::t_a3b5e9a88aabd4 159
+  s_5d2da5e81f5b45::t_054dc87cb516e8 249
+  s_5d2da5e81f5b45::t_87f29009625352 210
+  s_5d2da5e81f5b45::t_ea939c536ac247 81
+Quartz/GTweens/Source/Interpolators/SystemColorInterpolator.cs
+  s_5d2da5e81f5b45::t_1366ffe4a2239f 36-41,43-48
+Quartz/Features/Panels/PanelsOverlay.cs
+  s_5d2da5e81f5b45::t_ea1b19c4f0f78a 310
+  s_5d2da5e81f5b45::t_7a4b8259aeeddf 263,269
+  s_5d2da5e81f5b45::t_644839209779cb 274
+  s_5d2da5e81f5b45::t_d8f31d7d363651 148
+  s_5d2da5e81f5b45::t_eb5d0e7052ef53 438
+  s_5d2da5e81f5b45::t_d1063166d86804 239
+  s_5d2da5e81f5b45::t_9693ee10def348 553-554
+Quartz/Features/KeyLimiter/KeyLimiter.cs
+  s_5d2da5e81f5b45::t_e08caf42cf64d3 118
+  s_5d2da5e81f5b45::t_2661d169e5a18f 382,385,389,392
+  s_5d2da5e81f5b45::t_7a630d12cf08dd 59
+  s_5d2da5e81f5b45::t_c41dd491bc023a 662-663
+Quartz/UI/Factory/Page/PageJudgement.cs
+  s_5d2da5e81f5b45::t_f098bb1a75a932 98
+Quartz/Features/Tweaks/TweaksPatches.cs
+  s_5d2da5e81f5b45::t_046d00d87e5a93 67
+Quartz/Features/Status/Bpm.cs
+  s_5d2da5e81f5b45::t_dfbac40166e84c 46
+Quartz/Features/KeyViewer/KeyViewerSettings.cs
+  s_5d2da5e81f5b45::t_e325403dc8efd8 645
+  s_5d2da5e81f5b45::t_e0ee5dd1025996 360
+  s_5d2da5e81f5b45::t_62e2952bba026d 657
+  s_5d2da5e81f5b45::t_4cc822c36c0b62 620
+Quartz/UI/Objects/Impl/UIDropdown.cs
+  s_5d2da5e81f5b45::t_580e7eda30c50d 115
+  s_5d2da5e81f5b45::t_5fdaa3ced14842 203
+  s_5d2da5e81f5b45::t_3fbaa901d2bcad 153
+Quartz/UI/UICore.cs
+  s_5d2da5e81f5b45::t_4cc8748ddb4da7 1034
+  s_5d2da5e81f5b45::t_9ade54b5f068fd 913-914
+  s_5d2da5e81f5b45::t_525de205bd4a74 986-987
+Quartz/GTweens/Source/Extensions/MathExtensions.cs
+  s_5d2da5e81f5b45::t_d4f3b564b3b573 7
+Quartz/Features/ChatterBlocker/ChatterBlocker.cs
+  s_5d2da5e81f5b45::t_180b839344c9e5 181-182
+Quartz/Features/Interop/SettingsImporter.cs
+  s_5d2da5e81f5b45::t_ac35a826605847 342-343
+Quartz/UI/Utility/TMPTextShadow.cs
+  s_5d2da5e81f5b45::t_2ff05afe4cca96 159
+  s_5d2da5e81f5b45::t_aa61369c907600 292
+  s_5d2da5e81f5b45::t_3fe335c092b207 125
+Quartz/Features/PlanetColors/PlanetColors.cs
+  s_5d2da5e81f5b45::t_02af623343c185 158
+  s_5d2da5e81f5b45::t_be2c7392cea4ff 203
+  s_5d2da5e81f5b45::t_e90c6717b902f2 95
+  s_5d2da5e81f5b45::t_5a2964b8397e92 188
+  s_5d2da5e81f5b45::t_5adacb7594ee12 312
+Quartz/UI/Objects/Impl/UIColorPicker.cs
+  s_5d2da5e81f5b45::t_0f00d18bc7e519 187
+Quartz/GTweens/Source/Interpolators/SystemVector2Interpolator.cs
+  s_5d2da5e81f5b45::t_5886247b4e0d4d 11
+Quartz/Features/Interop/UmmInterop.cs
+  s_5d2da5e81f5b45::t_66178b9e3fbbb3 93,126
+Quartz/Features/Restriction/Restriction.cs
+  s_5d2da5e81f5b45::t_6b73dc2d976f86 134
+Quartz/Tween/GTweenExtensions.cs
+  s_5d2da5e81f5b45::t_eb0c0690194042 118-120
+Quartz/Features/Nostalgia/NostalgiaTweaks.cs
+  s_5d2da5e81f5b45::t_286312289d5418 54
+  s_5d2da5e81f5b45::t_6672d4e4b8f76b 141
+Quartz/GTweens/Source/Tweens/GTween.cs
+  s_5d2da5e81f5b45::t_e24ea3c56f554e 161
+Quartz/Features/Combo/ComboSettings.cs
+  s_5d2da5e81f5b45::t_1f9d560ab76eb9 106
+Quartz/GTweens/Source/Extensions/AngleExtensions.cs
+  s_5d2da5e81f5b45::t_1fdea007bd06bb 25
+  s_5d2da5e81f5b45::t_e0aabb0c801147 13
+Quartz/Features/Optimizer/Optimizer.cs
+  s_5d2da5e81f5b45::t_211d18e8c947d3 218
+Quartz/Features/Editor/EditorFloorReadout.cs
+  s_5d2da5e81f5b45::t_eaeba077817418 152
+Quartz/Features/Status/ProgressTracker.cs
+  s_5d2da5e81f5b45::t_e3193ddb6673dd 23
+  s_5d2da5e81f5b45::t_09dadc79abacd8 55
+  s_5d2da5e81f5b45::t_a623ae6f3515ef 27
+  s_5d2da5e81f5b45::t_aef0dd22cd3cde 34
+Quartz/Features/KeyViewer/KeyViewerOverlay.Css.cs
+  s_5d2da5e81f5b45::t_9e89fecaa836ed 243-244
+Quartz/Features/OttoIcon/OttoIcon.cs
+  s_5d2da5e81f5b45::t_aff5aa50d547b1 232
+  s_5d2da5e81f5b45::t_3eba1ce57f4e52 183
+Quartz/Core/SemVer.cs
+  s_5d2da5e81f5b45::t_b5096a6b828857 82
+Quartz/UI/Factory/Page/PageSettings.cs
+  s_5d2da5e81f5b45::t_c728e8e65ec021 110
+Quartz/UI/Factory/Page/PageOverlay.cs
+  s_5d2da5e81f5b45::t_2c53243f39d589 464
+  s_5d2da5e81f5b45::t_4c239c17d12051 1408
+  s_5d2da5e81f5b45::t_5cf411f3d2eaf0 1138
+  s_5d2da5e81f5b45::t_445ac5133b1653 1051
+  s_5d2da5e81f5b45::t_7ab0e57663152f 710
+Quartz/Features/Status/TimingScale.cs
+  s_5d2da5e81f5b45::t_6c2e9446f2373d 12
+Quartz/Features/Tweaks/Tweaks.cs
+  s_5d2da5e81f5b45::t_280ebf531995ce 459
+  s_5d2da5e81f5b45::t_1f32c512837daa 621
+  s_5d2da5e81f5b45::t_407a665438aa88 388
+  s_5d2da5e81f5b45::t_da0914c8362771 462
+Quartz/Features/Judgement/JudgementPopupHiderSettings.cs
+  s_5d2da5e81f5b45::t_f1eca1578793ed 14-17
+Quartz/UI/Generator/GenerateUI.Collapsible.cs
+  s_5d2da5e81f5b45::t_199446fccbf026 49-50
+Quartz/GTweens/Source/Interpolators/SystemQuaternionInterpolator.cs
+  s_5d2da5e81f5b45::t_8589a3be23b3d4 16
+Quartz/Features/Editor/Editor.cs
+  s_5d2da5e81f5b45::t_8259677d09148b 268
+Quartz/Features/Status/Hold.cs
+  s_5d2da5e81f5b45::t_77882bdf358b6a 15
+Quartz/Features/AutoDeafen/AutoDeafen.cs
+  s_5d2da5e81f5b45::t_7711da8d64bcc5 209
+Quartz/Features/Judgement/JudgementOverlay.cs
+  s_5d2da5e81f5b45::t_3e75e8fcd50591 380
+  s_5d2da5e81f5b45::t_8c590122f0bb34 107-108
+  s_5d2da5e81f5b45::t_33d0d8ad5c0555 324-325
+  s_5d2da5e81f5b45::t_1cffab8bb78ca5 218
+Quartz/Features/SongTitle/SongTitleOverlay.cs
+  s_5d2da5e81f5b45::t_c3245357a2953b 272-273,275
+Quartz/Features/AutoDeafen/DiscordOAuthServer.cs
+  s_5d2da5e81f5b45::t_bc0ef412f4fb8d 122
+Quartz/Features/Nostalgia/NostalgiaPatches.Play.cs
+  s_5d2da5e81f5b45::t_571f1f8aea4f29 186
+Quartz/Features/Editor/EditorBgaMod.cs
+  s_5d2da5e81f5b45::t_02dbb714df45cc 141
+  s_5d2da5e81f5b45::t_fb8f6896916e13 133
+  s_5d2da5e81f5b45::t_6b7a97e9562d0b 71
+Quartz/UI/Factory/Page/PageCombo.cs
+  s_5d2da5e81f5b45::t_00097d834db80e 252
+Quartz/GTweens/Source/Interpolators/SystemVector3Interpolator.cs
+  s_5d2da5e81f5b45::t_e8b0971e3a2c02 11
+Quartz/Update/UpdateService.cs
+  s_5d2da5e81f5b45::t_c2d5cbd930cd3f 205,207
+  s_5d2da5e81f5b45::t_87858f773a436c 167,169
+Quartz/Resource/FontManager.cs
+  s_5d2da5e81f5b45::t_a41021242fc2d0 308
+  s_5d2da5e81f5b45::t_d43a5ebdc160d4 427
+  s_5d2da5e81f5b45::t_dd162cd5fdc961 455
+  s_5d2da5e81f5b45::t_ac64253189b6df 151-152
+  s_5d2da5e81f5b45::t_a5f3644d15d422 424
+Quartz/GTweens/Source/TweenBehaviours/GroupTweenBehaviour.cs
+  s_5d2da5e81f5b45::t_98266f9ff5e80e 74
+  s_5d2da5e81f5b45::t_c9b6979ea2007d 66
+Quartz/IO/ProfileManager.cs
+  s_5d2da5e81f5b45::t_0d34cfea97a0cf 393
+  s_5d2da5e81f5b45::t_657aaa0c86aad9 493
+  s_5d2da5e81f5b45::t_2628d620d777f3 169
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "35968d4b1134cf827bd2657ca8524967949dcef3",
+  "prompts": {},
+  "sessions": {
+    "s_1750901d37fdc6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a1be4d19aa94976d4",
+        "model": "unknown"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_5d2da5e81f5b45": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ee5ac89c-8c59-49c6-bff6-be1f54c6dbc3",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
