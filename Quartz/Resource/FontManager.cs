@@ -1,4 +1,5 @@
 using Quartz.Core;
+using System.Reflection;
 using UnityEngine;
 
 using TMPro;
@@ -67,14 +68,69 @@ public static class FontManager {
     private static bool scanned;
 
     public static void Initialize() {
-        defaultFont = BuildDefaultFont();
-        Current = defaultFont;
-        CurrentName = DefaultName;
+        // TMP_FontAsset.CreateFontAsset (used by every build below) reads the
+        // static TMP_Settings.clearDynamicDataOnBuild, which dereferences
+        // TMP_Settings.instance. That getter lazily Resources.Load()s the game's
+        // "TMP Settings" asset; under UnityModManager the mod initializes before
+        // that resource is loadable, so the getter returns null and the build
+        // NREs at startup (MelonLoader inits late enough to dodge it). Prime a
+        // throwaway instance for the duration of startup font building, then drop
+        // it so the game's real settings (font fallbacks, default font) win.
+        bool primed = EnsureTmpSettings();
+        try {
+            defaultFont = BuildDefaultFont();
+            Current = defaultFont;
+            CurrentName = DefaultName;
 
-        string saved = MainCore.Conf.FontName;
-        // Treat a saved pick of the default file as "default" so it shows and
-        // behaves as the default entry rather than a duplicate.
-        if(!string.IsNullOrEmpty(saved) && saved != DefaultName && saved != DefaultFontFile) SetFont(saved, false);
+            string saved = MainCore.Conf.FontName;
+            // Treat a saved pick of the default file as "default" so it shows and
+            // behaves as the default entry rather than a duplicate.
+            if(!string.IsNullOrEmpty(saved) && saved != DefaultName && saved != DefaultFontFile) SetFont(saved, false);
+        } finally {
+            if(primed) ReleaseTmpSettings();
+        }
+    }
+
+    // Cached handle for TMP_Settings' private static instance field, and the
+    // throwaway settings object we inject through it.
+    private static FieldInfo tmpSettingsInstanceField;
+    private static TMP_Settings tmpSettingsFallback;
+
+    // Ensures TMP_Settings.instance is non-null while a font is built. Returns
+    // true only when it injected a throwaway instance the caller must release
+    // afterwards; false when the game's real settings are already loaded (or it
+    // couldn't prime, in which case the original NRE still surfaces).
+    private static bool EnsureTmpSettings() {
+        try {
+            if(TMP_Settings.instance != null) return false; // real asset loaded + cached
+        } catch {
+            // Some TMP builds do more in the getter; fall through and try to prime.
+        }
+
+        try {
+            tmpSettingsInstanceField ??= typeof(TMP_Settings).GetField("s_Instance", BindingFlags.Static | BindingFlags.NonPublic);
+            if(tmpSettingsInstanceField == null) return false;
+
+            tmpSettingsFallback = ScriptableObject.CreateInstance<TMP_Settings>();
+            tmpSettingsInstanceField.SetValue(null, tmpSettingsFallback);
+            return true;
+        } catch(Exception e) {
+            MainCore.Log.Wrn($"[FontManager] couldn't prime TMP_Settings: {e.Message}");
+            return false;
+        }
+    }
+
+    // Clears the throwaway TMP_Settings injected by EnsureTmpSettings so the
+    // game's real settings asset loads on next access, and destroys it.
+    private static void ReleaseTmpSettings() {
+        try {
+            tmpSettingsInstanceField?.SetValue(null, null);
+            if(tmpSettingsFallback != null) UnityEngine.Object.Destroy(tmpSettingsFallback);
+        } catch(Exception e) {
+            MainCore.Log.Wrn($"[FontManager] couldn't release primed TMP_Settings: {e.Message}");
+        } finally {
+            tmpSettingsFallback = null;
+        }
     }
 
     // Builds the default TMP asset from the shipped Cookie Run Bold file, falling
