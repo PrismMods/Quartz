@@ -11,13 +11,5 @@ public sealed class IntTweener : Tweener<int> {
         float duration,
         ValidationDelegates.Validation validation
         )
-        : base(
-              currValueGetter,
-              setter,
-              to,
-              duration,
-              IntInterpolator.Instance,
-              validation
-              ) {
-    }
+        : base(currValueGetter, setter, to, duration, IntInterpolator.Instance, validation) { }
 }

@@ -7,11 +7,7 @@ public static class IOUtils {
     #region Generic
     public static T Read<T>(JToken token, string key, T fallback) {
         var value = token[key];
-
-        if(value == null) {
-            return fallback;
-        }
-
+        if(value == null) return fallback;
         try {
             return value.Value<T>();
         } catch {
@@ -25,61 +21,35 @@ public static class IOUtils {
     #region Vector2
     public static Vector2 Read(JToken token, string key, Vector2 fallback) {
         var value = token[key];
-
-        if(value == null || value is not JArray arr || arr.Count < 2) {
-            return fallback;
-        }
-
+        if(value == null || value is not JArray arr || arr.Count < 2) return fallback;
         try {
-            return new Vector2(
-                (float)arr[0],
-                (float)arr[1]
-            );
+            return new Vector2((float)arr[0], (float)arr[1]);
         } catch {
             return fallback;
         }
     }
 
-    public static JArray Write(Vector2 v)
-        => new(v.x, v.y);
+    public static JArray Write(Vector2 v) => new(v.x, v.y);
     #endregion
     #region Vector3
     public static Vector3 Read(JToken token, string key, Vector3 fallback) {
         var value = token[key];
-
-        if(value == null || value is not JArray arr || arr.Count < 3) {
-            return fallback;
-        }
-
+        if(value == null || value is not JArray arr || arr.Count < 3) return fallback;
         try {
-            return new Vector3(
-                (float)arr[0],
-                (float)arr[1],
-                (float)arr[2]
-            );
+            return new Vector3((float)arr[0], (float)arr[1], (float)arr[2]);
         } catch {
             return fallback;
         }
     }
 
-    public static JArray Write(Vector3 v)
-        => new(v.x, v.y, v.z);
+    public static JArray Write(Vector3 v) => new(v.x, v.y, v.z);
     #endregion
     #region Vector4
     public static Vector4 Read(JToken token, string key, Vector4 fallback) {
         var value = token[key];
-
-        if(value == null || value is not JArray arr || arr.Count < 4) {
-            return fallback;
-        }
-
+        if(value == null || value is not JArray arr || arr.Count < 4) return fallback;
         try {
-            return new Vector4(
-                (float)arr[0],
-                (float)arr[1],
-                (float)arr[2],
-                (float)arr[3]
-            );
+            return new Vector4((float)arr[0], (float)arr[1], (float)arr[2], (float)arr[3]);
         } catch {
             return fallback;
         }
@@ -90,41 +60,22 @@ public static class IOUtils {
     #region Rect
     public static Rect Read(JToken token, string key, Rect fallback) {
         var value = token[key];
-
-        if(value == null || value is not JArray arr || arr.Count < 4) {
-            return fallback;
-        }
-
+        if(value == null || value is not JArray arr || arr.Count < 4) return fallback;
         try {
-            return new Rect(
-                (float)arr[0],
-                (float)arr[1],
-                (float)arr[2],
-                (float)arr[3]
-            );
+            return new Rect((float)arr[0], (float)arr[1], (float)arr[2], (float)arr[3]);
         } catch {
             return fallback;
         }
     }
 
-    public static JArray Write(Rect rect)
-        => new(rect.x, rect.y, rect.width, rect.height);
+    public static JArray Write(Rect rect) => new(rect.x, rect.y, rect.width, rect.height);
     #endregion
     #region Quaternion
     public static Quaternion Read(JToken token, string key, Quaternion fallback) {
         var value = token[key];
-
-        if(value == null || value is not JArray arr || arr.Count < 4) {
-            return fallback;
-        }
-
+        if(value == null || value is not JArray arr || arr.Count < 4) return fallback;
         try {
-            return new Quaternion(
-                (float)arr[0],
-                (float)arr[1],
-                (float)arr[2],
-                (float)arr[3]
-            );
+            return new Quaternion((float)arr[0], (float)arr[1], (float)arr[2], (float)arr[3]);
         } catch {
             return fallback;
         }
@@ -135,25 +86,15 @@ public static class IOUtils {
     #region Color
     public static Color Read(JToken token, string key, Color fallback) {
         var value = token[key];
-
-        if(value == null || value is not JArray arr || arr.Count < 4) {
-            return fallback;
-        }
-
+        if(value == null || value is not JArray arr || arr.Count < 4) return fallback;
         try {
-            return new Color(
-                (float)arr[0],
-                (float)arr[1],
-                (float)arr[2],
-                (float)arr[3]
-            );
+            return new Color((float)arr[0], (float)arr[1], (float)arr[2], (float)arr[3]);
         } catch {
             return fallback;
         }
     }
 
-    public static JArray Write(Color c)
-        => new(c.r, c.g, c.b, c.a);
+    public static JArray Write(Color c) => new(c.r, c.g, c.b, c.a);
 
     public static Color Rgba(float r, float g, float b, float a) =>
         new(Mathf.Clamp01(r), Mathf.Clamp01(g), Mathf.Clamp01(b), Mathf.Clamp01(a));

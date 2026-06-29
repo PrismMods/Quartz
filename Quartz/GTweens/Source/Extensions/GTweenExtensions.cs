@@ -189,9 +189,8 @@ public static class GTweenExtensions {
         float duration
     ) => Tween(() => from, setter, to, duration, ValidationExtensions.AlwaysValid);
 
-    public static GTween TweenTimeScale(this GTween target, float to, float duration) {
-        return Tween(() => target.TimeScale, current => target.SetTimeScale(current), to, duration);
-    }
+    public static GTween TweenTimeScale(this GTween target, float to, float duration)
+        => Tween(() => target.TimeScale, current => target.SetTimeScale(current), to, duration);
 
     public static bool IsPlayingOrCompleted(this GTween gTween) => gTween.IsPlaying || gTween.IsCompleted;
 
@@ -209,9 +208,7 @@ public static class GTweenExtensions {
     public static Task AwaitCompleteOrKill(this GTween gTween, CancellationToken cancellationToken) {
         TaskCompletionSource<bool> taskCompletionSource = new();
 
-        if(!gTween.IsPlaying || cancellationToken.IsCancellationRequested) {
-            return Task.CompletedTask;
-        }
+        if(!gTween.IsPlaying || cancellationToken.IsCancellationRequested) return Task.CompletedTask;
 
         void OnCompleteOrKill() {
             gTween.OnCompleteOrKillAction -= OnCompleteOrKill;

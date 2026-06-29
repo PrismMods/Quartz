@@ -21,9 +21,7 @@ internal static class NativeKeySender {
 
     internal static void SendChord(bool ctrl, bool shift, bool alt, bool meta, KeyCode key) {
         key = KeyLimiterFeature.NormalizeKey(key);
-        if(key == KeyCode.None) {
-            return;
-        }
+        if(key == KeyCode.None) return;
 
         // Tell the game's input funnel to ignore this chord for a short window
         // and open the SkyHook suppression bypass, so the synthetic presses reach
@@ -52,9 +50,7 @@ internal static class NativeKeySender {
     }
 
     private static void LogUnsupported(string detail) {
-        if(unsupportedLogged) {
-            return;
-        }
+        if(unsupportedLogged) return;
         unsupportedLogged = true;
         MainCore.Log.Msg("[AutoDeafen] key send unavailable (" + detail + ").");
     }

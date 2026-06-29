@@ -16,8 +16,7 @@ namespace Quartz.Features.Status
         private static void EnsurePrefix(List<scrFloor> floors)
         {
             int count = floors.Count;
-            if (ReferenceEquals(floors, cachedFloors) && count == cachedFloorCount && prefixHittable != null)
-                return;
+            if (ReferenceEquals(floors, cachedFloors) && count == cachedFloorCount && prefixHittable != null) return;
 
             int[] prefix = new int[count];
             int running = 0;
@@ -61,10 +60,7 @@ namespace Quartz.Features.Status
             return (counts != null && i >= 0 && i < counts.Length) ? counts[i] : 0;
         }
 
-        internal static float MaxRatio()
-        {
-            return MaxRatio(0);
-        }
+        internal static float MaxRatio() => MaxRatio(0);
 
         internal static float MaxRatio(int playerID)
         {

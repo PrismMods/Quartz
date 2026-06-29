@@ -74,8 +74,7 @@ public sealed class EffectRemoverSettings : ISettingsFile {
     public bool ResetTrackAnimation = true;
     public bool ResetTrackColor = true;
 
-    public JToken Serialize() {
-        return new JObject {
+    public JToken Serialize() => new JObject {
             [nameof(On)] = On,
             [nameof(Mode)] = Mode,
             [nameof(SimpleFilter)] = SimpleFilter,
@@ -110,8 +109,7 @@ public sealed class EffectRemoverSettings : ISettingsFile {
             [nameof(CameraZoomScale)] = CameraZoomScale,
             [nameof(ResetTrackAnimation)] = ResetTrackAnimation,
             [nameof(ResetTrackColor)] = ResetTrackColor,
-        };
-    }
+    };
 
     public void Deserialize(JToken token) {
         On = IOUtils.Read(token, nameof(On), On);

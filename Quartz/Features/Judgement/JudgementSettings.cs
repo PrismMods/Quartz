@@ -52,8 +52,7 @@ public sealed class JudgementSettings : ISettingsFile {
         TextShadowA = Mathf.Clamp01(c.a);
     }
 
-    public JToken Serialize() {
-        return new JObject {
+    public JToken Serialize() => new JObject {
             [nameof(Enabled)] = Enabled,
             [nameof(CompactRow)] = CompactRow,
             [nameof(ShowXPerfect)] = ShowXPerfect,
@@ -70,7 +69,6 @@ public sealed class JudgementSettings : ISettingsFile {
             [nameof(TextShadowB)] = TextShadowB,
             [nameof(TextShadowA)] = TextShadowA,
         };
-    }
 
     public void Deserialize(JToken token) {
         Enabled = IOUtils.Read(token, nameof(Enabled), Enabled);

@@ -29,16 +29,14 @@ public sealed class SongTitleSettings : ISettingsFile {
     public float ShadowX = 2f, ShadowY = -2f, ShadowSoftness = 0f;
     public float ShadowR = 0f, ShadowG = 0f, ShadowB = 0f, ShadowA = 0.3959352f;
 
-    public Color GetColor() => new(
-        Mathf.Clamp01(ColorR), Mathf.Clamp01(ColorG), Mathf.Clamp01(ColorB), Mathf.Clamp01(ColorA));
+    public Color GetColor() => new(Mathf.Clamp01(ColorR), Mathf.Clamp01(ColorG), Mathf.Clamp01(ColorB), Mathf.Clamp01(ColorA));
 
     public void SetColor(Color c) {
         ColorR = Mathf.Clamp01(c.r); ColorG = Mathf.Clamp01(c.g);
         ColorB = Mathf.Clamp01(c.b); ColorA = Mathf.Clamp01(c.a);
     }
 
-    public Color GetShadowColor() => new(
-        Mathf.Clamp01(ShadowR), Mathf.Clamp01(ShadowG), Mathf.Clamp01(ShadowB), Mathf.Clamp01(ShadowA));
+    public Color GetShadowColor() => new(Mathf.Clamp01(ShadowR), Mathf.Clamp01(ShadowG), Mathf.Clamp01(ShadowB), Mathf.Clamp01(ShadowA));
 
     public void SetShadowColor(Color c) {
         ShadowR = Mathf.Clamp01(c.r); ShadowG = Mathf.Clamp01(c.g);

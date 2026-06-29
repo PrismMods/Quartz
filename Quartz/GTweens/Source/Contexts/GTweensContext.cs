@@ -28,9 +28,7 @@ public sealed class GTweensContext {
     /// </summary>
     /// <param name="gTween">The GTween to play.</param>
     public void Play(GTween gTween) {
-        if(gTween.IsNested) {
-            return;
-        }
+        if(gTween.IsNested) return;
 
         if(gTween.IsAlive) {
             TryStartTween(gTween);
@@ -38,9 +36,7 @@ public sealed class GTweensContext {
         }
 
         gTween.IsAlive = true;
-
         _tweensToAdd.Add(gTween);
-
         TryStartTween(gTween);
     }
 
@@ -53,9 +49,7 @@ public sealed class GTweensContext {
 
         _updateStopwatch.Restart();
 
-        foreach(GTween tween in _tweensToAdd) {
-            _aliveTweens.Add(tween);
-        }
+        foreach(GTween tween in _tweensToAdd) _aliveTweens.Add(tween);
 
         _tweensToAdd.Clear();
 
@@ -107,8 +101,6 @@ public sealed class GTweensContext {
     }
 
     void TryStartTween(GTween gTween) {
-        if(!gTween.IsPlaying) {
-            gTween.Start();
-        }
+        if(!gTween.IsPlaying) gTween.Start();
     }
 }

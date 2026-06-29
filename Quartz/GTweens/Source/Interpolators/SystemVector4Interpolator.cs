@@ -6,9 +6,7 @@ namespace GTweens.Interpolators;
 public sealed class SystemVector4Interpolator : IInterpolator<Vector4> {
     public static readonly SystemVector4Interpolator Instance = new();
 
-    SystemVector4Interpolator() {
-
-    }
+    SystemVector4Interpolator() { }
 
     public Vector4 Evaluate(
         Vector4 initialValue,

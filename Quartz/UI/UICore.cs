@@ -823,13 +823,11 @@ public static class UICore {
         }
     }
 
-    // Repaints menu labels after the shared dynamic font atlas changes. The mod UI
-    // and the in-game overlay can share one dynamic TMP
-    // font atlas: when "apply font to overlay" is on and no separate overlay font
-    // is set, GameOverlayFont points the game's own text at FontManager.Current —
-    // the same asset the menu uses. Gameplay text (level titles, song names, the
-    // update-log board, …) keeps populating that shared atlas during play; when
-    // TMP grows it, menu labels generated earlier are left with stale glyph
+    // Repaints menu labels after the shared dynamic font atlas changes. The menu
+    // and the mod's in-game overlays (combo, judgement, song title, …) all draw
+    // with the same dynamic TMP font (FontManager.Current), so they share one
+    // atlas. Those overlays keep populating it with new glyphs during play; when
+    // TMP grows the atlas, menu labels generated earlier are left with stale glyph
     // geometry and the whole menu renders overlapped, clearing only on a restart.
     // Forcing a mesh update (so glyphs re-resolve against the current atlas) and a
     // layout rebuild (so rows re-flow off the corrected preferred sizes) on open

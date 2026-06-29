@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using ADOFAI;
-using Quartz.Features.GameOverlayFont;
 using Quartz.Resource;
 using Quartz.UI.Utility;
 using TMPro;
@@ -19,12 +18,8 @@ namespace Quartz.Features.Editor;
 //
 // Unlike AdofaiTweaks (which overwrites the tile's own legacy UnityEngine.UI.Text
 // sequence number), the readout is the mod's OWN TextMeshProUGUI in the mod's
-// overlay font — like the mod's other in-game overlays. Reusing the game's Text
-// meant it first rendered in the game font and only switched to the overlay font a
-// few frames later, once GameOverlayFont's twin sweep caught it; an owned TMP
-// renders in the overlay font immediately, every frame, and is independent of the
-// "apply font to game text" toggle. It carries a GameFontExclude marker so that
-// sweep leaves it alone.
+// font — like the mod's other in-game overlays. An owned TMP renders in the mod
+// font immediately, every frame, instead of reusing the game's own Text.
 //
 // For placement the label clones the tile's editorNumText (inheriting its
 // world-space canvas, scale, and camera tracking for free), then strips the legacy
@@ -65,6 +60,11 @@ public static partial class EditorFeature {
     // Shrink the readout below the game's own floor-number size — it's an
     // auxiliary annotation, not the tile's number.
     private const float ReadoutFontScale = 0.7f;
+
+    // Legacy UI.Text→TMP nominal point-size mapping: the cloned tile number's
+    // fontSize is in UI.Text units, which render about twice as large in TMP, so
+    // halve it to match the size the game drew the number at.
+    private const float GameTextSizeScale = 0.5f;
 
     private static void ReconcileFloorReadout() {
         bool want;
@@ -137,7 +137,7 @@ public static partial class EditorFeature {
         if(!EnsureLabel(host)) return;
 
         bool dirty = false;
-        TMP_FontAsset want = FontManager.GameOverlayFontAsset ?? FontManager.Current;
+        TMP_FontAsset want = FontManager.Current;
         if(want != null && readoutTmp.font != want) {
             readoutTmp.font = want;
             dirty = true;
@@ -200,18 +200,17 @@ public static partial class EditorFeature {
         foreach(BaseMeshEffect fx in clone.GetComponentsInChildren<BaseMeshEffect>(true)) Object.DestroyImmediate(fx);
 
         TextMeshProUGUI tmp = textGo.AddComponent<TextMeshProUGUI>();
-        textGo.AddComponent<GameFontExclude>();
-        tmp.font = FontManager.GameOverlayFontAsset ?? FontManager.Current;
+        tmp.font = FontManager.Current;
         tmp.alignment = TextAlignmentOptions.Center;
         tmp.textWrappingMode = TextWrappingModes.NoWrap;
         tmp.overflowMode = TextOverflowModes.Overflow;
         tmp.raycastTarget = false;
         tmp.richText = true;
         tmp.color = Color.white;
-        // Same UI.Text→TMP point-size mapping the GameOverlayFont twins use, so the
-        // readout matches the size the tile number rendered at, then ReadoutFontScale
+        // GameTextSizeScale maps the cloned UI.Text size into TMP so the readout
+        // matches the size the tile number rendered at; ReadoutFontScale then
         // shrinks it below that.
-        tmp.fontSize = Mathf.Max(1f, baseSize * GameFontMirror.SizeScale * ReadoutFontScale);
+        tmp.fontSize = Mathf.Max(1f, baseSize * GameTextSizeScale * ReadoutFontScale);
 
         clone.SetActive(true);
 

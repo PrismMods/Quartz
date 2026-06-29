@@ -24,8 +24,7 @@ public static class ProceduralTexture {
     // Top half rounded, bottom half a solid square (top-bar shape).
     public static Texture2D CircleHalfTop(int radius) {
         float c = radius - 0.5f;
-        return Generate(radius * 2, (x, y) =>
-            y <= c ? 1f : CircleCoverage(x - c, y - c, radius));
+        return Generate(radius * 2, (x, y) => y <= c ? 1f : CircleCoverage(x - c, y - c, radius));
     }
 
     // Ring: outer radius `radius`, stroke width `stroke`, AA on both edges.

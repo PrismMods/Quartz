@@ -312,8 +312,7 @@ public static class SongTitleOverlay {
 
     // Hides the game's own level-title HUD while the feature is taking over, so
     // only KRP's replacement shows. scrHUDText.Update re-enables the graphic each
-    // frame, so this postfix re-hides it after. (A hidden source also hides its
-    // GameOverlayFont twin, which copies the source's enabled state.)
+    // frame, so this postfix re-hides it after.
     [HarmonyPatch(typeof(scrHUDText), "Update")]
     private static class HideGameTitlePatch {
         private static void Postfix(scrHUDText __instance) {

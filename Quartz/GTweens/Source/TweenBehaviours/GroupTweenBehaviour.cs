@@ -19,51 +19,34 @@ public sealed class GroupTweenBehaviour : TweenBehaviour {
     public override void Tick(float deltaTime) {
         for(int i = _playingTweens.Count - 1; i >= 0; --i) {
             GTween gTween = _playingTweens[i];
-
             gTween.Tick(deltaTime);
-
-            if(!gTween.IsPlaying) {
-                _playingTweens.RemoveAt(i);
-            }
+            if(!gTween.IsPlaying) _playingTweens.RemoveAt(i);
         }
 
-        if(_playingTweens.Count == 0) {
-            MarkFinished();
-        }
+        if(_playingTweens.Count == 0) MarkFinished();
     }
 
     public override void Kill() {
-        foreach(GTween tween in _playingTweens) {
-            tween.Kill();
-        }
+        foreach(GTween tween in _playingTweens) tween.Kill();
 
         _playingTweens.Clear();
-
         MarkFinished();
     }
 
     public override void Complete() {
         foreach(GTween tween in _playingTweens) {
-            if(tween.IsCompleted) {
-                continue;
-            }
-
-            if(!tween.IsPlaying) {
-                tween.Start(isCompletingInstantly: true);
-            }
-
+            if(tween.IsCompleted) continue;
+            if(!tween.IsPlaying) tween.Start(isCompletingInstantly: true);
             tween.Complete();
         }
 
         _playingTweens.Clear();
-
         MarkFinished();
     }
 
     public override void Reset(bool kill, ResetMode resetMode) {
         for(int i = _tweens.Count - 1; i >= 0; --i) {
             GTween gTween = _tweens[i];
-
             gTween.Reset(kill, resetMode);
         }
 
@@ -71,18 +54,13 @@ public sealed class GroupTweenBehaviour : TweenBehaviour {
     }
 
     public override void SetEasing(EasingDelegate easingFunction) {
-        foreach(GTween tween in _tweens) {
-            tween.SetEasing(easingFunction);
-        }
+        foreach(GTween tween in _tweens) tween.SetEasing(easingFunction);
     }
 
     public override float GetDuration() {
-        if(_durationCalculated) {
-            return _cachedCalculatedDuration;
-        }
+        if(_durationCalculated) return _cachedCalculatedDuration;
 
         _durationCalculated = true;
-
         _cachedCalculatedDuration = 0.0f;
 
         foreach(GTween tween in _tweens) {
@@ -103,14 +81,10 @@ public sealed class GroupTweenBehaviour : TweenBehaviour {
     }
 
     public void Add(GTween gTween) {
-        if(gTween.IsPlayingOrCompletedOrNested()) {
-            return;
-        }
+        if(gTween.IsPlayingOrCompletedOrNested()) return;
 
         gTween.IsNested = true;
-
         _tweens.Add(gTween);
-
         _durationCalculated = false;
     }
 
@@ -120,16 +94,10 @@ public sealed class GroupTweenBehaviour : TweenBehaviour {
 
         for(int i = _playingTweens.Count - 1; i >= 0; --i) {
             GTween gTween = _playingTweens[i];
-
             gTween.Start(isCompletingInstantly);
-
-            if(!gTween.IsPlaying) {
-                _playingTweens.RemoveAt(i);
-            }
+            if(!gTween.IsPlaying) _playingTweens.RemoveAt(i);
         }
 
-        if(_playingTweens.Count == 0) {
-            MarkFinished();
-        }
+        if(_playingTweens.Count == 0) MarkFinished();
     }
 }

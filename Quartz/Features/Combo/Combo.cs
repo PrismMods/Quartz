@@ -27,9 +27,7 @@ internal static class Combo {
             return (1f, 0f);
         }
 
-        if(PulseStartTime < 0f || duration <= 0f) {
-            return (1f, 0f);
-        }
+        if(PulseStartTime < 0f || duration <= 0f) return (1f, 0f);
 
         float peak = 1f + Mathf.Max(0f, peakDelta);
         float outDur = duration * OutFraction;
@@ -55,9 +53,7 @@ internal static class Combo {
     [HarmonyPatch(typeof(scnGame), "Play")]
     private static class ResetOnRunStartPatch {
         private static void Postfix() {
-            if(!MainCore.IsModEnabled) {
-                return;
-            }
+            if(!MainCore.IsModEnabled) return;
             Count = 0;
             PulseStartTime = -1f;
         }
@@ -71,9 +67,7 @@ internal static class Combo {
     [HarmonyPatch(typeof(scrController), "Start")]
     private static class ResetOnControllerStartPatch {
         private static void Postfix(scrController __instance) {
-            if(!MainCore.IsModEnabled) {
-                return;
-            }
+            if(!MainCore.IsModEnabled) return;
             if(__instance.gameworld) {
                 Count = 0;
                 PulseStartTime = -1f;
@@ -84,9 +78,7 @@ internal static class Combo {
     [HarmonyPatch(typeof(scrController), "StartLoadingScene")]
     private static class ResetOnRunExitPatch {
         private static void Postfix() {
-            if(!MainCore.IsModEnabled) {
-                return;
-            }
+            if(!MainCore.IsModEnabled) return;
             Count = 0;
             PulseStartTime = -1f;
         }
@@ -95,14 +87,10 @@ internal static class Combo {
     [HarmonyPatch(typeof(scrMarginTracker), "AddHit", typeof(HitMargin))]
     private static class AddHitPatch {
         private static void Postfix(HitMargin hit) {
-            if(!MainCore.IsModEnabled) {
-                return;
-            }
+            if(!MainCore.IsModEnabled) return;
 
             ComboSettings conf = ComboOverlay.Conf;
-            if(conf == null) {
-                return;
-            }
+            if(conf == null) return;
 
             // XPerfect combo: only a dead-center X perfect keeps the combo; a
             // +/- perfect breaks it. Otherwise every Perfect counts as before.

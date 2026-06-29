@@ -40,27 +40,21 @@ public static partial class PlanetColors {
     private static class PlanetRendererAwakePatch {
         private static void Postfix(PlanetRenderer __instance) {
             InvalidatePlanetCache();
-            if(ShouldChange) {
-                ApplyPlanetRendererColor(__instance);
-            }
+            if(ShouldChange) ApplyPlanetRendererColor(__instance);
         }
     }
 
     [HarmonyPatch(typeof(PlanetRenderer), "Revive")]
     private static class PlanetRendererRevivePatch {
         private static void Postfix(PlanetRenderer __instance) {
-            if(ShouldChange) {
-                ApplyPlanetRendererColor(__instance);
-            }
+            if(ShouldChange) ApplyPlanetRendererColor(__instance);
         }
     }
 
     [HarmonyPatch(typeof(PlanetRenderer), "PlayParticles")]
     private static class PlanetRendererPlayParticlesPatch {
         private static void Postfix(PlanetRenderer __instance) {
-            if(!ShouldChange) {
-                return;
-            }
+            if(!ShouldChange) return;
             ApplyTailParticleColor(__instance, TailColor(GetPlanetSlot(__instance)));
         }
     }
@@ -70,9 +64,7 @@ public static partial class PlanetColors {
     [HarmonyPatch(typeof(PlanetRenderer), "LateUpdate")]
     private static class PlanetRendererLateUpdatePatch {
         private static void Postfix(PlanetRenderer __instance) {
-            if(ShouldChange) {
-                ApplyPlanetRing(__instance);
-            }
+            if(ShouldChange) ApplyPlanetRing(__instance);
         }
     }
 
@@ -84,9 +76,7 @@ public static partial class PlanetColors {
             => ExistingMethods(typeof(PlanetRenderer), "SetRainbow", "LoadPlanetColor", "SetColor");
 
         private static bool Prefix(PlanetRenderer __instance) {
-            if(applying || !ShouldChange) {
-                return true;
-            }
+            if(applying || !ShouldChange) return true;
             ApplyPlanetRendererColor(__instance);
             ApplyLogoColor(scrLogoText.instance);
             return false;
@@ -101,9 +91,7 @@ public static partial class PlanetColors {
             => ExistingMethods(typeof(PlanetRenderer), "SetPlanetColor", "SetCoreColor", "SetTailColor", "SetFaceColor");
 
         private static void Prefix(PlanetRenderer __instance, MethodBase __originalMethod, ref Color __0) {
-            if(applying || !ShouldChange) {
-                return;
-            }
+            if(applying || !ShouldChange) return;
 
             int slot = GetPlanetSlot(__instance);
             __0 = __originalMethod != null && __originalMethod.Name == "SetTailColor"
@@ -112,10 +100,7 @@ public static partial class PlanetColors {
         }
 
         private static void Postfix(PlanetRenderer __instance, MethodBase __originalMethod) {
-            if(applying || !ShouldChange || __originalMethod == null || __originalMethod.Name != "SetTailColor") {
-                return;
-            }
-
+            if(applying || !ShouldChange || __originalMethod == null || __originalMethod.Name != "SetTailColor") return;
             ApplyTailParticleColor(__instance, TailColor(GetPlanetSlot(__instance)));
         }
     }
@@ -126,18 +111,14 @@ public static partial class PlanetColors {
     [HarmonyPatch(typeof(scrLogoText), "Awake")]
     private static class LogoAwakePatch {
         private static void Postfix(scrLogoText __instance) {
-            if(ShouldChange) {
-                ApplyLogoColor(__instance);
-            }
+            if(ShouldChange) ApplyLogoColor(__instance);
         }
     }
 
     [HarmonyPatch(typeof(scrLogoText), "UpdateColors")]
     private static class LogoUpdateColorsPatch {
         private static bool Prefix(scrLogoText __instance) {
-            if(!ShouldChange) {
-                return true;
-            }
+            if(!ShouldChange) return true;
             ApplyLogoColor(__instance);
             return false;
         }

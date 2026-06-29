@@ -29,9 +29,7 @@ public sealed class LoaderUmm : IQuartzHost, IQuartzLogger {
 
     // EntryMethod in Info.json points here: "Quartz.LoaderUmm.Load".
     public static bool Load(UnityModManager.ModEntry modEntry) {
-        if(instance != null) {
-            return true;
-        }
+        if(instance != null) return true;
         instance = new LoaderUmm(modEntry);
 
         // If startup throws, reset instance (MainCore already nulled its Runtime)

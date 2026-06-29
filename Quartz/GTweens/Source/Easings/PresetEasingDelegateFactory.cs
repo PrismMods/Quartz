@@ -110,18 +110,9 @@ public static class PresetEasingDelegateFactory {
     static float InOutBounce(float a, float b, float t) => Lerp(a, b, t < 0.5f ? (1 - RawOutBounce(1 - (2 * t))) / 2 : (1 + RawOutBounce((2 * t) - 1)) / 2);
 
     static float RawOutBounce(float t) {
-        if(t < 1 / D1) {
-            return N1 * t * t;
-        }
-
-        if(t < 2 / D1) {
-            return (N1 * (t -= 1.5f / D1) * t) + 0.75f;
-        }
-
-        if(t < 2.5f / D1) {
-            return (N1 * (t -= 2.25f / D1) * t) + 0.9375f;
-        }
-
+        if(t < 1 / D1) return N1 * t * t;
+        if(t < 2 / D1) return (N1 * (t -= 1.5f / D1) * t) + 0.75f;
+        if(t < 2.5f / D1) return (N1 * (t -= 2.25f / D1) * t) + 0.9375f;
         return (N1 * (t -= 2.625f / D1) * t) + 0.984375f;
     }
 

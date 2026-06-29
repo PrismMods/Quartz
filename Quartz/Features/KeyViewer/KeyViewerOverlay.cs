@@ -1497,6 +1497,36 @@ public static partial class KeyViewerOverlay {
             ? value.ToString("N0", CultureInfo.InvariantCulture)
             : value.ToString(CultureInfo.InvariantCulture);
 
+    // Allocation-free integer -> TMP text for the per-frame hot path (per-key
+    // count + per-key KPS, up to 16 boxes, each changing nearly every frame
+    // while spamming). FormatCount allocates a string and takes TMP's heavier
+    // string-set path; at high KPS that per-frame garbage drives GC hitches the
+    // viewer reads as "lagging behind". TMP.SetText(char[], start, length)
+    // reuses this shared buffer with no allocation (mirrors the JipperKeyViewer
+    // reference's NumBuffer). Main-thread only (Updater.Update), so unsynced.
+    private static readonly char[] countBuf = new char[16];
+
+    private static void SetCount(TextMeshProUGUI tmp, int value) {
+        bool thousands = Conf != null && Conf.CountFormatting;
+        int pos = countBuf.Length;
+        if(value == 0) {
+            countBuf[--pos] = '0';
+        } else {
+            long v = value;
+            bool neg = v < 0;
+            if(neg) v = -v;
+            int seg = 0;
+            while(v > 0) {
+                if(thousands && seg == 3) { countBuf[--pos] = ','; seg = 0; }
+                countBuf[--pos] = (char)('0' + (int)(v % 10));
+                v /= 10;
+                seg++;
+            }
+            if(neg) countBuf[--pos] = '-';
+        }
+        tmp.SetText(countBuf, pos, countBuf.Length - pos);
+    }
+
     internal static TextMeshProUGUI NewText(Transform parent, string name, string text, float fontSize) {
         GameObject obj = new(name);
         obj.transform.SetParent(parent, false);
@@ -2567,10 +2597,13 @@ public static partial class KeyViewerOverlay {
                     // to equal the pre-rebuild value.
                     int value = box.IsKps ? pressLog.Count : totalCount;
                     if(box.Value != null && box.LastShown != value) {
-                        // Together mode renders the caption inline with the value.
-                        box.Value.text = box.StatTogether
-                            ? box.StatCaption + "  " + FormatCount(value)
-                            : FormatCount(value);
+                        // Together mode renders the caption inline with the value;
+                        // apart mode is the bare number, written alloc-free.
+                        if(box.StatTogether) {
+                            box.Value.text = box.StatCaption + "  " + FormatCount(value);
+                        } else {
+                            SetCount(box.Value, value);
+                        }
                         box.LastShown = value;
                     }
                     continue;
@@ -2644,11 +2677,11 @@ public static partial class KeyViewerOverlay {
                     int kps = box.KpsLog.Count;
                     if(box.LastShown != kps) {
                         box.LastShown = kps;
-                        box.Value.text = FormatCount(kps);
+                        SetCount(box.Value, kps);
                     }
                 } else if(box.Count != box.LastShown) {
                     box.LastShown = box.Count;
-                    box.Value.text = FormatCount(box.Count);
+                    SetCount(box.Value, box.Count);
                 }
             }
 

@@ -16,21 +16,15 @@ internal static class ProgressTracker {
     internal static bool RunStartedFromFirstTile = true;
 
     internal static bool IsFirstTileRunStart(int seqID = 0) {
-        if(seqID > 0) {
-            return false;
-        }
+        if(seqID > 0) return false;
 
         try {
-            if(scnGame.instance != null && scnGame.instance.checkpointsUsed > 0) {
-                return false;
-            }
+            if(scnGame.instance != null && scnGame.instance.checkpointsUsed > 0) return false;
         } catch {
         }
 
         try {
-            if(scrController.checkpointsUsed > 0) {
-                return false;
-            }
+            if(scrController.checkpointsUsed > 0) return false;
         } catch {
         }
 
@@ -38,9 +32,7 @@ internal static class ProgressTracker {
         // play-from-tile or a seek. The checkpoint count alone misses these.
         try {
             scrController c = scrController.instance;
-            if(c != null && c.currentSeqID > 0) {
-                return false;
-            }
+            if(c != null && c.currentSeqID > 0) return false;
         } catch {
         }
 
@@ -62,16 +54,12 @@ internal static class ProgressTracker {
         try {
             scrLevelMaker lm = scrLevelMaker.instance;
             int count = lm != null && lm.listFloors != null ? lm.listFloors.Count : 0;
-            if(seqID > 0 && count > 0) {
-                return Mathf.Clamp01((seqID + 1f) / count);
-            }
+            if(seqID > 0 && count > 0) return Mathf.Clamp01((seqID + 1f) / count);
         } catch {
         }
 
         float progress = c != null ? c.percentComplete : 0f;
-        if(progress > 0f) {
-            return Mathf.Clamp01(progress);
-        }
+        if(progress > 0f) return Mathf.Clamp01(progress);
 
         return 0f;
     }
@@ -81,9 +69,7 @@ internal static class ProgressTracker {
     [HarmonyPatch(typeof(scnGame), "Play")]
     private static class PlayPatch {
         private static void Postfix(int seqID) {
-            if(!MainCore.IsModEnabled) {
-                return;
-            }
+            if(!MainCore.IsModEnabled) return;
             CaptureRunStart(seqID);
         }
     }
@@ -91,9 +77,7 @@ internal static class ProgressTracker {
     [HarmonyPatch(typeof(scrController), "RestartProgress")]
     private static class RestartProgressPatch {
         private static void Postfix() {
-            if(!MainCore.IsModEnabled) {
-                return;
-            }
+            if(!MainCore.IsModEnabled) return;
             CaptureRunStart();
         }
     }
@@ -101,9 +85,7 @@ internal static class ProgressTracker {
     [HarmonyPatch(typeof(scrController), "Restart", typeof(bool))]
     private static class RestartPatch {
         private static void Postfix() {
-            if(!MainCore.IsModEnabled) {
-                return;
-            }
+            if(!MainCore.IsModEnabled) return;
             CaptureRunStart();
         }
     }
@@ -111,9 +93,7 @@ internal static class ProgressTracker {
     [HarmonyPatch(typeof(scrMistakesManager), "RevertToLastCheckpoint")]
     private static class RevertCheckpointPatch {
         private static void Postfix() {
-            if(!MainCore.IsModEnabled) {
-                return;
-            }
+            if(!MainCore.IsModEnabled) return;
             CaptureRunStart();
         }
     }

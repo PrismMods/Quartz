@@ -66,23 +66,17 @@ public abstract class UIObject {
 
     protected void UnregisterTick() => _tickables.Remove(this);
 
-    public virtual void Tick() {
-    }
+    public virtual void Tick() { }
 
     public static void TickAll() {
-        for(int i = 0; i < _tickables.Count; i++) {
-            _tickables[i].Tick();
-        }
+        for(int i = 0; i < _tickables.Count; i++) _tickables[i].Tick();
     }
 
     // Drops every registered tickable. Must run when the whole UI canvas is
     // torn down (profile switch rebuild) — stale entries would Tick destroyed
     // components and throw every frame.
     public static void DisposeAll() {
-        for(int i = _tickables.Count - 1; i >= 0; i--) {
-            _tickables[i].Dispose();
-        }
-
+        for(int i = _tickables.Count - 1; i >= 0; i--) _tickables[i].Dispose();
         _tickables.Clear();
     }
 }

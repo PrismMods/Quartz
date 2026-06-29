@@ -24,9 +24,7 @@ public static partial class Nostalgia {
     [HarmonyPatch(typeof(NewsSign), "Awake")]
     private static class HideAnnounceSignPatch {
         private static void Postfix() {
-            if(ShouldDisableAnnounceSign) {
-                ToggleSign(false);
-            }
+            if(ShouldDisableAnnounceSign) ToggleSign(false);
         }
     }
 
@@ -34,13 +32,9 @@ public static partial class Nostalgia {
     [HarmonyPatch(typeof(scnLevelSelect), "Start")]
     private static class LevelSelectStartPatch {
         private static void Postfix() {
-            if(!Enabled) {
-                return;
-            }
+            if(!Enabled) return;
             SetBackground();
-            if(ShouldDisableAnnounceSign) {
-                ToggleSign(false);
-            }
+            if(ShouldDisableAnnounceSign) ToggleSign(false);
             ApplyDeathSound();
             try { RDC.useOldAuto = ShouldWeakAuto; } catch { }
         }

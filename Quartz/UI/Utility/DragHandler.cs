@@ -26,13 +26,8 @@ public class DragHandler : MonoBehaviour {
     }
 
     private void OnPointerDownInternal() {
-        if(rect == null) {
-            rect = transform.parent?.GetComponent<RectTransform>();
-        }
-
-        if(rect == null) {
-            return;
-        }
+        if(rect == null) rect = transform.parent?.GetComponent<RectTransform>();
+        if(rect == null) return;
 
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             rect.parent as RectTransform,
@@ -44,13 +39,8 @@ public class DragHandler : MonoBehaviour {
     }
 
     private void OnDragInternal() {
-        if(rect == null) {
-            rect = transform.parent?.GetComponent<RectTransform>();
-        }
-
-        if(rect == null) {
-            return;
-        }
+        if(rect == null) rect = transform.parent?.GetComponent<RectTransform>();
+        if(rect == null) return;
 
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             rect.parent as RectTransform,

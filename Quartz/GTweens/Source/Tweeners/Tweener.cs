@@ -64,10 +64,7 @@ public abstract class Tweener<T> : ITweener {
 
         bool valid = Validate();
 
-        if(!valid) {
-            Kill();
-            return;
-        }
+        if(!valid) { Kill(); return; }
 
         _initialValue = _getter.Invoke();
 
@@ -79,10 +76,7 @@ public abstract class Tweener<T> : ITweener {
     public void Reset(ResetMode mode) {
         bool valid = Validate();
 
-        if(!valid) {
-            Kill();
-            return;
-        }
+        if(!valid) { Kill(); return; }
 
         GetFirstTimeValues();
 
@@ -116,10 +110,7 @@ public abstract class Tweener<T> : ITweener {
 
         bool valid = Validate();
 
-        if(!valid) {
-            Kill();
-            return;
-        }
+        if(!valid) { Kill(); return; }
 
         Elapsed = Math.Min(Duration, Elapsed + deltaTime);
 
@@ -160,7 +151,6 @@ public abstract class Tweener<T> : ITweener {
         if(!IsPlaying) return;
 
         bool isInstant = Duration == 0.0f;
-
         if(isInstant) Complete();
     }
 

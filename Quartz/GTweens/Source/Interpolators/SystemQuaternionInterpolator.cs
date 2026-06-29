@@ -6,9 +6,7 @@ namespace GTweens.Interpolators;
 public sealed class SystemQuaternionInterpolator : IInterpolator<Quaternion> {
     public static readonly SystemQuaternionInterpolator Instance = new();
 
-    SystemQuaternionInterpolator() {
-
-    }
+    SystemQuaternionInterpolator() { }
 
     public Quaternion Evaluate(
         Quaternion initialValue,

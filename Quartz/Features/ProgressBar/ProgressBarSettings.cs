@@ -82,8 +82,8 @@ public sealed class ProgressBarSettings : ISettingsFile {
         OutlineColA = Mathf.Clamp01(c.a);
     }
 
-    public JToken Serialize() {
-        return new JObject {
+    public JToken Serialize() =>
+        new JObject {
             [nameof(Enabled)] = Enabled,
             [nameof(Width)] = Width,
             [nameof(Height)] = Height,
@@ -106,7 +106,6 @@ public sealed class ProgressBarSettings : ISettingsFile {
             [nameof(OutlineColA)] = OutlineColA,
             [nameof(FillGradient)] = FillGradient?.Serialize(),
         };
-    }
 
     public void Deserialize(JToken token) {
         Enabled = IOUtils.Read(token, nameof(Enabled), Enabled);
@@ -129,8 +128,6 @@ public sealed class ProgressBarSettings : ISettingsFile {
         OutlineColG = IOUtils.Read(token, nameof(OutlineColG), OutlineColG);
         OutlineColB = IOUtils.Read(token, nameof(OutlineColB), OutlineColB);
         OutlineColA = IOUtils.Read(token, nameof(OutlineColA), OutlineColA);
-        if(token[nameof(FillGradient)] is JObject fillGradient) {
-            FillGradient = StatColor.Deserialize(fillGradient);
-        }
+        if(token[nameof(FillGradient)] is JObject fillGradient) FillGradient = StatColor.Deserialize(fillGradient);
     }
 }

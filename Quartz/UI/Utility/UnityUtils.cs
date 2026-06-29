@@ -22,9 +22,7 @@ public class UnityUtils {
     // counting as a click.
     public static void AddClickEvent(EventTrigger trigger, Action<PointerEventData> cb) {
         AddEvent(EventTriggerType.PointerUp, e => {
-            if(ReleasedInside(e, trigger.transform)) {
-                cb(e);
-            }
+            if(ReleasedInside(e, trigger.transform)) cb(e);
         }, trigger);
     }
 

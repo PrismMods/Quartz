@@ -18,11 +18,8 @@ public static partial class Nostalgia {
     [HarmonyPatch(typeof(scrFloor), "UpdateIconSprite")]
     private static class LegacyTwirlPatch {
         private static void Postfix(scrFloor __instance) {
-            if(ShouldLegacyTwirl) {
-                twirlEverApplied = true;
-            } else if(!twirlEverApplied) {
-                return;
-            }
+            if(ShouldLegacyTwirl) twirlEverApplied = true;
+            else if(!twirlEverApplied) return;
 
             // Clear any twirl arrows from a previous application before deciding
             // whether to (re)add them.
@@ -39,9 +36,7 @@ public static partial class Nostalgia {
 
             float num = (float)scrMisc.GetAngleMoved(
                 (float)__instance.entryangle, (float)__instance.exitangle, !__instance.isCCW);
-            if(Mathf.Abs(num) <= 1E-06f && !__instance.midSpin) {
-                num = Mathf.PI * 2;
-            }
+            if(Mathf.Abs(num) <= 1E-06f && !__instance.midSpin) num = Mathf.PI * 2;
 
             __instance.SetIconSprite(__instance.isCCW ? NostalgiaImages.SwirlCcw : NostalgiaImages.SwirlCw);
             __instance.SetIconFlipped(false);
@@ -57,9 +52,7 @@ public static partial class Nostalgia {
             __instance.SetIconAngle((__instance.floorRenderer is FloorSpriteRenderer) ? num4 : (-num4));
             __instance.SetIconOutlineSprite(__instance.isCCW ? NostalgiaImages.SwirlCcwOutline : NostalgiaImages.SwirlCwOutline);
 
-            if(Conf.TwirlWithoutArrow) {
-                return;
-            }
+            if(Conf.TwirlWithoutArrow) return;
 
             Renderer iconRef = (Renderer)__instance.iconsprite ?? __instance.floorRenderer.renderer;
 
@@ -111,9 +104,7 @@ public sealed class TwirlRenderer : MonoBehaviour {
     }
 
     private void LateUpdate() {
-        if(floor == null) {
-            return;
-        }
+        if(floor == null) return;
         if(floor.floorIcon != FloorIcon.Swirl && floor.floorIcon != FloorIcon.SwirlCW) {
             Destroy(this);
             return;

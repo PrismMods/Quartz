@@ -53,14 +53,10 @@ public readonly struct SemVer : IComparable<SemVer> {
     // "2.0.0-alpha.1" or "2.0.0". A leading 'v' is tolerated.
     public static bool TryParse(string text, out SemVer version) {
         version = default;
-        if(string.IsNullOrWhiteSpace(text)) {
-            return false;
-        }
+        if(string.IsNullOrWhiteSpace(text)) return false;
 
         string s = text.Trim();
-        if(s.StartsWith("v") || s.StartsWith("V")) {
-            s = s[1..];
-        }
+        if(s.StartsWith("v") || s.StartsWith("V")) s = s[1..];
 
         ReleaseChannel channel = ReleaseChannel.Stable;
         int build = 0;
@@ -93,22 +89,14 @@ public readonly struct SemVer : IComparable<SemVer> {
 
     public int CompareTo(SemVer other) {
         int c = Major.CompareTo(other.Major);
-        if(c != 0) {
-            return c;
-        }
+        if(c != 0) return c;
         c = Minor.CompareTo(other.Minor);
-        if(c != 0) {
-            return c;
-        }
+        if(c != 0) return c;
         c = Patch.CompareTo(other.Patch);
-        if(c != 0) {
-            return c;
-        }
+        if(c != 0) return c;
         // Alpha < Beta < ReleaseCandidate < Stable.
         c = Channel.CompareTo(other.Channel);
-        if(c != 0) {
-            return c;
-        }
+        if(c != 0) return c;
         // A stable release has no build component to compare.
         return Channel == ReleaseChannel.Stable ? 0 : Build.CompareTo(other.Build);
     }

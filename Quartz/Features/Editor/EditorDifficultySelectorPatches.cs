@@ -11,9 +11,7 @@ public static partial class EditorFeature {
         RectTransform iconRect = selector != null && selector.bullseyeImage != null
             ? selector.bullseyeImage.rectTransform
             : null;
-        if(iconRect == null) {
-            return true;
-        }
+        if(iconRect == null) return true;
 
         Camera camera = GetCanvasCamera(iconRect);
         iconRect.GetWorldCorners(difficultyCorners);
@@ -34,9 +32,7 @@ public static partial class EditorFeature {
 
     private static Camera GetCanvasCamera(RectTransform rect) {
         Canvas canvas = rect != null ? rect.GetComponentInParent<Canvas>() : null;
-        if(canvas == null || canvas.renderMode == RenderMode.ScreenSpaceOverlay) {
-            return null;
-        }
+        if(canvas == null || canvas.renderMode == RenderMode.ScreenSpaceOverlay) return null;
         return canvas.worldCamera != null ? canvas.worldCamera : Camera.main;
     }
 
@@ -51,9 +47,7 @@ public static partial class EditorFeature {
     [HarmonyPatch(typeof(EditorDifficultySelector), "OnPointerEnter")]
     private static class DifficultyPointerEnterPatch {
         private static bool Prefix(EditorDifficultySelector __instance) {
-            if(PointerIsOverVisibleDifficultyIcon(__instance)) {
-                return true;
-            }
+            if(PointerIsOverVisibleDifficultyIcon(__instance)) return true;
 
             HideDifficultyPopup(__instance);
             return false;
@@ -64,9 +58,7 @@ public static partial class EditorFeature {
     private static class DifficultyTogglePatch {
         private static bool Prefix(EditorDifficultySelector __instance) {
             bool allowed = PointerIsOverVisibleDifficultyIcon(__instance);
-            if(!allowed) {
-                HideDifficultyPopup(__instance);
-            }
+            if(!allowed) HideDifficultyPopup(__instance);
             return allowed;
         }
     }

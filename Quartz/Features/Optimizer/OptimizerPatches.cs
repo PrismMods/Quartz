@@ -20,15 +20,11 @@ public static class OptimizerPatches {
     private static class LoadTextureCompressPatch {
         private static bool Prefix(string filePath, ref LoadResult status, int maxSideSize, ref Texture2D __result) {
             Optimizer.EnsureConf();
-            if(!MainCore.IsModEnabled || Optimizer.Conf == null || !Optimizer.Conf.LossyTextureCompression) {
-                return true;
-            }
+            if(!MainCore.IsModEnabled || Optimizer.Conf == null || !Optimizer.Conf.LossyTextureCompression) return true;
 
             // Let the original handle internal levels (Resources) and bundle
             // levels (Addressables) — those aren't plain files on disk.
-            if(GCS.internalLevelName != null || ADOBase.isBundleLevel) {
-                return true;
-            }
+            if(GCS.internalLevelName != null || ADOBase.isBundleLevel) return true;
 
             status = LoadResult.MissingFile;
 
@@ -45,19 +41,13 @@ public static class OptimizerPatches {
                 return false;
             }
 
-            if(maxSideSize != -1) {
-                TextureManager.ShrinkImage(tex, maxSideSize);
-            }
+            if(maxSideSize != -1) TextureManager.ShrinkImage(tex, maxSideSize);
             tex.name = filePath;
 
             // DXT block compression requires dimensions divisible by 4.
-            if(tex.width % 4 == 0 && tex.height % 4 == 0) {
-                tex.Compress(false);
-            }
+            if(tex.width % 4 == 0 && tex.height % 4 == 0) tex.Compress(false);
 
-            if(tex.isReadable) {
-                tex.Apply(false, true);
-            }
+            if(tex.isReadable) tex.Apply(false, true);
             tex.wrapMode = TextureWrapMode.Repeat;
 
             __result = tex;
@@ -76,9 +66,7 @@ public static class OptimizerPatches {
 
         private static void Prefix(VideoBloom __instance, out bool __state) {
             __state = __instance.HighQuality;
-            if(Optimizer.FastBloomActive) {
-                __instance.HighQuality = false;
-            }
+            if(Optimizer.FastBloomActive) __instance.HighQuality = false;
         }
 
         private static void Postfix(VideoBloom __instance, bool __state) {
@@ -96,9 +84,7 @@ public static class OptimizerPatches {
         private static bool Prepare() => AccessTools.Method(typeof(ScreenTile), "OnRenderImage") != null;
 
         private static bool Prefix(ScreenTile __instance, RenderTexture sourceTexture, RenderTexture destTexture) {
-            if(!Optimizer.SkipNoOpScreenFiltersActive) {
-                return true;
-            }
+            if(!Optimizer.SkipNoOpScreenFiltersActive) return true;
 
             if(IsOne(__instance.tileX) && IsOne(__instance.tileY)) {
                 Graphics.Blit(sourceTexture, destTexture);
@@ -114,9 +100,7 @@ public static class OptimizerPatches {
         private static bool Prepare() => AccessTools.Method(typeof(ScreenScroll), "OnRenderImage") != null;
 
         private static bool Prefix(ScreenScroll __instance, RenderTexture sourceTexture, RenderTexture destTexture) {
-            if(!Optimizer.SkipNoOpScreenFiltersActive) {
-                return true;
-            }
+            if(!Optimizer.SkipNoOpScreenFiltersActive) return true;
 
             if(IsZero(__instance.scrollOffset) && IsZero(__instance.scrollSpeed)) {
                 Graphics.Blit(sourceTexture, destTexture);

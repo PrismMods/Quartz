@@ -84,10 +84,7 @@ public class UIButton : UIObject {
     }
 
     public void Click(bool invoke = true) {
-        if(invoke) {
-            OnClick?.Invoke();
-        }
-
+        if(invoke) OnClick?.Invoke();
         UpdateVisual();
     }
 

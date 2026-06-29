@@ -57,8 +57,7 @@ internal static class PageCredits {
         subtitleTmp.fontSize = 20;
         subtitleTmp.color = new Color(1f, 1f, 1f, 0.45f);
         subtitleTmp.alignment = TextAlignmentOptions.Center;
-        subtitleTmp.gameObject.AddComponent<TextLocalization>()
-            .Init("CREDITS_SUBTITLE", "by koren, sbrothers7, and more.");
+        subtitleTmp.gameObject.AddComponent<TextLocalization>().Init("CREDITS_SUBTITLE", "by koren, sbrothers7, and more.");
 
         GameObject credits = new("Credits");
         credits.transform.SetParent(parent, false);

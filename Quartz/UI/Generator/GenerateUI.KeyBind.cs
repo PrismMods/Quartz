@@ -62,9 +62,7 @@ public static partial class GenerateUI {
         capture.OnChanged = onChanged;
 
         AddButton(rect.gameObject, btn => {
-            if(btn == InputButton.Left) {
-                capture.Begin();
-            }
+            if(btn == InputButton.Left) capture.Begin();
         });
 
         return label;
@@ -84,9 +82,7 @@ internal sealed class KeyCapture : MonoBehaviour {
     private static readonly KeyCode[] AllKeys = (KeyCode[])System.Enum.GetValues(typeof(KeyCode));
 
     public void Begin() {
-        if(listening) {
-            return;
-        }
+        if(listening) return;
         listening = true;
         Keybind.Capturing = true;
         Display.text = MainCore.Tr.Get("PRESS_A_KEY", "Press a key...");
@@ -102,15 +98,11 @@ internal sealed class KeyCapture : MonoBehaviour {
 
     // Bail out of capture if the row is hidden (e.g. panel closed) mid-listen.
     private void OnDisable() {
-        if(listening) {
-            Cancel();
-        }
+        if(listening) Cancel();
     }
 
     private void Update() {
-        if(!listening) {
-            return;
-        }
+        if(!listening) return;
 
         if(Input.GetKeyDown(KeyCode.Escape)) {
             Cancel();
@@ -119,19 +111,11 @@ internal sealed class KeyCapture : MonoBehaviour {
 
         for(int i = 0; i < AllKeys.Length; i++) {
             KeyCode kc = AllKeys[i];
-            if(kc == KeyCode.None) {
-                continue;
-            }
+            if(kc == KeyCode.None) continue;
             // Skip mouse buttons and joystick inputs (everything >= Mouse0).
-            if((int)kc >= (int)KeyCode.Mouse0) {
-                continue;
-            }
-            if(Keybind.IsModifier(kc)) {
-                continue;
-            }
-            if(!Input.GetKeyDown(kc)) {
-                continue;
-            }
+            if((int)kc >= (int)KeyCode.Mouse0) continue;
+            if(Keybind.IsModifier(kc)) continue;
+            if(!Input.GetKeyDown(kc)) continue;
 
             Modifier = Keybind.HeldModifier();
             Key = kc;

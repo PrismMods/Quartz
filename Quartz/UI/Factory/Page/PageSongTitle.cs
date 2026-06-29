@@ -95,10 +95,7 @@ internal static class PageSongTitle {
         System.Action<float> setter,
         System.Action live, System.Action save
     ) {
-        float Snap(float v) {
-            float snapped = Mathf.Round(v / step) * step;
-            return Mathf.Clamp(snapped, min, max);
-        }
+        float Snap(float v) => Mathf.Clamp(Mathf.Round(v / step) * step, min, max);
 
         UISlider s = GenerateUI.Slider(
             GenerateUI.Row(body),

@@ -23,9 +23,7 @@ public static class NostalgiaImages {
     private static bool loaded;
 
     public static void EnsureLoaded() {
-        if(loaded) {
-            return;
-        }
+        if(loaded) return;
         loaded = true;
 
         SwirlCw = MakeSprite("swirl_cw", 100f);

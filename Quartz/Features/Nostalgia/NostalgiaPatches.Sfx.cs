@@ -29,9 +29,7 @@ public static partial class Nostalgia {
                 case SfxSound.ScreenWipeOut:
                     return !ShouldDisableWindSound;
                 case SfxSound.PlanetExplosionHighscore:
-                    if(ShouldDisableNewBestSound) {
-                        __0 = SfxSound.PlanetExplosion;
-                    }
+                    if(ShouldDisableNewBestSound) __0 = SfxSound.PlanetExplosion;
                     break;
             }
             return true;
@@ -46,13 +44,9 @@ public static partial class Nostalgia {
 
         private static void Prefix(scrConductor __instance) {
             prevFastTakeoff = __instance.fastTakeoff;
-            if(ShouldDisableCountdownSound) {
-                __instance.fastTakeoff = true;
-            }
+            if(ShouldDisableCountdownSound) __instance.fastTakeoff = true;
             prevEndingCymbal = __instance.playEndingCymbal;
-            if(ShouldDisableEndingSound) {
-                __instance.playEndingCymbal = false;
-            }
+            if(ShouldDisableEndingSound) __instance.playEndingCymbal = false;
         }
 
         private static void Postfix(scrConductor __instance) {

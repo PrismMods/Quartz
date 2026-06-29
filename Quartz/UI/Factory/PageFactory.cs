@@ -24,9 +24,7 @@ public static class PageFactory {
         PagesContaner.offsetMin = Vector2.zero;
         PagesContaner.offsetMax = new Vector2(0, -60);
 
-        for(int i = 0; i < Enum.GetValues(typeof(OriginalMenuState)).Length; i++) {
-            CreatePageBase(i);
-        }
+        for(int i = 0; i < Enum.GetValues(typeof(OriginalMenuState)).Length; i++) CreatePageBase(i);
 
         UICore.Pages[UICore.CurrentMenuState].GetComponent<CanvasGroup>().alpha = 1f;
         UICore.Pages[UICore.CurrentMenuState].GetComponent<CanvasGroup>().interactable = true;
@@ -45,13 +43,10 @@ public static class PageFactory {
 
         // Developer page — only populated in "dev" builds (its tab is likewise
         // only created then).
-        if(Quartz.Core.Info.IsDev) {
-            PageDeveloper.Create(UICore.Pages[(int)OriginalMenuState.Developer]);
-        }
+        if(Quartz.Core.Info.IsDev) PageDeveloper.Create(UICore.Pages[(int)OriginalMenuState.Developer]);
 
         return PagesContaner;
     }
-
 
     public static RectTransform CreateScrollablePage(RectTransform parent) =>
         CreateScrollablePage(parent, out _);

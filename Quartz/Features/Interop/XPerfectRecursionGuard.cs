@@ -22,14 +22,10 @@ internal static class XPerfectRecursionGuard {
     // first time XPerfect's patch type exists, then no-ops. That covers XPerfect
     // loading after Quartz, without a hard ordering dependency.
     public static void TryApply(HarmonyLib.Harmony harmony) {
-        if(applied || harmony == null) {
-            return;
-        }
+        if(applied || harmony == null) return;
         try {
             Type patchType = AccessTools.TypeByName("XPerfect.HitMarginPatch");
-            if(patchType == null) {
-                return;
-            }
+            if(patchType == null) return;
 
             MethodInfo target = AccessTools.Method(patchType, "Postfix");
             if(target == null) {
@@ -71,9 +67,7 @@ internal static class XPerfectRecursionGuard {
                 break;
             }
         }
-        if(patch == null) {
-            throw new MissingMethodException("HarmonyLib.Harmony.Patch not found");
-        }
+        if(patch == null) throw new MissingMethodException("HarmonyLib.Harmony.Patch not found");
 
         ParameterInfo[] ps = patch.GetParameters();
         object[] args = new object[ps.Length];
@@ -88,18 +82,14 @@ internal static class XPerfectRecursionGuard {
 
     private static bool GuardPrefix(ref bool __state) {
         __state = false;
-        if(depth > 0) {
-            return false; // already inside XPerfect's postfix — skip the reentry.
-        }
+        if(depth > 0) return false; // already inside XPerfect's postfix — skip the reentry.
         depth++;
         __state = true;
         return true;
     }
 
     private static Exception GuardFinalizer(bool __state, Exception __exception) {
-        if(__state && depth > 0) {
-            depth--;
-        }
+        if(__state && depth > 0) depth--;
         return __exception;
     }
 }

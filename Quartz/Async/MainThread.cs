@@ -8,10 +8,7 @@ public class MainThread : MonoBehaviour {
     private static readonly ConcurrentQueue<Action> queue = new();
 
     public static void Enqueue(Action action) {
-        if(action == null) {
-            return;
-        }
-
+        if(action == null) return;
         queue.Enqueue(action);
     }
 

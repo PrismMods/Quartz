@@ -18,9 +18,7 @@ public class TextLocalization : MonoBehaviour {
 
     public TextLocalization Init(string key, string defaultValue, Translator translator = null) {
         foreach(TextLocalization other in GetComponents<TextLocalization>()) {
-            if(other == this) {
-                continue;
-            }
+            if(other == this) continue;
 
             instances.Remove(other);
             Destroy(other);
@@ -44,20 +42,14 @@ public class TextLocalization : MonoBehaviour {
     void OnDisable() => instances.Remove(this);
 
     public void UpdateText() {
-        if(tmp == null) {
-            tmp = GetComponent<TMP_Text>();
-        }
+        if(tmp == null) tmp = GetComponent<TMP_Text>();
 
-        if(tmp == null || tr == null || string.IsNullOrEmpty(Key)) {
-            return;
-        }
+        if(tmp == null || tr == null || string.IsNullOrEmpty(Key)) return;
 
         tmp.text = Value;
     }
 
     public static void RefreshAll() {
-        foreach(TextLocalization t in instances) {
-            t?.UpdateText();
-        }
+        foreach(TextLocalization t in instances) t?.UpdateText();
     }
 }

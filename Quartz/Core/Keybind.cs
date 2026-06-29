@@ -19,8 +19,7 @@ public static class Keybind {
     public static bool Capturing;
 
     public static bool IsMac =>
-        Application.platform == RuntimePlatform.OSXPlayer
-        || Application.platform == RuntimePlatform.OSXEditor;
+        Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor;
 
     // The Command / Meta / Windows keys that exist in this Unity's KeyCode enum.
     private static readonly KeyCode[] CmdKeys = ResolveCmdKeys();
@@ -34,27 +33,21 @@ public static class Keybind {
         };
         List<KeyCode> keys = [];
         foreach(string name in names) {
-            if(System.Enum.TryParse(name, out KeyCode kc) && !keys.Contains(kc)) {
-                keys.Add(kc);
-            }
+            if(System.Enum.TryParse(name, out KeyCode kc) && !keys.Contains(kc)) keys.Add(kc);
         }
         return [.. keys];
     }
 
     private static bool AnyCmdHeld() {
         for(int i = 0; i < CmdKeys.Length; i++) {
-            if(Input.GetKey(CmdKeys[i])) {
-                return true;
-            }
+            if(Input.GetKey(CmdKeys[i])) return true;
         }
         return false;
     }
 
     private static bool IsCmdKey(KeyCode key) {
         for(int i = 0; i < CmdKeys.Length; i++) {
-            if(CmdKeys[i] == key) {
-                return true;
-            }
+            if(CmdKeys[i] == key) return true;
         }
         return false;
     }
@@ -82,18 +75,10 @@ public static class Keybind {
 
     // The modifier currently held (Ctrl > Cmd > Alt > Shift priority), or None.
     public static KeyModifier HeldModifier() {
-        if(ModifierHeld(KeyModifier.Ctrl)) {
-            return KeyModifier.Ctrl;
-        }
-        if(ModifierHeld(KeyModifier.Cmd)) {
-            return KeyModifier.Cmd;
-        }
-        if(ModifierHeld(KeyModifier.Alt)) {
-            return KeyModifier.Alt;
-        }
-        if(ModifierHeld(KeyModifier.Shift)) {
-            return KeyModifier.Shift;
-        }
+        if(ModifierHeld(KeyModifier.Ctrl)) return KeyModifier.Ctrl;
+        if(ModifierHeld(KeyModifier.Cmd)) return KeyModifier.Cmd;
+        if(ModifierHeld(KeyModifier.Alt)) return KeyModifier.Alt;
+        if(ModifierHeld(KeyModifier.Shift)) return KeyModifier.Shift;
         return KeyModifier.None;
     }
 

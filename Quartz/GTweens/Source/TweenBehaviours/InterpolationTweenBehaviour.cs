@@ -19,20 +19,14 @@ public sealed class InterpolationTweenBehaviour : TweenBehaviour {
 
             tweener.Tick(deltaTime);
 
-            if(!tweener.IsPlaying) {
-                _playingTweeners.RemoveAt(i);
-            }
+            if(!tweener.IsPlaying) _playingTweeners.RemoveAt(i);
         }
 
-        if(_playingTweeners.Count == 0) {
-            MarkFinished();
-        }
+        if(_playingTweeners.Count == 0) MarkFinished();
     }
 
     public override void Kill() {
-        foreach(ITweener tweener in _playingTweeners) {
-            tweener.Kill();
-        }
+        foreach(ITweener tweener in _playingTweeners) tweener.Kill();
 
         _playingTweeners.Clear();
 
@@ -41,9 +35,7 @@ public sealed class InterpolationTweenBehaviour : TweenBehaviour {
 
     public override void Complete() {
         foreach(ITweener tweener in _playingTweeners) {
-            if(!tweener.IsPlaying) {
-                continue;
-            }
+            if(!tweener.IsPlaying) continue;
 
             tweener.Complete();
         }
@@ -64,23 +56,17 @@ public sealed class InterpolationTweenBehaviour : TweenBehaviour {
     }
 
     public override void SetEasing(EasingDelegate easingFunction) {
-        foreach(ITweener tweener in _tweeners) {
-            tweener.SetEasing(easingFunction);
-        }
+        foreach(ITweener tweener in _tweeners) tweener.SetEasing(easingFunction);
     }
 
     public override float GetDuration() {
-        if(_durationCalculated) {
-            return _cachedCalculatedDuration;
-        }
+        if(_durationCalculated) return _cachedCalculatedDuration;
 
         _durationCalculated = true;
 
         _cachedCalculatedDuration = 0.0f;
 
-        foreach(ITweener tweener in _tweeners) {
-            _cachedCalculatedDuration += tweener.Duration;
-        }
+        foreach(ITweener tweener in _tweeners) _cachedCalculatedDuration += tweener.Duration;
 
         return _cachedCalculatedDuration;
     }
@@ -88,9 +74,7 @@ public sealed class InterpolationTweenBehaviour : TweenBehaviour {
     public override float GetElapsed() {
         float totalElapsed = 0.0f;
 
-        foreach(ITweener tweener in _tweeners) {
-            totalElapsed += tweener.Elapsed;
-        }
+        foreach(ITweener tweener in _tweeners) totalElapsed += tweener.Elapsed;
 
         return totalElapsed;
     }
@@ -128,13 +112,9 @@ public sealed class InterpolationTweenBehaviour : TweenBehaviour {
 
             tweener.Start();
 
-            if(!tweener.IsPlaying) {
-                _playingTweeners.RemoveAt(i);
-            }
+            if(!tweener.IsPlaying) _playingTweeners.RemoveAt(i);
         }
 
-        if(_playingTweeners.Count == 0) {
-            MarkFinished();
-        }
+        if(_playingTweeners.Count == 0) MarkFinished();
     }
 }

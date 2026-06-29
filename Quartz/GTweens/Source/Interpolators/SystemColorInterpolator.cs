@@ -7,7 +7,6 @@ public sealed class SystemColorInterpolator : IInterpolator<Color> {
     public static readonly SystemColorInterpolator Instance = new();
 
     SystemColorInterpolator() {
-
     }
 
     public Color Evaluate(

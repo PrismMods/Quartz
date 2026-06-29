@@ -14,9 +14,7 @@ public sealed class WaitTimeTweenBehaviour : TweenBehaviour {
     public override void Tick(float deltaTime) {
         _elapsedSeconds += deltaTime;
 
-        if(_elapsedSeconds >= _durationSeconds) {
-            MarkFinished();
-        }
+        if(_elapsedSeconds >= _durationSeconds) MarkFinished();
     }
 
     public override void Complete() {

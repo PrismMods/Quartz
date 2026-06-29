@@ -23,15 +23,11 @@ internal static class Bpm {
 
     internal static int GetAutoKps() {
         int frame = Time.frameCount;
-        if(autoKpsFrame == frame) {
-            return autoKpsValue;
-        }
+        if(autoKpsFrame == frame) return autoKpsValue;
         autoKpsFrame = frame;
 
         float now = Time.time;
-        while(autoTileTimes.Count > 0 && now - autoTileTimes.Peek() > 1f) {
-            autoTileTimes.Dequeue();
-        }
+        while(autoTileTimes.Count > 0 && now - autoTileTimes.Peek() > 1f) autoTileTimes.Dequeue();
         return autoKpsValue = autoTileTimes.Count;
     }
 
@@ -40,9 +36,7 @@ internal static class Bpm {
     [HarmonyPatch(typeof(scrPlanet), "MoveToNextFloor")]
     private static class MoveToNextFloorPatch {
         private static void Postfix() {
-            if(!MainCore.IsModEnabled) {
-                return;
-            }
+            if(!MainCore.IsModEnabled) return;
 
             try {
                 if(RDC.auto) {
@@ -71,9 +65,7 @@ internal static class Bpm {
             scrConductor conductor = scrConductor.instance;
             scrFloor floor = controller != null ? (controller.currFloor ?? controller.firstFloor) : null;
 
-            if(controller == null || conductor == null || floor == null || conductor.song == null) {
-                return;
-            }
+            if(controller == null || conductor == null || floor == null || conductor.song == null) return;
 
             double speed = controller.planetarySystem != null ? controller.planetarySystem.speed : 1.0;
             tileBpm = (float)(conductor.bpm * conductor.song.pitch * speed);

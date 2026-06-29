@@ -26,9 +26,7 @@ public sealed class SequenceTweenBehaviour : TweenBehaviour {
 
         gTween.Tick(deltaTime);
 
-        if(gTween.IsPlaying) {
-            return;
-        }
+        if(gTween.IsPlaying) return;
 
         _playingTweens.RemoveAt(0);
 
@@ -42,9 +40,7 @@ public sealed class SequenceTweenBehaviour : TweenBehaviour {
     }
 
     public override void Kill() {
-        foreach(GTween tween in _playingTweens) {
-            tween.Kill();
-        }
+        foreach(GTween tween in _playingTweens) tween.Kill();
 
         _playingTweens.Clear();
 
@@ -53,13 +49,9 @@ public sealed class SequenceTweenBehaviour : TweenBehaviour {
 
     public override void Complete() {
         foreach(GTween tween in _tweens) {
-            if(tween.IsCompleted) {
-                continue;
-            }
+            if(tween.IsCompleted) continue;
 
-            if(!tween.IsPlaying) {
-                tween.Start(isCompletingInstantly: true);
-            }
+            if(!tween.IsPlaying) tween.Start(isCompletingInstantly: true);
 
             tween.Complete();
         }
@@ -70,33 +62,23 @@ public sealed class SequenceTweenBehaviour : TweenBehaviour {
     }
 
     public override void Reset(bool kill, ResetMode resetMode) {
-        for(int i = _tweens.Count - 1; i >= 0; --i) {
-            GTween gTween = _tweens[i];
-
-            gTween.Reset(kill, resetMode);
-        }
+        for(int i = _tweens.Count - 1; i >= 0; --i) _tweens[i].Reset(kill, resetMode);
 
         MarkUnfinished();
     }
 
     public override void SetEasing(EasingDelegate easingFunction) {
-        foreach(GTween tween in _tweens) {
-            tween.SetEasing(easingFunction);
-        }
+        foreach(GTween tween in _tweens) tween.SetEasing(easingFunction);
     }
 
     public override float GetDuration() {
-        if(_durationCalculated) {
-            return _cachedCalculatedDuration;
-        }
+        if(_durationCalculated) return _cachedCalculatedDuration;
 
         _durationCalculated = true;
 
         _cachedCalculatedDuration = 0.0f;
 
-        foreach(GTween tween in _tweens) {
-            _cachedCalculatedDuration += tween.GetDuration();
-        }
+        foreach(GTween tween in _tweens) _cachedCalculatedDuration += tween.GetDuration();
 
         return _cachedCalculatedDuration;
     }
@@ -104,17 +86,13 @@ public sealed class SequenceTweenBehaviour : TweenBehaviour {
     public override float GetElapsed() {
         float totalDuration = 0.0f;
 
-        foreach(GTween tween in _tweens) {
-            totalDuration += tween.GetElapsed();
-        }
+        foreach(GTween tween in _tweens) totalDuration += tween.GetElapsed();
 
         return totalDuration;
     }
 
     public void Add(GTween gTween) {
-        if(gTween.IsPlayingOrCompletedOrNested()) {
-            return;
-        }
+        if(gTween.IsPlayingOrCompletedOrNested()) return;
 
         gTween.IsNested = true;
 
@@ -124,15 +102,11 @@ public sealed class SequenceTweenBehaviour : TweenBehaviour {
     }
 
     public void Remove(GTween gTween) {
-        if(gTween.IsPlayingOrCompleted()) {
-            return;
-        }
+        if(gTween.IsPlayingOrCompleted()) return;
 
         bool found = _tweens.Remove(gTween);
 
-        if(!found) {
-            return;
-        }
+        if(!found) return;
 
         gTween.IsNested = false;
 

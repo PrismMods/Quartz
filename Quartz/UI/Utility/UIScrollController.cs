@@ -22,15 +22,11 @@ public class UIScrollController : MonoBehaviour {
     private GTween scrollTween;
 
     private void Awake() {
-        if(content != null) {
-            targetY = content.anchoredPosition.y;
-        }
+        if(content != null) targetY = content.anchoredPosition.y;
     }
 
     private void Update() {
-        if(content == null || viewport == null) {
-            return;
-        }
+        if(content == null || viewport == null) return;
 
         HandleWheel();
         HandleRightDrag();
@@ -39,9 +35,7 @@ public class UIScrollController : MonoBehaviour {
     private void HandleWheel() {
         float wheel = Input.mouseScrollDelta.y;
 
-        if(Mathf.Abs(wheel) <= 0.0001f) {
-            return;
-        }
+        if(Mathf.Abs(wheel) <= 0.0001f) return;
 
         // Fixed pixels per wheel notch (independent of content length), so a long
         // list like the font dropdown scrolls at the same speed as a short page.
@@ -50,40 +44,27 @@ public class UIScrollController : MonoBehaviour {
     }
 
     private void HandleRightDrag() {
-        if(Input.GetMouseButtonDown(1)) {
-            rightDragging = true;
-        }
+        if(Input.GetMouseButtonDown(1)) rightDragging = true;
 
         if(Input.GetMouseButtonUp(1)) {
             rightDragging = false;
             ApplyTween();
         }
 
-        if(!rightDragging) {
-            return;
-        }
+        if(!rightDragging) return;
 
         float contentHeight = content.rect.height;
         float viewportHeight = viewport.rect.height;
 
         float maxOffset = Mathf.Max(0f, contentHeight - viewportHeight);
 
-        if(maxOffset <= 0f) {
-            return;
-        }
+        if(maxOffset <= 0f) return;
 
         Vector2 mouse = Input.mousePosition;
 
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            viewport,
-            mouse,
-            null,
-            out Vector2 local
-        );
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(viewport, mouse, null, out Vector2 local);
 
-        float normalized = 1f - Mathf.Clamp01(
-            (local.y + (viewportHeight * 0.5f)) / viewportHeight
-        );
+        float normalized = 1f - Mathf.Clamp01((local.y + (viewportHeight * 0.5f)) / viewportHeight);
 
         targetY = normalized * maxOffset;
 
@@ -105,12 +86,7 @@ public class UIScrollController : MonoBehaviour {
 
         scrollTween = GTweenExtensions.Tween(
             () => content.anchoredPosition.y,
-            x => {
-                content.anchoredPosition = new Vector2(
-                    content.anchoredPosition.x,
-                    x
-                );
-            },
+            x => content.anchoredPosition = new Vector2(content.anchoredPosition.x, x),
             targetY,
             scrollDuration
         )
@@ -121,9 +97,7 @@ public class UIScrollController : MonoBehaviour {
     // Scrolls so the content sits `y` pixels down from its top, with the same
     // tween as wheel scrolling. Clamped to the scrollable range.
     public void ScrollTo(float y) {
-        if(content == null || viewport == null) {
-            return;
-        }
+        if(content == null || viewport == null) return;
 
         float maxOffset = Mathf.Max(0f, content.rect.height - viewport.rect.height);
 
@@ -135,8 +109,6 @@ public class UIScrollController : MonoBehaviour {
         this.content = content;
         this.viewport = viewport;
 
-        if(content != null) {
-            targetY = content.anchoredPosition.y;
-        }
+        if(content != null) targetY = content.anchoredPosition.y;
     }
 }

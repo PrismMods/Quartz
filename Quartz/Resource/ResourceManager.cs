@@ -157,18 +157,14 @@ public sealed class ResourceManager(Assembly assembly, string resourcePath) : ID
                     if(font.material != null) Object.Destroy(font.material);
                     Texture2D[] atlases = font.atlasTextures;
                     if(atlases != null) {
-                        foreach(Texture2D tex in atlases) {
-                            if(tex != null) Object.Destroy(tex);
-                        }
+                        foreach(Texture2D tex in atlases) if(tex != null) Object.Destroy(tex);
                     }
                     Object.Destroy(font);
                     break;
             }
         }
 
-        foreach(Font font in sourceFonts) {
-            if(font != null) Object.Destroy(font);
-        }
+        foreach(Font font in sourceFonts) if(font != null) Object.Destroy(font);
         sourceFonts.Clear();
 
         cache.Clear();

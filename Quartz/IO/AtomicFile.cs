@@ -7,20 +7,14 @@ namespace Quartz.IO;
 // Small same-directory atomic writer used by settings, profiles, and counters.
 // Writing beside the destination keeps the final rename on one filesystem.
 internal static class AtomicFile {
-    public static void WriteAllText(string path, string contents) {
-        WriteAllBytes(path, Encoding.UTF8.GetBytes(contents ?? string.Empty));
-    }
+    public static void WriteAllText(string path, string contents) => WriteAllBytes(path, Encoding.UTF8.GetBytes(contents ?? string.Empty));
 
     public static void WriteAllBytes(string path, byte[] contents) {
-        if(string.IsNullOrEmpty(path)) {
-            throw new ArgumentException("Destination path is required.", nameof(path));
-        }
+        if(string.IsNullOrEmpty(path)) throw new ArgumentException("Destination path is required.", nameof(path));
 
         string fullPath = Path.GetFullPath(path);
         string? directory = Path.GetDirectoryName(fullPath);
-        if(!string.IsNullOrEmpty(directory)) {
-            Directory.CreateDirectory(directory);
-        }
+        if(!string.IsNullOrEmpty(directory)) Directory.CreateDirectory(directory);
 
         string tempPath = fullPath + "." + Guid.NewGuid().ToString("N") + ".tmp";
         bool committed = false;
@@ -50,9 +44,7 @@ internal static class AtomicFile {
             File.Move(tempPath, fullPath);
             committed = true;
         } finally {
-            if(!committed) {
-                try { File.Delete(tempPath); } catch { }
-            }
+            if(!committed) try { File.Delete(tempPath); } catch { }
         }
     }
 }

@@ -38,9 +38,7 @@ public sealed class UiHiderProfile {
     }
 
     public void Deserialize(JToken token) {
-        if(token == null) {
-            return;
-        }
+        if(token == null) return;
         HideEverything = IOUtils.Read(token, nameof(HideEverything), HideEverything);
         HideJudgment = IOUtils.Read(token, nameof(HideJudgment), HideJudgment);
         HideMissIndicators = IOUtils.Read(token, nameof(HideMissIndicators), HideMissIndicators);

@@ -117,14 +117,7 @@ public class Tooltip {
 
         seq?.Kill();
         seq = GTweenSequenceBuilder.New()
-            .Append(
-                GTweenExtensions.Tween(
-                    () => canvas.alpha,
-                    x => canvas.alpha = x,
-                    0f,
-                    0.16f
-                ).SetEasing(Easing.OutSine)
-            )
+            .Append(GTweenExtensions.Tween(() => canvas.alpha, x => canvas.alpha = x, 0f, 0.16f).SetEasing(Easing.OutSine))
             .AppendCallback(() => {
                 visible = false;
                 obj.SetActive(false);
@@ -136,9 +129,7 @@ public class Tooltip {
         visible = false;
         velocity = Vector2.zero;
 
-        if(obj != null) {
-            Object.Destroy(obj);
-        }
+        if(obj != null) Object.Destroy(obj);
 
         obj = null;
         rect = null;

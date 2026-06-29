@@ -47,9 +47,7 @@ public sealed class EditorSettings : ISettingsFile {
     }
 
     public void Deserialize(JToken token) {
-        if(token == null) {
-            return;
-        }
+        if(token == null) return;
         HorizontalProperties = IOUtils.Read(token, nameof(HorizontalProperties), HorizontalProperties);
         ShowFloorAngle = IOUtils.Read(token, nameof(ShowFloorAngle), ShowFloorAngle);
         ShowFloorBeats = IOUtils.Read(token, nameof(ShowFloorBeats), ShowFloorBeats);

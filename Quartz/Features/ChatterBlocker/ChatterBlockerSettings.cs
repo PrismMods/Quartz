@@ -10,12 +10,10 @@ public sealed class ChatterBlockerSettings : ISettingsFile {
     public bool Enabled = true;
     public float ThresholdMs = 35f;
 
-    public JToken Serialize() {
-        return new JObject {
-            [nameof(Enabled)] = Enabled,
-            [nameof(ThresholdMs)] = ThresholdMs,
-        };
-    }
+    public JToken Serialize() => new JObject {
+        [nameof(Enabled)] = Enabled,
+        [nameof(ThresholdMs)] = ThresholdMs,
+    };
 
     public void Deserialize(JToken token) {
         Enabled = IOUtils.Read(token, nameof(Enabled), Enabled);

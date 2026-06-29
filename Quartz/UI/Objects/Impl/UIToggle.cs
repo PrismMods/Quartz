@@ -51,11 +51,7 @@ public class UIToggle : UIObject {
 
     public void Set(bool value, bool invoke = true) {
         Value = value;
-
-        if(invoke) {
-            OnChanged?.Invoke(value);
-        }
-
+        if(invoke) OnChanged?.Invoke(value);
         UpdateVisual();
     }
 
@@ -67,9 +63,7 @@ public class UIToggle : UIObject {
         circleSeq?.Kill();
         changeSeq?.Kill();
 
-        CircleImage.sprite = MainCore.Spr.Get(
-            Value ? UISprite.Circle256 : UISprite.ToggleCircle128
-        );
+        CircleImage.sprite = MainCore.Spr.Get(Value ? UISprite.Circle256 : UISprite.ToggleCircle128);
 
         CircleRect.sizeDelta = new(30f, 30f);
 

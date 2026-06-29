@@ -26,7 +26,6 @@ namespace Quartz;
 // Mods/, mirroring upstream Overlayer's loader merge). Acts as the host bridge
 // (IQuartzHost/IQuartzLogger) into the runtime.
 public class Loader : MelonMod, IQuartzHost, IQuartzLogger {
-
     public IQuartzLogger QuartzLogger => this;
 
     // Data root is <game>/UserData/Quartz — the runtime uses this verbatim.

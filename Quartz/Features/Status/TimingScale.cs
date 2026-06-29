@@ -8,12 +8,9 @@ internal static class TimingScale {
         get {
             try {
                 scrController c = scrController.instance;
-                if(c != null && c.currFloor != null) {
-                    return (float)c.currFloor.marginScale;
-                }
+                if(c != null && c.currFloor != null) return (float)c.currFloor.marginScale;
             } catch {
             }
-
             return 1f;
         }
     }

@@ -16,13 +16,11 @@ public sealed class PlayData {
     public float BestStartProgress;
     public int TotalAttempts;
 
-    public JObject Serialize() {
-        return new JObject {
-            [nameof(BestProgress)] = BestProgress,
-            [nameof(BestStartProgress)] = BestStartProgress,
-            [nameof(TotalAttempts)] = TotalAttempts,
-        };
-    }
+    public JObject Serialize() => new JObject {
+        [nameof(BestProgress)] = BestProgress,
+        [nameof(BestStartProgress)] = BestStartProgress,
+        [nameof(TotalAttempts)] = TotalAttempts,
+    };
 
     public static PlayData Deserialize(JToken token) {
         PlayData data = new();

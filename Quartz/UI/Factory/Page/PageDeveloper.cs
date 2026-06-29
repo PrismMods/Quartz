@@ -70,9 +70,7 @@ internal static class PageDeveloper {
     }
 
     internal static void RefreshStatus() {
-        if(statusText == null) {
-            return;
-        }
+        if(statusText == null) return;
 
         UpdateInfo available = UpdateService.Available;
         string skipped = string.IsNullOrEmpty(MainCore.Conf.SkippedVersion)

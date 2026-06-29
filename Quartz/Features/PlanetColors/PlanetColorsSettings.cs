@@ -86,8 +86,7 @@ public sealed class PlanetColorsSettings : ISettingsFile {
         TailB[slot] = Mathf.Clamp01(c.b);
     }
 
-    public JToken Serialize() {
-        return new JObject {
+    public JToken Serialize() => new JObject {
             [nameof(Enabled)] = Enabled,
             [nameof(SeparateTailColor)] = SeparateTailColor,
             [nameof(BallR)] = new JArray(BallR),
@@ -103,8 +102,7 @@ public sealed class PlanetColorsSettings : ISettingsFile {
             [nameof(RingG)] = RingG,
             [nameof(RingB)] = RingB,
             [nameof(RingA)] = RingA,
-        };
-    }
+    };
 
     public void Deserialize(JToken token) {
         Enabled = IOUtils.Read(token, nameof(Enabled), Enabled);
@@ -125,10 +123,7 @@ public sealed class PlanetColorsSettings : ISettingsFile {
     }
 
     private static void ReadFloats(JToken token, string name, float[] target) {
-        if(token?[name] is not JArray arr) {
-            return;
-        }
-
+        if(token?[name] is not JArray arr) return;
         for(int i = 0; i < target.Length && i < arr.Count; i++) {
             try { target[i] = Mathf.Clamp01((float)arr[i]); } catch { }
         }

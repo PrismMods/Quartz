@@ -11,24 +11,16 @@ public class PageSwicher {
     private static GTween pageSeq;
 
     public static bool SwitchPage(int from, int to) {
-        if(from == to) {
-            return false;
-        }
+        if(from == to) return false;
 
-        if(!UICore.Pages.TryGetValue(from, out RectTransform fromPage)) {
-            return false;
-        }
+        if(!UICore.Pages.TryGetValue(from, out RectTransform fromPage)) return false;
 
-        if(!UICore.Pages.TryGetValue(to, out RectTransform toPage)) {
-            return false;
-        }
+        if(!UICore.Pages.TryGetValue(to, out RectTransform toPage)) return false;
 
         CanvasGroup fromCg = fromPage.GetComponent<CanvasGroup>();
         CanvasGroup toCg = toPage.GetComponent<CanvasGroup>();
 
-        if(fromCg == null || toCg == null) {
-            return false;
-        }
+        if(fromCg == null || toCg == null) return false;
 
         if(pageSeq != null) {
             pageSeq.Complete();

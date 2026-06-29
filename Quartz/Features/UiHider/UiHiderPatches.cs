@@ -26,13 +26,8 @@ public static partial class UiHider {
         private static MethodBase TargetMethod() => AccessTools.Method(AccessTools.TypeByName("scrMissIndicator"), "Awake");
 
         private static void Postfix(object __instance) {
-            if(!ShouldHideMissIndicators()) {
-                return;
-            }
-
-            if(__instance is Component component) {
-                component.transform.position = HiddenPosition;
-            }
+            if(!ShouldHideMissIndicators()) return;
+            if(__instance is Component component) component.transform.position = HiddenPosition;
         }
     }
 
@@ -45,9 +40,7 @@ public static partial class UiHider {
 
         private static void Prefix() {
             prevAuto = RDC.auto;
-            if(ShouldHideOtto()) {
-                RDC.auto = false;
-            }
+            if(ShouldHideOtto()) RDC.auto = false;
         }
 
         private static void Postfix() {
@@ -66,16 +59,11 @@ public static partial class UiHider {
         [HarmonyPatch(typeof(scrController), "OnLandOnPortal")]
         private static class HideResultTextPatch {
             private static void Prefix() {
-                if(ShouldHideLastFloorFlash()) {
-                    shouldIgnoreFlashOnce = true;
-                }
+                if(ShouldHideLastFloorFlash()) shouldIgnoreFlashOnce = true;
             }
 
             private static void Postfix(scrController __instance) {
-                if(!ShouldHideResult()) {
-                    return;
-                }
-
+                if(!ShouldHideResult()) return;
                 SetMemberInactive(__instance, "txtCongrats");
                 SetMemberInactive(__instance, "txtResults");
                 SetMemberInactive(__instance, "txtAllStrictClear");
@@ -90,10 +78,7 @@ public static partial class UiHider {
             private static MethodBase TargetMethod() => AccessTools.Method(AccessTools.TypeByName("scrFlash"), "Flash");
 
             private static bool Prefix(object[] __args) {
-                if(!shouldIgnoreFlashOnce || !TryGetFlashColor(__args, out Color colorStart) || !IsLastFloorFlashColor(colorStart)) {
-                    return true;
-                }
-
+                if(!shouldIgnoreFlashOnce || !TryGetFlashColor(__args, out Color colorStart) || !IsLastFloorFlashColor(colorStart)) return true;
                 shouldIgnoreFlashOnce = false;
                 return false;
             }
@@ -102,19 +87,11 @@ public static partial class UiHider {
 
     private static class HideHitErrorMeterPatches {
         private static void HideErrorMeter() {
-            if(!ShouldHideHitErrorMeter()) {
-                return;
-            }
-
+            if(!ShouldHideHitErrorMeter()) return;
             scrController controller = scrController.instance;
-            if(controller == null || !controller.gameworld) {
-                return;
-            }
-
+            if(controller == null || !controller.gameworld) return;
             GameObject errorMeter = GetGameObject(GetMemberValue(controller, "errorMeter"));
-            if(errorMeter != null && errorMeter.activeSelf) {
-                errorMeter.SetActive(false);
-            }
+            if(errorMeter != null && errorMeter.activeSelf) errorMeter.SetActive(false);
         }
 
         [HarmonyPatch(typeof(scrController), "paused", MethodType.Setter)]
@@ -138,9 +115,7 @@ public static partial class UiHider {
 
     private static void SetMemberInactive(object owner, string memberName) {
         GameObject gameObject = GetGameObject(GetMemberValue(owner, memberName));
-        if(gameObject != null) {
-            gameObject.SetActive(false);
-        }
+        if(gameObject != null) gameObject.SetActive(false);
     }
 
     private static bool IsLastFloorFlashColor(Color color) {
@@ -152,10 +127,7 @@ public static partial class UiHider {
 
     private static bool TryGetFlashColor(object[] args, out Color color) {
         color = default;
-        if(args == null || args.Length == 0 || args[0] is not Color c) {
-            return false;
-        }
-
+        if(args == null || args.Length == 0 || args[0] is not Color c) return false;
         color = c;
         return true;
     }

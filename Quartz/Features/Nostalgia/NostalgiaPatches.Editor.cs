@@ -36,14 +36,10 @@ public static partial class Nostalgia {
     [HarmonyPatch(typeof(scrShowIfDebug), "Update")]
     private static class WeakAutoPatch {
         private static void Prefix() {
-            if(ShouldWeakAuto) {
-                RDC.useOldAuto = false;
-            }
+            if(ShouldWeakAuto) RDC.useOldAuto = false;
         }
         private static void Postfix() {
-            if(ShouldWeakAuto) {
-                RDC.useOldAuto = true;
-            }
+            if(ShouldWeakAuto) RDC.useOldAuto = true;
         }
     }
 
@@ -51,18 +47,14 @@ public static partial class Nostalgia {
     [HarmonyPatch(typeof(scnEditor), "get_highBPM")]
     private static class WhiteAutoHighBpmPatch {
         private static void Postfix(ref bool __result) {
-            if(ShouldWhiteAuto) {
-                __result = false;
-            }
+            if(ShouldWhiteAuto) __result = false;
         }
     }
 
     [HarmonyPatch(typeof(scnGame), "ResetScene")]
     private static class WhiteAutoResetPatch {
         private static void Postfix() {
-            if(ShouldWhiteAuto && scnEditor.instance != null) {
-                scnEditor.instance.autoFailed = false;
-            }
+            if(ShouldWhiteAuto && scnEditor.instance != null) scnEditor.instance.autoFailed = false;
         }
     }
 
@@ -79,9 +71,7 @@ public static partial class Nostalgia {
     [HarmonyPatch(typeof(RDString), "GetWithCheck")]
     private static class LegacyTextsPatch {
         private static void Postfix(ref string __result) {
-            if(!ShouldLegacyTexts) {
-                return;
-            }
+            if(!ShouldLegacyTexts) return;
             switch(__result) {
                 case "눈폭풍":
                     __result = "눈폭충";

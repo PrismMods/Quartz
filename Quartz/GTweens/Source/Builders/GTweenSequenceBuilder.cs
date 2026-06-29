@@ -31,9 +31,7 @@ public sealed class GTweenSequenceBuilder {
     /// <returns>The current instance of the builder.</returns>
     public GTweenSequenceBuilder Append(GTween gTween) {
         _creatingGroupTween = false;
-
         _sequenceTweenBehaviour.Add(gTween);
-
         return this;
     }
 
@@ -50,7 +48,6 @@ public sealed class GTweenSequenceBuilder {
         }
 
         _creatingGroupTween = true;
-
         _groupTweenBehaviour = new GroupTweenBehaviour();
 
         if(_sequenceTweenBehaviour.Tweens.Count > 0) {
@@ -60,9 +57,7 @@ public sealed class GTweenSequenceBuilder {
         }
 
         _groupTweenBehaviour.Add(gTween);
-
         _sequenceTweenBehaviour.Add(new GTween(_groupTweenBehaviour));
-
         return this;
     }
 
@@ -75,7 +70,6 @@ public sealed class GTweenSequenceBuilder {
     public GTweenSequenceBuilder AppendCallback(Action callback, bool callIfCompletingInstantly = true) {
         CallbackTweenBehaviour callbackTweenBehaviour = new(callback, callIfCompletingInstantly);
         Append(new GTween(callbackTweenBehaviour));
-
         return this;
     }
 
@@ -89,7 +83,6 @@ public sealed class GTweenSequenceBuilder {
     public GTweenSequenceBuilder JoinCallback(Action callback, bool callIfCompletingInstantly = true) {
         CallbackTweenBehaviour callbackTweenBehaviour = new(callback, callIfCompletingInstantly);
         Join(new GTween(callbackTweenBehaviour));
-
         return this;
     }
 
@@ -101,7 +94,6 @@ public sealed class GTweenSequenceBuilder {
     public GTweenSequenceBuilder AppendTime(float timeSeconds) {
         WaitTimeTweenBehaviour timeTweenBehaviour = new(timeSeconds);
         Append(new GTween(timeTweenBehaviour));
-
         return this;
     }
 
@@ -114,7 +106,6 @@ public sealed class GTweenSequenceBuilder {
     public GTweenSequenceBuilder JoinTime(float timeSeconds) {
         WaitTimeTweenBehaviour timeTweenBehaviour = new(timeSeconds);
         Join(new GTween(timeTweenBehaviour));
-
         return this;
     }
 
@@ -127,7 +118,6 @@ public sealed class GTweenSequenceBuilder {
         GTweenSequenceBuilder sequenceBuilder = New();
         createSequence.Invoke(sequenceBuilder);
         Append(sequenceBuilder.Build());
-
         return this;
     }
 
@@ -141,7 +131,6 @@ public sealed class GTweenSequenceBuilder {
         GTweenSequenceBuilder sequenceBuilder = New();
         createSequence.Invoke(sequenceBuilder);
         Join(sequenceBuilder.Build());
-
         return this;
     }
 

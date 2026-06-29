@@ -18,9 +18,7 @@ public static class OverlayCalibration {
     // Capture the live display as the calibration baseline if none is stored yet.
     public static void EnsureCaptured() {
         CoreSettings c = MainCore.Conf;
-        if(c == null || (c.CalibWidth > 0f && c.CalibHeight > 0f)) {
-            return;
-        }
+        if(c == null || (c.CalibWidth > 0f && c.CalibHeight > 0f)) return;
         c.CalibWidth = Screen.width;
         c.CalibHeight = Screen.height;
         MainCore.ConfMgr?.RequestSave();

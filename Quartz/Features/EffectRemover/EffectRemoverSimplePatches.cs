@@ -26,9 +26,7 @@ public static partial class EffectRemover {
     private static class SimpleFilterPatch {
         private static bool Prepare() => AccessTools.Method(typeof(ffxSetFilterPlus), "SetFilter") != null;
         private static void Prefix(ref bool __0) {
-            if(SimpleFilterActive) {
-                __0 = false;
-            }
+            if(SimpleFilterActive) __0 = false;
         }
     }
 
@@ -37,19 +35,13 @@ public static partial class EffectRemover {
     private static class SimpleFilterStartPatch {
         private static bool Prepare() => AccessTools.Method(typeof(scrController), "WaitForStartCo") != null;
         private static void Postfix() {
-            if(!SimpleFilterActive) {
-                return;
-            }
+            if(!SimpleFilterActive) return;
             try {
                 object vfx = scrVfxPlus.instance;
-                if(vfx == null) {
-                    return;
-                }
+                if(vfx == null) return;
                 if(Traverse.Create(vfx).Field("filterToComp").GetValue() is IDictionary map) {
                     foreach(object v in map.Values) {
-                        if(v is Behaviour b) {
-                            b.enabled = false;
-                        }
+                        if(v is Behaviour b) b.enabled = false;
                     }
                 }
             } catch(Exception e) {
@@ -99,9 +91,7 @@ public static partial class EffectRemover {
         private static int origEnd;
 
         private static void Prefix(ffxMoveFloorPlus __instance) {
-            if(!SimpleMoveActive) {
-                return;
-            }
+            if(!SimpleMoveActive) return;
             int max = Conf.SimpleMoveTrackMax;
             int index = scrController.instance.currFloor.seqID;
             origStart = __instance.start;
@@ -117,9 +107,7 @@ public static partial class EffectRemover {
         }
 
         private static void Postfix(ffxMoveFloorPlus __instance) {
-            if(!SimpleMoveActive) {
-                return;
-            }
+            if(!SimpleMoveActive) return;
             __instance.start = origStart;
             __instance.end = origEnd;
         }

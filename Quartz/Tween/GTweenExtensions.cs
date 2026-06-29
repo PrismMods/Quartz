@@ -23,13 +23,11 @@ public static class GTweenExtensions {
         );
 
     extension(Graphic target) {
-        public GTween GTAlpha(float to, float duration) {
-            return GTweens.Extensions.GTweenExtensions.Tween(
+        public GTween GTAlpha(float to, float duration)
+            => GTweens.Extensions.GTweenExtensions.Tween(
                 () => target == null ? to : target.color.a,
                 x => {
-                    if(target == null) {
-                        return;
-                    }
+                    if(target == null) return;
                     var c = target.color;
                     c.a = x;
                     target.color = c;
@@ -37,7 +35,6 @@ public static class GTweenExtensions {
                 to,
                 duration
             );
-        }
 
         public GTween GTColor(Color to, float duration) {
             var from = target == null ? to : target.color;
@@ -50,14 +47,13 @@ public static class GTweenExtensions {
         }
     }
 
-    public static GTween GTFade(this CanvasGroup target, float to, float duration) {
-        return GTweens.Extensions.GTweenExtensions.Tween(
+    public static GTween GTFade(this CanvasGroup target, float to, float duration)
+        => GTweens.Extensions.GTweenExtensions.Tween(
             () => target == null ? to : target.alpha,
             x => { if(target != null) target.alpha = x; },
             to,
             duration
         );
-    }
 
     extension(RectTransform target) {
         public GTween GTAnchorPos(Vector2 to, float duration) {
@@ -70,13 +66,11 @@ public static class GTweenExtensions {
             );
         }
 
-        public GTween GTAnchorPosX(float to, float duration) {
-            return GTweens.Extensions.GTweenExtensions.Tween(
+        public GTween GTAnchorPosX(float to, float duration)
+            => GTweens.Extensions.GTweenExtensions.Tween(
                 () => target == null ? to : target.anchoredPosition.x,
                 x => {
-                    if(target == null) {
-                        return;
-                    }
+                    if(target == null) return;
                     var pos = target.anchoredPosition;
                     pos.x = x;
                     target.anchoredPosition = pos;
@@ -84,15 +78,12 @@ public static class GTweenExtensions {
                 to,
                 duration
             );
-        }
 
-        public GTween GTAnchorPosY(float to, float duration) {
-            return GTweens.Extensions.GTweenExtensions.Tween(
+        public GTween GTAnchorPosY(float to, float duration)
+            => GTweens.Extensions.GTweenExtensions.Tween(
                 () => target == null ? to : target.anchoredPosition.y,
                 x => {
-                    if(target == null) {
-                        return;
-                    }
+                    if(target == null) return;
                     var pos = target.anchoredPosition;
                     pos.y = x;
                     target.anchoredPosition = pos;
@@ -100,7 +91,6 @@ public static class GTweenExtensions {
                 to,
                 duration
             );
-        }
 
         public GTween GTSizeDelta(Vector2 to, float duration) {
             var from = target == null ? to : target.sizeDelta;

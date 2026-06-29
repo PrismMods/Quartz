@@ -8,21 +8,11 @@ namespace Quartz.Features.Status
             return ctrl != null ? ctrl.mistakesManager : null;
         }
 
-        internal static float PercentAcc(scrMistakesManager m)
-        {
-            return m != null ? m.percentAcc : 1f;
-        }
+        internal static float PercentAcc(scrMistakesManager m) => m != null ? m.percentAcc : 1f;
 
-        internal static float PercentXAcc(scrMistakesManager m)
-        {
-            return m != null ? m.percentXAcc : 1f;
-        }
+        internal static float PercentXAcc(scrMistakesManager m) => m != null ? m.percentXAcc : 1f;
 
-        internal static float PercentComplete(scrMistakesManager m)
-        {
-            return m != null ? m.percentComplete : 0f;
-        }
-
+        internal static float PercentComplete(scrMistakesManager m) => m != null ? m.percentComplete : 0f;
 
         internal static int PlayerCount()
         {

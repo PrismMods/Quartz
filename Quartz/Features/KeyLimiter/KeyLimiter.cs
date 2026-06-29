@@ -273,16 +273,30 @@ public static class KeyLimiter {
     // consults this as a fallback when Input.GetKey comes up empty.
     //
     // Written from the SkyHook thread (NoteHookEvent) and read from the main
-    // thread (HookKeyHeld), so it's lock-guarded. Hangul/Hanja don't reliably
-    // emit a release edge, so a press marks the key held for a short window that
-    // each auto-repeat refreshes; a real release, when it comes, clears it at
-    // once. Expiry means a missing release can never leave a box stuck lit.
+    // thread (HookKeyHeld), so both held collections are lock-guarded (on the
+    // hookHeldUntil object). Two schemes, picked per platform at the press edge:
+    //
+    //  - Reliable-release platforms (macOS/Linux, where libuiohook pairs every
+    //    KeyPressed with a KeyReleased): the press marks the key held in
+    //    hookHeldKeys and it stays lit until the real release edge clears it. A
+    //    fixed expiry can't be used here — RightAlt/RightControl are real
+    //    modifiers that DON'T auto-repeat, so the old refresh-on-repeat window
+    //    expired (HookHeldWindowMs) while the key was still physically held,
+    //    dropping the box after a fraction of a second.
+    //  - Windows: the right-Ctrl/right-Alt positions are the Korean Hangul/Hanja
+    //    toggle keys (VK 0x15 / 0x19), which emit a press but no reliable
+    //    release. Those use the expiring window so a missing release can't leave
+    //    a box stuck lit; each auto-repeat refreshes it. (Real RightAlt on a
+    //    non-Korean Windows layout is seen by Unity's Input directly, so it never
+    //    reaches this fallback.)
     private const int HookHeldWindowMs = 250;
     private static readonly Dictionary<KeyCode, int> hookHeldUntil = new();
+    // Sticky held keys (reliable-release platforms): held until the release edge.
+    private static readonly HashSet<KeyCode> hookHeldKeys = new();
 
-    // Volatile mirror of (hookHeldUntil.Count > 0), maintained under the lock.
-    // hookHeldUntil is only ever populated by SkyHook Hangul/Hanja events, so it
-    // stays empty for anyone without a Korean keyboard — the common case. The
+    // Volatile mirror of (any hook key currently held), maintained under the
+    // lock. Both collections are only ever populated by SkyHook edges for keys
+    // Unity's Input can't see, so they stay empty for the common case. The
     // KeyViewer box loop calls HookKeyHeld for every un-pressed key every frame
     // (and in menus, since ShowOutsideGame defaults on); this flag lets that path
     // skip the lock entirely when no hook keys are held.
@@ -292,11 +306,19 @@ public static class KeyLimiter {
         if(key == KeyCode.None) return;
         lock(hookHeldUntil) {
             if(pressed) {
-                hookHeldUntil[key] = Environment.TickCount + HookHeldWindowMs;
+                // IsWindowsRuntime() reads Application.platform — already done on
+                // this same hook thread by HookKeyToPhysicalUnityKey for every
+                // edge, so consulting it here is consistent and safe.
+                if(IsWindowsRuntime()) {
+                    hookHeldUntil[key] = Environment.TickCount + HookHeldWindowMs;
+                } else {
+                    hookHeldKeys.Add(key);
+                }
             } else {
+                hookHeldKeys.Remove(key);
                 hookHeldUntil.Remove(key);
             }
-            hookActive = hookHeldUntil.Count > 0;
+            hookActive = hookHeldKeys.Count > 0 || hookHeldUntil.Count > 0;
         }
     }
 
@@ -305,8 +327,10 @@ public static class KeyLimiter {
         // case (volatile read, no lock acquired per un-pressed key per frame).
         if(!hookActive || key == KeyCode.None) return false;
         lock(hookHeldUntil) {
-            // Unchecked (until - now) keeps the right sign across the ~49-day
-            // Environment.TickCount wrap.
+            // Sticky press (reliable-release platforms): held until the release.
+            if(hookHeldKeys.Contains(key)) return true;
+            // Expiring window (Windows Hangul/Hanja). Unchecked (until - now)
+            // keeps the right sign across the ~49-day Environment.TickCount wrap.
             return hookHeldUntil.TryGetValue(key, out int until)
                 && unchecked(until - Environment.TickCount) > 0;
         }

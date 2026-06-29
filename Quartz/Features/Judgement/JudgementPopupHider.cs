@@ -28,13 +28,9 @@ public static class JudgementPopupHider {
     private static readonly Vector3 HiddenPosition = new(123456f, 123456f, 123456f);
 
     public static void EnsureConf() {
-        if(ConfMgr != null) {
-            return;
-        }
+        if(ConfMgr != null) return;
 
-        ConfMgr = new SettingsFile<JudgementPopupHiderSettings>(
-            Path.Combine(MainCore.Paths.RootPath, "JudgementPopupHider.json")
-        );
+        ConfMgr = new SettingsFile<JudgementPopupHiderSettings>(Path.Combine(MainCore.Paths.RootPath, "JudgementPopupHider.json"));
         ConfMgr.Load();
     }
 
@@ -48,9 +44,7 @@ public static class JudgementPopupHider {
     }
 
     private static bool ShouldHide(scrHitTextMesh hitText) {
-        if(!Enabled || hitText == null) {
-            return false;
-        }
+        if(!Enabled || hitText == null) return false;
 
         // Under XPerfect, a Perfect popup is hidden by its X/+/- sub-judgement
         // rather than the single vanilla Perfect bit. A None judgement (not yet
@@ -62,9 +56,7 @@ public static class JudgementPopupHider {
                 XPerfectBridge.Judge.Minus => MinusPerfectBit,
                 _ => -1,
             };
-            if(xbit >= 0) {
-                return (Conf.HiddenMask & (1 << xbit)) != 0;
-            }
+            if(xbit >= 0) return (Conf.HiddenMask & (1 << xbit)) != 0;
         }
 
         int bit = (int)hitText.hitMargin;
@@ -74,9 +66,7 @@ public static class JudgementPopupHider {
     [HarmonyPatch(typeof(scrHitTextMesh), "Show")]
     private static class HitTextShowPatch {
         private static void Prefix(scrHitTextMesh __instance, ref Vector3 position, ref Vector3 borderOffset, ref float scale) {
-            if(!ShouldHide(__instance)) {
-                return;
-            }
+            if(!ShouldHide(__instance)) return;
 
             position = HiddenPosition;
             borderOffset = Vector3.zero;
@@ -84,14 +74,10 @@ public static class JudgementPopupHider {
         }
 
         private static void Postfix(scrHitTextMesh __instance) {
-            if(!ShouldHide(__instance)) {
-                return;
-            }
+            if(!ShouldHide(__instance)) return;
 
             __instance.dead = true;
-            if(__instance.text != null) {
-                __instance.text.text = "";
-            }
+            if(__instance.text != null) __instance.text.text = "";
             __instance.transform.localPosition = HiddenPosition;
             __instance.transform.localScale = Vector3.zero;
             __instance.gameObject.SetActive(false);

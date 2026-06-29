@@ -5,10 +5,7 @@ public static class MathExtensions {
     public const float Rad2Deg = 57.29578f;
 
     public static float SafeDivide(float v1, float v2) {
-        if(v2 == 0f) {
-            return 0f;
-        }
-
+        if(v2 == 0f) return 0f;
         return v1 / v2;
     }
 

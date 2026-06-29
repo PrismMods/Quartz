@@ -39,9 +39,7 @@ public static class MainCore {
     public static bool IsModEnabled => Runtime?.State.IsEnabled ?? false;
 
     public static void Initialize(IQuartzHost host) {
-        if(Runtime != null) {
-            return;
-        }
+        if(Runtime != null) return;
 
         // Runtime must be set before Initialize() runs — the static facades above
         // (Conf, Paths, Tr, ...) read through it during startup. But if Initialize
@@ -65,9 +63,7 @@ public static class MainCore {
     public static void Tick() => Runtime?.Tick();
 
     public static void Dispose() {
-        if(Runtime == null) {
-            return;
-        }
+        if(Runtime == null) return;
 
         Runtime.Dispose();
         Runtime = null;

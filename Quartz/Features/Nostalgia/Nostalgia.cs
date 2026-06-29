@@ -19,13 +19,8 @@ public static partial class Nostalgia {
     public static NostalgiaSettings Conf => ConfMgr?.Data;
 
     public static void EnsureConf() {
-        if(ConfMgr != null) {
-            return;
-        }
-
-        ConfMgr = new SettingsFile<NostalgiaSettings>(
-            Path.Combine(MainCore.Paths.RootPath, "Nostalgia.json")
-        );
+        if(ConfMgr != null) return;
+        ConfMgr = new SettingsFile<NostalgiaSettings>(Path.Combine(MainCore.Paths.RootPath, "Nostalgia.json"));
         ConfMgr.Load();
     }
 
@@ -68,9 +63,7 @@ public static partial class Nostalgia {
     // scene/mod-state refresh happens.
     public static void ApplyDeathSound() {
         try {
-            if(Enabled) {
-                GCS.playDeathSound = !Conf.DisableDeathSound;
-            }
+            if(Enabled) GCS.playDeathSound = !Conf.DisableDeathSound;
         } catch { }
     }
 
@@ -78,9 +71,7 @@ public static partial class Nostalgia {
     // or twirl display so the change shows immediately in the open editor.
     public static void ApplyEditorFloors() {
         try {
-            if(scnEditor.instance != null) {
-                scnEditor.instance.ApplyEventsToFloors();
-            }
+            if(scnEditor.instance != null) scnEditor.instance.ApplyEventsToFloors();
         } catch { }
     }
 

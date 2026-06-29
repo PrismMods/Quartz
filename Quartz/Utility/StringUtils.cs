@@ -2,15 +2,11 @@ namespace Quartz.Utility;
 
 public static class StringUtils {
     public static List<string> Search(string query, IEnumerable<string> source) {
-        if(string.IsNullOrWhiteSpace(query)) {
-            return [.. source];
-        }
+        if(string.IsNullOrWhiteSpace(query)) return [.. source];
 
         string q = Normalize(query);
 
-        if(string.IsNullOrEmpty(q)) {
-            return [];
-        }
+        if(string.IsNullOrEmpty(q)) return [];
 
         return [..
             source
@@ -29,21 +25,15 @@ public static class StringUtils {
     }
 
     private static int ScoreMatch(string normalizedValue, string normalizedQuery) {
-        if(normalizedValue == normalizedQuery) {
-            return 100;
-        }
+        if(normalizedValue == normalizedQuery) return 100;
 
-        if(normalizedValue.StartsWith(normalizedQuery)) {
-            return 80;
-        }
+        if(normalizedValue.StartsWith(normalizedQuery)) return 80;
 
         return normalizedValue.Contains(normalizedQuery) ? 50 : 0;
     }
 
     public static string Normalize(string input) {
-        if(string.IsNullOrEmpty(input)) {
-            return string.Empty;
-        }
+        if(string.IsNullOrEmpty(input)) return string.Empty;
 
         char[] chars = [.. input.Where(char.IsLetterOrDigit).Select(char.ToLowerInvariant)];
         return new string(chars);
@@ -57,9 +47,7 @@ public static class StringUtils {
     // Collapses Hangul syllables to their leading consonant (초성) so a query
     // like "ㅈㄷ" matches "진동". Non-Hangul characters pass through untouched.
     public static string NormalizeToHangulChosung(string input) {
-        if(string.IsNullOrEmpty(input)) {
-            return input;
-        }
+        if(string.IsNullOrEmpty(input)) return input;
 
         var result = new System.Text.StringBuilder();
 

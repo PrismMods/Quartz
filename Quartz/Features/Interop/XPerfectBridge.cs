@@ -161,9 +161,7 @@ internal static class XPerfectBridge {
             minusCountMember = GetStaticReadable(accuracyStateType, "MinusPerfectCount");
 
             Type mainType = xpAsm.GetType("XPerfect.Main");
-            if(mainType != null) {
-                enabledProp = mainType.GetProperty("Enabled", BindingFlags.Public | BindingFlags.Static);
-            }
+            if(mainType != null) enabledProp = mainType.GetProperty("Enabled", BindingFlags.Public | BindingFlags.Static);
 
             installed = lastJudgeMember != null;
             if(installed) {

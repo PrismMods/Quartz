@@ -50,23 +50,16 @@ internal static class Judgement {
     [HarmonyPatch(typeof(scrMarginTracker), "AddHit", typeof(HitMargin))]
     private static class AddHitPatch {
         private static void Postfix(HitMargin hit) {
-            if(!MainCore.IsModEnabled) {
-                return;
-            }
-
+            if(!MainCore.IsModEnabled) return;
             int idx = (int)hit;
-            if(idx >= 0 && idx < counts.Length) {
-                counts[idx]++;
-            }
+            if(idx >= 0 && idx < counts.Length) counts[idx]++;
         }
     }
 
     [HarmonyPatch(typeof(scnGame), "Play")]
     private static class ResetOnRunStartPatch {
         private static void Postfix() {
-            if(MainCore.IsModEnabled) {
-                Reset();
-            }
+            if(MainCore.IsModEnabled) Reset();
         }
     }
 
@@ -78,18 +71,14 @@ internal static class Judgement {
     [HarmonyPatch(typeof(scrController), "Start")]
     private static class ResetOnControllerStartPatch {
         private static void Postfix(scrController __instance) {
-            if(MainCore.IsModEnabled && __instance.gameworld) {
-                Reset();
-            }
+            if(MainCore.IsModEnabled && __instance.gameworld) Reset();
         }
     }
 
     [HarmonyPatch(typeof(scrController), "StartLoadingScene")]
     private static class ResetOnRunExitPatch {
         private static void Postfix() {
-            if(MainCore.IsModEnabled) {
-                Reset();
-            }
+            if(MainCore.IsModEnabled) Reset();
         }
     }
 }

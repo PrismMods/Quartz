@@ -9,10 +9,7 @@ public static partial class EditorFeature {
     [HarmonyPatch(typeof(scrUIController), "ShowDifficultyContainer")]
     private static class GameplayDifficultyShowPatch {
         private static bool Prefix(scrUIController __instance) {
-            if(!IsEditorLoaded()) {
-                return true;
-            }
-
+            if(!IsEditorLoaded()) return true;
             UiHiderFeature.HideGameplayDifficultyContainer(__instance);
             return false;
         }
@@ -21,10 +18,7 @@ public static partial class EditorFeature {
     [HarmonyPatch(typeof(scrUIController), "DifficultyArrowPressed")]
     private static class GameplayDifficultyArrowPatch {
         private static bool Prefix(scrUIController __instance) {
-            if(!IsEditorLoaded()) {
-                return true;
-            }
-
+            if(!IsEditorLoaded()) return true;
             UiHiderFeature.HideGameplayDifficultyContainer(__instance);
             return false;
         }

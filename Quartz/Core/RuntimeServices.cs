@@ -22,8 +22,6 @@ public sealed class RuntimeServices {
     }
 
     public void Dispose() {
-        for(int i = services.Count - 1; i >= 0; i--) {
-            services[i].Dispose();
-        }
+        for(int i = services.Count - 1; i >= 0; i--) services[i].Dispose();
     }
 }

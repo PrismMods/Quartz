@@ -29,12 +29,7 @@ public sealed class OttoIconSettings : ISettingsFile {
     public float OffsetX = -10f;
     public float OffsetY = 5f;
 
-    public Color GetColor() => new(
-        Mathf.Clamp01(R),
-        Mathf.Clamp01(G),
-        Mathf.Clamp01(B),
-        Mathf.Clamp01(A)
-    );
+    public Color GetColor() => new(Mathf.Clamp01(R), Mathf.Clamp01(G), Mathf.Clamp01(B), Mathf.Clamp01(A));
 
     public void SetColor(Color c) {
         R = Mathf.Clamp01(c.r);
@@ -43,12 +38,7 @@ public sealed class OttoIconSettings : ISettingsFile {
         A = Mathf.Clamp01(c.a);
     }
 
-    public Color GetHighBpmColor() => new(
-        Mathf.Clamp01(HighBpmR),
-        Mathf.Clamp01(HighBpmG),
-        Mathf.Clamp01(HighBpmB),
-        Mathf.Clamp01(HighBpmA)
-    );
+    public Color GetHighBpmColor() => new(Mathf.Clamp01(HighBpmR), Mathf.Clamp01(HighBpmG), Mathf.Clamp01(HighBpmB), Mathf.Clamp01(HighBpmA));
 
     public void SetHighBpmColor(Color c) {
         HighBpmR = Mathf.Clamp01(c.r);
@@ -57,8 +47,7 @@ public sealed class OttoIconSettings : ISettingsFile {
         HighBpmA = Mathf.Clamp01(c.a);
     }
 
-    public JToken Serialize() {
-        return new JObject {
+    public JToken Serialize() => new JObject {
             [nameof(Enabled)] = Enabled,
             [nameof(R)] = R,
             [nameof(G)] = G,
@@ -71,8 +60,7 @@ public sealed class OttoIconSettings : ISettingsFile {
             [nameof(HighBpmA)] = HighBpmA,
             [nameof(OffsetX)] = OffsetX,
             [nameof(OffsetY)] = OffsetY,
-        };
-    }
+    };
 
     public void Deserialize(JToken token) {
         Enabled = IOUtils.Read(token, nameof(Enabled), Enabled);

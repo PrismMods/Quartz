@@ -21,16 +21,12 @@ public static class UmmInterop {
     private static PropertyInfo modsPathProp; // static string modsPath { get; private set; }
 
     private static void Resolve() {
-        if(resolved) {
-            return;
-        }
+        if(resolved) return;
         resolved = true;
         try {
             // Assembly-qualified so it resolves the loaded UMM without a reference.
             ummType = Type.GetType("UnityModManagerNet.UnityModManager, UnityModManager");
-            if(ummType == null) {
-                return;
-            }
+            if(ummType == null) return;
             findMod = ummType.GetMethod("FindMod", BindingFlags.Public | BindingFlags.Static);
             modEntries = ummType.GetField("modEntries", BindingFlags.Public | BindingFlags.Static);
             modsPathProp = ummType.GetProperty("modsPath", BindingFlags.Public | BindingFlags.Static);
@@ -52,9 +48,7 @@ public static class UmmInterop {
     // time; pair with the reflection helpers below.
     public static object FindMod(string id) {
         Resolve();
-        if(findMod == null || string.IsNullOrEmpty(id)) {
-            return null;
-        }
+        if(findMod == null || string.IsNullOrEmpty(id)) return null;
         try {
             return findMod.Invoke(null, [id]);
         } catch {
@@ -91,13 +85,9 @@ public static class UmmInterop {
         try {
             if(modEntries?.GetValue(null) is IEnumerable entries) {
                 foreach(object entry in entries) {
-                    if(ReadMember(entry, "Active") is not bool active || !active) {
-                        continue;
-                    }
+                    if(ReadMember(entry, "Active") is not bool active || !active) continue;
                     object info = ReadMember(entry, "Info");
-                    if(info != null && ReadMember(info, "Id") is string id && !string.IsNullOrEmpty(id)) {
-                        ids.Add(id);
-                    }
+                    if(info != null && ReadMember(info, "Id") is string id && !string.IsNullOrEmpty(id)) ids.Add(id);
                 }
             }
         } catch {
@@ -131,9 +121,7 @@ public static class UmmInterop {
             if(modEntries?.GetValue(null) is IEnumerable entries) {
                 foreach(object entry in entries) {
                     object info = ReadMember(entry, "Info");
-                    if(info != null && ReadMember(info, "Id") is string id && !string.IsNullOrEmpty(id)) {
-                        ids.Add(id);
-                    }
+                    if(info != null && ReadMember(info, "Id") is string id && !string.IsNullOrEmpty(id)) ids.Add(id);
                 }
             }
         } catch {
@@ -144,15 +132,11 @@ public static class UmmInterop {
     // Reads a public instance member by name, field OR property (UMM mixes both:
     // ModEntry.Active/Assembly are properties, ModInfo.Id/Version are fields).
     private static object ReadMember(object target, string name) {
-        if(target == null) {
-            return null;
-        }
+        if(target == null) return null;
         try {
             Type t = target.GetType();
             FieldInfo f = t.GetField(name, BindingFlags.Public | BindingFlags.Instance);
-            if(f != null) {
-                return f.GetValue(target);
-            }
+            if(f != null) return f.GetValue(target);
             PropertyInfo p = t.GetProperty(name, BindingFlags.Public | BindingFlags.Instance);
             return p?.GetValue(target);
         } catch {

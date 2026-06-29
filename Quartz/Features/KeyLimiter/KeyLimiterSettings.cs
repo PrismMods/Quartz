@@ -43,12 +43,8 @@ public sealed class KeyLimiterSettings : ISettingsFile {
     }
 
     public KeyLimiterProfile ActiveProfileOrDefault() {
-        if(Profiles == null || Profiles.Count == 0) {
-            Profiles = [new KeyLimiterProfile { Name = "Profile 1", Keys = [] }];
-        }
-        if(ActiveProfile < 0 || ActiveProfile >= Profiles.Count) {
-            ActiveProfile = 0;
-        }
+        if(Profiles == null || Profiles.Count == 0) Profiles = [new KeyLimiterProfile { Name = "Profile 1", Keys = [] }];
+        if(ActiveProfile < 0 || ActiveProfile >= Profiles.Count) ActiveProfile = 0;
         return Profiles[ActiveProfile];
     }
 
@@ -81,9 +77,7 @@ public sealed class KeyLimiterSettings : ISettingsFile {
                 });
                 index++;
             }
-            if(list.Count > 0) {
-                Profiles = list;
-            }
+            if(list.Count > 0) Profiles = list;
             ActiveProfile = IOUtils.Read(token, nameof(ActiveProfile), 0);
         } else if(token?["AllowedKeys"] is JArray legacy) {
             // Pre-profile config: fold the single allowed list into profile 0.
@@ -91,19 +85,12 @@ public sealed class KeyLimiterSettings : ISettingsFile {
             ActiveProfile = 0;
         }
 
-        if(Profiles == null || Profiles.Count == 0) {
-            Profiles = [new KeyLimiterProfile { Name = "Profile 1", Keys = [] }];
-        }
-        if(ActiveProfile < 0 || ActiveProfile >= Profiles.Count) {
-            ActiveProfile = 0;
-        }
+        if(Profiles == null || Profiles.Count == 0) Profiles = [new KeyLimiterProfile { Name = "Profile 1", Keys = [] }];
+        if(ActiveProfile < 0 || ActiveProfile >= Profiles.Count) ActiveProfile = 0;
     }
 
     private static int[] ReadKeys(JToken token) {
-        if(token is not JArray arr) {
-            return [];
-        }
-
+        if(token is not JArray arr) return [];
         List<int> keys = [];
         foreach(JToken t in arr) {
             try { keys.Add((int)t); } catch { }

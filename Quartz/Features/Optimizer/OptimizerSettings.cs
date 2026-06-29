@@ -69,19 +69,17 @@ public sealed class OptimizerSettings : ISettingsFile {
     // per bundled font without a recompile.
     public float ShadowUnderlayOffsetScale = 6f;
 
-    public JToken Serialize() {
-        return new JObject {
-            [nameof(SmoothGC)] = SmoothGC,
-            [nameof(CollectOnLevelLoad)] = CollectOnLevelLoad,
-            [nameof(BoostProcessPriority)] = BoostProcessPriority,
-            [nameof(RunInBackground)] = RunInBackground,
-            [nameof(LossyTextureCompression)] = LossyTextureCompression,
-            [nameof(FastBloom)] = FastBloom,
-            [nameof(SkipNoOpScreenFilters)] = SkipNoOpScreenFilters,
-            [nameof(LightTextShadows)] = LightTextShadows,
-            [nameof(ShadowUnderlayOffsetScale)] = ShadowUnderlayOffsetScale,
-        };
-    }
+    public JToken Serialize() => new JObject {
+        [nameof(SmoothGC)] = SmoothGC,
+        [nameof(CollectOnLevelLoad)] = CollectOnLevelLoad,
+        [nameof(BoostProcessPriority)] = BoostProcessPriority,
+        [nameof(RunInBackground)] = RunInBackground,
+        [nameof(LossyTextureCompression)] = LossyTextureCompression,
+        [nameof(FastBloom)] = FastBloom,
+        [nameof(SkipNoOpScreenFilters)] = SkipNoOpScreenFilters,
+        [nameof(LightTextShadows)] = LightTextShadows,
+        [nameof(ShadowUnderlayOffsetScale)] = ShadowUnderlayOffsetScale,
+    };
 
     public void Deserialize(JToken token) {
         SmoothGC = IOUtils.Read(token, nameof(SmoothGC), SmoothGC);
