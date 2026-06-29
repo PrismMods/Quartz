@@ -721,7 +721,7 @@ public static partial class KeyViewerOverlay {
         Box box = NewBox(total ? "Total" : "Kps", x, y, w, h);
         box.IsKps = !total;
         box.IsTotal = total;
-        string caption = total ? MainCore.Tr.Get("KEYVIEWER_STAT_TOTAL", "Total") : "KPS";
+        string caption = total ? "Total" : "KPS";
         box.StatCaption = caption;
 
         // 10/12-key styles (0/1): the stat box is narrow, so stack the caption
@@ -1617,7 +1617,7 @@ public static partial class KeyViewerOverlay {
             if(keyName.Equals("kps", StringComparison.OrdinalIgnoreCase)) return "KPS";
             if(keyName.Equals("kpsAvg", StringComparison.OrdinalIgnoreCase)) return "AVG";
             if(keyName.Equals("kpsMax", StringComparison.OrdinalIgnoreCase)) return "MAX";
-            if(keyName.Equals("total", StringComparison.OrdinalIgnoreCase)) return MainCore.Tr.Get("KEYVIEWER_STAT_TOTAL", "Total");
+            if(keyName.Equals("total", StringComparison.OrdinalIgnoreCase)) return "Total";
             return keyName.ToUpperInvariant();
         }
 
