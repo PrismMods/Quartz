@@ -1,0 +1,23 @@
+Quartz/UI/Generator/GenerateUI.ColorPicker.cs
+  s_2eb7ebedaf93fc::t_0653e6fbaab703 157,159-160
+  s_2eb7ebedaf93fc::t_34321777e6f8a4 115
+  s_2eb7ebedaf93fc::t_ed6aa27ac46264 171-172
+  s_2eb7ebedaf93fc::t_dfca89ece4a732 29-40
+  s_2eb7ebedaf93fc::t_e0dc30a63cf588 138
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.6",
+  "base_commit_sha": "cf27749ccbc21394fa50b33cc20cf923d5a5df79",
+  "prompts": {},
+  "sessions": {
+    "s_2eb7ebedaf93fc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7d2655d9-b1d9-4b88-a4da-b3ccd0684d31",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
