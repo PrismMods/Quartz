@@ -26,10 +26,18 @@ public static partial class GenerateUI {
         string id,
         bool showAlpha = true
     ) {
-        // The R/G/B/A channel sliders stack full-width below the SV/hue band as
-        // standard 50px slider rows. Body sizing follows the last one so the
-        // rounded background always wraps it (no overflow).
-        const float sliderTop = 212f;
+        // Body stacks top-to-bottom: full-width hex readout, SV square + hue
+        // bar, full-width colour preview, then the R/G/B/A channel sliders
+        // (standard 50px slider rows, full-width). sliderTop derives from the
+        // three bands above it so nothing has to be kept in sync by hand.
+        // Body sizing follows the last slider so the rounded background always
+        // wraps it (no overflow).
+        const float topPad = 12f;
+        const float hexHeight = 40f;
+        const float svHueHeight = 188f;
+        const float previewHeight = 40f;
+        const float rowGap = 12f;
+        const float sliderTop = topPad + hexHeight + rowGap + svHueHeight + rowGap + previewHeight + rowGap;
         const float sliderStep = 58f;
         const float sliderHeight = 50f;
         int sliderCount = showAlpha ? 4 : 3;
@@ -104,7 +112,7 @@ public static partial class GenerateUI {
         svRect.anchorMin = new(0f, 1f);
         svRect.anchorMax = new(0f, 1f);
         svRect.pivot = new(0f, 1f);
-        svRect.anchoredPosition = new(16f, -12f);
+        svRect.anchoredPosition = new(16f, -(topPad + hexHeight + rowGap));
         svRect.sizeDelta = new(188f, 188f);
         RawImage svImage = sv.AddComponent<RawImage>();
 
@@ -127,7 +135,7 @@ public static partial class GenerateUI {
         hueRect.anchorMin = new(0f, 1f);
         hueRect.anchorMax = new(0f, 1f);
         hueRect.pivot = new(0f, 1f);
-        hueRect.anchoredPosition = new(216f, -12f);
+        hueRect.anchoredPosition = new(216f, -(topPad + hexHeight + rowGap));
         hueRect.sizeDelta = new(28f, 188f);
         RawImage hueImage = hue.AddComponent<RawImage>();
 
@@ -146,10 +154,10 @@ public static partial class GenerateUI {
         preview.transform.SetParent(body.transform, false);
         RectTransform previewRect = preview.AddComponent<RectTransform>();
         previewRect.anchorMin = new(0f, 1f);
-        previewRect.anchorMax = new(0f, 1f);
+        previewRect.anchorMax = new(1f, 1f);
         previewRect.pivot = new(0f, 1f);
-        previewRect.anchoredPosition = new(264f, -18f);
-        previewRect.sizeDelta = new(58f, 58f);
+        previewRect.offsetMin = new(16f, -(sliderTop - rowGap));
+        previewRect.offsetMax = new(-16f, -(sliderTop - rowGap - previewHeight));
         Image previewImg = preview.AddComponent<Image>();
         previewImg.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
         previewImg.type = Image.Type.Sliced;
@@ -160,8 +168,8 @@ public static partial class GenerateUI {
         hexRect.anchorMin = new(0f, 1f);
         hexRect.anchorMax = new(1f, 1f);
         hexRect.pivot = new(0f, 1f);
-        hexRect.offsetMin = new(334f, -58f);
-        hexRect.offsetMax = new(-18f, -18f);
+        hexRect.offsetMin = new(16f, -(topPad + hexHeight));
+        hexRect.offsetMax = new(-16f, -topPad);
         Image hexBg = hexObj.AddComponent<Image>();
         hexBg.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
         hexBg.type = Image.Type.Sliced;
