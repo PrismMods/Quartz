@@ -40,7 +40,13 @@ internal static class Bpm {
 
             try {
                 if(RDC.auto) {
-                    autoTileTimes.Enqueue(Time.time);
+                    // Drain expired entries here too, not just in GetAutoKps:
+                    // that drain only runs when a panel actually shows the Auto
+                    // KPS stat, so without this the queue would grow on every
+                    // tile for as long as autoplay stays on.
+                    float now = Time.time;
+                    while(autoTileTimes.Count > 0 && now - autoTileTimes.Peek() > 1f) autoTileTimes.Dequeue();
+                    autoTileTimes.Enqueue(now);
                     autoKpsFrame = -1;
                 }
             } catch { }

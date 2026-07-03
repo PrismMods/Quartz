@@ -77,9 +77,39 @@ internal static class XPerfectBridge {
     public static Judge LastJudgeForText() =>
         lastJudgeForTextMember == null ? LastJudge() : ReadJudge(lastJudgeForTextMember, LastJudge());
 
-    public static int XCount() => ReadIntMember(xCountMember);
-    public static int PlusCount() => ReadIntMember(plusCountMember);
-    public static int MinusCount() => ReadIntMember(minusCountMember);
+    // JudgementOverlay polls all three counts every frame while XPerfect mode is
+    // shown, so memoize the reflective reads (boxed GetValue + Convert.ToInt32)
+    // per frame, same pattern as Active. One stamp covers all three: they're
+    // always read together and can't change mid-frame. ReadIntMember still runs
+    // its Installed/EnsureResolved check on the refresh, so failure-safety and
+    // the AssemblyLoad re-scan are untouched.
+    private static int countsFrame = -1;
+    private static int xCountCache;
+    private static int plusCountCache;
+    private static int minusCountCache;
+
+    public static int XCount() {
+        RefreshCounts();
+        return xCountCache;
+    }
+
+    public static int PlusCount() {
+        RefreshCounts();
+        return plusCountCache;
+    }
+
+    public static int MinusCount() {
+        RefreshCounts();
+        return minusCountCache;
+    }
+
+    private static void RefreshCounts() {
+        if(countsFrame == UnityEngine.Time.frameCount) return;
+        xCountCache = ReadIntMember(xCountMember);
+        plusCountCache = ReadIntMember(plusCountMember);
+        minusCountCache = ReadIntMember(minusCountMember);
+        countsFrame = UnityEngine.Time.frameCount;
+    }
 
     private static Judge ReadJudge(MemberInfo member, Judge fallback) {
         if(!Installed || member == null) return fallback;

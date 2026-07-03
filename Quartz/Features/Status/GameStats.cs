@@ -9,129 +9,81 @@ namespace Quartz.Features.Status;
 // KorenResourcePack. Game types (scrController, scrMistakesManager) live in the
 // global namespace inside Assembly-CSharp.
 public static class GameStats {
-    private static int inGameFrame = -1;
-    private static bool inGameValue;
-    private static int progressFrame = -1;
-    private static float progressValue;
-    private static int accuracyFrame = -1;
-    private static float accuracyValue = 1f;
-    private static int xAccuracyFrame = -1;
-    private static float xAccuracyValue = 1f;
-    private static int maxAccuracyFrame = -1;
-    private static float maxAccuracyValue = 1f;
-    private static int maxXAccuracyFrame = -1;
-    private static float maxXAccuracyValue = 1f;
-    private static int checkpointFrame = -1;
-    private static int checkpointValue;
-    private static int pitchFrame = -1;
-    private static float pitchValue = 1f;
-    private static int musicRatioFrame = -1;
-    private static float musicRatioValue;
-    private static int mapRatioFrame = -1;
-    private static float mapRatioValue;
-    private static int mapTotalFrame = -1;
-    private static float mapTotalValue;
-    private static int songArtistFrame = -1;
-    private static string songArtistValue = "";
-    private static int songTitleFrame = -1;
-    private static string songTitleValue = "";
-    private static int songTitleRawFrame = -1;
-    private static string songTitleRawValue = "";
+    // Per-frame memo cell: compute runs at most once per Time.frameCount
+    // (replaces the old per-stat "xFrame == frame" field pairs). The stamp
+    // stores frameCount + 1 so the zero-initialized cell never matches a real
+    // frame. Only pass non-capturing (static) lambdas — the compiler caches
+    // those as singleton delegates, so nothing allocates per call. Computes
+    // must not throw (each catches internally), matching the old pattern
+    // where the frame stamp was written before the try block.
+    private struct FrameCached<T> {
+        private int stamp;
+        private T value;
+        internal T Get(Func<T> compute) {
+            int s = Time.frameCount + 1;
+            if(stamp == s) return value;
+            stamp = s;
+            return value = compute();
+        }
+    }
+
+    private static FrameCached<bool> inGameCache;
+    private static FrameCached<float> progressCache;
+    private static FrameCached<float> accuracyCache;
+    private static FrameCached<float> xAccuracyCache;
+    private static FrameCached<float> maxXAccuracyCache;
+    private static FrameCached<int> checkpointCache;
+    private static FrameCached<float> pitchCache;
+    private static FrameCached<float> musicRatioCache;
+    private static FrameCached<float> mapRatioCache;
+    private static FrameCached<float> mapTotalCache;
+    private static FrameCached<string> songArtistCache;
+    private static FrameCached<string> songTitleCache;
+    private static FrameCached<string> songTitleRawCache;
+    private static FrameCached<int> fpsCache;
 
     // True only while actually playing a level (the dance-floor world is live).
-    public static bool InGame {
-        get {
-            int frame = Time.frameCount;
-            if(inGameFrame == frame) return inGameValue;
-            inGameFrame = frame;
-            try {
-                scrController c = scrController.instance;
-                if (c == null || !c.gameworld || c.paused) return inGameValue = false;
+    public static bool InGame => inGameCache.Get(static () => {
+        try {
+            scrController c = scrController.instance;
+            if (c == null || !c.gameworld || c.paused) return false;
 
-                if (ADOBase.isLevelEditor) {
-                    scnEditor ed = scnEditor.instance;
-                    if (ed != null && ed.inStrictlyEditingMode) return inGameValue = false;
-                }
+            if (ADOBase.isLevelEditor) {
+                scnEditor ed = scnEditor.instance;
+                if (ed != null && ed.inStrictlyEditingMode) return false;
+            }
 
-                return inGameValue = true;
-            } catch { return inGameValue = false; }
-        }
-    }
+            return true;
+        } catch { return false; }
+    });
 
-    public static float Progress {
-        get {
-            int frame = Time.frameCount;
-            if(progressFrame == frame) return progressValue;
-            progressFrame = frame;
-            try {
-                scrController c = scrController.instance;
-                if (c == null || c.currentSeqID == 0) return progressValue = 0f;
-                return progressValue = c.percentComplete;
-            } catch { return progressValue = 0f; }
-        }
-    }
+    public static float Progress => progressCache.Get(static () => {
+        try {
+            scrController c = scrController.instance;
+            if (c == null || c.currentSeqID == 0) return 0f;
+            return c.percentComplete;
+        } catch { return 0f; }
+    });
 
-    public static float Accuracy {
-        get {
-            int frame = Time.frameCount;
-            if(accuracyFrame == frame) return accuracyValue;
-            accuracyFrame = frame;
-            try {
-                return accuracyValue = MistakesAccess.PercentAcc(MistakesAccess.Get());
-            } catch { return accuracyValue = 1f; }
-        }
-    }
+    public static float Accuracy => accuracyCache.Get(static () => {
+        try { return MistakesAccess.PercentAcc(MistakesAccess.Get()); }
+        catch { return 1f; }
+    });
 
-    public static float XAccuracy {
-        get {
-            int frame = Time.frameCount;
-            if(xAccuracyFrame == frame) return xAccuracyValue;
-            xAccuracyFrame = frame;
-            try {
-                return xAccuracyValue = MistakesAccess.PercentXAcc(MistakesAccess.Get());
-            } catch { return xAccuracyValue = 1f; }
-        }
-    }
+    public static float XAccuracy => xAccuracyCache.Get(static () => {
+        try { return MistakesAccess.PercentXAcc(MistakesAccess.Get()); }
+        catch { return 1f; }
+    });
 
-    // Original-pack formula: acc * prog + (1 - prog). Treats unplayed remainder
-    // as still-recoverable to 100%, so this is the ceiling, not the current run.
-    public static float MaxAccuracy {
-        get {
-            int frame = Time.frameCount;
-            if(maxAccuracyFrame == frame) return maxAccuracyValue;
-            maxAccuracyFrame = frame;
-            try {
-                scrMistakesManager m = MistakesAccess.Get();
-                float acc = MistakesAccess.PercentAcc(m);
-                float prog = MistakesAccess.PercentComplete(m);
-                float r = acc * prog + (1f - prog);
-                if(float.IsNaN(r) || float.IsInfinity(r)) return maxAccuracyValue = 1f;
-                return maxAccuracyValue = Mathf.Clamp01(r);
-            } catch { return maxAccuracyValue = 1f; }
-        }
-    }
+    public static float MaxXAccuracy => maxXAccuracyCache.Get(static () => {
+        try { return XAccuracyCalc.MaxRatio(); }
+        catch { return 1f; }
+    });
 
-    public static float MaxXAccuracy {
-        get {
-            int frame = Time.frameCount;
-            if(maxXAccuracyFrame == frame) return maxXAccuracyValue;
-            maxXAccuracyFrame = frame;
-            try {
-                return maxXAccuracyValue = XAccuracyCalc.MaxRatio();
-            } catch { return maxXAccuracyValue = 1f; }
-        }
-    }
-
-    public static int CheckpointCount {
-        get {
-            int frame = Time.frameCount;
-            if(checkpointFrame == frame) return checkpointValue;
-            checkpointFrame = frame;
-            try {
-                return checkpointValue = scnGame.instance != null ? scnGame.instance.checkpointsUsed : 0;
-            } catch { return checkpointValue = 0; }
-        }
-    }
+    public static int CheckpointCount => checkpointCache.Get(static () => {
+        try { return scnGame.instance != null ? scnGame.instance.checkpointsUsed : 0; }
+        catch { return 0; }
+    });
 
     // Tile BPM (chart tempo * pitch * speed) and Current BPM (derived from the
     // current floor's nextfloor entry time). See Bpm.cs for details.
@@ -148,17 +100,12 @@ public static class GameStats {
     // Song playback pitch (1.0 = 100%). This is the same audio pitch the BPM math
     // multiplies in, i.e. the speed the song is actually playing at (speed trials,
     // pitch-change events). Defaults to 1 off the floor / before the song loads.
-    public static float Pitch {
-        get {
-            int frame = Time.frameCount;
-            if(pitchFrame == frame) return pitchValue;
-            pitchFrame = frame;
-            try {
-                scrConductor c = scrConductor.instance;
-                return pitchValue = c != null && c.song != null ? c.song.pitch : 1f;
-            } catch { return pitchValue = 1f; }
-        }
-    }
+    public static float Pitch => pitchCache.Get(static () => {
+        try {
+            scrConductor c = scrConductor.instance;
+            return c != null && c.song != null ? c.song.pitch : 1f;
+        } catch { return 1f; }
+    });
 
     // XPerfect (UMM mod) per-run perfect breakdown — dead-center X, late +, and
     // early - counts. All 0 when XPerfect isn't installed.
@@ -166,50 +113,33 @@ public static class GameStats {
     public static int XPerfectPlus => Interop.XPerfectBridge.PlusCount();
     public static int XPerfectMinus => Interop.XPerfectBridge.MinusCount();
 
-    public static int Combo => Quartz.Features.Combo.Combo.Count;
-
     // Current level's song artist and title from the custom-level metadata.
     // levelData.artist is the *song* artist (what the game shows in the title);
     // levelData.author is the chart creator — not what we want here. Empty for
     // built-in levels (no scnGame) — callers fall back to SongTitleRaw. Safe to
     // poll every frame.
-    public static string SongArtist {
-        get {
-            int frame = Time.frameCount;
-            if(songArtistFrame == frame) return songArtistValue;
-            songArtistFrame = frame;
-            try {
-                var g = scnGame.instance;
-                return songArtistValue = g != null && g.levelData != null ? g.levelData.artist ?? "" : "";
-            } catch { return songArtistValue = ""; }
-        }
-    }
+    public static string SongArtist => songArtistCache.Get(static () => {
+        try {
+            var g = scnGame.instance;
+            return g != null && g.levelData != null ? g.levelData.artist ?? "" : "";
+        } catch { return ""; }
+    });
 
-    public static string SongTitle {
-        get {
-            int frame = Time.frameCount;
-            if(songTitleFrame == frame) return songTitleValue;
-            songTitleFrame = frame;
-            try {
-                var g = scnGame.instance;
-                return songTitleValue = g != null && g.levelData != null ? g.levelData.song ?? "" : "";
-            } catch { return songTitleValue = ""; }
-        }
-    }
+    public static string SongTitle => songTitleCache.Get(static () => {
+        try {
+            var g = scnGame.instance;
+            return g != null && g.levelData != null ? g.levelData.song ?? "" : "";
+        } catch { return ""; }
+    });
 
     // The game's own combined title text (e.g. "artist - title"), used as a
     // fallback when the separate author/song metadata isn't available.
-    public static string SongTitleRaw {
-        get {
-            int frame = Time.frameCount;
-            if(songTitleRawFrame == frame) return songTitleRawValue;
-            songTitleRawFrame = frame;
-            try {
-                scrController c = scrController.instance;
-                return songTitleRawValue = c != null && c.txtLevelName != null ? c.txtLevelName.text ?? "" : "";
-            } catch { return songTitleRawValue = ""; }
-        }
-    }
+    public static string SongTitleRaw => songTitleRawCache.Get(static () => {
+        try {
+            scrController c = scrController.instance;
+            return c != null && c.txtLevelName != null ? c.txtLevelName.text ?? "" : "";
+        } catch { return ""; }
+    });
 
     // True when the current run started mid-level (via checkpoint). The HUD
     // can use this to render Progress as a "start% - now%" range.
@@ -252,34 +182,24 @@ public static class GameStats {
 
     // How far through the song / map we are, 0..1 — drives the per-stat color
     // gradients for the time stats (v1 GetPrimaryTimeRatio / GetMapTimeRatio).
-    public static float MusicTimeRatio {
-        get {
-            int frame = Time.frameCount;
-            if(musicRatioFrame == frame) return musicRatioValue;
-            musicRatioFrame = frame;
-            try {
-                AudioSource song = scrConductor.instance != null ? scrConductor.instance.song : null;
-                if(song == null || song.clip == null || song.clip.length <= 0f) return musicRatioValue = 0f;
-                return musicRatioValue = Mathf.Clamp01(song.time / song.clip.length);
-            } catch { return musicRatioValue = 0f; }
-        }
-    }
+    public static float MusicTimeRatio => musicRatioCache.Get(static () => {
+        try {
+            AudioSource song = scrConductor.instance != null ? scrConductor.instance.song : null;
+            if(song == null || song.clip == null || song.clip.length <= 0f) return 0f;
+            return Mathf.Clamp01(song.time / song.clip.length);
+        } catch { return 0f; }
+    });
 
-    public static float MapTimeRatio {
-        get {
-            int frame = Time.frameCount;
-            if(mapRatioFrame == frame) return mapRatioValue;
-            mapRatioFrame = frame;
-            try {
-                scrConductor cd = scrConductor.instance;
-                if(cd == null) return mapRatioValue = 0f;
-                float time = (float)(cd.addoffset + cd.songposition_minusi);
-                float total = MapTotalSeconds();
-                if(total <= 0f) return mapRatioValue = 0f;
-                return mapRatioValue = Mathf.Clamp01(time / total);
-            } catch { return mapRatioValue = 0f; }
-        }
-    }
+    public static float MapTimeRatio => mapRatioCache.Get(static () => {
+        try {
+            scrConductor cd = scrConductor.instance;
+            if(cd == null) return 0f;
+            float time = (float)(cd.addoffset + cd.songposition_minusi);
+            float total = MapTotalSeconds();
+            if(total <= 0f) return 0f;
+            return Mathf.Clamp01(time / total);
+        } catch { return 0f; }
+    });
 
     public static string MapTimeText {
         get {
@@ -313,52 +233,37 @@ public static class GameStats {
     // tau: small swings settle slowly (steady reading), big swings catch up
     // fast. Reads Time.unscaledDeltaTime so it tracks real wall-clock fps.
     // Expected to be polled once per frame from the HUD updater.
-    public static int Fps {
-        get {
-            int frame = Time.frameCount;
-            if(fpsFrame == frame) return fpsFrameValue;
-            fpsFrame = frame;
+    public static int Fps => fpsCache.Get(static () => {
+        float dt = Time.unscaledDeltaTime;
+        if(dt <= 0f) return Mathf.RoundToInt(smoothedFps);
 
-            float dt = Time.unscaledDeltaTime;
-            if(dt <= 0f) {
-                fpsFrameValue = Mathf.RoundToInt(smoothedFps);
-                return fpsFrameValue;
-            }
-
-            float fps = 1f / dt;
-            if(smoothedFps <= 0f) {
-                smoothedFps = fps;
-            } else {
-                float diff = Mathf.Abs(fps - smoothedFps);
-                float t = Mathf.Clamp01(diff * fpsSensitivity);
-                float smooth = Mathf.Lerp(fpsMinSmooth, fpsMaxSmooth, t);
-                float factor = 1f - Mathf.Exp(-smooth * dt);
-                smoothedFps += (fps - smoothedFps) * factor;
-            }
-
-            fpsFrameValue = Mathf.RoundToInt(smoothedFps);
-            return fpsFrameValue;
+        float fps = 1f / dt;
+        if(smoothedFps <= 0f) {
+            smoothedFps = fps;
+        } else {
+            float diff = Mathf.Abs(fps - smoothedFps);
+            float t = Mathf.Clamp01(diff * fpsSensitivity);
+            float smooth = Mathf.Lerp(fpsMinSmooth, fpsMaxSmooth, t);
+            float factor = 1f - Mathf.Exp(-smooth * dt);
+            smoothedFps += (fps - smoothedFps) * factor;
         }
-    }
+
+        return Mathf.RoundToInt(smoothedFps);
+    });
 
     private static float smoothedFps;
-    private static int fpsFrame = -1;
-    private static int fpsFrameValue;
     private const float fpsMinSmooth = 2f;
     private const float fpsMaxSmooth = 12f;
     private const float fpsSensitivity = 0.08f;
 
-    private static float MapTotalSeconds() {
-        int frame = Time.frameCount;
-        if(mapTotalFrame == frame) return mapTotalValue;
-        mapTotalFrame = frame;
+    private static float MapTotalSeconds() => mapTotalCache.Get(static () => {
         try {
             scrLevelMaker lm = scrLevelMaker.instance;
-            if(lm == null || lm.listFloors == null || lm.listFloors.Count == 0) return mapTotalValue = 0f;
+            if(lm == null || lm.listFloors == null || lm.listFloors.Count == 0) return 0f;
             scrFloor last = lm.listFloors[lm.listFloors.Count - 1];
-            return mapTotalValue = last != null ? (float)last.entryTime : 0f;
-        } catch { return mapTotalValue = 0f; }
-    }
+            return last != null ? (float)last.entryTime : 0f;
+        } catch { return 0f; }
+    });
 
     private static string FormatTime(float seconds, bool forceHour = false) {
         if(seconds < 0f) seconds = 0f;

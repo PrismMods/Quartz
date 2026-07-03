@@ -12,18 +12,10 @@ namespace Quartz.Features.Status
 
         internal static float PercentXAcc(scrMistakesManager m) => m != null ? m.percentXAcc : 1f;
 
-        internal static float PercentComplete(scrMistakesManager m) => m != null ? m.percentComplete : 0f;
-
         internal static int PlayerCount()
         {
             try { return scrPlayerManager.playerCount; }
             catch { return 1; }
-        }
-
-        internal static bool CoopMode()
-        {
-            try { return scrController.coopMode; }
-            catch { return false; }
         }
 
         internal static scrMarginTracker Tracker(int playerID)
@@ -38,24 +30,6 @@ namespace Quartz.Features.Status
                 return p != null ? p.marginTracker : null;
             }
             catch { return null; }
-        }
-
-        internal static float PercentXAcc(int playerID)
-        {
-            scrMarginTracker t = Tracker(playerID);
-            return t != null ? t.percentXAcc : 1f;
-        }
-
-        internal static float PercentAcc(int playerID)
-        {
-            scrMarginTracker t = Tracker(playerID);
-            return t != null ? t.percentAcc : 1f;
-        }
-
-        internal static float PercentComplete(int playerID)
-        {
-            scrMarginTracker t = Tracker(playerID);
-            return t != null ? t.percentComplete : 0f;
         }
     }
 }
