@@ -1,0 +1,41 @@
+Quartz/UI/Objects/Impl/UIColorPicker.cs
+  s_e03bf5eb2b3681::t_338b2b15e7d708 67-68
+  s_e03bf5eb2b3681::t_033e1946c8b3e0 352-356,364-367,372,375,377
+Quartz/UI/Objects/Impl/UIInput.cs
+  s_e03bf5eb2b3681::t_ce65ccf2eac704 136
+  s_e03bf5eb2b3681::t_551c0dacb75800 151-158,165-166,171-172
+  s_e03bf5eb2b3681::t_d18dc2b3ef6b5c 182
+  s_e03bf5eb2b3681::t_52fbaa9842de6d 188-189
+  s_e03bf5eb2b3681::t_3f425ac3a36710 105
+  s_e03bf5eb2b3681::t_c756d1270bb81e 7,9
+Quartz/UI/UICore.cs
+  s_e03bf5eb2b3681::t_b7bfb25511269e 89-95
+  s_e03bf5eb2b3681::t_eb4a77a0e18233 1119
+  s_e03bf5eb2b3681::t_ae4936e9802777 1014-1022,1025-1042
+Quartz/UI/Objects/Impl/UIDropdown.cs
+  s_e03bf5eb2b3681::t_fc86cdb68c9d22 184
+Quartz/UI/Objects/Impl/UIToggle.cs
+  s_e03bf5eb2b3681::t_c5bc2db5b25fcd 98
+Quartz/UI/Objects/Impl/UISlider.cs
+  s_e03bf5eb2b3681::t_7eef4b438d302c 178-180
+  s_e03bf5eb2b3681::t_8f145e8c749eda 6,12
+Quartz/UI/Generator/GenerateUI.cs
+  s_e03bf5eb2b3681::t_6b2aaed47cf26b 580-596,601-603
+  s_e03bf5eb2b3681::t_695343d4cb9795 837-839,841,843,845-846
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "11db26576b5203fe96bdbdca2e9a9abdfefd3ec5",
+  "prompts": {},
+  "sessions": {
+    "s_e03bf5eb2b3681": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf4a35d5-d4c8-48f0-a560-989570ab28d8",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
