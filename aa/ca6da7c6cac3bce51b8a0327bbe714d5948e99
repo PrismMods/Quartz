@@ -1,0 +1,25 @@
+Quartz/Features/Status/Bpm.cs
+  s_e03bf5eb2b3681::t_14d56181982a06 43-49
+Quartz/Features/Judgement/Judgement.cs
+  s_e03bf5eb2b3681::t_eb22abfa304730 30
+Quartz/Features/Status/GameStats.cs
+  s_e03bf5eb2b3681::t_a772567d40bd22 12-26,30-43,45-49,51-54,56-58,60-86,103-108,121-126,128-133,137-142,185-191,193-202,236-248,250-252,259,262,264-266
+Quartz/Features/Interop/XPerfectBridge.cs
+  s_e03bf5eb2b3681::t_b1c0e0500b37d6 80-112
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "aaca6da7c6cac3bce51b8a0327bbe714d5948e99",
+  "prompts": {},
+  "sessions": {
+    "s_e03bf5eb2b3681": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf4a35d5-d4c8-48f0-a560-989570ab28d8",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
