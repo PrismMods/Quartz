@@ -1,0 +1,32 @@
+landing/src/public/index.html
+  s_c4511a3e7dd01d::t_6b74f7d57e185d 8-9,13,102
+landing/src/public/app.js
+  s_c4511a3e7dd01d::t_8cf0d30897dc3e 228,231
+  s_c4511a3e7dd01d::t_c0461a72aa6e4b 119,121,139
+  s_c4511a3e7dd01d::t_6b74f7d57e185d 5-7
+  s_c4511a3e7dd01d::t_a5a9d046daac39 27-82
+landing/src/server.js
+  s_c4511a3e7dd01d::t_6efca7f684acfa 84
+landing/tests/server.test.js
+  s_c4511a3e7dd01d::t_a3ce929dbac388 33-34,36-37
+.github/workflows/pages.yml
+  s_c4511a3e7dd01d::t_23e75694f8e33e 1-33
+landing/src/public/styles.css
+  s_c4511a3e7dd01d::t_6b74f7d57e185d 59,120,249-251
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "b63c9c8469714d1f6c1e98cba4729704204f8e7d",
+  "prompts": {},
+  "sessions": {
+    "s_c4511a3e7dd01d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dcdee383-7c2b-4a2c-862f-2985b9e70817",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
