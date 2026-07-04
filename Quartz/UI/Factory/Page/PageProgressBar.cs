@@ -3,6 +3,7 @@ using Quartz.Features.Panels;
 using Quartz.Features.ProgressBar;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
+using TMPro;
 using UnityEngine;
 
 namespace Quartz.UI.Factory.Page;
@@ -16,11 +17,19 @@ internal static class PageProgressBar {
 
         void Save() => ProgressBarOverlay.Save();
 
-        var sec = GenerateUI.Collapsible(
+        void SetHeaderEnabled(bool enabled, GenerateUI.CollapsibleSection section) {
+            if(section.HeaderObj.transform.Find("Bar/Label") is Transform labelTr
+                && labelTr.TryGetComponent(out TextMeshProUGUI label))
+                label.alpha = enabled ? 1f : 0.5f;
+        }
+
+        GenerateUI.CollapsibleSection sec = null;
+        sec = GenerateUI.Collapsible(
             content, "Progress Bar", startExpanded: false,
-            v => { conf.Enabled = v; ProgressBarOverlay.Apply(); Save(); },
+            v => { conf.Enabled = v; ProgressBarOverlay.Apply(); Save(); SetHeaderEnabled(v, sec); },
             conf.Enabled
         );
+        SetHeaderEnabled(conf.Enabled, sec);
 
         GenerateUI.Toggle(
             GenerateUI.Row(sec.Body),

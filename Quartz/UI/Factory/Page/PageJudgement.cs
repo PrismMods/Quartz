@@ -2,6 +2,7 @@ using Quartz.Features.Interop;
 using Quartz.Features.Judgement;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
+using TMPro;
 using UnityEngine;
 
 namespace Quartz.UI.Factory.Page;
@@ -18,11 +19,19 @@ internal static class PageJudgement {
         void Save() => JudgementOverlay.Save();
         void Apply() => JudgementOverlay.Apply();
 
-        var sec = GenerateUI.Collapsible(
+        void SetHeaderEnabled(bool enabled, GenerateUI.CollapsibleSection section) {
+            if(section.HeaderObj.transform.Find("Bar/Label") is Transform labelTr
+                && labelTr.TryGetComponent(out TextMeshProUGUI label))
+                label.alpha = enabled ? 1f : 0.5f;
+        }
+
+        GenerateUI.CollapsibleSection sec = null;
+        sec = GenerateUI.Collapsible(
             content, "Judgement", startExpanded: false,
-            v => { conf.Enabled = v; Apply(); Save(); },
+            v => { conf.Enabled = v; Apply(); Save(); SetHeaderEnabled(v, sec); },
             conf.Enabled
         );
+        SetHeaderEnabled(conf.Enabled, sec);
 
         // Only meaningful when the XPerfect mod is loaded — Quartz reads the X /
         // +Perfect / -Perfect counts FROM XPerfect, so with it disabled the split
