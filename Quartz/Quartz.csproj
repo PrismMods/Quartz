@@ -202,28 +202,22 @@
 
 		<ItemGroup>
 			<ExportFiles Include="Resource/Export/**/*.*" Exclude="Resource/Export/**/.DS_Store" />
-			<!-- Native FFmpeg encoder built by native/build.sh (per-platform under
-			     native/dist/<os>/). Absent on a C#-only checkout, in which case the
-			     renderer is simply unavailable at runtime. -->
-			<NativeFiles Include="$(MSBuildProjectDirectory)/../native/dist/**/*" />
 		</ItemGroup>
 
 		<MakeDir Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" Directories="$(GamePath)/UserData/Quartz" />
 		<Copy Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(GamePath)/UserData/Quartz/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
-		<Copy Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != '' And '@(NativeFiles)' != ''" SourceFiles="@(NativeFiles)" DestinationFiles="@(NativeFiles->'$(GamePath)/UserData/Quartz/native/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
 
 		<RemoveDir Directories="$(PackageStageRoot)" Condition="'$(TargetPath)' != ''" />
 		<MakeDir Directories="$(DistDir);$(PackageStageModsDir);$(PackageStageDataDir)" Condition="'$(TargetPath)' != ''" />
 		<Copy Condition="'$(TargetPath)' != ''" SourceFiles="$(TargetPath)" DestinationFolder="$(PackageStageModsDir)" />
 		<Copy Condition="'$(TargetPath)' != ''" SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(PackageStageDataDir)/%(RecursiveDir)%(Filename)%(Extension)')" />
-		<Copy Condition="'$(TargetPath)' != '' And '@(NativeFiles)' != ''" SourceFiles="@(NativeFiles)" DestinationFiles="@(NativeFiles->'$(PackageStageDataDir)/native/%(RecursiveDir)%(Filename)%(Extension)')" />
 		<Delete Files="$(DistZipPath)" Condition="'$(TargetPath)' != ''" TreatErrorsAsWarnings="true" />
 		<ZipDirectory SourceDirectory="$(PackageStageRoot)" DestinationFile="$(DistZipPath)" Condition="'$(TargetPath)' != ''" />
 		<Message Importance="high" Text="Zip: $(DistZipPath)" Condition="'$(TargetPath)' != ''" />
 	</Target>
 
 	<!-- UnityModManager packaging (UMM build only). Produces a self-contained mod
-	     folder — Quartz.dll + Info.json + Lang/Fonts/Presets + native/ — and zips
+	     folder — Quartz.dll + Info.json + Lang/Fonts/Presets — and zips
 	     it into dist/QuartzUmm.zip with the mod folder at the zip root (so UMM's
 	     installer drops it straight into the mods dir). AutoInstall also copies it
 	     into the game's UMMMods/ (or Mods/) for local testing. -->
@@ -252,7 +246,6 @@
 
 		<ItemGroup>
 			<ExportFiles Include="Resource/Export/**/*.*" Exclude="Resource/Export/**/.DS_Store" />
-			<NativeFiles Include="$(MSBuildProjectDirectory)/../native/dist/**/*" />
 		</ItemGroup>
 
 		<!-- Stage: $(PackageStageRoot)/Quartz/ (mod folder at zip root). -->
@@ -261,7 +254,6 @@
 		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(UmmStageModDir)" />
 		<WriteLinesToFile File="$(UmmStageModDir)/Info.json" Lines="$(_InfoJson)" Overwrite="true" />
 		<Copy SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(UmmStageModDir)/%(RecursiveDir)%(Filename)%(Extension)')" />
-		<Copy SourceFiles="@(NativeFiles)" DestinationFiles="@(NativeFiles->'$(UmmStageModDir)/native/%(RecursiveDir)%(Filename)%(Extension)')" Condition="'@(NativeFiles)' != ''" />
 
 		<Delete Files="$(DistZipPath)" TreatErrorsAsWarnings="true" />
 		<ZipDirectory SourceDirectory="$(PackageStageRoot)" DestinationFile="$(DistZipPath)" />
@@ -273,7 +265,6 @@
 		<Copy Condition="'$(UmmAutoInstall)' == 'true'" SourceFiles="$(TargetPath)" DestinationFolder="$(UmmModDir)" SkipUnchangedFiles="true" />
 		<WriteLinesToFile File="$(UmmModDir)/Info.json" Lines="$(_InfoJson)" Overwrite="true" Condition="'$(UmmAutoInstall)' == 'true'" />
 		<Copy Condition="'$(UmmAutoInstall)' == 'true'" SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(UmmModDir)/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
-		<Copy Condition="'$(UmmAutoInstall)' == 'true' And '@(NativeFiles)' != ''" SourceFiles="@(NativeFiles)" DestinationFiles="@(NativeFiles->'$(UmmModDir)/native/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
 		<Message Importance="high" Text="UMM installed: $(UmmModDir)" Condition="'$(UmmAutoInstall)' == 'true'" />
 		<Message Importance="high" Text="UMM build NOT auto-installed (MelonLoader present); QuartzUmm.zip still written to $(DistDir)." Condition="'$(AutoInstall)' == 'true' And '$(MelonLoaderPresent)' == 'true'" />
 	</Target>

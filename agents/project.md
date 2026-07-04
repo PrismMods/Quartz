@@ -20,7 +20,6 @@ The codebase was formerly KorenResourcePack v2 and still contains migration/self
 - Language: C# with `netstandard2.1` for the mod (`Quartz/Quartz.csproj`).
 - Tests: small plain .NET console test project targeting `net10.0` (`Quartz.Tests/Quartz.Tests.csproj`).
 - SDK pin: `global.json` asks for .NET SDK `10.0.100` with `rollForward: latestFeature`.
-- Native renderer: C + FFmpeg wrapper under `native/koren_encoder/`, staged to `native/dist/<platform>/` and bundled into the mod zips.
 - Formatting: `.editorconfig` uses 4-space C# indentation, tabs for project files, 2-space JSON/Markdown.
 - Nullable: mod uses `<Nullable>warnings</Nullable>`; tests use nullable enabled.
 - C# style seen in repo: file-scoped namespaces, opening braces on the same line, explicit static feature classes, settings objects with public fields and manual JSON serialize/deserialize.
@@ -61,14 +60,6 @@ dotnet build Quartz/Quartz.csproj -c Debug -p:LoaderTarget=ML
 dotnet build Quartz/Quartz.csproj -c Debug -p:LoaderTarget=UMM
 ```
 
-Native renderer:
-
-```sh
-./native/build.sh              # host platform, runs self-test by default
-./native/build.sh --no-test
-./native/build_win.sh          # cross-compiles Windows DLL; needs mingw-w64, curl, unzip
-```
-
 Release publishing is handled by `tools/release.sh`; read `agents/release.md` before using it.
 
 ## Repo map
@@ -79,7 +70,6 @@ Top level:
 - `Quartz.slnx` — solution file.
 - `Quartz/` — main mod source.
 - `Quartz.Tests/` — plain .NET tests for Unity-free code and localization parity.
-- `native/` — C FFmpeg encoder and platform bundles used by the recorder.
 - `tools/release.sh` — GitHub release automation.
 - `build.sh` — local build/auto-install/package script.
 - `test.sh` — test runner.
@@ -157,7 +147,6 @@ Current feature areas include:
 - `Optimizer` — performance/background execution/process priority toggles.
 - `OttoIcon` — Otto icon customization.
 - `PlayCount` — run/play count tracking service.
-- `Recorder` — offline/native FFmpeg renderer from the Editor tab.
 - `Status` — live stat calculations used by panels and overlays.
 - `Interop` — compatibility bridges/importers for other mods such as XPerfect and UMM settings.
 
@@ -196,20 +185,6 @@ Resources:
 - Languages: `Quartz/Resource/Export/Lang/en-US.json` and `ko-KR.json` must stay key-for-key identical.
 - Presets/fonts are shipped under `Quartz/Resource/Export/`.
 
-## Recorder and native encoder
-
-The recorder is one of the most cross-cutting areas:
-
-- `Quartz/Features/Recorder/Recorder.cs` — state machine (`Idle`, `Armed`, `Recording`, `Finalizing`), native availability, arm/cancel/session lifecycle.
-- `Quartz/Features/Recorder/RecorderSession.cs` — frame/audio capture session.
-- `Quartz/Features/Recorder/RecorderPatches.cs` — game hooks for starting, completing, failing, pausing, and controlled time.
-- `Quartz/Features/Recorder/RecorderAudioTap.cs` and `AutoHitSnap.cs` — audio/timing support.
-- `Quartz/Features/Recorder/Native/*` — C# P/Invoke wrapper and platform loading.
-- `native/koren_encoder/*` — C wrapper around FFmpeg.
-- `native/dist/osx` and `native/dist/win` — bundled native runtime artifacts included by the csproj.
-
-The renderer depends on deterministic time control and native library loading. Be careful with Unity time/audio APIs, pause/exit patches, and platform paths. If changing native code, run the native build/self-test and then the C# tests.
-
 ## Tests
 
 `Quartz.Tests/Program.cs` currently covers:
@@ -239,8 +214,6 @@ Read `agents/i18n.md` before touching strings. Short version:
 - UMM `PostBuildUmm` creates a self-contained `Quartz/` mod folder with `Info.json`, exported files, native files, and writes `dist/QuartzUmm.zip`.
 - UMM uses separate `obj/umm/...` and `bin/umm/...` paths so it does not clobber the MelonLoader output.
 
-`build.sh` also attempts to build the Windows native encoder if `native/dist/win/koren_encoder.dll` is missing and `mingw-w64` is installed.
-
 Do not hand-edit `build.json` or `Info.cs` for routine release bumps; use `tools/release.sh` per `agents/release.md`.
 
 ## Working-tree caution
@@ -265,7 +238,6 @@ Do not overwrite or casually reformat unrelated work. If a file is already modif
    - `./test.sh` for Unity-free logic/localization/parser changes.
    - `dotnet build Quartz/Quartz.csproj -c Debug -p:LoaderTarget=ML` for mod code if local game references are available.
    - Add `-p:LoaderTarget=UMM` when loader/packaging/shared runtime changes may affect UMM.
-   - Native build scripts for encoder changes.
 7. Summarize changed paths and actual verification output. Do not commit or push unless the user asks.
 
 ## Quick path lookup
@@ -283,6 +255,4 @@ Do not overwrite or casually reformat unrelated work. If a file is already modif
 - Feature modules: `Quartz/Features/<Feature>/`.
 - Stat panels: `Quartz/Features/Panels/PanelsOverlay.cs`, `PanelsSettings.cs`, `PageOverlay.cs`.
 - Key viewer CSS parser: `Quartz/Features/KeyViewer/KeyViewerCss.cs`, tests in `Quartz.Tests/Program.cs`.
-- Recorder: `Quartz/Features/Recorder/*`, `native/koren_encoder/*`.
-- Native staged libraries: `native/dist/<os|win|linux>/`.
 - Tests: `Quartz.Tests/Program.cs`, `test.sh`.
