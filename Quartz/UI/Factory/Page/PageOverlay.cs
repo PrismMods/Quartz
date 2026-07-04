@@ -3,6 +3,7 @@ using Quartz.Features.Combo;
 using Quartz.Features.Panels;
 using Quartz.Features.ProgressBar;
 using Quartz.Resource;
+using Quartz.Tween;
 using Quartz.UI;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
@@ -15,6 +16,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
+using GTweenExtensions = GTweens.Extensions.GTweenExtensions;
 using static UnityEngine.EventSystems.PointerEventData;
 
 using TMPro;
@@ -43,15 +45,13 @@ internal static class PageOverlay {
             "overlay_reorganize"
         );
 
-        GenerateUI.Toggle(
-            GenerateUI.Row(content.transform),
+        GenerateUI.ToggleTip(
+            content.transform,
             def.Enabled,
             conf.Enabled,
             v => { conf.Enabled = v; PanelsOverlay.Save(); },
             "Enable Overlays",
-            "overlay_enabled"
-        ).Rect.AddToolTip(
-            "DESC_OVERLAY_ENABLED",
+            "overlay_enabled",
             "Master switch for every overlay HUD — panels, progress bar, combo and judgement."
         );
 
@@ -213,58 +213,17 @@ internal static class PageOverlay {
         StatEntry replaceTarget = null;
         bool pickerOpen = false;
 
-        // Slides the picker open/closed like a dropdown: lay the rows out
-        // once, freeze the layout group, then drive a LayoutElement height +
-        // fade (same idiom as the collapsibles).
+        // Slides the picker open/closed like a dropdown (shared slide engine
+        // with the per-stat color bodies below).
         void AnimatePicker(bool open, Action onClosed = null) {
             pickerSeq?.Kill();
 
             if(picker == null || pickerLayout == null || pickerFitter == null
                 || pickerLE == null || pickerRect == null || pickerCg == null) return;
 
-            pickerLayout.enabled = true;
-            pickerFitter.enabled = true;
-            pickerLE.preferredHeight = -1f;
-            LayoutRebuilder.ForceRebuildLayoutImmediate(sec.Section);
-            float content = pickerRect.rect.height;
-
-            pickerLayout.enabled = false;
-            pickerFitter.enabled = false;
-
-            pickerLE.preferredHeight = open ? 0f : content;
-            pickerCg.alpha = open ? 0f : 1f;
-
-            pickerSeq = GTweenSequenceBuilder.New()
-                .Join(GTweenExtensions.Tween(
-                    () => pickerLE.preferredHeight,
-                    x => {
-                        pickerLE.preferredHeight = Mathf.Max(0f, x);
-                        LayoutRebuilder.ForceRebuildLayoutImmediate(sec.Section);
-                    },
-                    open ? content : 0f,
-                    0.16f
-                ).SetEasing(open ? Easing.OutBack : Easing.OutSine))
-                .Join(GTweenExtensions.Tween(
-                    () => pickerCg.alpha,
-                    x => pickerCg.alpha = x,
-                    open ? 1f : 0f,
-                    0.16f
-                ).SetEasing(Easing.OutSine))
-                .AppendCallback(() => {
-                    if(open) {
-                        // Hand sizing back so the rows stay laid out.
-                        pickerLayout.enabled = true;
-                        pickerFitter.enabled = true;
-                        pickerLE.preferredHeight = -1f;
-                        LayoutRebuilder.ForceRebuildLayoutImmediate(sec.Section);
-                    } else {
-                        GenerateUI.ClearChildren(picker.transform);
-                        pickerLE.preferredHeight = 0f;
-                        onClosed?.Invoke();
-                    }
-                })
-                .Build();
-            MainCore.TC.Play(pickerSeq);
+            pickerSeq = AnimateBody(
+                sec.Section, pickerRect, pickerLayout, pickerFitter, pickerLE, pickerCg,
+                open, onClosed);
         }
 
         void CommitOrder() {
@@ -281,7 +240,7 @@ internal static class PageOverlay {
         void ClosePicker(bool animate = true) {
             pickerOpen = false;
             replaceTarget = null;
-            if(addBtn != null) addBtn.Label.text = MainCore.Tr.Get("PANEL_ADDSTAT", "+ Add Stat");
+            if(addBtn != null) addBtn.Label.text = GenerateUI.Tr("PANEL_ADDSTAT", "+ Add Stat");
 
             if(animate) {
                 AnimatePicker(false);
@@ -296,7 +255,7 @@ internal static class PageOverlay {
 
         void OpenPickerAnimated() {
             pickerOpen = true;
-            if(addBtn != null) addBtn.Label.text = MainCore.Tr.Get("CLOSE", "Close");
+            if(addBtn != null) addBtn.Label.text = GenerateUI.Tr("CLOSE", "Close");
             BuildPicker();
             AnimatePicker(true);
         }
@@ -310,49 +269,8 @@ internal static class PageOverlay {
 
         void AnimateColorBody(StatColorBody body, bool open) {
             body.Seq?.Kill();
-
-            body.Layout.enabled = true;
-            body.Fitter.enabled = true;
-            body.LE.preferredHeight = -1f;
-            LayoutRebuilder.ForceRebuildLayoutImmediate(sec.Section);
-            float content = body.Rect.rect.height;
-
-            body.Layout.enabled = false;
-            body.Fitter.enabled = false;
-
-            body.LE.preferredHeight = open ? 0f : content;
-            body.CG.alpha = open ? 0f : 1f;
-
-            body.Seq = GTweenSequenceBuilder.New()
-                .Join(GTweenExtensions.Tween(
-                    () => body.LE.preferredHeight,
-                    x => {
-                        body.LE.preferredHeight = Mathf.Max(0f, x);
-                        LayoutRebuilder.ForceRebuildLayoutImmediate(sec.Section);
-                    },
-                    open ? content : 0f,
-                    0.16f
-                ).SetEasing(open ? Easing.OutBack : Easing.OutSine))
-                .Join(GTweenExtensions.Tween(
-                    () => body.CG.alpha,
-                    x => body.CG.alpha = x,
-                    open ? 1f : 0f,
-                    0.16f
-                ).SetEasing(Easing.OutSine))
-                .AppendCallback(() => {
-                    if(open) {
-                        // Hand sizing back so the content stays laid out.
-                        body.Layout.enabled = true;
-                        body.Fitter.enabled = true;
-                        body.LE.preferredHeight = -1f;
-                        LayoutRebuilder.ForceRebuildLayoutImmediate(sec.Section);
-                    } else {
-                        GenerateUI.ClearChildren(body.Rect);
-                        body.LE.preferredHeight = 0f;
-                    }
-                })
-                .Build();
-            MainCore.TC.Play(body.Seq);
+            body.Seq = AnimateBody(
+                sec.Section, body.Rect, body.Layout, body.Fitter, body.LE, body.CG, open);
         }
 
         void RebuildColorBody(StatEntry entry) {
@@ -651,15 +569,15 @@ internal static class PageOverlay {
             idp + "_textshadow"
         );
 
-        AddSlider(sec.Body, "Shadow X", idp + "_shadow_x",
+        GenerateUI.SnapSlider(sec.Body, "Shadow X", idp + "_shadow_x",
             def.TextShadowX, -20f, 20f, panel.TextShadowX, "0.0 px", 0.1f,
             v => panel.TextShadowX = v, PanelsOverlay.Apply, Save);
 
-        AddSlider(sec.Body, "Shadow Y", idp + "_shadow_y",
+        GenerateUI.SnapSlider(sec.Body, "Shadow Y", idp + "_shadow_y",
             def.TextShadowY, -20f, 20f, panel.TextShadowY, "0.0 px", 0.1f,
             v => panel.TextShadowY = v, PanelsOverlay.Apply, Save);
 
-        AddSlider(sec.Body, "Shadow Softness", idp + "_shadow_softness",
+        GenerateUI.SnapSlider(sec.Body, "Shadow Softness", idp + "_shadow_softness",
             def.TextShadowSoftness, 0f, 20f, panel.TextShadowSoftness, "0.0 px", 0.1f,
             v => panel.TextShadowSoftness = v, PanelsOverlay.Apply, Save);
 
@@ -699,26 +617,6 @@ internal static class PageOverlay {
 
     // ===== stat-list row plumbing =====
 
-    private static void AddSlider(
-        Transform body, string label, string id,
-        float defVal, float min, float max, float val,
-        string format, float step,
-        Action<float> setter,
-        Action live, Action save
-    ) {
-        float Snap(float v) => Mathf.Clamp(Mathf.Round(v / step) * step, min, max);
-
-        UISlider s = GenerateUI.Slider(
-            GenerateUI.Row(body),
-            defVal, min, max, val,
-            Snap, null, null,
-            label, id
-        );
-        s.Format = format;
-        s.OnChanged = v => { setter(v); live?.Invoke(); };
-        s.OnComplete = v => { setter(v); live?.Invoke(); save?.Invoke(); };
-    }
-
     private static GameObject MakeListContainer(string name, Transform parent, float spacing) {
         GameObject obj = new(name);
         obj.transform.SetParent(parent, false);
@@ -729,35 +627,78 @@ internal static class PageOverlay {
         return obj;
     }
 
-    // One stat entry row: [⠿ drag] [label] ... [enable dot] [Color] [Swap] [X]
-    private static void BuildStatRow(
-        Transform parent, StatEntry entry,
-        Action commitOrder, Action onDelete, Action onSwap, Action onColor, Action save,
-        string idp
+    // Slides a collapsible sub-body open/closed like a dropdown: lay the rows
+    // out once, freeze the layout group, then drive a LayoutElement height +
+    // fade (same idiom as the collapsibles). On open, sizing is handed back
+    // to the layout group so the rows stay laid out; on close, the content is
+    // torn down. Returns the sequence so the caller can Kill a rerun.
+    private static GTween AnimateBody(
+        RectTransform section, RectTransform rect,
+        VerticalLayoutGroup layout, ContentSizeFitter fitter,
+        LayoutElement le, CanvasGroup cg,
+        bool open, Action onClosed = null
     ) {
-        RectTransform row = GenerateUI.Row(parent);
-        row.gameObject.AddComponent<StatRowMarker>().Entry = entry;
+        layout.enabled = true;
+        fitter.enabled = true;
+        le.preferredHeight = -1f;
+        LayoutRebuilder.ForceRebuildLayoutImmediate(section);
+        float content = rect.rect.height;
 
-        RectTransform bg = GenerateUI.BackGround();
-        bg.SetParent(row, false);
+        layout.enabled = false;
+        fitter.enabled = false;
 
-        // 6-dot drag handle. Dragging reorders the row among its siblings;
-        // dropping commits the new order to the panel config.
-        GameObject handle = new("DragHandle");
-        handle.transform.SetParent(bg, false);
+        le.preferredHeight = open ? 0f : content;
+        cg.alpha = open ? 0f : 1f;
+
+        GTween seq = GTweenSequenceBuilder.New()
+            .Join(GTweenExtensions.Tween(
+                () => le.preferredHeight,
+                x => {
+                    le.preferredHeight = Mathf.Max(0f, x);
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(section);
+                },
+                open ? content : 0f,
+                0.16f
+            ).SetEasing(open ? Easing.OutBack : Easing.OutSine))
+            .Join(GTweenExtensions.Tween(
+                () => cg.alpha,
+                x => cg.alpha = x,
+                open ? 1f : 0f,
+                0.16f
+            ).SetEasing(Easing.OutSine))
+            .AppendCallback(() => {
+                if(open) {
+                    // Hand sizing back so the rows stay laid out.
+                    layout.enabled = true;
+                    fitter.enabled = true;
+                    le.preferredHeight = -1f;
+                    LayoutRebuilder.ForceRebuildLayoutImmediate(section);
+                } else {
+                    GenerateUI.ClearChildren(rect);
+                    le.preferredHeight = 0f;
+                    onClosed?.Invoke();
+                }
+            })
+            .Build();
+        MainCore.TC.Play(seq);
+        return seq;
+    }
+
+    // Builds the 6-dot drag-handle visual pinned to the left edge of `parent`
+    // (rect stretched to full height + 2x3 dot grid); the caller attaches the
+    // matching drag behaviour.
+    private static GameObject MakeDragHandle(Transform parent, string name, float width) {
+        GameObject handle = new(name);
+        handle.transform.SetParent(parent, false);
 
         RectTransform handleRect = handle.AddComponent<RectTransform>();
         handleRect.anchorMin = new Vector2(0f, 0f);
         handleRect.anchorMax = new Vector2(0f, 1f);
         handleRect.pivot = new Vector2(0f, 0.5f);
         handleRect.anchoredPosition = Vector2.zero;
-        handleRect.sizeDelta = new Vector2(40f, 0f);
+        handleRect.sizeDelta = new Vector2(width, 0f);
 
         handle.AddComponent<EmptyGraphic>().raycastTarget = true;
-
-        StatRowDrag drag = handle.AddComponent<StatRowDrag>();
-        drag.Row = row;
-        drag.OnReordered = commitOrder;
 
         for(int col = 0; col < 2; col++) {
             for(int dotRow = 0; dotRow < 3; dotRow++) {
@@ -777,6 +718,29 @@ internal static class PageOverlay {
                 dotImg.raycastTarget = false;
             }
         }
+
+        return handle;
+    }
+
+    // One stat entry row: [⠿ drag] [label] ... [enable dot] [Color] [Swap] [X]
+    private static void BuildStatRow(
+        Transform parent, StatEntry entry,
+        Action commitOrder, Action onDelete, Action onSwap, Action onColor, Action save,
+        string idp
+    ) {
+        RectTransform row = GenerateUI.Row(parent);
+        row.gameObject.AddComponent<StatRowMarker>().Entry = entry;
+
+        RectTransform bg = GenerateUI.BackGround();
+        bg.SetParent(row, false);
+
+        // 6-dot drag handle. Dragging reorders the row among its siblings;
+        // dropping commits the new order to the panel config.
+        GameObject handle = MakeDragHandle(bg, "DragHandle", 40f);
+
+        StatRowDrag drag = handle.AddComponent<StatRowDrag>();
+        drag.Row = row;
+        drag.OnReordered = commitOrder;
 
         // The "text" stat edits its custom string right here in the row; every
         // other stat shows its (localized) name as a static label.
@@ -857,9 +821,9 @@ internal static class PageOverlay {
             save();
         });
 
-        MiniButton(bg, "Color", "COLOR_SHORT", -144f, 88f, onColor);
-        MiniButton(bg, "Swap", "SWAP", -56f, 84f, onSwap);
-        MiniButton(bg, "X", "DELETE_SHORT", -8f, 44f, onDelete);
+        GenerateUI.MiniButton(bg, "Color", "COLOR_SHORT", -144f, 88f, onColor);
+        GenerateUI.MiniButton(bg, "Swap", "SWAP", -56f, 84f, onSwap);
+        GenerateUI.MiniButton(bg, "X", "DELETE_SHORT", -8f, 44f, onDelete);
     }
 
     // Collapsible body that hosts a stat's color settings. Starts collapsed
@@ -963,7 +927,7 @@ internal static class PageOverlay {
                 };
 
                 if(color.Points.Count > 1) {
-                    MiniButton(posRow, "X", "DELETE_SHORT", -8f, 44f, () => {
+                    GenerateUI.MiniButton(posRow, "X", "DELETE_SHORT", -8f, 44f, () => {
                         color.Points.Remove(point);
                         save();
                         rebuild();
@@ -984,7 +948,7 @@ internal static class PageOverlay {
             if(!hasRatio && color.Points.Count > 1) {
                 // No position rows for static stats — extra stops are
                 // meaningless there, offer delete on its own row.
-                MiniButton(GenerateUI.Row(parent, 40f), "X", "DELETE_SHORT", -8f, 44f, () => {
+                GenerateUI.MiniButton(GenerateUI.Row(parent, 40f), "X", "DELETE_SHORT", -8f, 44f, () => {
                     color.Points.Remove(point);
                     save();
                     rebuild();
@@ -1034,15 +998,15 @@ internal static class PageOverlay {
     }
 
     private static string AnchorName(PanelAnchor anchor) => anchor switch {
-        PanelAnchor.TopLeft => MainCore.Tr.Get("ANCHOR_TOP_LEFT", "Top Left"),
-        PanelAnchor.TopCenter => MainCore.Tr.Get("ANCHOR_TOP_CENTER", "Top Center"),
-        PanelAnchor.TopRight => MainCore.Tr.Get("ANCHOR_TOP_RIGHT", "Top Right"),
-        PanelAnchor.MiddleLeft => MainCore.Tr.Get("ANCHOR_MIDDLE_LEFT", "Middle Left"),
-        PanelAnchor.MiddleCenter => MainCore.Tr.Get("ANCHOR_MIDDLE_CENTER", "Middle Center"),
-        PanelAnchor.MiddleRight => MainCore.Tr.Get("ANCHOR_MIDDLE_RIGHT", "Middle Right"),
-        PanelAnchor.BottomLeft => MainCore.Tr.Get("ANCHOR_BOTTOM_LEFT", "Bottom Left"),
-        PanelAnchor.BottomCenter => MainCore.Tr.Get("ANCHOR_BOTTOM_CENTER", "Bottom Center"),
-        PanelAnchor.BottomRight => MainCore.Tr.Get("ANCHOR_BOTTOM_RIGHT", "Bottom Right"),
+        PanelAnchor.TopLeft => GenerateUI.Tr("ANCHOR_TOP_LEFT", "Top Left"),
+        PanelAnchor.TopCenter => GenerateUI.Tr("ANCHOR_TOP_CENTER", "Top Center"),
+        PanelAnchor.TopRight => GenerateUI.Tr("ANCHOR_TOP_RIGHT", "Top Right"),
+        PanelAnchor.MiddleLeft => GenerateUI.Tr("ANCHOR_MIDDLE_LEFT", "Middle Left"),
+        PanelAnchor.MiddleCenter => GenerateUI.Tr("ANCHOR_MIDDLE_CENTER", "Middle Center"),
+        PanelAnchor.MiddleRight => GenerateUI.Tr("ANCHOR_MIDDLE_RIGHT", "Middle Right"),
+        PanelAnchor.BottomLeft => GenerateUI.Tr("ANCHOR_BOTTOM_LEFT", "Bottom Left"),
+        PanelAnchor.BottomCenter => GenerateUI.Tr("ANCHOR_BOTTOM_CENTER", "Bottom Center"),
+        PanelAnchor.BottomRight => GenerateUI.Tr("ANCHOR_BOTTOM_RIGHT", "Bottom Right"),
         _ => anchor.ToString(),
     };
 
@@ -1050,32 +1014,6 @@ internal static class PageOverlay {
         foreach(PanelsOverlay.StatDef stat in PanelsOverlay.Catalog)
             if(stat.Id == id) return stat.Label;
         return id;
-    }
-
-    private static void MiniButton(Transform parent, string text, string key, float rightOffset, float width, Action onClick) {
-        GameObject obj = new("MiniBtn_" + text);
-        obj.transform.SetParent(parent, false);
-
-        RectTransform rect = obj.AddComponent<RectTransform>();
-        rect.anchorMin = new Vector2(1f, 0.5f);
-        rect.anchorMax = new Vector2(1f, 0.5f);
-        rect.pivot = new Vector2(1f, 0.5f);
-        rect.anchoredPosition = new Vector2(rightOffset, 0f);
-        rect.sizeDelta = new Vector2(width, 36f);
-
-        Image img = obj.AddComponent<Image>();
-        img.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
-        img.type = Image.Type.Sliced;
-        img.color = UIColors.ObjectButton;
-
-        var label = GenerateUI.AddText(obj.transform, true);
-        GenerateUI.Localize(label, key, text);
-        label.fontSize = 18f;
-        label.alignment = TextAlignmentOptions.Center;
-
-        GenerateUI.AddButton(obj, btn => {
-            if(btn == InputButton.Left) onClick();
-        });
     }
 
     // Inline editor for a "text" stat row: a single-line input sitting where the
@@ -1137,41 +1075,12 @@ internal static class PageOverlay {
         if(sec.HeaderObj.transform.Find("Bar") is RectTransform barRect)
             barRect.offsetMin = new Vector2(44f, barRect.offsetMin.y);
 
-        GameObject handle = new("LayerHandle");
-        handle.transform.SetParent(sec.HeaderObj.transform, false);
-
-        RectTransform handleRect = handle.AddComponent<RectTransform>();
-        handleRect.anchorMin = new Vector2(0f, 0f);
-        handleRect.anchorMax = new Vector2(0f, 1f);
-        handleRect.pivot = new Vector2(0f, 0.5f);
-        handleRect.anchoredPosition = Vector2.zero;
-        handleRect.sizeDelta = new Vector2(44f, 0f);
-
-        handle.AddComponent<EmptyGraphic>().raycastTarget = true;
+        GameObject handle = MakeDragHandle(sec.HeaderObj.transform, "LayerHandle", 44f);
 
         PanelLayerDrag drag = handle.AddComponent<PanelLayerDrag>();
         drag.Row = sec.Section;
 
-        for(int col = 0; col < 2; col++) {
-            for(int dotRow = 0; dotRow < 3; dotRow++) {
-                GameObject dot = new("Dot");
-                dot.transform.SetParent(handle.transform, false);
-
-                RectTransform dotRect = dot.AddComponent<RectTransform>();
-                dotRect.anchorMin = new Vector2(0.5f, 0.5f);
-                dotRect.anchorMax = new Vector2(0.5f, 0.5f);
-                dotRect.pivot = new Vector2(0.5f, 0.5f);
-                dotRect.anchoredPosition = new Vector2(col * 8f - 4f, dotRow * 8f - 8f);
-                dotRect.sizeDelta = new Vector2(4f, 4f);
-
-                Image dotImg = dot.AddComponent<Image>();
-                dotImg.sprite = MainCore.Spr.Get(UISprite.Circle256);
-                dotImg.color = new Color(1f, 1f, 1f, 0.4f);
-                dotImg.raycastTarget = false;
-            }
-        }
-
-        handleRect.AddToolTip(
+        handle.transform.AddToolTip(
             "DESC_PANEL_LAYER",
             "Drag to reorder. Panels higher in the list draw on top where they overlap."
         );
@@ -1204,12 +1113,12 @@ internal static class PageOverlay {
         public PanelConfig Config;
     }
 
-    // Drag-to-reorder for whole panel sections — same mechanism as the stat
-    // rows, but the committed order is the panels' layer (draw) order. The
-    // dragged section leaves the layout and floats with the pointer; a
-    // placeholder gap marks the drop slot; on release the section glides into
-    // the gap and the new order is committed.
-    private sealed class PanelLayerDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler {
+    // Shared drag-to-reorder engine. The dragged row leaves the layout and
+    // floats with the pointer (slightly scaled up); a placeholder gap slides
+    // through the list to mark the drop slot. On release the row glides into
+    // the gap, rejoins the layout at the gap's slot, and the subclass commits
+    // the new hierarchy order.
+    private abstract class RowDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler {
         public RectTransform Row;
 
         private LayoutElement rowLE;
@@ -1219,16 +1128,25 @@ internal static class PageOverlay {
         private GTween dropSeq;
         private bool dragging;
 
+        // Per-row slide tweens for the NOT-dragged rows: every placeholder
+        // move reflows the layout instantly, which would teleport the rows
+        // shoved aside — instead their old visual position is captured, the
+        // layout is rebuilt, and they glide from old to new slot.
         private readonly Dictionary<RectTransform, GTween> rowSlides = [];
         private readonly List<(RectTransform rt, Vector2 oldPos)> reflowCapture = [];
 
-        private static bool IsSection(Transform t) => t.GetComponent<PanelSectionMarker>() != null;
+        // Which siblings count as reorderable rows.
+        protected abstract bool IsRow(Transform t);
+
+        // Commits the new order once the drop animation has rejoined the
+        // layout.
+        protected abstract void OnDropped();
 
         private void AnimateReflow(Transform container) {
             reflowCapture.Clear();
             for(int i = 0; i < container.childCount; i++) {
                 Transform child = container.GetChild(i);
-                if(child == Row || !IsSection(child)) continue;
+                if(child == Row || !IsRow(child)) continue;
                 RectTransform rt = (RectTransform)child;
                 reflowCapture.Add((rt, rt.anchoredPosition));
             }
@@ -1259,21 +1177,19 @@ internal static class PageOverlay {
 
             // A previous drop animation still running: jump it to its end so
             // the placeholder/layout state is clean before re-grabbing.
-            if(dropSeq != null) {
-                dropSeq.Complete();
-                dropSeq.Kill();
-                dropSeq = null;
-            }
+            dropSeq.CompleteAndKill();
+            dropSeq = null;
 
             dragging = true;
 
-            // Sections size themselves with a ContentSizeFitter and have no
-            // LayoutElement; add an inert one so the section can be lifted out
-            // of the list layout (ignoreLayout) while it floats.
+            // Stat rows carry a LayoutElement already; panel sections size
+            // themselves with a ContentSizeFitter and get an inert one added
+            // here — either way it lifts the row out of the list layout
+            // (ignoreLayout) while it floats.
             rowLE = Row.GetComponent<LayoutElement>();
             if(rowLE == null) rowLE = Row.gameObject.AddComponent<LayoutElement>();
 
-            // Gap that holds the section's slot while it floats.
+            // Gap that holds the row's slot while it floats.
             GameObject ph = new("DragPlaceholder");
             ph.transform.SetParent(Row.parent, false);
             placeholder = ph.AddComponent<RectTransform>();
@@ -1297,185 +1213,13 @@ internal static class PageOverlay {
             pos.y = eventData.position.y + grabOffsetY;
             Row.position = pos;
 
-            // Slot index = how many other sections sit above the pointer.
-            Transform container = Row.parent;
-            int target = 0;
-            for(int i = 0; i < container.childCount; i++) {
-                Transform child = container.GetChild(i);
-                if(child == Row || child == placeholder) continue;
-                if(!IsSection(child)) continue;
-                if(((RectTransform)child).position.y > eventData.position.y) target++;
-            }
-
-            if(placeholder.GetSiblingIndex() != target) {
-                placeholder.SetSiblingIndex(target);
-                AnimateReflow(container);
-            }
-        }
-
-        public void OnEndDrag(PointerEventData eventData) {
-            if(!dragging || Row == null || placeholder == null) return;
-
-            dragging = false;
-
-            Transform container = Row.parent;
-            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)container);
-
-            float targetY = placeholder.position.y;
-            int finalIndex = placeholder.GetSiblingIndex();
-
-            RectTransform ph = placeholder;
-            placeholder = null;
-
-            PlayScale(1f);
-
-            // Glide into the gap, then rejoin the layout at the gap's slot.
-            dropSeq = GTweenSequenceBuilder.New()
-                .Append(GTweenExtensions.Tween(
-                    () => Row.position.y,
-                    y => {
-                        Vector3 pos = Row.position;
-                        pos.y = y;
-                        Row.position = pos;
-                    },
-                    targetY,
-                    0.12f
-                ).SetEasing(Easing.OutCubic))
-                .AppendCallback(() => {
-                    if(ph != null) {
-                        ph.gameObject.SetActive(false);
-                        Object.Destroy(ph.gameObject);
-                    }
-                    if(rowLE != null) rowLE.ignoreLayout = false;
-                    if(Row != null) {
-                        Row.SetSiblingIndex(finalIndex);
-                        Row.localScale = Vector3.one;
-                        AnimateReflow(Row.parent);
-                    }
-                    CommitPanelOrder();
-                })
-                .Build();
-            MainCore.TC.Play(dropSeq);
-        }
-
-        private void PlayScale(float target) {
-            if(Row == null) return;
-
-            scaleSeq?.Kill();
-            scaleSeq = GTweenExtensions.Tween(
-                () => Row.localScale.x,
-                x => Row.localScale = new Vector3(x, x, 1f),
-                target,
-                0.12f
-            ).SetEasing(Easing.OutSine);
-            MainCore.TC.Play(scaleSeq);
-        }
-    }
-
-    // Ties a list row back to its config entry so a reorder commit can read
-    // the new order straight off the hierarchy.
-    private sealed class StatRowMarker : MonoBehaviour {
-        public StatEntry Entry;
-    }
-
-    // Drag-to-reorder for stat rows. The dragged row leaves the layout and
-    // floats with the pointer (slightly scaled up); a placeholder gap slides
-    // through the list to mark the drop slot. On release the row glides into
-    // the gap, then the hierarchy order is committed to the panel config.
-    private sealed class StatRowDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler {
-        public RectTransform Row;
-        public Action OnReordered;
-
-        private LayoutElement rowLE;
-        private RectTransform placeholder;
-        private float grabOffsetY;
-        private GTween scaleSeq;
-        private GTween dropSeq;
-        private bool dragging;
-
-        // Per-row slide tweens for the NOT-dragged rows: every placeholder
-        // move reflows the layout instantly, which would teleport the rows
-        // shoved aside — instead their old visual position is captured, the
-        // layout is rebuilt, and they glide from old to new slot.
-        private readonly Dictionary<RectTransform, GTween> rowSlides = [];
-        private readonly List<(RectTransform rt, Vector2 oldPos)> reflowCapture = [];
-
-        private void AnimateReflow(Transform container) {
-            reflowCapture.Clear();
-            for(int i = 0; i < container.childCount; i++) {
-                Transform child = container.GetChild(i);
-                if(child == Row || child.GetComponent<StatRowMarker>() == null) continue;
-                RectTransform rt = (RectTransform)child;
-                reflowCapture.Add((rt, rt.anchoredPosition));
-            }
-
-            LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)container);
-
-            foreach((RectTransform rt, Vector2 oldPos) in reflowCapture) {
-                Vector2 target = rt.anchoredPosition;
-                if((target - oldPos).sqrMagnitude < 0.01f) continue;
-
-                rt.anchoredPosition = oldPos;
-
-                if(rowSlides.TryGetValue(rt, out GTween running)) running?.Kill();
-
-                GTween slide = GTweenExtensions.Tween(
-                    () => rt.anchoredPosition.y,
-                    y => rt.anchoredPosition = new Vector2(rt.anchoredPosition.x, y),
-                    target.y,
-                    0.15f
-                ).SetEasing(Easing.OutCubic);
-                rowSlides[rt] = slide;
-                MainCore.TC.Play(slide);
-            }
-        }
-
-        public void OnBeginDrag(PointerEventData eventData) {
-            if(Row == null || Row.parent == null) return;
-
-            // A previous drop animation still running: jump it to its end so
-            // the placeholder/layout state is clean before re-grabbing.
-            if(dropSeq != null) {
-                dropSeq.Complete();
-                dropSeq.Kill();
-                dropSeq = null;
-            }
-
-            dragging = true;
-
-            rowLE = Row.GetComponent<LayoutElement>();
-
-            // Gap that holds the row's slot while it floats.
-            GameObject ph = new("DragPlaceholder");
-            ph.transform.SetParent(Row.parent, false);
-            placeholder = ph.AddComponent<RectTransform>();
-            LayoutElement phLE = ph.AddComponent<LayoutElement>();
-            phLE.preferredHeight = Row.rect.height;
-            phLE.minHeight = Row.rect.height;
-            placeholder.SetSiblingIndex(Row.GetSiblingIndex());
-
-            if(rowLE != null) rowLE.ignoreLayout = true;
-            Row.SetAsLastSibling();
-
-            grabOffsetY = Row.position.y - eventData.position.y;
-
-            PlayScale(1.04f);
-        }
-
-        public void OnDrag(PointerEventData eventData) {
-            if(!dragging || Row == null || placeholder == null) return;
-
-            Vector3 pos = Row.position;
-            pos.y = eventData.position.y + grabOffsetY;
-            Row.position = pos;
-
             // Slot index = how many other rows sit above the pointer.
             Transform container = Row.parent;
             int target = 0;
             for(int i = 0; i < container.childCount; i++) {
                 Transform child = container.GetChild(i);
                 if(child == Row || child == placeholder) continue;
-                if(child.GetComponent<StatRowMarker>() == null) continue;
+                if(!IsRow(child)) continue;
                 if(((RectTransform)child).position.y > eventData.position.y) target++;
             }
 
@@ -1527,7 +1271,7 @@ internal static class PageOverlay {
                         // instead of snapping.
                         AnimateReflow(Row.parent);
                     }
-                    OnReordered?.Invoke();
+                    OnDropped();
                 })
                 .Build();
             MainCore.TC.Play(dropSeq);
@@ -1545,5 +1289,27 @@ internal static class PageOverlay {
             ).SetEasing(Easing.OutSine);
             MainCore.TC.Play(scaleSeq);
         }
+    }
+
+    // Drag-to-reorder for whole panel sections — the committed order is the
+    // panels' layer (draw) order.
+    private sealed class PanelLayerDrag : RowDrag {
+        protected override bool IsRow(Transform t) => t.GetComponent<PanelSectionMarker>() != null;
+        protected override void OnDropped() => CommitPanelOrder();
+    }
+
+    // Ties a list row back to its config entry so a reorder commit can read
+    // the new order straight off the hierarchy.
+    private sealed class StatRowMarker : MonoBehaviour {
+        public StatEntry Entry;
+    }
+
+    // Drag-to-reorder for stat rows — dropping commits the hierarchy order to
+    // the panel config via OnReordered.
+    private sealed class StatRowDrag : RowDrag {
+        public Action OnReordered;
+
+        protected override bool IsRow(Transform t) => t.GetComponent<StatRowMarker>() != null;
+        protected override void OnDropped() => OnReordered?.Invoke();
     }
 }

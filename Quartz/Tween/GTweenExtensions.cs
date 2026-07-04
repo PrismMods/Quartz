@@ -55,6 +55,15 @@ public static class GTweenExtensions {
             duration
         );
 
+    // Jumps a possibly-running tween to its end state (running its callbacks)
+    // and unregisters it — the "flush the previous animation before starting
+    // a replacement" idiom. No-op on null.
+    public static void CompleteAndKill(this GTween tween) {
+        if(tween == null) return;
+        tween.Complete();
+        tween.Kill();
+    }
+
     extension(RectTransform target) {
         public GTween GTAnchorPos(Vector2 to, float duration) {
             var from = target == null ? to : target.anchoredPosition;
