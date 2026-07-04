@@ -1,0 +1,21 @@
+Quartz/Core/Service/HarmonyService.cs
+  s_6062dee6cb1897::t_28721a88af6ce8 8-12,14-31,36-44,46
+Quartz/Core/QuartzRuntime.cs
+  s_6062dee6cb1897::t_1e7507e0e33336 211-213
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "626cd30c85a2cb3cf0d5122e7acd6bf29b314510",
+  "prompts": {},
+  "sessions": {
+    "s_6062dee6cb1897": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9565756a-8004-490e-bd79-430f1ba9f46c",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
