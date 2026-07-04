@@ -8,7 +8,7 @@ How to keep the documentation site — <https://quartzz.xyz/docs/> — in sync w
 
 ## Where the docs live
 
-The docs are **not in this repo**. They live in the website repo and are built with Material for MkDocs from plain markdown.
+The docs are **not in this repo**. They live in the website repo and are built with [Zensical](https://zensical.org/) from plain markdown. The config is still `mkdocs.yml` — Zensical reads it natively; don't convert it to `zensical.toml` until the Zensical team ships their migration tooling.
 
 | Piece | Where |
 |-------|-------|
@@ -55,7 +55,7 @@ Write for a player, not a committer — same voice rule as the changelog in `rel
    - `### Improved` / behavior changes → update the feature's page so it describes **current** behavior. Docs are a snapshot, not a changelog — don't append "as of vX.Y" deltas.
    - `### Fixed` → usually nothing; update `troubleshooting.md` if a documented symptom/workaround is now obsolete.
    - Install/loader/packaging changes → `install.md`.
-4. **Verify.** From the website repo root: `pip install mkdocs-material` (venv is fine), then `mkdocs build --strict` — it must pass with zero warnings. Watch the build log for "pages exist … but are not included in the nav".
+4. **Verify.** From the website repo root: `pip install zensical` (venv is fine), then `zensical build -s` (strict) — it must end with `No issues found`. To eyeball it, `zensical serve`.
 5. **Commit + push.** Conventional subject per [`agents/commits.md`](commits.md), e.g. `docs: cover v2.0.0-alpha-29`. Pushing `main` **is** publishing — the Pages workflow deploys on push. Confirm it: `gh run list -R QuartzTeam/Quartz-Website --workflow pages.yml -L 1` should end `success`.
 
 ## Don'ts
@@ -66,5 +66,5 @@ Write for a player, not a committer — same voice rule as the changelog in `rel
 - Don't add a page without its `nav:` entry and catalog row.
 - Don't touch `src/public/` (homepage), `quartz.css`, or `pages.yml` in a routine docs pass — content changes only.
 - Don't hand-write HTML in the markdown; the extensions above cover the layouts you need.
-- Don't ship a `--strict` failure or warning.
+- Don't ship a strict-mode failure or warning.
 - Don't leak internals: class names, file paths, patch names, or `Features/<Name>` module jargon stay out of player-facing prose.
