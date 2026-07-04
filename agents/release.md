@@ -4,7 +4,7 @@ How to cut a "full" release — a named build with a real, de-duplicated changel
 
 ## Shorthand
 
-- **`release`** — do the whole flow below: figure out the next build, draft + de-dup the changelog, pick a name, preview, publish, then commit the bump.
+- **`release`** — do the whole flow below: figure out the next build, draft + de-dup the changelog, pick a name, preview, publish, commit the bump, then update the docs site.
 
 ## What "full" means
 
@@ -71,6 +71,7 @@ So `git log <prev-tag>..HEAD` — what `--dry-run` shows as `range:` — will re
 7. **Preview.** `./tools/release.sh -n "Name" -F /tmp/notes.md --dry-run`. Preview it yourself then publish.
 8. **Publish.** Same command, drop `--dry-run`. The script bumps `build.json`, builds Release, and uploads `Quartz.zip` + `Quartz.dll`. (Re-running an existing tag refreshes title + notes and re-uploads assets.)
 9. **Commit the bump.** The build-number bump leaves `build.json` dirty. Commit it per [`agents/commits.md`](commits.md): `build: bump <chan> to <next>`. **Push only if asked.**
+10. **Update the docs site.** Every release ends with a docs pass: follow [`agents/docs.md`](docs.md) to fold the changelog you just published into <https://quartzz.xyz/docs/> (the `QuartzTeam/Quartz-Website` repo). A release isn't done until the docs describe it.
 
 ## Don'ts
 

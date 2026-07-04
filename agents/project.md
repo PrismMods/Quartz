@@ -5,6 +5,7 @@ This is the high-level map for AI agents working in this repo. Read this first, 
 - `agents/commits.md` — commit format and staging rules.
 - `agents/i18n.md` — localization keys, JSON parity, and translation audits.
 - `agents/release.md` — full GitHub release flow and changelog de-duplication.
+- `agents/docs.md` — documentation site (quartzz.xyz/docs) styling and the per-release docs update.
 
 ## What this project is
 
