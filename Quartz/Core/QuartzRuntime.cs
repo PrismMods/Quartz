@@ -208,6 +208,9 @@ public sealed class QuartzRuntime {
         Optimizer.Initialize();
 
         ticks.Add(playCount);
+        // Applies Quartz's own [HarmonyPatch] classes on the first tick rather
+        // than inline above — see HarmonyService's class comment for why.
+        ticks.Add(harmonyService);
 
         ticks.Add(uiService);
         ticks.Add(tweenService);
