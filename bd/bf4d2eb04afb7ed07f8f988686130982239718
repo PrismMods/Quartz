@@ -1,0 +1,21 @@
+Quartz/UI/Factory/Page/PageOverlay.cs
+  s_90010d0854592e::t_fa5c6694eaf225 159
+  s_90010d0854592e::t_37e43e997d4829 140-143,158,160-162
+  s_90010d0854592e::t_1acecc1c2693f2 163-164
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "bdbf4d2eb04afb7ed07f8f988686130982239718",
+  "prompts": {},
+  "sessions": {
+    "s_90010d0854592e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1eb3e6ee-7fd4-405a-948e-978db5260610",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
