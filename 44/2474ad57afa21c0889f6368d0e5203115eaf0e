@@ -1,0 +1,24 @@
+Quartz/UI/Factory/Page/PageOverlay.StatColorSettings.cs
+  s_90010d0854592e::t_3cd70e660becf6 1-139
+Quartz/UI/Factory/Page/PageOverlay.cs
+  s_90010d0854592e::t_83d364597f070d 348-356,358-361
+  s_90010d0854592e::t_e34f997e5e5fb4 30
+  s_90010d0854592e::t_7ea644c9bd543a 581-622
+  s_90010d0854592e::t_e425b3d4f97821 623-624
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "442474ad57afa21c0889f6368d0e5203115eaf0e",
+  "prompts": {},
+  "sessions": {
+    "s_90010d0854592e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1eb3e6ee-7fd4-405a-948e-978db5260610",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
