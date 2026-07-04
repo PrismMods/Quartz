@@ -1,0 +1,26 @@
+Quartz/Features/KeyViewer/KeyViewerOverlay.cs
+  s_e03bf5eb2b3681::t_23de42e7190144 1866-1871,1875-1886,1892,1903,1906
+  s_e03bf5eb2b3681::t_b5d7759e99ffa1 1839-1840,1843,1846-1848
+  s_e03bf5eb2b3681::t_9d044d3e161cf5 1800-1803
+Quartz/Features/KeyViewer/KeyViewerCss.cs
+  s_e03bf5eb2b3681::t_0225eb10f81c9e 976
+  s_e03bf5eb2b3681::t_8429569f12b003 639-641,644,656,658
+  s_e03bf5eb2b3681::t_081622c5c861c4 392
+  s_e03bf5eb2b3681::t_bd1b49413f7878 963
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "8ff3976299fb4a3f260e7fde63496716c00a1e89",
+  "prompts": {},
+  "sessions": {
+    "s_e03bf5eb2b3681": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf4a35d5-d4c8-48f0-a560-989570ab28d8",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
