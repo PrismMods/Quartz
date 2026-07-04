@@ -104,8 +104,39 @@ public static class KeyLimiter {
 
     public static bool IsMouseKey(KeyCode key) => key is >= KeyCode.Mouse0 and <= KeyCode.Mouse6;
 
-    public static bool ShouldBlockKey(KeyCode key)
-        => IsActive() && InPlayerControl() && !IsMouseKey(key) && !IsAllowedKey(key);
+    // Unity's legacy Input is NumLock-aware: with NumLock off, numpad keys
+    // report as their navigation twins (Keypad0 -> Insert, KeypadPeriod ->
+    // Delete, Keypad2 -> DownArrow, ...) instead of the Keypad* code the
+    // allowed list stores (synced from the key viewer, or captured with
+    // NumLock on). Only ShouldBlockKey needs this: it's fed by the
+    // synchronous Unity Input path (RDInput.GetMainPressKeys()'s KeyCode
+    // branch), which is the NumLock-dependent one. The async/hook path
+    // (ShouldBlockAsyncKeyFromHook) reads the physical key straight off
+    // SkyHook and is already NumLock-independent, so applying this fallback
+    // there would let a real physical Insert/arrow press masquerade as its
+    // numpad twin. Mirrors KeyViewerOverlay's NumpadNavTwin, reversed.
+    private static KeyCode NavTwinToNumpad(KeyCode key) => key switch {
+        KeyCode.Insert => KeyCode.Keypad0,
+        KeyCode.End => KeyCode.Keypad1,
+        KeyCode.DownArrow => KeyCode.Keypad2,
+        KeyCode.PageDown => KeyCode.Keypad3,
+        KeyCode.LeftArrow => KeyCode.Keypad4,
+        KeyCode.Clear => KeyCode.Keypad5,
+        KeyCode.RightArrow => KeyCode.Keypad6,
+        KeyCode.Home => KeyCode.Keypad7,
+        KeyCode.UpArrow => KeyCode.Keypad8,
+        KeyCode.PageUp => KeyCode.Keypad9,
+        KeyCode.Delete => KeyCode.KeypadPeriod,
+        _ => KeyCode.None,
+    };
+
+    public static bool ShouldBlockKey(KeyCode key) {
+        if(!IsActive() || !InPlayerControl() || IsMouseKey(key)) return false;
+        if(IsAllowedKey(key)) return false;
+
+        KeyCode numpadOrigin = NavTwinToNumpad(key);
+        return numpadOrigin == KeyCode.None || !IsAllowedKey(numpadOrigin);
+    }
 
     public static void ToggleAllowedKey(KeyCode key) {
         EnsureConf();
