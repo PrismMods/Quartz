@@ -1,0 +1,23 @@
+Quartz/UI/UICore.cs
+  s_e03bf5eb2b3681::t_fd9a25813aa69d 789-790,881-882
+Quartz/UI/Transition/PageSwicher.cs
+  s_e03bf5eb2b3681::t_520420840a074a 25
+Quartz/UI/Objects/Impl/UIInput.cs
+  s_e03bf5eb2b3681::t_5ddb6d1c31d006 91
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "e3648a1576236eff43d45baacc11d3f640567f04",
+  "prompts": {},
+  "sessions": {
+    "s_e03bf5eb2b3681": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf4a35d5-d4c8-48f0-a560-989570ab28d8",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
