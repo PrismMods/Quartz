@@ -1,0 +1,26 @@
+Quartz/UI/Utility/UnityUtils.cs
+  s_62bc00b59fa220::t_80ba2597428e29 1,9-31
+Quartz/Features/KeyViewer/KeyViewerOverlay.cs
+  s_62bc00b59fa220::t_fe158bcac76ac8 2223-2234,2236
+Quartz/Features/Judgement/JudgementOverlay.cs
+  s_62bc00b59fa220::t_3f33b310b552b2 320
+  s_62bc00b59fa220::t_571794fcdda39b 469,476
+Quartz/Features/Combo/ComboOverlay.cs
+  s_62bc00b59fa220::t_8c869a86022a29 272
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "1ca342b65f81e03e62c70109bd6c1376abc928bb",
+  "prompts": {},
+  "sessions": {
+    "s_62bc00b59fa220": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f0bae0d9-52c1-450c-82ca-7863c6cbf36d",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
