@@ -1,0 +1,45 @@
+Quartz/Features/Interop/SettingsImporter.cs
+  s_90010d0854592e::t_a1319a71e1014f 4,75-79,131,144,174,226,288,297,311-314,338,352,359-364,373,396-402,420-421,441-443
+Quartz/Features/Interop/Readers/JipperResourcePackReader.cs
+  s_90010d0854592e::t_156e92dd4490f1 1-126
+Quartz/Features/Interop/Readers/EnhancedEffectRemoverReader.cs
+  s_90010d0854592e::t_17e429932cb85e 1-73
+Quartz/Features/Interop/Readers/ChatterBlockerReader.cs
+  s_90010d0854592e::t_d982fcd990d0be 1-136
+Quartz/Features/Interop/Readers/KorenResourcePackV1Reader.cs
+  s_90010d0854592e::t_bd1004b4a39070 3
+  s_90010d0854592e::t_7de9f5a705cad8 1-2,4-371
+Quartz/Features/Interop/ReflectionHelpers.cs
+  s_90010d0854592e::t_b524d4aa3a8716 4
+  s_90010d0854592e::t_755ae88bafba6d 1-3,5,7-378
+  s_90010d0854592e::t_266d3e37c9d422 6
+Quartz/Features/Interop/Readers/KeyViewerImportShared.cs
+  s_90010d0854592e::t_926e9cebb53a0a 1-257
+Quartz/Features/Interop/Readers/JipperKeyViewerReader.cs
+  s_90010d0854592e::t_a6b684113a8ecb 1-42
+Quartz/Features/Interop/Readers/AdofaiTweaksReader.cs
+  s_90010d0854592e::t_eeb7ad919e4ae8 2
+  s_90010d0854592e::t_d67a74ab0ff548 1,3-111,113-125,127-134,136-143,145-152,154-167,169-218,220,222,224-228
+  s_90010d0854592e::t_ea2d47b8e68547 112,126,135,144,168,219
+  s_90010d0854592e::t_76806d7ede61bf 153,221,223
+Quartz/Resource/Export/Lang/en-US.json
+  s_90010d0854592e::t_f99f04d3e03630 742-746
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_90010d0854592e::t_04680fc9a83304 742-746
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "7eb5240ccbe8a0be61a8539fc4f09f8e44c0e4b1",
+  "prompts": {},
+  "sessions": {
+    "s_90010d0854592e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1eb3e6ee-7fd4-405a-948e-978db5260610",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
