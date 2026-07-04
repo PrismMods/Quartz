@@ -1,0 +1,25 @@
+Quartz/UI/Generator/GenerateUI.cs
+  s_90010d0854592e::t_7d20848ad81f4c 1079-1161
+Quartz/UI/Factory/Page/PageKeyViewer.cs
+  s_90010d0854592e::t_70c0e55b57b54e 44,48,72-79
+  s_90010d0854592e::t_39ec1ff3a9f0ca 1077-1086
+  s_90010d0854592e::t_4391319c84fdca 37,40
+  s_90010d0854592e::t_656e844d6f8781 34-35
+  s_90010d0854592e::t_50476321103f3b 1087
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "3925bb26a623d9904b7cc5a1358eec2e8a612fc4",
+  "prompts": {},
+  "sessions": {
+    "s_90010d0854592e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1eb3e6ee-7fd4-405a-948e-978db5260610",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
