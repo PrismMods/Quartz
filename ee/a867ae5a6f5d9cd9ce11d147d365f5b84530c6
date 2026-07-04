@@ -1,0 +1,27 @@
+Quartz/Features/Nostalgia/NostalgiaLegacyCLS.cs
+  s_90010d0854592e::t_9e4d5a3f382853 201-218,225,229-231,235,237,254-266
+Quartz/Features/Nostalgia/NostalgiaPatches.Play.cs
+  s_90010d0854592e::t_3a976e9660de14 239-241
+  s_90010d0854592e::t_84793c5d4f4072 181-182
+  s_90010d0854592e::t_7c3afdca010000 218-219,226,233,242-264
+  s_90010d0854592e::t_44f8dfd8ad4078 265
+Quartz/Features/Nostalgia/NostalgiaTweaks.cs
+  s_90010d0854592e::t_e0f6154e859c30 116-117,120,124-133
+  s_90010d0854592e::t_ef0bf69d9594fb 114-115
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "eea867ae5a6f5d9cd9ce11d147d365f5b84530c6",
+  "prompts": {},
+  "sessions": {
+    "s_90010d0854592e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1eb3e6ee-7fd4-405a-948e-978db5260610",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
