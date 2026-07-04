@@ -119,7 +119,7 @@
     "DESC_KL_CAPTURE": "Press any key to add/remove it from the allowed list. Escape cancels.",
     "DESC_KL_ON": "Only the allowed keys below count as gameplay hits while playing. Mouse buttons are always allowed; menus and the editor are unaffected.",
     "DESC_KL_PROFILE_NAME": "Rename the current profile, e.g. \"12 Keys\".",
-    "DESC_MIDDLE_CLICK_TO_SET_AS_DEFAULT": "Setting that restores an item to its default value when you middle-click on it.\nYou can identify it by a small dot at the top-left of the item",
+    "DESC_MIDDLE_CLICK_TO_SET_AS_DEFAULT": "Setting that restores an item to its default value when you middle-click on it.\nYou can identify it by a small dot at the top-left of the item.",
     "DESC_OTTO_HIGHBPM_ON": "On: Otto uses the color below while the level's top BPM is 300+ (where vanilla turns him red). Off: the normal color is always used.",
     "DESC_OTTO_ON": "Replaces the editor's Otto (auto-play) icon with the mod's icon, tinted with the color below. Dimmed automatically while auto-play is off.",
     "DESC_OVERLAY_ENABLED": "Master switch for every overlay HUD — panels, progress bar, combo and judgement.",
