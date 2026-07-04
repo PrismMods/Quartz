@@ -1,0 +1,21 @@
+Quartz/LoaderUmm.cs
+  s_d90fd9e34f4615::t_b43d5b47c58b64 35-64
+  s_d90fd9e34f4615::t_6d92fddc825243 79-80
+  s_d90fd9e34f4615::t_5cfbe0225cd6ed 69-71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "d70f6e1171fd55c35d2916e05cb110aa4eff4f6c",
+  "prompts": {},
+  "sessions": {
+    "s_d90fd9e34f4615": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "407a78d9-cd3a-4e8d-bea1-5fb7234b1435",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
