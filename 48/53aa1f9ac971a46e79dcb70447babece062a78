@@ -1,0 +1,32 @@
+Quartz.Tests/IO/ProfileNamesTests.cs
+  s_90010d0854592e::t_41b65f9ad322ad 1-19
+Quartz.Tests/IO/AtomicFileTests.cs
+  s_90010d0854592e::t_afc92a4203e671 1-18
+Quartz.Tests/Features/KeyViewer/KeyViewerCssTests.cs
+  s_90010d0854592e::t_037f58effca247 1-181
+Quartz.Tests/Localization/LocalizationParityTests.cs
+  s_90010d0854592e::t_d172c8890390ef 1-23
+Quartz.Tests/Support/Assert.cs
+  s_90010d0854592e::t_3573952c1d3cfe 3-5
+  s_90010d0854592e::t_6b24f9f640ac17 1-2
+Quartz.Tests/Core/SemVerTests.cs
+  s_90010d0854592e::t_a0c734727f6d7c 1-15
+Quartz.Tests/Program.cs
+  s_90010d0854592e::t_b7cf4ba12b6e3d 2-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "4853aa1f9ac971a46e79dcb70447babece062a78",
+  "prompts": {},
+  "sessions": {
+    "s_90010d0854592e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1eb3e6ee-7fd4-405a-948e-978db5260610",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
