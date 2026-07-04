@@ -2001,6 +2001,12 @@ public static partial class KeyViewerOverlay {
         kpsSum = 0;
         kpsSamples = 0;
         builtStyle = -1;
+
+        // UMM reloads the mod in-process, so statics holding runtime-created
+        // Unity assets would leak a full set per reload — destroy them here.
+        DisposeCssRenderCaches();
+        DisposeCssImageCache();
+        SyncSettingChanged = null;
     }
 
     // ===== rain (port of v1's KvRain* — one manager Update, batched row meshes,

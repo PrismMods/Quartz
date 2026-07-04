@@ -683,6 +683,26 @@ public static partial class KeyViewerOverlay {
         return t * t * (3f - 2f * t);
     }
 
+    // Dispose-time teardown of the runtime-created render caches (their users
+    // all live under the canvas being destroyed). cssFonts stays: it mixes
+    // runtime-built assets with FontManager-owned ones (ResolveFont caches
+    // catalogue fonts), so a blanket destroy would kill shared assets.
+    private static void DisposeCssRenderCaches() {
+        foreach(Texture2D tex in gradTex.Values)
+            if(tex != null) UnityEngine.Object.Destroy(tex);
+        gradTex.Clear();
+
+        if(glowSprite != null) {
+            UnityEngine.Object.Destroy(glowSprite.texture);
+            UnityEngine.Object.Destroy(glowSprite);
+            glowSprite = null;
+        }
+
+        cssFx.Clear();
+        cssCache = null;
+        cssCacheKey = null;
+    }
+
     // ---- @font-face / font-family -------------------------------------------
 
     private static readonly object cssFontLock = new();
