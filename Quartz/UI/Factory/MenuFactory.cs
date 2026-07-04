@@ -43,32 +43,20 @@ public static class MenuFactory {
         // multiplies px/unit by the user's UI scale, so bake for that too.
         float iconUnits = 28f * MainCore.Conf.UIScale;
 
-        var overlay = CreateItem(parent, "Overlay", MainCore.Spr.Get(UISprite.Monitor128, iconUnits), (int)OriginalMenuState.Overlay);
-        var gameplay = CreateItem(parent, "Gameplay", MainCore.Spr.Get(UISprite.Gamepad128, iconUnits), (int)OriginalMenuState.Gameplay);
-        var visuals = CreateItem(parent, "Visuals", MainCore.Spr.Get(UISprite.Image128, iconUnits), (int)OriginalMenuState.Visuals);
-        var tweaks = CreateItem(parent, "Tweaks", MainCore.Spr.Get(UISprite.AdjustmentsHorizontal128, iconUnits), (int)OriginalMenuState.Tweaks);
-        var editor = CreateItem(parent, "Editor", MainCore.Spr.Get(UISprite.Wrench128, iconUnits), (int)OriginalMenuState.Editor);
-        var search = CreateItem(parent, "Search", MainCore.Spr.Get(UISprite.MagnifyingGlass128, iconUnits), (int)OriginalMenuState.Search);
-        var profiles = CreateItem(parent, "Profiles", MainCore.Spr.Get(UISprite.Users128, iconUnits), (int)OriginalMenuState.Profiles);
-        var import = CreateItem(parent, "Import", MainCore.Spr.Get(UISprite.Book128, iconUnits), (int)OriginalMenuState.Import);
+        CreateItem(parent, "Overlay", MainCore.Spr.Get(UISprite.Monitor128, iconUnits), (int)OriginalMenuState.Overlay);
+        CreateItem(parent, "Gameplay", MainCore.Spr.Get(UISprite.Gamepad128, iconUnits), (int)OriginalMenuState.Gameplay);
+        CreateItem(parent, "Visuals", MainCore.Spr.Get(UISprite.Image128, iconUnits), (int)OriginalMenuState.Visuals);
+        CreateItem(parent, "Tweaks", MainCore.Spr.Get(UISprite.AdjustmentsHorizontal128, iconUnits), (int)OriginalMenuState.Tweaks);
+        CreateItem(parent, "Editor", MainCore.Spr.Get(UISprite.Wrench128, iconUnits), (int)OriginalMenuState.Editor);
+        CreateItem(parent, "Search", MainCore.Spr.Get(UISprite.MagnifyingGlass128, iconUnits), (int)OriginalMenuState.Search);
+        CreateItem(parent, "Profiles", MainCore.Spr.Get(UISprite.Users128, iconUnits), (int)OriginalMenuState.Profiles);
+        CreateItem(parent, "Import", MainCore.Spr.Get(UISprite.Book128, iconUnits), (int)OriginalMenuState.Import);
         var settings = CreateItem(parent, "Settings", MainCore.Spr.Get(UISprite.Gear128, iconUnits), (int)OriginalMenuState.Settings);
-        var credits = CreateItem(parent, "Credits", MainCore.Spr.Get(UISprite.Star128, iconUnits), (int)OriginalMenuState.Credits);
-
-        overlay.label.gameObject.AddComponent<TextLocalization>().Init("OVERLAY", "Overlay");
-        gameplay.label.gameObject.AddComponent<TextLocalization>().Init("GAMEPLAY", "Gameplay");
-        visuals.label.gameObject.AddComponent<TextLocalization>().Init("VISUALS", "Visuals");
-        tweaks.label.gameObject.AddComponent<TextLocalization>().Init("TWEAKS", "Tweaks");
-        editor.label.gameObject.AddComponent<TextLocalization>().Init("EDITOR", "Editor");
-        profiles.label.gameObject.AddComponent<TextLocalization>().Init("PROFILES", "Profiles");
-        import.label.gameObject.AddComponent<TextLocalization>().Init("IMPORT", "Import");
-        settings.label.gameObject.AddComponent<TextLocalization>().Init("SETTINGS", "Settings");
-        search.label.gameObject.AddComponent<TextLocalization>().Init("SEARCH", "Search");
-        credits.label.gameObject.AddComponent<TextLocalization>().Init("CREDITS", "Credits");
+        CreateItem(parent, "Credits", MainCore.Spr.Get(UISprite.Star128, iconUnits), (int)OriginalMenuState.Credits);
 
         // Developer tab — only present in "dev" builds.
         if(Info.IsDev) {
-            var developer = CreateItem(parent, "Developer", MainCore.Spr.Get(UISprite.Wrench128, iconUnits), (int)OriginalMenuState.Developer);
-            developer.label.gameObject.AddComponent<TextLocalization>().Init("DEVELOPER", "Developer");
+            CreateItem(parent, "Developer", MainCore.Spr.Get(UISprite.Wrench128, iconUnits), (int)OriginalMenuState.Developer);
         }
 
         CreateUpdateBadge(settings.obj.transform);
@@ -156,6 +144,9 @@ public static class MenuFactory {
         label.verticalAlignment = VerticalAlignmentOptions.Middle;
         label.characterSpacing = -3f;
 
+        // Every item's locale key is its name uppercased (OVERLAY, TWEAKS, ...).
+        label.gameObject.AddComponent<TextLocalization>().Init(name.ToUpperInvariant(), name);
+
         MenuItem menuItem = new() {
             obj = item,
             bg = bg,
@@ -174,25 +165,20 @@ public static class MenuFactory {
             trigger.triggers.Add(e);
         }
 
-        Add(EventTriggerType.PointerEnter, () => {
+        // Enter/exit are the same fade toward a different palette color; the
+        // color is resolved at hover time (Func) so accent changes apply live.
+        void HoverFade(EventTriggerType type, Func<Color> color, float duration) => Add(type, () => {
             if(UICore.CurrentMenuState == state) return;
 
             menuItem.hoverSeq?.Kill();
             menuItem.hoverSeq = GTweenSequenceBuilder.New()
-                .Append(bg.GTColor(UIColors.MenuHover, 0.2f).SetEasing(Easing.OutSine))
+                .Append(bg.GTColor(color(), duration).SetEasing(Easing.OutSine))
                 .Build();
             MainCore.TC.Play(menuItem.hoverSeq);
         });
 
-        Add(EventTriggerType.PointerExit, () => {
-            if(UICore.CurrentMenuState == state) return;
-
-            menuItem.hoverSeq?.Kill();
-            menuItem.hoverSeq = GTweenSequenceBuilder.New()
-                .Append(bg.GTColor(UIColors.MenuNormal, 0.25f).SetEasing(Easing.OutSine))
-                .Build();
-            MainCore.TC.Play(menuItem.hoverSeq);
-        });
+        HoverFade(EventTriggerType.PointerEnter, static () => UIColors.MenuHover, 0.2f);
+        HoverFade(EventTriggerType.PointerExit, static () => UIColors.MenuNormal, 0.25f);
 
         UnityUtils.AddClickEvent(trigger, _ => SetState(state));
 
