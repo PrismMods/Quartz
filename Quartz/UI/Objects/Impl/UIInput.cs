@@ -88,10 +88,7 @@ public sealed class UIInput : UIObject {
     }
 
     public void UpdateVisual(bool noAnimate = false) {
-        if(changeTween != null) {
-            changeTween.Complete();
-            changeTween.Kill();
-        }
+        changeTween.CompleteAndKill();
 
         float target = (DefaultValue != null && DefaultValue != Value) ? 1f : 0f;
 

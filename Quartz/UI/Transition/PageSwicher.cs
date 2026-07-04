@@ -22,10 +22,7 @@ public class PageSwicher {
 
         if(fromCg == null || toCg == null) return false;
 
-        if(pageSeq != null) {
-            pageSeq.Complete();
-            pageSeq.Kill();
-        }
+        pageSeq.CompleteAndKill();
 
         fromPage.anchoredPosition = Vector2.zero;
         toPage.anchoredPosition = new Vector2(1100f, 0f);

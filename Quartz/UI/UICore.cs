@@ -786,15 +786,8 @@ public static class UICore {
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
 
-        if(panelTweener != null) {
-            panelTweener.Complete();
-            panelTweener.Kill();
-        }
-
-        if(resetSequence != null) {
-            resetSequence.Complete();
-            resetSequence.Kill();
-        }
+        panelTweener.CompleteAndKill();
+        resetSequence.CompleteAndKill();
 
         if(noAnimate) {
             Panel.anchoredPosition = LastPanelPosition;
@@ -885,15 +878,8 @@ public static class UICore {
             0f
         );
 
-        if(panelTweener != null) {
-            panelTweener.Complete();
-            panelTweener.Kill();
-        }
-
-        if(resetSequence != null) {
-            resetSequence.Complete();
-            resetSequence.Kill();
-        }
+        panelTweener.CompleteAndKill();
+        resetSequence.CompleteAndKill();
 
         if(noAnimate) {
             canvasObj.SetActive(false);
