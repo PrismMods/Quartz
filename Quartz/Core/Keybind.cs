@@ -87,23 +87,36 @@ public static class Keybind {
         _ => "",
     };
 
-    public static string KeyName(KeyCode key) => key switch {
-        KeyCode.BackQuote => "`",
-        KeyCode.Return => "Enter",
-        KeyCode.Escape => "Esc",
-        KeyCode.Space => "Space",
-        KeyCode.Alpha0 => "0",
-        KeyCode.Alpha1 => "1",
-        KeyCode.Alpha2 => "2",
-        KeyCode.Alpha3 => "3",
-        KeyCode.Alpha4 => "4",
-        KeyCode.Alpha5 => "5",
-        KeyCode.Alpha6 => "6",
-        KeyCode.Alpha7 => "7",
-        KeyCode.Alpha8 => "8",
-        KeyCode.Alpha9 => "9",
-        _ => key.ToString(),
-    };
+    public static string KeyName(KeyCode key) {
+        string name = key.ToString();
+        if(name.Length == 6 && name.StartsWith("Alpha")) return name[5..];
+
+        return key switch {
+            KeyCode.BackQuote => "`",
+            KeyCode.Return => "Enter",
+            KeyCode.Escape => "Esc",
+            KeyCode.Space => "Space",
+            KeyCode.LeftShift => "LShift",
+            KeyCode.RightShift => "RShift",
+            KeyCode.LeftControl => "LCtrl",
+            KeyCode.RightControl => "RCtrl",
+            KeyCode.LeftAlt => "LAlt",
+            KeyCode.RightAlt => "RAlt",
+            KeyCode.LeftCommand => "LCmd",
+            KeyCode.RightCommand => "RCmd",
+            KeyCode.Backslash => "\\",
+            KeyCode.Slash => "/",
+            KeyCode.Minus => "-",
+            KeyCode.Equals => "=",
+            KeyCode.Comma => ",",
+            KeyCode.Period => ".",
+            KeyCode.Semicolon => ";",
+            KeyCode.Quote => "'",
+            KeyCode.LeftBracket => "[",
+            KeyCode.RightBracket => "]",
+            _ => name,
+        };
+    }
 
     // "Option + K" on macOS, "Alt + K" elsewhere; just "K" with no modifier.
     public static string Format(KeyModifier mod, KeyCode key) {

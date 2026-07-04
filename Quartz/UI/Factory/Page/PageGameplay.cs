@@ -492,7 +492,7 @@ internal static class PageGameplay {
         bg.SetParent(row, false);
 
         var label = GenerateUI.AddText(bg);
-        label.text = KeyName(key);
+        label.text = Keybind.KeyName(key);
 
         if(locked) return;
 
@@ -511,35 +511,6 @@ internal static class PageGameplay {
         });
 
         GenerateUI.MiniButton(bg, "Remove", "REMOVE", -8f, 90f, () => KeyLimiter.ToggleAllowedKey(key));
-    }
-
-    private static string KeyName(KeyCode key) {
-        string name = key.ToString();
-        if(name.Length == 6 && name.StartsWith("Alpha")) return name[5..];
-
-        return name switch {
-            "LeftShift" => "LShift",
-            "RightShift" => "RShift",
-            "LeftControl" => "LCtrl",
-            "RightControl" => "RCtrl",
-            "LeftAlt" => "LAlt",
-            "RightAlt" => "RAlt",
-            "LeftCommand" => "LCmd",
-            "RightCommand" => "RCmd",
-            "Return" => "Enter",
-            "BackQuote" => "`",
-            "Backslash" => "\\",
-            "Slash" => "/",
-            "Minus" => "-",
-            "Equals" => "=",
-            "Comma" => ",",
-            "Period" => ".",
-            "Semicolon" => ";",
-            "Quote" => "'",
-            "LeftBracket" => "[",
-            "RightBracket" => "]",
-            _ => name,
-        };
     }
 
     // ===== Keyboard Chatter Blocker =====
