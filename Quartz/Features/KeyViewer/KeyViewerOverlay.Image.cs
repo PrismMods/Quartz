@@ -1,5 +1,3 @@
-using System.Net;
-using System.Threading;
 using Quartz.Core;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,7 +13,6 @@ public static partial class KeyViewerOverlay {
     private static readonly Dictionary<string, Texture2D> cssImages = new(StringComparer.Ordinal);
     private static readonly HashSet<string> cssImagePending = new(StringComparer.Ordinal);
     private static readonly object cssImageLock = new();
-    private static volatile bool cssImageArrived;
 
     // Resolves a source string to a texture, or null if absent / still loading /
     // unsupported. Main-thread only (Texture2D.LoadImage).
@@ -81,19 +78,17 @@ public static partial class KeyViewerOverlay {
 
     private static void StartImageDownload(string url, string path) {
         lock(cssImageLock) { if(!cssImagePending.Add(url)) return; }
-        var thread = new Thread(() => {
-            try {
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                using var client = new WebClient();
-                File.WriteAllBytes(path, client.DownloadData(url));
-                cssImageArrived = true;
-            } catch(Exception ex) {
-                MainCore.Log.Msg("[KeyViewer] CSS image download failed: " + ex.Message);
-            } finally {
-                lock(cssImageLock) { cssImagePending.Remove(url); }
-            }
-        }) { IsBackground = true, Name = "QuartzCssImage" };
-        thread.Start();
+        StartCssDownload(url, path, "CSS image download failed",
+            "QuartzCssImage", cssImageLock, cssImagePending, url);
+    }
+
+    // Dispose-time teardown: destroys the decoded textures (UMM in-process
+    // reloads never collect statics, so they'd leak a set per reload). The
+    // negative-cache entries are null; the disk cache is left for next enable.
+    private static void DisposeCssImageCache() {
+        foreach(Texture2D tex in cssImages.Values)
+            if(tex != null) UnityEngine.Object.Destroy(tex);
+        cssImages.Clear();
     }
 
     // Builds the key's image layer: a rounded-clipped child behind the text,

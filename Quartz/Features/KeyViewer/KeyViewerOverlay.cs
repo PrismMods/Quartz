@@ -2567,12 +2567,11 @@ public static partial class KeyViewerOverlay {
     private sealed class Updater : MonoBehaviour {
         // CSS animation runs in LateUpdate so it samples the press state set in
         // Update and recolours after TMP has regenerated its mesh this frame. A
-        // finished font download (background thread) triggers one rebuild here.
+        // finished font/image download (background thread) triggers one rebuild here.
         private void LateUpdate() {
             // A finished font/image download (background thread) → one rebuild.
-            if(cssFontArrived || cssImageArrived) {
-                cssFontArrived = false;
-                cssImageArrived = false;
+            if(cssDownloadArrived) {
+                cssDownloadArrived = false;
                 if(Conf != null && Conf.IsDmNoteMode) {
                     Rebuild();
                     return;

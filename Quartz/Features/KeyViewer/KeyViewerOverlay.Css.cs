@@ -37,8 +37,9 @@ public static partial class KeyViewerOverlay {
     // Resolved @font-face / font-family assets, keyed by family name.
     private static readonly Dictionary<string, TMP_FontAsset> cssFonts = new(StringComparer.OrdinalIgnoreCase);
     private static readonly HashSet<string> cssFontPending = new(StringComparer.OrdinalIgnoreCase);
-    // Set by a finished background download; the Updater consumes it to rebuild.
-    private static volatile bool cssFontArrived;
+    // Set by a finished background download (font or image); the Updater
+    // consumes it to rebuild.
+    private static volatile bool cssDownloadArrived;
 
     private static KeyViewerStylesheet GetStylesheet(string text) {
         if(cssCache == null || !string.Equals(cssCacheKey, text, StringComparison.Ordinal)) {
@@ -768,20 +769,27 @@ public static partial class KeyViewerOverlay {
         string path = CachedFontPath(face);
         if(url == null || path == null) return;
         lock(cssFontLock) cssFontPending.Add(face.Family);
+        StartCssDownload(url, path, $"CSS font download failed ({face.Family})",
+            "QuartzCssFont", cssFontLock, cssFontPending, face.Family);
+    }
 
+    // Shared background-download scaffold for @font-face fonts and CSS images:
+    // fetches url to path on a worker thread, flags the Updater to rebuild on
+    // success, and drops the caller's pending marker when the thread finishes.
+    private static void StartCssDownload(string url, string path, string failWhat,
+        string threadName, object gate, HashSet<string> pending, string pendingKey) {
         var thread = new Thread(() => {
             try {
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                 using var client = new WebClient();
-                byte[] data = client.DownloadData(url);
-                File.WriteAllBytes(path, data);
-                cssFontArrived = true; // Updater rebuilds on the main thread
+                File.WriteAllBytes(path, client.DownloadData(url));
+                cssDownloadArrived = true; // Updater rebuilds on the main thread
             } catch(Exception ex) {
-                MainCore.Log.Msg($"[KeyViewer] CSS font download failed ({face.Family}): {ex.Message}");
+                MainCore.Log.Msg($"[KeyViewer] {failWhat}: {ex.Message}");
             } finally {
-                lock(cssFontLock) cssFontPending.Remove(face.Family);
+                lock(gate) pending.Remove(pendingKey);
             }
-        }) { IsBackground = true, Name = "QuartzCssFont" };
+        }) { IsBackground = true, Name = threadName };
         thread.Start();
     }
 
