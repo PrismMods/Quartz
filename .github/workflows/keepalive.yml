@@ -1,0 +1,10 @@
+name: Keep QuartzBot awake
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -sf --max-time 30 https://quartzbot-dkr7.onrender.com/ || true
