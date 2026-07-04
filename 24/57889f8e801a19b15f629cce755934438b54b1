@@ -1,0 +1,21 @@
+Quartz/UI/Utility/ResizeHandle.cs
+  s_e03bf5eb2b3681::t_f08960b2466c64 47-49,57-59,62
+Quartz/UI/Utility/DragHandler.cs
+  s_e03bf5eb2b3681::t_ac3f85ecabe532 18-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "2457889f8e801a19b15f629cce755934438b54b1",
+  "prompts": {},
+  "sessions": {
+    "s_e03bf5eb2b3681": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf4a35d5-d4c8-48f0-a560-989570ab28d8",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
