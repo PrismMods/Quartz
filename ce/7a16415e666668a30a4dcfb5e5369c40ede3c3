@@ -1,0 +1,19 @@
+Quartz/Resource/Export/Lang/KEY_PREFIXES.md
+  s_90010d0854592e::t_042ebf687478fb 1-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "ce7a16415e666668a30a4dcfb5e5369c40ede3c3",
+  "prompts": {},
+  "sessions": {
+    "s_90010d0854592e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1eb3e6ee-7fd4-405a-948e-978db5260610",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
