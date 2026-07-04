@@ -1,0 +1,36 @@
+Quartz/Features/Judgement/JudgementOverlay.cs
+  s_f1972e7c259f85::t_540b62e41b15b8 124
+  s_f1972e7c259f85::t_07f665547a1194 221
+  s_f1972e7c259f85::t_f724c58334c93b 171
+Quartz/Features/KeyViewer/KeyViewerOverlay.cs
+  s_0894c971c65c88::t_8b98fbaee10fc0 2145,2152,2166-2215
+  s_0894c971c65c88::t_e45a4c3437ba22 1152-1154,1159-1160,1165-1166
+  s_0894c971c65c88::t_9fceec6d3d6648 1056-1059
+  s_0894c971c65c88::t_e00049044c9543 2043-2045,2071-2075
+  s_0894c971c65c88::t_f4f09ec6da7ea0 190-195
+  s_0894c971c65c88::t_93af54493b037a 2216
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "a87aa5814ce0b4142e9e880326db11786298e569",
+  "prompts": {},
+  "sessions": {
+    "s_0894c971c65c88": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3d6f116c-722d-4511-8d86-872683a69a70",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_f1972e7c259f85": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7c918bb5-9f0d-4c2f-9a46-1b1d823ef8d7",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
