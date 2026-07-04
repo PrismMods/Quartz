@@ -48,11 +48,7 @@ public static class Optimizer {
     private static bool usingManualDefer;
     private static bool loggedGcStrategy;
 
-    public static void EnsureConf() {
-        if(ConfMgr != null) return;
-        ConfMgr = new SettingsFile<OptimizerSettings>(Path.Combine(MainCore.Paths.RootPath, "Optimizer.json"));
-        ConfMgr.Load();
-    }
+    public static void EnsureConf() => ConfMgr ??= SettingsFile<OptimizerSettings>.Loaded("Optimizer.json");
 
     public static void Save() => ConfMgr?.RequestSave();
 

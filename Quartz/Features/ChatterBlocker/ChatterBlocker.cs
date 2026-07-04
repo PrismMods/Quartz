@@ -25,12 +25,7 @@ public static class ChatterBlocker {
     public static SettingsFile<ChatterBlockerSettings> ConfMgr { get; private set; }
     public static ChatterBlockerSettings Conf => ConfMgr?.Data;
 
-    public static void EnsureConf() {
-        if(ConfMgr != null) return;
-
-        ConfMgr = new SettingsFile<ChatterBlockerSettings>(Path.Combine(MainCore.Paths.RootPath, "ChatterBlocker.json"));
-        ConfMgr.Load();
-    }
+    public static void EnsureConf() => ConfMgr ??= SettingsFile<ChatterBlockerSettings>.Loaded("ChatterBlocker.json");
 
     public static void Save() => ConfMgr?.RequestSave();
 

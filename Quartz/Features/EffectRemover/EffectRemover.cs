@@ -20,12 +20,7 @@ public static partial class EffectRemover {
     public static SettingsFile<EffectRemoverSettings> ConfMgr { get; private set; }
     public static EffectRemoverSettings Conf => ConfMgr?.Data;
 
-    public static void EnsureConf() {
-        if(ConfMgr != null) return;
-
-        ConfMgr = new SettingsFile<EffectRemoverSettings>(Path.Combine(MainCore.Paths.RootPath, "EffectRemover.json"));
-        ConfMgr.Load();
-    }
+    public static void EnsureConf() => ConfMgr ??= SettingsFile<EffectRemoverSettings>.Loaded("EffectRemover.json");
 
     public static void Save() => ConfMgr?.RequestSave();
 

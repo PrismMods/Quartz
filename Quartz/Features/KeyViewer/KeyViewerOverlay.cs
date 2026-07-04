@@ -847,30 +847,20 @@ public static partial class KeyViewerOverlay {
         Apply();
     }
 
-    private static void AddReorganizeHandle() {
-        GameObject drag = new("Drag");
-        dragObj = drag;
-        drag.transform.SetParent(root, false);
-        RectTransform dragRect = drag.AddComponent<RectTransform>();
-        dragRect.anchorMin = Vector2.zero;
-        dragRect.anchorMax = Vector2.one;
-        dragRect.offsetMin = Vector2.zero;
-        dragRect.offsetMax = Vector2.zero;
-        drag.AddComponent<EmptyGraphic>().raycastTarget = true;
-        ReorganizeHandle handle = drag.AddComponent<ReorganizeHandle>();
-        handle.Target = root;
-        handle.GetName = () => MainCore.Tr.Get("KEYVIEWER_TITLE", "Key Viewer");
-        handle.OnMoved = Save;
-        drag.SetActive(false);
-    }
+    private static void AddReorganizeHandle() =>
+        dragObj = BuildReorganizeHandle(root, "Drag", "KEYVIEWER_TITLE", "Key Viewer");
 
     // Separate reorganize handle for the foot element, so it drags on its own.
     private static void AddFootReorganizeHandle() {
         if(footRoot == null) return;
+        footDragObj = BuildReorganizeHandle(footRoot, "FootDrag", "KEYVIEWER_FOOT_TITLE", "Foot Keys");
+    }
 
-        GameObject drag = new("FootDrag");
-        footDragObj = drag;
-        drag.transform.SetParent(footRoot, false);
+    // Full-rect drag surface parented to (and moving) target while reorganizing.
+    private static GameObject BuildReorganizeHandle(RectTransform target, string name,
+        string titleKey, string titleFallback) {
+        GameObject drag = new(name);
+        drag.transform.SetParent(target, false);
         RectTransform dragRect = drag.AddComponent<RectTransform>();
         dragRect.anchorMin = Vector2.zero;
         dragRect.anchorMax = Vector2.one;
@@ -878,10 +868,11 @@ public static partial class KeyViewerOverlay {
         dragRect.offsetMax = Vector2.zero;
         drag.AddComponent<EmptyGraphic>().raycastTarget = true;
         ReorganizeHandle handle = drag.AddComponent<ReorganizeHandle>();
-        handle.Target = footRoot;
-        handle.GetName = () => MainCore.Tr.Get("KEYVIEWER_FOOT_TITLE", "Foot Keys");
+        handle.Target = target;
+        handle.GetName = () => MainCore.Tr.Get(titleKey, titleFallback);
         handle.OnMoved = Save;
         drag.SetActive(false);
+        return drag;
     }
 
     private static List<DmNoteSpec> ParseDmNoteSpecs() {

@@ -68,12 +68,7 @@ public static class JudgementOverlay {
     // SetText(StringBuilder) leaves .text stale (see UpdateCompact).
     private static readonly StringBuilder rowBuilder = new(160);
 
-    public static void EnsureConf() {
-        if(ConfMgr != null) return;
-
-        ConfMgr = new SettingsFile<JudgementSettings>(Path.Combine(MainCore.Paths.RootPath, "Judgement.json"));
-        ConfMgr.Load();
-    }
+    public static void EnsureConf() => ConfMgr ??= SettingsFile<JudgementSettings>.Loaded("Judgement.json");
 
     public static void Initialize(GameObject rootObject) {
         if(canvasObj != null) return;
@@ -81,21 +76,8 @@ public static class JudgementOverlay {
         EnsureConf();
         compact = Conf.CompactRow;
 
-        canvasObj = new GameObject("QuartzJudgementCanvas");
-        canvasObj.transform.SetParent(rootObject.transform, false);
-
-        Canvas canvas = canvasObj.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         // Between the progress bar (32755) and the combo counter (32757).
-        canvas.sortingOrder = 32756;
-
-        CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920, 1080);
-        scaler.matchWidthOrHeight = 0.5f;
-
-        raycaster = canvasObj.AddComponent<GraphicRaycaster>();
-        raycaster.enabled = false;
+        canvasObj = UnityUtils.CreateOverlayCanvas("QuartzJudgementCanvas", rootObject.transform, 32756, out raycaster);
 
         GameObject rowObj = new("JudgementRow");
         rowObj.transform.SetParent(canvasObj.transform, false);
@@ -107,23 +89,8 @@ public static class JudgementOverlay {
         if(compact) BuildCompactRow(rowObj);
         else BuildMultiLabelRow(rowObj);
 
-        GameObject drag = new("Drag");
-        dragObj = drag;
-        drag.transform.SetParent(root, false);
-        RectTransform dragRect = drag.AddComponent<RectTransform>();
-        dragRect.anchorMin = Vector2.zero;
-        dragRect.anchorMax = Vector2.one;
-        dragRect.offsetMin = Vector2.zero;
-        dragRect.offsetMax = Vector2.zero;
-        // The row layout group must not size the drag surface — without this
-        // it gets laid out to zero width and the overlay can't be grabbed.
-        drag.AddComponent<LayoutElement>().ignoreLayout = true;
-        drag.AddComponent<EmptyGraphic>().raycastTarget = true;
-        ReorganizeHandle handle = drag.AddComponent<ReorganizeHandle>();
-        handle.Target = root;
-        handle.GetName = () => MainCore.Tr.Get("JUDGEMENT", "Judgement");
-        handle.OnMoved = Save;
-        drag.SetActive(false);
+        // ignoreLayout: the row layout group must not size the drag surface.
+        dragObj = ReorganizeHandle.CreateDragSurface(root, () => MainCore.Tr.Get("JUDGEMENT", "Judgement"), Save, ignoreLayout: true);
 
         updater = canvasObj.AddComponent<Updater>();
 

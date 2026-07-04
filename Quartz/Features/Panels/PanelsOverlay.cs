@@ -178,14 +178,7 @@ public static class PanelsOverlay {
     private static readonly List<LivePanel> panels = [];
     private static Updater updater;
 
-    public static void EnsureConf() {
-        if(ConfMgr != null) return;
-
-        ConfMgr = new SettingsFile<PanelsSettings>(
-            Path.Combine(MainCore.Paths.RootPath, "OverlayPanels.json")
-        );
-        ConfMgr.Load();
-    }
+    public static void EnsureConf() => ConfMgr ??= SettingsFile<PanelsSettings>.Loaded("OverlayPanels.json");
 
     public static void Save() => ConfMgr?.RequestSave();
 
@@ -194,20 +187,7 @@ public static class PanelsOverlay {
 
         EnsureConf();
 
-        canvasObj = new GameObject("QuartzPanelsCanvas");
-        canvasObj.transform.SetParent(root.transform, false);
-
-        Canvas canvas = canvasObj.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 32760;
-
-        CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920, 1080);
-        scaler.matchWidthOrHeight = 0.5f;
-
-        raycaster = canvasObj.AddComponent<GraphicRaycaster>();
-        raycaster.enabled = false;
+        canvasObj = UnityUtils.CreateOverlayCanvas("QuartzPanelsCanvas", root.transform, 32760, out raycaster);
 
         BuildPanels();
 
@@ -342,19 +322,7 @@ public static class PanelsOverlay {
         bg.color = config.GetBackgroundColor();
         bg.raycastTarget = false;
 
-        GameObject drag = new("Drag");
-        drag.transform.SetParent(rect, false);
-        RectTransform dragRect = drag.AddComponent<RectTransform>();
-        dragRect.anchorMin = Vector2.zero;
-        dragRect.anchorMax = Vector2.one;
-        dragRect.offsetMin = Vector2.zero;
-        dragRect.offsetMax = Vector2.zero;
-        drag.AddComponent<EmptyGraphic>().raycastTarget = true;
-        ReorganizeHandle handle = drag.AddComponent<ReorganizeHandle>();
-        handle.Target = rect;
-        handle.GetName = () => config.Name;
-        handle.OnMoved = Save;
-        drag.SetActive(false);
+        GameObject drag = ReorganizeHandle.CreateDragSurface(rect, () => config.Name, Save);
 
         GameObject textObj = new("Text");
         textObj.transform.SetParent(rect, false);

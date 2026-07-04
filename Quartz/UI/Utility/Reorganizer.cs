@@ -80,6 +80,30 @@ public sealed class ReorganizeHandle : MonoBehaviour {
             OnMoved?.Invoke();
         }
     }
+
+    // Builds the standard full-stretch "Drag" child under target: a transparent
+    // EmptyGraphic surface carrying a ReorganizeHandle that moves the target.
+    // Starts inactive; overlays toggle it when Reorganize mode starts/ends.
+    // ignoreLayout: set when the target runs a layout group, which must not
+    // size the drag surface — without it the surface gets laid out to zero
+    // width and the overlay can't be grabbed.
+    public static GameObject CreateDragSurface(RectTransform target, Func<string> getName, Action onMoved, bool ignoreLayout = false) {
+        GameObject drag = new("Drag");
+        drag.transform.SetParent(target, false);
+        RectTransform dragRect = drag.AddComponent<RectTransform>();
+        dragRect.anchorMin = Vector2.zero;
+        dragRect.anchorMax = Vector2.one;
+        dragRect.offsetMin = Vector2.zero;
+        dragRect.offsetMax = Vector2.zero;
+        if(ignoreLayout) drag.AddComponent<LayoutElement>().ignoreLayout = true;
+        drag.AddComponent<EmptyGraphic>().raycastTarget = true;
+        ReorganizeHandle handle = drag.AddComponent<ReorganizeHandle>();
+        handle.Target = target;
+        handle.GetName = getName;
+        handle.OnMoved = onMoved;
+        drag.SetActive(false);
+        return drag;
+    }
 }
 
 public static class Reorganizer {

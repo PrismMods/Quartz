@@ -20,12 +20,7 @@ public static class Restriction {
     public static SettingsFile<RestrictionSettings> ConfMgr { get; private set; }
     public static RestrictionSettings Conf => ConfMgr?.Data;
 
-    public static void EnsureConf() {
-        if(ConfMgr != null) return;
-
-        ConfMgr = new SettingsFile<RestrictionSettings>(Path.Combine(MainCore.Paths.RootPath, "Restriction.json"));
-        ConfMgr.Load();
-    }
+    public static void EnsureConf() => ConfMgr ??= SettingsFile<RestrictionSettings>.Loaded("Restriction.json");
 
     public static void Save() => ConfMgr?.RequestSave();
 

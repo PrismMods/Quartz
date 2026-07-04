@@ -49,12 +49,7 @@ public static class SongTitleOverlay {
     private static string bbRawResult;
     private static readonly Dictionary<int, Graphic> hiddenTitleGraphics = [];
 
-    public static void EnsureConf() {
-        if(ConfMgr != null) return;
-
-        ConfMgr = new SettingsFile<SongTitleSettings>(Path.Combine(MainCore.Paths.RootPath, "SongTitle.json"));
-        ConfMgr.Load();
-    }
+    public static void EnsureConf() => ConfMgr ??= SettingsFile<SongTitleSettings>.Loaded("SongTitle.json");
 
     // True when the feature should take over the title — gates both our overlay
     // and the patch that hides the game's own title. Safe before Initialize
@@ -72,20 +67,7 @@ public static class SongTitleOverlay {
 
         EnsureConf();
 
-        canvasObj = new GameObject("QuartzSongTitleCanvas");
-        canvasObj.transform.SetParent(rootObject.transform, false);
-
-        Canvas canvas = canvasObj.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 32756;
-
-        CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920, 1080);
-        scaler.matchWidthOrHeight = 0.5f;
-
-        raycaster = canvasObj.AddComponent<GraphicRaycaster>();
-        raycaster.enabled = false;
+        canvasObj = UnityUtils.CreateOverlayCanvas("QuartzSongTitleCanvas", rootObject.transform, 32756, out raycaster);
 
         GameObject titleObj = new("SongTitle");
         titleObj.transform.SetParent(canvasObj.transform, false);
@@ -114,20 +96,7 @@ public static class SongTitleOverlay {
         text.textWrappingMode = TextWrappingModes.NoWrap;
         text.text = "";
 
-        GameObject drag = new("Drag");
-        dragObj = drag;
-        drag.transform.SetParent(root, false);
-        RectTransform dragRect = drag.AddComponent<RectTransform>();
-        dragRect.anchorMin = Vector2.zero;
-        dragRect.anchorMax = Vector2.one;
-        dragRect.offsetMin = Vector2.zero;
-        dragRect.offsetMax = Vector2.zero;
-        drag.AddComponent<EmptyGraphic>().raycastTarget = true;
-        ReorganizeHandle handle = drag.AddComponent<ReorganizeHandle>();
-        handle.Target = root;
-        handle.GetName = () => MainCore.Tr.Get("SONG_TITLE", "Song Title");
-        handle.OnMoved = Save;
-        drag.SetActive(false);
+        dragObj = ReorganizeHandle.CreateDragSurface(root, () => MainCore.Tr.Get("SONG_TITLE", "Song Title"), Save);
 
         updater = canvasObj.AddComponent<Updater>();
 

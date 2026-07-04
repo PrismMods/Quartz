@@ -26,12 +26,7 @@ public static partial class PlanetColors {
     public static SettingsFile<PlanetColorsSettings> ConfMgr { get; private set; }
     public static PlanetColorsSettings Conf => ConfMgr?.Data;
 
-    public static void EnsureConf() {
-        if(ConfMgr != null) return;
-
-        ConfMgr = new SettingsFile<PlanetColorsSettings>(Path.Combine(MainCore.Paths.RootPath, "PlanetColors.json"));
-        ConfMgr.Load();
-    }
+    public static void EnsureConf() => ConfMgr ??= SettingsFile<PlanetColorsSettings>.Loaded("PlanetColors.json");
 
     public static void Save() => ConfMgr?.RequestSave();
 

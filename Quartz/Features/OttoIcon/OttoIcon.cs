@@ -21,12 +21,7 @@ public static class OttoIcon {
     public static SettingsFile<OttoIconSettings> ConfMgr { get; private set; }
     public static OttoIconSettings Conf => ConfMgr?.Data;
 
-    public static void EnsureConf() {
-        if(ConfMgr != null) return;
-
-        ConfMgr = new SettingsFile<OttoIconSettings>(Path.Combine(MainCore.Paths.RootPath, "OttoIcon.json"));
-        ConfMgr.Load();
-    }
+    public static void EnsureConf() => ConfMgr ??= SettingsFile<OttoIconSettings>.Loaded("OttoIcon.json");
 
     public static void Save() => ConfMgr?.RequestSave();
 

@@ -27,12 +27,7 @@ public static class JudgementPopupHider {
 
     private static readonly Vector3 HiddenPosition = new(123456f, 123456f, 123456f);
 
-    public static void EnsureConf() {
-        if(ConfMgr != null) return;
-
-        ConfMgr = new SettingsFile<JudgementPopupHiderSettings>(Path.Combine(MainCore.Paths.RootPath, "JudgementPopupHider.json"));
-        ConfMgr.Load();
-    }
+    public static void EnsureConf() => ConfMgr ??= SettingsFile<JudgementPopupHiderSettings>.Loaded("JudgementPopupHider.json");
 
     public static void Save() => ConfMgr?.RequestSave();
 

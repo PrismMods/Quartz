@@ -72,6 +72,15 @@ public sealed class SettingsFile<T> : ISettingsHandle where T : class, ISettings
         SettingsRegistry.Register(this);
     }
 
+    // EnsureConf helper: builds the SettingsFile for UserData/Quartz/<fileName>
+    // and loads it, so every scoped feature's lazy-init is a one-liner
+    // (ConfMgr ??= SettingsFile<T>.Loaded("Feature.json")).
+    public static SettingsFile<T> Loaded(string fileName) {
+        SettingsFile<T> file = new(System.IO.Path.Combine(MainCore.Paths.RootPath, fileName));
+        file.Load();
+        return file;
+    }
+
     public bool Load() {
         try {
             if(!File.Exists(Path)) return false;

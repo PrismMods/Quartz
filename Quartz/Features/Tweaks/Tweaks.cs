@@ -29,12 +29,7 @@ public static partial class Tweaks {
     public static SettingsFile<TweaksSettings> ConfMgr { get; private set; }
     public static TweaksSettings Conf => ConfMgr?.Data;
 
-    public static void EnsureConf() {
-        if(ConfMgr != null) return;
-
-        ConfMgr = new SettingsFile<TweaksSettings>(Path.Combine(MainCore.Paths.RootPath, "Tweaks.json"));
-        ConfMgr.Load();
-    }
+    public static void EnsureConf() => ConfMgr ??= SettingsFile<TweaksSettings>.Loaded("Tweaks.json");
 
     public static void Save() => ConfMgr?.RequestSave();
 

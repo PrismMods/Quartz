@@ -34,12 +34,7 @@ public static partial class EditorFeature {
     public static SettingsFile<EditorSettings> ConfMgr { get; private set; }
     public static EditorSettings Conf => ConfMgr?.Data;
 
-    public static void EnsureConf() {
-        if(ConfMgr != null) return;
-
-        ConfMgr = new SettingsFile<EditorSettings>(Path.Combine(MainCore.Paths.RootPath, "Editor.json"));
-        ConfMgr.Load();
-    }
+    public static void EnsureConf() => ConfMgr ??= SettingsFile<EditorSettings>.Loaded("Editor.json");
 
     public static void Save() => ConfMgr?.RequestSave();
 

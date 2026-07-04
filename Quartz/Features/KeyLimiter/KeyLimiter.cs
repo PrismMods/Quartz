@@ -28,8 +28,7 @@ public static class KeyLimiter {
     public static void EnsureConf() {
         if(ConfMgr != null) return;
 
-        ConfMgr = new SettingsFile<KeyLimiterSettings>(Path.Combine(MainCore.Paths.RootPath, "KeyLimiter.json"));
-        ConfMgr.Load();
+        ConfMgr = SettingsFile<KeyLimiterSettings>.Loaded("KeyLimiter.json");
         EnsureTicker();
     }
 

@@ -43,34 +43,15 @@ public static class ProgressBarOverlay {
     private static GameObject dragObj;
     private static Updater updater;
 
-    public static void EnsureConf() {
-        if(ConfMgr != null) return;
-
-        ConfMgr = new SettingsFile<ProgressBarSettings>(Path.Combine(MainCore.Paths.RootPath, "ProgressBar.json"));
-        ConfMgr.Load();
-    }
+    public static void EnsureConf() => ConfMgr ??= SettingsFile<ProgressBarSettings>.Loaded("ProgressBar.json");
 
     public static void Initialize(GameObject root) {
         if(canvasObj != null) return;
 
         EnsureConf();
 
-        canvasObj = new GameObject("QuartzProgressBarCanvas");
-        canvasObj.transform.SetParent(root.transform, false);
-
-        Canvas canvas = canvasObj.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         // Below the settings panel (32767) and Status HUD (32760).
-        canvas.sortingOrder = 32755;
-
-        CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920, 1080);
-        scaler.matchWidthOrHeight = 0.5f;
-
-        // The progress bar is not draggable/interactive, so keep this canvas out
-        // of Unity's EventSystem raycast list during gameplay.
-        canvasObj.AddComponent<GraphicRaycaster>().enabled = false;
+        canvasObj = UnityUtils.CreateOverlayCanvas("QuartzProgressBarCanvas", root.transform, 32755, out _);
 
         GameObject barObj = new("Bar");
         barObj.transform.SetParent(canvasObj.transform, false);

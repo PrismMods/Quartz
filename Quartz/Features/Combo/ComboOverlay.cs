@@ -33,32 +33,14 @@ public static class ComboOverlay {
     private const float VerticalGap = 32f;
     private const float CaptionGap = 24f;
 
-    public static void EnsureConf() {
-        if(ConfMgr != null) return;
-
-        ConfMgr = new SettingsFile<ComboSettings>(Path.Combine(MainCore.Paths.RootPath, "Combo.json"));
-        ConfMgr.Load();
-    }
+    public static void EnsureConf() => ConfMgr ??= SettingsFile<ComboSettings>.Loaded("Combo.json");
 
     public static void Initialize(GameObject rootObject) {
         if(canvasObj != null) return;
 
         EnsureConf();
 
-        canvasObj = new GameObject("QuartzComboCanvas");
-        canvasObj.transform.SetParent(rootObject.transform, false);
-
-        Canvas canvas = canvasObj.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 32757;
-
-        CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920, 1080);
-        scaler.matchWidthOrHeight = 0.5f;
-
-        raycaster = canvasObj.AddComponent<GraphicRaycaster>();
-        raycaster.enabled = false;
+        canvasObj = UnityUtils.CreateOverlayCanvas("QuartzComboCanvas", rootObject.transform, 32757, out raycaster);
 
         GameObject rootObj = new("ComboRoot");
         rootObj.transform.SetParent(canvasObj.transform, false);
@@ -70,20 +52,7 @@ public static class ComboOverlay {
         valueText = CreateLabel(root, "Value", TextAlignmentOptions.Center);
         captionText = CreateLabel(root, "Caption", TextAlignmentOptions.Center);
 
-        GameObject drag = new("Drag");
-        dragObj = drag;
-        drag.transform.SetParent(root, false);
-        RectTransform dragRect = drag.AddComponent<RectTransform>();
-        dragRect.anchorMin = Vector2.zero;
-        dragRect.anchorMax = Vector2.one;
-        dragRect.offsetMin = Vector2.zero;
-        dragRect.offsetMax = Vector2.zero;
-        drag.AddComponent<EmptyGraphic>().raycastTarget = true;
-        ReorganizeHandle handle = drag.AddComponent<ReorganizeHandle>();
-        handle.Target = root;
-        handle.GetName = () => MainCore.Tr.Get("COMBO", "Combo");
-        handle.OnMoved = Save;
-        drag.SetActive(false);
+        dragObj = ReorganizeHandle.CreateDragSurface(root, () => MainCore.Tr.Get("COMBO", "Combo"), Save);
 
         updater = canvasObj.AddComponent<Updater>();
 

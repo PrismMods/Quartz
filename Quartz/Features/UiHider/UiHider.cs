@@ -26,8 +26,7 @@ public static partial class UiHider {
     public static void EnsureConf() {
         if(ConfMgr != null) return;
 
-        ConfMgr = new SettingsFile<UiHiderSettings>(Path.Combine(MainCore.Paths.RootPath, "UiHider.json"));
-        ConfMgr.Load();
+        ConfMgr = SettingsFile<UiHiderSettings>.Loaded("UiHider.json");
         EnsureTicker();
     }
 

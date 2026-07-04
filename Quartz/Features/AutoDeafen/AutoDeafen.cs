@@ -37,8 +37,7 @@ public static class AutoDeafen {
     public static void EnsureConf() {
         if(ConfMgr != null) return;
 
-        ConfMgr = new SettingsFile<AutoDeafenSettings>(Path.Combine(MainCore.Paths.RootPath, "AutoDeafen.json"));
-        ConfMgr.Load();
+        ConfMgr = SettingsFile<AutoDeafenSettings>.Loaded("AutoDeafen.json");
         EnsureTicker();
     }
 

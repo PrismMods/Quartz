@@ -18,11 +18,7 @@ public static partial class Nostalgia {
     public static SettingsFile<NostalgiaSettings> ConfMgr { get; private set; }
     public static NostalgiaSettings Conf => ConfMgr?.Data;
 
-    public static void EnsureConf() {
-        if(ConfMgr != null) return;
-        ConfMgr = new SettingsFile<NostalgiaSettings>(Path.Combine(MainCore.Paths.RootPath, "Nostalgia.json"));
-        ConfMgr.Load();
-    }
+    public static void EnsureConf() => ConfMgr ??= SettingsFile<NostalgiaSettings>.Loaded("Nostalgia.json");
 
     public static void Save() => ConfMgr?.RequestSave();
 
