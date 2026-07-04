@@ -32,11 +32,11 @@
 ## Install — MelonLoader (manual)
 0. First make sure you have MelonLoader, (if not follow [Recommended](https://github.com/QuartzTeam/Quartz#install--melonloader-recommended))
 1. Download `Quartz.zip` from [releases](https://github.com/QuartzTeam/Quartz/releases/latest).
-2. Shove it in ur ADoFaI folder. (Mac users: see the warning below)
+2. Shove it in ur ADOFAI folder. (Mac users: see the warning below)
 3. Done!
 
 ## Install — UnityModManager
-0. First make sure you have UnityModManager set up for ADoFaI.
+0. First make sure you have UnityModManager set up for ADOFAI.
 1. Download `QuartzUmm.zip` from [releases](https://github.com/QuartzTeam/Quartz/releases/latest).
 2. In the UMM installer, use "Install mod" and pick `QuartzUmm.zip` — or extract the `Quartz` folder into your UMM mods directory manually.
 3. Done! Open the in-game menu with the mod's keybind (settings live there, not in the UMM panel).
