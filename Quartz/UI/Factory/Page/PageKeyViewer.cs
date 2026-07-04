@@ -87,8 +87,8 @@ internal static class PageKeyViewer {
             "Keep the key viewer visible in menus and outside of gameplay, not just while a level is playing."
         );
 
-        simpleBody = AddModeBody(sec.Body, "SimpleMode");
-        dmNoteBody = AddModeBody(sec.Body, "DmNoteMode");
+        simpleBody = GenerateUI.MakeBody(sec.Body, "SimpleMode");
+        dmNoteBody = GenerateUI.MakeBody(sec.Body, "DmNoteMode");
 
         // Declared ahead: the style dropdown rebuilds the preview, and the
         // per-key editors below refresh their values when the selection changes.
@@ -1055,20 +1055,7 @@ internal static class PageKeyViewer {
         float defVal, float min, float max, float val,
         string format, float step,
         Action<float> setter, Action save
-    ) {
-        float Snap(float v) => Mathf.Clamp(Mathf.Round(v / step) * step, min, max);
-
-        UISlider s = GenerateUI.Slider(
-            GenerateUI.Row(body),
-            defVal, min, max, val,
-            Snap, null, null,
-            label, id
-        );
-        s.Format = format;
-        s.OnChanged = v => setter(v);
-        s.OnComplete = v => { setter(v); save?.Invoke(); };
-        return s;
-    }
+    ) => GenerateUI.SnapSlider(body, label, id, defVal, min, max, val, format, step, setter, null, save);
 
     private static void AddColor(
         Transform body, string label, string id,
@@ -1083,22 +1070,6 @@ internal static class PageKeyViewer {
             label,
             id
         );
-
-    private static RectTransform AddModeBody(Transform parent, string name) {
-        GameObject obj = new(name);
-        obj.transform.SetParent(parent, false);
-
-        RectTransform rect = obj.AddComponent<RectTransform>();
-        rect.anchorMin = new Vector2(0f, 0f);
-        rect.anchorMax = new Vector2(1f, 1f);
-        rect.pivot = new Vector2(0.5f, 1f);
-        rect.offsetMin = Vector2.zero;
-        rect.offsetMax = Vector2.zero;
-
-        GenerateUI.FitVertical(obj, 8f);
-
-        return rect;
-    }
 
     // A self-sizing card with a background, used for the per-key popup. Reads as
     // a distinct panel that collapses to nothing when hidden (SetActive false on

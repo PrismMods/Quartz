@@ -63,8 +63,6 @@ internal static class PageSearch {
         RunSearch("");
     }
 
-    private static string Tr(string key, string def) => MainCore.Tr.Get(key, def);
-
     // Normalize for matching; in Korean also collapse syllables to 초성 so
     // consonant-only queries (e.g. "ㅈㄷ" for "진동") match.
     private static string Norm(string input) {
@@ -77,16 +75,16 @@ internal static class PageSearch {
     }
 
     private static string TabName(int state) => (OriginalMenuState)state switch {
-        OriginalMenuState.Overlay => Tr("OVERLAY", "Overlay"),
-        OriginalMenuState.Gameplay => Tr("GAMEPLAY", "Gameplay"),
-        OriginalMenuState.Visuals => Tr("VISUALS", "Visuals"),
-        OriginalMenuState.Tweaks => Tr("TWEAKS", "Tweaks"),
-        OriginalMenuState.Profiles => Tr("PROFILES", "Profiles"),
-        OriginalMenuState.Import => Tr("IMPORT", "Import"),
-        OriginalMenuState.Settings => Tr("SETTINGS", "Settings"),
-        OriginalMenuState.Credits => Tr("CREDITS", "Credits"),
-        OriginalMenuState.Editor => Tr("EDITOR", "Editor"),
-        OriginalMenuState.Developer => Tr("DEVELOPER", "Developer"),
+        OriginalMenuState.Overlay => GenerateUI.Tr("OVERLAY", "Overlay"),
+        OriginalMenuState.Gameplay => GenerateUI.Tr("GAMEPLAY", "Gameplay"),
+        OriginalMenuState.Visuals => GenerateUI.Tr("VISUALS", "Visuals"),
+        OriginalMenuState.Tweaks => GenerateUI.Tr("TWEAKS", "Tweaks"),
+        OriginalMenuState.Profiles => GenerateUI.Tr("PROFILES", "Profiles"),
+        OriginalMenuState.Import => GenerateUI.Tr("IMPORT", "Import"),
+        OriginalMenuState.Settings => GenerateUI.Tr("SETTINGS", "Settings"),
+        OriginalMenuState.Credits => GenerateUI.Tr("CREDITS", "Credits"),
+        OriginalMenuState.Editor => GenerateUI.Tr("EDITOR", "Editor"),
+        OriginalMenuState.Developer => GenerateUI.Tr("DEVELOPER", "Developer"),
         _ => "?",
     };
 
@@ -98,7 +96,7 @@ internal static class PageSearch {
         string q = Norm(query ?? "");
 
         if(string.IsNullOrWhiteSpace(q)) {
-            statusText.text = Tr("SEARCH_HINT", "Type to search every tab — categories, toggles, buttons, everything.");
+            statusText.text = GenerateUI.Tr("SEARCH_HINT", "Type to search every tab — categories, toggles, buttons, everything.");
             return;
         }
 
@@ -116,14 +114,14 @@ internal static class PageSearch {
         });
 
         if(matches.Count == 0) {
-            statusText.text = Tr("SEARCH_NO_RESULTS", "No results.");
+            statusText.text = GenerateUI.Tr("SEARCH_NO_RESULTS", "No results.");
             return;
         }
 
         int shown = Mathf.Min(matches.Count, MAX_RESULTS);
         statusText.text = matches.Count > MAX_RESULTS
-            ? string.Format(Tr("SEARCH_RESULTS_CAPPED", "{0} results (showing first {1})"), matches.Count, MAX_RESULTS)
-            : string.Format(Tr("SEARCH_RESULTS", "{0} result(s)"), matches.Count);
+            ? string.Format(GenerateUI.Tr("SEARCH_RESULTS_CAPPED", "{0} results (showing first {1})"), matches.Count, MAX_RESULTS)
+            : string.Format(GenerateUI.Tr("SEARCH_RESULTS", "{0} result(s)"), matches.Count);
 
         for(int i = 0; i < shown; i++)
             AddResultRow(matches[i]);

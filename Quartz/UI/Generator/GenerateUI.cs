@@ -980,6 +980,120 @@ public static partial class GenerateUI {
         return obj;
     }
 
+    // ===== shared page-builder helpers (hoisted from the Page/*.cs files) =====
+
+    // Snap-slider: stamps a slider row, formats its readout, snaps values to
+    // `step`, and routes both the live and complete callbacks. A null `live`
+    // means the value only needs saving (no immediate re-apply).
+    internal static UISlider SnapSlider(
+        Transform body, string label, string id,
+        float defVal, float min, float max, float val,
+        string format, float step,
+        Action<float> setter,
+        Action live, Action save
+    ) {
+        float Snap(float v) => Mathf.Clamp(Mathf.Round(v / step) * step, min, max);
+
+        UISlider s = Slider(
+            Row(body),
+            defVal, min, max, val,
+            Snap, null, null,
+            label, id
+        );
+        s.Format = format;
+        s.OnChanged = v => { setter(v); live?.Invoke(); };
+        s.OnComplete = v => { setter(v); live?.Invoke(); save?.Invoke(); };
+        return s;
+    }
+
+    // Toggle row whose tooltip key is derived from the builder id
+    // ("DESC_" + id uppercased) — the dominant tooltip pattern across pages.
+    // Blocks whose tooltip key deviates from that rule must NOT use this.
+    internal static UIToggle ToggleTip(
+        Transform parent,
+        bool defaultValue,
+        bool value,
+        Action<bool> onChanged,
+        string label,
+        string id,
+        string tooltip
+    ) {
+        UIToggle toggle = Toggle(Row(parent), defaultValue, value, onChanged, label, id);
+        toggle.Rect.AddToolTip("DESC_" + id.ToUpperInvariant(), tooltip);
+        return toggle;
+    }
+
+    // Left-aligned horizontal button-row layout (the standard config used for
+    // rows of fixed-width buttons). spacing 0 = the variant without gaps.
+    internal static HorizontalLayoutGroup ButtonRow(RectTransform row, float spacing = 12f) {
+        HorizontalLayoutGroup layout = row.gameObject.AddComponent<HorizontalLayoutGroup>();
+        layout.spacing = spacing;
+        layout.padding = new RectOffset(16, 12, 0, 0);
+        layout.childControlWidth = true;
+        layout.childControlHeight = true;
+        layout.childForceExpandWidth = false;
+        layout.childForceExpandHeight = true;
+        layout.childAlignment = TextAnchor.MiddleLeft;
+        return layout;
+    }
+
+    // Pins a button inside a ButtonRow to a fixed width.
+    internal static void FixWidth(UIButton button, float width) {
+        LayoutElement le = button.Rect.gameObject.AddComponent<LayoutElement>();
+        le.preferredWidth = width;
+        le.minWidth = width;
+        le.flexibleWidth = 0f;
+    }
+
+    internal static string Tr(string key, string def) => MainCore.Tr.Get(key, def);
+
+    // Compact right-anchored pill button used inside list rows. A null/empty
+    // `key` keeps the raw text un-localized (e.g. an ellipsis placeholder).
+    internal static void MiniButton(Transform parent, string text, string key, float rightOffset, float width, Action onClick) {
+        GameObject obj = new("MiniBtn_" + text);
+        obj.transform.SetParent(parent, false);
+
+        RectTransform rect = obj.AddComponent<RectTransform>();
+        rect.anchorMin = new Vector2(1f, 0.5f);
+        rect.anchorMax = new Vector2(1f, 0.5f);
+        rect.pivot = new Vector2(1f, 0.5f);
+        rect.anchoredPosition = new Vector2(rightOffset, 0f);
+        rect.sizeDelta = new Vector2(width, 36f);
+
+        Image img = obj.AddComponent<Image>();
+        img.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
+        img.type = Image.Type.Sliced;
+        img.color = UIColors.ObjectButton;
+
+        var label = AddText(obj.transform, true);
+        if(string.IsNullOrEmpty(key)) label.text = text;
+        else Localize(label, key, text);
+        label.fontSize = 18f;
+        label.alignment = TextAlignmentOptions.Center;
+
+        AddButton(obj, btn => {
+            if(btn == InputButton.Left) onClick();
+        });
+    }
+
+    // A self-sizing vertical container whose children can be rebuilt in place
+    // (used for mode bodies and editors that add/remove rows).
+    internal static RectTransform MakeBody(Transform parent, string name) {
+        GameObject obj = new(name);
+        obj.transform.SetParent(parent, false);
+
+        RectTransform rect = obj.AddComponent<RectTransform>();
+        rect.anchorMin = new Vector2(0f, 0f);
+        rect.anchorMax = new Vector2(1f, 1f);
+        rect.pivot = new Vector2(0.5f, 1f);
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.zero;
+
+        FitVertical(obj, 8f);
+
+        return rect;
+    }
+
     public static Transform AddToolTip(this Transform parent, string key, string def, Translator tr = null) {
         tr ??= MainCore.Tr;
         return parent.AddToolTipInternal(() => tr.Get(key, def));

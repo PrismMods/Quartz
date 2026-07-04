@@ -497,7 +497,7 @@ internal static class PageGameplay {
         if(locked) return;
 
         bool settingThis = setCaptureKey == key && KeyLimiter.IsCapturing;
-        MiniButton(bg, settingThis ? "..." : "Set", settingThis ? null : "SET", -106f, 90f, () => {
+        GenerateUI.MiniButton(bg, settingThis ? "..." : "Set", settingThis ? null : "SET", -106f, 90f, () => {
             if(KeyLimiter.IsCapturing) {
                 KeyLimiter.CancelCapture();
                 return;
@@ -510,34 +510,7 @@ internal static class PageGameplay {
             );
         });
 
-        MiniButton(bg, "Remove", "REMOVE", -8f, 90f, () => KeyLimiter.ToggleAllowedKey(key));
-    }
-
-    private static void MiniButton(Transform parent, string text, string key, float rightOffset, float width, Action onClick) {
-        GameObject obj = new("MiniBtn_" + text);
-        obj.transform.SetParent(parent, false);
-
-        RectTransform rect = obj.AddComponent<RectTransform>();
-        rect.anchorMin = new Vector2(1f, 0.5f);
-        rect.anchorMax = new Vector2(1f, 0.5f);
-        rect.pivot = new Vector2(1f, 0.5f);
-        rect.anchoredPosition = new Vector2(rightOffset, 0f);
-        rect.sizeDelta = new Vector2(width, 36f);
-
-        Image img = obj.AddComponent<Image>();
-        img.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
-        img.type = Image.Type.Sliced;
-        img.color = UIColors.ObjectButton;
-
-        var label = GenerateUI.AddText(obj.transform, true);
-        if(string.IsNullOrEmpty(key)) label.text = text;
-        else GenerateUI.Localize(label, key, text);
-        label.fontSize = 18f;
-        label.alignment = TextAlignmentOptions.Center;
-
-        GenerateUI.AddButton(obj, btn => {
-            if(btn == InputButton.Left) onClick();
-        });
+        GenerateUI.MiniButton(bg, "Remove", "REMOVE", -8f, 90f, () => KeyLimiter.ToggleAllowedKey(key));
     }
 
     private static string KeyName(KeyCode key) {

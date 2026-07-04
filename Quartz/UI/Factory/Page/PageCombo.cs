@@ -51,11 +51,11 @@ internal static class PageCombo {
             );
         }
 
-        AddSlider(sec.Body, "Font Size", "combo_fontsize",
+        GenerateUI.SnapSlider(sec.Body, "Font Size", "combo_fontsize",
             def.FontSize, 24f, 120f, conf.FontSize, "0 px", 1f,
             v => conf.FontSize = v, Apply, Save);
 
-        AddSlider(sec.Body, "Master Size", "combo_master_size",
+        GenerateUI.SnapSlider(sec.Body, "Master Size", "combo_master_size",
             def.MasterSize, 0.25f, 3f, conf.MasterSize, "0.00 x", 0.01f,
             v => conf.MasterSize = v, Apply, Save);
 
@@ -82,11 +82,11 @@ internal static class PageCombo {
         );
         caption.InputField.characterLimit = 24;
 
-        AddSlider(sec.Body, "Caption Size", "combo_caption_size",
+        GenerateUI.SnapSlider(sec.Body, "Caption Size", "combo_caption_size",
             def.CaptionScale, 0.1f, 1.5f, conf.CaptionScale, "0.00 x", 0.01f,
             v => conf.CaptionScale = v, Apply, Save);
 
-        AddSlider(sec.Body, "Caption Offset", "combo_captionoffset",
+        GenerateUI.SnapSlider(sec.Body, "Caption Offset", "combo_captionoffset",
             def.CaptionOffsetY, -200f, 200f, conf.CaptionOffsetY, "0 px", 1f,
             v => conf.CaptionOffsetY = v, Apply, Save);
 
@@ -99,15 +99,15 @@ internal static class PageCombo {
             "combo_caption_shadow_enabled"
         );
 
-        AddSlider(sec.Body, "Caption Shadow X", "combo_caption_shadow_x",
+        GenerateUI.SnapSlider(sec.Body, "Caption Shadow X", "combo_caption_shadow_x",
             def.CaptionShadowX, -10f, 10f, conf.CaptionShadowX, "0.0 px", 0.1f,
             v => conf.CaptionShadowX = v, ApplyCaptionShadow, Save);
 
-        AddSlider(sec.Body, "Caption Shadow Y", "combo_caption_shadow_y",
+        GenerateUI.SnapSlider(sec.Body, "Caption Shadow Y", "combo_caption_shadow_y",
             def.CaptionShadowY, -10f, 10f, conf.CaptionShadowY, "0.0 px", 0.1f,
             v => conf.CaptionShadowY = v, ApplyCaptionShadow, Save);
 
-        AddSlider(sec.Body, "Caption Shadow Softness", "combo_caption_shadow_softness",
+        GenerateUI.SnapSlider(sec.Body, "Caption Shadow Softness", "combo_caption_shadow_softness",
             def.CaptionShadowSoftness, 0f, 20f, conf.CaptionShadowSoftness, "0.0 px", 0.1f,
             v => conf.CaptionShadowSoftness = v, ApplyCaptionShadow, Save);
 
@@ -124,7 +124,7 @@ internal static class PageCombo {
         // === Count ===
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(sec.Body)), "HEADING_COUNT", "Count");
 
-        AddSlider(sec.Body, "Thickness", "combo_count_thickness",
+        GenerateUI.SnapSlider(sec.Body, "Thickness", "combo_count_thickness",
             def.CountThickness, -0.5f, 0.5f, conf.CountThickness, "0.00", 0.01f,
             v => conf.CountThickness = v, Apply, Save);
 
@@ -137,15 +137,15 @@ internal static class PageCombo {
             "combo_count_shadow_enabled"
         );
 
-        AddSlider(sec.Body, "Count Shadow X", "combo_count_shadow_x",
+        GenerateUI.SnapSlider(sec.Body, "Count Shadow X", "combo_count_shadow_x",
             def.CountShadowX, -10f, 10f, conf.CountShadowX, "0.0 px", 0.1f,
             v => conf.CountShadowX = v, ApplyCountShadow, Save);
 
-        AddSlider(sec.Body, "Count Shadow Y", "combo_count_shadow_y",
+        GenerateUI.SnapSlider(sec.Body, "Count Shadow Y", "combo_count_shadow_y",
             def.CountShadowY, -10f, 10f, conf.CountShadowY, "0.0 px", 0.1f,
             v => conf.CountShadowY = v, ApplyCountShadow, Save);
 
-        AddSlider(sec.Body, "Count Shadow Softness", "combo_count_shadow_softness",
+        GenerateUI.SnapSlider(sec.Body, "Count Shadow Softness", "combo_count_shadow_softness",
             def.CountShadowSoftness, 0f, 20f, conf.CountShadowSoftness, "0.0 px", 0.1f,
             v => conf.CountShadowSoftness = v, ApplyCountShadow, Save);
 
@@ -171,22 +171,22 @@ internal static class PageCombo {
             "combo_nopop"
         );
 
-        AddSlider(sec.Body, "Pulse Duration", "combo_pulse_duration",
+        GenerateUI.SnapSlider(sec.Body, "Pulse Duration", "combo_pulse_duration",
             def.PulseDuration, 0f, 1f, conf.PulseDuration, "0.00 s", 0.01f,
             v => conf.PulseDuration = v, null, Save);
 
-        AddSlider(sec.Body, "Count Pulse Scale", "combo_pulse_count_scale",
+        GenerateUI.SnapSlider(sec.Body, "Count Pulse Scale", "combo_pulse_count_scale",
             def.CountPulseScale, 0f, 1f, conf.CountPulseScale, "0.00 x", 0.01f,
             v => conf.CountPulseScale = v, null, Save);
 
-        AddSlider(sec.Body, "Label Pulse Offset Y", "combo_pulse_label_offset",
+        GenerateUI.SnapSlider(sec.Body, "Label Pulse Offset Y", "combo_pulse_label_offset",
             def.LabelPulseOffsetY, 0f, 60f, conf.LabelPulseOffsetY, "0 px", 1f,
             v => conf.LabelPulseOffsetY = v, null, Save);
 
         // === Color ===
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(sec.Body)), "HEADING_COLOR", "Color");
 
-        AddSlider(sec.Body, "Color Max Combo", "combo_colormax",
+        GenerateUI.SnapSlider(sec.Body, "Color Max Combo", "combo_colormax",
             def.ColorMax, 1f, 5000f, conf.ColorMax, "0", 1f,
             v => conf.ColorMax = Mathf.RoundToInt(v), null, Save);
 
@@ -237,28 +237,5 @@ internal static class PageCombo {
             "Perfect Color",
             "combo_perfectcolor"
         );
-    }
-
-    // Shared slider helper: stamps a slider row, formats its readout, snaps
-    // values to `step`, and routes both the live and complete callbacks. A
-    // null `live` means the value only needs saving (no immediate re-apply).
-    private static void AddSlider(
-        Transform body, string label, string id,
-        float defVal, float min, float max, float val,
-        string format, float step,
-        System.Action<float> setter,
-        System.Action live, System.Action save
-    ) {
-        float Snap(float v) => Mathf.Clamp(Mathf.Round(v / step) * step, min, max);
-
-        UISlider s = GenerateUI.Slider(
-            GenerateUI.Row(body),
-            defVal, min, max, val,
-            Snap, null, null,
-            label, id
-        );
-        s.Format = format;
-        s.OnChanged = v => { setter(v); live?.Invoke(); };
-        s.OnComplete = v => { setter(v); live?.Invoke(); save?.Invoke(); };
     }
 }

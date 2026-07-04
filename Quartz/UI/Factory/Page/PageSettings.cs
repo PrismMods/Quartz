@@ -478,13 +478,7 @@ internal static class PageSettings {
         var updateActionRect = GenerateUI.Row(content.transform);
         updateActionRow = updateActionRect.gameObject;
 
-        HorizontalLayoutGroup actionLayout = updateActionRow.AddComponent<HorizontalLayoutGroup>();
-        actionLayout.padding = new RectOffset(16, 12, 0, 0);
-        actionLayout.childControlWidth = true;
-        actionLayout.childControlHeight = true;
-        actionLayout.childForceExpandWidth = false;
-        actionLayout.childForceExpandHeight = true;
-        actionLayout.childAlignment = TextAnchor.MiddleLeft;
+        GenerateUI.ButtonRow(updateActionRect, 0f);
 
         updateVersionText = GenerateUI.AddText(updateActionRect, true);
         updateVersionText.overflowMode = TextOverflowModes.Ellipsis;
@@ -494,21 +488,7 @@ internal static class PageSettings {
         var updateButtonRect = GenerateUI.Row(content.transform);
         updateButtonRow = updateButtonRect.gameObject;
 
-        HorizontalLayoutGroup buttonLayout = updateButtonRow.AddComponent<HorizontalLayoutGroup>();
-        buttonLayout.spacing = 12f;
-        buttonLayout.padding = new RectOffset(16, 12, 0, 0);
-        buttonLayout.childControlWidth = true;
-        buttonLayout.childControlHeight = true;
-        buttonLayout.childForceExpandWidth = false;
-        buttonLayout.childForceExpandHeight = true;
-        buttonLayout.childAlignment = TextAnchor.MiddleLeft;
-
-        static void FixWidth(UIButton button, float width) {
-            LayoutElement le = button.Rect.gameObject.AddComponent<LayoutElement>();
-            le.preferredWidth = width;
-            le.minWidth = width;
-            le.flexibleWidth = 0f;
-        }
+        GenerateUI.ButtonRow(updateButtonRect);
 
         updateNotesButton = GenerateUI.Button(
             updateButtonRect,
@@ -519,7 +499,7 @@ internal static class PageSettings {
             "Notes",
             "update_notes"
         ).SetSecondary();
-        FixWidth(updateNotesButton, 100f);
+        GenerateUI.FixWidth(updateNotesButton, 100f);
         updateNotesButton.Label.gameObject.AddComponent<TextLocalization>().Init("UPDATE_NOTES", "Notes");
         updateNotesButton.Rect.AddToolTip(
             "DESC_UPDATE_NOTES",
@@ -532,7 +512,7 @@ internal static class PageSettings {
             "Skip",
             "update_skip"
         ).SetSecondary();
-        FixWidth(updateSkipButton, 100f);
+        GenerateUI.FixWidth(updateSkipButton, 100f);
         updateSkipButton.Label.gameObject.AddComponent<TextLocalization>().Init("UPDATE_SKIP", "Skip");
         updateSkipButton.Rect.AddToolTip(
             "DESC_UPDATE_SKIP",
@@ -545,7 +525,7 @@ internal static class PageSettings {
             "Install",
             "update_install"
         );
-        FixWidth(updateInstallButton, 130f);
+        GenerateUI.FixWidth(updateInstallButton, 130f);
         updateInstallButton.Label.gameObject.AddComponent<TextLocalization>().Init("UPDATE_INSTALL", "Install");
 
         updateUndoButton = GenerateUI.Button(
@@ -554,7 +534,7 @@ internal static class PageSettings {
             "Undo",
             "update_undo"
         ).SetSecondary();
-        FixWidth(updateUndoButton, 100f);
+        GenerateUI.FixWidth(updateUndoButton, 100f);
         updateUndoButton.Label.gameObject.AddComponent<TextLocalization>().Init("UPDATE_UNDO", "Undo");
 
         if(!updateHooked) {
@@ -703,9 +683,9 @@ internal static class PageSettings {
 
     private static string DisplaySettingsFont(string name) =>
         name == FontManager.SameAsOverlay
-            ? Tr("FONT_SAME_AS_OVERLAY", "Same as overlay font")
+            ? GenerateUI.Tr("FONT_SAME_AS_OVERLAY", "Same as overlay font")
             : name == FontManager.DefaultName
-                ? Tr("FONT_DEFAULT", "Default (Cookie Run Bold)")
+                ? GenerateUI.Tr("FONT_DEFAULT", "Default (Cookie Run Bold)")
                 : name;
 
     // Rebuild every open font picker after an import, rename, or delete. This
@@ -729,9 +709,9 @@ internal static class PageSettings {
 
     private static string DisplayFont(string name) =>
         name == FontManager.AddSentinel
-            ? Tr("FONT_ADD", "＋  Add custom font…")
+            ? GenerateUI.Tr("FONT_ADD", "＋  Add custom font…")
             : name == FontManager.DefaultName
-                ? Tr("FONT_DEFAULT", "Default (Cookie Run Bold)")
+                ? GenerateUI.Tr("FONT_DEFAULT", "Default (Cookie Run Bold)")
                 : name;
 
     private static void OnFontSelected(string name) {
@@ -754,7 +734,7 @@ internal static class PageSettings {
                 null,
                 "Font",
                 ["ttf", "otf", "ttc"],
-                Tr("FONT_PICK_TITLE", "Select a font file")
+                GenerateUI.Tr("FONT_PICK_TITLE", "Select a font file")
             );
         } catch(Exception e) {
             MainCore.Log.Err($"[{nameof(PageSettings)}] font PickFile failed: {e}");
@@ -765,13 +745,13 @@ internal static class PageSettings {
 
         string name = FontManager.ImportFont(path);
         if(name == null) {
-            SetFontStatus(Tr("FONT_IMPORT_FAILED", "Couldn't import that file."));
+            SetFontStatus(GenerateUI.Tr("FONT_IMPORT_FAILED", "Couldn't import that file."));
             return;
         }
 
         fontDropdown.SetValues(BuildFontValues());
         fontDropdown.Set(name, true); // selects + applies via OnFontSelected
-        SetFontStatus(string.Format(Tr("FONT_ADDED", "Added '{0}'."), name));
+        SetFontStatus(string.Format(GenerateUI.Tr("FONT_ADDED", "Added '{0}'."), name));
     }
 
     private static void RenameCurrentFont() {
@@ -782,7 +762,7 @@ internal static class PageSettings {
             fontDropdown.SetValues(BuildFontValues());
             fontDropdown.Set(FontManager.CurrentName, false);
             RefreshFontManageRow();
-            SetFontStatus(string.Format(Tr("FONT_RENAMED", "Renamed to '{0}'."), FontManager.CurrentName));
+            SetFontStatus(string.Format(GenerateUI.Tr("FONT_RENAMED", "Renamed to '{0}'."), FontManager.CurrentName));
         } else {
             SetFontStatus(error);
         }
@@ -795,7 +775,7 @@ internal static class PageSettings {
         // Two-step delete: first click arms the button (red "Sure?").
         if(!fontDeleteArmed) {
             fontDeleteArmed = true;
-            fontDeleteBtn.Label.text = Tr("FONT_DELETE_CONFIRM", "Sure?");
+            fontDeleteBtn.Label.text = GenerateUI.Tr("FONT_DELETE_CONFIRM", "Sure?");
             fontDeleteBtn.RestColor = static () => UIColors.SoftRed;
             fontDeleteBtn.Background.color = UIColors.SoftRed;
             return;
@@ -805,7 +785,7 @@ internal static class PageSettings {
             fontDropdown.SetValues(BuildFontValues());
             fontDropdown.Set(FontManager.CurrentName, false);
             RefreshFontManageRow();
-            SetFontStatus(string.Format(Tr("FONT_DELETED", "Deleted '{0}'."), cur));
+            SetFontStatus(string.Format(GenerateUI.Tr("FONT_DELETED", "Deleted '{0}'."), cur));
         }
     }
 
@@ -819,7 +799,7 @@ internal static class PageSettings {
 
         fontDeleteArmed = false;
         if(fontDeleteBtn != null) {
-            fontDeleteBtn.Label.text = Tr("FONT_DELETE", "Delete");
+            fontDeleteBtn.Label.text = GenerateUI.Tr("FONT_DELETE", "Delete");
             if(fontDeleteRestColor != null) {
                 fontDeleteBtn.RestColor = fontDeleteRestColor;
                 fontDeleteBtn.Background.color = fontDeleteRestColor();
@@ -842,8 +822,6 @@ internal static class PageSettings {
 
         if(pageContent != null) LayoutRebuilder.ForceRebuildLayoutImmediate(pageContent);
     }
-
-    private static string Tr(string key, string def) => MainCore.Tr.Get(key, def);
 
     // Scrolls the page so the Updates section heading sits at the top of the
     // viewport. Used by the update toast after switching to this page.
@@ -868,26 +846,24 @@ internal static class PageSettings {
         bool available = status == UpdateStatus.Available && info != null;
         bool skipped = status == UpdateStatus.Skipped;
 
-        static string Tr(string key, string def) => MainCore.Tr.Get(key, def);
-
         updateStatusText.text = status switch {
-            UpdateStatus.Checking => Tr("UPDATE_CHECKING", "Checking for updates…"),
-            UpdateStatus.UpToDate => Tr("UPDATE_UP_TO_DATE", "You're up to date."),
-            UpdateStatus.Available => Tr("UPDATE_AVAILABLE", "Update available:"),
-            UpdateStatus.Installing => Tr("UPDATE_DOWNLOADING", "Downloading update…"),
+            UpdateStatus.Checking => GenerateUI.Tr("UPDATE_CHECKING", "Checking for updates…"),
+            UpdateStatus.UpToDate => GenerateUI.Tr("UPDATE_UP_TO_DATE", "You're up to date."),
+            UpdateStatus.Available => GenerateUI.Tr("UPDATE_AVAILABLE", "Update available:"),
+            UpdateStatus.Installing => GenerateUI.Tr("UPDATE_DOWNLOADING", "Downloading update…"),
             UpdateStatus.Installed => string.IsNullOrEmpty(UpdateService.Message)
-                ? Tr("UPDATE_INSTALLED", "Update installed — restart the game to apply.")
+                ? GenerateUI.Tr("UPDATE_INSTALLED", "Update installed — restart the game to apply.")
                 : UpdateService.Message,
             UpdateStatus.Skipped => string.Format(
-                Tr("UPDATE_SKIPPED", "Skipped {0} — it won't be offered again."),
+                GenerateUI.Tr("UPDATE_SKIPPED", "Skipped {0} — it won't be offered again."),
                 UpdateService.SkippedTag
             ),
             UpdateStatus.Failed => UpdateService.Failure switch {
-                UpdateFailure.Network => Tr("UPDATE_FAILED_NETWORK", "Couldn't reach GitHub — check your connection."),
-                UpdateFailure.NotFound => Tr("UPDATE_FAILED_NOT_FOUND", "Update check failed — release feed not found."),
-                UpdateFailure.RateLimited => Tr("UPDATE_FAILED_RATE_LIMIT", "GitHub rate limit reached — try again later."),
-                UpdateFailure.InstallError => Tr("UPDATE_FAILED_INSTALL", "Install failed."),
-                _ => Tr("UPDATE_FAILED_CHECK", "Update check failed."),
+                UpdateFailure.Network => GenerateUI.Tr("UPDATE_FAILED_NETWORK", "Couldn't reach GitHub — check your connection."),
+                UpdateFailure.NotFound => GenerateUI.Tr("UPDATE_FAILED_NOT_FOUND", "Update check failed — release feed not found."),
+                UpdateFailure.RateLimited => GenerateUI.Tr("UPDATE_FAILED_RATE_LIMIT", "GitHub rate limit reached — try again later."),
+                UpdateFailure.InstallError => GenerateUI.Tr("UPDATE_FAILED_INSTALL", "Install failed."),
+                _ => GenerateUI.Tr("UPDATE_FAILED_CHECK", "Update check failed."),
             },
             _ => "",
         };
@@ -916,7 +892,7 @@ internal static class PageSettings {
             // SUIT has the arrow glyph, but a user-supplied font might not.
             string arrow = HasGlyph('→') ? "→" : ">";
             string simulated = UpdateService.DevSimulate
-                ? $" {Tr("UPDATE_SIMULATED", "(simulated)")}"
+                ? $" {GenerateUI.Tr("UPDATE_SIMULATED", "(simulated)")}"
                 : "";
             updateVersionText.text = $"v{Info.DisplayVersion}  {arrow}  {info.Tag}{simulated}";
         } else {

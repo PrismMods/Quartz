@@ -71,17 +71,10 @@ internal static class PageProfiles {
         );
 
         var ioRow = GenerateUI.Row(content.transform);
-        HorizontalLayoutGroup ioLayout = ioRow.gameObject.AddComponent<HorizontalLayoutGroup>();
-        ioLayout.spacing = 12f;
-        ioLayout.padding = new RectOffset(16, 12, 0, 0);
-        ioLayout.childControlWidth = true;
-        ioLayout.childControlHeight = true;
-        ioLayout.childForceExpandWidth = false;
-        ioLayout.childForceExpandHeight = true;
-        ioLayout.childAlignment = TextAnchor.MiddleLeft;
+        GenerateUI.ButtonRow(ioRow);
 
         UIButton importBtn = GenerateUI.Button(ioRow, ImportProfile, "Import", "profile_import");
-        FixWidth(importBtn, 160f);
+        GenerateUI.FixWidth(importBtn, 160f);
         importBtn.Rect.AddToolTip(
             "DESC_PROFILE_IMPORT",
             "Loads a .qprofile (or legacy .krprofile) file as a new profile. It won't be selected automatically."
@@ -100,10 +93,10 @@ internal static class PageProfiles {
             "Open Folder",
             "profile_open_folder"
         ).SetSecondary();
-        FixWidth(folderBtn, 160f);
+        GenerateUI.FixWidth(folderBtn, 160f);
 
         UIButton recalibBtn = GenerateUI.Button(ioRow, RecalibrateDisplay, "Recalibrate Display", "profile_recalibrate").SetSecondary();
-        FixWidth(recalibBtn, 220f);
+        GenerateUI.FixWidth(recalibBtn, 220f);
         recalibBtn.Rect.AddToolTip(
             "DESC_PROFILE_RECALIBRATE",
             "Re-baseline overlay positions to this monitor, keeping them exactly where they are now. " +
@@ -123,15 +116,6 @@ internal static class PageProfiles {
         GenerateUI.FitVertical(list, 8f);
 
         RebuildList();
-    }
-
-    private static string Tr(string key, string def) => MainCore.Tr.Get(key, def);
-
-    private static void FixWidth(UIButton button, float width) {
-        LayoutElement le = button.Rect.gameObject.AddComponent<LayoutElement>();
-        le.preferredWidth = width;
-        le.minWidth = width;
-        le.flexibleWidth = 0f;
     }
 
     // Re-baselines every overlay's stored offsets to the current display: each
@@ -212,14 +196,7 @@ internal static class PageProfiles {
 
         foreach(ProfileManager.PresetInfo preset in presets) {
             RectTransform row = GenerateUI.Row(content, 50f);
-            HorizontalLayoutGroup rl = row.gameObject.AddComponent<HorizontalLayoutGroup>();
-            rl.spacing = 12f;
-            rl.padding = new RectOffset(16, 12, 0, 0);
-            rl.childControlWidth = true;
-            rl.childControlHeight = true;
-            rl.childForceExpandWidth = false;
-            rl.childForceExpandHeight = true;
-            rl.childAlignment = TextAnchor.MiddleLeft;
+            GenerateUI.ButtonRow(row);
 
             TextMeshProUGUI label = GenerateUI.AddText(row, noPad: true);
             label.overflowMode = TextOverflowModes.Ellipsis;
@@ -243,7 +220,7 @@ internal static class PageProfiles {
                             UICore.Rebuild();
                         } else {
                             if(statusText != null)
-                                statusText.text = Tr("PROFILE_STATUS_PRESET_FAILED", "Couldn't apply preset.");
+                                statusText.text = GenerateUI.Tr("PROFILE_STATUS_PRESET_FAILED", "Couldn't apply preset.");
                             RebuildList();
                         }
                     });
@@ -251,7 +228,7 @@ internal static class PageProfiles {
                 "Apply",
                 "preset_apply"
             );
-            FixWidth(applyBtn, 140f);
+            GenerateUI.FixWidth(applyBtn, 140f);
         }
     }
 
@@ -259,12 +236,12 @@ internal static class PageProfiles {
         string name = ProfileManager.Sanitize(pendingName);
 
         if(name == null) {
-            statusText.text = Tr("PROFILE_STATUS_NAME_INVALID", "Enter a name first.");
+            statusText.text = GenerateUI.Tr("PROFILE_STATUS_NAME_INVALID", "Enter a name first.");
             return;
         }
 
         if(ProfileManager.Exists(name)) {
-            statusText.text = Tr("PROFILE_STATUS_NAME_TAKEN", "That name is already used.");
+            statusText.text = GenerateUI.Tr("PROFILE_STATUS_NAME_TAKEN", "That name is already used.");
             return;
         }
 
@@ -284,7 +261,7 @@ internal static class PageProfiles {
                 null,
                 "Quartz Profile",
                 [.. ProfileManager.ImportExtensions, "json"],
-                Tr("PROFILE_IMPORT_TITLE", "Import Quartz Profile")
+                GenerateUI.Tr("PROFILE_IMPORT_TITLE", "Import Quartz Profile")
             );
         } catch(Exception e) {
             MainCore.Log.Err($"[{nameof(PageProfiles)}] PickFile failed: {e}");
@@ -296,11 +273,11 @@ internal static class PageProfiles {
         string name = ProfileManager.Import(path);
 
         if(name == null) {
-            statusText.text = Tr("PROFILE_STATUS_IMPORT_FAILED", "Import failed — not a Quartz profile file.");
+            statusText.text = GenerateUI.Tr("PROFILE_STATUS_IMPORT_FAILED", "Import failed — not a Quartz profile file.");
             return;
         }
 
-        statusText.text = string.Format(Tr("PROFILE_STATUS_IMPORTED", "Imported as '{0}'."), name);
+        statusText.text = string.Format(GenerateUI.Tr("PROFILE_STATUS_IMPORTED", "Imported as '{0}'."), name);
         RebuildList();
     }
 
@@ -313,7 +290,7 @@ internal static class PageProfiles {
                 $"{name}.{ProfileManager.EXPORT_EXTENSION}",
                 "Quartz Profile",
                 [ProfileManager.EXPORT_EXTENSION],
-                Tr("PROFILE_EXPORT_TITLE", "Export Quartz Profile")
+                GenerateUI.Tr("PROFILE_EXPORT_TITLE", "Export Quartz Profile")
             );
         } catch(Exception e) {
             MainCore.Log.Err($"[{nameof(PageProfiles)}] SaveFile failed: {e}");
@@ -329,8 +306,8 @@ internal static class PageProfiles {
         }
 
         statusText.text = ProfileManager.Export(name, path)
-            ? string.Format(Tr("PROFILE_STATUS_EXPORTED", "Exported '{0}'."), Path.GetFileName(path))
-            : Tr("PROFILE_STATUS_EXPORT_FAILED", "Export failed.");
+            ? string.Format(GenerateUI.Tr("PROFILE_STATUS_EXPORTED", "Exported '{0}'."), Path.GetFileName(path))
+            : GenerateUI.Tr("PROFILE_STATUS_EXPORT_FAILED", "Export failed.");
     }
 
     private static void SelectProfile(string name, UIButton button) {
@@ -358,15 +335,7 @@ internal static class PageProfiles {
 
     private static void CreateProfileRow(string name, bool active) {
         var row = GenerateUI.Row(listContainer, 50f);
-
-        HorizontalLayoutGroup rowLayout = row.gameObject.AddComponent<HorizontalLayoutGroup>();
-        rowLayout.spacing = 12f;
-        rowLayout.padding = new RectOffset(16, 12, 0, 0);
-        rowLayout.childControlWidth = true;
-        rowLayout.childControlHeight = true;
-        rowLayout.childForceExpandWidth = false;
-        rowLayout.childForceExpandHeight = true;
-        rowLayout.childAlignment = TextAnchor.MiddleLeft;
+        GenerateUI.ButtonRow(row);
 
         var label = GenerateUI.AddText(row, noPad: true);
         label.overflowMode = TextOverflowModes.Ellipsis;
@@ -376,7 +345,7 @@ internal static class PageProfiles {
 
         if(active) {
             string accent = ColorUtility.ToHtmlStringRGB(UIColors.ObjectActiveBright);
-            label.text = $"{name}  <size=70%><color=#{accent}>●  {Tr("PROFILE_ACTIVE", "Active")}</color></size>";
+            label.text = $"{name}  <size=70%><color=#{accent}>●  {GenerateUI.Tr("PROFILE_ACTIVE", "Active")}</color></size>";
         } else {
             label.text = name;
         }
@@ -384,11 +353,11 @@ internal static class PageProfiles {
         if(!active) {
             UIButton selectBtn = null;
             selectBtn = GenerateUI.Button(row, () => SelectProfile(name, selectBtn), "Select", "profile_select");
-            FixWidth(selectBtn, 110f);
+            GenerateUI.FixWidth(selectBtn, 110f);
         }
 
         UIButton exportBtn = GenerateUI.Button(row, () => ExportProfile(name), "Export", "profile_export").SetSecondary();
-        FixWidth(exportBtn, 110f);
+        GenerateUI.FixWidth(exportBtn, 110f);
 
         if(!active) {
             // Two-step delete: the first click arms the button (red "Sure?"),
@@ -401,7 +370,7 @@ internal static class PageProfiles {
                     if(deleteBtn == null) return;
                     if(!armed) {
                         armed = true;
-                        deleteBtn.Label.text = Tr("PROFILE_DELETE_CONFIRM", "Sure?");
+                        deleteBtn.Label.text = GenerateUI.Tr("PROFILE_DELETE_CONFIRM", "Sure?");
                         deleteBtn.RestColor = static () => UIColors.SoftRed;
                         deleteBtn.Background.color = UIColors.SoftRed;
                         return;
@@ -415,7 +384,7 @@ internal static class PageProfiles {
                 "Delete",
                 "profile_delete"
             ).SetSecondary();
-            FixWidth(deleteBtn, 110f);
+            GenerateUI.FixWidth(deleteBtn, 110f);
         }
     }
 }

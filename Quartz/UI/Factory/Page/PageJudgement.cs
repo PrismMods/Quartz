@@ -29,15 +29,13 @@ internal static class PageJudgement {
         // has no data and the toggle would silently do nothing. Hidden unless
         // installed, matching the XPerfect Combo toggle on PageCombo.
         if(XPerfectBridge.Installed) {
-            GenerateUI.Toggle(
-                GenerateUI.Row(sec.Body),
+            GenerateUI.ToggleTip(
+                sec.Body,
                 def.ShowXPerfect,
                 conf.ShowXPerfect,
                 v => { conf.ShowXPerfect = v; Apply(); Save(); },
                 "Show XPerfect",
-                "judgement_xperfect"
-            ).Rect.AddToolTip(
-                "DESC_JUDGEMENT_XPERFECT",
+                "judgement_xperfect",
                 "Split the Perfect count into +Perfect / X / -Perfect when the XPerfect mod is active."
             );
         }
@@ -45,11 +43,11 @@ internal static class PageJudgement {
         // === Layout ===
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(sec.Body)), "HEADING_LAYOUT", "Layout");
 
-        AddSlider(sec.Body, "Size", "judgement_size",
+        GenerateUI.SnapSlider(sec.Body, "Size", "judgement_size",
             def.Size, 0.3f, 3f, conf.Size, "0.00 x", 0.01f,
             v => conf.Size = v, Apply, Save);
 
-        AddSlider(sec.Body, "Spacing", "judgement_spacing",
+        GenerateUI.SnapSlider(sec.Body, "Spacing", "judgement_spacing",
             def.Spacing, -20f, 80f, conf.Spacing, "0 px", 1f,
             v => conf.Spacing = v, Apply, Save);
 
@@ -65,15 +63,15 @@ internal static class PageJudgement {
             "judgement_shadow_enabled"
         );
 
-        AddSlider(sec.Body, "Shadow X", "judgement_shadow_x",
+        GenerateUI.SnapSlider(sec.Body, "Shadow X", "judgement_shadow_x",
             def.TextShadowX, -20f, 20f, conf.TextShadowX, "0.0 px", 0.1f,
             v => conf.TextShadowX = v, Apply, Save);
 
-        AddSlider(sec.Body, "Shadow Y", "judgement_shadow_y",
+        GenerateUI.SnapSlider(sec.Body, "Shadow Y", "judgement_shadow_y",
             def.TextShadowY, -20f, 20f, conf.TextShadowY, "0.0 px", 0.1f,
             v => conf.TextShadowY = v, Apply, Save);
 
-        AddSlider(sec.Body, "Shadow Softness", "judgement_shadow_softness",
+        GenerateUI.SnapSlider(sec.Body, "Shadow Softness", "judgement_shadow_softness",
             def.TextShadowSoftness, 0f, 20f, conf.TextShadowSoftness, "0.0 px", 0.1f,
             v => conf.TextShadowSoftness = v, Apply, Save);
 
@@ -86,25 +84,5 @@ internal static class PageJudgement {
             "Shadow Color",
             "judgement_shadow_color"
         );
-    }
-
-    private static void AddSlider(
-        Transform body, string label, string id,
-        float defVal, float min, float max, float val,
-        string format, float step,
-        System.Action<float> setter,
-        System.Action live, System.Action save
-    ) {
-        float Snap(float v) => Mathf.Clamp(Mathf.Round(v / step) * step, min, max);
-
-        UISlider s = GenerateUI.Slider(
-            GenerateUI.Row(body),
-            defVal, min, max, val,
-            Snap, null, null,
-            label, id
-        );
-        s.Format = format;
-        s.OnChanged = v => { setter(v); live?.Invoke(); };
-        s.OnComplete = v => { setter(v); live?.Invoke(); save?.Invoke(); };
     }
 }

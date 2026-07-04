@@ -36,11 +36,11 @@ internal static class PageSongTitle {
         );
         fmt.InputField.characterLimit = 80;
 
-        AddSlider(sec.Body, "Font Size", "songtitle_fontsize",
+        GenerateUI.SnapSlider(sec.Body, "Font Size", "songtitle_fontsize",
             def.FontSize, 12f, 120f, conf.FontSize, "0 px", 1f,
             v => conf.FontSize = v, Apply, Save);
 
-        AddSlider(sec.Body, "Master Size", "songtitle_master",
+        GenerateUI.SnapSlider(sec.Body, "Master Size", "songtitle_master",
             def.MasterSize, 0.25f, 3f, conf.MasterSize, "0.00 x", 0.01f,
             v => conf.MasterSize = v, Apply, Save);
 
@@ -63,15 +63,15 @@ internal static class PageSongTitle {
             "songtitle_shadow"
         );
 
-        AddSlider(sec.Body, "Shadow X", "songtitle_shadow_x",
+        GenerateUI.SnapSlider(sec.Body, "Shadow X", "songtitle_shadow_x",
             def.ShadowX, -10f, 10f, conf.ShadowX, "0.0 px", 0.1f,
             v => conf.ShadowX = v, ApplyShadow, Save);
 
-        AddSlider(sec.Body, "Shadow Y", "songtitle_shadow_y",
+        GenerateUI.SnapSlider(sec.Body, "Shadow Y", "songtitle_shadow_y",
             def.ShadowY, -10f, 10f, conf.ShadowY, "0.0 px", 0.1f,
             v => conf.ShadowY = v, ApplyShadow, Save);
 
-        AddSlider(sec.Body, "Shadow Softness", "songtitle_shadow_soft",
+        GenerateUI.SnapSlider(sec.Body, "Shadow Softness", "songtitle_shadow_soft",
             def.ShadowSoftness, 0f, 20f, conf.ShadowSoftness, "0.0 px", 0.1f,
             v => conf.ShadowSoftness = v, ApplyShadow, Save);
 
@@ -84,27 +84,5 @@ internal static class PageSongTitle {
             "Shadow Color",
             "songtitle_shadow_color"
         );
-    }
-
-    // Shared slider helper (same shape as PageCombo's): snaps to step, formats
-    // the readout, routes live + complete callbacks. Null `live` = save only.
-    private static void AddSlider(
-        Transform body, string label, string id,
-        float defVal, float min, float max, float val,
-        string format, float step,
-        System.Action<float> setter,
-        System.Action live, System.Action save
-    ) {
-        float Snap(float v) => Mathf.Clamp(Mathf.Round(v / step) * step, min, max);
-
-        UISlider s = GenerateUI.Slider(
-            GenerateUI.Row(body),
-            defVal, min, max, val,
-            Snap, null, null,
-            label, id
-        );
-        s.Format = format;
-        s.OnChanged = v => { setter(v); live?.Invoke(); };
-        s.OnComplete = v => { setter(v); live?.Invoke(); save?.Invoke(); };
     }
 }

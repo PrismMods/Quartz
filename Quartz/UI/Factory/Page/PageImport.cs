@@ -84,15 +84,6 @@ internal static class PageImport {
         LayoutRebuilder.ForceRebuildLayoutImmediate(content);
     }
 
-    private static string Tr(string key, string def) => MainCore.Tr.Get(key, def);
-
-    private static void FixWidth(UIButton button, float width) {
-        LayoutElement le = button.Rect.gameObject.AddComponent<LayoutElement>();
-        le.preferredWidth = width;
-        le.minWidth = width;
-        le.flexibleWidth = 0f;
-    }
-
     private static void RebuildList() {
         if(listContainer == null) return;
 
@@ -136,15 +127,7 @@ internal static class PageImport {
     // left, a right-aligned "Not Compatible" tag, no Import button.
     private static void CreateIncompatibleCard(InstalledModInfo mod) {
         var row = GenerateUI.Row(listContainer, 50f);
-
-        HorizontalLayoutGroup rowLayout = row.gameObject.AddComponent<HorizontalLayoutGroup>();
-        rowLayout.spacing = 12f;
-        rowLayout.padding = new RectOffset(16, 12, 0, 0);
-        rowLayout.childControlWidth = true;
-        rowLayout.childControlHeight = true;
-        rowLayout.childForceExpandWidth = false;
-        rowLayout.childForceExpandHeight = true;
-        rowLayout.childAlignment = TextAnchor.MiddleLeft;
+        GenerateUI.ButtonRow(row);
 
         var label = GenerateUI.AddText(row, noPad: true);
         label.overflowMode = TextOverflowModes.Ellipsis;
@@ -164,15 +147,7 @@ internal static class PageImport {
     private static void CreateOptionCard(SettingsImportOption option) {
         // Title row: mod name on the left, Import on the right.
         var row = GenerateUI.Row(listContainer, 50f);
-
-        HorizontalLayoutGroup rowLayout = row.gameObject.AddComponent<HorizontalLayoutGroup>();
-        rowLayout.spacing = 12f;
-        rowLayout.padding = new RectOffset(16, 12, 0, 0);
-        rowLayout.childControlWidth = true;
-        rowLayout.childControlHeight = true;
-        rowLayout.childForceExpandWidth = false;
-        rowLayout.childForceExpandHeight = true;
-        rowLayout.childAlignment = TextAnchor.MiddleLeft;
+        GenerateUI.ButtonRow(row);
 
         var label = GenerateUI.AddText(row, noPad: true);
         label.overflowMode = TextOverflowModes.Ellipsis;
@@ -180,14 +155,14 @@ internal static class PageImport {
         label.text = option.Label;
 
         UIButton importBtn = GenerateUI.Button(row, () => RunImport(option, false), "Import", "import_do");
-        FixWidth(importBtn, 140f);
+        GenerateUI.FixWidth(importBtn, 140f);
         importBtn.Rect.AddToolTip(
             "DESC_IMPORT_DO",
             "Copy this mod's settings into Quartz. Settings it doesn't cover are left as they are."
         );
 
         UIButton profileBtn = GenerateUI.Button(row, () => RunImport(option, true), "Import Profile", "import_profile").SetSecondary();
-        FixWidth(profileBtn, 190f);
+        GenerateUI.FixWidth(profileBtn, 190f);
         profileBtn.Rect.AddToolTip(
             "DESC_IMPORT_PROFILE",
             "Copy this mod's settings into a new Quartz profile, leaving the current profile selected."
@@ -245,9 +220,9 @@ internal static class PageImport {
     }
 
     private static string ModeLabel(SettingsImportReplaceMode mode) => mode switch {
-        SettingsImportReplaceMode.ReplaceAll => Tr("IMPORT_MODE_REPLACE_ALL", "Replace all"),
-        SettingsImportReplaceMode.ReplaceCertain => Tr("IMPORT_MODE_REPLACE_CERTAIN", "Replace certain"),
-        _ => Tr("IMPORT_MODE_KEEP_OLD", "Keep old"),
+        SettingsImportReplaceMode.ReplaceAll => GenerateUI.Tr("IMPORT_MODE_REPLACE_ALL", "Replace all"),
+        SettingsImportReplaceMode.ReplaceCertain => GenerateUI.Tr("IMPORT_MODE_REPLACE_CERTAIN", "Replace certain"),
+        _ => GenerateUI.Tr("IMPORT_MODE_KEEP_OLD", "Keep old"),
     };
 
     private static void RunImport(SettingsImportOption option, bool separateProfile) {
@@ -259,13 +234,13 @@ internal static class PageImport {
             : SettingsImporter.Import(option, mode, p);
 
         if(!result.Success) {
-            statusText.text = string.Format(Tr("IMPORT_FAIL", "Import failed: {0}"), result.Message);
+            statusText.text = string.Format(GenerateUI.Tr("IMPORT_FAIL", "Import failed: {0}"), result.Message);
             return;
         }
 
         if(separateProfile && result.ImportedCount > 0) {
             statusText.text = string.Format(
-                Tr("IMPORT_PROFILE_OK", "Imported {0} settings from {1} into profile {2}."),
+                GenerateUI.Tr("IMPORT_PROFILE_OK", "Imported {0} settings from {1} into profile {2}."),
                 result.ImportedCount,
                 option.Label,
                 result.ProfileName
@@ -274,7 +249,7 @@ internal static class PageImport {
         }
 
         statusText.text = result.ImportedCount > 0
-            ? string.Format(Tr("IMPORT_OK", "Imported {0} settings from {1}."), result.ImportedCount, option.Label)
-            : string.Format(Tr("IMPORT_OK_NONE", "Nothing to import from {0}."), option.Label);
+            ? string.Format(GenerateUI.Tr("IMPORT_OK", "Imported {0} settings from {1}."), result.ImportedCount, option.Label)
+            : string.Format(GenerateUI.Tr("IMPORT_OK_NONE", "Nothing to import from {0}."), option.Label);
     }
 }

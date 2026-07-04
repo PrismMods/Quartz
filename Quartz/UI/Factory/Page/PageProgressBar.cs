@@ -112,7 +112,7 @@ internal static class PageProgressBar {
             "Shift the fill colour as the run progresses (0% to 100%) instead of using one flat colour."
         );
 
-        RectTransform fillBody = MakeBody(sec.Body, "FillColorBody");
+        RectTransform fillBody = GenerateUI.MakeBody(sec.Body, "FillColorBody");
 
         rebuildFill = () => {
             GenerateUI.ClearChildren(fillBody);
@@ -215,21 +215,4 @@ internal static class PageProgressBar {
         );
     }
 
-    // A self-sizing vertical container whose children can be rebuilt in place
-    // (used for the gradient-stops editor, which adds/removes rows).
-    private static RectTransform MakeBody(Transform parent, string name) {
-        GameObject obj = new(name);
-        obj.transform.SetParent(parent, false);
-
-        RectTransform rect = obj.AddComponent<RectTransform>();
-        rect.anchorMin = new Vector2(0f, 0f);
-        rect.anchorMax = new Vector2(1f, 1f);
-        rect.pivot = new Vector2(0.5f, 1f);
-        rect.offsetMin = Vector2.zero;
-        rect.offsetMax = Vector2.zero;
-
-        GenerateUI.FitVertical(obj, 8f);
-
-        return rect;
-    }
 }

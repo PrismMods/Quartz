@@ -270,36 +270,31 @@ internal static class PageVisuals {
         Transform parent, EffectRemoverSettings conf, EffectRemoverSettings def) {
         void Save() => EffectRemover.Save();
 
-        GenerateUI.Toggle(
-            GenerateUI.Row(parent), def.SimpleFilter, conf.SimpleFilter,
+        GenerateUI.ToggleTip(
+            parent, def.SimpleFilter, conf.SimpleFilter,
             v => { conf.SimpleFilter = v; Save(); },
-            "Disable Filters", "fxrm_s_filter"
-        ).Rect.AddToolTip("DESC_FXRM_S_FILTER",
+            "Disable Filters", "fxrm_s_filter",
             "Turns off VFX filters (Grayscale, Arcade, etc.) at runtime without changing the chart.");
 
-        GenerateUI.Toggle(
-            GenerateUI.Row(parent), def.SimpleBloom, conf.SimpleBloom,
+        GenerateUI.ToggleTip(
+            parent, def.SimpleBloom, conf.SimpleBloom,
             v => { conf.SimpleBloom = v; Save(); },
-            "Disable Bloom", "fxrm_s_bloom"
-        ).Rect.AddToolTip("DESC_FXRM_S_BLOOM", "Skips the bloom effect.");
+            "Disable Bloom", "fxrm_s_bloom", "Skips the bloom effect.");
 
-        GenerateUI.Toggle(
-            GenerateUI.Row(parent), def.SimpleFlash, conf.SimpleFlash,
+        GenerateUI.ToggleTip(
+            parent, def.SimpleFlash, conf.SimpleFlash,
             v => { conf.SimpleFlash = v; Save(); },
-            "Disable Flash", "fxrm_s_flash"
-        ).Rect.AddToolTip("DESC_FXRM_S_FLASH", "Neutralises screen-flash effects.");
+            "Disable Flash", "fxrm_s_flash", "Neutralises screen-flash effects.");
 
-        GenerateUI.Toggle(
-            GenerateUI.Row(parent), def.SimpleHallOfMirrors, conf.SimpleHallOfMirrors,
+        GenerateUI.ToggleTip(
+            parent, def.SimpleHallOfMirrors, conf.SimpleHallOfMirrors,
             v => { conf.SimpleHallOfMirrors = v; Save(); },
-            "Disable Hall of Mirrors", "fxrm_s_hom"
-        ).Rect.AddToolTip("DESC_FXRM_S_HOM", "Skips the Hall of Mirrors effect.");
+            "Disable Hall of Mirrors", "fxrm_s_hom", "Skips the Hall of Mirrors effect.");
 
-        GenerateUI.Toggle(
-            GenerateUI.Row(parent), def.SimpleScreenShake, conf.SimpleScreenShake,
+        GenerateUI.ToggleTip(
+            parent, def.SimpleScreenShake, conf.SimpleScreenShake,
             v => { conf.SimpleScreenShake = v; Save(); },
-            "Disable Screen Shake", "fxrm_s_shake"
-        ).Rect.AddToolTip("DESC_FXRM_S_SHAKE", "Skips screen-shake effects.");
+            "Disable Screen Shake", "fxrm_s_shake", "Skips screen-shake effects.");
 
         GenerateUI.Slider(
             GenerateUI.Row(parent),
@@ -343,8 +338,8 @@ internal static class PageVisuals {
 
         RectTransform highBpmColorRow = null;
 
-        GenerateUI.Toggle(
-            GenerateUI.Row(sec.Body),
+        GenerateUI.ToggleTip(
+            sec.Body,
             def.UseHighBpmColor,
             conf.UseHighBpmColor,
             v => {
@@ -354,9 +349,7 @@ internal static class PageVisuals {
                 OttoIcon.Save();
             },
             "Separate High BPM Color",
-            "otto_highbpm_on"
-        ).Rect.AddToolTip(
-            "DESC_OTTO_HIGHBPM_ON",
+            "otto_highbpm_on",
             "On: Otto uses the color below while the level's top BPM is 300+ (where vanilla turns him red). Off: the normal color is always used."
         );
 
@@ -413,8 +406,8 @@ internal static class PageVisuals {
             conf.Enabled
         );
 
-        GenerateUI.Toggle(
-            GenerateUI.Row(sec.Body),
+        GenerateUI.ToggleTip(
+            sec.Body,
             def.RecordingMode,
             conf.RecordingMode,
             v => {
@@ -423,9 +416,7 @@ internal static class PageVisuals {
                 UiHider.Save();
             },
             "Recording Mode",
-            "uih_recmode"
-        ).Rect.AddToolTip(
-            "DESC_UIH_RECMODE",
+            "uih_recmode",
             "Which profile is live right now: off = Playing, on = Recording."
         );
 
@@ -517,8 +508,8 @@ internal static class PageVisuals {
             foreach(RectTransform row in tailColorRows) row?.gameObject.SetActive(conf.SeparateTailColor);
         }
 
-        GenerateUI.Toggle(
-            GenerateUI.Row(sec.Body),
+        GenerateUI.ToggleTip(
+            sec.Body,
             def.SeparateTailColor,
             conf.SeparateTailColor,
             v => {
@@ -528,9 +519,7 @@ internal static class PageVisuals {
                 Save();
             },
             "Separate Tail Color",
-            "pcol_sep_tail"
-        ).Rect.AddToolTip(
-            "DESC_PCOL_SEP_TAIL",
+            "pcol_sep_tail",
             "Off: tails use the ball color (with their own opacity). On: each planet's tail gets its own color."
         );
 
@@ -645,67 +634,43 @@ internal static class PageVisuals {
 
         var sec = GenerateUI.Collapsible(content, "Visual Tweaks", startExpanded: false);
 
-        GenerateUI.Toggle(
-            GenerateUI.Row(sec.Body),
+        GenerateUI.ToggleTip(
+            sec.Body,
             def.RemoveAllCheckpoints,
             conf.RemoveAllCheckpoints,
-            v => {
-                conf.RemoveAllCheckpoints = v;
-                Tweaks.RefreshCheckpointTweak();
-                Tweaks.Save();
-            },
+            v => { conf.RemoveAllCheckpoints = v; Tweaks.RefreshCheckpointTweak(); Tweaks.Save(); },
             "Remove All Checkpoints",
-            "tw_cp"
-        ).Rect.AddToolTip(
-            "DESC_TW_CP",
+            "tw_cp",
             "Strips checkpoint icons and behavior from the level — dying always restarts the run. Turning this off needs a level reload to bring icons back."
         );
 
-        GenerateUI.Toggle(
-            GenerateUI.Row(sec.Body),
+        GenerateUI.ToggleTip(
+            sec.Body,
             def.RemoveBallCoreParticles,
             conf.RemoveBallCoreParticles,
-            v => {
-                conf.RemoveBallCoreParticles = v;
-                Tweaks.RefreshBallCoreParticlesTweak();
-                Tweaks.Save();
-            },
+            v => { conf.RemoveBallCoreParticles = v; Tweaks.RefreshBallCoreParticlesTweak(); Tweaks.Save(); },
             "Remove Ball Core Particles",
-            "tw_bcp"
-        ).Rect.AddToolTip(
-            "DESC_TW_BCP",
+            "tw_bcp",
             "Removes the planets' core and spark particles."
         );
 
-        GenerateUI.Toggle(
-            GenerateUI.Row(sec.Body),
+        GenerateUI.ToggleTip(
+            sec.Body,
             def.DisableTileHitGlow,
             conf.DisableTileHitGlow,
-            v => {
-                conf.DisableTileHitGlow = v;
-                Tweaks.RefreshTileHitGlowTweak();
-                Tweaks.Save();
-            },
+            v => { conf.DisableTileHitGlow = v; Tweaks.RefreshTileHitGlowTweak(); Tweaks.Save(); },
             "Disable Tile Hit Glow",
-            "tw_glow"
-        ).Rect.AddToolTip(
-            "DESC_TW_GLOW",
+            "tw_glow",
             "Suppresses the glow flash tiles get when the planet lands on them."
         );
 
-        GenerateUI.Toggle(
-            GenerateUI.Row(sec.Body),
+        GenerateUI.ToggleTip(
+            sec.Body,
             def.RemovePlanetGlow,
             conf.RemovePlanetGlow,
-            v => {
-                conf.RemovePlanetGlow = v;
-                Tweaks.RefreshPlanetGlowTweak();
-                Tweaks.Save();
-            },
+            v => { conf.RemovePlanetGlow = v; Tweaks.RefreshPlanetGlowTweak(); Tweaks.Save(); },
             "Remove Planet Glow",
-            "tw_pglow"
-        ).Rect.AddToolTip(
-            "DESC_TW_PGLOW",
+            "tw_pglow",
             "Hides the glow sprite drawn around the planets."
         );
     }
