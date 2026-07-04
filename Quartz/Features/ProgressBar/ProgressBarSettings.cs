@@ -40,47 +40,15 @@ public sealed class ProgressBarSettings : ISettingsFile {
     public Color GetFillColorForProgress(float progress) =>
         FillGradient is { Enabled: true } ? FillGradient.Evaluate(progress) : GetFillColor();
 
-    public Color GetFillColor() => new(
-        Mathf.Clamp01(FillR),
-        Mathf.Clamp01(FillG),
-        Mathf.Clamp01(FillB),
-        Mathf.Clamp01(FillA)
-    );
+    public Color GetFillColor() => IOUtils.Rgba(FillR, FillG, FillB, FillA);
+    public void SetFillColor(Color c) => IOUtils.SetRgba(c, ref FillR, ref FillG, ref FillB, ref FillA);
 
-    public void SetFillColor(Color c) {
-        FillR = Mathf.Clamp01(c.r);
-        FillG = Mathf.Clamp01(c.g);
-        FillB = Mathf.Clamp01(c.b);
-        FillA = Mathf.Clamp01(c.a);
-    }
+    public Color GetBackColor() => IOUtils.Rgba(BackR, BackG, BackB, BackA);
+    public void SetBackColor(Color c) => IOUtils.SetRgba(c, ref BackR, ref BackG, ref BackB, ref BackA);
 
-    public Color GetBackColor() => new(
-        Mathf.Clamp01(BackR),
-        Mathf.Clamp01(BackG),
-        Mathf.Clamp01(BackB),
-        Mathf.Clamp01(BackA)
-    );
-
-    public void SetBackColor(Color c) {
-        BackR = Mathf.Clamp01(c.r);
-        BackG = Mathf.Clamp01(c.g);
-        BackB = Mathf.Clamp01(c.b);
-        BackA = Mathf.Clamp01(c.a);
-    }
-
-    public Color GetOutlineColor() => new(
-        Mathf.Clamp01(OutlineColR),
-        Mathf.Clamp01(OutlineColG),
-        Mathf.Clamp01(OutlineColB),
-        Mathf.Clamp01(OutlineColA)
-    );
-
-    public void SetOutlineColor(Color c) {
-        OutlineColR = Mathf.Clamp01(c.r);
-        OutlineColG = Mathf.Clamp01(c.g);
-        OutlineColB = Mathf.Clamp01(c.b);
-        OutlineColA = Mathf.Clamp01(c.a);
-    }
+    public Color GetOutlineColor() => IOUtils.Rgba(OutlineColR, OutlineColG, OutlineColB, OutlineColA);
+    public void SetOutlineColor(Color c) =>
+        IOUtils.SetRgba(c, ref OutlineColR, ref OutlineColG, ref OutlineColB, ref OutlineColA);
 
     public JToken Serialize() =>
         new JObject {
@@ -116,18 +84,9 @@ public sealed class ProgressBarSettings : ISettingsFile {
         Rounding = IOUtils.Read(token, nameof(Rounding), Rounding);
         OutlineThickness = IOUtils.Read(token, nameof(OutlineThickness), OutlineThickness);
         PrefillStart = IOUtils.Read(token, nameof(PrefillStart), PrefillStart);
-        FillR = IOUtils.Read(token, nameof(FillR), FillR);
-        FillG = IOUtils.Read(token, nameof(FillG), FillG);
-        FillB = IOUtils.Read(token, nameof(FillB), FillB);
-        FillA = IOUtils.Read(token, nameof(FillA), FillA);
-        BackR = IOUtils.Read(token, nameof(BackR), BackR);
-        BackG = IOUtils.Read(token, nameof(BackG), BackG);
-        BackB = IOUtils.Read(token, nameof(BackB), BackB);
-        BackA = IOUtils.Read(token, nameof(BackA), BackA);
-        OutlineColR = IOUtils.Read(token, nameof(OutlineColR), OutlineColR);
-        OutlineColG = IOUtils.Read(token, nameof(OutlineColG), OutlineColG);
-        OutlineColB = IOUtils.Read(token, nameof(OutlineColB), OutlineColB);
-        OutlineColA = IOUtils.Read(token, nameof(OutlineColA), OutlineColA);
+        IOUtils.ReadRgba(token, "Fill", ref FillR, ref FillG, ref FillB, ref FillA);
+        IOUtils.ReadRgba(token, "Back", ref BackR, ref BackG, ref BackB, ref BackA);
+        IOUtils.ReadRgba(token, "OutlineCol", ref OutlineColR, ref OutlineColG, ref OutlineColB, ref OutlineColA);
         if(token[nameof(FillGradient)] is JObject fillGradient) FillGradient = StatColor.Deserialize(fillGradient);
     }
 }

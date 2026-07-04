@@ -38,19 +38,9 @@ public sealed class JudgementSettings : ISettingsFile {
     public float TextShadowSoftness = 0f;
     public float TextShadowR = 0f, TextShadowG = 0f, TextShadowB = 0f, TextShadowA = 0.5019608f;
 
-    public Color GetTextShadowColor() => new(
-        Mathf.Clamp01(TextShadowR),
-        Mathf.Clamp01(TextShadowG),
-        Mathf.Clamp01(TextShadowB),
-        Mathf.Clamp01(TextShadowA)
-    );
-
-    public void SetTextShadowColor(Color c) {
-        TextShadowR = Mathf.Clamp01(c.r);
-        TextShadowG = Mathf.Clamp01(c.g);
-        TextShadowB = Mathf.Clamp01(c.b);
-        TextShadowA = Mathf.Clamp01(c.a);
-    }
+    public Color GetTextShadowColor() => IOUtils.Rgba(TextShadowR, TextShadowG, TextShadowB, TextShadowA);
+    public void SetTextShadowColor(Color c) =>
+        IOUtils.SetRgba(c, ref TextShadowR, ref TextShadowG, ref TextShadowB, ref TextShadowA);
 
     public JToken Serialize() => new JObject {
             [nameof(Enabled)] = Enabled,
@@ -82,9 +72,6 @@ public sealed class JudgementSettings : ISettingsFile {
         TextShadowX = IOUtils.Read(token, nameof(TextShadowX), TextShadowX);
         TextShadowY = IOUtils.Read(token, nameof(TextShadowY), TextShadowY);
         TextShadowSoftness = IOUtils.Read(token, nameof(TextShadowSoftness), TextShadowSoftness);
-        TextShadowR = IOUtils.Read(token, nameof(TextShadowR), TextShadowR);
-        TextShadowG = IOUtils.Read(token, nameof(TextShadowG), TextShadowG);
-        TextShadowB = IOUtils.Read(token, nameof(TextShadowB), TextShadowB);
-        TextShadowA = IOUtils.Read(token, nameof(TextShadowA), TextShadowA);
+        IOUtils.ReadRgba(token, "TextShadow", ref TextShadowR, ref TextShadowG, ref TextShadowB, ref TextShadowA);
     }
 }

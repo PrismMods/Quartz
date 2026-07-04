@@ -29,23 +29,12 @@ public sealed class OttoIconSettings : ISettingsFile {
     public float OffsetX = -10f;
     public float OffsetY = 5f;
 
-    public Color GetColor() => new(Mathf.Clamp01(R), Mathf.Clamp01(G), Mathf.Clamp01(B), Mathf.Clamp01(A));
+    public Color GetColor() => IOUtils.Rgba(R, G, B, A);
+    public void SetColor(Color c) => IOUtils.SetRgba(c, ref R, ref G, ref B, ref A);
 
-    public void SetColor(Color c) {
-        R = Mathf.Clamp01(c.r);
-        G = Mathf.Clamp01(c.g);
-        B = Mathf.Clamp01(c.b);
-        A = Mathf.Clamp01(c.a);
-    }
-
-    public Color GetHighBpmColor() => new(Mathf.Clamp01(HighBpmR), Mathf.Clamp01(HighBpmG), Mathf.Clamp01(HighBpmB), Mathf.Clamp01(HighBpmA));
-
-    public void SetHighBpmColor(Color c) {
-        HighBpmR = Mathf.Clamp01(c.r);
-        HighBpmG = Mathf.Clamp01(c.g);
-        HighBpmB = Mathf.Clamp01(c.b);
-        HighBpmA = Mathf.Clamp01(c.a);
-    }
+    public Color GetHighBpmColor() => IOUtils.Rgba(HighBpmR, HighBpmG, HighBpmB, HighBpmA);
+    public void SetHighBpmColor(Color c) =>
+        IOUtils.SetRgba(c, ref HighBpmR, ref HighBpmG, ref HighBpmB, ref HighBpmA);
 
     public JToken Serialize() => new JObject {
             [nameof(Enabled)] = Enabled,
@@ -64,15 +53,9 @@ public sealed class OttoIconSettings : ISettingsFile {
 
     public void Deserialize(JToken token) {
         Enabled = IOUtils.Read(token, nameof(Enabled), Enabled);
-        R = IOUtils.Read(token, nameof(R), R);
-        G = IOUtils.Read(token, nameof(G), G);
-        B = IOUtils.Read(token, nameof(B), B);
-        A = IOUtils.Read(token, nameof(A), A);
+        IOUtils.ReadRgba(token, "", ref R, ref G, ref B, ref A);
         UseHighBpmColor = IOUtils.Read(token, nameof(UseHighBpmColor), UseHighBpmColor);
-        HighBpmR = IOUtils.Read(token, nameof(HighBpmR), HighBpmR);
-        HighBpmG = IOUtils.Read(token, nameof(HighBpmG), HighBpmG);
-        HighBpmB = IOUtils.Read(token, nameof(HighBpmB), HighBpmB);
-        HighBpmA = IOUtils.Read(token, nameof(HighBpmA), HighBpmA);
+        IOUtils.ReadRgba(token, "HighBpm", ref HighBpmR, ref HighBpmG, ref HighBpmB, ref HighBpmA);
         OffsetX = IOUtils.Read(token, nameof(OffsetX), OffsetX);
         OffsetY = IOUtils.Read(token, nameof(OffsetY), OffsetY);
     }
