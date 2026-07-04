@@ -1,0 +1,19 @@
+Quartz/UI/Factory/MenuFactory.cs
+  s_8e1d5ff6ffc842::t_ef88d00760987d 46,100,102,136,154,183
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "9cc52cb43fb3d9d1a3250e2d35ef31cb222726c4",
+  "prompts": {},
+  "sessions": {
+    "s_8e1d5ff6ffc842": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7495fb46-ab13-4d39-b4dc-ac7ec459dc35",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
