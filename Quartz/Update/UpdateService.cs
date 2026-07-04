@@ -2,6 +2,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Quartz.Async;
 using Quartz.Core;
@@ -38,6 +39,7 @@ public sealed class UpdateInfo {
     public string Url;          // release page
     public string AssetUrl;     // download URL for the release asset (null = none)
     public bool AssetIsZip;     // true: full Quartz.zip; false: legacy bare Quartz.dll
+    public string AssetSha256;  // lowercase hex digest from the GitHub API, or null if unavailable
 }
 
 // Checks GitHub Releases for a newer build on the user's chosen channel and,
@@ -199,13 +201,18 @@ public static class UpdateService {
             bool allowDllFallback = zipName == "Quartz.zip";
             string zipUrl = null;
             string dllUrl = null;
+            string zipSha256 = null;
+            string dllSha256 = null;
             if(rel["assets"] is JArray assets) {
                 foreach(JToken a in assets) {
                     string name = (string)a["name"];
-                    if(name == zipName)
+                    if(name == zipName) {
                         zipUrl = (string)a["browser_download_url"];
-                    else if(allowDllFallback && name == "Quartz.dll")
+                        zipSha256 = ParseSha256Digest((string)a["digest"]);
+                    } else if(allowDllFallback && name == "Quartz.dll") {
                         dllUrl = (string)a["browser_download_url"];
+                        dllSha256 = ParseSha256Digest((string)a["digest"]);
+                    }
                 }
             }
             string assetUrl = zipUrl ?? dllUrl;
@@ -219,11 +226,31 @@ public static class UpdateService {
                     Url = (string)rel["html_url"],
                     AssetUrl = assetUrl,
                     AssetIsZip = zipUrl != null,
+                    AssetSha256 = zipUrl != null ? zipSha256 : dllSha256,
                 };
             }
         }
 
         return best;
+    }
+
+    // GitHub's release-asset "digest" field looks like "sha256:abc123...".
+    // Only sha256 is recognized; anything else (or a missing/malformed field)
+    // means no usable digest, so verification is skipped for that asset.
+    private static string ParseSha256Digest(string digest) {
+        const string prefix = "sha256:";
+        if(string.IsNullOrEmpty(digest) || !digest.StartsWith(prefix, System.StringComparison.OrdinalIgnoreCase))
+            return null;
+
+        string hex = digest.Substring(prefix.Length);
+        return hex.Length == 64 ? hex.ToLowerInvariant() : null;
+    }
+
+    private static string HashFileSha256(string path) {
+        using SHA256 sha = SHA256.Create();
+        using FileStream stream = new(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        byte[] hash = sha.ComputeHash(stream);
+        return System.BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
     }
 
     // Downloads the given release and writes it over the installed DLLs.
@@ -309,10 +336,12 @@ public static class UpdateService {
         if(info.AssetIsZip) {
             string stagedZip = Path.Combine(staging, "Quartz.zip");
             await DownloadFile(info.AssetUrl, stagedZip, 0f, 1f);
+            VerifyChecksum(stagedZip, info);
             ExtractOverInstall(stagedZip);
         } else {
             string stagedQuartz = Path.Combine(staging, "Quartz.dll");
             await DownloadFile(info.AssetUrl, stagedQuartz, 0f, 1f);
+            VerifyChecksum(stagedQuartz, info);
             ReplaceFile(stagedQuartz, Path.Combine(MainCore.Host.ModsPath, "Quartz.dll"));
         }
 
@@ -320,6 +349,26 @@ public static class UpdateService {
         // in UserLibs; leaving either behind would double-load the mod.
         DeleteIfExists(Path.Combine(MainCore.Host.ModsPath, "Quartz.Loader.ML.dll"));
         DeleteIfExists(Path.Combine(MainCore.Host.UserLibsPath, "Quartz.dll"));
+    }
+
+    // Verifies the downloaded asset against the sha256 digest GitHub's release
+    // API reported for it (see ParseSha256Digest / FetchLatest). Releases
+    // published before GitHub exposed this field have no digest to check
+    // against — that's expected for older tags, so it's a warning, not a
+    // failure, and the update proceeds. A mismatch on a release that DOES
+    // have a digest means the bytes on disk aren't what GitHub says they
+    // should be, so the update is aborted rather than applied.
+    private static void VerifyChecksum(string path, UpdateInfo info) {
+        if(string.IsNullOrEmpty(info.AssetSha256)) {
+            MainCore.Log.Wrn($"[Update] no checksum available for {info.Tag} — integrity not verified");
+            return;
+        }
+
+        string actual = HashFileSha256(path);
+        if(!string.Equals(actual, info.AssetSha256, System.StringComparison.OrdinalIgnoreCase)) {
+            throw new System.Exception(
+                $"checksum mismatch for {info.Tag}: expected {info.AssetSha256}, got {actual}");
+        }
     }
 
     // Extracts the release zip over the live install. Entry paths are relative to
