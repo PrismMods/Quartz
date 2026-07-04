@@ -1,0 +1,34 @@
+Quartz/UI/Factory/Page/PageDeveloper.cs
+  s_90010d0854592e::t_9199a945acdf31 21-22,26,35,42,53,59,61
+Quartz/UI/Factory/Page/PageProfiles.cs
+  s_90010d0854592e::t_065ffa86db0f2b 200,203
+  s_90010d0854592e::t_1c871851ff27a3 46-48,75-77,112-114,119
+Quartz/Resource/Export/Lang/en-US.json
+  s_90010d0854592e::t_3a1a54ba30aa5c 628-631
+  s_90010d0854592e::t_70142200226579 632-634
+  s_90010d0854592e::t_7ac46ca5a6a044 635-637
+Quartz/UI/Factory/Page/PageImport.cs
+  s_90010d0854592e::t_a3aeb9b90e77e0 56-58,70,75
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_90010d0854592e::t_bb34062a8a16e7 628-631
+  s_90010d0854592e::t_d3dde2784dfd78 632-634
+  s_90010d0854592e::t_924087cd0a5820 635-637
+Quartz/UI/Factory/Page/PageEditor.cs
+  s_90010d0854592e::t_73c89802035054 19,21,27,29,35,37,42,47,52,57,63,65,70,75
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "38af7fbb173e8a686dc43fdb2e4328d98258b683",
+  "prompts": {},
+  "sessions": {
+    "s_90010d0854592e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1eb3e6ee-7fd4-405a-948e-978db5260610",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
