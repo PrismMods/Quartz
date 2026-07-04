@@ -43,7 +43,9 @@ internal static class PageProfiles {
         // Name input with the Add button in the right-hand gutter the
         // BackGround() widgets leave free (same pattern as the language row
         // on the Settings page).
-        var addRow = GenerateUI.Row(content.transform);
+        var addSec = GenerateUI.Collapsible(content.transform, "Add Profile", startExpanded: true);
+
+        var addRow = GenerateUI.Row(addSec.Body);
         nameInput = GenerateUI.Input(
             addRow,
             null,
@@ -70,7 +72,9 @@ internal static class PageProfiles {
             "Creates a new profile from your current settings and switches to it."
         );
 
-        var ioRow = GenerateUI.Row(content.transform);
+        var ioSec = GenerateUI.Collapsible(content.transform, "Import / Export", startExpanded: true);
+
+        var ioRow = GenerateUI.Row(ioSec.Body);
         GenerateUI.ButtonRow(ioRow);
 
         UIButton importBtn = GenerateUI.Button(ioRow, ImportProfile, "Import", "profile_import");
@@ -105,12 +109,14 @@ internal static class PageProfiles {
 
         BuildPresetsSection(content.transform);
 
-        var statusRow = GenerateUI.Row(content.transform, 32f);
+        var listSec = GenerateUI.Collapsible(content.transform, "Profiles", startExpanded: true);
+
+        var statusRow = GenerateUI.Row(listSec.Body, 32f);
         statusText = GenerateUI.AddMutedText(statusRow, 18f, 0.45f, true);
         statusText.text = "";
 
         GameObject list = new("Profiles");
-        list.transform.SetParent(content.transform, false);
+        list.transform.SetParent(listSec.Body, false);
 
         listContainer = list.AddComponent<RectTransform>();
         GenerateUI.FitVertical(list, 8f);
@@ -191,11 +197,10 @@ internal static class PageProfiles {
         List<ProfileManager.PresetInfo> presets = ProfileManager.ListPresets();
         if(presets.Count == 0) return;
 
-        TextMeshProUGUI header = GenerateUI.AddTextH1(GenerateUI.Row(content));
-        GenerateUI.Localize(header, "PRESETS", "Presets");
+        var sec = GenerateUI.Collapsible(content, "Presets", startExpanded: true);
 
         foreach(ProfileManager.PresetInfo preset in presets) {
-            RectTransform row = GenerateUI.Row(content, 50f);
+            RectTransform row = GenerateUI.Row(sec.Body, 50f);
             GenerateUI.ButtonRow(row);
 
             TextMeshProUGUI label = GenerateUI.AddText(row, noPad: true);

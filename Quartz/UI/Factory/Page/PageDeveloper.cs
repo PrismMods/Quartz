@@ -18,10 +18,12 @@ internal static class PageDeveloper {
 
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(content.transform)), "DEVELOPER", "Developer");
 
+        var updaterSec = GenerateUI.Collapsible(content.transform, "Updater", startExpanded: true);
+
         // Force the updater to offer an update for the current version. Install
         // goes through the motions but changes no files.
         GenerateUI.Toggle(
-            GenerateUI.Row(content.transform),
+            GenerateUI.Row(updaterSec.Body),
             false,
             UpdateService.DevSimulate,
             v => UpdateService.SetDevSimulate(v),
@@ -30,14 +32,14 @@ internal static class PageDeveloper {
         );
 
         GenerateUI.Button(
-            GenerateUI.Row(content.transform),
+            GenerateUI.Row(updaterSec.Body),
             () => UpdateService.Check(),
             "Run Update Check",
             "dev_check"
         );
 
         GenerateUI.Button(
-            GenerateUI.Row(content.transform),
+            GenerateUI.Row(updaterSec.Body),
             () => {
                 MainCore.Conf.SkippedVersion = "";
                 MainCore.ConfMgr.RequestSave();
@@ -48,15 +50,15 @@ internal static class PageDeveloper {
         );
 
         GenerateUI.Button(
-            GenerateUI.Row(content.transform),
+            GenerateUI.Row(updaterSec.Body),
             RefreshStatus,
             "Refresh Status",
             "dev_refresh"
         );
 
-        GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(content.transform)), "STATUS", "Status");
+        var statusSec = GenerateUI.Collapsible(content.transform, "Status", startExpanded: true);
 
-        statusText = GenerateUI.AddText(GenerateUI.Row(content.transform, 320f));
+        statusText = GenerateUI.AddText(GenerateUI.Row(statusSec.Body, 320f));
         statusText.alignment = TextAlignmentOptions.TopLeft;
         statusText.textWrappingMode = TextWrappingModes.Normal;
 
