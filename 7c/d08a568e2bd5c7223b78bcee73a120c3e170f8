@@ -1,0 +1,19 @@
+Quartz/Quartz.csproj
+  s_98e3cefce7983f::t_924610de1f3580 220
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "7cd08a568e2bd5c7223b78bcee73a120c3e170f8",
+  "prompts": {},
+  "sessions": {
+    "s_98e3cefce7983f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "716817a6-d78b-420e-bede-ca160556d085",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
