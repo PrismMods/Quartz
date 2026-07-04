@@ -1,0 +1,30 @@
+Quartz/UI/Factory/Page/PageSettings.cs
+  s_90010d0854592e::t_2161054ae71b54 188,190-192,194,207,209,223,225,240,243,245,262,268
+  s_90010d0854592e::t_390cfbd555dbd0 313,315,330,332
+  s_90010d0854592e::t_84da8323776cb1 130-132,135
+  s_90010d0854592e::t_f35438a517cc33 557-559,564
+  s_90010d0854592e::t_deaa3abab85e50 352,354
+  s_90010d0854592e::t_7a1db187a45ece 107-114
+  s_90010d0854592e::t_dd38688d8adbf6 405,407,416,426
+  s_90010d0854592e::t_d203c949ab14b5 644,650-652,654,669
+  s_90010d0854592e::t_40ad539069ab59 486,496
+  s_90010d0854592e::t_1250327c39a542 59
+  s_90010d0854592e::t_49c27415b01ace 835-837,839-841,845-848
+  s_90010d0854592e::t_3af4b97bb6b544 370,372-374,382
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "0feef004a426270078312d4fc5dbc261acc077a5",
+  "prompts": {},
+  "sessions": {
+    "s_90010d0854592e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1eb3e6ee-7fd4-405a-948e-978db5260610",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
