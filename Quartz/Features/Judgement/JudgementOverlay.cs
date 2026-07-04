@@ -317,7 +317,7 @@ public static class JudgementOverlay {
                 int count = i == PerfectSlot && xpMode ? XPerfectBridge.XCount() : Judgement.SlotCount(i);
                 if(!cacheValid || count != cached[i] || xpModeChanged) {
                     cached[i] = count;
-                    label.text = count.ToString(CultureInfo.InvariantCulture);
+                    UnityUtils.SetCount(label, count);
                     changed = true;
                 }
             }
@@ -466,14 +466,14 @@ public static class JudgementOverlay {
             int plus = XPerfectBridge.PlusCount();
             if(!cacheValid || plus != cachedPlus || xpModeChanged) {
                 cachedPlus = plus;
-                xPlusLabel.text = plus.ToString(CultureInfo.InvariantCulture);
+                UnityUtils.SetCount(xPlusLabel, plus);
                 changed = true;
             }
 
             int minus = XPerfectBridge.MinusCount();
             if(!cacheValid || minus != cachedMinus || xpModeChanged) {
                 cachedMinus = minus;
-                xMinusLabel.text = minus.ToString(CultureInfo.InvariantCulture);
+                UnityUtils.SetCount(xMinusLabel, minus);
                 changed = true;
             }
         }

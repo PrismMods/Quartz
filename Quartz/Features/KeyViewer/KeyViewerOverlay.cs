@@ -2220,15 +2220,21 @@ public static partial class KeyViewerOverlay {
                 // existing drops), mirroring DmNote's noteBuffer.allocate()
                 // insertion sort by trackIndex — the buffer order IS the draw
                 // order, and it must follow key zIndex, never press order. Simple
-                // mode spawns everything with Order 0, keeping the plain append.
-                int at = group.Count;
-                for(int i = 0; i < group.Count; i++) {
-                    if(group[i].Order > raw.Order) {
-                        at = i;
-                        break;
+                // mode spawns everything with Order 0, so skip the O(n) scan —
+                // append lands in the same place a scan would find anyway, and
+                // this is the hot path at high KPS.
+                if(raw.Order == 0) {
+                    group.Add(raw);
+                } else {
+                    int at = group.Count;
+                    for(int i = 0; i < group.Count; i++) {
+                        if(group[i].Order > raw.Order) {
+                            at = i;
+                            break;
+                        }
                     }
+                    group.Insert(at, raw);
                 }
-                group.Insert(at, raw);
             }
 
             float now = Time.unscaledTime;

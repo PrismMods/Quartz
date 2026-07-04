@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -5,6 +6,29 @@ using UnityEngine.UI;
 namespace Quartz.UI.Utility;
 
 public class UnityUtils {
+    // Allocation-free integer -> TMP text for per-frame hot paths (judgement
+    // and combo counters redraw on every hit). Mirrors KeyViewerOverlay's
+    // SetCount/WriteCountDigits pattern; main-thread only, so the shared
+    // buffer is unsynced.
+    private static readonly char[] countBuf = new char[16];
+
+    public static void SetCount(TextMeshProUGUI tmp, int value) {
+        int pos = countBuf.Length;
+        if(value == 0) {
+            countBuf[--pos] = '0';
+        } else {
+            long v = value;
+            bool neg = v < 0;
+            if(neg) v = -v;
+            while(v > 0) {
+                countBuf[--pos] = (char)('0' + (int)(v % 10));
+                v /= 10;
+            }
+            if(neg) countBuf[--pos] = '-';
+        }
+        tmp.SetText(countBuf, pos, countBuf.Length - pos);
+    }
+
     // Standard overlay HUD canvas: screen-space overlay, 1920x1080-reference
     // scaling, and a disabled GraphicRaycaster (overlay canvases only need
     // raycasts while Reorganize mode is active — keeping the raycaster off

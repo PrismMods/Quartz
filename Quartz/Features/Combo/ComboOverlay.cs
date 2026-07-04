@@ -269,7 +269,7 @@ public static class ComboOverlay {
                 bool textChanged = count != cachedCount;
                 if(textChanged) {
                     cachedCount = count;
-                    valueText.text = count.ToString(CultureInfo.InvariantCulture);
+                    UnityUtils.SetCount(valueText, count);
                 }
                 valueText.fontSize = valueSize;
                 valueText.color = color;
