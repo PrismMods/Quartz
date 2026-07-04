@@ -1,0 +1,25 @@
+Quartz/Update/UpdateService.cs
+  s_90010d0854592e::t_5b62e4428078ce 42
+  s_90010d0854592e::t_26a9ad9d10b6f3 237-255,372
+  s_90010d0854592e::t_c8b0a1d5dcddad 5
+  s_90010d0854592e::t_4ec7e4de53e213 354-371
+  s_90010d0854592e::t_b2ffef2c0da278 204-205,209,211-212,214-215,229
+  s_90010d0854592e::t_5702204be8dab2 339,344
+  s_90010d0854592e::t_db050edd8b78e1 373
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "3c4fe37f83be64a483a83c8eb97241a35dce2496",
+  "prompts": {},
+  "sessions": {
+    "s_90010d0854592e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1eb3e6ee-7fd4-405a-948e-978db5260610",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
