@@ -22,11 +22,11 @@ public static class FontManager {
 
     // Sentinel value carried in the font dropdown for the "add a custom font"
     // action row. Picked up by the settings page, never used as a real font.
-    public const string AddSentinel = "koren-add-custom-font";
+    public const string AddSentinel = "quartz-add-custom-font";
 
     // Dropdown sentinel for "use the mod's overlay font" in the settings-window
     // font picker. Stored as an empty CoreSettings.SettingsFontName.
-    public const string SameAsOverlay = "koren-overlay-font-same";
+    public const string SameAsOverlay = "quartz-overlay-font-same";
 
     public static TMP_FontAsset Current { get; private set; }
     public static string CurrentName { get; private set; } = DefaultName;
