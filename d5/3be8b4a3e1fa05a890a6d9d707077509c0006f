@@ -1,0 +1,21 @@
+Quartz/UI/Factory/MenuFactory.cs
+  s_e03bf5eb2b3681::t_61d8219fb378ac 168-170,175,180-181
+  s_e03bf5eb2b3681::t_70b5e8e05a57b5 147-149
+  s_e03bf5eb2b3681::t_dd8718b8f70e90 46-53,55,59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "d53be8b4a3e1fa05a890a6d9d707077509c0006f",
+  "prompts": {},
+  "sessions": {
+    "s_e03bf5eb2b3681": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bf4a35d5-d4c8-48f0-a560-989570ab28d8",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
