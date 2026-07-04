@@ -1,0 +1,26 @@
+Quartz/UI/Factory/Page/PageJudgement.cs
+  s_90010d0854592e::t_f7f9197190b4ed 28-29
+  s_90010d0854592e::t_3623de8bbf16d2 5,22-27,31,34
+Quartz/UI/Factory/Page/PageProgressBar.cs
+  s_90010d0854592e::t_7539afd4ce27f0 6,20-25,29,32
+  s_90010d0854592e::t_ee4810cc5f0431 26-27
+Quartz/UI/Factory/Page/PageSongTitle.cs
+  s_90010d0854592e::t_d22e5284ee55ac 29-30
+  s_90010d0854592e::t_b07291ebbe0891 6,23-28,32,35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "60bce080bfa7538c6ef6e62599b727c2123a0f32",
+  "prompts": {},
+  "sessions": {
+    "s_90010d0854592e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1eb3e6ee-7fd4-405a-948e-978db5260610",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
