@@ -32,23 +32,43 @@ public sealed class LoaderUmm : IQuartzHost, IQuartzLogger {
         if(instance != null) return true;
         instance = new LoaderUmm(modEntry);
 
-        // If startup throws, reset instance (MainCore already nulled its Runtime)
-        // so UMM can re-enter Load on a reload instead of being wedged until a
-        // full game restart. UMM still flags the mod as errored.
-        try {
-            MainCore.Initialize(instance);
-        } catch(System.Exception e) {
-            modEntry.Logger.Error($"Quartz failed to initialize: {e}");
-            instance = null;
-            return false;
-        }
-
-        // Per-frame tick, identical to MelonMod.OnUpdate.
-        modEntry.OnUpdate = (_, _) => MainCore.Tick();
+        // UMM's entry point can fire at a hostile moment: its injection rides
+        // MonoBehaviour's static ctor, and on the Unity 6 game build (macOS
+        // beta) that first fires while scene deserialization is constructing a
+        // UI.Image wrapper on the preload thread. Creating GPU resources there
+        // is fatal — building the default TMP font died inside new Texture2D
+        // with "Recursive Serialization is not supported" + "Graphics device
+        // is null". So Load() touches no Unity API at all: real init is
+        // deferred to the first OnUpdate tick, which UMM pumps from a plain
+        // main-thread Update once the game loop is actually running.
+        //
+        // Deferred failure can't return false to UMM anymore (UMM shows the
+        // mod as loaded either way); it logs, stops the pump, and resets
+        // instance (MainCore already nulled its Runtime) so a UMM reload can
+        // re-enter Load instead of being wedged until a full game restart.
+        bool initialized = false;
+        modEntry.OnUpdate = (entry, _) => {
+            if(initialized) {
+                // Per-frame tick, identical to MelonMod.OnUpdate.
+                MainCore.Tick();
+                return;
+            }
+            initialized = true;
+            try {
+                MainCore.Initialize(instance);
+            } catch(System.Exception e) {
+                entry.Logger.Error($"Quartz failed to initialize: {e}");
+                entry.OnUpdate = null;
+                instance = null;
+            }
+        };
 
         // UMM's enable/disable toggle drives the mod's master switch (and is
         // persisted through CoreSettings.Active, same as the in-mod power
         // button). The in-mod uGUI power toggle stays fully functional too.
+        // Fires before the deferred init? Null-guarded no-op; init then applies
+        // CoreSettings.Active itself, and UMM only pumps OnUpdate for active
+        // mods, so a pre-init disable simply pauses init until re-enabled.
         modEntry.OnToggle = (_, value) => {
             MainCore.SetModEnabled(value);
             return true;
@@ -56,7 +76,8 @@ public sealed class LoaderUmm : IQuartzHost, IQuartzLogger {
 
         // Full teardown on reload/quit so a subsequent Load re-initializes clean.
         // Clear the delegates too, so UMM can't fire a stale OnUpdate/OnToggle
-        // into a disposed runtime after unload.
+        // into a disposed runtime after unload — clearing OnUpdate also cancels
+        // a still-pending deferred init (Dispose no-ops on a null Runtime).
         modEntry.OnUnload = entry => {
             MainCore.Dispose();
             entry.OnUpdate = null;
