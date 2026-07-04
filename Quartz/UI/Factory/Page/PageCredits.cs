@@ -10,81 +10,49 @@ namespace Quartz.UI.Factory.Page;
 
 internal static class PageCredits {
     public static void Create(RectTransform parent) {
-        GameObject logo = new("Logo");
-        logo.transform.SetParent(parent, false);
-
-        var logoRect = logo.AddComponent<RectTransform>();
-        logoRect.anchorMin = new Vector2(0.5f, 0.5f);
-        logoRect.anchorMax = new Vector2(0.5f, 0.5f);
-        logoRect.pivot = new Vector2(0.5f, 0.5f);
-        logoRect.sizeDelta = new Vector2(260, 260);
-        logoRect.anchoredPosition = new Vector2(0, 175);
-
-        var logoImg = logo.AddComponent<Image>();
+        var logoImg = CenteredRect(parent, "Logo", 260, 260, 175).gameObject.AddComponent<Image>();
         logoImg.sprite = MainCore.Spr.Get(UISprite.QuartzLogo);
         logoImg.preserveAspect = true;
 
-        GameObject title = new("Title");
-        title.transform.SetParent(parent, false);
-
-        var titleRect = title.AddComponent<RectTransform>();
-        titleRect.anchorMin = new Vector2(0.5f, 0.5f);
-        titleRect.anchorMax = new Vector2(0.5f, 0.5f);
-        titleRect.pivot = new Vector2(0.5f, 0.5f);
-        titleRect.sizeDelta = new Vector2(800, 60);
-        titleRect.anchoredPosition = new Vector2(0, -10);
-
-        var tmp = title.AddComponent<TextMeshProUGUI>();
+        var tmp = CenteredText(parent, "Title", 800, 60, -10, 38);
         tmp.text = "Quartz";
-        tmp.font = FontManager.Current;
-        tmp.fontSize = 38;
-        tmp.color = Color.white;
-        tmp.alignment = TextAlignmentOptions.Center;
 
-        GameObject subtitle = new("Subtitle");
-        subtitle.transform.SetParent(parent, false);
-
-        var subtitleRect = subtitle.AddComponent<RectTransform>();
-        subtitleRect.anchorMin = new Vector2(0.5f, 0.5f);
-        subtitleRect.anchorMax = new Vector2(0.5f, 0.5f);
-        subtitleRect.pivot = new Vector2(0.5f, 0.5f);
-        subtitleRect.sizeDelta = new Vector2(800, 40);
-        subtitleRect.anchoredPosition = new Vector2(0, -60);
-
-        var subtitleTmp = subtitle.AddComponent<TextMeshProUGUI>();
+        var subtitleTmp = CenteredText(parent, "Subtitle", 800, 40, -60, 20);
         subtitleTmp.text = "by koren, sbrothers7, and more.";
-        subtitleTmp.font = FontManager.Current;
-        subtitleTmp.fontSize = 20;
         subtitleTmp.color = new Color(1f, 1f, 1f, 0.45f);
-        subtitleTmp.alignment = TextAlignmentOptions.Center;
         subtitleTmp.gameObject.AddComponent<TextLocalization>().Init("CREDITS_SUBTITLE", "by koren, sbrothers7, and more.");
 
-        GameObject credits = new("Credits");
-        credits.transform.SetParent(parent, false);
-
-        var creditsRect = credits.AddComponent<RectTransform>();
-        creditsRect.anchorMin = new Vector2(0.5f, 0.5f);
-        creditsRect.anchorMax = new Vector2(0.5f, 0.5f);
-        creditsRect.pivot = new Vector2(0.5f, 0.5f);
-        creditsRect.sizeDelta = new Vector2(900, 220);
-        creditsRect.anchoredPosition = new Vector2(0, -180);
-
-        var creditsTmp = credits.AddComponent<TextMeshProUGUI>();
-        creditsTmp.text =
+        string creditsBody =
             "<color=#FFFFFF66>UI based on Overlayer (modlist.org)</color>\n" +
             "<color=#FFFFFF88>Thank you for using Quartz.</color>\n" +
             "<size=12><color=#FFFFFF33>\nLicensed under GPLv3</color></size>";
-        creditsTmp.font = FontManager.Current;
-        creditsTmp.fontSize = 26;
-        creditsTmp.color = Color.white;
+
+        var creditsTmp = CenteredText(parent, "Credits", 900, 220, -180, 26);
+        creditsTmp.text = creditsBody;
         creditsTmp.lineSpacing = 18;
-        creditsTmp.alignment = TextAlignmentOptions.Center;
-        creditsTmp.gameObject.AddComponent<TextLocalization>()
-            .Init(
-                "CREDITS_BODY",
-                "<color=#FFFFFF66>UI based on Overlayer (modlist.org)</color>\n" +
-                "<color=#FFFFFF88>Thank you for using Quartz.</color>\n" +
-                "<size=12><color=#FFFFFF33>\nLicensed under GPLv3</color></size>"
-            );
+        creditsTmp.gameObject.AddComponent<TextLocalization>().Init("CREDITS_BODY", creditsBody);
+    }
+
+    // Center-anchored fixed-size block at (0, y).
+    private static RectTransform CenteredRect(Transform parent, string name, float w, float h, float y) {
+        GameObject obj = new(name);
+        obj.transform.SetParent(parent, false);
+
+        var rect = obj.AddComponent<RectTransform>();
+        rect.anchorMin = new Vector2(0.5f, 0.5f);
+        rect.anchorMax = new Vector2(0.5f, 0.5f);
+        rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.sizeDelta = new Vector2(w, h);
+        rect.anchoredPosition = new Vector2(0, y);
+        return rect;
+    }
+
+    private static TextMeshProUGUI CenteredText(Transform parent, string name, float w, float h, float y, float size) {
+        var tmp = CenteredRect(parent, name, w, h, y).gameObject.AddComponent<TextMeshProUGUI>();
+        tmp.font = FontManager.Current;
+        tmp.fontSize = size;
+        tmp.color = Color.white;
+        tmp.alignment = TextAlignmentOptions.Center;
+        return tmp;
     }
 }
