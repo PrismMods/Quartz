@@ -1,0 +1,29 @@
+Quartz/Features/KeyViewer/KeyViewerOverlay.DmNoteParsing.cs
+  s_90010d0854592e::t_26376a00074319 1-501
+Quartz/Features/KeyViewer/KeyViewerOverlay.cs
+  s_90010d0854592e::t_8645698154c500 1381-1383
+  s_90010d0854592e::t_5bb0dbd44b72e7 39-41
+  s_90010d0854592e::t_9a76461edc6c69 622,624
+  s_90010d0854592e::t_5bd913bae815b8 608-609
+  s_90010d0854592e::t_3672c3b69358fe 593-594
+Quartz/Features/KeyViewer/KeyViewerOverlay.DmNoteLayout.cs
+  s_90010d0854592e::t_aa1cab038016f6 1-189
+Quartz/Features/KeyViewer/RainRenderer.cs
+  s_90010d0854592e::t_411e4881a9cb0f 1-297
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "be24b283cc8165389cf2e8889196dbaea4f261e1",
+  "prompts": {},
+  "sessions": {
+    "s_90010d0854592e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1eb3e6ee-7fd4-405a-948e-978db5260610",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
