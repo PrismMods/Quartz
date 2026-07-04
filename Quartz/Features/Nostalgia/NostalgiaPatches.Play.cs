@@ -178,7 +178,8 @@ public static partial class Nostalgia {
     private static class NoJudgeAnimationPatch {
         private static void Postfix(scrHitTextMesh __instance) {
             if(!ShouldNoJudgeAnimation) return;
-            Renderer meshRenderer = Traverse.Create(__instance).Field("meshRenderer").GetValue<Renderer>();
+            EnsureHitTextAccessors();
+            Renderer meshRenderer = hitTextMeshRendererRef != null ? hitTextMeshRendererRef(__instance) : null;
             __instance.transform.DOKill();
             __instance.transform.localRotation = scrCamera.instance.transform.rotation;
             if(meshRenderer != null) {
@@ -214,25 +215,52 @@ public static partial class Nostalgia {
                 Vector3 pos = other.transform.position;
                 pos.y += 1f;
 
-                var cached = Traverse.Create(__instance).Field("cachedHitTexts")
-                    .GetValue<Dictionary<HitMargin, scrHitTextMesh[]>>();
+                EnsureHitTextAccessors();
+                var cached = cachedHitTextsRef != null ? cachedHitTextsRef(__instance) : null;
                 if(cached == null || !cached.TryGetValue(hitMargin, out scrHitTextMesh[] arr)) return;
                 // The text shown this call is the most recently shown live one.
                 scrHitTextMesh newest = null;
                 int best = int.MinValue;
                 foreach(scrHitTextMesh m in arr) {
                     if(m == null || m.dead) continue;
-                    int fs = Traverse.Create(m).Field("frameShown").GetValue<int>();
+                    int fs = hitTextMeshFrameShownRef != null ? hitTextMeshFrameShownRef(m) : 0;
                     if(fs >= best) {
                         best = fs;
                         newest = m;
                     }
                 }
                 if(newest != null) {
-                    Traverse.Create(newest).Field("textPos").SetValue(pos);
+                    if(hitTextMeshTextPosRef != null) hitTextMeshTextPosRef(newest) = pos;
                     newest.transform.position = pos;
                 }
             } catch { }
         }
+    }
+
+    // ShowHitText fires once per judged tile hit, so the reflection lookups
+    // above previously ran fresh every hit. Resolve the field accessors once
+    // (same guarded lazy pattern as PlanetColors' ringRef/onlyRingRef) instead
+    // of calling Traverse fresh on every hit.
+    private static bool hitTextAccessorsResolved;
+    private static AccessTools.FieldRef<scrHitTextManager, Dictionary<HitMargin, scrHitTextMesh[]>> cachedHitTextsRef;
+    private static AccessTools.FieldRef<scrHitTextMesh, int> hitTextMeshFrameShownRef;
+    private static AccessTools.FieldRef<scrHitTextMesh, Vector3> hitTextMeshTextPosRef;
+    private static AccessTools.FieldRef<scrHitTextMesh, Renderer> hitTextMeshRendererRef;
+
+    private static void EnsureHitTextAccessors() {
+        if(hitTextAccessorsResolved) return;
+        hitTextAccessorsResolved = true;
+        try {
+            cachedHitTextsRef = AccessTools.FieldRefAccess<scrHitTextManager, Dictionary<HitMargin, scrHitTextMesh[]>>("cachedHitTexts");
+        } catch { }
+        try {
+            hitTextMeshFrameShownRef = AccessTools.FieldRefAccess<scrHitTextMesh, int>("frameShown");
+        } catch { }
+        try {
+            hitTextMeshTextPosRef = AccessTools.FieldRefAccess<scrHitTextMesh, Vector3>("textPos");
+        } catch { }
+        try {
+            hitTextMeshRendererRef = AccessTools.FieldRefAccess<scrHitTextMesh, Renderer>("meshRenderer");
+        } catch { }
     }
 }

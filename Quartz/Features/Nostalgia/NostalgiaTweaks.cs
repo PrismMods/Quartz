@@ -111,13 +111,26 @@ public static partial class Nostalgia {
     // doesn't sit with an empty gap to its right. Restores the original spot
     // when no-fail is visible again.
     private static Vector2? diffOrigPos;
+    private static Component repositionSelectorSource;
+    private static Component repositionNofailSource;
+    private static RectTransform repositionDiffRect;
+    private static RectTransform repositionNofailRect;
 
     public static void RepositionDifficulty() {
+        if(!ShouldHideNoFail && !ShouldHideDifficulty) return;
         try {
             scnEditor editor = scnEditor.instance;
             if(editor == null || editor.editorDifficultySelector == null || editor.buttonNoFail == null) return;
-            RectTransform diff = editor.editorDifficultySelector.GetComponent<RectTransform>();
-            RectTransform nofail = editor.buttonNoFail.GetComponent<RectTransform>();
+
+            if(repositionSelectorSource != editor.editorDifficultySelector || repositionNofailSource != editor.buttonNoFail) {
+                repositionSelectorSource = editor.editorDifficultySelector;
+                repositionNofailSource = editor.buttonNoFail;
+                repositionDiffRect = editor.editorDifficultySelector.GetComponent<RectTransform>();
+                repositionNofailRect = editor.buttonNoFail.GetComponent<RectTransform>();
+                diffOrigPos = null;
+            }
+            RectTransform diff = repositionDiffRect;
+            RectTransform nofail = repositionNofailRect;
             if(diff == null || nofail == null) return;
             diffOrigPos ??= diff.anchoredPosition;
 

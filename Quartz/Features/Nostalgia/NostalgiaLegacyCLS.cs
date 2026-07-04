@@ -198,23 +198,43 @@ public static partial class Nostalgia {
 // Old CLS keyboard shortcuts: F search, S speed-trial, N no-fail, Del delete,
 // O cycle sort. Ported from BackToThePast's WorkshopShortcut.
 public sealed class WorkshopShortcut : MonoBehaviour {
+    // A fresh WorkshopShortcut is attached to a fresh scnCLS.instance every
+    // time the CLS screen loads (LegacyClsAwakePatch / ToggleCLS both call
+    // GetOrAddComponent on scnCLS.instance.gameObject), so this component's
+    // lifetime already matches scnCLS's — resolving accessors once in Awake
+    // needs no separate scene-change invalidation.
+    private AccessTools.FieldRef<scnCLS, object> optionsPanelsRef;
+    private Func<scnCLS, bool> responsiveGetter;
+    private Action<object> toggleSpeedTrial;
+    private Action<object> toggleNoFail;
+
+    private void Awake() {
+        try { optionsPanelsRef = AccessTools.FieldRefAccess<scnCLS, object>("optionsPanels"); } catch { }
+        try {
+            MethodInfo getter = AccessTools.PropertyGetter(typeof(scnCLS), "responsive");
+            if(getter != null) responsiveGetter = (Func<scnCLS, bool>)Delegate.CreateDelegate(typeof(Func<scnCLS, bool>), getter);
+        } catch { }
+    }
+
     private void Update() {
         if(!Nostalgia.ShouldLegacyCLS
            || scnCLS.instance == null
            || scrController.instance == null
            || scrController.instance.paused
            || Nostalgia.clsSearchMode
-           || !(Traverse.Create(scnCLS.instance).Property("responsive").GetValue<bool>())
+           || !IsResponsive(scnCLS.instance)
            || scnCLS.instance.showingInitialMenu) {
             return;
         }
-        object optionsPanels = Traverse.Create(scnCLS.instance).Field("optionsPanels").GetValue();
+        object optionsPanels = optionsPanelsRef != null
+            ? optionsPanelsRef(scnCLS.instance)
+            : Traverse.Create(scnCLS.instance).Field("optionsPanels").GetValue();
         if(Input.GetKeyDown(KeyCode.F)) {
             Nostalgia.ToggleSearchModeCLS(true);
         } else if(Input.GetKeyDown(KeyCode.S)) {
-            Traverse.Create(optionsPanels).Method("ToggleSpeedTrial").GetValue();
+            (toggleSpeedTrial ??= BuildActionInvoker(optionsPanels, "ToggleSpeedTrial"))(optionsPanels);
         } else if(Input.GetKeyDown(KeyCode.N)) {
-            Traverse.Create(optionsPanels).Method("ToggleNoFail").GetValue();
+            (toggleNoFail ??= BuildActionInvoker(optionsPanels, "ToggleNoFail"))(optionsPanels);
         } else if(Input.GetKeyDown(KeyCode.Delete)) {
             scnCLS.instance.DeleteLevel();
         } else if(Input.GetKeyDown(KeyCode.O)) {
@@ -230,5 +250,18 @@ public sealed class WorkshopShortcut : MonoBehaviour {
                 t.Method("UpdateSorting").GetValue();
             } catch { }
         }
+    }
+
+    private bool IsResponsive(scnCLS cls) =>
+        responsiveGetter != null
+            ? responsiveGetter(cls)
+            : Traverse.Create(cls).Property("responsive").GetValue<bool>();
+
+    private static Action<object> BuildActionInvoker(object optionsPanels, string methodName) {
+        try {
+            MethodInfo method = optionsPanels != null ? AccessTools.Method(optionsPanels.GetType(), methodName) : null;
+            if(method != null) return target => method.Invoke(target, null);
+        } catch { }
+        return target => Traverse.Create(target).Method(methodName).GetValue();
     }
 }
