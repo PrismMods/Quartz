@@ -1,0 +1,19 @@
+build.json
+  s_2590b4e518590b::t_f6d6fc7bc5fb75 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "3f6c8c8c5c289b1976e6e5b9d7155a79401a20dc",
+  "prompts": {},
+  "sessions": {
+    "s_2590b4e518590b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ed347027-7ceb-4e37-b13e-d9170282388e",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
