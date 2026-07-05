@@ -53,9 +53,7 @@ internal static class PageImport {
             "loaded through Unity Mod Manager and copies over what it has a home for. Your other settings are left untouched."
         );
 
-        var sec = GenerateUI.Collapsible(content.transform, "Detected Mods", startExpanded: true);
-
-        var topRow = GenerateUI.Row(sec.Body);
+        var topRow = GenerateUI.Row(content.transform);
         UIButton rescanBtn = GenerateUI.Button(topRow, RebuildList, "Rescan", "import_rescan").SetSecondary();
         {
             var br = rescanBtn.Rect;
@@ -67,12 +65,12 @@ internal static class PageImport {
         }
         rescanBtn.Rect.AddToolTip("DESC_IMPORT_RESCAN", "Re-scan for supported mods loaded through Unity Mod Manager.");
 
-        var statusRow = GenerateUI.Row(sec.Body, 32f);
+        var statusRow = GenerateUI.Row(content.transform, 32f);
         statusText = GenerateUI.AddMutedText(statusRow, 18f, 0.45f, true);
         statusText.text = "";
 
         GameObject list = new("Mods");
-        list.transform.SetParent(sec.Body, false);
+        list.transform.SetParent(content.transform, false);
 
         listContainer = list.AddComponent<RectTransform>();
         GenerateUI.FitVertical(list, 16f);
