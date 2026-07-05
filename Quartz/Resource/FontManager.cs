@@ -47,6 +47,11 @@ public static class FontManager {
         }
     }
 
+    // Raised after the selected font changes (and after ApplyToAll re-points the
+    // mod's UI). InGameOverlayFont listens so it can re-apply the font to any
+    // native text it's currently overriding.
+    public static event Action OnFontChanged;
+
     // Raised whenever the set of importable fonts changes so open pickers can
     // rebuild their option rows without FontManager depending on UI classes.
     public static event Action OnFontCatalogChanged;
@@ -228,6 +233,8 @@ public static class FontManager {
             MainCore.Conf.FontName = name == DefaultName ? "" : name;
             MainCore.ConfMgr.RequestSave();
         }
+
+        OnFontChanged?.Invoke();
     }
 
     // ===== custom font management =====

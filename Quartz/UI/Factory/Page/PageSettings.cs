@@ -4,6 +4,7 @@ using GTweens.Extensions;
 using GTweens.Tweens;
 using Quartz.Async;
 using Quartz.Core;
+using Quartz.Features.InGameOverlay;
 using Quartz.IO;
 using Quartz.Localization;
 using Quartz.Resource;
@@ -36,6 +37,8 @@ internal static class PageSettings {
     private static TextMeshProUGUI fontStatusText;
     private static UIDropDown<string> settingsFontDropdown;
     private static string pendingFontName = "";
+
+    // In-game overlay: independent font toggles for 3 native HUD elements.
 
     // Update UI, refreshed from UpdateService.OnChanged.
     private static UIButton updateCheckButton;
@@ -570,6 +573,70 @@ internal static class PageSettings {
         fontStatusRow.SetActive(false);
 
         RefreshFontManageRow();
+
+        // Applies FontManager.Current, in place, to three specific pieces of
+        // ADOFAI's own native HUD text — each independently toggleable, none
+        // repositioned/resized beyond fitting the wider mod font in its box.
+        var inGameOverlayLabelRow = GenerateUI.Row(content.transform);
+        var inGameOverlayText = GenerateUI.AddTextH1(inGameOverlayLabelRow);
+        var inGameOverlayTextTr = inGameOverlayText.gameObject.AddComponent<TextLocalization>().Init("IN_GAME_OVERLAY", "In-Game Overlay");
+
+        var songTitleFontRow = GenerateUI.Row(content.transform);
+        UIToggle songTitleFontToggle = GenerateUI.Toggle(
+            songTitleFontRow,
+            defSet.FontSongTitle,
+            MainCore.Conf.FontSongTitle,
+            toggle => {
+                MainCore.Conf.FontSongTitle = toggle;
+                MainCore.ConfMgr.RequestSave();
+                InGameOverlayFont.Refresh();
+            },
+            "Song Title",
+            "font_song_title"
+        );
+        songTitleFontToggle.Rect.AddToolTip(
+            "DESC_FONT_SONG_TITLE",
+            "Apply the selected font to the level title shown during play, not just this mod's UI."
+        );
+        songTitleFontToggle.Label.gameObject.AddComponent<TextLocalization>().Init("FONT_SONG_TITLE", "Song Title");
+
+        var countdownFontRow = GenerateUI.Row(content.transform);
+        UIToggle countdownFontToggle = GenerateUI.Toggle(
+            countdownFontRow,
+            defSet.FontCountdown,
+            MainCore.Conf.FontCountdown,
+            toggle => {
+                MainCore.Conf.FontCountdown = toggle;
+                MainCore.ConfMgr.RequestSave();
+                InGameOverlayFont.Refresh();
+            },
+            "Countdown",
+            "font_countdown"
+        );
+        countdownFontToggle.Rect.AddToolTip(
+            "DESC_FONT_COUNTDOWN",
+            "Apply the selected font to the pre-level countdown (\"3, 2, 1, Go!\")."
+        );
+        countdownFontToggle.Label.gameObject.AddComponent<TextLocalization>().Init("FONT_COUNTDOWN", "Countdown");
+
+        var judgementFontRow = GenerateUI.Row(content.transform);
+        UIToggle judgementFontToggle = GenerateUI.Toggle(
+            judgementFontRow,
+            defSet.FontJudgement,
+            MainCore.Conf.FontJudgement,
+            toggle => {
+                MainCore.Conf.FontJudgement = toggle;
+                MainCore.ConfMgr.RequestSave();
+                InGameOverlayFont.Refresh();
+            },
+            "Judgement",
+            "font_judgement"
+        );
+        judgementFontToggle.Rect.AddToolTip(
+            "DESC_FONT_JUDGEMENT",
+            "Apply the selected font to the per-hit judgement popup (\"Perfect!\"/\"Early!\"). This is the rating text itself, not the Judgement overlay's accumulated hit counts."
+        );
+        judgementFontToggle.Label.gameObject.AddComponent<TextLocalization>().Init("FONT_JUDGEMENT", "Judgement");
 
         // Settings-window font: lets this mod's own settings window use a
         // different face than the gameplay overlays. "Same as overlay font"
