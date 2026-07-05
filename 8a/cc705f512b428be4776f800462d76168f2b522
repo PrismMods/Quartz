@@ -1,0 +1,41 @@
+Quartz/Resource/Export/Lang/en-US.json
+  s_2590b4e518590b::t_3fb9e7f07b4390 201-207
+Quartz/UI/Factory/Page/PageSettings.cs
+  s_2590b4e518590b::t_8c6a8df705be69 7
+  s_2590b4e518590b::t_683f90a84339c6 41-42
+  s_2590b4e518590b::t_6cd2b3a16baa41 577-640
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_2590b4e518590b::t_13b05c4be38f48 201-207
+Quartz/Core/QuartzRuntime.cs
+  s_fe61209083ad4e::t_0b71bce5c9092a 10,192-195,291-292,353,378
+Quartz/Features/InGameOverlay/InGameOverlayFont.cs
+  s_fe61209083ad4e::t_b886c1559c760e 1-380
+Quartz/IO/CoreSettings.cs
+  s_fe61209083ad4e::t_bddedb756aa923 18-25,105-107,135-137
+Quartz/Resource/FontManager.cs
+  s_fe61209083ad4e::t_17748d62600d80 50-54,236-237
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "8acc705f512b428be4776f800462d76168f2b522",
+  "prompts": {},
+  "sessions": {
+    "s_2590b4e518590b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ed347027-7ceb-4e37-b13e-d9170282388e",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_fe61209083ad4e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d0a0e5a2-62d4-43c3-ad1d-df910eb2f3ab",
+        "model": "unknown"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
