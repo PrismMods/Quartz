@@ -1,0 +1,31 @@
+Quartz/UI/Factory/Page/PageImport.cs
+  s_90010d0854592e::t_e6de8fa0796b84 56,68,73
+Quartz/UI/Factory/Page/PageProfiles.cs
+  s_90010d0854592e::t_cd908c21e6f9cd 46,73,108,113,194-195,198
+Quartz/UI/Factory/Page/PageSettings.cs
+  s_2590b4e518590b::t_a4c97486296306 58,70-72,75,129-130,132,146,161,180,202,248,264,285,302-305,313,337,346,356,416,426,487-489,494,578-580,582,762,764,768-770
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "5a66fea45388d98722550099fc0e2c5112069293",
+  "prompts": {},
+  "sessions": {
+    "s_2590b4e518590b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ed347027-7ceb-4e37-b13e-d9170282388e",
+        "model": "unknown"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_90010d0854592e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1eb3e6ee-7fd4-405a-948e-978db5260610",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
