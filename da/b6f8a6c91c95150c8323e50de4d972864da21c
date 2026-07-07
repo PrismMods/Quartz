@@ -1,0 +1,22 @@
+README.kr.md
+  h_6eeb8441a8a159 11-13,25,35-36,43,56,58-60
+README.md
+  h_6eeb8441a8a159 11-13,24,33-34,40,52,54-56
+agents/release.md
+  h_6eeb8441a8a159 74
+agents/docs.md
+  h_6eeb8441a8a159 15,59
+Quartz/Core/Info.cs
+  h_6eeb8441a8a159 41,45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "dab6f8a6c91c95150c8323e50de4d972864da21c",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
