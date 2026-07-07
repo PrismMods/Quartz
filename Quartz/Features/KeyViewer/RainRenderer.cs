@@ -31,6 +31,11 @@ internal sealed class RawRain {
     public float GlowSize;
     public Color GlowTop;
     public Color GlowBottom;
+    // Dotted style (ghost rain option): draws a repeating dash/gap pattern
+    // instead of one solid quad. DotLength <= 0 skips it (solid streak).
+    public bool Dotted;
+    public float DotLength;
+    public float GapLength;
 }
 
 // Renderer for ALL rain drops in one mesh. Drops are held in 3 ordering
@@ -85,6 +90,11 @@ internal sealed class RainGraphic : MaskableGraphic {
         // reproduces them exactly — except across the fade boundary, where
         // the alpha kinks. Split into two quads there (as the original did),
         // one quad otherwise.
+        if(raw.Dotted && raw.DotLength > 0.5f) {
+            AddDottedDrop(vh, raw, dNear, dFar, xMin, xMax, yMin, height);
+            return;
+        }
+
         Color cMin = ColorForY(raw, dNear, dFar, yMin, yMin, height);
         Color cMax = ColorForY(raw, dNear, dFar, yMax, yMin, height);
 
@@ -108,6 +118,38 @@ internal sealed class RainGraphic : MaskableGraphic {
 
         AddQuad(vh, xMin, yMin, xMax, yMax, cMin, cMax);
         AddGlow(vh, raw, xMin, yMin, xMax, yMax, cMin, cMax);
+    }
+
+    // Dotted style: same drop, split into dash segments spaced by (DotLength +
+    // GapLength) and anchored to distance-from-key (d) rather than screen Y —
+    // so dashes stay put as the drop grows/shrinks, the same illusion a tiled
+    // sprite gives. Each dash reuses ColorForY for its endpoints, so the fade
+    // and top/bottom gradient still apply per-dash (at dash granularity, not
+    // the sub-pixel precision the solid-quad fade-split does).
+    private static void AddDottedDrop(VertexHelper vh, RawRain raw, float dNear, float dFar, float xMin, float xMax, float yMin, float height) {
+        float span = dFar - dNear;
+        if(span <= 0.0001f) return;
+
+        float period = Mathf.Max(1f, raw.DotLength + raw.GapLength);
+        int kStart = Mathf.FloorToInt(dNear / period);
+        int kEnd = Mathf.CeilToInt(dFar / period);
+        for(int k = kStart; k <= kEnd; k++) {
+            float segStart = Mathf.Max(dNear, k * period);
+            float segEnd = Mathf.Min(dFar, k * period + raw.DotLength);
+            if(segEnd <= segStart) continue;
+
+            float tA = raw.Reverse ? (dFar - segStart) / span : (segStart - dNear) / span;
+            float tB = raw.Reverse ? (dFar - segEnd) / span : (segEnd - dNear) / span;
+            float yA = yMin + tA * height;
+            float yB = yMin + tB * height;
+            float ySegMin = Mathf.Min(yA, yB);
+            float ySegMax = Mathf.Max(yA, yB);
+
+            Color cA = ColorForY(raw, dNear, dFar, ySegMin, yMin, height);
+            Color cB = ColorForY(raw, dNear, dFar, ySegMax, yMin, height);
+            AddQuad(vh, xMin, ySegMin, xMax, ySegMax, cA, cB);
+            AddGlow(vh, raw, xMin, ySegMin, xMax, ySegMax, cA, cB);
+        }
     }
 
     private static void AddQuad(VertexHelper vh, float xMin, float yMin, float xMax, float yMax, Color bottom, Color top) {

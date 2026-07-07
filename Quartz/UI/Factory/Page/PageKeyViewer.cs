@@ -748,6 +748,26 @@ internal static class PageKeyViewer {
             def.Rain2OffsetY, -100f, 100f, conf.Rain2OffsetY, "0 px", 1f,
             v => conf.Rain2OffsetY = v, Save);
 
+        GenerateUI.Toggle(
+            GenerateUI.Row(simpleBody),
+            def.GhostRainDotted,
+            conf.GhostRainDotted,
+            v => { conf.GhostRainDotted = v; Save(); },
+            "Dotted Ghost Rain",
+            "keyviewer_ghostraindotted"
+        ).Rect.AddToolTip(
+            "DESC_KEYVIEWER_GHOSTRAINDOTTED",
+            "Ghost rain draws as a repeating dash pattern instead of a solid streak (port of JipperResourcePack's ghost rain)."
+        );
+
+        AddSlider(simpleBody, "Ghost Rain Dot Length", "keyviewer_ghostraindotlength",
+            def.GhostRainDotLength, 1f, 60f, conf.GhostRainDotLength, "0 px", 1f,
+            v => conf.GhostRainDotLength = v, Save);
+
+        AddSlider(simpleBody, "Ghost Rain Gap Length", "keyviewer_ghostraingaplength",
+            def.GhostRainGapLength, 1f, 60f, conf.GhostRainGapLength, "0 px", 1f,
+            v => conf.GhostRainGapLength = v, Save);
+
         // === Color ===
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(simpleBody)), "HEADING_COLOR", "Color");
 

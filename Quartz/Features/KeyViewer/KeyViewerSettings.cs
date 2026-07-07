@@ -192,6 +192,12 @@ public sealed class KeyViewerSettings : ISettingsFile {
     // a slot's ghost rain is active simply by having a ghost key set (no
     // separate enable flag).
     public float GhostRainR = 1f, GhostRainG = 0f, GhostRainB = 0f, GhostRainA = 0.45f;
+    // Dotted ghost rain (port of JipperResourcePack's tiled ghost-rain
+    // sprite): draws the ghost streak as a repeating dash/gap pattern
+    // instead of one solid quad. Off by default to match existing behavior.
+    public bool GhostRainDotted = false;
+    public float GhostRainDotLength = 10f;
+    public float GhostRainGapLength = 6f;
     public int[] GhostKey8 = new int[8];
     public int[] GhostKey10 = new int[10];
     public int[] GhostKey12 = new int[12];
@@ -441,6 +447,9 @@ public sealed class KeyViewerSettings : ISettingsFile {
             [nameof(PerKeyTextPressed)] = WriteColors(PerKeyTextPressed),
             [nameof(PerKeyRain)] = WriteColors(PerKeyRain),
             [nameof(GhostRainR)] = GhostRainR, [nameof(GhostRainG)] = GhostRainG, [nameof(GhostRainB)] = GhostRainB, [nameof(GhostRainA)] = GhostRainA,
+            [nameof(GhostRainDotted)] = GhostRainDotted,
+            [nameof(GhostRainDotLength)] = GhostRainDotLength,
+            [nameof(GhostRainGapLength)] = GhostRainGapLength,
             [nameof(GhostKey8)] = new JArray(GhostKey8),
             [nameof(GhostKey10)] = new JArray(GhostKey10),
             [nameof(GhostKey12)] = new JArray(GhostKey12),
@@ -569,6 +578,9 @@ public sealed class KeyViewerSettings : ISettingsFile {
         PerKeyRain = ReadColors(token, nameof(PerKeyRain), PerKeyRain);
 
         IOUtils.ReadRgba(token, "GhostRain", ref GhostRainR, ref GhostRainG, ref GhostRainB, ref GhostRainA);
+        GhostRainDotted = IOUtils.Read(token, nameof(GhostRainDotted), GhostRainDotted);
+        GhostRainDotLength = IOUtils.Read(token, nameof(GhostRainDotLength), GhostRainDotLength);
+        GhostRainGapLength = IOUtils.Read(token, nameof(GhostRainGapLength), GhostRainGapLength);
         GhostKey8 = ReadKeys(token, nameof(GhostKey8), GhostKey8);
         GhostKey10 = ReadKeys(token, nameof(GhostKey10), GhostKey10);
         GhostKey12 = ReadKeys(token, nameof(GhostKey12), GhostKey12);

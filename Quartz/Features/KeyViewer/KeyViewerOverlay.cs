@@ -1348,6 +1348,11 @@ public static partial class KeyViewerOverlay {
         };
         raw.ColorTop = raw.Color;
         raw.ColorBottom = raw.Color;
+        if(ghost && Conf.GhostRainDotted) {
+            raw.Dotted = true;
+            raw.DotLength = Conf.GhostRainDotLength;
+            raw.GapLength = Conf.GhostRainGapLength;
+        }
         rainManager.Enqueue(raw);
         return raw;
     }
@@ -1374,6 +1379,11 @@ public static partial class KeyViewerOverlay {
             GlowTop = ghost ? spec.GhostRainGlowTop : spec.RainGlowTop,
             GlowBottom = ghost ? spec.GhostRainGlowBottom : spec.RainGlowBottom,
         };
+        if(ghost && Conf.GhostRainDotted) {
+            raw.Dotted = true;
+            raw.DotLength = Conf.GhostRainDotLength;
+            raw.GapLength = Conf.GhostRainGapLength;
+        }
         rainManager.Enqueue(raw);
         return raw;
     }
