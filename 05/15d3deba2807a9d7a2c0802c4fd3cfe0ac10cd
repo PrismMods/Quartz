@@ -1,0 +1,360 @@
+Quartz/UI/Factory/Page/PageSettings.cs
+  s_734b72a7e8faf4::t_1c7d95bd24c4d2 285-305
+  s_734b72a7e8faf4::t_41de2bf9a36a17 306
+Quartz/UI/Factory/Page/PageProgressBar.cs
+  s_e221391b14581b::t_3f94e53e00972e 20-24
+  s_2590b4e518590b::t_40d83a381519ed 218-224,227-228
+Quartz/UI/Factory/Page/NostalgiaUI.cs
+  s_54dc55d5ebb9d2::t_665e2f7f9465e8 9-13,19-34
+  s_54dc55d5ebb9d2::t_1e8338d66d7362 150
+  s_54dc55d5ebb9d2::t_b2987bd098bbe7 98
+  s_54dc55d5ebb9d2::t_880c79ded15704 52
+  s_54dc55d5ebb9d2::t_72cf67ba403516 161
+Quartz/UI/Factory/Page/PageKeyViewer.cs
+  s_e221391b14581b::t_ad2f5424c88f1a 36-40
+  s_2590b4e518590b::t_f6397d215219cb 543-544
+  s_2590b4e518590b::t_4f6b4b09a82434 554-555
+  s_2590b4e518590b::t_884148ff801632 611-612
+  s_2590b4e518590b::t_99930e79048e98 445-446
+  s_2590b4e518590b::t_4095d32fc5aa10 649-650
+  s_2590b4e518590b::t_0a23ac68f43b92 1098-1104,1107-1108
+  s_2590b4e518590b::t_2b3e959c43f602 590-591
+  s_2590b4e518590b::t_ff7f0c38257bd9 240-250,256-257,263,286,298
+  s_2590b4e518590b::t_6168e543deb83c 97
+  s_2590b4e518590b::t_e7011f3d000a98 5,7
+  s_2590b4e518590b::t_3b3856e7594a8c 471-472
+  s_2590b4e518590b::t_f9746349fe2b55 496-497
+  s_2590b4e518590b::t_cbb479a878ae96 668-669
+  s_2590b4e518590b::t_b17d0bb8fb3e10 564-565
+  s_2590b4e518590b::t_e498d3a86de056 425-431,433-444,447-470,473-491,493,495,499-510,513-516,518-542,545-550,552-553,556-563,566-585,587-589,592-610,613-625,627-630,633-638,640-643,646,648,651-667,670-673,675-698,700,702-705
+  s_2590b4e518590b::t_98f983da891e6b 308-309
+  s_2590b4e518590b::t_023e5b828f669c 1150-1161,1163-1166
+  s_2590b4e518590b::t_ed78d35645302a 511-512
+  s_2590b4e518590b::t_2dfef4c1e37afb 631-632
+  s_2590b4e518590b::t_4c65efa9c0913c 1109
+Quartz/Addons/AddonSettings.cs
+  s_734b72a7e8faf4::t_ee01c518af6117 1-67
+Quartz/UI/Factory/Page/PageGameplay.cs
+  s_e221391b14581b::t_62a32c3cfb7458 532-533,538-539
+  s_54dc55d5ebb9d2::t_1f5973eb609ef9 29-45
+  s_e221391b14581b::t_c4d4721750029c 54-55,60-61
+  s_e221391b14581b::t_71f5de92bc4ad1 569-570,575-576
+  s_e221391b14581b::t_3b165de779da34 385-386,391-392
+  s_e221391b14581b::t_1e31468b10b15a 692-693,698-699
+Quartz/Core/Service/PathService.cs
+  s_734b72a7e8faf4::t_0c97738baaadf4 12
+  s_734b72a7e8faf4::t_f9fec39401f783 23
+Quartz/Core/QuartzRuntime.cs
+  s_734b72a7e8faf4::t_c7f913a4eef941 206-208
+  s_734b72a7e8faf4::t_71068610af258b 226
+sdk/QuartzAddon.props
+  s_7981deb5380a5b::t_c10c2dc67c398c 62-65
+  s_7981deb5380a5b::t_69bccc0a7df267 79-85
+  s_7981deb5380a5b::t_80d2d96c969cfc 36-39
+  s_7981deb5380a5b::t_24a8d22a5618e2 21-23
+  s_7981deb5380a5b::t_ea7c49b3ee164c 8
+  s_7981deb5380a5b::t_7c3bd7c15e31c9 1-7,9-20,24-35,40-61,66-78,86-121
+Quartz/Addons/QuartzAddon.cs
+  s_734b72a7e8faf4::t_873c7df3bea55a 1-2,8-40
+  s_7981deb5380a5b::t_b06f9e79482014 3-7
+Quartz/Addons/AddonService.cs
+  s_7981deb5380a5b::t_6d69747f9c13d9 131,134-157
+  s_7981deb5380a5b::t_18f1e7983b20d3 364,372-374,395,398-401
+  s_7981deb5380a5b::t_3bc2222dd70207 293-297
+  s_7981deb5380a5b::t_b5c60c1d4fb7fc 413-432
+  s_734b72a7e8faf4::t_4a32c00ecf62a7 212
+  s_734b72a7e8faf4::t_534c3ff2cd3997 1-18,20-31,33-34,47-49,55-75,77-96,99-119,121-130,132-133,158-211,213-239,241-248,341-362,365,379-385,387-394,396-397,402-412,433-451,456-479,488-491
+  s_734b72a7e8faf4::t_e221329eee8044 452-455
+  s_734b72a7e8faf4::t_1f806656d6aa59 51,53-54
+  s_734b72a7e8faf4::t_0607b3456138a7 480-487
+  s_7981deb5380a5b::t_0f8c3083770732 76
+  s_7981deb5380a5b::t_ee0e54acb8d874 97-98
+  s_734b72a7e8faf4::t_515c45c37dae28 120
+  s_7981deb5380a5b::t_e4075c49c3a8a4 32,39-40,44-46,50,52
+  s_7981deb5380a5b::t_3ce72f491593c1 35,41-43
+  s_734b72a7e8faf4::t_53090b20639149 240
+  s_7981deb5380a5b::t_b1c7b43141d2fa 250,252,255
+  s_734b72a7e8faf4::t_b16d5cda785795 19
+  s_7981deb5380a5b::t_c6c6000f78d80c 36-38
+  s_734b72a7e8faf4::t_eed885ba11d6a0 386
+  s_7981deb5380a5b::t_e13de7dc69576c 249,251,253-254,256-292,298-340
+  s_734b72a7e8faf4::t_b662499bb0c860 363,366-371,375-378
+Quartz/Features/Panels/PanelsOverlay.cs
+  s_734b72a7e8faf4::t_076809b27ee44b 564-576
+  s_734b72a7e8faf4::t_f730b352465742 478-482,484-485
+  s_734b72a7e8faf4::t_17f949c846bfdb 111-147
+  s_734b72a7e8faf4::t_1f48a7f108e46f 577
+Quartz/Addons/AddonUI.cs
+  s_734b72a7e8faf4::t_ddbbeabca57452 1-51
+Quartz/UI/Factory/PageFactory.cs
+  s_54dc55d5ebb9d2::t_ccb0d810446d8c 64,72-99
+  s_734b72a7e8faf4::t_042449531ff101 102-103
+  s_734b72a7e8faf4::t_c61b180b5f8002 34-55
+  s_734b72a7e8faf4::t_6e7b60aa62ba56 15-19
+  s_734b72a7e8faf4::t_2fe416770fcb03 104
+  s_2590b4e518590b::t_dbe3166f264029 65-71
+  s_734b72a7e8faf4::t_314d9297bfe75f 105
+Quartz/IO/SettingsFile.cs
+  s_734b72a7e8faf4::t_e2f661b012e989 34-40
+Quartz/Quartz.csproj
+  s_7981deb5380a5b::t_f487e18da01275 22-25
+  s_7981deb5380a5b::t_8c3bfd30ac2c62 271-282
+  s_7981deb5380a5b::t_2c878cfc336143 283
+Quartz/UI/Factory/Page/PageJudgement.cs
+  s_fe61209083ad4e::t_99e449280b2f0a 1-2
+  s_2590b4e518590b::t_7a99892ea99622 98-104,132-134
+  s_fe61209083ad4e::t_ad5038767e54ad 105-130
+Quartz/UI/Factory/Page/PageEditor.cs
+  s_54dc55d5ebb9d2::t_8a339cff48571f 10-12,14-15,22,30,32-40,68,70-79
+  s_e221391b14581b::t_d24864e9d151ad 42
+  s_e221391b14581b::t_127082c03b527e 24
+  s_e221391b14581b::t_ff0d8c93196d51 80
+  s_e221391b14581b::t_122b1f3d23992b 41
+sdk/Directory.Build.props.example
+  s_7981deb5380a5b::t_b602b230a7c1a2 1-17
+Quartz/UI/Factory/Page/PagePanels.StatColorSettings.cs
+  s_2590b4e518590b::t_042a6151f1df8d 1-8,10-139
+  s_2590b4e518590b::t_86d0744c468923 9
+Quartz/Tween/GTweenExtensions.cs
+  s_2590b4e518590b::t_3ffd96a6d5cf2c 124-133
+Quartz/Resource/Export/Lang/en-US.json
+  s_7981deb5380a5b::t_df81ad1b75b10f 851
+  s_e221391b14581b::t_d67c4edbbc9a98 637-649
+  s_734b72a7e8faf4::t_c01ae260dff316 860,864-865
+  s_7981deb5380a5b::t_27130ae1e3d22e 853
+  s_7981deb5380a5b::t_0368e5193daec0 854-856,861-863
+  s_734b72a7e8faf4::t_303f6c04994243 204-210,463,466,684,849-850,852,857-859
+Quartz/Addons/AddonTags.cs
+  s_734b72a7e8faf4::t_359cfa3a910d23 1-100
+sdk/README.md
+  s_7981deb5380a5b::t_c75d3e5cd1a8cd 78-84
+  s_7981deb5380a5b::t_9422e712c3aa76 3-7,9-10
+  s_7981deb5380a5b::t_97184667b67797 1-2,8,11-77,85-98
+Quartz/UI/UICore.cs
+  s_2590b4e518590b::t_ea79b3ae00de82 399,406-407,410-419,440
+  s_2590b4e518590b::t_58093f40895863 409
+  s_734b72a7e8faf4::t_e55632cf78547e 101
+  s_734b72a7e8faf4::t_07a8918224437c 1141
+  s_734b72a7e8faf4::t_415e490580bde6 743-758,760-763
+  s_734b72a7e8faf4::t_3360bd1e752416 430-438
+  s_2590b4e518590b::t_b55556e2470cd1 1624
+  s_54dc55d5ebb9d2::t_4ab3f62faf43b4 27-35,43-71
+  s_2590b4e518590b::t_a937198a65f219 36-42
+  s_54dc55d5ebb9d2::t_bdcf6553cf6a52 523-524
+  s_54dc55d5ebb9d2::t_936e923422c31f 420-421,426
+  s_734b72a7e8faf4::t_2d7fa8f704f5ca 1164
+  s_54dc55d5ebb9d2::t_2c5b28d666a90d 7
+  s_734b72a7e8faf4::t_bc083abce38016 1042-1044,1052-1100
+  s_734b72a7e8faf4::t_d795ce00fe40ba 930-931
+  s_734b72a7e8faf4::t_76dd7418d249a5 897-899
+  s_734b72a7e8faf4::t_e5387fc311aadb 781-784,788-811
+  s_734b72a7e8faf4::t_238a1b1dfb21a3 1235-1238
+  s_54dc55d5ebb9d2::t_2929ccf628be80 925-926,928,932,937-941,943-944,946
+  s_54dc55d5ebb9d2::t_e5cddd93c1f40c 831-834,836,838-839
+  s_734b72a7e8faf4::t_8151adf4054283 900
+  s_734b72a7e8faf4::t_349f453c9748be 400-402
+  s_734b72a7e8faf4::t_9a03641da47f83 892-896,901-903
+  s_2590b4e518590b::t_4fd7eb0dd62cc9 100
+  s_734b72a7e8faf4::t_ecd39c1b06fb43 942,947
+  s_2590b4e518590b::t_e46aef4f6acd2d 149-157
+  s_734b72a7e8faf4::t_b2e9adb02b7a41 74-77
+  s_54dc55d5ebb9d2::t_51f10f0b42a56d 1471-1472,1477,1485-1486
+  s_734b72a7e8faf4::t_ce41cf65911d28 873-874
+  s_54dc55d5ebb9d2::t_be3c2872fec0bb 765,1227-1234,1239
+  s_2590b4e518590b::t_a88b0b4c6446f2 9
+  s_2590b4e518590b::t_ffb3435fc0ec7f 90
+  s_734b72a7e8faf4::t_740804f8326fa4 422-425,427-429
+  s_734b72a7e8faf4::t_bcefb6c40cbca2 456-459
+  s_734b72a7e8faf4::t_a0651bc3085216 759,764
+  s_734b72a7e8faf4::t_65e93130397866 1625-1626
+  s_734b72a7e8faf4::t_69aae8053a10c5 933-936,945
+  s_734b72a7e8faf4::t_37c5b456eebec4 158-161
+  s_734b72a7e8faf4::t_a947ccc5fe7d1b 851-860
+  s_54dc55d5ebb9d2::t_766ea83d4da2b9 812,814-830,835,837,840-850,877-891,904-924,927,929,948-1041,1045-1051,1104-1140,1142-1163,1165-1179
+  s_734b72a7e8faf4::t_9029b339d03f2e 861-872,875-876
+  s_54dc55d5ebb9d2::t_18db75fbd553af 766
+  s_54dc55d5ebb9d2::t_5073e86f1ac07c 813
+  s_54dc55d5ebb9d2::t_518b98c8d0c4d4 1180
+Quartz/Addons/AddonContext.cs
+  s_734b72a7e8faf4::t_9e05cf24804a86 71-74,79-89
+  s_734b72a7e8faf4::t_39b96d3445cdb1 142-147
+  s_734b72a7e8faf4::t_bed47bbb9b7925 137-139
+  s_734b72a7e8faf4::t_b3d86293c02e19 94-114
+  s_734b72a7e8faf4::t_0dca035587a1d9 16
+  s_734b72a7e8faf4::t_ed1f183e7f4535 18
+  s_734b72a7e8faf4::t_5a14da96201509 33
+  s_734b72a7e8faf4::t_37007d5f6f79cf 1-15,17,19-32,34-70,75-78,90-93,115-136,140-141,148-150
+Quartz/Features/InGameOverlay/InGameOverlayFont.cs
+  s_fe61209083ad4e::t_fb48a7f03bf67a 162,170-172,176-177,180-197
+  s_fe61209083ad4e::t_89ffb59332dbae 406-424
+  s_fe61209083ad4e::t_5f38e3b5639d99 205-206,221-222,233-234
+  s_fe61209083ad4e::t_41daa4cc2e0fbb 364-372
+  s_fe61209083ad4e::t_2e60ea80b42e82 378,383,393
+  s_fe61209083ad4e::t_a64cf1e4581632 33-35
+  s_fe61209083ad4e::t_d9cdaf45553cb3 198
+  s_fe61209083ad4e::t_17b3a2498694f1 425
+Quartz/UI/Generator/GenerateUI.Collapsible.cs
+  s_e221391b14581b::t_64b51e023dc9f1 60-92
+agents/project.md
+  s_7981deb5380a5b::t_5f24d8b6efe7ea 92
+  s_15117ff949670c::t_520a32f495980d 272-274
+  s_15117ff949670c::t_2da59bc0496086 173-174,176,178-181,183
+  s_7981deb5380a5b::t_762e93157462f8 175,177,182
+  s_15117ff949670c::t_571e55ab068be8 146-147
+  s_15117ff949670c::t_da6b18eede2902 160,162-166
+Quartz/IO/CoreSettings.cs
+  s_2590b4e518590b::t_0c0f35856d9e8c 54,57
+  s_fe61209083ad4e::t_98bb86777b91ef 125-127
+  s_fe61209083ad4e::t_3e8586467446a7 160-162
+  s_2590b4e518590b::t_240aa14a7fbc5e 134
+  s_fe61209083ad4e::t_28bfa7d303d6f3 26-31
+  s_54dc55d5ebb9d2::t_bb3dfd144dccf7 55-56
+  s_734b72a7e8faf4::t_ca82d3c8862c13 165
+  s_734b72a7e8faf4::t_51ac042ce8bd44 130
+  s_734b72a7e8faf4::t_045415942fc857 39-44
+  s_2590b4e518590b::t_22fac2ad36d4d9 169
+  s_2590b4e518590b::t_6e77c417b9258f 58
+Quartz/UI/Factory/Page/PageVisuals.cs
+  s_e221391b14581b::t_5422308113035b 512-513,520-521
+  s_54dc55d5ebb9d2::t_fb106eaf8f3769 23-45
+  s_e221391b14581b::t_c13fff0cd196d6 725-726,732-733
+  s_e221391b14581b::t_52deb6e90a8b96 653
+  s_e221391b14581b::t_0f17970725e59e 414-415,422-423
+  s_e221391b14581b::t_21b6b0d90bf6e3 333-334,341-342
+  s_e221391b14581b::t_4d52b5514ef055 52-53,59-60
+Quartz/Features/KeyViewer/KeyViewerOverlay.cs
+  s_2590b4e518590b::t_014beece6b8488 1468,1489,1499
+  s_2590b4e518590b::t_8ddaed6034bd6d 1331
+  s_2590b4e518590b::t_25926af484ab1d 1452
+  s_2590b4e518590b::t_75a289b25b6ff2 1675
+  s_2590b4e518590b::t_09ec8586585b83 1041-1062
+  s_2590b4e518590b::t_2d31be07a7e831 1427
+  s_2590b4e518590b::t_130e5dbcce1680 1842
+Quartz/UI/Factory/MenuFactory.cs
+  s_54dc55d5ebb9d2::t_14e80b91fafab3 30-33,37-42,51,91-104,113-114,145,170-171,259-260,268-273,275-302,305-326,328-329,332-333,347,359-360,362-365,375-378,385-389,391-397,401
+  s_734b72a7e8faf4::t_f9cb0d944a1255 116-136
+  s_734b72a7e8faf4::t_e10fa6b5f606c6 154
+  s_54dc55d5ebb9d2::t_1c5dfcb809ccad 303-304
+  s_54dc55d5ebb9d2::t_24efd15130b9b4 327
+  s_54dc55d5ebb9d2::t_98e4359d19eb79 274
+  s_54dc55d5ebb9d2::t_532c085e48dfce 43-50,52-90
+  s_2590b4e518590b::t_50f7e365c88117 4,203-205,265-267,330,334,417
+  s_54dc55d5ebb9d2::t_fa2b12e7f58a15 143-144,146-150
+Quartz/UI/Factory/Page/PageSongTitle.cs
+  s_fe61209083ad4e::t_cd791361dc9ffc 104-119,121-129
+  s_fe61209083ad4e::t_da4fd251edf232 120
+  s_fe61209083ad4e::t_1840acb6b55d51 2
+  s_2590b4e518590b::t_43a6f5637e6de2 97-103,131-133
+Quartz/Addons/AddonEvents.cs
+  s_734b72a7e8faf4::t_efd8f495decdbf 1-100
+Quartz/UI/Factory/Page/PageCombo.cs
+  s_2590b4e518590b::t_b12f9c9a6c1927 248-254,256-258
+  s_e221391b14581b::t_24f7d3a91f246d 27-31
+Quartz/UI/Factory/Page/PageTweaks.cs
+  s_e221391b14581b::t_c8efcd95c345cb 60
+  s_e221391b14581b::t_6d3f12479344d1 139
+  s_54dc55d5ebb9d2::t_28f049e52b553d 13-15,17-20,26-27,47-54,131,133-137,178-184
+  s_e221391b14581b::t_6ffc2378b4b3ab 186
+  s_e221391b14581b::t_d17bd8b8c1bf2b 138
+Quartz/UI/Factory/Page/PageOverlayGeneral.cs
+  s_fe61209083ad4e::t_965dfffefc63c9 2,6
+  s_fe61209083ad4e::t_6a532128c8c478 43-74
+  s_2590b4e518590b::t_2dbb6a10f9c953 1,3-5,7-42,75-76
+Quartz/UI/Factory/Page/PageSearch.cs
+  s_2590b4e518590b::t_203e3da036d227 89-95
+  s_734b72a7e8faf4::t_1a5d705d7d418c 77-87
+  s_734b72a7e8faf4::t_8ddbec24264444 126
+  s_54dc55d5ebb9d2::t_2f5d1b1b526893 88,96-123
+.gitignore
+  s_7981deb5380a5b::t_e1748d9ce2a74b 5-6
+Quartz/UI/Factory/Page/PagePanels.cs
+  s_2590b4e518590b::t_e8d465828b4a31 24-29,36-38,63
+  s_2590b4e518590b::t_042a6151f1df8d 1-23,30-35,39-62,64-530,537-539,541-836,838-1138
+  s_734b72a7e8faf4::t_d35a9389072acf 531-536,540
+  s_734b72a7e8faf4::t_9befa40d3fa009 837
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_e221391b14581b::t_dde94f1e2af016 637-649
+  s_7981deb5380a5b::t_0693bb1c01c7ba 854-856,861-863
+  s_7981deb5380a5b::t_f5338627b176b6 853
+  s_734b72a7e8faf4::t_303f6c04994243 204-210,463,466,684,849-850,852,857-859
+  s_7981deb5380a5b::t_78b117c233fc79 851
+  s_734b72a7e8faf4::t_c01ae260dff316 860,864-865
+Quartz/UI/Factory/Page/PageAddons.cs
+  s_734b72a7e8faf4::t_97c5ddc3785a78 123,125
+  s_7981deb5380a5b::t_ba42f47225272c 35-47
+  s_734b72a7e8faf4::t_9bf0649e83bc6c 113-114
+  s_7981deb5380a5b::t_0ce07404ec3443 121
+  s_7981deb5380a5b::t_14e4e6b238d12e 61
+  s_7981deb5380a5b::t_5a33f6a2c8b1b9 30
+  s_734b72a7e8faf4::t_73eba767b9ef23 6
+  s_734b72a7e8faf4::t_1006c6be3b7a6c 92-95,97
+  s_734b72a7e8faf4::t_215672c0c7ac84 1-5,7,9-29,31-34,48-60,62-91,96,98-101,108-109,116,118,120,122,124,126-132,162,183-184
+  s_7981deb5380a5b::t_de3b2c046dd573 133-161,163-182
+  s_7981deb5380a5b::t_27d1faf736f302 8
+  s_734b72a7e8faf4::t_6355b202b041bd 102-107
+  s_734b72a7e8faf4::t_8dad4c803238ae 110-112,115,117,119
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "0515d3deba2807a9d7a2c0802c4fd3cfe0ac10cd",
+  "prompts": {},
+  "sessions": {
+    "s_15117ff949670c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "620d628b-c77f-4c3a-b489-1533de01bbd9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_2590b4e518590b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ed347027-7ceb-4e37-b13e-d9170282388e",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_54dc55d5ebb9d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fc2f665d-5b71-4696-9949-6a9108c93f46",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_734b72a7e8faf4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4dd12cc-97c3-4b3c-9634-453d419035a7",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_7981deb5380a5b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "be06f58e-68ad-4b57-93b8-dc868ec6a8eb",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_e221391b14581b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "01d6a637-9641-4c11-b526-174030209144",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_fe61209083ad4e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d0a0e5a2-62d4-43c3-ad1d-df910eb2f3ab",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
