@@ -29,10 +29,18 @@ public class UIScrollController : MonoBehaviour {
         HandleRightDrag();
     }
 
+    // True only when the cursor is over this controller's own viewport, so the
+    // wheel scrolls just the pane it's hovering — otherwise every scroll view
+    // on the canvas reacts to one wheel notch at once (the main page and the
+    // docked bottom pane scrolling in lockstep).
+    private bool PointerOverViewport() =>
+        viewport != null && RectTransformUtility.RectangleContainsScreenPoint(viewport, Input.mousePosition, null);
+
     private void HandleWheel() {
         float wheel = Input.mouseScrollDelta.y;
 
         if(Mathf.Abs(wheel) <= 0.0001f) return;
+        if(!PointerOverViewport()) return;
 
         // Fixed pixels per wheel notch (independent of content length), so a long
         // list like the font dropdown scrolls at the same speed as a short page.
@@ -41,7 +49,9 @@ public class UIScrollController : MonoBehaviour {
     }
 
     private void HandleRightDrag() {
-        if(Input.GetMouseButtonDown(1)) rightDragging = true;
+        // Only start a right-drag when the press lands inside this viewport, so
+        // it drags the hovered pane, not every scroll view at once.
+        if(Input.GetMouseButtonDown(1) && PointerOverViewport()) rightDragging = true;
 
         if(Input.GetMouseButtonUp(1)) {
             rightDragging = false;

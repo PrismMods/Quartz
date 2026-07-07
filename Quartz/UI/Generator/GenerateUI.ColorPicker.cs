@@ -24,7 +24,8 @@ public static partial class GenerateUI {
         Action<Color> onComplete,
         string text,
         string id,
-        bool showAlpha = true
+        bool showAlpha = true,
+        float rightInset = 250f
     ) {
         // Body stacks top-to-bottom: full-width hex readout, SV square + hue
         // bar, full-width colour preview, then the R/G/B/A channel sliders
@@ -61,7 +62,7 @@ public static partial class GenerateUI {
         header.anchorMax = new(1f, 1f);
         header.pivot = new(0.5f, 1f);
         header.offsetMin = new(0f, -50f);
-        header.offsetMax = new(-250f, 0f);
+        header.offsetMax = new(-rightInset, 0f);
 
         TextMeshProUGUI label = AddText(header);
         label.text = text;
@@ -95,7 +96,7 @@ public static partial class GenerateUI {
         bodyRect.anchorMax = new(1f, 1f);
         bodyRect.pivot = new(0.5f, 1f);
         bodyRect.offsetMin = new(0f, -(62f + bodyHeight));
-        bodyRect.offsetMax = new(-250f, -62f);
+        bodyRect.offsetMax = new(-rightInset, -62f);
         Image bodyBg = body.AddComponent<Image>();
         bodyBg.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
         bodyBg.type = Image.Type.Sliced;

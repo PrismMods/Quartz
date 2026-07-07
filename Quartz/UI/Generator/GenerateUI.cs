@@ -57,9 +57,10 @@ public static partial class GenerateUI {
         bool value,
         Action<bool> onChanged,
         string text,
-        string id
+        string id,
+        float rightInset = 250f
     ) {
-        RectTransform rect = BackGround();
+        RectTransform rect = BackGround(rightInset);
         rect.SetParent(parent, false);
 
         TextMeshProUGUI tmp = AddText(rect);
@@ -114,9 +115,10 @@ public static partial class GenerateUI {
         Transform parent,
         Action onClick,
         string text,
-        string id
+        string id,
+        float rightInset = 250f
     ) {
-        RectTransform rect = BackGround();
+        RectTransform rect = BackGround(rightInset);
         rect.SetParent(parent, false);
 
         TextMeshProUGUI tmp = AddText(rect, true);
@@ -158,9 +160,10 @@ public static partial class GenerateUI {
         Action<float> onChanged,
         Action<float> onComplete,
         string text,
-        string id
+        string id,
+        float rightInset = 250f
     ) {
-        RectTransform rect = BackGround();
+        RectTransform rect = BackGround(rightInset);
         rect.SetParent(parent, false);
 
         rect.gameObject.AddComponent<EventTrigger>();
@@ -691,9 +694,10 @@ public static partial class GenerateUI {
         Action<string> onChanged,
         string placeholder,
         Sprite icon,
-        string id
+        string id,
+        float rightInset = 250f
     ) {
-        RectTransform rect = BackGround();
+        RectTransform rect = BackGround(rightInset);
         rect.SetParent(parent, false);
 
         GameObject change = AddSmallChangedCircle(rect);
@@ -783,14 +787,19 @@ public static partial class GenerateUI {
         return input;
     }
 
-    public static RectTransform BackGround() {
+    // rightInset reserves room for a value-editor column that lines up across
+    // every row on a page (250 is the house default everywhere). Callers with
+    // no such column to align against — e.g. the settings window's docked
+    // Context Pane, which is its own narrow single-column space — can pass 0
+    // for a row that uses its full width instead.
+    public static RectTransform BackGround(float rightInset = 250f) {
         GameObject obj = new("Bg");
         RectTransform rect = obj.AddComponent<RectTransform>();
         rect.anchorMin = new(0f, 0f);
         rect.anchorMax = new(1f, 1f);
         rect.pivot = new(0.5f, 0.5f);
         rect.offsetMin = Vector2.zero;
-        rect.offsetMax = new(-250f, 0f);
+        rect.offsetMax = new(-rightInset, 0f);
 
         Image img = obj.AddComponent<Image>();
         img.color = UIColors.ObjectBG;
