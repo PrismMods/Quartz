@@ -1,0 +1,19 @@
+.gitignore
+  s_7981deb5380a5b::t_29033d004fce48 30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "b65680f701e5a0945223c797574332a6076ca0f4",
+  "prompts": {},
+  "sessions": {
+    "s_7981deb5380a5b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "be06f58e-68ad-4b57-93b8-dc868ec6a8eb",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
