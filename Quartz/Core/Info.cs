@@ -38,10 +38,10 @@ public static class Info {
     public static SemVer Current => SemVer.TryParse(DisplayVersion, out SemVer v) ? v : default;
 
     public const string Description = ":thumbs_up:";
-    public const string GithubLink = "https://github.com/QuartzTeam/Quartz";
+    public const string GithubLink = "https://github.com/PrismMods/Quartz";
 
     // GitHub repo that hosts the release builds the updater pulls from.
     // (Releases are created by tools/release.sh.)
-    public const string RepoOwner = "QuartzTeam";
+    public const string RepoOwner = "PrismMods";
     public const string RepoName = "Quartz";
 }
