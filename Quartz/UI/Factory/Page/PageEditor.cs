@@ -7,32 +7,39 @@ using UnityEngine;
 namespace Quartz.UI.Factory.Page;
 
 // Editor tab. Hosts tweaks that target A Dance of Fire and Ice's level editor.
+// Each section is its own standalone page under the Editor category's column-2
+// (see MenuFactory.CategoryChildren). All rows share the same callback shape
+// (write the setting, re-apply the feature, save), re-declared per page.
 internal static partial class PageEditor {
-    public static void Create(RectTransform parent) {
+    // === Inspector ===
+    public static void InspectorPage(RectTransform parent) {
         EditorFeature.EnsureConf();
         EditorSettings conf = EditorFeature.Conf;
         EditorSettings def = new();
         RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
 
-        // All rows share the same callback shape: write the setting, then
-        // re-apply the feature and save.
         void Toggle(Transform body, bool dft, bool val, Action<bool> set, string label, string id, string desc) =>
-            GenerateUI.ToggleTip(
-                body, dft, val,
-                v => { set(v); EditorFeature.Apply(); EditorFeature.Save(); },
-                label, id, desc
-            );
+            GenerateUI.ToggleTip(body, dft, val, v => { set(v); EditorFeature.Apply(); EditorFeature.Save(); }, label, id, desc);
 
-        // === Inspector ===
-        var inspectorSec = GenerateUI.Collapsible(content.transform, "Inspector", startExpanded: true);
+        var inspectorSec = GenerateUI.FlatSection(content.transform, "Inspector");
 
         Toggle(inspectorSec.Body, def.HorizontalProperties, conf.HorizontalProperties,
             v => conf.HorizontalProperties = v,
             "Horizontal Properties", "editor_horizontal_properties",
             "Lays each level-editor inspector property out as \"label [field]\" on one row, instead of the label stacked above the field. Affects the in-game editor, not this settings window.");
+    }
 
-        // === Selected-tile readout (ported from AdofaiTweaks) ===
-        var tileReadoutSec = GenerateUI.Collapsible(content.transform, "Selected Tile Readout", startExpanded: false);
+    // === Selected-tile readout (ported from AdofaiTweaks) ===
+    public static void TileReadoutPage(RectTransform parent) {
+        EditorFeature.EnsureConf();
+        EditorSettings conf = EditorFeature.Conf;
+        EditorSettings def = new();
+        RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
+
+        void Toggle(Transform body, bool dft, bool val, Action<bool> set, string label, string id, string desc) =>
+            GenerateUI.ToggleTip(body, dft, val, v => { set(v); EditorFeature.Apply(); EditorFeature.Save(); }, label, id, desc);
+
+        var tileReadoutSec = GenerateUI.FlatSection(content.transform, "Selected Tile Readout");
 
         Toggle(tileReadoutSec.Body, def.ShowFloorAngle, conf.ShowFloorAngle,
             v => conf.ShowFloorAngle = v,
@@ -58,9 +65,19 @@ internal static partial class PageEditor {
             v => conf.UseTulttakModBehavior = v,
             "Prevent the last tile from being counted in timing calculation", "editor_use_tulttak_behavior",
             "Matches the Tulttak mod's behaviour by leaving the last selected tile out of the angle, beats, and duration totals.");
+    }
 
-        // === BGA Mod ===
-        var bgaSec = GenerateUI.Collapsible(content.transform, "BGA Mod", startExpanded: false);
+    // === BGA Mod ===
+    public static void BgaPage(RectTransform parent) {
+        EditorFeature.EnsureConf();
+        EditorSettings conf = EditorFeature.Conf;
+        EditorSettings def = new();
+        RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
+
+        void Toggle(Transform body, bool dft, bool val, Action<bool> set, string label, string id, string desc) =>
+            GenerateUI.ToggleTip(body, dft, val, v => { set(v); EditorFeature.Apply(); EditorFeature.Save(); }, label, id, desc);
+
+        var bgaSec = GenerateUI.FlatSection(content.transform, "BGA Mod");
 
         Toggle(bgaSec.Body, def.BgaMod, conf.BgaMod,
             v => conf.BgaMod = v,
@@ -76,7 +93,5 @@ internal static partial class PageEditor {
             v => conf.BgaHidePlanetDeco = v,
             "Disable planet decorations", "editor_bga_hide_planet_deco",
             "Also hides decorations attached to a planet while BGA Mod is hiding the level. Background and camera-anchored decorations are left visible.");
-
-        NostalgiaUI.AddEditorSection(content.transform);
     }
 }

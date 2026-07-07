@@ -1038,6 +1038,28 @@ public static partial class KeyViewerOverlay {
         return tmp;
     }
 
+    // Raised whenever a box's Pressed state actually flips — never on a
+    // per-frame poll of its own, just piggybacked on the edge-detection this
+    // overlay's Update loop already does at each of its press/release sites
+    // (simple mode, DM Note delayed display, and the prime/reset paths that
+    // run when input focus is gained/lost). A settings-window live-preview
+    // pane subscribes to mirror a specific slot's box without duplicating any
+    // of this polling itself.
+    public readonly struct KeyPressChangedEventArgs {
+        public readonly int Slot;
+        public readonly KeyCode Key;
+        public readonly bool Pressed;
+        public KeyPressChangedEventArgs(int slot, KeyCode key, bool pressed) {
+            Slot = slot;
+            Key = key;
+            Pressed = pressed;
+        }
+    }
+    public static event Action<KeyPressChangedEventArgs> OnKeyPressChanged;
+
+    private static void RaisePressChanged(Box box) =>
+        OnKeyPressChanged?.Invoke(new KeyPressChangedEventArgs(box.Slot, box.Key, box.Pressed));
+
     private static void ApplyBoxColors(Box box) {
         if(box.Dm != null) {
             bool dmPressed = box.Pressed;
@@ -1306,6 +1328,7 @@ public static partial class KeyViewerOverlay {
         DisposeCssRenderCaches();
         DisposeCssImageCache();
         SyncSettingChanged = null;
+        OnKeyPressChanged = null;
     }
 
     // ===== rain (port of v1's KvRain* — one manager Update, batched row meshes,
@@ -1401,6 +1424,7 @@ public static partial class KeyViewerOverlay {
 
     private static void ResetInputState(float now, bool clearTransientStats) {
         foreach(Box box in boxes) {
+            bool wasPressed = box.Pressed;
             bool changed = box.Pressed || box.RawPressed || box.GhostPressed || box.DisplayTargetPressed
                 || box.DelayedNotePending || box.LastRain != null || box.LastGhostRain != null;
 
@@ -1425,6 +1449,7 @@ public static partial class KeyViewerOverlay {
             box.DelayedReleaseTime = -1f;
 
             if(changed) ApplyBoxColors(box);
+            if(wasPressed) RaisePressChanged(box);
         }
 
         if(clearTransientStats) {
@@ -1440,6 +1465,7 @@ public static partial class KeyViewerOverlay {
         foreach(Box box in boxes) {
             if(box.IsStat) continue;
 
+            bool wasPressed = box.Pressed;
             bool pressed = KeyHeld(box.Key);
             bool ghostPressed = false;
 
@@ -1460,6 +1486,7 @@ public static partial class KeyViewerOverlay {
                 box.DelayedReleasedBeforeStart = false;
                 box.DelayedReleaseTime = -1f;
                 ApplyBoxColors(box);
+                if(wasPressed != box.Pressed) RaisePressChanged(box);
                 continue;
             }
 
@@ -1469,6 +1496,7 @@ public static partial class KeyViewerOverlay {
             box.Pressed = pressed;
             box.GhostPressed = ghostPressed;
             ApplyBoxColors(box);
+            if(wasPressed != box.Pressed) RaisePressChanged(box);
         }
     }
 
@@ -1644,6 +1672,7 @@ public static partial class KeyViewerOverlay {
             if(displayPressed != box.Pressed) {
                 box.Pressed = displayPressed;
                 ApplyBoxColors(box);
+                RaisePressChanged(box);
             }
             box.GhostPressed = ghostPressed;
 
@@ -1810,6 +1839,7 @@ public static partial class KeyViewerOverlay {
                 if(pressed != box.Pressed) {
                     box.Pressed = pressed;
                     ApplyBoxColors(box);
+                    RaisePressChanged(box);
                 }
 
                 if(box.Value == null) continue;

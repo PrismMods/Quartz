@@ -9,6 +9,7 @@ public sealed class PathService(string rootPath) {
     public string ModulePath => Path.Combine(RootPath, "Module");
     public string FontPath => Path.Combine(RootPath, "Fonts");
     public string CustomFontPath => Path.Combine(RootPath, "CustomFonts");
+    public string AddonsPath => Path.Combine(RootPath, "Addons");
 
     public string UserResourcePath => Path.Combine(RootPath, "UserResources.json");
 
@@ -19,5 +20,6 @@ public sealed class PathService(string rootPath) {
         Directory.CreateDirectory(ModulePath);
         Directory.CreateDirectory(FontPath);
         Directory.CreateDirectory(CustomFontPath);
+        Directory.CreateDirectory(AddonsPath);
     }
 }

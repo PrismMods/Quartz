@@ -203,6 +203,9 @@ public sealed class QuartzRuntime {
         playCount = new PlayCount();
 
         services.Add(Localization);
+        // Before UIService: addons register their tabs/stats in OnLoad, and
+        // UICore's initial build must already see them.
+        services.Add(Quartz.Addons.AddonService.Service);
         services.Add(uiService);
         services.Add(tweenService);
         services.Add(playCount);
@@ -220,6 +223,7 @@ public sealed class QuartzRuntime {
         ticks.Add(uiService);
         ticks.Add(tweenService);
         ticks.Add(Optimizer.Ticker);
+        ticks.Add(Quartz.Addons.AddonService.Ticker);
 
         // Keeps the editor's property-row template in sync with the
         // "Horizontal Properties" toggle (and reverts it when the mod is off).

@@ -121,6 +121,16 @@ public static class GTweenExtensions {
             );
         }
 
+        public GTween GTOffsetMax(Vector2 to, float duration) {
+            var from = target == null ? to : target.offsetMax;
+            return GTweens.Extensions.GTweenExtensions.Tween(
+                () => 0f,
+                x => { if(target != null) target.offsetMax = Vector2.LerpUnclamped(from, to, x); },
+                1f,
+                duration
+            );
+        }
+
         public GTween GTRotate(Vector3 to, float duration) {
             Vector3 from = target == null ? to : target.localEulerAngles;
             Vector3 delta = new(

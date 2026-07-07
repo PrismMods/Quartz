@@ -74,16 +74,58 @@ internal static class PageSearch {
         return normalized;
     }
 
-    private static string TabName(int state) => (OriginalMenuState)state switch {
-        OriginalMenuState.Overlay => GenerateUI.Tr("OVERLAY", "Overlay"),
-        OriginalMenuState.Gameplay => GenerateUI.Tr("GAMEPLAY", "Gameplay"),
-        OriginalMenuState.Visuals => GenerateUI.Tr("VISUALS", "Visuals"),
-        OriginalMenuState.Tweaks => GenerateUI.Tr("TWEAKS", "Tweaks"),
+    private static string TabName(int state) {
+        // Dynamic addon pages sit past the enum; resolve via their registry.
+        if(Quartz.Addons.AddonUI.IsAddonState(state)) {
+            foreach(var def in Quartz.Addons.AddonUI.Pages)
+                if(def.State == state) return GenerateUI.Tr(def.LocaleKey, def.Title);
+            return "?";
+        }
+        return TabNameFixed(state);
+    }
+
+    private static string TabNameFixed(int state) => (OriginalMenuState)state switch {
+        // Overlay
+        OriginalMenuState.OverlayGeneral => GenerateUI.Tr("OVERLAY_GENERAL", "General"),
+        OriginalMenuState.KeyViewer => GenerateUI.Tr("SECTION_KEY_VIEWER", "Key Viewer"),
+        OriginalMenuState.ProgressBar => GenerateUI.Tr("SECTION_PROGRESS_BAR", "Progress Bar"),
+        OriginalMenuState.Combo => GenerateUI.Tr("SECTION_COMBO", "Combo"),
+        OriginalMenuState.Judgement => GenerateUI.Tr("SECTION_JUDGEMENT", "Judgement"),
+        OriginalMenuState.SongTitle => GenerateUI.Tr("SECTION_SONG_TITLE", "Song Title"),
+        OriginalMenuState.Panels => GenerateUI.Tr("SECTION_PANELS", "Panels"),
+        // Gameplay
+        OriginalMenuState.GameplayKeyLimiter => GenerateUI.Tr("SECTION_KEY_LIMITER", "Key Limiter"),
+        OriginalMenuState.GameplayChatter => GenerateUI.Tr("SECTION_KEYBOARD_CHATTER_BLOCKER", "Keyboard Chatter Blocker"),
+        OriginalMenuState.GameplayJudgement => GenerateUI.Tr("SECTION_JUDGEMENT_RESTRICTION", "Judgement Restriction"),
+        OriginalMenuState.GameplayDeath => GenerateUI.Tr("SECTION_DEATH_LIMIT", "Death Limit"),
+        OriginalMenuState.GameplayAutoDeafen => GenerateUI.Tr("SECTION_AUTO_DEAFEN_DISCORD", "Auto Deafen (Discord)"),
+        // Visuals
+        OriginalMenuState.VisualsEffectRemover => GenerateUI.Tr("SECTION_EFFECT_REMOVER", "Effect Remover"),
+        OriginalMenuState.VisualsHideJudgements => GenerateUI.Tr("SECTION_HIDE_JUDGEMENTS", "Hide Judgements"),
+        OriginalMenuState.VisualsVisualTweaks => GenerateUI.Tr("SECTION_VISUAL_TWEAKS", "Visual Tweaks"),
+        OriginalMenuState.VisualsPlanetColors => GenerateUI.Tr("SECTION_PLANET_COLORS", "Planet Colors"),
+        OriginalMenuState.VisualsOttoIcon => GenerateUI.Tr("SECTION_OTTO_ICON", "Otto Icon"),
+        OriginalMenuState.VisualsUiHiding => GenerateUI.Tr("SECTION_UI_HIDING", "UI Hiding"),
+        // Tweaks
+        OriginalMenuState.TweaksGeneral => GenerateUI.Tr("TWEAKS_GENERAL", "General"),
+        OriginalMenuState.TweaksOptimizer => GenerateUI.Tr("SECTION_OPTIMIZER", "Optimizer"),
+        OriginalMenuState.TweaksMainMenu => GenerateUI.Tr("SECTION_MAIN_MENU", "Main Menu"),
+        OriginalMenuState.TweaksResults => GenerateUI.Tr("SECTION_DETAILED_RESULTS", "Detailed Results"),
+        // Editor
+        OriginalMenuState.EditorInspector => GenerateUI.Tr("SECTION_INSPECTOR", "Inspector"),
+        OriginalMenuState.EditorTileReadout => GenerateUI.Tr("SECTION_SELECTED_TILE_READOUT", "Selected Tile Readout"),
+        OriginalMenuState.EditorBga => GenerateUI.Tr("SECTION_BGA_MOD", "BGA Mod"),
+        // Nostalgia — all four children read "Nostalgia"; their leaf names
+        // (Gameplay/Visuals/…) would otherwise collide with the real tabs.
+        OriginalMenuState.NostalgiaGameplay or OriginalMenuState.NostalgiaVisuals
+            or OriginalMenuState.NostalgiaTweaks or OriginalMenuState.NostalgiaEditor
+            => GenerateUI.Tr("NOSTALGIA", "Nostalgia"),
+        // Single-page categories
         OriginalMenuState.Profiles => GenerateUI.Tr("PROFILES", "Profiles"),
         OriginalMenuState.Import => GenerateUI.Tr("IMPORT", "Import"),
+        OriginalMenuState.Addons => GenerateUI.Tr("ADDONS", "Addons"),
         OriginalMenuState.Settings => GenerateUI.Tr("SETTINGS", "Settings"),
         OriginalMenuState.Credits => GenerateUI.Tr("CREDITS", "Credits"),
-        OriginalMenuState.Editor => GenerateUI.Tr("EDITOR", "Editor"),
         OriginalMenuState.Developer => GenerateUI.Tr("DEVELOPER", "Developer"),
         _ => "?",
     };

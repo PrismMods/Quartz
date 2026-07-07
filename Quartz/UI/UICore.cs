@@ -4,7 +4,9 @@ using Quartz.Localization;
 using Quartz.Resource;
 using Quartz.UI.Factory;
 using Quartz.UI.Factory.Page;
+using Quartz.UI.Generator;
 using Quartz.UI.Objects;
+using Quartz.UI.Panes;
 using Quartz.UI.Utility;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -22,16 +24,60 @@ using TMPro;
 namespace Quartz.UI;
 
 public enum OriginalMenuState {
-    Overlay,
-    Gameplay,
-    Visuals,
-    Tweaks,
+    // Each contiguous block below is one sidebar category (see
+    // MenuFactory.CategoryChildren). A category's FIRST value is its
+    // "representative" state — the target of its column-1 row and the
+    // CategoryChildren key. Child display order matches the old on-tab section
+    // order. The trailing block (Profiles…Developer) are childless categories,
+    // each its own single state. Enum is never persisted by name, so this
+    // reshape can't corrupt saved settings.
+
+    // Overlay
+    OverlayGeneral,
+    KeyViewer,
+    ProgressBar,
+    Combo,
+    Judgement,
+    SongTitle,
+    Panels,
+    // Gameplay
+    GameplayKeyLimiter,
+    GameplayChatter,
+    GameplayJudgement,
+    GameplayDeath,
+    GameplayAutoDeafen,
+    // Visuals
+    VisualsEffectRemover,
+    VisualsHideJudgements,
+    VisualsVisualTweaks,
+    VisualsPlanetColors,
+    VisualsOttoIcon,
+    VisualsUiHiding,
+    // Tweaks
+    TweaksGeneral,
+    TweaksOptimizer,
+    TweaksMainMenu,
+    TweaksResults,
+    // Editor
+    EditorInspector,
+    EditorTileReadout,
+    EditorBga,
+    // Nostalgia — one category aggregating the retro toggles that used to be
+    // injected into the four feature tabs, split by their old host tab.
+    NostalgiaGameplay,
+    NostalgiaVisuals,
+    NostalgiaTweaks,
+    NostalgiaEditor,
+    // Single-page categories (no column-2)
     Profiles,
     Import,
+    // Addons — the category page (addon list/reload). Addon-registered pages
+    // are NOT enum values: they get dynamic states past the enum (AddonUI)
+    // and show as this category's column-2 children.
+    Addons,
     Settings,
     Search,
     Credits,
-    Editor,
     Developer, // dev-only tab; the menu item is created only in "dev" builds
 }
 
@@ -41,7 +87,7 @@ public static class UICore {
     private static CanvasScaler canvasScaler;
 
     public static readonly Dictionary<int, RectTransform> Pages = [];
-    public static int CurrentMenuState = (int)OriginalMenuState.Overlay;
+    public static int CurrentMenuState = (int)OriginalMenuState.OverlayGeneral;
 
     // Reorganize is a mode (not a tab): it hides the settings panel and lets
     // the on-screen overlay elements be dragged. Entered from a button on the
@@ -51,6 +97,8 @@ public static class UICore {
 
     private static Action<TranslationFailState> _onPageSettings;
     private static Action<TranslationFailState> _onRefresh;
+    private static Action<int> _onDockTabChanged;
+    private static Action _onPaneChanged;
 
     public static void Initialize() {
         canvasObj = new GameObject("QuartzUICanvas");
@@ -97,6 +145,19 @@ public static class UICore {
 
         MainCore.Tr.OnLoadEnd += _onPageSettings;
         MainCore.Tr.OnLoadEnd += _onRefresh;
+
+        // Any tab switch clears the Context/Live Preview panes — simpler than
+        // hardcoding which tab "owns" them, and still correct once more pages
+        // start pushing content into them.
+        _onDockTabChanged = _ => {
+            ContextPane.Clear();
+            LivePreviewPane.Clear();
+        };
+        MenuFactory.OnStateChanged += _onDockTabChanged;
+
+        // Reveal/hide the bottom band (animated) whenever pane content changes.
+        _onPaneChanged = () => RefreshBand(true);
+        Panes.PaneState.Changed += _onPaneChanged;
 
         TextLocalization.RefreshAll();
 
@@ -335,11 +396,48 @@ public static class UICore {
     public static RectTransform Panel;
     public static Image CloseImage;
     public const float MENU_WIDTH = 210f;
+    // Second sidebar column's width when the active top-level category has
+    // children. A bit wider than the first column (Menu) so the longest child
+    // labels ("Keyboard Chatter Blocker") don't clip against the column mask.
+    public const float SUBMENU_WIDTH = 260f;
     private const float TOP_BAR_HEIGHT = 60f;
     public static RectTransform Menu;
     public static RectTransform MenuContent;
+    public static RectTransform SubMenu;
+    public static RectTransform SubMenuContent;
     private static RectTransform Page;
+
+    // Bottom Band — a strip under the main page content hosting ContextPane/
+    // LivePreviewPane. A genuine child of MenuPanel (like Menu/SubMenu/Page),
+    // not a floating canvas-level panel: it shrinks Page's own height from
+    // below the same way Menu/SubMenu shrink its width from the left, via
+    // plain anchors — no follow-script needed.
+    public static RectTransform BottomBand;
+    public static RectTransform BottomBandContent;
+    private const float BandMinHeight = 160f;
+    private const float BandMaxHeight = 500f;
+    private const float DefaultBandHeight = 260f;
+    private const float MinPageHeight = 200f;
+    private static bool subMenuHasChildren;
+    // bandHeight = the user's configured/desired band height (drag + config).
+    // bandShown = its live, animated height: 0 while both panes are empty
+    // (the band is hidden), tweening up to bandHeight when content arrives.
+    // Page's bottom inset and the shell layout follow bandShown, not bandHeight.
+    private static float bandHeight;
+    private static float bandShown;
+    private static CanvasGroup bandCanvasGroup;
+    private static GTween bandSeq;
+
+    // The flat white outline strips (submenu column edges, the top rule, the
+    // bottom band edge) whose thickness the Outline Width setting drives live.
+    // horizontal = thickness is the y size (top/bottom rule); else the x size
+    // (left/right column edge). Repopulated on every panel (re)build.
+    private static readonly List<(RectTransform rect, bool horizontal)> outlineStrips = [];
+    // The panel's sprite-based outer border ring; its stroke also follows the
+    // setting (regenerated, since it's a procedural ring sprite not a strip).
+    private static Image borderImage;
     private static CanvasGroup menuCanvasGroup;
+    private static CanvasGroup subMenuCanvasGroup;
     private static CanvasGroup panelCanvasGroup;
     private static CanvasGroup exitReorganizeCanvasGroup;
     private static GTween reorganizeSeq;
@@ -355,6 +453,10 @@ public static class UICore {
     } = 1f;
 
     private static void CreatePanel() {
+        // Outline elements are rebuilt below; drop the previous build's refs.
+        outlineStrips.Clear();
+        borderImage = null;
+
         GameObject panel = new("Panel");
         panel.transform.SetParent(canvasObj.transform, false);
 
@@ -418,6 +520,8 @@ public static class UICore {
             mask.showMaskGraphic = false;
 
             Page = PageFactory.CreatePages(menuPanel);
+            CreateBottomBand(menuPanel.transform);
+            CreateSubMenu(menuPanel.transform);
 
             // Menu
             GameObject menu = new("Menu");
@@ -439,7 +543,6 @@ public static class UICore {
             menuCanvasGroup.interactable = true;
             menuCanvasGroup.blocksRaycasts = true;
             isMenuOpen = true;
-            Page.offsetMin = new Vector2(MENU_WIDTH, 0f);
 
             // Menu Content
             GameObject content = new("Content");
@@ -637,6 +740,30 @@ public static class UICore {
             trigger.triggers.Add(exit);
         }
 
+        // Full-width white rule directly under the top bar — the SubMenu
+        // column's top outline, extended across the whole window (its
+        // left/right/bottom edges stay on the column itself). A panel child so
+        // it spans the full width and draws over the menu/submenu/page; added
+        // before the border ring so the ring still frames the corners. y sits
+        // at the content top (panel top - top bar height), which is the
+        // SubMenu's top edge, so the column's side outlines meet it flush.
+        {
+            GameObject topRule = new("SubMenuTopRule");
+            topRule.transform.SetParent(panel.transform, false);
+
+            RectTransform ruleRect = topRule.AddComponent<RectTransform>();
+            ruleRect.anchorMin = new(0, 1);
+            ruleRect.anchorMax = new(1, 1);
+            ruleRect.pivot = new(0.5f, 1);
+            ruleRect.anchoredPosition = new(0, -TOP_BAR_HEIGHT);
+            ruleRect.sizeDelta = new(0, MainCore.Conf.OutlineWidth);
+
+            Image ruleImg = topRule.AddComponent<Image>();
+            ruleImg.color = Color.white;
+            ruleImg.raycastTarget = false;
+            outlineStrips.Add((ruleRect, true));
+        }
+
         // Border ring — last child so it frames over the menu and top bar.
         // Replaces the old white uGUI Outline that washed the panel white on
         // fade (see note where the CanvasGroup is added).
@@ -651,11 +778,404 @@ public static class UICore {
             borderRect.offsetMax = Vector2.zero;
 
             Image borderImg = border.AddComponent<Image>();
-            borderImg.sprite = MainCore.Spr.Get(UISliceSprite.CircleOutline256P1024);
+            // Procedural ring so the stroke can follow the Outline Width
+            // setting; 12.5 corner units matches the panel's rounded corners
+            // (the same radius CircleOutline256P1024 baked in).
+            borderImg.sprite = MainCore.Spr.GetRing(12.5f, BorderStroke(MainCore.Conf.OutlineWidth));
             borderImg.type = Image.Type.Sliced;
             borderImg.color = Color.white;
             borderImg.raycastTarget = false;
+            borderImage = borderImg;
         }
+    }
+
+    // The border ring's stroke can't exceed its 12.5-unit corner radius or the
+    // sliced ring self-overlaps at the corners; the flat edge strips take the
+    // raw width. Floor at 1 so it never vanishes.
+    private static float BorderStroke(float outlineWidth) => Mathf.Clamp(outlineWidth, 1f, 12.5f);
+
+    // Live-applies the Outline Width setting. Flat strips resize instantly
+    // (cheap); the border ring sprite is regenerated only when asked
+    // (regenBorder), since each distinct stroke builds a new procedural
+    // texture — do that on the slider's release, not every drag frame.
+    public static void SetOutlineWidth(float width, bool regenBorder) {
+        for(int i = 0; i < outlineStrips.Count; i++) {
+            (RectTransform rect, bool horizontal) = outlineStrips[i];
+            if(rect == null) continue;
+            rect.sizeDelta = horizontal
+                ? new Vector2(rect.sizeDelta.x, width)
+                : new Vector2(width, rect.sizeDelta.y);
+        }
+
+        if(regenBorder && borderImage != null)
+            borderImage.sprite = MainCore.Spr.GetRing(12.5f, BorderStroke(width));
+    }
+
+    // Second sidebar column: reveals the active top-level category's children
+    // (currently only the Overlay group's 7 pages) at a fixed width. Width is
+    // tweened by ApplyShellLayout, but SubMenuContent itself stays fixed-width
+    // so row text never reflows mid-tween — the tween is a pure reveal wipe,
+    // masked by the RectMask2D below (same trick as the old collapsible
+    // sidebar group, rotated 90 degrees).
+    private static void CreateSubMenu(Transform parent) {
+        GameObject subMenu = new("SubMenu");
+        subMenu.transform.SetParent(parent, false);
+
+        SubMenu = subMenu.AddComponent<RectTransform>();
+        SubMenu.anchorMin = new(0, 0);
+        SubMenu.anchorMax = new(0, 1);
+        SubMenu.pivot = new(0, 0.5f);
+        SubMenu.sizeDelta = new(0f, -TOP_BAR_HEIGHT);
+        SubMenu.anchoredPosition = new(MENU_WIDTH, -TOP_BAR_HEIGHT * 0.5f);
+
+        // TopBar shade (a darker, less accent-tinted palette role than the
+        // Menu's MenuBG) so the secondary column reads as its own recessed
+        // surface instead of blending into the primary tabs. Still a palette
+        // color, so RefreshTheme's accent remap keeps working.
+        var image = subMenu.AddComponent<Image>();
+        image.color = UIColors.TopBar;
+
+        // Hairline on the left edge crisps the seam against Menu — still useful
+        // now that the fill differs, and it stays a palette-safe white alpha.
+        GameObject hairline = new("Hairline");
+        hairline.transform.SetParent(subMenu.transform, false);
+        RectTransform hairlineRect = hairline.AddComponent<RectTransform>();
+        hairlineRect.anchorMin = new(0, 0);
+        hairlineRect.anchorMax = new(0, 1);
+        hairlineRect.pivot = new(0, 0.5f);
+        hairlineRect.sizeDelta = new(1f, 0f);
+        Image hairlineImg = hairline.AddComponent<Image>();
+        hairlineImg.color = new Color(1f, 1f, 1f, 0.08f);
+        hairlineImg.raycastTarget = false;
+
+        // White outline around the column — four crisp edge strips rather than
+        // a sliced outline sprite (those are rounded and would gap at the
+        // column's square top/bottom corners). Created AFTER Content below so
+        // they're the last siblings and draw on TOP of the sidebar rows (like
+        // the panel's own border ring is added last) — otherwise the selected
+        // row and row backgrounds cover the top/edge strips and the outline
+        // looks cut off. Row text is inset well past the strip, so drawing over
+        // the row edge only paints the border, not the label. Still children of
+        // SubMenu, so the RectMask2D keeps them inside the column and the width
+        // tween wipes the right edge in with the reveal.
+        void OutlineEdge(string name, Vector2 aMin, Vector2 aMax, Vector2 pivot, Vector2 size) {
+            GameObject edge = new(name);
+            edge.transform.SetParent(subMenu.transform, false);
+            RectTransform er = edge.AddComponent<RectTransform>();
+            er.anchorMin = aMin;
+            er.anchorMax = aMax;
+            er.pivot = pivot;
+            er.sizeDelta = size;
+            er.anchoredPosition = Vector2.zero;
+            Image ei = edge.AddComponent<Image>();
+            ei.color = Color.white;
+            ei.raycastTarget = false;
+            // horizontal strip (top/bottom) sets its y size; vertical its x.
+            outlineStrips.Add((er, size.x == 0f));
+        }
+
+        subMenu.AddComponent<RectMask2D>();
+        subMenuCanvasGroup = subMenu.AddComponent<CanvasGroup>();
+        subMenuCanvasGroup.alpha = 1f;
+
+        GameObject content = new("Content");
+        content.transform.SetParent(subMenu.transform, false);
+
+        SubMenuContent = content.AddComponent<RectTransform>();
+        SubMenuContent.anchorMin = new(0, 1);
+        SubMenuContent.anchorMax = new(0, 1);
+        SubMenuContent.pivot = new(0, 1);
+        SubMenuContent.anchoredPosition = Vector2.zero;
+        SubMenuContent.sizeDelta = new(SUBMENU_WIDTH, 0);
+
+        GenerateUI.FitVertical(content, 0f);
+
+        // Outline last, so it renders over the rows (see OutlineEdge note).
+        // Width matches the panel's outer border-ring stroke: that ring is
+        // CircleOutline(cornerRadius, cornerRadius/2), i.e. half the 12.5-unit
+        // corner radius = 6.25 units, so the column outline reads as thick as
+        // the window's. The TOP edge isn't drawn here — it's a full-width rule
+        // under the top bar (CreatePanel's SubMenuTopRule), so it spans the
+        // whole window rather than just this column.
+        float outline = MainCore.Conf.OutlineWidth;
+        OutlineEdge("OutlineBottom", new(0, 0), new(1, 0), new(0.5f, 0f), new(0f, outline));
+        OutlineEdge("OutlineLeft", new(0, 0), new(0, 1), new(0f, 0.5f), new(outline, 0f));
+        OutlineEdge("OutlineRight", new(1, 0), new(1, 1), new(1f, 0.5f), new(outline, 0f));
+    }
+
+    // Bottom Band — a strip under the main page content hosting ContextPane/
+    // LivePreviewPane. A genuine child of MenuPanel, shrinking Page's height
+    // from below the same way Menu/SubMenu shrink its width from the left.
+    private static void CreateBottomBand(Transform parent) {
+        bandHeight = ClampBand(MainCore.Conf.ContextBandHeight > 0f ? MainCore.Conf.ContextBandHeight : DefaultBandHeight);
+
+        GameObject band = new("BottomBand");
+        band.transform.SetParent(parent, false);
+
+        BottomBand = band.AddComponent<RectTransform>();
+        BottomBand.anchorMin = new(0, 0);
+        BottomBand.anchorMax = new(1, 0);
+        BottomBand.pivot = new(0.5f, 0f);
+        // Initial left inset is provisional — the first ApplyShellLayout call
+        // (triggered from MenuFactory.CreateMenu, later in the same build)
+        // corrects it the same frame.
+        BottomBand.offsetMin = new(MENU_WIDTH, 0f);
+        BottomBand.offsetMax = new(0f, bandHeight);
+
+        // TopBar shade (matching SubMenu) so the band reads as its own recessed
+        // surface, distinct from the darker Page content above it.
+        var image = band.AddComponent<Image>();
+        image.color = UIColors.TopBar;
+        band.AddComponent<RectMask2D>();
+        // Faded together with the height when the band reveals/hides.
+        bandCanvasGroup = band.AddComponent<CanvasGroup>();
+
+        // White outline along the band's top edge (the seam against Page) —
+        // 6.25px to match the submenu column outline and the panel border
+        // stroke, instead of the old faint 1px hairline.
+        GameObject bandHairline = new("Outline");
+        bandHairline.transform.SetParent(band.transform, false);
+        RectTransform bandHairlineRect = bandHairline.AddComponent<RectTransform>();
+        bandHairlineRect.anchorMin = new(0, 1);
+        bandHairlineRect.anchorMax = new(1, 1);
+        bandHairlineRect.pivot = new(0.5f, 1f);
+        bandHairlineRect.sizeDelta = new(0f, MainCore.Conf.OutlineWidth);
+        bandHairlineRect.anchoredPosition = Vector2.zero;
+        Image bandHairlineImg = bandHairline.AddComponent<Image>();
+        bandHairlineImg.color = Color.white;
+        bandHairlineImg.raycastTarget = false;
+        outlineStrips.Add((bandHairlineRect, true));
+
+        GameObject content = new("Content");
+        content.transform.SetParent(band.transform, false);
+        BottomBandContent = content.AddComponent<RectTransform>();
+        BottomBandContent.anchorMin = Vector2.zero;
+        BottomBandContent.anchorMax = Vector2.one;
+        BottomBandContent.offsetMin = Vector2.zero;
+        BottomBandContent.offsetMax = Vector2.zero;
+
+        var layout = content.AddComponent<VerticalLayoutGroup>();
+        layout.childControlWidth = true;
+        layout.childControlHeight = true;
+        layout.childForceExpandWidth = true;
+        layout.childForceExpandHeight = false;
+        layout.spacing = 8f;
+
+        // Live Preview Pane — fixed-height strip; collapses entirely
+        // (SetActive) when empty so it takes no layout space at all. Its own
+        // card background (distinct from the band's base fill) plus a hairline
+        // divider at its own bottom edge read it as a separate space from
+        // Context Pane below, rather than one continuous surface — both only
+        // visible while this pane has content, since they're its own children.
+        GameObject livePreview = new("LivePreviewPane");
+        livePreview.transform.SetParent(content.transform, false);
+        RectTransform livePreviewRect = livePreview.AddComponent<RectTransform>();
+        var livePreviewLayout = livePreview.AddComponent<LayoutElement>();
+        livePreviewLayout.minHeight = 0f;
+        livePreviewLayout.preferredHeight = 140f;
+        livePreviewLayout.flexibleHeight = 0f;
+
+        GameObject liveCard = new("Card");
+        liveCard.transform.SetParent(livePreview.transform, false);
+        RectTransform liveCardRect = liveCard.AddComponent<RectTransform>();
+        liveCardRect.anchorMin = Vector2.zero;
+        liveCardRect.anchorMax = Vector2.one;
+        liveCardRect.offsetMin = new(8f, 8f);
+        liveCardRect.offsetMax = new(-8f, -8f);
+        Image liveCardBg = liveCard.AddComponent<Image>();
+        liveCardBg.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
+        liveCardBg.type = Image.Type.Sliced;
+        liveCardBg.color = UIColors.ObjectBG;
+
+        GameObject liveDivider = new("Divider");
+        liveDivider.transform.SetParent(livePreview.transform, false);
+        RectTransform liveDividerRect = liveDivider.AddComponent<RectTransform>();
+        liveDividerRect.anchorMin = new(0f, 0f);
+        liveDividerRect.anchorMax = new(1f, 0f);
+        liveDividerRect.pivot = new(0.5f, 0f);
+        liveDividerRect.sizeDelta = new(0f, 1f);
+        liveDividerRect.anchoredPosition = Vector2.zero;
+        Image liveDividerImg = liveDivider.AddComponent<Image>();
+        liveDividerImg.color = new Color(1f, 1f, 1f, 0.08f);
+
+        // Context Pane — scrollable (reuses the same pad/viewport/content
+        // machinery every other page uses), fills whatever height Live
+        // Preview doesn't take.
+        GameObject contextPane = new("ContextPane");
+        contextPane.transform.SetParent(content.transform, false);
+        RectTransform contextPaneRect = contextPane.AddComponent<RectTransform>();
+        var contextPaneLayout = contextPane.AddComponent<LayoutElement>();
+        contextPaneLayout.minHeight = 0f;
+        contextPaneLayout.flexibleHeight = 1f;
+        RectTransform contextContentRect = PageFactory.CreateScrollablePage(contextPaneRect);
+
+        ContextPane.Attach(contextPaneRect, contextContentRect);
+        LivePreviewPane.Attach(livePreviewRect, liveCardRect);
+
+        // Divider strip on the band's top edge — dragging up grows it,
+        // dragging down shrinks it, since the band's bottom edge is pinned to
+        // Panel and can't move.
+        GameObject divider = new("Divider");
+        divider.transform.SetParent(band.transform, false);
+        RectTransform dividerRect = divider.AddComponent<RectTransform>();
+        dividerRect.anchorMin = new(0, 1);
+        dividerRect.anchorMax = new(1, 1);
+        dividerRect.pivot = new(0.5f, 0.5f);
+        dividerRect.sizeDelta = new(0, 8);
+        dividerRect.anchoredPosition = Vector2.zero;
+
+        var dividerImg = divider.AddComponent<Image>();
+        dividerImg.color = Color.clear;
+
+        var paneDivider = divider.AddComponent<PaneDivider>();
+        paneDivider.Target = BottomBand;
+        paneDivider.CoordinateSpace = parent as RectTransform;
+        paneDivider.Axis = PaneDividerAxis.Vertical;
+        paneDivider.MinSize = BandMinHeight;
+        paneDivider.MaxSize = BandMaxHeight;
+        // Bypasses the shell tween entirely — writes BottomBand.sizeDelta.y
+        // (via PaneDivider itself) and Page.offsetMin.y directly every drag
+        // frame, so Page yields height live instead of visibly overlapping
+        // the band until pointer-up.
+        paneDivider.OnResized = h => {
+            bandHeight = ClampBand(h);
+            // The band is open while it's being dragged, so the live height
+            // tracks the configured one (keeps the shell layout in sync).
+            bandShown = bandHeight;
+            if(!Mathf.Approximately(bandHeight, h)) BottomBand.sizeDelta = new Vector2(BottomBand.sizeDelta.x, bandHeight);
+            Page.offsetMin = new Vector2(Page.offsetMin.x, bandHeight);
+        };
+        paneDivider.OnResizeEnd = _ => {
+            MainCore.Conf.ContextBandHeight = bandHeight;
+            MainCore.ConfMgr.RequestSave();
+        };
+
+        // Panes start empty, so the band starts collapsed (hidden) — it reveals
+        // itself, animated, the first time a page pushes pane content.
+        RefreshBand(false);
+    }
+
+    // Reveals or hides the bottom band depending on whether either pane has
+    // content, animating its height (and fade) between 0 and the configured
+    // height. Page's bottom inset follows via bandShown. Called on every pane
+    // content change (PaneState.Changed) and once at build.
+    public static void RefreshBand(bool animate) {
+        if(BottomBand == null || Page == null) return;
+
+        bool open = ContextPane.HasContent || LivePreviewPane.HasContent;
+        float target = open ? ClampBand(bandHeight) : 0f;
+
+        bandSeq?.Kill();
+
+        // Must be active to be seen growing in; deactivated only after it has
+        // fully collapsed (below), so it takes no layout/raycast space when hidden.
+        if(open) BottomBand.gameObject.SetActive(true);
+
+        if(!animate) {
+            ApplyBandHeight(target);
+            if(!open) BottomBand.gameObject.SetActive(false);
+            return;
+        }
+
+        bandSeq = GTweenExtensions.Tween(
+            () => bandShown,
+            ApplyBandHeight,
+            target,
+            0.28f
+        ).SetEasing(Easing.OutExpo);
+        bandSeq.OnComplete(() => {
+            if(!open && BottomBand != null) BottomBand.gameObject.SetActive(false);
+        });
+        MainCore.TC.Play(bandSeq);
+    }
+
+    // Writes the live band height everywhere that depends on it: the band's own
+    // size, Page's bottom inset, and the band fade.
+    private static void ApplyBandHeight(float h) {
+        bandShown = h;
+        if(BottomBand != null) BottomBand.sizeDelta = new Vector2(BottomBand.sizeDelta.x, h);
+        if(Page != null) Page.offsetMin = new Vector2(Page.offsetMin.x, h);
+        if(bandCanvasGroup != null) {
+            float full = Mathf.Max(1f, ClampBand(bandHeight));
+            bandCanvasGroup.alpha = Mathf.Clamp01(h / full);
+        }
+    }
+
+    // Clamps a candidate band height to its declared min/max and to whatever
+    // vertical space the panel can actually spare (top bar + a minimum page
+    // height), so the band can never squeeze Page below a usable size.
+    private static float ClampBand(float h) =>
+        Mathf.Clamp(h, BandMinHeight, Mathf.Min(BandMaxHeight, Panel.sizeDelta.y - 2f - TOP_BAR_HEIGHT - MinPageHeight));
+
+    private static GTween shellSeq;
+
+    // Single writer for all shell geometry (Menu/SubMenu/Page/BottomBand
+    // insets + fades) — prevents a menu-open/close tween, a submenu-visibility
+    // change, and the initial build from fighting each other with disjoint
+    // partial writes to the same RectTransforms.
+    private static void ApplyShellLayout(bool animate, float duration = 0f) {
+        shellSeq?.Kill();
+
+        if(!animate) {
+            SnapShellLayout();
+            return;
+        }
+
+        Vector2 menuTarget = isMenuOpen ? MenuOpenPosition : MenuClosedPosition;
+        float subMenuX = isMenuOpen ? MENU_WIDTH : -SUBMENU_WIDTH;
+        float subMenuW = subMenuHasChildren ? SUBMENU_WIDTH : 0f;
+        float leftInset = isMenuOpen ? MENU_WIDTH + (subMenuHasChildren ? SUBMENU_WIDTH : 0f) : 0f;
+        float menuAlpha = isMenuOpen ? 1f : 0f;
+        float subMenuAlpha = isMenuOpen && subMenuHasChildren ? 1f : 0f;
+
+        // Interactable/raycast flags flip immediately, not tweened.
+        menuCanvasGroup.interactable = isMenuOpen;
+        menuCanvasGroup.blocksRaycasts = isMenuOpen;
+        subMenuCanvasGroup.interactable = isMenuOpen && subMenuHasChildren;
+        subMenuCanvasGroup.blocksRaycasts = isMenuOpen && subMenuHasChildren;
+
+        shellSeq = GTweenSequenceBuilder.New()
+            .Join(Menu.GTAnchorPos(menuTarget, duration).SetEasing(Easing.OutExpo))
+            .Join(SubMenu.GTAnchorPosX(subMenuX, duration).SetEasing(Easing.OutExpo))
+            .Join(SubMenu.GTSizeDelta(new Vector2(subMenuW, SubMenu.sizeDelta.y), duration).SetEasing(Easing.OutExpo))
+            .Join(Page.GTOffsetMin(new Vector2(leftInset, bandShown), duration).SetEasing(Easing.OutExpo))
+            .Join(BottomBand.GTOffsetMin(new Vector2(leftInset, 0f), duration).SetEasing(Easing.OutExpo))
+            .Join(menuCanvasGroup.GTFade(menuAlpha, Mathf.Min(duration, 0.3f)).SetEasing(Easing.OutSine))
+            .Join(subMenuCanvasGroup.GTFade(subMenuAlpha, Mathf.Min(duration, 0.3f)).SetEasing(Easing.OutSine))
+            // Self-heal: re-snap every target from *current* state, in case
+            // state changed again mid-tween (rapid open/close/category clicks).
+            .AppendCallback(SnapShellLayout)
+            .Build();
+        MainCore.TC.Play(shellSeq);
+    }
+
+    // Re-derives every shell target from current state and writes it directly
+    // (no tween). Used for the non-animated build/rebuild path and as the
+    // animated sequence's completion callback.
+    private static void SnapShellLayout() {
+        Vector2 menuTarget = isMenuOpen ? MenuOpenPosition : MenuClosedPosition;
+        float subMenuX = isMenuOpen ? MENU_WIDTH : -SUBMENU_WIDTH;
+        float subMenuW = subMenuHasChildren ? SUBMENU_WIDTH : 0f;
+        float leftInset = isMenuOpen ? MENU_WIDTH + (subMenuHasChildren ? SUBMENU_WIDTH : 0f) : 0f;
+
+        Menu.anchoredPosition = menuTarget;
+        SubMenu.anchoredPosition = new Vector2(subMenuX, SubMenu.anchoredPosition.y);
+        SubMenu.sizeDelta = new Vector2(subMenuW, SubMenu.sizeDelta.y);
+        Page.offsetMin = new Vector2(leftInset, bandShown);
+        BottomBand.offsetMin = new Vector2(leftInset, 0f);
+        menuCanvasGroup.alpha = isMenuOpen ? 1f : 0f;
+        subMenuCanvasGroup.alpha = isMenuOpen && subMenuHasChildren ? 1f : 0f;
+        menuCanvasGroup.interactable = isMenuOpen;
+        menuCanvasGroup.blocksRaycasts = isMenuOpen;
+        subMenuCanvasGroup.interactable = isMenuOpen && subMenuHasChildren;
+        subMenuCanvasGroup.blocksRaycasts = isMenuOpen && subMenuHasChildren;
+    }
+
+    // MenuFactory owns column-2 content (which category is active, whether it
+    // has children); UICore owns the geometry that reveals/hides it.
+    public static void SetSubMenuVisible(bool hasChildren, bool animate) {
+        subMenuHasChildren = hasChildren;
+        ApplyShellLayout(animate, 0.22f);
     }
 
     private static float holdStartTime = 0f;
@@ -704,6 +1224,19 @@ public static class UICore {
         MainCore.Conf.PanelWidth = Panel.sizeDelta.x;
         MainCore.Conf.PanelHeight = Panel.sizeDelta.y;
         MainCore.ConfMgr.RequestSave();
+
+        // A panel shrink can leave the band claiming more height than the
+        // (now smaller) panel can spare. Accepted transient: during the
+        // shrink drag itself the band can momentarily crowd the page; this
+        // snaps it right at drag end.
+        float clamped = ClampBand(bandHeight);
+        if(!Mathf.Approximately(clamped, bandHeight)) {
+            bandHeight = clamped;
+            // Re-apply through the visibility state so a hidden (empty) band
+            // isn't forced open by the re-clamp — only an already-open band
+            // snaps to the new height.
+            RefreshBand(false);
+        }
     }
 
     public static void HandleUpdate() {
@@ -929,49 +1462,35 @@ public static class UICore {
     }
 
     private static bool isMenuOpen = false;
-    private static GTween menuSequence;
     private static Vector2 MenuOpenPosition => new(0f, -TOP_BAR_HEIGHT * 0.5f);
     private static Vector2 MenuClosedPosition => new(-MENU_WIDTH, -TOP_BAR_HEIGHT * 0.5f);
 
     public static void OpenMenu() {
-        menuSequence?.Kill();
-
         isMenuOpen = true;
 
+        // Force a consistent slide-in distance even if a rapid double-toggle
+        // caught Menu mid-close.
         Menu.anchoredPosition = MenuClosedPosition;
         menuCanvasGroup.interactable = true;
         menuCanvasGroup.blocksRaycasts = true;
 
-        menuSequence = GTweenSequenceBuilder.New()
-            .Join(Menu.GTAnchorPos(MenuOpenPosition, 0.6f).SetEasing(Easing.OutExpo))
-            .Join(menuCanvasGroup.GTFade(1f, 0.4f).SetEasing(Easing.OutSine))
-            .Join(Page.GTOffsetMin(new Vector2(MENU_WIDTH, 0), 0.6f).SetEasing(Easing.OutExpo))
-            .Build();
-        MainCore.TC.Play(menuSequence);
-
-        isMenuOpen = true;
+        ApplyShellLayout(true, 0.6f);
     }
 
     public static void CloseMenu() {
-        menuSequence?.Kill();
-
         menuCanvasGroup.interactable = false;
         menuCanvasGroup.blocksRaycasts = false;
 
-        menuSequence = GTweenSequenceBuilder.New()
-            .Join(Menu.GTAnchorPos(MenuClosedPosition, 0.4f).SetEasing(Easing.OutExpo))
-            .Join(menuCanvasGroup.GTFade(0f, 0.3f).SetEasing(Easing.OutSine))
-            .Join(Page.GTOffsetMin(new Vector2(0, 0), 0.4f).SetEasing(Easing.OutExpo))
-            .Build();
-        MainCore.TC.Play(menuSequence);
-
         isMenuOpen = false;
+
+        ApplyShellLayout(true, 0.4f);
     }
 
     public static void ToggleMenu() {
         if(isMenuOpen) CloseMenu();
         else OpenMenu();
     }
+
 
     // Accent theming. Applies a new accent palette and recolors every already-built
     // Image in the canvas by remapping old palette colors -> new ones (white/icon
@@ -1102,6 +1621,9 @@ public static class UICore {
     public static void Dispose() {
         MainCore.Tr.OnLoadEnd -= _onPageSettings;
         MainCore.Tr.OnLoadEnd -= _onRefresh;
+        MenuFactory.OnStateChanged -= _onDockTabChanged;
+        Panes.PaneState.Changed -= _onPaneChanged;
+        bandSeq?.Kill();
         themeImages = null;
         UIObject.DisposeAll();
         Reorganizer.Dispose();

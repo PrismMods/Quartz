@@ -6,18 +6,32 @@ using UnityEngine;
 
 namespace Quartz.UI.Factory.Page;
 
-// The BackToThePast ("Nostalgia") toggles, dropped into each host page (Editor /
-// Visuals / Gameplay / Tweaks) under a big "Nostalgia" heading (not a
-// collapsible). The feature backend lives in Quartz.Features.Nostalgia; this just
-// builds the rows. Localization ids are unchanged (nost_*), so the existing
-// NOST_* / DESC_NOST_* lang keys still apply.
+// The BackToThePast ("Nostalgia") toggles. These are the four sub-pages of the
+// Nostalgia sidebar category (see MenuFactory.CategoryChildren), split by the
+// feature tab their toggles used to be injected into. The feature backend lives
+// in Quartz.Features.Nostalgia; this just builds the rows. Localization ids are
+// unchanged (nost_*), so the existing NOST_* / DESC_NOST_* lang keys still apply.
 internal static class NostalgiaUI {
     private static NostalgiaSettings Conf => Nostalgia.Conf;
     private static NostalgiaSettings Def => def ??= new NostalgiaSettings();
     private static NostalgiaSettings def;
 
-    private static void Heading(Transform p, string text) =>
-        GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(p)), "NOSTALGIA", text);
+    // Standalone-page entry points for PageFactory. The page H1 is the area name
+    // (the sidebar category column already reads "Nostalgia").
+    public static void GameplayPage(RectTransform parent) =>
+        AddGameplaySection(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
+
+    public static void VisualsPage(RectTransform parent) =>
+        AddVisualsSection(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
+
+    public static void TweaksPage(RectTransform parent) =>
+        AddTweaksSection(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
+
+    public static void EditorPage(RectTransform parent) =>
+        AddEditorSection(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
+
+    private static void Heading(Transform p, string key, string text) =>
+        GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(p)), key, text);
 
     private static void Toggle(Transform p, bool dft, bool val, Action<bool> set,
                                string label, string id, string desc) {
@@ -35,7 +49,7 @@ internal static class NostalgiaUI {
     // === Editor tab ===
     public static void AddEditorSection(Transform b) {
         Nostalgia.EnsureConf();
-        Heading(b, "Nostalgia");
+        Heading(b, "EDITOR", "Editor");
 
         Toggle(b, Def.HideDifficulty, Conf.HideDifficulty,
             v => { Conf.HideDifficulty = v; Nostalgia.Save(); Nostalgia.Refresh(); },
@@ -81,7 +95,7 @@ internal static class NostalgiaUI {
     // === Visuals tab ===
     public static void AddVisualsSection(Transform b) {
         Nostalgia.EnsureConf();
-        Heading(b, "Nostalgia");
+        Heading(b, "VISUALS", "Visuals");
 
         Toggle(b, Def.NoResult, Conf.NoResult,
             v => { Conf.NoResult = v; Nostalgia.Save(); },
@@ -133,7 +147,7 @@ internal static class NostalgiaUI {
     // === Gameplay tab ===
     public static void AddGameplaySection(Transform b) {
         Nostalgia.EnsureConf();
-        Heading(b, "Nostalgia");
+        Heading(b, "GAMEPLAY", "Gameplay");
 
         Toggle(b, Def.OldPracticeMode, Conf.OldPracticeMode,
             v => { Conf.OldPracticeMode = v; Nostalgia.Save(); },
@@ -144,7 +158,7 @@ internal static class NostalgiaUI {
     // === Tweaks tab (SFX + Etc) ===
     public static void AddTweaksSection(Transform b) {
         Nostalgia.EnsureConf();
-        Heading(b, "Nostalgia");
+        Heading(b, "TWEAKS", "Tweaks");
 
         Toggle(b, Def.DisablePurePerfectSound, Conf.DisablePurePerfectSound,
             v => { Conf.DisablePurePerfectSound = v; Nostalgia.Save(); },

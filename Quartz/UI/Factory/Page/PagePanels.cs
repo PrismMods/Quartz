@@ -1,7 +1,5 @@
 using Quartz.Core;
-using Quartz.Features.Combo;
 using Quartz.Features.Panels;
-using Quartz.Features.ProgressBar;
 using Quartz.Resource;
 using Quartz.Tween;
 using Quartz.UI;
@@ -23,52 +21,24 @@ using TMPro;
 
 namespace Quartz.UI.Factory.Page;
 
-// Settings page for the overlay HUDs. Master "Enable Overlays" toggle at the
-// top (no category), then the Progress Bar / Combo / Judgement sections, then
-// the Panels category: user-created, named panels that any catalog stat can
-// be placed on — replacing the old fixed Left/Right HUD.
-internal static partial class PageOverlay {
+// Panels page — one of the children of the collapsible "Overlay" sidebar
+// group. User-created, named panels that any catalog stat can be placed on;
+// extracted from the old monolithic PageOverlay.cs, which also used to host
+// the other overlay features (now their own separate pages) and the master
+// Enable Overlays toggle / Reorganize button (now on PageOverlayGeneral).
+internal static partial class PagePanels {
     private static GameObject panelsList;
 
     public static void Create(RectTransform parent) {
         PanelsOverlay.EnsureConf();
-        PanelsSettings conf = PanelsOverlay.Conf;
-        PanelsSettings def = new();
         RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
 
-        // === Top: master toggle + reorganize, no category ===
+        var headerRow = GenerateUI.Row(content.transform);
+        var headerText = GenerateUI.AddTextH1(headerRow);
+        GenerateUI.Localize(headerText, "SECTION_PANELS", "Panels");
 
         GenerateUI.Button(
             GenerateUI.Row(content.transform),
-            () => UICore.EnterReorganize(),
-            "Reorganize",
-            "overlay_reorganize"
-        );
-
-        GenerateUI.ToggleTip(
-            content.transform,
-            def.Enabled,
-            conf.Enabled,
-            v => { conf.Enabled = v; PanelsOverlay.Save(); },
-            "Enable Overlays",
-            "overlay_enabled",
-            "Master switch for every overlay HUD — panels, progress bar, combo and judgement."
-        );
-
-        // === Separate feature sections ===
-
-        PageProgressBar.AppendTo(content.transform);
-        PageCombo.AppendTo(content.transform);
-        PageJudgement.AppendTo(content.transform);
-        PageKeyViewer.AppendTo(content.transform);
-        PageSongTitle.AppendTo(content.transform);
-
-        // === Panels ===
-
-        var panelsSec = GenerateUI.Collapsible(content.transform, "Panels", startExpanded: true);
-
-        GenerateUI.Button(
-            GenerateUI.Row(panelsSec.Body),
             () => {
                 PanelConfig p = new() {
                     Name = "Panel " + (PanelsOverlay.Conf.Panels.Count + 1),
@@ -90,51 +60,11 @@ internal static partial class PageOverlay {
         );
 
         panelsList = new GameObject("PanelsList");
-        panelsList.transform.SetParent(panelsSec.Body, false);
+        panelsList.transform.SetParent(content.transform, false);
         panelsList.AddComponent<RectTransform>();
         GenerateUI.FitVertical(panelsList);
 
         RebuildPanelsList();
-
-        // === Layout / Reset (panel positions reset inside each panel) ===
-        {
-            var sec = GenerateUI.Collapsible(content.transform, "Layout", startExpanded: false);
-
-            GenerateUI.Button(
-                GenerateUI.Row(sec.Body),
-                () => ProgressBarOverlay.ResetPosition(),
-                "Reset Progress Bar Position",
-                "overlay_resetprogressbar"
-            );
-
-            GenerateUI.Button(
-                GenerateUI.Row(sec.Body),
-                () => ComboOverlay.ResetPosition(),
-                "Reset Combo Position",
-                "overlay_resetcombo"
-            );
-
-            GenerateUI.Button(
-                GenerateUI.Row(sec.Body),
-                () => Quartz.Features.Judgement.JudgementOverlay.ResetPosition(),
-                "Reset Judgement Position",
-                "overlay_resetjudgement"
-            );
-
-            GenerateUI.Button(
-                GenerateUI.Row(sec.Body),
-                () => Quartz.Features.SongTitle.SongTitleOverlay.ResetPosition(),
-                "Reset Song Title Position",
-                "overlay_resetsongtitle"
-            );
-
-            GenerateUI.Button(
-                GenerateUI.Row(sec.Body),
-                () => Quartz.Features.KeyViewer.KeyViewerOverlay.ResetPosition(),
-                "Reset Key Viewer Position",
-                "overlay_resetkeyviewer"
-            );
-        }
     }
 
     // Soft cap: past this many panels, a warning is shown, but creation is
@@ -598,11 +528,16 @@ internal static partial class PageOverlay {
         Transform picker, PanelConfig panel, string idp, Action<string> onPick
     ) {
         bool any = false;
-        string[] categories = ["Accuracy", "Time", "BPM", "Map Stats", "Other"];
+        // Built-in categories in their fixed order, then any category an
+        // addon stat introduced, in registration order.
+        List<string> categories = ["Accuracy", "Time", "BPM", "Map Stats", "Other"];
+        IReadOnlyList<PanelsOverlay.StatDef> allStats = PanelsOverlay.AllStats;
+        foreach(PanelsOverlay.StatDef stat in allStats)
+            if(!categories.Contains(stat.Category)) categories.Add(stat.Category);
         foreach(string category in categories) {
             bool headerAdded = false;
 
-            foreach(PanelsOverlay.StatDef stat in PanelsOverlay.Catalog) {
+            foreach(PanelsOverlay.StatDef stat in allStats) {
                 if(stat.Category != category) continue;
                 if(stat.Id != "text" && panel.Stats.Exists(e => e.Id == stat.Id)) continue;
 
@@ -899,7 +834,7 @@ internal static partial class PageOverlay {
     };
 
     private static string StatDefaultLabel(string id) {
-        foreach(PanelsOverlay.StatDef stat in PanelsOverlay.Catalog)
+        foreach(PanelsOverlay.StatDef stat in PanelsOverlay.AllStats)
             if(stat.Id == id) return stat.Label;
         return id;
     }

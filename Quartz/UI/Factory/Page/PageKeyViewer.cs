@@ -2,7 +2,9 @@ using Quartz.Core;
 using Quartz.Features.KeyViewer;
 using Quartz.Resource;
 using Quartz.UI.Generator;
+using Quartz.UI.Objects;
 using Quartz.UI.Objects.Impl;
+using Quartz.UI.Panes;
 using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.EventSystems.PointerEventData;
@@ -31,13 +33,12 @@ internal static class PageKeyViewer {
         void Save() => KeyViewerOverlay.Save();
         void Apply() => KeyViewerOverlay.Apply();
 
-        GenerateUI.CollapsibleSection sec = null;
-        sec = GenerateUI.Collapsible(
-            content, "Key Viewer", startExpanded: false,
-            v => { conf.Enabled = v; Save(); ApplyHeaderEnabledCue(sec, conf.Enabled); },
-            conf.Enabled
+        GenerateUI.CollapsibleSection sec = GenerateUI.FlatSection(
+            content, "Key Viewer",
+            v => { conf.Enabled = v; Save(); },
+            conf.Enabled,
+            "Enable Key Viewer", "keyviewer_enable"
         );
-        ApplyHeaderEnabledCue(sec, conf.Enabled);
 
         RectTransform simpleBody = null;
         RectTransform dmNoteBody = null;
@@ -93,12 +94,8 @@ internal static class PageKeyViewer {
         simpleBody = GenerateUI.MakeBody(sec.Body, "SimpleMode");
         dmNoteBody = GenerateUI.MakeBody(sec.Body, "DmNoteMode");
 
-        // Declared ahead: the style dropdown rebuilds the preview, and the
-        // per-key editors below refresh their values when the selection changes.
+        // Declared ahead: the style dropdown rebuilds the preview.
         Action rebuildPreview = null;
-        // The per-key popup (rebind / label / ghost / per-key colours & fonts)
-        // refreshes its controls for the selected key through this.
-        Action refreshPopup = null;
 
         GenerateUI.DropDown(
             GenerateUI.Row(simpleBody),
@@ -240,20 +237,30 @@ internal static class PageKeyViewer {
         int LabelIndexFor(int slot) =>
             slot >= KeyViewerSettings.FootSlotBase ? slot - KeyViewerSettings.FootSlotBase : slot;
 
-        // Clicking a key opens its editor popup. It no longer auto-arms a rebind
-        // — the popup's Rebind button does that explicitly.
+        // Rebuilds the context-pane editor for whatever's currently selected —
+        // used whenever something the editor displays changes (listening
+        // state, a just-captured key, a just-seeded color/font) without a new
+        // key being selected. A no-op if nothing's selected.
+        void RefreshContextEditor() {
+            if(SlotValid()) ContextPane.SetContent((root, tracked) => BuildKeyEditor(root, selectedSlot, tracked));
+        }
+
+        // Clicking a key opens its editor in the context pane (and mirrors its
+        // live press state in the live-preview pane). It no longer auto-arms a
+        // rebind — the editor's own Rebind button does that explicitly.
         void SelectSlot(int slot) {
             selectedSlot = slot;
             listening = false;
             ghostListening = false;
-            refreshPopup?.Invoke();
             RefreshPreviewVisuals();
+            ContextPane.SetContent((root, tracked) => BuildKeyEditor(root, slot, tracked));
+            LivePreviewPane.SetContent((root, tracked) => BuildLivePreview(root, slot, tracked));
         }
 
         void CancelCapture() {
             listening = false;
             ghostListening = false;
-            refreshPopup?.Invoke();
+            RefreshContextEditor();
             RefreshPreviewVisuals();
         }
 
@@ -276,7 +283,7 @@ internal static class PageKeyViewer {
                 }
             }
             listening = false;
-            refreshPopup?.Invoke();
+            RefreshContextEditor();
             RefreshPreviewVisuals();
         }
 
@@ -288,7 +295,7 @@ internal static class PageKeyViewer {
                 KeyViewerOverlay.Rebuild();
             }
             ghostListening = false;
-            refreshPopup?.Invoke();
+            RefreshContextEditor();
         }
 
         rebuildPreview = () => {
@@ -298,7 +305,8 @@ internal static class PageKeyViewer {
             selectedSlot = -1;
             listening = false;
             ghostListening = false;
-            refreshPopup?.Invoke();
+            ContextPane.Clear();
+            LivePreviewPane.Clear();
 
             int style = Mathf.Clamp(conf.Style, 0, KeyViewerSettings.MaxStyle);
             int footCount = conf.FootKeyCount();
@@ -414,252 +422,287 @@ internal static class PageKeyViewer {
 
         float SnapFont(float v) => Mathf.Clamp(Mathf.Round(v / 0.05f) * 0.05f, 0.1f, 3f);
 
-        // === Per-key popup ===
-        // Appears when a key in the preview is clicked; edits only that key
-        // (rebind, label, per-key colours/fonts, ghost key). Hidden otherwise.
-        RectTransform popup = MakeCard(simpleBody, "KeyPopup");
-        popup.gameObject.SetActive(false);
+        // === Per-key editor (context pane) ===
+        // Built fresh into ContextPane every time a key in the preview is
+        // clicked; edits only that key (rebind, label, per-key colours/fonts,
+        // ghost key). Replaces what used to be an inline popup card — same
+        // controls, now docked instead of sharing the scroll body.
+        void BuildKeyEditor(RectTransform root, int slot, List<UIObject> tracked) {
+            int style = Style();
 
-        TextMeshProUGUI popupTitle = GenerateUI.AddText(GenerateUI.Row(popup, 36f));
-        popupTitle.fontSize = 24f;
-        popupTitle.alignment = TextAlignmentOptions.MidlineLeft;
+            TextMeshProUGUI title = GenerateUI.AddText(GenerateUI.Row(root, 36f));
+            title.fontSize = 24f;
+            title.alignment = TextAlignmentOptions.MidlineLeft;
+            title.text = listening
+                ? MainCore.Tr.Get("KEYVIEWER_PK_LISTENING", "Press a key... (Esc cancels)")
+                : ghostListening
+                    ? MainCore.Tr.Get("KEYVIEWER_GHOST_LISTENING", "Press the ghost key... (Esc cancels)")
+                    : string.Format(MainCore.Tr.Get("KEYVIEWER_PK_TITLE", "Editing key: {0}"), KeyViewerOverlay.LabelFor(style, slot));
 
-        GenerateUI.Button(
-            GenerateUI.Row(popup),
-            () => { if(SlotValid()) { listening = true; ghostListening = false; refreshPopup?.Invoke(); RefreshPreviewVisuals(); } },
-            "Rebind Key", "keyviewer_pk_rebind"
-        ).Rect.AddToolTip(
-            "DESC_KEYVIEWER_PK_REBIND",
-            "Click, then press the new key for this slot. Esc cancels."
-        );
-
-        labelInput = GenerateUI.Input(
-            GenerateUI.Row(popup),
-            "",
-            "",
-            v => {
-                string[] overrides = LabelArrayFor(selectedSlot);
-                int idx = LabelIndexFor(selectedSlot);
-                if(idx >= 0 && idx < overrides.Length) {
-                    overrides[idx] = v ?? "";
-                    Save();
-                    KeyViewerOverlay.Rebuild();
-                    RefreshPreviewVisuals();
-                }
-            },
-            "Key Label (empty = default)",
-            MainCore.Spr.Get(UISprite.Text128),
-            "keyviewer_keylabel"
-        );
-        labelInput.InputField.characterLimit = 8;
-
-        // Colors: a collapsible whose first body row is the per-key-colours
-        // enable for THIS slot (each key opts in on its own — no global switch),
-        // followed by this key's colour pickers.
-        var colorsSec = GenerateUI.Collapsible(popup, "Colors", startExpanded: false);
-
-        UIToggle pkColorsEnable = GenerateUI.Toggle(
-            GenerateUI.Row(colorsSec.Body),
-            false, conf.PerKeyColorEnabled[0],
-            v => {
-                if(!SlotValid()) return;
-                conf.PerKeyColorEnabled[selectedSlot] = v;
-                if(v && !conf.PerKeyColorInit[selectedSlot]) {
-                    conf.SeedPerKeyColorsFromGlobal(selectedSlot);
-                    conf.PerKeyColorInit[selectedSlot] = true;
-                }
-                Apply();
-                Save();
-                refreshPopup?.Invoke();
-                RefreshPreviewVisuals();
-            },
-            "Separate Colors For This Key", "keyviewer_pk_colorsenable"
-        );
-        pkColorsEnable.Rect.AddToolTip(
-            "DESC_KEYVIEWER_PK_COLORSENABLE",
-            "Give just this key its own colours. The other keys keep the shared colours until you turn theirs on too."
-        );
-
-        UIColorPicker PerKeyColor(string label, string id, Color[] arr, Func<Color> fallback) =>
-            GenerateUI.ColorPicker(
-                GenerateUI.Row(colorsSec.Body),
-                fallback(), fallback(),
-                c => { if(SlotValid()) { arr[selectedSlot] = c; Apply(); RefreshPreviewVisuals(); } },
-                c => { if(SlotValid()) { arr[selectedSlot] = c; Apply(); Save(); RefreshPreviewVisuals(); } },
-                label, id
+            UIButton rebindBtn = GenerateUI.Button(
+                GenerateUI.Row(root),
+                () => { listening = true; ghostListening = false; RefreshContextEditor(); RefreshPreviewVisuals(); },
+                "Rebind Key", "keyviewer_pk_rebind",
+                rightInset: 0f
             );
+            rebindBtn.Rect.AddToolTip("DESC_KEYVIEWER_PK_REBIND", "Click, then press the new key for this slot. Esc cancels.");
+            tracked.Add(rebindBtn);
 
-        UIColorPicker pkBg = PerKeyColor("Background", "keyviewer_pk_bg", conf.PerKeyBg, conf.GetBg);
-        UIColorPicker pkBgPressed = PerKeyColor("Background Pressed", "keyviewer_pk_bgpressed", conf.PerKeyBgPressed, conf.GetBgPressed);
-        UIColorPicker pkOutline = PerKeyColor("Outline", "keyviewer_pk_outline", conf.PerKeyOutline, conf.GetOutline);
-        UIColorPicker pkOutlinePressed = PerKeyColor("Outline Pressed", "keyviewer_pk_outlinepressed", conf.PerKeyOutlinePressed, conf.GetOutlinePressed);
-        UIColorPicker pkText = PerKeyColor("Text", "keyviewer_pk_text", conf.PerKeyText, conf.GetText);
-        UIColorPicker pkTextPressed = PerKeyColor("Text Pressed", "keyviewer_pk_textpressed", conf.PerKeyTextPressed, conf.GetTextPressed);
-        UIColorPicker pkRain = PerKeyColor("Rain", "keyviewer_pk_rain", conf.PerKeyRain, conf.GetRain);
+            string[] labelOverrides = LabelArrayFor(slot);
+            int labelIdx = LabelIndexFor(slot);
+            string currentLabel = labelIdx >= 0 && labelIdx < labelOverrides.Length ? labelOverrides[labelIdx] ?? "" : "";
 
-        // Fonts: a collapsible whose first body row is the per-key font-size
-        // enable for THIS slot (per-key, like the colours above).
-        var fontsSec = GenerateUI.Collapsible(popup, "Fonts", startExpanded: false);
+            labelInput = GenerateUI.Input(
+                GenerateUI.Row(root),
+                "",
+                currentLabel,
+                v => {
+                    string[] arr = LabelArrayFor(slot);
+                    int i = LabelIndexFor(slot);
+                    if(i >= 0 && i < arr.Length) {
+                        arr[i] = v ?? "";
+                        Save();
+                        KeyViewerOverlay.Rebuild();
+                        RefreshPreviewVisuals();
+                    }
+                },
+                "Key Label (empty = default)",
+                MainCore.Spr.Get(UISprite.Text128),
+                "keyviewer_keylabel",
+                rightInset: 0f
+            );
+            labelInput.InputField.characterLimit = 8;
+            tracked.Add(labelInput);
 
-        UIToggle pkFontEnable = GenerateUI.Toggle(
-            GenerateUI.Row(fontsSec.Body),
-            false, conf.PerKeyFontEnabled[0],
-            v => {
-                if(!SlotValid()) return;
-                conf.PerKeyFontEnabled[selectedSlot] = v;
-                if(v && !conf.PerKeyFontInit[selectedSlot]) {
-                    conf.SeedPerKeyFontFromGlobal(selectedSlot);
-                    conf.PerKeyFontInit[selectedSlot] = true;
-                }
-                KeyViewerOverlay.Rebuild();
-                Save();
-                refreshPopup?.Invoke();
-            },
-            "Separate Font Sizes For This Key", "keyviewer_pk_fontenable"
-        );
-        pkFontEnable.Rect.AddToolTip(
-            "DESC_KEYVIEWER_PK_FONTENABLE",
-            "Give just this key its own font sizes. The other keys keep the shared sizes until you turn theirs on too."
-        );
+            // Colors: first row is the per-key-colours enable for THIS slot
+            // (each key opts in on its own — no global switch), followed by
+            // this key's colour pickers.
+            GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(root)), "SECTION_COLORS", "Colors");
 
-        UISlider pkKeyFont = GenerateUI.Slider(
-            GenerateUI.Row(fontsSec.Body), 1f, 0.1f, 3f, 1f, SnapFont, null, null,
-            "Key Font", "keyviewer_pk_keyfont"
-        );
-        pkKeyFont.Format = "0.00 x";
-        pkKeyFont.OnChanged = v => { if(SlotValid()) { conf.PerKeyKeyFont[selectedSlot] = v; } };
-        pkKeyFont.OnComplete = v => { if(SlotValid()) { conf.PerKeyKeyFont[selectedSlot] = v; KeyViewerOverlay.Rebuild(); Save(); } };
-
-        UISlider pkCounterFont = GenerateUI.Slider(
-            GenerateUI.Row(fontsSec.Body), 1f, 0.1f, 3f, 1f, SnapFont, null, null,
-            "Counter Font", "keyviewer_pk_counterfont"
-        );
-        pkCounterFont.Format = "0.00 x";
-        pkCounterFont.OnChanged = v => { if(SlotValid()) { conf.PerKeyCounterFont[selectedSlot] = v; } };
-        pkCounterFont.OnComplete = v => { if(SlotValid()) { conf.PerKeyCounterFont[selectedSlot] = v; KeyViewerOverlay.Rebuild(); Save(); } };
-
-        // Ghost Key: an optional secondary key for this slot that emits its own
-        // ghost-coloured rain streak without touching the press counters. Its
-        // own section (not under Colors) since it's a binding, not a colour;
-        // active whenever a ghost key is set, so the header carries no toggle.
-        var ghostSec = GenerateUI.Collapsible(popup, "Ghost Key", startExpanded: false);
-
-        TextMeshProUGUI ghostKeyLabel = GenerateUI.AddMutedText(GenerateUI.Row(ghostSec.Body, 30f), 17f, 0.6f);
-
-        GenerateUI.Button(
-            GenerateUI.Row(ghostSec.Body),
-            () => { if(SlotValid()) { ghostListening = true; listening = false; refreshPopup?.Invoke(); } },
-            "Set Ghost Key", "keyviewer_ghostset"
-        ).SetNeutral().Rect.AddToolTip(
-            "DESC_KEYVIEWER_GHOSTSET",
-            "Click, then press the secondary (ghost) key for this slot. Esc cancels."
-        );
-
-        GenerateUI.Button(
-            GenerateUI.Row(ghostSec.Body),
-            () => {
-                int[] ghost = GhostArray();
-                if(SlotValid() && selectedSlot < ghost.Length) {
-                    ghost[selectedSlot] = 0;
-                    Save();
-                    KeyViewerOverlay.Rebuild();
-                }
-                ghostListening = false;
-                refreshPopup?.Invoke();
-            },
-            "Clear Ghost Key", "keyviewer_ghostclear"
-        ).SetDanger();
-
-        GenerateUI.Button(
-            GenerateUI.Row(popup),
-            () => {
-                conf.SeedPerKeyColorsFromGlobal();
-                conf.SeedPerKeyFontFromGlobal();
-                for(int i = 0; i < KeyViewerSettings.SlotCount; i++) {
-                    conf.PerKeyColorInit[i] = true;
-                    conf.PerKeyFontInit[i] = true;
-                }
-                KeyViewerOverlay.Rebuild();
-                Save();
-                refreshPopup?.Invoke();
-                RefreshPreviewVisuals();
-            },
-            "Copy Global to All Keys", "keyviewer_pk_copyglobal"
-        ).SetNeutral().Rect.AddToolTip(
-            "DESC_KEYVIEWER_PK_COPYGLOBAL",
-            "Overwrite every key's per-key colours and font sizes with the current shared values."
-        );
-
-        GenerateUI.Button(
-            GenerateUI.Row(popup),
-            () => {
-                if(SlotValid()) {
-                    conf.CopyPerKeyColorsToAll(selectedSlot);
+            UIToggle pkColorsEnable = GenerateUI.Toggle(
+                GenerateUI.Row(root),
+                false, conf.PerKeyColorEnabled[slot],
+                v => {
+                    conf.PerKeyColorEnabled[slot] = v;
+                    if(v && !conf.PerKeyColorInit[slot]) {
+                        conf.SeedPerKeyColorsFromGlobal(slot);
+                        conf.PerKeyColorInit[slot] = true;
+                    }
                     Apply();
                     Save();
-                    refreshPopup?.Invoke();
+                    RefreshContextEditor();
                     RefreshPreviewVisuals();
-                }
-            },
-            "Copy This Key's Colors to All Keys", "keyviewer_pk_copythis"
-        ).SetNeutral().Rect.AddToolTip(
-            "DESC_KEYVIEWER_PK_COPYTHIS",
-            "Copy this key's colours onto every key and turn on separate colours for all of them."
-        );
+                },
+                "Separate Colors For This Key", "keyviewer_pk_colorsenable",
+                rightInset: 0f
+            );
+            pkColorsEnable.Rect.AddToolTip(
+                "DESC_KEYVIEWER_PK_COLORSENABLE",
+                "Give just this key its own colours. The other keys keep the shared colours until you turn theirs on too."
+            );
+            tracked.Add(pkColorsEnable);
 
-        GenerateUI.Button(
-            GenerateUI.Row(popup),
-            () => {
-                selectedSlot = -1;
-                listening = false;
-                ghostListening = false;
-                popup.gameObject.SetActive(false);
-                RefreshPreviewVisuals();
-            },
-            "Close", "keyviewer_pk_close"
-        ).SetDanger();
-
-        refreshPopup = () => {
-            bool valid = SlotValid();
-            if(popup.gameObject.activeSelf != valid) popup.gameObject.SetActive(valid);
-            if(!valid) return;
-
-            int style = Style();
-            if(listening) {
-                popupTitle.text = MainCore.Tr.Get("KEYVIEWER_PK_LISTENING", "Press a key... (Esc cancels)");
-            } else if(ghostListening) {
-                popupTitle.text = MainCore.Tr.Get("KEYVIEWER_GHOST_LISTENING", "Press the ghost key... (Esc cancels)");
-            } else {
-                popupTitle.text = string.Format(
-                    MainCore.Tr.Get("KEYVIEWER_PK_TITLE", "Editing key: {0}"),
-                    KeyViewerOverlay.LabelFor(style, selectedSlot));
+            UIColorPicker PerKeyColor(string label, string id, Color[] arr, Func<Color> fallback) {
+                UIColorPicker picker = GenerateUI.ColorPicker(
+                    GenerateUI.Row(root),
+                    fallback(), arr[slot],
+                    c => { arr[slot] = c; Apply(); RefreshPreviewVisuals(); },
+                    c => { arr[slot] = c; Apply(); Save(); RefreshPreviewVisuals(); },
+                    label, id,
+                    rightInset: 0f
+                );
+                tracked.Add(picker);
+                return picker;
             }
 
-            string[] overrides = LabelArrayFor(selectedSlot);
-            int idx = LabelIndexFor(selectedSlot);
-            labelInput.Set(idx >= 0 && idx < overrides.Length ? overrides[idx] ?? "" : "", invoke: false);
+            PerKeyColor("Background", "keyviewer_pk_bg", conf.PerKeyBg, conf.GetBg);
+            PerKeyColor("Background Pressed", "keyviewer_pk_bgpressed", conf.PerKeyBgPressed, conf.GetBgPressed);
+            PerKeyColor("Outline", "keyviewer_pk_outline", conf.PerKeyOutline, conf.GetOutline);
+            PerKeyColor("Outline Pressed", "keyviewer_pk_outlinepressed", conf.PerKeyOutlinePressed, conf.GetOutlinePressed);
+            PerKeyColor("Text", "keyviewer_pk_text", conf.PerKeyText, conf.GetText);
+            PerKeyColor("Text Pressed", "keyviewer_pk_textpressed", conf.PerKeyTextPressed, conf.GetTextPressed);
+            PerKeyColor("Rain", "keyviewer_pk_rain", conf.PerKeyRain, conf.GetRain);
 
-            int s = selectedSlot;
-            pkColorsEnable.Set(conf.PerKeyColorEnabled[s], invoke: false);
-            pkFontEnable.Set(conf.PerKeyFontEnabled[s], invoke: false);
-            pkKeyFont.Set(conf.PerKeyKeyFont[s], invoke: false);
-            pkCounterFont.Set(conf.PerKeyCounterFont[s], invoke: false);
-            pkBg.Set(conf.PerKeyBg[s], invoke: false);
-            pkBgPressed.Set(conf.PerKeyBgPressed[s], invoke: false);
-            pkOutline.Set(conf.PerKeyOutline[s], invoke: false);
-            pkOutlinePressed.Set(conf.PerKeyOutlinePressed[s], invoke: false);
-            pkText.Set(conf.PerKeyText[s], invoke: false);
-            pkTextPressed.Set(conf.PerKeyTextPressed[s], invoke: false);
-            pkRain.Set(conf.PerKeyRain[s], invoke: false);
+            // Fonts: first row is the per-key font-size enable for THIS slot
+            // (per-key, like the colours above).
+            GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(root)), "SECTION_FONTS", "Fonts");
 
-            int[] ghost = GhostArray();
-            int code = s < ghost.Length ? ghost[s] : 0;
+            UIToggle pkFontEnable = GenerateUI.Toggle(
+                GenerateUI.Row(root),
+                false, conf.PerKeyFontEnabled[slot],
+                v => {
+                    conf.PerKeyFontEnabled[slot] = v;
+                    if(v && !conf.PerKeyFontInit[slot]) {
+                        conf.SeedPerKeyFontFromGlobal(slot);
+                        conf.PerKeyFontInit[slot] = true;
+                    }
+                    KeyViewerOverlay.Rebuild();
+                    Save();
+                    RefreshContextEditor();
+                },
+                "Separate Font Sizes For This Key", "keyviewer_pk_fontenable",
+                rightInset: 0f
+            );
+            pkFontEnable.Rect.AddToolTip(
+                "DESC_KEYVIEWER_PK_FONTENABLE",
+                "Give just this key its own font sizes. The other keys keep the shared sizes until you turn theirs on too."
+            );
+            tracked.Add(pkFontEnable);
+
+            UISlider pkKeyFont = GenerateUI.Slider(
+                GenerateUI.Row(root), 1f, 0.1f, 3f, conf.PerKeyKeyFont[slot], SnapFont, null, null,
+                "Key Font", "keyviewer_pk_keyfont",
+                rightInset: 0f
+            );
+            pkKeyFont.Format = "0.00 x";
+            pkKeyFont.OnChanged = v => conf.PerKeyKeyFont[slot] = v;
+            pkKeyFont.OnComplete = v => { conf.PerKeyKeyFont[slot] = v; KeyViewerOverlay.Rebuild(); Save(); };
+            tracked.Add(pkKeyFont);
+
+            UISlider pkCounterFont = GenerateUI.Slider(
+                GenerateUI.Row(root), 1f, 0.1f, 3f, conf.PerKeyCounterFont[slot], SnapFont, null, null,
+                "Counter Font", "keyviewer_pk_counterfont",
+                rightInset: 0f
+            );
+            pkCounterFont.Format = "0.00 x";
+            pkCounterFont.OnChanged = v => conf.PerKeyCounterFont[slot] = v;
+            pkCounterFont.OnComplete = v => { conf.PerKeyCounterFont[slot] = v; KeyViewerOverlay.Rebuild(); Save(); };
+            tracked.Add(pkCounterFont);
+
+            // Ghost Key: an optional secondary key for this slot that emits its
+            // own ghost-coloured rain streak without touching the press
+            // counters. Its own section (not under Colors) since it's a
+            // binding, not a colour.
+            GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(root)), "SECTION_GHOST_KEY", "Ghost Key");
+
+            int[] ghostArr = GhostArray();
+            int ghostCode = slot < ghostArr.Length ? ghostArr[slot] : 0;
+            TextMeshProUGUI ghostKeyLabel = GenerateUI.AddMutedText(GenerateUI.Row(root, 30f), 17f, 0.6f);
             ghostKeyLabel.text = string.Format(
                 MainCore.Tr.Get("KEYVIEWER_GHOST_CURRENT", "Ghost key: {0}"),
-                code == 0
+                ghostCode == 0
                     ? MainCore.Tr.Get("KEYVIEWER_GHOST_UNSET", "none")
-                    : KeyViewerOverlay.KeyCodeShortLabel((KeyCode)code));
-        };
+                    : KeyViewerOverlay.KeyCodeShortLabel((KeyCode)ghostCode));
+
+            UIButton setGhostBtn = GenerateUI.Button(
+                GenerateUI.Row(root),
+                () => { ghostListening = true; listening = false; RefreshContextEditor(); },
+                "Set Ghost Key", "keyviewer_ghostset",
+                rightInset: 0f
+            );
+            setGhostBtn.SetNeutral().Rect.AddToolTip(
+                "DESC_KEYVIEWER_GHOSTSET",
+                "Click, then press the secondary (ghost) key for this slot. Esc cancels."
+            );
+            tracked.Add(setGhostBtn);
+
+            UIButton clearGhostBtn = GenerateUI.Button(
+                GenerateUI.Row(root),
+                () => {
+                    int[] ghost = GhostArray();
+                    if(slot < ghost.Length) {
+                        ghost[slot] = 0;
+                        Save();
+                        KeyViewerOverlay.Rebuild();
+                    }
+                    ghostListening = false;
+                    RefreshContextEditor();
+                },
+                "Clear Ghost Key", "keyviewer_ghostclear",
+                rightInset: 0f
+            );
+            clearGhostBtn.SetDanger();
+            tracked.Add(clearGhostBtn);
+
+            UIButton copyGlobalBtn = GenerateUI.Button(
+                GenerateUI.Row(root),
+                () => {
+                    conf.SeedPerKeyColorsFromGlobal();
+                    conf.SeedPerKeyFontFromGlobal();
+                    for(int i = 0; i < KeyViewerSettings.SlotCount; i++) {
+                        conf.PerKeyColorInit[i] = true;
+                        conf.PerKeyFontInit[i] = true;
+                    }
+                    KeyViewerOverlay.Rebuild();
+                    Save();
+                    RefreshContextEditor();
+                    RefreshPreviewVisuals();
+                },
+                "Copy Global to All Keys", "keyviewer_pk_copyglobal",
+                rightInset: 0f
+            );
+            copyGlobalBtn.SetNeutral().Rect.AddToolTip(
+                "DESC_KEYVIEWER_PK_COPYGLOBAL",
+                "Overwrite every key's per-key colours and font sizes with the current shared values."
+            );
+            tracked.Add(copyGlobalBtn);
+
+            UIButton copyThisBtn = GenerateUI.Button(
+                GenerateUI.Row(root),
+                () => {
+                    conf.CopyPerKeyColorsToAll(slot);
+                    Apply();
+                    Save();
+                    RefreshContextEditor();
+                    RefreshPreviewVisuals();
+                },
+                "Copy This Key's Colors to All Keys", "keyviewer_pk_copythis",
+                rightInset: 0f
+            );
+            copyThisBtn.SetNeutral().Rect.AddToolTip(
+                "DESC_KEYVIEWER_PK_COPYTHIS",
+                "Copy this key's colours onto every key and turn on separate colours for all of them."
+            );
+            tracked.Add(copyThisBtn);
+
+            UIButton closeBtn = GenerateUI.Button(
+                GenerateUI.Row(root),
+                () => {
+                    selectedSlot = -1;
+                    listening = false;
+                    ghostListening = false;
+                    ContextPane.Clear();
+                    LivePreviewPane.Clear();
+                    RefreshPreviewVisuals();
+                },
+                "Close", "keyviewer_pk_close",
+                rightInset: 0f
+            );
+            closeBtn.SetDanger();
+            tracked.Add(closeBtn);
+        }
+
+        // === Live preview (live-preview pane) ===
+        // A single key box mirroring the selected slot's real press state —
+        // subscribes to KeyViewerOverlay.OnKeyPressChanged instead of polling
+        // input itself, and unsubscribes (via LiveKeyPreviewHandle, tracked
+        // like every other widget here) whenever the pane's content changes.
+        void BuildLivePreview(RectTransform root, int slot, List<UIObject> tracked) {
+            (Image fill, Image border) = KeyViewerOverlay.NewBoxVisual("LivePreviewBox", root, 20f, 20f, 64f, 64f);
+            TextMeshProUGUI label = KeyViewerOverlay.NewText(fill.transform, "Label", KeyViewerOverlay.LabelFor(Style(), slot), 16f);
+            RectTransform labelRect = label.rectTransform;
+            labelRect.anchorMin = Vector2.zero;
+            labelRect.anchorMax = Vector2.one;
+            labelRect.offsetMin = Vector2.zero;
+            labelRect.offsetMax = Vector2.zero;
+
+            void Paint(bool pressed) {
+                fill.color = pressed
+                    ? conf.PerKeyOr(conf.PerKeyBgPressed, slot, conf.GetBgPressed())
+                    : conf.PerKeyOr(conf.PerKeyBg, slot, conf.GetBg());
+                border.color = pressed
+                    ? conf.PerKeyOr(conf.PerKeyOutlinePressed, slot, conf.GetOutlinePressed())
+                    : conf.PerKeyOr(conf.PerKeyOutline, slot, conf.GetOutline());
+                label.color = pressed
+                    ? conf.PerKeyOr(conf.PerKeyTextPressed, slot, conf.GetTextPressed())
+                    : conf.PerKeyOr(conf.PerKeyText, slot, conf.GetText());
+            }
+            Paint(false);
+
+            tracked.Add(new LiveKeyPreviewHandle(fill.rectTransform, e => {
+                if(e.Slot == slot) Paint(e.Pressed);
+            }));
+        }
 
         GenerateUI.Toggle(
             GenerateUI.Row(simpleBody),
@@ -1052,7 +1095,17 @@ internal static class PageKeyViewer {
         RefreshPresetStatus();
         RefreshCssStatus();
         RefreshMode();
+
+        GenerateUI.Button(
+            GenerateUI.Row(sec.Body),
+            () => KeyViewerOverlay.ResetPosition(),
+            "Reset Position",
+            "keyviewer_resetpos"
+        ).SetSecondary();
     }
+
+    public static void Create(RectTransform parent) =>
+        AppendTo(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
 
     private static string FootStyleName(int s) => s <= 0
         ? MainCore.Tr.Get("KEYVIEWER_FOOT_NONE", "None")
@@ -1094,44 +1147,23 @@ internal static class PageKeyViewer {
             id
         );
 
-    // Dims the section header's title when the feature is disabled, so the
-    // Key Viewer's on/off state reads at a glance without opening the section.
-    private static void ApplyHeaderEnabledCue(GenerateUI.CollapsibleSection sec, bool enabled) {
-        if(sec.HeaderObj.transform.Find("Bar") is not RectTransform bar) return;
-        if(bar.Find("Label") is not Transform labelT) return;
-        if(labelT.GetComponent<TextMeshProUGUI>() is not TextMeshProUGUI label) return;
+    // Bridges KeyViewerOverlay.OnKeyPressChanged into a UIObject so PaneHost's
+    // dispose-before-destroy step unsubscribes it automatically whenever the
+    // live-preview pane's content changes (new selection, tab switch, panel
+    // close) — no separate cleanup path to remember.
+    private sealed class LiveKeyPreviewHandle : UIObject {
+        private readonly Action<KeyViewerOverlay.KeyPressChangedEventArgs> handler;
 
-        label.color = enabled ? Color.white : new Color(1f, 1f, 1f, 0.45f);
-        label.fontStyle = enabled ? FontStyles.Bold : FontStyles.Normal;
-    }
+        public LiveKeyPreviewHandle(RectTransform rect, Action<KeyViewerOverlay.KeyPressChangedEventArgs> handler)
+            : base("livekeypreview", rect) {
+            this.handler = handler;
+            KeyViewerOverlay.OnKeyPressChanged += handler;
+        }
 
-    // A self-sizing card with a background, used for the per-key popup. Reads as
-    // a distinct panel that collapses to nothing when hidden (SetActive false on
-    // the returned panel). A full-width holder with right padding makes the
-    // visible panel narrower than the row — it sits slightly in from the right.
-    private static RectTransform MakeCard(Transform parent, string name) {
-        GameObject holder = new(name + "Holder");
-        holder.transform.SetParent(parent, false);
-        holder.AddComponent<RectTransform>();
-
-        // Right padding of 250 matches the standard rows' BackGround() inset, so
-        // the card's right edge lines up with the toggles/sliders below it.
-        VerticalLayoutGroup holderLayout = GenerateUI.FitVertical(holder, 0f);
-        holderLayout.padding = new RectOffset(0, 250, 0, 0);
-
-        GameObject obj = new(name);
-        obj.transform.SetParent(holder.transform, false);
-        RectTransform rect = obj.AddComponent<RectTransform>();
-
-        Image bg = obj.AddComponent<Image>();
-        bg.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
-        bg.type = Image.Type.Sliced;
-        bg.color = UIColors.ObjectBG;
-
-        VerticalLayoutGroup layout = GenerateUI.FitVertical(obj, 8f);
-        layout.padding = new RectOffset(16, 16, 16, 16);
-
-        return rect;
+        public override void Dispose() {
+            base.Dispose();
+            KeyViewerOverlay.OnKeyPressChanged -= handler;
+        }
     }
 
     // Polls for the next key press while the preview is armed. Focusing the

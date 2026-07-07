@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Quartz.UI.Factory.Page;
 
-internal static partial class PageOverlay {
+internal static partial class PagePanels {
     // Per-stat color settings, expanded under the stat's row — v1's ColorRange
     // editor: enable toggle, gradient stops (position + color, add/delete),
     // perfect-color override, and Max BPM for the BPM-driven stats.

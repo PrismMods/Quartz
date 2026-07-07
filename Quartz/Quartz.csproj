@@ -19,6 +19,10 @@
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 		<FindDependenciesOfExternallyResolvedReferences>false</FindDependenciesOfExternallyResolvedReferences>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<!-- Emit a reference assembly (public surface, no IL bodies). Published
+		     as sdk/QuartzAddon.dll by PublishAddonSdk so modders compile their
+		     .qaddon addons against the real API. -->
+		<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
 		<EnableNETAnalyzers>true</EnableNETAnalyzers>
 		<AnalysisLevel>latest</AnalysisLevel>
 		<EnableDefaultCompileItems>true</EnableDefaultCompileItems>
@@ -263,5 +267,18 @@
 		<Copy Condition="'$(UmmAutoInstall)' == 'true'" SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(UmmModDir)/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
 		<Message Importance="high" Text="UMM installed: $(UmmModDir)" Condition="'$(UmmAutoInstall)' == 'true'" />
 		<Message Importance="high" Text="UMM build NOT auto-installed (MelonLoader present); QuartzUmm.zip still written to $(DistDir)." Condition="'$(AutoInstall)' == 'true' And '$(MelonLoaderPresent)' == 'true'" />
+	</Target>
+
+	<!-- Publish the addon SDK: copy the reference assembly (public surface only,
+	     no IL bodies) to sdk/QuartzAddon.dll, the file modders compile their
+	     .qaddon addons against. Its assembly identity stays "Quartz", so a
+	     precompiled addon binds to the loaded mod at runtime (the UMM build
+	     unifies its "QuartzUmm" identity in AddonService.HookModIdentityResolver).
+	     ML build only — the UMM reference assembly would carry the wrong
+	     identity for a portable addon. -->
+	<Target Name="PublishAddonSdk" AfterTargets="Build" Condition="'$(LoaderTarget)' != 'UMM' And Exists('$(TargetRefPath)')">
+		<MakeDir Directories="$(MSBuildProjectDirectory)/../sdk" />
+		<Copy SourceFiles="$(TargetRefPath)" DestinationFiles="$(MSBuildProjectDirectory)/../sdk/QuartzAddon.dll" SkipUnchangedFiles="true" />
+		<Message Importance="high" Text="Addon SDK: sdk/QuartzAddon.dll" />
 	</Target>
 </Project>

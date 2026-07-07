@@ -1,3 +1,5 @@
+using Quartz.Core;
+using Quartz.Features.InGameOverlay;
 using Quartz.Features.Interop;
 using Quartz.Features.Judgement;
 using Quartz.UI.Generator;
@@ -93,5 +95,41 @@ internal static class PageJudgement {
             "Shadow Color",
             "judgement_shadow_color"
         );
+
+        GenerateUI.Button(
+            GenerateUI.Row(sec.Body),
+            () => JudgementOverlay.ResetPosition(),
+            "Reset Position",
+            "judgement_resetpos"
+        ).SetSecondary();
+
+        // Separate from the counts row above: fonts the native per-hit
+        // judgement popup ("Perfect!"/"Early!") in place — the rating text
+        // itself, not this page's accumulated hit counts.
+        GenerateUI.CollapsibleSection popupSec = null;
+        popupSec = GenerateUI.Collapsible(
+            content, "Judgement Popup Font", startExpanded: false,
+            v => {
+                MainCore.Conf.FontJudgement = v;
+                MainCore.ConfMgr.RequestSave();
+                InGameOverlayFont.Refresh();
+                SetHeaderEnabled(v, popupSec);
+            },
+            MainCore.Conf.FontJudgement
+        );
+        SetHeaderEnabled(MainCore.Conf.FontJudgement, popupSec);
+        popupSec.HeaderObj.transform.Find("Bar").AddToolTip(
+            "DESC_FONT_JUDGEMENT",
+            "Apply the selected font to the per-hit judgement popup (\"Perfect!\"/\"Early!\"). This is the rating text itself, not the counts above."
+        );
+
+        GenerateUI.SnapSlider(popupSec.Body, "Font Size", "font_judgement_popup_size",
+            1f, 0.25f, 3f, MainCore.Conf.FontJudgementSize, "0.00 x", 0.01f,
+            v => MainCore.Conf.FontJudgementSize = v,
+            () => InGameOverlayFont.RefreshSizeOnly(InGameOverlayFont.Category.Judgement),
+            () => MainCore.ConfMgr.RequestSave());
     }
+
+    public static void Create(RectTransform parent) =>
+        AppendTo(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
 }

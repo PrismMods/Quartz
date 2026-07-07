@@ -2,6 +2,8 @@
 bin/
 obj/
 /dist/
+# Roslyn compiler artifacts leaked to repo root by the addon system's C# compiler
+/Microsoft.CodeAnalysis.*
 
 # IDE / editor
 .vs/

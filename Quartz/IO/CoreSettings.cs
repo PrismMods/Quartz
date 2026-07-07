@@ -23,12 +23,24 @@ public sealed class CoreSettings : ISettingsFile {
     public bool FontCountdown = false;    // scrCountdown
     public bool FontJudgement = false;    // scrHitTextMesh (the per-hit "Perfect!"/"Early!" popup)
 
+    // Size multiplier on top of each element's auto-fit-to-box size (1 = the
+    // game's own size, fit-shrunk only if the mod font would otherwise overflow).
+    public float FontSongTitleSize = 1f;
+    public float FontCountdownSize = 1f;
+    public float FontJudgementSize = 1f;
+
     // Font for the mod's own settings window. Empty means "follow the overlay
     // font (FontName)"; otherwise a font display name from the same picker, so
     // the settings window can use a different face than the gameplay overlays.
     public string SettingsFontName = "";
 
     public float ScrollSpeed = 80f;
+
+    // Width (canvas units) of the settings-window white outlines — the panel
+    // border ring, the submenu column outline, the top rule and the bottom
+    // band edge. Default 6.25 = half the 12.5 corner radius, matching the
+    // original border-ring stroke.
+    public float OutlineWidth = 6.25f;
 
     // Settings-window opacity (0..1). Default fully opaque (shown as 100%).
     public float PanelOpacity = 1.0f;
@@ -38,6 +50,11 @@ public sealed class CoreSettings : ISettingsFile {
     // on next launch so a resize persists across sessions.
     public float PanelWidth = 0f;
     public float PanelHeight = 0f;
+
+    // Height of the settings window's bottom context band (Context/Live
+    // Preview panes), in panel-local units. 0 = unset → default height at
+    // first build. The band is always visible; this is purely its height.
+    public float ContextBandHeight = 0f;
 
     // Overlay position calibration: the screen resolution the overlay offsets
     // were authored at. Every overlay X/Y offset is scaled by current-screen /
@@ -105,11 +122,16 @@ public sealed class CoreSettings : ISettingsFile {
             [nameof(FontSongTitle)] = FontSongTitle,
             [nameof(FontCountdown)] = FontCountdown,
             [nameof(FontJudgement)] = FontJudgement,
+            [nameof(FontSongTitleSize)] = FontSongTitleSize,
+            [nameof(FontCountdownSize)] = FontCountdownSize,
+            [nameof(FontJudgementSize)] = FontJudgementSize,
             [nameof(SettingsFontName)] = SettingsFontName,
             [nameof(ScrollSpeed)] = ScrollSpeed,
+            [nameof(OutlineWidth)] = OutlineWidth,
             [nameof(PanelOpacity)] = PanelOpacity,
             [nameof(PanelWidth)] = PanelWidth,
             [nameof(PanelHeight)] = PanelHeight,
+            [nameof(ContextBandHeight)] = ContextBandHeight,
             [nameof(CalibWidth)] = CalibWidth,
             [nameof(CalibHeight)] = CalibHeight,
             [nameof(ToggleModifier)] = ToggleModifier,
@@ -135,11 +157,16 @@ public sealed class CoreSettings : ISettingsFile {
         FontSongTitle = IOUtils.Read(token, nameof(FontSongTitle), FontSongTitle);
         FontCountdown = IOUtils.Read(token, nameof(FontCountdown), FontCountdown);
         FontJudgement = IOUtils.Read(token, nameof(FontJudgement), FontJudgement);
+        FontSongTitleSize = IOUtils.Read(token, nameof(FontSongTitleSize), FontSongTitleSize);
+        FontCountdownSize = IOUtils.Read(token, nameof(FontCountdownSize), FontCountdownSize);
+        FontJudgementSize = IOUtils.Read(token, nameof(FontJudgementSize), FontJudgementSize);
         SettingsFontName = IOUtils.Read(token, nameof(SettingsFontName), SettingsFontName);
         ScrollSpeed = IOUtils.Read(token, nameof(ScrollSpeed), ScrollSpeed);
+        OutlineWidth = IOUtils.Read(token, nameof(OutlineWidth), OutlineWidth);
         PanelOpacity = IOUtils.Read(token, nameof(PanelOpacity), PanelOpacity);
         PanelWidth = IOUtils.Read(token, nameof(PanelWidth), PanelWidth);
         PanelHeight = IOUtils.Read(token, nameof(PanelHeight), PanelHeight);
+        ContextBandHeight = IOUtils.Read(token, nameof(ContextBandHeight), ContextBandHeight);
         CalibWidth = IOUtils.Read(token, nameof(CalibWidth), CalibWidth);
         CalibHeight = IOUtils.Read(token, nameof(CalibHeight), CalibHeight);
         ToggleModifier = IOUtils.Read(token, nameof(ToggleModifier), ToggleModifier);

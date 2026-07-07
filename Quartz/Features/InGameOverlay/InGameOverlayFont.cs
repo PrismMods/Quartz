@@ -30,9 +30,9 @@ namespace Quartz.Features.InGameOverlay;
 // else), plus a targeted one-object lookup when a toggle is flipped on
 // mid-scene to catch whatever's already showing.
 public static class InGameOverlayFont {
-    // internal, not private: GameFontMirror (below, a separate top-level class)
-    // needs it too.
-    internal enum Category { SongTitle, Countdown, Judgement }
+    // public: GameFontMirror (below, a separate top-level class) needs it too,
+    // and the Overlay-tab settings pages pass it to RefreshSizeOnly.
+    public enum Category { SongTitle, Countdown, Judgement }
 
     private sealed class Capture {
         public Category Cat;
@@ -159,7 +159,7 @@ public static class InGameOverlayFont {
 
             tmp.font = want;
             tmp.fontSharedMaterial = want.material;
-            ApplySize(tmp, gameSize);
+            ApplySize(tmp, gameSize, cat);
         } else if(tmp.font != want) {
             tmp.font = want;
             tmp.fontSharedMaterial = want.material;
@@ -167,14 +167,34 @@ public static class InGameOverlayFont {
     }
 
     // Single-line labels keep the game's size but shrink only when the wider
-    // mod font overflows the box horizontally.
-    private static void ApplySize(TMP_Text tmp, float gameSize) {
+    // mod font overflows the box horizontally; the user's size multiplier
+    // applies on top of that auto-fit.
+    private static void ApplySize(TMP_Text tmp, float gameSize, Category cat) {
         tmp.textWrappingMode = TextWrappingModes.NoWrap;
-        tmp.fontSize = gameSize;
         float boxW = tmp.rectTransform.rect.width;
         float wantW = tmp.GetPreferredValues(tmp.text).x;
-        if(boxW > 0f && wantW > boxW) tmp.fontSize = gameSize * (boxW / wantW) * 0.98f;
+        float fit = (boxW > 0f && wantW > boxW) ? gameSize * (boxW / wantW) * 0.98f : gameSize;
+        tmp.fontSize = fit * SizeMultiplier(cat);
     }
+
+    // Re-applies sizing (current multiplier) to every already-captured TMP
+    // item in this category, from its stored ORIGINAL game size — no
+    // re-scan, no re-capture. Cheap enough to call on every slider drag tick.
+    public static void RefreshSizeOnly(Category cat) {
+        foreach(Capture cap in tmpCaptures.Values) {
+            if(cap.Cat == cat && cap.Tmp != null) ApplySize(cap.Tmp, cap.OriginalSize, cat);
+        }
+        // Twin-mirrored items (GameFontMirror.Apply) recompute size from the
+        // live source every frame and already read the multiplier, so they
+        // need no explicit push here.
+    }
+
+    internal static float SizeMultiplier(Category cat) => cat switch {
+        Category.SongTitle => MainCore.Conf.FontSongTitleSize,
+        Category.Countdown => MainCore.Conf.FontCountdownSize,
+        Category.Judgement => MainCore.Conf.FontJudgementSize,
+        _ => 1f,
+    };
 
     [HarmonyPatch(typeof(RDString), "SetLocalizedFont", new[] { typeof(TMP_Text) })]
     private static class TmpFontPatch {
@@ -182,7 +202,8 @@ public static class InGameOverlayFont {
             try {
                 if(text == null) return;
                 if(TitleActive && text.GetComponent<scrHUDText>() is { isTitle: true }) OverrideTmp(text, Category.SongTitle);
-            } catch {
+            } catch(Exception e) {
+                MainCore.Log.Wrn($"[InGameOverlayFont] TmpFontPatch: {e}");
             }
         }
     }
@@ -197,7 +218,8 @@ public static class InGameOverlayFont {
                 } else if(CountdownActive && text.GetComponent<scrCountdown>() != null) {
                     GameFontMirror.Ensure()?.Track(text, Category.Countdown);
                 }
-            } catch {
+            } catch(Exception e) {
+                MainCore.Log.Wrn($"[InGameOverlayFont] TextFontPatch: {e}");
             }
         }
     }
@@ -208,7 +230,8 @@ public static class InGameOverlayFont {
             if(!JudgementActive) return;
             try {
                 if(__instance.text != null) OverrideTmp(__instance.text, Category.Judgement);
-            } catch {
+            } catch(Exception e) {
+                MainCore.Log.Wrn($"[InGameOverlayFont] JudgementFontPatch: {e}");
             }
         }
     }
@@ -338,16 +361,26 @@ internal sealed class GameFontMirror : MonoBehaviour {
         if(twin.color != source.color) twin.color = source.color;
         if(twin.richText != source.supportRichText) twin.richText = source.supportRichText;
 
+        // TextMeshProUGUI defaults to TopLeft — without mirroring the source's
+        // own alignment/style, a center-anchored label (the countdown number,
+        // dead center of the screen) renders the twin jammed into a corner
+        // instead, which reads as "the text is just gone".
+        FontStyles style = MapStyle(source.fontStyle);
+        if(twin.fontStyle != style) twin.fontStyle = style;
+        TextAlignmentOptions alignment = MapAlignment(source.alignment);
+        if(twin.alignment != alignment) twin.alignment = alignment;
+
         bool wrap = source.horizontalOverflow == HorizontalWrapMode.Wrap;
         TextWrappingModes wrapMode = wrap ? TextWrappingModes.Normal : TextWrappingModes.NoWrap;
         if(twin.textWrappingMode != wrapMode) twin.textWrappingMode = wrapMode;
         if(twin.overflowMode != TextOverflowModes.Overflow) twin.overflowMode = TextOverflowModes.Overflow;
 
+        float mult = InGameOverlayFont.SizeMultiplier(pair.Cat);
         if(source.resizeTextForBestFit) {
             float maxPx = source.resizeTextMaxSize > 0 ? source.resizeTextMaxSize : source.fontSize;
             if(!twin.enableAutoSizing) twin.enableAutoSizing = true;
             if(twin.fontSizeMin != 1f) twin.fontSizeMin = 1f;
-            float max = Mathf.Max(1f, maxPx);
+            float max = Mathf.Max(1f, maxPx) * mult;
             if(twin.fontSizeMax != max) twin.fontSizeMax = max;
         } else {
             if(twin.enableAutoSizing) twin.enableAutoSizing = false;
@@ -357,6 +390,7 @@ internal sealed class GameFontMirror : MonoBehaviour {
                 float wantW = twin.GetPreferredValues(twin.text).x;
                 if(wantW > boxW) size = source.fontSize * (boxW / wantW) * 0.98f;
             }
+            size *= mult;
             if(twin.fontSize != size) twin.fontSize = size;
         }
         if(twin.enabled != source.enabled) twin.enabled = source.enabled;
@@ -368,6 +402,26 @@ internal sealed class GameFontMirror : MonoBehaviour {
         if(twin.canvasRenderer.GetAlpha() != srcAlpha) twin.canvasRenderer.SetAlpha(srcAlpha);
         source.canvasRenderer.SetAlpha(0f);
     }
+
+    private static FontStyles MapStyle(FontStyle style) => style switch {
+        FontStyle.Bold => FontStyles.Bold,
+        FontStyle.Italic => FontStyles.Italic,
+        FontStyle.BoldAndItalic => FontStyles.Bold | FontStyles.Italic,
+        _ => FontStyles.Normal,
+    };
+
+    private static TextAlignmentOptions MapAlignment(TextAnchor anchor) => anchor switch {
+        TextAnchor.UpperLeft => TextAlignmentOptions.TopLeft,
+        TextAnchor.UpperCenter => TextAlignmentOptions.Top,
+        TextAnchor.UpperRight => TextAlignmentOptions.TopRight,
+        TextAnchor.MiddleLeft => TextAlignmentOptions.Left,
+        TextAnchor.MiddleCenter => TextAlignmentOptions.Center,
+        TextAnchor.MiddleRight => TextAlignmentOptions.Right,
+        TextAnchor.LowerLeft => TextAlignmentOptions.BottomLeft,
+        TextAnchor.LowerCenter => TextAlignmentOptions.Bottom,
+        TextAnchor.LowerRight => TextAlignmentOptions.BottomRight,
+        _ => TextAlignmentOptions.Center,
+    };
 
     private void Clear() {
         foreach(Pair pair in pairs) {

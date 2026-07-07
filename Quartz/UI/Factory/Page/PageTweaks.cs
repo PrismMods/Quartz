@@ -10,13 +10,20 @@ namespace Quartz.UI.Factory.Page;
 
 // Tweaks tab. Hosts v1's non-visual tweaks — Disable Auto Pause and Block
 // Scroll While Playing. The visual tweaks from the same v1 section live in
-// the Visuals tab's "Visual Tweaks" category.
+// the Visuals tab's "Visual Tweaks" category. Each section below is its own
+// standalone page under the Tweaks category's column-2 (see
+// MenuFactory.CategoryChildren).
 internal static class PageTweaks {
-    public static void Create(RectTransform parent) {
+    // General — the two loose top-level toggles that weren't under any
+    // collapsible. Gets its own page H1 (like PageOverlayGeneral), since there's
+    // no collapsible header to name it.
+    public static void GeneralPage(RectTransform parent) {
         Tweaks.EnsureConf();
         TweaksSettings conf = Tweaks.Conf;
         TweaksSettings def = new();
         RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
+
+        GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(content.transform)), "TWEAKS_GENERAL", "General");
 
         GenerateUI.ToggleTip(
             content.transform,
@@ -37,16 +44,20 @@ internal static class PageTweaks {
             "tw_scroll",
             "Ignores mouse wheel input while a level is being played, so accidental scrolling can't affect the game mid-run."
         );
+    }
 
-        // === Optimizer: engine/runtime performance toggles ===
-        // These tune how the engine runs (GC, process priority, background
-        // execution); none change how a level looks. Distinct from the Effect
-        // Remover, which strips visual events out of the chart itself.
+    // === Optimizer: engine/runtime performance toggles ===
+    // These tune how the engine runs (GC, process priority, background
+    // execution); none change how a level looks. Distinct from the Effect
+    // Remover, which strips visual events out of the chart itself.
+    public static void OptimizerPage(RectTransform parent) {
+        RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
+
         Optimizer.EnsureConf();
         OptimizerSettings opt = Optimizer.Conf;
         OptimizerSettings optDef = new();
 
-        var optimizerSec = GenerateUI.Collapsible(content.transform, "Optimizer", startExpanded: false);
+        var optimizerSec = GenerateUI.FlatSection(content.transform, "Optimizer");
 
         GenerateUI.ToggleTip(
             optimizerSec.Body,
@@ -117,8 +128,15 @@ internal static class PageTweaks {
             "opt_skipnoopfilters",
             "Skips ADOFAI full-screen screen-tile/screen-scroll shader passes when their current values are visually identity, replacing the shader pass with a plain copy. This removes real render work without wrapping an existing game setting."
         );
+    }
 
-        var mainMenuSec = GenerateUI.Collapsible(content.transform, "Main Menu", startExpanded: false);
+    public static void MainMenuPage(RectTransform parent) {
+        Tweaks.EnsureConf();
+        TweaksSettings conf = Tweaks.Conf;
+        TweaksSettings def = new();
+        RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
+
+        var mainMenuSec = GenerateUI.FlatSection(content.transform, "Main Menu");
 
         GenerateUI.ToggleTip(
             mainMenuSec.Body,
@@ -157,8 +175,15 @@ internal static class PageTweaks {
             "High BPM", "tw_menuhighbpm"
         );
         highBpm.Format = "0";
+    }
 
-        var resultsSec = GenerateUI.Collapsible(content.transform, "Detailed Results", startExpanded: false);
+    public static void ResultsPage(RectTransform parent) {
+        Tweaks.EnsureConf();
+        TweaksSettings conf = Tweaks.Conf;
+        TweaksSettings def = new();
+        RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
+
+        var resultsSec = GenerateUI.FlatSection(content.transform, "Detailed Results");
 
         GenerateUI.ToggleTip(
             resultsSec.Body,
@@ -199,7 +224,5 @@ internal static class PageTweaks {
             "tw_result_maxkeys",
             "Removes the Maximum Used Keys row from the detailed results screen."
         );
-
-        NostalgiaUI.AddTweaksSection(content.transform);
     }
 }

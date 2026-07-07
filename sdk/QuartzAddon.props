@@ -1,0 +1,121 @@
+<!--
+  QuartzAddon.props — shared build settings for Quartz addon projects.
+
+  Import this from an addon .csproj and you get:
+    • a reference to the Quartz addon API (QuartzAddon.dll, beside this file),
+    • the game + Unity + Harmony + Newtonsoft references an addon compiles
+      against (anything the mod itself can touch, an addon can too),
+    • compiler settings matching how the mod itself is built, and
+    • a post-build step that emits <name>.qaddon.
+
+  GamePath / GameData locate your "A Dance of Fire and Ice" install. They
+  auto-detect the common Steam locations; override either by setting them in a
+  Directory.Build.props next to your addon (see Directory.Build.props.example),
+  or on the command line:
+      dotnet build -p:GamePath="/path/to/game" -p:GameData="..._Data"
+-->
+<Project>
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <!-- Match how the Quartz mod itself is built: no implicit usings, nullable
+         off, unsafe allowed, latest language, and the QUARTZ_ADDON symbol
+         defined (guard addon-only code with #if QUARTZ_ADDON). -->
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>$(DefineConstants);QUARTZ_ADDON</DefineConstants>
+    <!-- Loaded as IL; AnyCPU avoids an arch-mismatch warning against the
+         loader's native build, same as the mod itself. -->
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <Deterministic>true</Deterministic>
+    <!-- The game assemblies are the runtime binding set; don't let MSBuild walk
+         their transitive deps and report netstandard-facade version conflicts
+         (MSB3277). Paired with ExternallyResolved below — same as Quartz.csproj. -->
+    <FindDependenciesOfExternallyResolvedReferences>false</FindDependenciesOfExternallyResolvedReferences>
+  </PropertyGroup>
+
+  <!-- Locate the game. Set GamePath/GameData yourself to skip auto-detection. -->
+  <PropertyGroup Condition="'$(GamePath)' == ''">
+    <GamePath Condition="Exists('$(HOME)/Library/Application Support/Steam/steamapps/common/A Dance of Fire and Ice')">$(HOME)/Library/Application Support/Steam/steamapps/common/A Dance of Fire and Ice</GamePath>
+    <GamePath Condition="'$(GamePath)' == '' And Exists('C:/Program Files (x86)/Steam/steamapps/common/A Dance of Fire and Ice')">C:/Program Files (x86)/Steam/steamapps/common/A Dance of Fire and Ice</GamePath>
+    <GamePath Condition="'$(GamePath)' == '' And Exists('$(HOME)/.local/share/Steam/steamapps/common/A Dance of Fire and Ice')">$(HOME)/.local/share/Steam/steamapps/common/A Dance of Fire and Ice</GamePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(GameData)' == ''">
+    <GameData Condition="Exists('$(GamePath)/ADanceOfFireAndIce.app/Contents/Resources/Data/Managed')">ADanceOfFireAndIce.app/Contents/Resources/Data</GameData>
+    <GameData Condition="'$(GameData)' == '' And Exists('$(GamePath)/A Dance of Fire and Ice_Data/Managed')">A Dance of Fire and Ice_Data</GameData>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManagedDir>$(GamePath)/$(GameData)/Managed</ManagedDir>
+    <!-- 0Harmony ships under MelonLoader (primary) or UMM; prefer MelonLoader's. -->
+    <HarmonyDll Condition="Exists('$(GamePath)/MelonLoader/net35/0Harmony.dll')">$(GamePath)/MelonLoader/net35/0Harmony.dll</HarmonyDll>
+    <HarmonyDll Condition="'$(HarmonyDll)' == '' And Exists('$(ManagedDir)/UnityModManager/0Harmony.dll')">$(ManagedDir)/UnityModManager/0Harmony.dll</HarmonyDll>
+  </PropertyGroup>
+
+  <!-- Compile-only: nothing here is copied into the addon output; at runtime the
+       game and the loaded Quartz mod provide the real assemblies. -->
+  <ItemDefinitionGroup>
+    <Reference>
+      <Private>false</Private>
+      <ExternallyResolved>true</ExternallyResolved>
+    </Reference>
+  </ItemDefinitionGroup>
+
+  <ItemGroup>
+    <!-- The Quartz addon API. The Include name is "Quartz" (the assembly's real
+         identity); the file on disk is QuartzAddon.dll next to this props. At
+         runtime the loaded mod supplies these types (see AddonService's
+         identity resolver for the UMM build). -->
+    <Reference Include="Quartz"><HintPath>$(MSBuildThisFileDirectory)QuartzAddon.dll</HintPath></Reference>
+
+    <Reference Include="Assembly-CSharp"><HintPath>$(ManagedDir)/Assembly-CSharp.dll</HintPath></Reference>
+    <Reference Include="Assembly-CSharp-firstpass"><HintPath>$(ManagedDir)/Assembly-CSharp-firstpass.dll</HintPath></Reference>
+    <Reference Include="0Harmony"><HintPath>$(HarmonyDll)</HintPath></Reference>
+    <Reference Include="Newtonsoft.Json"><HintPath>$(ManagedDir)/Newtonsoft.Json.dll</HintPath></Reference>
+    <!-- Prefer the game's own System.* assemblies over the netstandard facade
+         versions so MSBuild's conflict resolver matches the runtime binding set
+         (same fix as Quartz.csproj) instead of emitting MSB3277 warnings. -->
+    <Reference Include="System.Buffers" Condition="Exists('$(ManagedDir)/System.Buffers.dll')"><HintPath>$(ManagedDir)/System.Buffers.dll</HintPath></Reference>
+    <Reference Include="System.IO.Compression, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" Condition="Exists('$(ManagedDir)/System.IO.Compression.dll')"><HintPath>$(ManagedDir)/System.IO.Compression.dll</HintPath></Reference>
+    <Reference Include="System.Memory" Condition="Exists('$(ManagedDir)/System.Memory.dll')"><HintPath>$(ManagedDir)/System.Memory.dll</HintPath></Reference>
+    <Reference Include="System.ValueTuple" Condition="Exists('$(ManagedDir)/System.ValueTuple.dll')"><HintPath>$(ManagedDir)/System.ValueTuple.dll</HintPath></Reference>
+    <Reference Include="RDTools" Condition="Exists('$(ManagedDir)/RDTools.dll')"><HintPath>$(ManagedDir)/RDTools.dll</HintPath></Reference>
+    <Reference Include="SkyHook.Unity" Condition="Exists('$(ManagedDir)/SkyHook.Unity.dll')"><HintPath>$(ManagedDir)/SkyHook.Unity.dll</HintPath></Reference>
+    <Reference Include="Unity.TextMeshPro"><HintPath>$(ManagedDir)/Unity.TextMeshPro.dll</HintPath></Reference>
+    <Reference Include="UnityEngine"><HintPath>$(ManagedDir)/UnityEngine.dll</HintPath></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(ManagedDir)/UnityEngine.CoreModule.dll</HintPath></Reference>
+    <Reference Include="UnityEngine.AudioModule"><HintPath>$(ManagedDir)/UnityEngine.AudioModule.dll</HintPath></Reference>
+    <Reference Include="UnityEngine.IMGUIModule"><HintPath>$(ManagedDir)/UnityEngine.IMGUIModule.dll</HintPath></Reference>
+    <Reference Include="UnityEngine.ImageConversionModule"><HintPath>$(ManagedDir)/UnityEngine.ImageConversionModule.dll</HintPath></Reference>
+    <Reference Include="UnityEngine.InputLegacyModule"><HintPath>$(ManagedDir)/UnityEngine.InputLegacyModule.dll</HintPath></Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule"><HintPath>$(ManagedDir)/UnityEngine.ParticleSystemModule.dll</HintPath></Reference>
+    <Reference Include="UnityEngine.TextRenderingModule"><HintPath>$(ManagedDir)/UnityEngine.TextRenderingModule.dll</HintPath></Reference>
+    <Reference Include="UnityEngine.UI"><HintPath>$(ManagedDir)/UnityEngine.UI.dll</HintPath></Reference>
+    <Reference Include="UnityEngine.UIModule"><HintPath>$(ManagedDir)/UnityEngine.UIModule.dll</HintPath></Reference>
+  </ItemGroup>
+
+  <Target Name="_QuartzAddonCheckGame" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition="!Exists('$(MSBuildThisFileDirectory)QuartzAddon.dll')"
+           Text="QuartzAddon.dll not found next to QuartzAddon.props ($(MSBuildThisFileDirectory)). Copy it from the mod's sdk/ folder." />
+    <Error Condition="!Exists('$(ManagedDir)')"
+           Text="Game 'Managed' folder not found at '$(ManagedDir)'. Set GamePath (and GameData) in Directory.Build.props next to your addon, or pass -p:GamePath=... -p:GameData=... — see sdk/README.md." />
+  </Target>
+
+  <!-- Emit <name>.qaddon beside the built dll. A .qaddon is just the compiled
+       assembly under the extension the loader recognises. -->
+  <Target Name="_QuartzAddonPackage" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(TargetDir)$(AssemblyName).qaddon" OverwriteReadOnlyFiles="true" />
+    <Message Importance="high" Text="Quartz addon: $(TargetDir)$(AssemblyName).qaddon" />
+    <!-- Opt in to dropping it straight into the game: -p:DeployToGame=true -->
+    <Copy Condition="'$(DeployToGame)' == 'true' And Exists('$(GamePath)/UserData/Quartz')"
+          SourceFiles="$(TargetDir)$(AssemblyName).qaddon"
+          DestinationFolder="$(GamePath)/UserData/Quartz/Addons" />
+    <Message Condition="'$(DeployToGame)' == 'true' And Exists('$(GamePath)/UserData/Quartz')"
+             Importance="high" Text="Deployed: $(GamePath)/UserData/Quartz/Addons/$(AssemblyName).qaddon" />
+  </Target>
+
+</Project>

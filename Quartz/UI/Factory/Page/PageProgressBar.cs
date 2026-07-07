@@ -17,19 +17,12 @@ internal static class PageProgressBar {
 
         void Save() => ProgressBarOverlay.Save();
 
-        void SetHeaderEnabled(bool enabled, GenerateUI.CollapsibleSection section) {
-            if(section.HeaderObj.transform.Find("Bar/Label") is Transform labelTr
-                && labelTr.TryGetComponent(out TextMeshProUGUI label))
-                label.alpha = enabled ? 1f : 0.5f;
-        }
-
-        GenerateUI.CollapsibleSection sec = null;
-        sec = GenerateUI.Collapsible(
-            content, "Progress Bar", startExpanded: false,
-            v => { conf.Enabled = v; ProgressBarOverlay.Apply(); Save(); SetHeaderEnabled(v, sec); },
-            conf.Enabled
+        GenerateUI.CollapsibleSection sec = GenerateUI.FlatSection(
+            content, "Progress Bar",
+            v => { conf.Enabled = v; ProgressBarOverlay.Apply(); Save(); },
+            conf.Enabled,
+            "Enable Progress Bar", "progressbar_enable"
         );
-        SetHeaderEnabled(conf.Enabled, sec);
 
         GenerateUI.Toggle(
             GenerateUI.Row(sec.Body),
@@ -222,6 +215,15 @@ internal static class PageProgressBar {
             "Outline Color",
             "progressbar_outlinecolor"
         );
+
+        GenerateUI.Button(
+            GenerateUI.Row(sec.Body),
+            () => ProgressBarOverlay.ResetPosition(),
+            "Reset Position",
+            "progressbar_resetpos"
+        ).SetSecondary();
     }
 
+    public static void Create(RectTransform parent) =>
+        AppendTo(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
 }

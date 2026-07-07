@@ -57,6 +57,39 @@ public static partial class GenerateUI {
 
     public static void ClearSections() => Sections.Clear();
 
+    // Flat counterpart to Collapsible, for a tab that holds a single section:
+    // the tab itself already stands in for the collapsible, so the collapsing
+    // header/arrow are redundant. Rows are added to the returned .Body exactly
+    // as with Collapsible (here it's the page content directly, so rows sit at
+    // the page's normal left edge — no indent). A localized H1 leads the page,
+    // reusing the same SECTION_<title> key the collapsible header used, and an
+    // optional "Enable" toggle row follows it in place of the header dot.
+    //
+    // Not registered in `Sections` (there's nothing to expand) and adds no
+    // Section_ node, so PageSearch indexes the rows without a redundant,
+    // untranslated category entry — the tab name is already the destination.
+    public static CollapsibleSection FlatSection(
+        Transform parent,
+        string title,
+        Action<bool> onToggle = null,
+        bool toggleValue = false,
+        string enableLabel = null,
+        string enableId = null
+    ) {
+        Localize(AddTextH1(Row(parent)), LocaleKeyFromText("SECTION", title), title);
+
+        if(onToggle != null)
+            Toggle(Row(parent), false, toggleValue, onToggle, enableLabel ?? ("Enable " + title), enableId);
+
+        RectTransform body = parent as RectTransform;
+        return new CollapsibleSection {
+            Title = title,
+            Section = body,
+            Body = body,
+            Expanded = true,
+        };
+    }
+
     private static string GetCollapsibleKey(Transform parent, string title) {
         List<string> parts = [];
 

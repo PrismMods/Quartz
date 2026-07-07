@@ -24,21 +24,12 @@ internal static class PageCombo {
         void ApplyCaptionShadow() => ComboOverlay.ApplyCaptionShadow();
         void ApplyCountShadow() => ComboOverlay.ApplyCountShadow();
 
-        TextMeshProUGUI headerLabel = null;
-        void ApplyHeaderCue(bool enabled) {
-            if(headerLabel != null) headerLabel.alpha = enabled ? 1f : 0.5f;
-        }
-
-        var sec = GenerateUI.Collapsible(
-            content, "Combo", startExpanded: false,
-            v => { conf.Enabled = v; Apply(); Save(); ApplyHeaderCue(v); },
-            conf.Enabled
+        var sec = GenerateUI.FlatSection(
+            content, "Combo",
+            v => { conf.Enabled = v; Apply(); Save(); },
+            conf.Enabled,
+            "Enable Combo", "combo_enable"
         );
-
-        // Header gives no other indication of whether Combo is enabled without
-        // expanding it, so dim the title when it's off.
-        headerLabel = sec.HeaderObj.transform.Find("Bar/Label")?.GetComponent<TextMeshProUGUI>();
-        ApplyHeaderCue(conf.Enabled);
 
         GenerateUI.ToggleTip(
             sec.Body,
@@ -254,5 +245,15 @@ internal static class PageCombo {
             "Perfect Color",
             "combo_perfectcolor"
         );
+
+        GenerateUI.Button(
+            GenerateUI.Row(sec.Body),
+            () => ComboOverlay.ResetPosition(),
+            "Reset Position",
+            "combo_resetpos"
+        ).SetSecondary();
     }
+
+    public static void Create(RectTransform parent) =>
+        AppendTo(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
 }

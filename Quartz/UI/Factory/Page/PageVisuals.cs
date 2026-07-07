@@ -20,22 +20,44 @@ namespace Quartz.UI.Factory.Page;
 // mirror the original IMGUI layout. Also hosts Hide Judgements — v1's "Hide
 // judgement popups" tweak with its per-judgement mask.
 internal static class PageVisuals {
-    public static void Create(RectTransform parent) {
+    // Each section is its own standalone page under the Visuals category's
+    // column-2 (see MenuFactory.CategoryChildren). The 5 standalone helpers are
+    // unchanged; Effect Remover was inline in the old Create() and is extracted
+    // into CreateEffectRemover below verbatim.
+    public static void EffectRemoverPage(RectTransform parent) =>
+        CreateEffectRemover(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
+
+    public static void HideJudgementsPage(RectTransform parent) =>
+        CreateHideJudgements(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
+
+    public static void VisualTweaksPage(RectTransform parent) =>
+        CreateVisualTweaks(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
+
+    public static void PlanetColorsPage(RectTransform parent) =>
+        CreatePlanetColors(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
+
+    public static void OttoIconPage(RectTransform parent) =>
+        CreateOttoIcon(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
+
+    public static void UiHidingPage(RectTransform parent) =>
+        CreateUiHiding(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
+
+    private static void CreateEffectRemover(RectTransform content) {
         EffectRemover.EnsureConf();
         EffectRemoverSettings conf = EffectRemover.Conf;
         EffectRemoverSettings def = new();
-        RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
 
         void Save() => EffectRemover.Save();
 
-        var sec = GenerateUI.Collapsible(
-            content.transform, "Effect Remover", startExpanded: true,
+        var sec = GenerateUI.FlatSection(
+            content.transform, "Effect Remover",
             v => {
                 conf.On = v;
                 EffectRemover.RefreshEditorSaveButtons();
                 Save();
             },
-            conf.On
+            conf.On,
+            "Enable Effect Remover", "effectremover_enable"
         );
 
         // Mode: Simple (runtime effect disabling, editor-safe) vs Enhanced
@@ -255,13 +277,6 @@ internal static class PageVisuals {
         RefreshConditionalRows();
 
         } // end Enhanced-mode branch
-
-        CreateHideJudgements(content.transform);
-        CreateVisualTweaks(content.transform);
-        CreatePlanetColors(content.transform);
-        CreateOttoIcon(content.transform);
-        CreateUiHiding(content.transform);
-        NostalgiaUI.AddVisualsSection(content.transform);
     }
 
     // Simple mode — runtime effect disabling (AdofaiTweaks DisableEffects).
@@ -315,15 +330,16 @@ internal static class PageVisuals {
         OttoIconSettings conf = OttoIcon.Conf;
         OttoIconSettings def = new();
 
-        var sec = GenerateUI.Collapsible(
-            content, "Otto Icon", startExpanded: false,
+        var sec = GenerateUI.FlatSection(
+            content, "Otto Icon",
             v => {
                 conf.Enabled = v;
                 if(v) OttoIcon.Refresh();
                 else OttoIcon.Restore();
                 OttoIcon.Save();
             },
-            conf.Enabled
+            conf.Enabled,
+            "Enable Otto Icon", "ottoicon_enable"
         );
 
         GenerateUI.ColorPicker(
@@ -395,15 +411,16 @@ internal static class PageVisuals {
         UiHiderSettings conf = UiHider.Conf;
         UiHiderSettings def = new();
 
-        var sec = GenerateUI.Collapsible(
-            content, "UI Hiding", startExpanded: false,
+        var sec = GenerateUI.FlatSection(
+            content, "UI Hiding",
             v => {
                 conf.Enabled = v;
                 if(v) UiHider.ApplyNow();
                 else UiHider.Restore();
                 UiHider.Save();
             },
-            conf.Enabled
+            conf.Enabled,
+            "Enable UI Hiding", "uihiding_enable"
         );
 
         GenerateUI.ToggleTip(
@@ -492,15 +509,16 @@ internal static class PageVisuals {
         void Apply() => PlanetColors.Refresh();
         void Save() => PlanetColors.Save();
 
-        var sec = GenerateUI.Collapsible(
-            content, "Planet Colors", startExpanded: false,
+        var sec = GenerateUI.FlatSection(
+            content, "Planet Colors",
             v => {
                 conf.Enabled = v;
                 if(v) PlanetColors.Refresh();
                 else PlanetColors.Restore();
                 Save();
             },
-            conf.Enabled
+            conf.Enabled,
+            "Enable Planet Colors", "planetcolors_enable"
         );
         RectTransform[] tailColorRows = new RectTransform[PlanetColorsSettings.Slots];
 
@@ -632,7 +650,7 @@ internal static class PageVisuals {
         TweaksSettings conf = Tweaks.Conf;
         TweaksSettings def = new();
 
-        var sec = GenerateUI.Collapsible(content, "Visual Tweaks", startExpanded: false);
+        var sec = GenerateUI.FlatSection(content, "Visual Tweaks");
 
         GenerateUI.ToggleTip(
             sec.Body,
@@ -704,14 +722,15 @@ internal static class PageVisuals {
             foreach(RectTransform row in maskRows) row?.gameObject.SetActive(conf.Enabled);
         }
 
-        var sec = GenerateUI.Collapsible(
-            content, "Hide Judgements", startExpanded: false,
+        var sec = GenerateUI.FlatSection(
+            content, "Hide Judgements",
             v => {
                 conf.Enabled = v;
                 RefreshMaskRows();
                 JudgementPopupHider.Save();
             },
-            conf.Enabled
+            conf.Enabled,
+            "Enable Hide Judgements", "hidejudgements_enable"
         );
 
         void AddMaskToggle(int maskBit, string label, string id) {

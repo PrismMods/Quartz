@@ -12,6 +12,11 @@ public static class PageFactory {
         // Sections registered by a previous build of the pages are stale.
         GenerateUI.ClearSections();
 
+        // Page rects from a previous build (a profile-switch or addon-reload
+        // Rebuild) are destroyed with the old canvas; dynamic addon states
+        // from the previous generation would otherwise linger as dead keys.
+        UICore.Pages.Clear();
+
         GameObject pagesContainer = new("PagesContainer");
         pagesContainer.transform.SetParent(panel.transform, false);
 
@@ -26,6 +31,28 @@ public static class PageFactory {
 
         for(int i = 0; i < Enum.GetValues(typeof(OriginalMenuState)).Length; i++) CreatePageBase(i);
 
+        // Dynamic addon page bases must exist before the alpha block below,
+        // which activates UICore.Pages[CurrentMenuState] — and the current
+        // tab can BE a dynamic addon page (e.g. an accent-commit or
+        // profile-switch Rebuild fired while an addon tab was open).
+        foreach(Quartz.Addons.AddonUI.PageDef def in Quartz.Addons.AddonUI.Pages) {
+            RectTransform page = CreatePageBase(def.State);
+            RectTransform content = CreateScrollablePage(page);
+            try {
+                def.Build(content);
+            } catch(Exception e) {
+                Quartz.Core.MainCore.Log.Err($"[Addon:{def.AddonId}] tab '{def.Title}' build threw: {e}");
+                GenerateUI.AddMutedText(GenerateUI.Row(content, 40f)).text = $"'{def.Title}' failed to build — see log";
+            }
+        }
+
+        // Defensive: a stale CurrentMenuState (dynamic page from a prior
+        // generation that no longer exists) falls back to a guaranteed page
+        // instead of throwing. AddonService.Reload retargets before Rebuild,
+        // but this keeps CreatePages self-contained against any caller.
+        if(!UICore.Pages.ContainsKey(UICore.CurrentMenuState))
+            UICore.CurrentMenuState = (int)OriginalMenuState.OverlayGeneral;
+
         UICore.Pages[UICore.CurrentMenuState].GetComponent<CanvasGroup>().alpha = 1f;
         UICore.Pages[UICore.CurrentMenuState].GetComponent<CanvasGroup>().interactable = true;
         UICore.Pages[UICore.CurrentMenuState].GetComponent<CanvasGroup>().blocksRaycasts = true;
@@ -34,12 +61,47 @@ public static class PageFactory {
         PageProfiles.Create(UICore.Pages[(int)OriginalMenuState.Profiles]);
         PageImport.Create(UICore.Pages[(int)OriginalMenuState.Import]);
         PageSettings.Create(UICore.Pages[(int)OriginalMenuState.Settings]);
-        PageOverlay.Create(UICore.Pages[(int)OriginalMenuState.Overlay]);
-        PageGameplay.Create(UICore.Pages[(int)OriginalMenuState.Gameplay]);
-        PageVisuals.Create(UICore.Pages[(int)OriginalMenuState.Visuals]);
-        PageTweaks.Create(UICore.Pages[(int)OriginalMenuState.Tweaks]);
-        PageEditor.Create(UICore.Pages[(int)OriginalMenuState.Editor]);
+        // Overlay category
+        PageOverlayGeneral.Create(UICore.Pages[(int)OriginalMenuState.OverlayGeneral]);
+        PageKeyViewer.Create(UICore.Pages[(int)OriginalMenuState.KeyViewer]);
+        PageProgressBar.Create(UICore.Pages[(int)OriginalMenuState.ProgressBar]);
+        PageCombo.Create(UICore.Pages[(int)OriginalMenuState.Combo]);
+        PageJudgement.Create(UICore.Pages[(int)OriginalMenuState.Judgement]);
+        PageSongTitle.Create(UICore.Pages[(int)OriginalMenuState.SongTitle]);
+        PagePanels.Create(UICore.Pages[(int)OriginalMenuState.Panels]);
+        // Gameplay category
+        PageGameplay.KeyLimiterPage(UICore.Pages[(int)OriginalMenuState.GameplayKeyLimiter]);
+        PageGameplay.ChatterBlockerPage(UICore.Pages[(int)OriginalMenuState.GameplayChatter]);
+        PageGameplay.JudgementRestrictionPage(UICore.Pages[(int)OriginalMenuState.GameplayJudgement]);
+        PageGameplay.DeathLimitPage(UICore.Pages[(int)OriginalMenuState.GameplayDeath]);
+        PageGameplay.AutoDeafenPage(UICore.Pages[(int)OriginalMenuState.GameplayAutoDeafen]);
+        // Visuals category
+        PageVisuals.EffectRemoverPage(UICore.Pages[(int)OriginalMenuState.VisualsEffectRemover]);
+        PageVisuals.HideJudgementsPage(UICore.Pages[(int)OriginalMenuState.VisualsHideJudgements]);
+        PageVisuals.VisualTweaksPage(UICore.Pages[(int)OriginalMenuState.VisualsVisualTweaks]);
+        PageVisuals.PlanetColorsPage(UICore.Pages[(int)OriginalMenuState.VisualsPlanetColors]);
+        PageVisuals.OttoIconPage(UICore.Pages[(int)OriginalMenuState.VisualsOttoIcon]);
+        PageVisuals.UiHidingPage(UICore.Pages[(int)OriginalMenuState.VisualsUiHiding]);
+        // Tweaks category
+        PageTweaks.GeneralPage(UICore.Pages[(int)OriginalMenuState.TweaksGeneral]);
+        PageTweaks.OptimizerPage(UICore.Pages[(int)OriginalMenuState.TweaksOptimizer]);
+        PageTweaks.MainMenuPage(UICore.Pages[(int)OriginalMenuState.TweaksMainMenu]);
+        PageTweaks.ResultsPage(UICore.Pages[(int)OriginalMenuState.TweaksResults]);
+        // Editor category
+        PageEditor.InspectorPage(UICore.Pages[(int)OriginalMenuState.EditorInspector]);
+        PageEditor.TileReadoutPage(UICore.Pages[(int)OriginalMenuState.EditorTileReadout]);
+        PageEditor.BgaPage(UICore.Pages[(int)OriginalMenuState.EditorBga]);
+        // Nostalgia category
+        NostalgiaUI.GameplayPage(UICore.Pages[(int)OriginalMenuState.NostalgiaGameplay]);
+        NostalgiaUI.VisualsPage(UICore.Pages[(int)OriginalMenuState.NostalgiaVisuals]);
+        NostalgiaUI.TweaksPage(UICore.Pages[(int)OriginalMenuState.NostalgiaTweaks]);
+        NostalgiaUI.EditorPage(UICore.Pages[(int)OriginalMenuState.NostalgiaEditor]);
+        // Single-page categories
         PageSearch.Create(UICore.Pages[(int)OriginalMenuState.Search]);
+
+        // Addons category list/reload page (fixed enum state; the addon-
+        // registered dynamic pages were built up top, before the alpha block).
+        PageAddons.Create(UICore.Pages[(int)OriginalMenuState.Addons]);
 
         // Developer page — only populated in "dev" builds (its tab is likewise
         // only created then).

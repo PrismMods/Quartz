@@ -108,6 +108,43 @@ public static class PanelsOverlay {
         StringComparer.Ordinal
     );
 
+    // Addon-registered stats. They join the built-in Catalog everywhere —
+    // stat picker, lookup, localization (their locale key falls back to the
+    // registered Label). A panel entry whose addon stat is gone (addon
+    // unloaded/disabled) simply renders nothing: FindStat misses and
+    // UpdatePanel skips the line, exactly like any unknown id.
+    private static readonly List<StatDef> addonStats = [];
+
+    // Built-ins first, addon stats after, for the settings-UI picker.
+    public static IReadOnlyList<StatDef> AllStats {
+        get {
+            if(addonStats.Count == 0) return Catalog;
+            List<StatDef> all = new(Catalog.Length + addonStats.Count);
+            all.AddRange(Catalog);
+            all.AddRange(addonStats);
+            return all;
+        }
+    }
+
+    public static void RegisterStat(StatDef stat) {
+        if(stat == null || string.IsNullOrWhiteSpace(stat.Id) || stat.Value == null)
+            throw new ArgumentException("stat needs an Id and a Value delegate");
+        if(CatalogById.ContainsKey(stat.Id))
+            throw new InvalidOperationException($"stat id '{stat.Id}' is already registered");
+
+        addonStats.Add(stat);
+        CatalogById[stat.Id] = stat;
+        CatalogLocaleKeys[stat.Id] = LocaleKey("PANEL_STAT_", stat.Id);
+    }
+
+    public static void UnregisterStat(string statId) {
+        if(string.IsNullOrEmpty(statId)) return;
+        int removed = addonStats.RemoveAll(s => s.Id == statId);
+        if(removed == 0) return; // never removes a built-in
+        CatalogById.Remove(statId);
+        CatalogLocaleKeys.Remove(statId);
+    }
+
     public static string LocalizedStatLabel(StatDef stat) {
         if(stat == null) return "";
 
@@ -438,10 +475,14 @@ public static class PanelsOverlay {
 
                     string value;
                     if(entry.Id == "text") {
-                        // The "text" stat renders the entry's own custom string;
-                        // an empty one is skipped so it leaves no blank line.
+                        // The "text" stat renders the entry's own custom string,
+                        // with {TagName} placeholders substituted by addon tags
+                        // (and built-in stat ids like {fps}). An empty result —
+                        // literally empty or all-empty tags — is skipped so it
+                        // leaves no blank line.
                         if(string.IsNullOrEmpty(entry.Text)) continue;
-                        value = entry.Text;
+                        value = Quartz.Addons.AddonTags.Interpolate(entry.Text, name => ResolveStatToken(name, c));
+                        if(string.IsNullOrEmpty(value)) continue;
                     } else {
                         try { value = stat.Value(c); }
                         catch { continue; }
@@ -519,6 +560,20 @@ public static class PanelsOverlay {
 
         private static StatDef FindStat(string id) =>
             id != null && CatalogById.TryGetValue(id, out StatDef stat) ? stat : null;
+
+        // Resolver for {name} tokens in custom text: maps a built-in stat id
+        // to its current value so {fps}, {accuracy}, ... work alongside addon
+        // tags. Returns null when the name isn't a stat (the "text" stat is
+        // excluded to avoid it referencing itself), leaving addon-tag
+        // resolution / literal passthrough to the caller.
+        private static string ResolveStatToken(string name, PanelConfig config) {
+            if(name == "text" || !CatalogById.TryGetValue(name, out StatDef stat)) return null;
+            try {
+                return stat.Value(config) ?? "";
+            } catch {
+                return "";
+            }
+        }
 
         private static void SyncPosition(LivePanel p) {
             Vector2 stored = OverlayCalibration.Unscale(p.Rect.anchoredPosition);

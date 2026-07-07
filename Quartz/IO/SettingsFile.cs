@@ -31,6 +31,13 @@ public static class SettingsRegistry {
         }
     }
 
+    // Drops a handle from the set (e.g. an addon settings file whose addon
+    // was disabled/unloaded), so profile SaveAll/ReloadAll stop touching an
+    // orphaned instance. No-op if it isn't registered.
+    public static void Unregister(ISettingsHandle handle) {
+        lock(sync) handles.Remove(handle);
+    }
+
     public static ISettingsHandle[] Snapshot() {
         lock(sync) return [.. handles];
     }

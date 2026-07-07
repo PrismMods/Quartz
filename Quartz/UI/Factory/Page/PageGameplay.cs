@@ -26,16 +26,23 @@ internal static class PageGameplay {
     private static Action keysChangedHandler;
     private static Action syncLockChangedHandler;
 
-    public static void Create(RectTransform parent) {
-        RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
+    // Each section is now its own standalone page under the Gameplay category's
+    // column-2 (see MenuFactory.CategoryChildren). The private CreateX helpers
+    // are unchanged — these thin wrappers just give each its own scroll page.
+    public static void KeyLimiterPage(RectTransform parent) =>
+        CreateKeyLimiter(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
 
-        CreateKeyLimiter(content.transform);
-        CreateChatterBlocker(content.transform);
-        CreateJudgementRestriction(content.transform);
-        CreateDeathLimit(content.transform);
-        CreateAutoDeafen(content.transform);
-        NostalgiaUI.AddGameplaySection(content.transform);
-    }
+    public static void ChatterBlockerPage(RectTransform parent) =>
+        CreateChatterBlocker(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
+
+    public static void JudgementRestrictionPage(RectTransform parent) =>
+        CreateJudgementRestriction(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
+
+    public static void DeathLimitPage(RectTransform parent) =>
+        CreateDeathLimit(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
+
+    public static void AutoDeafenPage(RectTransform parent) =>
+        CreateAutoDeafen(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
 
     // ===== Auto Deafen (Discord) =====
 
@@ -44,13 +51,14 @@ internal static class PageGameplay {
         AutoDeafenSettings conf = AutoDeafen.Conf;
         AutoDeafenSettings def = new();
 
-        var sec = GenerateUI.Collapsible(
-            content, "Auto Deafen (Discord)", startExpanded: false,
+        var sec = GenerateUI.FlatSection(
+            content, "Auto Deafen (Discord)",
             v => {
                 conf.Enabled = v;
                 AutoDeafen.Save();
             },
-            conf.Enabled
+            conf.Enabled,
+            "Enable Auto Deafen (Discord)", "autodeafen_enable"
         );
 
         // Mode: Shortcut (taps your Discord deafen keybind — Windows only) vs Bot
@@ -374,13 +382,14 @@ internal static class PageGameplay {
         KeyLimiterSettings conf = KeyLimiter.Conf;
         KeyLimiterSettings def = new();
 
-        var sec = GenerateUI.Collapsible(
-            content, "Key Limiter", startExpanded: true,
+        var sec = GenerateUI.FlatSection(
+            content, "Key Limiter",
             v => {
                 conf.Enabled = v;
                 KeyLimiter.Save();
             },
-            conf.Enabled
+            conf.Enabled,
+            "Enable Key Limiter", "keylimiter_enable"
         );
 
         CreateProfileControls(sec.Body);
@@ -520,13 +529,14 @@ internal static class PageGameplay {
         ChatterBlockerSettings conf = ChatterBlocker.Conf;
         ChatterBlockerSettings def = new();
 
-        var sec = GenerateUI.Collapsible(
-            content, "Keyboard Chatter Blocker", startExpanded: false,
+        var sec = GenerateUI.FlatSection(
+            content, "Keyboard Chatter Blocker",
             v => {
                 conf.Enabled = v;
                 ChatterBlocker.Save();
             },
-            conf.Enabled
+            conf.Enabled,
+            "Enable Keyboard Chatter Blocker", "chatterblocker_enable"
         );
 
         UISlider threshold = GenerateUI.Slider(
@@ -556,13 +566,14 @@ internal static class PageGameplay {
         // the dropdown has a valid selection.
         if(conf.JRestrictMode == 2 && !XPerfectBridge.Installed) conf.JRestrictMode = 1;
 
-        var sec = GenerateUI.Collapsible(
-            content, "Judgement Restriction", startExpanded: false,
+        var sec = GenerateUI.FlatSection(
+            content, "Judgement Restriction",
             v => {
                 conf.JRestrictEnabled = v;
                 Restriction.Save();
             },
-            conf.JRestrictEnabled
+            conf.JRestrictEnabled,
+            "Enable Judgement Restriction", "judgementrestriction_enable"
         );
 
         RectTransform accuracyRow = null;
@@ -678,13 +689,14 @@ internal static class PageGameplay {
         RestrictionSettings conf = Restriction.Conf;
         RestrictionSettings def = new();
 
-        var sec = GenerateUI.Collapsible(
-            content, "Death Limit", startExpanded: false,
+        var sec = GenerateUI.FlatSection(
+            content, "Death Limit",
             v => {
                 conf.DeathLimitEnabled = v;
                 Restriction.Save();
             },
-            conf.DeathLimitEnabled
+            conf.DeathLimitEnabled,
+            "Enable Death Limit", "deathlimit_enable"
         );
 
         void LimitPair(string toggleLabel, string sliderLabel, string id,
