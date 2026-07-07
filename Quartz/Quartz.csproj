@@ -152,10 +152,6 @@
 		<EmbeddedResource Include="Resource\Embedded\**\*" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-	</ItemGroup>
-
 	<!-- Build number comes from build.json (repo root), keyed by the Version and
 	     Channel consts in Core/Info.cs. tools/release.sh bumps build.json; this
 	     target reads it back at compile time and generates BuildInfo.Number, so
