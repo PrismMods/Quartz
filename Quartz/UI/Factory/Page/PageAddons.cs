@@ -33,7 +33,7 @@ internal static class PageAddons {
         var actionsRow = GenerateUI.Row(content.transform);
         GenerateUI.ButtonRow(actionsRow);
 
-        // Copy a .cs/.qaddon/.dll into the Addons folder via a file picker.
+        // Copy a .qaddon/.dll into the Addons folder via a file picker.
         UIButton addBtn = GenerateUI.Button(
             actionsRow,
             AddAddon,
@@ -43,7 +43,7 @@ internal static class PageAddons {
         GenerateUI.FixWidth(addBtn, 200f);
         addBtn.Rect.AddToolTip(
             "DESC_ADDONS_ADD",
-            "Pick a .cs, .qaddon or .dll file to copy into the Addons folder, then reload."
+            "Pick a .qaddon or .dll file to copy into the Addons folder, then reload."
         );
 
         // Reload rebuilds this very panel — defer past the click callback so
