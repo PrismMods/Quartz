@@ -202,6 +202,23 @@ public static class AddonService {
         }
     }
 
+    // Disables + unloads a single addon in place (OnDisable, OnUnload, context
+    // cleanup, instance/context null-out) without touching the handles list —
+    // shared by RemoveAddon (one handle) and UnloadAll (every handle).
+    private static void TeardownHandle(Handle handle) {
+        SafeDisable(handle);
+        if(handle.Instance != null) {
+            try {
+                handle.Instance.OnUnload();
+            } catch(Exception e) {
+                MainCore.Log.Err($"[Addon:{handle.Id}] OnUnload threw: {e}");
+            }
+        }
+        handle.Context?.Cleanup();
+        handle.Instance = null;
+        handle.Context = null;
+    }
+
     // The user toggled an addon on the Addons page. Enabling may need OnLoad
     // to run (registrations happen there), so both directions go through a
     // full reload; deferred because the click arrives from a UI widget the
@@ -311,17 +328,7 @@ public static class AddonService {
         // then drop it from the list so the reload below skips the dead handle,
         // and only THEN delete the settings file (after Cleanup, so its
         // teardown save can't recreate the file we just removed).
-        SafeDisable(handle);
-        if(handle.Instance != null) {
-            try {
-                handle.Instance.OnUnload();
-            } catch(Exception e) {
-                MainCore.Log.Err($"[Addon:{handle.Id}] OnUnload threw: {e}");
-            }
-        }
-        handle.Context?.Cleanup();
-        handle.Instance = null;
-        handle.Context = null;
+        TeardownHandle(handle);
         handles.Remove(handle);
 
         try {
@@ -341,18 +348,7 @@ public static class AddonService {
     private static void UnloadAll() {
         // Reverse order, mirroring RuntimeServices.Dispose.
         for(int i = handles.Count - 1; i >= 0; i--) {
-            Handle handle = handles[i];
-            SafeDisable(handle);
-            if(handle.Instance != null) {
-                try {
-                    handle.Instance.OnUnload();
-                } catch(Exception e) {
-                    MainCore.Log.Err($"[Addon:{handle.Id}] OnUnload threw: {e}");
-                }
-            }
-            handle.Context?.Cleanup();
-            handle.Instance = null;
-            handle.Context = null;
+            TeardownHandle(handles[i]);
         }
         handles.Clear();
     }
