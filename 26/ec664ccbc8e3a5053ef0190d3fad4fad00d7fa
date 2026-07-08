@@ -1,0 +1,21 @@
+Quartz.Tests/Core/SemVerTests.cs
+  s_7dc67007514bbc::t_ed47049151f10c 15-40
+Quartz.Tests/Program.cs
+  s_7dc67007514bbc::t_9c42449f2563d7 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "26ec664ccbc8e3a5053ef0190d3fad4fad00d7fa",
+  "prompts": {},
+  "sessions": {
+    "s_7dc67007514bbc": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_0be96ed9effezgv58mL1RuWtX4",
+        "model": "tencent/hy3:free"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
