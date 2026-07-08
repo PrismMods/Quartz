@@ -115,9 +115,16 @@ public static partial class UiHider {
         if(uiController == null) return;
 
         if(IsEditingLevel() || scnEditor.instance != null) {
-            HideGameplayDifficultyContainer(uiController);
-
             object editor = scnEditor.instance;
+
+            // Only force the gameplay difficulty (strict/normal/lenient) container
+            // down while genuinely EDITING. Custom levels play inside the scnEditor
+            // scene in playMode, so this branch is also entered during normal
+            // custom-level / playtest play — hiding it there (every frame, ungated)
+            // killed the difficulty arrows at level start. In play, let the normal
+            // play-mode path below own that container (gated on HideTimingTarget).
+            if(editor is scnEditor ed && !ed.playMode) HideGameplayDifficultyContainer(uiController);
+
             SetEnabled(GetMemberValue(editor, "autoImage"), !hideOtto);
             SetEnabled(GetMemberValue(editor, "buttonAuto"), !hideOtto);
             SetMemberGameObjectActiveIfMatches(editor, "editorDifficultySelector", hideTimingTarget);
