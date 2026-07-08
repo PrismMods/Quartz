@@ -1,0 +1,21 @@
+Quartz/UI/Factory/Page/PageKeyViewer.cs
+  s_ca358292d15837::t_2d9cacab705616 423-441
+  s_ca358292d15837::t_eec1159bc85ac9 1254-1255
+  s_ca358292d15837::t_a741c7796a1729 1195
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "4a032ee2c4c42bd4440b4d90c0efae0750a44cdd",
+  "prompts": {},
+  "sessions": {
+    "s_ca358292d15837": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4e4a226c-059e-4d70-9842-7eab59cde34a",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
