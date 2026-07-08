@@ -1,5 +1,6 @@
 List<(string Name, Action Run)> tests = [
     ("SemVer parses and orders channels", SemVerTests.TestSemVer),
+    ("SemVer formats and parses channels", SemVerTests.TestSemVerFormatAndChannels),
     ("AtomicFile replaces without temp debris", AtomicFileTests.TestAtomicFile),
     ("Imported mod profile names are sanitized and uniquified", ProfileNamesTests.TestImportedModProfileNames),
     ("Localization keys stay in parity", LocalizationParityTests.TestLocalizationParity),
