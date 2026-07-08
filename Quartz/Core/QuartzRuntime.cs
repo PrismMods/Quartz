@@ -60,6 +60,8 @@ public sealed class QuartzRuntime {
     private readonly RuntimeServices services;
     private readonly RuntimeTicks ticks;
 
+    private readonly FeatureRegistry features = new();
+
     private UIService uiService;
     private TweenService tweenService;
     private HarmonyService harmonyService;
@@ -238,6 +240,7 @@ public sealed class QuartzRuntime {
         UnityEngine.SceneManagement.SceneManager.sceneLoaded += xperfectGuardHandler;
 
         sw.Restart();
+        RegisterFeatures();
         SetModEnabled(Config.Data.Active, false);
         Logger.Msg($"[Startup] SetModEnabled took {sw.ElapsedMilliseconds} ms");
 
@@ -327,6 +330,45 @@ public sealed class QuartzRuntime {
         Logger.Msg("Bye");
     }
 
+    // Lists every feature's enable/disable step in the order SetModEnabled used
+    // to run them. The overlays disable in REVERSE of their enable order, so
+    // their dispose steps are registered with OnDisable separately from their
+    // enable steps; the non-overlay features disable in the same (forward)
+    // order they enable, so they use Register. Behaviour is identical to the old
+    // hard-coded blocks — adding a feature is a registration line, not editing
+    // two interleaved sequences.
+    private void RegisterFeatures() {
+        // Enable: overlays build their GameObjects against the runtime root.
+        features.OnEnable("PanelsOverlay", () => PanelsOverlay.Initialize(RootObject));
+        features.OnEnable("ComboOverlay", () => ComboOverlay.Initialize(RootObject));
+        features.OnEnable("ProgressBarOverlay", () => ProgressBarOverlay.Initialize(RootObject));
+        features.OnEnable("JudgementOverlay", () => JudgementOverlay.Initialize(RootObject));
+        features.OnEnable("KeyViewerOverlay", () => KeyViewerOverlay.Initialize(RootObject));
+        features.OnEnable("SongTitleOverlay", () => SongTitleOverlay.Initialize(RootObject));
+
+        // Enable: non-overlay features re-apply their change to the live scene.
+        features.Register("EffectRemover", EffectRemover.RefreshEditorSaveButtons, EffectRemover.RestoreEditorSaveButtons);
+        features.Register("Tweaks", Tweaks.RefreshAll, Tweaks.RestoreAll);
+        features.Register("PlanetColors", PlanetColors.Refresh, PlanetColors.Restore);
+        features.Register("OttoIcon", OttoIcon.Refresh, OttoIcon.Restore);
+        features.Register("Optimizer", Optimizer.Apply, Optimizer.Restore);
+        features.Register("InGameOverlayFont", InGameOverlayFont.Refresh, InGameOverlayFont.RestoreAll);
+        features.Register("Nostalgia", Nostalgia.Refresh, Nostalgia.Restore);
+
+        // Disable: overlays unwind in REVERSE of their enable order.
+        features.OnDisable("SongTitleOverlay", SongTitleOverlay.Dispose);
+        features.OnDisable("KeyViewerOverlay", KeyViewerOverlay.Dispose);
+        features.OnDisable("JudgementOverlay", JudgementOverlay.Dispose);
+        features.OnDisable("ProgressBarOverlay", ProgressBarOverlay.Dispose);
+        features.OnDisable("ComboOverlay", ComboOverlay.Dispose);
+        features.OnDisable("PanelsOverlay", PanelsOverlay.Dispose);
+
+        // Disable: teardown-only steps with no enable counterpart.
+        features.OnDisable("UiHider", UiHider.Restore);
+        features.OnDisable("EditorFeature", EditorFeature.Restore);
+        features.OnDisable("AutoDeafen", Features.AutoDeafen.AutoDeafen.Stop);
+    }
+
     public void SetModEnabled(bool enabled, bool isDispose) {
         if(State.IsEnabled == enabled) return;
 
@@ -338,24 +380,7 @@ public sealed class QuartzRuntime {
         }
 
         if(enabled) {
-            PanelsOverlay.Initialize(RootObject);
-            ComboOverlay.Initialize(RootObject);
-            ProgressBarOverlay.Initialize(RootObject);
-            JudgementOverlay.Initialize(RootObject);
-            KeyViewerOverlay.Initialize(RootObject);
-            SongTitleOverlay.Initialize(RootObject);
-
-            // Re-disable editor Save buttons if the Effect Remover is on.
-            EffectRemover.RefreshEditorSaveButtons();
-
-            // Re-apply the visual tweaks and planet colors to whatever scene
-            // is live.
-            Tweaks.RefreshAll();
-            PlanetColors.Refresh();
-            OttoIcon.Refresh();
-            Optimizer.Apply();
-            InGameOverlayFont.Refresh();
-            Nostalgia.Refresh();
+            features.EnableAll();
 
             OnModEnabledChanged?.Invoke(true, isDispose);
 
@@ -363,26 +388,7 @@ public sealed class QuartzRuntime {
         } else {
             OnModEnabledChanged?.Invoke(false, isDispose);
 
-            SongTitleOverlay.Dispose();
-            KeyViewerOverlay.Dispose();
-            JudgementOverlay.Dispose();
-            ProgressBarOverlay.Dispose();
-            ComboOverlay.Dispose();
-            PanelsOverlay.Dispose();
-
-            // The remover's editor-save lock shouldn't outlive the mod.
-            EffectRemover.RestoreEditorSaveButtons();
-
-            // Put back the particles/glows/colors/UI the features changed.
-            Tweaks.RestoreAll();
-            PlanetColors.Restore();
-            OttoIcon.Restore();
-            UiHider.Restore();
-            Optimizer.Restore();
-            InGameOverlayFont.RestoreAll();
-            EditorFeature.Restore();
-            Nostalgia.Restore();
-            Features.AutoDeafen.AutoDeafen.Stop();
+            features.DisableAll();
 
             Logger.Msg("Mod Disabled");
         }
