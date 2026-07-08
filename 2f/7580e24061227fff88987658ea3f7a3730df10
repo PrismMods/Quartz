@@ -1,0 +1,20 @@
+.github/workflows/ci.yml
+  s_7dc67007514bbc::t_55a5da36eff928 1-21
+  s_7dc67007514bbc::t_c2c515d7ae965e 22-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "2f7580e24061227fff88987658ea3f7a3730df10",
+  "prompts": {},
+  "sessions": {
+    "s_7dc67007514bbc": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_0be96ed9effezgv58mL1RuWtX4",
+        "model": "tencent/hy3:free"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
