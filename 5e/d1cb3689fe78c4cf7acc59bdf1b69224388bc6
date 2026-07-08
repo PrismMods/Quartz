@@ -1,0 +1,19 @@
+build.json
+  s_7dc67007514bbc::t_79a75ae5ef4cb4 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "5ed1cb3689fe78c4cf7acc59bdf1b69224388bc6",
+  "prompts": {},
+  "sessions": {
+    "s_7dc67007514bbc": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_0be96ed9effezgv58mL1RuWtX4",
+        "model": "tencent/hy3:free"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
