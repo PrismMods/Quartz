@@ -1,0 +1,21 @@
+Quartz/Features/Editor/EditorGameplayDifficultyPatches.cs
+  s_e6dd6673c5c6bc::t_4912137bff1534 7-18,23,32
+Quartz/Features/UiHider/UiHider.cs
+  s_e6dd6673c5c6bc::t_5b3f566533202b 119-127
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "2c656604a1e01cbc27d0423e4c5a76cdf6ad848a",
+  "prompts": {},
+  "sessions": {
+    "s_e6dd6673c5c6bc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ead059df-9a8d-4cc3-8928-2e0a5f4cb1e1",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
