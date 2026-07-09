@@ -1,0 +1,25 @@
+Quartz/UI/Factory/PageFactory.cs
+  s_84f2b2df1f2e6d::t_15140ab120ce31 111-117
+  s_84f2b2df1f2e6d::t_edb0628a0bfe66 181-191
+  s_84f2b2df1f2e6d::t_cf66199f06bd2f 192
+Quartz/UI/Transition/PageSwicher.cs
+  s_84f2b2df1f2e6d::t_bb48c7f2d5f5c3 25-31,34-36
+  s_84f2b2df1f2e6d::t_781e939b7816ad 67
+  s_84f2b2df1f2e6d::t_fc07d61d179a6f 37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "817a4bf457ddf2c5e5744d70d080c1f4c34eb67c",
+  "prompts": {},
+  "sessions": {
+    "s_84f2b2df1f2e6d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "62736c12-5ffb-4b65-a659-5ca165b9a44a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
