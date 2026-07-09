@@ -1,0 +1,22 @@
+Quartz/Resource/FontExempt.cs
+  s_ac7b7f4411ac05::t_f8228b5aabecde 1-8
+  s_ac7b7f4411ac05::t_70b1826c70d550 9-12
+Quartz/Resource/FontManager.cs
+  s_ac7b7f4411ac05::t_6c7a0af121fa50 15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "4047a1cafc918342893b3942df1578c77d4d7782",
+  "prompts": {},
+  "sessions": {
+    "s_ac7b7f4411ac05": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_0be1f2f37ffe6D8Jnjd0wIslFp",
+        "model": "minimax/minimax-m3:thinking"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
