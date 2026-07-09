@@ -4,10 +4,7 @@ using Quartz.Features.ProgressBar;
 using UnityEngine;
 using static Quartz.Features.Interop.ReflectionHelpers;
 using static Quartz.Features.Interop.Readers.KeyViewerImportShared;
-
 namespace Quartz.Features.Interop.Readers;
-
-// ===== JipperResourcePack =====
 internal static class JipperResourcePackReader {
     public static int ImportJipperResourcePack(
         SettingsImportOption option,
@@ -22,20 +19,15 @@ internal static class JipperResourcePackReader {
         count += ImportJrpKeyViewer(option, mode, parts);
         return count;
     }
-
     private static int ImportJrpProgressBar(SettingsImportOption option) {
         object settings = GetStaticMember(SettingsImporter.FindType(option, "JipperResourcePack.OverlayContents.Status"), "Settings")
             ?? GetStaticMember(SettingsImporter.FindType(option, "JipperResourcePack.Jongyeol.JStatus"), "Settings");
         if(settings == null) return 0;
-
-        // Only the progress-BAR data maps; v2 has no flat text-stat toggles.
         if(!TryGetBool(settings, "ShowProgressBar", out bool barOn)) return 0;
-
         int count = 0;
         ProgressBarOverlay.EnsureConf();
         ProgressBarOverlay.Conf.Enabled = barOn;
         count++;
-
         if(TryGetColorRangeEndpoints(GetMemberValue(settings, "ProgressBarColor"), out Color fill, out _)) {
             ProgressBarOverlay.Conf.SetFillColor(fill);
             count++;
@@ -50,12 +42,10 @@ internal static class JipperResourcePackReader {
         }
         return count;
     }
-
     private static int ImportJrpCombo(SettingsImportOption option) {
         object settings = GetStaticMember(SettingsImporter.FindType(option, "JipperResourcePack.OverlayContents.Combo"), "Settings")
             ?? GetStaticMember(SettingsImporter.FindType(option, "JipperResourcePack.Jongyeol.JCombo"), "Settings");
         if(settings == null) return 0;
-
         int count = 0;
         ComboOverlay.EnsureConf();
         ComboOverlay.Conf.Enabled = true;
@@ -75,11 +65,9 @@ internal static class JipperResourcePackReader {
         }
         return count;
     }
-
     private static int ImportJrpJudgement(SettingsImportOption option) {
         object settings = GetStaticMember(SettingsImporter.FindType(option, "JipperResourcePack.OverlayContents.Judgement"), "Settings");
         if(settings == null) return 0;
-
         int count = 0;
         JudgementOverlay.EnsureConf();
         JudgementOverlay.Conf.Enabled = true;
@@ -90,11 +78,9 @@ internal static class JipperResourcePackReader {
         }
         return count;
     }
-
     private static int ImportJrpResourceChanger(SettingsImportOption option) {
         object settings = GetStaticMember(SettingsImporter.FindType(option, "JipperResourcePack.ResourceChanger"), "_settings");
         if(settings == null) return 0;
-
         int count = 0;
         if(TryGetBool(settings, "ChangeRabbit", out bool otto)) {
             Features.OttoIcon.OttoIcon.EnsureConf();
@@ -108,17 +94,14 @@ internal static class JipperResourcePackReader {
         }
         return count;
     }
-
     private static int ImportJrpKeyViewer(
         SettingsImportOption option,
         SettingsImportReplaceMode mode,
         SettingsImportKeyViewerPart parts
     ) {
         if(mode == SettingsImportReplaceMode.KeepOld) return 0;
-
         object settings = GetStaticMember(SettingsImporter.FindType(option, "JipperResourcePack.KeyViewerContents.KeyViewer"), "Settings");
         if(settings == null) return 0;
-
         ImportedKeyViewer imported = ReadKeyViewerFromObject(settings);
         if(imported == null || imported.Available == SettingsImportKeyViewerPart.None) return 0;
         return ApplyKeyViewerImport(imported, mode, parts);

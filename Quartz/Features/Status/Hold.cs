@@ -1,7 +1,4 @@
 namespace Quartz.Features.Status;
-
-// Player's hold-behavior setting (Normal / Hold Tap / No Holding Required).
-// Persistence.holdBehavior lives in Assembly-CSharp.
 internal static class Hold {
     internal static string GetHoldBehaviorLabel() {
         try {

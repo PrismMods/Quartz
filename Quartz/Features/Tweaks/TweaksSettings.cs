@@ -1,37 +1,22 @@
 using Newtonsoft.Json.Linq;
 using Quartz.IO;
 using Quartz.IO.Interface;
-
 namespace Quartz.Features.Tweaks;
-
-// Persisted config for the Tweaks feature, ported field-for-field from the
-// original KorenResourcePack (defaults match v1's Settings.cs). Lives in
-// UserData/Quartz/Tweaks.json.
 public sealed class TweaksSettings : ISettingsFile {
-    // === Visual tweaks (Visuals tab) ===
     public bool RemoveAllCheckpoints = true;
     public bool RemoveBallCoreParticles = true;
     public bool DisableTileHitGlow = true;
     public bool RemovePlanetGlow = true;
-
-    // === Behavior tweaks (Tweaks tab) ===
     public bool DisableAutoPause = true;
     public bool BlockMouseWheelScrollWhilePlaying = true;
     public bool DisableMenuMusic = true;
-
-    // Custom main-menu BPM: the menu's rabbit floor toggles the planet speed
-    // between slow and fast. When enabled, those two states run at these BPMs
-    // instead of the authored 1x / 2x. Off by default — leaves the menu alone.
     public bool MenuBpmEnabled = false;
     public float MenuSlowBpm = 100f;
     public float MenuHighBpm = 200f;
-
-    // === Detailed results tweaks (Tweaks tab) ===
     public bool HideResultXAccuracy = true;
     public bool HideResultAccuracy = true;
     public bool HideResultCheckpoints = true;
     public bool HideResultMaximumUsedKeys = true;
-
     public JToken Serialize() =>
         new JObject {
             [nameof(RemoveAllCheckpoints)] = RemoveAllCheckpoints,
@@ -49,7 +34,6 @@ public sealed class TweaksSettings : ISettingsFile {
             [nameof(HideResultCheckpoints)] = HideResultCheckpoints,
             [nameof(HideResultMaximumUsedKeys)] = HideResultMaximumUsedKeys,
         };
-
     public void Deserialize(JToken token) {
         RemoveAllCheckpoints = IOUtils.Read(token, nameof(RemoveAllCheckpoints), RemoveAllCheckpoints);
         RemoveBallCoreParticles = IOUtils.Read(token, nameof(RemoveBallCoreParticles), RemoveBallCoreParticles);

@@ -4,17 +4,10 @@ using System.Text;
 using Quartz.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
 namespace Quartz.Features.AutoDeafen;
-
-// Minimal Discord RPC client over the local IPC socket (named pipe on
-// Windows, unix socket elsewhere), ported from the original
-// KorenResourcePack. Authenticates with the user's OAuth access token and
-// flips SET_VOICE_SETTINGS deaf on request from a background thread.
 internal sealed class DiscordRpc {
     private readonly string clientId;
     private readonly string accessToken;
-
     private Thread thread;
     private volatile bool running;
     private volatile bool desiredDeaf;
@@ -22,24 +15,19 @@ internal sealed class DiscordRpc {
     private volatile string status = "idle";
     private Stream stream;
     private readonly object ioLock = new();
-
     internal string Status => status;
     internal bool Ready => ready;
-
     internal DiscordRpc(string clientId, string accessToken) {
         this.clientId = clientId;
         this.accessToken = accessToken;
     }
-
     internal void Start() {
         if(running) return;
         running = true;
         thread = new Thread(Run) { IsBackground = true, Name = "Quartz-DiscordRpc" };
         thread.Start();
     }
-
     internal void SetDeaf(bool deaf) => desiredDeaf = deaf;
-
     internal void Stop() {
         running = false;
         try { if(ready) ApplyDeaf(false); } catch { }
@@ -47,7 +35,6 @@ internal sealed class DiscordRpc {
         stream = null;
         ready = false;
     }
-
     private void Run() {
         try {
             status = "connecting";
@@ -57,18 +44,14 @@ internal sealed class DiscordRpc {
                 running = false;
                 return;
             }
-
             Handshake();
-
             if(!TryAuthenticate()) {
                 status = "authenticate failed";
                 running = false;
                 return;
             }
-
             ready = true;
             status = "ready";
-
             bool current = false;
             while(running) {
                 if(desiredDeaf != current) {
@@ -86,12 +69,10 @@ internal sealed class DiscordRpc {
             ready = false;
         }
     }
-
     private Stream Connect() {
         bool unix = Environment.OSVersion.Platform == PlatformID.Unix
             || Environment.OSVersion.Platform == PlatformID.MacOSX
             || (int)Environment.OSVersion.Platform == 6;
-
         for(int i = 0; i < 10; i++) {
             try {
                 if(unix) {
@@ -105,7 +86,6 @@ internal sealed class DiscordRpc {
                     sock.Connect(new UnixDomainSocketEndPoint(path));
                     return new NetworkStream(sock, true);
                 }
-
                 NamedPipeClientStream pipe = new(".", "discord-ipc-" + i, PipeDirection.InOut);
                 pipe.Connect(2000);
                 return pipe;
@@ -113,7 +93,6 @@ internal sealed class DiscordRpc {
         }
         return null;
     }
-
     private void WriteFrame(int op, string json) {
         byte[] payload = Encoding.UTF8.GetBytes(json);
         byte[] header = new byte[8];
@@ -125,7 +104,6 @@ internal sealed class DiscordRpc {
             stream.Flush();
         }
     }
-
     private JObject ReadFrame(out int op) {
         byte[] header = ReadExact(8);
         op = BitConverter.ToInt32(header, 0);
@@ -134,7 +112,6 @@ internal sealed class DiscordRpc {
         string json = Encoding.UTF8.GetString(payload);
         return string.IsNullOrEmpty(json) ? [] : JObject.Parse(json);
     }
-
     private byte[] ReadExact(int n) {
         byte[] buf = new byte[n];
         int off = 0;
@@ -145,26 +122,22 @@ internal sealed class DiscordRpc {
         }
         return buf;
     }
-
     private void Handshake() {
         WriteFrame(0, JsonConvert.SerializeObject(new { v = 1, client_id = clientId }));
         ReadFrame(out _);
     }
-
     private JObject Command(string cmd, object args) {
         string nonce = Guid.NewGuid().ToString();
         WriteFrame(1, JsonConvert.SerializeObject(new { cmd, args, nonce }));
         while(true) {
             JObject msg = ReadFrame(out int op);
             if(op == 3) {
-                // PING — answer with PONG and keep waiting for our reply.
                 WriteFrame(4, msg.ToString(Formatting.None));
                 continue;
             }
             if(msg.Value<string>("nonce") == nonce) return msg;
         }
     }
-
     private bool TryAuthenticate() {
         if(string.IsNullOrEmpty(accessToken)) return false;
         try {
@@ -175,6 +148,5 @@ internal sealed class DiscordRpc {
             return false;
         }
     }
-
     private void ApplyDeaf(bool deaf) => Command("SET_VOICE_SETTINGS", new { deaf });
 }

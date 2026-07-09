@@ -4,91 +4,56 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-
 namespace Quartz.Features.KeyViewer;
-
-// Unity-free parser for DM Note "custom CSS". It implements the DM Note CSS
-// contract (github.com/DmNote-App/DmNote, docs/custom-css) plus the wider set of
-// web effects the key viewer reproduces: per-glyph gradients, :before/:after
-// pseudo layers, @font-face fonts, transform, filter, transition, mix-blend-mode
-// and backdrop-filter. The output is an engine-agnostic style model the
-// overlay's runtime layer turns into meshes, materials and animations. Keeping
-// this free of UnityEngine lets it run under the plain-.NET unit tests.
-
-// An RGBA colour in 0..1 components. Has=false marks "not specified".
 public readonly struct CssColor {
     public readonly float R, G, B, A;
     public readonly bool Has;
-
     public CssColor(float r, float g, float b, float a) {
         R = r; G = g; B = b; A = a; Has = true;
     }
-
     public static readonly CssColor Unset = default;
     public static readonly CssColor Transparent = new(0f, 0f, 0f, 0f);
-
     public CssColor WithAlpha(float a) => new(R, G, B, a);
 }
-
-// A parsed linear-gradient(): ordered colour stops, the angle, and the optional
-// scrolling animation pulled from an accompanying `animation:` shorthand.
 public sealed class CssGradient {
     public readonly List<CssColor> Stops = new();
-    // CSS angle convention: 0deg = to top, 90deg = to right, 180deg = to bottom.
     public float AngleDeg = 180f;
-    public float AnimSeconds;   // 0 = static
+    public float AnimSeconds;   
     public bool Animated;
-    // background-clip:text — the gradient paints the text, not the box.
     public bool ClipText;
 }
-
-// One text-shadow / box-shadow / drop-shadow layer. On=false means "none".
 public readonly struct CssShadow {
     public readonly bool On;
     public readonly float X, Y, Blur;
     public readonly CssColor Color;
-
     public CssShadow(float x, float y, float blur, CssColor color) {
         On = true; X = x; Y = y; Blur = blur; Color = color;
     }
 }
-
 public enum CssBlend { Normal, Multiply, Screen, Additive, Darken, Lighten }
-
-// transform: scale()/translate()/rotate(). Identity until something is set.
 public sealed class CssTransform {
     public float ScaleX = 1f, ScaleY = 1f, TranslateX, TranslateY, RotateDeg;
     public bool Has;
 }
-
-// filter: brightness()/saturate()/contrast() fold into a colour multiply; blur()
-// and drop-shadow() are realised by the runtime.
 public sealed class CssFilter {
     public float Brightness = 1f, Saturate = 1f, Contrast = 1f, Blur;
     public CssShadow DropShadow;
     public bool Has;
 }
-
-// A :before / :after pseudo-element rendered as its own layer behind/over the box.
 public sealed class CssLayer {
     public CssColor Bg = CssColor.Unset;
     public CssGradient? Gradient;
     public float? Radius;
-    // CSS `inset`: positive shrinks the layer inside the box, negative grows it.
     public float InsetT, InsetR, InsetB, InsetL;
     public float Blur;
     public CssBlend Blend = CssBlend.Normal;
     public int Z;
     public bool Has;
 }
-
 public sealed class CssFontFace {
     public string Family = "";
     public readonly List<string> Srcs = new();
 }
-
-// Resolved key style for one state (idle or active). Absent fields = "leave the
-// preset value untouched".
 public sealed class CssKeyStyle {
     public float? Radius;
     public CssColor Bg = CssColor.Unset;
@@ -110,7 +75,6 @@ public sealed class CssKeyStyle {
     public float? BackdropBlur;
     public CssLayer? Before;
     public CssLayer? After;
-
     public bool Any =>
         Radius.HasValue || Bg.Has || BgGradient != null || BorderWidth.HasValue
         || BorderColor.Has || TextColor.Has || TextGradient != null
@@ -120,13 +84,11 @@ public sealed class CssKeyStyle {
         || Blend != CssBlend.Normal || BackdropBlur.HasValue
         || Before != null || After != null;
 }
-
 public sealed class CssKeyStyleSet {
     public readonly CssKeyStyle Idle = new();
     public readonly CssKeyStyle Active = new();
     public bool Any => Idle.Any || Active.Any;
 }
-
 public sealed class CssCounterStyle {
     public CssColor Color = CssColor.Unset;
     public CssGradient? Gradient;
@@ -135,38 +97,26 @@ public sealed class CssCounterStyle {
     public float? FontSize;
     public bool? Bold;
     public CssShadow TextShadow;
-
     public bool Any =>
         Color.Has || Gradient != null || StrokeColor.Has || StrokeWidth.HasValue
         || FontSize.HasValue || Bold.HasValue || TextShadow.On;
 }
-
 public sealed class CssCounterStyleSet {
     public readonly CssCounterStyle Idle = new();
     public readonly CssCounterStyle Active = new();
     public bool Any => Idle.Any || Active.Any;
 }
-
-// Resolved KPS-graph style. Graphs are always inactive (no press state); their
-// CSS variables (--graph-bg/-border/-radius/-color) override the preset inline
-// values per the DM Note GraphPanel contract.
 public sealed class CssGraphStyle {
     public CssColor Bg = CssColor.Unset;
     public float? BorderWidth;
     public CssColor BorderColor = CssColor.Unset;
     public float? Radius;
     public CssColor Color = CssColor.Unset;
-
     public bool Any => Bg.Has || BorderWidth.HasValue || BorderColor.Has || Radius.HasValue || Color.Has;
 }
-
-// Declaration store for one (target, state, pseudo) slot: global declarations
-// plus class-scoped rules matched by subset so both `.blue` and `.blue.special`
-// resolve with proper specificity.
 internal sealed class CssBucket {
     public readonly Dictionary<string, string> Global = new(StringComparer.OrdinalIgnoreCase);
     public readonly List<(string[] classes, Dictionary<string, string> decls)> Classes = new();
-
     public void Add(string[]? classes, Dictionary<string, string> decls) {
         if(classes == null || classes.Length == 0) {
             KeyViewerStylesheet.Overlay(Global, decls);
@@ -174,9 +124,6 @@ internal sealed class CssBucket {
             Classes.Add((classes, decls));
         }
     }
-
-    // Global first, then every class rule whose classes are all present on the
-    // key, lowest specificity (fewest classes) first so the most specific wins.
     public Dictionary<string, string> Flatten(HashSet<string> keyClasses) {
         var merged = new Dictionary<string, string>(Global, StringComparer.OrdinalIgnoreCase);
         if(Classes.Count > 0) {
@@ -186,7 +133,6 @@ internal sealed class CssBucket {
         }
         return merged;
     }
-
     private static bool AllPresent(string[] classes, HashSet<string> have) {
         for(int i = 0; i < classes.Length; i++) {
             if(!have.Contains(classes[i])) { return false; }
@@ -194,22 +140,17 @@ internal sealed class CssBucket {
         return true;
     }
 }
-
 public sealed class KeyViewerStylesheet {
     private readonly CssBucket _keyIdle = new(), _keyActive = new();
     private readonly CssBucket _beforeIdle = new(), _beforeActive = new();
     private readonly CssBucket _afterIdle = new(), _afterActive = new();
     private readonly CssBucket _ctrIdle = new(), _ctrActive = new();
-    // Graphs have no press state, so a single bucket (class-scoped) suffices.
     private readonly CssBucket _graph = new();
-
     public List<CssFontFace> FontFaces { get; } = new();
     public bool IsEmpty { get; private set; } = true;
-
     public static KeyViewerStylesheet Parse(string? css) {
         var sheet = new KeyViewerStylesheet();
         if(string.IsNullOrWhiteSpace(css)) { return sheet; }
-
         foreach((string prelude, string body) in CssReader.Rules(StripComments(css!))) {
             if(prelude.StartsWith("@", StringComparison.Ordinal)) {
                 string at = prelude.TrimStart('@').TrimStart();
@@ -225,10 +166,8 @@ public sealed class KeyViewerStylesheet {
             }
             sheet.AddRule(prelude, ParseDeclarations(body));
         }
-
         return sheet;
     }
-
     private void AddFontFace(Dictionary<string, string> decls) {
         var face = new CssFontFace();
         if(decls.TryGetValue("font-family", out string? fam)) { face.Family = fam.Trim().Trim('"', '\'').Trim(); }
@@ -243,7 +182,6 @@ public sealed class KeyViewerStylesheet {
             IsEmpty = false;
         }
     }
-
     private static string ExtractUrl(string part) {
         int u = part.IndexOf("url(", StringComparison.OrdinalIgnoreCase);
         if(u < 0) { return ""; }
@@ -252,16 +190,12 @@ public sealed class KeyViewerStylesheet {
         if(rp < 0) { return ""; }
         return part.Substring(lp + 1, rp - lp - 1).Trim().Trim('"', '\'').Trim();
     }
-
     private void AddRule(string selectorList, Dictionary<string, string> decls) {
         if(decls.Count == 0) { return; }
-
         foreach(string raw in SplitTopLevel(selectorList, ',')) {
             string sel = raw.Trim();
             if(sel.Length == 0) { continue; }
-
-            // Pseudo-element → a :before/:after layer on the key it decorates.
-            int pseudo = 0; // 0 none, 1 before, 2 after
+            int pseudo = 0; 
             string baseSel = sel;
             int dc = sel.IndexOf("::", StringComparison.Ordinal);
             int sc = dc >= 0 ? dc : sel.IndexOf(':', StringComparison.Ordinal);
@@ -272,30 +206,22 @@ public sealed class KeyViewerStylesheet {
                 } else if(tail.Contains("after")) {
                     pseudo = 2;
                 } else {
-                    continue; // A :hover/:focus or similar — not modelled; drop it.
+                    continue; 
                 }
                 baseSel = sel.Substring(0, sc);
             }
-
             string lower = baseSel.ToLowerInvariant();
             bool counter = lower.IndexOf("counter", StringComparison.Ordinal) >= 0;
             bool hasState = lower.IndexOf("data-state", StringComparison.Ordinal) >= 0;
             string[] classes = ExtractClasses(baseSel);
-
-            // A rule setting any --graph-* variable styles the KPS graph, matched
-            // by the graph's assigned class (e.g. `.kps-graph { --graph-bg: … }`),
-            // which carries no data-state. Route it before the key/counter skip.
             if(pseudo == 0 && HasGraphVar(decls)) {
                 _graph.Add(classes, decls);
                 IsEmpty = false;
             }
-
-            if(!counter && !hasState) { continue; } // unrecognised key/counter selector (e.g. bare .graph)
-
-            int state = -1; // -1 both, 0 inactive, 1 active
+            if(!counter && !hasState) { continue; } 
+            int state = -1; 
             if(lower.IndexOf("inactive", StringComparison.Ordinal) >= 0) { state = 0; }
             else if(lower.IndexOf("active", StringComparison.Ordinal) >= 0) { state = 1; }
-
             if(counter) {
                 AddTo(_ctrIdle, _ctrActive, state, classes, decls);
             } else if(pseudo == 1) {
@@ -305,17 +231,13 @@ public sealed class KeyViewerStylesheet {
             } else {
                 AddTo(_keyIdle, _keyActive, state, classes, decls);
             }
-
             IsEmpty = false;
         }
     }
-
     private static void AddTo(CssBucket idle, CssBucket active, int state, string[] classes, Dictionary<string, string> decls) {
         if(state != 1) { idle.Add(classes, decls); }
         if(state != 0) { active.Add(classes, decls); }
     }
-
-    // Every class token in the selector except the structural ".counter".
     private static string[] ExtractClasses(string selector) {
         List<string>? names = null;
         for(int i = 0; i < selector.Length; i++) {
@@ -330,13 +252,11 @@ public sealed class KeyViewerStylesheet {
         }
         return names == null ? Array.Empty<string>() : names.ToArray();
     }
-
     internal static void Overlay(Dictionary<string, string> into, Dictionary<string, string> from) {
         foreach(KeyValuePair<string, string> kv in from) {
-            into[kv.Key] = kv.Value; // later declaration wins (cascade order)
+            into[kv.Key] = kv.Value; 
         }
     }
-
     public CssKeyStyleSet ResolveKey(string? className) {
         HashSet<string> classes = ClassSet(className);
         var set = new CssKeyStyleSet();
@@ -348,7 +268,6 @@ public sealed class KeyViewerStylesheet {
         set.Active.After = MapLayer(_afterActive.Flatten(classes));
         return set;
     }
-
     public CssCounterStyleSet ResolveCounter(string? className) {
         HashSet<string> classes = ClassSet(className);
         var set = new CssCounterStyleSet();
@@ -356,20 +275,17 @@ public sealed class KeyViewerStylesheet {
         MapCounter(_ctrActive.Flatten(classes), set.Active);
         return set;
     }
-
     public CssGraphStyle ResolveGraph(string? className) {
         var style = new CssGraphStyle();
         MapGraph(_graph.Flatten(ClassSet(className)), style);
         return style;
     }
-
     private static bool HasGraphVar(Dictionary<string, string> decls) {
         foreach(string key in decls.Keys) {
             if(key.StartsWith("--graph-", StringComparison.Ordinal)) { return true; }
         }
         return false;
     }
-
     private static void MapGraph(Dictionary<string, string> d, CssGraphStyle s) {
         foreach(KeyValuePair<string, string> kv in d) {
             switch(kv.Key) {
@@ -388,9 +304,7 @@ public sealed class KeyViewerStylesheet {
             }
         }
     }
-
     private static void ParseGraphBorder(string v, CssGraphStyle s) => ParseBorderCore(v, ref s.BorderWidth, ref s.BorderColor);
-
     private static HashSet<string> ClassSet(string? className) {
         var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         if(!string.IsNullOrWhiteSpace(className)) {
@@ -398,11 +312,9 @@ public sealed class KeyViewerStylesheet {
         }
         return set;
     }
-
     private static void MapKey(Dictionary<string, string> d, CssKeyStyle s) {
         bool clipText = false;
         CssGradient? bgGradient = null;
-
         foreach(KeyValuePair<string, string> kv in d) {
             string prop = kv.Key;
             string val = kv.Value;
@@ -480,7 +392,6 @@ public sealed class KeyViewerStylesheet {
                     break;
             }
         }
-
         ApplyAnimation(d, bgGradient);
         if(clipText && bgGradient != null) {
             bgGradient.ClipText = true;
@@ -489,7 +400,6 @@ public sealed class KeyViewerStylesheet {
             s.BgGradient = bgGradient;
         }
     }
-
     private static void MapCounter(Dictionary<string, string> d, CssCounterStyle s) {
         CssGradient? gradient = null;
         foreach(KeyValuePair<string, string> kv in d) {
@@ -525,8 +435,6 @@ public sealed class KeyViewerStylesheet {
             s.Gradient = gradient;
         }
     }
-
-    // :before / :after layer.
     private static CssLayer? MapLayer(Dictionary<string, string> d) {
         if(d.Count == 0) { return null; }
         var layer = new CssLayer();
@@ -569,7 +477,6 @@ public sealed class KeyViewerStylesheet {
         }
         return layer.Has ? layer : null;
     }
-
     private static void ApplyAnimation(Dictionary<string, string> d, CssGradient? gradient) {
         if(gradient == null) { return; }
         if((d.TryGetValue("animation", out string? a) || d.TryGetValue("animation-duration", out a))
@@ -578,11 +485,7 @@ public sealed class KeyViewerStylesheet {
             gradient.AnimSeconds = seconds;
         }
     }
-
-    // ---- value parsing ------------------------------------------------------
-
     private static readonly char[] Space = { ' ', '\t', '\n', '\r' };
-
     private static string? FirstFamily(string v) {
         foreach(string part in SplitTopLevel(v, ',')) {
             string fam = part.Trim().Trim('"', '\'').Trim();
@@ -596,13 +499,11 @@ public sealed class KeyViewerStylesheet {
         }
         return null;
     }
-
     private static bool IsBold(string v) {
         string t = v.Trim();
         if(t.Equals("bold", StringComparison.OrdinalIgnoreCase) || t.Equals("bolder", StringComparison.OrdinalIgnoreCase)) { return true; }
         return int.TryParse(t, NumberStyles.Integer, CultureInfo.InvariantCulture, out int w) && w >= 600;
     }
-
     private static bool TryLen(string v, out float px) {
         px = 0f;
         string t = v.Trim();
@@ -618,7 +519,6 @@ public sealed class KeyViewerStylesheet {
         string num = (t.Length > 0 && t[0] == '-' ? "-" : "") + t.Substring(start, i - start);
         return float.TryParse(num, NumberStyles.Float, CultureInfo.InvariantCulture, out px);
     }
-
     private static bool TryDuration(string v, out float seconds) {
         seconds = 0f;
         foreach(string tok in v.Split(Space, StringSplitOptions.RemoveEmptyEntries)) {
@@ -635,9 +535,7 @@ public sealed class KeyViewerStylesheet {
         }
         return false;
     }
-
     private static void ParseBorder(string v, CssKeyStyle s) => ParseBorderCore(v, ref s.BorderWidth, ref s.BorderColor);
-
     private static void ParseBorderCore(string v, ref float? width, ref CssColor color) {
         string t = v.Trim();
         if(t.Equals("none", StringComparison.OrdinalIgnoreCase) || t.Length == 0) {
@@ -658,7 +556,6 @@ public sealed class KeyViewerStylesheet {
             } else if(TryParseColor(p, out CssColor c)) { color = c; }
         }
     }
-
     private static void ParseInset(string v, CssLayer layer) {
         var vals = new List<float>();
         foreach(string tok in v.Split(Space, StringSplitOptions.RemoveEmptyEntries)) {
@@ -673,7 +570,6 @@ public sealed class KeyViewerStylesheet {
         layer.InsetT = top; layer.InsetR = right; layer.InsetB = bottom; layer.InsetL = left;
         layer.Has = true;
     }
-
     private static CssShadow? ParseShadow(string v) {
         string t = v.Trim();
         if(t.Equals("none", StringComparison.OrdinalIgnoreCase) || t.Length == 0) { return null; }
@@ -704,7 +600,6 @@ public sealed class KeyViewerStylesheet {
         }
         return best;
     }
-
     private static CssTransform? ParseTransform(string v) {
         var t = new CssTransform();
         foreach((string name, string args) in Functions(v)) {
@@ -725,7 +620,6 @@ public sealed class KeyViewerStylesheet {
         }
         return t.Has ? t : null;
     }
-
     private static CssFilter? ParseFilter(string v) {
         var f = new CssFilter();
         foreach((string name, string args) in Functions(v)) {
@@ -739,7 +633,6 @@ public sealed class KeyViewerStylesheet {
         }
         return f.Has ? f : null;
     }
-
     // filter:/backdrop-filter: blur(Npx) → N.
     private static bool FilterBlur(string v, out float px) {
         px = 0f;
@@ -748,7 +641,6 @@ public sealed class KeyViewerStylesheet {
         }
         return false;
     }
-
     // brightness(1.2) or brightness(120%) → 1.2.
     private static bool TryAmount(string v, out float amount) {
         string t = v.Trim();
@@ -759,7 +651,6 @@ public sealed class KeyViewerStylesheet {
         }
         return float.TryParse(t, NumberStyles.Float, CultureInfo.InvariantCulture, out amount);
     }
-
     private static CssBlend ParseBlend(string v) => v.Trim().ToLowerInvariant() switch {
         "multiply" => CssBlend.Multiply,
         "screen" => CssBlend.Screen,
@@ -768,7 +659,6 @@ public sealed class KeyViewerStylesheet {
         "lighten" => CssBlend.Lighten,
         _ => CssBlend.Normal,
     };
-
     private static IEnumerable<(string name, string args)> Functions(string v) {
         int i = 0, n = v.Length;
         while(i < n) {
@@ -787,7 +677,6 @@ public sealed class KeyViewerStylesheet {
             i = rp + 1;
         }
     }
-
     private static List<float> Nums(string args) {
         var list = new List<float>();
         foreach(string tok in SplitTopLevel(args, ',')) {
@@ -797,7 +686,6 @@ public sealed class KeyViewerStylesheet {
         }
         return list;
     }
-
     private static CssGradient? ParseGradient(string v) {
         int idx = v.IndexOf("linear-gradient", StringComparison.OrdinalIgnoreCase);
         bool radial = false;
@@ -810,7 +698,6 @@ public sealed class KeyViewerStylesheet {
         if(lp < 0) { return null; }
         int rp = MatchParen(v, lp);
         if(rp < 0) { return null; }
-
         string inner = v.Substring(lp + 1, rp - lp - 1);
         var grad = new CssGradient();
         bool first = true;
@@ -827,7 +714,6 @@ public sealed class KeyViewerStylesheet {
         }
         return grad.Stops.Count >= 2 ? grad : null;
     }
-
     private static string FirstColorToken(string part) {
         string t = part.Trim();
         if(t.StartsWith("rgb", StringComparison.OrdinalIgnoreCase) || t.StartsWith("hsl", StringComparison.OrdinalIgnoreCase)) {
@@ -838,7 +724,6 @@ public sealed class KeyViewerStylesheet {
         int sp = t.IndexOf(' ');
         return sp > 0 ? t.Substring(0, sp) : t;
     }
-
     private static bool IsDirection(string p) {
         string t = p.Trim();
         if(t.StartsWith("to ", StringComparison.OrdinalIgnoreCase)) { return true; }
@@ -846,7 +731,6 @@ public sealed class KeyViewerStylesheet {
             || t.EndsWith("turn", StringComparison.OrdinalIgnoreCase)
             || t.EndsWith("rad", StringComparison.OrdinalIgnoreCase);
     }
-
     private static float DirectionToAngle(string p) {
         string t = p.Trim();
         if(t.StartsWith("to ", StringComparison.OrdinalIgnoreCase)) {
@@ -867,7 +751,6 @@ public sealed class KeyViewerStylesheet {
         if(t.EndsWith("rad", StringComparison.OrdinalIgnoreCase) && TryLen(t, out float rad)) { return rad * 57.29578f; }
         return 180f;
     }
-
     private static bool LooksLikeColor(string p) {
         string t = p.Trim();
         return t.Length > 0
@@ -876,7 +759,6 @@ public sealed class KeyViewerStylesheet {
                 || t.StartsWith("hsl", StringComparison.OrdinalIgnoreCase)
                 || NamedColor(t, out _));
     }
-
     public static bool TryParseColor(string v, out CssColor color) {
         color = CssColor.Unset;
         string s = v.Trim();
@@ -935,7 +817,6 @@ public sealed class KeyViewerStylesheet {
         }
         return false;
     }
-
     private static void HslToRgb(float h, float s, float l, out float r, out float g, out float b) {
         h = ((h % 360f) + 360f) % 360f / 360f;
         if(s <= 0f) {
@@ -948,7 +829,6 @@ public sealed class KeyViewerStylesheet {
         g = HueToRgb(p, q, h);
         b = HueToRgb(p, q, h - 1f / 3f);
     }
-
     private static float HueToRgb(float p, float q, float t) {
         if(t < 0f) { t += 1f; }
         if(t > 1f) { t -= 1f; }
@@ -957,9 +837,7 @@ public sealed class KeyViewerStylesheet {
         if(t < 2f / 3f) { return p + (q - p) * (2f / 3f - t) * 6f; }
         return p;
     }
-
     private static int Hex(char c) => Convert.ToInt32(c.ToString(), 16);
-
     internal static float Comp(string s, float scale) {
         string t = s.Trim();
         if(t.EndsWith("%", StringComparison.Ordinal)) {
@@ -967,12 +845,10 @@ public sealed class KeyViewerStylesheet {
         }
         return float.TryParse(t, NumberStyles.Float, CultureInfo.InvariantCulture, out float v) ? Clamp01(v / scale) : 1f;
     }
-
     private static float Pct(string s) {
         string t = s.Trim().TrimEnd('%').Trim();
         return float.TryParse(t, NumberStyles.Float, CultureInfo.InvariantCulture, out float v) ? Clamp01(v / 100f) : 0f;
     }
-
     internal static float Alpha(string s) {
         string t = s.Trim();
         if(t.EndsWith("%", StringComparison.Ordinal)) {
@@ -980,9 +856,7 @@ public sealed class KeyViewerStylesheet {
         }
         return float.TryParse(t, NumberStyles.Float, CultureInfo.InvariantCulture, out float v) ? Clamp01(v <= 1f ? v : v / 255f) : 1f;
     }
-
     private static float Clamp01(float v) => v < 0f ? 0f : v > 1f ? 1f : v;
-
     private static bool NamedColor(string name, out CssColor color) {
         switch(name.Trim().ToLowerInvariant()) {
             case "white": color = new CssColor(1f, 1f, 1f, 1f); return true;
@@ -1002,9 +876,7 @@ public sealed class KeyViewerStylesheet {
             default: color = CssColor.Unset; return false;
         }
     }
-
     // ---- declaration / structural parsing -----------------------------------
-
     internal static Dictionary<string, string> ParseDeclarations(string body) {
         var d = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach(string declRaw in SplitTopLevel(body, ';')) {
@@ -1020,7 +892,6 @@ public sealed class KeyViewerStylesheet {
         }
         return d;
     }
-
     internal static string StripComments(string css) {
         var sb = new StringBuilder(css.Length);
         for(int i = 0; i < css.Length; i++) {
@@ -1034,7 +905,6 @@ public sealed class KeyViewerStylesheet {
         }
         return sb.ToString();
     }
-
     internal static List<string> SplitTopLevel(string s, char sep) {
         var parts = new List<string>();
         int depth = 0, start = 0;
@@ -1052,7 +922,6 @@ public sealed class KeyViewerStylesheet {
         parts.Add(s.Substring(start));
         return parts;
     }
-
     private static int IndexOfTopLevel(string s, char target) {
         int depth = 0;
         for(int i = 0; i < s.Length; i++) {
@@ -1063,7 +932,6 @@ public sealed class KeyViewerStylesheet {
         }
         return -1;
     }
-
     private static int MatchParen(string s, int open) {
         int depth = 0;
         for(int i = open; i < s.Length; i++) {
@@ -1075,7 +943,6 @@ public sealed class KeyViewerStylesheet {
         return -1;
     }
 }
-
 // Walks a CSS string into (prelude, body) rule pairs, honouring nested braces so
 // @media/@keyframes blocks are returned whole rather than split mid-block.
 internal static class CssReader {
@@ -1084,7 +951,6 @@ internal static class CssReader {
         while(i < n) {
             while(i < n && char.IsWhiteSpace(css[i])) { i++; }
             if(i >= n) { yield break; }
-
             int start = i;
             int depth = 0;
             int braceOpen = -1;
@@ -1101,12 +967,10 @@ internal static class CssReader {
                 }
                 i++;
             }
-
             if(braceOpen < 0) {
                 i++;
                 continue;
             }
-
             string prelude = css.Substring(start, braceOpen - start).Trim();
             int bodyStart = braceOpen + 1;
             int bodyEnd = i < n ? i : n;

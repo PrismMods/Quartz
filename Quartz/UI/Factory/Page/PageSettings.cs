@@ -17,15 +17,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityFileDialog;
 using GTweenExtensions = GTweens.Extensions.GTweenExtensions;
-
 using TMPro;
-
 namespace Quartz.UI.Factory.Page;
-
 internal static partial class PageSettings {
     private static UIDropDown<string> languageDropdown;
-
-    // Font picker + custom-font management.
     private static UIDropDown<string> fontDropdown;
     private static GameObject fontManageRow;
     private static UIInput fontRenameInput;
@@ -36,8 +31,6 @@ internal static partial class PageSettings {
     private static TextMeshProUGUI fontStatusText;
     private static UIDropDown<string> settingsFontDropdown;
     private static string pendingFontName = "";
-
-    // Update UI, refreshed from UpdateService.OnChanged.
     private static UIButton updateCheckButton;
     private static TextMeshProUGUI updateStatusText;
     private static GameObject updateActionRow;
@@ -51,25 +44,18 @@ internal static partial class PageSettings {
     private static RectTransform updateProgressFill;
     private static TextMeshProUGUI updateProgressLabel;
     private static bool updateHooked;
-
-    // For jumping to the Updates section from the update toast.
     private static UIScrollController scrollController;
     private static RectTransform pageContent;
     private static RectTransform updatesAnchor;
     public static void Create(RectTransform parent) {
-        // The page can be built more than once per session (profile switches
-        // rebuild the whole UI); drop rows from the previous build.
         FontManager.OnFontCatalogChanged -= RefreshFontDropdowns;
         FontManager.OnFontCatalogChanged += RefreshFontDropdowns;
         RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent, out scrollController);
         pageContent = content;
-
         CoreSettings defSet = new();
-
         var langLabelRow = GenerateUI.Row(content.transform);
         var langText = GenerateUI.AddTextH1(langLabelRow);
         var langTextTr = langText.gameObject.AddComponent<TextLocalization>().Init("LANGUAGE", "Language");
-
         string[] langs = [.. MainCore.Tr.GetLanguages().OrderBy(x => x, StringComparer.OrdinalIgnoreCase)];
         var langRow = GenerateUI.Row(content.transform);
         languageDropdown = GenerateUI.DropDown(
@@ -79,9 +65,7 @@ internal static partial class PageSettings {
             langs,
             lang => {
                 if(lang == Translator.FALLBACK_LANGUAGE) return "DEFAULT";
-
                 string native = MainCore.Tr.GetForLanguage("0NATIVELANG", lang, lang);
-
                 return $"{native} ({lang})";
             },
             value => {
@@ -92,7 +76,6 @@ internal static partial class PageSettings {
             },
             "language_dropdown"
         );
-
         UIButton langBtn = GenerateUI.Button(
             langRow,
             () => { },
@@ -123,11 +106,8 @@ internal static partial class PageSettings {
             br.offsetMax = Vector2.zero;
         }
         langBtn.Label.gameObject.AddComponent<TextLocalization>().Init("RELOAD", "Reload");
-
-
         var overlayerText = GenerateUI.AddTextH1(GenerateUI.Row(content.transform));
         var overlayerTextTr = overlayerText.gameObject.AddComponent<TextLocalization>().Init("OVERLAYER", "Quartz");
-
         var startupRow = GenerateUI.Row(content.transform);
         UIToggle startupToggle = GenerateUI.Toggle(
             startupRow,
@@ -141,7 +121,6 @@ internal static partial class PageSettings {
             "show_on_startup"
         );
         var startupToggleTr = startupToggle.Label.gameObject.AddComponent<TextLocalization>().Init("SHOW_OVERLAYER_PANEL_AT_STARTUP", "Show Quartz Settings at Startup");
-
         var keybindRow = GenerateUI.Row(content.transform);
         var keybindLabel = GenerateUI.KeyBind(
             keybindRow,
@@ -156,7 +135,6 @@ internal static partial class PageSettings {
             "toggle_keybind"
         );
         var keybindTr = keybindLabel.gameObject.AddComponent<TextLocalization>().Init("TOGGLE_KEYBIND", "Toggle Menu Keybind");
-
         var tooltipRow = GenerateUI.Row(content.transform);
         UIToggle tooltipToggle = GenerateUI.Toggle(
             tooltipRow,
@@ -175,7 +153,6 @@ internal static partial class PageSettings {
             "Shows a description bubble when you hover over a setting. Turning this off hides all tooltips, including this one."
         );
         var tooltipToggleTr = tooltipToggle.Label.gameObject.AddComponent<TextLocalization>().Init("SHOW_TOOLTIP", "Show Tooltip");
-
         var middleClickRow = GenerateUI.Row(content.transform);
         UIToggle middleClickToggle = GenerateUI.Toggle(
             middleClickRow,
@@ -193,7 +170,6 @@ internal static partial class PageSettings {
             "Setting that restores an item to its default value when you middle-click on it.\nYou can identify it by a small dot at the top-left of the item"
         );
         var middleClickToggleTr = middleClickToggle.Label.gameObject.AddComponent<TextLocalization>().Init("MIDDLE_CLICK_TO_SET_AS_DEFAULT", "Middle-click to set as default");
-
         static float uiScaleFilter(float v) {
             v = Mathf.Round(v * 100f) / 100f;
             return Mathf.Clamp(v, 0.8f, 1.6f);
@@ -217,13 +193,10 @@ internal static partial class PageSettings {
         uiScale.OnComplete = value => {
             MainCore.Conf.UIScale = value;
             MainCore.ConfMgr.RequestSave();
-
             scaleSeq?.Kill();
-
             float scaleStart = UICore.PanelScale;
             Vector2 targetSize = UICore.DefaultPanelSize;
             UICore.LastPanelSize = targetSize;
-
             scaleSeq = GTweenSequenceBuilder.New()
                 .Append(
                     GTweenExtensions.Tween(
@@ -238,12 +211,9 @@ internal static partial class PageSettings {
                         .SetEasing(Easing.OutExpo)
                 )
                 .Build();
-
             MainCore.TC.Play(scaleSeq);
         };
         var uiScaleTr = uiScale.Label.gameObject.AddComponent<TextLocalization>().Init("UI_SCALE", "UI Scale");
-
-
         var scrollRow = GenerateUI.Row(content.transform);
         UISlider scrollSpeed = GenerateUI.Slider(
             scrollRow,
@@ -259,7 +229,6 @@ internal static partial class PageSettings {
         );
         scrollSpeed.Format = "0 px";
         var scrollTr = scrollSpeed.Label.gameObject.AddComponent<TextLocalization>().Init("SCROLL_SPEED", "Scroll Speed");
-
         var opacityRow = GenerateUI.Row(content.transform);
         UISlider opacity = GenerateUI.Slider(
             opacityRow,
@@ -273,14 +242,12 @@ internal static partial class PageSettings {
             "Window Opacity",
             "window_opacity"
         );
-        // Literal % (a bare "0%" is .NET's percent specifier and multiplies by 100).
         opacity.Format = "0'%'";
         opacity.Rect.AddToolTip(
             "DESC_WINDOW_OPACITY",
             "Transparency of the settings window."
         );
         var opacityTr = opacity.Label.gameObject.AddComponent<TextLocalization>().Init("WINDOW_OPACITY", "Window Opacity");
-
         var outlineRow = GenerateUI.Row(content.transform);
         UISlider outlineWidth = GenerateUI.Slider(
             outlineRow,
@@ -288,10 +255,8 @@ internal static partial class PageSettings {
             0f,
             15f,
             MainCore.Conf.OutlineWidth,
-            v => Mathf.Round(v * 4f) / 4f, // 0.25 steps
-            // Live while dragging (cheap strip resize, no border-sprite regen).
+            v => Mathf.Round(v * 4f) / 4f, 
             v => { MainCore.Conf.OutlineWidth = v; UICore.SetOutlineWidth(v, false); },
-            // On release regenerate the border ring sprite too, then save.
             v => { MainCore.Conf.OutlineWidth = v; UICore.SetOutlineWidth(v, true); MainCore.ConfMgr.RequestSave(); },
             "Outline Width",
             "outline_width"
@@ -302,7 +267,6 @@ internal static partial class PageSettings {
             "Thickness of the settings window's white outlines — the border ring, the submenu column, the top rule and the bottom pane edge."
         );
         var outlineTr = outlineWidth.Label.gameObject.AddComponent<TextLocalization>().Init("OUTLINE_WIDTH", "Outline Width");
-
         var accentRow = GenerateUI.Row(content.transform);
         UIColorPicker accentPicker = GenerateUI.ColorPicker(
             accentRow,
@@ -319,12 +283,10 @@ internal static partial class PageSettings {
             "Recolors the whole Quartz UI. Middle-click to reset."
         );
         var accentTr = accentPicker.Label.gameObject.AddComponent<TextLocalization>().Init("ACCENT_COLOR", "Accent Color");
-
         var updatesLabelRow = GenerateUI.Row(content.transform);
         var updatesText = GenerateUI.AddTextH1(updatesLabelRow);
         var updatesTextTr = updatesText.gameObject.AddComponent<TextLocalization>().Init("UPDATES", "Updates");
         updatesAnchor = updatesLabelRow;
-
         ReleaseChannel[] channels = [
             ReleaseChannel.Stable,
             ReleaseChannel.ReleaseCandidate,
@@ -354,7 +316,6 @@ internal static partial class PageSettings {
             "DESC_UPDATE_CHANNEL",
             "Which builds to receive when updating. Alpha includes every build; each step up is more stable, with Stable being only final releases."
         );
-
         var updateCheckRow = GenerateUI.Row(content.transform);
         updateCheckButton = GenerateUI.Button(
             updateCheckRow,
@@ -363,64 +324,45 @@ internal static partial class PageSettings {
             "update_check"
         );
         updateCheckButton.Label.gameObject.AddComponent<TextLocalization>().Init("CHECK_FOR_UPDATES", "Check for Updates");
-
         var updateStatusRow = GenerateUI.Row(content.transform);
-        // noPad so the text lines up with the progress bar track below.
         updateStatusText = GenerateUI.AddText(updateStatusRow, noPad: true);
         updateStatusText.text = "";
-
         {
-            // Download progress: a rounded track with an accent fill whose
-            // width follows UpdateService.Progress, plus a percent readout.
-            // Visible only while Installing (and progress is known); drives
-            // both real downloads and the dev-simulated one.
             var progressRect = GenerateUI.Row(content.transform, 32f);
             updateProgressRow = progressRect.gameObject;
-
             GameObject track = new("ProgressTrack");
             track.transform.SetParent(progressRect, false);
-
-            // Same horizontal span as the BackGround() widgets above (full
-            // width minus the 250-unit right gutter) so the edges line up;
-            // the percent readout sits in that gutter.
             RectTransform trackRect = track.AddComponent<RectTransform>();
             trackRect.anchorMin = new(0f, 0.5f);
             trackRect.anchorMax = new(1f, 0.5f);
             trackRect.pivot = new(0f, 0.5f);
             trackRect.offsetMin = new(0f, -7f);
             trackRect.offsetMax = new(-250f, 7f);
-
             Image trackImg = track.AddComponent<Image>();
             trackImg.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
             trackImg.type = Image.Type.Sliced;
             trackImg.color = UIColors.ObjectBG;
             trackImg.raycastTarget = false;
-
             GameObject fill = new("ProgressFill");
             fill.transform.SetParent(track.transform, false);
-
             updateProgressFill = fill.AddComponent<RectTransform>();
             updateProgressFill.anchorMin = Vector2.zero;
             updateProgressFill.anchorMax = new(0f, 1f);
             updateProgressFill.offsetMin = Vector2.zero;
             updateProgressFill.offsetMax = Vector2.zero;
-
             Image fillImg = fill.AddComponent<Image>();
             fillImg.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
             fillImg.type = Image.Type.Sliced;
             fillImg.color = UIColors.ObjectActive;
             fillImg.raycastTarget = false;
-
             GameObject pctObj = new("ProgressPercent");
             pctObj.transform.SetParent(progressRect, false);
-
             RectTransform pctRect = pctObj.AddComponent<RectTransform>();
             pctRect.anchorMin = new(1f, 0f);
             pctRect.anchorMax = new(1f, 1f);
             pctRect.pivot = new(0f, 0.5f);
             pctRect.anchoredPosition = new(-238f, 0f);
             pctRect.sizeDelta = new(90f, 0f);
-
             updateProgressLabel = pctObj.AddComponent<TextMeshProUGUI>();
             updateProgressLabel.font = FontManager.Current;
             updateProgressLabel.fontSize = 18f;
@@ -428,27 +370,18 @@ internal static partial class PageSettings {
             updateProgressLabel.alignment = TextAlignmentOptions.Left;
             updateProgressLabel.verticalAlignment = VerticalAlignmentOptions.Middle;
             updateProgressLabel.raycastTarget = false;
-
             updateProgressRow.SetActive(false);
         }
-
-        // Version text on its own row; action buttons on the row below so
-        // long tags get the full width instead of squeezing the buttons.
         var updateActionRect = GenerateUI.Row(content.transform);
         updateActionRow = updateActionRect.gameObject;
-
         GenerateUI.ButtonRow(updateActionRect, 0f);
-
         updateVersionText = GenerateUI.AddText(updateActionRect, true);
         updateVersionText.overflowMode = TextOverflowModes.Ellipsis;
         LayoutElement versionLe = updateVersionText.gameObject.AddComponent<LayoutElement>();
         versionLe.flexibleWidth = 1f;
-
         var updateButtonRect = GenerateUI.Row(content.transform);
         updateButtonRow = updateButtonRect.gameObject;
-
         GenerateUI.ButtonRow(updateButtonRect);
-
         updateNotesButton = GenerateUI.Button(
             updateButtonRect,
             () => {
@@ -464,7 +397,6 @@ internal static partial class PageSettings {
             "DESC_UPDATE_NOTES",
             "Opens this release's notes on GitHub."
         );
-
         updateSkipButton = GenerateUI.Button(
             updateButtonRect,
             () => UpdateService.Skip(UpdateService.Available),
@@ -477,7 +409,6 @@ internal static partial class PageSettings {
             "DESC_UPDATE_SKIP",
             "Hides this version. You'll still be offered the next release."
         );
-
         updateInstallButton = GenerateUI.Button(
             updateButtonRect,
             () => UpdateService.Install(UpdateService.Available),
@@ -486,7 +417,6 @@ internal static partial class PageSettings {
         );
         GenerateUI.FixWidth(updateInstallButton, 130f);
         updateInstallButton.Label.gameObject.AddComponent<TextLocalization>().Init("UPDATE_INSTALL", "Install");
-
         updateUndoButton = GenerateUI.Button(
             updateButtonRect,
             () => UpdateService.UndoSkip(),
@@ -495,27 +425,19 @@ internal static partial class PageSettings {
         ).SetSecondary();
         GenerateUI.FixWidth(updateUndoButton, 100f);
         updateUndoButton.Label.gameObject.AddComponent<TextLocalization>().Init("UPDATE_UNDO", "Undo");
-
         if(!updateHooked) {
             UpdateService.OnChanged += RefreshUpdates;
-            // The status line is plain text (not TextLocalization), so it has
-            // to be re-rendered when the language changes.
             MainCore.Tr.OnLanguageChanged += _ => RefreshUpdates();
             updateHooked = true;
         }
         RefreshUpdates();
-
         var fontLabelRow = GenerateUI.Row(content.transform);
         var fontText = GenerateUI.AddTextH1(fontLabelRow);
         var fontTextTr = fontText.gameObject.AddComponent<TextLocalization>().Init("FONT", "Font");
-
-        // Dropdown + the custom-font manage controls live in one container so
-        // the settings search shows/hides them together.
         GameObject fontGroup = new("FontGroup");
         fontGroup.transform.SetParent(content.transform, false);
         fontGroup.AddComponent<RectTransform>();
         GenerateUI.FitVertical(fontGroup, 8f);
-
         var fontRow = GenerateUI.Row(fontGroup.transform);
         fontDropdown = GenerateUI.DropDown(
             fontRow,
@@ -526,14 +448,9 @@ internal static partial class PageSettings {
             OnFontSelected,
             "font_dropdown"
         );
-        // Render each option in the face it names (e.g. the "JetBrains Mono"
-        // row draws in JetBrains Mono).
         fontDropdown.ItemFont = FontManager.GetFont;
-
-        // Rename / delete row — shown only when a custom font is selected.
         var manageRow = GenerateUI.Row(fontGroup.transform);
         fontManageRow = manageRow.gameObject;
-
         fontRenameInput = GenerateUI.Input(
             manageRow,
             null,
@@ -545,7 +462,6 @@ internal static partial class PageSettings {
         );
         fontRenameInput.Placeholder.gameObject.AddComponent<TextLocalization>().Init("FONT_NAME", "Font Name");
         fontRenameInput.InputField.characterLimit = 40;
-
         fontDeleteBtn = GenerateUI.Button(
             manageRow,
             () => DeleteCurrentFont(),
@@ -559,13 +475,9 @@ internal static partial class PageSettings {
             br.anchorMin = new(1f, 1f);
             br.anchorMax = new(1f, 1f);
             br.sizeDelta = new(104f, 50f);
-            // anchoredPosition, not offsetMax: BackGround() leaves a non-zero
-            // anchoredPosition (-125) from its stretch inset, and the offsetMax
-            // setter folds that into sizeDelta, blowing up the button width.
             br.anchoredPosition = Vector2.zero;
         }
         fontDeleteBtn.Label.gameObject.AddComponent<TextLocalization>().Init("FONT_DELETE", "Delete");
-
         UIButton fontRenameBtn = GenerateUI.Button(
             manageRow,
             RenameCurrentFont,
@@ -578,28 +490,18 @@ internal static partial class PageSettings {
             br.anchorMin = new(1f, 1f);
             br.anchorMax = new(1f, 1f);
             br.sizeDelta = new(104f, 50f);
-            // 104 wide + 8 gap = 112 left of the Delete button. anchoredPosition
-            // for the same reason as Delete above.
             br.anchoredPosition = new(-112f, 0f);
         }
         fontRenameBtn.Label.gameObject.AddComponent<TextLocalization>().Init("FONT_RENAME", "Rename");
-
         var fontStatusRowRect = GenerateUI.Row(fontGroup.transform, 28f);
         fontStatusRow = fontStatusRowRect.gameObject;
         fontStatusText = GenerateUI.AddMutedText(fontStatusRowRect, 16f, 0.5f, true);
         fontStatusText.text = "";
         fontStatusRow.SetActive(false);
-
         RefreshFontManageRow();
-
-        // Settings-window font: lets this mod's own settings window use a
-        // different face than the gameplay overlays. "Same as overlay font"
-        // (the default) follows the Font picker above, so setups that never
-        // touch this are unchanged.
         var settingsFontLabelRow = GenerateUI.Row(content.transform);
         var settingsFontText = GenerateUI.AddTextH1(settingsFontLabelRow);
         var settingsFontTextTr = settingsFontText.gameObject.AddComponent<TextLocalization>().Init("SETTINGS_FONT", "Settings Window Font");
-
         var settingsFontRow = GenerateUI.Row(content.transform);
         settingsFontDropdown = GenerateUI.DropDown(
             settingsFontRow,

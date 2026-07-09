@@ -4,48 +4,28 @@ using GTweens.Tweens;
 using Quartz.Core;
 using Quartz.Tween;
 using UnityEngine;
-
 namespace Quartz.UI.Transition;
-
 public class PageSwicher {
     private static GTween pageSeq;
-
     public static bool SwitchPage(int from, int to) {
         if(from == to) return false;
-
         if(!UICore.Pages.TryGetValue(from, out RectTransform fromPage)) return false;
-
         if(!UICore.Pages.TryGetValue(to, out RectTransform toPage)) return false;
-
         CanvasGroup fromCg = fromPage.GetComponent<CanvasGroup>();
         CanvasGroup toCg = toPage.GetComponent<CanvasGroup>();
-
         if(fromCg == null || toCg == null) return false;
-
-        // Per-page canvases render only while visible (see PageFactory). The
-        // incoming page must render for its slide-in; the outgoing one is
-        // switched off once the sequence settles (below), so only the visible
-        // tab composites in steady state.
         Canvas fromCanvas = fromPage.GetComponent<Canvas>();
         Canvas toCanvas = toPage.GetComponent<Canvas>();
-
         pageSeq.CompleteAndKill();
-
-        // After CompleteAndKill so a completing prior sequence can't leave the
-        // incoming page's canvas disabled.
         if(toCanvas != null) toCanvas.enabled = true;
-
         fromPage.anchoredPosition = Vector2.zero;
         toPage.anchoredPosition = new Vector2(1100f, 0f);
-
         fromCg.alpha = 1f;
         toCg.alpha = 0f;
-
         fromCg.interactable = false;
         fromCg.blocksRaycasts = false;
         toCg.interactable = false;
         toCg.blocksRaycasts = false;
-
         pageSeq = GTweenSequenceBuilder.New()
             .Join(fromPage.GTAnchorPosX(-1100f, 0.45f).SetEasing(Easing.OutExpo))
             .Join(fromCg.GTFade(0f, 0.3f))
@@ -58,16 +38,12 @@ public class PageSwicher {
                     toCg.blocksRaycasts = true;
                 }).Build()
             )
-            // Upstream raycast fix (4619e7d): force the outgoing page's
-            // raycasts off again once the sequence settles, so a Complete()d
-            // sequence from rapid tab switching can't leave it clickable.
             .AppendCallback(() => {
                 fromCg.interactable = false;
                 fromCg.blocksRaycasts = false;
                 if(fromCanvas != null) fromCanvas.enabled = false;
             }).Build();
         MainCore.TC.Play(pageSeq);
-
         return true;
     }
 }

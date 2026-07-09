@@ -1,4 +1,4 @@
-﻿//using Microsoft.ClearScript.V8;
+﻿
 using GTweens.Contexts;
 using Quartz.Compat;
 using Quartz.Compat.Interface;
@@ -7,17 +7,13 @@ using Quartz.IO;
 using Quartz.Localization;
 using Quartz.Resource;
 using System.Reflection;
-
 namespace Quartz.Core;
-
 public static class MainCore {
     public static QuartzRuntime Runtime { get; private set; }
-
     public static event Action<bool, bool> OnModEnabledChanged {
         add => Runtime.OnModEnabledChanged += value;
         remove => Runtime.OnModEnabledChanged -= value;
     }
-
     public static Version Version => Runtime.Version;
     public static Assembly Asm => Runtime.Assembly;
     public static QuartzLogger Log => Runtime.Logger;
@@ -30,22 +26,9 @@ public static class MainCore {
     public static IQuartzHost Host => Runtime.Host;
     public static UnityEngine.GameObject Root => Runtime.RootObject;
     public static GTweensContext TC => Runtime.TweensContext;
-    //public static V8ScriptEngine V8 => Runtime.V8Engine;
-    // Null-guarded like Tick/Dispose/SetModEnabled: a torn-down or never-built
-    // runtime reads as "disabled" instead of NRE-ing. Without this, any patch or
-    // ticker that survives a failed/partial init (Harmony patches stay applied;
-    // MonoBehaviour tickers on a leaked root keep running) would throw every
-    // frame off Runtime being null.
     public static bool IsModEnabled => Runtime?.State.IsEnabled ?? false;
-
     public static void Initialize(IQuartzHost host) {
         if(Runtime != null) return;
-
-        // Runtime must be set before Initialize() runs — the static facades above
-        // (Conf, Paths, Tr, ...) read through it during startup. But if Initialize
-        // throws, leave Runtime null so a later call can retry from clean state
-        // instead of short-circuiting on a half-built instance (UnityModManager
-        // can re-enter Load after an errored mod).
         Runtime = new QuartzRuntime(host);
         try {
             Runtime.Initialize();
@@ -53,23 +36,16 @@ public static class MainCore {
             try {
                 Runtime.Dispose();
             } catch {
-                // best-effort teardown of the partial runtime
             }
             Runtime = null;
             throw;
         }
     }
-
     public static void Tick() => Runtime?.Tick();
-
     public static void Dispose() {
         if(Runtime == null) return;
-
         Runtime.Dispose();
         Runtime = null;
     }
-
-    // Null-guarded like Tick/Dispose: UnityModManager can fire OnToggle after a
-    // teardown that already nulled Runtime.
     public static void SetModEnabled(bool enabled) => Runtime?.SetModEnabled(enabled, false);
 }

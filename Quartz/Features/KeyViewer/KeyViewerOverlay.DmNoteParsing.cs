@@ -2,62 +2,47 @@ using System.Globalization;
 using Quartz.Core;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
-
 namespace Quartz.Features.KeyViewer;
-
 public static partial class KeyViewerOverlay {
     private static List<DmNoteSpec> ParseDmNoteSpecs() {
         List<DmNoteSpec> result = [];
         dmCanvasHeight = 250f;
         dmCanvasWidth = 800f;
         ApplyDmRuntimeSettings();
-
         if(string.IsNullOrWhiteSpace(Conf.DmPresetJson)) return result;
-
         try {
             JObject preset = JObject.Parse(Conf.DmPresetJson);
-
             JObject keysTable = preset["keys"] as JObject;
             JObject posTable = (preset["keyPositions"] as JObject) ?? (preset["positions"] as JObject);
             string tab = ResolveDmTab(preset, keysTable, posTable);
             Conf.DmSelectedTab = tab;
             ApplyDmRuntimeSettings();
-
             JArray keyArr = keysTable?[tab] as JArray;
             JArray posArr = posTable?[tab] as JArray;
             if(keyArr == null || posArr == null) return result;
-
             float minX = float.PositiveInfinity;
             float minY = float.PositiveInfinity;
             float maxX = float.NegativeInfinity;
             float maxY = float.NegativeInfinity;
-
             int count = Mathf.Min(keyArr.Count, posArr.Count);
             for(int i = 0; i < count; i++) {
                 if(posArr[i] is not JObject p || JBool(p, "hidden", false)) continue;
-
                 DmNoteSpec spec = ParseDmNoteSpec(keyArr[i]?.ToString() ?? "", p, false);
                 spec.ZIndex = JFloat(p, "zIndex", i);
                 result.Add(spec);
                 ExtendDmBounds(spec, ref minX, ref minY, ref maxX, ref maxY);
             }
-
             if(preset["statPositions"] is JObject statTable && statTable[tab] is JArray statArr) {
                 for(int i = 0; i < statArr.Count; i++) {
                     if(statArr[i] is not JObject p || JBool(p, "hidden", false)) continue;
-
                     JObject statPosition = (p["position"] as JObject) ?? p;
                     if(JBool(statPosition, "hidden", false)) continue;
-
                     DmNoteSpec spec = ParseDmNoteSpec(JStr(p, "statType", JStr(statPosition, "statType", "stat")), statPosition, true);
                     spec.ZIndex = JFloat(statPosition, "zIndex", i);
                     result.Add(spec);
                     ExtendDmBounds(spec, ref minX, ref minY, ref maxX, ref maxY);
                 }
             }
-
-            // KPS graphs (DM Note graphPositions table), keyed by tab like keys
-            // and stats.
             if(preset["graphPositions"] is JObject graphTable && graphTable[tab] is JArray graphArr) {
                 for(int i = 0; i < graphArr.Count; i++) {
                     if(graphArr[i] is not JObject p || JBool(p, "hidden", false)) continue;
@@ -69,52 +54,39 @@ public static partial class KeyViewerOverlay {
                     ExtendDmBounds(spec, ref minX, ref minY, ref maxX, ref maxY);
                 }
             }
-
             if(float.IsPositiveInfinity(minX) || float.IsPositiveInfinity(minY)) return result;
-
             const float padding = 30f;
             float track = Conf.DmNoteEffect ? dmTrackHeight : 0f;
             float topOffset = track + padding;
             float offsetX = padding - minX;
             float offsetY = topOffset - minY;
-
             for(int i = 0; i < result.Count; i++) {
                 DmNoteSpec spec = result[i];
                 spec.X += offsetX;
                 spec.Y += offsetY;
                 ResolveDmTrackGeometry(spec, topOffset);
             }
-
             dmCanvasWidth = Mathf.Max(60f, maxX - minX) + padding * 2f;
             dmCanvasHeight = Mathf.Max(60f, maxY - minY) + padding * 2f + track;
         } catch(Exception ex) {
             MainCore.Log.Msg("[KeyViewer] DM Note parse failed: " + ex.Message);
             result.Clear();
         }
-
         ApplyCssToSpecs(result);
         return result;
     }
-
     private static string ResolveDmTab(JObject preset, JObject keysTable, JObject posTable) {
         string selected = JOptionalString(preset, "selectedKeyType");
         if(!string.IsNullOrWhiteSpace(selected) && keysTable?[selected] != null && posTable?[selected] != null) return selected;
-
         string configured = Conf.DmSelectedTab;
         if(!string.IsNullOrWhiteSpace(configured) && keysTable?[configured] != null && posTable?[configured] != null) return configured;
-
         if(keysTable != null) {
             foreach(JProperty prop in keysTable.Properties())
                 if(posTable?[prop.Name] != null) return prop.Name;
         }
-
         return string.IsNullOrWhiteSpace(configured) ? "4key" : configured;
     }
-
     private static void ApplyDmRuntimeSettings() {
-        // KRP v2 kept these rain controls outside the imported DM Note preset.
-        // Preset JSON still supplies key layout and colors, but local sliders
-        // remain authoritative for movement, height, reverse, delay, and fade.
         dmNoteSpeed = Mathf.Clamp(Conf.DmNoteSpeed, 1f, 5000f);
         dmTrackHeight = Mathf.Clamp(Conf.DmTrackHeight, 0f, 5000f);
         dmNoteReverse = Conf.DmNoteReverse;
@@ -124,15 +96,12 @@ public static partial class KeyViewerOverlay {
         dmShortNoteMinLengthPx = Mathf.Clamp(Conf.DmShortNoteMinLengthPx, 1f, 9999f);
         dmKeyDisplayDelayMs = Mathf.Clamp(Conf.DmKeyDisplayDelayMs, 0f, 9999f);
     }
-
     private static void ExtendDmBounds(DmNoteSpec spec, ref float minX, ref float minY, ref float maxX, ref float maxY) {
         minX = Mathf.Min(minX, spec.X);
         minY = Mathf.Min(minY, spec.Y);
         maxX = Mathf.Max(maxX, spec.X + spec.W);
         maxY = Mathf.Max(maxY, spec.Y + spec.H);
-
         if(spec.IsStat) return;
-
         float noteW = spec.NoteW > 0.5f ? spec.NoteW : spec.W;
         float align = DmNoteAlignOffset(spec.W, noteW, spec.NoteAlignment);
         minX = Mathf.Min(minX, spec.X + align + spec.NoteOffsetX);
@@ -143,33 +112,25 @@ public static partial class KeyViewerOverlay {
             maxY = Mathf.Max(maxY, spec.Y + spec.H + spec.NoteOffsetY);
         }
     }
-
     private static void ResolveDmTrackGeometry(DmNoteSpec spec, float topMostY) {
         if(spec.IsStat) return;
-
         spec.NoteW = spec.NoteW > 0.5f ? spec.NoteW : spec.W;
         float align = DmNoteAlignOffset(spec.W, spec.NoteW, spec.NoteAlignment);
         spec.TrackX = spec.X + align + spec.NoteOffsetX;
         spec.TrackBottomY = (spec.NoteAutoYCorrection ? topMostY : spec.Y) + spec.NoteOffsetY;
     }
-
     private static float DmNoteAlignOffset(float keyWidth, float noteWidth, string align) {
         if(string.Equals(align, "left", StringComparison.OrdinalIgnoreCase)) return 0f;
         if(string.Equals(align, "right", StringComparison.OrdinalIgnoreCase)) return keyWidth - noteWidth;
         return (keyWidth - noteWidth) * 0.5f;
     }
-
     private static void ResolveDmNoteColors(JObject p, bool glow, out Color top, out Color bottom) {
         string opacityKey = glow ? "noteGlowOpacity" : "noteOpacity";
         string opacityTopKey = glow ? "noteGlowOpacityTop" : "noteOpacityTop";
         string opacityBottomKey = glow ? "noteGlowOpacityBottom" : "noteOpacityBottom";
-
         float baseOpacity = JFloat(p, opacityKey, glow ? 70f : 80f);
         float opacityTop = Mathf.Clamp01(JFloat(p, opacityTopKey, baseOpacity) / 100f);
         float opacityBottom = Mathf.Clamp01(JFloat(p, opacityBottomKey, baseOpacity) / 100f);
-
-        // Glow colour defaults to the note's own colour when unset (DmNote:
-        // `noteGlowColor ?? noteColor`); opacity always comes from the glow keys.
         JToken color = p?[glow ? "noteGlowColor" : "noteColor"];
         if(glow && color == null) color = p?["noteColor"];
         if(color is JObject obj && string.Equals(JStr(obj, "type", ""), "gradient", StringComparison.OrdinalIgnoreCase)) {
@@ -177,14 +138,10 @@ public static partial class KeyViewerOverlay {
             bottom = HexToColor(JStr(obj, "bottom", "#FFFFFF"), opacityBottom);
             return;
         }
-
         string solid = color == null || color.Type == JTokenType.Null ? "#FFFFFF" : color.ToString();
         top = HexToColor(solid, opacityTop);
         bottom = HexToColor(solid, opacityBottom);
     }
-
-    // A KPS-graph element from the graphPositions table. Mirrors DM Note's
-    // GraphPanel defaults (200x100, line, #86EFAC, dark bg, faint border).
     private static DmNoteSpec ParseGraphSpec(JObject p) {
         DmNoteSpec spec = new() {
             IsGraph = true,
@@ -213,7 +170,6 @@ public static partial class KeyViewerOverlay {
         spec.DisplayText = "";
         return spec;
     }
-
     private static DmNoteSpec ParseDmNoteSpec(string keyName, JObject p, bool stat) {
         string fontHex = JStr(p, "fontColor", "rgba(121, 121, 121, 0.9)");
         string activeFontHex = JStr(p, "activeFontColor", "#FFFFFF");
@@ -224,7 +180,6 @@ public static partial class KeyViewerOverlay {
         JObject counter = p["counter"] as JObject;
         JObject counterFill = counter?["fill"] as JObject;
         JObject counterStroke = counter?["stroke"] as JObject;
-
         DmNoteSpec spec = new() {
             KeyName = keyName ?? "",
             X = JFloat(p, "dx", 0f),
@@ -233,7 +188,6 @@ public static partial class KeyViewerOverlay {
             H = Mathf.Max(1f, JFloat(p, "height", stat ? 30f : 60f)),
             IsStat = stat,
         };
-
         spec.KeyCode = stat ? KeyCode.None : ResolveDmNoteKeyCode(spec.KeyName);
         string ghost = JOptionalString(p, "ghostKey");
         spec.GhostKeyCode = string.IsNullOrEmpty(ghost) ? KeyCode.None : ResolveDmNoteKeyCode(ghost);
@@ -245,12 +199,10 @@ public static partial class KeyViewerOverlay {
         spec.IdleImageFit = JStr(p, "idleImageFit", "");
         spec.ActiveImageFit = JStr(p, "activeImageFit", "");
         spec.ImageFitDefault = JStr(p, "imageFit", "");
-
         spec.Bg = HexToColor(bgHex, 0.9f);
         spec.ActiveBg = HexToColor(activeBgHex, 0.9f);
         if(JBool(p, "idleTransparent", false)) spec.Bg.a = 0f;
         if(JBool(p, "activeTransparent", false)) spec.ActiveBg.a = 0f;
-
         spec.Outline = HexToColor(borderHex, 0.9f);
         spec.ActiveOutline = HexToColor(activeBorderHex, spec.Outline.a);
         spec.Text = HexToColor(fontHex, 1f);
@@ -261,7 +213,6 @@ public static partial class KeyViewerOverlay {
             spec.Outline.a = 0f;
             spec.ActiveOutline.a = 0f;
         }
-
         ResolveDmNoteColors(p, false, out spec.RainTop, out spec.RainBottom);
         spec.Rain = spec.RainBottom;
         spec.RainGlowOn = JBool(p, "noteGlowEnabled", false);
@@ -281,7 +232,6 @@ public static partial class KeyViewerOverlay {
             spec.GhostRainGlowBottom = ghostColor;
         }
         spec.GhostRain = spec.GhostRainBottom;
-
         spec.FontSize = JInt(p, "fontSize", stat ? 16 : 18);
         spec.CounterEnabled = Conf.DmShowCounter && (counter != null ? JBool(counter, "enabled", true) : true);
         spec.CounterFontSize = counter != null
@@ -316,10 +266,8 @@ public static partial class KeyViewerOverlay {
         spec.DisplayText = !string.IsNullOrEmpty(display)
             ? display
             : DefaultDmNoteDisplay(spec.KeyName, stat);
-
         return spec;
     }
-
     private static string DefaultDmNoteDisplay(string keyName, bool stat) {
         if(stat) {
             if(keyName.Equals("kps", StringComparison.OrdinalIgnoreCase)) return "KPS";
@@ -328,24 +276,16 @@ public static partial class KeyViewerOverlay {
             if(keyName.Equals("total", StringComparison.OrdinalIgnoreCase)) return "Total";
             return keyName.ToUpperInvariant();
         }
-
         if(string.IsNullOrEmpty(keyName)) return "";
-
         KeyCode key = ResolveDmNoteKeyCode(keyName);
         return key == KeyCode.None ? keyName : KeyCodeShortLabel(key);
     }
-
     private static KeyCode ResolveDmNoteKeyCode(string name) {
         if(string.IsNullOrEmpty(name)) return KeyCode.None;
-
         if(name.Length > 1 && int.TryParse(name, out int numeric)) return Features.KeyLimiter.KeyLimiter.NormalizeNumericKey(numeric);
-
         string normalized = name.Replace(" ", "").Replace("_", "").Replace("-", "");
         if(normalized.StartsWith("KEY", StringComparison.OrdinalIgnoreCase) && normalized.Length == 4) normalized = normalized[3..];
         if(normalized.StartsWith("DIGIT", StringComparison.OrdinalIgnoreCase) && normalized.Length == 6) normalized = normalized[5..];
-        // Numpad keys: the DM Note app names them "NUMPAD <x>" (e.g. "NUMPAD
-        // RETURN", "NUMPAD MULTIPLY"), which don't match Unity's "Keypad*"
-        // enum, so map them explicitly.
         if(normalized.StartsWith("NUMPAD", StringComparison.OrdinalIgnoreCase) && normalized.Length > 6) {
             string np = normalized.Substring(6).ToUpperInvariant();
             KeyCode npk = np switch {
@@ -362,10 +302,6 @@ public static partial class KeyViewerOverlay {
             };
             if(npk != KeyCode.None) return npk;
         }
-
-        // Enum.TryParse accepts numeric strings as raw enum values, so "3"
-        // would become the undefined (KeyCode)3 instead of Alpha3 — digit
-        // names must fall through to the single-char mapping below.
         if(!char.IsDigit(normalized[0]) && Enum.TryParse(normalized, true, out KeyCode parsed)) return Features.KeyLimiter.KeyLimiter.NormalizeKey(parsed);
         switch(normalized.ToUpperInvariant()) {
             case "DOT":
@@ -425,23 +361,18 @@ public static partial class KeyViewerOverlay {
             case "RIGHT":
             case "RIGHTARROW": return KeyCode.RightArrow;
         }
-
         if(normalized.Length == 1) {
             char c = char.ToUpperInvariant(normalized[0]);
             if(c >= 'A' && c <= 'Z') return (KeyCode)((int)KeyCode.A + (c - 'A'));
             if(c >= '0' && c <= '9') return (KeyCode)((int)KeyCode.Alpha0 + (c - '0'));
         }
-
         return KeyCode.None;
     }
-
     private static Color HexToColor(string hex, float alpha) {
         if(string.IsNullOrEmpty(hex)) return new Color(1f, 1f, 1f, alpha);
-
         string s = hex.Trim();
         try {
             if(string.Equals(s, "transparent", StringComparison.OrdinalIgnoreCase)) return new Color(0f, 0f, 0f, 0f);
-
             if(s.StartsWith("rgb", StringComparison.OrdinalIgnoreCase)) {
                 int lp = s.IndexOf('(');
                 int rp = s.IndexOf(')');
@@ -457,7 +388,6 @@ public static partial class KeyViewerOverlay {
                     }
                 }
             }
-
             string h = s.TrimStart('#');
             if(h.Length == 3 || h.Length == 4) {
                 int r = Convert.ToInt32(new string(h[0], 2), 16);
@@ -474,27 +404,21 @@ public static partial class KeyViewerOverlay {
                 return new Color(r / 255f, g / 255f, b / 255f, a / 255f);
             }
         } catch { }
-
         return new Color(1f, 1f, 1f, alpha);
     }
-
     private static string JStr(JObject p, string key, string def) {
         JToken t = p?[key];
         return t == null || t.Type == JTokenType.Null ? def : t.ToString();
     }
-
     private static string JOptionalString(JObject p, string key) {
         JToken t = p?[key];
         return t == null || t.Type == JTokenType.Null ? null : t.ToString();
     }
-
-    // Nullable-token-tolerant ToObject<T> behind the typed wrappers below.
     private static T JVal<T>(JObject p, string key, T def) {
         JToken t = p?[key];
         if(t == null || t.Type == JTokenType.Null) return def;
         try { return t.ToObject<T>(); } catch { return def; }
     }
-
     private static float JFloat(JObject p, string key, float def) => JVal(p, key, def);
     private static int JInt(JObject p, string key, int def) => JVal(p, key, def);
     private static bool JBool(JObject p, string key, bool def) => JVal(p, key, def);

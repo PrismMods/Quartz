@@ -2,46 +2,23 @@ using Newtonsoft.Json.Linq;
 using Quartz.IO;
 using Quartz.IO.Interface;
 using UnityEngine;
-
 namespace Quartz.Features.Judgement;
-
-// Persisted config for the judgement counts overlay (top-center row of
-// per-judgement hit counts). Ranges match the original KorenResourcePack:
-// OffsetY -100..200, Size 0.3..3, Spacing -20..80. OffsetX is new in v2 —
-// the overlay is draggable in Reorganize mode like the other HUD elements.
 public sealed class JudgementSettings : ISettingsFile {
     public bool Enabled = true;
-
-    // Render the whole row as ONE rich-text label (per-slot <color> spans joined by
-    // <space> gaps) instead of nine separate TextMeshPro labels in a
-    // HorizontalLayoutGroup. One label = one mesh / one draw and, crucially, no
-    // 9-cell layout solve on every hit (the multi-label row force-rebuilds its
-    // layout each time a count changes). Defaults on as the cheaper path; set false
-    // to fall back to the nine-label row if the single-label spacing looks off on a
-    // given font. The two render the same digits, colors and centering — only the
-    // inter-count gap differs (glyph-advance <space> vs layout-group spacing).
     public bool CompactRow = true;
-
-    // When the XPerfect mod is active, split the Perfect slot into
-    // +Perfect / X / -Perfect. Off collapses it back to a single combined
-    // Perfect count even while XPerfect is installed.
     public bool ShowXPerfect = true;
-
     public float OffsetX = 0f;
     public float OffsetY = -5f;
     public float Size = 0.9f;
     public float Spacing = 5f;
-
     public bool TextShadowEnabled = true;
     public float TextShadowX = 1.5f;
     public float TextShadowY = -1.5f;
     public float TextShadowSoftness = 0f;
     public float TextShadowR = 0f, TextShadowG = 0f, TextShadowB = 0f, TextShadowA = 0.5019608f;
-
     public Color GetTextShadowColor() => IOUtils.Rgba(TextShadowR, TextShadowG, TextShadowB, TextShadowA);
     public void SetTextShadowColor(Color c) =>
         IOUtils.SetRgba(c, ref TextShadowR, ref TextShadowG, ref TextShadowB, ref TextShadowA);
-
     public JToken Serialize() => new JObject {
             [nameof(Enabled)] = Enabled,
             [nameof(CompactRow)] = CompactRow,
@@ -59,7 +36,6 @@ public sealed class JudgementSettings : ISettingsFile {
             [nameof(TextShadowB)] = TextShadowB,
             [nameof(TextShadowA)] = TextShadowA,
         };
-
     public void Deserialize(JToken token) {
         Enabled = IOUtils.Read(token, nameof(Enabled), Enabled);
         CompactRow = IOUtils.Read(token, nameof(CompactRow), CompactRow);

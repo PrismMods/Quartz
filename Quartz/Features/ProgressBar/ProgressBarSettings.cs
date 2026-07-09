@@ -3,53 +3,29 @@ using Quartz.Features.Panels;
 using Quartz.IO;
 using Quartz.IO.Interface;
 using UnityEngine;
-
 namespace Quartz.Features.ProgressBar;
-
-// Persisted config for the top-of-screen Progress Bar HUD. Owns its own
-// UserData/Quartz/ProgressBar.json — separate from CoreSettings, per the
-// per-feature-settings pattern (see project_modstate_and_settings.md).
 public sealed class ProgressBarSettings : ISettingsFile {
     public bool Enabled = true;
-
     public float Width = 800f;
     public float Height = 8f;
     public float OffsetX = 0f;
     public float TopOffset = 10f;
-
     public float Rounding = 1f;
     public float OutlineThickness = 1.75f;
-
-    // When a run starts mid-chart (checkpoint / editor play-from-tile), start
-    // the bar already filled up to that point instead of empty.
     public bool PrefillStart = false;
-
     public float FillR = 1f, FillG = 0f, FillB = 0f, FillA = 0.96f;
     public float BackR = 0.05f, BackG = 0.05f, BackB = 0.06f, BackA = 0.80f;
     public float OutlineColR = 1f, OutlineColG = 1f, OutlineColB = 1f, OutlineColA = 1f;
-
-    // Optional progress-driven fill gradient (v1's ProgressBarFillColor range):
-    // when enabled, the fill colour is the gradient evaluated at the current
-    // progress (0 = empty, 1 = complete) instead of the flat FillColor above.
-    // Disabled by default so the bar keeps its solid colour. Reuses the Panels
-    // StatColor gradient model.
     public StatColor FillGradient = StatColor.DefaultFor("progress");
-
-    // Fill colour for a given progress ratio: the gradient when enabled, else
-    // the flat fill colour.
     public Color GetFillColorForProgress(float progress) =>
         FillGradient is { Enabled: true } ? FillGradient.Evaluate(progress) : GetFillColor();
-
     public Color GetFillColor() => IOUtils.Rgba(FillR, FillG, FillB, FillA);
     public void SetFillColor(Color c) => IOUtils.SetRgba(c, ref FillR, ref FillG, ref FillB, ref FillA);
-
     public Color GetBackColor() => IOUtils.Rgba(BackR, BackG, BackB, BackA);
     public void SetBackColor(Color c) => IOUtils.SetRgba(c, ref BackR, ref BackG, ref BackB, ref BackA);
-
     public Color GetOutlineColor() => IOUtils.Rgba(OutlineColR, OutlineColG, OutlineColB, OutlineColA);
     public void SetOutlineColor(Color c) =>
         IOUtils.SetRgba(c, ref OutlineColR, ref OutlineColG, ref OutlineColB, ref OutlineColA);
-
     public JToken Serialize() =>
         new JObject {
             [nameof(Enabled)] = Enabled,
@@ -74,7 +50,6 @@ public sealed class ProgressBarSettings : ISettingsFile {
             [nameof(OutlineColA)] = OutlineColA,
             [nameof(FillGradient)] = FillGradient?.Serialize(),
         };
-
     public void Deserialize(JToken token) {
         Enabled = IOUtils.Read(token, nameof(Enabled), Enabled);
         Width = IOUtils.Read(token, nameof(Width), Width);

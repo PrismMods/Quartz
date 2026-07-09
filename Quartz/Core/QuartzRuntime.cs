@@ -28,62 +28,35 @@ using Quartz.Update;
 using System.Reflection;
 using UnityEngine;
 using Object = UnityEngine.Object;
-
 namespace Quartz.Core;
-
-// Owns the whole mod lifecycle. Service-based, ported from Overlayer's runtime
-// but trimmed to the lean skeleton: no module discovery, tag engine, overlay
-// canvas engine or Harmony patch controller — the only runtime feature is Status.
 public sealed class QuartzRuntime {
     public Version Version { get; }
     public Assembly Assembly { get; }
-
     public QuartzLogger Logger { get; }
-
     public ModState State { get; }
-
     public event Action<bool, bool> OnModEnabledChanged;
-
     public PathService Paths { get; }
-
     public SettingsFile<CoreSettings> Config { get; }
-
     public LocalizationService Localization { get; private set; }
-
     public ResourceManager Resource { get; }
     public SpriteManager Sprite { get; }
-
     public GameObject RootObject { get; private set; }
-
     public GTweensContext TweensContext { get; }
-
     public readonly IQuartzHost Host;
-
     private readonly RuntimeServices services;
     private readonly RuntimeTicks ticks;
-
     private readonly FeatureRegistry features = new();
-
     private UIService uiService;
     private TweenService tweenService;
     private HarmonyService harmonyService;
     private PlayCount playCount;
-
-    // Kept so Dispose can unsubscribe — otherwise a UnityModManager in-process
-    // reload (Initialize → Dispose → Initialize) stacks a new live handler each
-    // time, leaving stale copies firing on every scene load for the process life.
     private UnityEngine.Events.UnityAction<UnityEngine.SceneManagement.Scene, UnityEngine.SceneManagement.LoadSceneMode> xperfectGuardHandler;
-
     public QuartzRuntime(IQuartzHost host) {
         Host = host;
-
         Version = new Version(Info.Version);
         Assembly = Assembly.GetExecutingAssembly();
         Logger = new QuartzLogger(host.QuartzLogger);
         State = new ModState();
-        // QuartzFilePath is the data root verbatim (the host appends any
-        // loader-specific suffix): <UserData>/Quartz on MelonLoader, the mod's
-        // own self-contained folder on UnityModManager.
         Paths = new PathService(host.QuartzFilePath);
         Config = new SettingsFile<CoreSettings>(Paths.ConfigPath);
         Resource = new ResourceManager(Assembly, "Quartz.Resource.Embedded.");
@@ -92,26 +65,19 @@ public sealed class QuartzRuntime {
         ticks = new RuntimeTicks();
         TweensContext = new GTweensContext();
     }
-
-    // One-time migration for the KorenResourcePack v2 -> Quartz rename: bring the
-    // user's settings over from the old UserData/Koren folder into UserData/Quartz.
-    // Done per-entry so it never clobbers the freshly-installed shipped files
-    // (Lang, native/) already sitting in the new folder. The legacy Koren folder
-    // sits beside the new data root (both under UserData on MelonLoader); on
-    // UnityModManager the sibling never exists, so this no-ops harmlessly.
     private void MigrateLegacyData() {
         try {
-            string newRoot = Host.QuartzFilePath;          // <UserData>/Quartz (ML)
-            string parent = Path.GetDirectoryName(newRoot); // <UserData>
+            string newRoot = Host.QuartzFilePath;          
+            string parent = Path.GetDirectoryName(newRoot); 
             if(string.IsNullOrEmpty(parent)) return;
-            string oldRoot = Path.Combine(parent, "Koren"); // <UserData>/Koren
+            string oldRoot = Path.Combine(parent, "Koren"); 
             if(!Directory.Exists(oldRoot) ||
                string.Equals(Path.GetFullPath(oldRoot), Path.GetFullPath(newRoot), StringComparison.OrdinalIgnoreCase)) return;
             Directory.CreateDirectory(newRoot);
             int moved = 0;
             foreach(string entry in Directory.GetFileSystemEntries(oldRoot)) {
                 string dest = Path.Combine(newRoot, Path.GetFileName(entry));
-                if(File.Exists(dest) || Directory.Exists(dest)) continue; // keep the newer/shipped copy
+                if(File.Exists(dest) || Directory.Exists(dest)) continue; 
                 try {
                     if(Directory.Exists(entry)) Directory.Move(entry, dest);
                     else File.Move(entry, dest);
@@ -125,51 +91,27 @@ public sealed class QuartzRuntime {
             Logger.Wrn($"[Startup] legacy data migration failed: {e.Message}");
         }
     }
-
-    // Self-heal for installs still carrying the pre-rename Mods/Koren.dll: the
-    // mod can't rename its own loaded file in place, so it pulls the current
-    // Quartz release (lays down Mods/Quartz.dll + shipped UserData/Quartz) and
-    // retires Koren.dll. The download is async and applies next launch; the
-    // UserData/Koren -> UserData/Quartz move already ran in MigrateLegacyData.
-    // One-shot by nature: once Koren.dll is gone this no longer matches.
     private void TryLegacyRenameUpgrade() {
         try {
-            // Assembly.Location is the path MelonLoader loaded us from
-            // (.../Mods/Koren.dll when renamed). Fall back to probing Mods/ if a
-            // loader handed us a byte[] image with no backing path.
             string dllPath = Assembly.Location;
             if(string.IsNullOrEmpty(dllPath) ||
                !string.Equals(Path.GetFileName(dllPath), "Koren.dll", StringComparison.OrdinalIgnoreCase)) {
                 string probe = Path.Combine(Host.ModsPath, "Koren.dll");
                 bool quartzPresent = File.Exists(Path.Combine(Host.ModsPath, "Quartz.dll"));
-                // Only treat a stray Koren.dll as ours when there's no separate
-                // Quartz.dll already loaded alongside it.
                 if(string.IsNullOrEmpty(dllPath) && File.Exists(probe) && !quartzPresent) dllPath = probe;
                 else return;
             }
-
             Logger.Msg("[Startup] running as Koren.dll — fetching Quartz release to migrate install");
             UpdateService.InstallLegacyRename(dllPath);
         } catch(Exception e) {
             Logger.Wrn($"[Startup] legacy rename upgrade failed: {e.Message}");
         }
     }
-
     public void Initialize() {
-        // Per-phase timing so "the game took forever to start" reports can be
-        // pinned to a phase from the log instead of guessed at.
         var sw = System.Diagnostics.Stopwatch.StartNew();
         var total = System.Diagnostics.Stopwatch.StartNew();
-
-        // Carry settings over from the pre-rename UserData/Koren folder.
         MigrateLegacyData();
-
         Paths.Initialize();
-
-        // The updater renames a running, mapped DLL aside as <name>.dll.old when
-        // it can't overwrite it in place; this session loaded the new one, so the
-        // leftovers are safe to delete now. Koren.dll.old comes from the
-        // legacy-rename migration below (a pre-rename Koren.dll being retired).
         foreach(string stale in new[] { "Quartz.dll.old", "QuartzUmm.dll.old", "Koren.dll.old" }) {
             try {
                 string oldDll = Path.Combine(Host.ModsPath, stale);
@@ -178,125 +120,61 @@ public sealed class QuartzRuntime {
                 Logger.Wrn($"[Startup] couldn't remove {stale}: {e.Message}");
             }
         }
-
         CreateRootObject();
-
         RootObject.AddComponent<MainThread>();
-
         Config.Load();
-
-        // Needs the config loaded; first run captures the live settings as
-        // the initial "Default" profile.
         ProfileManager.Initialize();
-
         Logger.Msg($"[Startup] paths + config took {sw.ElapsedMilliseconds} ms");
-
         sw.Restart();
         FontManager.Initialize();
-        // Re-apply the font to ADOFAI's own native text whenever the selection
-        // changes or a new scene loads.
         FontManager.OnFontChanged += InGameOverlayFont.Refresh;
         InGameOverlayFont.Initialize();
         Logger.Msg($"[Startup] FontManager took {sw.ElapsedMilliseconds} ms");
-
         Localization = new LocalizationService(Paths.LangPath, Config, Logger);
-
         uiService = new UIService();
         tweenService = new TweenService(TweensContext);
         harmonyService = new HarmonyService();
         playCount = new PlayCount();
-
         services.Add(Localization);
-        // Before UIService: addons register their tabs/stats in OnLoad, and
-        // UICore's initial build must already see them.
         services.Add(Quartz.Addons.AddonService.Service);
         services.Add(uiService);
         services.Add(tweenService);
         services.Add(playCount);
         services.Add(harmonyService);
-
-        // Engine-level performance toggles (GC scheduling, process priority,
-        // background execution). Static feature, so it just registers its tick.
         Optimizer.Initialize();
-
         ticks.Add(playCount);
-        // Applies Quartz's own [HarmonyPatch] classes on the first tick rather
-        // than inline above — see HarmonyService's class comment for why.
         ticks.Add(harmonyService);
-
         ticks.Add(uiService);
         ticks.Add(tweenService);
         ticks.Add(Optimizer.Ticker);
         ticks.Add(Quartz.Addons.AddonService.Ticker);
-
-        // Keeps the editor's property-row template in sync with the
-        // "Horizontal Properties" toggle (and reverts it when the mod is off).
         ticks.Add(EditorFeature.Ticker);
-
         services.Initialize(Logger);
-
-        // Install the XPerfect reentry guard if XPerfect is already loaded, and
-        // retry on each scene load in case it loads after us (load-order safe).
         Quartz.Features.Interop.XPerfectRecursionGuard.TryApply(harmonyService.Harmony);
         xperfectGuardHandler = (_, _) => Quartz.Features.Interop.XPerfectRecursionGuard.TryApply(harmonyService.Harmony);
         UnityEngine.SceneManagement.SceneManager.sceneLoaded += xperfectGuardHandler;
-
         sw.Restart();
         RegisterFeatures();
         SetModEnabled(Config.Data.Active, false);
         Logger.Msg($"[Startup] SetModEnabled took {sw.ElapsedMilliseconds} ms");
-
-        // A pre-rename install whose mod file is still Mods/Koren.dll self-heals
-        // to the proper Quartz layout (fetches the release, retires Koren.dll).
-        // Runs here, after Config.Load, because the fetch reads the update
-        // channel + skipped-version from config. It sets the updater to
-        // Installing, so the Check() below no-ops in that case (intended — the
-        // migration is the update). Skipped on the common Quartz.dll install.
-        // Gated on a host that self-updates. Both loaders do (each pulls its own
-        // asset — Quartz.zip / QuartzUmm.zip — via Host.UpdateAssetName). The
-        // Koren.dll legacy rename is MelonLoader-only history; it self-no-ops on
-        // UnityModManager (no Koren.dll under the mod folder), so it's safe to
-        // run on both.
         if(Host.SupportsSelfUpdate) {
             TryLegacyRenameUpgrade();
-
-            // Background check so the Settings page can show any available update.
             UpdateService.Check();
         }
-
         Logger.Msg($"[Startup] total {total.ElapsedMilliseconds} ms");
-
-        // Detect Unity Mod Manager + its loaded mods (e.g. xperfect). Logs the
-        // exact mod ids so interop can target them by id.
         if(Quartz.Features.Interop.UmmInterop.IsPresent) Logger.Msg($"[Umm] active mods: [{string.Join(", ", Quartz.Features.Interop.UmmInterop.ActiveModIds())}]");
         else Logger.Msg("[Umm] not present");
-
         Logger.Msg("Hello");
     }
-
     public void Tick() => ticks.Tick();
-
     public void Dispose() {
-        // Every step is best-effort: this also runs from MainCore.Initialize's
-        // catch on a FAILED/partial init, where any single step may throw on a
-        // half-built runtime. A throw must never skip the two steps that matter
-        // most — services.Dispose() (Harmony UnpatchSelf) and destroying the root
-        // (kills the MonoBehaviour tickers). Skipping either is exactly what left
-        // applied patches + orphaned tickers NRE-ing every frame after a failed
-        // init on vanilla UnityModManager.
         static void Safe(Action step) {
             try {
                 step();
             } catch {
-                // best-effort teardown; keep going so the rest still runs
             }
         }
-
         Safe(() => SetModEnabled(false, true));
-
-        // Drop the persistent subscriptions this runtime added in Initialize.
-        // Their targets are static, so without this a UnityModManager reload
-        // would leave every prior session's handler live (see field comment).
         Safe(() => FontManager.OnFontChanged -= InGameOverlayFont.Refresh);
         Safe(InGameOverlayFont.Unhook);
         Safe(Optimizer.Unhook);
@@ -306,41 +184,19 @@ public sealed class QuartzRuntime {
                 xperfectGuardHandler = null;
             }
         });
-
         Safe(() => Config.Save());
-
-        // Keep the active profile in sync with the final on-disk settings so
-        // switching profiles next session starts from what the user last saw.
         Safe(() => ProfileManager.CaptureActive());
-
-        // Harmony UnpatchSelf — must run so applied patches don't keep firing
-        // against a torn-down runtime.
         Safe(() => services.Dispose());
-
         Safe(() => Sprite.Dispose());
-        // Destroy the dynamically-built font assets (atlas + material + source
-        // Font) before ResourceManager tears down the default font they fall
-        // back to.
         Safe(() => Quartz.Resource.FontManager.Dispose());
         Safe(() => Resource.Dispose());
-
         if(RootObject != null) {
             Safe(() => Object.Destroy(RootObject));
             RootObject = null;
         }
-
         Logger.Msg("Bye");
     }
-
-    // Lists every feature's enable/disable step in the order SetModEnabled used
-    // to run them. The overlays disable in REVERSE of their enable order, so
-    // their dispose steps are registered with OnDisable separately from their
-    // enable steps; the non-overlay features disable in the same (forward)
-    // order they enable, so they use Register. Behaviour is identical to the old
-    // hard-coded blocks — adding a feature is a registration line, not editing
-    // two interleaved sequences.
     private void RegisterFeatures() {
-        // Enable: overlays build their GameObjects against the runtime root.
         features.OnEnable("PanelsOverlay", () => PanelsOverlay.Initialize(RootObject));
         features.OnEnable("ComboOverlay", () => ComboOverlay.Initialize(RootObject));
         features.OnEnable("ProgressBarOverlay", () => ProgressBarOverlay.Initialize(RootObject));
@@ -348,8 +204,6 @@ public sealed class QuartzRuntime {
         features.OnEnable("KeyViewerOverlay", () => KeyViewerOverlay.Initialize(RootObject));
         features.OnEnable("SongTitleOverlay", () => SongTitleOverlay.Initialize(RootObject));
         features.OnEnable("CalibrationPopup", CalibrationPopupUI.Initialize);
-
-        // Enable: non-overlay features re-apply their change to the live scene.
         features.Register("EffectRemover", EffectRemover.RefreshEditorSaveButtons, EffectRemover.RestoreEditorSaveButtons);
         features.Register("Tweaks", Tweaks.RefreshAll, Tweaks.RestoreAll);
         features.Register("PlanetColors", PlanetColors.Refresh, PlanetColors.Restore);
@@ -357,8 +211,6 @@ public sealed class QuartzRuntime {
         features.Register("Optimizer", Optimizer.Apply, Optimizer.Restore);
         features.Register("InGameOverlayFont", InGameOverlayFont.Refresh, InGameOverlayFont.RestoreAll);
         features.Register("Nostalgia", Nostalgia.Refresh, Nostalgia.Restore);
-
-        // Disable: overlays unwind in REVERSE of their enable order.
         features.OnDisable("SongTitleOverlay", SongTitleOverlay.Dispose);
         features.OnDisable("KeyViewerOverlay", KeyViewerOverlay.Dispose);
         features.OnDisable("JudgementOverlay", JudgementOverlay.Dispose);
@@ -366,38 +218,27 @@ public sealed class QuartzRuntime {
         features.OnDisable("ComboOverlay", ComboOverlay.Dispose);
         features.OnDisable("PanelsOverlay", PanelsOverlay.Dispose);
         features.OnDisable("CalibrationPopup", CalibrationPopupUI.Dispose);
-
-        // Disable: teardown-only steps with no enable counterpart.
         features.OnDisable("UiHider", UiHider.Restore);
         features.OnDisable("EditorFeature", EditorFeature.Restore);
         features.OnDisable("AutoDeafen", Features.AutoDeafen.AutoDeafen.Stop);
     }
-
     public void SetModEnabled(bool enabled, bool isDispose) {
         if(State.IsEnabled == enabled) return;
-
         State.IsEnabled = enabled;
-
         if(!isDispose) {
             Config.Data.Active = enabled;
             Config.RequestSave();
         }
-
         if(enabled) {
             features.EnableAll();
-
             OnModEnabledChanged?.Invoke(true, isDispose);
-
             Logger.Msg("Mod Enabled");
         } else {
             OnModEnabledChanged?.Invoke(false, isDispose);
-
             features.DisableAll();
-
             Logger.Msg("Mod Disabled");
         }
     }
-
     private void CreateRootObject() {
         RootObject = new GameObject("Quartz");
         Object.DontDestroyOnLoad(RootObject);

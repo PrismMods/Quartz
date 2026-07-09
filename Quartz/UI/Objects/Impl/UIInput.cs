@@ -7,28 +7,20 @@ using GTweens.Builders;
 using GTweenExtensions = GTweens.Extensions.GTweenExtensions;
 using Quartz.Core;
 using Quartz.Tween;
-
 using TMPro;
-
 namespace Quartz.UI.Objects.Impl;
-
 public sealed class UIInput : UIObject {
     public string DefaultValue { get; }
     public string Value { get; private set; }
-
     public Action<string> OnChanged { get; }
-
     public TMP_InputField InputField { get; }
     public TextMeshProUGUI Placeholder { get; }
-
     public Image IconImage { get; }
     public Image ChangedImage { get; }
-
     private GTween changeTween;
     private GTween caretTween;
     private GTween placeholderTween;
     private GTween iconTween;
-
     public UIInput(
         string id,
         RectTransform rect,
@@ -47,78 +39,50 @@ public sealed class UIInput : UIObject {
         DefaultValue = defaultValue;
         Value = value;
         OnChanged = onChanged;
-
         RegisterTick();
-
         SetupInputField();
-
-        // Seed the field's internal text, not just the label: TMP_InputField
-        // rewrites its label from the internal string on enable, so a value
-        // only painted onto the text component gets wiped to empty.
         InputField.SetTextWithoutNotify(value ?? string.Empty);
-
         InputField.onValueChanged.AddListener(OnValueChanged);
-
         UpdateVisual(true);
     }
-
     public void Set(string value, bool invoke = true) {
         value ??= string.Empty;
-
         Value = value;
-
         if(InputField.text != value) InputField.text = value;
-
         if(invoke) OnChanged?.Invoke(value);
-
         UpdateVisual();
     }
-
     public void Reset() {
         if(DefaultValue != null) Set(DefaultValue);
     }
-
     private void OnValueChanged(string value) {
         Value = value;
-
         UpdateVisual();
         UpdateCaretAnimation(InputField.isFocused);
-
         OnChanged?.Invoke(value);
     }
-
     public void UpdateVisual(bool noAnimate = false) {
         changeTween.CompleteAndKill();
-
         float target = (DefaultValue != null && DefaultValue != Value) ? 1f : 0f;
-
         if(noAnimate) {
             Color c = ChangedImage.color;
             c.a = target;
             ChangedImage.color = c;
             return;
         }
-
         changeTween = ChangedImage.GTAlpha(target, 0.2f).SetEasing(Easing.OutSine);
         MainCore.TC.Play(changeTween);
     }
-
     private void SetupInputField() {
         InputField.lineType = TMP_InputField.LineType.SingleLine;
         InputField.richText = false;
-
         InputField.customCaretColor = true;
-
         InputField.caretColor = Color.clear;
-
         InputField.caretBlinkRate = 0f;
         InputField.caretWidth = 2;
-
         InputField.selectionColor = UIColors.MenuHover;
     }
-
     private bool caretLooping;
-
     private void UpdateCaretAnimation(bool focused) {
         if(focused) {
             caretTween?.Kill();
@@ -127,7 +91,6 @@ public sealed class UIInput : UIObject {
                 MainCore.TC.Play(caretTween);
                 return;
             }
-
             caretLooping = true;
             caretTween = GTweenSequenceBuilder.New()
                 .Append(CreateCaretFade(1f, 0.2f))
@@ -139,18 +102,12 @@ public sealed class UIInput : UIObject {
             MainCore.TC.Play(caretTween);
             return;
         }
-
         if(!caretLooping) return;
-
         caretLooping = false;
-
         caretTween?.Kill();
         caretTween = CreateCaretFade(0f, 0.3f);
         MainCore.TC.Play(caretTween);
     }
-
-    // Caret alpha rides on UIColors.ObjectActive (not the current caretColor,
-    // which starts out Color.clear), so this can't be a Graphic.GTAlpha.
     private GTween CreateCaretFade(float to, float duration)
         => GTweenExtensions.Tween(
             () => InputField.caretColor.a,
@@ -162,47 +119,36 @@ public sealed class UIInput : UIObject {
             to,
             duration
         ).SetEasing(Easing.OutSine);
-
     private GTween CreateCaretLoop() {
         return GTweenSequenceBuilder.New()
             .Append(CreateCaretFade(1f, 0.02f))
             .Append(CreateCaretFade(0.4f, 0.62f))
             .Build().SetMaxLoops();
     }
-
     private void UpdatePlaceholder(bool focused) {
         placeholderTween?.Kill();
-
         float target = focused ? 0f : 0.2f;
         float duration = focused ? 0.2f : 0.3f;
-
         placeholderTween = Placeholder.GTAlpha(target, duration).SetEasing(Easing.OutQuad);
         MainCore.TC.Play(placeholderTween);
     }
-
     private void UpdateIconImage(bool focused) {
         iconTween?.Kill();
         iconTween = IconImage.GTAlpha(focused ? 0f : 0.2f, focused ? 0.2f : 0.3f)
             .SetEasing(Easing.OutQuad);
         MainCore.TC.Play(iconTween);
     }
-
     bool hasFocused = false;
     public override void Tick() {
         bool focused = InputField.isFocused;
-
         if(focused == hasFocused) return;
-
         hasFocused = focused;
-
         UpdateCaretAnimation(focused);
         UpdatePlaceholder(focused);
         UpdateIconImage(focused);
     }
-
     public override void Dispose() {
         base.Dispose();
-
         caretTween?.Kill();
         changeTween?.Kill();
         placeholderTween?.Kill();

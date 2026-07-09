@@ -1,23 +1,18 @@
 using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
-
 using TMPro;
-
 namespace Quartz.Features.KeyViewer;
-
 public static partial class KeyViewerOverlay {
     private static void AddDmNoteBox(int index, DmNoteSpec spec) {
         if(spec.IsGraph) {
             AddDmNoteGraph(index, spec);
             return;
         }
-
         (Image fill, Image border) = NewBoxVisual(
             "DmNote_" + index, root, spec.X, spec.Y, spec.W, spec.H,
             spec.BorderRadius, spec.BoxBorderWidth
         );
-
         Box box = new() {
             Key = spec.KeyCode,
             Name = spec.CountKey,
@@ -33,12 +28,10 @@ public static partial class KeyViewerOverlay {
             CenterX = spec.TrackX + spec.NoteW * 0.5f,
             BoxW = spec.NoteW,
         };
-
         box.Label = NewText(fill.transform, "Label", spec.DisplayText, spec.FontSize);
         box.Label.enableAutoSizing = true;
         box.Label.fontSizeMin = 0f;
         box.Label.fontSizeMax = Mathf.Max(8, spec.FontSize);
-
         if(spec.InlineStatCounter) {
             box.Label.text = DmInlineStatText(spec, spec.IsTotal ? totalCount : 0);
             box.DmStatPrefix = ((spec.DisplayText ?? "") + "  ").ToCharArray();
@@ -48,7 +41,6 @@ public static partial class KeyViewerOverlay {
             LayoutDmText(box.Label.rectTransform, spec, false);
             box.Label.alignment = DmCounterAlignment(spec, false);
         }
-
         if(spec.CounterEnabled && !spec.InlineStatCounter) {
             Transform counterParent = spec.CounterOutside ? root : fill.transform;
             box.Value = NewText(counterParent, "Counter", "0", spec.CounterFontSize);
@@ -63,12 +55,10 @@ public static partial class KeyViewerOverlay {
                 box.Value.alignment = DmCounterAlignment(spec, true);
             }
         }
-
         boxes.Add(box);
         BuildCssFx(box, spec);
         ApplyBoxColors(box);
     }
-
     private static void LayoutDmText(RectTransform rt, DmNoteSpec spec, bool counter) {
         bool top = string.Equals(spec.CounterAlign, "top", StringComparison.OrdinalIgnoreCase);
         bool bottom = string.Equals(spec.CounterAlign, "bottom", StringComparison.OrdinalIgnoreCase);
@@ -76,14 +66,12 @@ public static partial class KeyViewerOverlay {
         bool right = string.Equals(spec.CounterAlign, "right", StringComparison.OrdinalIgnoreCase);
         bool between = string.Equals(spec.CounterAlignMode, "between", StringComparison.OrdinalIgnoreCase);
         float gap = Mathf.Clamp(spec.CounterGap, -64f, 64f);
-
         if(!spec.CounterEnabled || spec.CounterOutside || spec.InlineStatCounter || string.IsNullOrWhiteSpace(spec.DisplayText)) {
             rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
             rt.anchoredPosition = Vector2.zero;
             rt.sizeDelta = new Vector2(spec.W - 4f, spec.H - 4f);
             return;
         }
-
         if(top || bottom) {
             float itemGap = between ? 0f : Mathf.Max(0f, gap);
             float avail = Mathf.Max(1f, spec.H - 4f);
@@ -94,7 +82,6 @@ public static partial class KeyViewerOverlay {
                 labelH *= k;
                 counterH *= k;
             }
-
             rt.anchorMin = rt.anchorMax = rt.pivot = Vector2.zero;
             float groupH = Mathf.Min(avail, labelH + counterH + itemGap);
             float y0 = Mathf.Max(2f, (spec.H - groupH) * 0.5f);
@@ -108,7 +95,6 @@ public static partial class KeyViewerOverlay {
             rt.sizeDelta = new Vector2(spec.W - 4f, counter ? counterH : labelH);
             return;
         }
-
         if(left || right) {
             float itemGap = between ? 0f : Mathf.Max(0f, gap);
             float availW = Mathf.Max(1f, spec.W - 4f);
@@ -119,7 +105,6 @@ public static partial class KeyViewerOverlay {
                 labelW *= k;
                 counterW *= k;
             }
-
             rt.anchorMin = rt.anchorMax = rt.pivot = Vector2.zero;
             float groupW = Mathf.Min(availW, labelW + counterW + itemGap);
             float x0 = Mathf.Max(2f, (spec.W - groupW) * 0.5f);
@@ -133,18 +118,15 @@ public static partial class KeyViewerOverlay {
             rt.sizeDelta = new Vector2(counter ? counterW : labelW, spec.H - 4f);
             return;
         }
-
         rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
         rt.anchoredPosition = Vector2.zero;
         rt.sizeDelta = new Vector2(spec.W - 4f, spec.H - 4f);
     }
-
     private static void LayoutDmOutsideCounter(RectTransform rt, DmNoteSpec spec) {
         string align = spec.CounterAlign;
         float gap = Mathf.Max(0f, spec.CounterGap);
         float w = Mathf.Max(spec.W, spec.CounterFontSize * 4f);
         float h = Mathf.Max(12f, spec.CounterFontSize + 8f);
-
         rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0f, 1f);
         if(string.Equals(align, "bottom", StringComparison.OrdinalIgnoreCase)) {
             rt.anchoredPosition = new Vector2(spec.X + spec.W * 0.5f - w * 0.5f, -(spec.Y + spec.H + gap));
@@ -161,11 +143,9 @@ public static partial class KeyViewerOverlay {
             rt.sizeDelta = new Vector2(w, h);
             return;
         }
-
         rt.anchoredPosition = new Vector2(spec.X + spec.W * 0.5f - w * 0.5f, -(spec.Y - gap - h));
         rt.sizeDelta = new Vector2(w, h);
     }
-
     private static TextAlignmentOptions DmCounterAlignment(DmNoteSpec spec, bool counter) {
         string align = spec.CounterAlign;
         bool between = string.Equals(spec.CounterAlignMode, "between", StringComparison.OrdinalIgnoreCase);
@@ -183,7 +163,6 @@ public static partial class KeyViewerOverlay {
         if(string.Equals(align, "right", StringComparison.OrdinalIgnoreCase)) return counter ? TextAlignmentOptions.MidlineRight : TextAlignmentOptions.MidlineLeft;
         return TextAlignmentOptions.Center;
     }
-
     private static string DmInlineStatText(DmNoteSpec spec, int value)
         => (spec.DisplayText ?? "") + "  " + value.ToString(CultureInfo.InvariantCulture);
 }

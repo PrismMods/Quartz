@@ -1,8 +1,6 @@
 ﻿using GTweens.Delegates;
 using GTweens.Interpolators;
-
 namespace GTweens.Tweeners;
-
 public sealed class IntTweener : Tweener<int> {
     internal IntTweener(
         Getter currValueGetter,

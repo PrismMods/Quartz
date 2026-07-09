@@ -4,18 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 using Object = UnityEngine.Object;
-
 namespace Quartz.Features.Nostalgia;
-
-// The "active manipulator" tweaks — methods that directly show/hide or move
-// live scene objects. Ported from BackToThePast's HideDifficultyTweak,
-// HideNoFailTweak, HideAnnounceSignTweak, OldBackgroundTweak and
-// LegacyEditorButtonsTweak. Reflection done with HarmonyLib (Traverse/
-// AccessTools) instead of BTTP's hand-rolled Reflections helper.
 public static partial class Nostalgia {
-
-    // Toggle a scrUIController UI field's GameObject. The field is a Component
-    // (Image/Text/Button/Transform). Returns true if the field exists.
     private static bool SetUiActive(object instance, string field, bool active) {
         try {
             if(Traverse.Create(instance).Field(field).GetValue() is Component comp
@@ -26,36 +16,26 @@ public static partial class Nostalgia {
             return false;
         }
     }
-
     private static void SetGoActive(Component comp, bool active) {
         try {
             if(comp != null && comp.gameObject.activeSelf != active)
                 comp.gameObject.SetActive(active);
         } catch { }
     }
-
-    // The difficulty UI was refactored across game versions; toggle every
-    // difficulty-related scrUIController field plus the editor selector, so the
-    // stars hide regardless of which container the build actually parents them
-    // under.
     private static readonly string[] DifficultyFields = {
         "difficultyContainer", "difficultyFadeContainer", "difficultyImage",
         "difficultyText", "difficultyButtonLeft", "difficultyButtonRight",
     };
-
-    // === Hide Difficulty (difficulty stars / selector) ===
     public static void ToggleDifficulty(bool show) {
         try {
             scrUIController ui = scrUIController.instance;
             scnEditor editor = scnEditor.instance;
-
             if(show) {
                 if(editor != null) SetGoActive(editor.editorDifficultySelector, true);
                 if(ui != null)
                     foreach(string f in DifficultyFields) SetUiActive(ui, f, true);
                 return;
             }
-
             try { GCS.difficulty = Difficulty.Strict; } catch { }
             if(editor != null) {
                 try { Traverse.Create(editor.editorDifficultySelector).Method("UpdateDifficultyDisplay").GetValue(); } catch { }
@@ -76,19 +56,15 @@ public static partial class Nostalgia {
             MainCore.Log.Wrn($"[Nostalgia] ToggleDifficulty failed: {e.Message}");
         }
     }
-
-    // === Hide No-Fail (editor button + level-select indicator) ===
     public static void ToggleNoFail(bool show) {
         try {
             scnEditor editor = scnEditor.instance;
             scrUIController ui = scrUIController.instance;
-
             if(show) {
                 if(editor != null) SetGoActive(editor.buttonNoFail, true);
                 if(ui != null) SetUiActive(ui, "noFailImage", true);
                 return;
             }
-
             try { GCS.useNoFail = false; } catch { }
             if(scrController.instance != null) {
                 try { scrController.instance.noFail = false; } catch { }
@@ -105,23 +81,16 @@ public static partial class Nostalgia {
             MainCore.Log.Wrn($"[Nostalgia] ToggleNoFail failed: {e.Message}");
         }
     }
-
-    // When Hide No-Fail removes the no-fail button but the difficulty selector
-    // is still shown, slide the difficulty over to the no-fail's slot so it
-    // doesn't sit with an empty gap to its right. Restores the original spot
-    // when no-fail is visible again.
     private static Vector2? diffOrigPos;
     private static Component repositionSelectorSource;
     private static Component repositionNofailSource;
     private static RectTransform repositionDiffRect;
     private static RectTransform repositionNofailRect;
-
     public static void RepositionDifficulty() {
         if(!ShouldHideNoFail && !ShouldHideDifficulty) return;
         try {
             scnEditor editor = scnEditor.instance;
             if(editor == null || editor.editorDifficultySelector == null || editor.buttonNoFail == null) return;
-
             if(repositionSelectorSource != editor.editorDifficultySelector || repositionNofailSource != editor.buttonNoFail) {
                 repositionSelectorSource = editor.editorDifficultySelector;
                 repositionNofailSource = editor.buttonNoFail;
@@ -133,7 +102,6 @@ public static partial class Nostalgia {
             RectTransform nofail = repositionNofailRect;
             if(diff == null || nofail == null) return;
             diffOrigPos ??= diff.anchoredPosition;
-
             bool move = ShouldHideNoFail && !ShouldHideDifficulty;
             Vector2 target = move
                 ? new Vector2(nofail.anchoredPosition.x, diffOrigPos.Value.y)
@@ -141,8 +109,6 @@ public static partial class Nostalgia {
             if(diff.anchoredPosition != target) diff.anchoredPosition = target;
         } catch { }
     }
-
-    // === Hide Announce Sign (lobby news sign) ===
     public static void ToggleSign(bool show) {
         NewsSign[] newsSigns = Object.FindObjectsByType<NewsSign>(FindObjectsSortMode.None);
         foreach(NewsSign newsSign in newsSigns) {
@@ -155,8 +121,6 @@ public static partial class Nostalgia {
                 foreach(SpriteRenderer renderer in renderers) renderer.enabled = show;
         }
     }
-
-    // === Old Background (lobby BG variant A/B/current) ===
     public static void SetBackground(bool forceDefault = false) {
         if(ADOBase.levelSelect == null) return;
         GameObject bg = UnityEngine.SceneManagement.SceneManager
@@ -169,15 +133,12 @@ public static partial class Nostalgia {
             bg.transform.GetChild(i).gameObject.SetActive(active);
         }
     }
-
-    // === Legacy Editor Buttons (positions + design) ===
     private static bool ebInitialized;
     private static Vector2 ebAutoPos, ebNofailPos, ebDiffPos;
     private static Vector2 ebAutoMax, ebNofailMax, ebDiffMax;
     private static Vector2 ebAutoMin, ebNofailMin, ebDiffMin;
     private static Vector2 ebNofailPivot;
     private static Rect ebNofailRect;
-
     public static void ChangeEditorButtons(bool change) {
         scnEditor editor = scnEditor.instance;
         if(editor == null) return;
@@ -200,42 +161,34 @@ public static partial class Nostalgia {
                 ebInitialized = true;
             }
             nofail.pivot = new Vector2(0.5f, 0.5f);
-
             auto.anchoredPosition = new Vector2(-15, 15);
             nofail.anchoredPosition = new Vector2(-52, 125);
             difficulty.anchoredPosition = new Vector2(-15, 10);
-
             auto.offsetMax = new Vector2(-15, 95);
             nofail.offsetMax = new Vector2(-22.5f, 155);
             difficulty.offsetMax = new Vector2(-15, 118);
-
             auto.offsetMin = new Vector2(-95, 15);
             nofail.offsetMin = new Vector2(-81.5f, 95);
             difficulty.offsetMin = new Vector2(-200, 10);
         } else {
             if(!ebInitialized) return;
             nofail.pivot = ebNofailPivot;
-
             auto.anchoredPosition = ebAutoPos;
             nofail.anchoredPosition = ebNofailPos;
             difficulty.anchoredPosition = ebDiffPos;
-
             auto.offsetMax = ebAutoMax;
             nofail.offsetMax = ebNofailMax;
             difficulty.offsetMax = ebDiffMax;
-
             auto.offsetMin = ebAutoMin;
             nofail.offsetMin = ebNofailMin;
             difficulty.offsetMin = ebDiffMin;
         }
     }
-
     public static void RemoveShadowAddOutline(bool rsao) {
         scnEditor editor = scnEditor.instance;
         if(editor == null) return;
         GameObject auto = editor.autoImage.gameObject;
         GameObject nofail = editor.buttonNoFail.gameObject;
-        // Already converted to an Outline — nothing to do.
         if(auto.GetComponent<Shadow>() is Outline) return;
         if(rsao) {
             auto.GetComponent<Shadow>().enabled = false;

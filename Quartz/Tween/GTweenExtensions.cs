@@ -2,17 +2,7 @@ using GTweens.Extensions;
 using GTweens.Tweens;
 using UnityEngine;
 using UnityEngine.UI;
-
 namespace Quartz.Tween;
-
-// Thin GTween helpers for uGUI types. Every setter/getter null-checks its
-// target: a tween lives in the shared GTweensContext and keeps ticking even
-// after its target GameObject is destroyed (rows rebuilt, panel torn down,
-// profile switch). Writing color/alpha/position on a destroyed Graphic throws
-// inside Unity every frame — and because the throw happens before the tween
-// completes, it never leaves the context, so it spams forever. Unity's
-// overloaded `== null` is true for destroyed objects, so these guards turn an
-// orphaned tween into a harmless no-op that still finishes and unregisters.
 public static class GTweenExtensions {
     public static GTween GTAlpha(this CanvasGroup target, float to, float duration)
         => GTweens.Extensions.GTweenExtensions.Tween(
@@ -21,7 +11,6 @@ public static class GTweenExtensions {
             to,
             duration
         );
-
     extension(Graphic target) {
         public GTween GTAlpha(float to, float duration)
             => GTweens.Extensions.GTweenExtensions.Tween(
@@ -35,7 +24,6 @@ public static class GTweenExtensions {
                 to,
                 duration
             );
-
         public GTween GTColor(Color to, float duration) {
             var from = target == null ? to : target.color;
             return GTweens.Extensions.GTweenExtensions.Tween(
@@ -46,7 +34,6 @@ public static class GTweenExtensions {
             );
         }
     }
-
     public static GTween GTFade(this CanvasGroup target, float to, float duration)
         => GTweens.Extensions.GTweenExtensions.Tween(
             () => target == null ? to : target.alpha,
@@ -54,16 +41,11 @@ public static class GTweenExtensions {
             to,
             duration
         );
-
-    // Jumps a possibly-running tween to its end state (running its callbacks)
-    // and unregisters it — the "flush the previous animation before starting
-    // a replacement" idiom. No-op on null.
     public static void CompleteAndKill(this GTween tween) {
         if(tween == null) return;
         tween.Complete();
         tween.Kill();
     }
-
     extension(RectTransform target) {
         public GTween GTAnchorPos(Vector2 to, float duration) {
             var from = target == null ? to : target.anchoredPosition;
@@ -74,7 +56,6 @@ public static class GTweenExtensions {
                 duration
             );
         }
-
         public GTween GTAnchorPosX(float to, float duration)
             => GTweens.Extensions.GTweenExtensions.Tween(
                 () => target == null ? to : target.anchoredPosition.x,
@@ -87,7 +68,6 @@ public static class GTweenExtensions {
                 to,
                 duration
             );
-
         public GTween GTAnchorPosY(float to, float duration)
             => GTweens.Extensions.GTweenExtensions.Tween(
                 () => target == null ? to : target.anchoredPosition.y,
@@ -100,7 +80,6 @@ public static class GTweenExtensions {
                 to,
                 duration
             );
-
         public GTween GTSizeDelta(Vector2 to, float duration) {
             var from = target == null ? to : target.sizeDelta;
             return GTweens.Extensions.GTweenExtensions.Tween(
@@ -110,7 +89,6 @@ public static class GTweenExtensions {
                 duration
             );
         }
-
         public GTween GTOffsetMin(Vector2 to, float duration) {
             var from = target == null ? to : target.offsetMin;
             return GTweens.Extensions.GTweenExtensions.Tween(
@@ -120,7 +98,6 @@ public static class GTweenExtensions {
                 duration
             );
         }
-
         public GTween GTOffsetMax(Vector2 to, float duration) {
             var from = target == null ? to : target.offsetMax;
             return GTweens.Extensions.GTweenExtensions.Tween(
@@ -130,7 +107,6 @@ public static class GTweenExtensions {
                 duration
             );
         }
-
         public GTween GTRotate(Vector3 to, float duration) {
             Vector3 from = target == null ? to : target.localEulerAngles;
             Vector3 delta = new(
@@ -138,7 +114,6 @@ public static class GTweenExtensions {
                 Mathf.DeltaAngle(from.y, to.y),
                 Mathf.DeltaAngle(from.z, to.z)
             );
-
             return GTweens.Extensions.GTweenExtensions.Tween(
                 () => 0f,
                 x => { if(target != null) target.localEulerAngles = from + (delta * x); },

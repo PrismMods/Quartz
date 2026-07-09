@@ -12,35 +12,19 @@ using Quartz.UI.Utility;
 using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.EventSystems.PointerEventData;
-
 using TMPro;
-
 namespace Quartz.UI.Factory.Page;
-
 internal static partial class PageGameplay {
-    // Static so a page rebuild replaces (not stacks) the allowed-keys
-    // listener from the previous build.
     private static Action keysChangedHandler;
     private static Action syncLockChangedHandler;
-
-    // Each section is now its own standalone page under the Gameplay category's
-    // column-2 (see MenuFactory.CategoryChildren). The private CreateX helpers
-    // are unchanged — these thin wrappers just give each its own scroll page.
     public static void KeyLimiterPage(RectTransform parent) =>
         CreateKeyLimiter(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
-
     public static void ChatterBlockerPage(RectTransform parent) =>
         CreateChatterBlocker(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
-
     public static void JudgementRestrictionPage(RectTransform parent) =>
         CreateJudgementRestriction(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
-
     public static void DeathLimitPage(RectTransform parent) =>
         CreateDeathLimit(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
-
     public static void AutoDeafenPage(RectTransform parent) =>
         CreateAutoDeafen(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
-
-    // ===== Auto Deafen (Discord) =====
-
 }

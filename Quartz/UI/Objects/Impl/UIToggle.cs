@@ -5,15 +5,11 @@ using UnityEngine.UI;
 using GTweens.Tweens;
 using GTweens.Extensions;
 using Quartz.Tween;
-
 using GTweens.Builders;
 using GTweens.Easings;
 using GTweenExtensions = GTweens.Extensions.GTweenExtensions;
-
 using TMPro;
-
 namespace Quartz.UI.Objects.Impl;
-
 public class UIToggle : UIObject {
     public bool DefaultValue { get; }
     public bool Value { get; private set; }
@@ -22,10 +18,8 @@ public class UIToggle : UIObject {
     public Image CircleImage { get; }
     public Image ChangedImage { get; }
     public RectTransform CircleRect { get; }
-
     private GTween circleSeq;
     private GTween changeSeq;
-
     public UIToggle(
         string id,
         RectTransform rect,
@@ -38,48 +32,35 @@ public class UIToggle : UIObject {
         Action<bool> onChanged
     ) : base(id, rect) {
         Label = label;
-
         CircleImage = circleImage;
         CircleRect = circleRect;
         ChangedImage = changedImage;
         DefaultValue = defaultValue;
         Value = value;
         OnChanged = onChanged;
-
         UpdateVisual(true);
     }
-
     public void Set(bool value, bool invoke = true) {
         Value = value;
         if(invoke) OnChanged?.Invoke(value);
         UpdateVisual();
     }
-
     public void Toggle() => Set(!Value);
-
     public void Reset() => Set(DefaultValue);
-
     public void UpdateVisual(bool noAnimate = false) {
         circleSeq?.Kill();
         changeSeq?.Kill();
-
         CircleImage.sprite = MainCore.Spr.Get(Value ? UISprite.Circle256 : UISprite.ToggleCircle128);
-
         CircleRect.sizeDelta = new(30f, 30f);
-
         float target = DefaultValue != Value ? 1f : 0f;
-
         if(noAnimate) {
             CircleRect.sizeDelta = new(26f, 26f);
             CircleImage.color = Value ? UIColors.ObjectActive : UIColors.ObjectInactive;
-
             Color c = ChangedImage.color;
             c.a = target;
             ChangedImage.color = c;
-
             return;
         }
-
         circleSeq = GTweenSequenceBuilder.New()
             .Join(
                 GTweenExtensions.Tween(
@@ -94,7 +75,6 @@ public class UIToggle : UIObject {
                     .SetEasing(Easing.OutQuad)
             ).Build();
         MainCore.TC.Play(circleSeq);
-
         changeSeq = ChangedImage.GTAlpha(target, 0.2f).SetEasing(Easing.OutSine);
         MainCore.TC.Play(changeSeq);
     }

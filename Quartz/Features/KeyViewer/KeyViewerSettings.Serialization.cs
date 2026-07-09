@@ -2,16 +2,11 @@ using Newtonsoft.Json.Linq;
 using Quartz.IO;
 using Quartz.IO.Interface;
 using UnityEngine;
-
 namespace Quartz.Features.KeyViewer;
-
-// Serialize/Deserialize + NormalizeMode helper. Extracted from KeyViewerSettings.cs.
 public sealed partial class KeyViewerSettings : ISettingsFile {
-
     public JToken Serialize() {
         JObject counts = [];
         foreach((string key, int value) in Counts) counts[key] = value;
-
         return new JObject {
             [nameof(Enabled)] = Enabled,
             [nameof(ShowOutsideGame)] = ShowOutsideGame,
@@ -111,7 +106,6 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
             [nameof(Counts)] = counts,
         };
     }
-
     public void Deserialize(JToken token) {
         Enabled = IOUtils.Read(token, nameof(Enabled), Enabled);
         ShowOutsideGame = IOUtils.Read(token, nameof(ShowOutsideGame), ShowOutsideGame);
@@ -121,7 +115,6 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
         OffsetX = IOUtils.Read(token, nameof(OffsetX), OffsetX);
         OffsetY = IOUtils.Read(token, nameof(OffsetY), OffsetY);
         SyncToKeyLimiter = IOUtils.Read(token, nameof(SyncToKeyLimiter), SyncToKeyLimiter);
-
         RainEnabled = IOUtils.Read(token, nameof(RainEnabled), RainEnabled);
         RainSpeed = IOUtils.Read(token, nameof(RainSpeed), RainSpeed);
         RainHeight = IOUtils.Read(token, nameof(RainHeight), RainHeight);
@@ -147,7 +140,6 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
         Rain3G = IOUtils.Read(token, nameof(Rain3G), Rain3G);
         Rain3B = IOUtils.Read(token, nameof(Rain3B), Rain3B);
         Rain3A = IOUtils.Read(token, nameof(Rain3A), Rain3A);
-
         DmPresetJson = IOUtils.Read(token, nameof(DmPresetJson), DmPresetJson) ?? "";
         DmSelectedTab = IOUtils.Read(token, nameof(DmSelectedTab), DmSelectedTab) ?? "4key";
         DmOffsetX = IOUtils.Read(token, nameof(DmOffsetX), DmOffsetX);
@@ -160,9 +152,6 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
         DmShowCounter = IOUtils.Read(token, nameof(DmShowCounter), DmShowCounter);
         bool hasSingleFade = token[nameof(DmFadePx)] != null;
         DmFadePx = Mathf.Clamp(IOUtils.Read(token, nameof(DmFadePx), DmFadePx), 0f, 2000f);
-        // Only DmFadeTopPx is read — it feeds the legacy (!hasSingleFade)
-        // migration below. The other three split fields are always derived from
-        // DmFadePx, so reading them here was dead work.
         DmFadeTopPx = Mathf.Clamp(IOUtils.Read(token, nameof(DmFadeTopPx), DmFadeTopPx), 0f, 500f);
         if(!hasSingleFade && token[nameof(DmFadeTopPx)] != null) {
             DmFadePx = DmFadeTopPx;
@@ -179,35 +168,28 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
         DmCssEnabled = IOUtils.Read(token, nameof(DmCssEnabled), DmCssEnabled);
         DmCssText = IOUtils.Read(token, nameof(DmCssText), DmCssText) ?? "";
         DmCssPath = IOUtils.Read(token, nameof(DmCssPath), DmCssPath) ?? "";
-
         Key10 = ReadKeys(token, nameof(Key10), Key10);
         Key12 = ReadKeys(token, nameof(Key12), Key12);
         Key16 = ReadKeys(token, nameof(Key16), Key16);
         Key20 = ReadKeys(token, nameof(Key20), Key20);
         Key8 = ReadKeys(token, nameof(Key8), Key8);
         Key14 = ReadKeys(token, nameof(Key14), Key14);
-
         Key10Text = ReadLabels(token, nameof(Key10Text), Key10Text);
         Key12Text = ReadLabels(token, nameof(Key12Text), Key12Text);
         Key16Text = ReadLabels(token, nameof(Key16Text), Key16Text);
         Key20Text = ReadLabels(token, nameof(Key20Text), Key20Text);
         Key8Text = ReadLabels(token, nameof(Key8Text), Key8Text);
         Key14Text = ReadLabels(token, nameof(Key14Text), Key14Text);
-
         IOUtils.ReadRgba(token, "Bg", ref BgR, ref BgG, ref BgB, ref BgA);
         IOUtils.ReadRgba(token, "BgPressed", ref BgPressedR, ref BgPressedG, ref BgPressedB, ref BgPressedA);
         IOUtils.ReadRgba(token, "Outline", ref OutlineR, ref OutlineG, ref OutlineB, ref OutlineA);
         IOUtils.ReadRgba(token, "OutlinePressed", ref OutlinePressedR, ref OutlinePressedG, ref OutlinePressedB, ref OutlinePressedA);
         IOUtils.ReadRgba(token, "Text", ref TextR, ref TextG, ref TextB, ref TextA);
         IOUtils.ReadRgba(token, "TextPressed", ref TextPressedR, ref TextPressedG, ref TextPressedB, ref TextPressedA);
-
         KeyFontScale = IOUtils.Read(token, nameof(KeyFontScale), KeyFontScale);
         CounterFontScale = IOUtils.Read(token, nameof(CounterFontScale), CounterFontScale);
         PerKeyKeyFont = ReadFloats(token, nameof(PerKeyKeyFont), PerKeyKeyFont);
         PerKeyCounterFont = ReadFloats(token, nameof(PerKeyCounterFont), PerKeyCounterFont);
-        // Per-slot opt-in arrays. A pre-per-slot save has a single global
-        // PerKeyFontSizes/PerKeyColors (+*Initialized) bool — fan each old flag
-        // out across every slot so existing per-key users keep their look.
         PerKeyFontEnabled = ReadBools(token, nameof(PerKeyFontEnabled),
             Filled(SlotCount, IOUtils.Read(token, "PerKeyFontSizes", false)));
         PerKeyFontInit = ReadBools(token, nameof(PerKeyFontInit),
@@ -223,7 +205,6 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
         PerKeyText = ReadColors(token, nameof(PerKeyText), PerKeyText);
         PerKeyTextPressed = ReadColors(token, nameof(PerKeyTextPressed), PerKeyTextPressed);
         PerKeyRain = ReadColors(token, nameof(PerKeyRain), PerKeyRain);
-
         IOUtils.ReadRgba(token, "GhostRain", ref GhostRainR, ref GhostRainG, ref GhostRainB, ref GhostRainA);
         GhostRainDotted = IOUtils.Read(token, nameof(GhostRainDotted), GhostRainDotted);
         GhostRainDotLength = IOUtils.Read(token, nameof(GhostRainDotLength), GhostRainDotLength);
@@ -234,13 +215,11 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
         GhostKey14 = ReadKeys(token, nameof(GhostKey14), GhostKey14);
         GhostKey16 = ReadKeys(token, nameof(GhostKey16), GhostKey16);
         GhostKey20 = ReadKeys(token, nameof(GhostKey20), GhostKey20);
-
         FootStyle = Mathf.Clamp(IOUtils.Read(token, nameof(FootStyle), FootStyle), 0, 8);
         FootOffsetX = IOUtils.Read(token, nameof(FootOffsetX), FootOffsetX);
         FootOffsetY = IOUtils.Read(token, nameof(FootOffsetY), FootOffsetY);
         FootKeys = ReadKeys(token, nameof(FootKeys), FootKeys);
         FootKeysText = ReadLabels(token, nameof(FootKeysText), FootKeysText);
-
         Counts.Clear();
         if(token[nameof(Counts)] is JObject counts) {
             foreach(var prop in counts.Properties()) {
@@ -251,19 +230,15 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
             }
         }
     }
-
     public static string NormalizeMode(string mode) =>
         string.Equals(mode, ModeDmNote, StringComparison.OrdinalIgnoreCase)
             ? ModeDmNote
             : ModeSimple;
-
     private static JArray WriteLabels(string[] labels) {
         JArray arr = [];
         foreach(string label in labels) arr.Add(label ?? "");
         return arr;
     }
-
-    // Color arrays serialize as a flat [r,g,b,a, r,g,b,a, ...] run.
     private static JArray WriteColors(Color[] colors) {
         JArray arr = [];
         foreach(Color c in colors) {
@@ -274,10 +249,8 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
         }
         return arr;
     }
-
     private static Color[] ReadColors(JToken token, string name, Color[] fallback) {
         if(token[name] is not JArray arr || arr.Count != fallback.Length * 4) return fallback;
-
         try {
             Color[] result = new Color[fallback.Length];
             for(int i = 0; i < result.Length; i++) {
@@ -291,27 +264,20 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
             return fallback;
         }
     }
-
     private static float[] ReadFloats(JToken token, string name, float[] fallback) =>
         ReadArray(token, name, fallback, t => t.Value<float>());
-
     private static bool[] ReadBools(JToken token, string name, bool[] fallback) =>
         ReadArray(token, name, fallback, t => t.Value<bool>());
-
     private static string[] ReadLabels(JToken token, string name, string[] fallback) {
         if(token[name] is not JArray arr || arr.Count != fallback.Length) return fallback;
-
         string[] result = new string[arr.Count];
         for(int i = 0; i < arr.Count; i++) result[i] = arr[i].Type == JTokenType.String ? arr[i].ToString() : "";
         return result;
     }
-
     private static int[] ReadKeys(JToken token, string name, int[] fallback) =>
         ReadArray(token, name, fallback, t => t.Value<int>());
-
     private static T[] ReadArray<T>(JToken token, string name, T[] fallback, Func<JToken, T> read) {
         if(token[name] is not JArray arr || arr.Count != fallback.Length) return fallback;
-
         try {
             T[] result = new T[arr.Count];
             for(int i = 0; i < arr.Count; i++) result[i] = read(arr[i]);

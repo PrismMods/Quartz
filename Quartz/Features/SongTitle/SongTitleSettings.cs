@@ -2,39 +2,22 @@ using Newtonsoft.Json.Linq;
 using Quartz.IO;
 using Quartz.IO.Interface;
 using UnityEngine;
-
 namespace Quartz.Features.SongTitle;
-
-// Persisted config for the in-game Song Title overlay (UserData/Quartz/SongTitle.json).
-// When enabled it hides the game's own level-title HUD and draws a customizable
-// replacement built from the {artist} and {title} tags in Format.
 public sealed class SongTitleSettings : ISettingsFile {
     public bool Enabled = true;
-
-    // Layout template. {artist} and {title} are replaced with the level's author
-    // and song. Default reproduces the game's "artist - title".
     public string Format = "{artist} - {title}";
-
     public float FontSize = 40f;
     public float MasterSize = 1f;
-
-    // Top-center anchored; OffsetY is measured down from the top edge (negative
-    // = lower). Defaults sit roughly where the game's own title is.
     public float OffsetX = 0f;
     public float OffsetY = -55f;
-
     public float ColorR = 1f, ColorG = 1f, ColorB = 1f, ColorA = 1f;
-
     public bool ShadowEnabled = true;
     public float ShadowX = 2f, ShadowY = -2f, ShadowSoftness = 0f;
     public float ShadowR = 0f, ShadowG = 0f, ShadowB = 0f, ShadowA = 0.3959352f;
-
     public Color GetColor() => IOUtils.Rgba(ColorR, ColorG, ColorB, ColorA);
     public void SetColor(Color c) => IOUtils.SetRgba(c, ref ColorR, ref ColorG, ref ColorB, ref ColorA);
-
     public Color GetShadowColor() => IOUtils.Rgba(ShadowR, ShadowG, ShadowB, ShadowA);
     public void SetShadowColor(Color c) => IOUtils.SetRgba(c, ref ShadowR, ref ShadowG, ref ShadowB, ref ShadowA);
-
     public JToken Serialize() => new JObject {
         [nameof(Enabled)] = Enabled,
         [nameof(Format)] = Format,
@@ -55,7 +38,6 @@ public sealed class SongTitleSettings : ISettingsFile {
         [nameof(ShadowB)] = ShadowB,
         [nameof(ShadowA)] = ShadowA,
     };
-
     public void Deserialize(JToken token) {
         Enabled = IOUtils.Read(token, nameof(Enabled), Enabled);
         Format = IOUtils.Read(token, nameof(Format), Format);

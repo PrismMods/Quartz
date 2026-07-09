@@ -5,26 +5,14 @@ using Quartz.UI.Objects.Impl;
 using Quartz.UI.Utility;
 using UnityEngine;
 using UnityEngine.UI;
-
 namespace Quartz.UI.Factory.Page;
-
-// Tweaks tab. Hosts v1's non-visual tweaks — Disable Auto Pause and Block
-// Scroll While Playing. The visual tweaks from the same v1 section live in
-// the Visuals tab's "Visual Tweaks" category. Each section below is its own
-// standalone page under the Tweaks category's column-2 (see
-// MenuFactory.CategoryChildren).
 internal static class PageTweaks {
-    // General — the two loose top-level toggles that weren't under any
-    // collapsible. Gets its own page H1 (like PageOverlayGeneral), since there's
-    // no collapsible header to name it.
     public static void GeneralPage(RectTransform parent) {
         Tweaks.EnsureConf();
         TweaksSettings conf = Tweaks.Conf;
         TweaksSettings def = new();
         RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
-
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(content.transform)), "TWEAKS_GENERAL", "General");
-
         GenerateUI.ToggleTip(
             content.transform,
             def.DisableAutoPause,
@@ -34,7 +22,6 @@ internal static class PageTweaks {
             "tw_nopause",
             "While auto-play is on, the game pauses itself (e.g. when the window loses focus). This blocks those automatic pauses — pausing manually still works."
         );
-
         GenerateUI.ToggleTip(
             content.transform,
             def.BlockMouseWheelScrollWhilePlaying,
@@ -45,20 +32,12 @@ internal static class PageTweaks {
             "Ignores mouse wheel input while a level is being played, so accidental scrolling can't affect the game mid-run."
         );
     }
-
-    // === Optimizer: engine/runtime performance toggles ===
-    // These tune how the engine runs (GC, process priority, background
-    // execution); none change how a level looks. Distinct from the Effect
-    // Remover, which strips visual events out of the chart itself.
     public static void OptimizerPage(RectTransform parent) {
         RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
-
         Optimizer.EnsureConf();
         OptimizerSettings opt = Optimizer.Conf;
         OptimizerSettings optDef = new();
-
         var optimizerSec = GenerateUI.FlatSection(content.transform, "Optimizer");
-
         GenerateUI.ToggleTip(
             optimizerSec.Body,
             optDef.SmoothGC,
@@ -68,7 +47,6 @@ internal static class PageTweaks {
             "opt_smoothgc",
             "Holds off garbage collection while a level is playing and runs it when the run ends, so a GC pause can't land mid-run and nudge your timing. The heap grows during the run (a safety collect kicks in on very long levels). Best paired with Clean Heap On Load."
         );
-
         GenerateUI.ToggleTip(
             optimizerSec.Body,
             optDef.CollectOnLevelLoad,
@@ -78,7 +56,6 @@ internal static class PageTweaks {
             "opt_collectonload",
             "Runs a garbage collection every time a scene loads, so each run starts from a clean heap. The load screen already hitches, so the collection is free here."
         );
-
         GenerateUI.ToggleTip(
             optimizerSec.Body,
             optDef.BoostProcessPriority,
@@ -88,7 +65,6 @@ internal static class PageTweaks {
             "opt_priority",
             "Asks the OS to give the game more consistent CPU time (Above Normal priority). Takes effect on Windows; ignored where the system doesn't allow it (usually macOS/Linux)."
         );
-
         GenerateUI.ToggleTip(
             optimizerSec.Body,
             optDef.RunInBackground,
@@ -98,7 +74,6 @@ internal static class PageTweaks {
             "opt_runinbg",
             "Keeps the game running at full speed when its window loses focus, so a run or practice session doesn't stall when you alt-tab."
         );
-
         GenerateUI.ToggleTip(
             optimizerSec.Body,
             optDef.LossyTextureCompression,
@@ -108,7 +83,6 @@ internal static class PageTweaks {
             "opt_lossytexture",
             "Compresses custom textures loaded from disk (DXT) to cut their memory use ~4-8x, with a small visual quality cost. Applies to textures loaded after it's turned on."
         );
-
         GenerateUI.ToggleTip(
             optimizerSec.Body,
             optDef.FastBloom,
@@ -118,7 +92,6 @@ internal static class PageTweaks {
             "opt_fastbloom",
             "Forces ADOFAI's bloom post-process to use its cheaper low-quality render path while bloom is active. This targets real GPU work and can improve FPS on bloom-heavy levels, with softer/less precise bloom."
         );
-
         GenerateUI.ToggleTip(
             optimizerSec.Body,
             optDef.SkipNoOpScreenFilters,
@@ -129,15 +102,12 @@ internal static class PageTweaks {
             "Skips ADOFAI full-screen screen-tile/screen-scroll shader passes when their current values are visually identity, replacing the shader pass with a plain copy. This removes real render work without wrapping an existing game setting."
         );
     }
-
     public static void MainMenuPage(RectTransform parent) {
         Tweaks.EnsureConf();
         TweaksSettings conf = Tweaks.Conf;
         TweaksSettings def = new();
         RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
-
         var mainMenuSec = GenerateUI.FlatSection(content.transform, "Main Menu");
-
         GenerateUI.ToggleTip(
             mainMenuSec.Body,
             def.DisableMenuMusic,
@@ -147,7 +117,6 @@ internal static class PageTweaks {
             "tw_menumusic",
             "Mutes the theme song on the title and island-select screens. Takes effect immediately; gameplay music is untouched."
         );
-
         GenerateUI.ToggleTip(
             mainMenuSec.Body,
             def.MenuBpmEnabled,
@@ -157,7 +126,6 @@ internal static class PageTweaks {
             "tw_menubpm",
             "Sets the menu rabbit's two speeds to the BPMs below instead of the default 1x / 2x. Re-open the menu to apply."
         );
-
         UISlider slowBpm = GenerateUI.Slider(
             GenerateUI.Row(mainMenuSec.Body),
             def.MenuSlowBpm, 30f, 600f, conf.MenuSlowBpm,
@@ -166,7 +134,6 @@ internal static class PageTweaks {
             "Slow BPM", "tw_menuslowbpm"
         );
         slowBpm.Format = "0";
-
         UISlider highBpm = GenerateUI.Slider(
             GenerateUI.Row(mainMenuSec.Body),
             def.MenuHighBpm, 30f, 600f, conf.MenuHighBpm,
@@ -176,15 +143,12 @@ internal static class PageTweaks {
         );
         highBpm.Format = "0";
     }
-
     public static void ResultsPage(RectTransform parent) {
         Tweaks.EnsureConf();
         TweaksSettings conf = Tweaks.Conf;
         TweaksSettings def = new();
         RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
-
         var resultsSec = GenerateUI.FlatSection(content.transform, "Detailed Results");
-
         GenerateUI.ToggleTip(
             resultsSec.Body,
             def.HideResultXAccuracy,
@@ -194,7 +158,6 @@ internal static class PageTweaks {
             "tw_result_xacc",
             "Removes the X-Accuracy row from the detailed results screen."
         );
-
         GenerateUI.ToggleTip(
             resultsSec.Body,
             def.HideResultAccuracy,
@@ -204,7 +167,6 @@ internal static class PageTweaks {
             "tw_result_acc",
             "Removes the Accuracy row from the detailed results screen."
         );
-
         GenerateUI.ToggleTip(
             resultsSec.Body,
             def.HideResultCheckpoints,
@@ -214,7 +176,6 @@ internal static class PageTweaks {
             "tw_result_checkpoints",
             "Removes the Checkpoints Used row from the detailed results screen."
         );
-
         GenerateUI.ToggleTip(
             resultsSec.Body,
             def.HideResultMaximumUsedKeys,

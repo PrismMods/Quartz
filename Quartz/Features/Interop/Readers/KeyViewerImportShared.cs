@@ -3,42 +3,27 @@ using Quartz.Features.KeyViewer;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using static Quartz.Features.Interop.ReflectionHelpers;
-
 namespace Quartz.Features.Interop.Readers;
-
-// KeyViewer import model shared by JipperKeyViewerReader, JipperResourcePackReader,
-// and KorenResourcePackV1Reader (each has its own KeyViewer-shaped settings but
-// merges into the same v2 KeyViewerSettings).
 internal sealed class ImportedKeyViewer {
     public SettingsImportKeyViewerPart Available;
-
     public bool HasStyle;
     public int Style;
     public int[] Key10, Key12, Key16, Key20;
     public string[] Key10Text, Key12Text, Key16Text, Key20Text;
-
     public Color? Bg, BgClicked, Outline, OutlineClicked, Text, TextClicked, Rain, Rain2, Rain3;
-
     public bool HasRainEnabled; public bool RainEnabled;
     public bool HasRainSpeed; public float RainSpeed;
     public bool HasRainHeight; public float RainHeight;
-
     public bool HasSize; public float Size;
     public bool HasEnabled; public bool Enabled;
     public bool HasSync; public bool SyncToKeyLimiter;
-
-    // v1 KorenResourcePack extras. v2 inherited v1's foot-key and ghost-rain
-    // model, so these map across; the other sources never set them (they
-    // stay null/false and ApplyKeyViewerImport skips them).
     public bool HasFoot; public int FootStyle; public int[] FootKeys;
     public int[] GhostKey10, GhostKey12, GhostKey16, GhostKey20;
     public Color? GhostRain;
 }
-
 internal static class KeyViewerImportShared {
     public static ImportedKeyViewer ReadKeyViewerFromObject(object src) {
         ImportedKeyViewer kv = new();
-
         if(TryParseKvStyle(GetMemberValue(src, "KeyViewerStyle"), out int style)) {
             kv.HasStyle = true;
             kv.Style = style;
@@ -50,7 +35,6 @@ internal static class KeyViewerImportShared {
         if(kv.HasStyle || AnyKeys(kv)) {
             kv.Available |= SettingsImportKeyViewerPart.KeysLayout;
         }
-
         kv.Key10Text = ReadStringArray(GetMemberValue(src, "key10Text"));
         kv.Key12Text = ReadStringArray(GetMemberValue(src, "key12Text"));
         kv.Key16Text = ReadStringArray(GetMemberValue(src, "key16Text"));
@@ -58,7 +42,6 @@ internal static class KeyViewerImportShared {
         if(AnyLabels(kv)) {
             kv.Available |= SettingsImportKeyViewerPart.Labels;
         }
-
         kv.Bg = TryGetColor(GetMemberValue(src, "Background"), out Color bg) ? bg : null;
         kv.BgClicked = TryGetColor(GetMemberValue(src, "BackgroundClicked"), out Color bgc) ? bgc : null;
         kv.Outline = TryGetColor(GetMemberValue(src, "Outline"), out Color ol) ? ol : null;
@@ -71,29 +54,23 @@ internal static class KeyViewerImportShared {
         if(AnyColors(kv)) {
             kv.Available |= SettingsImportKeyViewerPart.Colors;
         }
-
         if(TryGetBool(src, "useRain", out bool useRain)) { kv.HasRainEnabled = true; kv.RainEnabled = useRain; }
         if(TryGetFloat(src, "rainSpeed", out float rs)) { kv.HasRainSpeed = true; kv.RainSpeed = rs; }
         if(TryGetFloat(src, "rainHeight", out float rh)) { kv.HasRainHeight = true; kv.RainHeight = rh; }
         if(kv.HasRainEnabled || kv.HasRainSpeed || kv.HasRainHeight) {
             kv.Available |= SettingsImportKeyViewerPart.Rain;
         }
-
         if(TryGetFloat(src, "Size", out float size)) { kv.HasSize = true; kv.Size = Mathf.Clamp(size, 0.1f, 3f); }
         if(kv.HasSize) {
             kv.Available |= SettingsImportKeyViewerPart.PositionSize;
         }
-
         if(TryGetBool(src, "Enabled", out bool en)) { kv.HasEnabled = true; kv.Enabled = en; }
         if(TryGetBool(src, "SyncToKeyLimiter", out bool sync)) { kv.HasSync = true; kv.SyncToKeyLimiter = sync; }
-
         return kv;
     }
-
     public static ImportedKeyViewer ReadKeyViewerFromJson(JObject src) {
         if(src == null) return null;
         ImportedKeyViewer kv = new();
-
         if(TryParseKvStyle(JsonValue(src, "KeyViewerStyle"), out int style)) {
             kv.HasStyle = true;
             kv.Style = style;
@@ -105,7 +82,6 @@ internal static class KeyViewerImportShared {
         if(kv.HasStyle || AnyKeys(kv)) {
             kv.Available |= SettingsImportKeyViewerPart.KeysLayout;
         }
-
         kv.Key10Text = ReadStringArrayJson(src["key10Text"]);
         kv.Key12Text = ReadStringArrayJson(src["key12Text"]);
         kv.Key16Text = ReadStringArrayJson(src["key16Text"]);
@@ -113,7 +89,6 @@ internal static class KeyViewerImportShared {
         if(AnyLabels(kv)) {
             kv.Available |= SettingsImportKeyViewerPart.Labels;
         }
-
         kv.Bg = ReadJsonColor(src["Background"]);
         kv.BgClicked = ReadJsonColor(src["BackgroundClicked"]);
         kv.Outline = ReadJsonColor(src["Outline"]);
@@ -126,50 +101,40 @@ internal static class KeyViewerImportShared {
         if(AnyColors(kv)) {
             kv.Available |= SettingsImportKeyViewerPart.Colors;
         }
-
         if(TryConvertBool(JsonValue(src, "useRain"), out bool useRain)) { kv.HasRainEnabled = true; kv.RainEnabled = useRain; }
         if(TryConvertFloat(JsonValue(src, "rainSpeed"), out float rs)) { kv.HasRainSpeed = true; kv.RainSpeed = rs; }
         if(TryConvertFloat(JsonValue(src, "rainHeight"), out float rh)) { kv.HasRainHeight = true; kv.RainHeight = rh; }
         if(kv.HasRainEnabled || kv.HasRainSpeed || kv.HasRainHeight) {
             kv.Available |= SettingsImportKeyViewerPart.Rain;
         }
-
         if(TryConvertFloat(JsonValue(src, "Size"), out float size)) { kv.HasSize = true; kv.Size = Mathf.Clamp(size, 0.1f, 3f); }
         if(kv.HasSize) {
             kv.Available |= SettingsImportKeyViewerPart.PositionSize;
         }
-
         if(TryConvertBool(JsonValue(src, "Enabled"), out bool en)) { kv.HasEnabled = true; kv.Enabled = en; }
         if(TryConvertBool(JsonValue(src, "SyncToKeyLimiter"), out bool sync)) { kv.HasSync = true; kv.SyncToKeyLimiter = sync; }
-
         return kv;
     }
-
     public static int ApplyKeyViewerImport(
         ImportedKeyViewer kv,
         SettingsImportReplaceMode mode,
         SettingsImportKeyViewerPart parts
     ) {
         if(kv == null || mode == SettingsImportReplaceMode.KeepOld) return 0;
-
         SettingsImportKeyViewerPart effective = mode == SettingsImportReplaceMode.ReplaceCertain
             ? parts & kv.Available
             : kv.Available;
         if(effective == SettingsImportKeyViewerPart.None) return 0;
-
         KeyViewerOverlay.EnsureConf();
         KeyViewerSettings target = KeyViewerOverlay.Conf;
         target.Mode = KeyViewerSettings.ModeSimple;
         int count = 0;
-
         if((effective & SettingsImportKeyViewerPart.KeysLayout) != 0) {
             if(kv.HasStyle) { target.Style = Mathf.Clamp(kv.Style, 0, 3); }
             if(kv.Key10 is { Length: 10 }) { target.Key10 = kv.Key10; }
             if(kv.Key12 is { Length: 12 }) { target.Key12 = kv.Key12; }
             if(kv.Key16 is { Length: 16 }) { target.Key16 = kv.Key16; }
             if(kv.Key20 is { Length: 20 }) { target.Key20 = kv.Key20; }
-
-            // Foot keys + ghost keys ride along with the layout (v1 only).
             if(kv.HasFoot) {
                 target.FootStyle = Mathf.Clamp(kv.FootStyle, 0, 8);
                 if(kv.FootKeys is { Length: > 0 }) {
@@ -183,7 +148,6 @@ internal static class KeyViewerImportShared {
             if(kv.GhostKey20 is { Length: 20 }) { target.GhostKey20 = kv.GhostKey20; }
             count++;
         }
-
         if((effective & SettingsImportKeyViewerPart.Labels) != 0) {
             if(kv.Key10Text is { Length: 10 }) { target.Key10Text = kv.Key10Text; }
             if(kv.Key12Text is { Length: 12 }) { target.Key12Text = kv.Key12Text; }
@@ -191,7 +155,6 @@ internal static class KeyViewerImportShared {
             if(kv.Key20Text is { Length: 20 }) { target.Key20Text = kv.Key20Text; }
             count++;
         }
-
         if((effective & SettingsImportKeyViewerPart.Colors) != 0) {
             if(kv.Bg is { } bg) { target.SetBg(bg); }
             if(kv.BgClicked is { } bgc) { target.SetBgPressed(bgc); }
@@ -205,40 +168,29 @@ internal static class KeyViewerImportShared {
             if(kv.GhostRain is { } gr) { target.SetGhostRain(gr); }
             count++;
         }
-
         if((effective & SettingsImportKeyViewerPart.Rain) != 0) {
             if(kv.HasRainEnabled) { target.RainEnabled = kv.RainEnabled; }
             if(kv.HasRainSpeed) { target.RainSpeed = kv.RainSpeed; }
             if(kv.HasRainHeight) { target.RainHeight = kv.RainHeight; }
             count++;
         }
-
         if((effective & SettingsImportKeyViewerPart.PositionSize) != 0) {
             if(kv.HasSize) { target.Size = kv.Size; }
             count++;
         }
-
-        // Display fields ride along only on a full replace (no part toggle).
         if(mode == SettingsImportReplaceMode.ReplaceAll) {
             if(kv.HasEnabled) { target.Enabled = kv.Enabled; }
             if(kv.HasSync) { target.SyncToKeyLimiter = kv.SyncToKeyLimiter; }
         }
-
         return count;
     }
-
     public static bool AnyKeys(ImportedKeyViewer kv) =>
         kv.Key10?.Length > 0 || kv.Key12?.Length > 0 || kv.Key16?.Length > 0 || kv.Key20?.Length > 0;
-
     public static bool AnyLabels(ImportedKeyViewer kv) =>
         kv.Key10Text?.Length > 0 || kv.Key12Text?.Length > 0 || kv.Key16Text?.Length > 0 || kv.Key20Text?.Length > 0;
-
     public static bool AnyColors(ImportedKeyViewer kv) =>
         kv.Bg != null || kv.BgClicked != null || kv.Outline != null || kv.OutlineClicked != null
         || kv.Text != null || kv.TextClicked != null || kv.Rain != null || kv.Rain2 != null || kv.Rain3 != null;
-
-    // The source's style is an enum/int/string; v2 styles are 0=10,1=12,2=16,
-    // 3=20. Map by the key count embedded in the name; fall back to the raw int.
     public static bool TryParseKvStyle(object value, out int style) {
         style = 0;
         if(value == null) return false;

@@ -1,5 +1,4 @@
 ﻿namespace GTweens.Easings;
-
 public enum Easing {
     Linear,
     InSine,

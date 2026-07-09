@@ -1,74 +1,17 @@
 using Newtonsoft.Json.Linq;
 using Quartz.IO;
 using Quartz.IO.Interface;
-
 namespace Quartz.Features.Optimizer;
-
-// Persisted config for the Optimizer feature. These are engine/runtime
-// performance toggles the game doesn't expose in its own options and that the
-// Effect Remover (which strips visual events out of the chart) doesn't touch —
-// none of them change how a level looks, only how the engine runs. Lives in
-// UserData/Quartz/Optimizer.json. All default off: nothing here alters behaviour
-// until the user opts in.
 public sealed class OptimizerSettings : ISettingsFile {
-    // Defer garbage collection during a run (GC set to Manual), then collect at
-    // the end. Stops the stop-the-world GC pauses that otherwise land mid-run
-    // and nudge rhythm timing. The heap grows for the duration of the run (a
-    // safety valve forces a collect if it grows too far), so it's opt-in.
     public bool SmoothGC = true;
-
-    // Force a collection on every scene load, so a run starts from a clean heap.
-    // Pairs with SmoothGC — it's the pre-run clean that SmoothGC deliberately
-    // skips (collecting at gameplay start would itself hitch the first frame).
     public bool CollectOnLevelLoad = true;
-
-    // Raise the process priority (AboveNormal) so the OS scheduler hands the game
-    // more consistent CPU time. Real effect on Windows; a no-op where the
-    // platform doesn't permit it unprivileged (typically macOS/Linux).
     public bool BoostProcessPriority = true;
-
-    // Keep the game running at full speed when its window loses focus, so a run
-    // or practice session keeps going while alt-tabbed.
     public bool RunInBackground = true;
-
-    // Compress custom textures loaded from disk with lossy DXT compression
-    // (~4-8x less VRAM/RAM, small visual quality cost). Unlike the toggles above
-    // this changes how textures look, so it defaults off. Only affects disk-
-    // loaded custom textures; internal-level and bundle assets are untouched.
     public bool LossyTextureCompression = false;
-
-    // Force ADOFAI's VideoBloom post-process down the cheaper low-quality path.
-    // This targets real GPU work in VideoBloom.OnRenderImage on bloom-heavy
-    // levels. It changes bloom softness/quality, so it defaults off.
     public bool FastBloom = false;
-
-    // Skip ADOFAI full-screen post-process components when their public state is
-    // visually identity (e.g. screen tile 1x1, screen scroll offset/speed 0). The
-    // original shader blit is replaced by a plain copy only in those no-op states,
-    // so this should not change visuals and defaults on.
     public bool SkipNoOpScreenFilters = true;
-
-    // Render Quartz overlay text drop-shadows via the font material's GPU underlay
-    // (one mesh/draw per label) instead of a second sibling TMP (two meshes/draws).
-    // Halves the draw calls of every shadowed overlay label (Combo/Judgement/Panels/
-    // KeyViewer; SongTitle's rich-text shadow + any blurred shadow keep the sibling
-    // path for the per-glyph fade / soft edge). This is the single biggest draw-call
-    // reduction available and is the dominant FPS lever on weak/integrated GPUs, so
-    // it now defaults ON. The one caveat is cosmetic: the underlay offset is font-
-    // relative, not pixel-exact, so a hard shadow can sit slightly differently than
-    // the old sibling shadow — tune ShadowUnderlayOffsetScale if it looks off, or set
-    // this false to fall back to the pixel-exact sibling shadow. Only the softness-0
-    // (no blur) shadow on a non-isolate label uses the underlay.
     public bool LightTextShadows = true;
-
-    // px -> TMP-underlay-units factor for the LightTextShadows offset. TMP exposes no
-    // pixel API for the underlay offset (it's font-relative), so the shadow's X/Y px
-    // are mapped as (offsetPx / fontSize) * this. The default lands a typical small
-    // shadow in the visible range; raise it if the underlay shadow sits too close to
-    // the glyph, lower it if it sits too far. Exposed so the offset can be A/B-tuned
-    // per bundled font without a recompile.
     public float ShadowUnderlayOffsetScale = 6f;
-
     public JToken Serialize() => new JObject {
         [nameof(SmoothGC)] = SmoothGC,
         [nameof(CollectOnLevelLoad)] = CollectOnLevelLoad,
@@ -80,7 +23,6 @@ public sealed class OptimizerSettings : ISettingsFile {
         [nameof(LightTextShadows)] = LightTextShadows,
         [nameof(ShadowUnderlayOffsetScale)] = ShadowUnderlayOffsetScale,
     };
-
     public void Deserialize(JToken token) {
         SmoothGC = IOUtils.Read(token, nameof(SmoothGC), SmoothGC);
         CollectOnLevelLoad = IOUtils.Read(token, nameof(CollectOnLevelLoad), CollectOnLevelLoad);

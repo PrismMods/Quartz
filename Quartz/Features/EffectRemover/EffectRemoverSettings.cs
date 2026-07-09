@@ -2,41 +2,22 @@ using System;
 using Newtonsoft.Json.Linq;
 using Quartz.IO;
 using Quartz.IO.Interface;
-
 namespace Quartz.Features.EffectRemover;
-
-// Persisted config for the Effect Remover, ported field-for-field from the
-// original KorenResourcePack (defaults match v1's Settings.cs). Lives in
-// UserData/Quartz/EffectRemover.json.
 public sealed class EffectRemoverSettings : ISettingsFile {
     public bool On = true;
-
-    // === Mode ===
-    // "enhanced" (default, the original KRP behaviour) strips effect events out
-    // of the level data on decode. "simple" instead disables the live effect
-    // components at runtime (ported from PizzaLovers007's AdofaiTweaks
-    // DisableEffects) — it never touches the chart, so it's editor-safe.
     public const string ModeSimple = "simple";
     public const string ModeEnhanced = "enhanced";
     public string Mode = ModeEnhanced;
     public bool IsSimple => string.Equals(Mode, ModeSimple, StringComparison.OrdinalIgnoreCase);
     public bool IsEnhanced => !IsSimple;
-
-    // === Simple mode (AdofaiTweaks DisableEffects) ===
-    public const int MoveTrackUpperBound = 100; // above this = unlimited
+    public const int MoveTrackUpperBound = 100; 
     public bool SimpleFilter = false;
     public bool SimpleBloom = false;
     public bool SimpleFlash = false;
     public bool SimpleHallOfMirrors = false;
     public bool SimpleScreenShake = false;
-    public int SimpleMoveTrackMax = MoveTrackUpperBound + 5; // default: unlimited
-
-    // Editor: while the remover is on, saving a chart would write the
-    // stripped level over the original — saving is blocked unless this is
-    // explicitly enabled.
+    public int SimpleMoveTrackMax = MoveTrackUpperBound + 5; 
     public bool EnableSave = false;
-
-    // === Non-DLC events ===
     public bool Filters = true;
     public bool AdvancedFilters = true;
     public bool Particles = false;
@@ -46,34 +27,22 @@ public sealed class EffectRemoverSettings : ISettingsFile {
     public bool RepeatEvents = false;
     public bool FrameRate = true;
     public bool HitSounds = true;
-
-    // === Planet events ===
     public bool PlanetOrbit = false;
     public bool PlanetScale = false;
     public bool PlanetRadius = false;
-
-    // === Track events ===
     public bool TrackAnimations = false;
     public bool TrackPositions = false;
     public bool TrackMoves = false;
     public bool TrackColors = false;
-
-    // === DLC events ===
     public bool HoldSounds = true;
     public bool HideIcons = true;
-
-    // === Misc ===
     public bool RemoveAllDecorations = true;
-    // Background sub-option (shown only when Backgrounds is on): also hide the
-    // default/tutorial background's tiled pattern. Its pulsing shapes are
-    // always disabled whenever Backgrounds is on.
     public bool RemoveTutorialPatterns = true;
     public bool LimitTrackOpacity = true;
     public bool SetCameraZoom = false;
     public float CameraZoomScale = 250f;
     public bool ResetTrackAnimation = true;
     public bool ResetTrackColor = true;
-
     public JToken Serialize() => new JObject {
             [nameof(On)] = On,
             [nameof(Mode)] = Mode,
@@ -110,7 +79,6 @@ public sealed class EffectRemoverSettings : ISettingsFile {
             [nameof(ResetTrackAnimation)] = ResetTrackAnimation,
             [nameof(ResetTrackColor)] = ResetTrackColor,
     };
-
     public void Deserialize(JToken token) {
         On = IOUtils.Read(token, nameof(On), On);
         Mode = IOUtils.Read(token, nameof(Mode), Mode);

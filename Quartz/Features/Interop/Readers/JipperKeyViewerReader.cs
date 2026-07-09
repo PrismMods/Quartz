@@ -1,10 +1,7 @@
 using Newtonsoft.Json.Linq;
 using static Quartz.Features.Interop.ReflectionHelpers;
 using static Quartz.Features.Interop.Readers.KeyViewerImportShared;
-
 namespace Quartz.Features.Interop.Readers;
-
-// ===== JipperKeyViewer =====
 internal static class JipperKeyViewerReader {
     public static int ImportJipperKeyViewer(
         SettingsImportOption option,
@@ -12,7 +9,6 @@ internal static class JipperKeyViewerReader {
         SettingsImportKeyViewerPart parts
     ) {
         if(mode == SettingsImportReplaceMode.KeepOld) return 0;
-
         ImportedKeyViewer imported = null;
         object runtime = GetStaticMember(SettingsImporter.FindType(option, "JipperKeyViewer.KeyViewer.KeyViewer"), "Settings");
         if(runtime != null) imported = ReadKeyViewerFromObject(runtime);
@@ -22,12 +18,9 @@ internal static class JipperKeyViewerReader {
                 try { imported = ReadKeyViewerFromJson(JObject.Parse(json)); } catch { }
             }
         }
-
         if(imported == null || imported.Available == SettingsImportKeyViewerPart.None) return 0;
-
         return ApplyKeyViewerImport(imported, mode, parts);
     }
-
     private static IEnumerable<string> JkvConfigPaths(SettingsImportOption option) {
         string dir = option.Directory;
         if(string.IsNullOrEmpty(dir)) yield break;

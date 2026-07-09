@@ -2,50 +2,28 @@ using Newtonsoft.Json.Linq;
 using Quartz.IO;
 using Quartz.IO.Interface;
 using UnityEngine;
-
 namespace Quartz.Features.Panels;
-
-// One stat placed on a panel: which catalog stat, and whether its line is
-// currently shown (entries can be disabled without losing their spot).
 public sealed class StatEntry {
     public string Id = "";
     public bool Enabled = true;
-
-    // Show this stat's label before its value. Off = render only the number
-    // (the panel's LabelSeparator is skipped too).
     public bool ShowLabel = true;
-
-    // Custom text for the "text" stat — the literal string rendered as the
-    // line's value. Unused (empty) for every other stat id.
     public string Text = "";
-
-    // Optional per-stat value coloring (v1's ColorRange). null until the user
-    // opens the stat's color settings.
     public StatColor Color;
-
     public StatEntry() { }
     public StatEntry(string id) => Id = id;
-
-    // Lazily seeds the stat's color settings with the v1 defaults for its id.
     public StatColor EnsureColor() => Color ??= StatColor.DefaultFor(Id);
-
     public JToken Serialize() {
         JObject obj = new() {
             [nameof(Id)] = Id,
             [nameof(Enabled)] = Enabled,
             [nameof(ShowLabel)] = ShowLabel,
         };
-
         if(!string.IsNullOrEmpty(Text)) obj[nameof(Text)] = Text;
         if(Color != null) obj[nameof(Color)] = Color.Serialize();
-
         return obj;
     }
-
     public static StatEntry Deserialize(JToken token) {
-        // Legacy shape: a plain stat-id string.
         if(token is JValue) return new StatEntry(token.ToString());
-
         StatEntry e = new();
         e.Id = IOUtils.Read(token, nameof(Id), e.Id);
         e.Enabled = IOUtils.Read(token, nameof(Enabled), e.Enabled);
@@ -55,9 +33,6 @@ public sealed class StatEntry {
         return e;
     }
 }
-
-// Which screen corner/edge a panel hangs off. The panel's offset (PosX/PosY)
-// is relative to this anchor, and the panel grows away from it.
 public enum PanelAnchor {
     TopLeft,
     TopCenter,
@@ -69,18 +44,11 @@ public enum PanelAnchor {
     BottomCenter,
     BottomRight,
 }
-
-// One user-created overlay panel: a named, draggable HUD box showing the
-// stats the user put on it, with its own appearance settings.
 public sealed class PanelConfig {
     public string Name = "Panel";
-
-    // Screen anchor + offset from it; dragged around in Reorganize mode.
     public int Anchor = (int)PanelAnchor.TopLeft;
     public float PosX = 24f;
     public float PosY = -24f;
-
-    // Default inset for an anchor: 24px in from each non-centered edge.
     public static Vector2 DefaultOffset(PanelAnchor anchor) {
         Vector2 a = AnchorVector(anchor);
         return new Vector2(
@@ -88,7 +56,6 @@ public sealed class PanelConfig {
             a.y == 0f ? 24f : a.y == 1f ? -24f : 0f
         );
     }
-
     public static Vector2 AnchorVector(PanelAnchor anchor) => anchor switch {
         PanelAnchor.TopLeft => new Vector2(0f, 1f),
         PanelAnchor.TopCenter => new Vector2(0.5f, 1f),
@@ -101,36 +68,22 @@ public sealed class PanelConfig {
         PanelAnchor.BottomRight => new Vector2(1f, 0f),
         _ => new Vector2(0f, 1f),
     };
-
-    // Ordered stat entries (catalog ids); list order = display order.
     public List<StatEntry> Stats = [];
-
     public string Prefix = "";
     public int Decimals = 2;
     public float FontSize = 22f;
-    // Drawn between label and value; a single character is auto-padded with a
-    // space each side at render (see PanelsOverlay.EffectiveSeparator). "|" → " | ".
     public string LabelSeparator = "|";
     public float LineSpacing = 0f;
     public bool BackgroundEnabled = true;
-
-    // Panel background fill color + opacity (BgA). Defaults match the themed
-    // UIColors.PanelBG so enabling a background looks identical to before it
-    // was user-tunable.
     public float BgR = 0.165f;
     public float BgG = 0.161f;
     public float BgB = 0.196f;
     public float BgA = 1f;
-
-    // Stat labels on this panel stay English by default; on = follow the UI
-    // language. The settings UI always shows localized labels regardless.
     public bool LocalizeStatLabels = false;
-
     public float TextR = 1f;
     public float TextG = 1f;
     public float TextB = 1f;
     public float TextA = 1f;
-
     public bool TextShadowEnabled = true;
     public float TextShadowX = 2f;
     public float TextShadowY = -2f;
@@ -139,21 +92,16 @@ public sealed class PanelConfig {
     public float TextShadowG = 0f;
     public float TextShadowB = 0f;
     public float TextShadowA = 0.75f;
-
     public Color GetTextColor() => IOUtils.Rgba(TextR, TextG, TextB, TextA);
     public void SetTextColor(Color c) => IOUtils.SetRgba(c, ref TextR, ref TextG, ref TextB, ref TextA);
-
     public Color GetBackgroundColor() => IOUtils.Rgba(BgR, BgG, BgB, BgA);
     public void SetBackgroundColor(Color c) => IOUtils.SetRgba(c, ref BgR, ref BgG, ref BgB, ref BgA);
-
     public Color GetTextShadowColor() => IOUtils.Rgba(TextShadowR, TextShadowG, TextShadowB, TextShadowA);
     public void SetTextShadowColor(Color c) =>
         IOUtils.SetRgba(c, ref TextShadowR, ref TextShadowG, ref TextShadowB, ref TextShadowA);
-
     public JToken Serialize() {
         JArray stats = [];
         foreach(StatEntry e in Stats) stats.Add(e.Serialize());
-
         return new JObject {
             [nameof(Name)] = Name,
             [nameof(Anchor)] = Anchor,
@@ -185,11 +133,9 @@ public sealed class PanelConfig {
             [nameof(TextShadowA)] = TextShadowA,
         };
     }
-
     public static PanelConfig Deserialize(JToken token) {
         PanelConfig p = new();
         if(token == null) return p;
-
         p.Name = IOUtils.Read(token, nameof(Name), p.Name);
         p.Anchor = IOUtils.Read(token, nameof(Anchor), p.Anchor);
         p.PosX = IOUtils.Read(token, nameof(PosX), p.PosX);
@@ -218,19 +164,8 @@ public sealed class PanelConfig {
         return p;
     }
 }
-
-// Persisted config for the panel overlay system. Replaces the old fixed
-// Left/Right Status HUD (Status.json) — panels are user-created, named and
-// freely composed instead. Lives in UserData/Quartz/OverlayPanels.json.
 public sealed class PanelsSettings : ISettingsFile {
-    // Master switch for the whole overlay system ("Enable Overlays") —
-    // ProgressBar / Combo / Judgement HUDs gate on it too, like they did on
-    // the old Status master.
     public bool Enabled = true;
-
-    // Default layout matches the shipped Default profile: three corner panels
-    // (top-left run stats, top-right tempo, bottom-right attempts), all sharing
-    // the " | " separator, no background, and a soft drop shadow.
     public List<PanelConfig> Panels = [
         new PanelConfig {
             Name = "left",
@@ -268,20 +203,16 @@ public sealed class PanelsSettings : ISettingsFile {
             TextShadowY = -1.5f,
         },
     ];
-
     public JToken Serialize() {
         JArray panels = [];
         foreach(PanelConfig p in Panels) panels.Add(p.Serialize());
-
         return new JObject {
             [nameof(Enabled)] = Enabled,
             [nameof(Panels)] = panels,
         };
     }
-
     public void Deserialize(JToken token) {
         Enabled = IOUtils.Read(token, nameof(Enabled), Enabled);
-
         if(token?[nameof(Panels)] is JArray arr) {
             Panels = [];
             foreach(JToken t in arr) Panels.Add(PanelConfig.Deserialize(t));

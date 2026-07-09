@@ -5,25 +5,19 @@ using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using TMPro;
 using UnityEngine;
-
 namespace Quartz.UI.Factory.Page;
-
-// Progress Bar settings section for the Overlay tab.
 internal static class PageProgressBar {
     public static void AppendTo(Transform content) {
         ProgressBarOverlay.EnsureConf();
         ProgressBarSettings conf = ProgressBarOverlay.Conf;
         ProgressBarSettings def = new();
-
         void Save() => ProgressBarOverlay.Save();
-
         GenerateUI.CollapsibleSection sec = GenerateUI.FlatSection(
             content, "Progress Bar",
             v => { conf.Enabled = v; ProgressBarOverlay.Apply(); Save(); },
             conf.Enabled,
             "Enable Progress Bar", "progressbar_enable"
         );
-
         GenerateUI.Toggle(
             GenerateUI.Row(sec.Body),
             def.PrefillStart,
@@ -35,10 +29,7 @@ internal static class PageProgressBar {
             "DESC_PROGRESSBAR_PREFILLSTART",
             "When a run starts mid-chart (checkpoint or editor play), the bar starts already filled up to that point instead of starting empty."
         );
-
-        // === Size ===
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(sec.Body)), "HEADING_SIZE", "Size");
-
         static float widthFilter(float v) => Mathf.Clamp(Mathf.Round(v), 200f, 1800f);
         UISlider width = GenerateUI.Slider(
             GenerateUI.Row(sec.Body),
@@ -49,7 +40,6 @@ internal static class PageProgressBar {
         width.Format = "0 px";
         width.OnChanged = v => { conf.Width = v; ProgressBarOverlay.Apply(); };
         width.OnComplete = v => { conf.Width = v; ProgressBarOverlay.Apply(); Save(); };
-
         static float heightFilter(float v) => Mathf.Clamp(Mathf.Round(v), 2f, 60f);
         UISlider height = GenerateUI.Slider(
             GenerateUI.Row(sec.Body),
@@ -60,7 +50,6 @@ internal static class PageProgressBar {
         height.Format = "0 px";
         height.OnChanged = v => { conf.Height = v; ProgressBarOverlay.Apply(); };
         height.OnComplete = v => { conf.Height = v; ProgressBarOverlay.Apply(); Save(); };
-
         static float offsetFilter(float v) => Mathf.Clamp(Mathf.Round(v), 0f, 200f);
         UISlider offset = GenerateUI.Slider(
             GenerateUI.Row(sec.Body),
@@ -71,7 +60,6 @@ internal static class PageProgressBar {
         offset.Format = "0 px";
         offset.OnChanged = v => { conf.TopOffset = v; ProgressBarOverlay.Apply(); };
         offset.OnComplete = v => { conf.TopOffset = v; ProgressBarOverlay.Apply(); Save(); };
-
         static float roundingFilter(float v) => Mathf.Clamp(Mathf.Round(v), 0f, 30f);
         UISlider rounding = GenerateUI.Slider(
             GenerateUI.Row(sec.Body),
@@ -82,7 +70,6 @@ internal static class PageProgressBar {
         rounding.Format = "0 px";
         rounding.OnChanged = v => { conf.Rounding = v; ProgressBarOverlay.Apply(); };
         rounding.OnComplete = v => { conf.Rounding = v; ProgressBarOverlay.Apply(); Save(); };
-
         static float outlineFilter(float v) => Mathf.Clamp(Mathf.Round(v * 4f) * 0.25f, 0f, 8f);
         UISlider outlineThick = GenerateUI.Slider(
             GenerateUI.Row(sec.Body),
@@ -93,15 +80,9 @@ internal static class PageProgressBar {
         outlineThick.Format = "0.## px";
         outlineThick.OnChanged = v => { conf.OutlineThickness = v; ProgressBarOverlay.Apply(); };
         outlineThick.OnComplete = v => { conf.OutlineThickness = v; ProgressBarOverlay.Apply(); Save(); };
-
-        // === Color ===
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(sec.Body)), "HEADING_COLOR", "Color");
-
-        // Fill: a flat colour, or a progress-driven gradient (white at 0% ...
-        // red at 100%, by default). The gradient reuses the Panels StatColor.
         StatColor grad = conf.FillGradient;
         Action rebuildFill = null;
-
         GenerateUI.Toggle(
             GenerateUI.Row(sec.Body),
             false,
@@ -113,12 +94,9 @@ internal static class PageProgressBar {
             "DESC_PROGRESSBAR_FILLGRADIENT",
             "Shift the fill colour as the run progresses (0% to 100%) instead of using one flat colour."
         );
-
         RectTransform fillBody = GenerateUI.MakeBody(sec.Body, "FillColorBody");
-
         rebuildFill = () => {
             GenerateUI.ClearChildren(fillBody);
-
             if(!grad.Enabled) {
                 GenerateUI.ColorPicker(
                     GenerateUI.Row(fillBody),
@@ -131,11 +109,9 @@ internal static class PageProgressBar {
                 );
                 return;
             }
-
             for(int i = 0; i < grad.Points.Count; i++) {
                 ColorPoint point = grad.Points[i];
                 int index = i + 1;
-
                 GenerateUI.ColorPicker(
                     GenerateUI.Row(fillBody),
                     point.GetColor(),
@@ -145,7 +121,6 @@ internal static class PageProgressBar {
                     string.Format(MainCore.Tr.Get("PROGRESSBAR_STOP_COLOR", "Stop {0} Color"), index),
                     "progressbar_stopcolor_" + i
                 );
-
                 UISlider pos = GenerateUI.Slider(
                     GenerateUI.Row(fillBody),
                     point.Pos * 100f, 0f, 100f, point.Pos * 100f,
@@ -162,7 +137,6 @@ internal static class PageProgressBar {
                     Save();
                     rebuildFill?.Invoke();
                 };
-
                 if(grad.Points.Count > 1) {
                     GenerateUI.Button(
                         GenerateUI.Row(fillBody),
@@ -178,7 +152,6 @@ internal static class PageProgressBar {
                     ).SetSecondary();
                 }
             }
-
             if(grad.Points.Count < 8) {
                 GenerateUI.Button(
                     GenerateUI.Row(fillBody),
@@ -195,7 +168,6 @@ internal static class PageProgressBar {
             }
         };
         rebuildFill?.Invoke();
-
         GenerateUI.ColorPicker(
             GenerateUI.Row(sec.Body),
             def.GetBackColor(),
@@ -205,7 +177,6 @@ internal static class PageProgressBar {
             "Background Color",
             "progressbar_backcolor"
         );
-
         GenerateUI.ColorPicker(
             GenerateUI.Row(sec.Body),
             def.GetOutlineColor(),
@@ -215,7 +186,6 @@ internal static class PageProgressBar {
             "Outline Color",
             "progressbar_outlinecolor"
         );
-
         GenerateUI.Button(
             GenerateUI.Row(sec.Body),
             () => ProgressBarOverlay.ResetPosition(),
@@ -223,7 +193,6 @@ internal static class PageProgressBar {
             "progressbar_resetpos"
         ).SetSecondary();
     }
-
     public static void Create(RectTransform parent) =>
         AppendTo(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
 }

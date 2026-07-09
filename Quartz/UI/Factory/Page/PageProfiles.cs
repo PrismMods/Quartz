@@ -9,40 +9,25 @@ using Quartz.UI.Utility;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityFileDialog;
-
 using TMPro;
-
 namespace Quartz.UI.Factory.Page;
-
-// Profiles tab. Lists the settings profiles, lets the user add one from the
-// current settings, switch between them, and move them in/out of the install
-// as single .qprofile files (so a manual update that wipes UserData doesn't
-// take the settings with it). File pickers go through the game's bundled
-// UnityFileDialog.
 internal static class PageProfiles {
     private static RectTransform listContainer;
     private static TextMeshProUGUI statusText;
     private static UIInput nameInput;
     private static string pendingName = "";
-
     public static void Create(RectTransform parent) {
         pendingName = "";
         RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
-
         var headerRow = GenerateUI.Row(content.transform);
         var headerText = GenerateUI.AddTextH1(headerRow);
         headerText.gameObject.AddComponent<TextLocalization>().Init("PROFILES", "Profiles");
-
         var hintRow = GenerateUI.Row(content.transform, 54f);
         var hintText = GenerateUI.AddMutedText(hintRow, 17f, 0.45f, true);
         hintText.gameObject.AddComponent<TextLocalization>().Init(
             "PROFILE_HINT",
             "Every setting lives in the active profile. Export a profile before updating the mod manually, then import it back if your UserData gets replaced."
         );
-
-        // Name input with the Add button in the right-hand gutter the
-        // BackGround() widgets leave free (same pattern as the language row
-        // on the Settings page).
         var addRow = GenerateUI.Row(content.transform);
         nameInput = GenerateUI.Input(
             addRow,
@@ -55,7 +40,6 @@ internal static class PageProfiles {
         );
         nameInput.Placeholder.gameObject.AddComponent<TextLocalization>().Init("PROFILE_NAME", "Profile Name");
         nameInput.InputField.characterLimit = 32;
-
         UIButton addBtn = GenerateUI.Button(addRow, AddProfile, "Add Profile", "profile_add");
         {
             var br = addBtn.Rect;
@@ -69,17 +53,14 @@ internal static class PageProfiles {
             "DESC_PROFILE_ADD",
             "Creates a new profile from your current settings and switches to it."
         );
-
         var ioRow = GenerateUI.Row(content.transform);
         GenerateUI.ButtonRow(ioRow);
-
         UIButton importBtn = GenerateUI.Button(ioRow, ImportProfile, "Import", "profile_import");
         GenerateUI.FixWidth(importBtn, 160f);
         importBtn.Rect.AddToolTip(
             "DESC_PROFILE_IMPORT",
             "Loads a .qprofile (or legacy .krprofile) file as a new profile. It won't be selected automatically."
         );
-
         UIButton folderBtn = GenerateUI.Button(
             ioRow,
             () => {
@@ -94,7 +75,6 @@ internal static class PageProfiles {
             "profile_open_folder"
         ).SetSecondary();
         GenerateUI.FixWidth(folderBtn, 160f);
-
         UIButton recalibBtn = GenerateUI.Button(ioRow, RecalibrateDisplay, "Recalibrate Display", "profile_recalibrate").SetSecondary();
         GenerateUI.FixWidth(recalibBtn, 220f);
         recalibBtn.Rect.AddToolTip(
@@ -102,72 +82,51 @@ internal static class PageProfiles {
             "Re-baseline overlay positions to this monitor, keeping them exactly where they are now. " +
             "Positions then scale proportionally if the profile is used on a different-sized display."
         );
-
         BuildPresetsSection(content.transform);
-
         var statusRow = GenerateUI.Row(content.transform, 32f);
         statusText = GenerateUI.AddMutedText(statusRow, 18f, 0.45f, true);
         statusText.text = "";
-
         GameObject list = new("Profiles");
         list.transform.SetParent(content.transform, false);
-
         listContainer = list.AddComponent<RectTransform>();
         GenerateUI.FitVertical(list, 8f);
-
         RebuildList();
     }
-
-    // Re-baselines every overlay's stored offsets to the current display: each
-    // offset is multiplied by current-screen / old-calibration (so nothing moves
-    // on screen), then the calibration becomes this resolution. Future runs on a
-    // different-sized monitor scale from here. See OverlayCalibration.
     private static void RecalibrateDisplay() {
         CoreSettings conf = MainCore.Conf;
         OverlayCalibration.EnsureCaptured();
-
         float fx = conf.CalibWidth > 0f ? Screen.width / conf.CalibWidth : 1f;
         float fy = conf.CalibHeight > 0f ? Screen.height / conf.CalibHeight : 1f;
-
         Features.Panels.PanelsOverlay.EnsureConf();
         foreach(Features.Panels.PanelConfig pc in Features.Panels.PanelsOverlay.Conf.Panels) {
             pc.PosX *= fx;
             pc.PosY *= fy;
         }
-
         Features.Combo.ComboOverlay.EnsureConf();
         Features.Combo.ComboSettings combo = Features.Combo.ComboOverlay.Conf;
         combo.OffsetX *= fx;
         combo.OffsetY *= fy;
-
         Features.Judgement.JudgementOverlay.EnsureConf();
         Features.Judgement.JudgementSettings jud = Features.Judgement.JudgementOverlay.Conf;
         jud.OffsetX *= fx;
         jud.OffsetY *= fy;
-
         Features.ProgressBar.ProgressBarOverlay.EnsureConf();
         Features.ProgressBar.ProgressBarSettings pbar = Features.ProgressBar.ProgressBarOverlay.Conf;
         pbar.OffsetX *= fx;
         pbar.TopOffset *= fy;
-
         Features.SongTitle.SongTitleOverlay.EnsureConf();
         Features.SongTitle.SongTitleSettings song = Features.SongTitle.SongTitleOverlay.Conf;
         song.OffsetX *= fx;
         song.OffsetY *= fy;
-
         Features.KeyViewer.KeyViewerOverlay.EnsureConf();
         Features.KeyViewer.KeyViewerSettings kv = Features.KeyViewer.KeyViewerOverlay.Conf;
         kv.OffsetX *= fx;
         kv.OffsetY *= fy;
         kv.DmOffsetX *= fx;
         kv.DmOffsetY *= fy;
-
-        // New baseline = this display, then persist + re-apply so the live
-        // overlays read it immediately.
         conf.CalibWidth = Screen.width;
         conf.CalibHeight = Screen.height;
         MainCore.ConfMgr?.RequestSave();
-
         Features.Panels.PanelsOverlay.Apply();
         Features.Panels.PanelsOverlay.Save();
         Features.Combo.ComboOverlay.Apply();
@@ -180,41 +139,27 @@ internal static class PageProfiles {
         Features.SongTitle.SongTitleOverlay.Save();
         Features.KeyViewer.KeyViewerOverlay.Apply();
         Features.KeyViewer.KeyViewerOverlay.Save();
-
         if(statusText != null)
             statusText.text = MainCore.Tr.Get("PROFILE_RECALIBRATED", "Recalibrated overlays to this display.");
     }
-
-    // Built-in presets: a header plus one Apply row per shipped .qprofile/.krprofile.
-    // Hidden entirely when none ship. Each name is localized via PRESET_<NAME>.
     private static void BuildPresetsSection(Transform content) {
         List<ProfileManager.PresetInfo> presets = ProfileManager.ListPresets();
         if(presets.Count == 0) return;
-
         TextMeshProUGUI header = GenerateUI.AddTextH1(GenerateUI.Row(content));
         GenerateUI.Localize(header, "PRESETS", "Presets");
-
         foreach(ProfileManager.PresetInfo preset in presets) {
             RectTransform row = GenerateUI.Row(content, 50f);
             GenerateUI.ButtonRow(row);
-
             TextMeshProUGUI label = GenerateUI.AddText(row, noPad: true);
             label.overflowMode = TextOverflowModes.Ellipsis;
             label.gameObject.AddComponent<LayoutElement>().flexibleWidth = 1f;
             GenerateUI.Localize(label, "PRESET_" + preset.Name.ToUpperInvariant(), preset.Name);
-
             string presetPath = preset.Path;
             UIButton applyBtn = null;
             applyBtn = GenerateUI.Button(
                 row,
                 () => {
                     applyBtn?.SetBlocked(true);
-
-                    // ApplyPreset swaps and reloads every settings file, so the
-                    // whole settings UI must be rebuilt for the new colors/text/
-                    // etc to show — each widget bakes its value in at Create time.
-                    // Run outside the click dispatch that lives on the object the
-                    // rebuild destroys (same as SelectProfile).
                     MainThread.Enqueue(() => {
                         if(ProfileManager.ApplyPreset(presetPath) != null) {
                             UICore.Rebuild();
@@ -231,20 +176,16 @@ internal static class PageProfiles {
             GenerateUI.FixWidth(applyBtn, 140f);
         }
     }
-
     private static void AddProfile() {
         string name = ProfileManager.Sanitize(pendingName);
-
         if(name == null) {
             statusText.text = GenerateUI.Tr("PROFILE_STATUS_NAME_INVALID", "Enter a name first.");
             return;
         }
-
         if(ProfileManager.Exists(name)) {
             statusText.text = GenerateUI.Tr("PROFILE_STATUS_NAME_TAKEN", "That name is already used.");
             return;
         }
-
         if(ProfileManager.Create(name)) {
             pendingName = "";
             nameInput.Set("", false);
@@ -252,10 +193,8 @@ internal static class PageProfiles {
             RebuildList();
         }
     }
-
     private static void ImportProfile() {
         string path;
-
         try {
             path = FileBrowser.PickFile(
                 null,
@@ -267,23 +206,17 @@ internal static class PageProfiles {
             MainCore.Log.Err($"[{nameof(PageProfiles)}] PickFile failed: {e}");
             return;
         }
-
         if(string.IsNullOrEmpty(path)) return;
-
         string name = ProfileManager.Import(path);
-
         if(name == null) {
             statusText.text = GenerateUI.Tr("PROFILE_STATUS_IMPORT_FAILED", "Import failed — not a Quartz profile file.");
             return;
         }
-
         statusText.text = string.Format(GenerateUI.Tr("PROFILE_STATUS_IMPORTED", "Imported as '{0}'."), name);
         RebuildList();
     }
-
     private static void ExportProfile(string name) {
         string path;
-
         try {
             path = FileBrowser.SaveFile(
                 null,
@@ -296,25 +229,18 @@ internal static class PageProfiles {
             MainCore.Log.Err($"[{nameof(PageProfiles)}] SaveFile failed: {e}");
             return;
         }
-
         if(string.IsNullOrEmpty(path)) return;
-
         if(!path.EndsWith($".{ProfileManager.EXPORT_EXTENSION}", StringComparison.OrdinalIgnoreCase)
             && !path.EndsWith($".{ProfileManager.LEGACY_EXTENSION}", StringComparison.OrdinalIgnoreCase)
             && !path.EndsWith(".json", StringComparison.OrdinalIgnoreCase)) {
             path += $".{ProfileManager.EXPORT_EXTENSION}";
         }
-
         statusText.text = ProfileManager.Export(name, path)
             ? string.Format(GenerateUI.Tr("PROFILE_STATUS_EXPORTED", "Exported '{0}'."), Path.GetFileName(path))
             : GenerateUI.Tr("PROFILE_STATUS_EXPORT_FAILED", "Export failed.");
     }
-
     private static void SelectProfile(string name, UIButton button) {
         button.SetBlocked(true);
-
-        // Applying tears the whole settings UI down and rebuilds it — run
-        // outside the click dispatch that lives on the object being destroyed.
         MainThread.Enqueue(() => {
             if(ProfileManager.Apply(name)) {
                 UICore.Rebuild();
@@ -323,45 +249,33 @@ internal static class PageProfiles {
             }
         });
     }
-
     private static void RebuildList() {
         if(listContainer == null) return;
-
         GenerateUI.ClearChildren(listContainer);
-
         foreach(string name in ProfileManager.List())
             CreateProfileRow(name, name == ProfileManager.Active);
     }
-
     private static void CreateProfileRow(string name, bool active) {
         var row = GenerateUI.Row(listContainer, 50f);
         GenerateUI.ButtonRow(row);
-
         var label = GenerateUI.AddText(row, noPad: true);
         label.overflowMode = TextOverflowModes.Ellipsis;
-
         LayoutElement labelLe = label.gameObject.AddComponent<LayoutElement>();
         labelLe.flexibleWidth = 1f;
-
         if(active) {
             string accent = ColorUtility.ToHtmlStringRGB(UIColors.ObjectActiveBright);
             label.text = $"{name}  <size=70%><color=#{accent}>●  {GenerateUI.Tr("PROFILE_ACTIVE", "Active")}</color></size>";
         } else {
             label.text = name;
         }
-
         if(!active) {
             UIButton selectBtn = null;
             selectBtn = GenerateUI.Button(row, () => SelectProfile(name, selectBtn), "Select", "profile_select");
             GenerateUI.FixWidth(selectBtn, 110f);
         }
-
         UIButton exportBtn = GenerateUI.Button(row, () => ExportProfile(name), "Export", "profile_export").SetSecondary();
         GenerateUI.FixWidth(exportBtn, 110f);
-
         if(!active) {
-            // Two-step delete: the first click arms the button (red "Sure?"),
-            // the second one actually deletes.
             bool armed = false;
             UIButton deleteBtn = null;
             deleteBtn = GenerateUI.Button(
@@ -375,7 +289,6 @@ internal static class PageProfiles {
                         deleteBtn.Background.color = UIColors.SoftRed;
                         return;
                     }
-
                     if(ProfileManager.Delete(name)) {
                         statusText.text = "";
                         RebuildList();

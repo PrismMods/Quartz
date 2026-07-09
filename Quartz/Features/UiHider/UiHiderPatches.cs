@@ -1,17 +1,7 @@
 using HarmonyLib;
 using System.Reflection;
 using UnityEngine;
-
 namespace Quartz.Features.UiHider;
-
-// Harmony patches for the UI-hiding flags that must intercept the game
-// mid-call (the rest is reasserted per frame from the ticker). Ported from
-// v1's UiHiderPatches; string-named targets are types that have moved or
-// been renamed across game versions — resolved at runtime via
-// AccessTools.TypeByName (TargetMethod + Prepare) rather than the HarmonyX-only
-// [HarmonyPatch(string, string)] attribute ctor, which doesn't exist in the
-// plain Harmony 2.x that vanilla UnityModManager ships (it threw
-// MissingMethodException and stopped the whole mod from loading there).
 public static partial class UiHider {
     [HarmonyPatch(typeof(scrHitTextMesh), "Show")]
     private static class JudgmentTextShowPatch {
@@ -19,49 +9,37 @@ public static partial class UiHider {
             if(ShouldHideJudgementText()) position = HiddenPosition;
         }
     }
-
     [HarmonyPatch]
     private static class MissIndicatorPatch {
         private static bool Prepare() => AccessTools.TypeByName("scrMissIndicator") != null;
         private static MethodBase TargetMethod() => AccessTools.Method(AccessTools.TypeByName("scrMissIndicator"), "Awake");
-
         private static void Postfix(object __instance) {
             if(!ShouldHideMissIndicators()) return;
             if(__instance is Component component) component.transform.position = HiddenPosition;
         }
     }
-
-    // The flashing "AUTOPLAY" text checks RDC.auto each frame; faking it off
-    // around that one Update hides the text without affecting actual
-    // auto-play state.
     [HarmonyPatch(typeof(scrShowIfDebug), "Update")]
     private static class HideAutoplayTextPatch {
         private static bool prevAuto;
-
         private static void Prefix() {
             prevAuto = RDC.auto;
             if(ShouldHideOtto()) RDC.auto = false;
         }
-
         private static void Postfix() {
             RDC.auto = prevAuto;
         }
     }
-
     [HarmonyPatch(typeof(scnEditor), "SwitchToEditMode")]
     private static class ReapplyOnEditModePatch {
         private static void Postfix() => ApplyNow();
     }
-
     private static class HideResultTextAndFlashPatches {
         private static bool shouldIgnoreFlashOnce;
-
         [HarmonyPatch(typeof(scrController), "OnLandOnPortal")]
         private static class HideResultTextPatch {
             private static void Prefix() {
                 if(ShouldHideLastFloorFlash()) shouldIgnoreFlashOnce = true;
             }
-
             private static void Postfix(scrController __instance) {
                 if(!ShouldHideResult()) return;
                 SetMemberInactive(__instance, "txtCongrats");
@@ -69,14 +47,10 @@ public static partial class UiHider {
                 SetMemberInactive(__instance, "txtAllStrictClear");
             }
         }
-
-        // The portal-landing white flash is identified by its exact color so
-        // other flashes (death, checkpoints) stay untouched.
         [HarmonyPatch]
         private static class HideLastFloorFlashPatch {
             private static bool Prepare() => AccessTools.TypeByName("scrFlash") != null;
             private static MethodBase TargetMethod() => AccessTools.Method(AccessTools.TypeByName("scrFlash"), "Flash");
-
             private static bool Prefix(object[] __args) {
                 if(!shouldIgnoreFlashOnce || !TryGetFlashColor(__args, out Color colorStart) || !IsLastFloorFlashColor(colorStart)) return true;
                 shouldIgnoreFlashOnce = false;
@@ -84,7 +58,6 @@ public static partial class UiHider {
             }
         }
     }
-
     private static class HideHitErrorMeterPatches {
         private static void HideErrorMeter() {
             if(!ShouldHideHitErrorMeter()) return;
@@ -93,38 +66,31 @@ public static partial class UiHider {
             GameObject errorMeter = GetGameObject(GetMemberValue(controller, "errorMeter"));
             if(errorMeter != null && errorMeter.activeSelf) errorMeter.SetActive(false);
         }
-
         [HarmonyPatch(typeof(scrController), "paused", MethodType.Setter)]
         private static class PausedSetterPatch {
             private static void Postfix() => HideErrorMeter();
         }
-
         [HarmonyPatch(typeof(scrPlanet), "MoveToNextFloor")]
         private static class MoveToNextFloorPatch {
             private static void Postfix() => HideErrorMeter();
         }
-
         [HarmonyPatch]
         private static class TaroCutscenePatch {
             private static bool Prepare() => AccessTools.TypeByName("TaroCutsceneScript") != null;
             private static MethodBase TargetMethod() => AccessTools.Method(AccessTools.TypeByName("TaroCutsceneScript"), "DisplayText");
-
             private static void Postfix() => HideErrorMeter();
         }
     }
-
     private static void SetMemberInactive(object owner, string memberName) {
         GameObject gameObject = GetGameObject(GetMemberValue(owner, memberName));
         if(gameObject != null) gameObject.SetActive(false);
     }
-
     private static bool IsLastFloorFlashColor(Color color) {
         return Mathf.Abs(color.r - 1f) < 0.001f
             && Mathf.Abs(color.g - 1f) < 0.001f
             && Mathf.Abs(color.b - 1f) < 0.001f
             && Mathf.Abs(color.a - 0.4f) < 0.001f;
     }
-
     private static bool TryGetFlashColor(object[] args, out Color color) {
         color = default;
         if(args == null || args.Length == 0 || args[0] is not Color c) return false;

@@ -3,16 +3,8 @@ using System.Reflection;
 using DG.Tweening;
 using HarmonyLib;
 using UnityEngine;
-
 namespace Quartz.Features.Nostalgia;
-
-// Play-category patches ported from BackToThePast: noResult, hideDifficulty,
-// hideNoFail, oldPracticeMode, showSpeedChange, legacyFlash, noJudgeAnimation,
-// lateJudgement, forceJudgeCount. (legacyResult is an IL transpiler that can't
-// be runtime-gated in Quartz's always-applied patch model, so it is not ported.)
 public static partial class Nostalgia {
-
-    // --- No Result: blank the congrats/results text on portal land ---
     [HarmonyPatch(typeof(scrController), "OnLandOnPortal")]
     private static class NoResultPatch {
         private static void Postfix(scrController __instance) {
@@ -23,14 +15,8 @@ public static partial class Nostalgia {
             }
         }
     }
-
-    // --- Hide Difficulty: re-hide whenever the editor/UI rebuilds it ---
     [HarmonyPatch]
     private static class HideDifficultyApplyPatch {
-        // Null-filtered: a missing target (game drift) yields null, and on plain
-        // Harmony 2.x (vanilla UMM) a null in TargetMethods aborts the ENTIRE
-        // PatchAll, not just this class. Drop nulls so one drifted method can't
-        // take down every patch.
         private static IEnumerable<MethodBase> TargetMethods() => new[] {
             AccessTools.Method(typeof(scnEditor), "Start"),
             AccessTools.Method(typeof(scnEditor), "SwitchToEditMode"),
@@ -41,7 +27,6 @@ public static partial class Nostalgia {
             if(ShouldHideDifficulty) ToggleDifficulty(false);
         }
     }
-
     [HarmonyPatch]
     private static class HideDifficultyCancelPatch {
         private static IEnumerable<MethodBase> TargetMethods() => new[] {
@@ -50,8 +35,6 @@ public static partial class Nostalgia {
         }.Where(m => m != null);
         private static bool Prefix() => !ShouldHideDifficulty;
     }
-
-    // --- Hide No-Fail: re-hide on editor build, block toggling it on ---
     [HarmonyPatch]
     private static class HideNoFailApplyPatch {
         private static IEnumerable<MethodBase> TargetMethods() => new[] {
@@ -62,18 +45,10 @@ public static partial class Nostalgia {
             if(ShouldHideNoFail) ToggleNoFail(false);
         }
     }
-
     [HarmonyPatch(typeof(scnEditor), "ToggleNoFail")]
     private static class EditorToggleNoFailPatch {
         private static bool Prefix() => !ShouldHideNoFail;
     }
-
-    // The editor re-shows the difficulty selector and no-fail button on its own
-    // (HUD refresh, unpause, etc.), reverting a one-shot hide and leaving only
-    // the grayed-out look. Re-hide from LateUpdate (after the editor's Update,
-    // before render) — but only when a button has actually been re-shown, so
-    // it's a cheap activeSelf check every frame and a real hide only on the
-    // frame it reappears.
     [HarmonyPatch(typeof(scnEditor), "LateUpdate")]
     private static class EditorReHidePatch {
         private static void Postfix(scnEditor __instance) {
@@ -90,7 +65,6 @@ public static partial class Nostalgia {
             RepositionDifficulty();
         }
     }
-
     [HarmonyPatch]
     private static class ClsToggleNoFailPatch {
         private static MethodBase TargetMethod() =>
@@ -100,8 +74,6 @@ public static partial class Nostalgia {
         private static bool Prepare(MethodBase original) => TargetMethod() != null;
         private static bool Prefix() => !ShouldHideNoFail;
     }
-
-    // --- Old Practice Mode: 'P' starts practice from the fail screen ---
     [HarmonyPatch(typeof(scrController), "Fail2_Update")]
     private static class OldPracticeModePatch {
         private static bool Prefix() {
@@ -115,8 +87,6 @@ public static partial class Nostalgia {
             return true;
         }
     }
-
-    // --- Show Speed Change: tint same-speed tiles with a rabbit/snail icon ---
     [HarmonyPatch(typeof(scrFloor), "UpdateIconSprite")]
     private static class ShowSpeedChangePatch {
         private static void Prefix(scrFloor __instance) {
@@ -151,12 +121,6 @@ public static partial class Nostalgia {
             }
         }
     }
-
-    // --- Legacy Flash: re-fire the old red full-screen damage flash ---
-    // The damage handler moved scrController.OnDamage -> scrPlayer.OnDamage in
-    // newer builds; the flash effect scrFlash.OnDamage() (red, half-alpha) is
-    // unchanged. Postfix the player's damage event and fire the legacy flash on
-    // top, exactly like the old game did.
     [HarmonyPatch]
     private static class LegacyFlashPatch {
         private static MethodBase TargetMethod() =>
@@ -165,15 +129,9 @@ public static partial class Nostalgia {
         private static bool Prepare() => TargetMethod() != null;
         private static void Postfix() {
             if(!ShouldLegacyFlash) return;
-            // scrFlash.OnDamage() starts the flash already half-faded
-            // (colortimer = colorduration / 2), so only ~0.2s shows. FlashEx
-            // starts from full red and fades over the whole duration, so it
-            // reads as a proper damage flash.
             scrFlash.FlashEx(Color.red.WithAlpha(0.5f), Color.clear, 0.6f);
         }
     }
-
-    // --- No Judge Animation: snap the hit-text instead of the pop tween ---
     [HarmonyPatch(typeof(scrHitTextMesh), "Show")]
     private static class NoJudgeAnimationPatch {
         private static void Postfix(scrHitTextMesh __instance) {
@@ -189,12 +147,6 @@ public static partial class Nostalgia {
             }
         }
     }
-
-    // --- Late Judgement: place the judgement text on the previous tile ---
-    // ShowHitText moved scrController -> scrHitTextManager and now takes the
-    // planet (not a ref position), computing the spot internally. So instead of
-    // editing an argument, we Postfix it: find the text that was just shown and
-    // move it (via its textPos) onto the previous tile, like the old game did.
     [HarmonyPatch(typeof(scrHitTextManager), "ShowHitText")]
     private static class LateJudgementPatch {
         private static bool Prepare() => AccessTools.Method(typeof(scrHitTextManager), "ShowHitText") != null;
@@ -208,17 +160,13 @@ public static partial class Nostalgia {
                     return;
             }
             try {
-                // The other planet's current floor IS the previous tile (the one
-                // just left), so use it directly — no seqID offset.
                 scrFloor other = planet?.other?.currfloor;
                 if(other == null) return;
                 Vector3 pos = other.transform.position;
                 pos.y += 1f;
-
                 EnsureHitTextAccessors();
                 var cached = cachedHitTextsRef != null ? cachedHitTextsRef(__instance) : null;
                 if(cached == null || !cached.TryGetValue(hitMargin, out scrHitTextMesh[] arr)) return;
-                // The text shown this call is the most recently shown live one.
                 scrHitTextMesh newest = null;
                 int best = int.MinValue;
                 foreach(scrHitTextMesh m in arr) {
@@ -236,17 +184,11 @@ public static partial class Nostalgia {
             } catch { }
         }
     }
-
-    // ShowHitText fires once per judged tile hit, so the reflection lookups
-    // above previously ran fresh every hit. Resolve the field accessors once
-    // (same guarded lazy pattern as PlanetColors' ringRef/onlyRingRef) instead
-    // of calling Traverse fresh on every hit.
     private static bool hitTextAccessorsResolved;
     private static AccessTools.FieldRef<scrHitTextManager, Dictionary<HitMargin, scrHitTextMesh[]>> cachedHitTextsRef;
     private static AccessTools.FieldRef<scrHitTextMesh, int> hitTextMeshFrameShownRef;
     private static AccessTools.FieldRef<scrHitTextMesh, Vector3> hitTextMeshTextPosRef;
     private static AccessTools.FieldRef<scrHitTextMesh, Renderer> hitTextMeshRendererRef;
-
     private static void EnsureHitTextAccessors() {
         if(hitTextAccessorsResolved) return;
         hitTextAccessorsResolved = true;

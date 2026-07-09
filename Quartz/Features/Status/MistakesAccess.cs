@@ -7,17 +7,13 @@ namespace Quartz.Features.Status
             scrController ctrl = scrController.instance;
             return ctrl != null ? ctrl.mistakesManager : null;
         }
-
         internal static float PercentAcc(scrMistakesManager m) => m != null ? m.percentAcc : 1f;
-
         internal static float PercentXAcc(scrMistakesManager m) => m != null ? m.percentXAcc : 1f;
-
         internal static int PlayerCount()
         {
             try { return scrPlayerManager.playerCount; }
             catch { return 1; }
         }
-
         internal static scrMarginTracker Tracker(int playerID)
         {
             try

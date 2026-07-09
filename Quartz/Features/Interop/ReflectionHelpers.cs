@@ -7,18 +7,10 @@ using Quartz.Core;
 using Quartz.Features.UiHider;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
-
 namespace Quartz.Features.Interop;
-
-// Generic reflection/XML/JSON reading helpers shared across the per-source-mod
-// readers in Quartz/Features/Interop/Readers/. Nothing here is specific to any
-// one source mod's schema.
 public static class ReflectionHelpers {
     private const BindingFlags AllMembers =
         BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
-
-    // ===== reflection helpers =====
-
     public static object GetStaticMember(Type type, string name) {
         if(type == null || string.IsNullOrEmpty(name)) return null;
         FieldInfo field = type.GetField(name, AllMembers);
@@ -26,7 +18,6 @@ public static class ReflectionHelpers {
         PropertyInfo prop = type.GetProperty(name, AllMembers);
         return prop?.GetValue(null, null);
     }
-
     public static object GetMemberValue(object obj, string name) {
         if(obj == null || string.IsNullOrEmpty(name)) return null;
         Type type = obj as Type ?? obj.GetType();
@@ -36,7 +27,6 @@ public static class ReflectionHelpers {
         PropertyInfo prop = type.GetProperty(name, AllMembers);
         return prop?.GetValue(instance, null);
     }
-
     public static object ReadMember(object target, string name) {
         if(target == null) return null;
         try {
@@ -49,12 +39,9 @@ public static class ReflectionHelpers {
             return null;
         }
     }
-
     public static object ReadNested(object target, string first, string second) =>
         ReadMember(ReadMember(target, first), second);
-
     public static bool TryGetBool(object obj, string name, out bool value) => TryConvertBool(GetMemberValue(obj, name), out value);
-
     public static bool TryConvertBool(object obj, out bool value) {
         value = false;
         switch(obj) {
@@ -75,9 +62,7 @@ public static class ReflectionHelpers {
         }
         return false;
     }
-
     public static bool TryGetInt(object obj, string name, out int value) => TryConvertInt(GetMemberValue(obj, name), out value);
-
     public static bool TryConvertInt(object raw, out int value) {
         value = 0;
         if(raw == null) return false;
@@ -88,9 +73,7 @@ public static class ReflectionHelpers {
             return int.TryParse(raw.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out value);
         }
     }
-
     public static bool TryGetFloat(object obj, string name, out float value) => TryConvertFloat(GetMemberValue(obj, name), out value);
-
     public static bool TryConvertFloat(object raw, out float value) {
         value = 0f;
         if(raw == null) return false;
@@ -101,7 +84,6 @@ public static class ReflectionHelpers {
             return float.TryParse(raw.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out value);
         }
     }
-
     public static bool TryGetColor(object value, out Color color) {
         color = Color.white;
         if(value == null) return false;
@@ -116,14 +98,9 @@ public static class ReflectionHelpers {
         }
         return false;
     }
-
-    // The source mods store stat colors as a "ColorRange": a list of
-    // progress→color points plus a PerfectColor. v2 takes flat colors, so pull
-    // the lowest- and highest-progress points as the low/high endpoints.
     public static bool TryGetColorRangeEndpoints(object value, out Color low, out Color high) {
         low = high = Color.white;
         if(value == null) return false;
-
         List<(float progress, Color color)> points = [];
         if(GetMemberValue(value, "List") is IEnumerable list) {
             foreach(object item in list) {
@@ -132,25 +109,19 @@ public static class ReflectionHelpers {
                 }
             }
         }
-
         if(points.Count > 0) {
             points.Sort((x, y) => x.progress.CompareTo(y.progress));
             low = points[0].color;
             high = points[^1].color;
             return true;
         }
-
         if(TryGetColor(GetMemberValue(value, "PerfectColor"), out Color perfect)) {
             low = high = perfect;
             return true;
         }
         return false;
     }
-
-    // ===== key/array readers =====
-
     public static int[] ReadKeyCodesFromMember(object obj, string member) => ReadKeyCodeEnumerable(GetMemberValue(obj, member));
-
     public static int[] ReadKeyCodeEnumerable(object value) {
         if(value is not IEnumerable enumerable || value is string) return [];
         List<int> result = [];
@@ -161,7 +132,6 @@ public static class ReflectionHelpers {
         }
         return [.. result];
     }
-
     public static int[] ReadKeyCodesFromJson(JToken token) {
         if(token is not JArray arr) return [];
         List<int> result = [];
@@ -172,7 +142,6 @@ public static class ReflectionHelpers {
         }
         return [.. result];
     }
-
     public static bool TryConvertKeyCode(object value, out int key) {
         key = 0;
         if(value == null) return false;
@@ -197,9 +166,7 @@ public static class ReflectionHelpers {
         }
         return false;
     }
-
     public static int NormalizeKeyInt(int raw) => (int)Features.KeyLimiter.KeyLimiter.NormalizeKey((KeyCode)raw);
-
     public static string[] ReadStringArray(object value) {
         if(value is not IEnumerable enumerable || value is string) return null;
         List<string> result = [];
@@ -208,7 +175,6 @@ public static class ReflectionHelpers {
         }
         return result.Count > 0 ? [.. result] : null;
     }
-
     public static string[] ReadStringArrayJson(JToken token) {
         if(token is not JArray arr || arr.Count == 0) return null;
         string[] result = new string[arr.Count];
@@ -217,7 +183,6 @@ public static class ReflectionHelpers {
         }
         return result;
     }
-
     public static Color? ReadJsonColor(JToken token) {
         if(token is not JObject obj) return null;
         if(TryConvertFloat(JsonValue(obj, "r"), out float r)
@@ -228,10 +193,8 @@ public static class ReflectionHelpers {
         }
         return null;
     }
-
     public static object JsonValue(JObject obj, string name) =>
         obj != null && obj.TryGetValue(name, StringComparison.OrdinalIgnoreCase, out JToken t) ? t : null;
-
     public static bool[] ReadBoolArray(object value) {
         if(value is not IEnumerable enumerable || value is string) return [];
         List<bool> values = [];
@@ -240,9 +203,6 @@ public static class ReflectionHelpers {
         }
         return [.. values];
     }
-
-    // ===== XML / file helpers =====
-
     public static XDocument LoadXml(SettingsImportOption option, string fileName) {
         if(string.IsNullOrEmpty(option.Directory)) return null;
         string path = Path.Combine(option.Directory, fileName);
@@ -255,7 +215,6 @@ public static class ReflectionHelpers {
             return XDocument.Load(reader);
         } catch { return null; }
     }
-
     public static int[] ReadKeyCodesFromXml(XElement parent, string listName) {
         if(parent == null) return [];
         XElement list = FindFirstDescendant(parent, listName);
@@ -268,7 +227,6 @@ public static class ReflectionHelpers {
         }
         return [.. result];
     }
-
     public static bool[] ReadXmlBoolArray(XDocument doc, string arrayName) {
         XElement parent = FindFirstDescendant(doc, arrayName);
         if(parent == null) return [];
@@ -278,19 +236,16 @@ public static class ReflectionHelpers {
         }
         return [.. values];
     }
-
     public static bool TryReadXmlBool(XContainer root, string name, out bool value) {
         value = false;
         XElement element = FindFirstDescendant(root, name);
         return element != null && TryParseBool(element.Value, out value);
     }
-
     public static bool TryReadXmlInt(XContainer root, string name, out int value) {
         value = 0;
         XElement element = FindFirstDescendant(root, name);
         return element != null && int.TryParse(element.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out value);
     }
-
     public static bool TryReadXmlKeyCode(XContainer root, string name, out int value) {
         value = 0;
         XElement element = FindFirstDescendant(root, name);
@@ -298,7 +253,6 @@ public static class ReflectionHelpers {
         if(int.TryParse(element.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out value)) return true;
         try { value = (int)(KeyCode)Enum.Parse(typeof(KeyCode), element.Value, true); return true; } catch { return false; }
     }
-
     public static bool TryParseBool(string text, out bool value) {
         value = false;
         if(bool.TryParse(text, out value)) return true;
@@ -308,12 +262,10 @@ public static class ReflectionHelpers {
         }
         return false;
     }
-
     public static XElement FindFirstDescendant(XContainer root, string name) {
         if(root == null || string.IsNullOrEmpty(name)) return null;
         return root.Descendants().FirstOrDefault(e => e.Name.LocalName == name);
     }
-
     public static XElement FindSelectedProfileElement(XDocument doc, string profileName) {
         if(doc == null) return null;
         XElement first = null;
@@ -323,7 +275,6 @@ public static class ReflectionHelpers {
         }
         return first;
     }
-
     public static string ReadFirstText(IEnumerable<string> paths) {
         foreach(string path in paths) {
             try {
@@ -332,15 +283,10 @@ public static class ReflectionHelpers {
         }
         return null;
     }
-
-    // ===== UI-hiding profile copy (shared by AdofaiTweaks + KorenResourcePackV1) =====
-
     public static int ApplyAdofaiHideUiProfile(object profile, UiHiderProfile target) =>
         profile == null ? 0 : ApplyHideUiProfile(name => TryGetBool(profile, name, out bool v) ? v : null, target);
-
     public static int ApplyAdofaiHideUiProfileXml(XElement profile, UiHiderProfile target) =>
         profile == null ? 0 : ApplyHideUiProfile(name => TryReadXmlBool(profile, name, out bool v) ? v : null, target);
-
     private static int ApplyHideUiProfile(Func<string, bool?> read, UiHiderProfile target) {
         if(target == null) return 0;
         int count = 0;
@@ -360,13 +306,10 @@ public static class ReflectionHelpers {
         Flag("HideLastFloorFlash", v => target.HideLastFloorFlash = v);
         return count;
     }
-
     public static void ApplyShortcutModifier(object shortcut) =>
         SetShortcutModifier(name => TryGetBool(shortcut, name, out bool v) && v);
-
     public static void ApplyShortcutModifierXml(XElement shortcut) =>
         SetShortcutModifier(name => TryReadXmlBool(shortcut, name, out bool v) && v);
-
     private static void SetShortcutModifier(Func<string, bool> pressed) {
         Features.UiHider.UiHider.Conf.ShortcutModifier = (int)(
             pressed("PressCtrl") ? Keybind.KeyModifier.Ctrl

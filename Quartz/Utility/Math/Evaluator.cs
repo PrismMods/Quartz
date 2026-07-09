@@ -1,7 +1,5 @@
 using System.Globalization;
-
 namespace Quartz.Utility.Math;
-
 public enum EvalState {
     OK,
     Error,
@@ -9,64 +7,40 @@ public enum EvalState {
     OverRange,
     UnderRange
 }
-
-// Self-contained arithmetic evaluator for slider value fields. Upstream
-// Overlayer uses NCalc here; KRP can't take the dependency (single-DLL Mono
-// merge — only game-bundled assemblies are referenced), so this is a small
-// recursive-descent parser covering what a slider editor actually needs:
-// + - * / % ^ , parentheses, unary sign, the constants pi/e/tau, and a handful
-// of functions. Case-insensitive, culture-invariant numbers.
 public static class Evaluator {
     public static (float result, EvalState state) Evaluate(string exprStr, float currentVal, float? min = null, float? max = null) {
         if(string.IsNullOrWhiteSpace(exprStr)) return (currentVal, EvalState.Error);
-
         double evaluated;
         try {
             evaluated = new Parser(exprStr).Parse();
         } catch {
             return (currentVal, EvalState.Error);
         }
-
         if(double.IsNaN(evaluated) || double.IsInfinity(evaluated)) return (currentVal, EvalState.Error);
-
         float result = (float)evaluated;
-
         if(min.HasValue && max.HasValue) {
             if(result < min.Value) return (min.Value, EvalState.UnderRange);
             if(result > max.Value) return (max.Value, EvalState.OverRange);
         }
-
         if(UnityEngine.Mathf.Approximately(result, currentVal)) return (result, EvalState.Same);
-
         return (result, EvalState.OK);
     }
-
-    // Grammar (precedence low→high):
-    //   expr  := term   (('+' | '-') term)*
-    //   term  := unary  (('*' | '/' | '%') unary)*
-    //   unary := ('+' | '-') unary | power
-    //   power := atom   ('^' unary)?            right-associative
-    //   atom  := number | ident | '(' expr ')'
     private sealed class Parser {
         private readonly string s;
         private int pos;
-
         public Parser(string expr) {
             s = expr;
             pos = 0;
         }
-
         public double Parse() {
             double v = ParseExpr();
             if(Peek() != '\0') throw new FormatException("trailing input");
             return v;
         }
-
         private char Peek() {
             while(pos < s.Length && char.IsWhiteSpace(s[pos])) pos++;
             return pos < s.Length ? s[pos] : '\0';
         }
-
         private double ParseExpr() {
             double v = ParseTerm();
             while(true) {
@@ -82,7 +56,6 @@ public static class Evaluator {
                 }
             }
         }
-
         private double ParseTerm() {
             double v = ParseUnary();
             while(true) {
@@ -101,32 +74,26 @@ public static class Evaluator {
                 }
             }
         }
-
         private double ParseUnary() {
             char c = Peek();
             if(c == '-') {
                 pos++;
                 return -ParseUnary();
             }
-
             if(c == '+') {
                 pos++;
                 return ParseUnary();
             }
-
             return ParsePower();
         }
-
         private double ParsePower() {
             double baseVal = ParseAtom();
             if(Peek() == '^') {
                 pos++;
                 return System.Math.Pow(baseVal, ParseUnary());
             }
-
             return baseVal;
         }
-
         private double ParseAtom() {
             char c = Peek();
             if(c == '(') {
@@ -136,11 +103,9 @@ public static class Evaluator {
                 pos++;
                 return v;
             }
-
             if(char.IsLetter(c)) return ParseIdent();
             return ParseNumber();
         }
-
         private double ParseNumber() {
             Peek();
             int start = pos;
@@ -148,21 +113,17 @@ public static class Evaluator {
             if(pos == start) throw new FormatException("expected number");
             return double.Parse(s.Substring(start, pos - start), CultureInfo.InvariantCulture);
         }
-
         private double ParseIdent() {
             Peek();
             int start = pos;
             while(pos < s.Length && char.IsLetter(s[pos])) pos++;
             string name = s.Substring(start, pos - start).ToLowerInvariant();
-
             switch(name) {
                 case "pi": return System.Math.PI;
                 case "e": return System.Math.E;
                 case "tau": return System.Math.PI * 2d;
             }
-
             if(Peek() != '(') throw new FormatException("unknown identifier '" + name + "'");
-
             pos++;
             List<double> args = [];
             if(Peek() != ')') {
@@ -172,13 +133,10 @@ public static class Evaluator {
                     args.Add(ParseExpr());
                 }
             }
-
             if(Peek() != ')') throw new FormatException("missing ')' for '" + name + "'");
-
             pos++;
             return ApplyFunc(name, args);
         }
-
         private static double ApplyFunc(string name, List<double> a) {
             switch(name) {
                 case "abs": Require(a, 1); return System.Math.Abs(a[0]);
@@ -202,7 +160,6 @@ public static class Evaluator {
                 default: throw new FormatException("unknown function '" + name + "'");
             }
         }
-
         private static void Require(List<double> a, int n) {
             if(a.Count != n) throw new FormatException("wrong argument count");
         }

@@ -2,38 +2,18 @@ using System;
 using System.Runtime.InteropServices;
 using Quartz.Core;
 using UnityEngine;
-// KeyLimiter is both a namespace and the class inside it; alias the class so the
-// NormalizeKey call below doesn't bind to the namespace.
 using KeyLimiterFeature = Quartz.Features.KeyLimiter.KeyLimiter;
-
 namespace Quartz.Features.AutoDeafen;
-
-// Injects a system-wide key chord (modifiers + key) so Discord picks it up via
-// its own global "toggle deafen" shortcut. One SendChord call is a single tap
-// (press + release of the whole chord), which flips Discord's deafen state.
-//
-// Ported from the original KorenResourcePack, trimmed to the Windows backend:
-// shortcut mode is offered on Windows only (AutoDeafen forces bot mode
-// elsewhere), so the macOS/Linux injectors v1 carried would never run here.
-// Any non-Windows call no-ops with a single log line.
 internal static class NativeKeySender {
     private static bool unsupportedLogged;
-
     internal static void SendChord(bool ctrl, bool shift, bool alt, bool meta, KeyCode key) {
         key = KeyLimiterFeature.NormalizeKey(key);
         if(key == KeyCode.None) return;
-
-        // Tell the game's input funnel to ignore this chord for a short window
-        // and open the SkyHook suppression bypass, so the synthetic presses reach
-        // Discord without registering as gameplay hits. Mark the modifier
-        // keycodes too — Shift is a real ADOFAI gameplay key, and the others are
-        // harmless to list. (Meta/Win isn't a gameplay key, so it's skipped.)
         List<KeyCode> chord = [key];
         if(ctrl) { chord.Add(KeyCode.LeftControl); chord.Add(KeyCode.RightControl); }
         if(shift) { chord.Add(KeyCode.LeftShift); chord.Add(KeyCode.RightShift); }
         if(alt) { chord.Add(KeyCode.LeftAlt); chord.Add(KeyCode.RightAlt); }
         AutoDeafen.MarkInject(chord);
-
         try {
             switch(Application.platform) {
                 case RuntimePlatform.WindowsPlayer:
@@ -48,45 +28,35 @@ internal static class NativeKeySender {
             LogUnsupported(ex.Message);
         }
     }
-
     private static void LogUnsupported(string detail) {
         if(unsupportedLogged) return;
         unsupportedLogged = true;
         MainCore.Log.Msg("[AutoDeafen] key send unavailable (" + detail + ").");
     }
-
-    // ===== Windows (user32) =====
-
     [DllImport("user32.dll")]
     private static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
-
     private const uint KEYEVENTF_KEYUP = 0x0002;
     private const byte VK_CONTROL = 0x11;
     private const byte VK_SHIFT = 0x10;
-    private const byte VK_MENU = 0x12;   // Alt
+    private const byte VK_MENU = 0x12;   
     private const byte VK_LWIN = 0x5B;
-
     private static void SendWindows(bool ctrl, bool shift, bool alt, bool meta, KeyCode key) {
         byte vk = WinVk(key);
         if(vk == 0) {
             LogUnsupported("no VK for " + key);
             return;
         }
-
         if(ctrl) keybd_event(VK_CONTROL, 0, 0, UIntPtr.Zero);
         if(shift) keybd_event(VK_SHIFT, 0, 0, UIntPtr.Zero);
         if(alt) keybd_event(VK_MENU, 0, 0, UIntPtr.Zero);
         if(meta) keybd_event(VK_LWIN, 0, 0, UIntPtr.Zero);
-
         keybd_event(vk, 0, 0, UIntPtr.Zero);
         keybd_event(vk, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
-
         if(meta) keybd_event(VK_LWIN, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
         if(alt) keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
         if(shift) keybd_event(VK_SHIFT, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
         if(ctrl) keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
     }
-
     private static byte WinVk(KeyCode k) {
         if(k >= KeyCode.A && k <= KeyCode.Z) return (byte)(0x41 + (k - KeyCode.A));
         if(k >= KeyCode.Alpha0 && k <= KeyCode.Alpha9) return (byte)(0x30 + (k - KeyCode.Alpha0));

@@ -2,74 +2,39 @@ using Newtonsoft.Json.Linq;
 using Quartz.Core;
 using Quartz.Localization;
 using Quartz.Resource;
-
 namespace Quartz.IO;
-
-// Settings profiles. A profile is a snapshot of every settings json in
-// UserData/Quartz, stored under UserData/Quartz/Profiles/<name>/. The live
-// files in the root stay authoritative; the active profile is kept in sync
-// by capturing on quit and right before switching, so selecting another
-// profile never loses the current one. Export/import bundles a profile into
-// a single .qprofile file so settings survive manual updates that replace
-// the UserData folder. Legacy .krprofile files still import.
 public static partial class ProfileManager {
     public const string DEFAULT_NAME = "Default";
     public const string EXPORT_EXTENSION = "qprofile";
-
-    // Legacy export extension (KRP v2). New exports use EXPORT_EXTENSION, but
-    // both are still imported and discovered as presets so old .krprofile files
-    // and the shipped presets keep working.
     public const string LEGACY_EXTENSION = "krprofile";
-
-    // Extensions accepted when importing or scanning for profile bundles.
     public static readonly string[] ImportExtensions = [EXPORT_EXTENSION, LEGACY_EXTENSION];
-
     private const string BUNDLE_TYPE = "QuartzProfile";
-
-    // Bundle "Type" values accepted on import. QuartzProfile is the current
-    // format; KorenProfile is the pre-rename (KRP v2) magic, kept so old
-    // .krprofile files and already-installed presets still load. The bundle
-    // structure is otherwise identical, so accepting the legacy tag is enough.
     private static readonly HashSet<string> bundleTypes = new(StringComparer.Ordinal) {
         BUNDLE_TYPE,
         "KorenProfile",
     };
-
     private static bool IsProfileBundle(JToken bundle) =>
         bundle?["Type"]?.Value<string>() is string type && bundleTypes.Contains(type);
-
-    // Root json files that are not profile-switchable settings: play
-    // statistics shouldn't rewind when switching, and the pointer file
-    // tracks profiles rather than belonging to one.
     private static readonly HashSet<string> excluded = new(StringComparer.OrdinalIgnoreCase) {
         "PlayCount.json",
         "Profiles.json",
     };
-
     public static string Active { get; private set; } = DEFAULT_NAME;
-
     public static string ProfilesPath => Path.Combine(MainCore.Paths.RootPath, "Profiles");
     private static string PointerPath => Path.Combine(MainCore.Paths.RootPath, "Profiles.json");
     private static string SwitchMarkerPath => Path.Combine(ProfilesPath, ".switch.json");
     private static string SwitchRollbackPath => Path.Combine(ProfilesPath, ".switch-rollback");
-
     private static string DirOf(string name) => Path.Combine(ProfilesPath, name);
-
     public static void Initialize() {
         try {
             Directory.CreateDirectory(ProfilesPath);
             RecoverProfileDirectories();
             RecoverInterruptedSwitch();
-
             if(File.Exists(PointerPath)) {
                 JToken token = JToken.Parse(File.ReadAllText(PointerPath));
                 string name = token["Active"]?.Value<string>();
-
                 if(!string.IsNullOrWhiteSpace(name) && Directory.Exists(DirOf(name))) Active = name;
             }
-
-            // First run, or the pointer aimed at a deleted directory: capture
-            // the live (code-default) settings as the initial profile.
             if(!Directory.Exists(DirOf(Active))) {
                 Active = DEFAULT_NAME;
                 CaptureTo(Active);
@@ -79,7 +44,6 @@ public static partial class ProfileManager {
             MainCore.Log.Err($"[{nameof(ProfileManager)}] Initialize failed: {e}");
         }
     }
-
     public static string[] List() {
         try {
             return [..
@@ -92,57 +56,37 @@ public static partial class ProfileManager {
             return [Active];
         }
     }
-
     public static bool Exists(string name)
         => !string.IsNullOrEmpty(name) && Directory.Exists(DirOf(name));
-
-    // Strips path-hostile characters; returns null when nothing usable remains.
     public static string Sanitize(string name) => ProfileNames.Sanitize(name);
-
-    // Creates a new profile from the current live settings and makes it the
-    // active one (the old active profile is captured first, so both hold the
-    // same state until the user diverges them).
     public static bool Create(string name) {
         name = Sanitize(name);
-
         if(name == null || Exists(name)) return false;
-
         try {
             if(!CaptureActive()) return false;
             CaptureTo(name);
             Active = name;
             SavePointer();
-
             return true;
         } catch(Exception e) {
             MainCore.Log.Err($"[{nameof(ProfileManager)}] Create '{name}' failed: {e}");
-
             return false;
         }
     }
-
     public static string CreateUnique(string name) {
         name = ProfileNames.Unique(name, Exists);
         return Create(name) ? name : null;
     }
-
     public static bool Delete(string name) {
         if(name == Active || !Exists(name)) return false;
-
         try {
             Directory.Delete(DirOf(name), true);
-
             return true;
         } catch(Exception e) {
             MainCore.Log.Err($"[{nameof(ProfileManager)}] Delete '{name}' failed: {e}");
-
             return false;
         }
     }
-
-    // Snapshot the live settings into the active profile. Called on quit and
-    // before any switch, so edits always belong to the profile that was
-    // active while they were made.
     public static bool CaptureActive() {
         try {
             if(!SettingsRegistry.SaveAll()) return false;
@@ -153,56 +97,31 @@ public static partial class ProfileManager {
             return false;
         }
     }
-
-    // Switches the live settings to `name`. The caller owns any UI rebuild —
-    // this only swaps files, reloads them and re-applies the runtime side
-    // (mod enable state, font, language).
     public static bool Apply(string name) {
         if(name == Active || !Exists(name)) return false;
-
         string previous = Active;
         Dictionary<string, string> previousFiles = null;
         bool runtimeStopped = false;
         bool switchStarted = false;
-
         try {
             if(!CaptureActive()) throw new IOException("could not capture the active profile before switching");
-
-            // Read and validate both sides before changing live files. This catches
-            // a corrupt/inaccessible profile without disabling the mod or leaving a
-            // half-applied mixture on disk.
             Dictionary<string, string> targetFiles = ReadSettingsDirectory(DirOf(name), validateJson: true);
             previousFiles = ReadSettingsDirectory(MainCore.Paths.RootPath, validateJson: false);
             BeginSwitch(previous, previousFiles);
             switchStarted = true;
-
-            // A debounced save firing mid-switch would overwrite the freshly
-            // copied files with pre-switch data.
             SettingsRegistry.CancelPendingSaves();
-
-            // Tear the overlays down with the old settings, swap the files,
-            // then bring everything back up reading the new ones.
             MainCore.Runtime.SetModEnabled(false, true);
             runtimeStopped = true;
-
             ReplaceLiveSettings(targetFiles);
-
             SettingsRegistry.ReloadAll();
-
             ApplyRuntimeSettings();
-
             Active = name;
             SavePointer();
             MainCore.Runtime.SetModEnabled(MainCore.Conf.Active, true);
             CompleteSwitch();
-
             return true;
         } catch(Exception e) {
             MainCore.Log.Err($"[{nameof(ProfileManager)}] Apply '{name}' failed: {e}");
-
-            // Restore the exact pre-switch file set and runtime state. Older or
-            // imported profiles often omit newer feature files; exact replacement
-            // also guarantees those omissions reset to defaults instead of leaking.
             if(previousFiles != null) {
                 try {
                     ReplaceLiveSettings(previousFiles);
@@ -216,82 +135,55 @@ public static partial class ProfileManager {
                     MainCore.Log.Err($"[{nameof(ProfileManager)}] Rollback '{previous}' failed: {rollbackError}");
                 }
             }
-
             return false;
         }
     }
-
-    // Writes the profile as a single-file bundle: every settings json keyed
-    // by filename, plus enough metadata to validate on import.
     public static bool Export(string name, string destPath) {
         if(!Exists(name) || string.IsNullOrEmpty(destPath)) return false;
-
         try {
             if(name == Active && !CaptureActive()) return false;
-
             JObject files = [];
-
             foreach(string file in Directory.GetFiles(DirOf(name), "*.json")) {
                 try {
                     files[Path.GetFileName(file)] = JToken.Parse(File.ReadAllText(file));
                 } catch {
-                    // A corrupt settings file shouldn't block exporting the rest.
                 }
             }
-
             JObject bundle = new() {
                 ["Type"] = BUNDLE_TYPE,
                 ["Version"] = Info.Version,
                 ["Name"] = name,
                 ["Files"] = files,
             };
-
             AtomicFile.WriteAllText(destPath, bundle.ToString());
-
             return true;
         } catch(Exception e) {
             MainCore.Log.Err($"[{nameof(ProfileManager)}] Export '{name}' failed: {e}");
-
             return false;
         }
     }
-
-    // Creates a profile from a bundle file; returns its (uniquified) name,
-    // or null when the file isn't a profile bundle. Accepts both the current
-    // and legacy (KRP v2) bundle tags. Does not auto-apply.
     public static string Import(string srcPath) {
         try {
             JToken bundle = JToken.Parse(File.ReadAllText(srcPath));
-
             if(!IsProfileBundle(bundle) || bundle["Files"] is not JObject files) {
                 return null;
             }
-
             string name = Sanitize(bundle["Name"]?.Value<string>())
                 ?? Sanitize(Path.GetFileNameWithoutExtension(srcPath))
                 ?? "Imported";
             name = Uniquify(name);
-
             string dir = DirOf(name);
             Dictionary<string, byte[]> imported = new(StringComparer.OrdinalIgnoreCase);
-
             foreach(JProperty prop in files.Properties()) {
-                // GetFileName guards against path traversal in bundle keys.
                 string fileName = Path.GetFileName(prop.Name);
-
                 if(!fileName.EndsWith(".json", StringComparison.OrdinalIgnoreCase) || excluded.Contains(fileName)) continue;
-
                 imported[fileName] = System.Text.Encoding.UTF8.GetBytes(prop.Value.ToString());
             }
-
             WriteProfileDirectory(dir, imported);
-
             return name;
         } catch(Exception e) {
             MainCore.Log.Err($"[{nameof(ProfileManager)}] Import '{srcPath}' failed: {e}");
-
             return null;
         }
     }
-
 }

@@ -6,32 +6,19 @@ using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
-
 namespace Quartz.Features.Nostalgia;
-
-// Legacy Custom Level Select — restores the old CLS search bar + keyboard
-// shortcuts (F search, S speed-trial, N no-fail, O cycle sort, Del delete),
-// hiding the modern OptionsPanelsCLS panel. Ported from BackToThePast's
-// LegacyCLS. Heavy reflection into the modern options panel is done with
-// HarmonyLib Traverse and wrapped defensively — the feature is opt-in and
-// off by default. Guarded by the OptionsPanelsCLS type existing.
 public static partial class Nostalgia {
     private static readonly Type OptionsPanelsCLS = AccessTools.TypeByName("OptionsPanelsCLS");
-
     internal static InputField clsSearchField;
     internal static CanvasGroup clsSearchFieldCanvasGroup;
     internal static bool clsSearchMode;
     private static Sequence clsSearchSeq;
-
     static partial void ToggleLegacyCLSImpl(bool active) => ToggleCLS(active);
-
     private static object OptionsPanels =>
         scnCLS.instance == null ? null : Traverse.Create(scnCLS.instance).Field("optionsPanels").GetValue();
-
     private static void CreateInputField() {
         if(clsSearchField || scnCLS.instance == null) return;
         NostalgiaImages.EnsureLoaded();
-
         GameObject container = new("Search Field Container");
         container.transform.SetParent(scnCLS.instance.transform, false);
         RectTransform crect = container.GetOrAddComponent<RectTransform>();
@@ -41,7 +28,6 @@ public static partial class Nostalgia {
         crect.localPosition = new Vector3(0, 0, 2.5098f);
         crect.sizeDelta = new Vector2(552.5f, 100.7f);
         container.GetOrAddComponent<CanvasRenderer>().cullTransparentMesh = false;
-
         GameObject field = new("Search Field");
         field.transform.SetParent(container.transform, false);
         RectTransform frect = field.GetOrAddComponent<RectTransform>();
@@ -50,32 +36,24 @@ public static partial class Nostalgia {
         frect.offsetMin = new Vector2(-276, -50);
         frect.sizeDelta = new Vector2(552, 100);
         field.GetOrAddComponent<CanvasRenderer>().cullTransparentMesh = false;
-
         Image image = field.AddComponent<Image>();
         image.sprite = NostalgiaImages.EditorButtonFill;
         image.type = Image.Type.Sliced;
-
         InputField inputField = field.AddComponent<InputField>();
         inputField.caretColor = new Color(0.1961f, 0.1961f, 0.1961f);
         inputField.image = image;
         inputField.targetGraphic = image;
         clsSearchField = inputField;
         clsSearchFieldCanvasGroup = field.AddComponent<CanvasGroup>();
-
         inputField.placeholder = MakeFieldText(field.transform, "Placeholder", true);
         inputField.textComponent = MakeFieldText(field.transform, "Text", false);
         field.SetActive(false);
-
         clsSearchField.onValueChanged.AddListener(sub => scnCLS.instance.SearchLevels(sub, true));
         clsSearchField.onEndEdit.AddListener(_ => ToggleSearchModeCLS(false));
     }
-
-    // `responsive` is a scnLevelSelect property in the current build; set it
-    // reflectively so this compiles regardless of where it now lives.
     private static void SetClsResponsive(bool value) {
         try { Traverse.Create(scnCLS.instance).Property("responsive").SetValue(value); } catch { }
     }
-
     private static Text MakeFieldText(Transform parent, string name, bool placeholder) {
         GameObject obj = new(name);
         obj.transform.SetParent(parent, false);
@@ -87,7 +65,6 @@ public static partial class Nostalgia {
         rect.offsetMin = new Vector2(10, 6);
         rect.sizeDelta = new Vector2(-20, -13);
         obj.GetOrAddComponent<CanvasRenderer>().cullTransparentMesh = false;
-
         Text text = obj.AddComponent<Text>();
         text.alignment = TextAnchor.MiddleCenter;
         text.fontSize = 60;
@@ -108,11 +85,9 @@ public static partial class Nostalgia {
         text.SetLocalizedFont();
         return text;
     }
-
     internal static void ToggleSearchModeCLS(bool search) {
         if(scnCLS.instance != null) scnCLS.instance.StartCoroutine(ToggleSearchModeCo(search));
     }
-
     private static IEnumerator ToggleSearchModeCo(bool search) {
         Traverse.Create(OptionsPanels).Field("searchMode").SetValue(clsSearchMode = search);
         if(search && RDC.runningOnSteamDeck) {
@@ -133,7 +108,6 @@ public static partial class Nostalgia {
         yield return new WaitForEndOfFrame();
         SetClsResponsive(true);
     }
-
     private static void ToggleCLS(bool active) {
         if(OptionsPanelsCLS == null || scnCLS.instance == null || (!active && !clsSearchField)) return;
         try {
@@ -158,8 +132,6 @@ public static partial class Nostalgia {
             MainCore.Log.Wrn($"[Nostalgia] LegacyCLS toggle failed: {e.Message}");
         }
     }
-
-    // --- scnCLS.Awake: install shortcut + apply current state ---
     [HarmonyPatch(typeof(scnCLS), "Awake")]
     private static class LegacyClsAwakePatch {
         private static bool Prepare() => OptionsPanelsCLS != null;
@@ -180,9 +152,6 @@ public static partial class Nostalgia {
             }
         }
     }
-
-    // --- OptionsPanelsCLS.ToggleSearchMode: route to the legacy animation ---
-    // (The modern build moved search out of scnCLS into OptionsPanelsCLS.)
     [HarmonyPatch]
     private static class LegacyClsToggleSearchPatch {
         private static MethodBase TargetMethod() => AccessTools.Method(OptionsPanelsCLS, "ToggleSearchMode");
@@ -194,20 +163,11 @@ public static partial class Nostalgia {
         }
     }
 }
-
-// Old CLS keyboard shortcuts: F search, S speed-trial, N no-fail, Del delete,
-// O cycle sort. Ported from BackToThePast's WorkshopShortcut.
 public sealed class WorkshopShortcut : MonoBehaviour {
-    // A fresh WorkshopShortcut is attached to a fresh scnCLS.instance every
-    // time the CLS screen loads (LegacyClsAwakePatch / ToggleCLS both call
-    // GetOrAddComponent on scnCLS.instance.gameObject), so this component's
-    // lifetime already matches scnCLS's — resolving accessors once in Awake
-    // needs no separate scene-change invalidation.
     private AccessTools.FieldRef<scnCLS, object> optionsPanelsRef;
     private Func<scnCLS, bool> responsiveGetter;
     private Action<object> toggleSpeedTrial;
     private Action<object> toggleNoFail;
-
     private void Awake() {
         try { optionsPanelsRef = AccessTools.FieldRefAccess<scnCLS, object>("optionsPanels"); } catch { }
         try {
@@ -215,7 +175,6 @@ public sealed class WorkshopShortcut : MonoBehaviour {
             if(getter != null) responsiveGetter = (Func<scnCLS, bool>)Delegate.CreateDelegate(typeof(Func<scnCLS, bool>), getter);
         } catch { }
     }
-
     private void Update() {
         if(!Nostalgia.ShouldLegacyCLS
            || scnCLS.instance == null
@@ -251,12 +210,10 @@ public sealed class WorkshopShortcut : MonoBehaviour {
             } catch { }
         }
     }
-
     private bool IsResponsive(scnCLS cls) =>
         responsiveGetter != null
             ? responsiveGetter(cls)
             : Traverse.Create(cls).Property("responsive").GetValue<bool>();
-
     private static Action<object> BuildActionInvoker(object optionsPanels, string methodName) {
         try {
             MethodInfo method = optionsPanels != null ? AccessTools.Method(optionsPanels.GetType(), methodName) : null;

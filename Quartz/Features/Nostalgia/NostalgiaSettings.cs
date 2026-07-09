@@ -1,18 +1,8 @@
 using Newtonsoft.Json.Linq;
 using Quartz.IO;
 using Quartz.IO.Interface;
-
 namespace Quartz.Features.Nostalgia;
-
-// Persisted config for the Nostalgia feature — a faithful port of tjwogud's
-// "BackToThePast" mod, which reverts modern ADOFAI behaviour/visuals back to
-// how the game used to look and sound. Field names follow BTTP's Settings.cs;
-// defaults match BTTP's defaults (everything off except the OldXO secret level,
-// which BTTP ships on — we default it off here since it injects a fake world
-// into the level-select and is the most game-version-fragile piece).
-// Lives in UserData/Quartz/Nostalgia.json.
 public sealed class NostalgiaSettings : ISettingsFile {
-    // === Play ===
     public bool LegacyResult = false;
     public bool NoResult = false;
     public bool HideDifficulty = false;
@@ -28,30 +18,23 @@ public sealed class NostalgiaSettings : ISettingsFile {
     public int JudgeCount = 100;
     public bool LegacyTwirl = false;
     public bool TwirlWithoutArrow = false;
-
-    // === Editor ===
     public bool Space360Tile = false;
     public bool WeakAuto = false;
     public bool WhiteAuto = false;
     public bool LegacyEditorButtonsPositions = false;
     public bool LegacyEditorButtonsDesigns = false;
-    public bool LegacyTexts = false; // Korean-only editor string reverts
-
-    // === SFX ===
+    public bool LegacyTexts = false; 
     public bool DisablePurePerfectSound = false;
     public bool DisableWindSound = false;
     public bool DisableDeathSound = false;
     public bool DisableCountdownSound = false;
     public bool DisableEndingSound = false;
     public bool DisableNewBestSound = false;
-
-    // === Etc ===
     public bool LegacyCLS = false;
     public bool DisableAlphaWarning = false;
     public bool DisableAnnounceSign = false;
     public bool OldBackground = false;
-    public int OldBackgroundIndex = 0; // 0 = A, 1 = B
-
+    public int OldBackgroundIndex = 0; 
     public JToken Serialize() =>
         new JObject {
             [nameof(LegacyResult)] = LegacyResult,
@@ -87,7 +70,6 @@ public sealed class NostalgiaSettings : ISettingsFile {
             [nameof(OldBackground)] = OldBackground,
             [nameof(OldBackgroundIndex)] = OldBackgroundIndex,
         };
-
     public void Deserialize(JToken token) {
         LegacyResult = IOUtils.Read(token, nameof(LegacyResult), LegacyResult);
         NoResult = IOUtils.Read(token, nameof(NoResult), NoResult);

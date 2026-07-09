@@ -1,16 +1,12 @@
 using Quartz.Features.EffectRemover;
 using Newtonsoft.Json.Linq;
 using static Quartz.Features.Interop.ReflectionHelpers;
-
 namespace Quartz.Features.Interop.Readers;
-
-// ===== EnhancedEffectRemover =====
 internal static class EnhancedEffectRemoverReader {
     public static int ImportEnhancedEffectRemover(SettingsImportOption option) {
         int count = 0;
         object settings = GetStaticMember(SettingsImporter.FindType(option, "EnhancedEffectRemover.Settings"), "Instance");
         if(settings != null) count += ApplyEffectRemover(name => GetMemberValue(settings, name));
-
         if(count == 0) {
             string json = ReadFirstText([Path.Combine(option.Directory ?? "", "Settings.json")]);
             if(!string.IsNullOrEmpty(json)) {
@@ -23,21 +19,15 @@ internal static class EnhancedEffectRemoverReader {
         }
         return count;
     }
-
-    // Shared mapping for both the runtime object and the JSON file: `get`
-    // returns a raw value (boxed CLR value or JToken) for a source field name.
     private static int ApplyEffectRemover(Func<string, object> get) {
         Features.EffectRemover.EffectRemover.EnsureConf();
         EffectRemoverSettings c = Features.EffectRemover.EffectRemover.Conf;
         int count = 0;
-
         c.On = true;
         count++;
-
         void Flag(string srcName, Action<bool> set) {
             if(TryConvertBool(get(srcName), out bool v)) { set(v); count++; }
         }
-
         if(TryConvertFloat(get("CameraZoomScale"), out float zoom)) { c.CameraZoomScale = zoom; count++; }
         Flag("EnableSave", v => c.EnableSave = v);
         Flag("ResetTrackAnimation", v => c.ResetTrackAnimation = v);

@@ -5,25 +5,13 @@ using Quartz.UI.Objects.Impl;
 using Quartz.UI.Utility;
 using UnityEngine;
 using UnityEngine.UI;
-
 using TMPro;
-
 namespace Quartz.UI.Factory.Page;
-
-// Import tab. Lists every supported ADOFAI mod currently loaded through Unity
-// Mod Manager and copies its settings into Quartz. Mods that ship a
-// KeyViewer (KorenResourcePack v1, JipperResourcePack, JipperKeyViewer) get a
-// replace mode + the per-group toggles, mirroring v1's importer. The heavy
-// lifting lives in SettingsImporter; this page is just the surface.
 internal static class PageImport {
     private static RectTransform listContainer;
     private static TextMeshProUGUI statusText;
-
-    // Per-mod KeyViewer import choices, keyed by option id so they survive a
-    // list rebuild (e.g. when switching the replace mode re-draws the card).
     private static readonly Dictionary<string, SettingsImportReplaceMode> modes = [];
     private static readonly Dictionary<string, SettingsImportKeyViewerPart> parts = [];
-
     private static readonly (SettingsImportKeyViewerPart Flag, string Id, string Default)[] PartDefs = [
         (SettingsImportKeyViewerPart.KeysLayout, "import_part_keys", "Keys / layout"),
         (SettingsImportKeyViewerPart.Labels, "import_part_labels", "Labels"),
@@ -31,19 +19,12 @@ internal static class PageImport {
         (SettingsImportKeyViewerPart.Rain, "import_part_rain", "Rain"),
         (SettingsImportKeyViewerPart.PositionSize, "import_part_position", "Position / size"),
     ];
-
     public static void Create(RectTransform parent) {
         RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
-
         TextMeshProUGUI headerText = GenerateUI.AddTextH1(GenerateUI.Row(content.transform));
         GenerateUI.Localize(headerText, "IMPORT_HEADER", "Import from other mods");
-
         var hintRow = GenerateUI.Row(content.transform, 96f);
         var hintText = GenerateUI.AddMutedText(hintRow, 17f, 0.45f, true);
-        // CreateText stretches the rect to the row's full width and leaves TMP
-        // at NoWrap. Enable wrapping and inset the right edge by 250 (the same
-        // gutter BackGround() rows use) so the copy wraps instead of running off
-        // the row, and sits off the right edge like the other tabs.
         hintText.textWrappingMode = TextWrappingModes.Normal;
         hintText.rectTransform.offsetMax = new Vector2(-250f, 0f);
         GenerateUI.Localize(
@@ -52,7 +33,6 @@ internal static class PageImport {
             "Pull your settings in from another ADOFAI mod. Quartz reads each supported mod " +
             "loaded through Unity Mod Manager and copies over what it has a home for. Your other settings are left untouched."
         );
-
         var topRow = GenerateUI.Row(content.transform);
         UIButton rescanBtn = GenerateUI.Button(topRow, RebuildList, "Rescan", "import_rescan").SetSecondary();
         {
@@ -64,43 +44,26 @@ internal static class PageImport {
             br.offsetMax = Vector2.zero;
         }
         rescanBtn.Rect.AddToolTip("DESC_IMPORT_RESCAN", "Re-scan for supported mods loaded through Unity Mod Manager.");
-
         var statusRow = GenerateUI.Row(content.transform, 32f);
         statusText = GenerateUI.AddMutedText(statusRow, 18f, 0.45f, true);
         statusText.text = "";
-
         GameObject list = new("Mods");
         list.transform.SetParent(content.transform, false);
-
         listContainer = list.AddComponent<RectTransform>();
         GenerateUI.FitVertical(list, 16f);
-
         RebuildList();
-
-        // The hint is built before content's layout runs, so its TMP can cache a
-        // one-line mesh at a stale (full) width and never re-wrap. Force the
-        // layout now so every row gets its real width and the text re-wraps —
-        // same trick DropDown uses after building its popup.
         LayoutRebuilder.ForceRebuildLayoutImmediate(content);
     }
-
     private static void RebuildList() {
         if(listContainer == null) return;
-
         GenerateUI.ClearChildren(listContainer);
-
         List<SettingsImportOption> options = SettingsImporter.GetAvailableOptions();
         List<InstalledModInfo> installed = SettingsImporter.GetAllInstalledMods();
-
-        // Compatible = Quartz has an importer for it (an option). Every other
-        // installed UMM mod is shown below, tagged "Not Compatible".
         HashSet<string> compatIds = new(StringComparer.OrdinalIgnoreCase);
         foreach(SettingsImportOption opt in options) compatIds.Add(opt.Id);
-
         List<InstalledModInfo> incompatible = [];
         foreach(InstalledModInfo mod in installed)
             if(!compatIds.Contains(mod.Id)) incompatible.Add(mod);
-
         if(options.Count == 0 && incompatible.Count == 0) {
             var emptyRow = GenerateUI.Row(listContainer, 96f);
             var emptyText = GenerateUI.AddMutedText(emptyRow, 18f, 0.6f, true);
@@ -114,27 +77,19 @@ internal static class PageImport {
             );
             return;
         }
-
-        // Compatible on top, not-compatible below; each group sorted A→Z by label.
         options.Sort((a, b) => string.Compare(a.Label, b.Label, StringComparison.OrdinalIgnoreCase));
         incompatible.Sort((a, b) => string.Compare(a.Label, b.Label, StringComparison.OrdinalIgnoreCase));
-
         foreach(SettingsImportOption option in options) CreateOptionCard(option);
         foreach(InstalledModInfo mod in incompatible) CreateIncompatibleCard(mod);
     }
-
-    // A muted row for an installed mod Quartz has no importer for: name on the
-    // left, a right-aligned "Not Compatible" tag, no Import button.
     private static void CreateIncompatibleCard(InstalledModInfo mod) {
         var row = GenerateUI.Row(listContainer, 50f);
         GenerateUI.ButtonRow(row);
-
         var label = GenerateUI.AddText(row, noPad: true);
         label.overflowMode = TextOverflowModes.Ellipsis;
         label.color = new Color(1f, 1f, 1f, 0.55f);
         label.gameObject.AddComponent<LayoutElement>().flexibleWidth = 1f;
         label.text = mod.Label;
-
         var tag = GenerateUI.AddMutedText(row, 17f, 0.4f, true);
         tag.alignment = TextAlignmentOptions.MidlineRight;
         LayoutElement tagLe = tag.gameObject.AddComponent<LayoutElement>();
@@ -143,46 +98,35 @@ internal static class PageImport {
         tagLe.flexibleWidth = 0f;
         GenerateUI.Localize(tag, "IMPORT_NOT_COMPATIBLE", "Not Compatible");
     }
-
     private static void CreateOptionCard(SettingsImportOption option) {
-        // Title row: mod name on the left, Import on the right.
         var row = GenerateUI.Row(listContainer, 50f);
         GenerateUI.ButtonRow(row);
-
         var label = GenerateUI.AddText(row, noPad: true);
         label.overflowMode = TextOverflowModes.Ellipsis;
         label.gameObject.AddComponent<LayoutElement>().flexibleWidth = 1f;
         label.text = option.Label;
-
         UIButton importBtn = GenerateUI.Button(row, () => RunImport(option, false), "Import", "import_do");
         GenerateUI.FixWidth(importBtn, 140f);
         importBtn.Rect.AddToolTip(
             "DESC_IMPORT_DO",
             "Copy this mod's settings into Quartz. Settings it doesn't cover are left as they are."
         );
-
         UIButton profileBtn = GenerateUI.Button(row, () => RunImport(option, true), "Import Profile", "import_profile").SetSecondary();
         GenerateUI.FixWidth(profileBtn, 190f);
         profileBtn.Rect.AddToolTip(
             "DESC_IMPORT_PROFILE",
             "Copy this mod's settings into a new Quartz profile, leaving the current profile selected."
         );
-
         if(!SettingsImporter.HasKeyViewerPayload(option.Source)) return;
-
-        // KeyViewer replace mode + (for "Replace certain") the group toggles.
         SettingsImportReplaceMode mode = modes.TryGetValue(option.OptionId, out var m) ? m : SettingsImportReplaceMode.ReplaceAll;
-
         var modeHeaderRow = GenerateUI.Row(listContainer, 30f);
         var modeHeader = GenerateUI.AddMutedText(modeHeaderRow, 16f, 0.55f, true);
         GenerateUI.Localize(modeHeader, "IMPORT_KV_MODE", "KeyViewer import");
-
         IReadOnlyList<SettingsImportReplaceMode> modeValues = new[] {
             SettingsImportReplaceMode.ReplaceAll,
             SettingsImportReplaceMode.ReplaceCertain,
             SettingsImportReplaceMode.KeepOld,
         };
-
         var modeRow = GenerateUI.Row(listContainer);
         GenerateUI.DropDown(
             modeRow,
@@ -196,11 +140,8 @@ internal static class PageImport {
             },
             "import_mode_" + option.OptionId
         );
-
         if(mode != SettingsImportReplaceMode.ReplaceCertain) return;
-
         SettingsImportKeyViewerPart selected = parts.TryGetValue(option.OptionId, out var p) ? p : SettingsImportKeyViewerPart.All;
-
         foreach((SettingsImportKeyViewerPart flag, string id, string def) in PartDefs) {
             GenerateUI.Toggle(
                 listContainer,
@@ -218,26 +159,21 @@ internal static class PageImport {
             );
         }
     }
-
     private static string ModeLabel(SettingsImportReplaceMode mode) => mode switch {
         SettingsImportReplaceMode.ReplaceAll => GenerateUI.Tr("IMPORT_MODE_REPLACE_ALL", "Replace all"),
         SettingsImportReplaceMode.ReplaceCertain => GenerateUI.Tr("IMPORT_MODE_REPLACE_CERTAIN", "Replace certain"),
         _ => GenerateUI.Tr("IMPORT_MODE_KEEP_OLD", "Keep old"),
     };
-
     private static void RunImport(SettingsImportOption option, bool separateProfile) {
         SettingsImportReplaceMode mode = modes.TryGetValue(option.OptionId, out var m) ? m : SettingsImportReplaceMode.ReplaceAll;
         SettingsImportKeyViewerPart p = parts.TryGetValue(option.OptionId, out var pp) ? pp : SettingsImportKeyViewerPart.All;
-
         SettingsImportResult result = separateProfile
             ? SettingsImporter.ImportToProfile(option, mode, p)
             : SettingsImporter.Import(option, mode, p);
-
         if(!result.Success) {
             statusText.text = string.Format(GenerateUI.Tr("IMPORT_FAIL", "Import failed: {0}"), result.Message);
             return;
         }
-
         if(separateProfile && result.ImportedCount > 0) {
             statusText.text = string.Format(
                 GenerateUI.Tr("IMPORT_PROFILE_OK", "Imported {0} settings from {1} into profile {2}."),
@@ -247,7 +183,6 @@ internal static class PageImport {
             );
             return;
         }
-
         statusText.text = result.ImportedCount > 0
             ? string.Format(GenerateUI.Tr("IMPORT_OK", "Imported {0} settings from {1}."), result.ImportedCount, option.Label)
             : string.Format(GenerateUI.Tr("IMPORT_OK_NONE", "Nothing to import from {0}."), option.Label);

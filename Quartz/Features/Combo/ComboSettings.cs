@@ -2,110 +2,57 @@ using Newtonsoft.Json.Linq;
 using Quartz.IO;
 using Quartz.IO.Interface;
 using UnityEngine;
-
 namespace Quartz.Features.Combo;
-
-// Persisted config for the center-screen Combo overlay.
-// Lives in UserData/Quartz/Combo.json — separate from Status.json.
-//
-// The base layout (large value with a caption beneath, anchored below the
-// progress bar) is the original KorenResourcePack combo. The extra knobs —
-// master/caption scaling, per-element drop shadows, count thickness, solid /
-// perfect-combo color, and the configurable pulse — were ported from the
-// combo-progressbar-playcount branch. Every added field defaults to a value
-// that reproduces the original look, so an existing Combo.json is unchanged.
 public sealed class ComboSettings : ISettingsFile {
     public bool Enabled = true;
     public bool CountAuto = true;
-
-    // When XPerfect is installed + active, count ONLY its X (dead-center)
-    // perfects toward the combo, and prefix the caption with "X". A non-X
-    // perfect (early/late perfect) breaks the combo. Off = every Perfect counts.
     public bool XPerfectComboEnabled = false;
-
-    // === Sizing ===
-    // FontSize is the count's base pixel size (original field). MasterSize
-    // scales the whole overlay; CaptionScale is the caption size as a
-    // fraction of the count size (0.35 reproduces the original hard-coded
-    // ratio).
     public float FontSize = 56f;
     public float MasterSize = 1f;
     public float CaptionScale = 0.35f;
-
-    // === Position ===
     public float OffsetX = 0f;
     public float OffsetY = 58.8050537f;
-
-    // === Caption / Label ===
     public bool ShowCaption = true;
     public string CaptionText = "Combo";
     public float CaptionOffsetY = -40f;
-    // Drop shadow (TMP underlay). Offsets are in "pixel-ish" units.
     public bool CaptionShadowEnabled = true;
     public float CaptionShadowX = 1.5f;
     public float CaptionShadowY = -1.5f;
     public float CaptionShadowSoftness = 0f;
     public float CaptionShadowR = 0f, CaptionShadowG = 0f, CaptionShadowB = 0f, CaptionShadowA = 0.5019608f;
-
-    // === Count ===
-    // TMP face dilate — thickens the value strokes. Range roughly -0.5 (thin)
-    // to 0.5 (thick); 0 = native weight.
     public float CountThickness = 0f;
     public bool CountShadowEnabled = true;
     public float CountShadowX = 1.5f;
     public float CountShadowY = -1.5f;
     public float CountShadowSoftness = 0f;
     public float CountShadowR = 0f, CountShadowG = 0f, CountShadowB = 0f, CountShadowA = 0.5019608f;
-
-    // === Color ===
     public int ColorMax = 2000;
     public float ColorLowR = 1f, ColorLowG = 1f, ColorLowB = 1f, ColorLowA = 1f;
     public float ColorHighR = 1f, ColorHighG = 0.22f, ColorHighB = 0.22f, ColorHighA = 1f;
-    // SolidColor → always use the low color. PerfectColor → override with a
-    // dedicated color once the count reaches ColorMax. Both default off so the
-    // original low→high gradient is unchanged.
     public bool SolidColor = false;
     public bool PerfectColorEnabled = false;
     public float PerfectR = 0.886f, PerfectG = 0.404f, PerfectB = 0.427f, PerfectA = 1f;
-
-    // === Animation ===
-    // NoPopAnim disables the pulse entirely. CountPulseScale is the extra
-    // scale at the pulse peak (0.24 reproduces the original 1.24x pop).
-    // PulseDuration is the full pop length in seconds (0.255 ≈ the original
-    // 0.075 out + 0.18 settle). LabelPulseOffsetY kicks the caption up on each
-    // pop (0 = no kick, the original behavior).
     public bool NoPopAnim = false;
     public float CountPulseScale = 0.149999991f;
     public float PulseDuration = 0.099999994f;
     public float LabelPulseOffsetY = 7f;
-
     public Color GetColorLow() => IOUtils.Rgba(ColorLowR, ColorLowG, ColorLowB, ColorLowA);
     public void SetColorLow(Color c) => IOUtils.SetRgba(c, ref ColorLowR, ref ColorLowG, ref ColorLowB, ref ColorLowA);
-
     public Color GetColorHigh() => IOUtils.Rgba(ColorHighR, ColorHighG, ColorHighB, ColorHighA);
     public void SetColorHigh(Color c) => IOUtils.SetRgba(c, ref ColorHighR, ref ColorHighG, ref ColorHighB, ref ColorHighA);
-
     public Color GetPerfectColor() => IOUtils.Rgba(PerfectR, PerfectG, PerfectB, PerfectA);
     public void SetPerfectColor(Color c) => IOUtils.SetRgba(c, ref PerfectR, ref PerfectG, ref PerfectB, ref PerfectA);
-
     public Color GetCaptionShadowColor() => IOUtils.Rgba(CaptionShadowR, CaptionShadowG, CaptionShadowB, CaptionShadowA);
     public void SetCaptionShadowColor(Color c) =>
         IOUtils.SetRgba(c, ref CaptionShadowR, ref CaptionShadowG, ref CaptionShadowB, ref CaptionShadowA);
-
     public Color GetCountShadowColor() => IOUtils.Rgba(CountShadowR, CountShadowG, CountShadowB, CountShadowA);
     public void SetCountShadowColor(Color c) =>
         IOUtils.SetRgba(c, ref CountShadowR, ref CountShadowG, ref CountShadowB, ref CountShadowA);
-
-    // Resolves the value color for a given count:
-    //   PerfectColor (enabled, count >= ColorMax) → perfect color
-    //   SolidColor                                 → low color
-    //   otherwise                                  → low→high lerp by count/ColorMax
     public Color GetComboColor(int combo) {
         if(PerfectColorEnabled && ColorMax > 0 && combo >= ColorMax) return GetPerfectColor();
         if(SolidColor) return GetColorLow();
         return Color.Lerp(GetColorLow(), GetColorHigh(), ColorMax <= 0 ? 0f : Mathf.Clamp01((float)combo / ColorMax));
     }
-
     public JToken Serialize() {
         return new JObject {
             [nameof(Enabled)] = Enabled,
@@ -157,7 +104,6 @@ public sealed class ComboSettings : ISettingsFile {
             [nameof(LabelPulseOffsetY)] = LabelPulseOffsetY,
         };
     }
-
     public void Deserialize(JToken token) {
         Enabled = IOUtils.Read(token, nameof(Enabled), Enabled);
         CountAuto = IOUtils.Read(token, nameof(CountAuto), CountAuto);
@@ -195,14 +141,8 @@ public sealed class ComboSettings : ISettingsFile {
         CountPulseScale = IOUtils.Read(token, nameof(CountPulseScale), CountPulseScale);
         PulseDuration = IOUtils.Read(token, nameof(PulseDuration), PulseDuration);
         LabelPulseOffsetY = IOUtils.Read(token, nameof(LabelPulseOffsetY), LabelPulseOffsetY);
-
-        // Back-compat: migrate combo fields from Status.json naming.
         CountAuto = IOUtils.Read(token, "ComboCountAuto", CountAuto);
         Enabled = IOUtils.Read(token, "ShowCombo", Enabled);
-
-        // Back-compat: older combo JSON had no enable fields. Treat those as
-        // the new on-by-default shadow, and if the old offsets were both zero,
-        // give them the visible default offset.
         if(!hasCaptionShadowEnabled) {
             CaptionShadowEnabled = true;
             if(hasCaptionShadowOffset &&

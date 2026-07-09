@@ -1,7 +1,5 @@
 using Quartz.IO;
-
 using static Asserts;
-
 static class AtomicFileTests {
     public static void TestAtomicFile() {
         string root = Path.Combine(Path.GetTempPath(), "koren-tests-" + Guid.NewGuid().ToString("N"));

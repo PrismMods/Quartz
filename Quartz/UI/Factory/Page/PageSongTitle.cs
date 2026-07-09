@@ -6,27 +6,20 @@ using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using TMPro;
 using UnityEngine;
-
 namespace Quartz.UI.Factory.Page;
-
-// Song Title settings section for the Overlay tab. Replaces the game's own
-// in-game title/artist HUD with a customizable {artist}/{title} template.
 internal static class PageSongTitle {
     public static void AppendTo(Transform content) {
         SongTitleOverlay.EnsureConf();
         SongTitleSettings conf = SongTitleOverlay.Conf;
         SongTitleSettings def = new();
-
         void Save() => SongTitleOverlay.Save();
         void Apply() => SongTitleOverlay.Apply();
         void ApplyShadow() => SongTitleOverlay.ApplyShadow();
-
         void SetHeaderEnabled(bool enabled, GenerateUI.CollapsibleSection section) {
             if(section.HeaderObj.transform.Find("Bar/Label") is Transform labelTr
                 && labelTr.TryGetComponent(out TextMeshProUGUI label))
                 label.alpha = enabled ? 1f : 0.5f;
         }
-
         GenerateUI.CollapsibleSection sec = null;
         sec = GenerateUI.Collapsible(
             content, "Song Title", startExpanded: false,
@@ -34,7 +27,6 @@ internal static class PageSongTitle {
             conf.Enabled
         );
         SetHeaderEnabled(conf.Enabled, sec);
-
         UIInput fmt = GenerateUI.Input(
             GenerateUI.Row(sec.Body),
             def.Format,
@@ -45,15 +37,12 @@ internal static class PageSongTitle {
             "songtitle_format"
         );
         fmt.InputField.characterLimit = 80;
-
         GenerateUI.SnapSlider(sec.Body, "Font Size", "songtitle_fontsize",
             def.FontSize, 12f, 120f, conf.FontSize, "0 px", 1f,
             v => conf.FontSize = v, Apply, Save);
-
         GenerateUI.SnapSlider(sec.Body, "Master Size", "songtitle_master",
             def.MasterSize, 0.25f, 3f, conf.MasterSize, "0.00 x", 0.01f,
             v => conf.MasterSize = v, Apply, Save);
-
         GenerateUI.ColorPicker(
             GenerateUI.Row(sec.Body),
             def.GetColor(),
@@ -63,7 +52,6 @@ internal static class PageSongTitle {
             "Text Color",
             "songtitle_color"
         );
-
         GenerateUI.Toggle(
             GenerateUI.Row(sec.Body),
             def.ShadowEnabled,
@@ -72,19 +60,15 @@ internal static class PageSongTitle {
             "Shadow",
             "songtitle_shadow"
         );
-
         GenerateUI.SnapSlider(sec.Body, "Shadow X", "songtitle_shadow_x",
             def.ShadowX, -10f, 10f, conf.ShadowX, "0.0 px", 0.1f,
             v => conf.ShadowX = v, ApplyShadow, Save);
-
         GenerateUI.SnapSlider(sec.Body, "Shadow Y", "songtitle_shadow_y",
             def.ShadowY, -10f, 10f, conf.ShadowY, "0.0 px", 0.1f,
             v => conf.ShadowY = v, ApplyShadow, Save);
-
         GenerateUI.SnapSlider(sec.Body, "Shadow Softness", "songtitle_shadow_soft",
             def.ShadowSoftness, 0f, 20f, conf.ShadowSoftness, "0.0 px", 0.1f,
             v => conf.ShadowSoftness = v, ApplyShadow, Save);
-
         GenerateUI.ColorPicker(
             GenerateUI.Row(sec.Body),
             def.GetShadowColor(),
@@ -94,17 +78,12 @@ internal static class PageSongTitle {
             "Shadow Color",
             "songtitle_shadow_color"
         );
-
         GenerateUI.Button(
             GenerateUI.Row(sec.Body),
             () => SongTitleOverlay.ResetPosition(),
             "Reset Position",
             "songtitle_resetpos"
         ).SetSecondary();
-
-        // Separate from the replacement overlay above: fonts ADOFAI's OWN
-        // native title HUD in place (no repositioning), for when this overlay
-        // is off and the native title is what's actually showing.
         GenerateUI.CollapsibleSection fontSec = null;
         fontSec = GenerateUI.Collapsible(
             content, "Native Title Font", startExpanded: false,
@@ -121,14 +100,12 @@ internal static class PageSongTitle {
             "DESC_FONT_SONG_TITLE",
             "Apply the selected font to the level title shown during play, not just this mod's UI."
         );
-
         GenerateUI.SnapSlider(fontSec.Body, "Font Size", "font_song_title_size",
             1f, 0.25f, 3f, MainCore.Conf.FontSongTitleSize, "0.00 x", 0.01f,
             v => MainCore.Conf.FontSongTitleSize = v,
             () => InGameOverlayFont.RefreshSizeOnly(InGameOverlayFont.Category.SongTitle),
             () => MainCore.ConfMgr.RequestSave());
     }
-
     public static void Create(RectTransform parent) =>
         AppendTo(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
 }

@@ -7,7 +7,6 @@ List<(string Name, Action Run)> tests = [
     ("KeyViewer CSS parses the DM Note contract", KeyViewerCssTests.TestKeyViewerCss),
     ("KeyViewer CSS parses the extended web effects", KeyViewerCssTests.TestKeyViewerCssExtended),
 ];
-
 int failed = 0;
 foreach((string name, Action run) in tests) {
     try {
@@ -18,5 +17,4 @@ foreach((string name, Action run) in tests) {
         Console.Error.WriteLine("FAIL " + name + ": " + e.Message);
     }
 }
-
 return failed == 0 ? 0 : 1;

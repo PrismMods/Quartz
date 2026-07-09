@@ -1,9 +1,7 @@
 ﻿using GTweens.Delegates;
 using GTweens.Interpolators;
 using System.Numerics;
-
 namespace GTweens.Tweeners;
-
 public sealed class SystemVector3Tweener : Tweener<Vector3> {
     public SystemVector3Tweener(
         Getter currValueGetter,

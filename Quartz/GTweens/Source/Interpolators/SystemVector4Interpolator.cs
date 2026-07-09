@@ -1,13 +1,9 @@
 ﻿using GTweens.Easings;
 using System.Numerics;
-
 namespace GTweens.Interpolators;
-
 public sealed class SystemVector4Interpolator : IInterpolator<Vector4> {
     public static readonly SystemVector4Interpolator Instance = new();
-
     SystemVector4Interpolator() { }
-
     public Vector4 Evaluate(
         Vector4 initialValue,
         Vector4 finalValue,
@@ -21,8 +17,6 @@ public sealed class SystemVector4Interpolator : IInterpolator<Vector4> {
             easingDelegate(initialValue.W, finalValue.W, time)
             );
     }
-
     public Vector4 Subtract(Vector4 initialValue, Vector4 finalValue) => finalValue - initialValue;
-
     public Vector4 Add(Vector4 initialValue, Vector4 finalValue) => finalValue + initialValue;
 }

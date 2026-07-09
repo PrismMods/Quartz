@@ -1,29 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
-
 namespace Quartz.Core;
-
-// The modifier + key combo for the menu toggle, plus the shared capture and
-// formatting helpers. A bind is either a single key, or exactly one modifier
-// plus one key — never two ordinary keys.
-//
-// Modifiers: Ctrl / Alt / Shift, plus Cmd for the macOS Command key. Unity
-// reports Command under different keycodes depending on version (LeftMeta,
-// LeftCommand, LeftWindows...), so the meta keys are resolved by name at
-// runtime rather than referenced directly (a missing one would not compile).
 public static class Keybind {
     public enum KeyModifier { None, Ctrl, Alt, Shift, Cmd }
-
-    // True while a settings keybind capture is listening. UICore checks this so
-    // pressing keys to rebind doesn't also fire the menu toggle.
     public static bool Capturing;
-
     public static bool IsMac =>
         Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXEditor;
-
-    // The Command / Meta / Windows keys that exist in this Unity's KeyCode enum.
     private static readonly KeyCode[] CmdKeys = ResolveCmdKeys();
-
     private static KeyCode[] ResolveCmdKeys() {
         string[] names = {
             "LeftMeta", "RightMeta",
@@ -36,20 +19,16 @@ public static class Keybind {
             if(System.Enum.TryParse(name, out KeyCode kc) && !keys.Contains(kc)) keys.Add(kc);
         return [.. keys];
     }
-
     private static bool AnyCmdHeld() {
         for(int i = 0; i < CmdKeys.Length; i++)
             if(Input.GetKey(CmdKeys[i])) return true;
         return false;
     }
-
     private static bool IsCmdKey(KeyCode key) {
         for(int i = 0; i < CmdKeys.Length; i++)
             if(CmdKeys[i] == key) return true;
         return false;
     }
-
-    // A modifier key itself — never bound as the main key.
     public static bool IsModifier(KeyCode key) {
         switch(key) {
             case KeyCode.LeftControl or KeyCode.RightControl
@@ -60,7 +39,6 @@ public static class Keybind {
                 return IsCmdKey(key);
         }
     }
-
     public static bool ModifierHeld(KeyModifier mod) => mod switch {
         KeyModifier.None => true,
         KeyModifier.Ctrl => Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl),
@@ -69,8 +47,6 @@ public static class Keybind {
         KeyModifier.Cmd => AnyCmdHeld(),
         _ => false,
     };
-
-    // The modifier currently held (Ctrl > Cmd > Alt > Shift priority), or None.
     public static KeyModifier HeldModifier() {
         if(ModifierHeld(KeyModifier.Ctrl)) return KeyModifier.Ctrl;
         if(ModifierHeld(KeyModifier.Cmd)) return KeyModifier.Cmd;
@@ -78,7 +54,6 @@ public static class Keybind {
         if(ModifierHeld(KeyModifier.Shift)) return KeyModifier.Shift;
         return KeyModifier.None;
     }
-
     public static string ModifierName(KeyModifier mod) => mod switch {
         KeyModifier.Ctrl => "Ctrl",
         KeyModifier.Alt => IsMac ? "Option" : "Alt",
@@ -86,11 +61,9 @@ public static class Keybind {
         KeyModifier.Cmd => IsMac ? "Cmd" : "Win",
         _ => "",
     };
-
     public static string KeyName(KeyCode key) {
         string name = key.ToString();
         if(name.Length == 6 && name.StartsWith("Alpha")) return name[5..];
-
         return key switch {
             KeyCode.BackQuote => "`",
             KeyCode.Return => "Enter",
@@ -117,8 +90,6 @@ public static class Keybind {
             _ => name,
         };
     }
-
-    // "Option + K" on macOS, "Alt + K" elsewhere; just "K" with no modifier.
     public static string Format(KeyModifier mod, KeyCode key) {
         string k = KeyName(key);
         return mod == KeyModifier.None ? k : ModifierName(mod) + " + " + k;

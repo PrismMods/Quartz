@@ -10,18 +10,13 @@ using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using Quartz.UI.Utility;
 using UnityEngine;
-
 namespace Quartz.UI.Factory.Page;
-
-// Create* page-builder methods + nested types extracted from PageVisuals.cs.
 internal static partial class PageVisuals {
     private static void CreateEffectRemover(RectTransform content) {
         EffectRemover.EnsureConf();
         EffectRemoverSettings conf = EffectRemover.Conf;
         EffectRemoverSettings def = new();
-
         void Save() => EffectRemover.Save();
-
         var sec = GenerateUI.FlatSection(
             content.transform, "Effect Remover",
             v => {
@@ -32,9 +27,6 @@ internal static partial class PageVisuals {
             conf.On,
             "Enable Effect Remover", "effectremover_enable"
         );
-
-        // Mode: Simple (runtime effect disabling, editor-safe) vs Enhanced
-        // (the original chart-stripping behaviour). Switching rebuilds the page.
         GenerateUI.DropDown(
             GenerateUI.Row(sec.Body),
             EffectRemoverSettings.ModeEnhanced,
@@ -53,23 +45,16 @@ internal static partial class PageVisuals {
             260f,
             "Mode"
         );
-
         if(conf.IsSimple) {
             CreateSimpleEffectRemover(sec.Body, conf, def);
         } else {
-
-        // === Non-DLC events ===
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(sec.Body)), "HEADING_NON_DLC_EVENTS", "Non-DLC Events");
-
-        // Conditional rows created later; these callbacks update their
-        // visibility when the toggle that gates them changes.
         RectTransform removeAllRow = null;
         RectTransform setZoomRow = null;
         RectTransform zoomSliderRow = null;
         RectTransform resetAnimRow = null;
         RectTransform resetColorRow = null;
         RectTransform tutorialPatternsRow = null;
-
         void RefreshConditionalRows() {
             removeAllRow?.gameObject.SetActive(conf.Decorations);
             setZoomRow?.gameObject.SetActive(conf.Cameras);
@@ -78,7 +63,6 @@ internal static partial class PageVisuals {
             resetColorRow?.gameObject.SetActive(conf.TrackColors);
             tutorialPatternsRow?.gameObject.SetActive(conf.Backgrounds);
         }
-
         void SimpleToggle(Transform body, bool defVal, bool val, System.Action<bool> set, string label, string id) {
             GenerateUI.Toggle(
                 GenerateUI.Row(body),
@@ -93,7 +77,6 @@ internal static partial class PageVisuals {
                 id
             );
         }
-
         SimpleToggle(sec.Body, def.Filters, conf.Filters, v => conf.Filters = v, "Filter", "fxrm_filters");
         SimpleToggle(sec.Body, def.AdvancedFilters, conf.AdvancedFilters, v => conf.AdvancedFilters = v, "Advanced Filter", "fxrm_advfilters");
         SimpleToggle(sec.Body, def.Particles, conf.Particles, v => conf.Particles = v, "Particles", "fxrm_particles");
@@ -103,18 +86,13 @@ internal static partial class PageVisuals {
         SimpleToggle(sec.Body, def.RepeatEvents, conf.RepeatEvents, v => conf.RepeatEvents = v, "Repeat Event", "fxrm_repeat");
         SimpleToggle(sec.Body, def.FrameRate, conf.FrameRate, v => conf.FrameRate = v, "Frame Rate", "fxrm_framerate");
         SimpleToggle(sec.Body, def.HitSounds, conf.HitSounds, v => conf.HitSounds = v, "HitSound", "fxrm_hitsounds");
-
-        // === Planet events ===
         {
             var planet = GenerateUI.Collapsible(sec.Body, "Planet Events", startExpanded: false);
-
             UIToggle orbit = null, scale = null, radius = null;
-
             GenerateUI.Button(
                 GenerateUI.Row(planet.Body),
                 () => {
                     if(orbit == null || scale == null || radius == null) return;
-                    // v1 semantics: if none are on, turn all on; else all off.
                     bool value = !conf.PlanetOrbit && !conf.PlanetScale && !conf.PlanetRadius;
                     orbit.Set(value);
                     scale.Set(value);
@@ -123,7 +101,6 @@ internal static partial class PageVisuals {
                 "Toggle All",
                 "fxrm_planet_all"
             ).SetSecondary();
-
             orbit = GenerateUI.Toggle(
                 GenerateUI.Row(planet.Body), def.PlanetOrbit, conf.PlanetOrbit,
                 v => { conf.PlanetOrbit = v; Save(); }, "Planet Orbit", "fxrm_planet_orbit");
@@ -134,13 +111,9 @@ internal static partial class PageVisuals {
                 GenerateUI.Row(planet.Body), def.PlanetRadius, conf.PlanetRadius,
                 v => { conf.PlanetRadius = v; Save(); }, "Planet Radius", "fxrm_planet_radius");
         }
-
-        // === Track events ===
         {
             var track = GenerateUI.Collapsible(sec.Body, "Track Events", startExpanded: false);
-
             UIToggle anims = null, moves = null, positions = null, colors = null;
-
             GenerateUI.Button(
                 GenerateUI.Row(track.Body),
                 () => {
@@ -155,7 +128,6 @@ internal static partial class PageVisuals {
                 "Toggle All",
                 "fxrm_track_all"
             ).SetSecondary();
-
             anims = GenerateUI.Toggle(
                 GenerateUI.Row(track.Body), def.TrackAnimations, conf.TrackAnimations,
                 v => { conf.TrackAnimations = v; RefreshConditionalRows(); Save(); }, "Animate Track", "fxrm_track_anims");
@@ -169,16 +141,10 @@ internal static partial class PageVisuals {
                 GenerateUI.Row(track.Body), def.TrackColors, conf.TrackColors,
                 v => { conf.TrackColors = v; RefreshConditionalRows(); Save(); }, "Track Color", "fxrm_track_colors");
         }
-
-        // === DLC events ===
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(sec.Body)), "HEADING_DLC_EVENTS", "DLC Events");
-
         SimpleToggle(sec.Body, def.HoldSounds, conf.HoldSounds, v => conf.HoldSounds = v, "HoldSound", "fxrm_holdsounds");
         SimpleToggle(sec.Body, def.HideIcons, conf.HideIcons, v => conf.HideIcons = v, "HideIcon & Judgements", "fxrm_hideicons");
-
-        // === Misc ===
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(sec.Body)), "HEADING_MISC", "Misc");
-
         removeAllRow = GenerateUI.Row(sec.Body);
         GenerateUI.Toggle(
             removeAllRow, def.RemoveAllDecorations, conf.RemoveAllDecorations,
@@ -189,11 +155,9 @@ internal static partial class PageVisuals {
             "DESC_FXRM_REMOVE_ALL_DECO",
             "Off keeps decorations that judgement-conditional events reference (hit/miss feedback) and removes the rest."
         );
-
         SimpleToggle(sec.Body, def.LimitTrackOpacity, conf.LimitTrackOpacity,
             v => conf.LimitTrackOpacity = v,
             "Limit 'Track Opacity' Values to 100%", "fxrm_limit_opacity");
-
         setZoomRow = GenerateUI.Row(sec.Body);
         GenerateUI.Toggle(
             setZoomRow, def.SetCameraZoom, conf.SetCameraZoom,
@@ -205,7 +169,6 @@ internal static partial class PageVisuals {
             "Set Camera Zoom",
             "fxrm_set_zoom"
         );
-
         zoomSliderRow = GenerateUI.Row(sec.Body);
         UISlider zoom = GenerateUI.Slider(
             zoomSliderRow,
@@ -214,12 +177,9 @@ internal static partial class PageVisuals {
             "Camera Zoom",
             "fxrm_zoom_scale"
         );
-        // Quoted '%': bare % in a .NET format string multiplies by 100, and the
-        // zoom value is already a percent (100–1000).
         zoom.Format = "0' %'";
         zoom.OnChanged = v => conf.CameraZoomScale = v;
         zoom.OnComplete = v => { conf.CameraZoomScale = v; Save(); };
-
         resetAnimRow = GenerateUI.Row(sec.Body);
         GenerateUI.Toggle(
             resetAnimRow, def.ResetTrackAnimation, conf.ResetTrackAnimation,
@@ -227,7 +187,6 @@ internal static partial class PageVisuals {
             "Set Track Animation to Default",
             "fxrm_reset_anim"
         );
-
         resetColorRow = GenerateUI.Row(sec.Body);
         GenerateUI.Toggle(
             resetColorRow, def.ResetTrackColor, conf.ResetTrackColor,
@@ -235,7 +194,6 @@ internal static partial class PageVisuals {
             "Set Track Color to Default",
             "fxrm_reset_color"
         );
-
         tutorialPatternsRow = GenerateUI.Row(sec.Body);
         GenerateUI.Toggle(
             tutorialPatternsRow, def.RemoveTutorialPatterns, conf.RemoveTutorialPatterns,
@@ -246,44 +204,33 @@ internal static partial class PageVisuals {
             "DESC_FXRM_TUTORIAL_PATTERNS",
             "Also hides the default background's tiled pattern. Its pulsing shapes are always removed while Background is on."
         );
-
         RefreshConditionalRows();
-
-        } // end Enhanced-mode branch
+        } 
     }
-
-    // Simple mode — runtime effect disabling (AdofaiTweaks DisableEffects).
-    // Editor-safe (it never strips the chart), so no save-block toggle here.
     private static void CreateSimpleEffectRemover(
         Transform parent, EffectRemoverSettings conf, EffectRemoverSettings def) {
         void Save() => EffectRemover.Save();
-
         GenerateUI.ToggleTip(
             parent, def.SimpleFilter, conf.SimpleFilter,
             v => { conf.SimpleFilter = v; Save(); },
             "Disable Filters", "fxrm_s_filter",
             "Turns off VFX filters (Grayscale, Arcade, etc.) at runtime without changing the chart.");
-
         GenerateUI.ToggleTip(
             parent, def.SimpleBloom, conf.SimpleBloom,
             v => { conf.SimpleBloom = v; Save(); },
             "Disable Bloom", "fxrm_s_bloom", "Skips the bloom effect.");
-
         GenerateUI.ToggleTip(
             parent, def.SimpleFlash, conf.SimpleFlash,
             v => { conf.SimpleFlash = v; Save(); },
             "Disable Flash", "fxrm_s_flash", "Neutralises screen-flash effects.");
-
         GenerateUI.ToggleTip(
             parent, def.SimpleHallOfMirrors, conf.SimpleHallOfMirrors,
             v => { conf.SimpleHallOfMirrors = v; Save(); },
             "Disable Hall of Mirrors", "fxrm_s_hom", "Skips the Hall of Mirrors effect.");
-
         GenerateUI.ToggleTip(
             parent, def.SimpleScreenShake, conf.SimpleScreenShake,
             v => { conf.SimpleScreenShake = v; Save(); },
             "Disable Screen Shake", "fxrm_s_shake", "Skips screen-shake effects.");
-
         GenerateUI.Slider(
             GenerateUI.Row(parent),
             def.SimpleMoveTrackMax, 5f, EffectRemoverSettings.MoveTrackUpperBound + 5f,
@@ -295,14 +242,10 @@ internal static partial class PageVisuals {
         ).Rect.AddToolTip("DESC_FXRM_S_MOVEMAX",
             "Caps how many tiles a single Move Track event can move (around the current tile). The maximum value means unlimited.");
     }
-
-    // v1 ResourceChanger's "Change Otto icon": swaps the editor's auto-play
-    // icon for the mod's own sprite with a configurable tint and offset.
     private static void CreateOttoIcon(Transform content) {
         OttoIcon.EnsureConf();
         OttoIconSettings conf = OttoIcon.Conf;
         OttoIconSettings def = new();
-
         var sec = GenerateUI.FlatSection(
             content, "Otto Icon",
             v => {
@@ -314,7 +257,6 @@ internal static partial class PageVisuals {
             conf.Enabled,
             "Enable Otto Icon", "ottoicon_enable"
         );
-
         GenerateUI.ColorPicker(
             GenerateUI.Row(sec.Body),
             def.GetColor(),
@@ -324,9 +266,7 @@ internal static partial class PageVisuals {
             "Otto Color",
             "otto_color"
         );
-
         RectTransform highBpmColorRow = null;
-
         GenerateUI.ToggleTip(
             sec.Body,
             def.UseHighBpmColor,
@@ -341,7 +281,6 @@ internal static partial class PageVisuals {
             "otto_highbpm_on",
             "On: Otto uses the color below while the level's top BPM is 300+ (where vanilla turns him red). Off: the normal color is always used."
         );
-
         highBpmColorRow = GenerateUI.Row(sec.Body);
         GenerateUI.ColorPicker(
             highBpmColorRow,
@@ -353,7 +292,6 @@ internal static partial class PageVisuals {
             "otto_highbpm_color"
         );
         highBpmColorRow.gameObject.SetActive(conf.UseHighBpmColor);
-
         UISlider offsetX = GenerateUI.Slider(
             GenerateUI.Row(sec.Body),
             def.OffsetX, -100f, 100f, conf.OffsetX,
@@ -364,7 +302,6 @@ internal static partial class PageVisuals {
         offsetX.Format = "0";
         offsetX.OnChanged = v => { conf.OffsetX = v; OttoIcon.Refresh(); };
         offsetX.OnComplete = v => { conf.OffsetX = v; OttoIcon.Refresh(); OttoIcon.Save(); };
-
         UISlider offsetY = GenerateUI.Slider(
             GenerateUI.Row(sec.Body),
             def.OffsetY, -100f, 100f, conf.OffsetY,
@@ -376,14 +313,10 @@ internal static partial class PageVisuals {
         offsetY.OnChanged = v => { conf.OffsetY = v; OttoIcon.Refresh(); };
         offsetY.OnComplete = v => { conf.OffsetY = v; OttoIcon.Refresh(); OttoIcon.Save(); };
     }
-
-    // v1's UI Hiding: two profiles of hide flags (Playing / Recording) and a
-    // shortcut that flips between them mid-game.
     private static void CreateUiHiding(Transform content) {
         UiHider.EnsureConf();
         UiHiderSettings conf = UiHider.Conf;
         UiHiderSettings def = new();
-
         var sec = GenerateUI.FlatSection(
             content, "UI Hiding",
             v => {
@@ -395,7 +328,6 @@ internal static partial class PageVisuals {
             conf.Enabled,
             "Enable UI Hiding", "uihiding_enable"
         );
-
         GenerateUI.ToggleTip(
             sec.Body,
             def.RecordingMode,
@@ -409,7 +341,6 @@ internal static partial class PageVisuals {
             "uih_recmode",
             "Which profile is live right now: off = Playing, on = Recording."
         );
-
         GenerateUI.Toggle(
             GenerateUI.Row(sec.Body),
             def.UseShortcut,
@@ -421,7 +352,6 @@ internal static partial class PageVisuals {
             "Use Recording Mode Shortcut",
             "uih_useshortcut"
         );
-
         GenerateUI.KeyBind(
             GenerateUI.Row(sec.Body),
             (Keybind.KeyModifier)conf.ShortcutModifier,
@@ -434,10 +364,8 @@ internal static partial class PageVisuals {
             "Recording Mode Shortcut",
             "uih_shortcut"
         );
-
         void ProfileSection(string title, UiHiderProfile profile, UiHiderProfile defProfile, string idPrefix) {
             var prof = GenerateUI.Collapsible(sec.Body, title, startExpanded: false);
-
             void Flag(string label, string id, bool defVal, bool val, Action<bool> set) {
                 GenerateUI.Toggle(
                     GenerateUI.Row(prof.Body),
@@ -452,7 +380,6 @@ internal static partial class PageVisuals {
                     idPrefix + id
                 );
             }
-
             Flag("Hide Everything (No HUD)", "_all", defProfile.HideEverything, profile.HideEverything, v => profile.HideEverything = v);
             Flag("Hide Judgement Text", "_judg", defProfile.HideJudgment, profile.HideJudgment, v => profile.HideJudgment = v);
             Flag("Hide Miss Indicators", "_miss", defProfile.HideMissIndicators, profile.HideMissIndicators, v => profile.HideMissIndicators = v);
@@ -465,23 +392,15 @@ internal static partial class PageVisuals {
             Flag("Hide Hit Error Meter", "_meter", defProfile.HideHitErrorMeter, profile.HideHitErrorMeter, v => profile.HideHitErrorMeter = v);
             Flag("Hide Last Floor Flash", "_flash", defProfile.HideLastFloorFlash, profile.HideLastFloorFlash, v => profile.HideLastFloorFlash = v);
         }
-
         ProfileSection("Playing Profile", conf.Playing, def.Playing, "uih_play");
         ProfileSection("Recording Profile", conf.Recording, def.Recording, "uih_rec");
     }
-
-    // v1 ResourceChanger's "Change ball color": per planet slot a ball color
-    // (picker, RGB only) + ball opacity slider, and a tail opacity slider.
-    // "Separate Tail Color" reveals per-planet tail color pickers; while off,
-    // tails reuse the ball RGB, exactly like the original.
     private static void CreatePlanetColors(Transform content) {
         PlanetColors.EnsureConf();
         PlanetColorsSettings conf = PlanetColors.Conf;
         PlanetColorsSettings def = new();
-
         void Apply() => PlanetColors.Refresh();
         void Save() => PlanetColors.Save();
-
         var sec = GenerateUI.FlatSection(
             content, "Planet Colors",
             v => {
@@ -494,11 +413,9 @@ internal static partial class PageVisuals {
             "Enable Planet Colors", "planetcolors_enable"
         );
         RectTransform[] tailColorRows = new RectTransform[PlanetColorsSettings.Slots];
-
         void RefreshTailRows() {
             foreach(RectTransform row in tailColorRows) row?.gameObject.SetActive(conf.SeparateTailColor);
         }
-
         GenerateUI.ToggleTip(
             sec.Body,
             def.SeparateTailColor,
@@ -513,17 +430,14 @@ internal static partial class PageVisuals {
             "pcol_sep_tail",
             "Off: tails use the ball color (with their own opacity). On: each planet's tail gets its own color."
         );
-
         for(int i = 0; i < PlanetColorsSettings.Slots; i++) {
             int slot = i;
             string n = (slot + 1).ToString();
-
             GenerateUI.Localize(
                 GenerateUI.AddTextH1(GenerateUI.Row(sec.Body)),
                 "HEADING_PLANET_" + n,
                 $"Planet {n}"
             );
-
             GenerateUI.ColorPicker(
                 GenerateUI.Row(sec.Body),
                 new Color(def.BallR[slot], def.BallG[slot], def.BallB[slot]),
@@ -534,7 +448,6 @@ internal static partial class PageVisuals {
                 $"pcol_ball{n}",
                 showAlpha: false
             );
-
             UISlider ballOp = GenerateUI.Slider(
                 GenerateUI.Row(sec.Body),
                 def.BallOpacity[slot], 0f, 1f, conf.BallOpacity[slot],
@@ -545,7 +458,6 @@ internal static partial class PageVisuals {
             ballOp.Format = "0 %";
             ballOp.OnChanged = v => { conf.BallOpacity[slot] = v; Apply(); };
             ballOp.OnComplete = v => { conf.BallOpacity[slot] = v; Apply(); Save(); };
-
             tailColorRows[slot] = GenerateUI.Row(sec.Body);
             GenerateUI.ColorPicker(
                 tailColorRows[slot],
@@ -557,7 +469,6 @@ internal static partial class PageVisuals {
                 $"pcol_tail{n}",
                 showAlpha: false
             );
-
             UISlider tailOp = GenerateUI.Slider(
                 GenerateUI.Row(sec.Body),
                 def.TailOpacity[slot], 0f, 1f, conf.TailOpacity[slot],
@@ -569,15 +480,11 @@ internal static partial class PageVisuals {
             tailOp.OnChanged = v => { conf.TailOpacity[slot] = v; Apply(); };
             tailOp.OnComplete = v => { conf.TailOpacity[slot] = v; Apply(); Save(); };
         }
-
-        // Ring recolor (v1 ResourceChanger ring color). Off = the ring is hidden
-        // while planet colours are active.
         GenerateUI.Localize(
             GenerateUI.AddTextH1(GenerateUI.Row(sec.Body)),
             "HEADING_RING",
             "Ring"
         );
-
         GenerateUI.Toggle(
             GenerateUI.Row(sec.Body),
             def.EnableRingRecolor,
@@ -589,7 +496,6 @@ internal static partial class PageVisuals {
             "DESC_PCOL_RING",
             "Paint the planet ring a custom colour. When off, the ring is hidden while planet colours are active."
         );
-
         GenerateUI.ColorPicker(
             GenerateUI.Row(sec.Body),
             new Color(def.RingR, def.RingG, def.RingB),
@@ -600,7 +506,6 @@ internal static partial class PageVisuals {
             "pcol_ringcol",
             showAlpha: false
         );
-
         UISlider ringOp = GenerateUI.Slider(
             GenerateUI.Row(sec.Body),
             def.RingA, 0f, 1f, conf.RingA,
@@ -611,20 +516,13 @@ internal static partial class PageVisuals {
         ringOp.Format = "0 %";
         ringOp.OnChanged = v => { conf.RingA = v; Apply(); };
         ringOp.OnComplete = v => { conf.RingA = v; Apply(); Save(); };
-
         RefreshTailRows();
     }
-
-    // v1's visual tweaks: checkpoint removal, ball core particle removal,
-    // tile hit glow and planet glow suppression. The two non-visual tweaks
-    // from the same v1 section live on the Tweaks tab.
     private static void CreateVisualTweaks(Transform content) {
         Tweaks.EnsureConf();
         TweaksSettings conf = Tweaks.Conf;
         TweaksSettings def = new();
-
         var sec = GenerateUI.FlatSection(content, "Visual Tweaks");
-
         GenerateUI.ToggleTip(
             sec.Body,
             def.RemoveAllCheckpoints,
@@ -634,7 +532,6 @@ internal static partial class PageVisuals {
             "tw_cp",
             "Strips checkpoint icons and behavior from the level — dying always restarts the run. Turning this off needs a level reload to bring icons back."
         );
-
         GenerateUI.ToggleTip(
             sec.Body,
             def.RemoveBallCoreParticles,
@@ -644,7 +541,6 @@ internal static partial class PageVisuals {
             "tw_bcp",
             "Removes the planets' core and spark particles."
         );
-
         GenerateUI.ToggleTip(
             sec.Body,
             def.DisableTileHitGlow,
@@ -654,7 +550,6 @@ internal static partial class PageVisuals {
             "tw_glow",
             "Suppresses the glow flash tiles get when the planet lands on them."
         );
-
         GenerateUI.ToggleTip(
             sec.Body,
             def.RemovePlanetGlow,
@@ -665,15 +560,10 @@ internal static partial class PageVisuals {
             "Hides the glow sprite drawn around the planets."
         );
     }
-
-    // v1's "Hide judgement popups" tweak: a master toggle plus one toggle per
-    // vanilla judgement choosing which popups get suppressed. The mask rows
-    // are only shown while the master toggle is on, like the IMGUI original.
     private static void CreateHideJudgements(Transform content) {
         JudgementPopupHider.EnsureConf();
         JudgementPopupHiderSettings conf = JudgementPopupHider.Conf;
         JudgementPopupHiderSettings def = new();
-
         (HitMargin Margin, string Label, string Id)[] entries = [
             (HitMargin.TooEarly, "Too Early", "jpop_tooearly"),
             (HitMargin.VeryEarly, "Very Early", "jpop_veryearly"),
@@ -688,13 +578,10 @@ internal static partial class PageVisuals {
             (HitMargin.Auto, "Auto", "jpop_auto"),
             (HitMargin.OverPress, "Overload (Fail)", "jpop_overload_fail"),
         ];
-
         List<RectTransform> maskRows = [];
-
         void RefreshMaskRows() {
             foreach(RectTransform row in maskRows) row?.gameObject.SetActive(conf.Enabled);
         }
-
         var sec = GenerateUI.FlatSection(
             content, "Hide Judgements",
             v => {
@@ -705,7 +592,6 @@ internal static partial class PageVisuals {
             conf.Enabled,
             "Enable Hide Judgements", "hidejudgements_enable"
         );
-
         void AddMaskToggle(int maskBit, string label, string id) {
             RectTransform row = GenerateUI.Row(sec.Body);
             maskRows.Add(row);
@@ -722,12 +608,8 @@ internal static partial class PageVisuals {
                 id
             );
         }
-
         bool xperfect = XPerfectBridge.Installed;
         foreach(var entry in entries) {
-            // With XPerfect installed the single Perfect popup is split into
-            // X / + / -, so drop the vanilla Perfect row and put the three sub-
-            // judgement rows in its place (between Early Perfect and Late Perfect).
             if(entry.Margin == HitMargin.Perfect && xperfect) {
                 AddMaskToggle(1 << JudgementPopupHider.XPerfectPerfectBit, "X Perfect", "jpop_xperfect");
                 AddMaskToggle(1 << JudgementPopupHider.PlusPerfectBit, "+ Perfect", "jpop_plusperfect");
@@ -736,7 +618,6 @@ internal static partial class PageVisuals {
                 AddMaskToggle(1 << (int)entry.Margin, entry.Label, entry.Id);
             }
         }
-
         RefreshMaskRows();
     }
 }

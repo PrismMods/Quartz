@@ -1,8 +1,6 @@
 using Newtonsoft.Json.Linq;
 using UnityEngine;
-
 namespace Quartz.IO;
-
 public static class IOUtils {
     #region Generic
     public static T Read<T>(JToken token, string key, T fallback) {
@@ -15,9 +13,6 @@ public static class IOUtils {
         }
     }
     #endregion
-    // Enums persist as ints via the plain Read/Write overloads (rename-resilient).
-    // The former ReadEnum/WriteEnum helpers were unused and inconsistent (name vs
-    // int) — removed.
     #region Vector2
     public static Vector2 Read(JToken token, string key, Vector2 fallback) {
         var value = token[key];
@@ -28,7 +23,6 @@ public static class IOUtils {
             return fallback;
         }
     }
-
     public static JArray Write(Vector2 v) => new(v.x, v.y);
     #endregion
     #region Vector3
@@ -41,7 +35,6 @@ public static class IOUtils {
             return fallback;
         }
     }
-
     public static JArray Write(Vector3 v) => new(v.x, v.y, v.z);
     #endregion
     #region Vector4
@@ -54,7 +47,6 @@ public static class IOUtils {
             return fallback;
         }
     }
-
     public static JArray Write(Vector4 v) => new(v.x, v.y, v.z, v.w);
     #endregion
     #region Rect
@@ -67,7 +59,6 @@ public static class IOUtils {
             return fallback;
         }
     }
-
     public static JArray Write(Rect rect) => new(rect.x, rect.y, rect.width, rect.height);
     #endregion
     #region Quaternion
@@ -80,7 +71,6 @@ public static class IOUtils {
             return fallback;
         }
     }
-
     public static JArray Write(Quaternion q) => new(q.x, q.y, q.z, q.w);
     #endregion
     #region Color
@@ -93,17 +83,13 @@ public static class IOUtils {
             return fallback;
         }
     }
-
     public static JArray Write(Color c) => new(c.r, c.g, c.b, c.a);
-
     public static Color Rgba(float r, float g, float b, float a) =>
         new(Mathf.Clamp01(r), Mathf.Clamp01(g), Mathf.Clamp01(b), Mathf.Clamp01(a));
-
     public static void SetRgba(Color c, ref float r, ref float g, ref float b, ref float a) {
         r = Mathf.Clamp01(c.r); g = Mathf.Clamp01(c.g);
         b = Mathf.Clamp01(c.b); a = Mathf.Clamp01(c.a);
     }
-
     public static void ReadRgba(JToken token, string name, ref float r, ref float g, ref float b, ref float a) {
         r = Read(token, name + "R", r); g = Read(token, name + "G", g);
         b = Read(token, name + "B", b); a = Read(token, name + "A", a);

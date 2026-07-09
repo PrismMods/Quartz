@@ -1,8 +1,6 @@
 using Quartz.UI;
 using UnityEngine;
-
 namespace Quartz.Utility.Math;
-
 public static class MathVisuals {
     public static Color GetStateColor(EvalState state) => state switch {
         EvalState.OK => UIColors.ObjectActiveMathOk,

@@ -1,11 +1,7 @@
 using Quartz.Features.KeyViewer;
-
 using static Asserts;
-
 static class KeyViewerCssTests {
     public static void TestKeyViewerCss() {
-        // Global key states + per-class override + border shorthand + glow, modelled
-        // on transparent.css / neonsign.css.
         const string neon = """
             /* comment */
             [data-state="inactive"], [data-state="active"] {
@@ -32,10 +28,8 @@ static class KeyViewerCssTests {
             .counter[data-counter-state="active"] { --counter-color: #ff2b80; }
             .blue .counter[data-counter-state="active"] { --counter-color: #2ebef3; }
             """;
-
         KeyViewerStylesheet sheet = KeyViewerStylesheet.Parse(neon);
         Assert(!sheet.IsEmpty, "stylesheet should not be empty");
-
         CssKeyStyleSet plain = sheet.ResolveKey(null);
         Assert(plain.Idle.Radius == 6f, "global radius applies to idle");
         Assert(plain.Active.Radius == 6f, "global radius applies to active");
@@ -47,32 +41,22 @@ static class KeyViewerCssTests {
         Assert(plain.Idle.TextShadow.On == false, "idle has no text-shadow");
         Assert(plain.Active.TextShadow.On && plain.Active.TextShadow.Blur == 3f, "active text-shadow blur");
         Assert(plain.Active.BoxShadow.On && plain.Active.BoxShadow.Blur == 4f, "active box-shadow blur");
-
-        // Per-class wins over global, and only for the class it targets.
         CssKeyStyleSet blue = sheet.ResolveKey("blue");
         Assert(ColorEq(blue.Active.BorderColor, 0x2e, 0xbe, 0xf3), "blue border overrides global (!important stripped)");
         Assert(blue.Active.Radius == 6f, "blue still inherits global radius");
-
         CssCounterStyleSet ctr = sheet.ResolveCounter(null);
         Assert(ColorEq(ctr.Active.Color, 0xff, 0x2b, 0x80), "global counter colour");
         CssCounterStyleSet blueCtr = sheet.ResolveCounter("blue");
         Assert(ColorEq(blueCtr.Active.Color, 0x2e, 0xbe, 0xf3), "blue counter colour override");
-
-        // Counter outline (stroke) — width + colour, used by the outline-style preset.
         KeyViewerStylesheet strokeSheet = KeyViewerStylesheet.Parse(
             ".counter[data-counter-state=\"active\"] { --counter-stroke-color: #333; --counter-stroke-width: 2px; }");
         CssCounterStyle strokeActive = strokeSheet.ResolveCounter(null).Active;
         Assert(strokeActive.StrokeWidth == 2f, "counter stroke width parsed");
         Assert(ColorEq(strokeActive.StrokeColor, 0x33, 0x33, 0x33), "counter stroke colour parsed");
-
-        // rgba() with alpha, used widely by exported presets.
         KeyViewerStylesheet rgba = KeyViewerStylesheet.Parse(
             "[data-state=\"inactive\"] { --key-text-color: rgba(121, 121, 121, 0.5); }");
         CssColor txt = rgba.ResolveKey(null).Idle.TextColor;
         Assert(txt.Has && Math.Abs(txt.A - 0.5f) < 0.01f, "rgba alpha parsed");
-
-        // Animated gradient text + @font-face/@keyframes skipping, modelled on
-        // rainbow.css. The gradient targets the text (background-clip:text).
         const string rainbow = """
             @font-face { font-family: 'X'; src: url('https://example/x.woff2'); }
             [data-state="active"] > * {
@@ -89,14 +73,9 @@ static class KeyViewerCssTests {
         Assert(act.TextGradient!.Stops.Count == 4, "four gradient stops parsed");
         Assert(act.TextGradient!.Animated && Math.Abs(act.TextGradient!.AnimSeconds - 5f) < 0.01f, "animation duration parsed");
         Assert(act.BgGradient == null, "clip:text keeps gradient off the box fill");
-
-        // Bare @keyframes / @font-face on their own must not leak rules.
         Assert(KeyViewerStylesheet.Parse("@keyframes a { 0% { opacity: 0; } }").IsEmpty, "keyframes-only sheet is empty");
     }
-
     public static void TestKeyViewerCssExtended() {
-        // :before / :after pseudo layers + transform/filter/transition/blend/backdrop
-        // + @font-face + compound class, modelled on rainbow.css + transparent.css.
         const string css = """
             @font-face { font-family: 'OmuDaye'; src: url('https://cdn/omyu.woff2') format('woff2'); }
             [data-state="active"] {
@@ -121,11 +100,9 @@ static class KeyViewerCssTests {
             .blue.special[data-state="active"] { --key-text-color: #abcdef; }
             """;
         KeyViewerStylesheet sheet = KeyViewerStylesheet.Parse(css);
-
         Assert(sheet.FontFaces.Count == 1, "one @font-face captured");
         Assert(sheet.FontFaces[0].Family == "OmuDaye", "font-face family");
         Assert(sheet.FontFaces[0].Srcs.Count == 1 && sheet.FontFaces[0].Srcs[0].EndsWith("omyu.woff2"), "font-face src url");
-
         CssKeyStyle a = sheet.ResolveKey(null).Active;
         Assert(a.Transform != null && Math.Abs(a.Transform!.ScaleX - 1.05f) < 0.001f, "transform scale");
         Assert(Math.Abs(a.Transform!.TranslateY - 2f) < 0.001f, "transform translateY");
@@ -134,7 +111,6 @@ static class KeyViewerCssTests {
         Assert(a.TransitionSeconds.HasValue && Math.Abs(a.TransitionSeconds!.Value - 0.1f) < 0.001f, "transition duration");
         Assert(a.Blend == CssBlend.Screen, "mix-blend-mode screen");
         Assert(a.BackdropBlur.HasValue && Math.Abs(a.BackdropBlur!.Value - 10f) < 0.001f, "backdrop blur");
-
         CssLayer? before = sheet.ResolveKey(null).Idle.Before;
         Assert(before != null, ":before layer captured");
         Assert(before!.Gradient != null && before.Gradient!.Stops.Count == 3, ":before gradient stops");
@@ -142,20 +118,13 @@ static class KeyViewerCssTests {
         Assert(Math.Abs(before.InsetT + 2f) < 0.001f, ":before inset -2px");
         Assert(Math.Abs(before.Blur - 3f) < 0.001f, ":before filter blur");
         Assert(before.Z == -1, ":before z-index");
-
         CssLayer? after = sheet.ResolveKey(null).Active.After;
         Assert(after != null && after!.Gradient != null, ":after gradient");
         Assert(after!.Z == 0, ":after z-index 0");
-
-        // Compound class: needs BOTH classes present.
         Assert(!sheet.ResolveKey("blue").Active.TextColor.Has, "compound rule needs all classes");
         Assert(sheet.ResolveKey("blue special").Active.TextColor.Has, "compound rule matches when all present");
-
-        // hsl() colour parsing.
         Assert(KeyViewerStylesheet.TryParseColor("hsl(120, 100%, 50%)", out CssColor green)
             && green.G > 0.9f && green.R < 0.1f, "hsl parsed to green");
-
-        // KPS-graph variables, matched by the graph's class (no data-state).
         KeyViewerStylesheet gsheet = KeyViewerStylesheet.Parse("""
             .kps-graph {
               --graph-bg: rgba(7, 10, 18, 0.72);
@@ -169,10 +138,8 @@ static class KeyViewerCssTests {
         Assert(g.BorderWidth == 1f && g.BorderColor.Has, "--graph-border shorthand");
         Assert(g.Radius == 12f, "--graph-radius parsed");
         Assert(ColorEq(g.Color, 0x7d, 0xd3, 0xfc), "--graph-color parsed");
-        // A graph rule for a different class must not leak.
         Assert(!gsheet.ResolveGraph("other").Any, "graph class is scoped");
     }
-
     static bool ColorEq(CssColor c, int r, int g, int b) =>
         c.Has
         && Math.Abs(c.R - r / 255f) < 0.02f
