@@ -12,7 +12,7 @@ namespace Quartz.Resource;
 // two folders: UserData/Quartz/Fonts (shipped with the mod) and
 // UserData/Quartz/CustomFonts (imported by the user — these can be renamed and
 // deleted from the settings font picker). The OS font list is never offered.
-public static class FontManager {
+public static partial class FontManager {
     public const string DefaultName = "Default (Cookie Run Bold)";
 
     // Display name of the shipped font that backs DefaultName. It lives in the
@@ -520,8 +520,3 @@ public static class FontManager {
         UnityEngine.Object.Destroy(asset);
     }
 }
-
-// Marks a TMP text that picks its own font (e.g. the font dropdown's option
-// rows, each rendered in the face it names) so FontManager.ApplyToAll leaves
-// it alone when the global font changes.
-public sealed class FontExempt : MonoBehaviour { }
