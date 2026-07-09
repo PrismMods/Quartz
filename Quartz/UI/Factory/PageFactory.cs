@@ -108,6 +108,13 @@ public static class PageFactory {
         // only created then).
         if(Quartz.Core.Info.IsDev) PageDeveloper.Create(UICore.Pages[(int)OriginalMenuState.Developer]);
 
+        // Every page built + laid out once above; now switch off compositing for
+        // the hidden ones so only the visible tab's canvas renders each frame.
+        // GameObjects stay active (Update/coroutines run); PageSwicher flips
+        // these on/off across a slide. Runs last so init layout is unchanged.
+        foreach(var kv in UICore.Pages)
+            kv.Value.GetComponent<Canvas>().enabled = kv.Key == UICore.CurrentMenuState;
+
         return PagesContaner;
     }
 
@@ -170,6 +177,18 @@ public static class PageFactory {
         cg.alpha = 0f;
         cg.interactable = false;
         cg.blocksRaycasts = false;
+
+        // Each page is its own nested Canvas so its batch is isolated from the
+        // other ~35 pages that share the one root canvas. Without this, the
+        // per-frame slide (anchoredPosition) in PageSwicher dirties the root
+        // canvas and Unity rebuilds EVERY page's geometry each animation frame
+        // — the tab-switch stutter. overrideSorting=false keeps hierarchy draw
+        // order. A nested canvas registers its own graphics, so it needs its
+        // own GraphicRaycaster or the content becomes unclickable; CanvasGroup
+        // blocksRaycasts still gates it, so hidden pages stay inert.
+        Canvas pageCanvas = obj.AddComponent<Canvas>();
+        pageCanvas.overrideSorting = false;
+        obj.AddComponent<GraphicRaycaster>();
 
         UICore.Pages[num] = rt;
 

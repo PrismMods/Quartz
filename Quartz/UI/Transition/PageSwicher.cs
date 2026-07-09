@@ -22,7 +22,18 @@ public class PageSwicher {
 
         if(fromCg == null || toCg == null) return false;
 
+        // Per-page canvases render only while visible (see PageFactory). The
+        // incoming page must render for its slide-in; the outgoing one is
+        // switched off once the sequence settles (below), so only the visible
+        // tab composites in steady state.
+        Canvas fromCanvas = fromPage.GetComponent<Canvas>();
+        Canvas toCanvas = toPage.GetComponent<Canvas>();
+
         pageSeq.CompleteAndKill();
+
+        // After CompleteAndKill so a completing prior sequence can't leave the
+        // incoming page's canvas disabled.
+        if(toCanvas != null) toCanvas.enabled = true;
 
         fromPage.anchoredPosition = Vector2.zero;
         toPage.anchoredPosition = new Vector2(1100f, 0f);
@@ -53,6 +64,7 @@ public class PageSwicher {
             .AppendCallback(() => {
                 fromCg.interactable = false;
                 fromCg.blocksRaycasts = false;
+                if(fromCanvas != null) fromCanvas.enabled = false;
             }).Build();
         MainCore.TC.Play(pageSeq);
 
