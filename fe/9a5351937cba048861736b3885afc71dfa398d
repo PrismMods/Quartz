@@ -1,0 +1,22 @@
+Quartz/Features/KeyLimiter/KeyLimiter.cs
+  s_ac7b7f4411ac05::t_367bd46e6e16db 10
+Quartz/Features/KeyLimiter/KeyLimiter.Ticker.cs
+  s_ac7b7f4411ac05::t_5917d45112ae79 1-9,11-58
+  s_ac7b7f4411ac05::t_367bd46e6e16db 10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "fe9a5351937cba048861736b3885afc71dfa398d",
+  "prompts": {},
+  "sessions": {
+    "s_ac7b7f4411ac05": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_0be1f2f37ffe6D8Jnjd0wIslFp",
+        "model": "minimax/minimax-m3:thinking"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
