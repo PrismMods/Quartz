@@ -1,0 +1,73 @@
+using HarmonyLib;
+
+namespace Quartz.Features.Calibration;
+
+// Decimal (sub-millisecond) input offset, port of BetterCalibration's
+// FloatOffset. Replaces the native int-only calibration_i property when
+// enabled, and takes over the pause-menu offset row's +/- so Ctrl/Shift give
+// fine .1/.01ms steps instead of the native whole-ms increments.
+internal static class CalibrationFloatOffset {
+    // Harmony's equivalent of a full "replace": a Prefix that skips the
+    // original body (return false) and supplies __result itself. Falls back
+    // to running the original (return true) when float offset is off.
+    [HarmonyPatch(typeof(scrConductor), "get_calibration_i")]
+    private static class GetCalibrationIPatch {
+        private static bool Prefix(ref float __result) {
+            if(!Calibration.FloatOffsetEnabled) return true;
+
+            __result = Calibration.GetOffsetMs() / 1000f;
+            return false;
+        }
+    }
+
+    [HarmonyPatch(typeof(SettingsMenu), nameof(SettingsMenu.UpdateSetting))]
+    private static class UpdateSettingPatch {
+        private static bool Prefix(ref PauseSettingButton ___offsetButton, PauseSettingButton setting, SettingsMenu.Interaction action) {
+            if(!Calibration.FloatOffsetEnabled) return true;
+            if(setting.name != "inputOffset"
+                || action is SettingsMenu.Interaction.ActivateInfo or SettingsMenu.Interaction.Activate) return true;
+
+            ___offsetButton = setting;
+
+            if(action == SettingsMenu.Interaction.Refresh) {
+                setting.CachedValue = null;
+                setting.initialValue = Calibration.GetOffsetMs();
+            } else {
+                float offset = Calibration.GetOffsetMs();
+                float increment = 10f;
+                if(RDInput.holdingShift) increment /= 10f;
+                if(RDInput.holdingControl) increment /= 100f;
+
+                if(action == SettingsMenu.Interaction.Increment) {
+                    offset += increment;
+                    setting.PlayArrowAnimation(true);
+                } else if(action == SettingsMenu.Interaction.Decrement) {
+                    offset -= increment;
+                    setting.PlayArrowAnimation(false);
+                }
+
+                scrController.instance.pauseMenu.PlayMenuSfx(SfxSound.MenuSquelch, 1.5f);
+                Calibration.SetOffsetMs(offset);
+            }
+
+            SetOffsetLabel(setting);
+            return false;
+        }
+    }
+
+    // A Prefix (not Postfix) to match BetterCalibration's tested behaviour:
+    // Show() populates this label from some other internal path this patch
+    // needs to run ahead of, not after.
+    [HarmonyPatch(typeof(SettingsMenu), nameof(SettingsMenu.Show))]
+    private static class ShowPatch {
+        private static void Prefix(PauseSettingButton ___offsetButton) {
+            if(!___offsetButton) return;
+
+            if(Calibration.FloatOffsetEnabled) SetOffsetLabel(___offsetButton);
+            else ___offsetButton.valueLabel.text = scrConductor.currentPreset.inputOffset + RDString.Get("editor.unit." + ___offsetButton.unit);
+        }
+    }
+
+    private static void SetOffsetLabel(PauseSettingButton setting) =>
+        setting.valueLabel.text = Calibration.FormatMs(Calibration.GetOffsetMs()) + RDString.Get("editor.unit." + setting.unit);
+}

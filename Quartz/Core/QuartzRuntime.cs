@@ -3,6 +3,7 @@ using Quartz.Async;
 using Quartz.Compat;
 using Quartz.Compat.Interface;
 using Quartz.Core.Service;
+using Quartz.Features.Calibration;
 using Quartz.Features.PlayCount;
 using Quartz.Features.Combo;
 using Quartz.Features.Editor;
@@ -22,6 +23,7 @@ using Quartz.Features.Tweaks;
 using Quartz.Features.UiHider;
 using Quartz.IO;
 using Quartz.Resource;
+using Quartz.UI;
 using Quartz.Update;
 using System.Reflection;
 using UnityEngine;
@@ -345,6 +347,7 @@ public sealed class QuartzRuntime {
         features.OnEnable("JudgementOverlay", () => JudgementOverlay.Initialize(RootObject));
         features.OnEnable("KeyViewerOverlay", () => KeyViewerOverlay.Initialize(RootObject));
         features.OnEnable("SongTitleOverlay", () => SongTitleOverlay.Initialize(RootObject));
+        features.OnEnable("CalibrationPopup", CalibrationPopupUI.Initialize);
 
         // Enable: non-overlay features re-apply their change to the live scene.
         features.Register("EffectRemover", EffectRemover.RefreshEditorSaveButtons, EffectRemover.RestoreEditorSaveButtons);
@@ -362,6 +365,7 @@ public sealed class QuartzRuntime {
         features.OnDisable("ProgressBarOverlay", ProgressBarOverlay.Dispose);
         features.OnDisable("ComboOverlay", ComboOverlay.Dispose);
         features.OnDisable("PanelsOverlay", PanelsOverlay.Dispose);
+        features.OnDisable("CalibrationPopup", CalibrationPopupUI.Dispose);
 
         // Disable: teardown-only steps with no enable counterpart.
         features.OnDisable("UiHider", UiHider.Restore);

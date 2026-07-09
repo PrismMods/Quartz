@@ -208,7 +208,11 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
     // "real campaign level" (scene-name is a valid id) from "custom level in any
     // context" (must hash the file). levelPath is populated + unique in all the
     // custom cases, including the editor.
-    private static string ComputeMapKey() {
+    // internal: also used by CalibrationTimingLogger, which needs the exact
+    // same per-map identity this feature already resolves (official/custom/
+    // editor cases, async off-thread hashing for large custom levels) rather
+    // than re-deriving its own.
+    internal static string ComputeMapKey() {
         bool isOfficial;
         try {
             isOfficial = ADOBase.isOfficialLevel;
