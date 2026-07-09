@@ -1,0 +1,21 @@
+Quartz/Features/Panels/PanelsOverlay.LivePanel.cs
+  s_ac7b7f4411ac05::t_9ac318f3678c94 1-273
+Quartz/Features/Panels/PanelsOverlay.cs
+  s_ac7b7f4411ac05::t_9ac318f3678c94 18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "881a8959f2686058ab4dc323ebf3d1b5faaa0789",
+  "prompts": {},
+  "sessions": {
+    "s_ac7b7f4411ac05": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_0be1f2f37ffe6D8Jnjd0wIslFp",
+        "model": "minimax/minimax-m3:thinking"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
