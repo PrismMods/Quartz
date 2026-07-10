@@ -204,6 +204,10 @@ internal static partial class KeyLimiter {
             KeyCode hookKey = WindowsVirtualKeyToUnityKey(key);
             if(hookKey != KeyCode.None) return hookKey;
         }
+        if(IsMacOSRuntime()) {
+            KeyCode hookKey = MacVirtualKeyToUnityKey(key);
+            if(hookKey != KeyCode.None) return hookKey;
+        }
         KeyCode mapped = AsyncLabelToPhysicalUnityKey(label);
         if(mapped != KeyCode.None) return mapped;
         return KeyCode.None;
@@ -217,6 +221,10 @@ internal static partial class KeyLimiter {
     private static bool IsWindowsRuntime() {
         RuntimePlatform platform = Application.platform;
         return platform == RuntimePlatform.WindowsPlayer || platform == RuntimePlatform.WindowsEditor;
+    }
+    private static bool IsMacOSRuntime() {
+        RuntimePlatform platform = Application.platform;
+        return platform == RuntimePlatform.OSXPlayer || platform == RuntimePlatform.OSXEditor;
     }
     private static readonly Dictionary<KeyLabel, KeyCode> asyncLabelCache = new();
     private static KeyCode AsyncLabelToPhysicalUnityKey(KeyLabel label) {
@@ -234,7 +242,8 @@ internal static partial class KeyLimiter {
         if(name.Length >= 2 && name[0] == 'F'
             && int.TryParse(name[1..], out int functionKey) && functionKey >= 1 && functionKey <= 15)
             return (KeyCode)((int)KeyCode.F1 + (functionKey - 1));
-        if(name.Length == 7 && name.StartsWith("Keypad") && name[6] >= '0' && name[6] <= '9')
+        if(name.Length == 7 && (name.StartsWith("Keypad") || name.StartsWith("Numpad") || name.StartsWith("NumPad"))
+            && name[6] >= '0' && name[6] <= '9')
             return (KeyCode)((int)KeyCode.Keypad0 + (name[6] - '0'));
         return name switch {
             "Escape" => KeyCode.Escape,
@@ -342,6 +351,28 @@ internal static partial class KeyLimiter {
         0xDC => KeyCode.Backslash,
         0xDD => KeyCode.RightBracket,
         0xDE => KeyCode.Quote,
+        _ => KeyCode.None,
+    };
+    // macOS reports hardware key codes from NSEvent rather than Windows virtual keys.
+    // Prefer these physical keypad codes when a SkyHook label is layout-dependent
+    // (for example, a keypad digit reported as an ordinary numeric label).
+    private static KeyCode MacVirtualKeyToUnityKey(ushort key) => key switch {
+        0x52 => KeyCode.Keypad0,
+        0x53 => KeyCode.Keypad1,
+        0x54 => KeyCode.Keypad2,
+        0x55 => KeyCode.Keypad3,
+        0x56 => KeyCode.Keypad4,
+        0x57 => KeyCode.Keypad5,
+        0x58 => KeyCode.Keypad6,
+        0x59 => KeyCode.Keypad7,
+        0x5B => KeyCode.Keypad8,
+        0x5C => KeyCode.Keypad9,
+        0x41 => KeyCode.KeypadPeriod,
+        0x43 => KeyCode.KeypadMultiply,
+        0x45 => KeyCode.KeypadPlus,
+        0x4B => KeyCode.KeypadDivide,
+        0x4C => KeyCode.KeypadEnter,
+        0x4E => KeyCode.KeypadMinus,
         _ => KeyCode.None,
     };
     public static bool IsCapturing { get; private set; }
