@@ -1,0 +1,32 @@
+Quartz/UI/Factory/Page/TufPacksUI.cs
+  s_02627f4e5c150a::t_08a18bad4e7ef4 165-168
+  s_02627f4e5c150a::t_cfb3d9a9535596 44-53
+Quartz/UI/Factory/Page/TufBrowserUI.cs
+  s_02627f4e5c150a::t_b8d64d1455a570 53-62
+  s_02627f4e5c150a::t_ad1c81b40d321a 342-345
+Quartz/Localization/TextLocalization.cs
+  s_02627f4e5c150a::t_838ef4158b6f13 24-31,36
+Quartz/UI/Transition/PageSwicher.cs
+  s_02627f4e5c150a::t_32179b74b8c45b 42
+  s_02627f4e5c150a::t_52ba5c004efe1a 18
+Quartz/UI/Objects/UIObject.cs
+  s_02627f4e5c150a::t_65917b4484c9c3 52-56
+Quartz/UI/Factory/PageFactory.cs
+  s_02627f4e5c150a::t_833efee3f856ed 76-79,81
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "169c87531aa27c39fbfb644ecb3369c0398a69e6",
+  "prompts": {},
+  "sessions": {
+    "s_02627f4e5c150a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cde2b547-f43b-49a9-a8d8-ab25ccae4768",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
