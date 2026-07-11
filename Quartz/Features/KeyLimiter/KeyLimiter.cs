@@ -177,6 +177,7 @@ internal static partial class KeyLimiter {
         }
     }
     private static readonly HashSet<KeyCode> hookHeldKeys = new();
+    private static readonly HashSet<KeyCode> hookSeenKeys = new();
     private static volatile bool hookActive;
     private static bool IsHookOnlyKey(KeyCode key) {
         if(key is KeyCode.RightAlt or KeyCode.RightControl) return true;
@@ -184,11 +185,20 @@ internal static partial class KeyLimiter {
             KeyCode.LeftShift or KeyCode.RightShift or KeyCode.LeftControl or KeyCode.LeftAlt;
     }
     public static void NoteHookEvent(KeyCode key, bool pressed) {
+        if(key == KeyCode.None) return;
+        lock(hookSeenKeys) {
+            hookSeenKeys.Add(key);
+        }
         if(!IsHookOnlyKey(key)) return;
         lock(hookHeldKeys) {
             if(pressed) hookHeldKeys.Add(key);
             else hookHeldKeys.Remove(key);
             hookActive = hookHeldKeys.Count > 0;
+        }
+    }
+    public static bool HookEverSaw(KeyCode key) {
+        lock(hookSeenKeys) {
+            return hookSeenKeys.Contains(key);
         }
     }
     public static bool HookKeyHeld(KeyCode key) {
@@ -424,6 +434,7 @@ internal static partial class KeyLimiter {
         PersistChange();
     }
     private static bool IsHookOnlyModifier(KeyCode key) => IsHookOnlyKey(key);
+    public static bool IsHookOnlyModifierKey(KeyCode key) => IsHookOnlyKey(key);
     private static void PersistChange() {
         Save();
         Changed?.Invoke();

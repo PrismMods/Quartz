@@ -83,21 +83,57 @@ public static class ChatterBlocker {
         count += CountKeysMissedByGame(controller, now, threshold, chatterActive);
         return count;
     }
+    // scrPlayer.HitAutoFloors calls CountValidKeysPressed twice per batch (once through
+    // ValidInputWasTriggered, once for the hit count), and async input runs one batch per
+    // event tick plus a final per-frame batch. Injected keys are invisible to the game's
+    // own masks, so their press edge must be computed once per frame and then reported to
+    // every call of a single batch — consuming the edge on the first call starves the hit
+    // count, while reporting it to every batch multiplies one press into several hits.
+    private static int injectionBatch;
+    private static bool inPlayerBatch;
+    private static int injectedComputeFrame = -1;
+    private static int injectedBatch = -1;
+    private static int injectedCount;
+    public static void NotePlayerBatch(bool entered) {
+        inPlayerBatch = entered;
+        if(entered) injectionBatch++;
+    }
     private static int CountKeysMissedByGame(scrController controller, long now, long threshold, bool chatterActive) {
         if(!KeyLimiter.KeyLimiter.IsActive() || !KeyLimiter.KeyLimiter.InPlayerControl()) {
             injectedKeyHeldPrev.Clear();
+            injectedComputeFrame = -1;
             return 0;
         }
+        if(!inPlayerBatch) return 0;
+        int frame = UnityEngine.Time.frameCount;
+        if(injectedComputeFrame != frame) {
+            injectedComputeFrame = frame;
+            injectedBatch = injectionBatch;
+            injectedCount = ComputeInjectedKeys(controller, now, threshold, chatterActive);
+        }
+        return injectionBatch == injectedBatch ? injectedCount : 0;
+    }
+    private static bool AsyncKeyboardActive() {
+        try {
+            return RDInput.asyncKeyboard != null && RDInput.asyncKeyboard.isActive;
+        } catch {
+            return false;
+        }
+    }
+    private static int ComputeInjectedKeys(scrController controller, long now, long threshold, bool chatterActive) {
         int[] allowed = KeyLimiter.KeyLimiter.Conf?.AllowedKeys;
         if(allowed == null || allowed.Length == 0) {
             injectedKeyHeldPrev.Clear();
             return 0;
         }
+        bool asyncActive = AsyncKeyboardActive();
         int injected = 0;
         for(int i = 0; i < allowed.Length; i++) {
             KeyCode key = KeyLimiter.KeyLimiter.NormalizeKey((KeyCode)allowed[i]);
             if(key == KeyCode.None || KeyLimiter.KeyLimiter.IsMouseKey(key)) continue;
-            if(reportedKeysThisFrame.Contains(key)) {
+            if(reportedKeysThisFrame.Contains(key)
+                || (asyncActive && !KeyLimiter.KeyLimiter.IsHookOnlyModifierKey(key)
+                    && KeyLimiter.KeyLimiter.HookEverSaw(key))) {
                 injectedKeyHeldPrev.Add(key);
                 continue;
             }
@@ -113,6 +149,11 @@ public static class ChatterBlocker {
             else injectedKeyHeldPrev.Remove(key);
         }
         return injected;
+    }
+    [HarmonyPatch(typeof(scrPlayer), "Simulated_PlayerControl_Update")]
+    private static class SimulatedPlayerControlUpdatePatch {
+        private static void Prefix() => NotePlayerBatch(true);
+        private static void Postfix() => NotePlayerBatch(false);
     }
     [HarmonyPatch(typeof(scrPlayer), "CountValidKeysPressed")]
     private static class CountValidKeysPressedPatch {
