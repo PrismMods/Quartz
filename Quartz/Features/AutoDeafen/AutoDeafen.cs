@@ -18,9 +18,12 @@ public static class AutoDeafen {
     private static bool runStartCaptured;
     private static bool startedFromFirstTile;
     private const string TutorialUrl = "https://www.youtube.com/watch?v=1q4gB0ArypQ";
+    private const int MaxTokenLength = 4096;
+    private static string TokenPath => Path.Combine(MainCore.Paths.RootPath, "DiscordAccessToken.secret");
     public static void EnsureConf() {
         if(ConfMgr != null) return;
         ConfMgr = SettingsFile<AutoDeafenSettings>.Loaded("AutoDeafen.json");
+        LoadAccessToken();
         EnsureTicker();
     }
     public static void Save() => ConfMgr?.RequestSave();
@@ -161,8 +164,13 @@ public static class AutoDeafen {
         Stop();
         EnsureConf();
         Conf.DiscordAccessToken = "";
-        ConfMgr.Save();
-        status = "unlinked";
+        try {
+            if(File.Exists(TokenPath)) File.Delete(TokenPath);
+            status = "unlinked";
+        } catch(Exception e) {
+            status = "unlink failed";
+            MainCore.Log.Err("[AutoDeafen] couldn't remove stored Discord token: " + e.Message);
+        }
     }
     private static bool InRealPlay() {
         try { return scnGame.instance != null; }
@@ -186,12 +194,42 @@ public static class AutoDeafen {
         configToken = null;
     }
     internal static void SaveAccessToken(string token) {
-        if(string.IsNullOrEmpty(token) || Conf == null) return;
+        token = Trim(token);
+        if(token.Length == 0 || token.Length > MaxTokenLength || Conf == null) return;
         MainThread.Enqueue(() => {
             if(Conf == null || string.Equals(Conf.DiscordAccessToken, token, StringComparison.Ordinal)) return;
-            Conf.DiscordAccessToken = token;
-            try { ConfMgr.Save(); } catch { }
+            try {
+                AtomicFile.WriteAllText(TokenPath, token);
+                Conf.DiscordAccessToken = token;
+            } catch(Exception e) {
+                MainCore.Log.Err("[AutoDeafen] couldn't store Discord token: " + e.Message);
+            }
         });
+    }
+    private static void LoadAccessToken() {
+        string legacy = Trim(Conf?.LegacyDiscordAccessToken);
+        bool migrated = false;
+        try {
+            string persisted = "";
+            if(File.Exists(TokenPath)) {
+                FileInfo info = new(TokenPath);
+                if(info.Length > MaxTokenLength) throw new IOException("stored token exceeds size limit");
+                persisted = Trim(File.ReadAllText(TokenPath));
+            }
+            if(persisted.Length > MaxTokenLength) throw new IOException("stored token exceeds size limit");
+            if(persisted.Length > 0) {
+                Conf.DiscordAccessToken = persisted;
+            } else if(legacy.Length > 0 && legacy.Length <= MaxTokenLength) {
+                AtomicFile.WriteAllText(TokenPath, legacy);
+                Conf.DiscordAccessToken = legacy;
+                migrated = true;
+            }
+            if(legacy.Length > 0 && (persisted.Length > 0 || migrated)) ConfMgr.Save();
+        } catch(Exception e) {
+            MainCore.Log.Err("[AutoDeafen] couldn't load stored Discord token: " + e.Message);
+        } finally {
+            Conf.LegacyDiscordAccessToken = "";
+        }
     }
     private static string Trim(string value) => (value ?? "").Trim();
     private static Ticker ticker;

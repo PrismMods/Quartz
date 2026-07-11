@@ -18,7 +18,10 @@ public sealed class AutoDeafenSettings : ISettingsFile {
     public bool ShortcutMeta = false;
     public int ShortcutKey = (int)KeyCode.D;
     public string DiscordClientId = "";
+    // Runtime-only. OAuth bearer tokens are persisted separately from profile JSON
+    // so exporting or switching a profile cannot disclose or replace credentials.
     public string DiscordAccessToken = "";
+    internal string LegacyDiscordAccessToken = "";
     public JToken Serialize() {
         return new JObject {
             [nameof(Enabled)] = Enabled,
@@ -31,7 +34,6 @@ public sealed class AutoDeafenSettings : ISettingsFile {
             [nameof(ShortcutMeta)] = ShortcutMeta,
             [nameof(ShortcutKey)] = ShortcutKey,
             [nameof(DiscordClientId)] = DiscordClientId,
-            [nameof(DiscordAccessToken)] = DiscordAccessToken,
         };
     }
     public void Deserialize(JToken token) {
@@ -45,6 +47,6 @@ public sealed class AutoDeafenSettings : ISettingsFile {
         ShortcutMeta = IOUtils.Read(token, nameof(ShortcutMeta), ShortcutMeta);
         ShortcutKey = IOUtils.Read(token, nameof(ShortcutKey), ShortcutKey);
         DiscordClientId = IOUtils.Read(token, nameof(DiscordClientId), DiscordClientId);
-        DiscordAccessToken = IOUtils.Read(token, nameof(DiscordAccessToken), DiscordAccessToken);
+        LegacyDiscordAccessToken = IOUtils.Read(token, nameof(DiscordAccessToken), "");
     }
 }
