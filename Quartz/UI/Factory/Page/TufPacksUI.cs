@@ -235,24 +235,37 @@ internal sealed class TufPacksView : MonoBehaviour {
             AddStatus(Tr("TUF_PACK_NO_LEVELS", "This pack has no playable levels."), false, null);
         } else {
             AddLevelSortRow();
-            // Pack Order keeps the site's folder tree; the other sorts flatten it.
-            if(service.LevelSort == TufPackLevelSort.PackOrder) RenderItems(service.PackItems, 0);
-            else foreach(TufLevel level in SortedLevels()) RenderLevel(level, 0f);
+            RenderItems(service.PackItems, 0);
         }
     }
 
-    private IEnumerable<TufLevel> SortedLevels() {
-        IEnumerable<TufLevel> levels = service.LevelSort switch {
-            TufPackLevelSort.Difficulty => service.PackLevels.OrderBy(l => l.DifficultyRank),
-            TufPackLevelSort.Clears => service.PackLevels.OrderBy(l => l.Clears),
-            _ => service.PackLevels
+    // Difficulty/Clears sort levels in place at every depth of the folder tree;
+    // folders keep their hand-curated slots and their contents sort recursively.
+    // Pack Order leaves everything exactly as the site lists it.
+    private IReadOnlyList<TufPackItem> SortItems(IReadOnlyList<TufPackItem> items) {
+        if(service.LevelSort == TufPackLevelSort.PackOrder) return items;
+        List<TufPackItem> result = [.. items];
+        List<int> slots = [];
+        List<TufPackItem> levels = [];
+        for(int i = 0; i < result.Count; i++) {
+            if(result[i].IsFolder) continue;
+            slots.Add(i);
+            levels.Add(result[i]);
+        }
+        IEnumerable<TufPackItem> sorted = (service.LevelSort, service.LevelAscending) switch {
+            (TufPackLevelSort.Difficulty, true) => levels.OrderBy(x => x.Level.DifficultyRank),
+            (TufPackLevelSort.Difficulty, false) => levels.OrderByDescending(x => x.Level.DifficultyRank),
+            (TufPackLevelSort.Clears, true) => levels.OrderBy(x => x.Level.Clears),
+            _ => levels.OrderByDescending(x => x.Level.Clears),
         };
-        return service.LevelAscending ? levels : levels.Reverse();
+        int slot = 0;
+        foreach(TufPackItem item in sorted) result[slots[slot++]] = item;
+        return result;
     }
 
     private void RenderItems(IReadOnlyList<TufPackItem> items, int depth) {
         float indent = depth * 26f;
-        foreach(TufPackItem item in items) {
+        foreach(TufPackItem item in SortItems(items)) {
             if(item.IsFolder) {
                 AddFolderRow(item, indent);
                 if(expandedFolders.Contains(item.Key)) RenderItems(item.Children, depth + 1);
