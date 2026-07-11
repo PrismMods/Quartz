@@ -1,0 +1,79 @@
+Quartz/Features/Tuf/TufPackApiClient.cs
+  s_1c216ae4a50c19::t_0f81ca8bd6c53d 20,22
+  s_1c216ae4a50c19::t_d8ad5e061b6e35 118,124,129,132,134-143,145-151,155-159,161-162,165-169,181-182,191,193
+  s_1c216ae4a50c19::t_814a9c45fb4cfd 48,53
+  s_1c216ae4a50c19::t_cffcee5d661c6a 177-179
+  s_1c216ae4a50c19::t_f74d7918ec08ce 160,173-175,180,186,189-190,194-218
+  s_1c216ae4a50c19::t_6fba810f529ac8 50-52,55-60
+  s_1c216ae4a50c19::t_1d2e1a785c3580 91-92,106
+  s_1c216ae4a50c19::t_79227b3e7bf5dd 103-104,109-110,113
+  s_1c216ae4a50c19::t_1af0fa4f770d40 120
+  s_1c216ae4a50c19::t_510c31dd5c9842 2-19,21,23-47,49,54,61-90,93-102,105,107-108,111-112,114-117,119,121-123,125-128,130-131,133,144,152-154,163-164,170-172,176,183-185,187-188,192,219-233
+  s_1c216ae4a50c19::t_9364f54b39adc1 1
+Quartz/Core/QuartzRuntime.cs
+  s_1c216ae4a50c19::t_4aa683201bf419 55,142,146
+Quartz/UI/Factory/MenuFactory.cs
+  s_1c216ae4a50c19::t_4aa683201bf419 72-75
+Quartz/UI/Factory/Page/TufPacksUI.cs
+  s_1c216ae4a50c19::t_1cd41da363e675 75
+  s_1c216ae4a50c19::t_ea8e0ebcf1f3b4 171-172,176-198
+  s_1c216ae4a50c19::t_bdd0b8ac00ea8b 518-539
+  s_1c216ae4a50c19::t_fb4a22d4d91113 130-140
+  s_1c216ae4a50c19::t_30271764d57d82 230
+  s_1c216ae4a50c19::t_9f1287dd3929cc 202-204
+  s_1c216ae4a50c19::t_1e4339f980fbe8 618-619
+  s_1c216ae4a50c19::t_f4bb08e850b877 55
+  s_1c216ae4a50c19::t_e11fe68497a603 50
+  s_1c216ae4a50c19::t_c955b5aed6e6da 81
+  s_1c216ae4a50c19::t_e38b899db230d5 419-420
+  s_1c216ae4a50c19::t_0cef272f1e62ec 231
+  s_1c216ae4a50c19::t_80f41108c7d37c 481,486
+  s_1c216ae4a50c19::t_dbbc86dd3ddf00 224-228,237-260,263-338
+  s_1c216ae4a50c19::t_130f4c0d16748b 39-41
+  s_1c216ae4a50c19::t_98530eccb9598e 212-213,216
+  s_1c216ae4a50c19::t_54f1b5011c19c2 1-35,38,42-49,51-54,56-74,76-80,82-129,141-170,173-175,199-201,206-211,218-223,229,232-236,261-262,339-344,349-418,421-480,482-485,487-517,540-617,620-622
+  s_1c216ae4a50c19::t_7a9392b490a3bf 214-215,217
+  s_1c216ae4a50c19::t_68e710c27a9deb 345-348
+  s_1c216ae4a50c19::t_a02763f9c10ce0 205
+  s_1c216ae4a50c19::t_02556a205cf91c 36-37
+Quartz/Resource/Export/Lang/en-US.json
+  s_1c216ae4a50c19::t_4aa683201bf419 790-803
+Quartz/UI/Factory/PageFactory.cs
+  s_1c216ae4a50c19::t_4aa683201bf419 71
+Quartz/UI/UICore.cs
+  s_1c216ae4a50c19::t_4aa683201bf419 55
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_1c216ae4a50c19::t_4aa683201bf419 790-803
+Quartz/Features/Tuf/TufPackModels.cs
+  s_1c216ae4a50c19::t_87138858eb0529 65-67,69-70,74-77
+  s_1c216ae4a50c19::t_0420000ae06700 1-4,6,33-36,38,40-45,47-64,68,71-73,78
+  s_1c216ae4a50c19::t_0219285b28f81c 37,39,46
+  s_1c216ae4a50c19::t_5facbdc310e9ec 5,7-32
+Quartz/Features/Tuf/TufPackService.cs
+  s_1c216ae4a50c19::t_20c901cfebd866 34
+  s_1c216ae4a50c19::t_fb019fb6c11f15 275
+  s_1c216ae4a50c19::t_7074225defb393 204,206-207,209,211-213,215-225
+  s_1c216ae4a50c19::t_8926de3282b6b1 155
+  s_1c216ae4a50c19::t_3fcc85df81c6c6 1-15,17,20-33,35-135,139-154,156-178,180-189,192-195,197-203,205,208,210,214,226-235,237-274,276-279
+  s_1c216ae4a50c19::t_3a5180059f5b74 16,18-19
+  s_1c216ae4a50c19::t_7ec51d5c6b7455 236
+  s_1c216ae4a50c19::t_0f19dabe07db34 179,190-191
+  s_1c216ae4a50c19::t_6d1c31e1a46d58 136-138
+  s_1c216ae4a50c19::t_03c5aa54ea9382 196
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "6d4e210ffc368c52a0f582a19d8b1f403a1a35bd",
+  "prompts": {},
+  "sessions": {
+    "s_1c216ae4a50c19": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "db932714-25db-4d0b-8aa8-6b43cd020f56",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
