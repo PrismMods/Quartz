@@ -1,0 +1,24 @@
+Quartz/Features/KeyLimiter/KeyLimiter.cs
+  s_46e9e4725818a3::t_4ee5f20d2f2d7f 180,188-191,199-202
+  s_46e9e4725818a3::t_874d3071146eb8 437
+  s_46e9e4725818a3::t_aaf13900b206ea 203
+Quartz/Features/ChatterBlocker/ChatterBlocker.cs
+  s_46e9e4725818a3::t_532abacf26c893 86-100,104,107-115,123,153-156
+  s_46e9e4725818a3::t_b4e859c7d8ecc1 116-122,129,134-136,157
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "23b05d03ddc3fd90178a714382a57904a5b3e302",
+  "prompts": {},
+  "sessions": {
+    "s_46e9e4725818a3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "73b3fdfe-5c79-4b68-bb84-af02c8be07c9",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
