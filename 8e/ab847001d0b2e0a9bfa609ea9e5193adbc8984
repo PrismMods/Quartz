@@ -1,0 +1,24 @@
+Quartz/Features/KeyLimiter/KeyLimiter.cs
+  s_be82d738fcc66d::t_b44641caf653d0 82
+  s_be82d738fcc66d::t_be1883c96394fe 187-193,199
+  s_be82d738fcc66d::t_5003f4d3080168 258
+  s_be82d738fcc66d::t_850e5a1f5bf767 238
+Quartz/Features/KeyViewer/KeyViewerOverlay.Input.cs
+  s_be82d738fcc66d::t_7aae2648f8aaba 10-13,20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "8eab847001d0b2e0a9bfa609ea9e5193adbc8984",
+  "prompts": {},
+  "sessions": {
+    "s_be82d738fcc66d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0ca2da87-b317-4dd5-bb87-014a5ca1771e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
