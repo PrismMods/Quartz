@@ -79,7 +79,7 @@ internal static partial class KeyLimiter {
     public static bool ShouldBlockKey(KeyCode key) {
         if(!IsActive() || !InPlayerControl() || IsMouseKey(key)) return false;
         if(IsAllowedKey(key)) return false;
-        KeyCode numpadOrigin = NavTwinToNumpad(key);
+        KeyCode numpadOrigin = IsMacOSRuntime() ? KeyCode.None : NavTwinToNumpad(key);
         return numpadOrigin == KeyCode.None || !IsAllowedKey(numpadOrigin);
     }
     public static void ToggleAllowedKey(KeyCode key) {
@@ -184,12 +184,19 @@ internal static partial class KeyLimiter {
         return !IsWindowsRuntime() && key is
             KeyCode.LeftShift or KeyCode.RightShift or KeyCode.LeftControl or KeyCode.LeftAlt;
     }
+    private static bool IsNumpadHookKey(KeyCode key) => key is
+        KeyCode.Keypad0 or KeyCode.Keypad1 or KeyCode.Keypad2 or KeyCode.Keypad3 or KeyCode.Keypad4 or
+        KeyCode.Keypad5 or KeyCode.Keypad6 or KeyCode.Keypad7 or KeyCode.Keypad8 or KeyCode.Keypad9 or
+        KeyCode.KeypadPeriod or KeyCode.KeypadDivide or KeyCode.KeypadMultiply or
+        KeyCode.KeypadMinus or KeyCode.KeypadPlus;
+    public static bool IsHookTrackedKey(KeyCode key) =>
+        IsHookOnlyKey(key) || (IsMacOSRuntime() && IsNumpadHookKey(key));
     public static void NoteHookEvent(KeyCode key, bool pressed) {
         if(key == KeyCode.None) return;
         lock(hookSeenKeys) {
             hookSeenKeys.Add(key);
         }
-        if(!IsHookOnlyKey(key)) return;
+        if(!IsHookTrackedKey(key)) return;
         lock(hookHeldKeys) {
             if(pressed) hookHeldKeys.Add(key);
             else hookHeldKeys.Remove(key);
@@ -214,10 +221,6 @@ internal static partial class KeyLimiter {
             KeyCode hookKey = WindowsVirtualKeyToUnityKey(key);
             if(hookKey != KeyCode.None) return hookKey;
         }
-        if(IsMacOSRuntime()) {
-            KeyCode hookKey = MacVirtualKeyToUnityKey(key);
-            if(hookKey != KeyCode.None) return hookKey;
-        }
         KeyCode mapped = AsyncLabelToPhysicalUnityKey(label);
         if(mapped != KeyCode.None) return mapped;
         return KeyCode.None;
@@ -232,7 +235,7 @@ internal static partial class KeyLimiter {
         RuntimePlatform platform = Application.platform;
         return platform == RuntimePlatform.WindowsPlayer || platform == RuntimePlatform.WindowsEditor;
     }
-    private static bool IsMacOSRuntime() {
+    public static bool IsMacOSRuntime() {
         RuntimePlatform platform = Application.platform;
         return platform == RuntimePlatform.OSXPlayer || platform == RuntimePlatform.OSXEditor;
     }
@@ -252,8 +255,7 @@ internal static partial class KeyLimiter {
         if(name.Length >= 2 && name[0] == 'F'
             && int.TryParse(name[1..], out int functionKey) && functionKey >= 1 && functionKey <= 15)
             return (KeyCode)((int)KeyCode.F1 + (functionKey - 1));
-        if(name.Length == 7 && (name.StartsWith("Keypad") || name.StartsWith("Numpad") || name.StartsWith("NumPad"))
-            && name[6] >= '0' && name[6] <= '9')
+        if(name.Length == 7 && name.StartsWith("Keypad") && name[6] >= '0' && name[6] <= '9')
             return (KeyCode)((int)KeyCode.Keypad0 + (name[6] - '0'));
         return name switch {
             "Escape" => KeyCode.Escape,
@@ -363,28 +365,6 @@ internal static partial class KeyLimiter {
         0xDE => KeyCode.Quote,
         _ => KeyCode.None,
     };
-    // macOS reports hardware key codes from NSEvent rather than Windows virtual keys.
-    // Prefer these physical keypad codes when a SkyHook label is layout-dependent
-    // (for example, a keypad digit reported as an ordinary numeric label).
-    private static KeyCode MacVirtualKeyToUnityKey(ushort key) => key switch {
-        0x52 => KeyCode.Keypad0,
-        0x53 => KeyCode.Keypad1,
-        0x54 => KeyCode.Keypad2,
-        0x55 => KeyCode.Keypad3,
-        0x56 => KeyCode.Keypad4,
-        0x57 => KeyCode.Keypad5,
-        0x58 => KeyCode.Keypad6,
-        0x59 => KeyCode.Keypad7,
-        0x5B => KeyCode.Keypad8,
-        0x5C => KeyCode.Keypad9,
-        0x41 => KeyCode.KeypadPeriod,
-        0x43 => KeyCode.KeypadMultiply,
-        0x45 => KeyCode.KeypadPlus,
-        0x4B => KeyCode.KeypadDivide,
-        0x4C => KeyCode.KeypadEnter,
-        0x4E => KeyCode.KeypadMinus,
-        _ => KeyCode.None,
-    };
     public static bool IsCapturing { get; private set; }
     private static Action<KeyCode> captureOnKey;
     private static Action captureOnEnded;
@@ -433,7 +413,6 @@ internal static partial class KeyLimiter {
         Conf.AllowedKeys = [.. keys];
         PersistChange();
     }
-    private static bool IsHookOnlyModifier(KeyCode key) => IsHookOnlyKey(key);
     public static bool IsHookOnlyModifierKey(KeyCode key) => IsHookOnlyKey(key);
     private static void PersistChange() {
         Save();

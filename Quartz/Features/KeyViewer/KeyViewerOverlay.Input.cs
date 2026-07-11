@@ -7,15 +7,17 @@ public static partial class KeyViewerOverlay {
         if(key == KeyCode.None) return false;
         try {
             if(Input.GetKey(key)) return true;
-            KeyCode twin = NumpadNavTwin(key);
-            if(twin != KeyCode.None && Input.GetKey(twin)) return true;
+            if(!KeyLimiter.KeyLimiter.IsMacOSRuntime()) {
+                KeyCode twin = NumpadNavTwin(key);
+                if(twin != KeyCode.None && Input.GetKey(twin)) return true;
+            }
         } catch {
             return false;
         }
         return IsHookFallbackKey(key) && KeyLimiter.KeyLimiter.HookKeyHeld(key);
     }
     private static bool IsHookFallbackKey(KeyCode key)
-        => key is KeyCode.RightAlt or KeyCode.RightControl;
+        => KeyLimiter.KeyLimiter.IsHookTrackedKey(key);
     private static KeyCode NumpadNavTwin(KeyCode key) => key switch {
         KeyCode.KeypadEnter => KeyCode.Return,
         KeyCode.Keypad0 => KeyCode.Insert,
