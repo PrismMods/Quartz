@@ -38,6 +38,20 @@ public static class ChatterBlocker {
         if(DebugLog) MainCore.Log.Msg($"[ChatterBlocker] Blocked Key: {key} time: {elapsed}ms.");
         return false;
     }
+    private static bool AcceptAsyncKey(ushort key, long now, long thresholdMs, bool active) {
+        if(!active) return true;
+        if(!lastAsyncKeyPress.TryGetValue(key, out long last)) {
+            lastAsyncKeyPress[key] = now;
+            return true;
+        }
+        long elapsed = now - last;
+        if(elapsed > thresholdMs || elapsed <= 5L) {
+            lastAsyncKeyPress[key] = now;
+            return true;
+        }
+        if(DebugLog) MainCore.Log.Msg($"[ChatterBlocker] Blocked Async Key: {key} time: {elapsed}ms.");
+        return false;
+    }
     private static void RecordKeyStats(scrController controller, object key) {
         try {
             scrPlayer player = controller != null ? controller.playerOne : null;
@@ -77,7 +91,7 @@ public static class ChatterBlocker {
                 if(AutoDeafen.AutoDeafen.IsInjectedKey(physical)) continue;
                 if(KeyLimiter.KeyLimiter.ShouldBlockAsyncKeyFromHook(asyncKey.key, asyncKey.label)) continue;
                 RecordKeyStats(controller, asyncKey);
-                count++;
+                if(AcceptAsyncKey(asyncKey.key, now, threshold, chatterActive)) count++;
             }
         }
         count += CountKeysMissedByGame(controller, now, threshold, chatterActive);
@@ -89,6 +103,12 @@ public static class ChatterBlocker {
     // own masks, so their press edge must be computed once per frame and then reported to
     // every call of a single batch — consuming the edge on the first call starves the hit
     // count, while reporting it to every batch multiplies one press into several hits.
+    // ValidInputWasTriggered itself early-returns unless Input.anyKeyDown or a game-mask
+    // key is down, so on quiet frames (e.g. the frame an injected key is RELEASED) the
+    // game never calls CountValidKeysPressed and ComputeInjectedKeys cannot observe the
+    // release — injectedKeyHeldPrev would keep the key and swallow the next press of the
+    // same key (the consecutive-Tab bug). SampleInjectedKeyReleases, driven every frame
+    // by KeyLimiter's Ticker, clears release edges independently of game calls.
     private static int injectionBatch;
     private static bool inPlayerBatch;
     private static int injectedComputeFrame = -1;
@@ -113,13 +133,6 @@ public static class ChatterBlocker {
         }
         return injectionBatch == injectedBatch ? injectedCount : 0;
     }
-    private static bool AsyncKeyboardActive() {
-        try {
-            return RDInput.asyncKeyboard != null && RDInput.asyncKeyboard.isActive;
-        } catch {
-            return false;
-        }
-    }
     private static int ComputeInjectedKeys(scrController controller, long now, long threshold, bool chatterActive) {
         int[] allowed = KeyLimiter.KeyLimiter.Conf?.AllowedKeys;
         if(allowed == null || allowed.Length == 0) {
@@ -131,10 +144,13 @@ public static class ChatterBlocker {
         for(int i = 0; i < allowed.Length; i++) {
             KeyCode key = KeyLimiter.KeyLimiter.NormalizeKey((KeyCode)allowed[i]);
             if(key == KeyCode.None || KeyLimiter.KeyLimiter.IsMouseKey(key)) continue;
-            if(reportedKeysThisFrame.Contains(key)
-                || (asyncActive && !KeyLimiter.KeyLimiter.IsHookOnlyModifierKey(key)
-                    && KeyLimiter.KeyLimiter.HookEverSaw(key))) {
+            if(reportedKeysThisFrame.Contains(key)) {
                 injectedKeyHeldPrev.Add(key);
+                continue;
+            }
+            if(asyncActive && !KeyLimiter.KeyLimiter.IsHookOnlyModifierKey(key)
+                && KeyLimiter.KeyLimiter.HookEverSaw(key)) {
+                injectedKeyHeldPrev.Remove(key);
                 continue;
             }
             bool held;
@@ -149,6 +165,31 @@ public static class ChatterBlocker {
             else injectedKeyHeldPrev.Remove(key);
         }
         return injected;
+    }
+    // Removal only: press edges stay exclusively in ComputeInjectedKeys (inside a player
+    // batch), preserving the single-count-per-press guarantee above. Must consult
+    // HookKeyHeld too, or a held hook-only key (mac modifiers) would be cleared every
+    // frame and re-edge into phantom repeat hits.
+    private static readonly List<KeyCode> injectedReleaseScratch = [];
+    public static void SampleInjectedKeyReleases() {
+        if(injectedKeyHeldPrev.Count == 0) return;
+        injectedReleaseScratch.Clear();
+        foreach(KeyCode key in injectedKeyHeldPrev) injectedReleaseScratch.Add(key);
+        for(int i = 0; i < injectedReleaseScratch.Count; i++) {
+            KeyCode key = injectedReleaseScratch[i];
+            bool held;
+            try { held = UnityEngine.Input.GetKey(key); }
+            catch { held = false; }
+            if(!held) held = KeyLimiter.KeyLimiter.HookKeyHeld(key);
+            if(!held) injectedKeyHeldPrev.Remove(key);
+        }
+    }
+    private static bool AsyncKeyboardActive() {
+        try {
+            return RDInput.asyncKeyboard != null && RDInput.asyncKeyboard.isActive;
+        } catch {
+            return false;
+        }
     }
     [HarmonyPatch(typeof(scrPlayer), "Simulated_PlayerControl_Update")]
     private static class SimulatedPlayerControlUpdatePatch {
@@ -165,33 +206,15 @@ public static class ChatterBlocker {
     }
     [HarmonyPatch(typeof(SkyHookManager), "HookCallback")]
     private static class HookCallbackPatch {
-        private static bool Prefix(SkyHookEvent __0) {
+        private static void Prefix(SkyHookEvent __0) {
             try {
-                return PrefixCore(__0);
+                SkyHookEvent ev = __0;
+                if(KeyLimiter.KeyLimiter.IsMouseLabel(ev.Label)) return;
+                KeyLimiter.KeyLimiter.NoteHookEvent(
+                    KeyLimiter.KeyLimiter.HookKeyToPhysicalUnityKey(ev.Key, ev.Label),
+                    ev.Type == SkyHook.EventType.KeyPressed);
             } catch {
-                return true;
             }
-        }
-        private static bool PrefixCore(SkyHookEvent __0) {
-            SkyHookEvent ev = __0;
-            if(KeyLimiter.KeyLimiter.IsMouseLabel(ev.Label)) return true;
-            KeyLimiter.KeyLimiter.NoteHookEvent(
-                KeyLimiter.KeyLimiter.HookKeyToPhysicalUnityKey(ev.Key, ev.Label),
-                ev.Type == SkyHook.EventType.KeyPressed);
-            if(ev.Type == SkyHook.EventType.KeyReleased || ev.Key == 27) return true;
-            if(AutoDeafen.AutoDeafen.InjectBypassActive) return true;
-            if(KeyLimiter.KeyLimiter.ShouldBlockAsyncKeyFromHook(ev.Key, ev.Label)) return false;
-            if(!IsActive()) return true;
-            long now = NowMs();
-            long threshold = ThresholdMs();
-            if(!lastAsyncKeyPress.TryGetValue(ev.Key, out long last)) last = 0L;
-            long elapsed = now - last;
-            if(elapsed > threshold) {
-                lastAsyncKeyPress[ev.Key] = now;
-                return true;
-            }
-            if(DebugLog) MainCore.Log.Msg($"[ChatterBlocker] Blocked Async Key: {ev.Label} time: {elapsed}ms.");
-            return false;
         }
     }
 }

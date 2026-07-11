@@ -11,6 +11,10 @@ internal static partial class KeyLimiter {
         private bool wasCapturing;
         private void Update() {
             InPlayerControl();
+            // Release edges of injected keys (e.g. Tab) must be sampled every frame; the
+            // game only calls CountValidKeysPressed on frames with fresh game-visible
+            // input, so ChatterBlocker can't see releases on its own (consecutive-Tab bug).
+            ChatterBlocker.ChatterBlocker.SampleInjectedKeyReleases();
             if(!IsCapturing) {
                 wasCapturing = false;
                 if(prevHeld.Count > 0) prevHeld.Clear();
@@ -24,7 +28,7 @@ internal static partial class KeyLimiter {
                 bool held;
                 try { held = UnityEngine.Input.GetKey(key); }
                 catch { continue; }
-                if(!held && IsHookOnlyModifier(key)) held = HookKeyHeld(key);
+                if(!held && IsHookTrackedKey(key)) held = HookKeyHeld(key);
                 if(held && !priming && !prevHeld.Contains(key)) {
                     prevHeld.Add(key);
                     EndCapture(key);
