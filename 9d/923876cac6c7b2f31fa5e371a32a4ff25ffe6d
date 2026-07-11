@@ -1,0 +1,19 @@
+Quartz/UI/Factory/Page/TufPacksUI.cs
+  s_02627f4e5c150a::t_71c217db2d821e 238,242-259,261-263,268
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "9d923876cac6c7b2f31fa5e371a32a4ff25ffe6d",
+  "prompts": {},
+  "sessions": {
+    "s_02627f4e5c150a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cde2b547-f43b-49a9-a8d8-ab25ccae4768",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
