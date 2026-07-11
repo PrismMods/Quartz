@@ -69,6 +69,10 @@ public static class MenuFactory {
             ("Tweaks", "TWEAKS", (int)OriginalMenuState.NostalgiaTweaks),
             ("Editor", "EDITOR", (int)OriginalMenuState.NostalgiaEditor),
         ],
+        [(int)OriginalMenuState.NostalgiaTuf] = [
+            ("Levels", "TUF_LEVELS", (int)OriginalMenuState.NostalgiaTuf),
+            ("Packs", "TUF_PACKS", (int)OriginalMenuState.NostalgiaTufPacks),
+        ],
     };
     public static int CategoryFor(int state) {
         foreach(var kvp in CategoryChildren)

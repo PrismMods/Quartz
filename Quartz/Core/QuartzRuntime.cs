@@ -52,6 +52,7 @@ public sealed class QuartzRuntime {
     private HarmonyService harmonyService;
     private PlayCount playCount;
     private TufService tufService;
+    private TufPackService packService;
     private UnityEngine.Events.UnityAction<UnityEngine.SceneManagement.Scene, UnityEngine.SceneManagement.LoadSceneMode> xperfectGuardHandler;
     public QuartzRuntime(IQuartzHost host) {
         Host = host;
@@ -138,9 +139,11 @@ public sealed class QuartzRuntime {
         harmonyService = new HarmonyService();
         playCount = new PlayCount();
         tufService = new TufService();
+        packService = new TufPackService();
         services.Add(Localization);
         services.Add(Quartz.Addons.AddonService.Service);
         services.Add(tufService);
+        services.Add(packService);
         services.Add(uiService);
         services.Add(tweenService);
         services.Add(playCount);
