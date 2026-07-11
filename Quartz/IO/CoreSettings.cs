@@ -20,6 +20,7 @@ public sealed class CoreSettings : ISettingsFile {
     public float FontJudgementSize = 1f;
     public string SettingsFontName = "";
     public float ScrollSpeed = 80f;
+    public float FpsRefreshInterval = 0f;
     public float OutlineWidth = 6.25f;
     public float PanelOpacity = 1.0f;
     public float PanelWidth = 0f;
@@ -67,6 +68,7 @@ public sealed class CoreSettings : ISettingsFile {
             [nameof(FontJudgementSize)] = FontJudgementSize,
             [nameof(SettingsFontName)] = SettingsFontName,
             [nameof(ScrollSpeed)] = ScrollSpeed,
+            [nameof(FpsRefreshInterval)] = FpsRefreshInterval,
             [nameof(OutlineWidth)] = OutlineWidth,
             [nameof(PanelOpacity)] = PanelOpacity,
             [nameof(PanelWidth)] = PanelWidth,
@@ -101,6 +103,7 @@ public sealed class CoreSettings : ISettingsFile {
         FontJudgementSize = IOUtils.Read(token, nameof(FontJudgementSize), FontJudgementSize);
         SettingsFontName = IOUtils.Read(token, nameof(SettingsFontName), SettingsFontName);
         ScrollSpeed = IOUtils.Read(token, nameof(ScrollSpeed), ScrollSpeed);
+        FpsRefreshInterval = IOUtils.Read(token, nameof(FpsRefreshInterval), FpsRefreshInterval);
         OutlineWidth = IOUtils.Read(token, nameof(OutlineWidth), OutlineWidth);
         PanelOpacity = IOUtils.Read(token, nameof(PanelOpacity), PanelOpacity);
         PanelWidth = IOUtils.Read(token, nameof(PanelWidth), PanelWidth);

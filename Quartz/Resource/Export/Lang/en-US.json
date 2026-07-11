@@ -445,6 +445,8 @@
     "OVERLAY": "Overlay",
     "OVERLAY_GENERAL": "General",
     "OVERLAY_ENABLED": "Enable Overlays",
+    "OVERLAY_FPS_SMOOTH": "FPS Update Interval",
+    "DESC_OVERLAY_FPS_SMOOTH": "How long the FPS counter holds each value before updating. 0 = every frame; higher makes the number tick more slowly and steadily.",
     "OVERLAY_REORGANIZE": "Reorganize",
     "OVERLAYER": "Overlayer",
     "PANEL_ADDSTAT": "+ Add Stat",

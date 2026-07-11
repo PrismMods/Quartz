@@ -1,4 +1,5 @@
 using System.Globalization;
+using Quartz.Core;
 using UnityEngine;
 namespace Quartz.Features.Status;
 public static class GameStats {
@@ -163,20 +164,36 @@ public static class GameStats {
     }
     public static int Fps => fpsCache.Get(static () => {
         float dt = Time.unscaledDeltaTime;
-        if(dt <= 0f) return Mathf.RoundToInt(smoothedFps);
-        float fps = 1f / dt;
-        if(smoothedFps <= 0f) {
-            smoothedFps = fps;
-        } else {
-            float diff = Mathf.Abs(fps - smoothedFps);
-            float t = Mathf.Clamp01(diff * fpsSensitivity);
-            float smooth = Mathf.Lerp(fpsMinSmooth, fpsMaxSmooth, t);
-            float factor = 1f - Mathf.Exp(-smooth * dt);
-            smoothedFps += (fps - smoothedFps) * factor;
+        if(dt > 0f) {
+            float fps = 1f / dt;
+            if(smoothedFps <= 0f) {
+                smoothedFps = fps;
+            } else {
+                float diff = Mathf.Abs(fps - smoothedFps);
+                float t = Mathf.Clamp01(diff * fpsSensitivity);
+                float smooth = Mathf.Lerp(fpsMinSmooth, fpsMaxSmooth, t);
+                float factor = 1f - Mathf.Exp(-smooth * dt);
+                smoothedFps += (fps - smoothedFps) * factor;
+            }
+        }
+        // Optional display hold: keep the shown value steady for a user-set
+        // interval so the readout ticks more slowly instead of every frame.
+        // Smoothing above keeps running each frame, so no jump on refresh.
+        float interval = MainCore.Conf.FpsRefreshInterval;
+        if(interval > 0f) {
+            if(fpsDisplayed == 0) fpsDisplayed = Mathf.RoundToInt(smoothedFps);
+            fpsHoldTimer += dt;
+            if(fpsHoldTimer >= interval) {
+                fpsHoldTimer = 0f;
+                fpsDisplayed = Mathf.RoundToInt(smoothedFps);
+            }
+            return fpsDisplayed;
         }
         return Mathf.RoundToInt(smoothedFps);
     });
     private static float smoothedFps;
+    private static float fpsHoldTimer;
+    private static int fpsDisplayed;
     private const float fpsMinSmooth = 2f;
     private const float fpsMaxSmooth = 12f;
     private const float fpsSensitivity = 0.08f;

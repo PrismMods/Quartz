@@ -445,6 +445,8 @@
     "OVERLAY": "오버레이",
     "OVERLAY_GENERAL": "일반",
     "OVERLAY_ENABLED": "오버레이 활성화",
+    "OVERLAY_FPS_SMOOTH": "FPS 갱신 간격",
+    "DESC_OVERLAY_FPS_SMOOTH": "FPS 카운터가 값을 갱신하기 전에 유지하는 시간입니다. 0이면 매 프레임 갱신하고, 값이 클수록 숫자가 더 느리고 안정적으로 바뀝니다.",
     "OVERLAY_REORGANIZE": "재배치",
     "OVERLAYER": "오버레이어",
     "PANEL_ADDSTAT": "+ 스탯 추가",
