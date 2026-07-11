@@ -53,6 +53,7 @@ public enum OriginalMenuState {
     NostalgiaEditor,
     NostalgiaTuf,
     NostalgiaTufPacks,
+    NostalgiaTufSettings,
     Profiles,
     Import,
     Addons,

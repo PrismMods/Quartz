@@ -55,9 +55,9 @@ public sealed class TufService : IRuntimeService {
         quantumMinIndex = settings.Data.QuantumMinIndex;
         quantumMaxIndex = settings.Data.QuantumMaxIndex;
         api = new TufApiClient();
-        downloads = new TufDownloadService(MainCore.Paths.TufLevelsPath);
+        downloads = new TufDownloadService(MainCore.Paths.TufLevelsPath, LinkedDownloadsRoot);
         launcher = MainCore.Root.AddComponent<TufLevelLauncher>();
-        launcher.Initialize(MainCore.Paths.TufLevelsPath);
+        launcher.Initialize(MainCore.Paths.TufLevelsPath, LinkedDownloadsRoot);
         actions = new TufLevelActionRunner(levels, downloads, launcher, Notify);
     }
 
@@ -132,6 +132,20 @@ public sealed class TufService : IRuntimeService {
         nextOffset = 0;
         Refresh();
     }
+
+    public bool LinkTufHelperLite => settings?.Data.LinkTufHelperLite ?? false;
+
+    public void SetLinkTufHelperLite(bool value) {
+        if(settings == null || settings.Data.LinkTufHelperLite == value) return;
+        settings.Data.LinkTufHelperLite = value;
+        settings.RequestSave();
+        Notify();
+    }
+
+    // Live provider handed to the download service and launcher: null (fall back
+    // to Quartz's own cache) unless linking is on AND TUFHelperLite is installed.
+    private string LinkedDownloadsRoot() =>
+        settings?.Data.LinkTufHelperLite == true ? TufHelperLiteLink.DownloadsRoot() : null;
 
     private void SaveSettings() {
         if(settings == null) return;

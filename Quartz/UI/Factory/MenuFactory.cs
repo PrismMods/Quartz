@@ -72,6 +72,7 @@ public static class MenuFactory {
         [(int)OriginalMenuState.NostalgiaTuf] = [
             ("Levels", "TUF_LEVELS", (int)OriginalMenuState.NostalgiaTuf),
             ("Packs", "TUF_PACKS", (int)OriginalMenuState.NostalgiaTufPacks),
+            ("Settings", "TUF_SETTINGS", (int)OriginalMenuState.NostalgiaTufSettings),
         ],
     };
     public static int CategoryFor(int state) {

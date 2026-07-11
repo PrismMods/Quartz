@@ -69,6 +69,7 @@ public static class PageFactory {
         NostalgiaUI.EditorPage(UICore.Pages[(int)OriginalMenuState.NostalgiaEditor]);
         TufBrowserUI.Create(UICore.Pages[(int)OriginalMenuState.NostalgiaTuf]);
         TufPacksUI.Create(UICore.Pages[(int)OriginalMenuState.NostalgiaTufPacks]);
+        TufSettingsUI.Create(UICore.Pages[(int)OriginalMenuState.NostalgiaTufSettings]);
         PageSearch.Create(UICore.Pages[(int)OriginalMenuState.Search]);
         PageAddons.Create(UICore.Pages[(int)OriginalMenuState.Addons]);
         if(Quartz.Core.Info.IsDev) PageDeveloper.Create(UICore.Pages[(int)OriginalMenuState.Developer]);

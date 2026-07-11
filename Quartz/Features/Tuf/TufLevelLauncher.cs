@@ -12,17 +12,31 @@ namespace Quartz.Features.Tuf;
 
 public sealed class TufLevelLauncher : MonoBehaviour {
     private string levelsRoot;
+    private Func<string> linkedRoot;
     private Coroutine pending;
     private Action<bool, string> completion;
     private GameObject loadingCover;
 
-    public void Initialize(string root) => levelsRoot = Path.GetFullPath(root);
+    public void Initialize(string root, Func<string> linkedRoot = null) {
+        levelsRoot = Path.GetFullPath(root);
+        this.linkedRoot = linkedRoot;
+    }
+
+    // Charts may live in Quartz's own cache or, when directory linking is on,
+    // in TUFHelperLite's Downloads folder; both are trusted install roots.
+    private bool ChartUnderTrustedRoot(string chart) {
+        if(TufArchive.IsChartUnderRoot(chart, levelsRoot)) return true;
+        try {
+            string linked = linkedRoot?.Invoke();
+            return !string.IsNullOrEmpty(linked) && TufArchive.IsChartUnderRoot(chart, linked);
+        } catch { return false; }
+    }
 
     public bool Launch(string chartPath, Action<bool, string> completed) {
         if(pending != null || completion != null) Cancel();
         completion = completed;
         try {
-            if(!TufArchive.IsChartUnderRoot(chartPath, levelsRoot) || !File.Exists(chartPath))
+            if(!ChartUnderTrustedRoot(chartPath) || !File.Exists(chartPath))
                 throw new InvalidDataException(Tr("TUF_LAUNCH_INVALID_PATH", "Playable chart path is invalid."));
             string expected = Path.GetFullPath(chartPath);
             if(!ClearTufHelperLaunchState())

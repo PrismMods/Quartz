@@ -13,6 +13,7 @@ public sealed class TufSettings : ISettingsFile {
     public int QuantumMinIndex;
     public int QuantumMaxIndex = TufDifficultyFilter.QuantumNames.Count - 1;
     public List<string> SpecialDifficulties = [];
+    public bool LinkTufHelperLite;
 
     public TufSort GetSort() => Enum.IsDefined(typeof(TufSort), Sort)
         ? (TufSort)Sort
@@ -43,7 +44,8 @@ public sealed class TufSettings : ISettingsFile {
         [nameof(QuantumEnabled)] = QuantumEnabled,
         [nameof(QuantumMinIndex)] = QuantumMinIndex,
         [nameof(QuantumMaxIndex)] = QuantumMaxIndex,
-        [nameof(SpecialDifficulties)] = new JArray(SpecialDifficulties)
+        [nameof(SpecialDifficulties)] = new JArray(SpecialDifficulties),
+        [nameof(LinkTufHelperLite)] = LinkTufHelperLite
     };
 
     public void Deserialize(JToken token) {
@@ -55,6 +57,7 @@ public sealed class TufSettings : ISettingsFile {
         QuantumEnabled = Read(token, nameof(QuantumEnabled), QuantumEnabled);
         QuantumMinIndex = Read(token, nameof(QuantumMinIndex), QuantumMinIndex);
         QuantumMaxIndex = Read(token, nameof(QuantumMaxIndex), QuantumMaxIndex);
+        LinkTufHelperLite = Read(token, nameof(LinkTufHelperLite), LinkTufHelperLite);
         SpecialDifficulties.Clear();
         if(token[nameof(SpecialDifficulties)] is JArray values) {
             foreach(JToken value in values) {

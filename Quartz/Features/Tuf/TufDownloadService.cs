@@ -6,6 +6,7 @@ namespace Quartz.Features.Tuf;
 public sealed class TufDownloadService : IDisposable {
     private const long MaxArchiveBytes = 512L * 1024 * 1024;
     private readonly string levelsRoot;
+    private readonly Func<string> linkedRoot;
     private readonly HttpClient http;
     private readonly SemaphoreSlim oneAtATime = new(1, 1);
     private CancellationTokenSource active;
@@ -14,8 +15,13 @@ public sealed class TufDownloadService : IDisposable {
     // charts live directly in Levels/<id>/; older caches are wiped once on upgrade.
     private const string LayoutMarker = ".layout-v2";
 
-    public TufDownloadService(string levelsRoot) {
+    // linkedRoot optionally redirects final installs (e.g. into TUFHelperLite's
+    // Downloads folder); temp files and the layout migration always stay in
+    // levelsRoot — the migration wipes its root, which must never be a folder
+    // another mod owns.
+    public TufDownloadService(string levelsRoot, Func<string> linkedRoot = null) {
         this.levelsRoot = Path.GetFullPath(levelsRoot);
+        this.linkedRoot = linkedRoot;
         Directory.CreateDirectory(this.levelsRoot);
         MigrateLayout();
         http = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false }) {
@@ -42,19 +48,37 @@ public sealed class TufDownloadService : IDisposable {
         chart = null;
         if(id <= 0) return false;
         try {
-            chart = TufArchive.SelectChart(LevelFolder(id));
-            return chart != null && TufArchive.IsChartUnderRoot(chart, levelsRoot);
+            (string root, bool linked) = ResolveRoot();
+            chart = TufArchive.SelectChart(LevelFolder(id, root, linked));
+            return chart != null && TufArchive.IsChartUnderRoot(chart, root);
         } catch { return false; }
     }
 
-    public string LevelFolder(int id) => Path.Combine(levelsRoot, id.ToString());
+    public string LevelFolder(int id) {
+        (string root, bool linked) = ResolveRoot();
+        return LevelFolder(id, root, linked);
+    }
+
+    // The linked target uses TUFHelperLite's own "tuf-<id>" folder naming so that
+    // mod recognizes the download; Quartz's private cache keeps plain "<id>".
+    private static string LevelFolder(int id, string root, bool linked) =>
+        Path.Combine(root, linked ? TufHelperLiteLink.FolderName(id) : id.ToString());
+
+    private (string Root, bool Linked) ResolveRoot() {
+        try {
+            string linked = linkedRoot?.Invoke();
+            if(!string.IsNullOrEmpty(linked)) return (Path.GetFullPath(linked), true);
+        } catch { }
+        return (levelsRoot, false);
+    }
 
     // All playable charts cached for the level, preference-ordered and root-validated.
     public IReadOnlyList<string> ListCachedCharts(int id) {
         if(id <= 0) return Array.Empty<string>();
         try {
-            return TufArchive.ListCharts(LevelFolder(id))
-                .Where(c => TufArchive.IsChartUnderRoot(c, levelsRoot)).ToList();
+            (string root, bool linked) = ResolveRoot();
+            return TufArchive.ListCharts(LevelFolder(id, root, linked))
+                .Where(c => TufArchive.IsChartUnderRoot(c, root)).ToList();
         } catch { return Array.Empty<string>(); }
     }
 
@@ -62,9 +86,12 @@ public sealed class TufDownloadService : IDisposable {
         if(level == null || level.Id <= 0 || !TufNetworkPolicy.IsAllowedDownloadUri(level.DownloadUri))
             throw new InvalidDataException("Level has no safe download URL.");
         if(TryGetCachedChart(level.Id, out string cached)) return cached;
+        // Resolve the install target once so a settings flip mid-download can't
+        // split the install between two roots.
+        (string root, bool linked) = ResolveRoot();
         string part = Path.Combine(levelsRoot, level.Id + ".part");
         string extracting = Path.Combine(levelsRoot, level.Id + ".extracting");
-        string final = Path.Combine(levelsRoot, level.Id.ToString());
+        string final = LevelFolder(level.Id, root, linked);
         bool acquired = false;
         try {
             acquired = await oneAtATime.WaitAsync(0, token).ConfigureAwait(false);
@@ -89,7 +116,7 @@ public sealed class TufDownloadService : IDisposable {
             if(Directory.Exists(final)) Directory.Delete(final, true);
             Directory.Move(extracting, final);
             string installed = Path.GetFullPath(Path.Combine(final, relativeChart));
-            if(!TufArchive.IsChartUnderRoot(installed, levelsRoot)) throw new InvalidDataException("Installed chart path is unsafe.");
+            if(!TufArchive.IsChartUnderRoot(installed, root)) throw new InvalidDataException("Installed chart path is unsafe.");
             return installed;
         } finally {
             if(acquired) {
