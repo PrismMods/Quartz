@@ -1,0 +1,33 @@
+Quartz/Features/KeyViewer/KeyViewerOverlay.Boxes.cs
+  s_906f79363aa766::t_9e771f6538b64d 168,170
+  s_906f79363aa766::t_6ed6a8a2709464 87
+Quartz/Features/KeyViewer/KeyViewerOverlay.Lifecycle.cs
+  s_906f79363aa766::t_7da785e0556203 124
+Quartz/Features/Interop/Readers/KeyViewerImportShared.cs
+  s_906f79363aa766::t_f60ae791d35321 139,141-143
+Quartz/UI/Factory/Page/PageKeyViewer.cs
+  s_906f79363aa766::t_ca3c23aff0cfbd 183
+  s_906f79363aa766::t_d4e93e6df13160 207-209
+Quartz/Features/KeyViewer/KeyViewerSettings.Serialization.cs
+  s_906f79363aa766::t_7138c53d8423c2 218,221
+  s_906f79363aa766::t_d253deedb03476 241-287
+  s_906f79363aa766::t_b28147de47469a 104-105
+Quartz/Features/KeyViewer/KeyViewerSettings.cs
+  s_906f79363aa766::t_f4f05fbd5b62ec 97-120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "d153b1849a8c5bbe1a4bd2429d0eba5956a55754",
+  "prompts": {},
+  "sessions": {
+    "s_906f79363aa766": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b8041ed5-0513-4906-9c21-9c1f0aca071e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
