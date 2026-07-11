@@ -1,0 +1,77 @@
+Quartz.Tests/Features/Tuf/TufSecurityTests.cs
+  s_1be99e719817bd::t_1104fda9a49126 54
+  s_d582066fe49044::t_42819ca84bcd0c 75,105-114
+  s_1be99e719817bd::t_67c0a48fda38ce 1-53,55-57,115-137
+  s_1be99e719817bd::t_3482340e9e7bb0 58-69
+  s_d582066fe49044::t_391d403a1a3a34 70-74
+  s_d582066fe49044::t_247488fb980707 76-104
+Quartz.Tests/Features/Tuf/TufFilterTests.cs
+  s_1be99e719817bd::t_9d7c12edab26ba 50-51
+  s_3a2c9106aa71df::t_86952b62f28e69 75-101
+  s_2cfd6b57543564::t_2054bc7d72cbb6 5-29
+  s_1be99e719817bd::t_7d0c1f631f8b6b 1-4,30-49,52-56,59-63,68-74,102
+  s_1be99e719817bd::t_1a7174fb1892bc 57-58,64-67
+Quartz.Tests/Features/Tuf/TufPackParseTests.cs
+  s_1c216ae4a50c19::t_50c4c9a3c85ce9 1-89,92,95-101,103-104,113-114
+  s_1c216ae4a50c19::t_89ccff7ff1d3e4 90-91,93-94,102,105-112
+Quartz.Tests/Program.cs
+  s_1be99e719817bd::t_7d0c1f631f8b6b 11-12
+  s_1be99e719817bd::t_67c0a48fda38ce 9-10
+  s_2cfd6b57543564::t_2054bc7d72cbb6 14
+  s_1c216ae4a50c19::t_b8d40da25dfecb 15-16
+  s_3a2c9106aa71df::t_5155df0f4615e0 13
+Quartz.Tests/Quartz.Tests.csproj
+  s_1be99e719817bd::t_7d0c1f631f8b6b 18
+  s_2cfd6b57543564::t_478153f6309ef3 17
+  s_1be99e719817bd::t_67c0a48fda38ce 15,19-20
+  s_1c216ae4a50c19::t_e4e944260bde93 21-22
+  s_2cfd6b57543564::t_2054bc7d72cbb6 16,23-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "3afad9dd6b8a428fd466458e6b6c9983f9707f5f",
+  "prompts": {},
+  "sessions": {
+    "s_1be99e719817bd": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f4b6a-54cd-7020-9147-3c960eab4484",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": null
+    },
+    "s_1c216ae4a50c19": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "db932714-25db-4d0b-8aa8-6b43cd020f56",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_2cfd6b57543564": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f505b-586a-7e81-8aab-9f8d8cbce2fe",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_3a2c9106aa71df": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "be3c3b26-b76b-4531-b865-f50cf9f3e2d2",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": null
+    },
+    "s_d582066fe49044": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ee3a57a8-a324-4719-874a-375fd2f29c1f",
+        "model": "claude-fable-5"
+      },
+      "human_author": null
+    }
+  }
+}
