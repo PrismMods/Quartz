@@ -6,6 +6,14 @@ List<(string Name, Action Run)> tests = [
     ("Localization keys stay in parity", LocalizationParityTests.TestLocalizationParity),
     ("KeyViewer CSS parses the DM Note contract", KeyViewerCssTests.TestKeyViewerCss),
     ("KeyViewer CSS parses the extended web effects", KeyViewerCssTests.TestKeyViewerCssExtended),
+    ("TUF inputs and download URLs are validated", TufSecurityTests.TestInputAndNetworkPolicy),
+    ("TUF archives reject unsafe entries and select charts", TufSecurityTests.TestArchiveSafetyAndSelection),
+    ("TUF difficulty filters clamp, select, and reset", TufFilterTests.TestDifficultyFilterContract),
+    ("TUF API emits named PGU and special filters", TufFilterTests.TestApiDifficultyQuery),
+    ("TUF quantum range selects, clamps, and clears", TufFilterTests.TestQuantumRange),
+    ("TUF browser preferences serialize and normalize", TufFilterTests.TestPersistedPreferences),
+    ("TUF pack list parses string ids and counts", TufPackParseTests.TestPackListParsing),
+    ("TUF pack tree flattens, dedups, and credits charters", TufPackParseTests.TestPackTreeParsing),
 ];
 int failed = 0;
 foreach((string name, Action run) in tests) {

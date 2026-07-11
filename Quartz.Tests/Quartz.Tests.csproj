@@ -12,5 +12,17 @@
 		<Compile Include="../Quartz/IO/AtomicFile.cs" Link="Source/AtomicFile.cs" />
 		<Compile Include="../Quartz/IO/ProfileNames.cs" Link="Source/ProfileNames.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/KeyViewerCss.cs" Link="Source/KeyViewerCss.cs" />
+		<Compile Include="../Quartz/Features/Tuf/TufModels.cs" Link="Source/TufModels.cs" />
+		<Compile Include="../Quartz/Features/Tuf/TufSettings.cs" Link="Source/TufSettings.cs" />
+		<Compile Include="../Quartz/IO/Interface/ISettingsFile.cs" Link="Source/ISettingsFile.cs" />
+		<Compile Include="../Quartz/Features/Tuf/TufApiQuery.cs" Link="Source/TufApiQuery.cs" />
+		<Compile Include="../Quartz/Features/Tuf/TufNetworkPolicy.cs" Link="Source/TufNetworkPolicy.cs" />
+		<Compile Include="../Quartz/Features/Tuf/TufArchive.cs" Link="Source/TufArchive.cs" />
+		<Compile Include="../Quartz/Features/Tuf/TufPackModels.cs" Link="Source/TufPackModels.cs" />
+		<Compile Include="../Quartz/Features/Tuf/TufPackApiClient.cs" Link="Source/TufPackApiClient.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 </Project>
