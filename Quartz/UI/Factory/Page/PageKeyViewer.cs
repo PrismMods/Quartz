@@ -180,7 +180,7 @@ internal static partial class PageKeyViewer {
             }
         }
         string[] LabelArrayFor(int slot) =>
-            slot >= KeyViewerSettings.FootSlotBase ? conf.FootKeysText : conf.LabelsForStyle(Style());
+            slot >= KeyViewerSettings.FootSlotBase ? conf.FootLabelsForStyle(conf.FootStyle) : conf.LabelsForStyle(Style());
         int LabelIndexFor(int slot) =>
             slot >= KeyViewerSettings.FootSlotBase ? slot - KeyViewerSettings.FootSlotBase : slot;
         void RefreshContextEditor() {
@@ -204,8 +204,9 @@ internal static partial class PageKeyViewer {
             if(SlotValid()) {
                 if(selectedSlot >= KeyViewerSettings.FootSlotBase) {
                     int fi = selectedSlot - KeyViewerSettings.FootSlotBase;
-                    if(fi < conf.FootKeys.Length) {
-                        conf.FootKeys[fi] = (int)key;
+                    int[] footKeys = conf.FootKeysForStyle(conf.FootStyle);
+                    if(fi < footKeys.Length) {
+                        footKeys[fi] = (int)key;
                         Save();
                         KeyViewerOverlay.Rebuild();
                     }

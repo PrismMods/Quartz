@@ -84,7 +84,7 @@ public static partial class KeyViewerOverlay {
         boxes.Add(box);
     }
     private static void AddFootKey(int footIndex, float x, float y, float w, float h) {
-        int[] footKeys = Conf.FootKeys;
+        int[] footKeys = Conf.FootKeysForStyle(Conf.FootStyle);
         if(footIndex < 0 || footIndex >= footKeys.Length) return;
         int slot = KeyViewerSettings.FootSlotBase + footIndex;
         KeyCode key = (KeyCode)footKeys[footIndex];
@@ -165,9 +165,9 @@ public static partial class KeyViewerOverlay {
     internal static string LabelFor(int style, int slot) {
         if(slot >= KeyViewerSettings.FootSlotBase) {
             int fi = slot - KeyViewerSettings.FootSlotBase;
-            string[] footOverrides = Conf.FootKeysText;
+            string[] footOverrides = Conf.FootLabelsForStyle(Conf.FootStyle);
             if(fi >= 0 && fi < footOverrides.Length && !string.IsNullOrEmpty(footOverrides[fi])) return footOverrides[fi];
-            int[] footKeys = Conf.FootKeys;
+            int[] footKeys = Conf.FootKeysForStyle(Conf.FootStyle);
             return fi >= 0 && fi < footKeys.Length ? KeyCodeShortLabel((KeyCode)footKeys[fi]) : "";
         }
         string[] overrides = Conf.LabelsForStyle(style);

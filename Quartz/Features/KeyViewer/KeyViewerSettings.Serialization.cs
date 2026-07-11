@@ -101,8 +101,8 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
             [nameof(FootStyle)] = FootStyle,
             [nameof(FootOffsetX)] = FootOffsetX,
             [nameof(FootOffsetY)] = FootOffsetY,
-            [nameof(FootKeys)] = new JArray(FootKeys),
-            [nameof(FootKeysText)] = WriteLabels(FootKeysText),
+            [nameof(FootKeysByStyle)] = WriteFootKeys(FootKeysByStyle),
+            [nameof(FootKeysTextByStyle)] = WriteFootLabels(FootKeysTextByStyle),
             [nameof(Counts)] = counts,
         };
     }
@@ -215,11 +215,10 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
         GhostKey14 = ReadKeys(token, nameof(GhostKey14), GhostKey14);
         GhostKey16 = ReadKeys(token, nameof(GhostKey16), GhostKey16);
         GhostKey20 = ReadKeys(token, nameof(GhostKey20), GhostKey20);
-        FootStyle = Mathf.Clamp(IOUtils.Read(token, nameof(FootStyle), FootStyle), 0, 8);
+        FootStyle = Mathf.Clamp(IOUtils.Read(token, nameof(FootStyle), FootStyle), 0, MaxFootStyle);
         FootOffsetX = IOUtils.Read(token, nameof(FootOffsetX), FootOffsetX);
         FootOffsetY = IOUtils.Read(token, nameof(FootOffsetY), FootOffsetY);
-        FootKeys = ReadKeys(token, nameof(FootKeys), FootKeys);
-        FootKeysText = ReadLabels(token, nameof(FootKeysText), FootKeysText);
+        ReadFootKeys(token);
         Counts.Clear();
         if(token[nameof(Counts)] is JObject counts) {
             foreach(var prop in counts.Properties()) {
@@ -238,6 +237,53 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
         JArray arr = [];
         foreach(string label in labels) arr.Add(label ?? "");
         return arr;
+    }
+    private static JArray WriteFootKeys(int[][] byStyle) {
+        JArray outer = [];
+        foreach(int[] arr in byStyle) outer.Add(new JArray(arr));
+        return outer;
+    }
+    private static JArray WriteFootLabels(string[][] byStyle) {
+        JArray outer = [];
+        foreach(string[] arr in byStyle) outer.Add(WriteLabels(arr));
+        return outer;
+    }
+    private void ReadFootKeys(JToken token) {
+        if(token[nameof(FootKeysByStyle)] is JArray keysOuter && keysOuter.Count == FootKeysByStyle.Length) {
+            for(int s = 0; s < FootKeysByStyle.Length; s++) {
+                if(keysOuter[s] is not JArray arr || arr.Count != FootKeysByStyle[s].Length) continue;
+                try { for(int i = 0; i < arr.Count; i++) FootKeysByStyle[s][i] = arr[i].Value<int>(); } catch { }
+            }
+        } else if(token["FootKeys"] is JArray legacyKeys) {
+            SeedFootFromFlat(legacyKeys);
+        }
+        if(token[nameof(FootKeysTextByStyle)] is JArray textOuter && textOuter.Count == FootKeysTextByStyle.Length) {
+            for(int s = 0; s < FootKeysTextByStyle.Length; s++) {
+                if(textOuter[s] is not JArray arr || arr.Count != FootKeysTextByStyle[s].Length) continue;
+                for(int i = 0; i < arr.Count; i++) FootKeysTextByStyle[s][i] = arr[i].Type == JTokenType.String ? arr[i].ToString() : "";
+            }
+        } else if(token["FootKeysText"] is JArray legacyText) {
+            SeedFootLabelsFromFlat(legacyText);
+        }
+    }
+    // Pre-independence saves stored one shared FootKeys[16] / FootKeysText[16]. Seed every
+    // foot count from that array's prefix so each count keeps exactly what it showed before,
+    // then diverges as the user edits it.
+    private void SeedFootFromFlat(JArray flat) {
+        int[] values = new int[flat.Count];
+        try { for(int i = 0; i < values.Length; i++) values[i] = flat[i].Value<int>(); } catch { return; }
+        foreach(int[] dest in FootKeysByStyle) {
+            int n = Mathf.Min(dest.Length, values.Length);
+            for(int i = 0; i < n; i++) dest[i] = values[i];
+        }
+    }
+    private void SeedFootLabelsFromFlat(JArray flat) {
+        string[] values = new string[flat.Count];
+        for(int i = 0; i < values.Length; i++) values[i] = flat[i].Type == JTokenType.String ? flat[i].ToString() : "";
+        foreach(string[] dest in FootKeysTextByStyle) {
+            int n = Mathf.Min(dest.Length, values.Length);
+            for(int i = 0; i < n; i++) dest[i] = values[i];
+        }
     }
     private static JArray WriteColors(Color[] colors) {
         JArray arr = [];

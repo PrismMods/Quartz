@@ -94,9 +94,30 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
     public int FootStyle = 0;
     public float FootOffsetX = -360f;
     public float FootOffsetY = 24.76001f;
-    public int[] FootKeys = [289, 285, 288, 284, 287, 283, 286, 282, 48, 54, 57, 53, 56, 52, 55, 51];
-    public string[] FootKeysText = new string[16];
-    public int FootKeyCount() => Mathf.Clamp(FootStyle, 0, 8) * 2;
+    public const int MaxFootStyle = 8;
+    private static readonly int[] FootKeyDefaults = [289, 285, 288, 284, 287, 283, 286, 282, 48, 54, 57, 53, 56, 52, 55, 51];
+    // One bindings/labels array per foot count (FootStyle 0-8 → 0,2,4,…,16 keys), each
+    // sized 2*style. Independent per count, like the main styles — editing the 4-key
+    // foot layout must not bleed into the 8-key one.
+    public int[][] FootKeysByStyle = DefaultFootKeys();
+    public string[][] FootKeysTextByStyle = DefaultFootLabels();
+    public int FootKeyCount() => Mathf.Clamp(FootStyle, 0, MaxFootStyle) * 2;
+    public int[] FootKeysForStyle(int footStyle) => FootKeysByStyle[Mathf.Clamp(footStyle, 0, MaxFootStyle)];
+    public string[] FootLabelsForStyle(int footStyle) => FootKeysTextByStyle[Mathf.Clamp(footStyle, 0, MaxFootStyle)];
+    private static int[][] DefaultFootKeys() {
+        int[][] byStyle = new int[MaxFootStyle + 1][];
+        for(int s = 0; s <= MaxFootStyle; s++) {
+            int[] arr = new int[s * 2];
+            Array.Copy(FootKeyDefaults, arr, arr.Length);
+            byStyle[s] = arr;
+        }
+        return byStyle;
+    }
+    private static string[][] DefaultFootLabels() {
+        string[][] byStyle = new string[MaxFootStyle + 1][];
+        for(int s = 0; s <= MaxFootStyle; s++) byStyle[s] = new string[s * 2];
+        return byStyle;
+    }
     public float GhostRainR = 1f, GhostRainG = 0f, GhostRainB = 0f, GhostRainA = 0.45f;
     public bool GhostRainDotted = false;
     public float GhostRainDotLength = 10f;

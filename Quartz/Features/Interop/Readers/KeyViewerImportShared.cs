@@ -136,10 +136,11 @@ internal static class KeyViewerImportShared {
             if(kv.Key16 is { Length: 16 }) { target.Key16 = kv.Key16; }
             if(kv.Key20 is { Length: 20 }) { target.Key20 = kv.Key20; }
             if(kv.HasFoot) {
-                target.FootStyle = Mathf.Clamp(kv.FootStyle, 0, 8);
+                target.FootStyle = Mathf.Clamp(kv.FootStyle, 0, KeyViewerSettings.MaxFootStyle);
                 if(kv.FootKeys is { Length: > 0 }) {
-                    int n = Mathf.Min(kv.FootKeys.Length, target.FootKeys.Length);
-                    for(int i = 0; i < n; i++) { target.FootKeys[i] = kv.FootKeys[i]; }
+                    int[] dest = target.FootKeysForStyle(target.FootStyle);
+                    int n = Mathf.Min(kv.FootKeys.Length, dest.Length);
+                    for(int i = 0; i < n; i++) { dest[i] = kv.FootKeys[i]; }
                 }
             }
             if(kv.GhostKey10 is { Length: 10 }) { target.GhostKey10 = kv.GhostKey10; }

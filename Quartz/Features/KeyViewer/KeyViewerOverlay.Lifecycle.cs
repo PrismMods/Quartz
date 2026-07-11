@@ -121,7 +121,7 @@ public static partial class KeyViewerOverlay {
             }
         }
         AddKeys(keys, keys.Length);
-        AddKeys(Conf.FootKeys, Conf.FootKeyCount());
+        AddKeys(Conf.FootKeysForStyle(Conf.FootStyle), Conf.FootKeyCount());
         if(result.Count == 0) return;
         int[] current = Features.KeyLimiter.KeyLimiter.Conf.AllowedKeys;
         if(current != null && current.Length == result.Count) {
