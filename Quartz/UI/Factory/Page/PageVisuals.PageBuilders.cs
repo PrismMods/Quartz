@@ -55,8 +55,10 @@ internal static partial class PageVisuals {
         RectTransform resetAnimRow = null;
         RectTransform resetColorRow = null;
         RectTransform tutorialPatternsRow = null;
+        GenerateUI.CollapsibleSection decoTypesSection = null;
         void RefreshConditionalRows() {
             removeAllRow?.gameObject.SetActive(conf.Decorations);
+            decoTypesSection?.Section.gameObject.SetActive(conf.Decorations);
             setZoomRow?.gameObject.SetActive(conf.Cameras);
             zoomSliderRow?.gameObject.SetActive(conf.Cameras && conf.SetCameraZoom);
             resetAnimRow?.gameObject.SetActive(conf.TrackAnimations);
@@ -79,7 +81,6 @@ internal static partial class PageVisuals {
         }
         SimpleToggle(sec.Body, def.Filters, conf.Filters, v => conf.Filters = v, "Filter", "fxrm_filters");
         SimpleToggle(sec.Body, def.AdvancedFilters, conf.AdvancedFilters, v => conf.AdvancedFilters = v, "Advanced Filter", "fxrm_advfilters");
-        SimpleToggle(sec.Body, def.Particles, conf.Particles, v => conf.Particles = v, "Particles", "fxrm_particles");
         SimpleToggle(sec.Body, def.Decorations, conf.Decorations, v => conf.Decorations = v, "Decoration", "fxrm_decorations");
         SimpleToggle(sec.Body, def.Backgrounds, conf.Backgrounds, v => conf.Backgrounds = v, "Background", "fxrm_backgrounds");
         SimpleToggle(sec.Body, def.Cameras, conf.Cameras, v => conf.Cameras = v, "Camera", "fxrm_cameras");
@@ -145,6 +146,49 @@ internal static partial class PageVisuals {
         SimpleToggle(sec.Body, def.HoldSounds, conf.HoldSounds, v => conf.HoldSounds = v, "HoldSound", "fxrm_holdsounds");
         SimpleToggle(sec.Body, def.HideIcons, conf.HideIcons, v => conf.HideIcons = v, "HideIcon & Judgements", "fxrm_hideicons");
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(sec.Body)), "HEADING_MISC", "Misc");
+        {
+            var decoTypes = GenerateUI.Collapsible(sec.Body, "Decoration Types", startExpanded: false);
+            decoTypesSection = decoTypes;
+            UIToggle planetT = null, tileT = null, imageT = null, textT = null, particleT = null, hazardT = null;
+            GenerateUI.Button(
+                GenerateUI.Row(decoTypes.Body),
+                () => {
+                    if(planetT == null || tileT == null || imageT == null || textT == null || particleT == null || hazardT == null) return;
+                    bool value = !conf.DecoPlanet && !conf.DecoTiles && !conf.DecoImage
+                        && !conf.DecoText && !conf.Particles && !conf.DecoFailHitbox;
+                    planetT.Set(value);
+                    tileT.Set(value);
+                    imageT.Set(value);
+                    textT.Set(value);
+                    particleT.Set(value);
+                    hazardT.Set(value);
+                },
+                "Toggle All",
+                "fxrm_deco_types_all"
+            ).SetSecondary();
+            planetT = GenerateUI.Toggle(
+                GenerateUI.Row(decoTypes.Body), def.DecoPlanet, conf.DecoPlanet,
+                v => { conf.DecoPlanet = v; Save(); }, "Planet", "fxrm_deco_planet");
+            tileT = GenerateUI.Toggle(
+                GenerateUI.Row(decoTypes.Body), def.DecoTiles, conf.DecoTiles,
+                v => { conf.DecoTiles = v; Save(); }, "Tiles", "fxrm_deco_tiles");
+            imageT = GenerateUI.Toggle(
+                GenerateUI.Row(decoTypes.Body), def.DecoImage, conf.DecoImage,
+                v => { conf.DecoImage = v; Save(); }, "Image", "fxrm_deco_image");
+            textT = GenerateUI.Toggle(
+                GenerateUI.Row(decoTypes.Body), def.DecoText, conf.DecoText,
+                v => { conf.DecoText = v; Save(); }, "Text", "fxrm_deco_text");
+            particleT = GenerateUI.Toggle(
+                GenerateUI.Row(decoTypes.Body), def.Particles, conf.Particles,
+                v => { conf.Particles = v; Save(); }, "Particles", "fxrm_particles");
+            hazardT = GenerateUI.Toggle(
+                GenerateUI.Row(decoTypes.Body), def.DecoFailHitbox, conf.DecoFailHitbox,
+                v => { conf.DecoFailHitbox = v; Save(); }, "Judgement Limit (Fail Hitbox)", "fxrm_deco_failhitbox");
+            hazardT.Rect.AddToolTip(
+                "DESC_FXRM_DECO_FAILHITBOX",
+                "Removes decorations whose hitbox can fail your run (HitboxType: Kill), regardless of the type toggles above."
+            );
+        }
         removeAllRow = GenerateUI.Row(sec.Body);
         GenerateUI.Toggle(
             removeAllRow, def.RemoveAllDecorations, conf.RemoveAllDecorations,

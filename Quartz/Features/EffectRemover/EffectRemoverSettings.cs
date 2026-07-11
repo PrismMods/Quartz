@@ -37,6 +37,11 @@ public sealed class EffectRemoverSettings : ISettingsFile {
     public bool HoldSounds = true;
     public bool HideIcons = true;
     public bool RemoveAllDecorations = true;
+    public bool DecoPlanet = true;
+    public bool DecoTiles = true;
+    public bool DecoImage = true;
+    public bool DecoText = true;
+    public bool DecoFailHitbox = false;
     public bool RemoveTutorialPatterns = true;
     public bool LimitTrackOpacity = true;
     public bool SetCameraZoom = false;
@@ -72,6 +77,11 @@ public sealed class EffectRemoverSettings : ISettingsFile {
             [nameof(HoldSounds)] = HoldSounds,
             [nameof(HideIcons)] = HideIcons,
             [nameof(RemoveAllDecorations)] = RemoveAllDecorations,
+            [nameof(DecoPlanet)] = DecoPlanet,
+            [nameof(DecoTiles)] = DecoTiles,
+            [nameof(DecoImage)] = DecoImage,
+            [nameof(DecoText)] = DecoText,
+            [nameof(DecoFailHitbox)] = DecoFailHitbox,
             [nameof(RemoveTutorialPatterns)] = RemoveTutorialPatterns,
             [nameof(LimitTrackOpacity)] = LimitTrackOpacity,
             [nameof(SetCameraZoom)] = SetCameraZoom,
@@ -108,6 +118,11 @@ public sealed class EffectRemoverSettings : ISettingsFile {
         HoldSounds = IOUtils.Read(token, nameof(HoldSounds), HoldSounds);
         HideIcons = IOUtils.Read(token, nameof(HideIcons), HideIcons);
         RemoveAllDecorations = IOUtils.Read(token, nameof(RemoveAllDecorations), RemoveAllDecorations);
+        DecoPlanet = IOUtils.Read(token, nameof(DecoPlanet), DecoPlanet);
+        DecoTiles = IOUtils.Read(token, nameof(DecoTiles), DecoTiles);
+        DecoImage = IOUtils.Read(token, nameof(DecoImage), DecoImage);
+        DecoText = IOUtils.Read(token, nameof(DecoText), DecoText);
+        DecoFailHitbox = IOUtils.Read(token, nameof(DecoFailHitbox), DecoFailHitbox);
         RemoveTutorialPatterns = IOUtils.Read(token, nameof(RemoveTutorialPatterns), RemoveTutorialPatterns);
         LimitTrackOpacity = IOUtils.Read(token, nameof(LimitTrackOpacity), LimitTrackOpacity);
         SetCameraZoom = IOUtils.Read(token, nameof(SetCameraZoom), SetCameraZoom);

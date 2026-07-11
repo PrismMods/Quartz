@@ -45,13 +45,9 @@ public static partial class EffectRemover {
         if(!Enabled || levelData == null) return;
         EffectRemoverSettings conf = Conf;
         List<LevelEventType> events = [];
-        if(conf.Decorations) RemoveDecorations(events, levelData, conf);
+        if(conf.Decorations) RemoveDecorations(levelData, conf);
         if(conf.Filters) AddFilterEvents(events);
         if(conf.AdvancedFilters) events.Add(Event(25));
-        if(conf.Particles) {
-            events.Add(Event(64));
-            events.Add(Event(63));
-        }
         if(conf.Backgrounds) RemoveBackgrounds(events, levelData, conf);
         if(conf.Cameras) RemoveCameras(events, levelData, conf);
         if(conf.PlanetOrbit) events.Add(Event(26));
@@ -98,26 +94,46 @@ public static partial class EffectRemover {
         levelData.cameraSettings = new LevelEvent(0, Event(8), GCS.settingsInfo["CameraSettings"]);
         levelData.cameraSettings["zoom"] = zoom;
     }
-    private static void RemoveDecorations(List<LevelEventType> events, LevelData levelData, EffectRemoverSettings conf) {
-        if(conf.RemoveAllDecorations) {
-            levelData.decorations.Clear();
+    private static void RemoveDecorations(LevelData levelData, EffectRemoverSettings conf) {
+        if(!conf.DecoPlanet && !conf.DecoTiles && !conf.DecoImage && !conf.DecoText && !conf.Particles && !conf.DecoFailHitbox) return;
+        // DecorationSettings/MoveDecorations aren't type-specific (no planet/tile/image/text of their own), so they
+        // only get swept up once every real type is selected - matching the old all-or-nothing removal for them.
+        bool allCoreTypes = conf.DecoPlanet && conf.DecoTiles && conf.DecoImage && conf.DecoText;
+        if(allCoreTypes && conf.RemoveAllDecorations) {
             levelData.decorationSettings = new LevelEvent(0, Event(11), GCS.settingsInfo["DecorationSettings"]);
-            events.Add(Event(11));
-            events.Add(Event(19));
-            events.Add(Event(20));
-            events.Add(Event(21));
-            events.Add(Event(60));
-            events.Add(Event(29));
-            events.Add(Event(58));
-            events.Add(Event(59));
-            return;
         }
         HashSet<string> conditionalEventTags = GetConditionalEventTags(levelData);
         HashSet<string> preservedDecorationTags = GetPreservedDecorationTags(levelData, conditionalEventTags);
-        levelData.decorations.RemoveAll(data =>
-            IsDecorationData(data) && !ShouldPreserve(data, conditionalEventTags, preservedDecorationTags));
-        levelData.levelEvents.RemoveAll(data =>
-            IsDecorationData(data) && !ShouldPreserve(data, conditionalEventTags, preservedDecorationTags));
+        bool ShouldRemove(LevelEvent data) =>
+            IsDecorationData(data)
+            && MatchesDecorationCategory(data, conf, allCoreTypes)
+            && (conf.RemoveAllDecorations || !ShouldPreserve(data, conditionalEventTags, preservedDecorationTags));
+        levelData.decorations.RemoveAll(ShouldRemove);
+        levelData.levelEvents.RemoveAll(ShouldRemove);
+    }
+    private static bool MatchesDecorationCategory(LevelEvent data, EffectRemoverSettings conf, bool allCoreTypes) {
+        switch(data.eventType) {
+            case LevelEventType.DecorationSettings:
+            case LevelEventType.MoveDecorations:
+                return allCoreTypes;
+            case LevelEventType.AddDecoration:
+                return conf.DecoImage
+                    || (conf.DecoFailHitbox && data.ContainsKey("hitbox") && data.Get<HitboxType>("hitbox") == HitboxType.Kill);
+            case LevelEventType.AddText:
+            case LevelEventType.SetText:
+            case LevelEventType.SetDefaultText:
+                return conf.DecoText;
+            case LevelEventType.AddParticle:
+            case LevelEventType.SetParticle:
+            case LevelEventType.EmitParticle:
+                return conf.Particles;
+            case LevelEventType.AddObject:
+            case LevelEventType.SetObject:
+                bool isFloor = data.ContainsKey("objectType") && data.Get<ObjectDecorationType>("objectType") == ObjectDecorationType.Floor;
+                return isFloor ? conf.DecoTiles : conf.DecoPlanet;
+            default:
+                return false;
+        }
     }
     private static HashSet<string> GetConditionalEventTags(LevelData levelData) {
         HashSet<string> tags = [];
@@ -144,14 +160,17 @@ public static partial class EffectRemover {
     private static bool IsDecorationData(LevelEvent eventData) {
         if(eventData == null) return false;
         LevelEventType type = eventData.eventType;
-        return type == Event(11)
-            || type == Event(19)
-            || type == Event(20)
-            || type == Event(21)
-            || type == Event(60)
-            || type == Event(29)
-            || type == Event(58)
-            || type == Event(59);
+        return type == LevelEventType.DecorationSettings
+            || type == LevelEventType.AddDecoration
+            || type == LevelEventType.AddText
+            || type == LevelEventType.SetText
+            || type == LevelEventType.SetDefaultText
+            || type == LevelEventType.MoveDecorations
+            || type == LevelEventType.AddObject
+            || type == LevelEventType.SetObject
+            || type == LevelEventType.AddParticle
+            || type == LevelEventType.SetParticle
+            || type == LevelEventType.EmitParticle;
     }
     private static bool HasAnyEventTag(LevelEvent eventData, HashSet<string> tags) {
         foreach(string eventTag in GetTags(eventData, "eventTag")) {
