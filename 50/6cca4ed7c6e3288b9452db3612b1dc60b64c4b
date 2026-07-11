@@ -1,0 +1,45 @@
+Quartz/Features/EffectRemover/EffectRemover.cs
+  s_91c96196265dd7::t_682340dd688c34 163-173
+  s_91c96196265dd7::t_faac9112b493d1 48
+  s_91c96196265dd7::t_b3da8f061e3de5 97-102,107-136
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_99fcd47098033e::t_8cead080f04550 216-221
+  s_99fcd47098033e::t_5d7ce5bb3a2149 102
+  s_99fcd47098033e::t_bcc6769872fdd1 589
+Quartz/Resource/Export/Lang/en-US.json
+  s_99fcd47098033e::t_9efe211ad41047 102
+  s_99fcd47098033e::t_96c0cccc69091f 589
+  s_99fcd47098033e::t_9414da9ef11cb0 216-221
+Quartz/Features/EffectRemover/EffectRemoverSettings.cs
+  s_91c96196265dd7::t_e6daeb93078bc4 40-44
+  s_91c96196265dd7::t_d7cc34d637063f 80-84
+  s_91c96196265dd7::t_2742f175d5b432 121-125
+Quartz/UI/Factory/Page/PageVisuals.PageBuilders.cs
+  s_91c96196265dd7::t_9e7fa30950f13f 186-187
+  s_91c96196265dd7::t_2b92b5ab047760 58,61
+  s_91c96196265dd7::t_09fd3031f49bad 149-185,188-191
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "506cca4ed7c6e3288b9452db3612b1dc60b64c4b",
+  "prompts": {},
+  "sessions": {
+    "s_91c96196265dd7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1cb4fd3d-ff08-42b1-9bdc-a92bfe1948c6",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_99fcd47098033e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d809fb29-4e1f-4108-85ef-551c88739859",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
