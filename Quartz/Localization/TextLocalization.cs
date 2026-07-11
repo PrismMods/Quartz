@@ -21,12 +21,19 @@ public class TextLocalization : MonoBehaviour {
         UpdateText();
         return this;
     }
-    void Awake() => tmp = GetComponent<TMP_Text>();
+    // Registered for the component's whole lifetime, not just while enabled: hidden
+    // settings pages are fully deactivated now, and their labels must still pick up
+    // language changes (RefreshAll) so e.g. the search index reads current text.
+    // Setting .text on a disabled TMP is cheap — the mesh regenerates on enable.
+    void Awake() {
+        tmp = GetComponent<TMP_Text>();
+        instances.Add(this);
+    }
     void OnEnable() {
         instances.Add(this);
         UpdateText();
     }
-    void OnDisable() => instances.Remove(this);
+    void OnDestroy() => instances.Remove(this);
     public void UpdateText() {
         if(tmp == null) tmp = GetComponent<TMP_Text>();
         if(tmp == null || tr == null || string.IsNullOrEmpty(Key)) return;

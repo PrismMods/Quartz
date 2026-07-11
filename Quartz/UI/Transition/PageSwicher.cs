@@ -14,10 +14,8 @@ public class PageSwicher {
         CanvasGroup fromCg = fromPage.GetComponent<CanvasGroup>();
         CanvasGroup toCg = toPage.GetComponent<CanvasGroup>();
         if(fromCg == null || toCg == null) return false;
-        Canvas fromCanvas = fromPage.GetComponent<Canvas>();
-        Canvas toCanvas = toPage.GetComponent<Canvas>();
         pageSeq.CompleteAndKill();
-        if(toCanvas != null) toCanvas.enabled = true;
+        toPage.gameObject.SetActive(true);
         fromPage.anchoredPosition = Vector2.zero;
         toPage.anchoredPosition = new Vector2(1100f, 0f);
         fromCg.alpha = 1f;
@@ -41,7 +39,7 @@ public class PageSwicher {
             .AppendCallback(() => {
                 fromCg.interactable = false;
                 fromCg.blocksRaycasts = false;
-                if(fromCanvas != null) fromCanvas.enabled = false;
+                fromPage.gameObject.SetActive(false);
             }).Build();
         MainCore.TC.Play(pageSeq);
         return true;

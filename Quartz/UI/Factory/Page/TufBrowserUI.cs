@@ -50,6 +50,16 @@ internal sealed class TufBrowserView : MonoBehaviour {
     private readonly Dictionary<int, TMP_Text> cardLabels = [];
     private string listSignature;
     private bool built;
+    private bool pendingRebuild;
+
+    // Hidden pages are deactivated; downloads still tick service.Changed. Defer the
+    // list rebuild (forced layout passes + scroll restore need an active hierarchy)
+    // until the page is shown again.
+    private void OnEnable() {
+        if(!pendingRebuild) return;
+        pendingRebuild = false;
+        Rebuild();
+    }
 
     public void Build(RectTransform parent) {
         service = TufService.Instance;
@@ -329,6 +339,10 @@ internal sealed class TufBrowserView : MonoBehaviour {
 
     private void Rebuild() {
         if(!built || content == null || service == null) return;
+        if(!gameObject.activeInHierarchy) {
+            pendingRebuild = true;
+            return;
+        }
         string signature = BuildSignature();
         if(signature == listSignature && cardLabels.Count > 0) {
             // Same level list + item states: only progress/labels moved. Update the

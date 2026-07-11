@@ -49,7 +49,11 @@ public abstract class UIObject {
     protected void UnregisterTick() => _tickables.Remove(this);
     public virtual void Tick() { }
     public static void TickAll() {
-        for(int i = 0; i < _tickables.Count; i++) _tickables[i].Tick();
+        for(int i = 0; i < _tickables.Count; i++) {
+            UIObject o = _tickables[i];
+            if(o.Rect == null || !o.Rect.gameObject.activeInHierarchy) continue;
+            o.Tick();
+        }
     }
     public static void DisposeAll() {
         for(int i = _tickables.Count - 1; i >= 0; i--) _tickables[i].Dispose();
