@@ -12,13 +12,12 @@ public static class Optimizer {
     public static SettingsFile<OptimizerSettings> ConfMgr { get; private set; }
     public static OptimizerSettings Conf => ConfMgr?.Data;
     public static readonly IRuntimeTick Ticker = new TickImpl();
-    private const long GCSafetyBytes = 96L * 1024 * 1024;
+    private const long GCReserveBytes = 64L * 1024 * 1024;
     private static bool defaultsCaptured;
     private static bool defaultRunInBackground;
     private static ProcessPriorityClass defaultPriority = ProcessPriorityClass.Normal;
     private static bool gcDeferred;
-    private static long heapAtDefer;
-    private static bool usingManualDefer;
+    private static bool usingNoGcRegion;
     private static bool loggedGcStrategy;
     public static void EnsureConf() => ConfMgr ??= SettingsFile<OptimizerSettings>.Loaded("Optimizer.json");
     public static void Save() => ConfMgr?.RequestSave();
@@ -90,50 +89,40 @@ public static class Optimizer {
     private static void Tick() {
         bool wantDefer = Active && Conf.SmoothGC && GameStats.InGame;
         if(wantDefer != gcDeferred) {
-            if(wantDefer) {
-                DeferGC();
-            } else {
-                ResumeGC();
-            }
-            return;
-        }
-        if(gcDeferred && usingManualDefer
-            && GC.GetTotalMemory(false) - heapAtDefer > GCSafetyBytes) {
-            GC.Collect();
-            heapAtDefer = GC.GetTotalMemory(false);
+            if(wantDefer) DeferGC(); else ResumeGC();
         }
     }
     private static void DeferGC() {
-        try {
-            if(!loggedGcStrategy) {
-                loggedGcStrategy = true;
-                MainCore.Log.Msg(GarbageCollector.isIncremental
-                    ? "[Optimizer] SmoothGC: incremental GC present — leaving collection enabled (no Manual defer)."
-                    : "[Optimizer] SmoothGC: no incremental GC — deferring via Manual mode (96MB heap cap).");
-            }
-            if(GarbageCollector.isIncremental) {
-                usingManualDefer = false;
-                gcDeferred = true;
-                return;
-            }
-            GarbageCollector.GCMode = GarbageCollector.Mode.Manual;
-            usingManualDefer = true;
+        if(GarbageCollector.isIncremental) {
+            usingNoGcRegion = false;
             gcDeferred = true;
-            heapAtDefer = GC.GetTotalMemory(false);
+            LogGcStrategyOnce("incremental GC present — leaving collection enabled.");
+            return;
+        }
+        try {
+            usingNoGcRegion = GC.TryStartNoGCRegion(GCReserveBytes);
+            gcDeferred = true;
+            LogGcStrategyOnce(usingNoGcRegion
+                ? "no-GC region reserved (auto-recovers when the budget is spent)."
+                : "no-GC region unavailable — leaving collection enabled.");
         } catch {
-            gcDeferred = false;
-            usingManualDefer = false;
+            usingNoGcRegion = false;
+            gcDeferred = true;
+            LogGcStrategyOnce("no-GC region unsupported — leaving collection enabled.");
         }
     }
     private static void ResumeGC() {
-        try {
-            if(usingManualDefer) {
-                GarbageCollector.GCMode = GarbageCollector.Mode.Enabled;
-                GC.Collect();
-            }
-        } catch { }
-        usingManualDefer = false;
+        if(usingNoGcRegion) {
+            try { GC.EndNoGCRegion(); } catch { }
+            try { GC.Collect(); } catch { }
+        }
+        usingNoGcRegion = false;
         gcDeferred = false;
+    }
+    private static void LogGcStrategyOnce(string detail) {
+        if(loggedGcStrategy) return;
+        loggedGcStrategy = true;
+        MainCore.Log.Msg("[Optimizer] SmoothGC: " + detail);
     }
     private sealed class TickImpl : IRuntimeTick {
         public void Tick() => Optimizer.Tick();
