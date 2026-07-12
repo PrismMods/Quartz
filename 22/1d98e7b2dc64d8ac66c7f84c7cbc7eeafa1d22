@@ -1,0 +1,19 @@
+Quartz/Features/ChatterBlocker/ChatterBlocker.cs
+  s_c8d7bfae5b75b3::t_f6ab50b6ceb9ae 151-157
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "221d98e7b2dc64d8ac66c7f84c7cbc7eeafa1d22",
+  "prompts": {},
+  "sessions": {
+    "s_c8d7bfae5b75b3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "be0683c8-f8c9-454d-b590-a6cc6863bca1",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
