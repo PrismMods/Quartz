@@ -1,0 +1,27 @@
+Quartz.Tests/Quartz.Tests.csproj
+  s_88750aee4818ba::t_7c8e411c8631b0 15
+Quartz.Tests/Program.cs
+  s_88750aee4818ba::t_7c8e411c8631b0 9
+Quartz/Features/KeyViewer/KeyViewerPersistence.cs
+  s_88750aee4818ba::t_62b18e0673d761 17
+  s_88750aee4818ba::t_7c8e411c8631b0 1-16,18-31
+Quartz.Tests/Features/KeyViewer/KeyViewerCssTests.cs
+  s_88750aee4818ba::t_7c8e411c8631b0 143-149,152-172
+  s_88750aee4818ba::t_62b18e0673d761 150-151
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "72596dbcf497fda155f1e913886a9b0f7c22f21b",
+  "prompts": {},
+  "sessions": {
+    "s_88750aee4818ba": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f55d1-6ae5-7d50-8a12-620de9acd2ba",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
