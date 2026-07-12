@@ -1,0 +1,21 @@
+Quartz/Features/KeyViewer/KeyViewerOverlay.Lifecycle.cs
+  s_88750aee4818ba::t_7c8e411c8631b0 190
+Quartz/Features/KeyViewer/KeyViewerSettings.Serialization.cs
+  s_88750aee4818ba::t_7c8e411c8631b0 143-148
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "1bcb845eb067797798a153a90cf9d10e03fa3068",
+  "prompts": {},
+  "sessions": {
+    "s_88750aee4818ba": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f55d1-6ae5-7d50-8a12-620de9acd2ba",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
