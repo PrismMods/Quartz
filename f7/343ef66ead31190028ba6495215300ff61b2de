@@ -1,0 +1,30 @@
+Quartz/Features/KeyViewer/KeyViewerOverlay.Lifecycle.cs
+  s_88750aee4818ba::t_62b18e0673d761 251-252,255-256,258
+  s_88750aee4818ba::t_7c8e411c8631b0 47,227-228,241-246,253-254,276-277
+  s_88750aee4818ba::t_794502d1ac37d2 247-248
+  s_88750aee4818ba::t_9ccd0ea3825638 257
+  s_88750aee4818ba::t_9e144a8d039117 278-279
+  s_88750aee4818ba::t_0520de3ffefc2e 262
+Quartz/Features/KeyViewer/KeyViewerOverlay.Update.cs
+  s_88750aee4818ba::t_7c8e411c8631b0 24-28,30,43,52-55,57,70-73,101,146
+Quartz/Features/KeyViewer/KeyViewerOverlay.cs
+  s_88750aee4818ba::t_7c8e411c8631b0 62-63
+Quartz/Features/KeyViewer/KeyViewerOverlay.DmNote.cs
+  s_88750aee4818ba::t_7c8e411c8631b0 38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "f7343ef66ead31190028ba6495215300ff61b2de",
+  "prompts": {},
+  "sessions": {
+    "s_88750aee4818ba": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f55d1-6ae5-7d50-8a12-620de9acd2ba",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
