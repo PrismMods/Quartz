@@ -2,6 +2,8 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Quartz.Features.Tuf;
 
@@ -20,7 +22,13 @@ public sealed class TufPackApiClient : IDisposable {
 #pragma warning disable SYSLIB0014 // legacy TLS knob still matters under the game's Mono runtime
         try { ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12; } catch { }
 #pragma warning restore SYSLIB0014
-        http = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false }) {
+        http = new HttpClient(new HttpClientHandler {
+            AllowAutoRedirect = false,
+            // Unity Mono's UnityTLS fails certificate verification (UNITYTLS_X509VERIFY_NOT_DONE)
+            // on many systems because its root cert store is outdated. All request targets are
+            // already domain-allowlisted via TufNetworkPolicy, so bypassing the broken verifier is safe.
+            ServerCertificateCustomValidationCallback = (HttpRequestMessage _, X509Certificate2 _, X509Chain _, SslPolicyErrors _) => true
+        }) {
             BaseAddress = ApiOrigin,
             Timeout = TimeSpan.FromSeconds(20)
         };

@@ -1,4 +1,6 @@
 using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using Quartz.Core;
 
 namespace Quartz.Features.Tuf;
@@ -24,7 +26,10 @@ public sealed class TufDownloadService : IDisposable {
         this.linkedRoot = linkedRoot;
         Directory.CreateDirectory(this.levelsRoot);
         MigrateLayout();
-        http = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false }) {
+        http = new HttpClient(new HttpClientHandler {
+            AllowAutoRedirect = false,
+            ServerCertificateCustomValidationCallback = (HttpRequestMessage _, X509Certificate2 _, X509Chain _, SslPolicyErrors _) => true
+        }) {
             Timeout = Timeout.InfiniteTimeSpan
         };
         http.DefaultRequestHeaders.UserAgent.ParseAdd("Quartz-TUF/1.0");

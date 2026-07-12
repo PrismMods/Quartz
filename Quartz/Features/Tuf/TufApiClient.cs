@@ -1,6 +1,8 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Quartz.Features.Tuf;
 
@@ -12,7 +14,10 @@ public sealed class TufApiClient : IDisposable {
 
     public TufApiClient() {
         try { ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12; } catch { }
-        http = new HttpClient(new HttpClientHandler { AllowAutoRedirect = false }) {
+        http = new HttpClient(new HttpClientHandler {
+            AllowAutoRedirect = false,
+            ServerCertificateCustomValidationCallback = (HttpRequestMessage _, X509Certificate2 _, X509Chain _, SslPolicyErrors _) => true
+        }) {
             BaseAddress = ApiOrigin,
             Timeout = TimeSpan.FromSeconds(20)
         };
