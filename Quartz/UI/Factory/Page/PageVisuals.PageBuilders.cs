@@ -652,6 +652,11 @@ internal static partial class PageVisuals {
                 id
             );
         }
+        // Gate on Installed (assembly present), NOT Active. These X/+/- toggles stay meaningful
+        // even while XPerfect is disabled: ShouldHide's carry treats "all grades hidden" as "hide
+        // plain Perfect", so unchecking any grade shows Perfect and checking all hides it — full
+        // control across enable/disable with no mode-flip (so no page-rebuild needed mid-game).
+        // Vanilla users (Installed == false) get the single plain "Perfect" toggle instead.
         bool xperfect = XPerfectBridge.Installed;
         foreach(var entry in entries) {
             if(entry.Margin == HitMargin.Perfect && xperfect) {
