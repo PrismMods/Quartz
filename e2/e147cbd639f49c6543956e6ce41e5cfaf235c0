@@ -1,0 +1,28 @@
+Quartz/Resource/FontManager.cs
+  s_9e81e2213cd15e::t_5f837af22b9b64 331
+  s_9e81e2213cd15e::t_75be422335f9fd 83,91-93
+  s_9e81e2213cd15e::t_5927ea2eda4bff 302-330,332-341
+  s_9e81e2213cd15e::t_faf1a37e8edaf3 375
+  s_9e81e2213cd15e::t_f1e32f1e5425a0 351
+  s_9e81e2213cd15e::t_b5a66279c56ffb 293
+  s_9e81e2213cd15e::t_cf4cf964acbf70 276-277
+  s_9e81e2213cd15e::t_a418da4ff62ce9 24-28
+Quartz/Resource/Export/Lang/zh-CN.json
+  s_9e81e2213cd15e::t_e95cda3dfe7c55 1-907
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "e2e147cbd639f49c6543956e6ce41e5cfaf235c0",
+  "prompts": {},
+  "sessions": {
+    "s_9e81e2213cd15e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6e9d6da4-0aa9-4dd9-a90a-ec2e67be0ffa",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
