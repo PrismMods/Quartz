@@ -24,6 +24,9 @@ public static partial class KeyViewerOverlay {
         float inset = spec.GraphBorderWidth;
         rt.offsetMin = new Vector2(inset, inset);
         rt.offsetMax = new Vector2(-inset, -inset);
+        // The plot re-tessellates nearly every frame while KPS changes; without its
+        // own Canvas that dirties the whole overlay canvas (same pattern as RainLayer).
+        obj.AddComponent<Canvas>().overrideSorting = false;
         KpsGraphGraphic plot = obj.AddComponent<KpsGraphGraphic>();
         plot.raycastTarget = false;
         plot.Init(spec);
