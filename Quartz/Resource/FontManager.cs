@@ -21,6 +21,11 @@ public static partial class FontManager {
     public static event Action OnFontCatalogChanged;
     private static TMP_FontAsset defaultFont;
     private static Font defaultSourceFont;
+    private static TMP_FontAsset cjkFallback;
+    // Simplified-Chinese-only code points (这国说语门). Deliberately avoids common
+    // Hanja like 中 that Korean fonts (SUIT/Cookie Run/Gmarket) also carry, so the
+    // probe won't false-match a Korean font that lacks the rest of the CJK range.
+    private static readonly int[] CjkProbe = { 0x8FD9, 0x56FD, 0x8BF4, 0x8BED, 0x95E8 };
     private static readonly Dictionary<string, TMP_FontAsset> cache = [];
     private static readonly List<Font> sourceFonts = [];
     private static readonly Dictionary<string, Font> sourceByName = [];
@@ -75,6 +80,7 @@ public static partial class FontManager {
                 Font font = new(path);
                 TMP_FontAsset asset = TMP_FontAsset.CreateFontAsset(font);
                 asset.isMultiAtlasTexturesEnabled = true;
+                AttachCjk(asset);
                 defaultSourceFont = font;
                 return asset;
             } catch(Exception e) {
@@ -82,7 +88,9 @@ public static partial class FontManager {
             }
         }
         defaultSourceFont = null;
-        return MainCore.Res.Get<TMP_FontAsset>(Asset.SUIT_Medium);
+        TMP_FontAsset suit = MainCore.Res.Get<TMP_FontAsset>(Asset.SUIT_Medium);
+        AttachCjk(suit);
+        return suit;
     }
     public static IReadOnlyList<string> GetAvailableFonts() {
         if(available != null) return available;
@@ -265,6 +273,8 @@ public static partial class FontManager {
     public static void ApplyToAll() {
         if(MainCore.Root == null || Current == null) return;
         TMP_FontAsset menuFont = MenuFontAsset ?? Current;
+        AttachCjk(Current);
+        if(menuFont != Current) AttachCjk(menuFont);
         Transform menuRoot = MenuRoot;
         TMP_Text[] texts = MainCore.Root.GetComponentsInChildren<TMP_Text>(true);
         for(int i = 0; i < texts.Length; i++) {
@@ -280,6 +290,7 @@ public static partial class FontManager {
         if(menuRoot == null) return;
         TMP_FontAsset menuFont = MenuFontAsset ?? Current;
         if(menuFont == null) return;
+        AttachCjk(menuFont);
         TMP_Text[] texts = menuRoot.GetComponentsInChildren<TMP_Text>(true);
         for(int i = 0; i < texts.Length; i++) {
             TMP_Text text = texts[i];
@@ -287,6 +298,46 @@ public static partial class FontManager {
             text.font = menuFont;
             text.ForceMeshUpdate(false, true);
         }
+    }
+    // Finds a loaded font asset that covers Simplified Chinese and chains it as a
+    // fallback on our built assets, so zh-CN UI text renders instead of tofu boxes
+    // even when the picked font (Cookie Run / SUIT / a custom font) is Korean+Latin
+    // only. Source is whatever CJK-capable font the game already loaded for its own
+    // localization — nothing is bundled. Non-invasive: we only append to OUR assets'
+    // fallback tables, never mutate game globals.
+    private static void AttachCjk(TMP_FontAsset asset) {
+        if(asset == null) return;
+        TMP_FontAsset fb = GetCjkFallback();
+        if(fb == null || fb == asset) return;
+        asset.fallbackFontAssetTable ??= [];
+        if(!asset.fallbackFontAssetTable.Contains(fb)) asset.fallbackFontAssetTable.Add(fb);
+    }
+    private static TMP_FontAsset GetCjkFallback() {
+        // Not cached on failure: the game's CJK font may not be loaded yet at mod
+        // init, so keep re-probing (cheap, off the hot path) until one appears.
+        if(cjkFallback != null) return cjkFallback;
+        try {
+            TMP_FontAsset[] all = Resources.FindObjectsOfTypeAll<TMP_FontAsset>();
+            // pass 0: baked glyphs only. pass 1: allow dynamic fonts to report
+            // support via their source file (tryAddCharacter is a no-op on fonts
+            // that lack the glyph, so it never mutates an unrelated font).
+            for(int pass = 0; pass < 2 && cjkFallback == null; pass++) {
+                bool tryAdd = pass == 1;
+                foreach(TMP_FontAsset f in all) {
+                    if(f == null || f == defaultFont || cache.ContainsValue(f)) continue;
+                    try {
+                        int hit = 0;
+                        foreach(int cp in CjkProbe)
+                            if(f.HasCharacter((char)cp, false, tryAdd)) hit++;
+                        if(hit >= 3) { cjkFallback = f; break; }
+                    } catch { }
+                }
+            }
+            if(cjkFallback != null) MainCore.Log.Msg($"[FontManager] CJK fallback: {cjkFallback.name}");
+        } catch(Exception e) {
+            MainCore.Log.Wrn($"[FontManager] CJK fallback probe failed: {e.Message}");
+        }
+        return cjkFallback;
     }
     private static TMP_FontAsset Resolve(string name) {
         if(string.IsNullOrEmpty(name) || name == DefaultName || name == AddSentinel) return defaultFont;
@@ -297,6 +348,7 @@ public static partial class FontManager {
             Font font = new(path);
             TMP_FontAsset asset = TMP_FontAsset.CreateFontAsset(font);
             asset.isMultiAtlasTexturesEnabled = true;
+            AttachCjk(asset);
             cache[name] = asset;
             sourceFonts.Add(font);
             sourceByName[name] = font;
@@ -320,6 +372,7 @@ public static partial class FontManager {
         defaultFont = null;
         Current = null;
         CurrentName = DefaultName;
+        cjkFallback = null;
         fontFiles.Clear();
         customNames.Clear();
         available = null;
