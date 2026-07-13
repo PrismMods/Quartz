@@ -12,7 +12,7 @@ The docs are **not in this repo**. They live in the website repo and are built w
 
 | Piece | Where |
 |-------|-------|
-| repo | `PrismMods/Quartz-Website` — expected as a sibling checkout (`../Quartz-Website`); `gh repo clone PrismMods/Quartz-Website` if missing |
+| repo | `PrismMods/QuartzWebsite` — expected as a sibling checkout (`../Quartz-Website`); `gh repo clone PrismMods/QuartzWebsite` if missing |
 | content | `docs/**.md` |
 | nav + config | `mkdocs.yml` (repo root) |
 | brand styling | `docs/stylesheets/quartz.css` — palette/fonts matched to the homepage; not touched in content updates |
@@ -56,7 +56,7 @@ Write for a player, not a committer — same voice rule as the changelog in `rel
    - `### Fixed` → usually nothing; update `troubleshooting.md` if a documented symptom/workaround is now obsolete.
    - Install/loader/packaging changes → `install.md`.
 4. **Verify.** From the website repo root: `pip install zensical` (venv is fine), then `zensical build -s` (strict) — it must end with `No issues found`. To eyeball it, `zensical serve`.
-5. **Commit + push.** Conventional subject per [`agents/commits.md`](commits.md), e.g. `docs: cover v2.0.0-alpha-29`. Pushing `main` **is** publishing — the Pages workflow deploys on push. Confirm it: `gh run list -R PrismMods/Quartz-Website --workflow pages.yml -L 1` should end `success`.
+5. **Commit + push.** Conventional subject per [`agents/commits.md`](commits.md), e.g. `docs: cover v2.0.0-alpha-29`. Pushing `main` **is** publishing — the Pages workflow deploys on push. Confirm it: `gh run list -R PrismMods/QuartzWebsite --workflow pages.yml -L 1` should end `success`.
 
 ## Don'ts
 
