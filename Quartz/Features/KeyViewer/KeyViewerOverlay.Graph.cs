@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.UI;
 namespace Quartz.Features.KeyViewer;
 public static partial class KeyViewerOverlay {
-    private const float GraphTickMs = 50f;
     private const float GraphUpdateMs = 100f;
     private const float GraphAnimMs = 150f;
     private static void AddDmNoteGraph(int index, DmNoteSpec spec) {
@@ -72,9 +71,11 @@ public static partial class KeyViewerOverlay {
         }
         private void Update() {
             float now = Time.unscaledTime;
+            // Sample cadence must match the bucket size the history was sized with
+            // (speedMs / GraphUpdateMs buckets), or the visible window is wrong.
             if(now >= _nextSample) {
                 Sample();
-                _nextSample = now + GraphTickMs / 1000f;
+                _nextSample = now + GraphUpdateMs / 1000f;
             }
             if(_anim && _animStart >= 0f) {
                 float t = Mathf.Clamp01((now - _animStart) / (GraphAnimMs / 1000f));
