@@ -319,12 +319,16 @@ public static partial class KeyViewerOverlay {
             box.Glow.enabled = g.On;
             if(g.On) box.Glow.color = g.Color;
         }
-        Vector2 off = pressed ? spec.ActiveOffset : spec.IdleOffset;
-        Vector2 scl = pressed ? spec.ActiveScale : spec.IdleScale;
-        float rot = pressed ? spec.ActiveRot : spec.IdleRot;
-        box.Fill.rectTransform.anchoredPosition = new Vector2(spec.X + off.x, -(spec.Y + off.y));
-        box.Fill.rectTransform.localScale = new Vector3(scl.x, scl.y, 1f);
-        box.Fill.rectTransform.localRotation = rot == 0f ? Quaternion.identity : Quaternion.Euler(0f, 0f, -rot);
+        // Transform writes dirty the RectTransform even when values are unchanged;
+        // skip them entirely for specs that never move/scale/rotate between states.
+        if(spec.HasStateTransform) {
+            Vector2 off = pressed ? spec.ActiveOffset : spec.IdleOffset;
+            Vector2 scl = pressed ? spec.ActiveScale : spec.IdleScale;
+            float rot = pressed ? spec.ActiveRot : spec.IdleRot;
+            box.Fill.rectTransform.anchoredPosition = new Vector2(spec.X + off.x, -(spec.Y + off.y));
+            box.Fill.rectTransform.localScale = new Vector3(scl.x, scl.y, 1f);
+            box.Fill.rectTransform.localRotation = rot == 0f ? Quaternion.identity : Quaternion.Euler(0f, 0f, -rot);
+        }
         Color filter = pressed ? spec.ActiveFilter : spec.IdleFilter;
         if(filter != Color.white) {
             ApplyFilterTint(box, filter, pressed);

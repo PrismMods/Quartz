@@ -180,6 +180,10 @@ public static partial class KeyViewerOverlay {
         public float GraphBorderWidth = 3f;
         public float GraphBorderRadius = 8f;
         public bool GraphInlineStyles;
+        public bool HasStateTransform =>
+            IdleOffset != Vector2.zero || ActiveOffset != Vector2.zero
+            || IdleScale != Vector2.one || ActiveScale != Vector2.one
+            || IdleRot != 0f || ActiveRot != 0f;
         public bool HasPseudo =>
             IdleBefore != null || ActiveBefore != null || IdleAfter != null || ActiveAfter != null;
         public string InactiveImage = "", ActiveImage = "";
