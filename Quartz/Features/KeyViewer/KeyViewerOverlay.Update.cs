@@ -10,7 +10,9 @@ namespace Quartz.Features.KeyViewer;
 public static partial class KeyViewerOverlay {
     private sealed class Updater : MonoBehaviour {
         private void LateUpdate() {
-            if(cssDownloadArrived) {
+            // A finished font/image download triggers a full Rebuild — a visible
+            // hitch. Hold the flag until the player is out of gameplay.
+            if(cssDownloadArrived && !GameStats.InGame) {
                 cssDownloadArrived = false;
                 if(Conf != null && Conf.IsDmNoteMode) {
                     Rebuild();
