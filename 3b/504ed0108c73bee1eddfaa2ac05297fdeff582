@@ -1,0 +1,19 @@
+Quartz/Features/KeyViewer/RainRenderer.cs
+  s_fde26b07faaee8::t_0d1a79d48f0128 88,91-100,103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "3b504ed0108c73bee1eddfaa2ac05297fdeff582",
+  "prompts": {},
+  "sessions": {
+    "s_fde26b07faaee8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "52ed32b9-7837-43ff-bb8e-77220b9c0784",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
