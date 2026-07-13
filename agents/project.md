@@ -103,6 +103,7 @@ Key files:
 - `Quartz/Core/QuartzRuntime.cs` — owns the lifecycle. It creates paths/config/resources/root object, initializes services, registers ticks, toggles features, and disposes in reverse order.
 - `Quartz/Core/RuntimeServices.cs` — service initialize/dispose list with startup timing logs.
 - `Quartz/Core/RuntimeTicks.cs` — per-frame tick list.
+- `Quartz/Core/FeatureRegistry.cs` — collects per-feature enable/disable steps; `EnableAll()`/`DisableAll()` run them when the mod is toggled on/off.
 - `Quartz/Core/Service/*` — `PathService`, `LocalizationService`, `UIService`, `TweenService`, `HarmonyService`.
 - `Quartz/Core/Info.cs` — project identity (`Version`, `Channel`, GitHub repo info). `Build` comes from generated `BuildInfo.g.cs` based on `build.json`.
 
@@ -146,11 +147,13 @@ Current feature areas include:
 - `EffectRemover`, `Nostalgia`, `PlanetColors`, `UiHider`, `Tweaks` — visual/gameplay presentation tweaks.
 - `InGameOverlay` — applies the mod font to three specific pieces of the game's own native HUD text (song title, countdown, per-hit judgement); replaces an earlier scene-scanning `GameOverlayFont` that was removed for performance.
 - `KeyLimiter`, `Restriction` — input/gameplay restrictions.
+- `Calibration` — input-offset calibration flow: per-device float offsets, on-death calibration popup, and a detailed timing readout.
 - `KeyViewer` — key display overlay and DM Note-compatible CSS parser/rendering.
 - `Optimizer` — performance/background execution/process priority toggles.
 - `OttoIcon` — Otto icon customization.
 - `PlayCount` — run/play count tracking service.
 - `Status` — live stat calculations used by panels and overlays.
+- `Tuf` — in-game browser for TUF community levels and packs. Contains HTTP API clients (`TufApiClient`, `TufPackApiClient`), zip extraction/asset recovery (`TufArchive`), a shared download cache, and launchers that open levels directly into the live editor scene (`TufLevelLauncher`, `TufLevelActionRunner`). It is the only feature that performs network I/O — all requests go through `TufNetworkPolicy` — and it is wired as a runtime service, not a simple patch module. Its pages sit under the Nostalgia sidebar category (Levels / Packs / Settings).
 - `Interop` — compatibility bridges/importers for other mods such as XPerfect and UMM settings.
 
 Before editing a feature, trace all three places: the feature module, its settings class, and the page factory that exposes it.
@@ -270,6 +273,8 @@ Do not overwrite or casually reformat unrelated work. If a file is already modif
 - Main UI: `Quartz/UI/UICore.cs`, `Quartz/UI/Factory/Page/*.cs`, `Quartz/UI/Generator/*.cs`.
 - Feature modules: `Quartz/Features/<Feature>/`.
 - Stat panels: `Quartz/Features/Panels/PanelsOverlay.cs`, `PanelsSettings.cs`, `Quartz/UI/Factory/Page/PagePanels.cs`.
+- TUF browser: `Quartz/Features/Tuf/*`, UI in `Quartz/UI/Factory/Page/TufBrowserUI.cs`, `TufPacksUI.cs`, `TufSettingsUI.cs`.
+- Calibration: `Quartz/Features/Calibration/*`, `Quartz/Core/OverlayCalibration.cs`, `Quartz/UI/CalibrationPopupUI.cs`, `Quartz/UI/Factory/Page/PageCalibration.cs`.
 - Addon system: `Quartz/Addons/*` (service wired in `Quartz/Core/QuartzRuntime.cs`).
 - Menu sidebar/pages: `Quartz/UI/UICore.cs` (`OriginalMenuState`), `Quartz/UI/Factory/MenuFactory.cs`, `Quartz/UI/Factory/PageFactory.cs`, `Quartz/UI/Factory/Page/*.cs`.
 - Key viewer CSS parser: `Quartz/Features/KeyViewer/KeyViewerCss.cs`, tests in `Quartz.Tests/Program.cs`.
