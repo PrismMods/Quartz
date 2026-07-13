@@ -30,7 +30,17 @@ public static class TMPTextShadow {
         RectTransform shadowRoot = root.Rect;
         if(isolateCanvas && shadowRoot.GetComponent<Canvas>() == null)
             shadowRoot.gameObject.AddComponent<Canvas>().overrideSorting = false;
-        shadowRoot.gameObject.SetActive(on);
+        // Hide via CanvasGroup alpha rather than SetActive: deactivating the root
+        // re-registers up to 9 TMP layers with the canvas on every toggle, which is
+        // a per-press cost when only one CSS state has a text shadow.
+        if(root.Group == null) {
+            root.Group = shadowRoot.gameObject.GetComponent<CanvasGroup>()
+                ?? shadowRoot.gameObject.AddComponent<CanvasGroup>();
+            root.Group.interactable = false;
+            root.Group.blocksRaycasts = false;
+        }
+        if(!shadowRoot.gameObject.activeSelf) shadowRoot.gameObject.SetActive(true);
+        root.Group.alpha = on ? 1f : 0f;
         if(!on) return;
         SyncRootRect(text.rectTransform, shadowRoot);
         KeepRootBehindTarget(text, shadowRoot);
@@ -109,6 +119,9 @@ public static class TMPTextShadow {
             rect.offsetMax = Vector2.zero;
             TextMeshProUGUI tmp = obj.AddComponent<TextMeshProUGUI>();
             tmp.raycastTarget = false;
+            // Layers are hidden via CanvasGroup alpha 0; make sure the fully
+            // transparent meshes are culled instead of drawn.
+            tmp.canvasRenderer.cullTransparentMesh = true;
             root.Layers.Add(tmp);
         }
     }
@@ -139,8 +152,8 @@ public static class TMPTextShadow {
         rect.pivot = source.rectTransform.pivot;
         rect.localScale = Vector3.one;
         rect.localRotation = Quaternion.identity;
-        rect.offsetMin = offset;
-        rect.offsetMax = offset;
+        if(rect.offsetMin != offset) rect.offsetMin = offset;
+        if(rect.offsetMax != offset) rect.offsetMax = offset;
         layer.font = source.font;
         layer.text = StripColorKeepAlpha(source.text);
         layer.fontSize = source.fontSize;
@@ -243,6 +256,7 @@ public static class TMPTextShadow {
         public TextMeshProUGUI Target;
         public RectTransform Rect;
         public Material UnderlayDisabledMat;
+        public CanvasGroup Group;
         public readonly List<TextMeshProUGUI> Layers = new();
     }
     // Cached pointer from a text to its ShadowRoot, attached to the text's own
