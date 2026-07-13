@@ -21,10 +21,18 @@ public static partial class KeyViewerOverlay {
             DmNoteSpec spec = box.Dm;
             box.Border.color = dmPressed ? spec.ActiveOutline : spec.Outline;
             box.Fill.color = dmPressed ? spec.ActiveBg : spec.Bg;
-            if(box.Label != null) box.Label.color = dmPressed ? spec.ActiveText : spec.Text;
-            if(box.Value != null) box.Value.color = dmPressed ? spec.ActiveCounterText : spec.CounterText;
-            box.GradLabelText = null;
-            box.GradValueText = null;
+            // Gradient-driven texts keep their white base tint: writing .color would
+            // regenerate the TMP mesh, wipe the per-glyph gradient, and force a full
+            // ForceMeshUpdate reapply in CssTick on every press edge. Only recolor
+            // (and invalidate the gradient cache) when the current state is solid.
+            if(box.Label != null && (dmPressed ? spec.ActiveLabelGradient : spec.LabelGradient) == null) {
+                box.Label.color = dmPressed ? spec.ActiveText : spec.Text;
+                box.GradLabelText = null;
+            }
+            if(box.Value != null && (dmPressed ? spec.ActiveCounterGradient : spec.CounterGradient) == null) {
+                box.Value.color = dmPressed ? spec.ActiveCounterText : spec.CounterText;
+                box.GradValueText = null;
+            }
             if(spec.NeedsCssState) ApplyCssState(box, dmPressed);
             return;
         }
