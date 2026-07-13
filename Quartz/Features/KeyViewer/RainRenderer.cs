@@ -85,11 +85,22 @@ internal sealed class RainGraphic : MaskableGraphic {
         float span = dFar - dNear;
         if(span <= 0.0001f) return;
         float period = Mathf.Max(1f, raw.DotLength + raw.GapLength);
+        float dotLength = raw.DotLength;
         int kStart = Mathf.FloorToInt(dNear / period);
         int kEnd = Mathf.CeilToInt(dFar / period);
+        // Tiny dot+gap on a tall track can explode into thousands of segments
+        // (x9 quads each with glow); coarsen the pattern past a sane cap.
+        const int MaxSegments = 256;
+        if(kEnd - kStart > MaxSegments) {
+            float scale = (kEnd - kStart) / (float)MaxSegments;
+            period *= scale;
+            dotLength *= scale;
+            kStart = Mathf.FloorToInt(dNear / period);
+            kEnd = Mathf.CeilToInt(dFar / period);
+        }
         for(int k = kStart; k <= kEnd; k++) {
             float segStart = Mathf.Max(dNear, k * period);
-            float segEnd = Mathf.Min(dFar, k * period + raw.DotLength);
+            float segEnd = Mathf.Min(dFar, k * period + dotLength);
             if(segEnd <= segStart) continue;
             float tA = raw.Reverse ? (dFar - segStart) / span : (segStart - dNear) / span;
             float tB = raw.Reverse ? (dFar - segEnd) / span : (segEnd - dNear) / span;
