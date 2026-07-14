@@ -1,0 +1,19 @@
+.github/workflows/i18n-push.yml
+  s_9e81e2213cd15e::t_743af3cd624b37 15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "ce07838162d83e8173b8552f5834f99371318b50",
+  "prompts": {},
+  "sessions": {
+    "s_9e81e2213cd15e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6e9d6da4-0aa9-4dd9-a90a-ec2e67be0ffa",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
