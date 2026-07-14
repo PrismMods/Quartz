@@ -148,6 +148,7 @@ public static partial class KeyViewerOverlay {
             root.anchoredPosition = OverlayCalibration.Scale(new Vector2(Conf.DmOffsetX, Conf.DmOffsetY));
             float dmScale = Mathf.Clamp(Conf.DmScale, 0.2f, 4f);
             root.localScale = new Vector3(dmScale, dmScale, 1f);
+            ApplyBorderScale(dmScale);
             if(!Conf.DmNoteEffect) rainManager?.Clear();
             return;
         }
@@ -167,8 +168,36 @@ public static partial class KeyViewerOverlay {
             footRoot.anchoredPosition = OverlayCalibration.Scale(new Vector2(Conf.FootOffsetX, Conf.FootOffsetY));
             footRoot.localScale = new Vector3(size, size, 1f);
         }
+        ApplyBorderScale(size);
         if(!Conf.RainEnabled) rainManager?.Clear();
         foreach(Box box in boxes) ApplyBoxColors(box);
+    }
+    // A key-viewer border is a thin ring sprite scaled down with the overlay. Below
+    // ~1 on-screen pixel the stroke loses coverage and the border reads as fully
+    // transparent — DM Note presets are authored large and used at a low scale, so
+    // their default 3px border falls well under that. Regenerate the ring with a
+    // stroke floored to stay visible; the boost only kicks in once the natural
+    // scaled stroke would drop below the floor, and is capped so it never fills the
+    // key. Ring sprites are cached by (radius, stroke) and each box skips work when
+    // its stroke is unchanged, so this stays cheap during a scale-slider drag.
+    private const float MinBorderScreenUnits = 1.4f;
+    internal static float ScaledBorderStroke(float radiusUnits, float strokeUnits, float scale) {
+        if(strokeUnits <= 0.01f || scale >= 1f) return strokeUnits;
+        float floor = MinBorderScreenUnits / Mathf.Max(0.05f, scale);
+        if(floor <= strokeUnits) return strokeUnits;
+        return Mathf.Min(floor, Mathf.Max(strokeUnits, radiusUnits * 0.85f));
+    }
+    private static void ApplyBorderScale(float scale) {
+        foreach(Box box in boxes) {
+            if(box?.Border == null || box.Dm is { IsGraph: true }) continue;
+            float stroke = box.Dm?.BoxBorderWidth ?? BorderWidth;
+            if(stroke <= 0.01f) continue;
+            float radius = box.Dm?.BorderRadius ?? KeyRadius;
+            float eff = Mathf.Round(ScaledBorderStroke(radius, stroke, scale) * 4f) / 4f;
+            if(Mathf.Approximately(eff, box.AppliedBorderStroke)) continue;
+            box.AppliedBorderStroke = eff;
+            box.Border.sprite = MainCore.Spr.GetRing(Mathf.Max(0.5f, radius), Mathf.Max(0.1f, eff));
+        }
     }
     public static void ResetPosition() {
         KeyViewerSettings def = new();

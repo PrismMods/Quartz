@@ -73,6 +73,7 @@ public static partial class KeyViewerOverlay {
         public bool IsTotal;
         public string Name;
         public Image Border;
+        public float AppliedBorderStroke = -1f;
         public Image Fill;
         public Image Glow;
         public RawImage FillGrad;
