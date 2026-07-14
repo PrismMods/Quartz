@@ -4,6 +4,7 @@ using GTweens.Extensions;
 using GTweens.Tweens;
 using Quartz.Async;
 using Quartz.Core;
+using Quartz.Core.Service;
 using Quartz.IO;
 using Quartz.Localization;
 using Quartz.Resource;
@@ -88,6 +89,9 @@ internal static partial class PageSettings {
             langBtn.SetBlocked(true);
             langBtn.Label.text = "...";
             _ = Task.Run(async () => {
+                // redownload from Quartz-i18n first, so Reload picks up translation
+                // fixes that shipped after this build
+                await LangUpdateService.FetchAsync(MainCore.Paths.LangPath);
                 await MainCore.Tr.Load(MainCore.Paths.LangPath);
                 MainThread.Enqueue(() => {
                     languageDropdown.SetBlocked(false);
