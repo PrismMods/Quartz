@@ -199,7 +199,7 @@
 		<Delete Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" Files="$(GamePath)/Mods/Koren.dll;$(GamePath)/Mods/Quartz.Loader.ML.dll;$(GamePath)/UserLibs/Quartz.dll" TreatErrorsAsWarnings="true" />
 
 		<ItemGroup>
-			<ExportFiles Include="Resource/Export/**/*.*" Exclude="Resource/Export/**/.DS_Store" />
+			<ExportFiles Include="Resource/Export/**/*.*" Exclude="Resource/Export/**/.DS_Store;Resource/Export/**/.claude-flow/**" />
 		</ItemGroup>
 
 		<MakeDir Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" Directories="$(GamePath)/UserData/Quartz" />
@@ -243,7 +243,7 @@
 		</PropertyGroup>
 
 		<ItemGroup>
-			<ExportFiles Include="Resource/Export/**/*.*" Exclude="Resource/Export/**/.DS_Store" />
+			<ExportFiles Include="Resource/Export/**/*.*" Exclude="Resource/Export/**/.DS_Store;Resource/Export/**/.claude-flow/**" />
 		</ItemGroup>
 
 		<!-- Stage: $(PackageStageRoot)/Quartz/ (mod folder at zip root). -->
