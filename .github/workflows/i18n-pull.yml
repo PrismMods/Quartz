@@ -1,0 +1,76 @@
+name: i18n pull (quartz-i18n → translations)
+
+# Pulls community translations from quartz-i18n back into the mod as a reviewed PR.
+# Runs on a schedule + manual dispatch, so no workflow is needed on the i18n side.
+# en-US is NOT pulled — it is owned in this repo. A maintainer reviews the PR before
+# it ships.
+#
+# Security: this job holds I18N_PAT, so it runs ONLY this repo's validator
+# (scripts/validate_i18n.py) and reads the i18n checkout purely as JSON data. It
+# never executes any script from the i18n checkout, so translator-controlled content
+# cannot reach the token.
+#
+# Requires repo secret I18N_PAT: a fine-grained PAT scoped to BOTH repos —
+#   quartz-i18n: Contents R/W (also used by i18n-push)
+#   Quartz:      Contents R/W + Pull requests R/W (used to open the sync PR here,
+#                which is why the org "allow Actions to create PRs" toggle is not needed)
+on:
+  schedule:
+    - cron: "0 * * * *"    # hourly; adjust or replace with a repository_dispatch trigger for instant sync
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: quartz
+      - uses: actions/checkout@v4
+        with:
+          repository: PrismMods/Quartz-i18n
+          token: ${{ secrets.I18N_PAT }}
+          path: i18n
+      - name: Validate incoming translations
+        # this repo's validator, run against i18n's data — see security note above
+        run: python3 quartz/scripts/validate_i18n.py i18n/Lang quartz/Quartz/Resource/Export/Lang/en-US.json
+      - name: Copy translations (everything except en-US)
+        run: |
+          dest="quartz/Quartz/Resource/Export/Lang"
+          for f in i18n/Lang/*.json; do
+            b="$(basename "$f")"
+            [ "$b" = "en-US.json" ] && continue
+            cp "$f" "$dest/$b"
+          done
+      - name: Open / update PR if translations changed
+        working-directory: quartz
+        env:
+          # I18N_PAT (not github.token): a PAT-created PR doesn't need the
+          # org-locked "Allow GitHub Actions to create and approve pull requests"
+          # setting, and it also triggers CI on the resulting PR.
+          GH_TOKEN: ${{ secrets.I18N_PAT }}
+        run: |
+          git config user.name "quartz-i18n-bot"
+          git config user.email "i18n-bot@users.noreply.github.com"
+          br="i18n-sync"
+          git checkout -B "$br"
+          git add Quartz/Resource/Export/Lang
+          # Hard guard: en-US is owned by THIS repo and a pull must never change it,
+          # whatever the copy step did. Reset it to HEAD in both index and worktree
+          # so it can never appear in the sync commit/PR.
+          git checkout HEAD -- Quartz/Resource/Export/Lang/en-US.json
+          if git diff --cached --quiet; then
+            echo "no translation changes"
+            exit 0
+          fi
+          git commit -m "i18n: sync translations from quartz-i18n"
+          git push -f origin "$br"
+          if ! gh pr list --head "$br" --state open --json number -q '.[0].number' | grep -q .; then
+            gh pr create --base main --head "$br" \
+              --title "i18n: sync translations from quartz-i18n" \
+              --body "Automated pull of community translations from PrismMods/quartz-i18n. en-US is not included (it is owned in this repo). Review the diff before merging."
+          fi

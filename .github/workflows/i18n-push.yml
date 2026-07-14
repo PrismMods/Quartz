@@ -1,0 +1,45 @@
+name: i18n push (en-US → quartz-i18n)
+
+# Pushes the authoritative English strings out to the translation repo whenever
+# they change on main, so translators always work against the current key set.
+# Only en-US flows this direction — translations are owned by quartz-i18n and come
+# back via i18n-pull. Direct push (no PR): en-US is authoritative here and touches
+# a different file than any translation, so it never conflicts with translator work.
+#
+# Requires repo secret I18N_PAT: a fine-grained PAT with Contents: read/write on
+# PrismMods/quartz-i18n.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "Quartz/Resource/Export/Lang/en-US.json"
+  workflow_dispatch:
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: quartz
+      - uses: actions/checkout@v4
+        with:
+          repository: PrismMods/Quartz-i18n
+          token: ${{ secrets.I18N_PAT }}
+          path: i18n
+      - name: Copy en-US reference into i18n
+        run: |
+          mkdir -p i18n/Lang
+          cp quartz/Quartz/Resource/Export/Lang/en-US.json i18n/Lang/en-US.json
+      - name: Commit + push to quartz-i18n
+        working-directory: i18n
+        run: |
+          git config user.name "quartz-i18n-bot"
+          git config user.email "i18n-bot@users.noreply.github.com"
+          git add Lang/en-US.json
+          if git diff --cached --quiet; then
+            echo "en-US unchanged — nothing to push"
+            exit 0
+          fi
+          git commit -m "sync: en-US reference from Quartz@${GITHUB_SHA::7}"
+          git push
