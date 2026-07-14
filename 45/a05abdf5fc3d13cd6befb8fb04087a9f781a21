@@ -1,0 +1,28 @@
+.github/workflows/i18n-pull.yml
+  s_9e81e2213cd15e::t_090272ddd2367d 52-55
+  s_9e81e2213cd15e::t_ce802d964a98e0 62-65
+  s_9e81e2213cd15e::t_5f5a2b68a7a0f0 13-16
+  s_9e81e2213cd15e::t_f58d680682e0e4 1-12,17-34,36-51,56-61,66-76
+  s_9e81e2213cd15e::t_6515260e418490 35
+scripts/validate_i18n.py
+  s_9e81e2213cd15e::t_247b12490336e8 1-80
+.github/workflows/i18n-push.yml
+  s_9e81e2213cd15e::t_95ec7542bd8f42 1-26,28-45
+  s_9e81e2213cd15e::t_9f7e31f1d22cfe 27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "45a05abdf5fc3d13cd6befb8fb04087a9f781a21",
+  "prompts": {},
+  "sessions": {
+    "s_9e81e2213cd15e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6e9d6da4-0aa9-4dd9-a90a-ec2e67be0ffa",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
