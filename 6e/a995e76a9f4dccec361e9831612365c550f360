@@ -1,0 +1,19 @@
+Quartz/Quartz.csproj
+  s_9e81e2213cd15e::t_d77dbd43e78213 202,246
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "6ea995e76a9f4dccec361e9831612365c550f360",
+  "prompts": {},
+  "sessions": {
+    "s_9e81e2213cd15e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6e9d6da4-0aa9-4dd9-a90a-ec2e67be0ffa",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
