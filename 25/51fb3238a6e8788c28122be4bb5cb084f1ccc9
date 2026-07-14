@@ -1,0 +1,30 @@
+Quartz/Core/Service/LocalizationService.cs
+  s_9e81e2213cd15e::t_4b7604e5a465c1 17-31
+Quartz/Core/Service/LangUpdateService.cs
+  s_9e81e2213cd15e::t_55ea98671ff053 5-6,13-18,21-23,33-35,46-47,52-53,56-60,64-66,73-82,84-86,88-95,97-100,102-107,109,114,119-120,132,134-149,151-152
+  s_9e81e2213cd15e::t_205e79f8958464 61-63
+  s_9e81e2213cd15e::t_a19601ea2e8b3d 1-4,7-12,19-20,24-29,31-32,36-45,48-51,54-55,67-72,83,87,96,101,108,110-113,115-118,121,123-131,133,150,153
+  s_9e81e2213cd15e::t_94c185647b5e2a 122
+  s_9e81e2213cd15e::t_16d900d418bdb1 30
+Quartz/Core/Info.cs
+  s_9e81e2213cd15e::t_5e082761ab854b 19-23
+Quartz/UI/Factory/Page/PageSettings.cs
+  s_9e81e2213cd15e::t_53155d6b7a1db8 92-94
+  s_9e81e2213cd15e::t_9e7029aef6c30c 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "2551fb3238a6e8788c28122be4bb5cb084f1ccc9",
+  "prompts": {},
+  "sessions": {
+    "s_9e81e2213cd15e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6e9d6da4-0aa9-4dd9-a90a-ec2e67be0ffa",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
