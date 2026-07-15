@@ -1,0 +1,22 @@
+tools/release.sh
+  s_3d0c3aa8a4de6f::t_084e84e1120fe7 31-35
+  s_3d0c3aa8a4de6f::t_c9db78e1e03fa2 46
+  s_3d0c3aa8a4de6f::t_9e47c85d729e6c 194-254
+  s_3d0c3aa8a4de6f::t_b3240562c872dc 68-69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "1628df3a96d7262ceb9859dcf31a06b4e3bc8040",
+  "prompts": {},
+  "sessions": {
+    "s_3d0c3aa8a4de6f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b7d1395e-13b6-48df-bdd8-26fb46956805",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
