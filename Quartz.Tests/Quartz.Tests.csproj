@@ -19,6 +19,7 @@
 		<Compile Include="../Quartz/Features/Tuf/TufApiQuery.cs" Link="Source/TufApiQuery.cs" />
 		<Compile Include="../Quartz/Features/Tuf/TufNetworkPolicy.cs" Link="Source/TufNetworkPolicy.cs" />
 		<Compile Include="../Quartz/Features/Tuf/TufArchive.cs" Link="Source/TufArchive.cs" />
+		<Compile Include="../Quartz/Features/Tuf/TufDiskSpace.cs" Link="Source/TufDiskSpace.cs" />
 		<Compile Include="../Quartz/Features/Tuf/TufPackModels.cs" Link="Source/TufPackModels.cs" />
 		<Compile Include="../Quartz/Features/Tuf/TufPackApiClient.cs" Link="Source/TufPackApiClient.cs" />
 	</ItemGroup>

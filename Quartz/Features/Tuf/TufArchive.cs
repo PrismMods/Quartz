@@ -6,14 +6,30 @@ namespace Quartz.Features.Tuf;
 
 public static class TufArchive {
     public const int MaxEntries = 10_000;
-    public const long MaxEntryBytes = 512L * 1024 * 1024;
-    public const long MaxOutputBytes = 1024L * 1024 * 1024;
 
     // Legacy code pages tried, in order, to recover mojibake entry names from zips
     // that stored filenames in a national encoding without the UTF-8 flag. Korean
     // (949) first — most ADOFAI charts come from there — then Japanese, GBK, Big5,
     // Windows-1252. UTF-8 is tried before any of these.
     private static readonly int[] LegacyCodePages = { 949, 932, 936, 950, 1252 };
+
+    // Total size the archive claims it will expand to, and the entry count. Read from
+    // the zip directory before a single byte is written, so the caller can compare it
+    // against the free space on the destination volume. Sizes here are only claims —
+    // CopyBounded is what holds each entry to the size it declared.
+    public static long DeclaredSize(string archivePath) {
+        using ZipArchive archive = ZipFile.OpenRead(archivePath);
+        if(archive.Entries.Count > MaxEntries) throw new InvalidDataException("Archive contains too many entries.");
+        long total = 0;
+        foreach(ZipArchiveEntry entry in archive.Entries) {
+            long size = entry.Length;
+            if(size < 0) throw new InvalidDataException("Archive declares a negative entry size.");
+            // Saturate rather than wrap: a doctored directory claiming long.MaxValue
+            // must read as "enormous" to the space check, not as a negative.
+            total = long.MaxValue - size < total ? long.MaxValue : total + size;
+        }
+        return total;
+    }
 
     // Returns the number of entries skipped because a single asset could not be
     // decompressed or written; the caller decides whether a playable chart survived.
@@ -24,7 +40,6 @@ public static class TufArchive {
             ? root : root + Path.DirectorySeparatorChar;
         using ZipArchive archive = ZipFile.OpenRead(archivePath);
         if(archive.Entries.Count > MaxEntries) throw new InvalidDataException("Archive contains too many entries.");
-        long total = 0;
         int skipped = 0;
         foreach(ZipArchiveEntry entry in archive.Entries) {
             if(IsSymlink(entry)) throw new InvalidDataException("Archive contains a symbolic link.");
@@ -40,14 +55,12 @@ public static class TufArchive {
                 continue;
             }
             long size = entry.Length;
-            if(size < 0 || size > MaxEntryBytes || total > MaxOutputBytes - size)
-                throw new InvalidDataException("Archive expands beyond the safe size limit.");
+            if(size < 0) throw new InvalidDataException("Archive declares a negative entry size.");
             try {
                 Directory.CreateDirectory(Path.GetDirectoryName(target)!);
                 using Stream input = entry.Open();
                 using FileStream output = new(target, FileMode.CreateNew, FileAccess.Write, FileShare.None);
                 CopyBounded(input, output, size);
-                total += size;
             } catch(Exception e) when(IsSkippableEntryError(e)) {
                 // One asset we cannot decompress (a zip method System.IO.Compression
                 // lacks, e.g. Deflate64) or write (a name illegal on this filesystem)
@@ -181,6 +194,10 @@ public static class TufArchive {
         return unixMode == 0xA000;
     }
 
+    // The real defence against a zip bomb, now that the fixed ceilings are gone: an
+    // entry gets to write exactly the number of bytes its header declared and not one
+    // more. A bomb that lies about its size dies here mid-stream; an honest one is
+    // caught earlier, by DeclaredSize against the volume's free space.
     private static void CopyBounded(Stream input, Stream output, long expected) {
         byte[] buffer = new byte[65536];
         long written = 0;
@@ -188,7 +205,7 @@ public static class TufArchive {
             int read = input.Read(buffer, 0, buffer.Length);
             if(read == 0) break;
             written += read;
-            if(written > expected || written > MaxEntryBytes) throw new InvalidDataException("Archive entry exceeded declared size.");
+            if(written > expected) throw new InvalidDataException("Archive entry exceeded declared size.");
             output.Write(buffer, 0, read);
         }
         if(written != expected) throw new InvalidDataException("Archive entry size did not match its header.");

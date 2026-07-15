@@ -13,6 +13,9 @@ List<(string Name, Action Run)> tests = [
     ("TUF API emits named PGU and special filters", TufFilterTests.TestApiDifficultyQuery),
     ("TUF quantum range selects, clamps, and clears", TufFilterTests.TestQuantumRange),
     ("TUF browser preferences serialize and normalize", TufFilterTests.TestPersistedPreferences),
+    ("TUF free-space probe fails open when the volume is unknown", TufDiskSpaceTests.TestSpaceProbeFailsOpen),
+    ("TUF sizes are worded for humans", TufDiskSpaceTests.TestSizeWording),
+    ("TUF archives declare their expanded size instead of hitting a ceiling", TufDiskSpaceTests.TestDeclaredSize),
     ("TUF pack list parses string ids and counts", TufPackParseTests.TestPackListParsing),
     ("TUF pack tree flattens, dedups, and credits charters", TufPackParseTests.TestPackTreeParsing),
 ];
