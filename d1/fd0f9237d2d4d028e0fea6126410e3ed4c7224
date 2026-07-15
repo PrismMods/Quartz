@@ -1,0 +1,19 @@
+Quartz/Features/AutoDeafen/AutoDeafen.cs
+  s_352f08faf203b1::t_1978a900e55113 214-219,230,233,236,240
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "d1fd0f9237d2d4d028e0fea6126410e3ed4c7224",
+  "prompts": {},
+  "sessions": {
+    "s_352f08faf203b1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "60843700-e4bf-4bc7-832b-c5dec001ccd9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
