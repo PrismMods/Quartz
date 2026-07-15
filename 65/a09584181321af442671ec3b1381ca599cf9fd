@@ -1,0 +1,43 @@
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_3d0c3aa8a4de6f::t_b66fc1b96f7ea9 626
+  s_3d0c3aa8a4de6f::t_f0fce00d06168e 600
+Quartz/Features/KeyLimiter/KeyLimiterPatches.cs
+  s_8d45510e79e426::t_e77384c609b43b 1-29
+Quartz/UI/Factory/Page/PageGameplay.PageBuilders.cs
+  s_8d45510e79e426::t_7b6e5dea1f7c56 76-84
+Quartz/Resource/Export/Lang/en-US.json
+  s_8d45510e79e426::t_14bbaa944f472e 600
+  s_8d45510e79e426::t_8d0451d3762618 626
+Quartz/Features/KeyLimiter/KeyLimiter.cs
+  s_8d45510e79e426::t_344623633b6e1b 23-34
+Quartz/Features/ChatterBlocker/ChatterBlocker.cs
+  s_8d45510e79e426::t_5978cfd50719cb 18-19
+  s_8d45510e79e426::t_0faf7de4764f6f 74-76
+Quartz/Features/KeyLimiter/KeyLimiterSettings.cs
+  s_8d45510e79e426::t_9c87ecff375d67 11
+  s_8d45510e79e426::t_ad8f8235ae16a9 41,48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "65a09584181321af442671ec3b1381ca599cf9fd",
+  "prompts": {},
+  "sessions": {
+    "s_3d0c3aa8a4de6f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b7d1395e-13b6-48df-bdd8-26fb46956805",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_8d45510e79e426": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d56b39bc-4e34-4e2b-9b36-9af3379d5a76",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
