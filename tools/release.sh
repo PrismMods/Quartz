@@ -28,6 +28,11 @@
 # include already-released work). For curated, de-duplicated notes use the agent
 # flow in agents/release.md — it cross-checks prior release bodies.
 #
+# Every publish also rolls a "latest-<channel>" tag + pre-release (latest-alpha
+# today) onto the build just published, so download links in docs and chat never
+# go stale. That tag is intentionally not SemVer-parseable — which is what keeps
+# the in-game updater from ever seeing the pointer as a version to offer.
+#
 # The mod links the game's managed DLLs, so it can't build in CI — run locally.
 # Requires `gh` (authenticated), `jq`, and `git`.
 set -euo pipefail
@@ -38,7 +43,7 @@ command -v gh  >/dev/null || { echo "gh required: brew install gh (then 'gh auth
 command -v jq  >/dev/null || { echo "jq required: brew install jq" >&2; exit 1; }
 command -v git >/dev/null || { echo "git required" >&2; exit 1; }
 
-usage() { sed -n '2,31p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,36p' "$0" | sed 's/^# \{0,1\}//'; }
 
 # --- Parse flags ---------------------------------------------------------
 name="" ; notes="" ; notes_file="" ; auto=1 ; dry_run=0
@@ -60,6 +65,8 @@ BUILDS="build.json"
 
 ver=$(grep -E 'const string Version' "$INFO" | sed -E 's/.*"([^"]+)".*/\1/')
 chan=$(grep -E 'const string Channel' "$INFO" | sed -E 's/.*"([^"]+)".*/\1/')
+owner=$(grep -E 'const string RepoOwner' "$INFO" | sed -E 's/.*"([^"]+)".*/\1/')
+repo=$(grep -E 'const string RepoName' "$INFO" | sed -E 's/.*"([^"]+)".*/\1/')
 
 # --- Compute tag, release flags, and the previous tag (changelog base) ----
 if [ "$chan" = "stable" ]; then
@@ -182,6 +189,67 @@ if gh release view "$tag" >/dev/null 2>&1; then
 else
   # shellcheck disable=SC2086
   gh release create "$tag" "$quartz_zip" "$quartz_dll" "$quartz_umm_zip" --title "$title" --notes-file "$notes_tmp" $flags
+fi
+
+# --- Roll this channel's "latest" pointer --------------------------------
+# A tag + pre-release that always names the newest build of this channel, so
+# links in docs and chat never go stale:
+#   .../releases/download/latest-alpha/Quartz.zip
+#
+# The tag is deliberately NOT SemVer-parseable, and that is load-bearing: the
+# in-game updater walks the whole releases feed and skips every tag that
+# SemVer.TryParse rejects (UpdateService.FetchLatest), so this pointer can never
+# be offered as an upgrade or re-nag anyone. Keep it that way — a name like
+# "v2.0.0-latest" WOULD parse, and would break exactly that.
+#
+# Never --latest: GitHub's "Latest" badge belongs on the real release, not on a
+# pointer to it.
+roll_tag="latest-${chan}"
+roll_flags="--latest=false"
+[ "$chan" = "stable" ] || roll_flags="--prerelease --latest=false"
+
+roll_pointer() {
+  # Point the tag at the commit the real release was cut from rather than at the
+  # local HEAD: gh created "$tag" server-side, and a local bump commit or a
+  # concurrent session can leave HEAD somewhere else entirely.
+  git fetch --tags --force --quiet origin "refs/tags/${tag}:refs/tags/${tag}" || return 1
+  git tag -f "$roll_tag" "${tag}^{commit}" >/dev/null || return 1
+  # Scoped to this one ref on purpose — a rolling pointer is the only thing in
+  # this repo that is ever meant to move.
+  git push --force --quiet origin "refs/tags/${roll_tag}" || return 1
+
+  local roll_title roll_notes
+  roll_title="Latest ${chan}: ${title}"
+  roll_notes=$(mktemp)
+  {
+    printf 'Rolling pointer to the newest **%s** build — right now that is [%s](https://github.com/%s/%s/releases/tag/%s).\n\n' \
+      "$chan" "$title" "$owner" "$repo" "$tag"
+    printf 'These links always serve the newest %s build:\n\n' "$chan"
+    printf -- '- [Quartz.zip](https://github.com/%s/%s/releases/download/%s/Quartz.zip) — MelonLoader\n' "$owner" "$repo" "$roll_tag"
+    printf -- '- [QuartzUmm.zip](https://github.com/%s/%s/releases/download/%s/QuartzUmm.zip) — UnityModManager\n\n' "$owner" "$repo" "$roll_tag"
+    printf -- '---\n\n%s\n' "$body"
+  } > "$roll_notes"
+
+  if gh release view "$roll_tag" >/dev/null 2>&1; then
+    gh release edit "$roll_tag" --title "$roll_title" --notes-file "$roll_notes" \
+      && gh release upload "$roll_tag" "$quartz_zip" "$quartz_dll" "$quartz_umm_zip" --clobber
+  else
+    # shellcheck disable=SC2086
+    gh release create "$roll_tag" "$quartz_zip" "$quartz_dll" "$quartz_umm_zip" \
+      --title "$roll_title" --notes-file "$roll_notes" $roll_flags
+  fi
+  local rc=$?
+  rm -f "$roll_notes"
+  return $rc
+}
+
+echo "Rolling ${roll_tag} -> ${tag} ..."
+if roll_pointer; then
+  echo "Rolled: ${roll_tag}"
+else
+  # The real release is already public by now; a stale pointer is a nuisance,
+  # not a reason to report the release itself as failed.
+  echo "WARNING: could not update ${roll_tag} — ${tag} itself published fine. Re-run to retry." >&2
 fi
 
 echo "Done: ${title}"
