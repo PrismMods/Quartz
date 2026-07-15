@@ -51,7 +51,6 @@ internal sealed class TufBrowserView : MonoBehaviour {
     // Space between the id, difficulty and Installed badge on a card's top row.
     private const float MetaGap = 12f;
     private readonly Dictionary<int, TMP_Text> cardLabels = [];
-    private readonly Dictionary<int, TMP_Text> deleteLabels = [];
     private readonly Dictionary<int, Image> deleteChips = [];
     private Image installedChip;
     private TMP_Text installedLabel;
@@ -384,7 +383,6 @@ internal sealed class TufBrowserView : MonoBehaviour {
         chartChooserSeq?.Kill();
         GenerateUI.ClearChildren(content);
         cardLabels.Clear();
-        deleteLabels.Clear();
         deleteChips.Clear();
         // A fresh (non-append) fetch — sort/filter/query change — always shows the
         // spinner instead of the stale list; appends keep the list and spin at the end.
@@ -489,7 +487,7 @@ internal sealed class TufBrowserView : MonoBehaviour {
         bool installed = IsInstalled(level);
         if(installed) AddInstalledBadge(card, x + MetaGap);
         // Make room for the Delete button beside the action when there is one.
-        float textRight = installed ? -244f : -150f;
+        float textRight = installed ? -204f : -150f;
 
         RectTransform songRect = Rect("Song", card, new(0f, 1f), new(1f, 1f), new(22f, -66f), new(textRight, -34f));
         // An adopted install (downloaded before the index existed, or by another mod)
@@ -552,18 +550,17 @@ internal sealed class TufBrowserView : MonoBehaviour {
     // any card disarms every other, and the arm lapses on its own after a few
     // seconds so a stray click never leaves a live delete sitting on the screen.
     private void AddDelete(RectTransform card, TufLevel level) {
-        RectTransform button = Rect("Delete", card, new(1f, 0.5f), new(1f, 0.5f), new(-232f, -23f), new(-146f, 23f));
+        RectTransform button = Rect("Delete", card, new(1f, 0.5f), new(1f, 0.5f), new(-192f, -23f), new(-146f, 23f));
         Image image = button.gameObject.AddComponent<Image>();
         image.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
         image.type = Image.Type.Sliced;
-        bool armed = armedDeleteId == level.Id;
         bool enabled = !service.IsBusy;
-        image.color = armed
-            ? new Color(0.86f, 0.31f, 0.33f, 0.92f)
-            : Color.Lerp(UIColors.ObjectBG, new Color(0.86f, 0.31f, 0.33f, 1f), enabled ? 0.22f : 0.08f);
-        TMP_Text label = Text(button, DeleteLabel(level), 15f, TextAlignmentOptions.Center);
-        label.color = new(1f, 1f, 1f, enabled ? 0.95f : 0.45f);
-        deleteLabels[level.Id] = label;
+        image.color = DeleteColor(armedDeleteId == level.Id, enabled);
+        RectTransform iconRect = Rect("Icon", button, new(0.5f, 0.5f), new(0.5f, 0.5f), new(-11f, -11f), new(11f, 11f));
+        Image icon = iconRect.gameObject.AddComponent<Image>();
+        icon.sprite = MainCore.Spr.Get(UISprite.Trash128, 22f);
+        icon.color = new(1f, 1f, 1f, enabled ? 0.95f : 0.45f);
+        icon.raycastTarget = false;
         deleteChips[level.Id] = image;
         if(!enabled) return;
         GenerateUI.AddButton(button.gameObject, input => {
@@ -577,11 +574,13 @@ internal sealed class TufBrowserView : MonoBehaviour {
             armedUntil = Time.unscaledTime + ArmSeconds;
             RefreshDeleteChips();
         });
-        button.AddToolTip("DESC_TUF_DELETE", "Delete this level from your library. It can be downloaded again.");
+        button.AddToolTip("DESC_TUF_DELETE", "Delete this level from your library. Click it twice to confirm; the level can be downloaded again.");
     }
 
-    private string DeleteLabel(TufLevel level) =>
-        armedDeleteId == level.Id ? Tr("TUF_DELETE_CONFIRM", "Sure?") : Tr("TUF_DELETE", "Delete");
+    // Armed is a solid red; idle only tints the button's own grey towards it.
+    private static Color DeleteColor(bool armed, bool enabled) => armed
+        ? new Color(0.86f, 0.31f, 0.33f, 0.92f)
+        : Color.Lerp(UIColors.ObjectBG, new Color(0.86f, 0.31f, 0.33f, 1f), enabled ? 0.22f : 0.08f);
 
     private void DisarmDelete() {
         if(armedDeleteId == 0) return;
@@ -592,16 +591,9 @@ internal sealed class TufBrowserView : MonoBehaviour {
     // Repaints the delete buttons in place. Arming is view-only state, so it must not
     // reach the service or force a list rebuild.
     private void RefreshDeleteChips() {
-        foreach(TufLevel level in service.Levels) {
-            if(deleteLabels.TryGetValue(level.Id, out TMP_Text label) && label != null) {
-                string text = DeleteLabel(level);
-                if(label.text != text) label.text = text;
-            }
+        foreach(TufLevel level in service.Levels)
             if(deleteChips.TryGetValue(level.Id, out Image image) && image != null)
-                image.color = armedDeleteId == level.Id
-                    ? new Color(0.86f, 0.31f, 0.33f, 0.92f)
-                    : Color.Lerp(UIColors.ObjectBG, new Color(0.86f, 0.31f, 0.33f, 1f), 0.22f);
-        }
+                image.color = DeleteColor(armedDeleteId == level.Id, !service.IsBusy);
     }
 
     private void AddAction(RectTransform card, TufLevel level) {

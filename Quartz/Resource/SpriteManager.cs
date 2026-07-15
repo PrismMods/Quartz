@@ -23,6 +23,7 @@ public enum UISprite {
     AdjustmentsHorizontal128,
     Users128,
     ClockRewind128,
+    Trash128,
     QuantumQ,
     TufLogo,
 }
@@ -219,6 +220,7 @@ public sealed class SpriteManager(ResourceManager resource) : IDisposable {
         [UISprite.AdjustmentsHorizontal128] = Asset.AdjustmentsHorizontal128,
         [UISprite.Users128] = Asset.Users128,
         [UISprite.ClockRewind128] = Asset.ClockRewind128,
+        [UISprite.Trash128] = Asset.Trash128,
         [UISprite.QuantumQ] = Asset.QuantumQ,
         [UISprite.TufLogo] = Asset.TufLogo
     };

@@ -28,6 +28,7 @@ public enum Asset {
     AdjustmentsHorizontal128,
     Users128,
     ClockRewind128,
+    Trash128,
     OttoAuto,
     QuantumQ,
     TufLogo,
@@ -144,6 +145,7 @@ public sealed class ResourceManager(Assembly assembly, string resourcePath) : ID
         [Asset.AdjustmentsHorizontal128] = "Image.AdjustmentsHorizontal128.png",
         [Asset.Users128] = "Image.Users128.png",
         [Asset.ClockRewind128] = "Image.ClockRewind128.png",
+        [Asset.Trash128] = "Image.Trash128.png",
         [Asset.OttoAuto] = "Image.OttoAuto.png",
         [Asset.QuantumQ] = "Image.QuantumQ.png",
         [Asset.TufLogo] = "Image.TufLogo.png"
