@@ -12,6 +12,7 @@ public sealed class EffectRemoverSettings : ISettingsFile {
     public bool IsEnhanced => !IsSimple;
     public const int MoveTrackUpperBound = 100; 
     public bool SimpleFilter = false;
+    public bool SimpleAdvancedFilter = false;
     public bool SimpleBloom = false;
     public bool SimpleFlash = false;
     public bool SimpleHallOfMirrors = false;
@@ -52,6 +53,7 @@ public sealed class EffectRemoverSettings : ISettingsFile {
             [nameof(On)] = On,
             [nameof(Mode)] = Mode,
             [nameof(SimpleFilter)] = SimpleFilter,
+            [nameof(SimpleAdvancedFilter)] = SimpleAdvancedFilter,
             [nameof(SimpleBloom)] = SimpleBloom,
             [nameof(SimpleFlash)] = SimpleFlash,
             [nameof(SimpleHallOfMirrors)] = SimpleHallOfMirrors,
@@ -93,6 +95,7 @@ public sealed class EffectRemoverSettings : ISettingsFile {
         On = IOUtils.Read(token, nameof(On), On);
         Mode = IOUtils.Read(token, nameof(Mode), Mode);
         SimpleFilter = IOUtils.Read(token, nameof(SimpleFilter), SimpleFilter);
+        SimpleAdvancedFilter = IOUtils.Read(token, nameof(SimpleAdvancedFilter), SimpleAdvancedFilter);
         SimpleBloom = IOUtils.Read(token, nameof(SimpleBloom), SimpleBloom);
         SimpleFlash = IOUtils.Read(token, nameof(SimpleFlash), SimpleFlash);
         SimpleHallOfMirrors = IOUtils.Read(token, nameof(SimpleHallOfMirrors), SimpleHallOfMirrors);

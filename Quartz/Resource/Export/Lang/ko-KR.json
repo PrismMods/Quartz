@@ -873,6 +873,8 @@
     "FXRM_MODE_ENHANCED": "고급",
     "FXRM_S_FILTER": "필터 끄기",
     "DESC_FXRM_S_FILTER": "차트를 바꾸지 않고 실시간으로 VFX 필터(그레이스케일, 아케이드 등)를 끕니다.",
+    "FXRM_S_ADVFILTER": "고급 필터 끄기",
+    "DESC_FXRM_S_ADVFILTER": "차트를 바꾸지 않고 실시간으로 고급 필터 VFX를 끕니다.",
     "FXRM_S_BLOOM": "블룸 끄기",
     "DESC_FXRM_S_BLOOM": "블룸 효과를 건너뜁니다.",
     "FXRM_S_FLASH": "플래시 끄기",

@@ -6,6 +6,7 @@ using UnityEngine;
 namespace Quartz.Features.EffectRemover;
 public static partial class EffectRemover {
     private static bool SimpleFilterActive => SimpleActive && Conf.SimpleFilter;
+    private static bool SimpleAdvancedFilterActive => SimpleActive && Conf.SimpleAdvancedFilter;
     private static bool SimpleBloomActive => SimpleActive && Conf.SimpleBloom;
     private static bool SimpleFlashActive => SimpleActive && Conf.SimpleFlash;
     private static bool SimpleHomActive => SimpleActive && Conf.SimpleHallOfMirrors;
@@ -36,6 +37,11 @@ public static partial class EffectRemover {
                 MainCore.Log.Wrn($"[EffectRemover] simple filter start failed: {e.Message}");
             }
         }
+    }
+    [HarmonyPatch(typeof(ffxSetFilterAdvancedPlus), "StartEffect")]
+    private static class SimpleAdvancedFilterPatch {
+        private static bool Prepare() => AccessTools.Method(typeof(ffxSetFilterAdvancedPlus), "StartEffect") != null;
+        private static bool Prefix() => !SimpleAdvancedFilterActive;
     }
     [HarmonyPatch(typeof(ffxBloomPlus), "StartEffect")]
     private static class SimpleBloomPatch {

@@ -873,6 +873,8 @@
     "FXRM_MODE_ENHANCED": "Enhanced",
     "FXRM_S_FILTER": "Disable Filters",
     "DESC_FXRM_S_FILTER": "Turns off VFX filters (Grayscale, Arcade, etc.) at runtime without changing the chart.",
+    "FXRM_S_ADVFILTER": "Disable Advanced Filter",
+    "DESC_FXRM_S_ADVFILTER": "Turns off Advanced Filter VFX at runtime without changing the chart.",
     "FXRM_S_BLOOM": "Disable Bloom",
     "DESC_FXRM_S_BLOOM": "Skips the bloom effect.",
     "FXRM_S_FLASH": "Disable Flash",

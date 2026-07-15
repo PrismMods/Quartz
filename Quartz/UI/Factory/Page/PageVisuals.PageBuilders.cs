@@ -260,6 +260,11 @@ internal static partial class PageVisuals {
             "Disable Filters", "fxrm_s_filter",
             "Turns off VFX filters (Grayscale, Arcade, etc.) at runtime without changing the chart.");
         GenerateUI.ToggleTip(
+            parent, def.SimpleAdvancedFilter, conf.SimpleAdvancedFilter,
+            v => { conf.SimpleAdvancedFilter = v; Save(); },
+            "Disable Advanced Filter", "fxrm_s_advfilter",
+            "Turns off Advanced Filter VFX at runtime without changing the chart.");
+        GenerateUI.ToggleTip(
             parent, def.SimpleBloom, conf.SimpleBloom,
             v => { conf.SimpleBloom = v; Save(); },
             "Disable Bloom", "fxrm_s_bloom", "Skips the bloom effect.");
