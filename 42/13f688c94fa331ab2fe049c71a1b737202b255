@@ -1,0 +1,23 @@
+Quartz/UI/Factory/Page/TufBrowserUI.cs
+  s_fd2bd620aa809e::t_6ccabf9d6b899c 523,525-526,532-539,545,548
+  s_fd2bd620aa809e::t_9dcb3ba5c7df13 51-52
+  s_fd2bd620aa809e::t_1d28ff316d34fc 477-480,483,490
+  s_fd2bd620aa809e::t_bac99033370c10 524,527-531
+  s_fd2bd620aa809e::t_96ec0f366329d1 481,484-486
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "4213f688c94fa331ab2fe049c71a1b737202b255",
+  "prompts": {},
+  "sessions": {
+    "s_fd2bd620aa809e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bb0c75bc-9b10-45cc-82a5-1780cd230c01",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
