@@ -47,10 +47,20 @@ internal sealed class TufBrowserView : MonoBehaviour {
     private bool lastQuantumOn;
     private float quantumLayout;
     private float specialChecksScale = 0.82f;
+    private const float ArmSeconds = 4f;
     private readonly Dictionary<int, TMP_Text> cardLabels = [];
+    private readonly Dictionary<int, TMP_Text> deleteLabels = [];
+    private readonly Dictionary<int, Image> deleteChips = [];
+    private Image installedChip;
+    private TMP_Text installedLabel;
     private string listSignature;
     private bool built;
     private bool pendingRebuild;
+    // The card whose Delete is armed, and when it disarms. Confirmation lives here
+    // rather than in a modal: one card can be armed at a time, and walking away
+    // (or touching anything else) cancels it.
+    private int armedDeleteId;
+    private float armedUntil;
 
     // Hidden pages are deactivated; downloads still tick service.Changed. Defer the
     // list rebuild (forced layout passes + scroll restore need an active hierarchy)
@@ -106,6 +116,13 @@ internal sealed class TufBrowserView : MonoBehaviour {
         AddSortChip(sortRow, TufSort.Clears, "TUF_SORT_CLEARS", "Clears", 70f);
         AddSortChip(sortRow, TufSort.Likes, "TUF_SORT_LIKES", "Likes", 64f);
         (directionChip, directionLabel) = Chip(sortRow, "↓", 48f, service.ToggleAscending);
+        (installedChip, installedLabel) = Chip(sortRow, "Installed", 96f, () => {
+            DisarmDelete();
+            service.ToggleInstalled();
+        });
+        installedLabel.gameObject.AddComponent<TextLocalization>().Init("TUF_INSTALLED", "Installed");
+        installedChip.rectTransform.AddToolTip("DESC_TUF_INSTALLED",
+            "Show only the levels you have downloaded, newest first. Works offline.");
         AddFlexibleSpacer(sortRow);
         BuildDifficultyChips(sortRow);
 
@@ -317,6 +334,8 @@ internal sealed class TufBrowserView : MonoBehaviour {
     // shorter than the viewport, filling until the list scrolls.
     private void Update() {
         if(!built || service == null || content == null || viewport == null) return;
+        if(armedDeleteId != 0 && Time.unscaledTime >= armedUntil) DisarmDelete();
+        // The Installed view is the whole local library at once — nothing to page.
         if(!service.HasMore || service.LoadingMore || service.State != TufListState.Ready) return;
         float max = content.rect.height - viewport.rect.height;
         if(max <= 0f || content.anchoredPosition.y >= max - 400f) service.LoadMore();
@@ -363,6 +382,8 @@ internal sealed class TufBrowserView : MonoBehaviour {
         chartChooserSeq?.Kill();
         GenerateUI.ClearChildren(content);
         cardLabels.Clear();
+        deleteLabels.Clear();
+        deleteChips.Clear();
         // A fresh (non-append) fetch — sort/filter/query change — always shows the
         // spinner instead of the stale list; appends keep the list and spin at the end.
         if(service.State == TufListState.Loading) {
@@ -370,7 +391,7 @@ internal sealed class TufBrowserView : MonoBehaviour {
         } else if(service.State == TufListState.Error && service.Levels.Count == 0) {
             AddStatus(Tr("TUF_API_ERROR", "Could not load TUF levels.") + "\n" + service.Error, true, service.Refresh);
         } else if(service.State == TufListState.Empty) {
-            AddStatus(Tr("TUF_EMPTY", "No levels matched your search."), false, null);
+            AddStatus(EmptyMessage(), false, null);
         } else {
             foreach(TufLevel level in service.Levels) {
                 AddCard(level);
@@ -382,7 +403,10 @@ internal sealed class TufBrowserView : MonoBehaviour {
                 if(service.LoadingMore) AddLoadingStatus(Tr("TUF_LOADING", "Loading levels…"));
                 else if(service.State == TufListState.Error) AddStatus(Tr("TUF_RETRY", "Retry"), true, service.LoadMore);
             }
-            else if(service.Levels.Count > 0) AddStatus(Tr("TUF_END", "End of results"), false, null, 38f);
+            else if(service.Levels.Count > 0)
+                AddStatus(service.ShowInstalled
+                    ? string.Format(Tr("TUF_INSTALLED_COUNT", "{0} level(s) in your library"), service.Levels.Count)
+                    : Tr("TUF_END", "End of results"), false, null, 38f);
         }
         Canvas.ForceUpdateCanvases();
         LayoutRebuilder.ForceRebuildLayoutImmediate(content);
@@ -397,16 +421,32 @@ internal sealed class TufBrowserView : MonoBehaviour {
         sb.Append((int)service.State).Append('|')
             .Append(service.HasMore ? '1' : '0')
             .Append(service.LoadingMore ? '1' : '0')
-            .Append(service.IsBusy ? '1' : '0').Append('|');
+            .Append(service.IsBusy ? '1' : '0')
+            .Append(service.ShowInstalled ? '1' : '0').Append('|');
         foreach(TufLevel level in service.Levels)
             sb.Append(level.Id).Append(':').Append((int)level.State)
+                // A card gains a badge and a Delete button (and loses text width) the
+                // moment it becomes installed, so the install state is structural.
+                .Append(level.InstallFolder == null ? '-' : '+')
+                // So is having an error: the action tooltip only exists when there is
+                // one, and it is attached during the rebuild.
+                .Append(string.IsNullOrEmpty(level.Error) ? '-' : '!')
                 .Append('#').Append(level.Charts?.Count ?? 0).Append(',');
         return sb.ToString();
+    }
+
+    private string EmptyMessage() {
+        if(!service.ShowInstalled) return Tr("TUF_EMPTY", "No levels matched your search.");
+        return string.IsNullOrEmpty(service.Query)
+            ? Tr("TUF_INSTALLED_EMPTY", "You have not downloaded any levels yet.")
+            : Tr("TUF_INSTALLED_NO_MATCH", "No downloaded level matched your search.");
     }
 
     private void RefreshControls() {
         foreach((TufSort sort, Image image) in sortChips)
             image.color = sort == service.Sort ? UIColors.ObjectActive : UIColors.ObjectBG;
+        if(installedChip != null)
+            installedChip.color = service.ShowInstalled ? UIColors.ObjectActive : UIColors.ObjectBG;
         directionChip.color = service.Ascending ? UIColors.ObjectActive : UIColors.ObjectBG;
         directionLabel.text = service.Ascending ? "↑" : "↓";
         difficultyRange?.SetRange(service.MinDifficultyIndex, service.MaxDifficultyIndex);
@@ -439,17 +479,106 @@ internal sealed class TufBrowserView : MonoBehaviour {
         TMP_Text diff = Text(diffRect, level.Difficulty, 16f, TextAlignmentOptions.Left);
         diff.color = railImage.color;
 
-        RectTransform songRect = Rect("Song", card, new(0f, 1f), new(1f, 1f), new(22f, -66f), new(-150f, -34f));
-        TMP_Text song = Text(songRect, level.Song, 23f, TextAlignmentOptions.Left);
-        song.fontStyle = FontStyles.Bold;
-        song.overflowMode = TextOverflowModes.Ellipsis;
-        song.textWrappingMode = TextWrappingModes.NoWrap;
-        RectTransform metaRect = Rect("Metadata", card, new(0f, 0f), new(1f, 0f), new(22f, 8f), new(-150f, 34f));
-        TMP_Text meta = Text(metaRect, $"{level.Artist}  ·  {level.Creator}  ·  ✓ {level.Clears:N0}  ♥ {level.Likes:N0}", 15f, TextAlignmentOptions.Left);
+        bool installed = IsInstalled(level);
+        if(installed) AddInstalledBadge(card);
+        // Make room for the Delete button beside the action when there is one.
+        float textRight = installed ? -244f : -150f;
+
+        RectTransform songRect = Rect("Song", card, new(0f, 1f), new(1f, 1f), new(22f, -66f), new(textRight, -34f));
+        // An adopted install (downloaded before the index existed, or by another mod)
+        // has no metadata until it turns up in a search again; show the id instead of
+        // an empty row.
+        string song = string.IsNullOrEmpty(level.Song) ? Tr("TUF_UNKNOWN_LEVEL", "Level") + " #" + level.Id : level.Song;
+        TMP_Text songText = Text(songRect, song, 23f, TextAlignmentOptions.Left);
+        songText.fontStyle = FontStyles.Bold;
+        songText.overflowMode = TextOverflowModes.Ellipsis;
+        songText.textWrappingMode = TextWrappingModes.NoWrap;
+        RectTransform metaRect = Rect("Metadata", card, new(0f, 0f), new(1f, 0f), new(22f, 8f), new(textRight, 34f));
+        TMP_Text meta = Text(metaRect, CardMeta(level), 15f, TextAlignmentOptions.Left);
         meta.color = new(1f, 1f, 1f, 0.46f);
         meta.overflowMode = TextOverflowModes.Ellipsis;
         meta.textWrappingMode = TextWrappingModes.NoWrap;
         AddAction(card, level);
+        if(installed) AddDelete(card, level);
+    }
+
+    private string CardMeta(TufLevel level) {
+        if(string.IsNullOrEmpty(level.Artist) && string.IsNullOrEmpty(level.Creator))
+            return Tr("TUF_INSTALLED_UNKNOWN", "Downloaded before Quartz tracked level details.");
+        return $"{level.Artist}  ·  {level.Creator}  ·  ✓ {level.Clears:N0}  ♥ {level.Likes:N0}";
+    }
+
+    private bool IsInstalled(TufLevel level) =>
+        level.InstallFolder != null
+        && level.State is not TufItemState.Downloading and not TufItemState.Extracting
+            and not TufItemState.Loading;
+
+    private void AddInstalledBadge(RectTransform card) {
+        RectTransform badge = Rect("Installed Badge", card, new(0f, 1f), new(0f, 1f), new(239f, -33f), new(337f, -10f));
+        Image image = badge.gameObject.AddComponent<Image>();
+        image.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
+        image.type = Image.Type.Sliced;
+        image.color = new(0.38f, 0.78f, 0.52f, 0.22f);
+        image.raycastTarget = false;
+        TMP_Text label = Text(badge, Tr("TUF_INSTALLED", "Installed"), 13f, TextAlignmentOptions.Center);
+        label.color = new(0.62f, 0.92f, 0.72f, 0.95f);
+        label.raycastTarget = false;
+    }
+
+    // Two-step: the first click arms this one card, the second removes it. Arming
+    // any card disarms every other, and the arm lapses on its own after a few
+    // seconds so a stray click never leaves a live delete sitting on the screen.
+    private void AddDelete(RectTransform card, TufLevel level) {
+        RectTransform button = Rect("Delete", card, new(1f, 0.5f), new(1f, 0.5f), new(-232f, -23f), new(-146f, 23f));
+        Image image = button.gameObject.AddComponent<Image>();
+        image.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
+        image.type = Image.Type.Sliced;
+        bool armed = armedDeleteId == level.Id;
+        bool enabled = !service.IsBusy;
+        image.color = armed
+            ? new Color(0.86f, 0.31f, 0.33f, 0.92f)
+            : Color.Lerp(UIColors.ObjectBG, new Color(0.86f, 0.31f, 0.33f, 1f), enabled ? 0.22f : 0.08f);
+        TMP_Text label = Text(button, DeleteLabel(level), 15f, TextAlignmentOptions.Center);
+        label.color = new(1f, 1f, 1f, enabled ? 0.95f : 0.45f);
+        deleteLabels[level.Id] = label;
+        deleteChips[level.Id] = image;
+        if(!enabled) return;
+        GenerateUI.AddButton(button.gameObject, input => {
+            if(input != PointerEventData.InputButton.Left) return;
+            if(armedDeleteId == level.Id) {
+                DisarmDelete();
+                service.DeleteInstalled(level);
+                return;
+            }
+            armedDeleteId = level.Id;
+            armedUntil = Time.unscaledTime + ArmSeconds;
+            RefreshDeleteChips();
+        });
+        button.AddToolTip("DESC_TUF_DELETE", "Delete this level from your library. It can be downloaded again.");
+    }
+
+    private string DeleteLabel(TufLevel level) =>
+        armedDeleteId == level.Id ? Tr("TUF_DELETE_CONFIRM", "Sure?") : Tr("TUF_DELETE", "Delete");
+
+    private void DisarmDelete() {
+        if(armedDeleteId == 0) return;
+        armedDeleteId = 0;
+        RefreshDeleteChips();
+    }
+
+    // Repaints the delete buttons in place. Arming is view-only state, so it must not
+    // reach the service or force a list rebuild.
+    private void RefreshDeleteChips() {
+        foreach(TufLevel level in service.Levels) {
+            if(deleteLabels.TryGetValue(level.Id, out TMP_Text label) && label != null) {
+                string text = DeleteLabel(level);
+                if(label.text != text) label.text = text;
+            }
+            if(deleteChips.TryGetValue(level.Id, out Image image) && image != null)
+                image.color = armedDeleteId == level.Id
+                    ? new Color(0.86f, 0.31f, 0.33f, 0.92f)
+                    : Color.Lerp(UIColors.ObjectBG, new Color(0.86f, 0.31f, 0.33f, 1f), 0.22f);
+        }
     }
 
     private void AddAction(RectTransform card, TufLevel level) {
@@ -485,6 +614,9 @@ internal sealed class TufBrowserView : MonoBehaviour {
     // Rendered directly below a card whose level has multiple playable charts.
     // Choices fade in with a small stagger; the card action reads Cancel while open.
     private void AddChartChooser(TufLevel level) {
+        // Charts is only populated while the level sits in ChooseChart. The caller
+        // checks, but nothing stops a future one from forgetting.
+        if(level?.Charts == null) return;
         GTweenSequenceBuilder animation = GTweenSequenceBuilder.New();
         int index = 0;
         foreach(string chart in level.Charts) {

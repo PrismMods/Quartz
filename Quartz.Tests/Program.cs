@@ -16,6 +16,13 @@ List<(string Name, Action Run)> tests = [
     ("TUF free-space probe fails open when the volume is unknown", TufDiskSpaceTests.TestSpaceProbeFailsOpen),
     ("TUF sizes are worded for humans", TufDiskSpaceTests.TestSizeWording),
     ("TUF archives declare their expanded size instead of hitting a ceiling", TufDiskSpaceTests.TestDeclaredSize),
+    ("TUF level folder names are recognized strictly", TufInstallTests.TestLevelFolderNaming),
+    ("TUF delete only ever targets folders it owns", TufInstallTests.TestDeleteGuard),
+    ("TUF library roots reject volumes and folders holding user files", TufInstallTests.TestLibraryRootValidation),
+    ("TUF nested library roots are detected", TufInstallTests.TestNestedRoots),
+    ("TUF install index records, moves, and round-trips", TufInstallTests.TestInstallIndexRoundTrip),
+    ("TUF install index rejects corrupt records", TufInstallTests.TestInstallIndexRejectsJunk),
+    ("TUF install index adopts orphans and prunes missing", TufInstallTests.TestAdoptAndPrune),
     ("TUF pack list parses string ids and counts", TufPackParseTests.TestPackListParsing),
     ("TUF pack tree flattens, dedups, and credits charters", TufPackParseTests.TestPackTreeParsing),
 ];

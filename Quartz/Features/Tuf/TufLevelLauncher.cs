@@ -12,24 +12,27 @@ namespace Quartz.Features.Tuf;
 
 public sealed class TufLevelLauncher : MonoBehaviour {
     private string levelsRoot;
-    private Func<string> linkedRoot;
+    private Func<IEnumerable<string>> trustedRoots;
     private Coroutine pending;
     private Action<bool, string> completion;
     private GameObject loadingCover;
 
-    public void Initialize(string root, Func<string> linkedRoot = null) {
+    public void Initialize(string root, Func<IEnumerable<string>> trustedRoots = null) {
         levelsRoot = Path.GetFullPath(root);
-        this.linkedRoot = linkedRoot;
+        this.trustedRoots = trustedRoots;
     }
 
-    // Charts may live in Quartz's own cache or, when directory linking is on,
-    // in TUFHelperLite's Downloads folder; both are trusted install roots.
+    // Charts may live in Quartz's own cache, in TUFHelperLite's Downloads folder
+    // when linking is on, or in a library the user pointed elsewhere — including a
+    // root the library has since moved away from, which is why the trusted set is
+    // asked for rather than derived from the active root alone.
     private bool ChartUnderTrustedRoot(string chart) {
         if(TufArchive.IsChartUnderRoot(chart, levelsRoot)) return true;
         try {
-            string linked = linkedRoot?.Invoke();
-            return !string.IsNullOrEmpty(linked) && TufArchive.IsChartUnderRoot(chart, linked);
-        } catch { return false; }
+            foreach(string root in trustedRoots?.Invoke() ?? Array.Empty<string>())
+                if(!string.IsNullOrEmpty(root) && TufArchive.IsChartUnderRoot(chart, root)) return true;
+        } catch { }
+        return false;
     }
 
     public bool Launch(string chartPath, Action<bool, string> completed) {

@@ -266,16 +266,22 @@ internal sealed class TufPacksView : MonoBehaviour {
             slots.Add(i);
             levels.Add(result[i]);
         }
+        // Every entry in `levels` cleared the IsFolder check above, so Level is there —
+        // but that is a property invariant the sort lambdas cannot see. Read it through
+        // helpers instead of asserting it away.
         IEnumerable<TufPackItem> sorted = (service.LevelSort, service.LevelAscending) switch {
-            (TufPackLevelSort.Difficulty, true) => levels.OrderBy(x => x.Level.DifficultyRank),
-            (TufPackLevelSort.Difficulty, false) => levels.OrderByDescending(x => x.Level.DifficultyRank),
-            (TufPackLevelSort.Clears, true) => levels.OrderBy(x => x.Level.Clears),
-            _ => levels.OrderByDescending(x => x.Level.Clears),
+            (TufPackLevelSort.Difficulty, true) => levels.OrderBy(RankOf),
+            (TufPackLevelSort.Difficulty, false) => levels.OrderByDescending(RankOf),
+            (TufPackLevelSort.Clears, true) => levels.OrderBy(ClearsOf),
+            _ => levels.OrderByDescending(ClearsOf),
         };
         int slot = 0;
         foreach(TufPackItem item in sorted) result[slots[slot++]] = item;
         return result;
     }
+
+    private static int RankOf(TufPackItem item) => item.Level?.DifficultyRank ?? 0;
+    private static int ClearsOf(TufPackItem item) => item.Level?.Clears ?? 0;
 
     private void RenderItems(IReadOnlyList<TufPackItem> items, int depth) {
         float indent = depth * 26f;
@@ -506,6 +512,9 @@ internal sealed class TufPacksView : MonoBehaviour {
     };
 
     private void AddChartChooser(TufLevel level, float indent = 0f) {
+        // Charts is only populated while the level sits in ChooseChart. The caller
+        // checks, but nothing stops a future one from forgetting.
+        if(level?.Charts == null) return;
         GTweenSequenceBuilder animation = GTweenSequenceBuilder.New();
         int index = 0;
         foreach(string chart in level.Charts) {

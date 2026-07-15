@@ -14,6 +14,7 @@ internal sealed class TufLevelActionRunner {
     private readonly TufDownloadService downloads;
     private readonly TufLevelLauncher launcher;
     private readonly Action notify;
+    private readonly Action<TufLevel> installed;
     private CancellationTokenSource actionRequest;
     private int activeLevelId;
     private bool disposed;
@@ -21,11 +22,12 @@ internal sealed class TufLevelActionRunner {
     public bool IsBusy => activeLevelId != 0;
 
     public TufLevelActionRunner(IReadOnlyList<TufLevel> owner, TufDownloadService downloads,
-        TufLevelLauncher launcher, Action notify) {
+        TufLevelLauncher launcher, Action notify, Action<TufLevel> installed = null) {
         this.owner = owner;
         this.downloads = downloads;
         this.launcher = launcher;
         this.notify = notify;
+        this.installed = installed;
     }
 
     public void Act(TufLevel level) {
@@ -36,8 +38,10 @@ internal sealed class TufLevelActionRunner {
             return;
         }
         activeLevelId = level.Id;
-        if(downloads.TryGetCachedChart(level.Id, out string cached)) {
-            IReadOnlyList<string> charts = downloads.ListCachedCharts(level.Id);
+        // InstallFolder wins over the active root: a level installed before the
+        // library moved (or one a move skipped) still lives at its own path.
+        if(downloads.TryGetCachedChart(level.Id, level.InstallFolder, out string cached)) {
+            IReadOnlyList<string> charts = downloads.ListCachedCharts(level.Id, level.InstallFolder);
             if(charts.Count > 1) EnterChoose(level, charts);
             else Launch(level, cached);
             return;
@@ -70,7 +74,7 @@ internal sealed class TufLevelActionRunner {
         level.Progress = 0f;
         level.Error = "";
         level.Charts = charts;
-        level.ChartsRoot = downloads.LevelFolder(level.Id);
+        level.ChartsRoot = level.InstallFolder ?? downloads.LevelFolder(level.Id);
         notify();
     }
 
@@ -93,6 +97,9 @@ internal sealed class TufLevelActionRunner {
             }, token);
             MainThread.Enqueue(() => {
                 if(disposed || token.IsCancellationRequested) return;
+                // DownloadAsync stamped level.InstallFolder; record it before the
+                // state flips so the Installed view sees a complete entry.
+                installed?.Invoke(level);
                 FinishAction(level, TufItemState.Load, "");
             });
         } catch(OperationCanceledException) {

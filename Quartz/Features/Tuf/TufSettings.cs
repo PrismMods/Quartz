@@ -14,6 +14,14 @@ public sealed class TufSettings : ISettingsFile {
     public int QuantumMaxIndex = TufDifficultyFilter.QuantumNames.Count - 1;
     public List<string> SpecialDifficulties = [];
     public bool LinkTufHelperLite;
+    // Empty = install into Quartz's own Levels cache. Set = the folder the user
+    // picked instead (typically on a roomier drive).
+    public string CustomLevelsRoot = "";
+    // Every root the library has ever lived at. Delete and move validate an index
+    // path against this set, so a corrupt or hand-edited index cannot point a
+    // recursive delete at a folder we never owned. Bounded: one entry per folder
+    // change, deduped.
+    public List<string> KnownRoots = [];
 
     public TufSort GetSort() => Enum.IsDefined(typeof(TufSort), Sort)
         ? (TufSort)Sort
@@ -45,8 +53,20 @@ public sealed class TufSettings : ISettingsFile {
         [nameof(QuantumMinIndex)] = QuantumMinIndex,
         [nameof(QuantumMaxIndex)] = QuantumMaxIndex,
         [nameof(SpecialDifficulties)] = new JArray(SpecialDifficulties),
-        [nameof(LinkTufHelperLite)] = LinkTufHelperLite
+        [nameof(LinkTufHelperLite)] = LinkTufHelperLite,
+        [nameof(CustomLevelsRoot)] = CustomLevelsRoot,
+        [nameof(KnownRoots)] = new JArray(KnownRoots)
     };
+
+    public void RememberRoot(string? root) {
+        if(string.IsNullOrWhiteSpace(root)) return;
+        string full;
+        try { full = Path.GetFullPath(root); } catch { return; }
+        if(!KnownRoots.Any(r => string.Equals(r, full, PathComparison))) KnownRoots.Add(full);
+    }
+
+    private static StringComparison PathComparison =>
+        Path.DirectorySeparatorChar == '\\' ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 
     public void Deserialize(JToken token) {
         Sort = Read(token, nameof(Sort), Sort);
@@ -58,6 +78,12 @@ public sealed class TufSettings : ISettingsFile {
         QuantumMinIndex = Read(token, nameof(QuantumMinIndex), QuantumMinIndex);
         QuantumMaxIndex = Read(token, nameof(QuantumMaxIndex), QuantumMaxIndex);
         LinkTufHelperLite = Read(token, nameof(LinkTufHelperLite), LinkTufHelperLite);
+        CustomLevelsRoot = Read(token, nameof(CustomLevelsRoot), CustomLevelsRoot) ?? "";
+        KnownRoots.Clear();
+        if(token[nameof(KnownRoots)] is JArray roots) {
+            foreach(JToken root in roots)
+                if(root.Type == JTokenType.String) RememberRoot(root.Value<string>());
+        }
         SpecialDifficulties.Clear();
         if(token[nameof(SpecialDifficulties)] is JArray values) {
             foreach(JToken value in values) {

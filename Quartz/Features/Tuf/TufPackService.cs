@@ -49,7 +49,10 @@ public sealed class TufPackService : IRuntimeService {
         Instance = this;
         api = new TufPackApiClient();
         TufService tuf = TufService.Instance;
-        if(tuf != null) actions = new TufLevelActionRunner(packLevels, tuf.Downloads, tuf.Launcher, Notify);
+        // Same runner, same download service, same install index: a level pulled from
+        // a pack shows up in the Installed view exactly like one from the Levels tab.
+        if(tuf != null) actions = new TufLevelActionRunner(packLevels, tuf.Downloads, tuf.Launcher,
+            Notify, tuf.RecordInstalledLevel);
     }
 
     public void EnsureLoaded() {
@@ -207,10 +210,9 @@ public sealed class TufPackService : IRuntimeService {
         packItems.AddRange(items);
         packLevels.Clear();
         TufPackApiClient.FlattenLevels(items, packLevels);
-        TufDownloadService downloads = TufService.Instance?.Downloads;
-        if(downloads != null)
-            foreach(TufLevel level in packLevels)
-                if(downloads.TryGetCachedChart(level.Id, out _)) level.State = TufItemState.Load;
+        TufService tuf = TufService.Instance;
+        if(tuf != null)
+            foreach(TufLevel level in packLevels) tuf.MarkIfInstalled(level);
         DetailState = packLevels.Count == 0 ? TufPackListState.Empty : TufPackListState.Ready;
         Notify();
     }

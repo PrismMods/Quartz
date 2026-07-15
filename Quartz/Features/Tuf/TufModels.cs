@@ -9,6 +9,12 @@ public enum TufItemState { Download, Downloading, Extracting, Loading, Load, Ret
 
 public sealed class TufDifficultyFilter : IEquatable<TufDifficultyFilter> {
     public static readonly IReadOnlyList<string> RankedNames = BuildRankedNames();
+    private static readonly Dictionary<string, int> RankIndex = BuildRankIndex();
+
+    // Rank of a difficulty name ("G15"), or -1 for specials and unknowns. Used by the
+    // Installed view's sort comparator, so it must not allocate per call.
+    public static int RankOf(string? name) =>
+        name != null && RankIndex.TryGetValue(name, out int rank) ? rank : -1;
     public static readonly IReadOnlyList<string> SpecialNames = Array.AsReadOnly(new[] { "Unranked", "Censored", "Impossible" });
     public static readonly IReadOnlyList<string> QuantumNames = Array.AsReadOnly(new[] {
         "Qq", "GQ0 (G1~G4)", "GQ1 (G5~G8)", "GQ2 (G9~G12)", "GQ3 (G13~G16)",
@@ -92,6 +98,12 @@ public sealed class TufDifficultyFilter : IEquatable<TufDifficultyFilter> {
             for(int i = 1; i <= 20; i++) values.Add(band + i);
         return values.AsReadOnly();
     }
+
+    private static Dictionary<string, int> BuildRankIndex() {
+        Dictionary<string, int> index = new(RankedNames.Count, StringComparer.Ordinal);
+        for(int i = 0; i < RankedNames.Count; i++) index[RankedNames[i]] = i;
+        return index;
+    }
 }
 
 public sealed class TufLevel {
@@ -114,6 +126,11 @@ public sealed class TufLevel {
     // full paths of every playable chart in it, in SelectChart preference order.
     public IReadOnlyList<string>? Charts { get; set; }
     public string? ChartsRoot { get; set; }
+    // Where this level is installed, once it is. Read from the install index rather
+    // than derived from the active root, so a level still resolves after the library
+    // moves or a move is interrupted partway. Null means "not installed".
+    public string? InstallFolder { get; set; }
+    public long InstalledAtUtc { get; set; }
 
     public TufLevel(int id, string song, string artist, string creator, string difficulty,
         string difficultyColor, int clears, int likes, Uri? downloadUri) {

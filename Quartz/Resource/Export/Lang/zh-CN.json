@@ -808,7 +808,6 @@
     "DESC_TUF_OPEN_FOLDER": "打开TUF下载谱面的保存文件夹。",
     "TUF_LINK_HELPER": "关联TUFHelperLite目录",
     "DESC_TUF_LINK_HELPER": "将下载的谱面保存至TUFHelperLite的Downloads文件夹（文件名格式tuf-<id>），使两个模组共享同一谱面库；游戏目录内优先检查UMMMods，其次检查Mods。",
-    "TUF_LINK_HELPER_MISSING": "未在游戏Mods或UMMMods文件夹中找到TUFHelperLite——未安装该模组时此设置无需开启。",
     "NOSTALGIA": "怀旧复古设置",
     "NOST_NORESULT": "隐藏结算文字",
     "NOST_HIDEDIFFICULTY": "隐藏难度选择",
