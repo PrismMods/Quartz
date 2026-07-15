@@ -125,6 +125,18 @@ internal static partial class PageSettings {
             "show_on_startup"
         );
         var startupToggleTr = startupToggle.Label.gameObject.AddComponent<TextLocalization>().Init("SHOW_OVERLAYER_PANEL_AT_STARTUP", "Show Quartz Settings at Startup");
+        var blockInputsRow = GenerateUI.Row(content.transform);
+        UIToggle blockInputsToggle = GenerateUI.Toggle(
+            blockInputsRow,
+            defSet.BlockInputsWhileMenuOpen,
+            MainCore.Conf.BlockInputsWhileMenuOpen,
+            toggle => {
+                MainCore.Conf.BlockInputsWhileMenuOpen = toggle;
+                MainCore.ConfMgr.RequestSave();
+            },
+            "Block game inputs while menu is open",
+            "block_inputs_while_menu_open"
+        );
         var keybindRow = GenerateUI.Row(content.transform);
         var keybindLabel = GenerateUI.KeyBind(
             keybindRow,

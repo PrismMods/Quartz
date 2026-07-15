@@ -10,6 +10,7 @@ public sealed class CoreSettings : ISettingsFile {
     public bool ShowOnStartup = false;
     public bool Tooltip = true;
     public bool MiddleClickToDefault = true;
+    public bool BlockInputsWhileMenuOpen = true;
     public float UIScale = 0.85f;
     public string FontName = "";
     public bool FontSongTitle = false;    
@@ -58,6 +59,7 @@ public sealed class CoreSettings : ISettingsFile {
             [nameof(ShowOnStartup)] = ShowOnStartup,
             [nameof(Tooltip)] = Tooltip,
             [nameof(MiddleClickToDefault)] = MiddleClickToDefault,
+            [nameof(BlockInputsWhileMenuOpen)] = BlockInputsWhileMenuOpen,
             [nameof(UIScale)] = UIScale,
             [nameof(FontName)] = FontName,
             [nameof(FontSongTitle)] = FontSongTitle,
@@ -93,6 +95,7 @@ public sealed class CoreSettings : ISettingsFile {
         ShowOnStartup = IOUtils.Read(token, nameof(ShowOnStartup), ShowOnStartup);
         Tooltip = IOUtils.Read(token, nameof(Tooltip), Tooltip);
         MiddleClickToDefault = IOUtils.Read(token, nameof(MiddleClickToDefault), MiddleClickToDefault);
+        BlockInputsWhileMenuOpen = IOUtils.Read(token, nameof(BlockInputsWhileMenuOpen), BlockInputsWhileMenuOpen);
         UIScale = IOUtils.Read(token, nameof(UIScale), UIScale);
         FontName = IOUtils.Read(token, nameof(FontName), FontName);
         FontSongTitle = IOUtils.Read(token, nameof(FontSongTitle), FontSongTitle);
