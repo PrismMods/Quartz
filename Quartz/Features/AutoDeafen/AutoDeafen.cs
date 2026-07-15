@@ -211,7 +211,12 @@ public static class AutoDeafen {
         });
     }
     private static void LoadAccessToken() {
-        string legacy = Trim(Conf?.LegacyDiscordAccessToken);
+        // Bound to a local rather than re-read: Conf is ConfMgr?.Data, and the clear
+        // in the finally below would otherwise throw over whatever exception put us
+        // there — hiding the real failure behind a null reference.
+        AutoDeafenSettings conf = Conf;
+        if(conf == null) return;
+        string legacy = Trim(conf.LegacyDiscordAccessToken);
         bool migrated = false;
         try {
             string persisted = "";
@@ -222,17 +227,17 @@ public static class AutoDeafen {
             }
             if(persisted.Length > MaxTokenLength) throw new IOException("stored token exceeds size limit");
             if(persisted.Length > 0) {
-                Conf.DiscordAccessToken = persisted;
+                conf.DiscordAccessToken = persisted;
             } else if(legacy.Length > 0 && legacy.Length <= MaxTokenLength) {
                 AtomicFile.WriteAllText(TokenPath, legacy);
-                Conf.DiscordAccessToken = legacy;
+                conf.DiscordAccessToken = legacy;
                 migrated = true;
             }
-            if(legacy.Length > 0 && (persisted.Length > 0 || migrated)) ConfMgr.Save();
+            if(legacy.Length > 0 && (persisted.Length > 0 || migrated)) ConfMgr?.Save();
         } catch(Exception e) {
             MainCore.Log.Err("[AutoDeafen] couldn't load stored Discord token: " + e.Message);
         } finally {
-            Conf.LegacyDiscordAccessToken = "";
+            conf.LegacyDiscordAccessToken = "";
         }
     }
     private static string Trim(string value) => (value ?? "").Trim();
