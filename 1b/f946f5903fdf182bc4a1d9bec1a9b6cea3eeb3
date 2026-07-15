@@ -1,0 +1,32 @@
+Quartz.Tests/Program.cs
+  s_352f08faf203b1::t_00179286f0bffb 16-18
+Quartz.Tests/Features/Tuf/TufDiskSpaceTests.cs
+  s_352f08faf203b1::t_a34563ba93ae00 1-25,33-85,92-102
+  s_352f08faf203b1::t_06db59e9ae6813 86-91
+  s_352f08faf203b1::t_59ce1b9e3d7a2a 26-32
+Quartz/Features/Tuf/TufArchive.cs
+  s_352f08faf203b1::t_ff2999eae7f28b 197-200,208
+  s_352f08faf203b1::t_4a85f2d910d539 58
+  s_352f08faf203b1::t_907ab5490bc93c 16-33
+Quartz.Tests/Quartz.Tests.csproj
+  s_352f08faf203b1::t_8716d2a2eb286e 22
+Quartz/Features/Tuf/TufDiskSpace.cs
+  s_352f08faf203b1::t_667b92f820bc2b 1-54,56-58,65-83
+  s_352f08faf203b1::t_785ad86fa536a2 55,59-64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "1bf946f5903fdf182bc4a1d9bec1a9b6cea3eeb3",
+  "prompts": {},
+  "sessions": {
+    "s_352f08faf203b1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "60843700-e4bf-4bc7-832b-c5dec001ccd9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
