@@ -1,0 +1,25 @@
+Quartz/Core/QuartzRuntime.cs
+  s_f037d79216385d::t_795817d1893d11 159
+  s_f037d79216385d::t_d6c334252de932 196
+Quartz/Features/Calibration/CalibrationTimingLogger.cs
+  s_f037d79216385d::t_ad06965d811bb5 67
+  s_f037d79216385d::t_d706554bb4f792 5,14-33
+Quartz/Features/PlayCount/PlayCount.cs
+  s_f037d79216385d::t_39aa8c69b78c98 21-22,24,26-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "48ebb1d38ce226997ada86d01f01acc93e621ea4",
+  "prompts": {},
+  "sessions": {
+    "s_f037d79216385d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "93483106-0b1d-4ed4-81fb-2ae0472ad072",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
