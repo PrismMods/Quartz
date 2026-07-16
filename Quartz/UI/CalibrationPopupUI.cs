@@ -66,7 +66,7 @@ public static class CalibrationPopupUI {
         group = panelObj.AddComponent<CanvasGroup>();
         group.alpha = 0f;
         Image bg = panelObj.AddComponent<Image>();
-        bg.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
+        bg.sprite = MainCore.Spr.GetFilled(18.5f);
         bg.type = Image.Type.Sliced;
         bg.color = UIColors.PanelBG;
         {
