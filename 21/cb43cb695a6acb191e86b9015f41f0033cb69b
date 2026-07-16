@@ -1,0 +1,23 @@
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_7bafcf8590dc91::t_cb11ace5587062 537
+Quartz/Resource/Export/Presets/JeulGemi.qprofile
+  s_7bafcf8590dc91::t_df98f3c82693f0 1-2456
+Quartz/Resource/Export/Lang/en-US.json
+  s_7bafcf8590dc91::t_5ac7462c82ca91 537
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "21cb43cb695a6acb191e86b9015f41f0033cb69b",
+  "prompts": {},
+  "sessions": {
+    "s_7bafcf8590dc91": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5cc4b79c-f626-42fd-85bb-c35bb897fb1e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
