@@ -1,0 +1,23 @@
+Quartz.Tests/Quartz.Tests.csproj
+  s_458b128bf68369::t_9dd5dbb6b71a97 14
+Quartz.Tests/IO/ProfileBundleTests.cs
+  s_458b128bf68369::t_36226c4b92da76 1-55
+Quartz.Tests/Program.cs
+  s_458b128bf68369::t_8f7a59049eea51 6-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "6522256701cc92a7f5122dd830c6d4d1382ee26b",
+  "prompts": {},
+  "sessions": {
+    "s_458b128bf68369": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b55a071d-b796-45e7-b442-ede65aa7b319",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
