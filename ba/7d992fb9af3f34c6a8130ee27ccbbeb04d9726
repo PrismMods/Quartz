@@ -1,0 +1,35 @@
+Quartz/IO/ProfileManager.IO.cs
+  s_7bafcf8590dc91::t_a7e681b381fdb9 50
+Quartz/IO/ProfileManager.cs
+  s_458b128bf68369::t_2df9100a12c2ea 23-24
+  s_7bafcf8590dc91::t_ba6079b87578cd 170
+  s_458b128bf68369::t_8f83f758d4d9a5 180-183
+  s_7bafcf8590dc91::t_f49089df766eb1 169
+  s_7bafcf8590dc91::t_4a9c02de2f07e8 22,25
+Quartz/IO/ProfileBundle.cs
+  s_458b128bf68369::t_7a74ec0a5d7291 1-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "ba7d992fb9af3f34c6a8130ee27ccbbeb04d9726",
+  "prompts": {},
+  "sessions": {
+    "s_458b128bf68369": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b55a071d-b796-45e7-b442-ede65aa7b319",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_7bafcf8590dc91": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5cc4b79c-f626-42fd-85bb-c35bb897fb1e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
