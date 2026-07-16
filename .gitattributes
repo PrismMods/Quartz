@@ -1,2 +1,9 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# The zip bundles whatever is in the WORKING TREE, and the mod hashes those bytes
+# against Quartz-i18n's manifest.json. `text=auto` normalizes only the index and
+# leaves the worktree to core.autocrlf, so a Windows build machine would bundle
+# CRLF and miss every manifest hash — re-downloading each language forever. Pin the
+# working tree to LF so the bundled bytes are identical on every build machine.
+Quartz/Resource/Export/Lang/*.json text eol=lf
