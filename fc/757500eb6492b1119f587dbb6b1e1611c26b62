@@ -1,0 +1,19 @@
+Quartz/UI/CalibrationPopupUI.cs
+  s_7576f4f8a087a0::t_e83de6830a1da2 69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "fc757500eb6492b1119f587dbb6b1e1611c26b62",
+  "prompts": {},
+  "sessions": {
+    "s_7576f4f8a087a0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dc147a7f-f94c-44eb-a549-b47835793da1",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
