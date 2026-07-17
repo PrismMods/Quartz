@@ -1,0 +1,19 @@
+Quartz/Resource/Export/Lang/zh-CN.json
+  s_ad17d588a48f68::t_10be859c685d13 637,812-838,903-904,936
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "5465f896bb4f242439d539badd1cde7df8d415ce",
+  "prompts": {},
+  "sessions": {
+    "s_ad17d588a48f68": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7f1d61b2-a802-416b-92ec-24a30890417f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
