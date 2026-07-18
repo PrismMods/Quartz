@@ -26,6 +26,23 @@ public class UISlider : UIObject {
     public Action<float> OnChanged;
     public Action<float> OnComplete;
     public Func<float, float> Filter;
+    /// <summary>
+    /// Smallest share of the track the fill may take while it is not empty. 0, which is every row
+    /// wide enough not to need it, leaves the fill exactly proportional.
+    ///
+    /// The fill is a sliced rounded rect: narrower than its own two corners there is no bar left
+    /// to draw, and it collapses into an accent-coloured nub against the left edge that reads as a
+    /// stray marker rather than as a slider near its minimum. Width alone decides that, so a
+    /// narrow row — or a range so wide that its useful values all sit in the bottom percent —
+    /// reaches it at values a wide row never would.
+    /// </summary>
+    internal float MinFill;
+    /// <summary>
+    /// Fixed fill tint for this slider (e.g. the R/G/B channel sliders inside a color picker).
+    /// Null means follow the theme accent, which is what every ordinary slider does.
+    /// </summary>
+    private Color? accentOverride;
+    public Color AccentColor => accentOverride ?? UIColors.ObjectActive;
     public RectTransform FillRect { get; }
     public Image FillImage { get; }
     public TextMeshProUGUI Label { get; }
@@ -86,6 +103,11 @@ public class UISlider : UIObject {
         if(invoke) OnChanged?.Invoke(Value);
         UpdateVisual();
     }
+    public void SetAccent(Color color) {
+        accentOverride = color;
+        Color fill = FillImage.color;
+        FillImage.color = new(color.r, color.g, color.b, fill.a);
+    }
     public void SetOnlyValue(float value, bool noAnimate = false) {
         if(float.IsNaN(value)) return;
         Value = Mathf.Clamp(ApplyFilter(value), Min, Max);
@@ -93,13 +115,18 @@ public class UISlider : UIObject {
     }
     public float Normalize() => Mathf.InverseLerp(Min, Max, Value);
     public float Normalize(float value) => Mathf.InverseLerp(Min, Max, value);
+    /// <summary>
+    /// Where to draw the fill for <paramref name="t"/>. Empty stays empty — the floor is for a
+    /// fill that exists but cannot be read, not for one that is genuinely not there.
+    /// </summary>
+    private float FillFor(float t) => MinFill > 0f && t > 0f ? Mathf.Max(t, Mathf.Min(MinFill, 1f)) : t;
     private float ApplyFilter(float v) => Filter?.Invoke(v) ?? v;
     private void UpdateValueText() => ValueText?.text = Value.ToString(Format);
     public void UpdateVisual(bool noAnimate = false) {
         fillSeq?.Kill();
         changeSeq?.Kill();
         UpdateValueText();
-        float t = Normalize();
+        float t = FillFor(Normalize());
         float changeAlpha = Mathf.Abs(DefaultValue - Value) > 0.001f ? 1f : 0f;
         if(noAnimate) {
             Vector2 fra = FillRect.anchorMax;
@@ -165,7 +192,7 @@ public class UISlider : UIObject {
             UpdateVisual(true);
         }
         if(PreviewLabel != null) PreviewLabel.text = "";
-        SetStateVisuals(UIColors.ObjectActive, false);
+        SetStateVisuals(AccentColor, false);
     }
     private void SetStateVisuals(Color targetColor, bool isCalculating, float? value = null) {
         stateSeq?.Kill();
@@ -202,7 +229,7 @@ public class UISlider : UIObject {
                             anchor.x = x;
                             FillRect.anchorMax = anchor;
                         },
-                        Normalize(value.Value),
+                        FillFor(Normalize(value.Value)),
                         0.4f
                     ).SetEasing(Easing.OutExpo)
                 ).Build();

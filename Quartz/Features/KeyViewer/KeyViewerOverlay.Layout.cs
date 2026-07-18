@@ -81,24 +81,4 @@ public static partial class KeyViewerOverlay {
         float blockH = row2 > 0 ? FootRowPitch + FootKeyH : FootKeyH;
         return new Vector2(blockW, blockH);
     }
-    internal static Vector2 GridSizeWithFoot(int style, int footCount) {
-        Vector2 main = GridSize(style);
-        if(footCount <= 0) return main;
-        List<KeySlot> footSlots = [];
-        Vector2 foot = BuildFootLayout(footCount, footSlots);
-        return new Vector2(Mathf.Max(main.x, foot.x), main.y + FootGapAbove + foot.y);
-    }
-    private static void BuildFoot() {
-        if(footRoot == null) return;
-        int footCount = Conf.FootKeyCount();
-        if(!Conf.IsSimpleMode || footCount <= 0) {
-            footRoot.sizeDelta = Vector2.zero;
-            return;
-        }
-        List<KeySlot> footSlots = [];
-        Vector2 footSize = BuildFootLayout(footCount, footSlots);
-        footRoot.sizeDelta = footSize;
-        foreach(KeySlot slot in footSlots) AddFootKey(slot.Slot - KeyViewerSettings.FootSlotBase, slot.X, slot.Y, slot.W, slot.H);
-        AddFootReorganizeHandle();
-    }
 }

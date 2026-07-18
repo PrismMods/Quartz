@@ -19,11 +19,22 @@ public static partial class KeyViewerOverlay {
             Fill = fill,
             Border = border,
             Dm = spec,
+            Source = spec.Source,
+            CountInTotal = spec.CountInTotal,
+            PerKeyKps = spec.PerKeyKps,
             IsKps = spec.IsKps,
             IsKpsAvg = spec.IsKpsAvg,
             IsKpsMax = spec.IsKpsMax,
             IsTotal = spec.IsTotal,
-            Count = spec.IsStat ? 0 : Conf.GetCount(spec.CountKey),
+            // A layout element's own count field is authoritative and Conf.Counts is not
+            // consulted: Conf buckets by Box.Name (Unity enum name) while an element keys by
+            // DM Note globalKey, so GetCount would read 0 for every key whose two names
+            // differ — "3" vs "ALPHA3", "DOT" vs "PERIOD" — and the write-back would then
+            // persist that 0 over the user's history. Pinning countKey instead would freeze
+            // the bucket to today's binding and strand the count on a later rebind.
+            Count = spec.IsStat ? 0
+                : spec.Source != null ? spec.Source.Count
+                : Conf.GetCount(spec.CountKey),
             RainGroup = 1,
             CenterX = spec.TrackX + spec.NoteW * 0.5f,
             BoxW = spec.NoteW,
@@ -32,6 +43,9 @@ public static partial class KeyViewerOverlay {
         box.Label.enableAutoSizing = true;
         box.Label.fontSizeMin = 0f;
         box.Label.fontSizeMax = Mathf.Max(8, spec.FontSize);
+        // fontWeight/fontItalic/fontUnderline/fontStrikethrough. Custom CSS may still OR in Bold
+        // on top of this base (ApplyCssTypography).
+        if(spec.LabelFontStyles != FontStyles.Normal) box.Label.fontStyle |= spec.LabelFontStyles;
         if(spec.InlineStatCounter) {
             box.Label.text = DmInlineStatText(spec, spec.IsTotal ? totalCount : 0);
             box.DmStatPrefix = ((spec.DisplayText ?? "") + "  ").ToCharArray();
@@ -47,6 +61,7 @@ public static partial class KeyViewerOverlay {
             box.Value.enableAutoSizing = true;
             box.Value.fontSizeMin = 0f;
             box.Value.fontSizeMax = Mathf.Max(8, spec.CounterFontSize);
+            if(spec.CounterFontStyles != FontStyles.Normal) box.Value.fontStyle |= spec.CounterFontStyles;
             if(spec.CounterOutside) {
                 LayoutDmOutsideCounter(box.Value.rectTransform, spec);
                 box.Value.alignment = TextAlignmentOptions.Center;
@@ -59,7 +74,10 @@ public static partial class KeyViewerOverlay {
         BuildCssFx(box, spec);
         ApplyBoxColors(box);
     }
-    private static void LayoutDmText(RectTransform rt, DmNoteSpec spec, bool counter) {
+    /// <summary>TMP's default line height as a share of font size — what one stacked text row
+    /// actually occupies on screen.</summary>
+    private const float LineHeight = 1.2f;
+    internal static void LayoutDmText(RectTransform rt, DmNoteSpec spec, bool counter) {
         bool top = string.Equals(spec.CounterAlign, "top", StringComparison.OrdinalIgnoreCase);
         bool bottom = string.Equals(spec.CounterAlign, "bottom", StringComparison.OrdinalIgnoreCase);
         bool left = string.Equals(spec.CounterAlign, "left", StringComparison.OrdinalIgnoreCase);
@@ -75,8 +93,11 @@ public static partial class KeyViewerOverlay {
         if(top || bottom) {
             float itemGap = between ? 0f : Mathf.Max(0f, gap);
             float avail = Mathf.Max(1f, spec.H - 4f);
-            float labelH = Mathf.Clamp(spec.FontSize + 8f, 1f, avail);
-            float counterH = Mathf.Clamp(spec.CounterFontSize + 8f, 1f, avail);
+            // One text line's height, not fontSize + 8: the strips sit adjacent and the +8 of air
+            // per strip read as a built-in gap — at counterGap 0 the label and the counter are
+            // meant to nearly touch, the way DM Note's flex column stacks them.
+            float labelH = Mathf.Clamp(spec.FontSize * LineHeight, 1f, avail);
+            float counterH = Mathf.Clamp(spec.CounterFontSize * LineHeight, 1f, avail);
             if(labelH + counterH + itemGap > avail) {
                 float k = Mathf.Max(1f, avail - itemGap) / (labelH + counterH);
                 labelH *= k;
@@ -122,7 +143,7 @@ public static partial class KeyViewerOverlay {
         rt.anchoredPosition = Vector2.zero;
         rt.sizeDelta = new Vector2(spec.W - 4f, spec.H - 4f);
     }
-    private static void LayoutDmOutsideCounter(RectTransform rt, DmNoteSpec spec) {
+    internal static void LayoutDmOutsideCounter(RectTransform rt, DmNoteSpec spec) {
         string align = spec.CounterAlign;
         float gap = Mathf.Max(0f, spec.CounterGap);
         float w = Mathf.Max(spec.W, spec.CounterFontSize * 4f);
@@ -146,7 +167,7 @@ public static partial class KeyViewerOverlay {
         rt.anchoredPosition = new Vector2(spec.X + spec.W * 0.5f - w * 0.5f, -(spec.Y - gap - h));
         rt.sizeDelta = new Vector2(w, h);
     }
-    private static TextAlignmentOptions DmCounterAlignment(DmNoteSpec spec, bool counter) {
+    internal static TextAlignmentOptions DmCounterAlignment(DmNoteSpec spec, bool counter) {
         string align = spec.CounterAlign;
         bool between = string.Equals(spec.CounterAlignMode, "between", StringComparison.OrdinalIgnoreCase);
         if(!between && (string.Equals(align, "top", StringComparison.OrdinalIgnoreCase)

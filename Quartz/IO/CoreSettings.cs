@@ -29,6 +29,9 @@ public sealed class CoreSettings : ISettingsFile {
     public float ContextBandHeight = 0f;
     public float CalibWidth = 0f;
     public float CalibHeight = 0f;
+    /// <summary>0 means "never set": the editor resolves its own default rather than storing one
+    /// here, so the default can move without every existing config pinning the old value.</summary>
+    public float KvInspectorWidth = 0f;
     public Dictionary<string, bool> CollapsibleStates = [];
     public int ToggleModifier = (int)Keybind.KeyModifier.Alt;
     public int ToggleKey = (int)KeyCode.K;
@@ -78,6 +81,7 @@ public sealed class CoreSettings : ISettingsFile {
             [nameof(ContextBandHeight)] = ContextBandHeight,
             [nameof(CalibWidth)] = CalibWidth,
             [nameof(CalibHeight)] = CalibHeight,
+            [nameof(KvInspectorWidth)] = KvInspectorWidth,
             [nameof(ToggleModifier)] = ToggleModifier,
             [nameof(ToggleKey)] = ToggleKey,
             [nameof(UpdateChannel)] = UpdateChannel,
@@ -114,6 +118,7 @@ public sealed class CoreSettings : ISettingsFile {
         ContextBandHeight = IOUtils.Read(token, nameof(ContextBandHeight), ContextBandHeight);
         CalibWidth = IOUtils.Read(token, nameof(CalibWidth), CalibWidth);
         CalibHeight = IOUtils.Read(token, nameof(CalibHeight), CalibHeight);
+        KvInspectorWidth = IOUtils.Read(token, nameof(KvInspectorWidth), KvInspectorWidth);
         ToggleModifier = IOUtils.Read(token, nameof(ToggleModifier), ToggleModifier);
         ToggleKey = IOUtils.Read(token, nameof(ToggleKey), ToggleKey);
         UpdateChannel = IOUtils.Read(token, nameof(UpdateChannel), UpdateChannel);

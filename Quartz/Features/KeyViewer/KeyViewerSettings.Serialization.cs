@@ -1,4 +1,5 @@
 using Newtonsoft.Json.Linq;
+using Quartz.Features.KeyViewer.Layout;
 using Quartz.IO;
 using Quartz.IO.Interface;
 using UnityEngine;
@@ -234,10 +235,13 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
             }
         }
     }
+    // The two legacy strings are preserved verbatim on load so KvMigration.RunOnce can still tell
+    // which mode an un-migrated config was in; everything else — including already-migrated configs
+    // — normalizes to the editor.
     public static string NormalizeMode(string mode) =>
-        string.Equals(mode, ModeDmNote, StringComparison.OrdinalIgnoreCase)
-            ? ModeDmNote
-            : ModeSimple;
+        string.Equals(mode, KvMigrationPlan.LegacyModeDmNote, StringComparison.OrdinalIgnoreCase) ? KvMigrationPlan.LegacyModeDmNote
+        : string.Equals(mode, KvMigrationPlan.LegacyModeSimple, StringComparison.OrdinalIgnoreCase) ? KvMigrationPlan.LegacyModeSimple
+        : ModeEditor;
     private static JArray WriteLabels(string[] labels) {
         JArray arr = [];
         foreach(string label in labels) arr.Add(label ?? "");

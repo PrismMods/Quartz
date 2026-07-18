@@ -22,15 +22,52 @@ public class UIScrollController : MonoBehaviour {
     }
     private bool PointerOverViewport() =>
         viewport != null && RectTransformUtility.RectangleContainsScreenPoint(viewport, Input.mousePosition, null);
+    private static readonly List<RectTransform> captures = [];
+    /// <summary>
+    /// Register a region that takes the wheel and the right button for itself (a zoom/pan
+    /// surface). Needed because this controller polls Input rather than implementing
+    /// IScrollHandler, so a nested widget has no event to consume and would otherwise scroll the
+    /// page as well as itself.
+    /// </summary>
+    public static void AddInputCapture(RectTransform region) {
+        if(region != null && !captures.Contains(region)) captures.Add(region);
+    }
+    public static void RemoveInputCapture(RectTransform region) => captures.Remove(region);
+    /// <summary>
+    /// Checked as a predicate rather than a frame-scoped claim so it holds regardless of which
+    /// Update runs first.
+    ///
+    /// A controller never yields to its own viewport: a region is registered so the page behind it
+    /// keeps its hands off, not so the scroll inside it refuses to work. Without the exemption a
+    /// scroll view nested in a page — the layout editor's property panel — could not both take the
+    /// wheel from the page and use it.
+    /// </summary>
+    private static bool PointerOverCapture(RectTransform self) {
+        for(int i = captures.Count - 1; i >= 0; i--) {
+            RectTransform region = captures[i];
+            if(region == null) {
+                captures.RemoveAt(i);
+                continue;
+            }
+            if(region == self) continue;
+            if(region.gameObject.activeInHierarchy
+                && RectTransformUtility.RectangleContainsScreenPoint(region, Input.mousePosition, null)) return true;
+        }
+        return false;
+    }
     private void HandleWheel() {
         float wheel = Input.mouseScrollDelta.y;
         if(Mathf.Abs(wheel) <= 0.0001f) return;
         if(!PointerOverViewport()) return;
+        if(PointerOverCapture(viewport)) return;
         AddDelta(-wheel * MainCore.Conf.ScrollSpeed);
         ApplyTween();
     }
     private void HandleRightDrag() {
-        if(Input.GetMouseButtonDown(1) && PointerOverViewport()) rightDragging = true;
+        // A capture region owns the right button too — it pans with it, and the page jumping to
+        // the pointer at the same time would fight that. Only the press is gated: a drag that
+        // began on the page keeps scrolling after it wanders over the canvas.
+        if(Input.GetMouseButtonDown(1) && PointerOverViewport() && !PointerOverCapture(viewport)) rightDragging = true;
         if(Input.GetMouseButtonUp(1)) {
             rightDragging = false;
             ApplyTween();

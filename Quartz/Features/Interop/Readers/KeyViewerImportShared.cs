@@ -1,5 +1,6 @@
 using System.Globalization;
 using Quartz.Features.KeyViewer;
+using Quartz.Features.KeyViewer.Layout;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using static Quartz.Features.Interop.ReflectionHelpers;
@@ -127,7 +128,10 @@ internal static class KeyViewerImportShared {
         if(effective == SettingsImportKeyViewerPart.None) return 0;
         KeyViewerOverlay.EnsureConf();
         KeyViewerSettings target = KeyViewerOverlay.Conf;
-        target.Mode = KeyViewerSettings.ModeSimple;
+        // A cross-mod import lands in the legacy Simple fields and stamps the legacy mode, so the
+        // one-time KvMigration.RunOnce ports it into the editor layout the same way an upgrading
+        // user's own Simple config is ported. It is not a live render mode.
+        target.Mode = KvMigrationPlan.LegacyModeSimple;
         int count = 0;
         if((effective & SettingsImportKeyViewerPart.KeysLayout) != 0) {
             if(kv.HasStyle) { target.Style = Mathf.Clamp(kv.Style, 0, 3); }

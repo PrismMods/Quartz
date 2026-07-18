@@ -306,7 +306,11 @@ public static partial class KeyViewerOverlay {
         }
         if(box.Value != null && spec.CounterStrokeWidth > 0.01f) {
             Color stroke = pressed ? spec.ActiveCounterStroke : spec.CounterStroke;
-            Material mat = box.Value.fontMaterial;
+            // TMP_Text.fontMaterial is not a plain accessor: every read runs GetPaddingForMaterial
+            // and re-dirties the mesh + material. Cache the instanced material so a press edge does
+            // not force a counter re-tessellation; the ref is invalidated on font swap.
+            if(box.CounterStrokeMat == null) box.CounterStrokeMat = box.Value.fontMaterial;
+            Material mat = box.CounterStrokeMat;
             if(stroke.a > 0.001f) {
                 mat.SetColor(ShaderUtilities.ID_OutlineColor, stroke);
                 mat.SetFloat(ShaderUtilities.ID_OutlineWidth, Mathf.Clamp(spec.CounterStrokeWidth * 0.1f, 0f, 0.5f));
@@ -436,7 +440,9 @@ public static partial class KeyViewerOverlay {
         float scroll = g.Period > 0.01f ? (time / g.Period) % 1f : 0f;
         int count = info.characterCount;
         for(int i = 0; i < count; i++) {
-            TMP_CharacterInfo ch = info.characterInfo[i];
+            // Ref: TMP_CharacterInfo is a large struct; copying it per glyph per
+            // frame is measurable at high glyph counts.
+            ref TMP_CharacterInfo ch = ref info.characterInfo[i];
             if(!ch.isVisible) continue;
             float u = count > 1 ? (float)i / (count - 1) : 0f;
             Color32 col = SampleGradient(g.Stops, u + scroll);

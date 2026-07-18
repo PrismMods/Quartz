@@ -32,6 +32,26 @@ public enum Asset {
     OttoAuto,
     QuantumQ,
     TufLogo,
+    // The layout editor's icon set, baked from DM Note's own SVGs (GPL-3.0, (c) lee-sihun) so the
+    // editor reads as the tool it mirrors. Each glyph is centred in a 128px square scaled against
+    // an 18-unit reference box, so one draw size renders every one at its true DM Note size.
+    Move128,
+    Eraser128,
+    Layer128,
+    Primary128,
+    Broom128,
+    Grid128,
+    Plus128,
+    PlusBold128,
+    Minus128,
+    Reset128,
+    TurnArrow128,
+    EyeOpen128,
+    EyeClosed128,
+    Palette128,
+    Note128,
+    ChevronDown128,
+    Folder128,
 }
 public sealed class ResourceManager(Assembly assembly, string resourcePath) : IDisposable {
     private readonly Dictionary<string, object> cache = [];
@@ -148,6 +168,23 @@ public sealed class ResourceManager(Assembly assembly, string resourcePath) : ID
         [Asset.Trash128] = "Image.Trash128.png",
         [Asset.OttoAuto] = "Image.OttoAuto.png",
         [Asset.QuantumQ] = "Image.QuantumQ.png",
-        [Asset.TufLogo] = "Image.TufLogo.png"
+        [Asset.TufLogo] = "Image.TufLogo.png",
+        [Asset.Move128] = "Image.Move128.png",
+        [Asset.Eraser128] = "Image.Eraser128.png",
+        [Asset.Layer128] = "Image.Layer128.png",
+        [Asset.Primary128] = "Image.Primary128.png",
+        [Asset.Broom128] = "Image.Broom128.png",
+        [Asset.Grid128] = "Image.Grid128.png",
+        [Asset.Plus128] = "Image.Plus128.png",
+        [Asset.PlusBold128] = "Image.PlusBold128.png",
+        [Asset.Minus128] = "Image.Minus128.png",
+        [Asset.Reset128] = "Image.Reset128.png",
+        [Asset.TurnArrow128] = "Image.TurnArrow128.png",
+        [Asset.EyeOpen128] = "Image.EyeOpen128.png",
+        [Asset.EyeClosed128] = "Image.EyeClosed128.png",
+        [Asset.Palette128] = "Image.Palette128.png",
+        [Asset.Note128] = "Image.Note128.png",
+        [Asset.ChevronDown128] = "Image.ChevronDown128.png",
+        [Asset.Folder128] = "Image.Folder128.png"
     };
 }

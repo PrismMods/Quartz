@@ -54,26 +54,34 @@ public static partial class KeyViewerOverlay {
                     ExtendDmBounds(spec, ref minX, ref minY, ref maxX, ref maxY);
                 }
             }
-            if(float.IsPositiveInfinity(minX) || float.IsPositiveInfinity(minY)) return result;
-            const float padding = 30f;
-            float track = Conf.DmNoteEffect ? dmTrackHeight : 0f;
-            float topOffset = track + padding;
-            float offsetX = padding - minX;
-            float offsetY = topOffset - minY;
-            for(int i = 0; i < result.Count; i++) {
-                DmNoteSpec spec = result[i];
-                spec.X += offsetX;
-                spec.Y += offsetY;
-                ResolveDmTrackGeometry(spec, topOffset);
-            }
-            dmCanvasWidth = Mathf.Max(60f, maxX - minX) + padding * 2f;
-            dmCanvasHeight = Mathf.Max(60f, maxY - minY) + padding * 2f + track;
+            FinishDmSpecs(result, minX, minY, maxX, maxY);
         } catch(Exception ex) {
             MainCore.Log.Msg("[KeyViewer] DM Note parse failed: " + ex.Message);
             result.Clear();
         }
         ApplyCssToSpecs(result);
         return result;
+    }
+    /// <summary>
+    /// Shift <paramref name="specs"/> into canvas space and size the canvas around them.
+    /// Shared with the layout spec source, which must land pixel-for-pixel where the same
+    /// preset does in DM Note mode.
+    /// </summary>
+    private static void FinishDmSpecs(List<DmNoteSpec> specs, float minX, float minY, float maxX, float maxY) {
+        if(float.IsPositiveInfinity(minX) || float.IsPositiveInfinity(minY)) return;
+        const float padding = 30f;
+        float track = Conf.DmNoteEffect ? dmTrackHeight : 0f;
+        float topOffset = track + padding;
+        float offsetX = padding - minX;
+        float offsetY = topOffset - minY;
+        for(int i = 0; i < specs.Count; i++) {
+            DmNoteSpec spec = specs[i];
+            spec.X += offsetX;
+            spec.Y += offsetY;
+            ResolveDmTrackGeometry(spec, topOffset);
+        }
+        dmCanvasWidth = Mathf.Max(60f, maxX - minX) + padding * 2f;
+        dmCanvasHeight = Mathf.Max(60f, maxY - minY) + padding * 2f + track;
     }
     private static string ResolveDmTab(JObject preset, JObject keysTable, JObject posTable) {
         string selected = JOptionalString(preset, "selectedKeyType");
@@ -218,6 +226,48 @@ public static partial class KeyViewerOverlay {
         spec.RainGlowOn = JBool(p, "noteGlowEnabled", false);
         spec.RainGlowSize = Mathf.Clamp(JFloat(p, "noteGlowSize", 20f), 0f, 50f);
         ResolveDmNoteColors(p, true, out spec.RainGlowTop, out spec.RainGlowBottom);
+        // Quartz extension; DM Note ignores unknown keys, so it rides through its round trip.
+        spec.RainShadowOn = JBool(p, "quartzNoteShadow", false);
+        spec.RainShadowColor = HexToColor(JStr(p, "quartzNoteShadowColor", "rgba(0, 0, 0, 0.5)"), 0.5f);
+        spec.RainShadowX = Mathf.Clamp(JFloat(p, "quartzNoteShadowX", 3f), -64f, 64f);
+        spec.RainShadowY = Mathf.Clamp(JFloat(p, "quartzNoteShadowY", -3f), -64f, 64f);
+        // DM Note's own note border and corner radius (noteBorder*). Width 0 = no border; the
+        // border's opacity is its own field, independent of the note's.
+        spec.NoteBorderWidth = Mathf.Clamp(JFloat(p, "noteBorderWidth", 0f), 0f, 20f);
+        Color noteBorder = HexToColor(JStr(p, "noteBorderColor", "#FFFFFF"), 1f);
+        noteBorder.a = Mathf.Clamp01(JFloat(p, "noteBorderOpacity", 100f) / 100f);
+        spec.NoteBorderColor = noteBorder;
+        spec.NoteBorderSide = JStr(p, "noteBorderSide", "all").ToLowerInvariant() switch {
+            "vertical" => 1,
+            "horizontal" => 2,
+            _ => 0,
+        };
+        spec.NoteRadius = Mathf.Clamp(JFloat(p, "noteBorderRadius", 0f), 0f, 60f);
+        // DM Note's per-element font styling, for the label...
+        spec.LabelFontStyles = DmFontStyles(
+            JInt(p, "fontWeight", 400), JBool(p, "fontItalic", false),
+            JBool(p, "fontUnderline", false), JBool(p, "fontStrikethrough", false));
+        // ...and the counter's own set, plus its press animation (default-on in DM Note).
+        if(counter != null) {
+            spec.CounterFontStyles = DmFontStyles(
+                JInt(counter, "fontWeight", 400), JBool(counter, "fontItalic", false),
+                JBool(counter, "fontUnderline", false), JBool(counter, "fontStrikethrough", false));
+            if(counter["animation"] is JObject anim) {
+                spec.CounterAnimEnabled = JBool(anim, "enabled", true);
+                spec.CounterAnimScale = Mathf.Clamp(JFloat(anim, "scale", 1.1f), 0.25f, 4f);
+                spec.CounterAnimDurationMs = Mathf.Clamp(JFloat(anim, "durationMs", 300f), 1f, 5000f);
+                if(anim["bezier"] is JArray bz && bz.Count == 4) {
+                    spec.CounterAnimBezier = new Vector4(
+                        Mathf.Clamp01(JTokenFloat(bz[0], 0.25f)), JTokenFloat(bz[1], 0.46f),
+                        Mathf.Clamp01(JTokenFloat(bz[2], 0.45f)), JTokenFloat(bz[3], 0.94f));
+                }
+            }
+        }
+        // JipperKeyViewer's press animation, as a plain per-element field. Routed through the CSS
+        // state transform so the one press path applies it; explicit CSS wins when it set a scale.
+        float pressScale = Mathf.Clamp(JFloat(p, "quartzPressScale", 1f), 0.25f, 2f);
+        if(Mathf.Abs(pressScale - 1f) > 0.001f && spec.ActiveScale == Vector2.one)
+            spec.ActiveScale = new Vector2(pressScale, pressScale);
         string ghostNoteHex = JOptionalString(p, "ghostNoteColor");
         if(string.IsNullOrEmpty(ghostNoteHex)) {
             spec.GhostRainTop = new Color(spec.RainTop.r, spec.RainTop.g, spec.RainTop.b, spec.RainTop.a * 0.45f);
@@ -280,6 +330,8 @@ public static partial class KeyViewerOverlay {
         KeyCode key = ResolveDmNoteKeyCode(keyName);
         return key == KeyCode.None ? keyName : KeyCodeShortLabel(key);
     }
+    /// <summary>Permissive DM Note globalKey → KeyCode. Inverse of <see cref="Layout.KvKeyNames.ToGlobalKey"/>.</summary>
+    internal static KeyCode ResolveGlobalKey(string name) => ResolveDmNoteKeyCode(name);
     private static KeyCode ResolveDmNoteKeyCode(string name) {
         if(string.IsNullOrEmpty(name)) return KeyCode.None;
         if(name.Length > 1 && int.TryParse(name, out int numeric)) return Features.KeyLimiter.KeyLimiter.NormalizeNumericKey(numeric);
@@ -368,7 +420,7 @@ public static partial class KeyViewerOverlay {
         }
         return KeyCode.None;
     }
-    private static Color HexToColor(string hex, float alpha) {
+    internal static Color HexToColor(string hex, float alpha) {
         if(string.IsNullOrEmpty(hex)) return new Color(1f, 1f, 1f, alpha);
         string s = hex.Trim();
         try {
@@ -422,4 +474,17 @@ public static partial class KeyViewerOverlay {
     private static float JFloat(JObject p, string key, float def) => JVal(p, key, def);
     private static int JInt(JObject p, string key, int def) => JVal(p, key, def);
     private static bool JBool(JObject p, string key, bool def) => JVal(p, key, def);
+    private static float JTokenFloat(JToken t, float def) {
+        if(t == null || t.Type == JTokenType.Null) return def;
+        try { return t.ToObject<float>(); } catch { return def; }
+    }
+    /// <summary>CSS font styling to TMP flags. Weight 600+ is bold, the browser convention.</summary>
+    private static TMPro.FontStyles DmFontStyles(int weight, bool italic, bool underline, bool strikethrough) {
+        TMPro.FontStyles styles = TMPro.FontStyles.Normal;
+        if(weight >= 600) styles |= TMPro.FontStyles.Bold;
+        if(italic) styles |= TMPro.FontStyles.Italic;
+        if(underline) styles |= TMPro.FontStyles.Underline;
+        if(strikethrough) styles |= TMPro.FontStyles.Strikethrough;
+        return styles;
+    }
 }

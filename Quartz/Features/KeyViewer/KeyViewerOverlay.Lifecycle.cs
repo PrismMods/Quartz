@@ -32,12 +32,6 @@ public static partial class KeyViewerOverlay {
         root.anchorMin = new Vector2(0.5f, 0f);
         root.anchorMax = new Vector2(0.5f, 0f);
         root.pivot = new Vector2(0.5f, 0f);
-        GameObject footObj = new("KeyViewerFoot");
-        footObj.transform.SetParent(canvasObj.transform, false);
-        footRoot = footObj.AddComponent<RectTransform>();
-        footRoot.anchorMin = new Vector2(0.5f, 0f);
-        footRoot.anchorMax = new Vector2(0.5f, 0f);
-        footRoot.pivot = new Vector2(0.5f, 0f);
         rainManager = canvasObj.AddComponent<RainManager>();
         canvasObj.AddComponent<Updater>();
         Rebuild();
@@ -47,82 +41,61 @@ public static partial class KeyViewerOverlay {
         CaptureCounts();
         rainManager?.Clear();
         Quartz.UI.Generator.GenerateUI.ClearChildren(root);
-        if(footRoot != null) {
-            Quartz.UI.Generator.GenerateUI.ClearChildren(footRoot);
-            footRoot.sizeDelta = Vector2.zero;
-        }
         boxes.Clear();
+        counterBounces.Clear();
         cssFx.Clear();
         cssGlowLayer = null;
         dragObj = null;
-        footDragObj = null;
         kpsMax = 0;
         kpsSum = 0;
         kpsSamples = 0;
         nextKpsSample = 0f;
         inputWasActive = false;
         inputPrimed = false;
-        if(Conf.IsDmNoteMode) {
-            BuildDmNote();
-            return;
-        }
-        if(!Conf.IsSimpleMode) {
-            builtMode = null;
-            builtStyle = -1;
-            root.sizeDelta = Vector2.zero;
-            Apply();
-            return;
-        }
-        int style = Mathf.Clamp(Conf.Style, 0, KeyViewerSettings.MaxStyle);
-        builtMode = KeyViewerSettings.ModeSimple;
-        builtStyle = style;
-        int[] keys = Conf.KeysForStyle(style);
-        GameObject rainObj = new("RainLayer");
-        rainObj.transform.SetParent(root, false);
-        RectTransform rainLayer = rainObj.AddComponent<RectTransform>();
-        rainLayer.anchorMin = Vector2.zero;
-        rainLayer.anchorMax = Vector2.one;
-        rainLayer.offsetMin = Vector2.zero;
-        rainLayer.offsetMax = Vector2.zero;
-        rainObj.AddComponent<Canvas>().overrideSorting = false;
-        rainManager?.SetLayer(rainLayer);
-        List<KeySlot> keySlots = [];
-        List<StatSlot> statSlots = [];
-        BuildLayout(style, keySlots, statSlots);
-        foreach(KeySlot slot in keySlots) AddKey(keys, slot.Slot, slot.X, slot.Y, slot.W, slot.H);
-        foreach(StatSlot slot in statSlots) AddStat(slot.Total, slot.X, slot.Y, slot.W, slot.H);
-        root.sizeDelta = GridSize(style);
-        BuildFoot();
-        totalCount = 0;
-        foreach(Box box in boxes)
-            if(!box.IsStat) totalCount += box.Count;
-        AddReorganizeHandle();
-        Apply();
+        layoutRebuildPending = false;
+        BuildDmNote();
         SyncKeysToKeyLimiter();
+    }
+    /// <summary>
+    /// Ask the overlay to pick up an edit to the layout document.
+    ///
+    /// Coalesced rather than rebuilt on the spot: a held arrow-key nudge fires an edit every
+    /// 50ms (KvCanvas.NudgeRepeatInterval), and a Rebuild destroys and recreates every
+    /// GameObject, text and CSS effect in the overlay. The editor canvas is already showing
+    /// the edit live, so the overlay only has to catch up once the gesture settles.
+    /// </summary>
+    public static void RequestLayoutRebuild() {
+        if(root == null || Conf == null) return;
+        layoutRebuildPending = true;
+        layoutRebuildAt = Time.unscaledTime + LayoutRebuildDebounceSeconds;
     }
     public static event Action SyncSettingChanged;
     public static void RaiseSyncSettingChanged() => SyncSettingChanged?.Invoke();
     public static bool IsSyncingToKeyLimiter {
         get {
             EnsureConf();
-            return Conf is { SyncToKeyLimiter: true } && Conf.IsSimpleMode;
+            return Conf is { SyncToKeyLimiter: true };
         }
     }
+    /// <summary>
+    /// Hand the keys the viewer shows to the Key Limiter.
+    ///
+    /// Called from the build paths and from the toggle, never per frame: it walks the layout, and
+    /// a change writes the Key Limiter's settings file.
+    /// </summary>
     public static void SyncKeysToKeyLimiter() {
         EnsureConf();
-        if(!Conf.IsSimpleMode || !Conf.SyncToKeyLimiter) return;
+        if(Conf is not { SyncToKeyLimiter: true }) return;
         Features.KeyLimiter.KeyLimiter.EnsureConf();
-        int[] keys = Conf.KeysForStyle(Mathf.Clamp(Conf.Style, 0, KeyViewerSettings.MaxStyle));
         List<int> result = [];
         HashSet<int> seen = [];
-        void AddKeys(int[] codes, int count) {
-            for(int i = 0; i < count && i < codes.Length; i++) {
-                int normalized = (int)Features.KeyLimiter.KeyLimiter.NormalizeKey((KeyCode)codes[i]);
-                if(normalized != 0 && seen.Add(normalized)) result.Add(normalized);
-            }
+        void Add(KeyCode key) {
+            int normalized = (int)Features.KeyLimiter.KeyLimiter.NormalizeKey(key);
+            if(normalized != 0 && seen.Add(normalized)) result.Add(normalized);
         }
-        AddKeys(keys, keys.Length);
-        AddKeys(Conf.FootKeysForStyle(Conf.FootStyle), Conf.FootKeyCount());
+        AddLayoutKeys(Add);
+        // Never an empty set — that blocks every key on the keyboard. A layout with nothing bound
+        // on it yet is not a request for that.
         if(result.Count == 0) return;
         int[] current = Features.KeyLimiter.KeyLimiter.Conf.AllowedKeys;
         if(current != null && current.Length == result.Count) {
@@ -137,40 +110,30 @@ public static partial class KeyViewerOverlay {
         }
         Features.KeyLimiter.KeyLimiter.SetAllowedKeys([.. result]);
     }
+    /// <summary>
+    /// The layout's own bindings, from the tab it has selected rather than the one the editor
+    /// canvas is showing — <see cref="ParseLayoutSpecs"/> renders that tab, and the limiter has to
+    /// allow the keys the viewer draws, not the ones being edited off screen.
+    /// </summary>
+    private static void AddLayoutKeys(Action<KeyCode> add) {
+        Layout.KvDocument doc = Layout.KvStore.Current;
+        if(doc == null) return;
+        foreach(Layout.KvElement el in doc.BoundKeyElements(doc.SelectedTab)) add(el.KeyCodeValue);
+    }
     public static void Apply() {
         if(root == null) return;
-        if(Conf.IsDmNoteMode) {
-            if(builtMode != KeyViewerSettings.ModeDmNote) {
-                Rebuild();
-                return;
-            }
-            ApplyDmRuntimeSettings();
-            root.anchoredPosition = OverlayCalibration.Scale(new Vector2(Conf.DmOffsetX, Conf.DmOffsetY));
-            float dmScale = Mathf.Clamp(Conf.DmScale, 0.2f, 4f);
-            root.localScale = new Vector3(dmScale, dmScale, 1f);
-            ApplyBorderScale(dmScale);
-            if(!Conf.DmNoteEffect) rainManager?.Clear();
-            return;
-        }
-        if(!Conf.IsSimpleMode) {
-            rainManager?.Clear();
-            if(root.gameObject.activeSelf) root.gameObject.SetActive(false);
-            return;
-        }
-        if(builtMode != KeyViewerSettings.ModeSimple || builtStyle != Mathf.Clamp(Conf.Style, 0, KeyViewerSettings.MaxStyle)) {
+        // Only before the first Rebuild: nothing else can leave the overlay unbuilt, and applying
+        // settings to boxes that do not exist yet would silently do nothing.
+        if(!built) {
             Rebuild();
             return;
         }
-        root.anchoredPosition = OverlayCalibration.Scale(new Vector2(Conf.OffsetX, Conf.OffsetY));
-        float size = Mathf.Clamp(Conf.Size, 0.2f, 4f);
-        root.localScale = new Vector3(size, size, 1f);
-        if(footRoot != null) {
-            footRoot.anchoredPosition = OverlayCalibration.Scale(new Vector2(Conf.FootOffsetX, Conf.FootOffsetY));
-            footRoot.localScale = new Vector3(size, size, 1f);
-        }
-        ApplyBorderScale(size);
-        if(!Conf.RainEnabled) rainManager?.Clear();
-        foreach(Box box in boxes) ApplyBoxColors(box);
+        ApplyDmRuntimeSettings();
+        root.anchoredPosition = OverlayCalibration.Scale(new Vector2(Conf.DmOffsetX, Conf.DmOffsetY));
+        float dmScale = Mathf.Clamp(Conf.DmScale, 0.2f, 4f);
+        root.localScale = new Vector3(dmScale, dmScale, 1f);
+        ApplyBorderScale(dmScale);
+        if(!Conf.DmNoteEffect) rainManager?.Clear();
     }
     // A key-viewer border is a thin ring sprite scaled down with the overlay. Below
     // ~1 on-screen pixel the stroke loses coverage and the border reads as fully
@@ -201,23 +164,11 @@ public static partial class KeyViewerOverlay {
     }
     public static void ResetPosition() {
         KeyViewerSettings def = new();
-        if(Conf.IsDmNoteMode) {
-            Conf.DmOffsetX = def.DmOffsetX;
-            Conf.DmOffsetY = def.DmOffsetY;
-        } else {
-            Conf.OffsetX = def.OffsetX;
-            Conf.OffsetY = def.OffsetY;
-            Conf.FootOffsetX = def.FootOffsetX;
-            Conf.FootOffsetY = def.FootOffsetY;
-        }
+        Conf.DmOffsetX = def.DmOffsetX;
+        Conf.DmOffsetY = def.DmOffsetY;
         Apply();
         Save();
     }
-    public static bool ImportDmNotePreset(out string error) =>
-        ImportDmNoteFile(out error, "JSON Preset", "json", "Select DM Note preset", "preset",
-            (text, _) => {
-                Conf.DmPresetJson = KeyViewerPersistence.SanitizeDmPreset(text);
-            });
     public static bool ImportDmNoteCss(out string error) =>
         ImportDmNoteFile(out error, "CSS", "css", "Select DM Note custom CSS", "CSS",
             (text, picked) => {
@@ -260,10 +211,18 @@ public static partial class KeyViewerOverlay {
         kpsSum = 0;
         kpsSamples = 0;
         totalCount = 0;
+        bool layout = false;
         foreach(Box box in boxes) {
             box.Count = 0;
             box.LastShown = int.MinValue;
+            // Clearing Conf.Counts does not reach a layout box; without this its element
+            // still holds the old count and the next Rebuild seeds it straight back.
+            if(box.Source != null && box.Source.Count != 0) {
+                box.Source.Count = 0;
+                layout = true;
+            }
         }
+        if(layout) Layout.KvStore.RequestSave();
         Save();
     }
     private static void MarkCountsDirty(float now) {
@@ -275,26 +234,39 @@ public static partial class KeyViewerOverlay {
     }
     private static void CaptureCounts() {
         if(!countsDirty) return;
-        foreach(Box box in boxes)
-            if(KeyViewerPersistence.ShouldPersistBoxCount(box.IsStat, box.IsFoot)) Conf.SetCount(box.Name, box.Count);
+        foreach(Box box in boxes) {
+            if(!KeyViewerPersistence.ShouldPersistBoxCount(box.IsStat, box.IsFoot)) continue;
+            // A layout box's count belongs to its element, not to Conf.Counts — the two key
+            // by different names (see Box.Source).
+            if(box.Source != null) box.Source.Count = box.Count;
+            else Conf.SetCount(box.Name, box.Count);
+        }
     }
-    private static bool FlushCounts() {
+    /// <summary>
+    /// Writes only. Every caller is already off the gameplay path — the layout file is the
+    /// one thing here that must never be written mid-run.
+    /// </summary>
+    private static bool FlushCounts(bool immediate = false) {
         if(!countsDirty) return false;
         CaptureCounts();
         countsDirty = false;
+        if(built) {
+            // Immediate on teardown: a debounced save resumes on the main thread, which is
+            // gone by the time the game has finished unloading.
+            if(immediate) Layout.KvStore.Save();
+            else Layout.KvStore.RequestSave();
+        }
         ConfMgr?.Save();
         return true;
     }
     public static void Dispose() {
         if(canvasObj == null) return;
-        if(!FlushCounts()) ConfMgr?.Save();
+        if(!FlushCounts(immediate: true)) ConfMgr?.Save();
         Object.Destroy(canvasObj);
         canvasObj = null;
         raycaster = null;
         root = null;
         dragObj = null;
-        footRoot = null;
-        footDragObj = null;
         rainManager = null;
         boxes.Clear();
         pressLog.Clear();
@@ -305,7 +277,7 @@ public static partial class KeyViewerOverlay {
         nextCountsSave = 0f;
         gameStateKnown = false;
         wasInGame = false;
-        builtStyle = -1;
+        built = false;
         DisposeCssRenderCaches();
         DisposeCssImageCache();
         SyncSettingChanged = null;

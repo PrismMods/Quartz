@@ -7,110 +7,12 @@ using UnityEngine.UI;
 using TMPro;
 namespace Quartz.Features.KeyViewer;
 public static partial class KeyViewerOverlay {
-    private static void AddKey(int[] keys, int slot, float x, float y, float w, float h) {
-        if(slot < 0 || slot >= keys.Length) return;
-        KeyCode key = (KeyCode)keys[slot];
-        Box box = NewBox("Key_" + slot, x, y, w, h);
-        box.Key = key;
-        box.Slot = slot;
-        int[] ghostKeys = Conf.GhostKeysForStyle(builtStyle);
-        box.GhostKey = slot < ghostKeys.Length ? (KeyCode)ghostKeys[slot] : KeyCode.None;
-        box.Name = key.ToString().ToUpperInvariant();
-        box.Count = Conf.GetCount(box.Name);
-        box.RainGroup = slot < 8 ? 1 : builtStyle == 3 && slot >= 16 ? 3 : 2;
-        box.CenterX = x + w * 0.5f;
-        box.BoxW = w;
-        int cols = Mathf.Max(1, Mathf.RoundToInt((w + KeyGap) / (KeyW + KeyGap)));
-        if(cols > 1) {
-            float gridCenter = SpanW(8) * 0.5f;
-            box.RainAlign = box.CenterX < gridCenter - 0.5f ? 1f
-                : box.CenterX > gridCenter + 0.5f ? -1f
-                : 0f;
-        }
-        bool showCount = !Conf.HideMainKeyCount;
-        box.Label = NewText(box.Fill.transform, "Label", LabelFor(builtStyle, slot), KeyFontSize * Conf.KeyFontFor(slot));
-        RectTransform labelRect = box.Label.rectTransform;
-        labelRect.anchorMin = Vector2.zero;
-        labelRect.anchorMax = Vector2.one;
-        labelRect.offsetMin = new Vector2(0f, showCount ? 12f : 0f);
-        labelRect.offsetMax = Vector2.zero;
-        if(showCount) {
-            box.Value = NewText(box.Fill.transform, "Counter", "0", CounterFontSize * Conf.CounterFontFor(slot));
-            RectTransform counterRect = box.Value.rectTransform;
-            counterRect.anchorMin = Vector2.zero;
-            counterRect.anchorMax = new Vector2(1f, 0f);
-            counterRect.pivot = new Vector2(0.5f, 0f);
-            counterRect.anchoredPosition = new Vector2(0f, 3f);
-            counterRect.sizeDelta = new Vector2(0f, 16f);
-        }
-        boxes.Add(box);
-    }
-    private static void AddStat(bool total, float x, float y, float w, float h) {
-        Box box = NewBox(total ? "Total" : "Kps", x, y, w, h);
-        box.IsKps = !total;
-        box.IsTotal = total;
-        string caption = total ? "Total" : "KPS";
-        box.StatCaptionChars = (caption + "  ").ToCharArray();
-        bool stacked = builtStyle is 0 or 1;
-        bool together = Conf != null && Conf.StatsTogether && !stacked;
-        box.StatTogether = together;
-        box.Label = NewText(box.Fill.transform, "Label", caption, StatFontSize);
-        box.Value = NewText(box.Fill.transform, "Value", "0", StatFontSize);
-        RectTransform labelRect = box.Label.rectTransform;
-        RectTransform valueRect = box.Value.rectTransform;
-        labelRect.anchorMin = Vector2.zero;
-        labelRect.anchorMax = Vector2.one;
-        labelRect.offsetMin = Vector2.zero;
-        labelRect.offsetMax = Vector2.zero;
-        valueRect.anchorMin = Vector2.zero;
-        valueRect.anchorMax = Vector2.one;
-        valueRect.offsetMin = Vector2.zero;
-        valueRect.offsetMax = Vector2.zero;
-        if(stacked) {
-            labelRect.anchorMin = new Vector2(0f, 0.5f);
-            box.Label.alignment = TextAlignmentOptions.Center;
-            valueRect.anchorMax = new Vector2(1f, 0.5f);
-            box.Value.alignment = TextAlignmentOptions.Center;
-        } else if(together) {
-            box.Label.gameObject.SetActive(false);
-            box.Value.alignment = TextAlignmentOptions.Center;
-            box.Value.text = caption + "  0";
-        } else {
-            labelRect.offsetMin = new Vector2(10f, 0f);
-            box.Label.alignment = TextAlignmentOptions.MidlineLeft;
-            valueRect.offsetMax = new Vector2(-10f, 0f);
-            box.Value.alignment = TextAlignmentOptions.MidlineRight;
-        }
-        boxes.Add(box);
-    }
-    private static void AddFootKey(int footIndex, float x, float y, float w, float h) {
-        int[] footKeys = Conf.FootKeysForStyle(Conf.FootStyle);
-        if(footIndex < 0 || footIndex >= footKeys.Length) return;
-        int slot = KeyViewerSettings.FootSlotBase + footIndex;
-        KeyCode key = (KeyCode)footKeys[footIndex];
-        (Image fill, Image border) = NewBoxVisual("Foot_" + footIndex, footRoot, x, y, w, h);
-        Box box = new() { Border = border, Fill = fill };
-        box.Key = key;
-        box.Slot = slot;
-        box.IsFoot = true;
-        box.RainGroup = 0;
-        box.CenterX = x + w * 0.5f;
-        box.BoxW = w;
-        box.Name = key.ToString().ToUpperInvariant();
-        box.Label = NewText(box.Fill.transform, "Label", LabelFor(builtStyle, slot), FootFontSize * Conf.KeyFontFor(slot));
-        RectTransform labelRect = box.Label.rectTransform;
-        labelRect.anchorMin = Vector2.zero;
-        labelRect.anchorMax = Vector2.one;
-        labelRect.offsetMin = Vector2.zero;
-        labelRect.offsetMax = Vector2.zero;
-        boxes.Add(box);
-    }
+    // The Simple-mode box builders (AddKey / AddStat / AddFootKey and the foot drag handle) were
+    // removed with Simple mode: the editor renders every element through the DM Note path. The
+    // shared primitives below — NewBoxVisual / NewBox / NewText / LabelFor / KeyCodeShortLabel and
+    // the main reorganize handle — are still used by that path and by the settings preview.
     private static void AddReorganizeHandle() =>
         dragObj = BuildReorganizeHandle(root, "Drag", "KEYVIEWER_TITLE", "Key Viewer");
-    private static void AddFootReorganizeHandle() {
-        if(footRoot == null) return;
-        footDragObj = BuildReorganizeHandle(footRoot, "FootDrag", "KEYVIEWER_FOOT_TITLE", "Foot Keys");
-    }
     private static GameObject BuildReorganizeHandle(RectTransform target, string name,
         string titleKey, string titleFallback) {
         GameObject drag = new(name);

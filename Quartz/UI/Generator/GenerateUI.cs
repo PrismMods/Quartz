@@ -255,7 +255,11 @@ public static partial class GenerateUI {
         slider.Set(Apply(value), false);
         return slider;
     }
-    private static void AddSliderValueEditor(
+    /// <summary>
+    /// Visibility only: the editor's own compact slider drives the same expression editor and
+    /// would otherwise have to carry a copy of it.
+    /// </summary>
+    internal static void AddSliderValueEditor(
         UISlider slider,
         RectTransform rect,
         TextMeshProUGUI valueText,

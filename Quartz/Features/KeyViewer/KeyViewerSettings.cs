@@ -1,18 +1,32 @@
 using Newtonsoft.Json.Linq;
+using Quartz.Features.KeyViewer.Layout;
 using Quartz.IO;
 using Quartz.IO.Interface;
 using UnityEngine;
 namespace Quartz.Features.KeyViewer;
 public sealed partial class KeyViewerSettings : ISettingsFile {
-    public const string ModeSimple = "simple";
-    public const string ModeDmNote = "dmnote";
+    public const string ModeEditor = "editor";
     public bool Enabled = true;
     public bool ShowOutsideGame = true;
-    public string Mode = ModeSimple;
+    /// <summary>
+    /// Migration-only. The editor replaced the Simple and DM Note modes, so nothing branches on
+    /// this at runtime: it records which of them this config was last in, and
+    /// <see cref="KvMigration.RunOnce"/> stamps it to <see cref="ModeEditor"/> once it has read it.
+    ///
+    /// It defaults to the Simple value rather than to <see cref="ModeEditor"/> on purpose. A fresh
+    /// install has no layout file, and the field initializers below are the stock Simple settings —
+    /// so migrating from them is what gives a new user the stock key viewer instead of an empty
+    /// canvas, through the same path an upgrading user takes.
+    /// </summary>
+    public string Mode = KvMigrationPlan.LegacyModeSimple;
+    /// <summary>
+    /// Migration-only, like the legacy key arrays below. The editor has no styles; this records
+    /// which fixed layout a Simple-mode config last used so <see cref="KvMigration.FromLegacy"/>
+    /// can regenerate it, and so cross-mod importers (<see cref="Interop"/>) have somewhere to land
+    /// a style before that migration runs. Never branched on at render time.
+    /// </summary>
     public int Style = 2;
     public const int MaxStyle = 5;
-    public bool IsSimpleMode => string.Equals(Mode, ModeSimple, StringComparison.OrdinalIgnoreCase);
-    public bool IsDmNoteMode => string.Equals(Mode, ModeDmNote, StringComparison.OrdinalIgnoreCase);
     public float Size = 0.8f;
     public float OffsetX = -713.51886f;
     public float OffsetY = 24.76001f;

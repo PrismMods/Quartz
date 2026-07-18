@@ -10,6 +10,12 @@ public sealed class PaneDivider : MonoBehaviour {
     public RectTransform Target;
     public RectTransform CoordinateSpace;
     public PaneDividerAxis Axis = PaneDividerAxis.Horizontal;
+    /// <summary>
+    /// Set when the pane grows away from the pointer's direction of travel — a right-docked pane
+    /// widens as the divider is dragged left, where a bottom-docked one grows as it is dragged up.
+    /// Opt-in so a pane that never asked for it keeps the sign it was written against.
+    /// </summary>
+    public bool Invert;
     public float MinSize = 160f;
     public float MaxSize = 640f;
     public Action<float> OnResizeEnd;
@@ -59,6 +65,7 @@ public sealed class PaneDivider : MonoBehaviour {
         RectTransformUtility.ScreenPointToLocalPointInRectangle(CoordinateSpace, Input.mousePosition, null, out Vector2 local);
         float coord = Axis == PaneDividerAxis.Horizontal ? local.x : local.y;
         float delta = coord - startMouseCoord;
+        if(Invert) delta = -delta;
         float newSize = Mathf.Clamp(startSize + delta, MinSize, MaxSize);
         Target.sizeDelta = Axis == PaneDividerAxis.Horizontal
             ? new Vector2(newSize, Target.sizeDelta.y)

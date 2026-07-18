@@ -11,8 +11,17 @@ using static UnityEngine.EventSystems.PointerEventData;
 using TMPro;
 namespace Quartz.UI.Factory.Page;
 internal static partial class PageKeyViewer {
-    public static void Create(RectTransform parent) =>
-        AppendTo(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
+    /// <summary>
+    /// The scroll controller is handed on rather than dropped: Editor mode sizes itself to the
+    /// viewport it is scrolling inside, which is the one thing a page body cannot measure for
+    /// itself.
+    /// </summary>
+    public static void Create(RectTransform parent) {
+        RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(
+            parent, out Quartz.UI.Utility.UIScrollController scroll
+        );
+        AppendTo(content, scroll);
+    }
     private static string FootStyleName(int s) => s <= 0
         ? MainCore.Tr.Get("KEYVIEWER_FOOT_NONE", "None")
         : string.Format(MainCore.Tr.Get("KEYVIEWER_FOOT_COUNT", "{0} Keys"), s * 2);
@@ -22,6 +31,7 @@ internal static partial class PageKeyViewer {
         3 => MainCore.Tr.Get("KEYVIEWER_STYLE_20", "20 Keys"),
         4 => MainCore.Tr.Get("KEYVIEWER_STYLE_8", "8 Keys"),
         5 => MainCore.Tr.Get("KEYVIEWER_STYLE_14", "14 Keys"),
+        Features.KeyViewer.Layout.KvPresets.Style24 => MainCore.Tr.Get("KEYVIEWER_STYLE_24", "24 Keys"),
         _ => MainCore.Tr.Get("KEYVIEWER_STYLE_16", "16 Keys"),
     };
     private static string DmOutOfLimiterName(int mode) => mode switch {
@@ -59,49 +69,5 @@ internal static partial class PageKeyViewer {
             base.Dispose();
             KeyViewerOverlay.OnKeyPressChanged -= handler;
         }
-    }
-    private sealed class KeyCaptureRunner : MonoBehaviour {
-        public Func<bool> IsListening;
-        public Func<bool> ShouldCancel;
-        public Action<KeyCode> OnCaptured;
-        public Action OnCancelled;
-        public Action OnDestroyed;
-        private static readonly KeyCode[] allKeys = (KeyCode[])Enum.GetValues(typeof(KeyCode));
-        private bool prevHookRAlt;
-        private bool prevHookRCtrl;
-        private void Update() {
-            bool hookRAlt = Features.KeyLimiter.KeyLimiter.HookKeyHeld(KeyCode.RightAlt);
-            bool hookRCtrl = Features.KeyLimiter.KeyLimiter.HookKeyHeld(KeyCode.RightControl);
-            bool rAltEdge = hookRAlt && !prevHookRAlt;
-            bool rCtrlEdge = hookRCtrl && !prevHookRCtrl;
-            prevHookRAlt = hookRAlt;
-            prevHookRCtrl = hookRCtrl;
-            if(IsListening == null || !IsListening()) return;
-            if(Input.GetKeyDown(KeyCode.Escape) || (ShouldCancel?.Invoke() ?? false)) {
-                OnCancelled?.Invoke();
-                return;
-            }
-            if(rCtrlEdge) {
-                OnCaptured?.Invoke(KeyCode.RightControl);
-                return;
-            }
-            if(rAltEdge) {
-                OnCaptured?.Invoke(KeyCode.RightAlt);
-                return;
-            }
-            if(!Input.anyKeyDown) return;
-            if(Input.GetKeyDown(KeyCode.KeypadEnter)) {
-                OnCaptured?.Invoke(KeyCode.KeypadEnter);
-                return;
-            }
-            foreach(KeyCode key in allKeys) {
-                if(key == KeyCode.None || (key >= KeyCode.Mouse0 && key <= KeyCode.Mouse6)) continue;
-                if(Input.GetKeyDown(key)) {
-                    OnCaptured?.Invoke(key);
-                    return;
-                }
-            }
-        }
-        private void OnDestroy() => OnDestroyed?.Invoke();
     }
 }
