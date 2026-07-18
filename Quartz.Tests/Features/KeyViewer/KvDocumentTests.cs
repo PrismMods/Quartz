@@ -501,4 +501,30 @@ static class KvDocumentTests {
         // And a genuinely valid preset passes the same validator, so it is not just always-failing.
         Assert(DmNoteImportViolation(Preset) == null, "the fixture preset satisfies the import rules");
     }
+    /// <summary>
+    /// The render anchor freezes the overlay's coordinate mapping per tab: set once, it survives a
+    /// save/load round-trip (else the overlay would jump at every restart), is absent until seeded
+    /// (the renderer's cue to capture it from the current bounds), and dies with its tab.
+    /// </summary>
+    public static void TestRenderAnchorPersistsAndDiesWithItsTab() {
+        KvDocument doc = KvDocument.Empty();
+        string tab = doc.SelectedTab;
+        Assert(!doc.TryGetRenderAnchor(tab, out _, out _), "a fresh tab has no anchor until the renderer seeds it");
+        doc.SetRenderAnchor(tab, 123.5f, -40f);
+        Assert(doc.TryGetRenderAnchor(tab, out float x, out float y) && x == 123.5f && y == -40f,
+            "the anchor reads back what was set");
+        KvDocument reloaded = KvDocument.Parse(doc.ToJson());
+        Assert(reloaded.TryGetRenderAnchor(tab, out x, out y) && x == 123.5f && y == -40f,
+            "the anchor survives a serialize/parse round-trip");
+        string second = doc.NewTabId();
+        doc.EnsureTab(second, doc.UniqueTabName("Other"));
+        doc.SetRenderAnchor(second, 1f, 2f);
+        doc.Add(second, KvElement.Wrap([], KvElementKind.Key));
+        doc.SelectedTab = second;
+        Assert(doc.RemoveTab(second), "the second tab goes");
+        Assert(!doc.TryGetRenderAnchor(second, out _, out _), "a removed tab's anchor is pruned with it");
+        Assert(doc.TryGetRenderAnchor(tab, out _, out _), "the surviving tab keeps its anchor");
+        Assert((JObject.Parse(doc.ToJson())["quartzRenderAnchors"] as JObject)?[second] == null,
+            "the pruned anchor is gone from the serialized document too");
+    }
 }

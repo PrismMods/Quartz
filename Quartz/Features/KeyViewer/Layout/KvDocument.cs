@@ -142,6 +142,9 @@ internal sealed class KvDocument {
         // so an entry left here would outlive the tab and be written back on every save.
         foreach((string table, _) in Tables) (Root[table] as JObject)?.Remove(tab);
         (Root["keys"] as JObject)?.Remove(tab);
+        // Quartz's own table, so pruning it does not break the "what we do not model, we do not
+        // touch" contract the comment below states for DM Note's tables.
+        (Root[RenderAnchorTable] as JObject)?.Remove(tab);
         if(Root["customTabs"] is JArray custom)
             for(int i = custom.Count - 1; i >= 0; i--)
                 if(custom[i] is JObject o && o["id"]?.ToString() == tab) custom.RemoveAt(i);
@@ -154,6 +157,37 @@ internal sealed class KvDocument {
         if(wasSelected && order.Count > 0) SelectedTab = order[Math.Max(0, index - 1)];
         return true;
     }
+    /// <summary>
+    /// The tab's render anchor: the reference point the in-game overlay maps this tab's
+    /// coordinates against, captured from the layout's bounds the first time the tab is rendered
+    /// and then never recomputed. Rendering against live bounds moved the ENTIRE overlay whenever
+    /// an edit changed the bounding box — add a key left of the others and every existing key
+    /// slid right on screen. Anchoring to a frozen reference keeps placed elements exactly where
+    /// the user put them; only the edited element moves.
+    ///
+    /// Stored in a Quartz-owned top-level table (`quartzRenderAnchors`), so it travels with the
+    /// preset through save/export/import round-trips. DM Note ignores unknown tables on import.
+    /// </summary>
+    internal bool TryGetRenderAnchor(string tab, out float x, out float y) {
+        x = 0f;
+        y = 0f;
+        if(tab == null || Root[RenderAnchorTable] is not JObject anchors || anchors[tab] is not JObject a) return false;
+        JToken ax = a["x"], ay = a["y"];
+        if(ax == null || ay == null) return false;
+        try {
+            x = ax.ToObject<float>();
+            y = ay.ToObject<float>();
+            return true;
+        } catch {
+            return false;
+        }
+    }
+    internal void SetRenderAnchor(string tab, float x, float y) {
+        if(string.IsNullOrWhiteSpace(tab)) return;
+        if(Root[RenderAnchorTable] is not JObject anchors) Root[RenderAnchorTable] = anchors = [];
+        anchors[tab] = new JObject { ["x"] = x, ["y"] = y };
+    }
+    private const string RenderAnchorTable = "quartzRenderAnchors";
     /// <summary>
     /// The preset's embedded custom CSS, as (enabled, content). DM Note stores its keyviewer CSS in
     /// the top-level customCSS table, not on the elements, so importing only the geometry leaves a

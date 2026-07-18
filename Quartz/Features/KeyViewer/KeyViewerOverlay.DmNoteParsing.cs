@@ -67,21 +67,39 @@ public static partial class KeyViewerOverlay {
     /// Shared with the layout spec source, which must land pixel-for-pixel where the same
     /// preset does in DM Note mode.
     /// </summary>
-    private static void FinishDmSpecs(List<DmNoteSpec> specs, float minX, float minY, float maxX, float maxY) {
+    private static void FinishDmSpecs(List<DmNoteSpec> specs, float minX, float minY, float maxX, float maxY) =>
+        FinishDmSpecs(specs, minX, minY, maxX, maxY, (minX + maxX) * 0.5f, minY);
+    /// <summary>
+    /// The anchor is the document-space point the on-screen mapping is pinned to: the point that
+    /// lands at the root's horizontal pivot (<paramref name="anchorCx"/>) and its bottom edge
+    /// (<paramref name="anchorMinY"/>). The preset path passes the live bounds (a static layout,
+    /// so the distinction never shows); the editor-layout path passes the tab's frozen
+    /// <see cref="Layout.KvDocument.TryGetRenderAnchor"/> so an edit that grows the bounding box
+    /// resizes the canvas around the content WITHOUT moving every already-placed element on
+    /// screen. The canvas rect itself still tracks live bounds — it is the coordinate mapping,
+    /// not the rect, that must not chase the bounds.
+    /// </summary>
+    private static void FinishDmSpecs(
+        List<DmNoteSpec> specs, float minX, float minY, float maxX, float maxY,
+        float anchorCx, float anchorMinY
+    ) {
         if(float.IsPositiveInfinity(minX) || float.IsPositiveInfinity(minY)) return;
         const float padding = 30f;
         float track = Conf.DmNoteEffect ? dmTrackHeight : 0f;
         float topOffset = track + padding;
-        float offsetX = padding - minX;
-        float offsetY = topOffset - minY;
+        dmCanvasWidth = Mathf.Max(60f, maxX - minX) + padding * 2f;
+        dmCanvasHeight = Mathf.Max(60f, maxY - minY) + padding * 2f + track;
+        // Children position against the root's bottom-center pivot, so a spec's on-screen spot is
+        // (spec.X - width/2, spec.Y). Solving for "anchorCx sits at the pivot, anchorMinY at the
+        // bottom padding" keeps the mapping independent of where the bounds happen to be.
+        float offsetX = dmCanvasWidth * 0.5f - anchorCx;
+        float offsetY = topOffset - anchorMinY;
         for(int i = 0; i < specs.Count; i++) {
             DmNoteSpec spec = specs[i];
             spec.X += offsetX;
             spec.Y += offsetY;
             ResolveDmTrackGeometry(spec, topOffset);
         }
-        dmCanvasWidth = Mathf.Max(60f, maxX - minX) + padding * 2f;
-        dmCanvasHeight = Mathf.Max(60f, maxY - minY) + padding * 2f + track;
     }
     private static string ResolveDmTab(JObject preset, JObject keysTable, JObject posTable) {
         string selected = JOptionalString(preset, "selectedKeyType");

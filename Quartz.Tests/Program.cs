@@ -24,6 +24,7 @@ List<(string Name, Action Run)> tests = [
     ("KeyViewer import surfaces a preset's embedded custom CSS", KvDocumentTests.TestEmbeddedCssIsExtractedForImport),
     ("KeyViewer import merges tabs, keeping the existing ones", KvDocumentTests.TestMergeKeepsExistingTabsAndAddsImported),
     ("KeyViewer tab removal leaves unmodelled tables alone", KvDocumentTests.TestRemoveTabLeavesUnmodelledTablesAlone),
+    ("KeyViewer render anchor persists and dies with its tab", KvDocumentTests.TestRenderAnchorPersistsAndDiesWithItsTab),
     ("KeyViewer key-limiter sync sees only the keys the viewer draws", KvDocumentTests.TestBoundKeyElementsMatchWhatTheViewerDraws),
     ("KeyViewer editor grid step tracks zoom", KvSnapTests.TestGridStepTracksZoom),
     ("KeyViewer editor zoom clamps to DM Note's range", KvSnapTests.TestZoomClamps),

@@ -50,7 +50,19 @@ public static partial class KeyViewerOverlay {
                 result.Add(spec);
                 ExtendDmBounds(spec, ref minX, ref minY, ref maxX, ref maxY);
             }
-            FinishDmSpecs(result, minX, minY, maxX, maxY);
+            // Pin the mapping to the tab's frozen anchor so edits that change the bounding box
+            // (adding a key, dragging one past the edge) never shift the elements already placed.
+            // First render of a tab seeds the anchor from the current bounds, which reproduces the
+            // old bounds-based mapping exactly — existing users see no jump on update.
+            if(result.Count > 0) {
+                if(!doc.TryGetRenderAnchor(tab, out float anchorCx, out float anchorMinY)) {
+                    anchorCx = (minX + maxX) * 0.5f;
+                    anchorMinY = minY;
+                    doc.SetRenderAnchor(tab, anchorCx, anchorMinY);
+                    if(ReferenceEquals(doc, KvStore.Current)) KvStore.RequestSave();
+                }
+                FinishDmSpecs(result, minX, minY, maxX, maxY, anchorCx, anchorMinY);
+            }
         } catch(Exception ex) {
             MainCore.Log.Msg("[KeyViewer] Layout parse failed: " + ex.Message);
             result.Clear();
