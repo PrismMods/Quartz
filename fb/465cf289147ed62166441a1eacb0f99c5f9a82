@@ -1,0 +1,64 @@
+Quartz/Features/Nostalgia/NostalgiaPatches.Twirl.cs
+  s_216cf8d0b4a9ab::t_4a02e589b5b013 51
+  s_216cf8d0b4a9ab::t_ac227041764cb2 6-12,15-16,21-27
+  s_e287ffe23760d1::t_88f2258286cfe8 13-14,17,92,96-103
+Quartz/GTweens/Source/Contexts/GTweensContext.cs
+  s_e287ffe23760d1::t_88f2258286cfe8 22-27,44-52
+Quartz/Features/Nostalgia/NostalgiaLegacyCLS.cs
+  s_e287ffe23760d1::t_88f2258286cfe8 188,192,195,201,214-217
+Quartz/UI/Utility/TMPTextShadow.cs
+  s_e287ffe23760d1::t_88f2258286cfe8 50-57,72,155-156,167,298-301
+  s_216cf8d0b4a9ab::t_35566ff15b1ec3 292-296
+  s_216cf8d0b4a9ab::t_291cd2823a5bbb 64
+  s_216cf8d0b4a9ab::t_75e1a4e275f30a 219-225,234-235,237-241,248-254,262-266,272-276,278,285-286
+Quartz/UI/Objects/Impl/UIColorPicker.cs
+  s_e287ffe23760d1::t_88f2258286cfe8 53,128-135,290-292
+Quartz/Features/PlanetColors/PlanetColors.cs
+  s_e287ffe23760d1::t_88f2258286cfe8 24-25,237-241,257-271
+  s_e287ffe23760d1::t_e8bf828265d931 272-273
+Quartz/Features/Panels/PanelsOverlay.LivePanel.cs
+  s_e287ffe23760d1::t_88f2258286cfe8 26,75,137-140
+Quartz/UI/UICore.cs
+  s_e287ffe23760d1::t_88f2258286cfe8 889-893
+Quartz/Features/UiHider/UiHider.cs
+  s_e287ffe23760d1::t_88f2258286cfe8 220,227-229,232
+Quartz/Features/Calibration/CalibrationDetail.cs
+  s_e287ffe23760d1::t_88f2258286cfe8 36-38
+Quartz/Features/ChatterBlocker/ChatterBlocker.cs
+  s_e287ffe23760d1::t_88f2258286cfe8 60-62
+Quartz/Features/Tweaks/Tweaks.cs
+  s_216cf8d0b4a9ab::t_e9433929559342 110-111,117-122,126-127
+  s_e287ffe23760d1::t_88f2258286cfe8 139,157-164,257-270,318-319,407
+Quartz/Features/SongTitle/SongTitleOverlay.cs
+  s_e287ffe23760d1::t_88f2258286cfe8 191-197,205-209
+  s_e287ffe23760d1::t_fb9166a272fecf 210
+Quartz/Features/InGameOverlay/InGameOverlayFont.cs
+  s_e287ffe23760d1::t_88f2258286cfe8 38,43-50
+  s_e287ffe23760d1::t_6cf83deaa40aba 51
+Quartz/Resource/FontManager.cs
+  s_e287ffe23760d1::t_88f2258286cfe8 79,81,88,349,351,360-362
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "fb465cf289147ed62166441a1eacb0f99c5f9a82",
+  "prompts": {},
+  "sessions": {
+    "s_216cf8d0b4a9ab": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f940dfe2-d973-4c4f-94d4-0220373642a8",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_e287ffe23760d1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ab316e4b-2cb6-4398-9f71-434f3e03dacd",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
