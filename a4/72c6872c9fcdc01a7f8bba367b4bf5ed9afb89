@@ -1,0 +1,28 @@
+Quartz/Features/Combo/ComboOverlay.cs
+  s_216cf8d0b4a9ab::t_2da31851092c43 141-147,149-150,153-155
+  s_e287ffe23760d1::t_e5175314976d81 163,165,229,251-253,255-256,258-260,262-264,266-273
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "a472c6872c9fcdc01a7f8bba367b4bf5ed9afb89",
+  "prompts": {},
+  "sessions": {
+    "s_216cf8d0b4a9ab": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f940dfe2-d973-4c4f-94d4-0220373642a8",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_e287ffe23760d1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ab316e4b-2cb6-4398-9f71-434f3e03dacd",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
