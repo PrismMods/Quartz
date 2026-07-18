@@ -1,0 +1,19 @@
+Quartz/Features/KeyLimiter/KeyLimiter.cs
+  s_e287ffe23760d1::t_88f2258286cfe8 280-281,284-289
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "dd6146daa961d9cdde4d744e5471836eb76df5d6",
+  "prompts": {},
+  "sessions": {
+    "s_e287ffe23760d1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ab316e4b-2cb6-4398-9f71-434f3e03dacd",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
