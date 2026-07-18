@@ -10,6 +10,26 @@ public interface ISettingsHandle {
     bool Save();
     void CancelPendingSave();
 }
+/// <summary>
+/// Host veto for debounced writes. A debounced save resumes on the main thread, where the
+/// serialize + fsync is a felt frame hitch; the host points <see cref="DeferWrites"/> at
+/// "a run is being played right now" so a debounce that comes due mid-run re-arms and lands
+/// on its first fire outside gameplay instead. Direct <c>Save()</c> calls are never gated —
+/// every synchronous caller (teardown, falling-edge flushes, menu actions) has already
+/// chosen its moment. Null (tests, early startup) means never defer.
+/// </summary>
+public static class SaveGate {
+    public static Func<bool> DeferWrites;
+    public static bool ShouldDefer {
+        get {
+            try {
+                return DeferWrites?.Invoke() ?? false;
+            } catch {
+                return false;
+            }
+        }
+    }
+}
 public static class SettingsRegistry {
     private static readonly List<ISettingsHandle> handles = [];
     private static readonly object sync = new();
@@ -80,13 +100,37 @@ public sealed class SettingsFile<T> : ISettingsHandle where T : class, ISettings
         CancelPendingSave();
         return SaveCore();
     }
+    // Writes are ordered by a sequence stamped at serialize time: a direct
+    // Save() that lands while an older debounced background write is still in
+    // flight must not be overwritten by it afterwards.
+    private long saveSeq;
+    private long lastWrittenSeq;
     private bool SaveCore() {
+        if(!TrySerialize(out string json, out long seq)) return false;
+        return WriteJson(json, seq);
+    }
+    // Serialize touches the live settings object, so it must stay on the
+    // caller's (main) thread; only the file write + fsync go off-thread.
+    private bool TrySerialize(out string json, out long seq) {
+        try {
+            json = Data.Serialize().ToString();
+            seq = Interlocked.Increment(ref saveSeq);
+            return true;
+        } catch(Exception e) {
+            MainCore.Log.Err($"[{nameof(SettingsFile<>)}] Failed to serialize settings '{Path}': {e}");
+            json = null;
+            seq = 0;
+            return false;
+        }
+    }
+    private bool WriteJson(string json, long seq) {
         lock(saveLock) {
+            if(seq < lastWrittenSeq) return true; // superseded by a newer write
             try {
                 string dir = System.IO.Path.GetDirectoryName(Path);
                 if(!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
-                string json = Data.Serialize().ToString();
                 AtomicFile.WriteAllText(Path, json);
+                lastWrittenSeq = seq;
                 return true;
             } catch(Exception e) {
                 MainCore.Log.Err($"[{nameof(SettingsFile<>)}] Failed to save settings '{Path}': {e}");
@@ -116,9 +160,23 @@ public sealed class SettingsFile<T> : ISettingsHandle where T : class, ISettings
                 bool isCurrent;
                 lock(requestLock) {
                     isCurrent = ReferenceEquals(saveCts, request);
-                    if(isCurrent) saveCts = null;
                 }
-                if(isCurrent && !token.IsCancellationRequested) SaveCore();
+                if(!isCurrent || token.IsCancellationRequested) {
+                    request.Dispose();
+                    return;
+                }
+                if(SaveGate.ShouldDefer) {
+                    _ = SaveAfterDelay(delay, request);
+                    return;
+                }
+                lock(requestLock) {
+                    if(ReferenceEquals(saveCts, request)) saveCts = null;
+                }
+                // Debounced path: serialize here (main thread — the settings
+                // object is live), then push the fsync-bearing file write to
+                // the thread pool so no frame pays for disk latency.
+                if(TrySerialize(out string json, out long seq))
+                    _ = Task.Run(() => WriteJson(json, seq));
                 request.Dispose();
             });
         } catch(OperationCanceledException) {

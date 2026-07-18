@@ -125,6 +125,12 @@ public sealed class QuartzRuntime {
         }
         CreateRootObject();
         RootObject.AddComponent<MainThread>();
+        // Debounced settings writes must never land on a played frame (fsync = felt hitch);
+        // gate them on the live-gameplay signal. See SaveGate. Menu open overrides the veto:
+        // InGame can hold while the user sits in the menu (result screen, a level idling
+        // behind it, scnEditor playmode), and deferring there held their edits hostage until
+        // a restart — they are in a menu, so the write is not landing on a played frame.
+        SaveGate.DeferWrites = static () => Features.Status.GameStats.InGame && !UI.UICore.IsOpen;
         Config.Load();
         ProfileManager.Initialize();
         Logger.Msg($"[Startup] paths + config took {sw.ElapsedMilliseconds} ms");
