@@ -144,7 +144,6 @@ public static partial class KeyViewerOverlay {
             nextKpsSample = now + 0.05f;
         }
         TMP_FontAsset font = FontManager.Current;
-        int limiterMode = Mathf.Clamp(Conf.DmOutOfLimiterMode, 0, 2);
         foreach(Box box in boxes) {
             if(box.Label != null && box.Label.font != font) { box.Label.font = font; box.GradLabelText = null; }
             if(box.Value != null && box.Value.font != font) { box.Value.font = font; box.GradValueText = null; box.CounterStrokeMat = null; }
@@ -162,12 +161,8 @@ public static partial class KeyViewerOverlay {
                 box.LastShown = value;
                 continue;
             }
-            bool rawPressed = KeyHeld(box.Key);
-            bool blocked = box.Key != KeyCode.None && rawPressed && KeyLimiter.KeyLimiter.ShouldBlockKey(box.Key);
-            bool hidden = blocked && limiterMode == 0;
-            bool rainOnly = blocked && limiterMode == 1;
-            bool physicalPressed = rawPressed && !hidden && !rainOnly;
-            bool ghostPressed = (rainOnly || KeyHeld(spec.GhostKeyCode)) && !hidden;
+            bool physicalPressed = KeyHeld(box.Key);
+            bool ghostPressed = KeyHeld(spec.GhostKeyCode);
             if(physicalPressed && !box.RawPressed) {
                 RecordDmPress(box, now);
                 BeginDmNoteRain(box, now);
@@ -178,10 +173,6 @@ public static partial class KeyViewerOverlay {
             UpdateDelayedDmNote(box, now);
             if(ghostPressed && !box.GhostPressed) {
                 if(Conf.DmNoteEffect && spec.NoteEnabled && rainManager != null) box.LastGhostRain = SpawnDmRain(box, now, true);
-                if(rainOnly && box.CountInTotal) {
-                    totalCount++;
-                    pressLog.Enqueue(now);
-                }
             } else if(!ghostPressed && box.GhostPressed && box.LastGhostRain != null) {
                 float minLengthSeconds = dmNoteSpeed > 0f ? dmShortNoteMinLengthPx / dmNoteSpeed : 0f;
                 box.LastGhostRain.EndTime = Mathf.Max(now, box.LastGhostRain.StartTime + Mathf.Max(0.001f, minLengthSeconds));

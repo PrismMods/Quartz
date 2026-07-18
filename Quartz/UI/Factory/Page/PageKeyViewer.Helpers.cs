@@ -34,11 +34,6 @@ internal static partial class PageKeyViewer {
         Features.KeyViewer.Layout.KvPresets.Style24 => MainCore.Tr.Get("KEYVIEWER_STYLE_24", "24 Keys"),
         _ => MainCore.Tr.Get("KEYVIEWER_STYLE_16", "16 Keys"),
     };
-    private static string DmOutOfLimiterName(int mode) => mode switch {
-        0 => MainCore.Tr.Get("KEYVIEWER_DM_LIMITER_HIDE", "Hide"),
-        2 => MainCore.Tr.Get("KEYVIEWER_DM_LIMITER_FULL_PRESS", "Full Press"),
-        _ => MainCore.Tr.Get("KEYVIEWER_DM_LIMITER_RAIN_ONLY", "Rain Only"),
-    };
     private static UISlider AddSlider(
         Transform body, string label, string id,
         float defVal, float min, float max, float val,

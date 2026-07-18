@@ -74,15 +74,10 @@ public static partial class KeyViewerOverlay {
             bool pressed = KeyHeld(box.Key);
             bool ghostPressed = false;
             if(box.Dm != null) {
-                int limiterMode = Mathf.Clamp(Conf.DmOutOfLimiterMode, 0, 2);
-                bool blocked = box.Key != KeyCode.None && pressed && KeyLimiter.KeyLimiter.ShouldBlockKey(box.Key);
-                bool hidden = blocked && limiterMode == 0;
-                bool rainOnly = blocked && limiterMode == 1;
-                bool physicalPressed = pressed && !hidden && !rainOnly;
-                ghostPressed = (rainOnly || KeyHeld(box.Dm.GhostKeyCode)) && !hidden;
-                box.RawPressed = physicalPressed;
-                box.Pressed = physicalPressed;
-                box.DisplayTargetPressed = physicalPressed;
+                ghostPressed = KeyHeld(box.Dm.GhostKeyCode);
+                box.RawPressed = pressed;
+                box.Pressed = pressed;
+                box.DisplayTargetPressed = pressed;
                 box.DisplayTargetTime = now;
                 box.GhostPressed = ghostPressed;
                 box.DelayedNotePending = false;
