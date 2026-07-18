@@ -39,6 +39,7 @@ internal sealed class TufPacksView : MonoBehaviour {
     private GTween viewSwitchSeq;
     private CanvasGroup contentCg;
     private bool lastDetailView;
+    private float listScrollY;
     private string listSignature;
     private bool built;
     private bool pendingRebuild;
@@ -187,10 +188,21 @@ internal sealed class TufPacksView : MonoBehaviour {
         else RebuildList();
         Canvas.ForceUpdateCanvases();
         LayoutRebuilder.ForceRebuildLayoutImmediate(content);
-        scroll.ScrollTo(detail ? 0f : oldY);
+        // Scroll resets only when the view actually changes: drilling into a pack
+        // starts at the top, backing out restores the list position. In-place
+        // rebuilds (download progress, chart chooser, folder toggles) keep the
+        // scroll where it was.
         if(detail != lastDetailView) {
+            if(detail) {
+                listScrollY = oldY;
+                scroll.ScrollTo(0f);
+            } else {
+                scroll.ScrollTo(listScrollY);
+            }
             lastDetailView = detail;
             PlayViewSwitch(detail);
+        } else {
+            scroll.ScrollTo(oldY);
         }
     }
 
