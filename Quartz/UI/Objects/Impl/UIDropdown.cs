@@ -81,12 +81,34 @@ public class UIDropDown<T> : UIObject {
         if(Label != null) Label.text = Display(Value);
         RebuildList();
     }
+    private GTween listSeq;
     public void SetExpanded(bool expanded) {
         Expanded = expanded;
         if(expanded) ApplyItemFonts();
-        ListObject?.SetActive(expanded);
+        AnimateList(expanded);
         UpdateVisual();
         OnLayoutChanged?.Invoke();
+    }
+    /// <summary>
+    /// Fade the list in on open and out on close instead of snapping its GameObject on/off. The
+    /// CanvasGroup does not block raycasts, so the list stays clickable through the fade; a close
+    /// deactivates only once the fade lands, so a re-open mid-fade (the Kill above) never leaves it
+    /// hidden.
+    /// </summary>
+    private void AnimateList(bool expanded) {
+        if(ListObject == null) return;
+        listSeq?.Kill();
+        CanvasGroup cg = ListObject.GetComponent<CanvasGroup>() ?? ListObject.AddComponent<CanvasGroup>();
+        if(expanded) {
+            ListObject.SetActive(true);
+            cg.alpha = 0f;
+            listSeq = cg.GTFade(1f, 0.14f).SetEasing(Easing.OutSine);
+            MainCore.TC.Play(listSeq);
+        } else if(ListObject.activeSelf) {
+            listSeq = cg.GTFade(0f, 0.1f).SetEasing(Easing.OutSine)
+                .OnComplete(() => { if(ListObject != null) ListObject.SetActive(false); });
+            MainCore.TC.Play(listSeq);
+        }
     }
     private void ApplyItemFonts() {
         if(ItemFont == null) return;
