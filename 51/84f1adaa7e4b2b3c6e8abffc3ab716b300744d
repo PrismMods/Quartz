@@ -1,0 +1,31 @@
+Quartz/UI/Factory/Page/PageCalibration.cs
+  s_e287ffe23760d1::t_e5175314976d81 33
+Quartz/UI/Factory/Page/PageVisuals.PageBuilders.cs
+  s_02bea41bcc42a2::t_447f9f910e200e 520,541,578
+Quartz/UI/Factory/Page/PageProgressBar.cs
+  s_e287ffe23760d1::t_e5175314976d81 131
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "5184f1adaa7e4b2b3c6e8abffc3ab716b300744d",
+  "prompts": {},
+  "sessions": {
+    "s_02bea41bcc42a2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e6a2305a-635a-430b-8986-33d5847dcd68",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_e287ffe23760d1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ab316e4b-2cb6-4398-9f71-434f3e03dacd",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
