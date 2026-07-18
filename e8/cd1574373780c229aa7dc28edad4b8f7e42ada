@@ -1,0 +1,20 @@
+Quartz/UI/Objects/Impl/UIDropdown.cs
+  s_e287ffe23760d1::t_2bd8d968f17463 84,88,92-111
+  s_e287ffe23760d1::t_c179d6e5e9cb3c 112
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "e8cd1574373780c229aa7dc28edad4b8f7e42ada",
+  "prompts": {},
+  "sessions": {
+    "s_e287ffe23760d1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ab316e4b-2cb6-4398-9f71-434f3e03dacd",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
