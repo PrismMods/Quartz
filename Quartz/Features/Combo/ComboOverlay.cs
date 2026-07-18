@@ -138,10 +138,21 @@ public static class ComboOverlay {
             Conf.GetCaptionShadowColor()
         );
     }
+    // fontMaterial's getter re-runs padding + dirty-mesh work on every access,
+    // and ApplyValueMaterial runs every frame while the pulse animates — so
+    // only pay it when the material or the dilate value actually changed.
+    // After the first access the instanced material IS fontSharedMaterial
+    // (a plain field read), which makes a stable memo key.
+    private static Material thicknessMat;
+    private static float lastThicknessDilate = float.NaN;
     private static void ApplyThickness(TextMeshProUGUI text, float dilate) {
+        float clamped = Mathf.Clamp(dilate, -1f, 1f);
+        if(clamped == lastThicknessDilate && ReferenceEquals(text.fontSharedMaterial, thicknessMat)) return;
         Material mat = text.fontMaterial;
         if(mat == null) return;
-        mat.SetFloat("_FaceDilate", Mathf.Clamp(dilate, -1f, 1f));
+        mat.SetFloat("_FaceDilate", clamped);
+        thicknessMat = text.fontSharedMaterial;
+        lastThicknessDilate = clamped;
     }
     private sealed class Updater : MonoBehaviour {
         private int cachedCount = -1;
@@ -149,9 +160,9 @@ public static class ComboOverlay {
         private Color lastColor;
         private bool lastCaptionShown;
         private float lastCaptionSize = float.NaN;
-        private float lastLabelKick = float.NaN;
-        private float lastCaptionOffsetY = float.NaN;
+        private float lastCaptionPosY = float.NaN;
         private float lastBlockH = float.NaN;
+        private float lastOverhang = float.NaN;
         private Vector2 prefPerPoint;
         private Vector2 captionPrefPerPoint;
         private string lastCaptionText;
@@ -215,9 +226,7 @@ public static class ComboOverlay {
                     bool captionChanged = captionFontChanged
                         || valueChanged
                         || !lastCaptionShown
-                        || captionSize != lastCaptionSize
-                        || labelKick != lastLabelKick
-                        || Conf.CaptionOffsetY != lastCaptionOffsetY;
+                        || captionSize != lastCaptionSize;
                     if(captionChanged) {
                         captionText.fontSize = captionSize;
                         captionText.color = Color.white;
@@ -231,27 +240,37 @@ public static class ComboOverlay {
                         }
                         Vector2 capPref = captionPrefPerPoint * captionSize;
                         captionText.rectTransform.sizeDelta = new Vector2(Mathf.Max(capPref.x, 200f), capPref.y);
-                        captionText.rectTransform.anchoredPosition = new Vector2(
-                            0f,
-                            -(valueText.rectTransform.sizeDelta.y + CaptionGap + Conf.CaptionOffsetY) + labelKick
-                        );
                         ApplyCaptionMaterial();
                         lastCaptionSize = captionSize;
-                        lastLabelKick = labelKick;
-                        lastCaptionOffsetY = Conf.CaptionOffsetY;
                     }
                 } else if(lastCaptionShown || captionFontChanged) {
                     ApplyCaptionMaterial();
                 }
                 lastCaptionShown = captionShown;
             }
-            float blockH = valueText.rectTransform.sizeDelta.y;
+            float valueH = valueText.rectTransform.sizeDelta.y;
+            float capTop = 0f;
+            float capBottom = 0f;
             if(captionShown && captionText != null) {
-                blockH += CaptionGap + captionText.rectTransform.sizeDelta.y + Conf.CaptionOffsetY;
+                capTop = valueH + CaptionGap + Conf.CaptionOffsetY;
+                capBottom = capTop + captionText.rectTransform.sizeDelta.y;
             }
-            if(blockH != lastBlockH) {
+            float overhang = Mathf.Max(0f, -capTop);
+            float blockH = Mathf.Max(1f, Mathf.Max(valueH, capBottom) + overhang);
+            if(blockH != lastBlockH || overhang != lastOverhang) {
                 root.sizeDelta = new Vector2(768f, blockH);
+                // Pivot stays on the value's top edge: OffsetY is persisted from root.anchoredPosition.
+                root.pivot = new Vector2(0.5f, 1f - overhang / blockH);
+                valueText.rectTransform.anchoredPosition = new Vector2(0f, -overhang);
                 lastBlockH = blockH;
+                lastOverhang = overhang;
+            }
+            if(captionShown && captionText != null) {
+                float capPosY = -(overhang + capTop) + labelKick;
+                if(capPosY != lastCaptionPosY) {
+                    captionText.rectTransform.anchoredPosition = new Vector2(0f, capPosY);
+                    lastCaptionPosY = capPosY;
+                }
             }
         }
     }
