@@ -1,10 +1,22 @@
-name: i18n push (en-US → quartz-i18n)
+name: i18n push (en-US + ko-KR → quartz-i18n)
 
-# Pushes the authoritative English strings out to the translation repo whenever
-# they change on main, so translators always work against the current key set.
-# Only en-US flows this direction — translations are owned by quartz-i18n and come
-# back via i18n-pull. Direct push (no PR): en-US is authoritative here and touches
-# a different file than any translation, so it never conflicts with translator work.
+# Pushes the languages this repo authors out to the translation repo whenever they
+# change on main, so translators always work against the current key set — and so a
+# later pull can never propose deleting strings that only exist here.
+#
+# scripts/i18n_sync.py owns the direction rules; see its docstring. In short: the
+# languages in its OWNED_HERE (en-US, ko-KR) are overwritten in quartz-i18n, and
+# community-authored languages only get keys they are missing — a translator's
+# wording is never clobbered by this job.
+#
+# The `paths` filter below is deliberately the whole Lang directory. It was once
+# narrowed to en-US.json because the job only copied en-US, which made every
+# translation-only commit a no-op run. That is no longer true: ko-KR is authored
+# here now, so a ko-KR-only commit MUST reach i18n or the hourly pull goes back to
+# proposing the deletion of every Korean key added since (PR #2, 2026-07-17).
+#
+# Direct push (no PR): this job only ever writes files it authors, plus additive
+# gap-fills, so it cannot conflict with translator work.
 #
 # Requires repo secret I18N_PAT: a fine-grained PAT with Contents: read/write on
 # PrismMods/Quartz-i18n, and whose **Resource owner is the PrismMods org**. A token
@@ -21,7 +33,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "Quartz/Resource/Export/Lang/en-US.json"
+      - "Quartz/Resource/Export/Lang/**"
   workflow_dispatch:
 
 jobs:
@@ -49,19 +61,25 @@ jobs:
           fi
           echo "::error title=I18N_PAT cannot push to PrismMods/Quartz-i18n::git-receive-pack refused the token, so the push at the end of this job would 403 after committing. Both repos are public, which is why checkout still succeeds. Most likely the fine-grained PAT's Resource owner is a personal account: org-owned repos are then not covered at all. Fix: recreate the PAT with Resource owner = PrismMods, repository access covering Quartz-i18n and Quartz, permissions Contents: Read and write (Quartz-i18n) + Pull requests: Read and write (Quartz), approve it as org admin if prompted, then update the I18N_PAT repo secret."
           exit 1
-      - name: Copy en-US reference into i18n
+      - name: Validate what we are about to publish
+        # Our own files, our own validator — a dev committing broken JSON here would
+        # otherwise ship it to every translator.
+        run: python3 quartz/scripts/validate_i18n.py quartz/Quartz/Resource/Export/Lang quartz/Quartz/Resource/Export/Lang/en-US.json
+      - name: Merge our languages into i18n
+        # Reads the i18n checkout purely as JSON data and never executes anything
+        # from it, so translator-controlled content cannot reach I18N_PAT.
         run: |
           mkdir -p i18n/Lang
-          cp quartz/Quartz/Resource/Export/Lang/en-US.json i18n/Lang/en-US.json
+          python3 quartz/scripts/i18n_sync.py push quartz/Quartz/Resource/Export/Lang i18n/Lang
       - name: Commit + push to quartz-i18n
         working-directory: i18n
         run: |
           git config user.name "quartz-i18n-bot"
           git config user.email "i18n-bot@users.noreply.github.com"
-          git add Lang/en-US.json
+          git add Lang
           if git diff --cached --quiet; then
-            echo "en-US unchanged — nothing to push"
+            echo "languages unchanged — nothing to push"
             exit 0
           fi
-          git commit -m "sync: en-US reference from Quartz@${GITHUB_SHA::7}"
+          git commit -m "sync: languages from Quartz@${GITHUB_SHA::7}"
           git push

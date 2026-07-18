@@ -2,8 +2,12 @@ name: i18n pull (quartz-i18n → translations)
 
 # Pulls community translations from quartz-i18n back into the mod as a reviewed PR.
 # Runs on a schedule + manual dispatch, so no workflow is needed on the i18n side.
-# en-US is NOT pulled — it is owned in this repo. A maintainer reviews the PR before
-# it ships.
+# A maintainer reviews the PR before it ships.
+#
+# The languages this repo authors (scripts/i18n_sync.py OWNED_HERE: en-US, ko-KR)
+# are NOT pulled — they only flow outward, via i18n-push. Everything else merges in
+# additively: translator values win, but a key we have and i18n lacks is kept, never
+# deleted. See that script's docstring for the full direction rules.
 #
 # Security: this job holds I18N_PAT, so it runs ONLY this repo's validator
 # (scripts/validate_i18n.py) and reads the i18n checkout purely as JSON data. It
@@ -48,14 +52,14 @@ jobs:
       - name: Validate incoming translations
         # this repo's validator, run against i18n's data — see security note above
         run: python3 quartz/scripts/validate_i18n.py i18n/Lang quartz/Quartz/Resource/Export/Lang/en-US.json
-      - name: Copy translations (everything except en-US)
-        run: |
-          dest="quartz/Quartz/Resource/Export/Lang"
-          for f in i18n/Lang/*.json; do
-            b="$(basename "$f")"
-            [ "$b" = "en-US.json" ] && continue
-            cp "$f" "$dest/$b"
-          done
+      - name: Merge translations in (never delete a key)
+        # Was a wholesale `cp`, which let a stale i18n erase live strings: its ko-KR
+        # lagged this repo by 31 keys, so the PR proposed deleting 31 Korean strings
+        # (PR #2, 2026-07-17). i18n_sync.py merges instead — it starts from our file
+        # and only adds or revalues, so a key we have can never be dropped by a
+        # sender that simply has not caught up yet. It also skips every language we
+        # author (OWNED_HERE), so those only ever flow outward via i18n-push.
+        run: python3 quartz/scripts/i18n_sync.py pull i18n/Lang quartz/Quartz/Resource/Export/Lang
       - name: Open / update PR if translations changed
         working-directory: quartz
         env:
@@ -68,10 +72,14 @@ jobs:
           br="i18n-sync"
           git checkout -B "$br"
           git add Quartz/Resource/Export/Lang
-          # Hard guard: en-US is owned by THIS repo and a pull must never change it,
-          # whatever the copy step did. Reset it to HEAD in both index and worktree
-          # so it can never appear in the sync commit/PR.
-          git checkout HEAD -- Quartz/Resource/Export/Lang/en-US.json
+          # Hard guard: a pull must never change a language THIS repo authors,
+          # whatever the merge step did. Reset each to HEAD in both index and
+          # worktree so it can never appear in the sync commit/PR. The list comes
+          # from i18n_sync.py's OWNED_HERE so it cannot drift out of step with the
+          # merge rules.
+          for code in $(python3 scripts/i18n_sync.py owned); do
+            git checkout HEAD -- "Quartz/Resource/Export/Lang/$code.json"
+          done
           if git diff --cached --quiet; then
             echo "no translation changes"
             exit 0
