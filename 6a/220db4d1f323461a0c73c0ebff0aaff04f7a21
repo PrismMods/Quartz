@@ -1,0 +1,21 @@
+Quartz/UI/UIColors.cs
+  s_81ecb199ef9d4f::t_1da57d8b02fd84 38-40
+Quartz/UI/Generator/GenerateUI.ColorPicker.cs
+  s_81ecb199ef9d4f::t_c2e23e72687322 190-195
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "6a220db4d1f323461a0c73c0ebff0aaff04f7a21",
+  "prompts": {},
+  "sessions": {
+    "s_81ecb199ef9d4f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "19ccc380-b642-4006-9f49-382deefa5616",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
