@@ -1,0 +1,19 @@
+agents/commits.md
+  s_e287ffe23760d1::t_e5175314976d81 86-100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "131e7b4a0362264647248864d599d6f913f75f2b",
+  "prompts": {},
+  "sessions": {
+    "s_e287ffe23760d1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ab316e4b-2cb6-4398-9f71-434f3e03dacd",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
