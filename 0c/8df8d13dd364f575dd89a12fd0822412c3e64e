@@ -1,0 +1,24 @@
+Quartz/Features/Panels/PanelsOverlay.LivePanel.cs
+  s_02bea41bcc42a2::t_9c18aaf882e404 89-93
+  s_02bea41bcc42a2::t_8f95de544a41ee 171-173
+  s_02bea41bcc42a2::t_6dacb1f110edc5 94
+  s_02bea41bcc42a2::t_5f9e1dc81e9e6a 174
+Quartz/Features/Panels/StatColor.cs
+  s_02bea41bcc42a2::t_87af8e82785606 42-48,51-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "0c8df8d13dd364f575dd89a12fd0822412c3e64e",
+  "prompts": {},
+  "sessions": {
+    "s_02bea41bcc42a2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e6a2305a-635a-430b-8986-33d5847dcd68",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
