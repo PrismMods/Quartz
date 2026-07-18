@@ -211,8 +211,18 @@ internal static partial class PageSettings {
             MainCore.ConfMgr.RequestSave();
             scaleSeq?.Kill();
             float scaleStart = UICore.PanelScale;
-            Vector2 targetSize = UICore.DefaultPanelSize;
+            // Keep the window's on-screen size: the canvas rescales by scaleStart→value, so the
+            // panel's virtual size is counter-scaled to cancel it out. Snapping to
+            // DefaultPanelSize here threw away the user's own window size and read as "UI Scale
+            // resizes my window".
+            Vector2 targetSize = UICore.Panel.sizeDelta * (scaleStart / value);
+            targetSize = new Vector2(
+                Mathf.Clamp(targetSize.x, ResizeHandle.MIN_WIDTH / value, Screen.width / value),
+                Mathf.Clamp(targetSize.y, ResizeHandle.MIN_HEIGHT / value, Screen.height / value)
+            );
             UICore.LastPanelSize = targetSize;
+            MainCore.Conf.PanelWidth = targetSize.x;
+            MainCore.Conf.PanelHeight = targetSize.y;
             scaleSeq = GTweenSequenceBuilder.New()
                 .Append(
                     GTweenExtensions.Tween(
