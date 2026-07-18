@@ -1,0 +1,38 @@
+Quartz/Features/KeyLimiter/KeyLimiter.cs
+  s_216cf8d0b4a9ab::t_8d4930a3f4e467 262-264,267
+  s_02bea41bcc42a2::t_c93c3ab429c982 251-261,265-266,268-279
+Quartz/Features/KeyViewer/KeyViewerOverlay.Input.cs
+  s_65082c41801867::t_4bdc3f39cf397b 6-10,13-17,20,29-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "416e7bcf7e325db83b6d25f3c54c704b412dde26",
+  "prompts": {},
+  "sessions": {
+    "s_02bea41bcc42a2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e6a2305a-635a-430b-8986-33d5847dcd68",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_216cf8d0b4a9ab": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f940dfe2-d973-4c4f-94d4-0220373642a8",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_65082c41801867": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "51f32074-2ba1-425c-bc95-ea26e606581b",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
