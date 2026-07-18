@@ -20,6 +20,7 @@
     "AD_PCT": "Deafen At %",
     "AD_SHORTCUT_HINT": "Set this to match your Discord 'Toggle Deafen' keybind.",
     "AD_SHORTCUT_WINDOWS_ONLY": "Shortcut mode is Windows-only — using Bot mode.",
+    "AD_SKIP_AUTO": "Don't Deafen While Auto Is On",
     "AD_START": "Only When Starting From 0%",
     "AD_TUTORIAL": "Watch Tutorial",
     "AD_UNLINK": "Unlink",

@@ -70,6 +70,17 @@ internal static partial class PageGameplay {
             "Only When Starting From 0%",
             "ad_start"
         );
+        GenerateUI.Toggle(
+            GenerateUI.Row(sec.Body),
+            def.SkipWhenAuto,
+            conf.SkipWhenAuto,
+            v => {
+                conf.SkipWhenAuto = v;
+                AutoDeafen.Save();
+            },
+            "Don't Deafen While Auto Is On",
+            "ad_skip_auto"
+        );
         if(AutoDeafen.EffectiveMode == AutoDeafenSettings.ModeShortcut) {
             CreateAutoDeafenShortcut(sec.Body, conf);
         } else {

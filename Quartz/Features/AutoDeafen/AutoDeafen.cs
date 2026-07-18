@@ -91,6 +91,7 @@ public static class AutoDeafen {
             && progress01 >= 0f
             && InRealPlay()
             && eligibleStart
+            && !(Conf.SkipWhenAuto && Autoplaying)
             && Mathf.Clamp01(progress01) * 100f >= Conf.DeafenAtPercent;
         if(shouldDeaf != desiredDeaf) {
             desiredDeaf = shouldDeaf;
@@ -179,6 +180,9 @@ public static class AutoDeafen {
     private static bool InRealPlay() {
         try { return scnGame.instance != null; }
         catch { return false; }
+    }
+    private static bool Autoplaying {
+        get { try { return RDC.auto; } catch { return false; } }
     }
     private static void Restart(string clientId, string token) {
         StopRpc();

@@ -8,6 +8,7 @@ public sealed class AutoDeafenSettings : ISettingsFile {
     public bool Enabled = false;
     public float DeafenAtPercent = 5f;
     public bool OnlyFromStart = true;
+    public bool SkipWhenAuto = true;
     public const string ModeShortcut = "shortcut";
     public const string ModeBot = "bot";
     public string Mode = ModeShortcut;
@@ -27,6 +28,7 @@ public sealed class AutoDeafenSettings : ISettingsFile {
             [nameof(Enabled)] = Enabled,
             [nameof(DeafenAtPercent)] = DeafenAtPercent,
             [nameof(OnlyFromStart)] = OnlyFromStart,
+            [nameof(SkipWhenAuto)] = SkipWhenAuto,
             [nameof(Mode)] = Mode,
             [nameof(ShortcutCtrl)] = ShortcutCtrl,
             [nameof(ShortcutShift)] = ShortcutShift,
@@ -40,6 +42,7 @@ public sealed class AutoDeafenSettings : ISettingsFile {
         Enabled = IOUtils.Read(token, nameof(Enabled), Enabled);
         DeafenAtPercent = IOUtils.Read(token, nameof(DeafenAtPercent), DeafenAtPercent);
         OnlyFromStart = IOUtils.Read(token, nameof(OnlyFromStart), OnlyFromStart);
+        SkipWhenAuto = IOUtils.Read(token, nameof(SkipWhenAuto), SkipWhenAuto);
         Mode = IOUtils.Read(token, nameof(Mode), Mode);
         ShortcutCtrl = IOUtils.Read(token, nameof(ShortcutCtrl), ShortcutCtrl);
         ShortcutShift = IOUtils.Read(token, nameof(ShortcutShift), ShortcutShift);
