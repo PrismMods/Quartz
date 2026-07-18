@@ -277,12 +277,16 @@ internal static partial class KeyLimiter {
             return false;
         }
     }
+    // Reached from both the SkyHook hook thread (HookCallback prefix) and the main
+    // thread (CountValidKeysPressed); an unlocked Dictionary corrupts under that.
     private static readonly Dictionary<KeyLabel, KeyCode> asyncLabelCache = new();
     private static KeyCode AsyncLabelToPhysicalUnityKey(KeyLabel label) {
-        if(asyncLabelCache.TryGetValue(label, out KeyCode cached)) return cached;
-        KeyCode resolved = ResolveAsyncLabelToPhysicalUnityKey(label);
-        asyncLabelCache[label] = resolved;
-        return resolved;
+        lock(asyncLabelCache) {
+            if(asyncLabelCache.TryGetValue(label, out KeyCode cached)) return cached;
+            KeyCode resolved = ResolveAsyncLabelToPhysicalUnityKey(label);
+            asyncLabelCache[label] = resolved;
+            return resolved;
+        }
     }
     private static KeyCode ResolveAsyncLabelToPhysicalUnityKey(KeyLabel label) {
         string name = label.ToString();
