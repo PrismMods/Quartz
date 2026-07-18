@@ -1,0 +1,33 @@
+Quartz/Features/EffectRemover/EffectRemover.cs
+  s_e287ffe23760d1::t_e5175314976d81 20
+Quartz/UI/Factory/Page/PageVisuals.PageBuilders.cs
+  s_e287ffe23760d1::t_e5175314976d81 51-63
+Quartz/Resource/Export/Lang/en-US.json
+  s_65082c41801867::t_172823843206c1 104,232
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_65082c41801867::t_16846732572fac 104,232
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "9f0713d9189c30fbafa020ce7c25247d720b5b92",
+  "prompts": {},
+  "sessions": {
+    "s_65082c41801867": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "51f32074-2ba1-425c-bc95-ea26e606581b",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_e287ffe23760d1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ab316e4b-2cb6-4398-9f71-434f3e03dacd",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
