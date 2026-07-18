@@ -1,0 +1,526 @@
+Quartz/Features/KeyViewer/KeyViewerOverlay.LayoutSpecs.cs
+  s_e287ffe23760d1::t_e5175314976d81 1-63,65-70
+  s_e287ffe23760d1::t_e704dcc3c17c9b 64
+Quartz/UI/Editor/KvWidgets.Color.cs
+  s_e287ffe23760d1::t_e5175314976d81 1-228
+Quartz/Features/KeyViewer/KeyViewerOverlay.Css.cs
+  s_e287ffe23760d1::t_2e922f29fc6439 309-313
+  s_e287ffe23760d1::t_88f2258286cfe8 443-445
+Quartz/UI/Editor/KvCanvasDrag.cs
+  s_e287ffe23760d1::t_e5175314976d81 1-98
+Quartz/UI/Editor/KvWidgets.Slider.cs
+  s_e287ffe23760d1::t_e5175314976d81 1-13,24-93,95-138
+  s_e287ffe23760d1::t_6bd2fcfdbd35a2 14-23
+  s_e287ffe23760d1::t_3b50bc2696ee02 94
+Quartz/Features/KeyViewer/KeyViewerOverlay.Update.cs
+  s_02bea41bcc42a2::t_438a03b1a6b0a4 30,42,74-99
+  s_02bea41bcc42a2::t_e6db92bdcfe758 41
+  s_e287ffe23760d1::t_ca3dbfdb327da6 26,35
+  s_e287ffe23760d1::t_e5175314976d81 31-32,34
+  s_02bea41bcc42a2::t_17e893e8fc99b7 29,43-73
+  s_02bea41bcc42a2::t_7d0f04f33380b6 12-20,24,33
+  s_e287ffe23760d1::t_0458d1d6c549cd 109,120-121,127
+  s_02bea41bcc42a2::t_1c0b87f03c3de2 27-28
+Quartz/UI/Editor/KvInspector.Note.cs
+  s_e287ffe23760d1::t_e5175314976d81 1-18,21-24,28,30-31,37,39-54,56-57,94-97,99-108,110-111,113-114,116-119,121-122,134-203
+  s_02bea41bcc42a2::t_97e5d7c251c3ca 60,62-73
+  s_02bea41bcc42a2::t_447f9f910e200e 29,55,83
+  s_02bea41bcc42a2::t_17bc80b55190ac 58-59,61,74-82,84-93
+  s_02bea41bcc42a2::t_10984c365de98a 109,112,115,120,123-133
+  s_02bea41bcc42a2::t_78db7a21d162c4 98
+  s_02bea41bcc42a2::t_0f2585d2b77d6e 19-20,25-27,32-36,38
+Quartz/UI/Editor/KvCanvasEdit.cs
+  s_e287ffe23760d1::t_e5175314976d81 1-83
+Quartz/UI/Factory/Page/PageKeyViewer.EditorSettings.cs
+  s_e287ffe23760d1::t_0b65cee781b1e4 81
+  s_e287ffe23760d1::t_3195a52bff159e 55
+  s_e287ffe23760d1::t_751b6dbaa16100 29
+  s_e287ffe23760d1::t_385b1013dfecc0 20,22-24,27,31-42
+  s_e287ffe23760d1::t_ad392a7070e9b7 58,65-77,84
+  s_e287ffe23760d1::t_6f28dbad200b2c 79
+  s_e287ffe23760d1::t_fa840761b9f56e 25-26,28,30
+  s_e287ffe23760d1::t_0a56fce39f5523 3,5
+  s_e287ffe23760d1::t_cc130d2e83c62c 1,4
+  s_e287ffe23760d1::t_e5175314976d81 2,6-19,21,43-54,56-57,59-64,78,80,82-83,85-87
+Quartz/Features/KeyViewer/Layout/KvStore.cs
+  s_e287ffe23760d1::t_baa57223f810cd 277-320
+  s_e287ffe23760d1::t_2bd5f759fb44ba 234,238-240,246-249,251,253,255-256
+  s_e287ffe23760d1::t_e7872f715d5ba1 342-351,361-398,400-402,405-410,413-414,416,420,422-428
+  s_216cf8d0b4a9ab::t_c58e47d7ffd22e 170-174
+  s_e287ffe23760d1::t_ef254e2f3eb8a1 230-233,241-245,250,252,254
+  s_e33a436a097355::t_21651d31b750b1 156-169
+  s_216cf8d0b4a9ab::t_999adf2dcefc60 95-100,102-122,124-125
+  s_e287ffe23760d1::t_e5175314976d81 1-94,101,123,126-155,175-229,235-237,257-276,321-341,399,403-404,411-412,415,417-419,421,429-443
+  s_e287ffe23760d1::t_9b08682d308302 352-360
+Quartz/Resource/SpriteManager.cs
+  s_e287ffe23760d1::t_e5175314976d81 29-45,242-259
+Quartz/Features/KeyViewer/KeyViewerOverlay.Boxes.cs
+  s_e287ffe23760d1::t_b71b3ad2bb8588 10-13
+Quartz/UI/Editor/KvPopup.cs
+  s_e287ffe23760d1::t_b2a6094273ffbd 156-167
+  s_e287ffe23760d1::t_e5175314976d81 1-2,4-5,8-26,28,30,32,34,36-56,61-78,80-155,168-184
+  s_02bea41bcc42a2::t_6a7532c25b3faf 57-60
+  s_02bea41bcc42a2::t_cdfb7eddfc26e0 27,29,31,33,35
+  s_e287ffe23760d1::t_245426c45d7413 79
+  s_e287ffe23760d1::t_b71b306de6f349 3,6-7
+Quartz/Resource/Export/Lang/en-US.json
+  s_02bea41bcc42a2::t_848637799fca35 964,1024-1031,1033,1042,1046-1053,1055-1067,1069,1073-1076
+  s_02bea41bcc42a2::t_7c0cdea5a2de3d 84,109-116,351-366,370,437,961-963,965-1023,1032,1034-1041,1043-1045,1054,1068,1070-1072,1077-1137
+Quartz/UI/Editor/KvGrid.cs
+  s_e287ffe23760d1::t_e5175314976d81 1-82
+Quartz/Features/KeyViewer/Layout/KvHistory.cs
+  s_e287ffe23760d1::t_e5175314976d81 1-71
+Quartz/UI/Editor/KvCanvasInput.cs
+  s_e287ffe23760d1::t_687ea189676467 76-83
+  s_e287ffe23760d1::t_f6b7456d6d2069 67-68
+  s_e287ffe23760d1::t_533eae6b8aaa58 50-52
+  s_e287ffe23760d1::t_213f787960b510 104
+  s_e287ffe23760d1::t_ba8bcf32c0427c 60,63-66
+  s_e287ffe23760d1::t_b55f98df93205b 87-94,96-100,102-103,105-106
+  s_e287ffe23760d1::t_e5175314976d81 1-49,53-59,61-62,69-75,84-86,95,107-197
+  s_e287ffe23760d1::t_965b9d107e580f 101
+Quartz/Resource/ResourceManager.cs
+  s_e287ffe23760d1::t_e5175314976d81 35-54,171-188
+Quartz/Features/KeyViewer/RainRenderer.cs
+  s_02bea41bcc42a2::t_a5f32ca5479da4 58-61
+  s_e287ffe23760d1::t_6a5aa6e5098927 408-417,420
+  s_e287ffe23760d1::t_88f2258286cfe8 36-54,62-65,360-370,404,432-435,439
+  s_02bea41bcc42a2::t_fa3886c2eb67d6 353-354
+  s_02bea41bcc42a2::t_12c1a80987f462 70-82
+  s_02bea41bcc42a2::t_1669faf6d2c68e 118-120,124,126-127,131-134,137-170,178-180,188-223,230-239
+  s_02bea41bcc42a2::t_92738b577798aa 23-24,55-57
+  s_02bea41bcc42a2::t_d7c2dfd01adc07 121-123,125,128-130,135-136,224-229
+  s_02bea41bcc42a2::t_d04dca02b34d6f 272-275
+  s_02bea41bcc42a2::t_ae308423a2a74c 280-281,285,293-303,308
+  s_02bea41bcc42a2::t_f7efc26c694922 270-271
+  s_02bea41bcc42a2::t_5e50517e8ee8d5 22,25-32
+Quartz/UI/Editor/KvInspector.Multi.cs
+  s_e287ffe23760d1::t_8830f0c6ab20c0 141-146
+  s_e287ffe23760d1::t_b551960c978fd5 1-140,147-196
+Quartz/Features/KeyViewer/KeyViewerOverlay.Lifecycle.cs
+  s_e287ffe23760d1::t_dcf85442d35aac 80-82,85,92-94,97-98
+  s_e287ffe23760d1::t_a3ce28194a4325 125-127,131-136
+  s_e287ffe23760d1::t_ccdd4f85eae71c 280
+  s_02bea41bcc42a2::t_ab76b46081fa72 45
+  s_e287ffe23760d1::t_d6a310b51c7b8d 56
+  s_e287ffe23760d1::t_33c85a601e8404 68,77,83-84,88,96
+  s_e287ffe23760d1::t_c270dda2b5d511 71,113-122
+  s_e287ffe23760d1::t_e5175314976d81 55,59-67,69-70,214,218-223,225,237-243,245-249,254-258,264
+  s_e287ffe23760d1::t_067c91f0b4b676 253
+  s_e287ffe23760d1::t_b71c68599e94ee 167-168
+Quartz/UI/Factory/Page/PageCredits.cs
+  s_e287ffe23760d1::t_e5175314976d81 19-20,23
+Quartz/Features/KeyViewer/KeyViewerOverlay.cs
+  s_e287ffe23760d1::t_e5175314976d81 62-64,73-82,148-150
+  s_e287ffe23760d1::t_510f942f1d1377 293-297
+  s_02bea41bcc42a2::t_5194cd2509a353 135-139
+  s_02bea41bcc42a2::t_0bb7c629ba56f2 143-145
+  s_e287ffe23760d1::t_4f4b4276d97981 83-86
+  s_02bea41bcc42a2::t_6f3e2a022fc478 179-180,184-200
+  s_e287ffe23760d1::t_c1b1a4d64528a0 41-42
+  s_02bea41bcc42a2::t_c6f9864beeb6ad 39-40
+  s_e287ffe23760d1::t_cbd8b7faac4188 109-111
+  s_e287ffe23760d1::t_dd39cf191a5e4e 151-153
+  s_02bea41bcc42a2::t_be7f06a52ee91d 181-183
+Quartz/UI/Editor/KvInspector.Counter.cs
+  s_e287ffe23760d1::t_cd0debc3a5923e 28-38
+  s_02bea41bcc42a2::t_447f9f910e200e 62
+  s_02bea41bcc42a2::t_48e4189bb00a57 54-61,63-67
+  s_02bea41bcc42a2::t_82b1c90a5f871a 115-116
+  s_e287ffe23760d1::t_e5175314976d81 1-27,39-53,68-114,117-137
+Quartz/Features/Interop/Readers/KeyViewerImportShared.cs
+  s_e287ffe23760d1::t_de12f2c8ec771d 131-134
+  s_e287ffe23760d1::t_72c5223ce4bd2a 3
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_02bea41bcc42a2::t_7c0cdea5a2de3d 84,109-116,351-366,370,437,961-963,965-1023,1032,1034-1041,1043-1045,1054,1068,1070-1072,1077-1137
+  s_02bea41bcc42a2::t_848637799fca35 964,1024-1031,1033,1042,1046-1053,1055-1067,1069,1073-1076
+Quartz.Tests/Program.cs
+  s_e287ffe23760d1::t_a17d6ce5760bdd 21
+  s_e287ffe23760d1::t_6e4f2625fc890a 27
+  s_e287ffe23760d1::t_5ba76a1a3e1875 24
+  s_e287ffe23760d1::t_0cec6956529636 20,22,26
+  s_e287ffe23760d1::t_04c2b4c61b655c 40
+  s_e287ffe23760d1::t_a47d6fa489128e 37,41-42
+  s_e287ffe23760d1::t_0fd55d984c6f76 23
+  s_e287ffe23760d1::t_6bb850a9a4d52a 38-39
+  s_e287ffe23760d1::t_27a38c4e5ac175 17
+  s_e287ffe23760d1::t_fed471ea8b67d6 25
+  s_e287ffe23760d1::t_7351d43463d738 18-19
+  s_e287ffe23760d1::t_bca40315fc9a1d 13-16,28-36,43-46
+Quartz/UI/Editor/KvInspector.Style.cs
+  s_02bea41bcc42a2::t_b19aa07701056e 80-81,83-107
+  s_e287ffe23760d1::t_e5175314976d81 2-70,82,108-135
+  s_02bea41bcc42a2::t_dc3b9ccc7760b9 1
+  s_02bea41bcc42a2::t_067470742683d2 71-73,75-79
+  s_02bea41bcc42a2::t_447f9f910e200e 74
+Quartz/Features/KeyViewer/KeyViewerOverlay.DmNote.cs
+  s_e287ffe23760d1::t_64031a5fea7679 150
+  s_e287ffe23760d1::t_e5175314976d81 29,76-81
+  s_02bea41bcc42a2::t_4b1c728175a70d 62-70
+  s_02bea41bcc42a2::t_dd8c2f8b0c5ff4 60-61
+  s_e287ffe23760d1::t_84e28ae05e72e2 8
+  s_e287ffe23760d1::t_baa136c80dad7b 71-75
+  s_65082c41801867::t_4765c51d1c498c 181
+  s_e287ffe23760d1::t_5a77e7d0c6bcbb 209-220
+  s_e287ffe23760d1::t_043826de8303b2 18
+  s_e287ffe23760d1::t_109d136bcb7353 30,34-56
+  s_65082c41801867::t_8f3647ffccee78 57
+Quartz/UI/Editor/KvInspector.Element.cs
+  s_e287ffe23760d1::t_ad542689fb06e4 174-176
+  s_e287ffe23760d1::t_bcf6e30107b228 39,43,58,74,76-77,105,133-159
+  s_e287ffe23760d1::t_2c40eb5296e25e 1-38,40-42,44-57,59-73,75,78-104,106-132,160-173,177-202
+Quartz/UI/Editor/KvTabRemeasure.cs
+  s_e287ffe23760d1::t_ce6fd7b464c192 34-36
+  s_e287ffe23760d1::t_6b921627d9243a 18-21,30-31,39-42,47,54-59
+  s_e287ffe23760d1::t_2e6a720e6b831c 1-17,22-29,32-33,37-38,43-46,48-53,60-67
+Quartz/UI/Editor/KvFillHeight.cs
+  s_e287ffe23760d1::t_e5175314976d81 1-41
+Quartz/UI/Generator/GenerateUI.cs
+  s_e287ffe23760d1::t_e5175314976d81 258-262
+Quartz/UI/Factory/Page/PageKeyViewer.Tuning.cs
+  s_e287ffe23760d1::t_af7b9074d1fc28 73-112
+  s_e287ffe23760d1::t_e5175314976d81 1-44,113-253
+  s_e287ffe23760d1::t_56321756023d19 45-72
+Quartz.Tests/Features/KeyViewer/KvDocumentTests.cs
+  s_e287ffe23760d1::t_d7283e1ce7f282 5,9,59,160,162,169,171,183,204,209,215,217-218,249,260,379-503
+  s_e287ffe23760d1::t_82915c5b2b82e3 210,219-242
+  s_e287ffe23760d1::t_a7bfa44b51e4af 61-95
+  s_e287ffe23760d1::t_da70611d7e7a0a 145,149,185,195,261-283,309-338,366-378
+  s_e287ffe23760d1::t_18e0312c881684 186,284-308
+  s_e287ffe23760d1::t_cd44546e8a053c 109-112
+  s_e287ffe23760d1::t_439842fdd46c7e 115-143
+  s_e287ffe23760d1::t_4e715700ebc031 96-108,113-114,256
+  s_e287ffe23760d1::t_0faaa5de67c290 339-365
+  s_e287ffe23760d1::t_fe3b7ff9767c1d 2-4
+  s_e287ffe23760d1::t_2f322f8b2a9e7a 6-8
+  s_e287ffe23760d1::t_16ea41da129f79 10-12,56-58
+  s_e287ffe23760d1::t_acb8c7b2763cd1 60
+  s_e287ffe23760d1::t_efb3383634a244 144
+  s_e287ffe23760d1::t_37d811409dbf0f 146-148
+  s_e287ffe23760d1::t_aa66249aaed331 150-152,157-159
+  s_e287ffe23760d1::t_4c349ad90001c0 161
+  s_e287ffe23760d1::t_f4e7169f7b3b37 163-168
+  s_e287ffe23760d1::t_d0f2de6a09a311 170
+  s_e287ffe23760d1::t_24bbcaabd734d0 172-174,180-182
+  s_e287ffe23760d1::t_d06f0ebf0f25ed 184
+  s_e287ffe23760d1::t_3bec07e6c6c479 187-189,192-194
+  s_e287ffe23760d1::t_71e99dd19f85b2 196-198,201-203
+  s_e287ffe23760d1::t_7020688f2a0e18 205-208
+  s_e287ffe23760d1::t_e4b2d3b23bd974 211-214
+  s_e287ffe23760d1::t_36bd902c7f594f 216
+  s_e287ffe23760d1::t_4e809d7f1c066d 243-248
+  s_e287ffe23760d1::t_4c65ff7460ea9e 250-255
+  s_e287ffe23760d1::t_cbb272cd215166 257-259
+  s_e287ffe23760d1::t_f15df756647adc 504
+  s_e287ffe23760d1::t_691ea26a1949c9 1,13-55,153-156,175-179,190-191,199-200
+Quartz/Features/KeyViewer/Layout/KvMigrationPlan.cs
+  s_e287ffe23760d1::t_28cfaac0582974 1-89
+Quartz/UI/Utility/UIScrollController.cs
+  s_e287ffe23760d1::t_e5175314976d81 25-57,62,67-70
+Quartz/Features/KeyViewer/Layout/KvSnap.cs
+  s_e287ffe23760d1::t_3b5ea4efeee951 41-47
+  s_e287ffe23760d1::t_4cdb3381ac8d18 147-151,160,166-173,190
+  s_e287ffe23760d1::t_e5175314976d81 1-40,48-146,191-197
+  s_e287ffe23760d1::t_8f3de6fa977347 152-158,161-164,175
+  s_e287ffe23760d1::t_cdcc00a3f1a24d 159,165,174,176-189
+Quartz/UI/Editor/KvSplit.cs
+  s_e287ffe23760d1::t_e5175314976d81 1-55
+Quartz/UI/Editor/KvCanvasGuides.cs
+  s_e287ffe23760d1::t_e5175314976d81 1-84
+Quartz.Tests/Features/KeyViewer/KvSnapTests.cs
+  s_e287ffe23760d1::t_c22e7407ab3ddf 75,77-80,82,84,86-90,99
+  s_e287ffe23760d1::t_e5175314976d81 1-67,119
+  s_e287ffe23760d1::t_d613fb041f5506 68-70,72-73,76,85,91-93,95-97,112-118
+  s_e287ffe23760d1::t_47da2392077ee3 71,74,81,83,94,98,100-111
+Quartz/UI/Factory/Page/PageKeyViewer.Helpers.cs
+  s_02bea41bcc42a2::t_6dbbb8b37b3849 34
+  s_e287ffe23760d1::t_e5175314976d81 14-24
+Quartz/IO/CoreSettings.cs
+  s_e287ffe23760d1::t_e5175314976d81 32-34,84,121
+Quartz/UI/Editor/KvWidgets.Input.cs
+  s_e287ffe23760d1::t_e5175314976d81 1-83
+Quartz/UI/Objects/Impl/UISlider.cs
+  s_e287ffe23760d1::t_756814cf3f6749 232
+  s_e287ffe23760d1::t_7ef12821b750f6 129
+  s_81ecb199ef9d4f::t_24309e6e62a2bd 195
+  s_81ecb199ef9d4f::t_c899c4864252ed 40-45
+  s_e287ffe23760d1::t_08defd71467dfa 118-122
+  s_81ecb199ef9d4f::t_6270e8d2501393 106-110
+  s_e287ffe23760d1::t_aaf96b380feba1 29-39
+Quartz/Features/KeyViewer/Layout/KvMigration.cs
+  s_e287ffe23760d1::t_e5175314976d81 2-4,8-11,14-16,81-85,88,137-151,153,155-156,158-170
+  s_e287ffe23760d1::t_c0311c23d5e00d 91-100,108,110-113,115,117-119,121-122,124,128,130-131,134,136
+  s_02bea41bcc42a2::t_f31076d527d02b 101-107,109
+  s_e287ffe23760d1::t_9f8f050830baf0 86-87,89-90,114,116,120,123,125-127,129,132-133,135
+  s_e287ffe23760d1::t_93bf62ad22ac4e 152,154,157
+  s_e287ffe23760d1::t_2ea2f04de620e7 1,5-7,12-13,17-80
+Quartz/Features/KeyViewer/KeyViewerOverlay.Rain.cs
+  s_02bea41bcc42a2::t_3c2cbdd513ec9e 60-63
+  s_02bea41bcc42a2::t_9755a059c3ca7c 55-59
+  s_e287ffe23760d1::t_88f2258286cfe8 11-24,38-54
+Quartz/UI/Factory/Page/PageKeyViewer.EditorTabs.cs
+  s_e287ffe23760d1::t_cf649736e1b067 25
+  s_02bea41bcc42a2::t_57bc6cf0b624ac 30
+  s_e287ffe23760d1::t_febded18df325f 89
+  s_e287ffe23760d1::t_9950692ab19fbc 1-24,26-29,31-62,65,68-81,86-88,90-150
+  s_e287ffe23760d1::t_1a0fdee8f85a71 82-85
+  s_e287ffe23760d1::t_de319d5722f5eb 63-64,66-67
+Quartz/Features/KeyViewer/Layout/KvKeyNames.cs
+  s_e287ffe23760d1::t_e5175314976d81 1-93
+Quartz/UI/Editor/KvInspector.Toolbar.cs
+  s_e287ffe23760d1::t_e5175314976d81 1-87,89-91,93-95,97-114,116,118-181
+  s_02bea41bcc42a2::t_4b4d062aa043bd 115,117
+  s_e287ffe23760d1::t_22fdf56758310e 96
+  s_e287ffe23760d1::t_188049cbd79d3d 92
+  s_e287ffe23760d1::t_5d6f49dada8e2f 88
+Quartz/UI/Editor/KvProps.cs
+  s_e287ffe23760d1::t_e5175314976d81 1-141
+Quartz/UI/Editor/KvTabStrip.cs
+  s_e287ffe23760d1::t_d6951c9cf6b0d0 1-28,30,32,34-38,40,42-43,46-47,49-89,92-101,103-105,107-111,115-116,121-143,145-160,164-166
+  s_e287ffe23760d1::t_4ae8291f07a6c7 102,106,112-114,117-120
+  s_02bea41bcc42a2::t_7350b7e75cb6fe 44-45,48
+  s_02bea41bcc42a2::t_d4adda6d010237 161-163
+  s_02bea41bcc42a2::t_cdfb7eddfc26e0 29,31,33,39,41
+  s_02bea41bcc42a2::t_c312ec2c466663 90-91
+  s_e287ffe23760d1::t_cfdc9d5dc1d19e 144
+Quartz/Features/KeyViewer/Layout/KvDocument.cs
+  s_e287ffe23760d1::t_9a414fff37c223 152-154
+  s_e287ffe23760d1::t_e4d9fdde1913ae 47-101,129-138,140-151,155-156
+  s_e287ffe23760d1::t_877341e9677347 102-128
+  s_e287ffe23760d1::t_a3ab10e3a288a0 157-169
+  s_e287ffe23760d1::t_e5175314976d81 2-46,192-250,266-348
+  s_e287ffe23760d1::t_59c830c60ae1f0 170-191
+  s_e287ffe23760d1::t_c48aa867b54c5a 139
+  s_e287ffe23760d1::t_58593c9168361e 1
+  s_e287ffe23760d1::t_bb838a7781eae1 251-265
+Quartz/UI/Editor/KvToolbar.cs
+  s_02bea41bcc42a2::t_56e7e31fff7331 215-218
+  s_02bea41bcc42a2::t_49558a2704634c 243,248-256,260-262
+  s_02bea41bcc42a2::t_148fcfccfca39e 236-242,244-247,257-259,263-273
+  s_02bea41bcc42a2::t_445e38b3c54f57 223-235
+  s_02bea41bcc42a2::t_20ada0203a0ee6 48-68,79-127
+  s_e287ffe23760d1::t_e5175314976d81 1-47,69-78,128-214,219-222,274-295
+Quartz/UI/Editor/KvInspector.cs
+  s_02bea41bcc42a2::t_e914c3272a6e6b 260
+  s_02bea41bcc42a2::t_c53524618e3925 257-259
+  s_02bea41bcc42a2::t_c148dc4ec21be1 261-263
+  s_02bea41bcc42a2::t_3e0c30170c3636 1-256,264-412
+Quartz.Tests/Features/KeyViewer/KvHistoryTests.cs
+  s_e287ffe23760d1::t_e5175314976d81 1-50
+Quartz/UI/Factory/Page/PageKeyViewer.EditorChrome.cs
+  s_e287ffe23760d1::t_e5175314976d81 1-224,230-260
+  s_02bea41bcc42a2::t_52046d13a1ab25 225-229
+Quartz/UI/Editor/KvCanvasKeys.cs
+  s_e287ffe23760d1::t_e5175314976d81 1-17,21-67,94-230
+  s_e287ffe23760d1::t_694444ee569734 68-77,80-81,83-85,87,89-93
+  s_e287ffe23760d1::t_6955e80e31325b 78-79,82,86,88
+  s_e287ffe23760d1::t_6f3d69d3efd8fd 18-20
+Quartz/UI/Factory/Page/PageKeyViewer.cs
+  s_e287ffe23760d1::t_e5175314976d81 3,14
+  s_e287ffe23760d1::t_1654495ed845e4 7-13,19,23-25
+Quartz/UI/Editor/KvCanvasView.cs
+  s_02bea41bcc42a2::t_2ffa5daba46479 37-43
+  s_02bea41bcc42a2::t_38011cc8ce0bfb 67,70-75,77,79-124,128-129,132-139
+  s_e287ffe23760d1::t_e5175314976d81 1-36,44-66,68-69,76,78,140-225
+  s_02bea41bcc42a2::t_b18fc2ed474678 125-127,130-131
+Quartz/UI/Utility/PaneDivider.cs
+  s_e287ffe23760d1::t_e5175314976d81 13-18,68
+Quartz/UI/Utility/KeyCaptureRunner.cs
+  s_e287ffe23760d1::t_e5175314976d81 1-54
+Quartz.Tests/Quartz.Tests.csproj
+  s_e287ffe23760d1::t_e5175314976d81 17-20
+Quartz/Features/KeyViewer/Layout/KvElement.Unity.cs
+  s_e287ffe23760d1::t_e5175314976d81 1-14
+Quartz/UI/Editor/KvWidgets.cs
+  s_e287ffe23760d1::t_268493356f917c 182-183
+  s_e287ffe23760d1::t_1d583432ae5938 213-216
+  s_e287ffe23760d1::t_d4b09cf54587f0 62
+  s_02bea41bcc42a2::t_cdfb7eddfc26e0 42
+  s_e287ffe23760d1::t_6feadbd44415aa 144
+  s_e287ffe23760d1::t_14d602b3db03a6 73-82,93
+  s_e287ffe23760d1::t_11830807c760ce 22-23
+  s_e287ffe23760d1::t_85101155cc0901 48-61,63
+  s_e287ffe23760d1::t_e5175314976d81 1-21,24-41,43-47,64-72,83-92,94-143,145-181,184-212,217-220
+Quartz/Features/KeyViewer/KeyViewerOverlay.DmNoteParsing.cs
+  s_e287ffe23760d1::t_e5175314976d81 57,65-84,333-334,423
+  s_02bea41bcc42a2::t_aa04041ba9a4ee 230-233,266-270
+  s_02bea41bcc42a2::t_a62a4d27982311 85,477-489
+  s_02bea41bcc42a2::t_4cf93ee48eb87e 229,234-265
+Quartz/UI/Editor/KvPalette.cs
+  s_e287ffe23760d1::t_e5175314976d81 1-48,50-54,60,62,64,66,68,70,72,74-78,80,82,84,86,88-92
+  s_02bea41bcc42a2::t_c661292bae2dc7 49,55-59,61,63,65,67,69,71,73,79,81,83,85,87
+Quartz/Features/KeyViewer/KeyViewerOverlay.DmNoteLayout.cs
+  s_02bea41bcc42a2::t_ea8347968bc43b 46-48
+  s_02bea41bcc42a2::t_c8587cf7365160 80
+  s_02bea41bcc42a2::t_5b27ea72e91ba3 77-79
+  s_e287ffe23760d1::t_e5175314976d81 22-23,29-37
+  s_02bea41bcc42a2::t_c867d3774b30e4 64
+  s_02bea41bcc42a2::t_9c8b4b062d4751 146
+  s_e287ffe23760d1::t_2f16b4a0b6c8e7 24
+  s_02bea41bcc42a2::t_a1710e69aa4251 96-100
+  s_02bea41bcc42a2::t_ab8624acd3aa5b 170
+Quartz/Features/KeyViewer/Layout/KvPresets.cs
+  s_e287ffe23760d1::t_5b8a34969f281c 203-204,207
+  s_e287ffe23760d1::t_919cf984a0e1c7 289-292
+  s_e287ffe23760d1::t_194a40ad5a04d1 321-329,334-338
+  s_e287ffe23760d1::t_859b5d87813171 250-256,258
+  s_e287ffe23760d1::t_a12b17659e90bf 345-347
+  s_e287ffe23760d1::t_d219550151fcae 155-156
+  s_e287ffe23760d1::t_ce451bb9559881 42-49,51
+  s_02bea41bcc42a2::t_58f85f76678358 33-38,40
+  s_e287ffe23760d1::t_c62c89a7703d49 168-170,174-202,205-206
+  s_e287ffe23760d1::t_64f9ed9d5dd79a 118,151,259
+  s_02bea41bcc42a2::t_41d26c91c5cf7c 58,61-98
+  s_e287ffe23760d1::t_e5175314976d81 1-32,39,41,50,52-57,59-60,99-104,106-117,119-150,152-154,157-167,171-173,208-249,257,260-288,293-320,330-333,339-344,348-370
+  s_e287ffe23760d1::t_9578a75ec06cbb 105
+Quartz/UI/Editor/KvCanvas.cs
+  s_02bea41bcc42a2::t_cb5f8a5ebe5205 28
+  s_e287ffe23760d1::t_e5175314976d81 1-27,29-135,139-143,148,150-283
+  s_e287ffe23760d1::t_edc0dedc9d2c49 136-138
+  s_02bea41bcc42a2::t_3a06f5991ab1a6 144-147,149
+Quartz/UI/Editor/KvCanvasNav.cs
+  s_e287ffe23760d1::t_95d722713e2374 37-42
+  s_e287ffe23760d1::t_e5175314976d81 1-36,43-89,110-116,120-141
+  s_e287ffe23760d1::t_f241b43b17ddc4 90-109,117-119
+Quartz/Features/KeyViewer/Layout/KvElement.cs
+  s_e287ffe23760d1::t_cdde3c8f15dc1b 26,35,45,53,124,152,164-177
+  s_e287ffe23760d1::t_0fbbf15b85d3fb 31,39,44,48,52,57,67,72,77,81,85,89,93,97,107,111,116,119,122-123,126,133,142-143,147-148,155,158,161-163,178-191,194,197-198,211,215
+  s_e287ffe23760d1::t_ca0c6dec5b0e54 98-106
+  s_e287ffe23760d1::t_cd2cdf85d5f5f8 23-25
+  s_e287ffe23760d1::t_a03edb75deaf7b 27-30
+  s_e287ffe23760d1::t_fdd6a7375e044e 32-34
+  s_e287ffe23760d1::t_ee17091ec535e7 36-38
+  s_e287ffe23760d1::t_f258b9246d0146 40-43
+  s_e287ffe23760d1::t_a30add3ac7deeb 46-47
+  s_e287ffe23760d1::t_1af088cbb7ed6f 49-51
+  s_e287ffe23760d1::t_efb1ae30d6a8ed 54-56
+  s_e287ffe23760d1::t_39e8111d555b95 58-60,64-66
+  s_e287ffe23760d1::t_f7b6ccd50fbe38 68-71
+  s_e287ffe23760d1::t_4828f44ba408d0 73-76
+  s_e287ffe23760d1::t_5a320749e9b090 78-80
+  s_e287ffe23760d1::t_e57e6b44cce4c3 82-84
+  s_e287ffe23760d1::t_2268906a030993 86-88
+  s_e287ffe23760d1::t_4d2a73dd0fe54c 90-92
+  s_e287ffe23760d1::t_b172ff3126399a 94-96
+  s_e287ffe23760d1::t_2b01f589095eb8 108-110
+  s_e287ffe23760d1::t_57f5b23b0045b0 112-115
+  s_e287ffe23760d1::t_f3cc98310799fe 117-118
+  s_e287ffe23760d1::t_368b769127fc69 120-121
+  s_e287ffe23760d1::t_bc3908c2f1cd6d 125
+  s_e287ffe23760d1::t_53a74d7096d09f 127-132
+  s_e287ffe23760d1::t_a036ff0432a683 134-136,139-141
+  s_e287ffe23760d1::t_662eb7a3a99c64 144-146
+  s_e287ffe23760d1::t_83f1d8d9aa5af7 149-151
+  s_e287ffe23760d1::t_9829e6fdc5a34d 153-154
+  s_e287ffe23760d1::t_da702681ed6217 156-157
+  s_e287ffe23760d1::t_822e4755a90f75 159-160
+  s_e287ffe23760d1::t_f37f57c51af564 192-193
+  s_e287ffe23760d1::t_2c7d1f21021f3b 195-196
+  s_e287ffe23760d1::t_c673441262e1fa 199-201,208-210
+  s_e287ffe23760d1::t_08eac69443b8a9 212-214
+  s_e287ffe23760d1::t_b253e7b61045ae 216-218
+  s_5a0783a0fad6b9::t_bc58bb0fb0de43 1-22,61-63,137-138,202-207
+Quartz/UI/Editor/KvCanvasHandles.cs
+  s_e287ffe23760d1::t_e5175314976d81 1-132
+Quartz/Features/KeyViewer/KeyViewerSettings.cs
+  s_e287ffe23760d1::t_04ad739292ffb2 2,11-21
+  s_e287ffe23760d1::t_9ae5c3295bb275 22-27
+  s_e287ffe23760d1::t_e5175314976d81 8
+Quartz/UI/Editor/KvTabs.cs
+  s_e287ffe23760d1::t_8a792be5af611a 50-52,56
+  s_02bea41bcc42a2::t_cdfb7eddfc26e0 35,37,39,41,43,45
+  s_02bea41bcc42a2::t_632c7504fda46e 99
+  s_e287ffe23760d1::t_7d006b05e9cc97 186
+  s_e287ffe23760d1::t_72625350f1ae36 104-105,108-116
+  s_e287ffe23760d1::t_e5175314976d81 1,3,8-9,11-24,31-34,36,38,40,46-49,53-55,80,82-83,85,100,103,106-107,117-122,124-127,129,134-135,137-142,150,152-155,157-160,185,231-232
+  s_02bea41bcc42a2::t_98dd76c3a8d279 5,7,10
+  s_e287ffe23760d1::t_08d380312d387c 156
+  s_02bea41bcc42a2::t_46409fe7761e6a 66
+  s_02bea41bcc42a2::t_861d11135ca9c4 25-30,42,44,57-65,67-79,81,84,86-98,101-102,123,128,130-133,136,143-149,151,187-230
+  s_02bea41bcc42a2::t_ff8b66e4aefcf0 4
+  s_e287ffe23760d1::t_e65df165493f93 2,6
+  s_02bea41bcc42a2::t_c6e4f656a4cf87 161,164-184
+  s_02bea41bcc42a2::t_8d379ac5c72c6d 162-163
+Quartz/UI/Factory/Page/PageKeyViewer.Editor.cs
+  s_e287ffe23760d1::t_2ce1f138a13236 54-55
+  s_e287ffe23760d1::t_5f46735f3e07b3 59-60
+  s_e287ffe23760d1::t_44fe2ddedd5c95 42
+  s_e287ffe23760d1::t_3375921379ac7c 82
+  s_e287ffe23760d1::t_27e7a3c45f6bca 33
+  s_e287ffe23760d1::t_4bf72211423fe1 45
+  s_e287ffe23760d1::t_7e30183943faec 122,127-129,140,157,160
+  s_e287ffe23760d1::t_4c23a7b53eddb3 61
+  s_e287ffe23760d1::t_6500d87a0abc81 108
+  s_e287ffe23760d1::t_345ad3ad1cecfc 123-126,131-132,147-149,154,159,162-164
+  s_e287ffe23760d1::t_d47e45a6570be5 40-41
+  s_e287ffe23760d1::t_000cee264df46b 116-121
+  s_02bea41bcc42a2::t_ac2c34d4c7acbc 115
+  s_e287ffe23760d1::t_e5175314976d81 1-32,34-39,43-44,46-53,56-58,62-81,83-107,109-114,130,133-139,141-146,150-153,155-156,158,161,165-169
+Quartz/Features/KeyViewer/KeyViewerSettings.Serialization.cs
+  s_e287ffe23760d1::t_9c14c6926c4e46 2
+  s_e287ffe23760d1::t_70a38b51fb3bbb 238-240,242-244
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "3fdae909fd7f24c781fde37678a719d78e614663",
+  "prompts": {},
+  "sessions": {
+    "s_02bea41bcc42a2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e6a2305a-635a-430b-8986-33d5847dcd68",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_216cf8d0b4a9ab": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f940dfe2-d973-4c4f-94d4-0220373642a8",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_5a0783a0fad6b9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a67b830cf4a175bc4",
+        "model": "unknown"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_65082c41801867": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "51f32074-2ba1-425c-bc95-ea26e606581b",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_81ecb199ef9d4f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "19ccc380-b642-4006-9f49-382deefa5616",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_e287ffe23760d1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ab316e4b-2cb6-4398-9f71-434f3e03dacd",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_e33a436a097355": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ced29af6-2237-4030-b415-c40eec6536f1",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
