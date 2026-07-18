@@ -86,7 +86,12 @@ public static partial class PanelsOverlay {
                     }
                     StatColor color = entry.Color;
                     if(color is { Enabled: true }) {
-                        Color tint = color.Evaluate(ColorRatio(entry.Id, color));
+                        Color tint = color.Evaluate(
+                            ColorRatio(entry.Id, color),
+                            // Percent stats round at the panel's decimals; the perfect colour has
+                            // to agree with the number the user actually reads.
+                            IsPercentStat(entry.Id) ? Mathf.Clamp(c.Decimals, 0, 6) : -1
+                        );
                         sb.Append("<color=#");
                         AppendHex(sb, tint);
                         sb.Append('>').Append(value).AppendLine("</color>");
@@ -163,6 +168,10 @@ public static partial class PanelsOverlay {
                 if(sb[i] != value[i]) return false;
             return true;
         }
+        /// <summary>The stats Pct() renders — the ones whose colour gate must match the rounded
+        /// display. See PanelsOverlay's stat catalog.</summary>
+        private static bool IsPercentStat(string id) =>
+            id is "progress" or "accuracy" or "xaccuracy" or "maxaccuracy" or "best";
         private static float ColorRatio(string id, StatColor color) {
             try {
                 switch(id) {
