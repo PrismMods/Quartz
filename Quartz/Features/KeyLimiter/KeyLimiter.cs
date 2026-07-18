@@ -248,6 +248,35 @@ internal static partial class KeyLimiter {
         RuntimePlatform platform = Application.platform;
         return platform == RuntimePlatform.OSXPlayer || platform == RuntimePlatform.OSXEditor;
     }
+    // Physical key state straight from the HID system, bypassing both Unity's event stream and
+    // SkyHook. Needed for keys neither source reports reliably on macOS: Unity's backend drops
+    // Tab's down/up while Shift is held (it becomes a backtab character before Unity keycodes
+    // it), and macOS SkyHook never emits Tab at all — so Shift+Tab was invisible to the key
+    // viewer while the game itself (Rewired, reading HID) counted the hit. Same technique as
+    // the earlier RightAlt/RightControl hold fix. Extend the switch if another key shows the
+    // same symptom; keep it a whitelist — this is an extra native call per query.
+    [System.Runtime.InteropServices.DllImport(
+        "/System/Library/Frameworks/ApplicationServices.framework/ApplicationServices")]
+    private static extern bool CGEventSourceKeyState(int sourceStateID, ushort keyCode);
+    private const int KCGEventSourceStateHidSystemState = 1;
+    // Application.platform is an engine icall; this helper is on the KeyViewer
+    // per-key per-frame path (20-56 calls/frame), so resolve the platform once.
+    private static readonly bool MacRuntimeCached = IsMacOSRuntime();
+    public static bool TryMacPhysicalKeyHeld(KeyCode key, out bool held) {
+        held = false;
+        if(!MacRuntimeCached) return false;
+        ushort vk = key switch {
+            KeyCode.Tab => 0x30,
+            _ => ushort.MaxValue,
+        };
+        if(vk == ushort.MaxValue) return false;
+        try {
+            held = CGEventSourceKeyState(KCGEventSourceStateHidSystemState, vk);
+            return true;
+        } catch {
+            return false;
+        }
+    }
     private static readonly Dictionary<KeyLabel, KeyCode> asyncLabelCache = new();
     private static KeyCode AsyncLabelToPhysicalUnityKey(KeyLabel label) {
         if(asyncLabelCache.TryGetValue(label, out KeyCode cached)) return cached;

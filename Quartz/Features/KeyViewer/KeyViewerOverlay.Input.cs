@@ -3,11 +3,21 @@ using Quartz.Features;
 using UnityEngine;
 namespace Quartz.Features.KeyViewer;
 public static partial class KeyViewerOverlay {
+    // KeyHeld runs 20-56x per frame; the platform never changes at runtime and
+    // hook-tracking is a pure function of (key, platform), so cache both instead
+    // of paying the Application.platform engine icalls on every call.
+    private static readonly bool macRuntime = KeyLimiter.KeyLimiter.IsMacOSRuntime();
+    private static readonly Dictionary<KeyCode, bool> hookFallback = new();
     private static bool KeyHeld(KeyCode key) {
         if(key == KeyCode.None) return false;
+        // Keys Unity's mac backend misreports under modifiers (Shift+Tab) answer from the HID
+        // system's physical state instead — authoritative in both directions, so it also can't
+        // leave the box stuck lit when Unity swallows the matching key-up.
+        if(macRuntime && KeyLimiter.KeyLimiter.TryMacPhysicalKeyHeld(key, out bool physical))
+            return physical;
         try {
             if(Input.GetKey(key)) return true;
-            if(!KeyLimiter.KeyLimiter.IsMacOSRuntime()) {
+            if(!macRuntime) {
                 KeyCode twin = NumpadNavTwin(key);
                 if(twin != KeyCode.None && Input.GetKey(twin)) return true;
             }
@@ -16,8 +26,13 @@ public static partial class KeyViewerOverlay {
         }
         return IsHookFallbackKey(key) && KeyLimiter.KeyLimiter.HookKeyHeld(key);
     }
-    private static bool IsHookFallbackKey(KeyCode key)
-        => KeyLimiter.KeyLimiter.IsHookTrackedKey(key);
+    private static bool IsHookFallbackKey(KeyCode key) {
+        if(!hookFallback.TryGetValue(key, out bool tracked)) {
+            tracked = KeyLimiter.KeyLimiter.IsHookTrackedKey(key);
+            hookFallback[key] = tracked;
+        }
+        return tracked;
+    }
     private static KeyCode NumpadNavTwin(KeyCode key) => key switch {
         KeyCode.KeypadEnter => KeyCode.Return,
         KeyCode.Keypad0 => KeyCode.Insert,
