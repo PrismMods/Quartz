@@ -1,0 +1,20 @@
+Quartz/UI/UICore.cs
+  s_65b8e117e716ff::t_90d75b1609243d 356-361
+  s_65b8e117e716ff::t_7ac78e150d4caa 362
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "b8d053c57915326e2092ee9d0e222478e510a2de",
+  "prompts": {},
+  "sessions": {
+    "s_65b8e117e716ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8fb9bd08-fb7e-4c49-8fa2-47ebe22377cc",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
