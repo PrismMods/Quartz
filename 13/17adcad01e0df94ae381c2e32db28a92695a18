@@ -1,0 +1,22 @@
+Quartz/Features/Editor/EditorBgaMod.cs
+  s_a4d7b37eff0786::t_758fbef854e39a 52
+  s_a4d7b37eff0786::t_f9818772a5cb2d 29
+  s_a4d7b37eff0786::t_4f7de8c6d86a57 109-118
+  s_a4d7b37eff0786::t_a7f7f2cb4937ab 123-127,130-131,135,140-146,148-149,151-152,154-161,163
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "1317adcad01e0df94ae381c2e32db28a92695a18",
+  "prompts": {},
+  "sessions": {
+    "s_a4d7b37eff0786": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c3da5f65-414d-49ed-b51f-7d7cf3fc4dca",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
