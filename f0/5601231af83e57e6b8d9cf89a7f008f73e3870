@@ -1,0 +1,21 @@
+Quartz/UI/Factory/Page/PageVisuals.PageBuilders.cs
+  s_b571147b145ad5::t_76eee5f913fd3b 536-537,542-543
+  s_b571147b145ad5::t_13e96531e22158 515-516,521-522
+  s_b571147b145ad5::t_4071c82974a34c 573-574,579-580
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "f05601231af83e57e6b8d9cf89a7f008f73e3870",
+  "prompts": {},
+  "sessions": {
+    "s_b571147b145ad5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "43107610-a351-48d4-a3ab-a7ff09090189",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
