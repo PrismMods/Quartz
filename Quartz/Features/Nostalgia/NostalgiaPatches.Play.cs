@@ -136,15 +136,13 @@ public static partial class Nostalgia {
     private static class NoJudgeAnimationPatch {
         private static void Postfix(scrHitTextMesh __instance) {
             if(!ShouldNoJudgeAnimation) return;
-            EnsureHitTextAccessors();
-            Renderer meshRenderer = hitTextMeshRendererRef != null ? hitTextMeshRendererRef(__instance) : null;
+            // BTTP also retargeted the fade tween's ease via TweensByTarget(meshRenderer.material),
+            // but in the current game every candidate fade tween targets the TMP_Text (Show's DOFade)
+            // or a GameObject (DOTweenAnimation.SetTarget), never the material — that lookup could
+            // never match, and reading .material only cloned the TMP font material per renderer,
+            // detaching it from the game's fontMaterial.SetColor(GlowColor, ...) updates.
             __instance.transform.DOKill();
             __instance.transform.localRotation = scrCamera.instance.transform.rotation;
-            if(meshRenderer != null) {
-                var tweens = DOTween.TweensByTarget(meshRenderer.material);
-                if(tweens != null && tweens.Count > 0)
-                    tweens[0].SetEase(Ease.InExpo);
-            }
         }
     }
     [HarmonyPatch(typeof(scrHitTextManager), "ShowHitText")]
@@ -188,7 +186,6 @@ public static partial class Nostalgia {
     private static AccessTools.FieldRef<scrHitTextManager, Dictionary<HitMargin, scrHitTextMesh[]>> cachedHitTextsRef;
     private static AccessTools.FieldRef<scrHitTextMesh, int> hitTextMeshFrameShownRef;
     private static AccessTools.FieldRef<scrHitTextMesh, Vector3> hitTextMeshTextPosRef;
-    private static AccessTools.FieldRef<scrHitTextMesh, Renderer> hitTextMeshRendererRef;
     private static void EnsureHitTextAccessors() {
         if(hitTextAccessorsResolved) return;
         hitTextAccessorsResolved = true;
@@ -200,9 +197,6 @@ public static partial class Nostalgia {
         } catch { }
         try {
             hitTextMeshTextPosRef = AccessTools.FieldRefAccess<scrHitTextMesh, Vector3>("textPos");
-        } catch { }
-        try {
-            hitTextMeshRendererRef = AccessTools.FieldRefAccess<scrHitTextMesh, Renderer>("meshRenderer");
         } catch { }
     }
 }
