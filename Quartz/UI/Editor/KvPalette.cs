@@ -19,6 +19,13 @@ internal static class KvPalette {
     // colors.ts
     /// <summary>The bar and page behind the editor. colors.primary.</summary>
     internal static readonly Color Primary = Hex("#1A191E");
+    /// <summary>
+    /// The grid canvas well the elements sit on. DM Note's Grid container is <c>bg-[#3A3943]</c>
+    /// (Grid.tsx), a lighter inset than the <see cref="Primary"/> page around it — NOT primary. The
+    /// grid line is a near-black picked to sit against exactly this well; drawn over primary instead
+    /// the two are one shade apart and the grid vanishes.
+    /// </summary>
+    internal static readonly Color CanvasWell = Hex("#3A3943");
     /// <summary>Grouping pills and the buttons inside them. colors.button.primary.</summary>
     internal static readonly Color ButtonPrimary = Hex("#000000");
     internal static readonly Color ButtonHover = Hex("#1F1F23");

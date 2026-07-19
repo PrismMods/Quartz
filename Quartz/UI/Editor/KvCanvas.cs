@@ -81,10 +81,10 @@ internal sealed partial class KvCanvas {
         bg.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P1024);
         bg.type = Image.Type.Sliced;
         bg.pixelsPerUnitMultiplier = 8f / 6f;
-        // DM Note's page colour, not the accent-derived panel one: the grid lines are a near-black
-        // picked to sit against exactly this, and on a tinted well they would either vanish or
-        // read as a coloured hatch.
-        bg.color = KvPalette.Primary;
+        // DM Note's grid well (#3A3943), not the near-black page around it: the grid lines are a
+        // near-black picked to sit against exactly this well. Drawn over the page colour instead —
+        // as this was — the line and the fill are one shade apart and the grid is invisible.
+        bg.color = KvPalette.CanvasWell;
         bg.raycastTarget = true;
         viewObj.AddComponent<RectMask2D>();
         // First child, so it sits under the elements rather than over them. It fills the viewport
