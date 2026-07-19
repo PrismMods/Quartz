@@ -32,6 +32,7 @@ internal static partial class PageKeyViewer {
         4 => MainCore.Tr.Get("KEYVIEWER_STYLE_8", "8 Keys"),
         5 => MainCore.Tr.Get("KEYVIEWER_STYLE_14", "14 Keys"),
         Features.KeyViewer.Layout.KvPresets.Style24 => MainCore.Tr.Get("KEYVIEWER_STYLE_24", "24 Keys"),
+        Features.KeyViewer.Layout.KvPresets.Style108 => MainCore.Tr.Get("KEYVIEWER_STYLE_108", "108 Keys"),
         _ => MainCore.Tr.Get("KEYVIEWER_STYLE_16", "16 Keys"),
     };
     private static UISlider AddSlider(

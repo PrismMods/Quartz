@@ -398,6 +398,13 @@ public static partial class KeyViewerOverlay {
             case "LALT":
             case "LEFTALT": return KeyCode.LeftAlt;
             case "INS": return KeyCode.Insert;
+            // DM Note writes Print Screen as "PRINT SCREEN"; Unity's enum member is Print (no
+            // PrintScreen), so Enum.TryParse misses it and the key would render as its raw name
+            // and never match input. SysReq is the same physical key.
+            case "PRINTSCREEN":
+            case "PRTSC":
+            case "PRTSCR":
+            case "SYSREQ": return KeyCode.Print;
             case "CONTEXTMENU": return KeyCode.Menu;
             case "BACKSLASH": return KeyCode.Backslash;
             case "SLASH": return KeyCode.Slash;

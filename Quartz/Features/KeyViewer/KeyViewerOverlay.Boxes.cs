@@ -116,6 +116,7 @@ public static partial class KeyViewerOverlay {
         if(s.StartsWith("Right")) s = "R" + s[5..];
         if(s.EndsWith("Shift")) s = s[..^5] + "⇧";
         if(s.EndsWith("Control")) s = s[..^7] + "Ctrl";
+        if(s.EndsWith("Windows")) s = s[..^7] + "Win";
         return s switch {
             "PageUp" => "PgUp",
             "PageDown" => "PgDn",
@@ -125,6 +126,7 @@ public static partial class KeyViewerOverlay {
             "ScrollLock" => "ScLk",
             "Print" or "SysReq" => "PrtSc",
             "Break" => "Brk",
+            "Escape" => "Esc",
             "Plus" => "+",
             "Minus" => "-",
             "Multiply" => "*",

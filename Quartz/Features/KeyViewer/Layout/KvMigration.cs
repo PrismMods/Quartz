@@ -105,6 +105,12 @@ internal static class KvMigration {
             KvPresets.Generate24KeyTab(doc, tab, (el, slot) => BakeKey(KvPresets.Stock, el, 2, slot));
             return;
         }
+        // The 108-key full keyboard binds every key itself from a physical-keyboard table, so it
+        // has nothing to bake from the legacy settings — like the 24-key row, but for all of it.
+        if(style == KvPresets.Style108) {
+            KvPresets.Generate108KeyTab(doc, tab);
+            return;
+        }
         GenerateTab(doc, tab, style, KvPresets.Stock);
     }
     /// <summary>As above for the foot row: stock foot bindings, never the user's.</summary>

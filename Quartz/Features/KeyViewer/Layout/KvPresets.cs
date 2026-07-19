@@ -11,7 +11,7 @@ namespace Quartz.Features.KeyViewer.Layout;
 /// second copy of them, so a generated layout is what the simple-mode overlay draws today,
 /// to the pixel, and cannot drift away from it.
 /// </summary>
-internal static class KvPresets {
+internal static partial class KvPresets {
     // KeyViewerOverlay's geometry constants are private, so the ones its helpers do not
     // hand back are repeated here. Every position and size still comes from BuildLayout,
     // GridSize and BuildFootLayout — only these cosmetics are duplicated.
@@ -36,8 +36,16 @@ internal static class KvPresets {
     /// collide with the foot range. The generator below builds the extra row directly instead.
     /// </summary>
     internal const int Style24 = 100;
+    /// <summary>
+    /// Editor-only 108-key full-keyboard preset, ported from JipperKeyViewer's Full108. Like
+    /// <see cref="Style24"/> it sits outside the legacy style axis: its keys bind themselves from
+    /// the physical-keyboard table in <see cref="Generate108KeyTab"/> rather than any
+    /// KeysForStyle slice (the flat slot model tops out long before 105 keys), so it never routes
+    /// through BuildLayout.
+    /// </summary>
+    internal const int Style108 = 101;
     /// <summary>Style ids in the order the settings UI lists them (ascending key count).</summary>
-    internal static readonly int[] Styles = [4, 0, 1, 5, 2, 3, Style24];
+    internal static readonly int[] Styles = [4, 0, 1, 5, 2, 3, Style24, Style108];
     /// <summary>
     /// A settings object holding nothing but the field initializers — the stock palette, the
     /// stock bindings (Key8..Key20, FootKeyDefaults), no labels, no ghost keys, no counts.
@@ -56,6 +64,7 @@ internal static class KvPresets {
         4 => 8,
         5 => 14,
         Style24 => 24,
+        Style108 => 104,
         _ => 16,
     };
     /// <summary>
