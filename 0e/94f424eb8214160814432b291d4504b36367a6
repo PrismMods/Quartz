@@ -1,0 +1,92 @@
+Quartz/Features/Tuf/TufSettings.cs
+  s_b43ab9990cbc25::t_79816fb28eb1aa 85
+  s_b43ab9990cbc25::t_3ee2dabb595c68 17-19
+  s_b43ab9990cbc25::t_5feb926d2b6dba 60
+Quartz/Resource/Export/Lang/en-US.json
+  s_b43ab9990cbc25::t_6077661be2e269 842-843
+Quartz/Features/Tuf/TufService.cs
+  s_b43ab9990cbc25::t_e7d90341f51d1d 636
+  s_b43ab9990cbc25::t_a0bca0d5a05e06 173-184
+Quartz/Features/Tuf/TufApiClient.cs
+  s_f5a0574730be3f::t_1132bee891cd70 79-81
+Quartz/UI/Factory/Page/TufSettingsUI.cs
+  s_b43ab9990cbc25::t_97e3369651934b 122-131
+Quartz/Features/Tuf/TufModels.cs
+  s_b43ab9990cbc25::t_eaaa7ab4a6936a 119-121
+Quartz/Features/Tuf/TufPackModels.cs
+  s_b43ab9990cbc25::t_8aece978660c74 48-50
+  s_b43ab9990cbc25::t_d70d54e0eb4b7f 45-47
+Quartz/Features/Tuf/TufPreviewCache.cs
+  s_b43ab9990cbc25::t_9267cec9eea798 392-398,400
+  s_b43ab9990cbc25::t_2c30c197846738 409-410
+  s_b43ab9990cbc25::t_172cddb2c408ed 16-21,26,30,44-47,49-55,57-58,65-67,70,80-81,91,94,96,105-107,111-113,116,119,147,151,159,163,166-170,177,179,189-192,225-241,246,258,262-291,305-307,312,320-322,325,330,343,347,357,364,367,377-388,403,415-425,440-459
+  s_b43ab9990cbc25::t_8fccb4ef48b038 137
+  s_b43ab9990cbc25::t_bba226d0b04d22 8,12
+  s_b43ab9990cbc25::t_9825aded3311ce 193-199,210-222
+  s_b43ab9990cbc25::t_d3ab422de72861 63
+  s_b43ab9990cbc25::t_c3a66bc63f0333 22-25,27-29,31-43
+  s_b43ab9990cbc25::t_fd533cae7812dc 1,4-7,9-11,13-15,59-61,64,71-79,82,85,87-90,92-93,95,97-104,109-110,117-118,120-130,144-146,148,150,152-153,155-156,161,164-165,171-176,181,292-293,295-298,300-304,308-309,311,313-319,323-324,326-329,331-342,344-346,348-356,358-363,365-366,368-370,375-376,389-391,399,401-402,404-408,411-412,414,461,469-470,474,478,482-485,497,512-514,521
+  s_b43ab9990cbc25::t_1617935ae4b1d6 2-3,48,56,62,68-69,83-84,86,108,114-115,131-136,138-143,149,154,157-158,160,162,182-185,310,371-374,413,426-439,460,462-468,471-473,475-477,479-481,486-496,498-511,515-520
+  s_b43ab9990cbc25::t_223acfcd45f7c5 178,180,186-188,200-209,223-224,242-245,247-257,259-261,294,299
+Quartz/Features/Tuf/TufThumbnail.cs
+  s_b43ab9990cbc25::t_39690ea857522e 1-3,9,14,40,42-49,53-54,64-93,129-138
+  s_b43ab9990cbc25::t_4627416e349bc5 94-128
+  s_b43ab9990cbc25::t_d140ddc40b4559 4-8,15-39
+  s_b43ab9990cbc25::t_e2cc82cf9a512e 10-13,41
+  s_b43ab9990cbc25::t_da77be82a292cc 50-52,55-63
+Quartz/UI/Factory/Page/TufPacksUI.cs
+  s_b43ab9990cbc25::t_2943a0c9eaef21 395-396
+  s_b43ab9990cbc25::t_5f6f0f4f6fba50 37-40
+  s_b43ab9990cbc25::t_a5b3af5c0ecc47 480
+  s_b43ab9990cbc25::t_a5b7bf970eb7e1 451
+  s_b43ab9990cbc25::t_1f1c0adceb8199 151
+  s_b43ab9990cbc25::t_37234c1549e0dd 75
+  s_b43ab9990cbc25::t_be8daa99ce3137 190
+  s_f5a0574730be3f::t_468c77502b7b1d 679
+Quartz/UI/Factory/Page/TufBrowserUI.cs
+  s_b43ab9990cbc25::t_4aba9cfc3d4650 430-432
+  s_b43ab9990cbc25::t_a5ca7fedeb522c 341
+  s_b43ab9990cbc25::t_691a420b544851 94
+  s_b43ab9990cbc25::t_e472f7f0945998 388
+  s_b43ab9990cbc25::t_5252ab1bed0c3b 55-56
+  s_b43ab9990cbc25::t_6cb424b5007d71 476
+  s_f5a0574730be3f::t_62c68f081ed9ce 781
+Quartz/Features/Tuf/TufPackApiClient.cs
+  s_b43ab9990cbc25::t_b3009ca3314adb 123-124
+  s_b43ab9990cbc25::t_9e6b55c79f62a9 122,125
+  s_b43ab9990cbc25::t_018db13fee26dd 105,108-110
+  s_b43ab9990cbc25::t_2e8480a948942d 205-208
+Quartz/Features/Tuf/TufInstallIndex.cs
+  s_b43ab9990cbc25::t_48ee848aac29d2 73-75
+  s_b43ab9990cbc25::t_63363ce371aae6 64
+  s_b43ab9990cbc25::t_58d75f476c2138 108
+  s_b43ab9990cbc25::t_b0e67fb607d0bd 25,39
+Quartz/UI/Factory/Page/TufPreviewLayer.cs
+  s_b43ab9990cbc25::t_6d0df5abf619f5 1-135
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_b43ab9990cbc25::t_4b09e7e27dcda2 842-843
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "0e94f424eb8214160814432b291d4504b36367a6",
+  "prompts": {},
+  "sessions": {
+    "s_b43ab9990cbc25": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48f51aff-a642-4deb-8831-516405f6dded",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_f5a0574730be3f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5e55b667-d95f-4ba2-a294-c43781ee7581",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
