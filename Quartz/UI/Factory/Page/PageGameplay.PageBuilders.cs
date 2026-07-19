@@ -82,6 +82,22 @@ internal static partial class PageGameplay {
             conf.Enabled,
             "Enable Key Limiter", "keylimiter_enable"
         );
+        // The Key Viewer owns this setting; surfaced here too so a map needing a special key set can
+        // be switched between viewer-driven and manual keys without leaving the Key Limiter page.
+        // Both toggles route through KeyViewerOverlay.SetSyncToKeyLimiter, and the change flows back
+        // to ApplySyncLock below (via SyncSettingChanged) to lock or free the controls under it.
+        UIToggle syncToggle = GenerateUI.Toggle(
+            GenerateUI.Row(sec.Body),
+            new KeyViewerSettings().SyncToKeyLimiter,
+            KeyViewerOverlay.IsSyncingToKeyLimiter,
+            v => KeyViewerOverlay.SetSyncToKeyLimiter(v),
+            "Sync Keys to Key Limiter",
+            "keyviewer_synclimiter"
+        );
+        syncToggle.Rect.AddToolTip(
+            "DESC_KEYVIEWER_SYNCLIMITER",
+            "Overwrites the Key Limiter's allowed keys with the keys shown here, and keeps them matched when you rebind keys or switch styles."
+        );
         CreateProfileControls(sec.Body);
         UIButton captureBtn = null;
         captureBtn = GenerateUI.Button(
@@ -139,6 +155,7 @@ internal static partial class PageGameplay {
         void ApplySyncLock() {
             bool locked = KeyViewerOverlay.IsSyncingToKeyLimiter;
             if(locked && KeyLimiter.IsCapturing) KeyLimiter.CancelCapture();
+            syncToggle.Set(locked, false);
             captureBtn.SetBlocked(locked, true);
             clearBtn.SetBlocked(locked, true);
             syncNote.gameObject.SetActive(locked);

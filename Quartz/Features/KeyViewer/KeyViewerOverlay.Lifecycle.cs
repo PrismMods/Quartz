@@ -78,6 +78,21 @@ public static partial class KeyViewerOverlay {
         }
     }
     /// <summary>
+    /// Flip the Key Limiter sync setting. Both surfaces that expose it — the Key Viewer editor's
+    /// Settings pane and the Key Limiter page's own top-of-section toggle — route through here so
+    /// they write, save, push the keys when it goes on, and raise <see cref="SyncSettingChanged"/>
+    /// in the same order. The event is what makes the other surface and the Key Limiter page's lock
+    /// catch up, so a second copy of this sequence would be one edit away from doing only part of it.
+    /// </summary>
+    public static void SetSyncToKeyLimiter(bool value) {
+        EnsureConf();
+        if(Conf == null) return;
+        Conf.SyncToKeyLimiter = value;
+        Save();
+        if(value) SyncKeysToKeyLimiter();
+        RaiseSyncSettingChanged();
+    }
+    /// <summary>
     /// Hand the keys the viewer shows to the Key Limiter.
     ///
     /// Called from the build paths and from the toggle, never per frame: it walks the layout, and

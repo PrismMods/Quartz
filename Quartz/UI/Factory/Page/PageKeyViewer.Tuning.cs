@@ -54,12 +54,7 @@ internal static partial class PageKeyViewer {
             body, compact,
             def.SyncToKeyLimiter,
             conf.SyncToKeyLimiter,
-            v => {
-                conf.SyncToKeyLimiter = v;
-                KeyViewerOverlay.Save();
-                if(v) KeyViewerOverlay.SyncKeysToKeyLimiter();
-                KeyViewerOverlay.RaiseSyncSettingChanged();
-            },
+            v => KeyViewerOverlay.SetSyncToKeyLimiter(v),
             "Sync Keys to Key Limiter",
             "keyviewer_synclimiter"
         );
