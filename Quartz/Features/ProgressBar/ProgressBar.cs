@@ -84,7 +84,8 @@ public static class ProgressBarOverlay {
         ApplyRounding(fill, Conf.Rounding);
         if(back != null) back.color = Conf.GetBackColor();
         if(fill != null) {
-            fill.color = Conf.GetFillColorForProgress(Mathf.Clamp01(GameStats.Progress));
+            GetProgressValues(out _, out float now);
+            fill.color = Conf.GetFillColorForProgress(now);
         }
         ApplyOutline();
     }
@@ -121,6 +122,20 @@ public static class ProgressBarOverlay {
             img.pixelsPerUnitMultiplier = Mathf.Max(0.05f, 8f / rounding);
         }
     }
+    // Fill source: tile-fraction (percentComplete, steps per tile) by default, or
+    // the smooth map-time ratio (song position / chart length) when UseMapTime is
+    // on. Both start and now come from the same space so the checkpoint start
+    // offset stays consistent with the moving fill.
+    private static void GetProgressValues(out float start, out float now) {
+        if(Conf.UseMapTime) {
+            start = Mathf.Clamp01(GameStats.RunStartMapTimeRatio);
+            now = Mathf.Clamp01(GameStats.MapTimeRatio);
+        } else {
+            start = Mathf.Clamp01(GameStats.RunStartProgress);
+            now = Mathf.Clamp01(GameStats.Progress);
+        }
+        if(now < start) now = start;
+    }
     private static void ApplyOutline() {
         if(border == null || borderImg == null) return;
         float t = Mathf.Max(0f, Conf.OutlineThickness);
@@ -142,9 +157,7 @@ public static class ProgressBarOverlay {
             if(bar.gameObject.activeSelf != show) bar.gameObject.SetActive(show);
             if(dragObj != null && dragObj.activeSelf) dragObj.SetActive(false);
             if(!show) return;
-            float start = Mathf.Clamp01(GameStats.RunStartProgress);
-            float now = Mathf.Clamp01(GameStats.Progress);
-            if(now < start) now = start;
+            GetProgressValues(out float start, out float now);
             float fillFrom = Conf.PrefillStart ? 0f : start;
             float totalW = Conf.Width;
             float startX = totalW * fillFrom;

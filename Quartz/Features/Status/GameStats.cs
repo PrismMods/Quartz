@@ -95,6 +95,7 @@ public static class GameStats {
     public static bool RunHasStartProgress => !ProgressTracker.RunStartedFromFirstTile
         && ProgressTracker.RunStartProgress > 0f;
     public static float RunStartProgress => ProgressTracker.RunStartProgress;
+    public static float RunStartMapTimeRatio => ProgressTracker.RunStartMapTimeRatio;
     public static int SessionAttempts => PlayCount.PlayCount.SessionAttempts;
     public static int TotalAttempts => PlayCount.PlayCount.TotalAttemptsForCurrentMap();
     public static float Best => PlayCount.PlayCount.BestForCurrentMap();

@@ -13,6 +13,7 @@ public sealed class ProgressBarSettings : ISettingsFile {
     public float Rounding = 1f;
     public float OutlineThickness = 1.75f;
     public bool PrefillStart = false;
+    public bool UseMapTime = false;
     public float FillR = 1f, FillG = 0f, FillB = 0f, FillA = 0.96f;
     public float BackR = 0.05f, BackG = 0.05f, BackB = 0.06f, BackA = 0.80f;
     public float OutlineColR = 1f, OutlineColG = 1f, OutlineColB = 1f, OutlineColA = 1f;
@@ -36,6 +37,7 @@ public sealed class ProgressBarSettings : ISettingsFile {
             [nameof(Rounding)] = Rounding,
             [nameof(OutlineThickness)] = OutlineThickness,
             [nameof(PrefillStart)] = PrefillStart,
+            [nameof(UseMapTime)] = UseMapTime,
             [nameof(FillR)] = FillR,
             [nameof(FillG)] = FillG,
             [nameof(FillB)] = FillB,
@@ -59,6 +61,7 @@ public sealed class ProgressBarSettings : ISettingsFile {
         Rounding = IOUtils.Read(token, nameof(Rounding), Rounding);
         OutlineThickness = IOUtils.Read(token, nameof(OutlineThickness), OutlineThickness);
         PrefillStart = IOUtils.Read(token, nameof(PrefillStart), PrefillStart);
+        UseMapTime = IOUtils.Read(token, nameof(UseMapTime), UseMapTime);
         IOUtils.ReadRgba(token, "Fill", ref FillR, ref FillG, ref FillB, ref FillA);
         IOUtils.ReadRgba(token, "Back", ref BackR, ref BackG, ref BackB, ref BackA);
         IOUtils.ReadRgba(token, "OutlineCol", ref OutlineColR, ref OutlineColG, ref OutlineColB, ref OutlineColA);

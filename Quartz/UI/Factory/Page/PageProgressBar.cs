@@ -29,6 +29,17 @@ internal static class PageProgressBar {
             "DESC_PROGRESSBAR_PREFILLSTART",
             "When a run starts mid-chart (checkpoint or editor play), the bar starts already filled up to that point instead of starting empty."
         );
+        GenerateUI.Toggle(
+            GenerateUI.Row(sec.Body),
+            def.UseMapTime,
+            conf.UseMapTime,
+            v => { conf.UseMapTime = v; ProgressBarOverlay.Apply(); Save(); },
+            "Smooth Fill (Map Time)",
+            "progressbar_usemaptime"
+        ).Rect.AddToolTip(
+            "DESC_PROGRESSBAR_USEMAPTIME",
+            "Advance the bar by the chart's elapsed time instead of tiles completed. The fill moves continuously every frame instead of stepping forward on each tile."
+        );
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(sec.Body)), "HEADING_SIZE", "Size");
         static float widthFilter(float v) => Mathf.Clamp(Mathf.Round(v), 200f, 1800f);
         UISlider width = GenerateUI.Slider(
