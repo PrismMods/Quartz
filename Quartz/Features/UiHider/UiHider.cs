@@ -67,8 +67,8 @@ public static partial class UiHider {
         if(IsEditingLevel() || scnEditor.instance != null) {
             object editor = scnEditor.instance;
             if(editor is scnEditor ed && !ed.playMode) HideGameplayDifficultyContainer(uiController);
-            SetEnabled(GetMemberValue(editor, "autoImage"), !hideOtto);
-            SetEnabled(GetMemberValue(editor, "buttonAuto"), !hideOtto);
+            SetEnabled(GetMemberValueCached(editor, "autoImage"), !hideOtto);
+            SetEnabled(GetMemberValueCached(editor, "buttonAuto"), !hideOtto);
             SetMemberGameObjectActiveIfMatches(editor, "editorDifficultySelector", hideTimingTarget);
             SetMemberGameObjectActiveIfMatches(editor, "buttonNoFail", hideNoFail);
         } else {
@@ -147,6 +147,20 @@ public static partial class UiHider {
         }
     }
     private static readonly Dictionary<(Type, string), MemberInfo> memberCache = [];
+    // Ticker.Update reaches these member fetches every frame (the editor branch also runs
+    // during custom-level play inside scnEditor), so reflection GetValue per frame adds up.
+    // The fields are inspector-wired and stable per owner instance; cache the resolved Unity
+    // object and refetch only when it dies. Cleared on StartLoadingScene.
+    private static readonly Dictionary<(int, string), UnityEngine.Object> memberValueCache = [];
+    internal static void ClearMemberValueCache() => memberValueCache.Clear();
+    internal static object GetMemberValueCached(object owner, string memberName) {
+        if(owner is not UnityEngine.Object unityOwner) return GetMemberValue(owner, memberName);
+        (int, string) key = (unityOwner.GetInstanceID(), memberName);
+        if(memberValueCache.TryGetValue(key, out UnityEngine.Object cached) && cached != null) return cached;
+        object value = GetMemberValue(owner, memberName);
+        if(value is UnityEngine.Object unityValue && unityValue != null) memberValueCache[key] = unityValue;
+        return value;
+    }
     internal static object GetMemberValue(object owner, string memberName) {
         if(owner == null || string.IsNullOrEmpty(memberName)) return null;
         Type type = owner.GetType();
@@ -170,7 +184,7 @@ public static partial class UiHider {
     private static void SetEnabled(object value, bool enabled) {
         if(value == null) return;
         if(value is Behaviour behaviour) {
-            behaviour.enabled = enabled;
+            if(behaviour.enabled != enabled) behaviour.enabled = enabled;
             return;
         }
         PropertyInfo property = AccessTools.Property(value.GetType(), "enabled");
@@ -178,7 +192,7 @@ public static partial class UiHider {
         try { property.SetValue(value, enabled, null); } catch { }
     }
     private static void SetMemberGameObjectActiveIfMatches(object owner, string memberName, bool hide)
-        => SetGameObjectActiveIfMatches(GetGameObject(GetMemberValue(owner, memberName)), hide);
+        => SetGameObjectActiveIfMatches(GetGameObject(GetMemberValueCached(owner, memberName)), hide);
     private static void SetGameObjectActiveIfMatches(GameObject gameObject, bool hide) {
         if(gameObject == null) return;
         if(gameObject.activeSelf == hide) gameObject.SetActive(!hide);
@@ -186,19 +200,25 @@ public static partial class UiHider {
     internal static void HideGameplayDifficultyContainer(scrUIController uiController) {
         if(uiController == null) return;
         try {
-            if(uiController.difficultyContainer != null) uiController.difficultyContainer.gameObject.SetActive(false);
+            // runs per frame from the ticker while in the editor; only write on change
+            if(uiController.difficultyContainer != null && uiController.difficultyContainer.gameObject.activeSelf)
+                uiController.difficultyContainer.gameObject.SetActive(false);
             if(uiController.difficultyFadeContainer != null) {
-                uiController.difficultyFadeContainer.blocksRaycasts = false;
-                uiController.difficultyFadeContainer.gameObject.SetActive(false);
+                if(uiController.difficultyFadeContainer.blocksRaycasts)
+                    uiController.difficultyFadeContainer.blocksRaycasts = false;
+                if(uiController.difficultyFadeContainer.gameObject.activeSelf)
+                    uiController.difficultyFadeContainer.gameObject.SetActive(false);
             }
-            if(uiController.difficultyButtonLeft != null) uiController.difficultyButtonLeft.enabled = false;
-            if(uiController.difficultyButtonRight != null) uiController.difficultyButtonRight.enabled = false;
+            if(uiController.difficultyButtonLeft != null && uiController.difficultyButtonLeft.enabled)
+                uiController.difficultyButtonLeft.enabled = false;
+            if(uiController.difficultyButtonRight != null && uiController.difficultyButtonRight.enabled)
+                uiController.difficultyButtonRight.enabled = false;
         } catch { }
     }
     private static void ReconcileHitErrorMeter(bool hide) {
         scrController controller = scrController.instance;
         if(controller == null || !controller.gameworld) return;
-        GameObject errorMeter = GetGameObject(GetMemberValue(controller, "errorMeter"));
+        GameObject errorMeter = GetGameObject(GetMemberValueCached(controller, "errorMeter"));
         if(errorMeter == null) return;
         if(hide) {
             if(errorMeter.activeSelf) errorMeter.SetActive(false);

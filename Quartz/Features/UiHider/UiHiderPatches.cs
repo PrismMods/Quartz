@@ -33,6 +33,10 @@ public static partial class UiHider {
     private static class ReapplyOnEditModePatch {
         private static void Postfix() => ApplyNow();
     }
+    [HarmonyPatch(typeof(scrController), "StartLoadingScene")]
+    private static class ClearCachesOnSceneChangePatch {
+        private static void Postfix() => ClearMemberValueCache();
+    }
     private static class HideResultTextAndFlashPatches {
         private static bool shouldIgnoreFlashOnce;
         [HarmonyPatch(typeof(scrController), "OnLandOnPortal")]
@@ -63,7 +67,7 @@ public static partial class UiHider {
             if(!ShouldHideHitErrorMeter()) return;
             scrController controller = scrController.instance;
             if(controller == null || !controller.gameworld) return;
-            GameObject errorMeter = GetGameObject(GetMemberValue(controller, "errorMeter"));
+            GameObject errorMeter = GetGameObject(GetMemberValueCached(controller, "errorMeter"));
             if(errorMeter != null && errorMeter.activeSelf) errorMeter.SetActive(false);
         }
         [HarmonyPatch(typeof(scrController), "paused", MethodType.Setter)]
