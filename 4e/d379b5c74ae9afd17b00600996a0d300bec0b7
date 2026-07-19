@@ -1,0 +1,21 @@
+Quartz/UI/Editor/KvPalette.cs
+  s_439e3af5daf391::t_82f33ce218b072 22-28
+Quartz/UI/Editor/KvCanvas.cs
+  s_439e3af5daf391::t_845d3962fd14f7 84-87
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "4ed379b5c74ae9afd17b00600996a0d300bec0b7",
+  "prompts": {},
+  "sessions": {
+    "s_439e3af5daf391": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1ccccb16-9200-4027-a6b8-392cee87956a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
