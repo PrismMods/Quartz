@@ -17,7 +17,8 @@ public sealed class EffectRemoverSettings : ISettingsFile {
     public bool SimpleFlash = false;
     public bool SimpleHallOfMirrors = false;
     public bool SimpleScreenShake = false;
-    public int SimpleMoveTrackMax = MoveTrackUpperBound + 5; 
+    public bool SimpleScreenTile = false;
+    public int SimpleMoveTrackMax = MoveTrackUpperBound + 5;
     public bool EnableSave = false;
     public bool Filters = true;
     public bool AdvancedFilters = true;
@@ -58,6 +59,7 @@ public sealed class EffectRemoverSettings : ISettingsFile {
             [nameof(SimpleFlash)] = SimpleFlash,
             [nameof(SimpleHallOfMirrors)] = SimpleHallOfMirrors,
             [nameof(SimpleScreenShake)] = SimpleScreenShake,
+            [nameof(SimpleScreenTile)] = SimpleScreenTile,
             [nameof(SimpleMoveTrackMax)] = SimpleMoveTrackMax,
             [nameof(EnableSave)] = EnableSave,
             [nameof(Filters)] = Filters,
@@ -100,6 +102,7 @@ public sealed class EffectRemoverSettings : ISettingsFile {
         SimpleFlash = IOUtils.Read(token, nameof(SimpleFlash), SimpleFlash);
         SimpleHallOfMirrors = IOUtils.Read(token, nameof(SimpleHallOfMirrors), SimpleHallOfMirrors);
         SimpleScreenShake = IOUtils.Read(token, nameof(SimpleScreenShake), SimpleScreenShake);
+        SimpleScreenTile = IOUtils.Read(token, nameof(SimpleScreenTile), SimpleScreenTile);
         SimpleMoveTrackMax = IOUtils.Read(token, nameof(SimpleMoveTrackMax), SimpleMoveTrackMax);
         EnableSave = IOUtils.Read(token, nameof(EnableSave), EnableSave);
         Filters = IOUtils.Read(token, nameof(Filters), Filters);

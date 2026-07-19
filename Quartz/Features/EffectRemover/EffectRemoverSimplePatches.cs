@@ -11,6 +11,7 @@ public static partial class EffectRemover {
     private static bool SimpleFlashActive => SimpleActive && Conf.SimpleFlash;
     private static bool SimpleHomActive => SimpleActive && Conf.SimpleHallOfMirrors;
     private static bool SimpleShakeActive => SimpleActive && Conf.SimpleScreenShake;
+    private static bool SimpleScreenTileActive => SimpleActive && Conf.SimpleScreenTile;
     private static bool SimpleMoveActive =>
         SimpleActive && Conf.SimpleMoveTrackMax <= EffectRemoverSettings.MoveTrackUpperBound;
     [HarmonyPatch(typeof(ffxSetFilterPlus), "SetFilter")]
@@ -67,6 +68,38 @@ public static partial class EffectRemover {
     private static class SimpleShakePatch {
         private static bool Prepare() => AccessTools.Method(typeof(ffxShakeScreenPlus), "StartEffect") != null;
         private static bool Prefix() => !SimpleShakeActive;
+    }
+    // ScreenTile (kaleidoscope/repeat) and ScreenScroll (screen drift) are full-screen post effects that
+    // Enhanced mode strips via the "Filters" event bundle, but Simple mode had no runtime toggle for them.
+    // Both enable a *static* camera component (which can persist across events), and the tile effect arms a
+    // DOTween that re-enables it on complete - so we skip StartEffect AND force the component off to be safe.
+    private static void ForceDisableCamBehaviour<T>(ffxPlusBase fx) where T : Behaviour {
+        try {
+            scrCamera cam = fx?.cam ?? scrCamera.instance;
+            if(cam == null) return;
+            T comp = cam.GetComponent<T>();
+            if(comp != null) comp.enabled = false;
+        } catch(Exception e) {
+            MainCore.Log.Wrn($"[EffectRemover] simple screen-tile disable failed: {e.Message}");
+        }
+    }
+    [HarmonyPatch(typeof(ffxScreenTilePlus), "StartEffect")]
+    private static class SimpleScreenTilePatch {
+        private static bool Prepare() => AccessTools.Method(typeof(ffxScreenTilePlus), "StartEffect") != null;
+        private static bool Prefix(ffxScreenTilePlus __instance) {
+            if(!SimpleScreenTileActive) return true;
+            ForceDisableCamBehaviour<ScreenTile>(__instance);
+            return false;
+        }
+    }
+    [HarmonyPatch(typeof(ffxScreenScrollPlus), "StartEffect")]
+    private static class SimpleScreenScrollPatch {
+        private static bool Prepare() => AccessTools.Method(typeof(ffxScreenScrollPlus), "StartEffect") != null;
+        private static bool Prefix(ffxScreenScrollPlus __instance) {
+            if(!SimpleScreenTileActive) return true;
+            ForceDisableCamBehaviour<ScreenScroll>(__instance);
+            return false;
+        }
     }
     [HarmonyPatch(typeof(ffxMoveFloorPlus), "StartEffect")]
     private static class SimpleMovePatch {

@@ -293,6 +293,11 @@ internal static partial class PageVisuals {
             parent, def.SimpleScreenShake, conf.SimpleScreenShake,
             v => { conf.SimpleScreenShake = v; Save(); },
             "Disable Screen Shake", "fxrm_s_shake", "Skips screen-shake effects.");
+        GenerateUI.ToggleTip(
+            parent, def.SimpleScreenTile, conf.SimpleScreenTile,
+            v => { conf.SimpleScreenTile = v; Save(); },
+            "Disable Screen Tiling/Scroll", "fxrm_s_screentile",
+            "Turns off screen-tiling (kaleidoscope/repeat) and screen-scroll VFX at runtime without changing the chart.");
         GenerateUI.Slider(
             GenerateUI.Row(parent),
             def.SimpleMoveTrackMax, 5f, EffectRemoverSettings.MoveTrackUpperBound + 5f,

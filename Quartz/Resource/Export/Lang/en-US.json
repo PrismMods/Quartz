@@ -939,6 +939,8 @@
     "DESC_FXRM_S_HOM": "Skips the Hall of Mirrors effect.",
     "FXRM_S_SHAKE": "Disable Screen Shake",
     "DESC_FXRM_S_SHAKE": "Skips screen-shake effects.",
+    "FXRM_S_SCREENTILE": "Disable Screen Tiling/Scroll",
+    "DESC_FXRM_S_SCREENTILE": "Turns off screen-tiling (kaleidoscope/repeat) and screen-scroll VFX at runtime without changing the chart.",
     "FXRM_S_MOVEMAX": "Max Tile Movements",
     "DESC_FXRM_S_MOVEMAX": "Caps how many tiles a single Move Track event can move. The maximum value means unlimited.",
     "OPT_FASTBLOOM": "Fast Bloom",

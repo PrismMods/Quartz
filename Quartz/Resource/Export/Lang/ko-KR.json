@@ -939,6 +939,8 @@
     "DESC_FXRM_S_HOM": "할 오브 미러 효과를 건너뜁니다.",
     "FXRM_S_SHAKE": "화면 흔들림 끄기",
     "DESC_FXRM_S_SHAKE": "화면 흔들림 효과를 건너뜁니다.",
+    "FXRM_S_SCREENTILE": "화면 타일링/스크롤 끄기",
+    "DESC_FXRM_S_SCREENTILE": "차트를 바꾸지 않고 실시간으로 화면 타일링(만화경/반복)과 화면 스크롤 VFX를 끕니다.",
     "FXRM_S_MOVEMAX": "최대 타일 이동 수",
     "DESC_FXRM_S_MOVEMAX": "단일 트랙 이동 이벤트가 움직일 수 있는 타일 수를 제한합니다. 최댓값은 무제한을 의미합니다.",
     "OPT_FASTBLOOM": "빠른 블룸",
