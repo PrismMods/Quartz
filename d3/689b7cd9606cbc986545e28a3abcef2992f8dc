@@ -1,0 +1,19 @@
+Quartz/Features/Nostalgia/NostalgiaPatches.Play.cs
+  s_a4d7b37eff0786::t_42385dda317586 139-143
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "d3689b7cd9606cbc986545e28a3abcef2992f8dc",
+  "prompts": {},
+  "sessions": {
+    "s_a4d7b37eff0786": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c3da5f65-414d-49ed-b51f-7d7cf3fc4dca",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
