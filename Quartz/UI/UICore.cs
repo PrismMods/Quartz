@@ -353,8 +353,13 @@ public static class UICore {
             menuPanelRect.anchorMax = new(1, 1);
             menuPanelRect.pivot = new(0.5f, 0.5f);
             menuPanelRect.anchoredPosition = Vector2.zero;
-            menuPanelRect.offsetMin = new(1, 1);
-            menuPanelRect.offsetMax = new(-1, -1);
+            // Fill the panel exactly (no inset): the rounded content mask must be
+            // concentric with the panel border ring, which is drawn on `panel` at
+            // 0px inset. A 1px inset here offsets the mask arc from the border arc,
+            // exposing a ~1px crescent of PanelBG at the rounded corners where a
+            // selected main-menu tab meets the outline.
+            menuPanelRect.offsetMin = Vector2.zero;
+            menuPanelRect.offsetMax = Vector2.zero;
             menuPanelRect.sizeDelta = Vector2.zero;
             var maskImage = menuPanel.AddComponent<Image>();
             maskImage.color = Color.white;
