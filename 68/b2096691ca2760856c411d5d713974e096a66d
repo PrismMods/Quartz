@@ -1,0 +1,24 @@
+Quartz/UI/Factory/Page/PageGameplay.PageBuilders.cs
+  s_733d4c6dc4645a::t_e26aa6a97551d8 158
+  s_733d4c6dc4645a::t_ee7335d407c62a 85-100
+Quartz/Features/KeyViewer/KeyViewerOverlay.Lifecycle.cs
+  s_733d4c6dc4645a::t_d34ec2b60528de 81-95
+Quartz/UI/Factory/Page/PageKeyViewer.Tuning.cs
+  s_733d4c6dc4645a::t_c23f20b90e725c 57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "68b2096691ca2760856c411d5d713974e096a66d",
+  "prompts": {},
+  "sessions": {
+    "s_733d4c6dc4645a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f2414253-1de1-429c-a630-092fa90bde56",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
