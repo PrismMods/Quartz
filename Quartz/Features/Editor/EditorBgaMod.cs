@@ -26,6 +26,7 @@ public static partial class EditorFeature {
                 } catch {
                 }
                 bgaApplied = false;
+                particleRendererCache.Clear();
             }
             ReconcileBgaDecorations(false);
             return;
@@ -48,6 +49,7 @@ public static partial class EditorFeature {
             } catch {
             }
             bgaApplied = false;
+            particleRendererCache.Clear();
         }
         ReconcileBgaDecorations(false);
     }
@@ -104,40 +106,61 @@ public static partial class EditorFeature {
         Set(pr.faceDetails, visible);
         Set(pr.samuraiSprite, visible);
     }
-    private static Renderer ParticleRenderer(ParticleSystem ps)
-        => ps != null ? ps.GetComponent<Renderer>() : null;
+    // SetPlanetsVisible runs every tick while BGA is active; cache the GetComponent lookups
+    private static readonly Dictionary<int, Renderer> particleRendererCache = new();
+    private static Renderer ParticleRenderer(ParticleSystem ps) {
+        if(ps == null) return null;
+        int id = ps.GetInstanceID();
+        if(particleRendererCache.TryGetValue(id, out Renderer cached) && cached != null) return cached;
+        Renderer r = ps.GetComponent<Renderer>();
+        if(r != null) particleRendererCache[id] = r;
+        return r;
+    }
     private static void Set(Renderer r, bool visible) {
         if(r != null && r.enabled != visible) r.enabled = visible;
     }
     private enum DecoKind { Tile, Planet }
-    private static readonly HashSet<scrDecoration> bgaTileDecos = new();
-    private static readonly HashSet<scrDecoration> bgaPlanetDecos = new();
+    // deco -> was visible when flagged (only those get re-shown on restore)
+    private static readonly Dictionary<scrDecoration, bool> bgaTileDecos = new();
+    private static readonly Dictionary<scrDecoration, bool> bgaPlanetDecos = new();
+    private static int bgaTileScanCount = -1;
+    private static int bgaPlanetScanCount = -1;
     private static void ReconcileBgaDecorations(bool bgaActive) {
         try {
-            UpdateDecoSet(bgaTileDecos, bgaActive && Conf.BgaHideTileDeco, DecoKind.Tile);
-            UpdateDecoSet(bgaPlanetDecos, bgaActive && Conf.BgaHidePlanetDeco, DecoKind.Planet);
+            UpdateDecoSet(bgaTileDecos, ref bgaTileScanCount, bgaActive && Conf.BgaHideTileDeco, DecoKind.Tile);
+            UpdateDecoSet(bgaPlanetDecos, ref bgaPlanetScanCount, bgaActive && Conf.BgaHidePlanetDeco, DecoKind.Planet);
         } catch {
         }
     }
-    private static void UpdateDecoSet(HashSet<scrDecoration> hidden, bool hide, DecoKind kind) {
+    private static void UpdateDecoSet(Dictionary<scrDecoration, bool> flagged, ref int scannedCount, bool hide, DecoKind kind) {
         if(hide) {
             scrDecorationManager mgr = scrDecorationManager.instance;
             List<scrDecoration> all = mgr != null ? mgr.allDecorations : null;
             if(all == null) return;
+            // This ran every tick, O(all decorations) — the exact levels BGA mode targets are
+            // decoration-heavy. Every game re-show path checks forceHide (scrDecoration's state
+            // reset and ffxMoveDecorationsPlus both do SetVisible(v && !forceHide)), so flagging
+            // every matching deco once suppresses re-shows without rescanning; rescan only when
+            // the list changes. The count guard resets whenever hide goes inactive, which covers
+            // level reloads that swap instances without changing the count.
+            if(all.Count == scannedCount) return;
             foreach(scrDecoration deco in all) {
-                if(deco == null || !Matches(deco, kind) || !deco.GetVisible()) continue;
+                if(deco == null || !Matches(deco, kind) || deco.forceHide) continue;
+                bool visible = deco.GetVisible();
                 deco.forceHide = true;
-                deco.SetVisible(false);
-                hidden.Add(deco);
+                if(visible) deco.SetVisible(false);
+                flagged[deco] = visible;
             }
-        } else if(hidden.Count > 0) {
-            foreach(scrDecoration deco in hidden) {
-                if(deco != null) {
-                    deco.forceHide = false;
-                    deco.SetVisible(true);
-                }
+            scannedCount = all.Count;
+        } else {
+            scannedCount = -1;
+            if(flagged.Count == 0) return;
+            foreach(KeyValuePair<scrDecoration, bool> entry in flagged) {
+                if(entry.Key == null) continue;
+                entry.Key.forceHide = false;
+                if(entry.Value) entry.Key.SetVisible(true);
             }
-            hidden.Clear();
+            flagged.Clear();
         }
     }
     private static bool Matches(scrDecoration deco, DecoKind kind) {
