@@ -609,8 +609,10 @@ internal sealed class TufBrowserView : MonoBehaviour {
         Image image = action.gameObject.AddComponent<Image>();
         image.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
         image.type = Image.Type.Sliced;
-        bool enabled = level.State is not TufItemState.Unavailable and not TufItemState.Downloading
-            and not TufItemState.Extracting and not TufItemState.Loading && !service.IsBusy;
+        bool actionable = level.State is not TufItemState.Unavailable and not TufItemState.Downloading
+                and not TufItemState.Extracting and not TufItemState.Loading
+            || (level.State == TufItemState.Unavailable && TufMainLevel.Resolve(level, out _) != TufMainLevel.TufMainAction.None);
+        bool enabled = actionable && !service.IsBusy;
         image.color = enabled ? UIColors.ObjectButton : Color.Lerp(UIColors.ObjectBG, UIColors.PanelBG, 0.25f);
         TMP_Text label = Text(action, ActionLabel(level), 15f, TextAlignmentOptions.Center);
         label.color = new(1f, 1f, 1f, enabled ? 1f : 0.5f);
@@ -629,7 +631,11 @@ internal sealed class TufBrowserView : MonoBehaviour {
         TufItemState.Loading => Tr("TUF_LOADING_LEVEL", "Loading…"),
         TufItemState.Load => Tr("TUF_LOAD", "Load"),
         TufItemState.Retry => Tr("TUF_RETRY", "Retry"),
-        TufItemState.Unavailable => Tr("TUF_UNAVAILABLE", "Unavailable"),
+        TufItemState.Unavailable => TufMainLevel.Resolve(level, out _) switch {
+            TufMainLevel.TufMainAction.Play => Tr("TUF_PLAY", "Play"),
+            TufMainLevel.TufMainAction.BuyDlc => Tr("TUF_BUY_DLC", "Buy DLC"),
+            _ => Tr("TUF_UNAVAILABLE", "Unavailable"),
+        },
         TufItemState.ChooseChart => Tr("TUF_CANCEL", "Cancel"),
         _ => Tr("TUF_DOWNLOAD", "Download")
     };

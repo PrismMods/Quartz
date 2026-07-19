@@ -119,6 +119,14 @@ public sealed class TufLevel {
     // The level's showcase video (YouTube, Bilibili, …), straight from the API. Only
     // YouTube links become a preview thumbnail; see TufThumbnail. Empty when unknown.
     public string VideoLink { get; set; } = "";
+    // Free-text suffix from the API (e.g. "(1-X)"). For the base game's own charts —
+    // which have no download and would otherwise read "Unavailable" — this encodes
+    // the in-game level code. Resolved lazily on the main thread by TufMainLevel;
+    // MainLevelResolved gates the one-time WorldData validation, and MainLevelCode is
+    // the launchable code ("1-X") or "" once resolved to "not a base-game level".
+    public string Suffix { get; set; } = "";
+    public string MainLevelCode { get; set; } = "";
+    public bool MainLevelResolved { get; set; }
     // Ordering key for difficulty sorts (difficulties endpoint sortOrder). Only
     // populated for pack levels; the plain browser sorts server-side.
     public int DifficultyRank { get; set; }

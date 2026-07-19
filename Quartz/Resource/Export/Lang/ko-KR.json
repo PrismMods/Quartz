@@ -1157,6 +1157,9 @@
     "EDITOR_FLIPROTATE_SHORTCUT_FLIP_V": "Ctrl + Shift + L — 선택 영역 수직 반전",
     "EDITOR_FLIPROTATE_SHORTCUT_ROT_CCW": "Ctrl + , — 선택 영역 시계반대방향 회전",
     "EDITOR_FLIPROTATE_SHORTCUT_ROT_CW": "Ctrl + . — 선택 영역 시계방향 회전",
-    "EDITOR_FLIPROTATE_SHORTCUT_ROT_180": "Ctrl + / — 선택 영역 180° 회전"
+    "EDITOR_FLIPROTATE_SHORTCUT_ROT_180": "Ctrl + / — 선택 영역 180° 회전",
+    "TUF_PLAY": "플레이",
+    "TUF_MAIN_LAUNCH_FAILED": "기본 게임 레벨을 열 수 없습니다.",
+    "TUF_BUY_DLC": "DLC 구매"
   }
 }

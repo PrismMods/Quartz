@@ -1157,6 +1157,9 @@
     "EDITOR_FLIPROTATE_SHORTCUT_FLIP_V": "Ctrl + Shift + L — Flip selection vertically",
     "EDITOR_FLIPROTATE_SHORTCUT_ROT_CCW": "Ctrl + , — Rotate selection counterclockwise",
     "EDITOR_FLIPROTATE_SHORTCUT_ROT_CW": "Ctrl + . — Rotate selection clockwise",
-    "EDITOR_FLIPROTATE_SHORTCUT_ROT_180": "Ctrl + / — Rotate selection 180°"
+    "EDITOR_FLIPROTATE_SHORTCUT_ROT_180": "Ctrl + / — Rotate selection 180°",
+    "TUF_PLAY": "Play",
+    "TUF_MAIN_LAUNCH_FAILED": "Could not open the base-game level.",
+    "TUF_BUY_DLC": "Buy DLC"
   }
 }

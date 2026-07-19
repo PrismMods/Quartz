@@ -48,6 +48,13 @@ internal sealed class TufLevelActionRunner {
         }
         if(level.DownloadUri == null) {
             activeLevelId = 0;
+            // The base game's own charts have no download: launch the real in-game
+            // level, or send the player to buy the DLC it needs, instead of leaving a
+            // dead "Unavailable" button.
+            switch(TufMainLevel.Resolve(level, out string codeOrUrl)) {
+                case TufMainLevel.TufMainAction.Play: LaunchMainLevel(level, codeOrUrl); break;
+                case TufMainLevel.TufMainAction.BuyDlc: TufMainLevel.OpenStore(codeOrUrl); break;
+            }
             return;
         }
         actionRequest?.Cancel();
@@ -55,6 +62,18 @@ internal sealed class TufLevelActionRunner {
         actionRequest = new CancellationTokenSource();
         Update(level, TufItemState.Downloading, 0f, "");
         Download(level, actionRequest.Token);
+    }
+
+    // Base-game levels aren't files we launch through the editor; they load in-game
+    // via the game's own EnterLevel path. Success tears the menu down with the scene.
+    private void LaunchMainLevel(TufLevel level, string code) {
+        MainCore.Log.Msg($"[TUF] opening base-game level {code} for #{level.Id}");
+        if(TufMainLevel.Launch(code)) {
+            UICore.Close(true);
+            return;
+        }
+        level.Error = MainCore.Tr.Get("TUF_MAIN_LAUNCH_FAILED", "Could not open the base-game level.");
+        notify();
     }
 
     // Launch the chart the user picked from the ChooseChart list.

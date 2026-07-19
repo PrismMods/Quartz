@@ -78,6 +78,7 @@ public sealed class TufApiClient : IDisposable {
                 download
             ) {
                 VideoLink = TufInput.CapDisplay(token.Value<string>("videoLink"), "", 300),
+                Suffix = TufInput.CapDisplay(token.Value<string>("suffix"), "", 40),
             });
         }
         return new TufPage(levels, root.Value<bool?>("hasMore") == true, results.Count);
