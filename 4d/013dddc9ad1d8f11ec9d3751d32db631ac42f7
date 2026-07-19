@@ -1,0 +1,71 @@
+Quartz/UI/Factory/Page/TufDifficultyRangeBar.cs
+  s_a4d7b37eff0786::t_6ffca0990ce217 53-54
+  s_a4d7b37eff0786::t_1517b6c573b025 244-246,248-250
+Quartz/UI/Utility/TMPTextShadow.cs
+  s_a4d7b37eff0786::t_a5133813046b58 155-156
+  s_a4d7b37eff0786::t_e7baf12edd024a 50-57
+  s_a4d7b37eff0786::t_cae8e29e7cc89e 72
+  s_a4d7b37eff0786::t_d5123fb137ef82 167
+  s_a4d7b37eff0786::t_0cb04fcee1ddaa 269-272
+Quartz/UI/Objects/Impl/UIColorPicker.cs
+  s_a4d7b37eff0786::t_f7fb25200449bd 290-292
+  s_a4d7b37eff0786::t_20efc3bbccbee3 53
+  s_a4d7b37eff0786::t_b9860e93c47194 128-135
+Quartz/UI/Factory/Page/TufSettingsUI.cs
+  s_a4d7b37eff0786::t_c88c79ea7b4509 18-26
+  s_a4d7b37eff0786::t_b303b13f4bbc7f 52-55
+Quartz/Features/SongTitle/SongTitleOverlay.cs
+  s_a4d7b37eff0786::t_9f42760b24ec4b 191-197,205-209
+  s_a4d7b37eff0786::t_2f81c8a1bdb80f 210
+Quartz/Features/ChatterBlocker/ChatterBlocker.cs
+  s_a4d7b37eff0786::t_428348f8cc68ee 60-62
+Quartz/Features/Tuf/TufService.cs
+  s_a4d7b37eff0786::t_97ff107183a6de 97-99,101
+  s_a4d7b37eff0786::t_9fa4a09a48594b 275-282
+Quartz/Features/Panels/PanelsOverlay.LivePanel.cs
+  s_a4d7b37eff0786::t_86a207550820c3 132-135
+  s_a4d7b37eff0786::t_401d516f7c40fa 75
+  s_a4d7b37eff0786::t_c671f48c03acfb 26
+Quartz/GTweens/Source/Contexts/GTweensContext.cs
+  s_a4d7b37eff0786::t_a8fd5da6869163 44-52
+  s_a4d7b37eff0786::t_da78033f541c15 22-27
+Quartz/UI/UICore.cs
+  s_a4d7b37eff0786::t_1ad44e818ea70f 889-893
+Quartz/Features/KeyViewer/KeyViewerOverlay.Css.cs
+  s_a4d7b37eff0786::t_e7b79e4bfd24a4 439-441
+Quartz/Features/KeyViewer/KeyViewerOverlay.Rain.cs
+  s_a4d7b37eff0786::t_25fa156462acd9 11-24
+  s_a4d7b37eff0786::t_05c9e85b78c66f 38-54
+Quartz/Features/InGameOverlay/InGameOverlayFont.cs
+  s_a4d7b37eff0786::t_b3b132adacaf98 38,43-50
+  s_a4d7b37eff0786::t_a308eaba0b56d0 51
+Quartz/Features/KeyLimiter/KeyLimiter.cs
+  s_a4d7b37eff0786::t_fcd396ed83b311 251-252,255-260
+Quartz/Resource/FontManager.cs
+  s_a4d7b37eff0786::t_5d742e10e72851 349,351,360-362
+  s_a4d7b37eff0786::t_45b31583e0108d 79,81,88
+Quartz/Features/KeyViewer/KeyViewerOverlay.Input.cs
+  s_a4d7b37eff0786::t_e107b91879793b 6-10,15,24-30
+Quartz/Features/KeyViewer/RainRenderer.cs
+  s_a4d7b37eff0786::t_4881bbe666ac15 203-213
+  s_a4d7b37eff0786::t_51e7de97b14be5 25-47
+  s_a4d7b37eff0786::t_1fde6ef4af5975 247,274-277,281
+Quartz/Features/Calibration/CalibrationDetail.cs
+  s_a4d7b37eff0786::t_d079b0ab7e47f0 36-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "4d013dddc9ad1d8f11ec9d3751d32db631ac42f7",
+  "prompts": {},
+  "sessions": {
+    "s_a4d7b37eff0786": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c3da5f65-414d-49ed-b51f-7d7cf3fc4dca",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
