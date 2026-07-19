@@ -60,9 +60,9 @@ public static class PageFactory {
         PageTweaks.OptimizerPage(UICore.Pages[(int)OriginalMenuState.TweaksOptimizer]);
         PageTweaks.MainMenuPage(UICore.Pages[(int)OriginalMenuState.TweaksMainMenu]);
         PageTweaks.ResultsPage(UICore.Pages[(int)OriginalMenuState.TweaksResults]);
-        PageEditor.InspectorPage(UICore.Pages[(int)OriginalMenuState.EditorInspector]);
         PageEditor.TileReadoutPage(UICore.Pages[(int)OriginalMenuState.EditorTileReadout]);
         PageEditor.BgaPage(UICore.Pages[(int)OriginalMenuState.EditorBga]);
+        PageEditor.FlipRotatePage(UICore.Pages[(int)OriginalMenuState.EditorFlipRotate]);
         NostalgiaUI.GameplayPage(UICore.Pages[(int)OriginalMenuState.NostalgiaGameplay]);
         NostalgiaUI.VisualsPage(UICore.Pages[(int)OriginalMenuState.NostalgiaVisuals]);
         NostalgiaUI.TweaksPage(UICore.Pages[(int)OriginalMenuState.NostalgiaTweaks]);

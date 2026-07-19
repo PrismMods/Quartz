@@ -1141,6 +1141,20 @@
     "KVI_TOOLBAR_HINT": "스크롤하거나 마우스 가운데·오른쪽 버튼으로 드래그하면 화면을 이동합니다. + 와 - 키로 확대·축소, 0 키로 실제 크기입니다. 방향키로 미세 이동, Delete로 삭제합니다.",
     "KVI_HIDDEN": "숨김",
     "DESC_KVI_HIDDEN": "선택한 요소를 레이아웃에 남겨두되 게임에서는 그리지 않습니다. 숨긴 요소는 캔버스에서 흐리게 표시되며 클릭할 수 없습니다.",
-    "KVI_EMPTY": "캔버스에서 요소를 선택하면 편집할 수 있습니다. 여러 개를 드래그로 묶으면 함께 편집합니다."
+    "KVI_EMPTY": "캔버스에서 요소를 선택하면 편집할 수 있습니다. 여러 개를 드래그로 묶으면 함께 편집합니다.",
+    "SECTION_FLIP_ROTATE_TILES": "타일 반전 및 회전",
+    "EDITOR_FLIP_ADJUST": "타일 반전 시 길 위치 좌표 수정",
+    "DESC_EDITOR_FLIP_ADJUST": "선택한 타일을 가로 또는 세로로 반전할 때, 각 타일의 길 위치(Position Track) 이벤트에 저장된 좌표도 함께 반전하여 해당 이벤트로 배치된 요소가 타일과 함께 움직이도록 합니다.",
+    "EDITOR_ROTATE_ADJUST": "타일 회전 시 길 위치 좌표 수정",
+    "DESC_EDITOR_ROTATE_ADJUST": "선택한 타일을 회전할 때, 각 타일의 길 위치(Position Track) 이벤트에 저장된 좌표도 같은 각도로 회전하여 해당 이벤트로 배치된 요소가 타일과 함께 회전하도록 합니다.",
+    "EDITOR_CUSTOM_ANGLE": "사용자 지정 회전 각도 사용",
+    "DESC_EDITOR_CUSTOM_ANGLE": "회전 단축키를 사용할 때 기본 90° 대신 아래에서 지정한 각도로 선택한 타일을 회전합니다. 180° 회전 단축키는 항상 180°로 유지됩니다.",
+    "EDITOR_CUSTOM_ANGLE_VALUE": "회전 각도",
+    "HEADING_SHORTCUTS": "단축키",
+    "EDITOR_FLIPROTATE_SHORTCUT_FLIP_H": "Ctrl + L — 선택 영역 수평 반전",
+    "EDITOR_FLIPROTATE_SHORTCUT_FLIP_V": "Ctrl + Shift + L — 선택 영역 수직 반전",
+    "EDITOR_FLIPROTATE_SHORTCUT_ROT_CCW": "Ctrl + , — 선택 영역 시계반대방향 회전",
+    "EDITOR_FLIPROTATE_SHORTCUT_ROT_CW": "Ctrl + . — 선택 영역 시계방향 회전",
+    "EDITOR_FLIPROTATE_SHORTCUT_ROT_180": "Ctrl + / — 선택 영역 180° 회전"
   }
 }

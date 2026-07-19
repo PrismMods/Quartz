@@ -1141,6 +1141,20 @@
     "KVI_TOOLBAR_HINT": "Scroll to pan, or drag with the middle or right mouse button. Press + and - to zoom, 0 for actual size. Arrow keys nudge, Delete removes.",
     "KVI_HIDDEN": "Hidden",
     "DESC_KVI_HIDDEN": "Keep the selected elements in the layout but stop drawing them in game. Hidden elements dim on the canvas and cannot be clicked.",
-    "KVI_EMPTY": "Select an element on the canvas to edit it. Drag a box around several to edit them together."
+    "KVI_EMPTY": "Select an element on the canvas to edit it. Drag a box around several to edit them together.",
+    "SECTION_FLIP_ROTATE_TILES": "Flip & Rotate Tiles",
+    "EDITOR_FLIP_ADJUST": "Adjust Position Track when flipping",
+    "DESC_EDITOR_FLIP_ADJUST": "When you flip the selected tiles horizontally or vertically, also mirror the coordinates stored in each tile's Position Track events, so anything positioned by those events flips along with the tiles.",
+    "EDITOR_ROTATE_ADJUST": "Adjust Position Track when rotating",
+    "DESC_EDITOR_ROTATE_ADJUST": "When you rotate the selected tiles, also rotate the coordinates stored in each tile's Position Track events by the same angle, so anything positioned by those events turns along with the tiles.",
+    "EDITOR_CUSTOM_ANGLE": "Use a custom rotation angle",
+    "DESC_EDITOR_CUSTOM_ANGLE": "Rotate the selected tiles by the angle below instead of the default 90° when you use the rotate shortcut. The 180° rotate shortcut always stays 180°.",
+    "EDITOR_CUSTOM_ANGLE_VALUE": "Rotation angle",
+    "HEADING_SHORTCUTS": "Shortcuts",
+    "EDITOR_FLIPROTATE_SHORTCUT_FLIP_H": "Ctrl + L — Flip selection horizontally",
+    "EDITOR_FLIPROTATE_SHORTCUT_FLIP_V": "Ctrl + Shift + L — Flip selection vertically",
+    "EDITOR_FLIPROTATE_SHORTCUT_ROT_CCW": "Ctrl + , — Rotate selection counterclockwise",
+    "EDITOR_FLIPROTATE_SHORTCUT_ROT_CW": "Ctrl + . — Rotate selection clockwise",
+    "EDITOR_FLIPROTATE_SHORTCUT_ROT_180": "Ctrl + / — Rotate selection 180°"
   }
 }

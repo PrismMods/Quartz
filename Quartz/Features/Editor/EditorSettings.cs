@@ -10,8 +10,12 @@ public sealed class EditorSettings : ISettingsFile {
     public bool ShowFloorDuration = false; 
     public bool UseTulttakModBehavior = false;
     public bool BgaMod = false;
-    public bool BgaHideTileDeco = false;   
-    public bool BgaHidePlanetDeco = false; 
+    public bool BgaHideTileDeco = false;
+    public bool BgaHidePlanetDeco = false;
+    public bool AdjustOnFlip = false;
+    public bool AdjustOnRotate = false;
+    public bool CustomAngleRotation = false;
+    public float CustomAngle = 90f;
     public bool ShowAny =>
         ShowFloorAngle || ShowFloorBeats || ShowFloorCount || ShowFloorDuration;
     public JToken Serialize() {
@@ -25,6 +29,10 @@ public sealed class EditorSettings : ISettingsFile {
             [nameof(BgaMod)] = BgaMod,
             [nameof(BgaHideTileDeco)] = BgaHideTileDeco,
             [nameof(BgaHidePlanetDeco)] = BgaHidePlanetDeco,
+            [nameof(AdjustOnFlip)] = AdjustOnFlip,
+            [nameof(AdjustOnRotate)] = AdjustOnRotate,
+            [nameof(CustomAngleRotation)] = CustomAngleRotation,
+            [nameof(CustomAngle)] = CustomAngle,
         };
     }
     public void Deserialize(JToken token) {
@@ -38,5 +46,9 @@ public sealed class EditorSettings : ISettingsFile {
         BgaMod = IOUtils.Read(token, nameof(BgaMod), BgaMod);
         BgaHideTileDeco = IOUtils.Read(token, nameof(BgaHideTileDeco), BgaHideTileDeco);
         BgaHidePlanetDeco = IOUtils.Read(token, nameof(BgaHidePlanetDeco), BgaHidePlanetDeco);
+        AdjustOnFlip = IOUtils.Read(token, nameof(AdjustOnFlip), AdjustOnFlip);
+        AdjustOnRotate = IOUtils.Read(token, nameof(AdjustOnRotate), AdjustOnRotate);
+        CustomAngleRotation = IOUtils.Read(token, nameof(CustomAngleRotation), CustomAngleRotation);
+        CustomAngle = IOUtils.Read(token, nameof(CustomAngle), CustomAngle);
     }
 }

@@ -58,10 +58,10 @@ public static class MenuFactory {
             ("Main Menu", "SECTION_MAIN_MENU", (int)OriginalMenuState.TweaksMainMenu),
             ("Detailed Results", "SECTION_DETAILED_RESULTS", (int)OriginalMenuState.TweaksResults),
         ],
-        [(int)OriginalMenuState.EditorInspector] = [
-            ("Inspector", "SECTION_INSPECTOR", (int)OriginalMenuState.EditorInspector),
+        [(int)OriginalMenuState.EditorTileReadout] = [
             ("Selected Tile Readout", "SECTION_SELECTED_TILE_READOUT", (int)OriginalMenuState.EditorTileReadout),
             ("BGA Mod", "SECTION_BGA_MOD", (int)OriginalMenuState.EditorBga),
+            ("Flip & Rotate Tiles", "SECTION_FLIP_ROTATE_TILES", (int)OriginalMenuState.EditorFlipRotate),
         ],
         [(int)OriginalMenuState.NostalgiaGameplay] = [
             ("Gameplay", "GAMEPLAY", (int)OriginalMenuState.NostalgiaGameplay),
@@ -109,7 +109,7 @@ public static class MenuFactory {
         CreateItem(parent, "Gameplay", MainCore.Spr.Get(UISprite.Gamepad128, iconUnits), (int)OriginalMenuState.GameplayKeyLimiter);
         CreateItem(parent, "Visuals", MainCore.Spr.Get(UISprite.Image128, iconUnits), (int)OriginalMenuState.VisualsEffectRemover);
         CreateItem(parent, "Tweaks", MainCore.Spr.Get(UISprite.AdjustmentsHorizontal128, iconUnits), (int)OriginalMenuState.TweaksGeneral);
-        CreateItem(parent, "Editor", MainCore.Spr.Get(UISprite.Wrench128, iconUnits), (int)OriginalMenuState.EditorInspector);
+        CreateItem(parent, "Editor", MainCore.Spr.Get(UISprite.Wrench128, iconUnits), (int)OriginalMenuState.EditorTileReadout);
         CreateItem(parent, "Nostalgia", MainCore.Spr.Get(UISprite.ClockRewind128, iconUnits), (int)OriginalMenuState.NostalgiaGameplay);
         CreateItem(parent, "TUF", MainCore.Spr.Get(UISprite.TufLogo, iconUnits), (int)OriginalMenuState.NostalgiaTuf);
         CreateItem(parent, "Search", MainCore.Spr.Get(UISprite.MagnifyingGlass128, iconUnits), (int)OriginalMenuState.Search);
