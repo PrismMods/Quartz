@@ -1,0 +1,216 @@
+Quartz/UI/Editor/KvInspector.cs
+  s_cc9ec3350fe20f::t_3199f437a76d4f 324-350
+  s_2be22c6480a4c7::t_12071c00d23d31 13,20,26,32,35,37,39,42,44,50,52,72,77,100,107,109,118,134,156,168,193,211,219,228,239,284,286,301,323,351
+Quartz/Features/Optimizer/HitSoundRenderer.cs
+  s_2be22c6480a4c7::t_08fb9218257554 12,20,23,25,66,68,150,201,229,250,343,366,395
+  s_2c56d4c626aa2b::t_f9b1c731fdf629 256-263,266-275
+  s_2c56d4c626aa2b::t_79c2dcf7d782b7 21
+  s_2c56d4c626aa2b::t_c85f99bd28c272 396
+Quartz/UI/Editor/KvCanvasView.cs
+  s_cc9ec3350fe20f::t_b1819e70dfe7b0 127
+  s_cc9ec3350fe20f::t_a7abbdb6e93f08 66-68
+  s_cc9ec3350fe20f::t_ccb9d31066daa4 114
+  s_2be22c6480a4c7::t_00733b35dbaffc 11,36,65,70,80,98,104,113,126,134,172,180,186
+Quartz/Features/KeyViewer/KeyViewerOverlay.Update.cs
+  s_2307d4e0ac74cb::t_94e797264fe45f 26,33-34
+  s_2be22c6480a4c7::t_4b39ed5493ce89 12,14,17,25,36,63,95,98
+  s_2307d4e0ac74cb::t_12ad61e51a1084 87,96-97
+  s_2307d4e0ac74cb::t_08004fe813837c 94,99,104,114
+  s_2307d4e0ac74cb::t_589c338fb66c12 100
+  s_2307d4e0ac74cb::t_af378ca3297400 15
+Quartz/Features/KeyViewer/KeyViewerOverlay.Lifecycle.cs
+  s_2be22c6480a4c7::t_2598e506041214 59,73,82,94,109,117,129,202,222,227,233,242
+  s_2307d4e0ac74cb::t_9f2d1d7f2dde11 244-249
+  s_2307d4e0ac74cb::t_5b9c226e8248c1 243
+  s_2307d4e0ac74cb::t_d48947a27d6f1b 63
+Quartz/Features/KeyViewer/KeyViewerOverlay.Graph.cs
+  s_2be22c6480a4c7::t_43d246abb42daa 63,80,163
+  s_2307d4e0ac74cb::t_5d6368a36168f5 72
+  s_2be22c6480a4c7::t_37a4e78c2c2f55 26,73
+  s_2307d4e0ac74cb::t_be2562843f58cb 102
+Quartz/Features/Panels/PanelsOverlay.cs
+  s_2be22c6480a4c7::t_43d246abb42daa 97
+Quartz/Features/KeyViewer/RainRenderer.cs
+  s_2be22c6480a4c7::t_b55ae6b80d5784 22,25,29,34,68,112,122,137,141,144,149,173,210,226,247,256,335,381,391,402
+  s_2307d4e0ac74cb::t_1d2d2c6a6d1c16 392
+Quartz/Features/KeyViewer/KeyViewerOverlay.DmNote.cs
+  s_2307d4e0ac74cb::t_4c4fec040d034e 159,163,165,167-168
+  s_2be22c6480a4c7::t_92e4bd9d7b5c6d 35,54,58,64,66,125,158,180
+  s_2be22c6480a4c7::t_43d246abb42daa 23-24,122
+  s_2307d4e0ac74cb::t_5a27a4271c3904 126,128
+  s_cc9ec3350fe20f::t_4f97e71a985d8f 32
+  s_2307d4e0ac74cb::t_585b09b07891c2 30
+  s_2307d4e0ac74cb::t_9d8419bd84438f 127
+Quartz/Features/KeyViewer/KeyViewerOverlay.Events.cs
+  s_cc9ec3350fe20f::t_a6509db06f659e 25-29
+  s_cc9ec3350fe20f::t_503c09fed2dd6c 30,33-34
+  s_cc9ec3350fe20f::t_8f275fb4279a21 31
+  s_2be22c6480a4c7::t_90dd77d6f76973 24,32,35
+Quartz/Update/UpdateService.cs
+  s_c872233fc6ab85::t_21808c5bbdbf8a 159-169
+  s_c872233fc6ab85::t_5df58834f9819c 30-31,33-36
+  s_c872233fc6ab85::t_bdb8b1bd2dffbf 375
+  s_2be22c6480a4c7::t_43d246abb42daa 17-18,23-27,101
+  s_c872233fc6ab85::t_d58759d195f5c5 148
+Quartz/Resource/Export/Lang/en-US.json
+  s_cc9ec3350fe20f::t_2dbab05cc4fd2d 1094-1095
+  s_2307d4e0ac74cb::t_31a01c4d89a2d6 339,341
+  s_cc9ec3350fe20f::t_50c03e4bc855ff 361
+  s_cc9ec3350fe20f::t_26cb773f8415f5 1009
+  s_cc9ec3350fe20f::t_a78fbb6891dc8a 1006-1007
+Quartz/UI/Factory/Page/PageKeyViewer.Editor.cs
+  s_cc9ec3350fe20f::t_0cfa67e1c279ac 103-110
+  s_2be22c6480a4c7::t_edbd81dba0a2a9 13,17,27,29,42,46,50,59,68,84,89,93,100,102,127,130
+Quartz/Features/KeyViewer/KvInput.cs
+  s_2307d4e0ac74cb::t_db195de57b8a3b 192
+  s_2307d4e0ac74cb::t_fd0d6595851849 1-22,27,29-136,193-200,212,223-229
+  s_2307d4e0ac74cb::t_128d80b9ef1073 23-26,28
+  s_2307d4e0ac74cb::t_f05291ebdafeaa 166,173,181,187,191,201,203-204,207-211,213-217
+  s_2307d4e0ac74cb::t_f334687a25e3ce 218-222
+  s_2307d4e0ac74cb::t_602a974d3ceb09 137-158
+  s_2307d4e0ac74cb::t_6c9357a935bf74 159-165,167-172,174-180,182-186,188-190,202,205-206
+Quartz/UI/Utility/Reorganizer.cs
+  s_cc9ec3350fe20f::t_322577d1fa8558 198
+  s_2be22c6480a4c7::t_9db7d1c590e0b3 13,205
+  s_cc9ec3350fe20f::t_c9c483024a5cc7 14-16
+  s_cc9ec3350fe20f::t_afd5d7acb05547 218
+  s_cc9ec3350fe20f::t_f0fd934e3d565a 206
+  s_cc9ec3350fe20f::t_6e3fcef39d38a8 242
+  s_cc9ec3350fe20f::t_0465d0053057b5 100
+Quartz/Features/KeyViewer/KeyViewerOverlay.Input.cs
+  s_2307d4e0ac74cb::t_8decf95f51662d 58
+  s_2307d4e0ac74cb::t_447136144b4611 99
+  s_2307d4e0ac74cb::t_71c5203cddd7be 220,226
+  s_2307d4e0ac74cb::t_c28d34f56adc6c 199
+  s_2307d4e0ac74cb::t_4b97e7e77cc1e2 250,255
+  s_2307d4e0ac74cb::t_6d26154321e442 261
+  s_2307d4e0ac74cb::t_1669dfca913543 82
+  s_2307d4e0ac74cb::t_b482480aba1508 138,147-148
+  s_2307d4e0ac74cb::t_f9beb4ec307ec4 48-57,59-80,83,89-98,100-120,124-125,127,129-130,133-136,139-146,149-170,173-182
+  s_2307d4e0ac74cb::t_24264c977bf2c2 121-123,126,131-132
+  s_2be22c6480a4c7::t_0f1b4c9a7d16bd 6,11,47,81,84,137,171,218,249,260
+  s_2307d4e0ac74cb::t_1a9bdcfa742298 85-88
+  s_2307d4e0ac74cb::t_48b9ba293ff2b9 128
+  s_2307d4e0ac74cb::t_c3b63c8b99a8aa 172
+Quartz/Features/KeyViewer/Layout/KvStore.cs
+  s_cc9ec3350fe20f::t_446f01d7052c27 257-258
+  s_cc9ec3350fe20f::t_3643cc0e5f39fd 240-243,251-255,259-274
+  s_2be22c6480a4c7::t_0a580605d4ab9f 7,15,38,48,59,81,89,104,142,150,208,216,239,256,275-276,304,307,316,331,333,352,361,382,403
+Quartz/UI/Editor/KvInspector.Element.cs
+  s_cc9ec3350fe20f::t_2f2bd57f75ead5 47
+  s_2be22c6480a4c7::t_8a69fb9e278f40 17,25,57,74,134,155
+  s_cc9ec3350fe20f::t_1843aac7a85284 37,48
+  s_cc9ec3350fe20f::t_7302ce393c2070 26-31,33-36,38-46
+Quartz/Features/KeyViewer/KeyViewerOverlay.DmNoteLayout.cs
+  s_cc9ec3350fe20f::t_cf73f1549b4578 84
+  s_cc9ec3350fe20f::t_e1f3ae279d941b 38-53
+  s_2be22c6480a4c7::t_92d13221bd0e68 29,37,74,76,93
+  s_cc9ec3350fe20f::t_e91e9bd47827c3 77
+Quartz/UI/Factory/Page/PageKeyViewer.Tuning.cs
+  s_2307d4e0ac74cb::t_c1859ca25727b5 221-222
+  s_2be22c6480a4c7::t_992dc559c80838 10,36,54,59,84,129,206
+  s_2307d4e0ac74cb::t_a9597776f7c75d 195-205
+Quartz/UI/UpdateToast.cs
+  s_c872233fc6ab85::t_b8be63678169c3 34
+  s_c872233fc6ab85::t_079f703fbf243a 266
+  s_c872233fc6ab85::t_2342eceafe1bd3 186,189,192
+  s_c872233fc6ab85::t_80ccc11fd21588 241-243
+Quartz/Features/KeyViewer/KeyViewerOverlay.Css.cs
+  s_2be22c6480a4c7::t_43d246abb42daa 228,495,608,626
+  s_2be22c6480a4c7::t_045992e0016a68 309,324,440
+  s_2307d4e0ac74cb::t_a3bbfdce8f2ede 350
+Quartz/UI/Factory/Page/PageSettings.Helpers.cs
+  s_2be22c6480a4c7::t_43d246abb42daa 93
+  s_c872233fc6ab85::t_a37fb2d8369d61 201-204
+Quartz/Features/ChatterBlocker/ChatterBlocker.cs
+  s_2be22c6480a4c7::t_cb910175730aea 74,103,143,161
+  s_2307d4e0ac74cb::t_f27b07248d558f 202-206
+Quartz/Features/KeyViewer/KeyViewerOverlay.DmNoteParsing.cs
+  s_cc9ec3350fe20f::t_b91577d41ff0a6 290
+  s_cc9ec3350fe20f::t_f1b843b80f26bb 325-332
+  s_2307d4e0ac74cb::t_aa23f13a5580bd 109
+  s_2be22c6480a4c7::t_b38504b9810a51 65,68,79,233,238,249,253,269,289,323,347,397,500
+  s_cc9ec3350fe20f::t_6c60b128a83954 324
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_cc9ec3350fe20f::t_5ff13055691408 1009
+  s_cc9ec3350fe20f::t_6969ded364f08b 361
+  s_cc9ec3350fe20f::t_4176ca57de6859 1006-1007
+  s_cc9ec3350fe20f::t_6ba56d0062aa23 1094-1095
+  s_2307d4e0ac74cb::t_7749d1787f8305 339,341
+Quartz/UI/Editor/KvInspector.Counter.cs
+  s_cc9ec3350fe20f::t_a1685d06c1ecc0 36,39
+  s_cc9ec3350fe20f::t_a8ed9dc1dcee8e 34-35,37-38
+  s_2be22c6480a4c7::t_a13c1dbe7b0c73 13,24,33,56,58,70,75,103,105
+Quartz/Features/KeyViewer/KeyViewerOverlay.Boxes.cs
+  s_2be22c6480a4c7::t_eb52003e9f9813 10,35,37
+  s_cc9ec3350fe20f::t_2a3880ab8c0459 26-34,38-41
+  s_cc9ec3350fe20f::t_b7b7b9d2b74f94 11,13-25,36,42-47
+Quartz/Features/KeyViewer/KeyViewerOverlay.cs
+  s_2be22c6480a4c7::t_43d246abb42daa 236-239,279-280,283,287
+  s_cc9ec3350fe20f::t_1c9f5d4ed9246e 166
+  s_2307d4e0ac74cb::t_470bb6db1c61d0 54-61
+  s_cc9ec3350fe20f::t_7c61faad0a8bb2 169
+  s_2307d4e0ac74cb::t_556dd22090f5d3 121-124
+  s_cc9ec3350fe20f::t_ae0d179c544b9a 164
+  s_2be22c6480a4c7::t_b428ca22ab8a57 39,41,82,84,86,110,116,118,120,142,149,153,156,163,165,168,189,193,196,198,200,202,299
+  s_2307d4e0ac74cb::t_7bae94c648a2d5 62
+Quartz/Features/KeyViewer/Layout/KvElement.cs
+  s_cc9ec3350fe20f::t_f01ca54308a24e 144-145,147-148
+  s_cc9ec3350fe20f::t_0bd2604346544f 146,149-150
+  s_cc9ec3350fe20f::t_09889a8822bc22 26,29-30,39
+  s_2be22c6480a4c7::t_cf56a08dc3361a 7,10,12,14,18,24,40,82,91,103,119,127,135,143,151,159,174,176,190
+  s_cc9ec3350fe20f::t_976df13176de3a 41-50
+  s_cc9ec3350fe20f::t_afc68c0a254a38 136-142
+  s_cc9ec3350fe20f::t_90411ffa0b6114 152-158
+Quartz/Features/KeyViewer/KeyViewerSettings.cs
+  s_2be22c6480a4c7::t_48e84b8b08415f 11,13,55,102
+  s_2307d4e0ac74cb::t_7bbcfbb4e718ee 56-58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "1fababf2d0a70328bca70edf71d684f8a33db01f",
+  "prompts": {},
+  "sessions": {
+    "s_2307d4e0ac74cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7a1d6f37-5fa2-4c28-b151-c4ea812f34a8",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_2be22c6480a4c7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fa3fd9f1-a979-4355-8c0f-1d75f35c9a8e",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_2c56d4c626aa2b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f53df3ce-9ac6-4fa6-b99a-dc820e6db4c3",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_c872233fc6ab85": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4f505138-83df-4697-ab8e-964d053303b9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_cc9ec3350fe20f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7f2b5795-8afe-4b57-85df-b9462c7a0a93",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
