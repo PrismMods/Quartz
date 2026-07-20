@@ -49,10 +49,4 @@
 ![Credits](readme/credits.png)
 ![In-Game](readme/ingame.png)
 
-<a href="https://www.star-history.com/?repos=PrismMods%2FQuartz&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=PrismMods/Quartz&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=PrismMods/Quartz&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=PrismMods/Quartz&type=date&legend=top-left" />
- </picture>
-</a>
+[![Star History Chart](https://api.star-history.com/chart?repos=PrismMods/Quartz&type=date&legend=top-left&sealed_token=jLOAJP3ZX3bJC2EMB8uFffsM-mLOmUQtAw7dx5nxei-RcXYLxb00DWLaruw5CERMja-OoZV3POlvGUKXAIzTDRRBiX2E89nDk34r__RKJGybbxXP-Awo4g)](https://www.star-history.com/?repos=PrismMods%2FQuartz&type=date&legend=top-left)
