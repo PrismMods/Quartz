@@ -8,6 +8,7 @@ public static class PageFactory {
     public static RectTransform PagesContaner;
     public static RectTransform CreatePages(GameObject panel) {
         GenerateUI.ClearSections();
+        ToggleBinds.ClearLive();
         UICore.Pages.Clear();
         GameObject pagesContainer = new("PagesContainer");
         pagesContainer.transform.SetParent(panel.transform, false);

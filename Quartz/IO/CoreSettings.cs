@@ -31,6 +31,7 @@ public sealed class CoreSettings : ISettingsFile {
     public float CalibHeight = 0f;
     public float KvInspectorWidth = 0f;
     public Dictionary<string, bool> CollapsibleStates = [];
+    public Dictionary<string, (int Modifier, int Key)> ToggleKeybinds = [];
     public int ToggleModifier = (int)Keybind.KeyModifier.Alt;
     public int ToggleKey = (int)KeyCode.K;
     public int UpdateChannel = (int)ReleaseChannel.Alpha;
@@ -53,6 +54,9 @@ public sealed class CoreSettings : ISettingsFile {
     public JToken Serialize() {
         JObject collapsibleStates = [];
         foreach(var kvp in CollapsibleStates) collapsibleStates[kvp.Key] = kvp.Value;
+        JObject toggleKeybinds = [];
+        foreach(var kvp in ToggleKeybinds)
+            toggleKeybinds[kvp.Key] = new JArray(kvp.Value.Modifier, kvp.Value.Key);
         return new JObject {
             [nameof(Active)] = Active,
             [nameof(Language)] = Language,
@@ -85,6 +89,7 @@ public sealed class CoreSettings : ISettingsFile {
             [nameof(UpdateChannel)] = UpdateChannel,
             [nameof(SkippedVersion)] = SkippedVersion,
             [nameof(CollapsibleStates)] = collapsibleStates,
+            [nameof(ToggleKeybinds)] = toggleKeybinds,
             [nameof(AccentR)] = AccentR,
             [nameof(AccentG)] = AccentG,
             [nameof(AccentB)] = AccentB
@@ -126,6 +131,15 @@ public sealed class CoreSettings : ISettingsFile {
             foreach(var prop in collapsibleStates.Properties()) {
                 try {
                     CollapsibleStates[prop.Name] = prop.Value.Value<bool>();
+                } catch { }
+            }
+        }
+        ToggleKeybinds.Clear();
+        if(token[nameof(ToggleKeybinds)] is JObject toggleKeybinds) {
+            foreach(var prop in toggleKeybinds.Properties()) {
+                try {
+                    if(prop.Value is not JArray pair || pair.Count != 2) continue;
+                    ToggleKeybinds[prop.Name] = (pair[0].Value<int>(), pair[1].Value<int>());
                 } catch { }
             }
         }

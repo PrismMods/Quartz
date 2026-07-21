@@ -1149,6 +1149,7 @@
     "EDITOR_FLIPROTATE_SHORTCUT_ROT_180": "Ctrl + / — Rotate selection 180°",
     "TUF_PLAY": "Play",
     "TUF_MAIN_LAUNCH_FAILED": "Could not open the base-game level.",
-    "TUF_BUY_DLC": "Buy DLC"
+    "TUF_BUY_DLC": "Buy DLC",
+    "TOGGLE_BIND_HINT": "Right-click any toggle to give it its own hotkey. Press Esc while binding to unbind it."
   }
 }

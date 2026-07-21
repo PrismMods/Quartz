@@ -878,6 +878,7 @@ public static class UICore {
             holdingToggle = false;
         }
         if(Input.GetKeyUp(key)) holdingToggle = false;
+        ToggleBinds.HandleUpdate();
         if(!canvasObj.activeSelf) return;
         UIObject.TickAll();
         Tooltip.Tick();
@@ -1116,6 +1117,7 @@ public static class UICore {
         bandSeq?.Kill();
         themeImages = null;
         UIObject.DisposeAll();
+        ToggleBinds.ClearLive();
         Reorganizer.Dispose();
         UpdateToast.Dispose();
         Tooltip.Dispose();

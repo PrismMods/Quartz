@@ -148,6 +148,11 @@ internal static partial class PageSettings {
             "toggle_keybind"
         );
         var keybindTr = keybindLabel.gameObject.AddComponent<TextLocalization>().Init("TOGGLE_KEYBIND", "Toggle Menu Keybind");
+        GenerateUI.AddLocalizedMutedText(
+            GenerateUI.Row(content.transform, 32f),
+            "TOGGLE_BIND_HINT",
+            "Right-click any toggle to give it its own hotkey. Press Esc while binding to unbind it."
+        );
         var tooltipRow = GenerateUI.Row(content.transform);
         UIToggle tooltipToggle = GenerateUI.Toggle(
             tooltipRow,

@@ -77,6 +77,7 @@ public static partial class GenerateUI {
             value,
             onChanged
         );
+        KeyCapture bind = AttachToggleBind(rect, toggle, id);
         AddButton(rect.gameObject, btn => {
             switch(btn) {
                 case InputButton.Left:
@@ -85,6 +86,9 @@ public static partial class GenerateUI {
                 case InputButton.Middle:
                     if(MainCore.Conf.MiddleClickToDefault && toggle.Value != toggle.DefaultValue)
                         toggle.Reset();
+                    break;
+                case InputButton.Right:
+                    bind?.Begin();
                     break;
             }
         });

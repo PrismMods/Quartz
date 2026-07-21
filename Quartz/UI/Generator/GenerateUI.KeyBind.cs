@@ -1,6 +1,7 @@
 using Quartz.Core;
 using Quartz.Localization;
 using Quartz.Resource;
+using Quartz.UI.Objects.Impl;
 using Quartz.UI.Utility;
 using UnityEngine;
 using UnityEngine.UI;
@@ -50,24 +51,59 @@ public static partial class GenerateUI {
         });
         return label;
     }
+    internal static KeyCapture AttachToggleBind(RectTransform rect, UIToggle toggle, string id) {
+        if(rect == null || toggle == null || string.IsNullOrEmpty(id)) return null;
+        ToggleBinds.Register(id, toggle);
+        bool bound = ToggleBinds.TryGet(id, out Keybind.KeyModifier modifier, out KeyCode key);
+        GameObject box = new("BindLabel");
+        box.transform.SetParent(rect, false);
+        RectTransform boxRect = box.AddComponent<RectTransform>();
+        boxRect.anchorMin = new Vector2(1f, 0.5f);
+        boxRect.anchorMax = new Vector2(1f, 0.5f);
+        boxRect.pivot = new Vector2(1f, 0.5f);
+        boxRect.anchoredPosition = new Vector2(-46f, 0f);
+        boxRect.sizeDelta = new Vector2(240f, 30f);
+        TextMeshProUGUI display = AddMutedText(box.transform, 16f, 0.5f, true);
+        display.alignment = TextAlignmentOptions.Right;
+        display.raycastTarget = false;
+        display.text = bound ? Keybind.Format(modifier, key) : "";
+        KeyCapture capture = rect.gameObject.AddComponent<KeyCapture>();
+        capture.Display = display;
+        capture.Modifier = modifier;
+        capture.Key = key;
+        capture.Bound = bound;
+        capture.AllowClear = true;
+        capture.OnChanged = (mod, k) => ToggleBinds.Set(id, mod, k);
+        capture.OnCleared = () => ToggleBinds.Clear(id);
+        return capture;
+    }
 }
 internal sealed class KeyCapture : MonoBehaviour {
     public TextMeshProUGUI Display;
     public Keybind.KeyModifier Modifier;
     public KeyCode Key;
     public System.Action<Keybind.KeyModifier, KeyCode> OnChanged;
+    public bool Bound = true;
+    public bool AllowClear;
+    public System.Action OnCleared;
     private bool listening;
     private static readonly KeyCode[] AllKeys = (KeyCode[])System.Enum.GetValues(typeof(KeyCode));
+    private void Awake() => enabled = false;
     public void Begin() {
         if(listening) return;
         listening = true;
+        enabled = true;
         Keybind.Capturing = true;
         Display.text = MainCore.Tr.Get("PRESS_A_KEY", "Press a key...");
     }
-    private void Refresh() => Display.text = Keybind.Format(Modifier, Key);
-    private void Cancel() {
+    private void Refresh() => Display.text = Bound ? Keybind.Format(Modifier, Key) : "";
+    private void Stop() {
         listening = false;
+        enabled = false;
         Keybind.Capturing = false;
+    }
+    private void Cancel() {
+        Stop();
         Refresh();
     }
     private void OnDisable() {
@@ -75,8 +111,18 @@ internal sealed class KeyCapture : MonoBehaviour {
     }
     private void Update() {
         if(!listening) return;
-        if(Input.GetKeyDown(KeyCode.Escape)) {
-            Cancel();
+        if(Input.GetKeyDown(KeyCode.Escape)
+            || (AllowClear && (Input.GetKeyDown(KeyCode.Backspace) || Input.GetKeyDown(KeyCode.Delete)))) {
+            if(!AllowClear) {
+                Cancel();
+                return;
+            }
+            Bound = false;
+            Key = KeyCode.None;
+            Modifier = Keybind.KeyModifier.None;
+            Stop();
+            Refresh();
+            OnCleared?.Invoke();
             return;
         }
         for(int i = 0; i < AllKeys.Length; i++) {
@@ -87,8 +133,8 @@ internal sealed class KeyCapture : MonoBehaviour {
             if(!Input.GetKeyDown(kc)) continue;
             Modifier = Keybind.HeldModifier();
             Key = kc;
-            listening = false;
-            Keybind.Capturing = false;
+            Bound = true;
+            Stop();
             Refresh();
             OnChanged?.Invoke(Modifier, Key);
             return;
