@@ -1,0 +1,20 @@
+Quartz/Features/KeyViewer/KeyViewerSettings.Serialization.cs
+  s_cbe4458429ccd8::t_dc96d0f10b122a 56
+  s_cbe4458429ccd8::t_9192ca466fb32e 175
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "70ca82a3d6d45365efe1912d4ae7f6d2957ac0ed",
+  "prompts": {},
+  "sessions": {
+    "s_cbe4458429ccd8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f8406ab1-574f-434e-9aad-5169f0ce609a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
