@@ -1,0 +1,33 @@
+.gitignore
+  s_998aa19ed6fcf4::t_f838ff724720e8 22-26
+Quartz/Quartz.csproj
+  s_b6aa76c639e8a5::t_3f4a32303a1ebe 38-42,96-102,104,110-117,127,130-132,134-148,151-164
+agents/project.md
+  s_998aa19ed6fcf4::t_dd0d8106698d45 79
+build.sh
+  s_998aa19ed6fcf4::t_8fdba3324f557e 68,70-72
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "22b101d7b5758cc3c8065840abf1a3012b8a234b",
+  "prompts": {},
+  "sessions": {
+    "s_998aa19ed6fcf4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e7499d06-0b33-46cf-bc70-f1816a32cf21",
+        "model": "unknown"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_b6aa76c639e8a5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "704e24ca-25a2-4015-ae77-16f396248cd4",
+        "model": "unknown"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
