@@ -40,6 +40,12 @@ public static partial class Tweaks {
     private static class MistakesMarkCheckpointPatch {
         private static bool Prefix() => !ShouldRemoveCheckpoints;
     }
+    [HarmonyPatch(typeof(scrFloor), "Start")]
+    private static class FloorStartPatch {
+        private static void Postfix(scrFloor __instance) {
+            if(ShouldDisableTileHitGlow) SuppressFloorHitGlow(__instance);
+        }
+    }
     [HarmonyPatch(typeof(scrFloor), "LightUp")]
     private static class FloorLightUpPatch {
         private static void Prefix(scrFloor __instance) {
