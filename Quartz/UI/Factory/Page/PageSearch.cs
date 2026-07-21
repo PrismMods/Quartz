@@ -73,6 +73,7 @@ internal static class PageSearch {
         OriginalMenuState.Judgement => GenerateUI.Tr("SECTION_JUDGEMENT", "Judgement"),
         OriginalMenuState.SongTitle => GenerateUI.Tr("SECTION_SONG_TITLE", "Song Title"),
         OriginalMenuState.Panels => GenerateUI.Tr("SECTION_PANELS", "Panels"),
+        OriginalMenuState.Calibration => GenerateUI.Tr("SECTION_CALIBRATION", "Calibration"),
         OriginalMenuState.GameplayKeyLimiter => GenerateUI.Tr("SECTION_KEY_LIMITER", "Key Limiter"),
         OriginalMenuState.GameplayChatter => GenerateUI.Tr("SECTION_KEYBOARD_CHATTER_BLOCKER", "Keyboard Chatter Blocker"),
         OriginalMenuState.GameplayJudgement => GenerateUI.Tr("SECTION_JUDGEMENT_RESTRICTION", "Judgement Restriction"),

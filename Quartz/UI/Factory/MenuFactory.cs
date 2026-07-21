@@ -35,6 +35,7 @@ public static class MenuFactory {
             ("Judgement", "SECTION_JUDGEMENT", (int)OriginalMenuState.Judgement),
             ("Song Title", "SECTION_SONG_TITLE", (int)OriginalMenuState.SongTitle),
             ("Panels", "SECTION_PANELS", (int)OriginalMenuState.Panels),
+            ("Calibration", "SECTION_CALIBRATION", (int)OriginalMenuState.Calibration),
         ],
         [(int)OriginalMenuState.GameplayKeyLimiter] = [
             ("Key Limiter", "SECTION_KEY_LIMITER", (int)OriginalMenuState.GameplayKeyLimiter),
@@ -42,7 +43,6 @@ public static class MenuFactory {
             ("Judgement Restriction", "SECTION_JUDGEMENT_RESTRICTION", (int)OriginalMenuState.GameplayJudgement),
             ("Death Limit", "SECTION_DEATH_LIMIT", (int)OriginalMenuState.GameplayDeath),
             ("Auto Deafen (Discord)", "SECTION_AUTO_DEAFEN_DISCORD", (int)OriginalMenuState.GameplayAutoDeafen),
-            ("Calibration", "SECTION_CALIBRATION", (int)OriginalMenuState.GameplayCalibration),
         ],
         [(int)OriginalMenuState.VisualsEffectRemover] = [
             ("Effect Remover", "SECTION_EFFECT_REMOVER", (int)OriginalMenuState.VisualsEffectRemover),

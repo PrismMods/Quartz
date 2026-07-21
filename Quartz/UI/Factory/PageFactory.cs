@@ -44,12 +44,12 @@ public static class PageFactory {
         PageJudgement.Create(UICore.Pages[(int)OriginalMenuState.Judgement]);
         PageSongTitle.Create(UICore.Pages[(int)OriginalMenuState.SongTitle]);
         PagePanels.Create(UICore.Pages[(int)OriginalMenuState.Panels]);
+        PageCalibration.Create(UICore.Pages[(int)OriginalMenuState.Calibration]);
         PageGameplay.KeyLimiterPage(UICore.Pages[(int)OriginalMenuState.GameplayKeyLimiter]);
         PageGameplay.ChatterBlockerPage(UICore.Pages[(int)OriginalMenuState.GameplayChatter]);
         PageGameplay.JudgementRestrictionPage(UICore.Pages[(int)OriginalMenuState.GameplayJudgement]);
         PageGameplay.DeathLimitPage(UICore.Pages[(int)OriginalMenuState.GameplayDeath]);
         PageGameplay.AutoDeafenPage(UICore.Pages[(int)OriginalMenuState.GameplayAutoDeafen]);
-        PageCalibration.Create(UICore.Pages[(int)OriginalMenuState.GameplayCalibration]);
         PageVisuals.EffectRemoverPage(UICore.Pages[(int)OriginalMenuState.VisualsEffectRemover]);
         PageVisuals.HideJudgementsPage(UICore.Pages[(int)OriginalMenuState.VisualsHideJudgements]);
         PageVisuals.VisualTweaksPage(UICore.Pages[(int)OriginalMenuState.VisualsVisualTweaks]);
