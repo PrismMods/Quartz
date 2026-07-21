@@ -1,0 +1,29 @@
+Quartz/UI/Objects/Impl/UIDropdown.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 192-196
+  s_a9c1ba50eef6d7::t_19f3fce847bfee 197
+Quartz/UI/Objects/Impl/UIButton.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 75-78
+Quartz/UI/Objects/Impl/UIColorPicker.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 154,156,166-167,359
+Quartz/UI/Objects/Impl/UISlider.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 107-113,134,189-191,202,206-207,212-217
+Quartz/UI/Objects/Impl/UIToggle.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 67-68,81-84
+  s_a9c1ba50eef6d7::t_85fe9bb8dc12b5 85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "53a55958d108b23f31e8c8540905984f2ae3e433",
+  "prompts": {},
+  "sessions": {
+    "s_a9c1ba50eef6d7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b4ace9ac-b0a6-47cf-bf45-8230428d814f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
