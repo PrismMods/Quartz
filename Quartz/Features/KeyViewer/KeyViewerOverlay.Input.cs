@@ -246,6 +246,7 @@ public static partial class KeyViewerOverlay {
     }
     private static void MarkInputInactive(float now, bool clearTransientStats) {
         KvInputQueue.Discard();
+        tabubActive = false;
         if(inputWasActive || inputPrimed) ResetInputState(now, clearTransientStats);
         inputWasActive = false;
         inputPrimed = false;

@@ -34,7 +34,7 @@ public static partial class KeyViewerOverlay {
     }
     private static RawRain SpawnDmRain(Box box, float now, bool ghost) {
         DmNoteSpec spec = box.Dm;
-        if(spec == null) return null;
+        if(spec == null || tabubActive) return null;
         RawRain raw = rainManager.Rent();
         raw.Group = 1;
         raw.Order = spec.ZIndex;

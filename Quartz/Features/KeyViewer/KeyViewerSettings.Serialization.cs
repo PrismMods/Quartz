@@ -54,6 +54,12 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
             [nameof(DmKeyDisplayDelayMs)] = DmKeyDisplayDelayMs,
             [nameof(DmMinLitMs)] = DmMinLitMs,
             [nameof(IndependentInput)] = IndependentInput,
+            [nameof(TabubEnabled)] = TabubEnabled,
+            [nameof(TabubPercent)] = TabubPercent,
+            [nameof(TabubImagePath)] = TabubImagePath,
+            [nameof(TabubOffsetX)] = TabubOffsetX,
+            [nameof(TabubOffsetY)] = TabubOffsetY,
+            [nameof(TabubScale)] = TabubScale,
             [nameof(DmCssEnabled)] = DmCssEnabled,
             [nameof(DmCssText)] = DmCssText,
             [nameof(DmCssPath)] = DmCssPath,
@@ -173,6 +179,12 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
         DmKeyDisplayDelayMs = Mathf.Clamp(IOUtils.Read(token, nameof(DmKeyDisplayDelayMs), DmKeyDisplayDelayMs), 0f, 9999f);
         DmMinLitMs = Mathf.Clamp(IOUtils.Read(token, nameof(DmMinLitMs), DmMinLitMs), 0f, 500f);
         IndependentInput = IOUtils.Read(token, nameof(IndependentInput), IndependentInput);
+        TabubEnabled = IOUtils.Read(token, nameof(TabubEnabled), TabubEnabled);
+        TabubPercent = Mathf.Clamp(IOUtils.Read(token, nameof(TabubPercent), TabubPercent), 0f, 100f);
+        TabubImagePath = IOUtils.Read(token, nameof(TabubImagePath), TabubImagePath) ?? "";
+        TabubOffsetX = IOUtils.Read(token, nameof(TabubOffsetX), TabubOffsetX);
+        TabubOffsetY = IOUtils.Read(token, nameof(TabubOffsetY), TabubOffsetY);
+        TabubScale = Mathf.Clamp(IOUtils.Read(token, nameof(TabubScale), TabubScale), 0.1f, 4f);
         DmCssEnabled = IOUtils.Read(token, nameof(DmCssEnabled), DmCssEnabled);
         DmCssText = IOUtils.Read(token, nameof(DmCssText), DmCssText) ?? "";
         DmCssPath = IOUtils.Read(token, nameof(DmCssPath), DmCssPath) ?? "";

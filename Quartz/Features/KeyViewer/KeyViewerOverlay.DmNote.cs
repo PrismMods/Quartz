@@ -117,6 +117,7 @@ public static partial class KeyViewerOverlay {
         return pressLog.Count;
     }
     private static void UpdateDmNote(float now) {
+        UpdateTabubState(now);
         SyncHookCoverage();
         DrainInputEvents(now);
         PollUncoveredKeys(now);

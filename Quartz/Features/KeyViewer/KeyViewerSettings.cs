@@ -52,6 +52,12 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
     public float DmKeyDisplayDelayMs = 0f;
     public float DmMinLitMs = 40f;
     public bool IndependentInput = true;
+    public bool TabubEnabled = false;
+    public float TabubPercent = 50f;
+    public string TabubImagePath = "";
+    public float TabubOffsetX = 0f;
+    public float TabubOffsetY = 520f;
+    public float TabubScale = 1f;
     public bool DmCssEnabled = false;
     public string DmCssText = "";
     public string DmCssPath = "";

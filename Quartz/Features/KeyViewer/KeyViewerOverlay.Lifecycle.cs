@@ -35,6 +35,7 @@ public static partial class KeyViewerOverlay {
         root.pivot = new Vector2(0.5f, 0f);
         rainManager = canvasObj.AddComponent<RainManager>();
         canvasObj.AddComponent<Updater>();
+        BuildTabub();
         Rebuild();
     }
     public static void Rebuild() {
@@ -55,6 +56,7 @@ public static partial class KeyViewerOverlay {
         nextKpsSample = 0f;
         inputWasActive = false;
         inputPrimed = false;
+        tabubActive = false;
         layoutRebuildPending = false;
         BuildDmNote();
         SyncKeysToKeyLimiter();
@@ -121,6 +123,7 @@ public static partial class KeyViewerOverlay {
         float dmScale = Mathf.Clamp(Conf.DmScale, 0.2f, 4f);
         root.localScale = new Vector3(dmScale, dmScale, 1f);
         ApplyBorderScale(dmScale);
+        ApplyTabub();
         if(!Conf.DmNoteEffect) rainManager?.Clear();
     }
     private const float MinBorderScreenUnits = 1.4f;
@@ -239,6 +242,7 @@ public static partial class KeyViewerOverlay {
         hookWasActive = false;
         resyncRequested = false;
         if(!FlushCounts(immediate: true)) ConfMgr?.Save();
+        DisposeTabub();
         Object.Destroy(canvasObj);
         canvasObj = null;
         raycaster = null;

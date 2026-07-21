@@ -23,6 +23,8 @@ public static class GameStats {
     private static FrameCached<float> musicRatioCache;
     private static FrameCached<float> mapRatioCache;
     private static FrameCached<float> mapTotalCache;
+    private static FrameCached<float> mapSecondsCache;
+    private static FrameCached<int> mapFloorCountCache;
     private static FrameCached<string> songArtistCache;
     private static FrameCached<string> songTitleCache;
     private static FrameCached<string> songTitleRawCache;
@@ -92,6 +94,7 @@ public static class GameStats {
             return c != null && c.txtLevelName != null ? c.txtLevelName.text ?? "" : "";
         } catch { return ""; }
     });
+    public static bool RunCleared => ProgressTracker.RunCleared;
     public static bool RunHasStartProgress => !ProgressTracker.RunStartedFromFirstTile
         && ProgressTracker.RunStartProgress > 0f;
     public static float RunStartProgress => ProgressTracker.RunStartProgress;
@@ -138,6 +141,30 @@ public static class GameStats {
             return Mathf.Clamp01(time / total);
         } catch { return 0f; }
     });
+    public static float MapTimeSeconds => mapSecondsCache.Get(static () => {
+        try {
+            scrConductor cd = scrConductor.instance;
+            return cd == null ? 0f : (float)(cd.addoffset + cd.songposition_minusi);
+        } catch { return 0f; }
+    });
+    public static float MapTotalTimeSeconds => MapTotalSeconds();
+    public static int MapFloorCount => mapFloorCountCache.Get(static () => {
+        try {
+            scrLevelMaker lm = scrLevelMaker.instance;
+            return lm != null && lm.listFloors != null ? lm.listFloors.Count : 0;
+        } catch { return 0; }
+    });
+    public static float MapTimeAtProgress(float ratio) {
+        try {
+            scrLevelMaker lm = scrLevelMaker.instance;
+            if(lm == null || lm.listFloors == null) return -1f;
+            int count = lm.listFloors.Count;
+            if(count == 0) return -1f;
+            int index = Mathf.Clamp(Mathf.CeilToInt(Mathf.Clamp01(ratio) * count) - 1, 0, count - 1);
+            scrFloor floor = lm.listFloors[index];
+            return floor != null ? (float)floor.entryTime : -1f;
+        } catch { return -1f; }
+    }
     public static string MapTimeText {
         get {
             try {

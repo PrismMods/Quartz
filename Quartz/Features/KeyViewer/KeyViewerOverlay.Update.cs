@@ -99,6 +99,7 @@ public static partial class KeyViewerOverlay {
                 }
                 dragObj.SetActive(isReorganizing);
             }
+            UpdateTabubVisibility(show, isReorganizing);
             if(!show || !focused) {
                 MarkInputInactive(now, clearTransientStats: !show);
                 TryFlushCounts(now, inGame);

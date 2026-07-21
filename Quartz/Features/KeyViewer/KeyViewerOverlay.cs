@@ -52,6 +52,9 @@ public static partial class KeyViewerOverlay {
     private static float dmShortNoteMinLengthPx = 30f;
     private static float dmKeyDisplayDelayMs;
     private static float dmMinLitSeconds;
+    private static bool tabubEnabled;
+    private static float tabubPercent = 50f;
+    private static bool tabubActive;
     private static readonly Dictionary<KeyCode, List<Box>> keyMap = new();
     private static readonly List<Box> pollBoxes = [];
     private static int uncoveredBindings;

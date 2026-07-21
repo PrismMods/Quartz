@@ -1,4 +1,5 @@
 using HarmonyLib;
+using MonsterLove.StateMachine;
 using Quartz.Core;
 using UnityEngine;
 namespace Quartz.Features.Status;
@@ -6,6 +7,7 @@ internal static class ProgressTracker {
     internal static float RunStartProgress;
     internal static float RunStartMapTimeRatio;
     internal static bool RunStartedFromFirstTile = true;
+    internal static bool RunCleared;
     internal static bool IsFirstTileRunStart(int seqID = 0) {
         if(seqID > 0) return false;
         try {
@@ -21,6 +23,7 @@ internal static class ProgressTracker {
         return true;
     }
     internal static void CaptureRunStart(int seqID = 0) {
+        RunCleared = false;
         try {
             scrController c = scrController.instance;
             RunStartedFromFirstTile = IsFirstTileRunStart(seqID);
@@ -83,6 +86,13 @@ internal static class ProgressTracker {
         private static void Postfix() {
             if(!MainCore.IsModEnabled) return;
             CaptureRunStart();
+        }
+    }
+    [HarmonyPatch(typeof(StateBehaviour), "ChangeState", new[] { typeof(Enum) })]
+    private static class ClearedPatch {
+        private static void Postfix(Enum newState) {
+            if(!MainCore.IsModEnabled) return;
+            if(newState is States.Won) RunCleared = true;
         }
     }
 }
