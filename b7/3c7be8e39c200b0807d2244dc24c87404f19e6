@@ -1,0 +1,57 @@
+Quartz/Features/KeyViewer/KeyViewerOverlay.Lifecycle.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 63,232-238
+Quartz/Features/KeyViewer/KeyViewerSettings.Serialization.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 55,173
+Quartz/Features/KeyViewer/RainRenderer.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 373
+Quartz/Features/KeyViewer/KvInput.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 1-102
+Quartz/Features/KeyViewer/KeyViewerOverlay.DmNoteParsing.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 106
+Quartz/Features/KeyViewer/KeyViewerSettings.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 53-54
+Quartz/Features/ChatterBlocker/ChatterBlocker.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 196-199
+Quartz/Features/KeyViewer/KeyViewerOverlay.Input.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 45-172,189,209,215,238,243,248
+Quartz/Features/KeyViewer/KeyViewerOverlay.DmNote.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 30,120-122,152,156,158,160-161
+Quartz/Features/KeyViewer/KeyViewerOverlay.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 52-58,110-112
+Quartz/Features/KeyViewer/KeyViewerOverlay.Css.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 348
+Quartz/UI/Factory/Page/PageKeyViewer.Tuning.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 189-199,214-215
+Quartz/Features/KeyViewer/KeyViewerOverlay.Graph.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 71,100
+Quartz/Features/KeyViewer/KeyViewerOverlay.Update.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 13,22,29-30,81,88-92,96,106
+Quartz/Resource/Export/Lang/en-US.json
+  s_8d101ed8af3510::t_79fb46d92f38e6 1153-1154
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_8d101ed8af3510::t_85468059ec5f9e 1153-1154
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "b73c7be8e39c200b0807d2244dc24c87404f19e6",
+  "prompts": {},
+  "sessions": {
+    "s_8d101ed8af3510": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a142f204-4352-4ebc-9c45-063a817eee85",
+        "model": "unknown"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_a9c1ba50eef6d7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b4ace9ac-b0a6-47cf-bf45-8230428d814f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
