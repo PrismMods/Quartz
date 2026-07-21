@@ -69,7 +69,7 @@ fi
 GP_CHECK="$(grep -oE '<GamePath>[^<]+' Directory.Build.props | sed 's/<GamePath>//')"
 if [[ ! -f "$GP_CHECK/MelonLoader/net35/MelonLoader.dll" && ! -f lib/MelonLoader.dll ]]; then
     echo "WARNING: MelonLoader not found at $GP_CHECK/MelonLoader — install MelonLoader,"
-    echo "         or drop MelonLoader.dll into lib/ to build without it (see lib/README.md)."
+    echo "         or drop MelonLoader.dll into lib/ to build without it."
 fi
 
 # --- Build (PostBuild targets auto-install into the game) ---
