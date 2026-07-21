@@ -1,0 +1,23 @@
+Quartz/UI/Factory/Page/PageSettings.Helpers.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 201-204
+Quartz/UI/UpdateToast.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 34,186,189,192,241-243,266
+Quartz/Update/UpdateService.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 31,148,159-169,375
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "c2578f10fdf916d72589fa567f94e5105cd6a73a",
+  "prompts": {},
+  "sessions": {
+    "s_a9c1ba50eef6d7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b4ace9ac-b0a6-47cf-bf45-8230428d814f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
