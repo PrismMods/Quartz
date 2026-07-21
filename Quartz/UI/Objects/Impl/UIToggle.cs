@@ -64,8 +64,8 @@ public class UIToggle : UIObject {
         circleSeq = GTweenSequenceBuilder.New()
             .Join(
                 GTweenExtensions.Tween(
-                    () => CircleRect.sizeDelta.x,
-                    x => CircleRect.sizeDelta = new Vector2(x, x),
+                    () => CircleRect == null ? 26f : CircleRect.sizeDelta.x,
+                    x => { if(CircleRect != null) CircleRect.sizeDelta = new Vector2(x, x); },
                     26f,
                     0.3f
                 ).SetEasing(Easing.OutQuad)
@@ -77,5 +77,10 @@ public class UIToggle : UIObject {
         MainCore.TC.Play(circleSeq);
         changeSeq = ChangedImage.GTAlpha(target, 0.2f).SetEasing(Easing.OutSine);
         MainCore.TC.Play(changeSeq);
+    }
+    public override void Dispose() {
+        base.Dispose();
+        circleSeq?.Kill();
+        changeSeq?.Kill();
     }
 }

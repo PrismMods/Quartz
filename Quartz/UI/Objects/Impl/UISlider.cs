@@ -104,6 +104,13 @@ public class UISlider : UIObject {
     private float FillFor(float t) => MinFill > 0f && t > 0f ? Mathf.Max(t, Mathf.Min(MinFill, 1f)) : t;
     private float ApplyFilter(float v) => Filter?.Invoke(v) ?? v;
     private void UpdateValueText() => ValueText?.text = Value.ToString(Format);
+    private float FillX(float fallback) => FillRect == null ? fallback : FillRect.anchorMax.x;
+    private void SetFillX(float x) {
+        if(FillRect == null) return;
+        Vector2 anchor = FillRect.anchorMax;
+        anchor.x = x;
+        FillRect.anchorMax = anchor;
+    }
     public void UpdateVisual(bool noAnimate = false) {
         fillSeq?.Kill();
         changeSeq?.Kill();
@@ -124,16 +131,7 @@ public class UISlider : UIObject {
         }
         fillSeq = GTweenSequenceBuilder.New()
             .Join(
-                GTweenExtensions.Tween(
-                    () => FillRect.anchorMax.x,
-                    x => {
-                        Vector2 anchor = FillRect.anchorMax;
-                        anchor.x = x;
-                        FillRect.anchorMax = anchor;
-                    },
-                    t,
-                    0.6f
-                ).SetEasing(Easing.OutExpo)
+                GTweenExtensions.Tween(() => FillX(t), SetFillX, t, 0.6f).SetEasing(Easing.OutExpo)
             ).Build();
         MainCore.TC.Play(fillSeq);
         changeSeq = GTweenSequenceBuilder.New()
@@ -188,9 +186,9 @@ public class UISlider : UIObject {
                 GTweenExtensions.Tween(
                     () => 0f,
                     x => {
-                        OutlineImage.color = Color.Lerp(startOutline, new(targetColor.r, targetColor.g, targetColor.b, isCalculating ? targetColor.a : 0f), x);
-                        FillImage.color = Color.Lerp(startFill, new(targetColor.r, targetColor.g, targetColor.b, targetFillAlpha), x);
-                        ChangedImage.color = Color.Lerp(startChanged, new(targetColor.r, targetColor.g, targetColor.b, ChangedImage.color.a), x);
+                        if(OutlineImage != null) OutlineImage.color = Color.Lerp(startOutline, new(targetColor.r, targetColor.g, targetColor.b, isCalculating ? targetColor.a : 0f), x);
+                        if(FillImage != null) FillImage.color = Color.Lerp(startFill, new(targetColor.r, targetColor.g, targetColor.b, targetFillAlpha), x);
+                        if(ChangedImage != null) ChangedImage.color = Color.Lerp(startChanged, new(targetColor.r, targetColor.g, targetColor.b, ChangedImage.color.a), x);
                         if(EditField != null) {
                             EditField.caretColor = Color.Lerp(startCaret, new(targetColor.r, targetColor.g, targetColor.b, EditField.caretColor.a), x);
                         }
@@ -201,21 +199,20 @@ public class UISlider : UIObject {
             ).Build();
         MainCore.TC.Play(stateSeq);
         if(value.HasValue && isCalculating) {
+            float target = FillFor(Normalize(value.Value));
             fillSeq?.Kill();
             fillSeq = GTweenSequenceBuilder.New()
                 .Join(
-                    GTweenExtensions.Tween(
-                        () => FillRect.anchorMax.x,
-                        x => {
-                            Vector2 anchor = FillRect.anchorMax;
-                            anchor.x = x;
-                            FillRect.anchorMax = anchor;
-                        },
-                        FillFor(Normalize(value.Value)),
-                        0.4f
-                    ).SetEasing(Easing.OutExpo)
+                    GTweenExtensions.Tween(() => FillX(target), SetFillX, target, 0.4f)
+                        .SetEasing(Easing.OutExpo)
                 ).Build();
             MainCore.TC.Play(fillSeq);
         }
+    }
+    public override void Dispose() {
+        base.Dispose();
+        fillSeq?.Kill();
+        changeSeq?.Kill();
+        stateSeq?.Kill();
     }
 }

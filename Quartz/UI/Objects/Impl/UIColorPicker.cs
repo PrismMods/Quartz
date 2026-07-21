@@ -151,8 +151,9 @@ public sealed class UIColorPicker : UIObject {
         if(rowLayout != null) {
             rowLayout.minHeight = 50f;
             builder.Join(GTweenExtensions.Tween(
-                () => rowLayout.preferredHeight,
+                () => rowLayout == null ? targetHeight : rowLayout.preferredHeight,
                 x => {
+                    if(rowLayout == null) return;
                     rowLayout.preferredHeight = Mathf.Max(50f, x);
                     if(rootRect != null) LayoutRebuilder.ForceRebuildLayoutImmediate(rootRect);
                 },
@@ -162,8 +163,8 @@ public sealed class UIColorPicker : UIObject {
         }
         if(bodyCanvasGroup != null) {
             builder.Join(GTweenExtensions.Tween(
-                () => bodyCanvasGroup.alpha,
-                x => bodyCanvasGroup.alpha = x,
+                () => bodyCanvasGroup == null ? targetAlpha : bodyCanvasGroup.alpha,
+                x => { if(bodyCanvasGroup != null) bodyCanvasGroup.alpha = x; },
                 targetAlpha,
                 0.16f
             ).SetEasing(Easing.OutSine));
@@ -355,6 +356,7 @@ public sealed class UIColorPicker : UIObject {
     }
     public override void Dispose() {
         base.Dispose();
+        expandSeq?.Kill();
         if(svTexture != null) Object.Destroy(svTexture);
         if(hueTexture != null) Object.Destroy(hueTexture);
     }

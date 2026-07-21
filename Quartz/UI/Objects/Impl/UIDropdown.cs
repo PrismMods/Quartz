@@ -189,4 +189,10 @@ public class UIDropDown<T> : UIObject {
         base.SetBlocked(blocked, noAnimate);
         SetExpanded(false);
     }
+    public override void Dispose() {
+        base.Dispose();
+        triangleSeq?.Kill();
+        changeSeq?.Kill();
+        listSeq?.Kill();
+    }
 }

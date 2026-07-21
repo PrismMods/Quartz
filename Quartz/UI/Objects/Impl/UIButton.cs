@@ -72,4 +72,8 @@ public class UIButton : UIObject {
             .SetEasing(Easing.OutSine);
         MainCore.TC.Play(hoverTween);
     }
+    public override void Dispose() {
+        base.Dispose();
+        hoverTween?.Kill();
+    }
 }
