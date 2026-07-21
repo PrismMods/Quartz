@@ -1,0 +1,45 @@
+Quartz/UI/Generator/GenerateUI.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 80,90-91
+  s_a9c1ba50eef6d7::t_1b6caffcacaea4 92
+Quartz/UI/Factory/PageFactory.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 11
+Quartz/UI/UICore.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 881,1120
+Quartz/UI/Generator/GenerateUI.KeyBind.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 4,54-79,86-88,91,95,99-100,102,104-106,114-125,136-137
+Quartz/IO/CoreSettings.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 34,57-59,92,137-142
+  s_a9c1ba50eef6d7::t_c389b68879fac5 143-145
+Quartz/UI/Utility/ToggleBinds.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 1-71
+Quartz/UI/Factory/Page/PageSettings.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 151-155
+Quartz/Resource/Export/Lang/en-US.json
+  s_8d101ed8af3510::t_258eb163adc17e 1152-1153
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_8d101ed8af3510::t_1e38a6eaf5fa94 1152-1153
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "ad4d317d7891d67a020c4e0338d2e4c9fc1e6cb5",
+  "prompts": {},
+  "sessions": {
+    "s_8d101ed8af3510": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a142f204-4352-4ebc-9c45-063a817eee85",
+        "model": "unknown"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_a9c1ba50eef6d7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b4ace9ac-b0a6-47cf-bf45-8230428d814f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}

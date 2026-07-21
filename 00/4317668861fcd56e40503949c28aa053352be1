@@ -1,0 +1,48 @@
+Quartz/UI/Editor/KvInspector.Element.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 24-29,31-43
+Quartz/UI/Editor/KvInspector.Counter.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 31-36
+Quartz/Features/KeyViewer/KeyViewerOverlay.DmNoteLayout.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 36-50,72,79
+Quartz/Features/KeyViewer/KeyViewerOverlay.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 147-148,150
+Quartz/Features/KeyViewer/KeyViewerOverlay.DmNoteParsing.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 281,314-320
+Quartz/UI/Editor/KvInspector.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 296-318
+  s_a9c1ba50eef6d7::t_61b1f1171e8e47 319-321
+Quartz/Features/KeyViewer/Layout/KvElement.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 120-140
+Quartz/Features/KeyViewer/KeyViewerOverlay.Events.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 24-31
+Quartz/UI/Editor/KvCanvasView.cs
+  s_a9c1ba50eef6d7::t_f151c6af2ce0b6 63-65,106,118
+Quartz/Resource/Export/Lang/en-US.json
+  s_8d101ed8af3510::t_e507bdbe379603 1151-1152,1172-1174
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_8d101ed8af3510::t_80741bb21db152 1151-1152,1172-1174
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "004317668861fcd56e40503949c28aa053352be1",
+  "prompts": {},
+  "sessions": {
+    "s_8d101ed8af3510": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a142f204-4352-4ebc-9c45-063a817eee85",
+        "model": "unknown"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_a9c1ba50eef6d7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b4ace9ac-b0a6-47cf-bf45-8230428d814f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
