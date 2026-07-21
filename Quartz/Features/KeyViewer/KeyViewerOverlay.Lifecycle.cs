@@ -47,6 +47,8 @@ public static partial class KeyViewerOverlay {
         cssFx.Clear();
         cssGlowLayer = null;
         dragObj = null;
+        dragRect = null;
+        rainLayerRef = null;
         kpsMax = 0;
         kpsSum = 0;
         kpsSamples = 0;
@@ -242,6 +244,8 @@ public static partial class KeyViewerOverlay {
         raycaster = null;
         root = null;
         dragObj = null;
+        dragRect = null;
+        rainLayerRef = null;
         rainManager = null;
         boxes.Clear();
         pressLog.Clear();

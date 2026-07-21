@@ -35,6 +35,8 @@ public static partial class KeyViewerOverlay {
     private static GraphicRaycaster raycaster;
     private static RectTransform root;
     private static GameObject dragObj;
+    private static RectTransform dragRect;
+    private static RectTransform rainLayerRef;
     private static readonly List<Box> boxes = [];
     private static readonly List<Box> counterBounces = [];
     private static bool built;
