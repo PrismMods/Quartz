@@ -1,0 +1,23 @@
+build.sh
+  s_a9c1ba50eef6d7::t_ad1f0eb656d4f9 72
+.gitignore
+  s_a9c1ba50eef6d7::t_7fe84fefbbb189 23
+agents/project.md
+  s_a9c1ba50eef6d7::t_a944f499688ebe 79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "06094a050c4f7cf4f5c9508fecf433c2ba28271c",
+  "prompts": {},
+  "sessions": {
+    "s_a9c1ba50eef6d7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b4ace9ac-b0a6-47cf-bf45-8230428d814f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
