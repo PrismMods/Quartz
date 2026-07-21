@@ -40,6 +40,7 @@
     "CALIBRATION_POPUP_NO": "아니오",
     "CALIBRATION_POPUP_ON_DEATH": "사망 시 팝업 표시",
     "CALIBRATION_POPUP_YES": "예",
+    "CALIBRATION_RESETPOS": "팝업 위치 초기화",
     "CALIBRATION_SONG_MINIMUM": "최솟값",
     "CALIBRATION_SONG_PITCH": "피치",
     "CALIBRATION_SONG_REPEAT": "음악 반복",

@@ -153,6 +153,7 @@ public static class UICore {
     public static void EnterReorganize() {
         if(IsReorganizing) return;
         IsReorganizing = true;
+        CalibrationPopupUI.BeginReorganize();
         if(panelCanvasGroup != null) {
             panelCanvasGroup.interactable = false;
             panelCanvasGroup.blocksRaycasts = false;
@@ -173,6 +174,7 @@ public static class UICore {
         if(!IsReorganizing) return;
         IsReorganizing = false;
         Reorganizer.Deselect();
+        CalibrationPopupUI.EndReorganize();
         if(Panel != null) Panel.gameObject.SetActive(true);
         if(panelCanvasGroup != null) {
             panelCanvasGroup.interactable = true;

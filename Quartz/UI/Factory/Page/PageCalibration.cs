@@ -16,6 +16,12 @@ internal static class PageCalibration {
             "Show Popup on Death", "calibration_popup_on_death",
             "When you die, offer to update your input offset from this run's average timing."
         );
+        GenerateUI.Button(
+            GenerateUI.Row(sec.Body),
+            () => CalibrationPopupUI.ResetPosition(),
+            "Reset Popup Position",
+            "calibration_resetpos"
+        ).SetSecondary();
         GenerateUI.ToggleTip(
             sec.Body, def.DetailedDisplay, conf.DetailedDisplay,
             v => { conf.DetailedDisplay = v; Save(); },

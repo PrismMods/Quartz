@@ -6,6 +6,7 @@ using Quartz.Features.Calibration;
 using Quartz.Resource;
 using Quartz.Tween;
 using Quartz.UI.Generator;
+using Quartz.UI.Utility;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -13,21 +14,33 @@ using UnityEngine.UI;
 using static UnityEngine.EventSystems.PointerEventData;
 using Object = UnityEngine.Object;
 using TMPro;
+using Quartz.Compat.Game;
 namespace Quartz.UI;
 public static class CalibrationPopupUI {
     private const float WIDTH = 460f;
     private const float HEIGHT = 210f;
-    private static readonly Vector2 ShownPos = Vector2.zero;
-    private static readonly Vector2 HiddenPos = new(0f, -36f);
+    private static Vector2 ShownPos {
+        get {
+            Calibration.EnsureConf();
+            return OverlayCalibration.Scale(new Vector2(Calibration.Conf.PopupOffsetX, Calibration.Conf.PopupOffsetY));
+        }
+    }
+    private static Vector2 HiddenPos => ShownPos + new Vector2(0f, -36f);
     private static GameObject canvasObj;
     private static GameObject panelObj;
     private static RectTransform panelRect;
     private static CanvasGroup group;
     private static TextMeshProUGUI messageText;
+    private static Image bgImage;
+    private static Image borderImage;
+    private static Image iconImage;
+    private static Image yesImage;
     private static GTween moveSeq;
     private static bool visible;
     private static float pendingOffsetMs;
     private static GameObject ownedEventSystem;
+    private static GameObject dragObj;
+    private static bool reorganizing;
     public static void Initialize() => SceneManager.sceneUnloaded += OnSceneUnloaded;
     public static void Dispose() {
         SceneManager.sceneUnloaded -= OnSceneUnloaded;
@@ -39,7 +52,13 @@ public static class CalibrationPopupUI {
         panelRect = null;
         group = null;
         messageText = null;
+        bgImage = null;
+        borderImage = null;
+        iconImage = null;
+        yesImage = null;
+        dragObj = null;
         visible = false;
+        reorganizing = false;
     }
     private static void OnSceneUnloaded(Scene _) => Hide();
     private static void Build() {
@@ -65,10 +84,9 @@ public static class CalibrationPopupUI {
         panelRect.anchoredPosition = HiddenPos;
         group = panelObj.AddComponent<CanvasGroup>();
         group.alpha = 0f;
-        Image bg = panelObj.AddComponent<Image>();
-        bg.sprite = MainCore.Spr.GetFilled(18.5f);
-        bg.type = Image.Type.Sliced;
-        bg.color = UIColors.PanelBG;
+        bgImage = panelObj.AddComponent<Image>();
+        bgImage.sprite = MainCore.Spr.GetFilled(18.5f);
+        bgImage.type = Image.Type.Sliced;
         {
             GameObject border = new("Border");
             border.transform.SetParent(panelObj.transform, false);
@@ -77,11 +95,10 @@ public static class CalibrationPopupUI {
             rect.anchorMax = Vector2.one;
             rect.offsetMin = new(-2f, -2f);
             rect.offsetMax = new(2f, 2f);
-            Image borderImg = border.AddComponent<Image>();
-            borderImg.sprite = MainCore.Spr.GetRing(20.5f, 3f);
-            borderImg.type = Image.Type.Sliced;
-            borderImg.color = UIColors.ObjectActive;
-            borderImg.raycastTarget = false;
+            borderImage = border.AddComponent<Image>();
+            borderImage.sprite = MainCore.Spr.GetRing(20.5f, 3f);
+            borderImage.type = Image.Type.Sliced;
+            borderImage.raycastTarget = false;
         }
         {
             GameObject icon = new("Icon");
@@ -92,10 +109,9 @@ public static class CalibrationPopupUI {
             iconRect.pivot = new(0.5f, 1f);
             iconRect.anchoredPosition = new(0f, -22f);
             iconRect.sizeDelta = new(34f, 34f);
-            Image iconImg = icon.AddComponent<Image>();
-            iconImg.sprite = MainCore.Spr.Get(UISprite.AdjustmentsHorizontal128, 34f);
-            iconImg.color = UIColors.ObjectActive;
-            iconImg.raycastTarget = false;
+            iconImage = icon.AddComponent<Image>();
+            iconImage.sprite = MainCore.Spr.Get(UISprite.AdjustmentsHorizontal128, 34f);
+            iconImage.raycastTarget = false;
         }
         {
             GameObject msg = new("Message");
@@ -111,15 +127,27 @@ public static class CalibrationPopupUI {
             messageText.color = Color.white;
             messageText.alignment = TextAlignmentOptions.Center;
             messageText.verticalAlignment = VerticalAlignmentOptions.Middle;
-            messageText.textWrappingMode = TextWrappingModes.Normal;
+            TextCompat.Wrap(messageText);
             messageText.overflowMode = TextOverflowModes.Truncate;
             messageText.raycastTarget = false;
         }
-        Button(panelObj.transform, -118f, UIColors.ObjectButton, "CALIBRATION_POPUP_YES", "Yes", OnYes);
+        yesImage = Button(panelObj.transform, -118f, UIColors.ObjectButton, "CALIBRATION_POPUP_YES", "Yes", OnYes);
         Button(panelObj.transform, 118f, new Color(1f, 1f, 1f, 0.12f), "CALIBRATION_POPUP_NO", "No", Hide);
+        dragObj = ReorganizeHandle.CreateDragSurface(
+            panelRect,
+            () => MainCore.Tr.Get("SECTION_CALIBRATION", "Calibration"),
+            CaptureOffset
+        );
+        ApplyTheme();
         panelObj.SetActive(false);
     }
-    private static void Button(Transform parent, float x, Color color, string localeKey, string defaultText, System.Action onClick) {
+    private static void ApplyTheme() {
+        if(bgImage != null) bgImage.color = UIColors.PanelBG;
+        if(borderImage != null) borderImage.color = UIColors.ObjectActive;
+        if(iconImage != null) iconImage.color = UIColors.ObjectActive;
+        if(yesImage != null) yesImage.color = UIColors.ObjectButton;
+    }
+    private static Image Button(Transform parent, float x, Color color, string localeKey, string defaultText, System.Action onClick) {
         GameObject obj = new("Button_" + defaultText);
         obj.transform.SetParent(parent, false);
         RectTransform rect = obj.AddComponent<RectTransform>();
@@ -150,6 +178,7 @@ public static class CalibrationPopupUI {
         GenerateUI.AddButton(obj, btn => {
             if(btn == InputButton.Left) onClick();
         });
+        return img;
     }
     private static void OnYes() {
         Calibration.SetOffsetMs(pendingOffsetMs);
@@ -171,6 +200,7 @@ public static class CalibrationPopupUI {
         if(canvasObj == null) Build();
         if(canvasObj == null) return;
         EnsureEventSystem();
+        ApplyTheme();
         pendingOffsetMs = suggestedOffsetMs;
         messageText.text = string.Format(
             MainCore.Tr.Get("CALIBRATION_POPUP_CHANGE_OFFSET", "Change input offset from {0}ms to {1}ms?"),
@@ -187,7 +217,7 @@ public static class CalibrationPopupUI {
         MainCore.TC.Play(moveSeq);
     }
     public static void Hide() {
-        if(canvasObj == null || !visible) return;
+        if(reorganizing || canvasObj == null || !visible) return;
         visible = false;
         ReleaseEventSystem();
         moveSeq?.Kill();
@@ -201,5 +231,49 @@ public static class CalibrationPopupUI {
         MainCore.TC.Play(moveSeq);
         if((ADOBase.isLevelEditor || ADOBase.controller is { paused: false }) && ADOBase.conductor is { isGameWorld: true })
             Cursor.visible = !Persistence.GetHideCursorWhilePlaying();
+    }
+    public static void BeginReorganize() {
+        if(reorganizing) return;
+        if(canvasObj == null) Build();
+        if(canvasObj == null) return;
+        reorganizing = true;
+        EnsureEventSystem();
+        ApplyTheme();
+        messageText.text = string.Format(
+            MainCore.Tr.Get("CALIBRATION_POPUP_CHANGE_OFFSET", "Change input offset from {0}ms to {1}ms?"),
+            Calibration.FormatMs(0f), Calibration.FormatMs(12f)
+        );
+        moveSeq?.Kill();
+        panelObj.SetActive(true);
+        panelRect.anchoredPosition = ShownPos;
+        group.alpha = 1f;
+        dragObj.SetActive(true);
+    }
+    public static void EndReorganize() {
+        if(!reorganizing) return;
+        reorganizing = false;
+        CaptureOffset();
+        if(dragObj != null) dragObj.SetActive(false);
+        if(visible) return;
+        ReleaseEventSystem();
+        if(panelRect != null) panelRect.anchoredPosition = HiddenPos;
+        if(group != null) group.alpha = 0f;
+        if(panelObj != null) panelObj.SetActive(false);
+    }
+    private static void CaptureOffset() {
+        if(panelRect == null) return;
+        Calibration.EnsureConf();
+        Vector2 stored = OverlayCalibration.Unscale(panelRect.anchoredPosition);
+        Calibration.Conf.PopupOffsetX = stored.x;
+        Calibration.Conf.PopupOffsetY = stored.y;
+        Calibration.Save();
+    }
+    public static void ResetPosition() {
+        Calibration.EnsureConf();
+        CalibrationSettings def = new();
+        Calibration.Conf.PopupOffsetX = def.PopupOffsetX;
+        Calibration.Conf.PopupOffsetY = def.PopupOffsetY;
+        Calibration.Save();
+        if(panelRect != null) panelRect.anchoredPosition = reorganizing || visible ? ShownPos : HiddenPos;
     }
 }
