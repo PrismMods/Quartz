@@ -76,6 +76,7 @@ Top level:
 - `Quartz/` — main mod source.
 - `Quartz.Tests/` — plain .NET tests for Unity-free code (see Tests below).
 - `sdk/` — addon SDK shipped to modders (see Addons system).
+- `lib/` — gitignored per-developer drop folder for reference assemblies the game install lacks (MelonLoader on a UMM-only box, and vice versa). The install always wins; `lib/` is a fallback search path only, and `Assembly-CSharp*` is never taken from it. See `lib/README.md`.
 - `scripts/` — `i18n_sync.py`, `validate_i18n.py`.
 - `tools/release.sh` — GitHub release automation.
 - `build.sh` — local build/auto-install/package script.

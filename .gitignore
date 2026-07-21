@@ -19,6 +19,11 @@ obj/
 # Local machine config (per-developer GamePath — use Directory.Build.example.props as template)
 Directory.Build.props
 
+# Per-developer reference assemblies standing in for whatever the game install
+# lacks (see lib/README.md). Other people's binaries — never committed.
+/lib/*
+!/lib/README.md
+
 # OS
 .DS_Store
 Thumbs.db
