@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Text;
 using Quartz.Core;
-using Quartz.Features.Interop;
 using Quartz.Features.Status;
 using Quartz.IO;
 using Quartz.Resource;
@@ -63,12 +62,6 @@ public static partial class PanelsOverlay {
         new() { Id = "fps", Category = "Other", Label = "FPS", Value = _ =>
             GameStats.Fps.ToString(CultureInfo.InvariantCulture) },
         new() { Id = "text", Category = "Other", Label = "Text", Value = _ => null },
-        new() { Id = "xperfect", Category = "Accuracy", Label = "X Perfect", Value = _ =>
-            XPerfectBridge.Active ? GameStats.XPerfectX.ToString(CultureInfo.InvariantCulture) : null },
-        new() { Id = "plusperfect", Category = "Accuracy", Label = "+ Perfect", Value = _ =>
-            XPerfectBridge.Active ? GameStats.XPerfectPlus.ToString(CultureInfo.InvariantCulture) : null },
-        new() { Id = "minusperfect", Category = "Accuracy", Label = "- Perfect", Value = _ =>
-            XPerfectBridge.Active ? GameStats.XPerfectMinus.ToString(CultureInfo.InvariantCulture) : null },
     ];
     private static readonly Dictionary<string, StatDef> CatalogById = Catalog.ToDictionary(
         stat => stat.Id,
