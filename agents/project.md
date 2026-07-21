@@ -12,7 +12,7 @@ This is the high-level map for AI agents working in this repo. Read this first, 
 Quartz is an all-in-one mod for **A Dance of Fire and Ice**. It builds one shared C# runtime for two loader targets:
 
 - **MelonLoader**: primary/recommended build, packaged as `dist/Quartz.zip` with `Mods/Quartz.dll` plus `UserData/Quartz/*`.
-- **UnityModManager**: alternate build, packaged as `dist/QuartzUmm.zip` as a self-contained `Quartz/` mod folder.
+- **UnityModManager**: alternate build, packaged as `dist/QuartzUmm.zip` as a self-contained `Quartz/` mod folder — `QuartzUmm.dll` + `Info.json` at the top, everything the mod reads/writes under `Quartz/UserData/*` (the data root, mirroring MelonLoader's split). Pre-`UserData` flat installs are pulled in one level on first launch by `QuartzRuntime.MigrateModRootDataIntoDataRoot`.
 
 The codebase was formerly KorenResourcePack v2 and still contains migration/self-heal code for old `Koren` user data and `Koren.dll` installs. Treat this as intentional compatibility unless the task is explicitly about removing legacy support.
 

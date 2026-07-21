@@ -41,6 +41,9 @@
 2. In the UMM installer, use "Install mod" and pick `QuartzUmm.zip` — or extract the `Quartz` folder into your UMM mods directory manually.
 3. Done! Open the in-game menu with the mod's keybind (settings live there, not in the UMM panel).
 
+> [!NOTE]
+> Settings, languages, fonts, presets and downloaded levels live in `Quartz/UserData/`, so the mod folder itself only holds `QuartzUmm.dll` and `Info.json`. Updating from an older build moves your existing data into `UserData/` automatically on the next launch — nothing to do by hand.
+
 > [!WARNING]
 > On Mac, this replaces the entire folder instead of just adding the files. drag the files in manually.
 

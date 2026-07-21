@@ -73,25 +73,96 @@ public sealed class QuartzRuntime {
             string newRoot = Host.QuartzFilePath;
             string parent = Path.GetDirectoryName(newRoot);
             if(string.IsNullOrEmpty(parent)) return;
-            string oldRoot = Path.Combine(parent, "Koren");
-            if(!Directory.Exists(oldRoot) ||
-               string.Equals(Path.GetFullPath(oldRoot), Path.GetFullPath(newRoot), StringComparison.OrdinalIgnoreCase)) return;
-            Directory.CreateDirectory(newRoot);
             int moved = 0;
-            foreach(string entry in Directory.GetFileSystemEntries(oldRoot)) {
-                string dest = Path.Combine(newRoot, Path.GetFileName(entry));
-                if(File.Exists(dest) || Directory.Exists(dest)) continue;
-                try {
-                    if(Directory.Exists(entry)) Directory.Move(entry, dest);
-                    else File.Move(entry, dest);
-                    moved++;
-                } catch(Exception e) {
-                    Logger.Wrn($"[Startup] migrate '{Path.GetFileName(entry)}' failed: {e.Message}");
+            foreach(string oldRoot in LegacyDataRoots(newRoot, parent)) {
+                if(!Directory.Exists(oldRoot) ||
+                   string.Equals(Path.GetFullPath(oldRoot), Path.GetFullPath(newRoot), StringComparison.OrdinalIgnoreCase)) continue;
+                Directory.CreateDirectory(newRoot);
+                foreach(string entry in Directory.GetFileSystemEntries(oldRoot)) {
+                    string dest = Path.Combine(newRoot, Path.GetFileName(entry));
+                    if(File.Exists(dest) || Directory.Exists(dest)) continue;
+                    try {
+                        if(Directory.Exists(entry)) Directory.Move(entry, dest);
+                        else File.Move(entry, dest);
+                        moved++;
+                    } catch(Exception e) {
+                        Logger.Wrn($"[Startup] migrate '{Path.GetFileName(entry)}' failed: {e.Message}");
+                    }
                 }
             }
-            if(moved > 0) Logger.Msg($"[Startup] migrated {moved} item(s) from UserData/Koren to UserData/Quartz");
+            if(moved > 0) Logger.Msg($"[Startup] migrated {moved} item(s) from legacy Koren data into {newRoot}");
         } catch(Exception e) {
             Logger.Wrn($"[Startup] legacy data migration failed: {e.Message}");
+        }
+    }
+    private IEnumerable<string> LegacyDataRoots(string newRoot, string parent) {
+        yield return Path.Combine(parent, "Koren");
+        string modRoot = Host.ModsPath;
+        if(string.IsNullOrEmpty(modRoot) ||
+           !string.Equals(NormalizeDir(parent), NormalizeDir(modRoot), StringComparison.OrdinalIgnoreCase)) yield break;
+        string modParent = Path.GetDirectoryName(NormalizeDir(modRoot));
+        if(!string.IsNullOrEmpty(modParent)) yield return Path.Combine(modParent, "Koren");
+    }
+    private static readonly string[] ModRootKeepSuffixes = { ".dll", ".dll.old", ".old", ".pdb", ".xml", ".krnew" };
+    private static bool IsModDistributionEntry(string name) {
+        if(name.Length == 0 || name[0] == '.') return true;
+        if(string.Equals(name, "UserData", StringComparison.OrdinalIgnoreCase) ||
+           string.Equals(name, "Info.json", StringComparison.OrdinalIgnoreCase)) return true;
+        foreach(string suffix in ModRootKeepSuffixes)
+            if(name.EndsWith(suffix, StringComparison.OrdinalIgnoreCase)) return true;
+        return false;
+    }
+    private static string NormalizeDir(string path) =>
+        Path.GetFullPath(path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+    private void MigrateModRootDataIntoDataRoot() {
+        try {
+            string dataRoot = Host.QuartzFilePath;
+            string modRoot = Host.ModsPath;
+            if(string.IsNullOrEmpty(dataRoot) || string.IsNullOrEmpty(modRoot) || !Directory.Exists(modRoot)) return;
+            string parent = Path.GetDirectoryName(NormalizeDir(dataRoot));
+            if(string.IsNullOrEmpty(parent) ||
+               !string.Equals(parent, NormalizeDir(modRoot), StringComparison.OrdinalIgnoreCase)) return;
+            string[] loose = Directory.GetFileSystemEntries(modRoot);
+            int moved = 0;
+            foreach(string entry in loose) {
+                string name = Path.GetFileName(entry);
+                if(IsModDistributionEntry(name)) continue;
+                Directory.CreateDirectory(dataRoot);
+                moved += MergeMove(entry, Path.Combine(dataRoot, name));
+            }
+            if(moved > 0) Logger.Msg($"[Startup] moved {moved} item(s) from the mod folder into UserData");
+        } catch(Exception e) {
+            Logger.Wrn($"[Startup] UserData layout migration failed: {e.Message}");
+        }
+    }
+    private int MergeMove(string src, string dest) {
+        try {
+            if(Directory.Exists(src)) {
+                if(!Directory.Exists(dest) && !File.Exists(dest)) {
+                    Directory.Move(src, dest);
+                    return 1;
+                }
+                int n = 0;
+                foreach(string child in Directory.GetFileSystemEntries(src))
+                    n += MergeMove(child, Path.Combine(dest, Path.GetFileName(child)));
+                try {
+                    if(Directory.GetFileSystemEntries(src).Length == 0) Directory.Delete(src);
+                } catch {
+                }
+                return n;
+            }
+            if(!File.Exists(src)) return 0;
+            if(Directory.Exists(dest)) return 0;
+            if(File.Exists(dest)) {
+                File.Delete(src);
+                return 0;
+            }
+            Directory.CreateDirectory(Path.GetDirectoryName(dest));
+            File.Move(src, dest);
+            return 1;
+        } catch(Exception e) {
+            Logger.Wrn($"[Startup] move '{Path.GetFileName(src)}' failed: {e.Message}");
+            return 0;
         }
     }
     private void TryLegacyRenameUpgrade() {
@@ -113,6 +184,7 @@ public sealed class QuartzRuntime {
     public void Initialize() {
         var sw = System.Diagnostics.Stopwatch.StartNew();
         var total = System.Diagnostics.Stopwatch.StartNew();
+        MigrateModRootDataIntoDataRoot();
         MigrateLegacyData();
         Paths.Initialize();
         foreach(string stale in new[] { "Quartz.dll.old", "QuartzUmm.dll.old", "Koren.dll.old" }) {

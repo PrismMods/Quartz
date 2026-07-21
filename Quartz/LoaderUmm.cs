@@ -7,9 +7,11 @@ public sealed class LoaderUmm : IQuartzHost, IQuartzLogger {
     private static LoaderUmm instance;
     private readonly UnityModManager.ModEntry.ModLogger logger;
     private readonly string modPath;
+    private readonly string dataPath;
     private LoaderUmm(UnityModManager.ModEntry modEntry) {
         logger = modEntry.Logger;
         modPath = modEntry.Path;
+        dataPath = Path.Combine(modPath, "UserData");
     }
     public static bool Load(UnityModManager.ModEntry modEntry) {
         if(instance != null) return true;
@@ -43,7 +45,7 @@ public sealed class LoaderUmm : IQuartzHost, IQuartzLogger {
         return true;
     }
     public IQuartzLogger QuartzLogger => this;
-    public string QuartzFilePath => modPath;
+    public string QuartzFilePath => dataPath;
     public string ModsPath => modPath;
     public string UserLibsPath => modPath;
     public bool SupportsSelfUpdate => true;

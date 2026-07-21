@@ -91,4 +91,4 @@ esac
 
 echo ">> done."
 [[ "$TARGET" == "ML"  || "$TARGET" == "both" ]] && echo ">> MelonLoader:     Mods/Quartz.dll + UserData/Quartz/* — dist/Quartz.zip"
-[[ "$TARGET" == "UMM" || "$TARGET" == "both" ]] && echo ">> UnityModManager: UMMMods/Quartz (or Mods/Quartz) — dist/QuartzUmm.zip"
+[[ "$TARGET" == "UMM" || "$TARGET" == "both" ]] && echo ">> UnityModManager: UMMMods/Quartz (or Mods/Quartz) + Quartz/UserData/* — dist/QuartzUmm.zip"

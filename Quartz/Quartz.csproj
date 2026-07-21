@@ -71,6 +71,12 @@
 		<UmmInstallRoot Condition="'$(UmmInstallRoot)' == ''">$(GamePath)/Mods</UmmInstallRoot>
 		<UmmModDir>$(UmmInstallRoot)/$(UmmModFolderName)</UmmModDir>
 		<UmmStageModDir>$(PackageStageRoot)/$(UmmModFolderName)</UmmStageModDir>
+		<!-- Everything the mod reads/writes at runtime lives under the mod folder's
+		     UserData/ (== LoaderUmm.QuartzFilePath), mirroring MelonLoader's
+		     UserData/Quartz split, so the mod folder itself only carries the DLL and
+		     Info.json that UMM installs and the self-updater overwrites. -->
+		<UmmStageDataDir>$(UmmStageModDir)/UserData</UmmStageDataDir>
+		<UmmModDataDir>$(UmmModDir)/UserData</UmmModDataDir>
 		<!-- Only auto-install the UMM build locally when MelonLoader is NOT present.
 		     On a MelonLoader machine (incl. the ummcompat bridge) the ML build is
 		     already installed under Mods/, and dropping the UMM build into UMMMods/
@@ -245,10 +251,12 @@
 	</Target>
 
 	<!-- UnityModManager packaging (UMM build only). Produces a self-contained mod
-	     folder — Quartz.dll + Info.json + Lang/Fonts/Presets — and zips
-	     it into dist/QuartzUmm.zip with the mod folder at the zip root (so UMM's
-	     installer drops it straight into the mods dir). AutoInstall also copies it
-	     into the game's UMMMods/ (or Mods/) for local testing. -->
+	     folder — QuartzUmm.dll + Info.json at the top, Lang/Fonts/Presets under
+	     UserData/ — and zips it into dist/QuartzUmm.zip with the mod folder at the
+	     zip root (so UMM's installer drops it straight into the mods dir, and the
+	     self-updater, which extracts over the mods dir, lands on the same paths).
+	     AutoInstall also copies it into the game's UMMMods/ (or Mods/) for local
+	     testing. -->
 	<Target Name="PostBuildUmm" AfterTargets="Build" Condition="'$(LoaderTarget)' == 'UMM' And '$(TargetPath)' != ''">
 		<!-- Recompute the display version (Info.cs + build.json), same logic as
 		     GenerateBuildInfo, to stamp Info.json's Version. -->
@@ -278,10 +286,10 @@
 
 		<!-- Stage: $(PackageStageRoot)/Quartz/ (mod folder at zip root). -->
 		<RemoveDir Directories="$(PackageStageRoot)" />
-		<MakeDir Directories="$(DistDir);$(UmmStageModDir)" />
+		<MakeDir Directories="$(DistDir);$(UmmStageModDir);$(UmmStageDataDir)" />
 		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(UmmStageModDir)" />
 		<WriteLinesToFile File="$(UmmStageModDir)/Info.json" Lines="$(_InfoJson)" Overwrite="true" />
-		<Copy SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(UmmStageModDir)/%(RecursiveDir)%(Filename)%(Extension)')" />
+		<Copy SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(UmmStageDataDir)/%(RecursiveDir)%(Filename)%(Extension)')" />
 
 		<Delete Files="$(DistZipPath)" TreatErrorsAsWarnings="true" />
 		<ZipDirectory SourceDirectory="$(PackageStageRoot)" DestinationFile="$(DistZipPath)" />
@@ -289,10 +297,10 @@
 
 		<!-- Local install for testing: UMMMods/Quartz (or Mods/Quartz). Skipped when
 		     MelonLoader is present (the ML build already covers this game). -->
-		<MakeDir Directories="$(UmmModDir)" Condition="'$(UmmAutoInstall)' == 'true'" />
+		<MakeDir Directories="$(UmmModDir);$(UmmModDataDir)" Condition="'$(UmmAutoInstall)' == 'true'" />
 		<Copy Condition="'$(UmmAutoInstall)' == 'true'" SourceFiles="$(TargetPath)" DestinationFolder="$(UmmModDir)" SkipUnchangedFiles="true" />
 		<WriteLinesToFile File="$(UmmModDir)/Info.json" Lines="$(_InfoJson)" Overwrite="true" Condition="'$(UmmAutoInstall)' == 'true'" />
-		<Copy Condition="'$(UmmAutoInstall)' == 'true'" SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(UmmModDir)/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+		<Copy Condition="'$(UmmAutoInstall)' == 'true'" SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(UmmModDataDir)/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
 		<Message Importance="high" Text="UMM installed: $(UmmModDir)" Condition="'$(UmmAutoInstall)' == 'true'" />
 		<Message Importance="high" Text="UMM build NOT auto-installed (MelonLoader present); QuartzUmm.zip still written to $(DistDir)." Condition="'$(AutoInstall)' == 'true' And '$(MelonLoaderPresent)' == 'true'" />
 	</Target>
