@@ -53,7 +53,8 @@ public static partial class PlanetColors {
     [HarmonyPatch]
     private static class PlanetRendererColorBlockPatch {
         private static IEnumerable<MethodBase> TargetMethods()
-            => ExistingMethods(typeof(PlanetRenderer), "SetRainbow", "LoadPlanetColor", "SetColor");
+            => ExistingMethods(
+                typeof(PlanetRenderer), "SetRainbow", "LoadPlanetColor", "SetColor", "DisableCustomColor");
         private static bool Prefix(PlanetRenderer __instance) {
             if(applying || !ShouldChange) return true;
             ApplyPlanetRendererColor(__instance);

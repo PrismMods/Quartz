@@ -219,8 +219,19 @@ public static partial class PlanetColors {
             ApplyTailParticleColor(renderer, tailColor);
             try { renderer.SetCoreColor(ballColor); } catch { }
             InvokeRendererColor(renderer, "SetFaceColor", ballColor);
+            ApplyPlanetGlowColor(renderer, ballColor);
         } finally {
             applying = false;
+        }
+    }
+    private static void ApplyPlanetGlowColor(PlanetRenderer renderer, Color color) {
+        try {
+            SpriteRenderer glow = renderer.glow;
+            if(glow == null) return;
+            Color next = color;
+            next.a = glow.color.a;
+            if(glow.color != next) glow.color = next;
+        } catch {
         }
     }
     private static void ApplyTailParticleColor(PlanetRenderer renderer, Color tailColor) {
