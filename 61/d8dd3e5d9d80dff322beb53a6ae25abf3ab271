@@ -1,0 +1,30 @@
+Quartz/Features/KeyViewer/KeyViewerCss.cs
+  s_e6d11c6d328e96::t_744608f4842a60 885-891
+Quartz.Tests/Features/KeyViewer/KeyViewerCssTests.cs
+  s_518ec951af4421::t_352c3b8f82f3d4 133
+  s_518ec951af4421::t_68cd94199fa966 140
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "61d8dd3e5d9d80dff322beb53a6ae25abf3ab271",
+  "prompts": {},
+  "sessions": {
+    "s_518ec951af4421": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "021f0768-f968-465c-9e7c-e7efb2eb9076",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_e6d11c6d328e96": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0d98dc9a-8a1f-4090-be67-5b7049ca616d",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
