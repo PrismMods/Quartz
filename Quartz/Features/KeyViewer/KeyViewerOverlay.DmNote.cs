@@ -28,7 +28,7 @@ public static partial class KeyViewerOverlay {
         foreach(Box box in boxes)
             if(!box.IsStat && box.CountInTotal) totalCount += box.Count;
         PaintInitialCounts();
-        AddReorganizeHandle();
+        AddReorganizeHandle(rainLayer);
         Apply();
     }
     private static void PaintInitialCounts() {

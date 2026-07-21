@@ -10,6 +10,8 @@ using TMPro;
 namespace Quartz.UI.Utility;
 public sealed class ReorganizeHandle : MonoBehaviour {
     public RectTransform Target;
+    public RectTransform Bounds;
+    internal RectTransform MeasureRect => Bounds != null ? Bounds : Target;
     public Func<string> GetName;
     public Action OnMoved;
     private Vector2 grabOffset;
@@ -93,7 +95,7 @@ public static class Reorganizer {
             Deselect();
             return;
         }
-        BuildOutline(handle.Target);
+        BuildOutline(handle.MeasureRect);
         EnsurePanel();
         nameLabel.text = handle.GetName?.Invoke() ?? handle.Target.name;
         SyncSelectedSliders();
@@ -191,14 +193,14 @@ public static class Reorganizer {
     }
     internal static void SyncSelectedSliders() {
         if(Selected?.Target == null || xSlider == null) return;
-        Vector2 center = ScreenToVirtual(ScreenCenter(Selected.Target));
+        Vector2 center = ScreenToVirtual(ScreenCenter(Selected.MeasureRect));
         xSlider.SetOnlyValue(center.x, true);
         ySlider.SetOnlyValue(center.y, true);
     }
     private static void MoveSelected(float? virtualX, float? virtualY) {
         if(Selected?.Target == null) return;
         RectTransform rt = Selected.Target;
-        Vector2 center = ScreenCenter(rt);
+        Vector2 center = ScreenCenter(Selected.MeasureRect);
         Vector2 target = center;
         if(virtualX.HasValue) target.x = virtualX.Value / VirtualW * Screen.width;
         if(virtualY.HasValue) target.y = virtualY.Value / VirtualH * Screen.height;
@@ -210,7 +212,7 @@ public static class Reorganizer {
     internal static void SnapDuringDrag(ReorganizeHandle handle) {
         if(handle?.Target == null) return;
         if(Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt)) return;
-        GetScreenRect(handle.Target, out float left, out float right, out float bottom, out float top);
+        GetScreenRect(handle.MeasureRect, out float left, out float right, out float bottom, out float top);
         float cx = (left + right) * 0.5f;
         float cy = (bottom + top) * 0.5f;
         float threshold = SnapThreshold * Screen.height / VirtualH;
@@ -234,7 +236,7 @@ public static class Reorganizer {
         TryY(Screen.height);
         foreach(ReorganizeHandle other in handles) {
             if(other == handle || other.Target == null || !other.isActiveAndEnabled) continue;
-            GetScreenRect(other.Target, out float l, out float r, out float b, out float t);
+            GetScreenRect(other.MeasureRect, out float l, out float r, out float b, out float t);
             TryX(l);
             TryX((l + r) * 0.5f);
             TryX(r);
