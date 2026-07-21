@@ -1,0 +1,19 @@
+Quartz/Features/Calibration/Calibration.cs
+  s_d4d7f10f60dc34::t_a2c7a33096acae 22-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "647b1b3dc8a0271985ed1b879d90414748f70ed7",
+  "prompts": {},
+  "sessions": {
+    "s_d4d7f10f60dc34": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f96721b6-44f2-4e62-8b6e-405468666dbc",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
