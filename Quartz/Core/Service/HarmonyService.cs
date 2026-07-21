@@ -15,12 +15,19 @@ public sealed class HarmonyService : IRuntimeService, IRuntimeTick {
     }
     private void PatchAllResilient() {
         foreach(Type type in AccessTools.GetTypesFromAssembly(MainCore.Asm)) {
+            if(!IsPatchClass(type)) continue;
             try {
                 Harmony.CreateClassProcessor(type).Patch();
             } catch(Exception e) {
                 MainCore.Log.Wrn($"[Harmony] skipped patch class {type.FullName}: {e.Message}");
             }
         }
+    }
+    private static bool IsPatchClass(Type type) {
+        if(type.GetCustomAttributes(typeof(HarmonyPatch), true).Length > 0) return true;
+        foreach(System.Reflection.MethodInfo m in AccessTools.GetDeclaredMethods(type))
+            if(m.GetCustomAttributes(typeof(HarmonyPatch), true).Length > 0) return true;
+        return false;
     }
     public void Dispose() {
         Harmony?.UnpatchAll(Harmony.Id);
