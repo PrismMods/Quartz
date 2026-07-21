@@ -19,10 +19,14 @@ public static class Calibration {
     public static bool FloatOffsetEnabled => Enabled && Conf.FloatOffsetEnabled;
     public static float GetOffsetMs() {
         EnsureConf();
-        if(Conf.FloatOffsetEnabled
-            && Conf.FloatOffsetByDevice.TryGetValue(scrConductor.currentPreset.outputName, out float f))
-            return f;
-        return scrConductor.currentPreset.inputOffset;
+        int preset = scrConductor.currentPreset.inputOffset;
+        if(!Conf.FloatOffsetEnabled) return preset;
+        string device = scrConductor.currentPreset.outputName;
+        if(!Conf.FloatOffsetByDevice.TryGetValue(device, out float f)) return preset;
+        if(Mathf.RoundToInt(f) == preset) return f;
+        Conf.FloatOffsetByDevice[device] = preset;
+        Save();
+        return preset;
     }
     public static void SetOffsetMs(float value) {
         EnsureConf();
