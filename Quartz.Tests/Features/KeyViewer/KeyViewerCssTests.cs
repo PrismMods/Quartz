@@ -130,14 +130,14 @@ static class KeyViewerCssTests {
               --graph-bg: rgba(7, 10, 18, 0.72);
               --graph-border: 1px solid rgba(125, 211, 252, 0.55);
               --graph-radius: 12px;
-              --graph-color: #7dd3fc;
+              --graph-color: #7dd3fc !important;
             }
             """);
         CssGraphStyle g = gsheet.ResolveGraph("kps-graph");
         Assert(g.Bg.Has && Math.Abs(g.Bg.A - 0.72f) < 0.02f, "--graph-bg parsed");
         Assert(g.BorderWidth == 1f && g.BorderColor.Has, "--graph-border shorthand");
         Assert(g.Radius == 12f, "--graph-radius parsed");
-        Assert(ColorEq(g.Color, 0x7d, 0xd3, 0xfc), "--graph-color parsed");
+        Assert(ColorEq(g.Color, 0x7d, 0xd3, 0xfc), "--graph-color drops !important");
         Assert(!gsheet.ResolveGraph("other").Any, "graph class is scoped");
     }
     public static void TestKeyViewerPersistence() {

@@ -882,7 +882,13 @@ public sealed class KeyViewerStylesheet {
             string name = decl.Substring(0, colon).Trim().ToLowerInvariant();
             string value = decl.Substring(colon + 1).Trim();
             int bang = value.IndexOf('!');
-            if(bang >= 0) { value = value.Substring(0, bang).Trim(); }
+            while(bang >= 0) {
+                if(value.Substring(bang + 1).TrimStart().StartsWith("important", StringComparison.OrdinalIgnoreCase)) {
+                    value = value.Substring(0, bang).Trim();
+                    break;
+                }
+                bang = value.IndexOf('!', bang + 1);
+            }
             if(name.Length > 0 && value.Length > 0) { d[name] = value; }
         }
         return d;
