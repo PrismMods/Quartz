@@ -84,17 +84,53 @@ internal static partial class PageKeyViewer {
             "DESC_KEYVIEWER_EDITOR_FILE",
             "Import a DM Note preset from the presets folder, or write this layout out to it."
         );
-        void Export(bool includeCounts) {
-            if(KvStore.Export(out string error, includeCounts)) {
-                status.text = MainCore.Tr.Get("KEYVIEWER_EDITOR_EXPORTED", "Exported.");
+        void Export(KvExportFormat format) {
+            if(KvStore.Export(format, out string error)) {
+                status.text = format == KvExportFormat.Quartz
+                    ? MainCore.Tr.Get(
+                        "KEYVIEWER_EDITOR_EXPORTED_QKV",
+                        "Exported as .qkv — the full layout and Key Viewer settings, for another Quartz install."
+                    )
+                    : DmNoteExportStatus();
             } else if(!string.IsNullOrEmpty(error)) {
                 status.text = error;
             }
         }
+        static string DmNoteExportStatus() {
+            List<string> gaps = KvStore.DmNoteGaps();
+            if(gaps.Count == 0) return MainCore.Tr.Get("KEYVIEWER_EDITOR_EXPORTED_JSON", "Exported for DM Note.");
+            List<string> named = [];
+            foreach(string gap in gaps) named.Add(GapName(gap));
+            return string.Format(
+                MainCore.Tr.Get(
+                    "KEYVIEWER_EDITOR_EXPORTED_JSON_GAPS",
+                    "Exported for DM Note, without: {0}. Export .qkv instead to keep them."
+                ), string.Join(", ", named));
+        }
+        static string GapName(string gap) => gap switch {
+            KvExportShaping.GapStats => MainCore.Tr.Get("KEYVIEWER_DMGAP_STATS", "Avg/Max stats (exported as KPS)"),
+            KvExportShaping.GapGhostKeys => MainCore.Tr.Get("KEYVIEWER_DMGAP_GHOST", "ghost keys"),
+            KvExportShaping.GapPressedLabels => MainCore.Tr.Get("KEYVIEWER_DMGAP_PRESSED_LABEL", "pressed labels"),
+            KvExportShaping.GapHiddenLabels => MainCore.Tr.Get("KEYVIEWER_DMGAP_HIDDEN_LABEL", "hidden labels"),
+            KvExportShaping.GapCounterWhilePressed => MainCore.Tr.Get("KEYVIEWER_DMGAP_COUNTER_PRESSED", "counters hidden while pressed"),
+            KvExportShaping.GapCountInTotal => MainCore.Tr.Get("KEYVIEWER_DMGAP_COUNT_IN_TOTAL", "keys kept out of the total"),
+            KvExportShaping.GapPerKeyKps => MainCore.Tr.Get("KEYVIEWER_DMGAP_PER_KEY_KPS", "per-key KPS counters"),
+            KvExportShaping.GapFootRows => MainCore.Tr.Get("KEYVIEWER_DMGAP_FOOT", "foot-row markers"),
+            KvExportShaping.GapPressScale => MainCore.Tr.Get("KEYVIEWER_DMGAP_PRESS_SCALE", "press scaling"),
+            KvExportShaping.GapNoteShadows => MainCore.Tr.Get("KEYVIEWER_DMGAP_NOTE_SHADOW", "note shadows"),
+            _ => MainCore.Tr.Get("KEYVIEWER_DMGAP_OTHER", "other Quartz-only settings"),
+        };
         void Import() {
-            if(KvStore.Import(out string error)) {
+            if(KvStore.Import(out string error, out int settingsApplied)) {
                 rebind();
                 refreshStatus();
+                if(settingsApplied > 0) {
+                    status.text = string.Format(
+                        MainCore.Tr.Get(
+                            "KEYVIEWER_EDITOR_IMPORTED_QKV",
+                            "Imported. {0} Key Viewer setting(s) came from the .qkv and replaced yours."
+                        ), settingsApplied);
+                }
             } else if(!string.IsNullOrEmpty(error)) {
                 status.text = error;
             }
@@ -103,8 +139,8 @@ internal static partial class PageKeyViewer {
             host, file.Rect,
             [
                 ("KEYVIEWER_EDITOR_IMPORT", "Import"),
-                ("KEYVIEWER_EDITOR_EXPORT_COUNTS", "Export"),
-                ("KEYVIEWER_EDITOR_EXPORT_ZEROED", "Export (Zeroed)"),
+                ("KEYVIEWER_EDITOR_EXPORT_QKV", "Export .qkv (Quartz)"),
+                ("KEYVIEWER_EDITOR_EXPORT_JSON", "Export .json (DM Note)"),
                 ("KEYVIEWER_EDITOR_OPEN_FOLDER", "Open Presets Folder"),
             ],
             index => {
@@ -113,10 +149,10 @@ internal static partial class PageKeyViewer {
                         Import();
                         break;
                     case 1:
-                        Export(true);
+                        Export(KvExportFormat.Quartz);
                         break;
                     case 2:
-                        Export(false);
+                        Export(KvExportFormat.DmNote);
                         break;
                     default:
                         KvStore.RevealLibrary();

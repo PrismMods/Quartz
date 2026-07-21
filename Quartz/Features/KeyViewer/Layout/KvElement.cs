@@ -17,10 +17,10 @@ internal sealed partial class KvElement {
         Kind = kind;
     }
     internal static KvElement Wrap(JObject raw, KvElementKind kind, string globalKey = "") {
-        EnsureRequired(raw);
+        EnsureRequired(raw, kind);
         return new KvElement(raw, kind) { GlobalKey = globalKey ?? "" };
     }
-    private static void EnsureRequired(JObject raw) {
+    private static void EnsureRequired(JObject raw, KvElementKind kind) {
         if(raw == null) return;
         if(raw["dx"] == null) raw["dx"] = 0f;
         if(raw["dy"] == null) raw["dy"] = 0f;
@@ -29,6 +29,16 @@ internal sealed partial class KvElement {
         if(raw["count"] == null) raw["count"] = 0;
         if(raw["noteColor"] == null) raw["noteColor"] = "#FFFFFF";
         if(raw["noteOpacity"] == null) raw["noteOpacity"] = 80;
+        if(kind != KvElementKind.Graph) return;
+        JObject outer = raw.Parent is JProperty { Name: "position" } prop && prop.Parent is JObject o ? o : raw;
+        Fill("statType", "kps");
+        Fill("graphType", "line");
+        Fill("graphSpeed", 1000);
+        Fill("graphColor", "#86EFAC");
+        void Fill(string key, JToken value) {
+            if(raw[key] == null) raw[key] = value;
+            if(outer[key] == null) outer[key] = value.DeepClone();
+        }
     }
     private float Num(string key, float fallback) {
         JToken t = Raw[key];

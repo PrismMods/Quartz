@@ -5,7 +5,7 @@ using Quartz.Core;
 using Quartz.IO;
 using Quartz.Compat.Game;
 namespace Quartz.Features.KeyViewer.Layout;
-internal static class KvStore {
+internal static partial class KvStore {
     private const string JsonExtension = ".json";
     private const string LayoutFileName = "KeyViewerLayout.json";
     private const string CorruptPrefix = "KeyViewerLayout.corrupt-";
@@ -165,8 +165,9 @@ internal static class KvStore {
         }
         pending?.Cancel();
     }
-    internal static bool ImportFromPath(string path, out string error) {
+    internal static bool ImportFromPath(string path, out string error, out int settingsApplied) {
         error = null;
+        settingsApplied = 0;
         if(string.IsNullOrWhiteSpace(path)) {
             error = "No file selected.";
             return false;
@@ -200,8 +201,10 @@ internal static class KvStore {
         string added = Current.MergeFrom(doc);
         if(added != null) Current.SelectedTab = added;
         ApplyEmbeddedCss(doc);
+        settingsApplied = ApplyTransferSettings(doc.Root);
         Save();
-        Msg("Imported layout from " + path);
+        Msg("Imported layout from " + path
+            + (settingsApplied > 0 ? " with " + settingsApplied + " Quartz setting(s)" : ""));
         return true;
     }
     private static void ApplyEmbeddedCss(KvDocument doc) {
@@ -215,17 +218,19 @@ internal static class KvStore {
         conf.DmCssPath = "";
         KeyViewerOverlay.Save();
     }
-    internal static bool ExportToPath(string path, out string error, bool includeCounts = true) {
+    internal static bool ExportToPath(string path, KvExportFormat format, out string error) {
         error = null;
         if(string.IsNullOrWhiteSpace(path)) {
             error = "No destination selected.";
             return false;
         }
         try {
-            string json = Current.ToJson(true);
-            if(!includeCounts) json = StripCounts(json);
-            AtomicFile.WriteAllText(path, json);
-            Msg("Exported layout to " + path);
+            AtomicFile.WriteAllText(path, BuildExportJson(format));
+            Msg("Exported layout to " + path + " as " + (format == KvExportFormat.Quartz ? ".qkv" : "DM Note .json"));
+            if(format == KvExportFormat.DmNote) {
+                List<string> gaps = DmNoteGaps();
+                if(gaps.Count > 0) Msg("Not carried into the DM Note export: " + string.Join(", ", gaps));
+            }
             return true;
         } catch(Exception e) {
             error = "Export failed: " + e.Message;
@@ -233,35 +238,43 @@ internal static class KvStore {
             return false;
         }
     }
-    internal static bool Import(out string error) {
+    internal static bool Import(out string error, out int settingsApplied) {
         error = null;
+        settingsApplied = 0;
         string picked;
         try {
             picked = FileDialog.PickFile(
-                "", FilterName, ["json"], "Select a DM Note preset or Quartz layout");
+                "", FilterName, ["qkv", "json"], "Select a Quartz .qkv, a DM Note preset, or a Quartz layout");
         } catch(Exception e) {
             error = "Picker failed: " + e.Message;
             Msg(error);
             return false;
         }
-        return string.IsNullOrEmpty(picked) || ImportFromPath(picked, out error);
+        return string.IsNullOrEmpty(picked) || ImportFromPath(picked, out error, out settingsApplied);
     }
-    internal static bool Export(out string error, bool includeCounts = true) {
+    internal static bool Export(KvExportFormat format, out string error) {
         error = null;
+        bool quartz = format == KvExportFormat.Quartz;
+        string extension = quartz ? QkvExtension : JsonExtension;
         string picked;
         try {
             Directory.CreateDirectory(LibraryDir);
             picked = FileDialog.SaveFile(
-                LibraryDir, DefaultExportName, FilterName, ["json"], "Export KeyViewer layout");
+                LibraryDir,
+                quartz ? DefaultQkvExportName : DefaultExportName,
+                quartz ? QkvFilterName : FilterName,
+                [extension.TrimStart('.')],
+                quartz ? "Export KeyViewer layout (Quartz)" : "Export KeyViewer layout (DM Note)");
         } catch(Exception e) {
             error = "Picker failed: " + e.Message;
             Msg(error);
             return false;
         }
-        return string.IsNullOrEmpty(picked) || ExportToPath(EnsureJsonExtension(picked), out error, includeCounts);
+        return string.IsNullOrEmpty(picked)
+            || ExportToPath(EnsureExtension(picked, extension), format, out error);
     }
-    private static string EnsureJsonExtension(string path) =>
-        string.IsNullOrEmpty(Path.GetExtension(path)) ? path + JsonExtension : path;
+    private static string EnsureExtension(string path, string extension) =>
+        string.IsNullOrEmpty(Path.GetExtension(path)) ? path + extension : path;
     internal static void RevealLibrary() {
         try {
             Directory.CreateDirectory(LibraryDir);
@@ -269,20 +282,6 @@ internal static class KvStore {
         } catch(Exception e) {
             Msg("[KeyViewer] Reveal failed: " + e.Message);
         }
-    }
-    private static string StripCounts(string json) {
-        JObject root = JObject.Parse(json);
-        foreach(string table in new[] { "keyPositions", "statPositions", "graphPositions", "knobPositions" }) {
-            if(root[table] is not JObject byTab) continue;
-            foreach(JProperty tab in byTab.Properties()) {
-                if(tab.Value is not JArray arr) continue;
-                foreach(JToken entry in arr) {
-                    JObject target = entry["position"] as JObject ?? entry as JObject;
-                    if(target?["count"] != null) target["count"] = 0;
-                }
-            }
-        }
-        return root.ToString(Formatting.Indented);
     }
     internal static string LibraryDir => Path.Combine(MainCore.Paths.RootPath, "Presets");
     internal static string LibraryHint {
@@ -310,10 +309,12 @@ internal static class KvStore {
             if(string.IsNullOrEmpty(dir)) return;
             try {
                 if(!Directory.Exists(dir)) return;
-                foreach(string file in Directory.EnumerateFiles(dir, "*" + JsonExtension)) {
-                    if(string.Equals(Path.GetFileName(file), LayoutFileName, StringComparison.OrdinalIgnoreCase)) continue;
-                    if(!seen.Add(Path.GetFullPath(file))) continue;
-                    found.Add((file, tag + Path.GetFileName(file)));
+                foreach(string extension in new[] { QkvExtension, JsonExtension }) {
+                    foreach(string file in Directory.EnumerateFiles(dir, "*" + extension)) {
+                        if(string.Equals(Path.GetFileName(file), LayoutFileName, StringComparison.OrdinalIgnoreCase)) continue;
+                        if(!seen.Add(Path.GetFullPath(file))) continue;
+                        found.Add((file, tag + Path.GetFileName(file)));
+                    }
                 }
             } catch(Exception e) {
                 Msg("[KeyViewer] Could not scan " + dir + ": " + e.Message);
@@ -331,24 +332,26 @@ internal static class KvStore {
             return DateTime.MinValue;
         }
     }
-    internal static bool ExportToLibrary(bool includeCounts, out string savedPath, out string error) {
+    internal static bool ExportToLibrary(KvExportFormat format, out string savedPath, out string error) {
         savedPath = null;
         error = null;
         try {
             Directory.CreateDirectory(LibraryDir);
-            savedPath = UniqueExportPath();
+            savedPath = UniqueExportPath(format);
         } catch(Exception e) {
             error = "Export failed: " + e.Message;
             Msg(error);
             return false;
         }
-        return ExportToPath(savedPath, out error, includeCounts);
+        return ExportToPath(savedPath, format, out error);
     }
-    private static string UniqueExportPath() {
-        string baseName = Path.GetFileNameWithoutExtension(DefaultExportName);
-        string candidate = Path.Combine(LibraryDir, baseName + JsonExtension);
+    private static string UniqueExportPath(KvExportFormat format) {
+        string extension = format == KvExportFormat.Quartz ? QkvExtension : JsonExtension;
+        string baseName = Path.GetFileNameWithoutExtension(
+            format == KvExportFormat.Quartz ? DefaultQkvExportName : DefaultExportName);
+        string candidate = Path.Combine(LibraryDir, baseName + extension);
         for(int n = 2; File.Exists(candidate) && n < 10000; n++)
-            candidate = Path.Combine(LibraryDir, baseName + "-" + n + JsonExtension);
+            candidate = Path.Combine(LibraryDir, baseName + "-" + n + extension);
         return candidate;
     }
     private static void Msg(string message) {

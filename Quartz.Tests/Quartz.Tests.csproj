@@ -16,6 +16,7 @@
 		<Compile Include="../Quartz/Features/KeyViewer/KeyViewerPersistence.cs" Link="Source/KeyViewerPersistence.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvElement.cs" Link="Source/KvElement.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvDocument.cs" Link="Source/KvDocument.cs" />
+		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvExportShaping.cs" Link="Source/KvExportShaping.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvSnap.cs" Link="Source/KvSnap.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvHistory.cs" Link="Source/KvHistory.cs" />
 		<Compile Include="../Quartz/Features/Tuf/TufModels.cs" Link="Source/TufModels.cs" />

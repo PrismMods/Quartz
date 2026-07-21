@@ -303,6 +303,7 @@ static class KvDocumentTests {
     private static readonly Dictionary<string, string[]> EnumFields = new() {
         ["noteAlignment"] = ["left", "center", "right"],
     };
+    private static readonly string[] DmNoteStatTypes = ["kps", "total"];
     private static readonly Dictionary<string, string[]> CounterEnumFields = new() {
         ["placement"] = ["inside", "outside"],
         ["align"] = ["top", "bottom", "left", "right"],
@@ -329,6 +330,11 @@ static class KvDocumentTests {
                         if(p[req] == null) return $"{where} missing required '{req}'";
                     foreach(string d in disc)
                         if((outer ?? p)[d] == null) return $"{where} missing '{d}'";
+                    if(table == "statPositions") {
+                        string statType = ((outer ?? p)["statType"] ?? p["statType"])?.ToString();
+                        if(statType != null && Array.IndexOf(DmNoteStatTypes, statType) < 0)
+                            return $"{where}.statType='{statType}' is not a legal DM Note stat readout";
+                    }
                     foreach(string f in IntegerFields) {
                         JToken t = p[f];
                         if(t != null && t.Type == JTokenType.Float)
@@ -410,5 +416,96 @@ static class KvDocumentTests {
         Assert(doc.TryGetRenderAnchor(tab, out _, out _), "the surviving tab keeps its anchor");
         Assert((JObject.Parse(doc.ToJson())["quartzRenderAnchors"] as JObject)?[second] == null,
             "the pruned anchor is gone from the serialized document too");
+    }
+    public static void TestExportFormatsSplitQuartzOnlyData() {
+        KvDocument doc = KvDocument.Empty();
+        string tab = doc.SelectedTab;
+        KvElement key = KvElement.Wrap([], KvElementKind.Key, "Z");
+        key.MoveTo(0f, 0f);
+        key.Count = 4321;
+        key.PressedText = "!";
+        key.LabelEnabled = false;
+        key.CounterShowWhilePressed = false;
+        doc.Add(tab, key);
+        KvElement stat = KvElement.Wrap([], KvElementKind.Stat, "");
+        stat.StatType = "kpsAvg";
+        stat.MoveTo(0f, 60f);
+        doc.Add(tab, stat);
+        string authored = doc.ToJson();
+        Assert(DmNoteImportViolation(authored) != null,
+            "the layout as authored must be one DM Note refuses, or this test proves nothing");
+        JObject dm = JObject.Parse(authored);
+        KvExportShaping.Shape(dm, KvExportFormat.DmNote);
+        string violation = DmNoteImportViolation(dm.ToString());
+        Assert(violation == null, "the DM Note export must pass DM Note's contract, but: " + violation);
+        Assert(dm["statPositions"]?[tab]?[0]?["statType"]?.ToString() == "kps",
+            "the Avg stat is written as KPS, the nearest readout DM Note has");
+        Assert(!HasQuartzKey(dm), "no Quartz extension survives the DM Note export");
+        Assert(dm["keyPositions"]?[tab]?[0]?["count"]?.Value<int>() == 4321,
+            "a counts-included export keeps the press counts");
+        JObject qkv = JObject.Parse(authored);
+        KvExportShaping.Shape(qkv, KvExportFormat.Quartz);
+        Assert(qkv["statPositions"]?[tab]?[0]?["statType"]?.ToString() == "kpsAvg",
+            "the Quartz export keeps the readout the user chose");
+        JObject qkvKey = (JObject)qkv["keyPositions"]![tab]![0]!;
+        Assert(qkvKey["quartzPressedText"]?.ToString() == "!"
+            && qkvKey["quartzLabelEnabled"]?.Value<bool>() == false
+            && qkvKey["quartzCounterShowWhilePressed"]?.Value<bool>() == false,
+            "the Quartz export keeps every per-element extension");
+    }
+    public static void TestDmNoteGapsReportOnlyWhatIsUsed() {
+        KvDocument plain = KvDocument.Empty();
+        string plainTab = plain.SelectedTab;
+        plain.Add(plainTab, KvElement.Wrap([], KvElementKind.Key, "Z"));
+        KvElement kps = KvElement.Wrap([], KvElementKind.Stat, "");
+        kps.StatType = "total";
+        plain.Add(plainTab, kps);
+        plain.SetRenderAnchor(plainTab, 12f, 0f);
+        List<string> none = KvExportShaping.DetectDmNoteGaps(JObject.Parse(plain.ToJson()));
+        Assert(none.Count == 0, "a DM-Note-expressible layout reports no gaps, but got: " + string.Join(", ", none));
+        KvDocument doc = KvDocument.Empty();
+        string tab = doc.SelectedTab;
+        KvElement key = KvElement.Wrap([], KvElementKind.Key, "Z");
+        key.PressedText = "!";
+        key.GhostKey = "X";
+        key.CountInTotal = false;
+        doc.Add(tab, key);
+        KvElement stat = KvElement.Wrap([], KvElementKind.Stat, "");
+        stat.StatType = "kpsMax";
+        doc.Add(tab, stat);
+        List<string> gaps = KvExportShaping.DetectDmNoteGaps(JObject.Parse(doc.ToJson()));
+        Assert(string.Join(",", gaps) == string.Join(",", new[] {
+            KvExportShaping.GapStats, KvExportShaping.GapGhostKeys,
+            KvExportShaping.GapPressedLabels, KvExportShaping.GapCountInTotal,
+        }), "the gap list names what is used, in report order, but got: " + string.Join(", ", gaps));
+    }
+    public static void TestDmNoteGapsIgnoreDisabledNoteShadow() {
+        KvDocument doc = KvDocument.Empty();
+        string tab = doc.SelectedTab;
+        KvElement key = KvElement.Wrap([], KvElementKind.Key, "Z");
+        key.Raw["quartzNoteShadow"] = false;
+        key.Raw["quartzNoteShadowColor"] = "rgba(0, 0, 0, 0.5)";
+        doc.Add(tab, key);
+        Assert(KvExportShaping.DetectDmNoteGaps(JObject.Parse(doc.ToJson())).Count == 0,
+            "a note shadow that is switched off is not a gap");
+        key.Raw["quartzNoteShadow"] = true;
+        Assert(KvExportShaping.DetectDmNoteGaps(JObject.Parse(doc.ToJson()))
+            is [KvExportShaping.GapNoteShadows], "a note shadow that is on is");
+    }
+    private static bool HasQuartzKey(JToken node) {
+        switch(node) {
+            case JObject obj:
+                foreach(JProperty prop in obj.Properties()) {
+                    if(prop.Name.StartsWith(KvExportShaping.QuartzPrefix, StringComparison.OrdinalIgnoreCase)) return true;
+                    if(HasQuartzKey(prop.Value)) return true;
+                }
+                return false;
+            case JArray arr:
+                foreach(JToken item in arr)
+                    if(HasQuartzKey(item)) return true;
+                return false;
+            default:
+                return false;
+        }
     }
 }
