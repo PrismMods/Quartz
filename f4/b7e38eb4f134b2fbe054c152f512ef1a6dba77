@@ -1,0 +1,26 @@
+Quartz/Features/KeyViewer/KeyViewerOverlay.Boxes.cs
+  s_22d0ef40a9918b::t_ec5a421e4774bf 12,14,16-20,25,29,32-33,36-46,48,51-56
+Quartz/Features/KeyViewer/KeyViewerOverlay.Lifecycle.cs
+  s_22d0ef40a9918b::t_bee9f49fb1c514 247-248
+  s_22d0ef40a9918b::t_a934aef92bb58a 50-51
+Quartz/Features/KeyViewer/KeyViewerOverlay.cs
+  s_22d0ef40a9918b::t_92a1f5848a2bd6 38-39
+Quartz/Features/KeyViewer/KeyViewerOverlay.Update.cs
+  s_22d0ef40a9918b::t_d5cd9b7fe49e56 95-101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "f4b7e38eb4f134b2fbe054c152f512ef1a6dba77",
+  "prompts": {},
+  "sessions": {
+    "s_22d0ef40a9918b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dbe54474-ddbb-46f3-9d3d-e34a61216e5b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
