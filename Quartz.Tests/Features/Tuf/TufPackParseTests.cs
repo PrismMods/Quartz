@@ -1,10 +1,6 @@
 using System.Text;
 using Quartz.Features.Tuf;
 using static Asserts;
-
-// Fixtures mirror the real api.tuforums.com payloads captured 2026-07-11:
-// pack ids are opaque strings ("RCAXIAv9"), list rows carry levelCount, and tree
-// levels have no flat creator — charters live in levelCredits[].creator.name.
 static class TufPackParseTests {
     public static void TestPackListParsing() {
         const string json = """
@@ -41,13 +37,11 @@ static class TufPackParseTests {
         Assert(numeric.Id == "42", "numeric id read as string");
         Assert(numeric.LevelCount == 3, "totalLevelCount fallback with string number");
         Assert(numeric.Favorites == 0, "garbage count swallowed to zero");
-
         Assert(TufPackApiClient.IsValidPackId("RCAXIAv9"), "link code id accepted");
         Assert(!TufPackApiClient.IsValidPackId(""), "empty id rejected");
         Assert(!TufPackApiClient.IsValidPackId("a/../b"), "path chars rejected");
         Assert(!TufPackApiClient.IsValidPackId(new string('x', 65)), "oversized id rejected");
     }
-
     public static void TestPackTreeParsing() {
         const string json = """
         {
@@ -102,7 +96,6 @@ static class TufPackParseTests {
         Assert(levels[1].DifficultyRank == 21, "difficulty rank read from dictionary");
         Assert(levels[0].Clears == 14, "clears read");
         Assert(levels[0].Likes == 0, "absent likes default to zero");
-
         IReadOnlyList<TufPackItem> items = TufPackApiClient.ParsePackItems(bytes, difficulties);
         Assert(items.Count == 2, "tree keeps root order without the duplicate");
         Assert(!items[0].IsFolder && items[0].Level!.Id == 5358, "root level first by sortOrder");

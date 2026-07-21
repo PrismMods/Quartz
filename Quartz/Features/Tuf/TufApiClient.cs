@@ -3,15 +3,12 @@ using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-
 namespace Quartz.Features.Tuf;
-
 public sealed class TufApiClient : IDisposable {
     private const int MaxJsonBytes = 2 * 1024 * 1024;
     private static readonly Uri ApiOrigin = new("https://api.tuforums.com/");
     private readonly HttpClient http;
     private CancellationTokenSource staleRequest;
-
     public TufApiClient() {
         try { ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12; } catch { }
         http = new HttpClient(new HttpClientHandler {
@@ -24,7 +21,6 @@ public sealed class TufApiClient : IDisposable {
         http.DefaultRequestHeaders.UserAgent.ParseAdd("Quartz-TUF/1.0");
         http.DefaultRequestHeaders.Accept.ParseAdd("application/json");
     }
-
     public async Task<TufPage> FetchAsync(string query, TufSort sort, bool ascending, int offset,
         TufDifficultyFilter filter, CancellationToken token) {
         staleRequest?.Cancel();
@@ -42,10 +38,8 @@ public sealed class TufApiClient : IDisposable {
         requestToken.ThrowIfCancellationRequested();
         return Parse(bytes);
     }
-
     internal static string BuildPath(string query, TufSort sort, bool ascending, int offset,
         TufDifficultyFilter filter) => TufApiQuery.BuildPath(query, sort, ascending, offset, filter);
-
     internal static TufPage Parse(byte[] bytes) {
         JObject root;
         try {
@@ -83,7 +77,6 @@ public sealed class TufApiClient : IDisposable {
         }
         return new TufPage(levels, root.Value<bool?>("hasMore") == true, results.Count);
     }
-
     private static async Task<byte[]> ReadBoundedAsync(Stream stream, int max, CancellationToken token) {
         using MemoryStream output = new();
         byte[] buffer = new byte[32768];
@@ -94,7 +87,6 @@ public sealed class TufApiClient : IDisposable {
             output.Write(buffer, 0, read);
         }
     }
-
     public void Dispose() {
         staleRequest?.Cancel();
         staleRequest?.Dispose();

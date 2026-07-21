@@ -25,8 +25,6 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
     public void Tick() {
         if(!MainCore.IsModEnabled) return;
         bool inGame = Status.GameStats.InGame;
-        // Attempts and best-progress are accumulated in memory across the die-retry loop and only
-        // written once gameplay ends, so the fsync never lands on a rendered frame.
         if(gameStateKnown && wasInGame && !inGame) FlushIfDirty();
         wasInGame = inGame;
         gameStateKnown = true;

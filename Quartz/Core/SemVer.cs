@@ -1,7 +1,7 @@
 using System;
 namespace Quartz.Core;
 public enum ReleaseChannel {
-    Dev = -1, 
+    Dev = -1,
     Alpha = 0,
     Beta = 1,
     ReleaseCandidate = 2,
@@ -12,7 +12,7 @@ public readonly struct SemVer : IComparable<SemVer> {
     public readonly int Minor;
     public readonly int Patch;
     public readonly ReleaseChannel Channel;
-    public readonly int Build; 
+    public readonly int Build;
     public SemVer(int major, int minor, int patch, ReleaseChannel channel, int build) {
         Major = major;
         Minor = minor;

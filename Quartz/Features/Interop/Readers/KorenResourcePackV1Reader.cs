@@ -14,9 +14,9 @@ using static Quartz.Features.Interop.Readers.KeyViewerImportShared;
 namespace Quartz.Features.Interop.Readers;
 internal static class KorenResourcePackV1Reader {
     private sealed class V1Reader {
-        public Func<string, object> Scalar;    
-        public Func<string, int[]> Keys;       
-        public Func<string, string[]> Labels;  
+        public Func<string, object> Scalar;
+        public Func<string, int[]> Keys;
+        public Func<string, string[]> Labels;
     }
     public static int ImportKorenResourcePackV1(
         SettingsImportOption option,
@@ -27,7 +27,7 @@ internal static class KorenResourcePackV1Reader {
         object live = GetStaticMember(SettingsImporter.FindType(option, "KorenResourcePack.Main"), "settings");
         if(live != null) {
             count += ApplyV1Common(V1FromObject(live), keyViewerMode, keyViewerParts);
-            count += ImportV1UiHider(live); 
+            count += ImportV1UiHider(live);
         }
         if(count == 0) {
             XDocument doc = LoadXml(option, "Settings.xml");

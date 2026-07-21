@@ -30,9 +30,6 @@ public static class TMPTextShadow {
         RectTransform shadowRoot = root.Rect;
         if(isolateCanvas && shadowRoot.GetComponent<Canvas>() == null)
             shadowRoot.gameObject.AddComponent<Canvas>().overrideSorting = false;
-        // Hide via CanvasGroup alpha rather than SetActive: deactivating the root
-        // re-registers up to 9 TMP layers with the canvas on every toggle, which is
-        // a per-press cost when only one CSS state has a text shadow.
         if(root.Group == null) {
             root.Group = shadowRoot.gameObject.GetComponent<CanvasGroup>()
                 ?? shadowRoot.gameObject.AddComponent<CanvasGroup>();
@@ -47,9 +44,6 @@ public static class TMPTextShadow {
         float soft = Mathf.Clamp(softness, 0f, 50f);
         int layerCount = soft > 0.001f ? 9 : 1;
         EnsureLayerCount(root, layerCount);
-        // Strip color tags once per Apply (not once per layer — soft shadows have
-        // 9 layers) and memo against the source string: Apply runs per keypress
-        // from KeyViewer CSS and per text change from the Panels overlay.
         string srcText = text.text;
         if(!ReferenceEquals(srcText, root.LastSourceText)) {
             root.LastSourceText = srcText;
@@ -127,8 +121,6 @@ public static class TMPTextShadow {
             rect.offsetMax = Vector2.zero;
             TextMeshProUGUI tmp = obj.AddComponent<TextMeshProUGUI>();
             tmp.raycastTarget = false;
-            // Layers are hidden via CanvasGroup alpha 0; make sure the fully
-            // transparent meshes are culled instead of drawn.
             tmp.canvasRenderer.cullTransparentMesh = true;
             root.Layers.Add(tmp);
         }
@@ -190,14 +182,14 @@ public static class TMPTextShadow {
             : ColorTagRegex.Replace(s, m => ColorTagToAlpha(m.Value));
     private static string ColorTagToAlpha(string tag) {
         int eq = tag.IndexOf('=');
-        if(eq < 0) return "<alpha=#FF>"; 
+        if(eq < 0) return "<alpha=#FF>";
         string val = tag.Substring(eq + 1, tag.Length - eq - 2).Trim().Trim('"', '\'');
-        if(val.Length == 0 || val[0] != '#') return "<alpha=#FF>"; // named colour (red, etc.) → opaque silhouette
+        if(val.Length == 0 || val[0] != '#') return "<alpha=#FF>";
         string hex = val.Substring(1);
         string aa = hex.Length switch {
-            >= 8 => hex.Substring(6, 2),        // RRGGBBAA
-            4 or 5 => $"{hex[3]}{hex[3]}",       // RGBA short form (alpha nibble)
-            _ => "FF",                           // RRGGBB / RGB / malformed → opaque
+            >= 8 => hex.Substring(6, 2),
+            4 or 5 => $"{hex[3]}{hex[3]}",
+            _ => "FF",
         };
         return $"<alpha=#{aa}>";
     }
@@ -214,15 +206,6 @@ public static class TMPTextShadow {
             _ => new Vector2(-spread, -spread),
         };
     }
-    // Drive the drop shadow through the font material's GPU underlay instead of a
-    // sibling TMP. One mesh/draw per label. Offset is font-relative (approximate).
-    // Memo note (both methods below): the fontMaterial getter is NOT a plain
-    // accessor — every access re-runs padding calc + SetVerticesDirty +
-    // SetMaterialDirty, so a memo keyed on its return value pays the exact
-    // cost it exists to skip. Key on fontSharedMaterial instead (plain field
-    // read): after the first fontMaterial access the instanced material IS the
-    // shared material, and the reference only changes on a font swap — which
-    // is precisely when the writes must re-run.
     private static void ApplyUnderlay(
         TextMeshProUGUI text,
         ShadowRoot root,
@@ -234,19 +217,14 @@ public static class TMPTextShadow {
         Material shared = text.fontSharedMaterial;
         if(shared == null) return;
         if(!on) {
-            // Nothing to turn off unless the underlay was enabled on this material.
             if(!ReferenceEquals(shared, root.UnderlayAppliedMat)) return;
             Material off = text.fontMaterial;
             if(off != null) off.DisableKeyword("UNDERLAY_ON");
             root.UnderlayAppliedMat = null;
-            // Invalidate the cache so a later sibling-mode Apply re-runs its
-            // idempotent disable writes against this material.
             root.UnderlayDisabledMat = null;
             return;
         }
         float fs = text.fontSize <= 0f ? 1f : text.fontSize;
-        // Apply runs every frame during the Combo pulse and per keypress from
-        // KeyViewer CSS — skip the material writes when nothing changed.
         if(ReferenceEquals(shared, root.UnderlayAppliedMat)
            && offsetX == root.UnderlayAppliedX && offsetY == root.UnderlayAppliedY
            && fs == root.UnderlayAppliedFontSize && color == root.UnderlayAppliedColor) return;
@@ -264,14 +242,9 @@ public static class TMPTextShadow {
         root.UnderlayAppliedY = offsetY;
         root.UnderlayAppliedFontSize = fs;
         root.UnderlayAppliedColor = color;
-        // Underlay is ON now — a switch back to sibling mode must actually re-run
-        // DisableUnderlay, so clear its "already disabled" memo.
         root.UnderlayDisabledMat = null;
     }
     private static void DisableUnderlay(TextMeshProUGUI text, ShadowRoot root) {
-        // Underlay is permanently off and never re-enabled, so the 6 idempotent
-        // material writes only need to run once per material instance (the
-        // instance changes on a font swap, which re-triggers this).
         Material shared = text.fontSharedMaterial;
         if(shared == null || ReferenceEquals(shared, root.UnderlayDisabledMat)) return;
         Material mat = text.fontMaterial;
@@ -295,14 +268,10 @@ public static class TMPTextShadow {
         public float UnderlayAppliedFontSize;
         public Color UnderlayAppliedColor;
         public CanvasGroup Group;
-        // Memo for StripColorKeepAlpha: keyed by reference on the source string,
-        // which TMP keeps stable while the text is unchanged.
         public string LastSourceText;
         public string StrippedText;
         public readonly List<TextMeshProUGUI> Layers = new();
     }
-    // Cached pointer from a text to its ShadowRoot, attached to the text's own
-    // GameObject so lookup is one GetComponent and the cache can't outlive it.
     private sealed class ShadowLink : MonoBehaviour {
         public ShadowRoot Root;
     }

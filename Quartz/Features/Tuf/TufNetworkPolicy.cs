@@ -1,20 +1,16 @@
 using System.Net;
 using System.Net.Sockets;
-
 namespace Quartz.Features.Tuf;
-
 public static class TufNetworkPolicy {
     private static readonly HashSet<string> DownloadHosts = new(StringComparer.OrdinalIgnoreCase) {
         "api.tuforums.com", "cdn.tuforums.com"
     };
-
     public static bool IsAllowedDownloadUri(Uri uri) {
         if(uri == null || !uri.IsAbsoluteUri || uri.Scheme != Uri.UriSchemeHttps) return false;
         if(!string.IsNullOrEmpty(uri.UserInfo) || !uri.IsDefaultPort) return false;
         if(IPAddress.TryParse(uri.DnsSafeHost, out _)) return false;
         return DownloadHosts.Contains(uri.DnsSafeHost);
     }
-
     public static async Task EnsurePublicHostAsync(Uri uri, CancellationToken token) {
         if(!IsAllowedDownloadUri(uri)) throw new InvalidDataException("Download URL is not an approved TUF HTTPS URL.");
         IPAddress[] addresses = await Dns.GetHostAddressesAsync(uri.DnsSafeHost).ConfigureAwait(false);
@@ -22,7 +18,6 @@ public static class TufNetworkPolicy {
         if(addresses.Length == 0 || addresses.Any(IsNonPublic))
             throw new InvalidDataException("Download host resolved to a non-public address.");
     }
-
     public static bool IsNonPublic(IPAddress address) {
         if(IPAddress.IsLoopback(address)) return true;
         if(address.IsIPv4MappedToIPv6) return IsNonPublic(address.MapToIPv4());

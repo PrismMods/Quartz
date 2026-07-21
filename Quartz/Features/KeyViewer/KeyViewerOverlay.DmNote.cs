@@ -20,8 +20,8 @@ public static partial class KeyViewerOverlay {
         int[] order = new int[specs.Count];
         for(int i = 0; i < order.Length; i++) order[i] = i;
         System.Array.Sort(order, (a, b) => {
-            int byZ = specs[a].ZIndex.CompareTo(specs[b].ZIndex); 
-            return byZ != 0 ? byZ : a.CompareTo(b);                
+            int byZ = specs[a].ZIndex.CompareTo(specs[b].ZIndex);
+            return byZ != 0 ? byZ : a.CompareTo(b);
         });
         foreach(int i in order) AddDmNoteBox(i, specs[i]);
         totalCount = 0;
@@ -31,14 +31,6 @@ public static partial class KeyViewerOverlay {
         AddReorganizeHandle();
         Apply();
     }
-    /// <summary>
-    /// Write each counter's loaded value at build time, not just from UpdateDmNote.
-    ///
-    /// The counter text is created as "0" and UpdateDmNote paints the real number — but Unity does
-    /// not run Update while the window is unfocused, so a game launched in the background showed
-    /// every count as 0 until the user clicked in. The counts were loaded correctly; only the paint
-    /// was deferred. Mirrors UpdateDmNote's display exactly so the first Update is a no-op.
-    /// </summary>
     private static void PaintInitialCounts() {
         foreach(Box box in boxes) {
             DmNoteSpec spec = box.Dm;
@@ -57,24 +49,15 @@ public static partial class KeyViewerOverlay {
     }
     private static void RecordDmPress(Box box, float now) {
         box.Count++;
-        // DM Note's counter press animation: the number pops to animScale and eases back along
-        // the counter's cubic-bezier. Started on the press edge, ticked by the Updater.
         if(box.Value != null && box.Dm is { CounterAnimEnabled: true } spec && spec.CounterAnimScale > 1.001f) {
             if(!box.Bouncing) {
                 box.Bouncing = true;
-                // Captured only from rest: mid-bounce the position is already offset.
                 box.BounceBasePos = box.Value.rectTransform.anchoredPosition;
                 counterBounces.Add(box);
             }
             box.BounceStart = now;
         }
-        // Fed at the same edge as Count, which is what it stands in for on screen — and so not
-        // gated on CountInTotal: that excludes a box from the *shared* readouts below, while this
-        // queue is only ever read by this box. Gated on the flag because nothing trims it when
-        // it is off.
         if(box.PerKeyKps) box.KpsLog.Enqueue(now);
-        // A box outside the total is outside KPS too: pressLog is what every KPS readout
-        // counts, so a foot key left in it would inflate KPS as well as the total.
         if(box.CountInTotal) {
             totalCount++;
             pressLog.Enqueue(now);
@@ -130,7 +113,7 @@ public static partial class KeyViewerOverlay {
         if(statType.Equals("kpsAvg", StringComparison.OrdinalIgnoreCase)) return kpsSamples > 0 ? Mathf.RoundToInt(kpsSum / (float)kpsSamples) : 0;
         if(statType.Equals("kpsMax", StringComparison.OrdinalIgnoreCase)) return kpsMax;
         if(statType.Equals("total", StringComparison.OrdinalIgnoreCase)) return totalCount;
-        return pressLog.Count; 
+        return pressLog.Count;
     }
     private static void UpdateDmNote(float now) {
         while(pressLog.Count > 0 && now - pressLog.Peek() > 1f) pressLog.Dequeue();
@@ -199,10 +182,6 @@ public static partial class KeyViewerOverlay {
             box.GhostPressed = ghostPressed;
             int shown = box.Count;
             if(box.PerKeyKps) {
-                // Same one-second sliding window as simple mode's own PerKeyKps readout, trimmed
-                // lazily against `now`. Trimmed whenever the flag is set rather than only when the
-                // counter is drawn: this box's every press feeds the queue, so an untrimmed one
-                // behind a disabled counter would grow for the whole session.
                 while(box.KpsLog.Count > 0 && now - box.KpsLog.Peek() > 1f) box.KpsLog.Dequeue();
                 shown = box.KpsLog.Count;
             }

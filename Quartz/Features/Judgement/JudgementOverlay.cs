@@ -79,8 +79,8 @@ public static class JudgementOverlay {
         }
         xPlusLabel = CreateJudgementLabel("Judgement_XPlus", PlusMinusPerfectColor);
         xMinusLabel = CreateJudgementLabel("Judgement_XMinus", PlusMinusPerfectColor);
-        xPlusLabel.transform.SetSiblingIndex(PerfectSlot);       
-        xMinusLabel.transform.SetSiblingIndex(PerfectSlot + 2);  
+        xPlusLabel.transform.SetSiblingIndex(PerfectSlot);
+        xMinusLabel.transform.SetSiblingIndex(PerfectSlot + 2);
         xPlusLabel.gameObject.SetActive(false);
         xMinusLabel.gameObject.SetActive(false);
     }

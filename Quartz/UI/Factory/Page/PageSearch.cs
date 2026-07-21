@@ -22,10 +22,6 @@ internal static class PageSearch {
         public bool IsCategory;
     }
     private const int MAX_RESULTS = 40;
-    // Walking every page's full hierarchy on each keystroke is the expensive part of
-    // a search; cache the index (with pre-normalized text) for a typing burst. The
-    // short TTL self-heals rows that appear/disappear at runtime, and destroyed
-    // targets are already null-guarded in Navigate.
     private const float INDEX_TTL_SECONDS = 10f;
     private static List<Entry> cachedIndex;
     private static float cachedIndexTime;

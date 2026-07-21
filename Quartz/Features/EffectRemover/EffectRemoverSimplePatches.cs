@@ -69,10 +69,6 @@ public static partial class EffectRemover {
         private static bool Prepare() => AccessTools.Method(typeof(ffxShakeScreenPlus), "StartEffect") != null;
         private static bool Prefix() => !SimpleShakeActive;
     }
-    // ScreenTile (kaleidoscope/repeat) and ScreenScroll (screen drift) are full-screen post effects that
-    // Enhanced mode strips via the "Filters" event bundle, but Simple mode had no runtime toggle for them.
-    // Both enable a *static* camera component (which can persist across events), and the tile effect arms a
-    // DOTween that re-enables it on complete - so we skip StartEffect AND force the component off to be safe.
     private static void ForceDisableCamBehaviour<T>(ffxPlusBase fx) where T : Behaviour {
         try {
             scrCamera cam = fx?.cam ?? scrCamera.instance;

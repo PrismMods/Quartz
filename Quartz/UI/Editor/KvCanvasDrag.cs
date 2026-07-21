@@ -23,9 +23,6 @@ internal sealed partial class KvCanvas {
             ? pressElement
             : selection.Count > 0 ? selection[0] : null;
         if(dragPrimary != null) dragPrimaryOrigin = new Vector2(dragPrimary.X, dragPrimary.Y);
-        // Snapping targets exclude the whole selection, not just the primary, or a multi-drag
-        // would snap to the elements travelling with it. Cached here because the set cannot
-        // change mid-drag.
         foreach(Visual v in visuals)
             if(!selection.Contains(v.El)) dragOthers.Add(RectOf(v.El));
         axisLatched = false;
@@ -33,10 +30,6 @@ internal sealed partial class KvCanvas {
     private void UpdateDrag(Vector2 layout) {
         if(dragPrimary == null || dragTargets.Count == 0) return;
         Vector2 raw = layout - pressLayout;
-        // Latched once, on the first movement past the threshold, and never re-evaluated: the
-        // axis is a property of the gesture's initial direction. Deltas are layout-space (y
-        // down) because KvSnap.ShiftLocksToX reproduces a DM Note quirk that compares signed
-        // deltas, so a y-up delta would invert it.
         if(!axisLatched) {
             lockToX = KvSnap.ShiftLocksToX(raw.x, raw.y);
             axisLatched = true;

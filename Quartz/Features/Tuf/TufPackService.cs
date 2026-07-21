@@ -1,17 +1,10 @@
 using Quartz.Async;
 using Quartz.Compat.Interface;
 using Quartz.Core;
-
 namespace Quartz.Features.Tuf;
-
-// Backs the TUF "Packs" sub-tab: a searchable list of community packs, and a
-// drill-in view of one pack's levels. Level download/launch is delegated to a
-// TufLevelActionRunner over the shared TufService download service + launcher, so
-// packs and the plain level browser share one cache and never act concurrently.
 public sealed class TufPackService : IRuntimeService {
     public static TufPackService Instance { get; private set; }
     private const int PageSize = 30;
-
     public IReadOnlyList<TufPack> Packs => packs;
     public IReadOnlyList<TufPackItem> PackItems => packItems;
     public IReadOnlyList<TufLevel> PackLevels => packLevels;
@@ -29,7 +22,6 @@ public sealed class TufPackService : IRuntimeService {
     public TufPack SelectedPack { get; private set; }
     public bool IsBusy => actions?.IsBusy ?? false;
     public event Action Changed = delegate { };
-
     private readonly List<TufPack> packs = [];
     private readonly List<TufPackItem> packItems = [];
     private readonly List<TufLevel> packLevels = [];
@@ -44,21 +36,16 @@ public sealed class TufPackService : IRuntimeService {
     private int nextOffset;
     private bool appendFailed;
     private bool disposed;
-
     public void Initialize() {
         Instance = this;
         api = new TufPackApiClient();
         TufService tuf = TufService.Instance;
-        // Same runner, same download service, same install index: a level pulled from
-        // a pack shows up in the Installed view exactly like one from the Levels tab.
         if(tuf != null) actions = new TufLevelActionRunner(packLevels, tuf.Downloads, tuf.Launcher,
             Notify, tuf.RecordInstalledLevel);
     }
-
     public void EnsureLoaded() {
         if(ListState == TufPackListState.Idle) RefreshPacks();
     }
-
     public void SetQuery(string value) {
         string query = TufInput.NormalizeQuery(value);
         if(query == Query) return;
@@ -76,7 +63,6 @@ public sealed class TufPackService : IRuntimeService {
         debounce = new CancellationTokenSource();
         DebouncedRefresh(debounce.Token);
     }
-
     private async void DebouncedRefresh(CancellationToken token) {
         try {
             await Task.Delay(300, token);
@@ -88,29 +74,24 @@ public sealed class TufPackService : IRuntimeService {
             FetchPacks(false);
         } catch(OperationCanceledException) { }
     }
-
     public void SetSort(TufPackSort value) {
         if(Sort == value) return;
         Sort = value;
         RefreshPacks();
     }
-
     public void ToggleAscending() {
         Ascending = !Ascending;
         RefreshPacks();
     }
-
     public void RefreshPacks() {
         CancelDebounce();
         FetchPacks(false);
     }
-
     public void LoadMore() {
         if(HasMore && !LoadingMore
             && (ListState == TufPackListState.Ready || (ListState == TufPackListState.Error && appendFailed)))
             FetchPacks(true);
     }
-
     private async void FetchPacks(bool append) {
         listRequest?.Cancel();
         listRequest?.Dispose();
@@ -136,8 +117,6 @@ public sealed class TufPackService : IRuntimeService {
         catch(Exception e) {
             MainThread.Enqueue(() => {
                 if(!ListRequestIsCurrent(token, generation, query, sort, ascending)) return;
-                // The status card shows only e.Message; keep the full exception in the
-                // log where it is legible and copyable for a bug report.
                 MainCore.Log.Wrn("[TUF] pack list could not be loaded: " + e);
                 LoadingMore = false;
                 appendFailed = append;
@@ -147,7 +126,6 @@ public sealed class TufPackService : IRuntimeService {
             });
         }
     }
-
     private void ApplyPacks(TufPacksPage page, bool append, CancellationToken token, int generation,
         string query, TufPackSort sort, bool ascending) {
         if(!ListRequestIsCurrent(token, generation, query, sort, ascending)) return;
@@ -165,12 +143,10 @@ public sealed class TufPackService : IRuntimeService {
         ListState = packs.Count == 0 ? TufPackListState.Empty : TufPackListState.Ready;
         Notify();
     }
-
     private bool ListRequestIsCurrent(CancellationToken token, int generation, string query,
         TufPackSort sort, bool ascending) =>
         !token.IsCancellationRequested && !disposed && generation == listGeneration
         && query == Query && sort == Sort && ascending == Ascending;
-
     public void OpenPack(TufPack pack) {
         if(pack == null) return;
         detailRequest?.Cancel();
@@ -186,7 +162,6 @@ public sealed class TufPackService : IRuntimeService {
         Notify();
         LoadPackLevels(pack, token, generation);
     }
-
     private async void LoadPackLevels(TufPack pack, CancellationToken token, int generation) {
         try {
             difficulties ??= await api.FetchDifficultiesAsync(token);
@@ -203,7 +178,6 @@ public sealed class TufPackService : IRuntimeService {
             });
         }
     }
-
     private void ApplyPackLevels(TufPack pack, IReadOnlyList<TufPackItem> items, CancellationToken token, int generation) {
         if(!DetailRequestIsCurrent(token, generation, pack)) return;
         packItems.Clear();
@@ -216,22 +190,18 @@ public sealed class TufPackService : IRuntimeService {
         DetailState = packLevels.Count == 0 ? TufPackListState.Empty : TufPackListState.Ready;
         Notify();
     }
-
     public void SetLevelSort(TufPackLevelSort value) {
         if(LevelSort == value) return;
         LevelSort = value;
         Notify();
     }
-
     public void ToggleLevelAscending() {
         LevelAscending = !LevelAscending;
         Notify();
     }
-
     private bool DetailRequestIsCurrent(CancellationToken token, int generation, TufPack pack) =>
         !token.IsCancellationRequested && !disposed && generation == detailGeneration
         && ReferenceEquals(pack, SelectedPack);
-
     public void ClosePack() {
         detailRequest?.Cancel();
         SelectedPack = null;
@@ -241,27 +211,21 @@ public sealed class TufPackService : IRuntimeService {
         DetailError = "";
         Notify();
     }
-
     public void RetryPackLevels() {
         if(SelectedPack != null) OpenPack(SelectedPack);
     }
-
     public void Act(TufLevel level) => actions?.Act(level);
     public void LaunchChart(TufLevel level, string chart) => actions?.LaunchChart(level, chart);
-
     private void InvalidateListRequest() {
         listRequest?.Cancel();
         listGeneration++;
     }
-
     private void CancelDebounce() {
         debounce?.Cancel();
         debounce?.Dispose();
         debounce = null;
     }
-
     private void Notify() => Changed?.Invoke();
-
     public void Dispose() {
         disposed = true;
         debounce?.Cancel();

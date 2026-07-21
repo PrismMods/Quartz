@@ -32,9 +32,6 @@ internal static class ProgressTracker {
             RunStartMapTimeRatio = 0f;
         }
     }
-    // Map-time-space twin of StartProgress: where the run began as a fraction of
-    // the chart's total duration, so the smooth (map-time) bar's start offset
-    // lines up with its fill instead of borrowing the tile-fraction value.
     private static float StartMapTimeRatio(int seqID) {
         try {
             scrLevelMaker lm = scrLevelMaker.instance;
@@ -48,8 +45,6 @@ internal static class ProgressTracker {
                 return Mathf.Clamp01(t / total);
             }
         } catch { }
-        // Checkpoint reverts don't carry a seqID; fall back to the live map-time
-        // ratio, mirroring StartProgress's percentComplete fallback.
         return GameStats.MapTimeRatio;
     }
     private static float StartProgress(scrController c, int seqID) {

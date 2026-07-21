@@ -101,7 +101,7 @@ public static partial class PanelsOverlay {
     public static void UnregisterStat(string statId) {
         if(string.IsNullOrEmpty(statId)) return;
         int removed = addonStats.RemoveAll(s => s.Id == statId);
-        if(removed == 0) return; 
+        if(removed == 0) return;
         CatalogById.Remove(statId);
         CatalogLocaleKeys.Remove(statId);
     }

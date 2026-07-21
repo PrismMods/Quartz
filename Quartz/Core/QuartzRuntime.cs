@@ -70,17 +70,17 @@ public sealed class QuartzRuntime {
     }
     private void MigrateLegacyData() {
         try {
-            string newRoot = Host.QuartzFilePath;          
-            string parent = Path.GetDirectoryName(newRoot); 
+            string newRoot = Host.QuartzFilePath;
+            string parent = Path.GetDirectoryName(newRoot);
             if(string.IsNullOrEmpty(parent)) return;
-            string oldRoot = Path.Combine(parent, "Koren"); 
+            string oldRoot = Path.Combine(parent, "Koren");
             if(!Directory.Exists(oldRoot) ||
                string.Equals(Path.GetFullPath(oldRoot), Path.GetFullPath(newRoot), StringComparison.OrdinalIgnoreCase)) return;
             Directory.CreateDirectory(newRoot);
             int moved = 0;
             foreach(string entry in Directory.GetFileSystemEntries(oldRoot)) {
                 string dest = Path.Combine(newRoot, Path.GetFileName(entry));
-                if(File.Exists(dest) || Directory.Exists(dest)) continue; 
+                if(File.Exists(dest) || Directory.Exists(dest)) continue;
                 try {
                     if(Directory.Exists(entry)) Directory.Move(entry, dest);
                     else File.Move(entry, dest);
@@ -125,11 +125,6 @@ public sealed class QuartzRuntime {
         }
         CreateRootObject();
         RootObject.AddComponent<MainThread>();
-        // Debounced settings writes must never land on a played frame (fsync = felt hitch);
-        // gate them on the live-gameplay signal. See SaveGate. Menu open overrides the veto:
-        // InGame can hold while the user sits in the menu (result screen, a level idling
-        // behind it, scnEditor playmode), and deferring there held their edits hostage until
-        // a restart — they are in a menu, so the write is not landing on a played frame.
         SaveGate.DeferWrites = static () => Features.Status.GameStats.InGame && !UI.UICore.IsOpen;
         Config.Load();
         ProfileManager.Initialize();

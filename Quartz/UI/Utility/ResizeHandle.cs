@@ -30,7 +30,7 @@ public class ResizeHandle : MonoBehaviour {
         ResizeHandleType.Left or ResizeHandleType.Right => ResizeCursorShape.Horizontal,
         ResizeHandleType.Top or ResizeHandleType.Bottom => ResizeCursorShape.Vertical,
         ResizeHandleType.TopRight or ResizeHandleType.BottomLeft => ResizeCursorShape.DiagNESW,
-        _ => ResizeCursorShape.DiagNWSE, 
+        _ => ResizeCursorShape.DiagNWSE,
     };
     private void Awake() {
         var trigger = gameObject.AddComponent<EventTrigger>();

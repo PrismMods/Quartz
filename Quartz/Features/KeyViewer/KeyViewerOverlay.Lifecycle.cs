@@ -56,14 +56,6 @@ public static partial class KeyViewerOverlay {
         BuildDmNote();
         SyncKeysToKeyLimiter();
     }
-    /// <summary>
-    /// Ask the overlay to pick up an edit to the layout document.
-    ///
-    /// Coalesced rather than rebuilt on the spot: a held arrow-key nudge fires an edit every
-    /// 50ms (KvCanvas.NudgeRepeatInterval), and a Rebuild destroys and recreates every
-    /// GameObject, text and CSS effect in the overlay. The editor canvas is already showing
-    /// the edit live, so the overlay only has to catch up once the gesture settles.
-    /// </summary>
     public static void RequestLayoutRebuild() {
         if(root == null || Conf == null) return;
         layoutRebuildPending = true;
@@ -77,13 +69,6 @@ public static partial class KeyViewerOverlay {
             return Conf is { SyncToKeyLimiter: true };
         }
     }
-    /// <summary>
-    /// Flip the Key Limiter sync setting. Both surfaces that expose it — the Key Viewer editor's
-    /// Settings pane and the Key Limiter page's own top-of-section toggle — route through here so
-    /// they write, save, push the keys when it goes on, and raise <see cref="SyncSettingChanged"/>
-    /// in the same order. The event is what makes the other surface and the Key Limiter page's lock
-    /// catch up, so a second copy of this sequence would be one edit away from doing only part of it.
-    /// </summary>
     public static void SetSyncToKeyLimiter(bool value) {
         EnsureConf();
         if(Conf == null) return;
@@ -92,12 +77,6 @@ public static partial class KeyViewerOverlay {
         if(value) SyncKeysToKeyLimiter();
         RaiseSyncSettingChanged();
     }
-    /// <summary>
-    /// Hand the keys the viewer shows to the Key Limiter.
-    ///
-    /// Called from the build paths and from the toggle, never per frame: it walks the layout, and
-    /// a change writes the Key Limiter's settings file.
-    /// </summary>
     public static void SyncKeysToKeyLimiter() {
         EnsureConf();
         if(Conf is not { SyncToKeyLimiter: true }) return;
@@ -109,8 +88,6 @@ public static partial class KeyViewerOverlay {
             if(normalized != 0 && seen.Add(normalized)) result.Add(normalized);
         }
         AddLayoutKeys(Add);
-        // Never an empty set — that blocks every key on the keyboard. A layout with nothing bound
-        // on it yet is not a request for that.
         if(result.Count == 0) return;
         int[] current = Features.KeyLimiter.KeyLimiter.Conf.AllowedKeys;
         if(current != null && current.Length == result.Count) {
@@ -125,11 +102,6 @@ public static partial class KeyViewerOverlay {
         }
         Features.KeyLimiter.KeyLimiter.SetAllowedKeys([.. result]);
     }
-    /// <summary>
-    /// The layout's own bindings, from the tab it has selected rather than the one the editor
-    /// canvas is showing — <see cref="ParseLayoutSpecs"/> renders that tab, and the limiter has to
-    /// allow the keys the viewer draws, not the ones being edited off screen.
-    /// </summary>
     private static void AddLayoutKeys(Action<KeyCode> add) {
         Layout.KvDocument doc = Layout.KvStore.Current;
         if(doc == null) return;
@@ -137,8 +109,6 @@ public static partial class KeyViewerOverlay {
     }
     public static void Apply() {
         if(root == null) return;
-        // Only before the first Rebuild: nothing else can leave the overlay unbuilt, and applying
-        // settings to boxes that do not exist yet would silently do nothing.
         if(!built) {
             Rebuild();
             return;
@@ -150,14 +120,6 @@ public static partial class KeyViewerOverlay {
         ApplyBorderScale(dmScale);
         if(!Conf.DmNoteEffect) rainManager?.Clear();
     }
-    // A key-viewer border is a thin ring sprite scaled down with the overlay. Below
-    // ~1 on-screen pixel the stroke loses coverage and the border reads as fully
-    // transparent — DM Note presets are authored large and used at a low scale, so
-    // their default 3px border falls well under that. Regenerate the ring with a
-    // stroke floored to stay visible; the boost only kicks in once the natural
-    // scaled stroke would drop below the floor, and is capped so it never fills the
-    // key. Ring sprites are cached by (radius, stroke) and each box skips work when
-    // its stroke is unchanged, so this stays cheap during a scale-slider drag.
     private const float MinBorderScreenUnits = 1.4f;
     internal static float ScaledBorderStroke(float radiusUnits, float strokeUnits, float scale) {
         if(strokeUnits <= 0.01f || scale >= 1f) return strokeUnits;
@@ -230,8 +192,6 @@ public static partial class KeyViewerOverlay {
         foreach(Box box in boxes) {
             box.Count = 0;
             box.LastShown = int.MinValue;
-            // Clearing Conf.Counts does not reach a layout box; without this its element
-            // still holds the old count and the next Rebuild seeds it straight back.
             if(box.Source != null && box.Source.Count != 0) {
                 box.Source.Count = 0;
                 layout = true;
@@ -251,23 +211,15 @@ public static partial class KeyViewerOverlay {
         if(!countsDirty) return;
         foreach(Box box in boxes) {
             if(!KeyViewerPersistence.ShouldPersistBoxCount(box.IsStat, box.IsFoot)) continue;
-            // A layout box's count belongs to its element, not to Conf.Counts — the two key
-            // by different names (see Box.Source).
             if(box.Source != null) box.Source.Count = box.Count;
             else Conf.SetCount(box.Name, box.Count);
         }
     }
-    /// <summary>
-    /// Writes only. Every caller is already off the gameplay path — the layout file is the
-    /// one thing here that must never be written mid-run.
-    /// </summary>
     private static bool FlushCounts(bool immediate = false) {
         if(!countsDirty) return false;
         CaptureCounts();
         countsDirty = false;
         if(built) {
-            // Immediate on teardown: a debounced save resumes on the main thread, which is
-            // gone by the time the game has finished unloading.
             if(immediate) Layout.KvStore.Save();
             else Layout.KvStore.RequestSave();
         }

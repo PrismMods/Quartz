@@ -71,8 +71,6 @@ public static class ChatterBlocker {
         scrController controller = scrController.instance;
         if(controller == null) return 0;
         ResetKeyLimiterOverCounter(controller);
-        // Same gate as the RDInput blocks in KeyLimiterPatches — while the Quartz menu is
-        // open, no hits register at all (mouse included), same as those other reads.
         if(KeyLimiter.KeyLimiter.IsMenuBlockActive()) return 0;
         bool chatterActive = IsActive();
         long now = NowMs();
@@ -101,18 +99,6 @@ public static class ChatterBlocker {
         count += CountKeysMissedByGame(controller, now, threshold, chatterActive);
         return count;
     }
-    // scrPlayer.HitAutoFloors calls CountValidKeysPressed twice per batch (once through
-    // ValidInputWasTriggered, once for the hit count), and async input runs one batch per
-    // event tick plus a final per-frame batch. Injected keys are invisible to the game's
-    // own masks, so their press edge must be computed once per frame and then reported to
-    // every call of a single batch — consuming the edge on the first call starves the hit
-    // count, while reporting it to every batch multiplies one press into several hits.
-    // ValidInputWasTriggered itself early-returns unless Input.anyKeyDown or a game-mask
-    // key is down, so on quiet frames (e.g. the frame an injected key is RELEASED) the
-    // game never calls CountValidKeysPressed and ComputeInjectedKeys cannot observe the
-    // release — injectedKeyHeldPrev would keep the key and swallow the next press of the
-    // same key (the consecutive-Tab bug). SampleInjectedKeyReleases, driven every frame
-    // by KeyLimiter's Ticker, clears release edges independently of game calls.
     private static int injectionBatch;
     private static bool inPlayerBatch;
     private static int injectedComputeFrame = -1;
@@ -152,12 +138,6 @@ public static class ChatterBlocker {
                 injectedKeyHeldPrev.Add(key);
                 continue;
             }
-            // When the async keyboard is live it reports every KeyLabel (AllAsyncKeys),
-            // so any key the hook has ever seen — hook-only modifiers included — is already
-            // counted by the game-visible async path above. Injecting it too double-counts it;
-            // the reportedKeysThisFrame guard can't catch that because the async main-loop add
-            // and this injected pass land in different per-tick / per-frame batches. Hook-only
-            // modifiers must NOT be excluded here (that was the RShift/RControl double-count).
             if(asyncActive && KeyLimiter.KeyLimiter.HookEverSaw(key)) {
                 injectedKeyHeldPrev.Remove(key);
                 continue;
@@ -175,10 +155,6 @@ public static class ChatterBlocker {
         }
         return injected;
     }
-    // Removal only: press edges stay exclusively in ComputeInjectedKeys (inside a player
-    // batch), preserving the single-count-per-press guarantee above. Must consult
-    // HookKeyHeld too, or a held hook-only key (mac modifiers) would be cleared every
-    // frame and re-edge into phantom repeat hits.
     private static readonly List<KeyCode> injectedReleaseScratch = [];
     public static void SampleInjectedKeyReleases() {
         if(injectedKeyHeldPrev.Count == 0) return;

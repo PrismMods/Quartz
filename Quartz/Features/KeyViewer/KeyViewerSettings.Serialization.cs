@@ -233,9 +233,6 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
             }
         }
     }
-    // The two legacy strings are preserved verbatim on load so KvMigration.RunOnce can still tell
-    // which mode an un-migrated config was in; everything else — including already-migrated configs
-    // — normalizes to the editor.
     public static string NormalizeMode(string mode) =>
         string.Equals(mode, KvMigrationPlan.LegacyModeDmNote, StringComparison.OrdinalIgnoreCase) ? KvMigrationPlan.LegacyModeDmNote
         : string.Equals(mode, KvMigrationPlan.LegacyModeSimple, StringComparison.OrdinalIgnoreCase) ? KvMigrationPlan.LegacyModeSimple
@@ -273,9 +270,6 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
             SeedFootLabelsFromFlat(legacyText);
         }
     }
-    // Pre-independence saves stored one shared FootKeys[16] / FootKeysText[16]. Seed every
-    // foot count from that array's prefix so each count keeps exactly what it showed before,
-    // then diverges as the user edits it.
     private void SeedFootFromFlat(JArray flat) {
         int[] values = new int[flat.Count];
         try { for(int i = 0; i < values.Length; i++) values[i] = flat[i].Value<int>(); } catch { return; }

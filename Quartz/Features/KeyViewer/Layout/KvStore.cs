@@ -4,14 +4,6 @@ using Quartz.Async;
 using Quartz.Core;
 using Quartz.IO;
 namespace Quartz.Features.KeyViewer.Layout;
-/// <summary>
-/// Owns the KeyViewer layout on disk: load, debounced save, and DM Note import/export.
-///
-/// The layout lives in its own file rather than inside KeyViewer.json. A DM Note preset may
-/// embed base64 font, image and sound blobs (embeddedLocalFonts/Images/Sounds) that run to
-/// megabytes, which has no business in the settings file every other feature shares — and a
-/// standalone file makes an export a copy of what is already on disk.
-/// </summary>
 internal static class KvStore {
     private const string JsonExtension = ".json";
     private const string LayoutFileName = "KeyViewerLayout.json";
@@ -19,10 +11,6 @@ internal static class KvStore {
     private const int MaxCorruptBackups = 99;
     private const string DefaultExportName = "quartz-keyviewer-preset.json";
     private const string FilterName = "JSON Preset";
-    /// <summary>
-    /// DM Note presets embed base64 blobs and are legitimately large, so this is only a floor
-    /// against reading something that was never a preset into memory whole.
-    /// </summary>
     private const long MaxImportBytes = 64L * 1024 * 1024;
     private static readonly object sync = new();
     private static readonly object requestLock = new();
@@ -45,10 +33,6 @@ internal static class KvStore {
         lock(sync) current = doc;
         RequestSave();
     }
-    /// <summary>
-    /// Never throws. <see cref="Current"/> resolves lazily from the render path, so a failure
-    /// here has to degrade to an empty layout rather than take its caller down.
-    /// </summary>
     private static KvDocument Read() {
         string path;
         string json;
@@ -58,8 +42,6 @@ internal static class KvStore {
             json = File.ReadAllText(path);
         } catch(Exception e) {
             Err($"Failed to read the layout file: {e}");
-            // Not quarantined: an unreadable file is usually a locked or transient one, and
-            // the contents may be perfectly good.
             return KvDocument.Empty();
         }
         try {
@@ -70,7 +52,6 @@ internal static class KvStore {
             return KvDocument.Empty();
         }
     }
-    /// <summary>Renames the bad file aside so the next save cannot destroy it.</summary>
     private static void Quarantine(string path) {
         try {
             if(string.IsNullOrEmpty(path) || !File.Exists(path)) return;
@@ -92,9 +73,6 @@ internal static class KvStore {
         CancelPendingSave();
         return SaveCore();
     }
-    // Writes are ordered by a sequence stamped at serialize time so a direct
-    // Save() is never overwritten afterwards by an older debounced write that
-    // was still in flight on the thread pool.
     private static readonly object writeLock = new();
     private static long saveSeq;
     private static long lastWrittenSeq;
@@ -102,9 +80,6 @@ internal static class KvStore {
         if(!TrySerialize(out string json, out long seq)) return false;
         return WriteJson(json, seq);
     }
-    // The document is mutated by the editor on the main thread, so serialize
-    // stays on the caller's (main) thread; only the multi-MB file write +
-    // fsync go off-thread.
     private static bool TrySerialize(out string json, out long seq) {
         try {
             lock(sync) json = Current.ToJson(true);
@@ -119,7 +94,7 @@ internal static class KvStore {
     }
     private static bool WriteJson(string json, long seq) {
         lock(writeLock) {
-            if(seq < lastWrittenSeq) return true; // superseded by a newer write
+            if(seq < lastWrittenSeq) return true;
             try {
                 AtomicFile.WriteAllText(LayoutPath, json);
                 lastWrittenSeq = seq;
@@ -157,9 +132,6 @@ internal static class KvStore {
                     request.Dispose();
                     return;
                 }
-                // The layout serialize + fsync can run to megabytes with embedded preset
-                // blobs; if the debounce comes due mid-run (pause → quick resume, die →
-                // retry), re-arm instead of hitching a played frame.
                 if(SaveGate.ShouldDefer) {
                     _ = SaveAfterDelay(delay, request);
                     return;
@@ -167,9 +139,6 @@ internal static class KvStore {
                 lock(requestLock) {
                     if(ReferenceEquals(saveCts, request)) saveCts = null;
                 }
-                // Serialize on the main thread (the document is live), then
-                // push the fsync-bearing write to the thread pool so no frame
-                // pays for disk latency.
                 if(TrySerialize(out string json, out long seq))
                     _ = Task.Run(() => WriteJson(json, seq));
                 request.Dispose();
@@ -227,8 +196,6 @@ internal static class KvStore {
             Msg(error);
             return false;
         }
-        // Add the preset's tabs to the current layout rather than replacing it, so a multi-tab
-        // setup survives importing one more preset. The first imported tab becomes the selection.
         string added = Current.MergeFrom(doc);
         if(added != null) Current.SelectedTab = added;
         ApplyEmbeddedCss(doc);
@@ -236,14 +203,6 @@ internal static class KvStore {
         Msg("Imported layout from " + path);
         return true;
     }
-    /// <summary>
-    /// Move the imported preset's own custom CSS into the CSS engine's state, so a CSS-styled
-    /// DM Note preset renders as it does in DM Note rather than as bare boxes.
-    ///
-    /// Only when the user has no CSS of their own: import now ADDS tabs rather than replacing the
-    /// document, and the CSS is global, so overwriting it would restyle every existing tab from a
-    /// preset that was only meant to add one. A user starting empty still gets the preset's look.
-    /// </summary>
     private static void ApplyEmbeddedCss(KvDocument doc) {
         KeyViewerSettings conf = KeyViewerOverlay.Conf;
         if(conf == null) return;
@@ -273,11 +232,6 @@ internal static class KvStore {
             return false;
         }
     }
-    /// <summary>
-    /// Import through the native picker, the way TUF's folder picker does. On an exclusive-fullscreen
-    /// macOS game the dialog opens on its own Space — the same behaviour every other picker in the
-    /// mod has — so the library folder (see <see cref="LibraryFiles"/>) stays as the reliable path.
-    /// </summary>
     internal static bool Import(out string error) {
         error = null;
         string picked;
@@ -305,10 +259,8 @@ internal static class KvStore {
         }
         return string.IsNullOrEmpty(picked) || ExportToPath(EnsureJsonExtension(picked), out error, includeCounts);
     }
-    /// <summary>The dialog does not always append the filter extension, and DM Note lists only .json.</summary>
     private static string EnsureJsonExtension(string path) =>
         string.IsNullOrEmpty(Path.GetExtension(path)) ? path + JsonExtension : path;
-    /// <summary>Open the presets folder in the OS file browser. No Space switch — it launches Finder.</summary>
     internal static void RevealLibrary() {
         try {
             Directory.CreateDirectory(LibraryDir);
@@ -317,14 +269,6 @@ internal static class KvStore {
             Msg("[KeyViewer] Reveal failed: " + e.Message);
         }
     }
-    /// <summary>
-    /// Zero every element's press counter in a serialized layout.
-    ///
-    /// DM Note persists live per-key counts into presets, so a faithful export ships the
-    /// author's key counts to anyone they send the file to. Operates on a re-parsed copy so
-    /// the in-memory document — and the user's own counts — are untouched. `count` stays
-    /// present because DM Note's deserializer requires it on every position object.
-    /// </summary>
     private static string StripCounts(string json) {
         JObject root = JObject.Parse(json);
         foreach(string table in new[] { "keyPositions", "statPositions", "graphPositions", "knobPositions" }) {
@@ -339,17 +283,7 @@ internal static class KvStore {
         }
         return root.ToString(Formatting.Indented);
     }
-    /// <summary>
-    /// A preset folder inside the mod's own data, NOT an OS file dialog.
-    ///
-    /// The native dialog (UnityFileDialog) opens on its own macOS Space, so from an exclusive-
-    /// fullscreen game pressing Import/Export flips the user to another desktop and strands the
-    /// dialog there — it is unusable. Import and export therefore work against a fixed, in-game
-    /// browsable folder instead. Users drop a preset in here to import it and find their exports
-    /// here to hand to DM Note.
-    /// </summary>
     internal static string LibraryDir => Path.Combine(MainCore.Paths.RootPath, "Presets");
-    /// <summary>The folder to name to a user with no presets yet, created so it is there to open.</summary>
     internal static string LibraryHint {
         get {
             try {
@@ -368,11 +302,6 @@ internal static class KvStore {
             }
         }
     }
-    /// <summary>
-    /// Every .json in the library folder and the user's Downloads, newest first, as (path, name).
-    /// Downloads is included because that is where a preset shared from DM Note or a browser lands,
-    /// so it can be imported without the user first moving it anywhere.
-    /// </summary>
     internal static IReadOnlyList<(string Path, string Name)> LibraryFiles() {
         List<(string Path, string Name)> found = [];
         HashSet<string> seen = new(StringComparer.OrdinalIgnoreCase);
@@ -381,7 +310,6 @@ internal static class KvStore {
             try {
                 if(!Directory.Exists(dir)) return;
                 foreach(string file in Directory.EnumerateFiles(dir, "*" + JsonExtension)) {
-                    // The live layout is not a preset the user would re-import over itself.
                     if(string.Equals(Path.GetFileName(file), LayoutFileName, StringComparison.OrdinalIgnoreCase)) continue;
                     if(!seen.Add(Path.GetFullPath(file))) continue;
                     found.Add((file, tag + Path.GetFileName(file)));
@@ -402,10 +330,6 @@ internal static class KvStore {
             return DateTime.MinValue;
         }
     }
-    /// <summary>
-    /// Write the layout into the library folder under a fresh, non-clobbering name, reporting the
-    /// path so the UI can point the user at it. Replaces the SaveFile dialog.
-    /// </summary>
     internal static bool ExportToLibrary(bool includeCounts, out string savedPath, out string error) {
         savedPath = null;
         error = null;
@@ -426,8 +350,6 @@ internal static class KvStore {
             candidate = Path.Combine(LibraryDir, baseName + "-" + n + JsonExtension);
         return candidate;
     }
-    // MainCore.Log resolves through the runtime, which is absent before init and during
-    // teardown; Read must hold its never-throw guarantee even then.
     private static void Msg(string message) {
         try {
             MainCore.Log.Msg("[KeyViewer] " + message);

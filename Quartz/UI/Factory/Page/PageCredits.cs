@@ -16,8 +16,6 @@ internal static class PageCredits {
         subtitleTmp.text = "by koren, sbrothers7, and more.";
         subtitleTmp.color = new Color(1f, 1f, 1f, 0.45f);
         subtitleTmp.gameObject.AddComponent<TextLocalization>().Init("CREDITS_SUBTITLE", "by koren, sbrothers7, and more.");
-        // The Key Viewer editor's icons are DM Note's own artwork, reused under its GPL-3.0 terms.
-        // Attribution is a licence condition, not a courtesy.
         string creditsBody =
             "<color=#FFFFFF66>UI based on Overlayer (modlist.org)</color>\n" +
             "<color=#FFFFFF66>Key Viewer editor icons by DM Note (lee-sihun)</color>\n" +

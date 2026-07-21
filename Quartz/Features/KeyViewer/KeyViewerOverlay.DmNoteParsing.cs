@@ -62,23 +62,8 @@ public static partial class KeyViewerOverlay {
         ApplyCssToSpecs(result);
         return result;
     }
-    /// <summary>
-    /// Shift <paramref name="specs"/> into canvas space and size the canvas around them.
-    /// Shared with the layout spec source, which must land pixel-for-pixel where the same
-    /// preset does in DM Note mode.
-    /// </summary>
     private static void FinishDmSpecs(List<DmNoteSpec> specs, float minX, float minY, float maxX, float maxY) =>
         FinishDmSpecs(specs, minX, minY, maxX, maxY, (minX + maxX) * 0.5f, minY);
-    /// <summary>
-    /// The anchor is the document-space point the on-screen mapping is pinned to: the point that
-    /// lands at the root's horizontal pivot (<paramref name="anchorCx"/>) and its bottom edge
-    /// (<paramref name="anchorMinY"/>). The preset path passes the live bounds (a static layout,
-    /// so the distinction never shows); the editor-layout path passes the tab's frozen
-    /// <see cref="Layout.KvDocument.TryGetRenderAnchor"/> so an edit that grows the bounding box
-    /// resizes the canvas around the content WITHOUT moving every already-placed element on
-    /// screen. The canvas rect itself still tracks live bounds — it is the coordinate mapping,
-    /// not the rect, that must not chase the bounds.
-    /// </summary>
     private static void FinishDmSpecs(
         List<DmNoteSpec> specs, float minX, float minY, float maxX, float maxY,
         float anchorCx, float anchorMinY
@@ -89,9 +74,6 @@ public static partial class KeyViewerOverlay {
         float topOffset = track + padding;
         dmCanvasWidth = Mathf.Max(60f, maxX - minX) + padding * 2f;
         dmCanvasHeight = Mathf.Max(60f, maxY - minY) + padding * 2f + track;
-        // Children position against the root's bottom-center pivot, so a spec's on-screen spot is
-        // (spec.X - width/2, spec.Y). Solving for "anchorCx sits at the pivot, anchorMinY at the
-        // bottom padding" keeps the mapping independent of where the bounds happen to be.
         float offsetX = dmCanvasWidth * 0.5f - anchorCx;
         float offsetY = topOffset - anchorMinY;
         for(int i = 0; i < specs.Count; i++) {
@@ -244,13 +226,10 @@ public static partial class KeyViewerOverlay {
         spec.RainGlowOn = JBool(p, "noteGlowEnabled", false);
         spec.RainGlowSize = Mathf.Clamp(JFloat(p, "noteGlowSize", 20f), 0f, 50f);
         ResolveDmNoteColors(p, true, out spec.RainGlowTop, out spec.RainGlowBottom);
-        // Quartz extension; DM Note ignores unknown keys, so it rides through its round trip.
         spec.RainShadowOn = JBool(p, "quartzNoteShadow", false);
         spec.RainShadowColor = HexToColor(JStr(p, "quartzNoteShadowColor", "rgba(0, 0, 0, 0.5)"), 0.5f);
         spec.RainShadowX = Mathf.Clamp(JFloat(p, "quartzNoteShadowX", 3f), -64f, 64f);
         spec.RainShadowY = Mathf.Clamp(JFloat(p, "quartzNoteShadowY", -3f), -64f, 64f);
-        // DM Note's own note border and corner radius (noteBorder*). Width 0 = no border; the
-        // border's opacity is its own field, independent of the note's.
         spec.NoteBorderWidth = Mathf.Clamp(JFloat(p, "noteBorderWidth", 0f), 0f, 20f);
         Color noteBorder = HexToColor(JStr(p, "noteBorderColor", "#FFFFFF"), 1f);
         noteBorder.a = Mathf.Clamp01(JFloat(p, "noteBorderOpacity", 100f) / 100f);
@@ -261,11 +240,9 @@ public static partial class KeyViewerOverlay {
             _ => 0,
         };
         spec.NoteRadius = Mathf.Clamp(JFloat(p, "noteBorderRadius", 0f), 0f, 60f);
-        // DM Note's per-element font styling, for the label...
         spec.LabelFontStyles = DmFontStyles(
             JInt(p, "fontWeight", 400), JBool(p, "fontItalic", false),
             JBool(p, "fontUnderline", false), JBool(p, "fontStrikethrough", false));
-        // ...and the counter's own set, plus its press animation (default-on in DM Note).
         if(counter != null) {
             spec.CounterFontStyles = DmFontStyles(
                 JInt(counter, "fontWeight", 400), JBool(counter, "fontItalic", false),
@@ -281,8 +258,6 @@ public static partial class KeyViewerOverlay {
                 }
             }
         }
-        // JipperKeyViewer's press animation, as a plain per-element field. Routed through the CSS
-        // state transform so the one press path applies it; explicit CSS wins when it set a scale.
         float pressScale = Mathf.Clamp(JFloat(p, "quartzPressScale", 1f), 0.25f, 2f);
         if(Mathf.Abs(pressScale - 1f) > 0.001f && spec.ActiveScale == Vector2.one)
             spec.ActiveScale = new Vector2(pressScale, pressScale);
@@ -348,7 +323,6 @@ public static partial class KeyViewerOverlay {
         KeyCode key = ResolveDmNoteKeyCode(keyName);
         return key == KeyCode.None ? keyName : KeyCodeShortLabel(key);
     }
-    /// <summary>Permissive DM Note globalKey → KeyCode. Inverse of <see cref="Layout.KvKeyNames.ToGlobalKey"/>.</summary>
     internal static KeyCode ResolveGlobalKey(string name) => ResolveDmNoteKeyCode(name);
     private static KeyCode ResolveDmNoteKeyCode(string name) {
         if(string.IsNullOrEmpty(name)) return KeyCode.None;
@@ -398,9 +372,6 @@ public static partial class KeyViewerOverlay {
             case "LALT":
             case "LEFTALT": return KeyCode.LeftAlt;
             case "INS": return KeyCode.Insert;
-            // DM Note writes Print Screen as "PRINT SCREEN"; Unity's enum member is Print (no
-            // PrintScreen), so Enum.TryParse misses it and the key would render as its raw name
-            // and never match input. SysReq is the same physical key.
             case "PRINTSCREEN":
             case "PRTSC":
             case "PRTSCR":
@@ -503,7 +474,6 @@ public static partial class KeyViewerOverlay {
         if(t == null || t.Type == JTokenType.Null) return def;
         try { return t.ToObject<float>(); } catch { return def; }
     }
-    /// <summary>CSS font styling to TMP flags. Weight 600+ is bold, the browser convention.</summary>
     private static TMPro.FontStyles DmFontStyles(int weight, bool italic, bool underline, bool strikethrough) {
         TMPro.FontStyles styles = TMPro.FontStyles.Normal;
         if(weight >= 600) styles |= TMPro.FontStyles.Bold;

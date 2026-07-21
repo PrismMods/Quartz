@@ -3,13 +3,10 @@ using UnityEngine;
 using UnityEngine.UI;
 namespace Quartz.UI.Editor;
 internal sealed partial class KvCanvas {
-    // DM Note's ResizeHandles geometry: 10px corners, 8x18 edges, and a 18px hit box that
-    // deliberately overhangs the drawn handle.
     private const float HandleCorner = 10f;
     private const float HandleEdgeThick = 8f;
     private const float HandleEdgeLong = 18f;
     private const float HandleHitSize = 18f;
-    /// <summary>nw n ne w e sw s se, as (x, y) directions. y is down, so -1 is north.</summary>
     private static readonly (int dx, int dy)[] HandleDirs = [
         (-1, -1), (0, -1), (1, -1),
         (-1, 0), (1, 0),
@@ -41,8 +38,6 @@ internal sealed partial class KvCanvas {
             rect.pivot = new Vector2(0.5f, 0.5f);
             Image img = obj.AddComponent<Image>();
             img.color = UIColors.ObjectActive;
-            // Hit-testing is done against the layout rect, not the raycaster, so the drawn
-            // handle can stay smaller than the grab area.
             img.raycastTarget = false;
             handles[i] = rect;
         }

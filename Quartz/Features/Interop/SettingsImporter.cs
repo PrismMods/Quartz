@@ -130,7 +130,7 @@ public static class SettingsImporter {
                 string id = ReadInfoJsonId(dir);
                 string folder = Path.GetFileName(dir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
                 if(!V1FolderMatches(spec, id, folder)) continue;
-                if(!File.Exists(Path.Combine(dir, "Settings.xml"))) continue; 
+                if(!File.Exists(Path.Combine(dir, "Settings.xml"))) continue;
                 string resolvedId = string.IsNullOrEmpty(id) ? "KorenResourcePack" : id;
                 return new SettingsImportOption {
                     Source = SettingsImportSource.KorenResourcePackV1,

@@ -143,11 +143,11 @@ public static class SongTitleOverlay {
         return HexColorTagRegex.Replace(s, m => {
             string hex = m.Groups[1].Value;
             int valid = hex.Length switch {
-                >= 8 => 8,      
-                6 or 7 => 6,    
-                4 or 5 => 4,    
-                3 => 3,         
-                _ => 0,         
+                >= 8 => 8,
+                6 or 7 => 6,
+                4 or 5 => 4,
+                3 => 3,
+                _ => 0,
             };
             if(valid == 0) return string.Empty;
             return valid == hex.Length ? m.Value : $"<color=#{hex.Substring(0, valid)}>";
@@ -189,8 +189,6 @@ public static class SongTitleOverlay {
                 if(!TakesOverTitle || !GameStats.InGame) return;
                 int id = __instance.GetInstanceID();
                 if(!hiddenTitleGraphics.TryGetValue(id, out Graphic g)) {
-                    // First sighting of this HUD instance (scene load): drop entries
-                    // for destroyed instances so the cache doesn't grow all session.
                     PruneDestroyedTitleGraphics();
                     g = __instance.GetComponent<Graphic>();
                     hiddenTitleGraphics[id] = g;

@@ -9,18 +9,8 @@ using TMPro;
 namespace Quartz.Features.KeyViewer;
 public static partial class KeyViewerOverlay {
     private sealed class Updater : MonoBehaviour {
-        /// <summary>
-        /// The InGame veto is for a run being *played*, not for whichever scene the mod menu was
-        /// opened over. gameworld && !paused can hold while the user sits in the menu — the
-        /// result screen, a level idling behind it, a custom level's scnEditor playmode — and
-        /// there the veto turned every layout edit into "doesn't apply until the game restarts"
-        /// (nothing re-requests the rebuild once they leave the scene). Menu open means the
-        /// user is in a menu: the rebuild hitch is fine, and it is their edit being applied.
-        /// </summary>
         private static bool CanRebuild => !GameStats.InGame || Quartz.UI.UICore.IsOpen;
         private void LateUpdate() {
-            // A finished font/image download triggers a full Rebuild — a visible
-            // hitch. Hold the flag until the player is out of gameplay.
             if(cssDownloadArrived && CanRebuild) {
                 cssDownloadArrived = false;
                 if(Conf != null) {
@@ -28,8 +18,6 @@ public static partial class KeyViewerOverlay {
                     return;
                 }
             }
-            // Same reasoning as the download above: a layout edit costs a full Rebuild, so it
-            // waits for the debounce to settle and for the player to be out of gameplay.
             if(layoutRebuildPending && Time.unscaledTime >= layoutRebuildAt && CanRebuild) {
                 layoutRebuildPending = false;
                 if(Conf != null) {
@@ -40,12 +28,6 @@ public static partial class KeyViewerOverlay {
             if(cssFx.Count > 0 && root != null && root.gameObject.activeSelf) CssTick(Time.unscaledTime);
             if(counterBounces.Count > 0) TickCounterBounces(Time.unscaledTime);
         }
-        /// <summary>
-        /// DM Note's counter press animation: pop to the spec's scale on the press edge, ease
-        /// back to 1 along its cubic-bezier. Scaling happens around the counter's visual centre —
-        /// its pivot is layout-driven (often a corner), so the position is compensated per frame
-        /// from a base captured at the pop.
-        /// </summary>
         private static void TickCounterBounces(float now) {
             for(int i = counterBounces.Count - 1; i >= 0; i--) {
                 Box box = counterBounces[i];
@@ -72,11 +54,6 @@ public static partial class KeyViewerOverlay {
             counterBounces[index].Bouncing = false;
             counterBounces.RemoveAt(index);
         }
-        /// <summary>
-        /// CSS cubic-bezier(x1, y1, x2, y2) easing: solve the curve parameter whose X is
-        /// <paramref name="t"/> (Newton, with the curve's monotonic X), return its Y. Y control
-        /// points may leave [0,1] — that is what makes an overshoot preset bounce.
-        /// </summary>
         private static float CubicBezierEase(Vector4 b, float t) {
             if(t <= 0f) return 0f;
             if(t >= 1f) return 1f;

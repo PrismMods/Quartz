@@ -1,14 +1,7 @@
 using Quartz.Async;
 using Quartz.Core;
 using Quartz.UI;
-
 namespace Quartz.Features.Tuf;
-
-// Drives download/extract/launch for a single owner list of levels. Both the
-// Levels browser (TufService) and the Packs browser (TufPackService) reuse this
-// so the per-item state machine lives in exactly one place. The runner shares the
-// download service and launcher across owners: the download semaphore and the
-// single launcher instance keep two browsers from acting at the same time.
 internal sealed class TufLevelActionRunner {
     private readonly IReadOnlyList<TufLevel> owner;
     private readonly TufDownloadService downloads;
@@ -18,9 +11,7 @@ internal sealed class TufLevelActionRunner {
     private CancellationTokenSource actionRequest;
     private int activeLevelId;
     private bool disposed;
-
     public bool IsBusy => activeLevelId != 0;
-
     public TufLevelActionRunner(IReadOnlyList<TufLevel> owner, TufDownloadService downloads,
         TufLevelLauncher launcher, Action notify, Action<TufLevel> installed = null) {
         this.owner = owner;
@@ -29,7 +20,6 @@ internal sealed class TufLevelActionRunner {
         this.notify = notify;
         this.installed = installed;
     }
-
     public void Act(TufLevel level) {
         if(level == null || IsBusy
             || level.State is TufItemState.Downloading or TufItemState.Extracting or TufItemState.Loading) return;
@@ -38,8 +28,6 @@ internal sealed class TufLevelActionRunner {
             return;
         }
         activeLevelId = level.Id;
-        // InstallFolder wins over the active root: a level installed before the
-        // library moved (or one a move skipped) still lives at its own path.
         if(downloads.TryGetCachedChart(level.Id, level.InstallFolder, out string cached)) {
             IReadOnlyList<string> charts = downloads.ListCachedCharts(level.Id, level.InstallFolder);
             if(charts.Count > 1) EnterChoose(level, charts);
@@ -48,9 +36,6 @@ internal sealed class TufLevelActionRunner {
         }
         if(level.DownloadUri == null) {
             activeLevelId = 0;
-            // The base game's own charts have no download: launch the real in-game
-            // level, or send the player to buy the DLC it needs, instead of leaving a
-            // dead "Unavailable" button.
             switch(TufMainLevel.Resolve(level, out string codeOrUrl)) {
                 case TufMainLevel.TufMainAction.Play: LaunchMainLevel(level, codeOrUrl); break;
                 case TufMainLevel.TufMainAction.BuyDlc: TufMainLevel.OpenStore(codeOrUrl); break;
@@ -63,9 +48,6 @@ internal sealed class TufLevelActionRunner {
         Update(level, TufItemState.Downloading, 0f, "");
         Download(level, actionRequest.Token);
     }
-
-    // Base-game levels aren't files we launch through the editor; they load in-game
-    // via the game's own EnterLevel path. Success tears the menu down with the scene.
     private void LaunchMainLevel(TufLevel level, string code) {
         MainCore.Log.Msg($"[TUF] opening base-game level {code} for #{level.Id}");
         if(TufMainLevel.Launch(code)) {
@@ -75,8 +57,6 @@ internal sealed class TufLevelActionRunner {
         level.Error = MainCore.Tr.Get("TUF_MAIN_LAUNCH_FAILED", "Could not open the base-game level.");
         notify();
     }
-
-    // Launch the chart the user picked from the ChooseChart list.
     public void LaunchChart(TufLevel level, string chart) {
         if(level == null || IsBusy || level.State != TufItemState.ChooseChart) return;
         if(level.Charts == null || !level.Charts.Contains(chart, StringComparer.Ordinal)) return;
@@ -84,7 +64,6 @@ internal sealed class TufLevelActionRunner {
         ExitChoose(level, notify: false);
         Launch(level, chart);
     }
-
     private void EnterChoose(TufLevel level, IReadOnlyList<string> charts) {
         activeLevelId = 0;
         foreach(TufLevel other in owner)
@@ -96,14 +75,12 @@ internal sealed class TufLevelActionRunner {
         level.ChartsRoot = level.InstallFolder ?? downloads.LevelFolder(level.Id);
         notify();
     }
-
     private void ExitChoose(TufLevel level, bool notify = true) {
         level.Charts = null;
         level.ChartsRoot = null;
         if(level.State == TufItemState.ChooseChart) level.State = TufItemState.Load;
         if(notify) this.notify();
     }
-
     private async void Download(TufLevel level, CancellationToken token) {
         int lastPercent = -2;
         try {
@@ -116,8 +93,6 @@ internal sealed class TufLevelActionRunner {
             }, token);
             MainThread.Enqueue(() => {
                 if(disposed || token.IsCancellationRequested) return;
-                // DownloadAsync stamped level.InstallFolder; record it before the
-                // state flips so the Installed view sees a complete entry.
                 installed?.Invoke(level);
                 FinishAction(level, TufItemState.Load, "");
             });
@@ -126,15 +101,11 @@ internal sealed class TufLevelActionRunner {
         }
         catch(Exception e) {
             MainThread.Enqueue(() => {
-                // The card only shows this on hover (and a missing glyph renders as a
-                // box), so write the full exception to the log where it is legible and
-                // copyable for a bug report.
                 MainCore.Log.Wrn($"[TUF] level {level.Id} could not be downloaded or extracted: {e}");
                 FinishAction(level, TufItemState.Retry, e.Message);
             });
         }
     }
-
     private void Launch(TufLevel level, string chart) {
         if(disposed) return;
         Update(level, TufItemState.Loading, 1f, "");
@@ -142,15 +113,11 @@ internal sealed class TufLevelActionRunner {
             if(disposed) return;
             if(!success) {
                 MainCore.Log.Wrn("[TUF] automatic play failed: " + error);
-                // The launcher closed the settings menu before loading; bring it back
-                // so the user lands on the TUF page with the Retry button and error
-                // instead of a bare scene that looks frozen.
                 UICore.Open(true);
             }
             FinishAction(level, success ? TufItemState.Load : TufItemState.Retry, error);
         }));
     }
-
     private void FinishAction(TufLevel level, TufItemState state, string error) {
         activeLevelId = 0;
         if(disposed) return;
@@ -161,7 +128,6 @@ internal sealed class TufLevelActionRunner {
         }
         notify();
     }
-
     private void Update(TufLevel level, TufItemState state, float progress, string error) {
         if(disposed || !owner.Contains(level)) return;
         level.State = state;
@@ -169,9 +135,7 @@ internal sealed class TufLevelActionRunner {
         level.Error = error ?? "";
         notify();
     }
-
     public void Cancel() => actionRequest?.Cancel();
-
     public void Dispose() {
         disposed = true;
         actionRequest?.Cancel();

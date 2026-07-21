@@ -7,7 +7,6 @@ namespace Quartz.UI.Editor;
 internal sealed partial class KvCanvas {
     private const float NudgeRepeatDelay = 0.4f;
     private const float NudgeRepeatInterval = 0.05f;
-    /// <summary>Static so a copy survives rebinding and can be pasted onto another tab.</summary>
     private static readonly List<KvElement> clipboard = [];
     private static readonly (KeyCode key, int dx, int dy)[] Arrows = [
         (KeyCode.LeftArrow, -1, 0),
@@ -66,15 +65,6 @@ internal sealed partial class KvCanvas {
         }
         HandleNudge();
     }
-    /// <summary>
-    /// Zoom on the bare +/-/0 keys. This is the keyboard's half of keeping zoom reachable now that
-    /// the wheel pans: a ctrl-based binding would not exist on macOS, where the modifier cannot be
-    /// read at all.
-    ///
-    /// Each direction lists several codes because which one arrives is not knowable here: `+` is
-    /// shifted `=` on most layouts and its own key on a keypad, and the shift state that decides
-    /// between them is exactly what this surface cannot see.
-    /// </summary>
     private void HandleZoomKeys() {
         if(doc == null || TextInputFocused() || (InputSuppressed?.Invoke() ?? false)) return;
         if(AnyKeyDown(ZoomInKeys)) {
@@ -120,12 +110,8 @@ internal sealed partial class KvCanvas {
             return;
         }
     }
-    /// <summary>Nudges move by one unit, not one grid step, so an element can be placed off-grid.</summary>
     private void ApplyNudge(int dx, int dy) {
         float now = Time.unscaledTime;
-        // PushNudge throws the snapshot away inside its coalescing window, so serializing the
-        // document on every repeat would be pure waste. Attempting at half the window is always
-        // more often than the model can accept, so no push is ever missed.
         if(now - nudgeSnapshotAt >= KvHistory.NudgeCoalesceSeconds * 0.5f) {
             nudgeSnapshotAt = now;
             try {
@@ -209,8 +195,6 @@ internal sealed partial class KvCanvas {
             return null;
         }
     }
-    /// <summary>Adopts a reparsed snapshot in place. Deliberately not routed through
-    /// <see cref="Bind"/>, which would clear the history it was just driven by.</summary>
     private void Restore(string snapshot) {
         if(snapshot == null) return;
         KvDocument restored;

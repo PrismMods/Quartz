@@ -18,7 +18,7 @@ public readonly struct CssColor {
 public sealed class CssGradient {
     public readonly List<CssColor> Stops = new();
     public float AngleDeg = 180f;
-    public float AnimSeconds;   
+    public float AnimSeconds;
     public bool Animated;
     public bool ClipText;
 }
@@ -195,7 +195,7 @@ public sealed class KeyViewerStylesheet {
         foreach(string raw in SplitTopLevel(selectorList, ',')) {
             string sel = raw.Trim();
             if(sel.Length == 0) { continue; }
-            int pseudo = 0; 
+            int pseudo = 0;
             string baseSel = sel;
             int dc = sel.IndexOf("::", StringComparison.Ordinal);
             int sc = dc >= 0 ? dc : sel.IndexOf(':', StringComparison.Ordinal);
@@ -206,7 +206,7 @@ public sealed class KeyViewerStylesheet {
                 } else if(tail.Contains("after")) {
                     pseudo = 2;
                 } else {
-                    continue; 
+                    continue;
                 }
                 baseSel = sel.Substring(0, sc);
             }
@@ -218,8 +218,8 @@ public sealed class KeyViewerStylesheet {
                 _graph.Add(classes, decls);
                 IsEmpty = false;
             }
-            if(!counter && !hasState) { continue; } 
-            int state = -1; 
+            if(!counter && !hasState) { continue; }
+            int state = -1;
             if(lower.IndexOf("inactive", StringComparison.Ordinal) >= 0) { state = 0; }
             else if(lower.IndexOf("active", StringComparison.Ordinal) >= 0) { state = 1; }
             if(counter) {
@@ -254,7 +254,7 @@ public sealed class KeyViewerStylesheet {
     }
     internal static void Overlay(Dictionary<string, string> into, Dictionary<string, string> from) {
         foreach(KeyValuePair<string, string> kv in from) {
-            into[kv.Key] = kv.Value; 
+            into[kv.Key] = kv.Value;
         }
     }
     public CssKeyStyleSet ResolveKey(string? className) {
@@ -489,7 +489,6 @@ public sealed class KeyViewerStylesheet {
     private static string? FirstFamily(string v) {
         foreach(string part in SplitTopLevel(v, ',')) {
             string fam = part.Trim().Trim('"', '\'').Trim();
-            // Skip generic fallbacks; the runtime can't synthesise them anyway.
             if(fam.Length > 0
                 && !fam.Equals("sans-serif", StringComparison.OrdinalIgnoreCase)
                 && !fam.Equals("serif", StringComparison.OrdinalIgnoreCase)
@@ -562,7 +561,6 @@ public sealed class KeyViewerStylesheet {
             if(TryLen(tok, out float n)) { vals.Add(n); }
         }
         if(vals.Count == 0) { return; }
-        // CSS shorthand: 1 = all, 2 = T/B + L/R, 3 = T + L/R + B, 4 = T R B L.
         float top = vals[0];
         float right = vals.Count >= 2 ? vals[1] : vals[0];
         float bottom = vals.Count >= 3 ? vals[2] : vals[0];
@@ -633,7 +631,6 @@ public sealed class KeyViewerStylesheet {
         }
         return f.Has ? f : null;
     }
-    // filter:/backdrop-filter: blur(Npx) → N.
     private static bool FilterBlur(string v, out float px) {
         px = 0f;
         foreach((string name, string args) in Functions(v)) {
@@ -641,7 +638,6 @@ public sealed class KeyViewerStylesheet {
         }
         return false;
     }
-    // brightness(1.2) or brightness(120%) → 1.2.
     private static bool TryAmount(string v, out float amount) {
         string t = v.Trim();
         if(t.EndsWith("%", StringComparison.Ordinal)) {
@@ -876,7 +872,6 @@ public sealed class KeyViewerStylesheet {
             default: color = CssColor.Unset; return false;
         }
     }
-    // ---- declaration / structural parsing -----------------------------------
     internal static Dictionary<string, string> ParseDeclarations(string body) {
         var d = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach(string declRaw in SplitTopLevel(body, ';')) {
@@ -943,8 +938,6 @@ public sealed class KeyViewerStylesheet {
         return -1;
     }
 }
-// Walks a CSS string into (prelude, body) rule pairs, honouring nested braces so
-// @media/@keyframes blocks are returned whole rather than split mid-block.
 internal static class CssReader {
     public static IEnumerable<(string prelude, string body)> Rules(string css) {
         int i = 0, n = css.Length;

@@ -7,10 +7,6 @@ using UnityEngine.UI;
 using TMPro;
 namespace Quartz.Features.KeyViewer;
 public static partial class KeyViewerOverlay {
-    // The Simple-mode box builders (AddKey / AddStat / AddFootKey and the foot drag handle) were
-    // removed with Simple mode: the editor renders every element through the DM Note path. The
-    // shared primitives below — NewBoxVisual / NewBox / NewText / LabelFor / KeyCodeShortLabel and
-    // the main reorganize handle — are still used by that path and by the settings preview.
     private static void AddReorganizeHandle() =>
         dragObj = BuildReorganizeHandle(root, "Drag", "KEYVIEWER_TITLE", "Key Viewer");
     private static GameObject BuildReorganizeHandle(RectTransform target, string name,

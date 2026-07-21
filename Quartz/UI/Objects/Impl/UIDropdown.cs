@@ -89,12 +89,6 @@ public class UIDropDown<T> : UIObject {
         UpdateVisual();
         OnLayoutChanged?.Invoke();
     }
-    /// <summary>
-    /// Fade the list in on open and out on close instead of snapping its GameObject on/off. The
-    /// CanvasGroup does not block raycasts, so the list stays clickable through the fade; a close
-    /// deactivates only once the fade lands, so a re-open mid-fade (the Kill above) never leaves it
-    /// hidden.
-    /// </summary>
     private void AnimateList(bool expanded) {
         if(ListObject == null) return;
         listSeq?.Kill();

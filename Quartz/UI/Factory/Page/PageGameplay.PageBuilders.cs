@@ -82,10 +82,6 @@ internal static partial class PageGameplay {
             conf.Enabled,
             "Enable Key Limiter", "keylimiter_enable"
         );
-        // The Key Viewer owns this setting; surfaced here too so a map needing a special key set can
-        // be switched between viewer-driven and manual keys without leaving the Key Limiter page.
-        // Both toggles route through KeyViewerOverlay.SetSyncToKeyLimiter, and the change flows back
-        // to ApplySyncLock below (via SyncSettingChanged) to lock or free the controls under it.
         UIToggle syncToggle = GenerateUI.Toggle(
             GenerateUI.Row(sec.Body),
             new KeyViewerSettings().SyncToKeyLimiter,

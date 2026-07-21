@@ -39,16 +39,9 @@ public sealed class StatColor {
     public ColorPoint Perfect = new(1f, Gold);
     public float MaxBpm = 8000f;
     private static readonly Color Gold = new(1f, 0.854902f, 0f, 1f);
-    /// <summary>
-    /// <paramref name="displayDecimals"/> is the decimal count the value renders with, when the
-    /// caller has one. The perfect colour then triggers exactly when the rendered number reads
-    /// 100% — a 99.7% run shown as "100%" (0 decimals) was slipping under the old fixed 99.99%
-    /// gate and painting the gradient end instead, which reads as "100% but not perfect-coloured".
-    /// </summary>
     public Color Evaluate(float ratio, int displayDecimals = -1) {
         if(float.IsNaN(ratio) || float.IsInfinity(ratio)) ratio = 0f;
         ratio = Mathf.Clamp01(ratio);
-        // Rendered as 100 iff round(100*ratio, d) == 100, i.e. ratio >= 1 - 0.005 * 10^-d.
         float perfectAt = displayDecimals >= 0
             ? 1f - 0.005f * Mathf.Pow(10f, -displayDecimals)
             : 0.9999f;

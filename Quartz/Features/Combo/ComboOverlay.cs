@@ -138,11 +138,6 @@ public static class ComboOverlay {
             Conf.GetCaptionShadowColor()
         );
     }
-    // fontMaterial's getter re-runs padding + dirty-mesh work on every access,
-    // and ApplyValueMaterial runs every frame while the pulse animates — so
-    // only pay it when the material or the dilate value actually changed.
-    // After the first access the instanced material IS fontSharedMaterial
-    // (a plain field read), which makes a stable memo key.
     private static Material thicknessMat;
     private static float lastThicknessDilate = float.NaN;
     private static void ApplyThickness(TextMeshProUGUI text, float dilate) {
@@ -259,7 +254,6 @@ public static class ComboOverlay {
             float blockH = Mathf.Max(1f, Mathf.Max(valueH, capBottom) + overhang);
             if(blockH != lastBlockH || overhang != lastOverhang) {
                 root.sizeDelta = new Vector2(768f, blockH);
-                // Pivot stays on the value's top edge: OffsetY is persisted from root.anchoredPosition.
                 root.pivot = new Vector2(0.5f, 1f - overhang / blockH);
                 valueText.rectTransform.anchoredPosition = new Vector2(0f, -overhang);
                 lastBlockH = blockH;

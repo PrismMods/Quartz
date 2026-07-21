@@ -60,9 +60,6 @@ internal static partial class PageEditor {
         EditorSettings conf = EditorFeature.Conf;
         EditorSettings def = new();
         RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
-        // Flip/rotate are per-call Harmony postfixes gated on the settings, so a
-        // toggle only needs to persist — no reconcile/Apply pass like the tick
-        // features on the other editor pages.
         void Toggle(Transform body, bool dft, bool val, Action<bool> set, string label, string id, string desc) =>
             GenerateUI.ToggleTip(body, dft, val, v => { set(v); EditorFeature.Save(); }, label, id, desc);
         var sec = GenerateUI.FlatSection(content.transform, "Flip & Rotate Tiles");

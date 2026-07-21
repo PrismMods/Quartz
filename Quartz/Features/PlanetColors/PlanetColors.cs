@@ -264,7 +264,6 @@ public static partial class PlanetColors {
         );
         if(setParticleSystemColorMethod == null) return;
         try {
-            // open delegate avoids per-hit Color boxing through MethodInfo.Invoke on the tail path
             setParticleSystemColorFast = (Action<PlanetRenderer, ParticleSystem, Color, Color>)Delegate.CreateDelegate(
                 typeof(Action<PlanetRenderer, ParticleSystem, Color, Color>), setParticleSystemColorMethod);
         } catch {

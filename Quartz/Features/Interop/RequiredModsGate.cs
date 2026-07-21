@@ -3,13 +3,6 @@ using System.Reflection;
 using HarmonyLib;
 using Quartz.Core;
 namespace Quartz.Features.Interop;
-// Vanilla ADOFAI refuses to load any level whose settings carry a non-empty
-// "requiredMods" array: RDEditorUtils.CheckModsDependency is literally
-// `mods != null && mods.Length != 0`, so LevelData.Decode bails with
-// LoadResult.ModRequired without ever looking at what is installed. This gate
-// keeps that block only for mods that are genuinely absent; when every listed
-// mod is loaded (UMM entry, MelonLoader melon, or a loaded assembly of that
-// name) the level is allowed through.
 public static class RequiredModsGate {
     [HarmonyPatch(typeof(RDEditorUtils), "CheckModsDependency")]
     private static class CheckModsDependencyPatch {
@@ -51,11 +44,7 @@ public static class RequiredModsGate {
         string norm = Norm(raw);
         if(norm.Length != 0) names.Add(norm);
     }
-    // Level authors type mod names free-hand ("Key Limiter" vs "KeyLimiter"),
-    // so compare case-insensitively with spaces stripped.
     private static string Norm(string s) => s == null ? "" : s.Replace(" ", "").Trim().ToLowerInvariant();
-    // Reflection instead of a direct MelonLoader reference: this file is shared
-    // by the UMM build, and ML has renamed these members across versions.
     private static List<string> MelonNames() {
         List<string> names = [];
         try {

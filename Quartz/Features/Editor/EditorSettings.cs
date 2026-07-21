@@ -4,10 +4,10 @@ using Quartz.IO.Interface;
 namespace Quartz.Features.Editor;
 public sealed class EditorSettings : ISettingsFile {
     public bool HorizontalProperties = false;
-    public bool ShowFloorAngle = true;   
-    public bool ShowFloorBeats = false;  
-    public bool ShowFloorCount = false;  
-    public bool ShowFloorDuration = false; 
+    public bool ShowFloorAngle = true;
+    public bool ShowFloorBeats = false;
+    public bool ShowFloorCount = false;
+    public bool ShowFloorDuration = false;
     public bool UseTulttakModBehavior = false;
     public bool BgaMod = false;
     public bool BgaHideTileDeco = false;

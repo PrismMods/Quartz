@@ -1,11 +1,5 @@
 using UnityEngine;
 namespace Quartz.UI.Utility;
-/// <summary>
-/// Click-to-rebind key capture. Shared by the Simple-mode per-key editor and the layout
-/// editor's inspector rather than duplicated: RightAlt and RightControl are invisible to
-/// Unity's Input on macOS and only arrive through the KeyLimiter hook, so a second copy of
-/// this would silently fail to capture them.
-/// </summary>
 internal sealed class KeyCaptureRunner : MonoBehaviour {
     public Func<bool> IsListening;
     public Func<bool> ShouldCancel;
@@ -16,8 +10,6 @@ internal sealed class KeyCaptureRunner : MonoBehaviour {
     private bool prevHookRAlt;
     private bool prevHookRCtrl;
     private void Update() {
-        // Sampled every frame, not only while listening: an edge is only an edge against the
-        // previous frame, so a gap would report a key held since before the capture began.
         bool hookRAlt = Features.KeyLimiter.KeyLimiter.HookKeyHeld(KeyCode.RightAlt);
         bool hookRCtrl = Features.KeyLimiter.KeyLimiter.HookKeyHeld(KeyCode.RightControl);
         bool rAltEdge = hookRAlt && !prevHookRAlt;

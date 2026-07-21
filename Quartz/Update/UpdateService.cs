@@ -14,25 +14,25 @@ public enum UpdateStatus {
     UpToDate,
     Available,
     Installing,
-    Installed, 
-    Skipped,   
+    Installed,
+    Skipped,
     Failed,
 }
 public enum UpdateFailure {
     None,
-    Network,      
-    NotFound,     
-    RateLimited,  
-    CheckError,   
-    InstallError, 
+    Network,
+    NotFound,
+    RateLimited,
+    CheckError,
+    InstallError,
 }
 public sealed class UpdateInfo {
-    public string Tag;          
+    public string Tag;
     public SemVer Version;
-    public string Url;          
-    public string AssetUrl;     
-    public bool AssetIsZip;     
-    public string AssetSha256;  
+    public string Url;
+    public string AssetUrl;
+    public bool AssetIsZip;
+    public string AssetSha256;
 }
 public static class UpdateService {
     public static UpdateStatus Status { get; private set; } = UpdateStatus.Idle;
@@ -97,7 +97,7 @@ public static class UpdateService {
     private static UpdateFailure Classify(System.Exception ex) => ex switch {
         CheckException ce => ce.Kind,
         HttpRequestException => UpdateFailure.Network,
-        TaskCanceledException => UpdateFailure.Network, 
+        TaskCanceledException => UpdateFailure.Network,
         _ => UpdateFailure.CheckError,
     };
     private static async Task<UpdateInfo> FetchLatest(bool forceLatest = false) {

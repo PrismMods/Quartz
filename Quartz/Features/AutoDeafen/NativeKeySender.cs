@@ -38,7 +38,7 @@ internal static class NativeKeySender {
     private const uint KEYEVENTF_KEYUP = 0x0002;
     private const byte VK_CONTROL = 0x11;
     private const byte VK_SHIFT = 0x10;
-    private const byte VK_MENU = 0x12;   
+    private const byte VK_MENU = 0x12;
     private const byte VK_LWIN = 0x5B;
     private static void SendWindows(bool ctrl, bool shift, bool alt, bool meta, KeyCode key) {
         byte vk = WinVk(key);

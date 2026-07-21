@@ -10,24 +10,7 @@ using UnityEngine.UI;
 using static UnityEngine.EventSystems.PointerEventData;
 namespace Quartz.UI.Editor;
 internal static partial class KvWidgets {
-    /// <summary>
-    /// The floor under the fill (see <see cref="UISlider.MinFill"/>), as a share of the track.
-    /// About 15px of the default pane and 11 of the narrowest, which is the width either side of
-    /// the fill sprite's own corners — enough to still read as the head of a bar.
-    ///
-    /// The shared rows need no floor because they are more than twice as wide, not because they
-    /// are drawn differently: this is where a range like the note length's 1..9999 first puts a
-    /// default value under a pixel of fill.
-    /// </summary>
     private const float MinFillFraction = 0.05f;
-    /// <summary>
-    /// The fill-bar slider, at pane width. Kept on one row rather than stacked over its label:
-    /// the bar is the row's background, so a caption line above it would double the height of
-    /// the commonest row in the panel to say what the row already says.
-    ///
-    /// Geometry aside, this is <see cref="GenerateUI.Slider"/> — same drag, same middle-click
-    /// reset, same click-the-value expression editor.
-    /// </summary>
     internal static UISlider Slider(
         Transform parent,
         float defaultValue,

@@ -35,7 +35,6 @@ static class KvHistoryTests {
         Assert(!h.CanUndo, "nothing older remains");
     }
     public static void TestHeldNudgeCoalescesToOneStep() {
-        // A held arrow key fires every frame; without coalescing it would bury the undo stack.
         KvHistory h = new();
         h.PushNudge("a", 0f);
         h.PushNudge("b", 0.1f);

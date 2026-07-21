@@ -215,9 +215,6 @@ public static class AutoDeafen {
         });
     }
     private static void LoadAccessToken() {
-        // Bound to a local rather than re-read: Conf is ConfMgr?.Data, and the clear
-        // in the finally below would otherwise throw over whatever exception put us
-        // there — hiding the real failure behind a null reference.
         AutoDeafenSettings conf = Conf;
         if(conf == null) return;
         string legacy = Trim(conf.LegacyDiscordAccessToken);

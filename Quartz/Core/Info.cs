@@ -16,8 +16,6 @@ public static class Info {
     public const string GithubLink = "https://github.com/PrismMods/Quartz";
     public const string RepoOwner = "PrismMods";
     public const string RepoName = "Quartz";
-    // Community translations live in their own repo so translators never touch this
-    // one; LangUpdateService pulls newer language files from it at runtime.
     public const string I18nRepoOwner = "PrismMods";
     public const string I18nRepoName = "Quartz-i18n";
     public const string I18nBranch = "main";

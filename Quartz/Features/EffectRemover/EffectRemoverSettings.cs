@@ -10,7 +10,7 @@ public sealed class EffectRemoverSettings : ISettingsFile {
     public string Mode = ModeEnhanced;
     public bool IsSimple => string.Equals(Mode, ModeSimple, StringComparison.OrdinalIgnoreCase);
     public bool IsEnhanced => !IsSimple;
-    public const int MoveTrackUpperBound = 100; 
+    public const int MoveTrackUpperBound = 100;
     public bool SimpleFilter = false;
     public bool SimpleAdvancedFilter = false;
     public bool SimpleBloom = false;

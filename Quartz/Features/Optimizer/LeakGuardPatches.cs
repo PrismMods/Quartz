@@ -100,7 +100,6 @@ public static class LeakGuardPatches {
             } catch { }
         }
     }
-    // Static caches the game never evicts; swept from Optimizer's sceneLoaded hook.
     internal static void SweepStaticCaches() {
         try {
             FloorMesh.cache.Clear();

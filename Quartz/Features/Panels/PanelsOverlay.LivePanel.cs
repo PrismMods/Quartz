@@ -89,8 +89,6 @@ public static partial class PanelsOverlay {
                     if(color is { Enabled: true }) {
                         Color tint = color.Evaluate(
                             ColorRatio(entry.Id, color),
-                            // Percent stats round at the panel's decimals; the perfect colour has
-                            // to agree with the number the user actually reads.
                             IsPercentStat(entry.Id) ? Mathf.Clamp(c.Decimals, 0, 6) : -1
                         );
                         sb.Append("<color=#");
@@ -134,8 +132,6 @@ public static partial class PanelsOverlay {
         }
         private static StatDef FindStat(string id) =>
             id != null && CatalogById.TryGetValue(id, out StatDef stat) ? stat : null;
-        // Built once per panel: an inline lambda here would capture a local and
-        // allocate a display class on every 20Hz refresh of every panel.
         private static Func<string, string> MakeResolver(PanelConfig config) =>
             name => ResolveStatToken(name, config);
         private static string ResolveStatToken(string name, PanelConfig config) {
@@ -173,8 +169,6 @@ public static partial class PanelsOverlay {
                 if(sb[i] != value[i]) return false;
             return true;
         }
-        /// <summary>The stats Pct() renders — the ones whose colour gate must match the rounded
-        /// display. See PanelsOverlay's stat catalog.</summary>
         private static bool IsPercentStat(string id) =>
             id is "progress" or "accuracy" or "xaccuracy" or "maxaccuracy" or "best";
         private static float ColorRatio(string id, StatColor color) {

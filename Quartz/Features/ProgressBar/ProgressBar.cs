@@ -122,10 +122,6 @@ public static class ProgressBarOverlay {
             img.pixelsPerUnitMultiplier = Mathf.Max(0.05f, 8f / rounding);
         }
     }
-    // Fill source: tile-fraction (percentComplete, steps per tile) by default, or
-    // the smooth map-time ratio (song position / chart length) when UseMapTime is
-    // on. Both start and now come from the same space so the checkpoint start
-    // offset stays consistent with the moving fill.
     private static void GetProgressValues(out float start, out float now) {
         if(Conf.UseMapTime) {
             start = Mathf.Clamp01(GameStats.RunStartMapTimeRatio);

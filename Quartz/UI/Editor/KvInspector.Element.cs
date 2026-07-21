@@ -14,10 +14,6 @@ internal sealed partial class KvInspector {
     private void BuildElementTab(RectTransform root, List<UIObject> tracked, KvElement[] batch) {
         KvElement first = batch[0];
         bool single = batch.Length == 1;
-        // A rebind reads one key press and writes one binding, so it stays single-selection: there
-        // is no sense in which every key in a marquee is bound to the key you just pressed. The
-        // stat and graph strips do fan out, but only when the whole batch reads them — a mixed
-        // marquee gets neither rather than a strip that silently skips half of it.
         if(single && first.Kind == KvElementKind.Key) BuildBinding(root, tracked, first);
         else if(AllOf(batch, KvElementKind.Stat)) {
             Header(root, "KVI_SEC_STAT", "Stat");
@@ -25,13 +21,6 @@ internal sealed partial class KvInspector {
         }
         else if(AllGraphs(batch)) BuildGraph(root, tracked, batch);
         Header(root, "KVI_SEC_LABEL", "Label");
-        // DisplayText's setter removes the key when the value is empty, which is what restores
-        // the automatic label (the key's own name, or KPS/AVG/MAX/Total for a stat).
-        //
-        // Streamed, not Edit()ed per keystroke: onValueChanged fires on every character, so a
-        // discrete edit here would snapshot, save and rebuild the overlay 24 times for a
-        // 24-character label — and, at a history depth of 50, evict 24 of the user's real
-        // undo steps to record one typed word.
         bool mixedLabel = Mixed(batch, el => el.DisplayText);
         bool typed = false;
         UIInput label = KvWidgets.Input(
@@ -47,11 +36,6 @@ internal sealed partial class KvInspector {
         );
         label.InputField.characterLimit = 24;
         label.InputField.onEndEdit.AddListener(v => {
-            // A batch that disagrees opens this field blank, and blank is a real value here — it
-            // means "go back to the automatic label". Committing it on a click-through would wipe
-            // every label in the selection, so a mixed field writes nothing until it is typed in.
-            // The ctor seeds the field with SetTextWithoutNotify, so this flag cannot be set by
-            // anything but the user.
             if(mixedLabel && !typed) return;
             Commit("kvi_display", () => {
                 foreach(KvElement el in batch) el.DisplayText = v ?? "";
@@ -67,8 +51,6 @@ internal sealed partial class KvInspector {
                 "DESC_KVI_COUNTINTOTAL",
                 "Include this key's presses in the Total stat. Turn it off for foot keys and anything you do not want counted."
             );
-            // Typing one press count onto a batch would overwrite counts the user cannot see, so
-            // the field is single-selection. Resetting them all to zero is unambiguous and stays.
             if(single) NumField(root, tracked, "Presses", "kvi_count", first.Count, v => first.Count = Mathf.RoundToInt(v));
             Btn(root, tracked, "Reset Count", "kvi_count_reset", () => {
                 Edit(() => {
@@ -85,9 +67,6 @@ internal sealed partial class KvInspector {
             NumField(root, tracked, "Height", "kvi_h", first.H, v => first.H = v);
         }
         else {
-            // X and Y are left out rather than fanned out: one X written to a selection stacks it
-            // into a pile at the first element, which is not an edit anyone reaches for. Aligning
-            // is, and the Arrange block below does it properly.
             Num(root, tracked, "Width", "kvi_w", first.W, KvElement.MinSize, 500f, "0 px", 1f,
                 batch, el => el.W, (el, v) => el.W = v);
             Num(root, tracked, "Height", "kvi_h", first.H, KvElement.MinSize, 500f, "0 px", 1f,
@@ -147,10 +126,6 @@ internal sealed partial class KvInspector {
             batch, el => KvProps.Color(el.Raw, "graphColor", "#86EFAC", 1f),
             (el, c) => KvProps.SetColor(el.Raw, "graphColor", c), true
         );
-        // Bounds mirror ParseGraphSpec's own clamps; a value outside them is silently pulled
-        // back at render time, so offering it would just lie. Written as an integer: KvPresets
-        // never emits this field, so nothing proves DM Note declares it a float, and a float
-        // written into an integer field fails the whole preset load. See KvProps.SetInt.
         Num(root, tracked, "Graph Speed", "kvi_graph_speed", 1000f, 500f, 5000f, "0 ms", 50f,
             batch, el => KvProps.Float(el.Raw, "graphSpeed", 1000f),
             (el, v) => KvProps.SetInt(el.Raw, "graphSpeed", v));
@@ -171,14 +146,6 @@ internal sealed partial class KvInspector {
         Push();
     }
     private KvElement Single() => canvas.Selection.Count == 1 ? canvas.Selection[0] : null;
-    // CurrentStat's job — echoing a stored value back in the vocabulary's own casing so the
-    // segmented control can find it — is MatchMulti's now, which does the same for one element
-    // and for many.
-    /// <summary>
-    /// Falls back to the raw globalKey rather than "none": a name Quartz cannot resolve to a
-    /// KeyCode is still a real binding in the file, and showing "none" would invite the user to
-    /// overwrite it.
-    /// </summary>
     private static string KeyLabel(KeyCode key, string globalKey) {
         if(key != KeyCode.None) return KeyViewerOverlay.KeyCodeShortLabel(key);
         return string.IsNullOrEmpty(globalKey) ? MainCore.Tr.Get("KVI_KEY_NONE", "none") : globalKey;

@@ -19,8 +19,6 @@ public sealed class GTweensContext {
         TryStartTween(gTween);
     }
     public void Tick(float deltaTime) {
-        // Quartz: ticked every frame for the mod's lifetime, but tweens only exist
-        // around menu interactions — skip the stopwatch + list sweeps when idle.
         if(_aliveTweens.Count == 0 && _tweensToAdd.Count == 0) {
             TickDurationMs = 0f;
             return;
@@ -41,8 +39,6 @@ public sealed class GTweensContext {
                 _tweensToRemove.Add(tween);
             }
         }
-        // Quartz: IsAlive only flips false right here, so the RemoveAll scan is
-        // pure overhead on frames where nothing finished.
         if(_tweensToRemove.Count > 0) {
             foreach(GTween tween in _tweensToRemove) {
                 tween.IsAlive = false;

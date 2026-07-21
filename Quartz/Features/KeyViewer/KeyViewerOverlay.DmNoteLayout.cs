@@ -26,12 +26,6 @@ public static partial class KeyViewerOverlay {
             IsKpsAvg = spec.IsKpsAvg,
             IsKpsMax = spec.IsKpsMax,
             IsTotal = spec.IsTotal,
-            // A layout element's own count field is authoritative and Conf.Counts is not
-            // consulted: Conf buckets by Box.Name (Unity enum name) while an element keys by
-            // DM Note globalKey, so GetCount would read 0 for every key whose two names
-            // differ — "3" vs "ALPHA3", "DOT" vs "PERIOD" — and the write-back would then
-            // persist that 0 over the user's history. Pinning countKey instead would freeze
-            // the bucket to today's binding and strand the count on a later rebind.
             Count = spec.IsStat ? 0
                 : spec.Source != null ? spec.Source.Count
                 : Conf.GetCount(spec.CountKey),
@@ -43,8 +37,6 @@ public static partial class KeyViewerOverlay {
         box.Label.enableAutoSizing = true;
         box.Label.fontSizeMin = 0f;
         box.Label.fontSizeMax = Mathf.Max(8, spec.FontSize);
-        // fontWeight/fontItalic/fontUnderline/fontStrikethrough. Custom CSS may still OR in Bold
-        // on top of this base (ApplyCssTypography).
         if(spec.LabelFontStyles != FontStyles.Normal) box.Label.fontStyle |= spec.LabelFontStyles;
         if(spec.InlineStatCounter) {
             box.Label.text = DmInlineStatText(spec, spec.IsTotal ? totalCount : 0);
@@ -74,8 +66,6 @@ public static partial class KeyViewerOverlay {
         BuildCssFx(box, spec);
         ApplyBoxColors(box);
     }
-    /// <summary>TMP's default line height as a share of font size — what one stacked text row
-    /// actually occupies on screen.</summary>
     private const float LineHeight = 1.2f;
     internal static void LayoutDmText(RectTransform rt, DmNoteSpec spec, bool counter) {
         bool top = string.Equals(spec.CounterAlign, "top", StringComparison.OrdinalIgnoreCase);
@@ -93,9 +83,6 @@ public static partial class KeyViewerOverlay {
         if(top || bottom) {
             float itemGap = between ? 0f : Mathf.Max(0f, gap);
             float avail = Mathf.Max(1f, spec.H - 4f);
-            // One text line's height, not fontSize + 8: the strips sit adjacent and the +8 of air
-            // per strip read as a built-in gap — at counterGap 0 the label and the counter are
-            // meant to nearly touch, the way DM Note's flex column stacks them.
             float labelH = Mathf.Clamp(spec.FontSize * LineHeight, 1f, avail);
             float counterH = Mathf.Clamp(spec.CounterFontSize * LineHeight, 1f, avail);
             if(labelH + counterH + itemGap > avail) {

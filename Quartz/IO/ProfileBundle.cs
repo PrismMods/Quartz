@@ -2,9 +2,6 @@
 using System.Text;
 using Newtonsoft.Json.Linq;
 namespace Quartz.IO;
-// The rules for turning an export bundle's Files object into the files that land in a
-// profile directory. Free of Unity and MainCore so Quartz.Tests can cover the preset
-// contract: the caller names the config file and the fields a preset may not impose.
 public static class ProfileBundle {
     public static Dictionary<string, byte[]> ReadFiles(
         JObject files, ISet<string> excluded,
@@ -21,9 +18,6 @@ public static class ProfileBundle {
         }
         return imported;
     }
-    // Dropping the key instead of rewriting it is what keeps the applier's own value:
-    // an absent key makes CoreSettings.Deserialize fall back to the live field, because
-    // SettingsFile<T>.Data is one reused instance rather than a fresh default.
     public static JToken StripPresetImposed(string fileName, JToken contents, string configFileName, string[] presetImposed) {
         if(!fileName.Equals(configFileName, StringComparison.OrdinalIgnoreCase)
             || contents is not JObject settings) return contents;

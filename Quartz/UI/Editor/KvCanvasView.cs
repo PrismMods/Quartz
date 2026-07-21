@@ -8,8 +8,6 @@ using UnityEngine;
 using UnityEngine.UI;
 namespace Quartz.UI.Editor;
 internal sealed partial class KvCanvas {
-    // Defaults mirror KeyViewerOverlay's DM Note parsing so an element reads the same in the
-    // editor as it renders in the overlay.
     private const string DefaultBg = "rgba(46, 46, 47, 0.9)";
     private const string DefaultBorder = "rgba(113, 113, 113, 0.9)";
     private const string DefaultFont = "rgba(121, 121, 121, 0.9)";
@@ -34,9 +32,6 @@ internal sealed partial class KvCanvas {
         labelRect.anchorMax = Vector2.one;
         labelRect.offsetMin = Vector2.zero;
         labelRect.offsetMax = Vector2.zero;
-        // The overlay's press counter, previewed at rest ("0"). Built unconditionally and toggled
-        // in Paint: the Counter tab can enable, move or exile it outside the box without a full
-        // canvas rebuild, so the visual has to be able to follow from a repaint alone.
         if(el.Kind is KvElementKind.Key or KvElementKind.Stat) {
             v.Counter = KeyViewerOverlay.NewText(fill.transform, "Counter", "0", 16f);
             v.Counter.raycastTarget = false;
@@ -67,7 +62,6 @@ internal sealed partial class KvCanvas {
         KeyViewerOverlay.DmNoteSpec spec = CounterSpec(el);
         if(v.Label != null) {
             v.Label.color = Fade(KeyViewerOverlay.HexToColor(RawStr(el, "fontColor", DefaultFont), 1f), dim);
-            // Inline stat counters render as part of the label ("KPS  0"), the overlay's own rule.
             v.Label.text = spec.InlineStatCounter ? LabelOf(el) + "  0" : LabelOf(el);
             KeyViewerOverlay.LayoutDmText(v.Label.rectTransform, spec, false);
             v.Label.alignment = spec.InlineStatCounter
@@ -77,11 +71,6 @@ internal sealed partial class KvCanvas {
         PaintCounter(v, el, spec, dim);
         if(v.Outline != null) v.Outline.enabled = selection.Contains(el);
     }
-    /// <summary>
-    /// The rest-state counter ("0"), laid out by the overlay's own DM Note code so the preview
-    /// cannot drift from what renders in game. Reparented per paint because the Counter tab can
-    /// move it between inside the box and outside it.
-    /// </summary>
     private void PaintCounter(Visual v, KvElement el, KeyViewerOverlay.DmNoteSpec spec, float dim) {
         if(v.Counter == null) return;
         bool show = spec.CounterEnabled && !spec.InlineStatCounter;
@@ -99,18 +88,11 @@ internal sealed partial class KvCanvas {
         v.Counter.fontSize = spec.CounterFontSize;
         v.Counter.color = Fade(CounterColor(el), dim);
     }
-    /// <summary>counter.fill.idle, falling back to the element font colour — the parser's rule.</summary>
     private static Color CounterColor(KvElement el) {
         string fontHex = RawStr(el, "fontColor", DefaultFont);
         string idle = el.Raw["counter"]?["fill"]?["idle"]?.ToString();
         return KeyViewerOverlay.HexToColor(string.IsNullOrEmpty(idle) ? fontHex : idle, 1f);
     }
-    /// <summary>
-    /// The counter-relevant slice of the element's raw JSON, read with the parser's defaults
-    /// (KeyViewerOverlay.DmNoteParsing). Only the fields the layout methods touch are filled.
-    /// The editor previews the counter regardless of the global DmShowCounter toggle — the
-    /// Counter tab is being edited here, so hiding it would make the tab a blind control panel.
-    /// </summary>
     private static KeyViewerOverlay.DmNoteSpec CounterSpec(KvElement el) {
         JObject c = el.Raw["counter"] as JObject;
         bool stat = el.Kind == KvElementKind.Stat;
@@ -138,8 +120,6 @@ internal sealed partial class KvCanvas {
             && !string.Equals(spec.CounterAlign, "bottom", StringComparison.OrdinalIgnoreCase);
         return spec;
     }
-    /// <summary>Radius and stroke are baked into the sprite by NewBoxVisual, so a repaint has to
-    /// regenerate them itself or a property edit would not show until a full rebuild.</summary>
     private static void ApplyShape(Visual v, KvElement el) {
         float radius = Mathf.Clamp(RawFloat(el, "borderRadius", 10f), 0f, 100f);
         float borderWidth = Mathf.Clamp(RawFloat(el, "borderWidth", 3f), 0f, 20f);
@@ -177,17 +157,6 @@ internal sealed partial class KvCanvas {
         JToken t = el.Raw[key];
         return t == null || t.Type == JTokenType.Null ? fallback : t.ToString();
     }
-    /// <summary>
-    /// DM Note's ZoomIndicator: a dark pill in the bottom-left of the canvas reading the zoom as a
-    /// percentage.
-    ///
-    /// Parented to the viewport rather than the overlay: the overlay is a zero-size point pinned to
-    /// the content's anchor corner, so it cannot anchor anything to an edge.
-    ///
-    /// Kept visible rather than faded out after 1.5s as DM Note does. The fade is driven there by a
-    /// timer per zoom change; here the readout is also the only always-true statement of where the
-    /// view is, and a coroutine that exists to hide information is not worth the teardown it adds.
-    /// </summary>
     private void BuildZoomLabel() {
         GameObject pillObj = new("ZoomIndicator");
         pillObj.transform.SetParent(viewport, false);
@@ -195,14 +164,11 @@ internal sealed partial class KvCanvas {
         pill.anchorMin = Vector2.zero;
         pill.anchorMax = Vector2.zero;
         pill.pivot = Vector2.zero;
-        // DM Note's `bottom-2 left-2`, without the 96px lift that clears a minimap this canvas
-        // does not have.
         pill.anchoredPosition = new Vector2(8f, 8f);
         pill.sizeDelta = new Vector2(52f, 24f);
         Image bg = pillObj.AddComponent<Image>();
         bg.sprite = MainCore.Spr.GetFilled(4f);
         bg.type = Image.Type.Sliced;
-        // bg-black/50.
         bg.color = new Color(0f, 0f, 0f, 0.5f);
         bg.raycastTarget = false;
         zoomLabel = KeyViewerOverlay.NewText(pill, "Zoom", "100%", 14f);

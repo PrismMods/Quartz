@@ -89,8 +89,6 @@ internal static partial class PageSettings {
             langBtn.SetBlocked(true);
             langBtn.Label.text = "...";
             _ = Task.Run(async () => {
-                // redownload from Quartz-i18n first, so Reload picks up translation
-                // fixes that shipped after this build
                 await LangUpdateService.FetchAsync(MainCore.Paths.LangPath);
                 await MainCore.Tr.Load(MainCore.Paths.LangPath);
                 MainThread.Enqueue(() => {
@@ -211,10 +209,6 @@ internal static partial class PageSettings {
             MainCore.ConfMgr.RequestSave();
             scaleSeq?.Kill();
             float scaleStart = UICore.PanelScale;
-            // Keep the window's on-screen size: the canvas rescales by scaleStart→value, so the
-            // panel's virtual size is counter-scaled to cancel it out. Snapping to
-            // DefaultPanelSize here threw away the user's own window size and read as "UI Scale
-            // resizes my window".
             Vector2 targetSize = UICore.Panel.sizeDelta * (scaleStart / value);
             targetSize = new Vector2(
                 Mathf.Clamp(targetSize.x, ResizeHandle.MIN_WIDTH / value, Screen.width / value),
@@ -281,7 +275,7 @@ internal static partial class PageSettings {
             0f,
             15f,
             MainCore.Conf.OutlineWidth,
-            v => Mathf.Round(v * 4f) / 4f, 
+            v => Mathf.Round(v * 4f) / 4f,
             v => { MainCore.Conf.OutlineWidth = v; UICore.SetOutlineWidth(v, false); },
             v => { MainCore.Conf.OutlineWidth = v; UICore.SetOutlineWidth(v, true); MainCore.ConfMgr.RequestSave(); },
             "Outline Width",

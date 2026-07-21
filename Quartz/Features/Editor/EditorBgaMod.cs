@@ -106,7 +106,6 @@ public static partial class EditorFeature {
         Set(pr.faceDetails, visible);
         Set(pr.samuraiSprite, visible);
     }
-    // SetPlanetsVisible runs every tick while BGA is active; cache the GetComponent lookups
     private static readonly Dictionary<int, Renderer> particleRendererCache = new();
     private static Renderer ParticleRenderer(ParticleSystem ps) {
         if(ps == null) return null;
@@ -120,7 +119,6 @@ public static partial class EditorFeature {
         if(r != null && r.enabled != visible) r.enabled = visible;
     }
     private enum DecoKind { Tile, Planet }
-    // deco -> was visible when flagged (only those get re-shown on restore)
     private static readonly Dictionary<scrDecoration, bool> bgaTileDecos = new();
     private static readonly Dictionary<scrDecoration, bool> bgaPlanetDecos = new();
     private static int bgaTileScanCount = -1;
@@ -137,12 +135,6 @@ public static partial class EditorFeature {
             scrDecorationManager mgr = scrDecorationManager.instance;
             List<scrDecoration> all = mgr != null ? mgr.allDecorations : null;
             if(all == null) return;
-            // This ran every tick, O(all decorations) — the exact levels BGA mode targets are
-            // decoration-heavy. Every game re-show path checks forceHide (scrDecoration's state
-            // reset and ffxMoveDecorationsPlus both do SetVisible(v && !forceHide)), so flagging
-            // every matching deco once suppresses re-shows without rescanning; rescan only when
-            // the list changes. The count guard resets whenever hide goes inactive, which covers
-            // level reloads that swap instances without changing the count.
             if(all.Count == scannedCount) return;
             foreach(scrDecoration deco in all) {
                 if(deco == null || !Matches(deco, kind) || deco.forceHide) continue;

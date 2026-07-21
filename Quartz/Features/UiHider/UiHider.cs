@@ -147,10 +147,6 @@ public static partial class UiHider {
         }
     }
     private static readonly Dictionary<(Type, string), MemberInfo> memberCache = [];
-    // Ticker.Update reaches these member fetches every frame (the editor branch also runs
-    // during custom-level play inside scnEditor), so reflection GetValue per frame adds up.
-    // The fields are inspector-wired and stable per owner instance; cache the resolved Unity
-    // object and refetch only when it dies. Cleared on StartLoadingScene.
     private static readonly Dictionary<(int, string), UnityEngine.Object> memberValueCache = [];
     internal static void ClearMemberValueCache() => memberValueCache.Clear();
     internal static object GetMemberValueCached(object owner, string memberName) {
@@ -200,7 +196,6 @@ public static partial class UiHider {
     internal static void HideGameplayDifficultyContainer(scrUIController uiController) {
         if(uiController == null) return;
         try {
-            // runs per frame from the ticker while in the editor; only write on change
             if(uiController.difficultyContainer != null && uiController.difficultyContainer.gameObject.activeSelf)
                 uiController.difficultyContainer.gameObject.SetActive(false);
             if(uiController.difficultyFadeContainer != null) {
@@ -244,7 +239,6 @@ public static partial class UiHider {
             betaTypeResolved = true;
         }
         if(betaType == null) return;
-        // handle instead of name: Scene.name marshals a fresh string, and this runs every frame
         int scene = SceneManager.GetActiveScene().handle;
         if(cachedBetaObjects == null || cachedBetaSceneHandle != scene) {
             try { cachedBetaObjects = Resources.FindObjectsOfTypeAll(betaType); }

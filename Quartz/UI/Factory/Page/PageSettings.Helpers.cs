@@ -90,7 +90,7 @@ internal static partial class PageSettings {
             return;
         }
         fontDropdown.SetValues(BuildFontValues());
-        fontDropdown.Set(name, true); 
+        fontDropdown.Set(name, true);
         SetFontStatus(string.Format(GenerateUI.Tr("FONT_ADDED", "Added '{0}'."), name));
     }
     private static void RenameCurrentFont() {

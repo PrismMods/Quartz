@@ -32,9 +32,6 @@ public enum Asset {
     OttoAuto,
     QuantumQ,
     TufLogo,
-    // The layout editor's icon set, baked from DM Note's own SVGs (GPL-3.0, (c) lee-sihun) so the
-    // editor reads as the tool it mirrors. Each glyph is centred in a 128px square scaled against
-    // an 18-unit reference box, so one draw size renders every one at its true DM Note size.
     Move128,
     Eraser128,
     Layer128,

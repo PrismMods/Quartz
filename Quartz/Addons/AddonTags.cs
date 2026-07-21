@@ -30,16 +30,16 @@ public static class AddonTags {
         while(i < n) {
             char c = template[i];
             if(c == '{') {
-                if(i + 1 < n && template[i + 1] == '{') { sb.Append('{'); i += 2; continue; } 
+                if(i + 1 < n && template[i + 1] == '{') { sb.Append('{'); i += 2; continue; }
                 int close = template.IndexOf('}', i + 1);
-                if(close < 0) { sb.Append(template, i, n - i); break; } 
+                if(close < 0) { sb.Append(template, i, n - i); break; }
                 string name = template.Substring(i + 1, close - i - 1).Trim();
                 if(Resolve(name, extraResolver, out string resolved)) sb.Append(resolved);
-                else sb.Append(template, i, close - i + 1); 
+                else sb.Append(template, i, close - i + 1);
                 i = close + 1;
                 continue;
             }
-            if(c == '}' && i + 1 < n && template[i + 1] == '}') { sb.Append('}'); i += 2; continue; } 
+            if(c == '}' && i + 1 < n && template[i + 1] == '}') { sb.Append('}'); i += 2; continue; }
             sb.Append(c);
             i++;
         }

@@ -4,10 +4,10 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 namespace Quartz.UI.Utility;
 public enum ResizeCursorShape {
-    Horizontal, 
-    Vertical,   
-    DiagNWSE,   
-    DiagNESW,   
+    Horizontal,
+    Vertical,
+    DiagNWSE,
+    DiagNESW,
 }
 public static class NativeCursor {
     private static readonly bool isWindows =
@@ -40,10 +40,10 @@ public static class NativeCursor {
         Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
     }
     private const int IDC_ARROW = 32512;
-    private const int IDC_SIZENWSE = 32642; 
-    private const int IDC_SIZENESW = 32643; 
-    private const int IDC_SIZEWE = 32644;   
-    private const int IDC_SIZENS = 32645;   
+    private const int IDC_SIZENWSE = 32642;
+    private const int IDC_SIZENESW = 32643;
+    private const int IDC_SIZEWE = 32644;
+    private const int IDC_SIZENS = 32645;
     [DllImport("user32.dll", EntryPoint = "LoadCursorW")]
     private static extern IntPtr LoadCursorW(IntPtr hInstance, IntPtr lpCursorName);
     [DllImport("user32.dll")]
@@ -100,7 +100,7 @@ public static class NativeCursor {
         ResizeCursorShape.Horizontal => 0,
         ResizeCursorShape.Vertical => 90,
         ResizeCursorShape.DiagNESW => 45,
-        _ => 135, 
+        _ => 135,
     };
     private static void ApplyTexture(ResizeCursorShape shape) {
         Texture2D tex = GetTexture(Angle(shape));

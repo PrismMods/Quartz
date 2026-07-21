@@ -271,7 +271,7 @@ public static class AddonService {
                 Enabled = !confMgr.Data.Enabled.TryGetValue(unit.id, out bool en) || en,
             };
             handles.Add(handle);
-            if(!handle.Enabled) continue; 
+            if(!handle.Enabled) continue;
             Assembly assembly = null;
             try {
                 assembly = LoadPrecompiled(unit.path);

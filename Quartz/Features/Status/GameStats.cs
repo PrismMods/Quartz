@@ -177,13 +177,6 @@ public static class GameStats {
                 smoothedFps += (fps - smoothedFps) * factor;
             }
         }
-        // Optional display hold: keep the shown value steady for a user-set
-        // interval so the readout ticks more slowly instead of every frame.
-        // Smoothing above keeps running each frame, so no jump on refresh.
-        // Use an absolute unscaled-time deadline, not a per-frame accumulator:
-        // this getter is polled on the panel's ~20Hz cadence, not once per
-        // frame, so summing unscaledDeltaTime would undercount and stretch the
-        // real interval well past the value the user set.
         float interval = MainCore.Conf.FpsRefreshInterval;
         if(interval > 0f) {
             float now = Time.unscaledTime;

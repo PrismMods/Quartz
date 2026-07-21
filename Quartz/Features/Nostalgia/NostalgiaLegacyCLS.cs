@@ -185,7 +185,6 @@ public sealed class WorkshopShortcut : MonoBehaviour {
            || scnCLS.instance.showingInitialMenu) {
             return;
         }
-        // fetch optionsPanels lazily: the Traverse fallback allocates, and most frames press nothing
         if(Input.GetKeyDown(KeyCode.F)) {
             Nostalgia.ToggleSearchModeCLS(true);
         } else if(Input.GetKeyDown(KeyCode.S)) {

@@ -13,9 +13,9 @@ public sealed class CoreSettings : ISettingsFile {
     public bool BlockInputsWhileMenuOpen = true;
     public float UIScale = 0.85f;
     public string FontName = "";
-    public bool FontSongTitle = false;    
-    public bool FontCountdown = false;    
-    public bool FontJudgement = false;    
+    public bool FontSongTitle = false;
+    public bool FontCountdown = false;
+    public bool FontJudgement = false;
     public float FontSongTitleSize = 1f;
     public float FontCountdownSize = 1f;
     public float FontJudgementSize = 1f;
@@ -29,8 +29,6 @@ public sealed class CoreSettings : ISettingsFile {
     public float ContextBandHeight = 0f;
     public float CalibWidth = 0f;
     public float CalibHeight = 0f;
-    /// <summary>0 means "never set": the editor resolves its own default rather than storing one
-    /// here, so the default can move without every existing config pinning the old value.</summary>
     public float KvInspectorWidth = 0f;
     public Dictionary<string, bool> CollapsibleStates = [];
     public int ToggleModifier = (int)Keybind.KeyModifier.Alt;

@@ -3,9 +3,6 @@ using Newtonsoft.Json.Linq;
 using Quartz.IO;
 using static Asserts;
 static class ProfileBundleTests {
-    // What ProfileManager passes into ProfileBundle: the config file name off
-    // MainCore.Paths.ConfigPath, and the imposed list off nameof(CoreSettings.Language).
-    // Both of those pull in Unity, so the values are restated here rather than linked.
     private const string Config = "Settings.json";
     private static readonly string[] Imposed = ["Language"];
     private static readonly HashSet<string> Excluded = new(StringComparer.OrdinalIgnoreCase) {
@@ -39,8 +36,6 @@ static class ProfileBundleTests {
         Assert(Parse(normal[Config])["Language"]?.Value<string>() == "ko-KR", "the Import button restores the exported Language");
     }
     public static void TestPresetLeavesOtherFilesByteIdentical() {
-        // One bundle for both reads, preset first: that also pins ReadFiles to leaving
-        // its input alone, since a preset that stripped in place would strip the second read too.
         JObject files = Bundle();
         Dictionary<string, byte[]> preset = ProfileBundle.ReadFiles(files, Excluded, true, Config, Imposed);
         Dictionary<string, byte[]> normal = ProfileBundle.ReadFiles(files, Excluded, false, Config, Imposed);

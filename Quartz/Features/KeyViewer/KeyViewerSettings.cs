@@ -8,23 +8,7 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
     public const string ModeEditor = "editor";
     public bool Enabled = true;
     public bool ShowOutsideGame = true;
-    /// <summary>
-    /// Migration-only. The editor replaced the Simple and DM Note modes, so nothing branches on
-    /// this at runtime: it records which of them this config was last in, and
-    /// <see cref="KvMigration.RunOnce"/> stamps it to <see cref="ModeEditor"/> once it has read it.
-    ///
-    /// It defaults to the Simple value rather than to <see cref="ModeEditor"/> on purpose. A fresh
-    /// install has no layout file, and the field initializers below are the stock Simple settings —
-    /// so migrating from them is what gives a new user the stock key viewer instead of an empty
-    /// canvas, through the same path an upgrading user takes.
-    /// </summary>
     public string Mode = KvMigrationPlan.LegacyModeSimple;
-    /// <summary>
-    /// Migration-only, like the legacy key arrays below. The editor has no styles; this records
-    /// which fixed layout a Simple-mode config last used so <see cref="KvMigration.FromLegacy"/>
-    /// can regenerate it, and so cross-mod importers (<see cref="Interop"/>) have somewhere to land
-    /// a style before that migration runs. Never branched on at render time.
-    /// </summary>
     public int Style = 2;
     public const int MaxStyle = 5;
     public float Size = 0.8f;
@@ -109,9 +93,6 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
     public float FootOffsetY = 24.76001f;
     public const int MaxFootStyle = 8;
     private static readonly int[] FootKeyDefaults = [289, 285, 288, 284, 287, 283, 286, 282, 48, 54, 57, 53, 56, 52, 55, 51];
-    // One bindings/labels array per foot count (FootStyle 0-8 → 0,2,4,…,16 keys), each
-    // sized 2*style. Independent per count, like the main styles — editing the 4-key
-    // foot layout must not bleed into the 8-key one.
     public int[][] FootKeysByStyle = DefaultFootKeys();
     public string[][] FootKeysTextByStyle = DefaultFootLabels();
     public int FootKeyCount() => Mathf.Clamp(FootStyle, 0, MaxFootStyle) * 2;

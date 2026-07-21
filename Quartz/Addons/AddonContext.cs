@@ -9,7 +9,7 @@ public sealed class AddonContext {
     private HarmonyLib.Harmony harmony;
     private readonly List<string> statIds = [];
     private readonly List<string> tagNames = [];
-    private object settings; 
+    private object settings;
     internal AddonContext(string id) => Id = id;
     public void Msg(string message) => MainCore.Log.Msg($"[Addon:{Id}] {message}");
     public void Wrn(string message) => MainCore.Log.Wrn($"[Addon:{Id}] {message}");

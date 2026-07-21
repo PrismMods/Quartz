@@ -9,27 +9,6 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 namespace Quartz.Features.Optimizer;
-// "Render All Hit Sounds" optimizer toggle.
-//
-// At very high note density (Hz / high-KPS charts) ADOFAI cannot fire every
-// hit-sound voice, so overlapping hits get dropped. This captures the level's
-// scheduled hit-sound timeline, mixes every hit's original PCM into short
-// rendered AudioClip segments a few seconds ahead of the playhead, and plays
-// those through one scheduled AudioSource each — so no hit is lost regardless
-// of density. Raw copy only: original clip samples at the game's hit volume,
-// no limiter / density-gain / tone shaping.
-//
-// Streaming-segment mode only (renders just ahead of playback), which is the
-// only mode safe to run during live gameplay. Driven by Optimizer's per-frame
-// tick and scene hooks — no MonoBehaviour of its own.
-//
-// PCM mixing runs on a dedicated background thread: a segment mix is pure
-// managed float math over immutable ClipData captured up front, and doing it
-// on the main thread cost several ms on dense bars (a felt judgement-breaking
-// hitch at 60fps). The main thread only enqueues jobs and, when a mixed
-// buffer comes back, copies it into a pooled AudioClip and schedules a pooled
-// AudioSource. Steady state allocates nothing per segment: float buffers,
-// clips, and sources are all reused.
 internal static class HitSoundRenderer {
     private const int SampleRate = 48000;
     private const int Channels = 2;
@@ -37,23 +16,12 @@ internal static class HitSoundRenderer {
     private const double AheadSeconds = 12.0;
     private const double ClipTailSeconds = 0.03;
     private const double LateMarginSeconds = 0.05;
-    // Every segment is the same fixed length, so buffers and pooled clips are
-    // one size and can be reused forever.
     private static readonly int SegmentSamples = (int)Math.Ceiling((SegmentSeconds + ClipTailSeconds) * SampleRate);
     private static readonly int SegmentFloats = SegmentSamples * Channels;
-    // Segments overlap by the clip tail only; 12s look-ahead / 0.5s spacing
-    // bounds live + scheduled voices. Margin on top for late rescheduling.
     private const int MaxVoices = 32;
-    // Feed and drain throttles. Segments are enqueued to the mixer at most
-    // MaxQueuePerFrame per frame, so the initial 12s look-ahead prefill
-    // (~24 segments) trickles in instead of landing at once; that bounds
-    // in-flight buffers (pool never overflows) and keeps the main-thread
-    // SetData drain at ~2 copies (~400 KB) per frame during the prefill.
-    // 12s of slack makes the added fill latency (~0.2s) irrelevant.
     private const int MaxQueuePerFrame = 2;
     private const int MaxApplyPerFrame = 2;
     private const int MaxPooledBuffers = 12;
-
     private sealed class HitSoundEvent {
         public double Time;
         public float Volume;
@@ -81,30 +49,18 @@ internal static class HitSoundRenderer {
         public AudioClip Clip;
         public double BusyUntil;
     }
-
     private static readonly FieldInfo HitSoundsDataField = AccessTools.Field(typeof(scrConductor), "hitSoundsData");
     private static readonly FieldInfo NextHitSoundField = AccessTools.Field(typeof(scrConductor), "nextHitSoundToSchedule");
     private static readonly Type HitSoundsDataType = AccessTools.Inner(typeof(scrConductor), "HitSoundsData");
     private static readonly FieldInfo HitSoundField = HitSoundsDataType != null ? AccessTools.Field(HitSoundsDataType, "hitSound") : null;
     private static readonly FieldInfo TimeField = HitSoundsDataType != null ? AccessTools.Field(HitSoundsDataType, "time") : null;
     private static readonly FieldInfo VolumeField = HitSoundsDataType != null ? AccessTools.Field(HitSoundsDataType, "volume") : null;
-
-    // Main-thread only. Worker threads never touch this cache — each event
-    // carries its resolved ClipData, whose payload is immutable once built.
     private static readonly Dictionary<int, ClipData> ClipCache = new();
-    // HitSound-enum-value → decoded PCM. ClipData is a pure managed copy, so
-    // entries stay valid across scene loads even after the AudioClip itself is
-    // unloaded; a null value marks "None"/unloadable-as-skip. Lets the capture
-    // loop skip enum ToString + clip lookup per event on dense charts.
     private static readonly Dictionary<int, ClipData> HitSoundClipCache = new();
-    // Compiled per-field getters so capturing a 50k-hit chart doesn't pay a
-    // boxed FieldInfo.GetValue ×3 per event. Built once; null (build failed on
-    // a drifted game version) falls back to the reflective path.
     private static Func<object, int> hitSoundIdGetter;
     private static Func<object, double> timeGetter;
     private static Func<object, float> volumeGetter;
     private static bool captureGettersBuilt;
-
     private static bool EnsureCaptureGetters() {
         if(captureGettersBuilt) return hitSoundIdGetter != null;
         captureGettersBuilt = true;
@@ -134,9 +90,6 @@ internal static class HitSoundRenderer {
     private static int nextSegmentIndex;
     private static AudioMixerGroup mixerGroup;
     private static bool sceneHookInstalled;
-
-    // Cross-thread state. generation invalidates in-flight work on StopAll:
-    // the worker drops stale jobs, the apply path drops stale results.
     private static int generation;
     private static readonly ConcurrentQueue<RenderResult> pendingJobs = new();
     private static readonly ConcurrentQueue<RenderResult> completedJobs = new();
@@ -145,41 +98,28 @@ internal static class HitSoundRenderer {
     private static readonly object bufferPoolLock = new();
     private static readonly Stack<float[]> bufferPool = new();
     private static bool loggedRenderError;
-
-    // Main-thread playback pool.
     private static GameObject poolRoot;
     private static readonly List<Voice> voices = new();
-
     internal static bool Active {
         get {
             Optimizer.EnsureConf();
             return MainCore.IsModEnabled && Optimizer.Conf != null && Optimizer.Conf.RenderAllHitSounds;
         }
     }
-
-    // Reflection or the inner struct layout drifted between game versions — the
-    // capture path can't run safely, so keep vanilla hit sounds.
     private static bool ReflectionReady =>
         HitSoundsDataField != null && NextHitSoundField != null &&
         HitSoundField != null && TimeField != null && VolumeField != null;
-
     internal static void EnsureSceneHook() {
         if(sceneHookInstalled) return;
         sceneHookInstalled = true;
         SceneManager.sceneUnloaded += OnSceneUnloaded;
     }
-
     private static void OnSceneUnloaded(Scene scene) => StopAll("scene unloaded", destroyPool: true);
-
-    // Called from scrConductor.PlayHitTimes postfix. Captures the freshly built
-    // hit-sound timeline, starts streaming playback, and clears the vanilla list
-    // so the game's own scheduler does not double up.
     internal static void Capture(scrConductor conductor) {
         if(conductor == null || !ReflectionReady) return;
         try {
             if(HitSoundsDataField.GetValue(conductor) is not System.Collections.IList list) return;
             if(list.Count == 0) { StopAll("no hit sounds"); return; }
-
             bool fast = EnsureCaptureGetters();
             List<HitSoundEvent> events = new(list.Count);
             for(int i = 0; i < list.Count; i++) {
@@ -189,9 +129,6 @@ internal static class HitSoundRenderer {
                 if(fast) {
                     int hs = hitSoundIdGetter(item);
                     if(!HitSoundClipCache.TryGetValue(hs, out data)) {
-                        // A hit sound that cannot be decoded means an incomplete
-                        // mix — fall back to the game's own hit sounds rather
-                        // than a silent gap.
                         if(!ResolveClipData(item, out data)) {
                             StopAll("clip unreadable");
                             return;
@@ -219,12 +156,9 @@ internal static class HitSoundRenderer {
             }
             if(events.Count == 0) { StopAll("no readable hit sounds"); return; }
             events.Sort((a, b) => a.Time.CompareTo(b.Time));
-
             StopAll("recapture");
             mixerGroup = conductor.hitSoundGroup;
             BuildSegments(events);
-
-            // Silence the vanilla incremental scheduler for this run.
             list.Clear();
             NextHitSoundField.SetValue(conductor, 0);
         } catch(Exception e) {
@@ -232,9 +166,6 @@ internal static class HitSoundRenderer {
             StopAll("capture error");
         }
     }
-
-    // Called every frame from Optimizer.Tick(). Feeds segments entering the
-    // look-ahead window to the mixer thread and schedules finished buffers.
     internal static void Pump() {
         if(!Active) return;
         try {
@@ -245,7 +176,6 @@ internal static class HitSoundRenderer {
                   && Segments[nextSegmentIndex].Start <= now + AheadSeconds) {
                 SegmentJob job = Segments[nextSegmentIndex];
                 nextSegmentIndex++;
-                // Whole segment already in the past — nothing audible left.
                 if(job.End + ClipTailSeconds < now - 0.05) continue;
                 pendingJobs.Enqueue(new RenderResult { Generation = generation, Job = job });
                 queued = true;
@@ -269,12 +199,8 @@ internal static class HitSoundRenderer {
             StopAll("pump error");
         }
     }
-
     internal static void StopAll(string reason) => StopAll(reason, destroyPool: false);
-
     private static void StopAll(string reason, bool destroyPool) {
-        // Invalidate every in-flight mix; the worker and the apply path both
-        // drop anything stamped with an older generation.
         generation++;
         while(completedJobs.TryDequeue(out RenderResult stale)) ReturnBuffer(stale.Buffer);
         Segments.Clear();
@@ -286,7 +212,6 @@ internal static class HitSoundRenderer {
         }
         if(destroyPool) DestroyPool();
     }
-
     private static void DestroyPool() {
         for(int i = 0; i < voices.Count; i++) {
             Voice v = voices[i];
@@ -295,9 +220,8 @@ internal static class HitSoundRenderer {
         }
         voices.Clear();
         if(poolRoot != null) UnityEngine.Object.Destroy(poolRoot);
-        poolRoot = null; // recreated lazily on the next scheduled segment
+        poolRoot = null;
     }
-
     private static void BuildSegments(List<HitSoundEvent> events) {
         Segments.Clear();
         nextSegmentIndex = 0;
@@ -314,9 +238,6 @@ internal static class HitSoundRenderer {
             current.Events.Add(ev);
         }
     }
-
-    // ---- Mixer thread ----
-
     private static void EnsureRenderThread() {
         if(renderThread is { IsAlive: true }) return;
         renderThread = new Thread(RenderLoop) {
@@ -326,7 +247,6 @@ internal static class HitSoundRenderer {
         };
         renderThread.Start();
     }
-
     private static void RenderLoop() {
         while(true) {
             jobSignal.WaitOne();
@@ -348,27 +268,21 @@ internal static class HitSoundRenderer {
             }
         }
     }
-
     private static float[] RentBuffer() {
         lock(bufferPoolLock) {
             if(bufferPool.Count > 0) return bufferPool.Pop();
         }
         return new float[SegmentFloats];
     }
-
     private static void ReturnBuffer(float[] buffer) {
         if(buffer == null || buffer.Length != SegmentFloats) return;
         lock(bufferPoolLock) {
             if(bufferPool.Count < MaxPooledBuffers) bufferPool.Push(buffer);
         }
     }
-
-    // ---- Main-thread playback ----
-
     private static void ScheduleSegment(SegmentJob job, float[] buffer, double now) {
         Voice voice = AcquireVoice(now);
         if(voice == null) return;
-
         double scheduleTime = job.Start;
         double skipped = 0.0;
         double minTime = now + LateMarginSeconds;
@@ -378,12 +292,10 @@ internal static class HitSoundRenderer {
         }
         float clipLength = (float)((double)SegmentSamples / SampleRate);
         if(skipped >= clipLength - 0.001) return;
-
         voice.Clip.SetData(buffer, 0);
         AudioSource source = voice.Source;
         source.clip = voice.Clip;
         if(mixerGroup != null) source.outputAudioMixerGroup = mixerGroup;
-        // Voices are reused — always reset the read head.
         int timeSamples = skipped > 0.0 ? (int)Math.Round(skipped * SampleRate) : 0;
         if(timeSamples < 0) timeSamples = 0;
         if(timeSamples >= SegmentSamples) timeSamples = SegmentSamples - 1;
@@ -391,7 +303,6 @@ internal static class HitSoundRenderer {
         source.PlayScheduled(scheduleTime);
         voice.BusyUntil = scheduleTime + clipLength - skipped + 0.1;
     }
-
     private static Voice AcquireVoice(double now) {
         EnsurePoolRoot();
         if(poolRoot == null) return null;
@@ -406,17 +317,13 @@ internal static class HitSoundRenderer {
             Voice v = CreateVoice();
             if(v != null) { voices.Add(v); return v; }
         }
-        // All voices busy (should not happen inside a 12s window) — reuse the
-        // one closest to finishing rather than dropping the segment silently.
         return best;
     }
-
     private static void EnsurePoolRoot() {
         if(poolRoot != null) return;
         poolRoot = new GameObject("Quartz HitSound Pool");
         UnityEngine.Object.DontDestroyOnLoad(poolRoot);
     }
-
     private static Voice CreateVoice() {
         if(poolRoot == null) return null;
         GameObject go = new("Voice");
@@ -429,7 +336,6 @@ internal static class HitSoundRenderer {
         AudioClip clip = AudioClip.Create("QuartzHitSoundSegment", SegmentSamples, Channels, SampleRate, false);
         return new Voice { Go = go, Source = source, Clip = clip };
     }
-
     private static void MixEvent(float[] output, double segmentStart, HitSoundEvent hit) {
         ClipData data = hit.Data;
         if(data == null) return;
@@ -455,10 +361,6 @@ internal static class HitSoundRenderer {
             }
         }
     }
-
-    // data == null with a true return means "skip this event" (hit sound is
-    // None, or its clip could not be loaded); false means the clip exists but
-    // its PCM is unreadable — the caller aborts capture and keeps vanilla.
     private static bool ResolveClipData(object item, out ClipData data) {
         data = null;
         object hitSoundObj = HitSoundField.GetValue(item);
@@ -469,7 +371,6 @@ internal static class HitSoundRenderer {
         if(clip == null) return true;
         return TryGetClipData(clip, out data);
     }
-
     private static AudioClip LoadClip(string clipName) {
         try {
             return AudioManager.Instance != null ? AudioManager.Instance.FindOrLoadAudioClip(clipName) : null;
@@ -478,7 +379,6 @@ internal static class HitSoundRenderer {
             return null;
         }
     }
-
     private static bool TryGetClipData(AudioClip clip, out ClipData data) {
         data = null;
         if(clip == null) return false;

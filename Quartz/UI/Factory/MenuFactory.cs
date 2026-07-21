@@ -79,7 +79,7 @@ public static class MenuFactory {
         foreach(var kvp in CategoryChildren)
             foreach(var c in kvp.Value)
                 if(c.State == state) return kvp.Key;
-        return state; 
+        return state;
     }
     private static int activeCategoryKey = -1;
     private static readonly Dictionary<int, int> lastChildForCategory = [];
@@ -253,7 +253,7 @@ public static class MenuFactory {
         HoverFade(EventTriggerType.PointerEnter, static () => UIColors.MenuHover, 0.2f);
         HoverFade(EventTriggerType.PointerExit, static () => UIColors.MenuNormal, 0.25f);
         UnityUtils.AddClickEvent(trigger, _ => {
-            if(IsSelected(menuItem, UICore.CurrentMenuState)) return; 
+            if(IsSelected(menuItem, UICore.CurrentMenuState)) return;
             SetState(menuItem.isCategory
                 ? lastChildForCategory.GetValueOrDefault(menuItem.state, menuItem.state)
                 : menuItem.state);
@@ -265,7 +265,7 @@ public static class MenuFactory {
         UICore.CurrentMenuState = to;
         int cat = CategoryFor(to);
         if(CategoryChildren.ContainsKey(cat)) lastChildForCategory[cat] = to;
-        RefreshSubMenu(cat, animate: true); 
+        RefreshSubMenu(cat, animate: true);
         PageSwicher.SwitchPage(from, to);
         ApplyState(to);
         OnStateChanged?.Invoke(to);

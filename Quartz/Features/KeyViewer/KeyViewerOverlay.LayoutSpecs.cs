@@ -2,18 +2,6 @@ using Quartz.Core;
 using Quartz.Features.KeyViewer.Layout;
 namespace Quartz.Features.KeyViewer;
 public static partial class KeyViewerOverlay {
-    /// <summary>
-    /// Render specs for the free-form layout the editor owns.
-    ///
-    /// The layout is stored as a real DM Note preset, so this feeds the same
-    /// <see cref="ParseDmNoteSpec"/> and <see cref="FinishDmSpecs"/> the preset path uses:
-    /// only the source of the position objects differs, and the two modes cannot drift into
-    /// rendering the same document differently.
-    ///
-    /// Each element is parsed from its own backing object rather than a serialized copy of
-    /// the document. That keeps the live <see cref="KvElement"/> reachable for count
-    /// write-back, and keeps Build off <see cref="KvDocument.ToJson"/>.
-    /// </summary>
     private static List<DmNoteSpec> ParseLayoutSpecs(KvDocument doc) {
         List<DmNoteSpec> result = [];
         dmCanvasHeight = 250f;
@@ -21,8 +9,6 @@ public static partial class KeyViewerOverlay {
         ApplyDmRuntimeSettings();
         if(doc == null) return result;
         try {
-            // The document's own tab, never Conf.DmSelectedTab: writing that here would move
-            // DM Note mode's tab selection as a side effect of editing the layout.
             string tab = doc.SelectedTab;
             float minX = float.PositiveInfinity;
             float minY = float.PositiveInfinity;
@@ -45,15 +31,10 @@ public static partial class KeyViewerOverlay {
             foreach(KvElement el in doc.Elements(tab, KvElementKind.Graph)) {
                 if(el.Hidden) continue;
                 DmNoteSpec spec = ParseGraphSpec(el.Raw);
-                // No Source: a graph carries no count and never becomes a Box.
                 spec.ZIndex = el.Z;
                 result.Add(spec);
                 ExtendDmBounds(spec, ref minX, ref minY, ref maxX, ref maxY);
             }
-            // Pin the mapping to the tab's frozen anchor so edits that change the bounding box
-            // (adding a key, dragging one past the edge) never shift the elements already placed.
-            // First render of a tab seeds the anchor from the current bounds, which reproduces the
-            // old bounds-based mapping exactly — existing users see no jump on update.
             if(result.Count > 0) {
                 if(!doc.TryGetRenderAnchor(tab, out float anchorCx, out float anchorMinY)) {
                     anchorCx = (minX + maxX) * 0.5f;
@@ -76,7 +57,6 @@ public static partial class KeyViewerOverlay {
         spec.PerKeyKps = el.PerKeyKps;
         spec.ZIndex = el.Z;
     }
-    /// <summary>Outer object first, matching the preset path's own statType lookup.</summary>
     private static string LayoutStatType(KvElement el) =>
         JStr(el.Container, "statType", JStr(el.Raw, "statType", "stat"));
 }

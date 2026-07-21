@@ -19,8 +19,6 @@ internal static class CalibrationTimingLogger {
         public void Tick() {
             if(!Calibration.Enabled) return;
             bool inGame = Status.GameStats.InGame;
-            // Timings are a rolling in-memory cache; write them once gameplay ends rather than on
-            // the death frame, so the fsync never lands on a rendered frame.
             if(gameStateKnown && wasInGame && !inGame) FlushIfDirty();
             wasInGame = inGame;
             gameStateKnown = true;

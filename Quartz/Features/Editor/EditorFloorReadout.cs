@@ -84,7 +84,7 @@ public static partial class EditorFeature {
             dirty = true;
         }
         if(readoutTmp.text != text) {
-            readoutTmp.text = text; 
+            readoutTmp.text = text;
             dirty = true;
         }
         if(dirty) ApplyReadoutShadow();
@@ -187,7 +187,7 @@ public static partial class EditorFeature {
         for(int i = 0; i < iterations; i++) {
             scrFloor floor = selected[i];
             if(floor == null || floor.seqID == lastSeq)
-                continue; 
+                continue;
             double arc;
             try {
                 arc = ADOBase.lm.CalculateSingleFloorAngleLength(floor);

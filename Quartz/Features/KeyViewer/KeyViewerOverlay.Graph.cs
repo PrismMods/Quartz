@@ -23,8 +23,6 @@ public static partial class KeyViewerOverlay {
         float inset = spec.GraphBorderWidth;
         rt.offsetMin = new Vector2(inset, inset);
         rt.offsetMax = new Vector2(-inset, -inset);
-        // The plot re-tessellates nearly every frame while KPS changes; without its
-        // own Canvas that dirties the whole overlay canvas (same pattern as RainLayer).
         obj.AddComponent<Canvas>().overrideSorting = false;
         KpsGraphGraphic plot = obj.AddComponent<KpsGraphGraphic>();
         plot.raycastTarget = false;
@@ -61,7 +59,7 @@ public static partial class KeyViewerOverlay {
             _showAvg = spec.GraphShowAvg;
             _anim = spec.GraphAnim;
             _color = spec.GraphColor;
-            color = Color.white; 
+            color = Color.white;
             int size = Mathf.Max(1, Mathf.CeilToInt(_speedMs / GraphUpdateMs));
             _history = new float[size];
             _animFrom = new float[size];
@@ -71,15 +69,13 @@ public static partial class KeyViewerOverlay {
         }
         private void Update() {
             float now = Time.unscaledTime;
-            // Sample cadence must match the bucket size the history was sized with
-            // (speedMs / GraphUpdateMs buckets), or the visible window is wrong.
             if(now >= _nextSample) {
                 Sample();
                 _nextSample = now + GraphUpdateMs / 1000f;
             }
             if(_anim && _animStart >= 0f) {
                 float t = Mathf.Clamp01((now - _animStart) / (GraphAnimMs / 1000f));
-                float e = 1f - (1f - t) * (1f - t) * (1f - t); 
+                float e = 1f - (1f - t) * (1f - t) * (1f - t);
                 for(int i = 0; i < _history.Length; i++) _history[i] = Mathf.Lerp(_animFrom[i], _animTo[i], e);
                 SetVerticesDirty();
                 if(t >= 1f) _animStart = -1f;
@@ -162,7 +158,7 @@ public static partial class KeyViewerOverlay {
                 Vector2 dir = (b - a);
                 float len = dir.magnitude;
                 if(len < 0.0001f) continue;
-                Vector2 nrm = new Vector2(-dir.y, dir.x) / len; 
+                Vector2 nrm = new Vector2(-dir.y, dir.x) / len;
                 Color ca = Fade(Mathf.Lerp(0.3f, 1f, i / denom));
                 Color cb = Fade(Mathf.Lerp(0.3f, 1f, (i + 1) / denom));
                 AddQuad(vh, a - nrm, b - nrm, b + nrm, a + nrm, ca, cb, cb, ca);

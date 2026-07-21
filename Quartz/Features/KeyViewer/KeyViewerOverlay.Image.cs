@@ -9,7 +9,7 @@ public static partial class KeyViewerOverlay {
     private static Texture2D ResolveImage(string src) {
         if(string.IsNullOrWhiteSpace(src)) return null;
         string key = src.Trim();
-        if(cssImages.TryGetValue(key, out Texture2D cached)) return cached; 
+        if(cssImages.TryGetValue(key, out Texture2D cached)) return cached;
         try {
             if(key.StartsWith("data:", StringComparison.OrdinalIgnoreCase)) {
                 int comma = key.IndexOf(',');
@@ -23,7 +23,7 @@ public static partial class KeyViewerOverlay {
                 string path = ImageCachePath(key);
                 if(File.Exists(path)) return Cache(key, LoadTex(File.ReadAllBytes(path)));
                 StartImageDownload(key, path);
-                return null; 
+                return null;
             }
             string file = key.StartsWith("file://", StringComparison.OrdinalIgnoreCase)
                 ? new Uri(key).LocalPath
@@ -32,7 +32,7 @@ public static partial class KeyViewerOverlay {
         } catch(Exception ex) {
             MainCore.Log.Msg("[KeyViewer] CSS image load failed: " + ex.Message);
         }
-        return Cache(key, null); 
+        return Cache(key, null);
     }
     private static bool IsLikelyLocalPath(string v) =>
         v.Length > 1 && (v[0] == '/' || v.StartsWith("\\\\", StringComparison.Ordinal)
@@ -76,7 +76,7 @@ public static partial class KeyViewerOverlay {
         obj.transform.SetParent(box.Fill.transform, false);
         RawImage ri = obj.AddComponent<RawImage>();
         ri.raycastTarget = false;
-        obj.transform.SetAsFirstSibling(); 
+        obj.transform.SetAsFirstSibling();
         box.KeyImage = ri;
     }
     private static void BuildGraphImage(RectTransform parent, DmNoteSpec spec) {
@@ -87,7 +87,7 @@ public static partial class KeyViewerOverlay {
         obj.transform.SetParent(parent, false);
         RawImage ri = obj.AddComponent<RawImage>();
         ri.raycastTarget = false;
-        obj.transform.SetAsFirstSibling(); 
+        obj.transform.SetAsFirstSibling();
         string fit = spec.ImageFitDefault.Length > 0 ? spec.ImageFitDefault : "cover";
         ApplyImageFit(ri, tex, fit, spec.W, spec.H);
         ri.color = Color.white;
@@ -104,8 +104,6 @@ public static partial class KeyViewerOverlay {
         string fit = usingActive
             ? Pick(spec.ActiveImageFit, spec.ImageFitDefault)
             : Pick(spec.IdleImageFit, spec.ImageFitDefault);
-        // Re-fitting rewrites the RectTransform + uvRect; only do it when the
-        // texture or fit actually changed since the last press edge.
         if(!ReferenceEquals(tex, box.LastImageTex) || !string.Equals(fit, box.LastImageFit, StringComparison.Ordinal)) {
             ApplyImageFit(box.KeyImage, tex, fit, spec.W, spec.H);
             box.LastImageTex = tex;
@@ -132,10 +130,10 @@ public static partial class KeyViewerOverlay {
                 break;
             }
             case "none":
-                Center(rt, tw, th); 
+                Center(rt, tw, th);
                 ri.uvRect = new Rect(0f, 0f, 1f, 1f);
                 break;
-            default: { 
+            default: {
                 Stretch(rt);
                 float ra = rw / rh, ta = tw / th;
                 ri.uvRect = ta > ra

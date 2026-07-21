@@ -11,35 +11,14 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static UnityEngine.EventSystems.PointerEventData;
 namespace Quartz.UI.Editor;
-/// <summary>
-/// DM Note's ListPopup: the black tray of choices an icon button opens, and the reason its toolbar
-/// needs one icon where this editor had four buttons.
-///
-/// Editor-local and action-only. <see cref="Objects.Impl.UIDropDown{T}"/> is the menu's list
-/// control, but it is a value selector — it holds a current value and a changed-dot against a
-/// default — and "Add Key" is not a value. Modelling these as a selection would leave it reporting
-/// whichever action was run last as the field's state.
-///
-/// Opens upward, because the bar it hangs off is at the bottom of the editor.
-/// </summary>
 internal sealed class KvPopup : MonoBehaviour {
-    /// <summary>24px row.</summary>
     private static float ItemHeight => 24f * KvPalette.Scale;
-    /// <summary>108px min-w item, inside a 5px tray pad.</summary>
     private static float MinWidth => (108f + 10f) * KvPalette.Scale;
-    /// <summary>13px item label (text-style-2).</summary>
     private static float LabelSize => 13f * KvPalette.Scale;
-    /// <summary>1px flex gap.</summary>
     private static float ItemGap => 1f * KvPalette.Scale;
-    /// <summary>The tray floats clear of the button that opened it.</summary>
     private static float AnchorGap => 6f * KvPalette.Scale;
     private static KvPopup open;
     private Action onClosed;
-    /// <summary>
-    /// Show a list over <paramref name="host"/>, hanging off <paramref name="anchor"/>. Re-opening
-    /// from the same button closes it, which is how DM Note's toggle behaves and what a user who
-    /// missed the list expects from a second click.
-    /// </summary>
     internal static void Show(
         RectTransform host, RectTransform anchor, IReadOnlyList<(string Key, string Text)> items,
         Action<int> onPick, Action onClosed = null
@@ -54,17 +33,11 @@ internal sealed class KvPopup : MonoBehaviour {
         rect.anchorMax = Vector2.one;
         rect.offsetMin = Vector2.zero;
         rect.offsetMax = Vector2.zero;
-        // The full-bleed overlay is positioned by Place, never by a parent group. A host with a
-        // layout group (the editor region has a VerticalLayoutGroup) would otherwise count it as a
-        // row and open one extra spacing gap, shunting the whole bar up until the popup closed.
         obj.AddComponent<LayoutElement>().ignoreLayout = true;
-        // Above every sibling in the region, including the canvas and the panel.
         obj.transform.SetAsLastSibling();
         KvPopup popup = obj.AddComponent<KvPopup>();
         popup.Anchor = anchor;
         popup.onClosed = onClosed;
-        // A click anywhere but the tray dismisses. Full-bleed and behind the tray, so the tray's
-        // own rows get the pointer first.
         GameObject catcher = new("Catcher");
         catcher.transform.SetParent(rect, false);
         RectTransform catcherRect = catcher.AddComponent<RectTransform>();
@@ -148,13 +121,6 @@ internal sealed class KvPopup : MonoBehaviour {
         UnityUtils.AddEvent(EventTriggerType.PointerEnter, _ => bg.color = KvPalette.ButtonHover, trigger);
         UnityUtils.AddEvent(EventTriggerType.PointerExit, _ => bg.color = KvPalette.ButtonPrimary, trigger);
     }
-    /// <summary>
-    /// Sit the tray above the button, centred on it and kept inside the region. The layout has to
-    /// be resolved before it can be measured, hence the forced rebuild — the fitter would otherwise
-    /// not have run until the end of the frame and every tray would place off a zero-size rect.
-    /// </summary>
-    /// <summary>Fade the tray in and let it rise the last few px into place — a light pop, matching
-    /// the toast's fade+slide. Placed after <see cref="Place"/> so the rest position is known.</summary>
     private static void AnimateIn(RectTransform tray) {
         CanvasGroup cg = tray.GetComponent<CanvasGroup>() ?? tray.gameObject.AddComponent<CanvasGroup>();
         cg.alpha = 0f;

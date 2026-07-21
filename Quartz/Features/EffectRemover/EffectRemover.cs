@@ -96,8 +96,6 @@ public static partial class EffectRemover {
     }
     private static void RemoveDecorations(LevelData levelData, EffectRemoverSettings conf) {
         if(!conf.DecoPlanet && !conf.DecoTiles && !conf.DecoImage && !conf.DecoText && !conf.Particles && !conf.DecoFailHitbox) return;
-        // DecorationSettings/MoveDecorations aren't type-specific (no planet/tile/image/text of their own), so they
-        // only get swept up once every real type is selected - matching the old all-or-nothing removal for them.
         bool allCoreTypes = conf.DecoPlanet && conf.DecoTiles && conf.DecoImage && conf.DecoText;
         if(allCoreTypes && conf.RemoveAllDecorations) {
             levelData.decorationSettings = new LevelEvent(0, Event(11), GCS.settingsInfo["DecorationSettings"]);

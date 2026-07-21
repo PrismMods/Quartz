@@ -3,16 +3,9 @@ using UnityEngine;
 using Object = UnityEngine.Object;
 namespace Quartz.Features.Nostalgia;
 public static partial class Nostalgia {
-    // Floors that actually have arrow child objects. The old scene-global
-    // "ever applied" latch made EVERY UpdateIconSprite call in the scene pay
-    // 2× transform.Find + DestroyImmediate once the toggle had ever been on
-    // (~10k string Finds on a 5k-tile load, and it kept paying after the
-    // toggle went off until the next scene). Tracking the floors that hold
-    // arrows confines the cleanup cost to exactly those floors.
     private static readonly HashSet<int> twirlArrowFloors = [];
     [HarmonyPatch(typeof(scrController), "StartLoadingScene")]
     private static class TwirlSceneResetPatch {
-        // fresh scenes carry no arrow objects
         private static void Postfix() => twirlArrowFloors.Clear();
     }
     [HarmonyPatch(typeof(scrFloor), "UpdateIconSprite")]
@@ -89,7 +82,7 @@ public sealed class TwirlRenderer : MonoBehaviour {
     private void LateUpdate() {
         if(floor == null) return;
         if(floor.floorIcon != FloorIcon.Swirl && floor.floorIcon != FloorIcon.SwirlCW) {
-            Destroy(gameObject); // whole arrow object, or the orphaned SpriteRenderer keeps drawing
+            Destroy(gameObject);
             return;
         }
         Renderer iconRef = (Renderer)floor.iconsprite ?? floor.floorRenderer.renderer;

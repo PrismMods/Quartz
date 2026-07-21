@@ -19,9 +19,6 @@ public static partial class ProfileManager {
         "PlayCount.json",
         "Profiles.json",
     };
-    // A preset ships one author's look to everyone, so it must not carry settings that
-    // describe that author rather than the look. ProfileBundle.StripPresetImposed drops
-    // these fields from the config file when a bundle is imported as a preset.
     private static readonly string[] presetImposed = [nameof(CoreSettings.Language)];
     public static string Active { get; private set; } = DEFAULT_NAME;
     public static string ProfilesPath => Path.Combine(MainCore.Paths.RootPath, "Profiles");

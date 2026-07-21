@@ -99,7 +99,7 @@ public static partial class EditorFeature {
     }
     private static void EnableHorizontal() {
         GameObject template = ADOBase.gc?.prefab_property;
-        if(template == null) return; 
+        if(template == null) return;
         VerticalLayoutGroup vertical = template.GetComponent<VerticalLayoutGroup>();
         if(vertical != null) {
             if(!captured) {

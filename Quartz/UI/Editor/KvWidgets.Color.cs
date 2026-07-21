@@ -19,24 +19,7 @@ internal static partial class KvWidgets {
     private const float HueGap = 8f;
     private const float AlphaH = 34f;
     private const float ColorGapY = 10f;
-    /// <summary>Room for the hex readout and the swatch on the right of the header.</summary>
     private const float ColorHeaderReserve = 120f;
-    /// <summary>
-    /// The colour picker, at pane width.
-    ///
-    /// The shared one cannot follow the inspector into a column: its saturation square and hue
-    /// strip are placed at fixed x, ending at 244px before any margin, and under them sit four
-    /// full-height R/G/B/A sliders that make the open picker 616px tall — taller than the whole
-    /// pane, in a panel the pane has to scroll. This one anchors the square to both edges so it
-    /// grows with the pane, and drops the R/G/B sliders: the hex field already does exact entry
-    /// and the square and strip already do visual picking, which takes the open height to 234px
-    /// (278 with alpha).
-    ///
-    /// <see cref="UIColorPicker"/> itself is reused whole rather than reimplemented. It reads its
-    /// geometry off the rects at runtime, so all of the colour maths — HSV round-tripping, hex
-    /// parsing, texture generation, handle placement, and the texture cleanup in its Dispose —
-    /// works unchanged against a different layout.
-    /// </summary>
     internal static UIColorPicker ColorPicker(
         Transform parent,
         Color defaultValue,
@@ -102,9 +85,6 @@ internal static partial class KvWidgets {
         GameObject sv = new("SaturationValue");
         sv.transform.SetParent(body.transform, false);
         RectTransform svRect = sv.AddComponent<RectTransform>();
-        // Stretched rather than sized: the pane is resizable, and a fixed square is exactly what
-        // stops the shared picker from fitting in it. The pivot still puts rect.xMin at 0, which
-        // is what UIColorPicker's pointer maths and handle placement read.
         svRect.anchorMin = new Vector2(0f, 1f);
         svRect.anchorMax = new Vector2(1f, 1f);
         svRect.pivot = new Vector2(0f, 1f);

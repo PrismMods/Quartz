@@ -10,11 +10,6 @@ internal sealed partial class KvInspector {
     private static readonly string[] Placements = ["inside", "outside"];
     private static readonly string[] CounterAligns = ["top", "bottom", "left", "right"];
     private static readonly string[] AlignModes = ["center", "between"];
-    /// <summary>
-    /// <paramref name="batch"/> is the keys and stats of the selection, not the selection: a graph
-    /// draws no counter, so one caught in a marquee is dropped before it gets here rather than
-    /// given a counter object nothing will ever read.
-    /// </summary>
     private void BuildCounterTab(RectTransform root, List<UIObject> tracked, KvElement[] batch) {
         if(batch.Length == 0) return;
         Header(root, "KVI_SEC_COUNTER", "Counter");
@@ -25,8 +20,6 @@ internal sealed partial class KvInspector {
             "DESC_KVI_COUNTER_ENABLED",
             "Draw this element's press count. The Key Viewer's own Show Counter setting still has to be on."
         );
-        // Keys only: a stat picks its readout with statType, so offering this there would be a
-        // second, disagreeing control over the same thing.
         KvElement[] keys = OfKind(batch, KvElementKind.Key);
         if(keys.Length > 0) {
             Flag(root, tracked, "Per-Key KPS", "kvi_counter_perkeykps", false,
@@ -51,10 +44,7 @@ internal sealed partial class KvInspector {
         Num(root, tracked, "Counter Font Size", "kvi_counter_font", 16f, 1f, 200f, "0 px", 1f,
             batch, el => KvProps.Int(Read(el), "fontSize", 16),
             (el, v) => KvProps.SetInt(Counter(el), "fontSize", v));
-        // The counter's own DM Note font styling, on its counter object rather than the element.
         FontStyleRows(root, tracked, batch, "kvi_counter", Read, Counter);
-        // counter.animation: the count pops to Scale on a press and eases back over Duration.
-        // Default-on in DM Note; the bezier rides along from whatever preset authored it.
         Header(root, "KVI_SEC_COUNTER_ANIM", "Animation");
         Flag(root, tracked, "Press Animation", "kvi_counter_anim", true,
             batch, el => KvProps.Bool(AnimOrNull(el), "enabled", true),
@@ -66,14 +56,10 @@ internal sealed partial class KvInspector {
             batch, el => KvProps.Float(AnimOrNull(el), "durationMs", 300f),
             (el, v) => KvProps.SetInt(Anim(el), "durationMs", v));
         Header(root, "KVI_SEC_COUNTER_COLORS", "Counter Colors");
-        // An absent counter fill renders as the element's own text colour, so the picker opens
-        // on that rather than on a colour the renderer never used. Resolved per element: in a
-        // batch each one falls back to its own text colour, not to the first element's.
         CounterColor(root, tracked, batch, "Counter Text", "kvi_counter_fill", "fill", "idle",
             el => KvProps.Str(el.Raw, "fontColor", DefFont), 1f);
         CounterColor(root, tracked, batch, "Counter Text (Pressed)", "kvi_counter_fill_active", "fill", "active",
             el => KvProps.Str(el.Raw, "activeFontColor", DefFontActive), 1f);
-        // Stroke falls back at alpha 0, so its default really is invisible, not black.
         CounterColor(root, tracked, batch, "Counter Outline", "kvi_counter_stroke", "stroke", "idle",
             _ => "transparent", 0f);
         CounterColor(root, tracked, batch, "Counter Outline (Pressed)", "kvi_counter_stroke_active", "stroke", "active",
@@ -101,16 +87,7 @@ internal sealed partial class KvInspector {
         el => KvProps.Color(KvProps.ChildOrNull(Read(el), groupKey), field, def(el), defAlpha),
         (el, c) => KvProps.SetColor(KvProps.Child(Counter(el), groupKey), field, c), true
     );
-    /// <summary>
-    /// The counter object to read, which may not exist. Never materialized on the read side: an
-    /// element with no counter renders with every default, and writing one in just to look at it
-    /// would be a change the user did not ask for — and, in a batch, a change to elements they
-    /// only meant to look at. Every KvProps reader is null-safe, so this can be handed straight
-    /// on.
-    /// </summary>
     private static JObject Read(KvElement el) => KvProps.ChildOrNull(el.Raw, "counter");
-    /// <summary>The counter object, created on first write. Intermediates have to be
-    /// materialized or a nested write lands nowhere.</summary>
     private static JObject Counter(KvElement el) => KvProps.Child(el.Raw, "counter");
     private static JObject AnimOrNull(KvElement el) => KvProps.ChildOrNull(Read(el), "animation");
     private static JObject Anim(KvElement el) => KvProps.Child(Counter(el), "animation");

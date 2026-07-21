@@ -225,7 +225,7 @@ public static partial class KeyViewerOverlay {
         RawImage ri = obj.AddComponent<RawImage>();
         ri.texture = GradientTexture(g.Stops, 0f);
         ri.raycastTarget = false;
-        rt.SetAsFirstSibling(); 
+        rt.SetAsFirstSibling();
         box.FillGrad = ri;
     }
     private static RawImage BuildPseudo(Box box, DmNoteSpec spec, CssLayerRt layer, bool isBefore) {
@@ -306,9 +306,6 @@ public static partial class KeyViewerOverlay {
         }
         if(box.Value != null && spec.CounterStrokeWidth > 0.01f) {
             Color stroke = pressed ? spec.ActiveCounterStroke : spec.CounterStroke;
-            // TMP_Text.fontMaterial is not a plain accessor: every read runs GetPaddingForMaterial
-            // and re-dirties the mesh + material. Cache the instanced material so a press edge does
-            // not force a counter re-tessellation; the ref is invalidated on font swap.
             if(box.CounterStrokeMat == null) box.CounterStrokeMat = box.Value.fontMaterial;
             Material mat = box.CounterStrokeMat;
             if(stroke.a > 0.001f) {
@@ -323,8 +320,6 @@ public static partial class KeyViewerOverlay {
             box.Glow.enabled = g.On;
             if(g.On) box.Glow.color = g.Color;
         }
-        // Transform writes dirty the RectTransform even when values are unchanged;
-        // skip them entirely for specs that never move/scale/rotate between states.
         if(spec.HasStateTransform) {
             Vector2 off = pressed ? spec.ActiveOffset : spec.IdleOffset;
             Vector2 scl = pressed ? spec.ActiveScale : spec.IdleScale;
@@ -440,8 +435,6 @@ public static partial class KeyViewerOverlay {
         float scroll = g.Period > 0.01f ? (time / g.Period) % 1f : 0f;
         int count = info.characterCount;
         for(int i = 0; i < count; i++) {
-            // Ref: TMP_CharacterInfo is a large struct; copying it per glyph per
-            // frame is measurable at high glyph counts.
             ref TMP_CharacterInfo ch = ref info.characterInfo[i];
             if(!ch.isVisible) continue;
             float u = count > 1 ? (float)i / (count - 1) : 0f;
@@ -496,7 +489,7 @@ public static partial class KeyViewerOverlay {
             float r = 0f, g = 0f, b = 0f, a = 0f;
             int cnt = 0;
             for(int k = -radius; k <= radius; k++) {
-                int j = ((i + k) % n + n) % n; 
+                int j = ((i + k) % n + n) % n;
                 r += src[j].r; g += src[j].g; b += src[j].b; a += src[j].a;
                 cnt++;
             }
@@ -609,7 +602,7 @@ public static partial class KeyViewerOverlay {
             cssFonts[family] = asset;
         } catch(Exception ex) {
             MainCore.Log.Msg($"[KeyViewer] CSS font '{family}' build failed: {ex.Message}");
-            cssFonts[family] = null; 
+            cssFonts[family] = null;
         }
     }
     private static void StartFontDownload(CssFontFace face) {
@@ -627,7 +620,7 @@ public static partial class KeyViewerOverlay {
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                 using var client = new WebClient();
                 File.WriteAllBytes(path, client.DownloadData(url));
-                cssDownloadArrived = true; 
+                cssDownloadArrived = true;
             } catch(Exception ex) {
                 MainCore.Log.Msg($"[KeyViewer] {failWhat}: {ex.Message}");
             } finally {

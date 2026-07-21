@@ -4,12 +4,7 @@ using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-
 namespace Quartz.Features.Tuf;
-
-// Read-only client for the TUF pack endpoints. Mirrors TufApiClient's hardening:
-// no redirects, bounded response size, HTTPS-only origin. All parsing is defensive
-// because the payloads are attacker-influenceable community data.
 public sealed class TufPackApiClient : IDisposable {
     private const int MaxListJsonBytes = 2 * 1024 * 1024;
     private const int MaxTreeJsonBytes = 12 * 1024 * 1024;
@@ -17,16 +12,12 @@ public sealed class TufPackApiClient : IDisposable {
     private const int MaxPackLevels = 5000;
     private static readonly Uri ApiOrigin = new("https://api.tuforums.com/");
     private readonly HttpClient http;
-
     public TufPackApiClient() {
-#pragma warning disable SYSLIB0014 // legacy TLS knob still matters under the game's Mono runtime
+#pragma warning disable SYSLIB0014
         try { ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12; } catch { }
 #pragma warning restore SYSLIB0014
         http = new HttpClient(new HttpClientHandler {
             AllowAutoRedirect = false,
-            // Unity Mono's UnityTLS fails certificate verification (UNITYTLS_X509VERIFY_NOT_DONE)
-            // on many systems because its root cert store is outdated. All request targets are
-            // already domain-allowlisted via TufNetworkPolicy, so bypassing the broken verifier is safe.
             ServerCertificateCustomValidationCallback = (HttpRequestMessage _, X509Certificate2 _, X509Chain _, SslPolicyErrors _) => true
         }) {
             BaseAddress = ApiOrigin,
@@ -35,7 +26,6 @@ public sealed class TufPackApiClient : IDisposable {
         http.DefaultRequestHeaders.UserAgent.ParseAdd("Quartz-TUF/1.0");
         http.DefaultRequestHeaders.Accept.ParseAdd("application/json");
     }
-
     public async Task<TufPacksPage> FetchPacksAsync(string query, TufPackSort sort, bool ascending, int offset,
         int limit, CancellationToken token) {
         string order = sort switch { TufPackSort.Name => "NAME", TufPackSort.Levels => "LEVELS", _ => "RECENT" };
@@ -47,12 +37,10 @@ public sealed class TufPackApiClient : IDisposable {
         byte[] bytes = await GetAsync(path, MaxListJsonBytes, token).ConfigureAwait(false);
         return ParsePacks(bytes);
     }
-
     public async Task<TufDifficultyDictionary> FetchDifficultiesAsync(CancellationToken token) {
         byte[] bytes = await GetAsync("v2/database/difficulties", MaxDifficultiesJsonBytes, token).ConfigureAwait(false);
         return ParseDifficulties(bytes);
     }
-
     public async Task<IReadOnlyList<TufPackItem>> FetchPackItemsAsync(string packId, TufDifficultyDictionary difficulties,
         CancellationToken token) {
         if(!IsValidPackId(packId)) throw new InvalidDataException("Invalid pack id.");
@@ -60,13 +48,9 @@ public sealed class TufPackApiClient : IDisposable {
             MaxTreeJsonBytes, token).ConfigureAwait(false);
         return ParsePackItems(bytes, difficulties);
     }
-
-    // Pack ids are short opaque link codes ("RCAXIAv9"). Bound + charset-check them
-    // before they are ever embedded in a request path.
     internal static bool IsValidPackId(string? id) =>
         !string.IsNullOrEmpty(id) && id.Length <= 64
         && id.All(c => char.IsLetterOrDigit(c) || c is '-' or '_');
-
     private async Task<byte[]> GetAsync(string path, int maxBytes, CancellationToken token) {
         using HttpResponseMessage response = await http.GetAsync(path, HttpCompletionOption.ResponseHeadersRead, token)
             .ConfigureAwait(false);
@@ -78,7 +62,6 @@ public sealed class TufPackApiClient : IDisposable {
         token.ThrowIfCancellationRequested();
         return bytes;
     }
-
     private static JToken LoadJson(byte[] bytes) {
         try {
             using MemoryStream ms = new(bytes, false);
@@ -89,7 +72,6 @@ public sealed class TufPackApiClient : IDisposable {
             throw new InvalidDataException("TUF returned malformed data.", e);
         }
     }
-
     internal static TufPacksPage ParsePacks(byte[] bytes) {
         if(LoadJson(bytes) is not JObject root) throw new InvalidDataException("TUF returned malformed pack data.");
         if(root["packs"] is not JArray packs || packs.Count > 100)
@@ -126,7 +108,6 @@ public sealed class TufPackApiClient : IDisposable {
         }
         return new TufPacksPage(result, Math.Max(SafeInt(root, "total"), result.Count));
     }
-
     internal static TufDifficultyDictionary ParseDifficulties(byte[] bytes) {
         if(LoadJson(bytes) is not JArray array) return TufDifficultyDictionary.Empty;
         Dictionary<int, (string, string, int)> map = new();
@@ -139,7 +120,6 @@ public sealed class TufPackApiClient : IDisposable {
         }
         return new TufDifficultyDictionary(map);
     }
-
     internal static IReadOnlyList<TufPackItem> ParsePackItems(byte[] bytes, TufDifficultyDictionary difficulties) {
         JToken root = LoadJson(bytes);
         JToken? items = root["items"] ?? (root["pack"]?["items"]);
@@ -149,25 +129,17 @@ public sealed class TufPackApiClient : IDisposable {
         long syntheticKey = -1;
         return BuildItems(array, difficulties, seen, ref total, ref syntheticKey);
     }
-
-    // Flat, on-site-ordered level list derived from the tree (used by tests and by
-    // the service to seed the shared action runner's owner list).
     internal static IReadOnlyList<TufLevel> ParsePackLevels(byte[] bytes, TufDifficultyDictionary difficulties) {
         List<TufLevel> levels = [];
         FlattenLevels(ParsePackItems(bytes, difficulties), levels);
         return levels;
     }
-
     internal static void FlattenLevels(IReadOnlyList<TufPackItem> items, List<TufLevel> output) {
         foreach(TufPackItem item in items) {
             if(item.Level != null) output.Add(item.Level);
             if(item.Children.Count > 0) FlattenLevels(item.Children, output);
         }
     }
-
-    // Depth-first over the folder/level tree, preserving each container's sortOrder so
-    // the tree mirrors the pack's on-site ordering. Levels are de-duplicated by id;
-    // folders keep their identity for the UI's expand/collapse state.
     private static IReadOnlyList<TufPackItem> BuildItems(JArray items, TufDifficultyDictionary difficulties,
         HashSet<int> seen, ref int total, ref long syntheticKey) {
         List<TufPackItem> result = [];
@@ -209,9 +181,6 @@ public sealed class TufPackApiClient : IDisposable {
         }
         return result;
     }
-
-    // Tree levels carry no flat "creator" string; the charters live in
-    // levelCredits[].creator.name. Prefer charter-role credits, else any credit.
     private static string? ExtractCreator(JToken level) {
         string? flat = level.Value<string>("creator") ?? level.Value<string>("charter");
         if(!string.IsNullOrWhiteSpace(flat)) return flat;
@@ -228,13 +197,9 @@ public sealed class TufPackApiClient : IDisposable {
         if(chosen.Count == 0) return null;
         return chosen.Count <= 3 ? string.Join(" & ", chosen) : string.Join(" & ", chosen.Take(3)) + " …";
     }
-
-    // The API is community data; a field that should be a number can arrive as any
-    // token type. Json.NET conversions throw FormatException on garbage — swallow to 0.
     private static int SafeInt(JToken? token, string name) {
         try { return token?.Value<int?>(name) ?? 0; } catch { return 0; }
     }
-
     private static async Task<byte[]> ReadBoundedAsync(Stream stream, int max, CancellationToken token) {
         using MemoryStream output = new();
         byte[] buffer = new byte[32768];
@@ -245,6 +210,5 @@ public sealed class TufPackApiClient : IDisposable {
             output.Write(buffer, 0, read);
         }
     }
-
     public void Dispose() => http.Dispose();
 }

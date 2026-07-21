@@ -2,7 +2,6 @@ using System.IO.Compression;
 using System.Net;
 using Quartz.Features.Tuf;
 using static Asserts;
-
 static class TufSecurityTests {
     public static void TestInputAndNetworkPolicy() {
         string noisy = "  hello\t\r\n world  ";
@@ -20,7 +19,6 @@ static class TufSecurityTests {
         Assert(TufNetworkPolicy.IsNonPublic(IPAddress.Parse("fe80::1")), "link-local IPv6 rejected");
         Assert(!TufNetworkPolicy.IsNonPublic(IPAddress.Parse("1.1.1.1")), "public IPv4 accepted");
     }
-
     public static void TestArchiveSafetyAndSelection() {
         string temp = Path.Combine(Path.GetTempPath(), "quartz-tuf-test-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(temp);
@@ -29,20 +27,17 @@ static class TufSecurityTests {
             MakeZip(traversal, zip => Write(zip, "../escape.adofai", "bad"));
             AssertThrows(() => TufArchive.Extract(traversal, Path.Combine(temp, "out")), "traversal rejected");
             Assert(!File.Exists(Path.Combine(temp, "escape.adofai")), "traversal wrote no file");
-
             string symlink = Path.Combine(temp, "symlink.zip");
             MakeZip(symlink, zip => {
                 ZipArchiveEntry entry = zip.CreateEntry("link.adofai");
                 entry.ExternalAttributes = unchecked((int)0xA0000000);
             });
             AssertThrows(() => TufArchive.Extract(symlink, Path.Combine(temp, "links")), "symlink rejected");
-
             string many = Path.Combine(temp, "many.zip");
             MakeZip(many, zip => {
                 for(int i = 0; i <= TufArchive.MaxEntries; i++) zip.CreateEntry("d/" + i);
             });
             AssertThrows(() => TufArchive.Extract(many, Path.Combine(temp, "many")), "entry count capped");
-
             string valid = Path.Combine(temp, "valid.zip");
             MakeZip(valid, zip => {
                 Write(zip, "charts/large.adofai", new string('x', 100));
@@ -55,7 +50,6 @@ static class TufSecurityTests {
             Assert(Path.GetFileName(selected) == "main.adofai", "main chart preferred");
             Assert(TufArchive.IsChartUnderRoot(selected, extracted), "selected chart contained by root");
             Assert(!TufArchive.IsChartUnderRoot(Path.Combine(temp, "outside.adofai"), extracted), "outside chart rejected");
-
             string multi = Path.Combine(temp, "multi.zip");
             MakeZip(multi, zip => {
                 Write(zip, "alternate.adofai", new string('x', 200));
@@ -72,7 +66,6 @@ static class TufSecurityTests {
             Assert(Path.GetFileName(charts[0]) == "alternate.adofai" && Path.GetFileName(charts[1]) == "target.adofai",
                 "chart list preserves selection preference order");
             Assert(TufArchive.ListCharts(Path.Combine(temp, "does-not-exist")).Count == 0, "missing folder lists no charts");
-
             string wrapped = Path.Combine(temp, "wrapped.zip");
             MakeZip(wrapped, zip => {
                 Write(zip, "Artist - Title/level.adofai", "chart");
@@ -83,14 +76,12 @@ static class TufSecurityTests {
             TufArchive.FlattenSingleRoot(wrappedExtracted);
             Assert(File.Exists(Path.Combine(wrappedExtracted, "level.adofai")), "wrapper folder flattened to root");
             Assert(!Directory.Exists(Path.Combine(wrappedExtracted, "Artist - Title")), "wrapper folder removed");
-
             string samename = Path.Combine(temp, "samename.zip");
             MakeZip(samename, zip => Write(zip, "X/X/a.adofai", "chart"));
             string samenameExtracted = Path.Combine(temp, "samename");
             TufArchive.Extract(samename, samenameExtracted);
             TufArchive.FlattenSingleRoot(samenameExtracted);
             Assert(File.Exists(Path.Combine(samenameExtracted, "a.adofai")), "double wrapper with same name flattened");
-
             string flat = Path.Combine(temp, "flat.zip");
             MakeZip(flat, zip => {
                 Write(zip, "root.adofai", "chart");
@@ -101,7 +92,6 @@ static class TufSecurityTests {
             TufArchive.FlattenSingleRoot(flatExtracted);
             Assert(File.Exists(Path.Combine(flatExtracted, "root.adofai"))
                 && File.Exists(Path.Combine(flatExtracted, "assets", "img.png")), "already-flat layout untouched");
-
             string unicode = Path.Combine(temp, "unicode.zip");
             MakeZip(unicode, zip => {
                 Write(zip, "레벨/메인.adofai", "main");
@@ -116,19 +106,16 @@ static class TufSecurityTests {
             try { Directory.Delete(temp, true); } catch { }
         }
     }
-
     private static void MakeZip(string path, Action<ZipArchive> write) {
         using FileStream stream = new(path, FileMode.CreateNew);
         using ZipArchive zip = new(stream, ZipArchiveMode.Create);
         write(zip);
     }
-
     private static void Write(ZipArchive zip, string path, string value) {
         ZipArchiveEntry entry = zip.CreateEntry(path);
         using StreamWriter writer = new(entry.Open());
         writer.Write(value);
     }
-
     private static void AssertThrows(Action action, string message) {
         try { action(); }
         catch(InvalidDataException) { return; }

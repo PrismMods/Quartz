@@ -126,9 +126,6 @@ public sealed class UIColorPicker : UIObject {
     public void SetExpanded(bool expanded, bool noAnimate = false) {
         Expanded = expanded;
         if(expanded && !texturesBuilt) {
-            // Deferred from the constructor: every picker on every page is built
-            // at startup, and the 128x128 HSV fill is invisible until the body is
-            // first expanded (BuildSvTexture no-ops before this).
             texturesBuilt = true;
             BuildHueTexture();
             BuildSvTexture();
@@ -287,8 +284,6 @@ public sealed class UIColorPicker : UIObject {
         hueTexture.Apply(false);
     }
     private void BuildSvTexture() {
-        // Not visible until the first expand; builtHue stays stale so the first
-        // SetExpanded(true) builds with whatever hue Set() has landed on by then.
         if(!texturesBuilt) return;
         if(Mathf.Approximately(builtHue, hue)) return;
         if(svTexture == null) {

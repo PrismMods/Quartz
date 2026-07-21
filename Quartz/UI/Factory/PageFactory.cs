@@ -73,10 +73,6 @@ public static class PageFactory {
         PageSearch.Create(UICore.Pages[(int)OriginalMenuState.Search]);
         PageAddons.Create(UICore.Pages[(int)OriginalMenuState.Addons]);
         if(Quartz.Core.Info.IsDev) PageDeveloper.Create(UICore.Pages[(int)OriginalMenuState.Developer]);
-        // Hidden pages are fully deactivated (not alpha-0 with a disabled Canvas):
-        // active-but-invisible pages still run layout rebuilds on every container
-        // resize and register their graphics for pointer raycasts, which made any
-        // shell-width change re-layout all ~40 pages at once.
         foreach(var kv in UICore.Pages)
             kv.Value.gameObject.SetActive(kv.Key == UICore.CurrentMenuState);
         return PagesContaner;

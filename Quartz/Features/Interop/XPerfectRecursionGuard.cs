@@ -13,7 +13,7 @@ internal static class XPerfectRecursionGuard {
             MethodInfo target = AccessTools.Method(patchType, "Postfix");
             if(target == null) {
                 MainCore.Log.Msg("[XPerfectGuard] XPerfect.HitMarginPatch.Postfix not found; guard not installed.");
-                applied = true; 
+                applied = true;
                 return;
             }
             MethodInfo prefix = typeof(XPerfectRecursionGuard).GetMethod(
@@ -49,7 +49,7 @@ internal static class XPerfectRecursionGuard {
     }
     private static bool GuardPrefix(ref bool __state) {
         __state = false;
-        if(depth > 0) return false; 
+        if(depth > 0) return false;
         depth++;
         __state = true;
         return true;

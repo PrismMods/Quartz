@@ -1,9 +1,7 @@
 #nullable enable
 using Newtonsoft.Json.Linq;
 using Quartz.IO.Interface;
-
 namespace Quartz.Features.Tuf;
-
 public sealed class TufSettings : ISettingsFile {
     public int Sort = (int)TufSort.Recent;
     public bool Ascending;
@@ -14,29 +12,18 @@ public sealed class TufSettings : ISettingsFile {
     public int QuantumMaxIndex = TufDifficultyFilter.QuantumNames.Count - 1;
     public List<string> SpecialDifficulties = [];
     public bool LinkTufHelperLite;
-    // Blurred YouTube thumbnail behind each browser card. On by default; off stops the
-    // thumbnail downloads and frees the cached textures.
     public bool ShowPreviews = true;
-    // Empty = install into Quartz's own Levels cache. Set = the folder the user
-    // picked instead (typically on a roomier drive).
     public string CustomLevelsRoot = "";
-    // Every root the library has ever lived at. Delete and move validate an index
-    // path against this set, so a corrupt or hand-edited index cannot point a
-    // recursive delete at a folder we never owned. Bounded: one entry per folder
-    // change, deduped.
     public List<string> KnownRoots = [];
-
     public TufSort GetSort() => Enum.IsDefined(typeof(TufSort), Sort)
         ? (TufSort)Sort
         : TufSort.Recent;
-
     public TufDifficultyFilter GetDifficultyFilter() {
         TufDifficultyFilter filter = new(MinDifficultyIndex, MaxDifficultyIndex, SpecialDifficulties);
         return QuantumEnabled
             ? filter.WithQuantumRange(QuantumMinIndex, QuantumMaxIndex)
             : filter;
     }
-
     public void SetDifficultyFilter(TufDifficultyFilter filter, int quantumMinIndex, int quantumMaxIndex) {
         MinDifficultyIndex = filter.MinIndex;
         MaxDifficultyIndex = filter.MaxIndex;
@@ -46,7 +33,6 @@ public sealed class TufSettings : ISettingsFile {
         SpecialDifficulties = filter.SelectedDifficulties
             .Where(TufDifficultyFilter.SpecialNames.Contains).ToList();
     }
-
     public JToken Serialize() => new JObject {
         [nameof(Sort)] = Sort,
         [nameof(Ascending)] = Ascending,
@@ -61,17 +47,14 @@ public sealed class TufSettings : ISettingsFile {
         [nameof(CustomLevelsRoot)] = CustomLevelsRoot,
         [nameof(KnownRoots)] = new JArray(KnownRoots)
     };
-
     public void RememberRoot(string? root) {
         if(string.IsNullOrWhiteSpace(root)) return;
         string full;
         try { full = Path.GetFullPath(root); } catch { return; }
         if(!KnownRoots.Any(r => string.Equals(r, full, PathComparison))) KnownRoots.Add(full);
     }
-
     private static StringComparison PathComparison =>
         Path.DirectorySeparatorChar == '\\' ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-
     public void Deserialize(JToken token) {
         Sort = Read(token, nameof(Sort), Sort);
         if(!Enum.IsDefined(typeof(TufSort), Sort)) Sort = (int)TufSort.Recent;
@@ -103,7 +86,6 @@ public sealed class TufSettings : ISettingsFile {
         if(quantumMin > quantumMax) (quantumMin, quantumMax) = (quantumMax, quantumMin);
         SetDifficultyFilter(normalized, quantumMin, quantumMax);
     }
-
     private static T Read<T>(JToken token, string key, T fallback) {
         try {
             if(token[key] is not JToken value) return fallback;

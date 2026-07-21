@@ -22,9 +22,6 @@ public static partial class FontManager {
     private static TMP_FontAsset defaultFont;
     private static Font defaultSourceFont;
     private static TMP_FontAsset cjkFallback;
-    // Simplified-Chinese-only code points (这国说语门). Deliberately avoids common
-    // Hanja like 中 that Korean fonts (SUIT/Cookie Run/Gmarket) also carry, so the
-    // probe won't false-match a Korean font that lacks the rest of the CJK range.
     private static readonly int[] CjkProbe = { 0x8FD9, 0x56FD, 0x8BF4, 0x8BED, 0x95E8 };
     private static readonly Dictionary<string, TMP_FontAsset> cache = [];
     private static readonly List<Font> sourceFonts = [];
@@ -49,7 +46,7 @@ public static partial class FontManager {
     private static TMP_Settings tmpSettingsFallback;
     private static bool EnsureTmpSettings() {
         try {
-            if(TMP_Settings.instance != null) return false; 
+            if(TMP_Settings.instance != null) return false;
         } catch {
         }
         try {
@@ -196,7 +193,7 @@ public static partial class FontManager {
             MainCore.Log.Err($"[FontManager] rename failed: {e.Message}");
             Invalidate();
             if(wasCurrent) {
-                SetFont(oldName, false); 
+                SetFont(oldName, false);
             }
             return false;
         }
@@ -217,7 +214,7 @@ public static partial class FontManager {
             MainCore.Log.Err($"[FontManager] delete failed: {e.Message}");
             Invalidate();
             if(wasCurrent) {
-                SetFont(name, false); 
+                SetFont(name, false);
             }
             return false;
         }
@@ -301,12 +298,6 @@ public static partial class FontManager {
             text.ForceMeshUpdate(false, true);
         }
     }
-    // Finds a loaded font asset that covers Simplified Chinese and chains it as a
-    // fallback on our built assets, so zh-CN UI text renders instead of tofu boxes
-    // even when the picked font (Cookie Run / SUIT / a custom font) is Korean+Latin
-    // only. Source is whatever CJK-capable font the game already loaded for its own
-    // localization — nothing is bundled. Non-invasive: we only append to OUR assets'
-    // fallback tables, never mutate game globals.
     private static void AttachCjk(TMP_FontAsset asset) {
         if(asset == null) return;
         TMP_FontAsset fb = GetCjkFallback();
@@ -315,14 +306,9 @@ public static partial class FontManager {
         if(!asset.fallbackFontAssetTable.Contains(fb)) asset.fallbackFontAssetTable.Add(fb);
     }
     private static TMP_FontAsset GetCjkFallback() {
-        // Not cached on failure: the game's CJK font may not be loaded yet at mod
-        // init, so keep re-probing (cheap, off the hot path) until one appears.
         if(cjkFallback != null) return cjkFallback;
         try {
             TMP_FontAsset[] all = Resources.FindObjectsOfTypeAll<TMP_FontAsset>();
-            // pass 0: baked glyphs only. pass 1: allow dynamic fonts to report
-            // support via their source file (tryAddCharacter is a no-op on fonts
-            // that lack the glyph, so it never mutates an unrelated font).
             for(int pass = 0; pass < 2 && cjkFallback == null; pass++) {
                 bool tryAdd = pass == 1;
                 foreach(TMP_FontAsset f in all) {
@@ -357,8 +343,6 @@ public static partial class FontManager {
             sourceByName[name] = font;
             return asset;
         } catch(Exception e) {
-            // Resolve is retried on every apply while the saved name points at a
-            // broken file; destroy the orphaned Font or each retry leaks one.
             if(font != null) UnityEngine.Object.Destroy(font);
             MainCore.Log.Wrn($"[FontManager] build '{name}' failed: {e.Message}");
             return null;

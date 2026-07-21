@@ -12,9 +12,6 @@ public static class ProceduralTexture {
     }
     public static Texture2D CircleOutline(int radius, int stroke) {
         float c = radius - 0.5f;
-        // No mipmaps: an outline is mostly transparent, so minified mip levels
-        // average its thin stroke away and the border fades to invisible when the
-        // key viewer is scaled down. Bilinear keeps the stroke present at any scale.
         return Generate(radius * 2, (x, y) => {
             float d = Mathf.Sqrt(((x - c) * (x - c)) + ((y - c) * (y - c)));
             float outer = Mathf.Clamp01(radius - d + 0.5f);

@@ -7,24 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 namespace Quartz.Core.Service;
-// Pulls community translations from the Quartz-i18n repo into the local Lang folder,
-// so a translator's work reaches users without cutting a release.
-//
-// Cost is kept near zero by a manifest: one small file at the repo root lists the
-// sha256 of every language file. We hash what is on disk and only download the ones
-// that differ, so the usual "nothing changed" launch costs a single ~200 byte
-// request. Everything goes through raw.githubusercontent.com rather than the GitHub
-// API, which also sidesteps the API's 60-requests/hour unauthenticated limit.
-//
-// The language files shipped in the zip stay the offline baseline: if anything here
-// fails — no network, GitHub blocked or throttled (common in mainland China, i.e.
-// exactly where zh-CN users are), a malformed upstream file, a hash mismatch —
-// nothing is written and the bundled translations are used unchanged. Failure is
-// always silent and lossless; this never throws.
-//
-// Touches no Unity API (HTTP + file IO + JSON only), so it is safe to run off the
-// main thread. The reload it feeds (Translator.Load) marshals OnLoadEnd through the
-// dispatcher itself, which is what keeps the UI rebuild on the main thread.
 public static class LangUpdateService {
     private const int MaxFileBytes = 2 * 1024 * 1024;
     private const string EnglishFile = "en-US.json";
@@ -43,9 +25,6 @@ public static class LangUpdateService {
         client.DefaultRequestHeaders.UserAgent.ParseAdd("Quartz-Translations");
         return client;
     }
-    // Returns how many language files were written. 0 means "already current" or
-    // "couldn't reach the repo" — both leave what's on disk alone, so callers can
-    // skip the reload when this returns 0.
     public static async Task<int> FetchAsync(string langPath) {
         if(string.IsNullOrEmpty(langPath)) return 0;
         try {
@@ -57,12 +36,9 @@ public static class LangUpdateService {
                 string name = entry.Name;
                 string want = ((string)entry.Value)?.ToLowerInvariant();
                 if(!IsAcceptableName(name) || string.IsNullOrEmpty(want) || want.Length != 64) continue;
-                // en-US is owned by the mod repo and only mirrored into Quartz-i18n; the
-                // bundled copy always matches this build, so pulling it back could only
-                // ever replace it with a staler one.
                 if(name.Equals(EnglishFile, System.StringComparison.OrdinalIgnoreCase)) continue;
                 string dest = Path.Combine(langPath, name);
-                if(HashFileSha256(dest) == want) continue;   // already current — no download at all
+                if(HashFileSha256(dest) == want) continue;
                 if(await FetchOne(name, want, dest)) written++;
             }
             if(written > 0) MainCore.Log.Msg($"[LangUpdate] updated {written} translation file(s)");
@@ -85,8 +61,6 @@ public static class LangUpdateService {
         MainCore.Log.Wrn("[LangUpdate] manifest has no 'files' map — keeping the bundled translations");
         return null;
     }
-    // The manifest is remote content, so its keys are untrusted: anything that isn't a
-    // plain file name could escape the Lang folder once it reaches Path.Combine.
     private static bool IsAcceptableName(string name) =>
         !string.IsNullOrEmpty(name)
         && name.EndsWith(".json", System.StringComparison.OrdinalIgnoreCase)
@@ -102,9 +76,6 @@ public static class LangUpdateService {
             if(bytes.Length > MaxFileBytes) return Reject(name, $"bigger than {MaxFileBytes} bytes");
             if(HashBytesSha256(bytes) != wantSha) return Reject(name, "sha256 doesn't match the manifest");
             if(!IsUsable(bytes, name)) return false;
-            // Write the exact bytes the manifest hashed — re-encoding the text could
-            // shift a BOM or line endings and leave the on-disk hash permanently
-            // mismatched, re-downloading this file on every single launch.
             string tmp = dest + ".tmp";
             File.WriteAllBytes(tmp, bytes);
             if(File.Exists(dest)) File.Delete(dest);
@@ -114,9 +85,6 @@ public static class LangUpdateService {
             return Reject(name, e.Message);
         }
     }
-    // Never let a broken download replace a good bundled file. Translator silently
-    // drops any block whose 0KTL sentinel is missing, so an upstream mistake would
-    // otherwise wipe a whole language with no error anywhere.
     private static bool IsUsable(byte[] bytes, string name) {
         try {
             JObject root = JObject.Parse(new UTF8Encoding(false).GetString(bytes).TrimStart('\uFEFF'));
@@ -132,8 +100,6 @@ public static class LangUpdateService {
         MainCore.Log.Wrn($"[LangUpdate] {name} rejected: {why} — keeping the copy on disk");
         return false;
     }
-    // null when the file is missing or unreadable, which simply reads as "differs from
-    // the manifest" and re-downloads.
     private static string HashFileSha256(string path) {
         try {
             if(!File.Exists(path)) return null;

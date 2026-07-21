@@ -19,8 +19,6 @@ public sealed class AutoDeafenSettings : ISettingsFile {
     public bool ShortcutMeta = false;
     public int ShortcutKey = (int)KeyCode.D;
     public string DiscordClientId = "";
-    // Runtime-only. OAuth bearer tokens are persisted separately from profile JSON
-    // so exporting or switching a profile cannot disclose or replace credentials.
     public string DiscordAccessToken = "";
     internal string LegacyDiscordAccessToken = "";
     public JToken Serialize() {

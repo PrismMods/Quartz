@@ -1,22 +1,10 @@
 #nullable enable
 using System.IO.Compression;
 using System.Text;
-
 namespace Quartz.Features.Tuf;
-
 public static class TufArchive {
     public const int MaxEntries = 10_000;
-
-    // Legacy code pages tried, in order, to recover mojibake entry names from zips
-    // that stored filenames in a national encoding without the UTF-8 flag. Korean
-    // (949) first — most ADOFAI charts come from there — then Japanese, GBK, Big5,
-    // Windows-1252. UTF-8 is tried before any of these.
     private static readonly int[] LegacyCodePages = { 949, 932, 936, 950, 1252 };
-
-    // Total size the archive claims it will expand to, and the entry count. Read from
-    // the zip directory before a single byte is written, so the caller can compare it
-    // against the free space on the destination volume. Sizes here are only claims —
-    // CopyBounded is what holds each entry to the size it declared.
     public static long DeclaredSize(string archivePath) {
         using ZipArchive archive = ZipFile.OpenRead(archivePath);
         if(archive.Entries.Count > MaxEntries) throw new InvalidDataException("Archive contains too many entries.");
@@ -24,15 +12,10 @@ public static class TufArchive {
         foreach(ZipArchiveEntry entry in archive.Entries) {
             long size = entry.Length;
             if(size < 0) throw new InvalidDataException("Archive declares a negative entry size.");
-            // Saturate rather than wrap: a doctored directory claiming long.MaxValue
-            // must read as "enormous" to the space check, not as a negative.
             total = long.MaxValue - size < total ? long.MaxValue : total + size;
         }
         return total;
     }
-
-    // Returns the number of entries skipped because a single asset could not be
-    // decompressed or written; the caller decides whether a playable chart survived.
     public static int Extract(string archivePath, string destination) {
         string root = Path.GetFullPath(destination);
         Directory.CreateDirectory(root);
@@ -62,21 +45,12 @@ public static class TufArchive {
                 using FileStream output = new(target, FileMode.CreateNew, FileAccess.Write, FileShare.None);
                 CopyBounded(input, output, size);
             } catch(Exception e) when(IsSkippableEntryError(e)) {
-                // One asset we cannot decompress (a zip method System.IO.Compression
-                // lacks, e.g. Deflate64) or write (a name illegal on this filesystem)
-                // must not doom the whole level — the .adofai chart almost always
-                // extracts fine. Drop it and let SelectChart judge what remains.
                 skipped++;
                 TryDelete(target);
             }
         }
         return skipped;
     }
-
-    // Level zips usually wrap everything in a single "Artist - Title" folder; hoist
-    // that wrapper's contents so the chart sits directly in Levels/<id>/. Runs a few
-    // levels deep for double-wrapped archives. macOS zip junk (__MACOSX, .DS_Store)
-    // is ignored when deciding whether a single wrapper exists.
     public static void FlattenSingleRoot(string destination) {
         string root = Path.GetFullPath(destination);
         for(int depth = 0; depth < 4; depth++) {
@@ -89,8 +63,6 @@ public static class TufArchive {
             if(dirs.Length != 1 || anyRealFile) return;
             string wrapper = dirs[0];
             if((File.GetAttributes(wrapper) & FileAttributes.ReparsePoint) != 0) return;
-            // Rename the wrapper out of the way first so a child that shares its
-            // name cannot collide while its contents move up.
             string staging = Path.Combine(root, ".flatten-" + Guid.NewGuid().ToString("N"));
             Directory.Move(wrapper, staging);
             foreach(string child in Directory.GetFileSystemEntries(staging)) {
@@ -101,10 +73,6 @@ public static class TufArchive {
             Directory.Delete(staging);
         }
     }
-
-    // Every playable chart under the level root, in launch-preference order:
-    // main.adofai, then the archive-named chart, then largest-first (name-tiebreak).
-    // SelectChart is simply the head of this list, so both stay in sync.
     public static IReadOnlyList<string> ListCharts(string? root, string? archiveStem = null) {
         if(string.IsNullOrWhiteSpace(root) || !Directory.Exists(root)) return Array.Empty<string>();
         string rootFull = Path.GetFullPath(root);
@@ -124,10 +92,8 @@ public static class TufArchive {
             .Select(f => f.FullName)
             .ToList();
     }
-
     public static string? SelectChart(string? root, string? archiveStem = null) =>
         ListCharts(root, archiveStem).FirstOrDefault();
-
     public static bool IsChartUnderRoot(string? path, string? root) {
         if(string.IsNullOrWhiteSpace(path) || string.IsNullOrWhiteSpace(root)
             || !string.Equals(Path.GetExtension(path), ".adofai", StringComparison.OrdinalIgnoreCase)) return false;
@@ -144,7 +110,6 @@ public static class TufArchive {
         if(current == null) return false;
         return (File.GetAttributes(rootFull) & FileAttributes.ReparsePoint) == 0;
     }
-
     private static string NormalizeEntry(string name) {
         if(string.IsNullOrEmpty(name)) return "";
         string value = name.Replace('\\', '/');
@@ -154,13 +119,6 @@ public static class TufArchive {
         if(parts.Any(p => p is "." or "..")) throw new InvalidDataException("Archive contains path traversal.");
         return Path.Combine(parts);
     }
-
-    // System.IO.Compression decodes non-UTF8-flagged entry names as UTF-8 with a
-    // replacement fallback, so a name stored in a national code page (common for
-    // Korean/Japanese charts) arrives as U+FFFD boxes. When every char is <= 0xFF the
-    // decode was byte-preserving, so we can reconstruct the original bytes and re-decode
-    // them: strict UTF-8 first, then the legacy code pages. Names that already hold real
-    // unicode (a UTF-8-flagged entry, char > 0xFF) or plain ASCII are returned untouched.
     private static string RecoverEntryName(string name) {
         if(string.IsNullOrEmpty(name)) return name;
         bool hasHigh = false;
@@ -180,24 +138,16 @@ public static class TufArchive {
         }
         return name;
     }
-
     private static bool IsSkippableEntryError(Exception e) =>
         e is NotSupportedException or IOException or UnauthorizedAccessException
           or InvalidDataException or ArgumentException or System.Security.SecurityException;
-
     private static void TryDelete(string path) {
         try { if(File.Exists(path)) File.Delete(path); } catch { }
     }
-
     private static bool IsSymlink(ZipArchiveEntry entry) {
         int unixMode = (entry.ExternalAttributes >> 16) & 0xF000;
         return unixMode == 0xA000;
     }
-
-    // The real defence against a zip bomb, now that the fixed ceilings are gone: an
-    // entry gets to write exactly the number of bytes its header declared and not one
-    // more. A bomb that lies about its size dies here mid-stream; an honest one is
-    // caught earlier, by DeclaredSize against the volume's free space.
     private static void CopyBounded(Stream input, Stream output, long expected) {
         byte[] buffer = new byte[65536];
         long written = 0;
@@ -210,13 +160,11 @@ public static class TufArchive {
         }
         if(written != expected) throw new InvalidDataException("Archive entry size did not match its header.");
     }
-
     private static string SafeStem(string? value) {
         string stem = Path.GetFileNameWithoutExtension(value ?? "");
         foreach(char c in Path.GetInvalidFileNameChars()) stem = stem.Replace(c.ToString(), "");
         return stem;
     }
-
     private static IEnumerable<FileInfo> EnumerateFilesSafely(string root) {
         Stack<string> pending = new();
         pending.Push(root);
@@ -233,7 +181,6 @@ public static class TufArchive {
             }
         }
     }
-
     private static StringComparison PathComparison =>
         Path.DirectorySeparatorChar == '\\' ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 }

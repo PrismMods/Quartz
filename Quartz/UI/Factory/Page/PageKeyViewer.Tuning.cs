@@ -7,15 +7,6 @@ using TMPro;
 using UnityEngine;
 namespace Quartz.UI.Factory.Page;
 internal static partial class PageKeyViewer {
-    /// <summary>
-    /// Which widget set a shared control builds with. The DM Note body is a full-width page and
-    /// gets the shared rows; the editor builds the same controls into its property pane, which is
-    /// a third of that width and needs <see cref="KvWidgets"/>.
-    ///
-    /// One seam rather than two copies of the builders: the two bodies drive the same fields on
-    /// the same settings object, and a copy would be one edit away from disagreeing about which
-    /// of them writes what.
-    /// </summary>
     private static UIToggle DmToggle(
         RectTransform body, bool compact, bool def, bool value, Action<bool> onChanged, string text, string id
     ) => compact
@@ -41,12 +32,6 @@ internal static partial class PageKeyViewer {
         s.OnComplete = v => { setter(v); save?.Invoke(); };
         return s;
     }
-    /// <summary>
-    /// The Key Limiter sync toggle, for the two modes that have a key set of their own to sync
-    /// (see KeyViewerOverlay.SyncModeSupported). Shared rather than built twice because flipping it
-    /// on has to push the keys immediately and re-evaluate the Key Limiter page's lock, and a
-    /// second copy of that would be one edit away from doing only one of them.
-    /// </summary>
     private static UIToggle DmSyncLimiter(
         RectTransform body, KeyViewerSettings conf, KeyViewerSettings def, bool compact
     ) {
@@ -64,22 +49,10 @@ internal static partial class PageKeyViewer {
         );
         return sync;
     }
-    /// <summary>
-    /// The dotted ghost-rain styling. Both spawn paths read these — Simple mode's rain and the DM
-    /// Note renderer Editor mode draws through — so the fields are live in Editor mode and only the
-    /// controls were missing. Shared for the same reason as <see cref="DmSyncLimiter"/>: two bodies
-    /// build a control per field over the one conf, and a second copy would be one edit away from
-    /// disagreeing about the ranges or the write path.
-    ///
-    /// Returns the callback to run each time the body is shown. Both callers have to invoke it —
-    /// neither body is ever rebuilt, so a stale control would write its own old value back on the
-    /// next touch.
-    /// </summary>
     private static Action AppendGhostRainDots(
         RectTransform body, KeyViewerSettings conf, KeyViewerSettings def, bool compact
     ) {
         void Save() => KeyViewerOverlay.Save();
-        // No Apply: both spawn paths read these when a streak is created, not from built state.
         UIToggle dotted = DmToggle(
             body, compact,
             def.GhostRainDotted,
@@ -104,11 +77,6 @@ internal static partial class PageKeyViewer {
             gapLength.SetOnlyValue(conf.GhostRainGapLength, true);
         };
     }
-    /// <summary>
-    /// Builds the custom CSS controls, which layer over whatever the DM Note renderer is drawing —
-    /// an imported preset in DM Note mode, the edited layout in Editor mode. Both bodies build
-    /// their own; returns the callback to run each time this one is shown.
-    /// </summary>
     private static Action AppendDmCss(RectTransform body, KeyViewerSettings conf, bool compact = false) {
         KeyViewerSettings def = new();
         TextMeshProUGUI cssStatus = GenerateUI.AddMutedText(GenerateUI.Row(body, 30f), 17f, 0.45f);
@@ -153,13 +121,6 @@ internal static partial class PageKeyViewer {
             RefreshCssStatus();
         };
     }
-    /// <summary>
-    /// Builds the tuning controls for the DM Note renderer, which both DM Note mode and
-    /// Editor mode draw the in-game viewer through. Returns the callback to run each time
-    /// the body is shown.
-    /// <paramref name="includeOffsets"/> false drops the Offset X/Y sliders. The editor drags the
-    /// overlay directly, so they are a second way to set a field the canvas already owns.
-    /// </summary>
     private static Action AppendDmTuning(
         RectTransform body, KeyViewerSettings conf, bool compact = false, bool includeOffsets = true
     ) {
@@ -225,10 +186,6 @@ internal static partial class PageKeyViewer {
         UISlider keyDelay = DmSlider(body, compact, "Key Display Delay", "keyviewer_dm_key_delay",
             def.DmKeyDisplayDelayMs, 0f, 9999f, conf.DmKeyDisplayDelayMs, "0 ms", 1f,
             v => { conf.DmKeyDisplayDelayMs = v; Apply(); }, Save);
-        // Both mode bodies build a control per field over the one shared conf and are only
-        // hidden, never rebuilt, so the hidden body's controls still show what conf held when
-        // the page was built. Without this re-read a stale slider would write its own old
-        // value back to conf on the next drag.
         return () => {
             noteEffect.Set(conf.DmNoteEffect, false);
             reverse.Set(conf.DmNoteReverse, false);

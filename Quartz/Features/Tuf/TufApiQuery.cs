@@ -1,6 +1,5 @@
 #nullable enable
 namespace Quartz.Features.Tuf;
-
 public static class TufApiQuery {
     public static string BuildPath(string query, TufSort sort, bool ascending, int offset,
         TufDifficultyFilter? filter = null) {

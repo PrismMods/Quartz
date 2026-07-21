@@ -136,11 +136,6 @@ public static partial class Nostalgia {
     private static class NoJudgeAnimationPatch {
         private static void Postfix(scrHitTextMesh __instance) {
             if(!ShouldNoJudgeAnimation) return;
-            // BTTP also retargeted the fade tween's ease via TweensByTarget(meshRenderer.material),
-            // but in the current game every candidate fade tween targets the TMP_Text (Show's DOFade)
-            // or a GameObject (DOTweenAnimation.SetTarget), never the material — that lookup could
-            // never match, and reading .material only cloned the TMP font material per renderer,
-            // detaching it from the game's fontMaterial.SetColor(GlowColor, ...) updates.
             __instance.transform.DOKill();
             __instance.transform.localRotation = scrCamera.instance.transform.rotation;
         }

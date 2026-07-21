@@ -60,7 +60,7 @@ public enum OriginalMenuState {
     Settings,
     Search,
     Credits,
-    Developer, 
+    Developer,
 }
 public static class UICore {
     private static GameObject canvasObj;
@@ -353,11 +353,6 @@ public static class UICore {
             menuPanelRect.anchorMax = new(1, 1);
             menuPanelRect.pivot = new(0.5f, 0.5f);
             menuPanelRect.anchoredPosition = Vector2.zero;
-            // Fill the panel exactly (no inset): the rounded content mask must be
-            // concentric with the panel border ring, which is drawn on `panel` at
-            // 0px inset. A 1px inset here offsets the mask arc from the border arc,
-            // exposing a ~1px crescent of PanelBG at the rounded corners where a
-            // selected main-menu tab meets the outline.
             menuPanelRect.offsetMin = Vector2.zero;
             menuPanelRect.offsetMax = Vector2.zero;
             menuPanelRect.sizeDelta = Vector2.zero;
@@ -797,14 +792,6 @@ public static class UICore {
             .Build();
         MainCore.TC.Play(shellSeq);
     }
-    // Sets the rect's final horizontal geometry up front, then shifts it back so it
-    // still sits at its current visual position; the tween slides anchoredPosition.x
-    // home. A pure translation never changes the rect's size, so the page content
-    // does zero layout/text-wrap work per frame (tweening offsetMin resized every
-    // page each frame — the old sub-tab ↔ no-sub-tab switch lag). Width during the
-    // slide stays at max(old, new); any excess hangs past the panel's right edge
-    // where the panel mask clips it, and SnapShellLayout squares offsets up at the
-    // end (the single layout pass for the shrink case).
     private static float PrepareSlide(RectTransform rect, float targetLeft, float minY) {
         float shift = rect.offsetMin.x - targetLeft;
         rect.offsetMin = new Vector2(targetLeft, minY);
@@ -821,7 +808,6 @@ public static class UICore {
         Menu.anchoredPosition = menuTarget;
         SubMenu.anchoredPosition = new Vector2(subMenuX, SubMenu.anchoredPosition.y);
         SubMenu.sizeDelta = new Vector2(subMenuW, SubMenu.sizeDelta.y);
-        // Set both offsets: clears any slide shift/right-overflow left by PrepareSlide.
         Page.offsetMin = new Vector2(leftInset, bandShown);
         Page.offsetMax = new Vector2(0f, Page.offsetMax.y);
         BottomBand.offsetMin = new Vector2(leftInset, 0f);
@@ -891,10 +877,6 @@ public static class UICore {
             holdingToggle = false;
         }
         if(Input.GetKeyUp(key)) holdingToggle = false;
-        // Menu fully closed (canvas deactivated after the close tween): every
-        // tickable is inactive and the tooltip is invisible, so skip the
-        // per-widget activeInHierarchy polling that would otherwise run on
-        // every gameplay frame.
         if(!canvasObj.activeSelf) return;
         UIObject.TickAll();
         Tooltip.Tick();

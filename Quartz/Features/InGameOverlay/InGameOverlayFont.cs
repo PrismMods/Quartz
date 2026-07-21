@@ -40,9 +40,6 @@ public static class InGameOverlayFont {
         RefreshCountdown();
         RefreshJudgement();
     }
-    // Captures whose TMP was destroyed (scene unload) can never be restored, but
-    // their entries survive Restore* passes; drop them here (runs on scene load)
-    // so tmpCaptures doesn't grow for the whole session.
     private static void PruneDeadCaptures() {
         List<int> dead = null;
         foreach(var kv in tmpCaptures)

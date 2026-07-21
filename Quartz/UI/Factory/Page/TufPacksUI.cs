@@ -13,16 +13,13 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-
 namespace Quartz.UI.Factory.Page;
-
 public static class TufPacksUI {
     public static void Create(RectTransform parent) {
         TufPacksView view = parent.gameObject.AddComponent<TufPacksView>();
         view.Build(parent);
     }
 }
-
 internal sealed class TufPacksView : MonoBehaviour {
     private TufPackService service;
     private RectTransform content;
@@ -34,8 +31,6 @@ internal sealed class TufPacksView : MonoBehaviour {
     private TMP_Text directionLabel;
     private readonly Dictionary<int, TMP_Text> cardLabels = [];
     private readonly HashSet<long> expandedFolders = [];
-    // Blurred pack-icon / level-thumbnail layer, shared with the level browser (same
-    // cache, same disk files). Preview visibility follows the browser's setting.
     private TufPreviewGroup previews;
     private static bool ShowPreviews => TufService.Instance?.ShowPreviews ?? true;
     private string expandedPackId;
@@ -47,16 +42,11 @@ internal sealed class TufPacksView : MonoBehaviour {
     private string listSignature;
     private bool built;
     private bool pendingRebuild;
-
-    // Hidden pages are deactivated; downloads still tick service.Changed. Defer the
-    // list rebuild (forced layout passes + scroll restore need an active hierarchy)
-    // until the page is shown again.
     private void OnEnable() {
         if(!pendingRebuild) return;
         pendingRebuild = false;
         Rebuild();
     }
-
     public void Build(RectTransform parent) {
         service = TufPackService.Instance;
         if(service == null) return;
@@ -77,7 +67,6 @@ internal sealed class TufPacksView : MonoBehaviour {
         service.EnsureLoaded();
         Rebuild();
     }
-
     private void BuildHeader(RectTransform parent) {
         RectTransform titleRect = Rect("Title", parent, new(0f, 1f), new(1f, 1f), new(0f, -30f), Vector2.zero);
         TMP_Text title = Text(titleRect, "Packs", 28f, TextAlignmentOptions.Left);
@@ -87,13 +76,11 @@ internal sealed class TufPacksView : MonoBehaviour {
         TMP_Text tagline = Text(taglineRect, "Browse level packs, open one, then load its levels.", 14f, TextAlignmentOptions.Left);
         tagline.color = new(1f, 1f, 1f, 0.42f);
         tagline.gameObject.AddComponent<TextLocalization>().Init("TUF_PACKS_TAGLINE", tagline.text);
-
         RectTransform searchRow = Rect("Search Controls", parent, new(0f, 1f), new(1f, 1f), new(0f, -78f), new(0f, -42f));
         AddHorizontal(searchRow);
         BuildSearch(searchRow);
         (Image refresh, TMP_Text refreshLabel) = Chip(searchRow, "Refresh", 92f, service.RefreshPacks);
         refreshLabel.gameObject.AddComponent<TextLocalization>().Init("TUF_REFRESH", "Refresh");
-
         RectTransform sortRow = Rect("Sort Controls", parent, new(0f, 1f), new(1f, 1f), new(0f, -126f), new(0f, -90f));
         AddHorizontal(sortRow);
         AddSortChip(sortRow, TufPackSort.Recent, "TUF_SORT_RECENT", "Recent", 76f);
@@ -101,7 +88,6 @@ internal sealed class TufPacksView : MonoBehaviour {
         AddSortChip(sortRow, TufPackSort.Levels, "TUF_PACK_SORT_LEVELS", "Levels", 72f);
         (directionChip, directionLabel) = Chip(sortRow, "↓", 48f, service.ToggleAscending);
     }
-
     private void BuildSearch(Transform parent) {
         RectTransform bg = Rect("Search", parent, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
         LayoutElement size = bg.gameObject.AddComponent<LayoutElement>();
@@ -142,10 +128,6 @@ internal sealed class TufPacksView : MonoBehaviour {
         });
         search.onDeselect.AddListener(_ => ResetSearchScroll());
     }
-
-    // Infinite scroll for the pack list (the detail view is not paged). Fires once
-    // per page: LoadingMore flips synchronously inside LoadMore. Also fires when the
-    // first page is shorter than the viewport, filling until the list scrolls.
     private void Update() {
         if(!built || service == null || content == null || viewport == null) return;
         previews?.Tick();
@@ -154,19 +136,16 @@ internal sealed class TufPacksView : MonoBehaviour {
         float max = content.rect.height - viewport.rect.height;
         if(max <= 0f || content.anchoredPosition.y >= max - 400f) service.LoadMore();
     }
-
     private void ResetSearchScroll() {
         if(search == null || search.textComponent == null) return;
         search.textComponent.rectTransform.anchoredPosition =
             new(0f, search.textComponent.rectTransform.anchoredPosition.y);
     }
-
     private void AddSortChip(Transform parent, TufPackSort sort, string key, string label, float width) {
         (Image image, TMP_Text text) = Chip(parent, label, width, () => service.SetSort(sort));
         text.gameObject.AddComponent<TextLocalization>().Init(key, label);
         sortChips.Add((sort, image));
     }
-
     private void Rebuild() {
         if(!built || content == null || service == null) return;
         if(!gameObject.activeInHierarchy) {
@@ -195,10 +174,6 @@ internal sealed class TufPacksView : MonoBehaviour {
         else RebuildList();
         Canvas.ForceUpdateCanvases();
         LayoutRebuilder.ForceRebuildLayoutImmediate(content);
-        // Scroll resets only when the view actually changes: drilling into a pack
-        // starts at the top, backing out restores the list position. In-place
-        // rebuilds (download progress, chart chooser, folder toggles) keep the
-        // scroll where it was.
         if(detail != lastDetailView) {
             if(detail) {
                 listScrollY = oldY;
@@ -212,9 +187,6 @@ internal sealed class TufPacksView : MonoBehaviour {
             scroll.ScrollTo(oldY);
         }
     }
-
-    // Slide + fade when drilling into a pack (from the right) or backing out to the
-    // list (from the left), so the view swap reads as navigation instead of a flash.
     private void PlayViewSwitch(bool detail) {
         if(contentCg == null) return;
         viewSwitchSeq?.Kill();
@@ -230,10 +202,7 @@ internal sealed class TufPacksView : MonoBehaviour {
             .Build();
         MainCore.TC.Play(viewSwitchSeq);
     }
-
     private void RebuildList() {
-        // A fresh (non-append) fetch — sort/query change — always shows the spinner
-        // instead of the stale list; appends keep the list and spin at the end.
         if(service.ListState == TufPackListState.Loading) {
             AddLoadingStatus(Tr("TUF_PACK_LOADING", "Loading packs…"));
         } else if(service.ListState == TufPackListState.Error && service.Packs.Count == 0) {
@@ -242,8 +211,6 @@ internal sealed class TufPacksView : MonoBehaviour {
             AddStatus(Tr("TUF_PACK_EMPTY", "No packs matched your search."), false, null);
         } else {
             foreach(TufPack pack in service.Packs) AddPackCard(pack);
-            // Paging is automatic (see Update); the only interactive bottom row left
-            // is a Retry after a failed append.
             if(service.HasMore) {
                 if(service.LoadingMore) AddLoadingStatus(Tr("TUF_PACK_LOADING", "Loading packs…"));
                 else if(service.ListState == TufPackListState.Error) AddStatus(Tr("TUF_RETRY", "Retry"), true, service.LoadMore);
@@ -251,10 +218,8 @@ internal sealed class TufPacksView : MonoBehaviour {
             else if(service.Packs.Count > 0) AddStatus(Tr("TUF_END", "End of results"), false, null, 38f);
         }
     }
-
     private void RebuildDetail() {
         TufPack pack = service.SelectedPack;
-        // Expand/collapse state is per pack; opening a different pack starts collapsed.
         if(expandedPackId != pack.Id) {
             expandedPackId = pack.Id;
             expandedFolders.Clear();
@@ -271,10 +236,6 @@ internal sealed class TufPacksView : MonoBehaviour {
             RenderItems(service.PackItems, 0);
         }
     }
-
-    // Difficulty/Clears sort levels in place at every depth of the folder tree;
-    // folders keep their hand-curated slots and their contents sort recursively.
-    // Pack Order leaves everything exactly as the site lists it.
     private IReadOnlyList<TufPackItem> SortItems(IReadOnlyList<TufPackItem> items) {
         if(service.LevelSort == TufPackLevelSort.PackOrder) return items;
         List<TufPackItem> result = [.. items];
@@ -285,9 +246,6 @@ internal sealed class TufPacksView : MonoBehaviour {
             slots.Add(i);
             levels.Add(result[i]);
         }
-        // Every entry in `levels` cleared the IsFolder check above, so Level is there —
-        // but that is a property invariant the sort lambdas cannot see. Read it through
-        // helpers instead of asserting it away.
         IEnumerable<TufPackItem> sorted = (service.LevelSort, service.LevelAscending) switch {
             (TufPackLevelSort.Difficulty, true) => levels.OrderBy(RankOf),
             (TufPackLevelSort.Difficulty, false) => levels.OrderByDescending(RankOf),
@@ -298,10 +256,8 @@ internal sealed class TufPacksView : MonoBehaviour {
         foreach(TufPackItem item in sorted) result[slots[slot++]] = item;
         return result;
     }
-
     private static int RankOf(TufPackItem item) => item.Level?.DifficultyRank ?? 0;
     private static int ClearsOf(TufPackItem item) => item.Level?.Clears ?? 0;
-
     private void RenderItems(IReadOnlyList<TufPackItem> items, int depth) {
         float indent = depth * 26f;
         foreach(TufPackItem item in SortItems(items)) {
@@ -313,12 +269,10 @@ internal sealed class TufPacksView : MonoBehaviour {
             }
         }
     }
-
     private void RenderLevel(TufLevel level, float indent) {
         AddLevelCard(level, indent);
         if(level.State == TufItemState.ChooseChart && level.Charts != null) AddChartChooser(level, indent);
     }
-
     private void AddLevelSortRow() {
         RectTransform row = FixedRow("Level Sort", 36f);
         HorizontalLayoutGroup layout = row.gameObject.AddComponent<HorizontalLayoutGroup>();
@@ -333,18 +287,13 @@ internal sealed class TufPacksView : MonoBehaviour {
         AddLevelSortChip(row, TufPackLevelSort.Clears, "TUF_SORT_CLEARS", "Clears", 70f);
         (Image direction, TMP_Text directionText) = Chip(row, service.LevelAscending ? "↑" : "↓", 48f, service.ToggleLevelAscending);
         direction.color = service.LevelAscending ? UIColors.ObjectBG : UIColors.ObjectActive;
-        // Direction is meaningless for the hand-curated pack order.
         directionText.color = new(1f, 1f, 1f, service.LevelSort == TufPackLevelSort.PackOrder ? 0.35f : 1f);
     }
-
     private void AddLevelSortChip(Transform parent, TufPackLevelSort sort, string key, string label, float width) {
         (Image image, TMP_Text text) = Chip(parent, label, width, () => service.SetLevelSort(sort));
         text.gameObject.AddComponent<TextLocalization>().Init(key, label);
         image.color = sort == service.LevelSort ? UIColors.ObjectActive : UIColors.ObjectBG;
     }
-
-    // A collapsible folder header in the style of the level cards: expand arrow,
-    // folder name, recursive level count.
     private void AddFolderRow(TufPackItem folder, float indent) {
         bool expanded = expandedFolders.Contains(folder.Key);
         RectTransform row = IndentedRow("Folder " + folder.Name, 52f, indent);
@@ -352,28 +301,23 @@ internal sealed class TufPacksView : MonoBehaviour {
         bg.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
         bg.type = Image.Type.Sliced;
         bg.color = UIColors.ObjectBG;
-
         RectTransform arrowRect = Rect("Arrow", row, new(0f, 0.5f), new(0f, 0.5f), Vector2.zero, Vector2.zero);
         arrowRect.sizeDelta = new(16f, 16f);
         arrowRect.anchoredPosition = new(22f, 0f);
-        // Triangle sprite points down = expanded; +90° points it right = collapsed.
         arrowRect.localEulerAngles = new(0f, 0f, expanded ? 0f : 90f);
         Image arrow = arrowRect.gameObject.AddComponent<Image>();
         arrow.sprite = MainCore.Spr.Get(UISprite.Triangle128);
         arrow.color = expanded ? UIColors.ObjectActive : UIColors.ObjectInactive;
         arrow.raycastTarget = false;
-
         TMP_Text name = Text(row, folder.Name, 18f, TextAlignmentOptions.Left);
         name.rectTransform.offsetMin = new(46f, 0f);
         name.rectTransform.offsetMax = new(-140f, 0f);
         name.fontStyle = FontStyles.Bold;
         name.overflowMode = TextOverflowModes.Ellipsis;
         name.textWrappingMode = TextWrappingModes.NoWrap;
-
         TMP_Text count = Text(row, string.Format(Tr("TUF_PACK_LEVEL_COUNT", "{0} levels"), folder.LevelCount), 14f, TextAlignmentOptions.Right);
         count.rectTransform.offsetMax = new(-18f, 0f);
         count.color = new(1f, 1f, 1f, 0.46f);
-
         GenerateUI.AddButton(row.gameObject, input => {
             if(input != PointerEventData.InputButton.Left) return;
             if(!expandedFolders.Add(folder.Key)) expandedFolders.Remove(folder.Key);
@@ -381,18 +325,13 @@ internal sealed class TufPacksView : MonoBehaviour {
             Rebuild();
         });
     }
-
-    // A full-width list row whose visible card is inset from the left by `indent`,
-    // used to nest folder contents like the site's pack tree.
     private RectTransform IndentedRow(string name, float height, float indent) {
         RectTransform row = FixedRow(name, height);
         if(indent <= 0f) return row;
         return Rect(name + " Inner", row, Vector2.zero, Vector2.one, new(indent, 0f), Vector2.zero);
     }
-
     private string BuildSignature() {
         StringBuilder sb = new();
-        // Toggling previews adds or removes the whole preview layer on every card.
         sb.Append(ShowPreviews ? 'P' : 'p');
         if(service.SelectedPack != null) {
             sb.Append("D:").Append(service.SelectedPack.Id).Append('|')
@@ -410,14 +349,12 @@ internal sealed class TufPacksView : MonoBehaviour {
         }
         return sb.ToString();
     }
-
     private void RefreshControls() {
         foreach((TufPackSort sort, Image image) in sortChips)
             image.color = sort == service.Sort ? UIColors.ObjectActive : UIColors.ObjectBG;
         directionChip.color = service.Ascending ? UIColors.ObjectActive : UIColors.ObjectBG;
         directionLabel.text = service.Ascending ? "↑" : "↓";
     }
-
     private void AddBackRow(TufPack pack) {
         RectTransform row = FixedRow("Back", 52f);
         Image bg = row.gameObject.AddComponent<Image>();
@@ -441,7 +378,6 @@ internal sealed class TufPacksView : MonoBehaviour {
             if(input == PointerEventData.InputButton.Left) service.ClosePack();
         });
     }
-
     private void AddPackCard(TufPack pack) {
         RectTransform card = FixedRow("Pack " + pack.Id, 88f);
         Image bg = card.gameObject.AddComponent<Image>();
@@ -449,13 +385,11 @@ internal sealed class TufPacksView : MonoBehaviour {
         bg.type = Image.Type.Sliced;
         bg.color = Color.Lerp(UIColors.ObjectBG, UIColors.PanelBG, 0.12f);
         if(ShowPreviews) previews.Attach(card, "pack-" + pack.Id, TufPreviewSource.ForPack(pack.IconUrl, pack.FirstLevelId));
-
         RectTransform nameRect = Rect("Name", card, new(0f, 1f), new(1f, 1f), new(22f, -46f), new(-22f, -12f));
         TMP_Text name = Text(nameRect, pack.Name, 22f, TextAlignmentOptions.Left);
         name.fontStyle = FontStyles.Bold;
         name.overflowMode = TextOverflowModes.Ellipsis;
         name.textWrappingMode = TextWrappingModes.NoWrap;
-
         string preview = pack.Preview.Count > 0 ? "  ·  " + string.Join(", ", pack.Preview) : "";
         RectTransform metaRect = Rect("Metadata", card, new(0f, 0f), new(1f, 0f), new(22f, 10f), new(-22f, 46f));
         TMP_Text meta = Text(metaRect,
@@ -465,12 +399,10 @@ internal sealed class TufPacksView : MonoBehaviour {
         meta.color = new(1f, 1f, 1f, 0.46f);
         meta.overflowMode = TextOverflowModes.Ellipsis;
         meta.textWrappingMode = TextWrappingModes.NoWrap;
-
         GenerateUI.AddButton(card.gameObject, input => {
             if(input == PointerEventData.InputButton.Left) service.OpenPack(pack);
         });
     }
-
     private void AddLevelCard(TufLevel level, float indent) {
         RectTransform card = IndentedRow("Level " + level.Id, 94f, indent);
         Image bg = card.gameObject.AddComponent<Image>();
@@ -483,14 +415,12 @@ internal sealed class TufPacksView : MonoBehaviour {
         railImage.sprite = MainCore.Spr.GetFilled(2f);
         railImage.type = Image.Type.Sliced;
         railImage.color = ColorUtility.TryParseHtmlString(level.DifficultyColor, out Color color) ? color : Color.white;
-
         RectTransform idRect = Rect("Id", card, new(0f, 1f), new(0f, 1f), new(22f, -35f), new(108f, -8f));
         TMP_Text id = Text(idRect, $"#{level.Id}", 16f, TextAlignmentOptions.Left);
         id.color = new(1f, 1f, 1f, 0.48f);
         RectTransform diffRect = Rect("Difficulty", card, new(0f, 1f), new(0f, 1f), new(104f, -35f), new(235f, -8f));
         TMP_Text diff = Text(diffRect, level.Difficulty, 16f, TextAlignmentOptions.Left);
         diff.color = railImage.color;
-
         RectTransform songRect = Rect("Song", card, new(0f, 1f), new(1f, 1f), new(22f, -66f), new(-150f, -34f));
         TMP_Text song = Text(songRect, level.Song, 23f, TextAlignmentOptions.Left);
         song.fontStyle = FontStyles.Bold;
@@ -503,7 +433,6 @@ internal sealed class TufPacksView : MonoBehaviour {
         meta.textWrappingMode = TextWrappingModes.NoWrap;
         AddAction(card, level);
     }
-
     private void AddAction(RectTransform card, TufLevel level) {
         RectTransform action = Rect("Action", card, new(1f, 0.5f), new(1f, 0.5f), new(-138f, -23f), new(-10f, 23f));
         Image image = action.gameObject.AddComponent<Image>();
@@ -522,7 +451,6 @@ internal sealed class TufPacksView : MonoBehaviour {
         });
         if(!string.IsNullOrWhiteSpace(level.Error)) action.AddToolTip(level.Error.Length > 900 ? level.Error[..900] + "…" : level.Error);
     }
-
     private string ActionLabel(TufLevel level) => level.State switch {
         TufItemState.Downloading => level.Progress < 0
             ? Tr("TUF_DOWNLOADING", "Downloading…")
@@ -539,10 +467,7 @@ internal sealed class TufPacksView : MonoBehaviour {
         TufItemState.ChooseChart => Tr("TUF_CANCEL", "Cancel"),
         _ => Tr("TUF_DOWNLOAD", "Download")
     };
-
     private void AddChartChooser(TufLevel level, float indent = 0f) {
-        // Charts is only populated while the level sits in ChooseChart. The caller
-        // checks, but nothing stops a future one from forgetting.
         if(level?.Charts == null) return;
         GTweenSequenceBuilder animation = GTweenSequenceBuilder.New();
         int index = 0;
@@ -571,7 +496,6 @@ internal sealed class TufPacksView : MonoBehaviour {
         chartChooserSeq = animation.Build();
         MainCore.TC.Play(chartChooserSeq);
     }
-
     private static string ChartDisplayName(TufLevel level, string chart) {
         try {
             return string.IsNullOrEmpty(level.ChartsRoot)
@@ -579,8 +503,6 @@ internal sealed class TufPacksView : MonoBehaviour {
                 : Path.GetRelativePath(level.ChartsRoot, chart);
         } catch { return Path.GetFileName(chart); }
     }
-
-    // A status row with a rotating ring arc beside the message.
     private void AddLoadingStatus(string message, float height = 70f) {
         RectTransform row = FixedRow("Loading", height);
         Image bg = row.gameObject.AddComponent<Image>();
@@ -601,7 +523,6 @@ internal sealed class TufPacksView : MonoBehaviour {
         TMP_Text label = Text(row, message, 18f, TextAlignmentOptions.Center);
         label.color = new(1f, 1f, 1f, 0.48f);
     }
-
     private void AddStatus(string message, bool button, Action action, float height = 70f) {
         RectTransform row = FixedRow("Status", height);
         Image bg = row.gameObject.AddComponent<Image>();
@@ -614,7 +535,6 @@ internal sealed class TufPacksView : MonoBehaviour {
             if(input == PointerEventData.InputButton.Left) action();
         });
     }
-
     private RectTransform FixedRow(string name, float height) {
         RectTransform row = Rect(name, content, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
         LayoutElement size = row.gameObject.AddComponent<LayoutElement>();
@@ -622,7 +542,6 @@ internal sealed class TufPacksView : MonoBehaviour {
         size.preferredHeight = height;
         return row;
     }
-
     private static (Image, TMP_Text) Chip(Transform parent, string value, float width, Action action) {
         RectTransform rect = Rect("Chip " + value, parent, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
         LayoutElement size = rect.gameObject.AddComponent<LayoutElement>();
@@ -637,7 +556,6 @@ internal sealed class TufPacksView : MonoBehaviour {
         });
         return (image, label);
     }
-
     private static void AddHorizontal(Transform row, float spacing = 8f) {
         HorizontalLayoutGroup layout = row.gameObject.AddComponent<HorizontalLayoutGroup>();
         layout.spacing = spacing;
@@ -647,7 +565,6 @@ internal sealed class TufPacksView : MonoBehaviour {
         layout.childForceExpandHeight = true;
         layout.childAlignment = TextAnchor.MiddleLeft;
     }
-
     private static TMP_Text Text(Transform parent, string value, float size, TextAlignmentOptions align) {
         TextMeshProUGUI text = GenerateUI.AddText(parent, true);
         text.text = value;
@@ -658,7 +575,6 @@ internal sealed class TufPacksView : MonoBehaviour {
         SetFull(text.rectTransform, 0f, 0f);
         return text;
     }
-
     private static RectTransform Rect(string name, Transform parent, Vector2 min, Vector2 max, Vector2 offsetMin, Vector2 offsetMax) {
         GameObject obj = new(name);
         obj.transform.SetParent(parent, false);
@@ -669,16 +585,13 @@ internal sealed class TufPacksView : MonoBehaviour {
         rect.offsetMax = offsetMax;
         return rect;
     }
-
     private static void SetFull(RectTransform rect, float padX, float padY) {
         rect.anchorMin = Vector2.zero;
         rect.anchorMax = Vector2.one;
         rect.offsetMin = new(padX, padY);
         rect.offsetMax = new(-padX, -padY);
     }
-
     private static string Tr(string key, string fallback) => MainCore.Tr.Get(key, fallback);
-
     private void OnDestroy() {
         viewSwitchSeq?.Kill();
         chartChooserSeq?.Kill();

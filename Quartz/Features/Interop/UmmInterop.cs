@@ -3,10 +3,10 @@ using System.Reflection;
 namespace Quartz.Features.Interop;
 public static class UmmInterop {
     private static bool resolved;
-    private static Type ummType;        
-    private static MethodInfo findMod;  
-    private static FieldInfo modEntries; 
-    private static PropertyInfo modsPathProp; 
+    private static Type ummType;
+    private static MethodInfo findMod;
+    private static FieldInfo modEntries;
+    private static PropertyInfo modsPathProp;
     private static void Resolve() {
         if(resolved) return;
         resolved = true;

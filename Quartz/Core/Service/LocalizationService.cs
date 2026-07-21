@@ -16,12 +16,6 @@ public sealed class LocalizationService(
         Translator.Language = configFile.Data.Language;
         _ = LoadThenUpdate();
     }
-    // The bundled files load first, so the UI never waits on the network; newer
-    // community translations from Quartz-i18n, if any, are folded in afterwards and
-    // only then is a second load worth doing. The Translator's dispatcher marshals
-    // OnLoadEnd (and so the UI rebuild) back to the main thread — see the r145
-    // off-thread launch crash. Failure here is silent by design: the bundled
-    // translations stay in place.
     private async Task LoadThenUpdate() {
         try {
             await Translator.Load(langPath);

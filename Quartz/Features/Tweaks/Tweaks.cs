@@ -114,11 +114,6 @@ public static partial class Tweaks {
         bool target;
         try { target = ShouldDisableMenuMusic && ADOBase.isLevelSelect; }
         catch { return; }
-        // This postfix rides scrConductor.Update every frame in every scene.
-        // Once a conductor has been restored to unmuted (the tweak-off / not-
-        // level-select steady state), skip the AudioSource .mute reads — they
-        // are native calls. While muting is active, keep per-frame enforcement
-        // so the game can't silently unmute underneath the tweak.
         if(!target && !lastMuteTarget && ReferenceEquals(conductor, lastMuteConductor)) return;
         try {
             if(conductor.song != null && conductor.song.mute != target) conductor.song.mute = target;
@@ -254,7 +249,6 @@ public static partial class Tweaks {
     }
     private static void ApplyBallCoreParticlesTweak(PlanetRenderer renderer, bool forceRestore = false) {
         if(renderer == null) return;
-        // tweak off + nothing saved: applying would no-op, skip the reflection lookups
         if(!forceRestore && !ShouldRemoveBallCoreParticles && !HasParticleTweakState) return;
         (ParticleSystem core, ParticleSystem sparks) = GetPlanetParticles(renderer);
         ApplyPlanetParticleTweak(core, forceRestore);
@@ -266,7 +260,7 @@ public static partial class Tweaks {
         int id = renderer.GetInstanceID();
         if(planetParticleCache.TryGetValue(id, out (ParticleSystem, ParticleSystem) cached)) return cached;
         (ParticleSystem, ParticleSystem) resolved = (GetCoreParticles(renderer), GetSparks(renderer));
-        if(resolved is { Item1: not null, Item2: not null }) planetParticleCache[id] = resolved; // partial pairs re-resolve later
+        if(resolved is { Item1: not null, Item2: not null }) planetParticleCache[id] = resolved;
         return resolved;
     }
     private static ParticleSystem GetCoreParticles(PlanetRenderer renderer)
@@ -404,7 +398,7 @@ public static partial class Tweaks {
     }
     private static void RestoreParticleSystemTree(GameObject particleObject) {
         if(particleObject == null) return;
-        if(!HasParticleTweakState) return; // every restore below is TryGetValue-gated: no state, no-op
+        if(!HasParticleTweakState) return;
         try {
             GameObject[] objects = CollectGameObjects(particleObject);
             for(int i = 0; i < objects.Length; i++) {

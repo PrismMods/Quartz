@@ -8,9 +8,9 @@ public static class JudgementPopupHider {
     public static SettingsFile<JudgementPopupHiderSettings> ConfMgr { get; private set; }
     public static JudgementPopupHiderSettings Conf => ConfMgr?.Data;
     public const int JudgementCount = 12;
-    public const int XPerfectPerfectBit = JudgementCount;      
-    public const int PlusPerfectBit = JudgementCount + 1;      
-    public const int MinusPerfectBit = JudgementCount + 2;     
+    public const int XPerfectPerfectBit = JudgementCount;
+    public const int PlusPerfectBit = JudgementCount + 1;
+    public const int MinusPerfectBit = JudgementCount + 2;
     private const int AllPerfectGradeBits = (1 << XPerfectPerfectBit) | (1 << PlusPerfectBit) | (1 << MinusPerfectBit);
     private static readonly Vector3 HiddenPosition = new(123456f, 123456f, 123456f);
     public static void EnsureConf() => ConfMgr ??= SettingsFile<JudgementPopupHiderSettings>.Loaded("JudgementPopupHider.json");
@@ -33,12 +33,6 @@ public static class JudgementPopupHider {
                 };
                 if(xbit >= 0) return (Conf.HiddenMask & (1 << xbit)) != 0;
             } else if(XPerfectBridge.Installed && (Conf.HiddenMask & AllPerfectGradeBits) == AllPerfectGradeBits) {
-                // XPerfect installed but currently disabled: grades collapse into one plain Perfect,
-                // so LastJudgeForText can't tell them apart. If the user hid EVERY grade they wanted
-                // no Perfect popups at all — carry that so it stays hidden without re-checking when
-                // XPerfect is toggled off mid-session. Guarded on Installed (a user who has actually
-                // seen the X/+/- toggles); vanilla users never expose grades 13/14, and the default
-                // (X-grade only) isn't all-grades, so neither triggers this.
                 return true;
             }
         }

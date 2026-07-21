@@ -8,12 +8,7 @@ using UnityEngine.UI;
 using static UnityEngine.EventSystems.PointerEventData;
 namespace Quartz.UI.Editor;
 internal static partial class KvWidgets {
-    /// <summary>Room for the trailing icon, which sits 23px off the right edge at 26px wide.</summary>
     private const float IconReserve = 44f;
-    /// <summary>
-    /// A text field, at pane width. Same as <see cref="GenerateUI.Input"/> but for the icon, which
-    /// shrinks so the text has somewhere to go, and the text itself, which does not wrap.
-    /// </summary>
     internal static UIInput Input(
         Transform parent,
         string defaultValue,

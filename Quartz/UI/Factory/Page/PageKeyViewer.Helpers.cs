@@ -11,11 +11,6 @@ using static UnityEngine.EventSystems.PointerEventData;
 using TMPro;
 namespace Quartz.UI.Factory.Page;
 internal static partial class PageKeyViewer {
-    /// <summary>
-    /// The scroll controller is handed on rather than dropped: Editor mode sizes itself to the
-    /// viewport it is scrolling inside, which is the one thing a page body cannot measure for
-    /// itself.
-    /// </summary>
     public static void Create(RectTransform parent) {
         RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(
             parent, out Quartz.UI.Utility.UIScrollController scroll

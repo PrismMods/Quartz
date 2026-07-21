@@ -23,7 +23,7 @@ public sealed class NostalgiaSettings : ISettingsFile {
     public bool WhiteAuto = false;
     public bool LegacyEditorButtonsPositions = false;
     public bool LegacyEditorButtonsDesigns = false;
-    public bool LegacyTexts = false; 
+    public bool LegacyTexts = false;
     public bool DisablePurePerfectSound = false;
     public bool DisableWindSound = false;
     public bool DisableDeathSound = false;
@@ -34,7 +34,7 @@ public sealed class NostalgiaSettings : ISettingsFile {
     public bool DisableAlphaWarning = false;
     public bool DisableAnnounceSign = false;
     public bool OldBackground = false;
-    public int OldBackgroundIndex = 0; 
+    public int OldBackgroundIndex = 0;
     public JToken Serialize() =>
         new JObject {
             [nameof(LegacyResult)] = LegacyResult,
