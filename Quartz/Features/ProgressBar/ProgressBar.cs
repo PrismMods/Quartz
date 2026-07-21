@@ -18,6 +18,7 @@ public static class ProgressBarOverlay {
     private static Image back;
     private static RectTransform fillContainer;
     private static Image fill;
+    private static SegmentedBarGraphic segments;
     private static GameObject dragObj;
     private static Updater updater;
     public static void EnsureConf() => ConfMgr ??= SettingsFile<ProgressBarSettings>.Loaded("ProgressBar.json");
@@ -62,6 +63,16 @@ public static class ProgressBarOverlay {
         fillRect.offsetMax = Vector2.zero;
         fill = fillObj.AddComponent<Image>();
         fill.raycastTarget = false;
+        GameObject segmentsObj = new("Segments");
+        segmentsObj.transform.SetParent(bar, false);
+        RectTransform segmentsRect = segmentsObj.AddComponent<RectTransform>();
+        segmentsRect.anchorMin = Vector2.zero;
+        segmentsRect.anchorMax = Vector2.one;
+        segmentsRect.offsetMin = Vector2.zero;
+        segmentsRect.offsetMax = Vector2.zero;
+        segments = segmentsObj.AddComponent<SegmentedBarGraphic>();
+        segments.raycastTarget = false;
+        segmentsObj.SetActive(false);
         GameObject drag = new("Drag");
         dragObj = drag;
         drag.transform.SetParent(bar, false);
@@ -78,14 +89,40 @@ public static class ProgressBarOverlay {
     }
     public static void Apply() {
         if(bar == null) return;
-        bar.sizeDelta = new Vector2(Conf.Width, Conf.Height);
-        bar.anchoredPosition = OverlayCalibration.Scale(new Vector2(Conf.OffsetX, -Conf.TopOffset));
-        ApplyRounding(back, Conf.Rounding);
-        ApplyRounding(fill, Conf.Rounding);
+        bool line = Conf.Style == ProgressBarStyle.Line;
+        bool segmented = Conf.Style == ProgressBarStyle.Bar;
+        if(line) {
+            float thickness = Mathf.Max(1f, Conf.LineThickness);
+            bool bottom = Conf.LineAtBottom;
+            bar.anchorMin = new Vector2(0f, bottom ? 0f : 1f);
+            bar.anchorMax = new Vector2(1f, bottom ? 0f : 1f);
+            bar.pivot = new Vector2(0.5f, bottom ? 0f : 1f);
+            bar.offsetMin = new Vector2(0f, bottom ? 0f : -thickness);
+            bar.offsetMax = new Vector2(0f, bottom ? thickness : 0f);
+        } else {
+            bar.anchorMin = new Vector2(0.5f, 1f);
+            bar.anchorMax = new Vector2(0.5f, 1f);
+            bar.pivot = new Vector2(0.5f, 1f);
+            bar.sizeDelta = new Vector2(Conf.Width, Conf.Height);
+            bar.anchoredPosition = OverlayCalibration.Scale(new Vector2(Conf.OffsetX, -Conf.TopOffset));
+        }
+        float rounding = line ? 0f : Conf.Rounding;
+        bool box = !segmented;
+        if(back != null && back.gameObject.activeSelf != box) back.gameObject.SetActive(box);
+        if(fillContainer != null && fillContainer.gameObject.activeSelf != box)
+            fillContainer.gameObject.SetActive(box);
+        if(segments != null && segments.gameObject.activeSelf != segmented)
+            segments.gameObject.SetActive(segmented);
+        ApplyRounding(back, rounding);
+        ApplyRounding(fill, rounding);
         if(back != null) back.color = Conf.GetBackColor();
-        if(fill != null) {
-            GetProgressValues(out _, out float now);
-            fill.color = Conf.GetFillColorForProgress(now);
+        GetProgressValues(out _, out float now);
+        if(fill != null) fill.color = Conf.GetFillColorForProgress(now);
+        if(segments != null) {
+            Panels.StatColor grad = Conf.FillGradient;
+            bool useGradient = grad is { Enabled: true };
+            segments.GradientEval = useGradient ? r => grad.Evaluate(r) : null;
+            segments.SetLook(Conf.SegmentCount, Conf.SegmentGap, Conf.GetFillColor(), Conf.GetBackColor(), useGradient);
         }
         ApplyOutline();
     }
@@ -108,6 +145,7 @@ public static class ProgressBarOverlay {
         back = null;
         fillContainer = null;
         fill = null;
+        segments = null;
         dragObj = null;
         updater = null;
     }
@@ -134,7 +172,7 @@ public static class ProgressBarOverlay {
     }
     private static void ApplyOutline() {
         if(border == null || borderImg == null) return;
-        float t = Mathf.Max(0f, Conf.OutlineThickness);
+        float t = Conf.Style == ProgressBarStyle.Line ? 0f : Mathf.Max(0f, Conf.OutlineThickness);
         bool on = t > 0.01f;
         if(border.gameObject.activeSelf != on) border.gameObject.SetActive(on);
         if(!on) return;
@@ -155,7 +193,11 @@ public static class ProgressBarOverlay {
             if(!show) return;
             GetProgressValues(out float start, out float now);
             float fillFrom = Conf.PrefillStart ? 0f : start;
-            float totalW = Conf.Width;
+            if(Conf.Style == ProgressBarStyle.Bar) {
+                if(segments != null) segments.SetProgress(fillFrom, now);
+                return;
+            }
+            float totalW = bar.rect.width;
             float startX = totalW * fillFrom;
             float fillW = Mathf.Clamp(totalW * (now - fillFrom), 0f, totalW);
             if(startX != lastStartX || fillW != lastFillW) {

@@ -4,14 +4,24 @@ using Quartz.IO;
 using Quartz.IO.Interface;
 using UnityEngine;
 namespace Quartz.Features.ProgressBar;
+public enum ProgressBarStyle {
+    Modern,
+    Bar,
+    Line,
+}
 public sealed class ProgressBarSettings : ISettingsFile {
     public bool Enabled = true;
+    public ProgressBarStyle Style = ProgressBarStyle.Modern;
     public float Width = 800f;
     public float Height = 8f;
     public float OffsetX = 0f;
     public float TopOffset = 10f;
     public float Rounding = 1f;
     public float OutlineThickness = 1.75f;
+    public int SegmentCount = 64;
+    public float SegmentGap = 2f;
+    public float LineThickness = 3f;
+    public bool LineAtBottom = false;
     public bool PrefillStart = false;
     public bool UseMapTime = false;
     public float FillR = 1f, FillG = 0f, FillB = 0f, FillA = 0.96f;
@@ -30,12 +40,17 @@ public sealed class ProgressBarSettings : ISettingsFile {
     public JToken Serialize() =>
         new JObject {
             [nameof(Enabled)] = Enabled,
+            [nameof(Style)] = Style.ToString(),
             [nameof(Width)] = Width,
             [nameof(Height)] = Height,
             [nameof(OffsetX)] = OffsetX,
             [nameof(TopOffset)] = TopOffset,
             [nameof(Rounding)] = Rounding,
             [nameof(OutlineThickness)] = OutlineThickness,
+            [nameof(SegmentCount)] = SegmentCount,
+            [nameof(SegmentGap)] = SegmentGap,
+            [nameof(LineThickness)] = LineThickness,
+            [nameof(LineAtBottom)] = LineAtBottom,
             [nameof(PrefillStart)] = PrefillStart,
             [nameof(UseMapTime)] = UseMapTime,
             [nameof(FillR)] = FillR,
@@ -54,12 +69,18 @@ public sealed class ProgressBarSettings : ISettingsFile {
         };
     public void Deserialize(JToken token) {
         Enabled = IOUtils.Read(token, nameof(Enabled), Enabled);
+        if(Enum.TryParse(IOUtils.Read(token, nameof(Style), Style.ToString()), true, out ProgressBarStyle style))
+            Style = style;
         Width = IOUtils.Read(token, nameof(Width), Width);
         Height = IOUtils.Read(token, nameof(Height), Height);
         OffsetX = IOUtils.Read(token, nameof(OffsetX), OffsetX);
         TopOffset = IOUtils.Read(token, nameof(TopOffset), TopOffset);
         Rounding = IOUtils.Read(token, nameof(Rounding), Rounding);
         OutlineThickness = IOUtils.Read(token, nameof(OutlineThickness), OutlineThickness);
+        SegmentCount = IOUtils.Read(token, nameof(SegmentCount), SegmentCount);
+        SegmentGap = IOUtils.Read(token, nameof(SegmentGap), SegmentGap);
+        LineThickness = IOUtils.Read(token, nameof(LineThickness), LineThickness);
+        LineAtBottom = IOUtils.Read(token, nameof(LineAtBottom), LineAtBottom);
         PrefillStart = IOUtils.Read(token, nameof(PrefillStart), PrefillStart);
         UseMapTime = IOUtils.Read(token, nameof(UseMapTime), UseMapTime);
         IOUtils.ReadRgba(token, "Fill", ref FillR, ref FillG, ref FillB, ref FillA);
