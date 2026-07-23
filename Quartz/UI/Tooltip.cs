@@ -77,7 +77,7 @@ public class Tooltip {
         visible = true;
         seq = GTweenSequenceBuilder.New()
             .AppendTime(0.14f)
-            .Append(GTweenExtensions.Tween(() => canvas.alpha, x => canvas.alpha = x, 1f, 0.16f).SetEasing(Easing.OutSine))
+            .Append(GTweenExtensions.Tween(() => canvas == null ? 1f : canvas.alpha, x => { if(canvas != null) canvas.alpha = x; }, 1f, 0.16f).SetEasing(Easing.OutSine))
             .Build();
         MainCore.TC.Play(seq);
     }
@@ -85,10 +85,10 @@ public class Tooltip {
         if(!MainCore.Conf.Tooltip || obj == null) return;
         seq?.Kill();
         seq = GTweenSequenceBuilder.New()
-            .Append(GTweenExtensions.Tween(() => canvas.alpha, x => canvas.alpha = x, 0f, 0.16f).SetEasing(Easing.OutSine))
+            .Append(GTweenExtensions.Tween(() => canvas == null ? 0f : canvas.alpha, x => { if(canvas != null) canvas.alpha = x; }, 0f, 0.16f).SetEasing(Easing.OutSine))
             .AppendCallback(() => {
                 visible = false;
-                obj.SetActive(false);
+                if(obj != null) obj.SetActive(false);
             }).Build();
         MainCore.TC.Play(seq);
     }

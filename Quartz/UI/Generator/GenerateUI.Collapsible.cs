@@ -227,26 +227,28 @@ public static partial class GenerateUI {
             bodyLE.preferredHeight = exp ? 0f : content;
             openSeq = GTweenSequenceBuilder.New()
                 .Join(GTweenExtensions.Tween(
-                    () => bodyLE.preferredHeight,
+                    () => bodyLE == null ? to : bodyLE.preferredHeight,
                     x => {
+                        if(bodyLE == null) return;
                         bodyLE.preferredHeight = Mathf.Max(0f, x);
-                        LayoutRebuilder.ForceRebuildLayoutImmediate(sectionRect);
+                        if(sectionRect != null) LayoutRebuilder.ForceRebuildLayoutImmediate(sectionRect);
                     },
                     to,
                     0.16f
                 ).SetEasing(exp ? Easing.OutBack : Easing.OutSine))
                 .Join(GTweenExtensions.Tween(
-                    () => bodyCg.alpha,
-                    x => bodyCg.alpha = x,
+                    () => bodyCg == null ? (exp ? 1f : 0f) : bodyCg.alpha,
+                    x => { if(bodyCg != null) bodyCg.alpha = x; },
                     exp ? 1f : 0f,
                     0.16f
                 ).SetEasing(Easing.OutSine))
                 .AppendCallback(() => {
+                    if(bodyObj == null || bodyLE == null) return;
                     if(c.Expanded) {
-                        bodyLayout.enabled = true;
-                        bodyFitter.enabled = true;
+                        if(bodyLayout != null) bodyLayout.enabled = true;
+                        if(bodyFitter != null) bodyFitter.enabled = true;
                         bodyLE.preferredHeight = -1f;
-                        LayoutRebuilder.ForceRebuildLayoutImmediate(sectionRect);
+                        if(sectionRect != null) LayoutRebuilder.ForceRebuildLayoutImmediate(sectionRect);
                     }
                     else {
                         bodyObj.SetActive(false);

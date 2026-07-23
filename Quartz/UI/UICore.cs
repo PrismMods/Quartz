@@ -258,6 +258,7 @@ public static class UICore {
                     .Append(GTweenExtensions.Tween(
                         () => 0,
                         x => firstRunHelperText.text = fullText[..x],
+                        x => { if(firstRunHelperText != null) firstRunHelperText.text = fullText[..x]; },
                         fullText.Length,
                         1.4f
                     ).SetEasing(Easing.OutSine))

@@ -183,6 +183,7 @@ internal sealed class TufBrowserView : MonoBehaviour {
                 value => {
                     specialChecksScale = value;
                     specialChecks.localScale = new Vector3(value, 1f, 1f);
+                    if(specialChecks != null) specialChecks.localScale = new Vector3(value, 1f, 1f);
                 },
                 specialExpanded ? 1f : 0.82f,
                 specialExpanded ? 0.42f : 0.18f)

@@ -249,7 +249,9 @@ internal static class PageSearch {
             .AppendTime(0.35f)
             .Append(GTweenExtensions.Tween(
                 () => img.color.a,
+                () => img == null ? 0f : img.color.a,
                 a => {
+                    if(img == null) return;
                     Color c = img.color;
                     c.a = a;
                     img.color = c;
