@@ -1,0 +1,19 @@
+.github/workflows/i18n-pull.yml
+  s_95fdb6b09ab717::t_5f6262f7534a5b 3-5,12-15,17-20,38,46-50,52,60-61,70-72
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "370f307d426bcc54f5c9bba33e0df3b87de46012",
+  "prompts": {},
+  "sessions": {
+    "s_95fdb6b09ab717": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5ad03a7e-df87-44cf-a292-fe962cde9c6c",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}

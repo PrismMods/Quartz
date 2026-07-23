@@ -1,0 +1,77 @@
+Quartz/UI/UICore.cs
+  s_c946fbec1e2d3a::t_fd7c9a5a800e6b 37
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_c946fbec1e2d3a::t_8608c3df1485c8 629,638,640,645
+  s_c946fbec1e2d3a::t_ee71b91e53021c 627-628,630-637,639,641-644,647-654
+  s_c946fbec1e2d3a::t_53ef4fa657edc9 646
+Quartz/Features/Practice/PracticeDifficulty.cs
+  s_c946fbec1e2d3a::t_1b95df9b23cde7 9
+  s_c946fbec1e2d3a::t_9c3722eacfffe8 15
+  s_c946fbec1e2d3a::t_79c2695751d2da 18
+  s_c946fbec1e2d3a::t_0f21397b0bfac9 1-8,10-14,16-17,19-27,29-31,39-47,49-57
+  s_c946fbec1e2d3a::t_2ea66d631e63f9 32-38
+  s_c946fbec1e2d3a::t_382b4b82589140 48
+  s_c946fbec1e2d3a::t_c801a552900218 28
+Quartz/UI/Generator/GenerateUI.cs
+  s_c946fbec1e2d3a::t_6266e5d6a46d1a 715-719
+  s_c946fbec1e2d3a::t_e556125d8d9d81 703-704
+  s_c946fbec1e2d3a::t_93ec1e7d72abe4 720
+Quartz/UI/Factory/PageFactory.cs
+  s_c946fbec1e2d3a::t_7b89a19f473eee 54
+Quartz/Features/Practice/PracticeOverlay.cs
+  s_c946fbec1e2d3a::t_88fc1f4df864b6 1-80,83-124
+  s_c946fbec1e2d3a::t_9e59b7e7beacce 81-82
+Quartz/UI/Generator/GenerateUI.Collapsible.cs
+  s_c946fbec1e2d3a::t_dd0750e036442d 176
+  s_c946fbec1e2d3a::t_928d53dcd18694 42-44
+Quartz/UI/Factory/Page/PageGameplay.cs
+  s_c946fbec1e2d3a::t_1d02e1f5d84736 30-31
+Quartz/Features/Practice/PracticePitch.cs
+  s_c946fbec1e2d3a::t_7a3e33797444e8 6,9-10,13,16
+  s_c946fbec1e2d3a::t_d5321e7f7832fd 15,17-24,26,37,39-43
+  s_c946fbec1e2d3a::t_92c1d0c1ac1550 7-8,11,14
+  s_c946fbec1e2d3a::t_849bb6e925bf4b 1-5,12,25,27-36,38,44-45
+Quartz/Features/Practice/PracticeSettings.cs
+  s_c946fbec1e2d3a::t_73151c42cb4a48 45
+  s_c946fbec1e2d3a::t_80a82d4c3ac7bc 1-8,10-14,16-23,27-32,35-44,46-80
+  s_c946fbec1e2d3a::t_8820b66ec8e07a 33-34
+  s_c946fbec1e2d3a::t_146332209bbaa8 9,15,24-26
+Quartz/UI/Factory/MenuFactory.cs
+  s_c946fbec1e2d3a::t_d6a18cb3116120 46
+Quartz/Resource/Export/Lang/en-US.json
+  s_c946fbec1e2d3a::t_53ef4fa657edc9 646
+  s_c946fbec1e2d3a::t_ee71b91e53021c 627-628,630-637,639,641-644,647-654
+  s_c946fbec1e2d3a::t_8608c3df1485c8 629,638,640,645
+Quartz/Core/QuartzRuntime.cs
+  s_c946fbec1e2d3a::t_f76eedac563d4e 288
+  s_c946fbec1e2d3a::t_065fee2283831c 297
+Quartz/UI/Factory/Page/PageGameplay.Practice.cs
+  s_c946fbec1e2d3a::t_dbb4064f7ccf1a 118,122-125
+  s_c946fbec1e2d3a::t_05ac831c258b80 144,173,186,212,223,233
+  s_c946fbec1e2d3a::t_fb3a13dc66a400 38
+  s_c946fbec1e2d3a::t_0d04e7350ab047 190-191,193-195,197-200
+  s_c946fbec1e2d3a::t_53ef4fa657edc9 88
+  s_c946fbec1e2d3a::t_8e3786ca7d6c7b 84
+  s_c946fbec1e2d3a::t_8608c3df1485c8 27
+  s_c946fbec1e2d3a::t_67faa171009e60 1-26,28-37,39-83,85-87,89-117,119-121,126-143,151-172,174-185,187-189,192,196,201-211,213-221,224-232,234-239
+  s_c946fbec1e2d3a::t_7c4b64a92515ac 222
+  s_c946fbec1e2d3a::t_9998d9399a4762 145-150
+Quartz/UI/Factory/Page/PageSearch.cs
+  s_c946fbec1e2d3a::t_313d0f23bf9501 82
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "c0f0d2c6084f5a11203fdecec0a9ce18babd454b",
+  "prompts": {},
+  "sessions": {
+    "s_c946fbec1e2d3a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "059ed993-d3e5-43a3-9504-59518050ddea",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}

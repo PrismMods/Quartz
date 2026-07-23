@@ -1,0 +1,30 @@
+Quartz/UI/Factory/Page/PageVisuals.PageBuilders.cs
+  s_c946fbec1e2d3a::t_1bf4b72afeab72 461-464
+Quartz/Resource/Export/Lang/en-US.json
+  s_c946fbec1e2d3a::t_0177014ddc967e 711-712,724-725
+Quartz/Features/UiHider/UiHiderPatches.cs
+  s_c946fbec1e2d3a::t_bbf10a5048406a 36-57
+Quartz/Features/UiHider/UiHiderSettings.cs
+  s_c946fbec1e2d3a::t_54b1649ebfdf6d 18,32
+  s_c946fbec1e2d3a::t_4f03d96943a2c9 48
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_c946fbec1e2d3a::t_0177014ddc967e 711-712,724-725
+Quartz/Features/UiHider/UiHider.cs
+  s_c946fbec1e2d3a::t_af5effb5d90eea 99-100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "28212dace4d0a0461e5dd644763ef5010eadd073",
+  "prompts": {},
+  "sessions": {
+    "s_c946fbec1e2d3a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "059ed993-d3e5-43a3-9504-59518050ddea",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}

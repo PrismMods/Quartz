@@ -1,0 +1,44 @@
+Quartz.Tests/Program.cs
+  s_c946fbec1e2d3a::t_30ab48f24bf749 67-69
+Quartz/Features/Tuf/TufPackApiClient.cs
+  s_c946fbec1e2d3a::t_b453e0bdc3a100 184
+Quartz/Features/Tuf/TufApiClient.cs
+  s_c946fbec1e2d3a::t_c5d9d01a86796f 61-71,76,80-101
+  s_c946fbec1e2d3a::t_a0f445b543b32e 41-57
+Quartz/Features/Tuf/TufChartInfo.cs
+  s_c946fbec1e2d3a::t_de145f03fcd11e 1-6,8-27,34-48
+  s_c946fbec1e2d3a::t_49f11212dc28d8 7
+  s_c946fbec1e2d3a::t_f30d4690106007 28-33
+Quartz.Tests/Quartz.Tests.csproj
+  s_c946fbec1e2d3a::t_38eadcb7942bf2 31-32
+Quartz.Tests/Features/Tuf/TufChartInfoTests.cs
+  s_c946fbec1e2d3a::t_8ccee4788dd0c6 1-72
+Quartz/Features/Tuf/TufService.cs
+  s_c946fbec1e2d3a::t_8cf57ef84964d5 606
+  s_c946fbec1e2d3a::t_e11c1863c9d559 252,255,258,260-284
+  s_c946fbec1e2d3a::t_09e225931a8c4f 53
+  s_c946fbec1e2d3a::t_1d666593d5b7bc 227-228
+  s_c946fbec1e2d3a::t_93842a4a6480f5 51-52,54
+  s_c946fbec1e2d3a::t_ebffc04d460713 613
+  s_c946fbec1e2d3a::t_42fcc4f8e24911 247,250-251,253-254,256-257,259,285-318
+Quartz/Features/Tuf/TufInstallIndex.cs
+  s_c946fbec1e2d3a::t_bde1fac6e3d6a4 18-60
+Quartz/Features/Tuf/TufCredits.cs
+  s_c946fbec1e2d3a::t_aedcf5197dc649 1-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "52299584b9573631af84e256a0167797f143dfac",
+  "prompts": {},
+  "sessions": {
+    "s_c946fbec1e2d3a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "059ed993-d3e5-43a3-9504-59518050ddea",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
