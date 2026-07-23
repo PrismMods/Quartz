@@ -13,6 +13,7 @@ public sealed class TufSettings : ISettingsFile {
     public List<string> SpecialDifficulties = [];
     public bool LinkTufHelperLite;
     public bool ShowPreviews = true;
+    public bool GridView;
     public string CustomLevelsRoot = "";
     public List<string> KnownRoots = [];
     public TufSort GetSort() => Enum.IsDefined(typeof(TufSort), Sort)
@@ -44,6 +45,7 @@ public sealed class TufSettings : ISettingsFile {
         [nameof(SpecialDifficulties)] = new JArray(SpecialDifficulties),
         [nameof(LinkTufHelperLite)] = LinkTufHelperLite,
         [nameof(ShowPreviews)] = ShowPreviews,
+        [nameof(GridView)] = GridView,
         [nameof(CustomLevelsRoot)] = CustomLevelsRoot,
         [nameof(KnownRoots)] = new JArray(KnownRoots)
     };
@@ -66,6 +68,7 @@ public sealed class TufSettings : ISettingsFile {
         QuantumMaxIndex = Read(token, nameof(QuantumMaxIndex), QuantumMaxIndex);
         LinkTufHelperLite = Read(token, nameof(LinkTufHelperLite), LinkTufHelperLite);
         ShowPreviews = Read(token, nameof(ShowPreviews), ShowPreviews);
+        GridView = Read(token, nameof(GridView), GridView);
         CustomLevelsRoot = Read(token, nameof(CustomLevelsRoot), CustomLevelsRoot) ?? "";
         KnownRoots.Clear();
         if(token[nameof(KnownRoots)] is JArray roots) {

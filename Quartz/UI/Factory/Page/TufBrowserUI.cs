@@ -47,11 +47,16 @@ internal sealed class TufBrowserView : MonoBehaviour {
     private float specialChecksScale = 0.82f;
     private const float ArmSeconds = 4f;
     private const float MetaGap = 12f;
+    private const float GridMinWidth = 268f;
+    private const float GridGap = 8f;
+    private const float GridCardHeight = 176f;
     private readonly Dictionary<int, TMP_Text> cardLabels = [];
     private readonly Dictionary<int, Image> deleteChips = [];
     private TufPreviewGroup previews;
     private Image installedChip;
     private TMP_Text installedLabel;
+    private Image gridChip;
+    private int gridColumns = 2;
     private string listSignature;
     private bool built;
     private bool pendingRebuild;
@@ -112,6 +117,9 @@ internal sealed class TufBrowserView : MonoBehaviour {
         installedLabel.gameObject.AddComponent<TextLocalization>().Init("TUF_INSTALLED", "Installed");
         installedChip.rectTransform.AddToolTip("DESC_TUF_INSTALLED",
             "Show only the levels you have downloaded, newest first. Works offline.");
+        gridChip = IconChip(sortRow, UISprite.Grid128, 48f, () => service.SetGridView(!service.GridView));
+        gridChip.rectTransform.AddToolTip("DESC_TUF_GRID_VIEW",
+            "Lay the level browser out as a grid of cards instead of one column of rows. The column count follows the window width.");
         AddFlexibleSpacer(sortRow);
         BuildDifficultyChips(sortRow);
         RectTransform rangeRow = Rect("Difficulty Range", parent, new(0f, 1f), new(1f, 1f), new(0f, -186f), new(0f, -130f));
@@ -182,7 +190,6 @@ internal sealed class TufBrowserView : MonoBehaviour {
                 () => specialChecksScale,
                 value => {
                     specialChecksScale = value;
-                    specialChecks.localScale = new Vector3(value, 1f, 1f);
                     if(specialChecks != null) specialChecks.localScale = new Vector3(value, 1f, 1f);
                 },
                 specialExpanded ? 1f : 0.82f,
@@ -285,6 +292,14 @@ internal sealed class TufBrowserView : MonoBehaviour {
     private void Update() {
         if(!built || service == null || content == null || viewport == null) return;
         previews?.Tick();
+        if(service.GridView) {
+            int columns = ComputeColumns();
+            if(columns != gridColumns) {
+                gridColumns = columns;
+                listSignature = null;
+                Rebuild();
+            }
+        }
         if(armedDeleteId != 0 && Time.unscaledTime >= armedUntil) DisarmDelete();
         if(!service.HasMore || service.LoadingMore || service.State != TufListState.Ready) return;
         float max = content.rect.height - viewport.rect.height;
@@ -332,10 +347,7 @@ internal sealed class TufBrowserView : MonoBehaviour {
         } else if(service.State == TufListState.Empty) {
             AddStatus(EmptyMessage(), false, null);
         } else {
-            foreach(TufLevel level in service.Levels) {
-                AddCard(level);
-                if(level.State == TufItemState.ChooseChart && level.Charts != null) AddChartChooser(level);
-            }
+            AddLevelCards();
             if(service.HasMore) {
                 if(service.LoadingMore) AddLoadingStatus(Tr("TUF_LOADING", "Loading levels…"));
                 else if(service.State == TufListState.Error) AddStatus(Tr("TUF_RETRY", "Retry"), true, service.LoadMore);
@@ -358,6 +370,7 @@ internal sealed class TufBrowserView : MonoBehaviour {
             .Append(service.ShowInstalled ? '1' : '0')
             .Append(service.OfflineError ? '1' : '0')
             .Append(service.ShowPreviews ? '1' : '0').Append('|')
+            .Append(service.GridView ? 'G' : 'L').Append(gridColumns).Append('|')
             .Append(service.InfoRevision).Append('|');
         foreach(TufLevel level in service.Levels)
             sb.Append(level.Id).Append(':').Append((int)level.State)
@@ -377,6 +390,8 @@ internal sealed class TufBrowserView : MonoBehaviour {
             image.color = sort == service.Sort ? UIColors.ObjectActive : UIColors.ObjectBG;
         if(installedChip != null)
             installedChip.color = service.ShowInstalled ? UIColors.ObjectActive : UIColors.ObjectBG;
+        if(gridChip != null)
+            gridChip.color = service.GridView ? UIColors.ObjectActive : UIColors.ObjectBG;
         directionChip.color = service.Ascending ? UIColors.ObjectActive : UIColors.ObjectBG;
         directionLabel.text = service.Ascending ? "↑" : "↓";
         difficultyRange?.SetRange(service.MinDifficultyIndex, service.MaxDifficultyIndex);
@@ -388,6 +403,83 @@ internal sealed class TufBrowserView : MonoBehaviour {
         foreach((string name, Image fill) in difficultyChips)
             fill.color = service.DifficultyFilter.IsSelected(name)
                 ? UIColors.ObjectActive : new Color(1f, 1f, 1f, 0f);
+    }
+    private void AddLevelCards() {
+        if(!service.GridView) {
+            foreach(TufLevel level in service.Levels) {
+                AddCard(level);
+                if(level.State == TufItemState.ChooseChart && level.Charts != null) AddChartChooser(level);
+            }
+            return;
+        }
+        gridColumns = ComputeColumns();
+        List<TufLevel> chunk = [];
+        foreach(TufLevel level in service.Levels) {
+            chunk.Add(level);
+            if(chunk.Count >= gridColumns) FlushGridRow(chunk);
+        }
+        if(chunk.Count > 0) FlushGridRow(chunk);
+    }
+    private void FlushGridRow(List<TufLevel> chunk) {
+        RectTransform row = FixedRow("Grid Row", GridCardHeight);
+        AddHorizontal(row, GridGap);
+        foreach(TufLevel level in chunk) AddGridCard(row, level);
+        for(int i = chunk.Count; i < gridColumns; i++) AddFlexibleSpacer(row);
+        foreach(TufLevel level in chunk)
+            if(level.State == TufItemState.ChooseChart && level.Charts != null) AddChartChooser(level);
+        chunk.Clear();
+    }
+    private int ComputeColumns() {
+        if(viewport == null) return gridColumns;
+        float width = viewport.rect.width;
+        if(width < 1f) return gridColumns;
+        return Mathf.Clamp(Mathf.FloorToInt((width + GridGap) / (GridMinWidth + GridGap)), 1, 6);
+    }
+    private void AddGridCard(Transform parent, TufLevel level) {
+        RectTransform card = Rect("Level " + level.Id, parent, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+        LayoutElement size = card.gameObject.AddComponent<LayoutElement>();
+        size.minWidth = 0f;
+        size.flexibleWidth = 1f;
+        Image bg = card.gameObject.AddComponent<Image>();
+        bg.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
+        bg.type = Image.Type.Sliced;
+        bg.color = Color.Lerp(UIColors.ObjectBG, UIColors.PanelBG, 0.12f);
+        if(service.ShowPreviews) previews.Attach(card, level.Id.ToString(), TufPreviewSource.Video(level.VideoLink));
+        RectTransform rail = Rect("Difficulty Rail", card, new(0f, 0f), new(0f, 1f), new(5f, 8f), new(11f, -8f));
+        Image railImage = rail.gameObject.AddComponent<Image>();
+        railImage.sprite = MainCore.Spr.GetFilled(2f);
+        railImage.type = Image.Type.Sliced;
+        railImage.color = ColorUtility.TryParseHtmlString(level.DifficultyColor, out Color color) ? color : Color.white;
+        float x = 20f;
+        TMP_Text id = MetaLabel(card, "Id", $"#{level.Id}", ref x, 78f);
+        id.color = new(1f, 1f, 1f, 0.48f);
+        x += MetaGap;
+        TMP_Text diff = MetaLabel(card, "Difficulty", level.Difficulty, ref x, 128f);
+        diff.color = railImage.color;
+        RectTransform songRect = Rect("Song", card, new(0f, 1f), new(1f, 1f), new(20f, -74f), new(-16f, -40f));
+        string song = string.IsNullOrEmpty(level.Song) ? Tr("TUF_UNKNOWN_LEVEL", "Level") + " #" + level.Id : level.Song;
+        TMP_Text songText = Text(songRect, song, 20f, TextAlignmentOptions.Left);
+        songText.fontStyle = FontStyles.Bold;
+        songText.overflowMode = TextOverflowModes.Ellipsis;
+        TextCompat.NoWrap(songText);
+        bool known = !string.IsNullOrEmpty(level.Artist) || !string.IsNullOrEmpty(level.Creator);
+        RectTransform creditRect = Rect("Credits", card, new(0f, 1f), new(1f, 1f), new(20f, -98f), new(-16f, -76f));
+        TMP_Text credit = Text(creditRect,
+            known ? $"{level.Artist}  ·  {level.Creator}" : Tr("TUF_INSTALLED_UNKNOWN", "Downloaded before Quartz tracked level details."),
+            14f, TextAlignmentOptions.Left);
+        credit.color = new(1f, 1f, 1f, 0.46f);
+        credit.overflowMode = TextOverflowModes.Ellipsis;
+        TextCompat.NoWrap(credit);
+        if(known) {
+            RectTransform statRect = Rect("Stats", card, new(0f, 1f), new(1f, 1f), new(20f, -120f), new(-16f, -98f));
+            TMP_Text stats = Text(statRect, $"✓ {level.Clears:N0}    ♥ {level.Likes:N0}", 14f, TextAlignmentOptions.Left);
+            stats.color = new(1f, 1f, 1f, 0.46f);
+            stats.overflowMode = TextOverflowModes.Ellipsis;
+            TextCompat.NoWrap(stats);
+        }
+        bool installed = IsInstalled(level);
+        BuildAction(Rect("Action", card, new(0f, 0f), new(1f, 0f), new(20f, 14f), new(installed ? -66f : -16f, 48f)), level);
+        if(installed) BuildDelete(Rect("Delete", card, new(1f, 0f), new(1f, 0f), new(-58f, 14f), new(-16f, 48f)), level);
     }
     private void AddCard(TufLevel level) {
         RectTransform card = FixedRow("Level " + level.Id, 94f);
@@ -456,8 +548,9 @@ internal sealed class TufBrowserView : MonoBehaviour {
         label.raycastTarget = false;
         badge.offsetMax = new(x + Mathf.Ceil(label.GetPreferredValues(value).x) + 22f, -10f);
     }
-    private void AddDelete(RectTransform card, TufLevel level) {
-        RectTransform button = Rect("Delete", card, new(1f, 0.5f), new(1f, 0.5f), new(-192f, -23f), new(-146f, 23f));
+    private void AddDelete(RectTransform card, TufLevel level) =>
+        BuildDelete(Rect("Delete", card, new(1f, 0.5f), new(1f, 0.5f), new(-192f, -23f), new(-146f, 23f)), level);
+    private void BuildDelete(RectTransform button, TufLevel level) {
         Image image = button.gameObject.AddComponent<Image>();
         image.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
         image.type = Image.Type.Sliced;
@@ -496,8 +589,9 @@ internal sealed class TufBrowserView : MonoBehaviour {
             if(deleteChips.TryGetValue(level.Id, out Image image) && image != null)
                 image.color = DeleteColor(armedDeleteId == level.Id, !service.IsBusy);
     }
-    private void AddAction(RectTransform card, TufLevel level) {
-        RectTransform action = Rect("Action", card, new(1f, 0.5f), new(1f, 0.5f), new(-138f, -23f), new(-10f, 23f));
+    private void AddAction(RectTransform card, TufLevel level) =>
+        BuildAction(Rect("Action", card, new(1f, 0.5f), new(1f, 0.5f), new(-138f, -23f), new(-10f, 23f)), level);
+    private void BuildAction(RectTransform action, TufLevel level) {
         Image image = action.gameObject.AddComponent<Image>();
         image.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
         image.type = Image.Type.Sliced;
@@ -632,6 +726,24 @@ internal sealed class TufBrowserView : MonoBehaviour {
             if(button == PointerEventData.InputButton.Left) action?.Invoke();
         });
         return (image, label);
+    }
+    private static Image IconChip(Transform parent, UISprite sprite, float width, Action action) {
+        RectTransform rect = Rect("Chip " + sprite, parent, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+        LayoutElement size = rect.gameObject.AddComponent<LayoutElement>();
+        size.minWidth = size.preferredWidth = width;
+        Image image = rect.gameObject.AddComponent<Image>();
+        image.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
+        image.type = Image.Type.Sliced;
+        image.color = UIColors.ObjectBG;
+        RectTransform iconRect = Rect("Icon", rect, new(0.5f, 0.5f), new(0.5f, 0.5f), new(-11f, -11f), new(11f, 11f));
+        Image icon = iconRect.gameObject.AddComponent<Image>();
+        icon.sprite = MainCore.Spr.Get(sprite, 22f);
+        icon.color = new(1f, 1f, 1f, 0.9f);
+        icon.raycastTarget = false;
+        GenerateUI.AddButton(rect.gameObject, button => {
+            if(button == PointerEventData.InputButton.Left) action?.Invoke();
+        });
+        return image;
     }
     private static HorizontalLayoutGroup AddHorizontal(Transform row, float spacing = 8f) {
         HorizontalLayoutGroup layout = row.gameObject.AddComponent<HorizontalLayoutGroup>();

@@ -104,6 +104,15 @@ internal static class TufSettingsUI {
             "tuf_previews",
             "Show a blurred preview image behind each level in the browser, taken from its YouTube video. Turn off to skip the thumbnail downloads."
         );
+        GenerateUI.ToggleTip(
+            content.transform,
+            false,
+            service.GridView,
+            service.SetGridView,
+            "Grid View",
+            "tuf_grid_view",
+            "Lay the level browser out as a grid of cards instead of one column of rows. The column count follows the window width."
+        );
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(content.transform)),
             "TUF_LIBRARY", "Level Library");
         RectTransform pathRow = GenerateUI.Row(content.transform, 34f);

@@ -883,6 +883,8 @@
     "DESC_TUF_LINK_HELPER": "Saves downloaded levels into TUFHelperLite's Downloads folder (as tuf-<id>) so both mods share one level library. Inside the game folder, UMMMods is checked first, then Mods.",
     "TUF_PREVIEWS": "Level Previews",
     "DESC_TUF_PREVIEWS": "Show a blurred preview image behind each level in the browser, taken from its YouTube video. Turn off to skip the thumbnail downloads.",
+    "TUF_GRID_VIEW": "Grid View",
+    "DESC_TUF_GRID_VIEW": "Lay the level browser out as a grid of cards instead of one column of rows. The column count follows the window width.",
     "TUF_INSTALLED": "Installed",
     "DESC_TUF_INSTALLED": "Show only the levels you have downloaded, newest first. Works offline.",
     "TUF_INSTALLED_EMPTY": "You have not downloaded any levels yet.",

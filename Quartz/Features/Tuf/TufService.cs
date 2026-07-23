@@ -165,6 +165,13 @@ public sealed class TufService : IRuntimeService {
         if(!value) TufPreviewCache.Clear();
         Notify();
     }
+    public bool GridView => settings?.Data.GridView ?? false;
+    public void SetGridView(bool value) {
+        if(settings == null || settings.Data.GridView == value) return;
+        settings.Data.GridView = value;
+        settings.RequestSave();
+        Notify();
+    }
     public bool LinkTufHelperLite => settings?.Data.LinkTufHelperLite ?? false;
     public void SetLinkTufHelperLite(bool value) {
         if(settings == null || settings.Data.LinkTufHelperLite == value) return;
