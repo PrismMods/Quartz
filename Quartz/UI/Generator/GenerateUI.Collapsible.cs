@@ -41,7 +41,7 @@ public static partial class GenerateUI {
     public static void ClearSections() => Sections.Clear();
     public static void PruneSections() => Sections.RemoveAll(s => s == null || s.Body == null);
     private static bool IsDynamicTitleList(Transform parent) =>
-        parent != null && parent.name is "PanelsList" or "PracticeBindings";
+        parent != null && parent.name is "PanelsList" or "PracticeBindings" or "FaqList";
     public static CollapsibleSection FlatSection(
         Transform parent,
         string title,

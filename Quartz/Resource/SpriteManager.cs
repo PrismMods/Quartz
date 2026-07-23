@@ -43,6 +43,7 @@ public enum UISprite {
     Note128,
     ChevronDown128,
     Folder128,
+    QuestionMarkCircle128,
 }
 public enum UISliceSprite {
     Circle256P1024,
@@ -256,6 +257,7 @@ public sealed class SpriteManager(ResourceManager resource) : IDisposable {
         [UISprite.Palette128] = Asset.Palette128,
         [UISprite.Note128] = Asset.Note128,
         [UISprite.ChevronDown128] = Asset.ChevronDown128,
-        [UISprite.Folder128] = Asset.Folder128
+        [UISprite.Folder128] = Asset.Folder128,
+        [UISprite.QuestionMarkCircle128] = Asset.QuestionMarkCircle128
     };
 }

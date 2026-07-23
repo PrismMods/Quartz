@@ -101,6 +101,7 @@ internal static class PageSearch {
         OriginalMenuState.Import => GenerateUI.Tr("IMPORT", "Import"),
         OriginalMenuState.Addons => GenerateUI.Tr("ADDONS", "Addons"),
         OriginalMenuState.Settings => GenerateUI.Tr("SETTINGS", "Settings"),
+        OriginalMenuState.HelpFaq => GenerateUI.Tr("HELP", "Help") + " · " + GenerateUI.Tr("FAQ", "FAQ"),
         OriginalMenuState.Credits => GenerateUI.Tr("CREDITS", "Credits"),
         OriginalMenuState.Developer => GenerateUI.Tr("DEVELOPER", "Developer"),
         _ => "?",
@@ -248,7 +249,6 @@ internal static class PageSearch {
         var seq = GTweenSequenceBuilder.New()
             .AppendTime(0.35f)
             .Append(GTweenExtensions.Tween(
-                () => img.color.a,
                 () => img == null ? 0f : img.color.a,
                 a => {
                     if(img == null) return;

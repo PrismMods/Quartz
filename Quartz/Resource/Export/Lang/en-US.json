@@ -1232,5 +1232,16 @@
     "KVI_DISPLAY_PRESSED": "Label While Pressed (empty = same)",
     "KVI_LABEL_ENABLED": "Show Label",
     "TOGGLE_BIND_HINT": "Right-click any toggle to give it its own hotkey. Press Esc while binding to unbind it.",
+    "HELP": "Help",
+    "FAQ": "FAQ",
+    "FAQ_HINT": "These questions live in FAQ.json in your Quartz folder. Edit that file to reword an answer, add your own questions or drop the ones you don't need, then press Reload. Delete the file and reload to get the defaults back.",
+    "FAQ_OPEN_FILE": "Open File",
+    "DESC_FAQ_OPEN_FILE": "Opens FAQ.json in whatever your system uses for .json files, writing the default file first if it isn't there yet.",
+    "FAQ_OPEN_FOLDER": "Open Folder",
+    "DESC_FAQ_OPEN_FOLDER": "Opens the Quartz data folder that holds FAQ.json and your settings.",
+    "FAQ_RELOAD": "Reload",
+    "DESC_FAQ_RELOAD": "Re-reads FAQ.json from disk and rebuilds the list below.",
+    "FAQ_ERROR": "FAQ.json couldn't be read, showing the built-in questions instead — {0}",
+    "FAQ_EMPTY": "FAQ.json has no questions in it yet."
   }
 }

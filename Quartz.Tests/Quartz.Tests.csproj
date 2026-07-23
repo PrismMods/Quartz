@@ -12,6 +12,7 @@
 		<Compile Include="../Quartz/IO/AtomicFile.cs" Link="Source/AtomicFile.cs" />
 		<Compile Include="../Quartz/IO/ProfileNames.cs" Link="Source/ProfileNames.cs" />
 		<Compile Include="../Quartz/IO/ProfileBundle.cs" Link="Source/ProfileBundle.cs" />
+		<Compile Include="../Quartz/IO/FaqDocument.cs" Link="Source/FaqDocument.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/KeyViewerCss.cs" Link="Source/KeyViewerCss.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/KeyViewerPersistence.cs" Link="Source/KeyViewerPersistence.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvElement.cs" Link="Source/KvElement.cs" />

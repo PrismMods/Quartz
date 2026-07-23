@@ -74,6 +74,9 @@ public static class MenuFactory {
             ("Packs", "TUF_PACKS", (int)OriginalMenuState.NostalgiaTufPacks),
             ("Settings", "TUF_SETTINGS", (int)OriginalMenuState.NostalgiaTufSettings),
         ],
+        [(int)OriginalMenuState.HelpFaq] = [
+            ("FAQ", "FAQ", (int)OriginalMenuState.HelpFaq),
+        ],
     };
     public static int CategoryFor(int state) {
         foreach(var kvp in CategoryChildren)
@@ -117,6 +120,7 @@ public static class MenuFactory {
         CreateItem(parent, "Import", MainCore.Spr.Get(UISprite.Book128, iconUnits), (int)OriginalMenuState.Import);
         CreateItem(parent, "Addons", MainCore.Spr.Get(UISprite.Wrench128, iconUnits), (int)OriginalMenuState.Addons);
         var settings = CreateItem(parent, "Settings", MainCore.Spr.Get(UISprite.Gear128, iconUnits), (int)OriginalMenuState.Settings);
+        CreateItem(parent, "Help", MainCore.Spr.Get(UISprite.QuestionMarkCircle128, iconUnits), (int)OriginalMenuState.HelpFaq);
         CreateItem(parent, "Credits", MainCore.Spr.Get(UISprite.Star128, iconUnits), (int)OriginalMenuState.Credits);
         if(Info.IsDev) {
             CreateItem(parent, "Developer", MainCore.Spr.Get(UISprite.Wrench128, iconUnits), (int)OriginalMenuState.Developer);
