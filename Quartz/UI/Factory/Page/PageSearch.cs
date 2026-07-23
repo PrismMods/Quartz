@@ -79,6 +79,7 @@ internal static class PageSearch {
         OriginalMenuState.GameplayJudgement => GenerateUI.Tr("SECTION_JUDGEMENT_RESTRICTION", "Judgement Restriction"),
         OriginalMenuState.GameplayDeath => GenerateUI.Tr("SECTION_DEATH_LIMIT", "Death Limit"),
         OriginalMenuState.GameplayAutoDeafen => GenerateUI.Tr("SECTION_AUTO_DEAFEN_DISCORD", "Auto Deafen (Discord)"),
+        OriginalMenuState.GameplayPractice => GenerateUI.Tr("SECTION_PRACTICE_DIFFICULTY", "Practice Difficulty"),
         OriginalMenuState.VisualsEffectRemover => GenerateUI.Tr("SECTION_EFFECT_REMOVER", "Effect Remover"),
         OriginalMenuState.VisualsHideJudgements => GenerateUI.Tr("SECTION_HIDE_JUDGEMENTS", "Hide Judgements"),
         OriginalMenuState.VisualsVisualTweaks => GenerateUI.Tr("SECTION_VISUAL_TWEAKS", "Visual Tweaks"),

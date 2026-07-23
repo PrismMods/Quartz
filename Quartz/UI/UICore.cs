@@ -34,6 +34,7 @@ public enum OriginalMenuState {
     GameplayJudgement,
     GameplayDeath,
     GameplayAutoDeafen,
+    GameplayPractice,
     VisualsEffectRemover,
     VisualsHideJudgements,
     VisualsVisualTweaks,

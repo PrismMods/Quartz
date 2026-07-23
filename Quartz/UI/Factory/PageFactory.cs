@@ -51,6 +51,7 @@ public static class PageFactory {
         PageGameplay.JudgementRestrictionPage(UICore.Pages[(int)OriginalMenuState.GameplayJudgement]);
         PageGameplay.DeathLimitPage(UICore.Pages[(int)OriginalMenuState.GameplayDeath]);
         PageGameplay.AutoDeafenPage(UICore.Pages[(int)OriginalMenuState.GameplayAutoDeafen]);
+        PageGameplay.PracticePage(UICore.Pages[(int)OriginalMenuState.GameplayPractice]);
         PageVisuals.EffectRemoverPage(UICore.Pages[(int)OriginalMenuState.VisualsEffectRemover]);
         PageVisuals.HideJudgementsPage(UICore.Pages[(int)OriginalMenuState.VisualsHideJudgements]);
         PageVisuals.VisualTweaksPage(UICore.Pages[(int)OriginalMenuState.VisualsVisualTweaks]);

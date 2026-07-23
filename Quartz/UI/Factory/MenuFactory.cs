@@ -43,6 +43,7 @@ public static class MenuFactory {
             ("Judgement Restriction", "SECTION_JUDGEMENT_RESTRICTION", (int)OriginalMenuState.GameplayJudgement),
             ("Death Limit", "SECTION_DEATH_LIMIT", (int)OriginalMenuState.GameplayDeath),
             ("Auto Deafen (Discord)", "SECTION_AUTO_DEAFEN_DISCORD", (int)OriginalMenuState.GameplayAutoDeafen),
+            ("Practice Difficulty", "SECTION_PRACTICE_DIFFICULTY", (int)OriginalMenuState.GameplayPractice),
         ],
         [(int)OriginalMenuState.VisualsEffectRemover] = [
             ("Effect Remover", "SECTION_EFFECT_REMOVER", (int)OriginalMenuState.VisualsEffectRemover),

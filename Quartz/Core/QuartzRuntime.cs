@@ -285,6 +285,7 @@ public sealed class QuartzRuntime {
         features.OnEnable("JudgementOverlay", () => JudgementOverlay.Initialize(RootObject));
         features.OnEnable("KeyViewerOverlay", () => KeyViewerOverlay.Initialize(RootObject));
         features.OnEnable("SongTitleOverlay", () => SongTitleOverlay.Initialize(RootObject));
+        features.OnEnable("PracticeOverlay", () => Features.Practice.PracticeOverlay.Initialize(RootObject));
         features.OnEnable("CalibrationPopup", CalibrationPopupUI.Initialize);
         features.Register("EffectRemover", EffectRemover.RefreshEditorSaveButtons, EffectRemover.RestoreEditorSaveButtons);
         features.Register("Tweaks", Tweaks.RefreshAll, Tweaks.RestoreAll);
@@ -293,6 +294,7 @@ public sealed class QuartzRuntime {
         features.Register("Optimizer", Optimizer.Apply, Optimizer.Restore);
         features.Register("InGameOverlayFont", InGameOverlayFont.Refresh, InGameOverlayFont.RestoreAll);
         features.Register("Nostalgia", Nostalgia.Refresh, Nostalgia.Restore);
+        features.OnDisable("PracticeOverlay", Features.Practice.PracticeOverlay.Dispose);
         features.OnDisable("SongTitleOverlay", SongTitleOverlay.Dispose);
         features.OnDisable("KeyViewerOverlay", KeyViewerOverlay.Dispose);
         features.OnDisable("JudgementOverlay", JudgementOverlay.Dispose);

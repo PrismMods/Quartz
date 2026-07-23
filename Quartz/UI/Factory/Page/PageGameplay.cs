@@ -27,4 +27,6 @@ internal static partial class PageGameplay {
         CreateDeathLimit(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
     public static void AutoDeafenPage(RectTransform parent) =>
         CreateAutoDeafen(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
+    public static void PracticePage(RectTransform parent) =>
+        CreatePractice(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
 }

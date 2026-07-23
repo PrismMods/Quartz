@@ -39,6 +39,9 @@ public static partial class GenerateUI {
     }
     public static readonly List<CollapsibleSection> Sections = [];
     public static void ClearSections() => Sections.Clear();
+    public static void PruneSections() => Sections.RemoveAll(s => s == null || s.Body == null);
+    private static bool IsDynamicTitleList(Transform parent) =>
+        parent != null && parent.name is "PanelsList" or "PracticeBindings";
     public static CollapsibleSection FlatSection(
         Transform parent,
         string title,
@@ -170,7 +173,7 @@ public static partial class GenerateUI {
         label.text = title;
         label.characterSpacing = -3f;
         label.raycastTarget = false;
-        if(parent == null || parent.name != "PanelsList") Localize(label, LocaleKeyFromText("SECTION", title), title);
+        if(!IsDynamicTitleList(parent)) Localize(label, LocaleKeyFromText("SECTION", title), title);
         GameObject bodyObj = new("Body");
         bodyObj.transform.SetParent(sectionRect, false);
         RectTransform bodyRect = bodyObj.AddComponent<RectTransform>();
