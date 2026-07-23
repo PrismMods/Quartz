@@ -1231,6 +1231,6 @@
     "KVI_COUNTER_SHOWWHILEPRESSING": "Show Counter While Pressing",
     "KVI_DISPLAY_PRESSED": "Label While Pressed (empty = same)",
     "KVI_LABEL_ENABLED": "Show Label",
-    "TOGGLE_BIND_HINT": "Right-click any toggle to give it its own hotkey. Press Esc while binding to unbind it."
+    "TOGGLE_BIND_HINT": "Right-click any toggle to give it its own hotkey. Press Esc while binding to unbind it.",
   }
 }
