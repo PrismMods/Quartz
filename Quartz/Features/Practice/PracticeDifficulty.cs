@@ -27,8 +27,32 @@ public static class PracticeDifficulty {
         if(binding.SetsDifficulty) SetDifficulty(binding.Difficulty);
         if(binding.SetsSpeed) PracticePitch.SetLevelPitch(binding.Pitch);
     }
+    private static int pendingDifficulty = -1;
+    public static int PendingDifficulty => pendingDifficulty;
+    private static bool InRun {
+        get {
+            try {
+                scrController controller = scrController.instance;
+                return controller != null && controller.gameworld && controller.currentSeqID > 1;
+            } catch { return false; }
+        }
+    }
     public static void SetDifficulty(int index) {
         index = Mathf.Clamp(index, 0, DifficultyCount - 1);
+        if(InRun) {
+            pendingDifficulty = index == CurrentDifficulty ? -1 : index;
+            return;
+        }
+        pendingDifficulty = -1;
+        ApplyDifficulty(index);
+    }
+    internal static void FlushPendingDifficulty() {
+        if(pendingDifficulty < 0 || InRun) return;
+        int index = pendingDifficulty;
+        pendingDifficulty = -1;
+        ApplyDifficulty(index);
+    }
+    private static void ApplyDifficulty(int index) {
         try {
             GCS.difficulty = (Difficulty)index;
             Refl.Invoke(Refl.Method(Refl.Type("Persistence"), "SetDefaultDifficulty", 1), null, (Difficulty)index);

@@ -24,7 +24,7 @@ internal static partial class PageGameplay {
         GenerateUI.AddLocalizedMutedText(
             GenerateUI.Row(sec.Body, 46f),
             "PRACTICE_HINT",
-            "Bind a key to a difficulty and a pitch. Difficulty switches the moment you press it. Pitch is written into the level's own Pitch setting once, exactly as if you typed it in — the game picks it up on your next run, and you stay free to edit the field yourself afterwards.",
+            "Bind a key to a difficulty and a pitch. Both land between attempts, never mid-run: difficulty is held until the current attempt ends, and pitch is written into the level's own Pitch setting once, exactly as if you typed it in. The readout shows anything still queued with an arrow.",
             18f
         );
         GameObject list = new("PracticeBindings");

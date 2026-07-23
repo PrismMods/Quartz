@@ -77,6 +77,8 @@ public static class PracticeOverlay {
         string body = difficulty < 0
             ? MainCore.Tr.Get("PRACTICE_DIFF_UNKNOWN", "Difficulty ?")
             : PracticeDifficulty.DifficultyName(difficulty);
+        int pending = PracticeDifficulty.PendingDifficulty;
+        if(pending >= 0) body += " → " + PracticeDifficulty.DifficultyName(pending);
         if(!Conf.ShowSpeed) return body;
         return body + "  ·  "
             + PracticeDifficulty.CurrentPitch.ToString(System.Globalization.CultureInfo.InvariantCulture) + "%";
@@ -86,6 +88,7 @@ public static class PracticeOverlay {
         private void Update() {
             if(root == null || text == null) return;
             PracticeInput.Poll();
+            PracticeDifficulty.FlushPendingDifficulty();
             bool isReorganizing = UICore.IsReorganizing;
             bool show = (PanelsOverlay.IsEnabled && Conf.Enabled && Conf.ShowIndicator
                 && (!Conf.IndicatorOnlyInGame || GameStats.InGame)) || isReorganizing;
