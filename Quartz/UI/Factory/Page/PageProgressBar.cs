@@ -44,9 +44,8 @@ internal static class PageProgressBar {
             GenerateUI.Row(sec.Body),
             def.Style,
             conf.Style,
-            new[] { ProgressBarStyle.Modern, ProgressBarStyle.Bar, ProgressBarStyle.Line },
+            new[] { ProgressBarStyle.Modern, ProgressBarStyle.Line },
             s => s switch {
-                ProgressBarStyle.Bar => MainCore.Tr.Get("PROGRESSBAR_STYLE_BAR", "Bar"),
                 ProgressBarStyle.Line => MainCore.Tr.Get("PROGRESSBAR_STYLE_LINE", "Line"),
                 _ => MainCore.Tr.Get("PROGRESSBAR_STYLE_MODERN", "Modern"),
             },
@@ -61,7 +60,7 @@ internal static class PageProgressBar {
             "Style"
         ).Rect.AddToolTip(
             "DESC_PROGRESSBAR_STYLE",
-            "Modern is a floating rounded bar. Bar splits that bar into lit segments. Line is a thin strip stretched edge to edge along the top or bottom of the screen."
+            "Modern is a floating rounded bar. Line is a thin strip stretched edge to edge along the top or bottom of the screen."
         );
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(sec.Body)), "HEADING_SIZE", "Size");
         if(conf.Style == ProgressBarStyle.Line) AppendLineSize(sec.Body, conf, def, Save);
@@ -145,43 +144,16 @@ internal static class PageProgressBar {
         offset.Format = "0 px";
         offset.OnChanged = v => { conf.TopOffset = v; ProgressBarOverlay.Apply(); };
         offset.OnComplete = v => { conf.TopOffset = v; ProgressBarOverlay.Apply(); save(); };
-        if(conf.Style == ProgressBarStyle.Bar) {
-            static float segmentFilter(float v) => Mathf.Clamp(Mathf.Round(v), 4f, 256f);
-            UISlider segmentCount = GenerateUI.Slider(
-                GenerateUI.Row(body),
-                def.SegmentCount,
-                4f, 256f, conf.SegmentCount, segmentFilter, null, null,
-                "Segment Count", "progressbar_segmentcount"
-            );
-            segmentCount.Format = "0";
-            segmentCount.OnChanged = v => { conf.SegmentCount = Mathf.RoundToInt(v); ProgressBarOverlay.Apply(); };
-            segmentCount.OnComplete = v => {
-                conf.SegmentCount = Mathf.RoundToInt(v);
-                ProgressBarOverlay.Apply();
-                save();
-            };
-            static float gapFilter(float v) => Mathf.Clamp(Mathf.Round(v * 4f) * 0.25f, 0f, 20f);
-            UISlider segmentGap = GenerateUI.Slider(
-                GenerateUI.Row(body),
-                def.SegmentGap,
-                0f, 20f, conf.SegmentGap, gapFilter, null, null,
-                "Segment Gap", "progressbar_segmentgap"
-            );
-            segmentGap.Format = "0.## px";
-            segmentGap.OnChanged = v => { conf.SegmentGap = v; ProgressBarOverlay.Apply(); };
-            segmentGap.OnComplete = v => { conf.SegmentGap = v; ProgressBarOverlay.Apply(); save(); };
-        } else {
-            static float roundingFilter(float v) => Mathf.Clamp(Mathf.Round(v), 0f, 30f);
-            UISlider rounding = GenerateUI.Slider(
-                GenerateUI.Row(body),
-                def.Rounding,
-                0f, 30f, conf.Rounding, roundingFilter, null, null,
-                "Corner Rounding", "progressbar_rounding"
-            );
-            rounding.Format = "0 px";
-            rounding.OnChanged = v => { conf.Rounding = v; ProgressBarOverlay.Apply(); };
-            rounding.OnComplete = v => { conf.Rounding = v; ProgressBarOverlay.Apply(); save(); };
-        }
+        static float roundingFilter(float v) => Mathf.Clamp(Mathf.Round(v), 0f, 30f);
+        UISlider rounding = GenerateUI.Slider(
+            GenerateUI.Row(body),
+            def.Rounding,
+            0f, 30f, conf.Rounding, roundingFilter, null, null,
+            "Corner Rounding", "progressbar_rounding"
+        );
+        rounding.Format = "0 px";
+        rounding.OnChanged = v => { conf.Rounding = v; ProgressBarOverlay.Apply(); };
+        rounding.OnComplete = v => { conf.Rounding = v; ProgressBarOverlay.Apply(); save(); };
         static float outlineFilter(float v) => Mathf.Clamp(Mathf.Round(v * 4f) * 0.25f, 0f, 8f);
         UISlider outlineThick = GenerateUI.Slider(
             GenerateUI.Row(body),
@@ -293,8 +265,8 @@ internal static class PageProgressBar {
             conf.GetBackColor(),
             c => { conf.SetBackColor(c); ProgressBarOverlay.Apply(); },
             c => { conf.SetBackColor(c); ProgressBarOverlay.Apply(); save(); },
-            conf.Style == ProgressBarStyle.Bar ? "Unlit Segment Color" : "Background Color",
-            conf.Style == ProgressBarStyle.Bar ? "progressbar_unlitcolor" : "progressbar_backcolor"
+            "Background Color",
+            "progressbar_backcolor"
         );
         if(conf.Style == ProgressBarStyle.Line) return;
         GenerateUI.ColorPicker(
