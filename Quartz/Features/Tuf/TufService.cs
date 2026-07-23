@@ -48,6 +48,10 @@ public sealed class TufService : IRuntimeService {
     private bool disposed;
     private SettingsFile<TufSettings> settings;
     private SettingsFile<TufInstallIndex> index;
+    private const int MaxInfoProbes = 25;
+    private readonly HashSet<int> infoProbed = [];
+    private readonly HashSet<int> chartProbed = [];
+    private CancellationTokenSource infoRequest;
     private int quantumMinIndex;
     private int quantumMaxIndex = TufDifficultyFilter.QuantumNames.Count - 1;
     public void Initialize() {
@@ -220,7 +224,8 @@ public sealed class TufService : IRuntimeService {
             foreach(string dir in Directory.EnumerateDirectories(root.Path)) {
                 if(!TufInstallPaths.IsLevelFolderName(Path.GetFileName(dir), out int id)) continue;
                 if(index.Data.Find(id) != null) continue;
-                if(TufArchive.SelectChart(dir) == null) continue;
+                string chart = TufArchive.SelectChart(dir);
+                if(chart == null) continue;
                 long stamp;
                 try { stamp = Directory.GetCreationTimeUtc(dir).Ticks; } catch { stamp = 0; }
                 index.Data.Adopt(id, dir, stamp);
@@ -239,7 +244,77 @@ public sealed class TufService : IRuntimeService {
         bool pruned = index.Data.PruneMissing();
         AdoptOrphans();
         if(pruned) index.RequestSave();
+        BackfillInstalledInfo();
         RebuildInstalledList();
+    }
+    private void BackfillInstalledInfo() {
+        if(index == null) return;
+        List<(int Id, string Folder)> charts = [];
+        List<int> missing = [];
+        foreach(TufInstallEntry entry in index.Data.Entries) {
+            if(string.IsNullOrEmpty(entry.Song) && chartProbed.Add(entry.Id)) charts.Add((entry.Id, entry.Folder));
+            if(entry.NeedsInfo && missing.Count < MaxInfoProbes && infoProbed.Add(entry.Id)) missing.Add(entry.Id);
+        }
+        if(charts.Count > 0) ReadChartInfo(charts);
+        if(missing.Count > 0) FetchMissingInfo(missing);
+    }
+    private async void ReadChartInfo(List<(int Id, string Folder)> pending) {
+        List<(int Id, TufChartInfo Info)> found = await Task.Run(() => {
+            List<(int, TufChartInfo)> results = [];
+            foreach((int id, string folder) in pending) {
+                TufChartInfo info = TufChartInfo.Read(TufArchive.SelectChart(folder));
+                if(info != null) results.Add((id, info));
+            }
+            return results;
+        }).ConfigureAwait(false);
+        if(found.Count == 0) return;
+        MainThread.Enqueue(() => ApplyChartInfo(found));
+    }
+    private void ApplyChartInfo(List<(int Id, TufChartInfo Info)> found) {
+        if(disposed || index == null) return;
+        bool changed = false;
+        foreach((int id, TufChartInfo info) in found) {
+            TufInstallEntry entry = index.Data.Find(id);
+            if(entry != null && entry.ApplyChart(info)) changed = true;
+        }
+        if(!changed) return;
+        InfoRevision++;
+        index.RequestSave();
+        if(ShowInstalled) RebuildInstalledList();
+        else Notify();
+    }
+    private async void FetchMissingInfo(List<int> ids) {
+        infoRequest ??= new CancellationTokenSource();
+        CancellationToken token = infoRequest.Token;
+        List<TufLevel> fetched = [];
+        foreach(int id in ids) {
+            if(disposed || token.IsCancellationRequested) return;
+            try {
+                TufLevel level = await api.FetchLevelAsync(id, token).ConfigureAwait(false);
+                if(level != null) fetched.Add(level);
+            } catch(OperationCanceledException) when(token.IsCancellationRequested) {
+                return;
+            } catch(Exception e) {
+                MainCore.Log.Wrn($"[TUF] could not fetch info for level {id}: {e.Message}");
+                foreach(int pending in ids) if(pending != id) infoProbed.Remove(pending);
+                break;
+            }
+        }
+        if(fetched.Count == 0) return;
+        MainThread.Enqueue(() => ApplyFetchedInfo(fetched));
+    }
+    private void ApplyFetchedInfo(List<TufLevel> fetched) {
+        if(disposed || index == null) return;
+        bool changed = false;
+        foreach(TufLevel level in fetched) {
+            TufInstallEntry entry = index.Data.Find(level.Id);
+            if(entry != null && entry.ApplyLevel(level)) changed = true;
+        }
+        if(!changed) return;
+        InfoRevision++;
+        index.RequestSave();
+        if(ShowInstalled) RebuildInstalledList();
+        else Notify();
     }
     private void RebuildInstalledList() {
         if(index == null) return;
@@ -528,12 +603,14 @@ public sealed class TufService : IRuntimeService {
         debounce?.Cancel();
         listRequest?.Cancel();
         moveRequest?.Cancel();
+        infoRequest?.Cancel();
         actions?.Dispose();
         downloads?.Cancel();
         launcher?.Cancel();
         debounce?.Dispose();
         listRequest?.Dispose();
         moveRequest?.Dispose();
+        infoRequest?.Dispose();
         downloads?.Dispose();
         api?.Dispose();
         TufPreviewCache.Clear();

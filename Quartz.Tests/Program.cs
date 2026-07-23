@@ -64,6 +64,9 @@ List<(string Name, Action Run)> tests = [
     ("TUF install index records, moves, and round-trips", TufInstallTests.TestInstallIndexRoundTrip),
     ("TUF install index rejects corrupt records", TufInstallTests.TestInstallIndexRejectsJunk),
     ("TUF install index adopts orphans and prunes missing", TufInstallTests.TestAdoptAndPrune),
+    ("TUF reads song info straight out of an installed chart", TufChartInfoTests.TestReadsSettingsAfterChartData),
+    ("TUF ignores charts it cannot read info from", TufChartInfoTests.TestRejectsUnreadableCharts),
+    ("TUF install entries merge chart and API info", TufChartInfoTests.TestEntryMetadataMerge),
     ("TUF pack list parses string ids and counts", TufPackParseTests.TestPackListParsing),
     ("TUF pack tree flattens, dedups, and credits charters", TufPackParseTests.TestPackTreeParsing),
 ];

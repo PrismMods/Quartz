@@ -28,6 +28,8 @@
 		<Compile Include="../Quartz/Features/Tuf/TufDiskSpace.cs" Link="Source/TufDiskSpace.cs" />
 		<Compile Include="../Quartz/Features/Tuf/TufInstallPaths.cs" Link="Source/TufInstallPaths.cs" />
 		<Compile Include="../Quartz/Features/Tuf/TufInstallIndex.cs" Link="Source/TufInstallIndex.cs" />
+		<Compile Include="../Quartz/Features/Tuf/TufChartInfo.cs" Link="Source/TufChartInfo.cs" />
+		<Compile Include="../Quartz/Features/Tuf/TufCredits.cs" Link="Source/TufCredits.cs" />
 		<Compile Include="../Quartz/Features/Tuf/TufPackModels.cs" Link="Source/TufPackModels.cs" />
 		<Compile Include="../Quartz/Features/Tuf/TufPackApiClient.cs" Link="Source/TufPackApiClient.cs" />
 	</ItemGroup>

@@ -181,22 +181,7 @@ public sealed class TufPackApiClient : IDisposable {
         }
         return result;
     }
-    private static string? ExtractCreator(JToken level) {
-        string? flat = level.Value<string>("creator") ?? level.Value<string>("charter");
-        if(!string.IsNullOrWhiteSpace(flat)) return flat;
-        if(level["levelCredits"] is not JArray credits) return null;
-        List<string> charters = [];
-        List<string> others = [];
-        foreach(JToken credit in credits) {
-            string? name = credit["creator"]?.Value<string>("name");
-            if(string.IsNullOrWhiteSpace(name)) continue;
-            string role = credit.Value<string>("role") ?? "";
-            (role.Contains("charter", StringComparison.OrdinalIgnoreCase) ? charters : others).Add(name);
-        }
-        List<string> chosen = charters.Count > 0 ? charters : others;
-        if(chosen.Count == 0) return null;
-        return chosen.Count <= 3 ? string.Join(" & ", chosen) : string.Join(" & ", chosen.Take(3)) + " …";
-    }
+    private static string? ExtractCreator(JToken level) => TufCredits.Extract(level);
     private static int SafeInt(JToken? token, string name) {
         try { return token?.Value<int?>(name) ?? 0; } catch { return 0; }
     }
