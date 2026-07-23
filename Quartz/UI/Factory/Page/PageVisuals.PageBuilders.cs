@@ -458,6 +458,10 @@ internal static partial class PageVisuals {
             Flag("Hide Result Text", "_result", defProfile.HideResult, profile.HideResult, v => profile.HideResult = v);
             Flag("Hide Hit Error Meter", "_meter", defProfile.HideHitErrorMeter, profile.HideHitErrorMeter, v => profile.HideHitErrorMeter = v);
             Flag("Hide Last Floor Flash", "_flash", defProfile.HideLastFloorFlash, profile.HideLastFloorFlash, v => profile.HideLastFloorFlash = v);
+            Flag("Hide Shortcut Hints", "_shortcut", defProfile.HideShortcutHints, profile.HideShortcutHints, v => {
+                profile.HideShortcutHints = v;
+                UiHider.RefreshShortcutHints();
+            });
         }
         ProfileSection("Playing Profile", conf.Playing, def.Playing, "uih_play");
         ProfileSection("Recording Profile", conf.Recording, def.Recording, "uih_rec");

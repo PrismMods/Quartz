@@ -33,6 +33,28 @@ public static partial class UiHider {
     private static class ReapplyOnEditModePatch {
         private static void Postfix() => ApplyNow();
     }
+    [HarmonyPatch]
+    private static class HideShortcutHintPatch {
+        private static bool Prepare() => ShortcutTextType != null;
+        private static MethodBase TargetMethod() => AccessTools.Method(ShortcutTextType, "SetText");
+        private static void Postfix(object __instance) {
+            if(!ShouldHideShortcutHints()) return;
+            if(__instance is Component component
+                && component.GetComponent<UnityEngine.UI.Text>() is UnityEngine.UI.Text label
+                && label.text.Length > 0) label.text = "";
+        }
+    }
+    private static readonly Type ShortcutTextType = AccessTools.TypeByName("scrShortcutText");
+    internal static void RefreshShortcutHints() {
+        if(ShortcutTextType == null) return;
+        MethodInfo setText = AccessTools.Method(ShortcutTextType, "SetText");
+        if(setText == null) return;
+        try {
+            foreach(UnityEngine.Object found in Resources.FindObjectsOfTypeAll(ShortcutTextType)) {
+                try { setText.Invoke(found, null); } catch { }
+            }
+        } catch { }
+    }
     [HarmonyPatch(typeof(scrController), "StartLoadingScene")]
     private static class ClearCachesOnSceneChangePatch {
         private static void Postfix() => ClearMemberValueCache();
