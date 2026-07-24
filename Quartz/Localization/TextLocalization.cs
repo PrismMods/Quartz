@@ -35,7 +35,9 @@ public class TextLocalization : MonoBehaviour {
         if(tmp == null || tr == null || string.IsNullOrEmpty(Key)) return;
         tmp.text = Value;
     }
+    public static event Action Refreshed;
     public static void RefreshAll() {
         foreach(TextLocalization t in instances) t?.UpdateText();
+        Refreshed?.Invoke();
     }
 }

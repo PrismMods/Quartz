@@ -34,6 +34,7 @@ public enum OriginalMenuState {
     GameplayJudgement,
     GameplayDeath,
     GameplayAutoDeafen,
+    GameplayPractice,
     VisualsEffectRemover,
     VisualsHideJudgements,
     VisualsVisualTweaks,
@@ -60,6 +61,7 @@ public enum OriginalMenuState {
     Search,
     Credits,
     Developer,
+    HelpFaq,
 }
 public static class UICore {
     private static GameObject canvasObj;
@@ -256,7 +258,7 @@ public static class UICore {
                 secondRunHelperTextSequence = GTweenSequenceBuilder.New()
                     .Append(GTweenExtensions.Tween(
                         () => 0,
-                        x => firstRunHelperText.text = fullText[..x],
+                        x => { if(firstRunHelperText != null) firstRunHelperText.text = fullText[..x]; },
                         fullText.Length,
                         1.4f
                     ).SetEasing(Easing.OutSine))

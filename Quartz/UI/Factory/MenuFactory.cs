@@ -43,6 +43,7 @@ public static class MenuFactory {
             ("Judgement Restriction", "SECTION_JUDGEMENT_RESTRICTION", (int)OriginalMenuState.GameplayJudgement),
             ("Death Limit", "SECTION_DEATH_LIMIT", (int)OriginalMenuState.GameplayDeath),
             ("Auto Deafen (Discord)", "SECTION_AUTO_DEAFEN_DISCORD", (int)OriginalMenuState.GameplayAutoDeafen),
+            ("Practice Difficulty", "SECTION_PRACTICE_DIFFICULTY", (int)OriginalMenuState.GameplayPractice),
         ],
         [(int)OriginalMenuState.VisualsEffectRemover] = [
             ("Effect Remover", "SECTION_EFFECT_REMOVER", (int)OriginalMenuState.VisualsEffectRemover),
@@ -72,6 +73,9 @@ public static class MenuFactory {
             ("Levels", "TUF_LEVELS", (int)OriginalMenuState.NostalgiaTuf),
             ("Packs", "TUF_PACKS", (int)OriginalMenuState.NostalgiaTufPacks),
             ("Settings", "TUF_SETTINGS", (int)OriginalMenuState.NostalgiaTufSettings),
+        ],
+        [(int)OriginalMenuState.HelpFaq] = [
+            ("FAQ", "FAQ", (int)OriginalMenuState.HelpFaq),
         ],
     };
     public static int CategoryFor(int state) {
@@ -116,6 +120,7 @@ public static class MenuFactory {
         CreateItem(parent, "Import", MainCore.Spr.Get(UISprite.Book128, iconUnits), (int)OriginalMenuState.Import);
         CreateItem(parent, "Addons", MainCore.Spr.Get(UISprite.Wrench128, iconUnits), (int)OriginalMenuState.Addons);
         var settings = CreateItem(parent, "Settings", MainCore.Spr.Get(UISprite.Gear128, iconUnits), (int)OriginalMenuState.Settings);
+        CreateItem(parent, "Help", MainCore.Spr.Get(UISprite.QuestionMarkCircle128, iconUnits), (int)OriginalMenuState.HelpFaq);
         CreateItem(parent, "Credits", MainCore.Spr.Get(UISprite.Star128, iconUnits), (int)OriginalMenuState.Credits);
         if(Info.IsDev) {
             CreateItem(parent, "Developer", MainCore.Spr.Get(UISprite.Wrench128, iconUnits), (int)OriginalMenuState.Developer);

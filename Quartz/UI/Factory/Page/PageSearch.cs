@@ -79,6 +79,7 @@ internal static class PageSearch {
         OriginalMenuState.GameplayJudgement => GenerateUI.Tr("SECTION_JUDGEMENT_RESTRICTION", "Judgement Restriction"),
         OriginalMenuState.GameplayDeath => GenerateUI.Tr("SECTION_DEATH_LIMIT", "Death Limit"),
         OriginalMenuState.GameplayAutoDeafen => GenerateUI.Tr("SECTION_AUTO_DEAFEN_DISCORD", "Auto Deafen (Discord)"),
+        OriginalMenuState.GameplayPractice => GenerateUI.Tr("SECTION_PRACTICE_DIFFICULTY", "Practice Difficulty"),
         OriginalMenuState.VisualsEffectRemover => GenerateUI.Tr("SECTION_EFFECT_REMOVER", "Effect Remover"),
         OriginalMenuState.VisualsHideJudgements => GenerateUI.Tr("SECTION_HIDE_JUDGEMENTS", "Hide Judgements"),
         OriginalMenuState.VisualsVisualTweaks => GenerateUI.Tr("SECTION_VISUAL_TWEAKS", "Visual Tweaks"),
@@ -100,6 +101,7 @@ internal static class PageSearch {
         OriginalMenuState.Import => GenerateUI.Tr("IMPORT", "Import"),
         OriginalMenuState.Addons => GenerateUI.Tr("ADDONS", "Addons"),
         OriginalMenuState.Settings => GenerateUI.Tr("SETTINGS", "Settings"),
+        OriginalMenuState.HelpFaq => GenerateUI.Tr("HELP", "Help") + " · " + GenerateUI.Tr("FAQ", "FAQ"),
         OriginalMenuState.Credits => GenerateUI.Tr("CREDITS", "Credits"),
         OriginalMenuState.Developer => GenerateUI.Tr("DEVELOPER", "Developer"),
         _ => "?",
@@ -247,8 +249,9 @@ internal static class PageSearch {
         var seq = GTweenSequenceBuilder.New()
             .AppendTime(0.35f)
             .Append(GTweenExtensions.Tween(
-                () => img.color.a,
+                () => img == null ? 0f : img.color.a,
                 a => {
+                    if(img == null) return;
                     Color c = img.color;
                     c.a = a;
                     img.color = c;

@@ -211,6 +211,7 @@ Resources:
 - Exported resources: `Quartz/Resource/Export/**` are copied into `UserData/Quartz` or UMM mod folder during packaging.
 - Languages: `Quartz/Resource/Export/Lang/` ships `en-US.json`, `ko-KR.json` and `zh-CN.json`, plus a `KEY_PREFIXES.md` legend. Only **en-US ↔ ko-KR** parity is enforced (by test and by `scripts/validate_i18n.py`); other languages are translator-authored and may lag.
 - Presets/fonts are shipped under `Quartz/Resource/Export/`.
+- FAQ: the Help ▸ FAQ page reads `FAQ.json` from the data root. It is deliberately **not** an exported resource — `FaqFile` seeds it from `FaqDocument.Default` only when the file is missing, so a mod update never overwrites a user's edited FAQ. A parse error falls back to the built-in questions and shows the error on the page. `FaqDocument` is Unity-free so the parser is covered by tests.
 
 ## Tests
 

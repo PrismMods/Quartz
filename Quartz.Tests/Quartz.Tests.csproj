@@ -12,6 +12,7 @@
 		<Compile Include="../Quartz/IO/AtomicFile.cs" Link="Source/AtomicFile.cs" />
 		<Compile Include="../Quartz/IO/ProfileNames.cs" Link="Source/ProfileNames.cs" />
 		<Compile Include="../Quartz/IO/ProfileBundle.cs" Link="Source/ProfileBundle.cs" />
+		<Compile Include="../Quartz/IO/FaqDocument.cs" Link="Source/FaqDocument.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/KeyViewerCss.cs" Link="Source/KeyViewerCss.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/KeyViewerPersistence.cs" Link="Source/KeyViewerPersistence.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvElement.cs" Link="Source/KvElement.cs" />
@@ -28,6 +29,8 @@
 		<Compile Include="../Quartz/Features/Tuf/TufDiskSpace.cs" Link="Source/TufDiskSpace.cs" />
 		<Compile Include="../Quartz/Features/Tuf/TufInstallPaths.cs" Link="Source/TufInstallPaths.cs" />
 		<Compile Include="../Quartz/Features/Tuf/TufInstallIndex.cs" Link="Source/TufInstallIndex.cs" />
+		<Compile Include="../Quartz/Features/Tuf/TufChartInfo.cs" Link="Source/TufChartInfo.cs" />
+		<Compile Include="../Quartz/Features/Tuf/TufCredits.cs" Link="Source/TufCredits.cs" />
 		<Compile Include="../Quartz/Features/Tuf/TufPackModels.cs" Link="Source/TufPackModels.cs" />
 		<Compile Include="../Quartz/Features/Tuf/TufPackApiClient.cs" Link="Source/TufPackApiClient.cs" />
 	</ItemGroup>

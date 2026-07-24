@@ -39,6 +39,9 @@ public static partial class GenerateUI {
     }
     public static readonly List<CollapsibleSection> Sections = [];
     public static void ClearSections() => Sections.Clear();
+    public static void PruneSections() => Sections.RemoveAll(s => s == null || s.Body == null);
+    private static bool IsDynamicTitleList(Transform parent) =>
+        parent != null && parent.name is "PanelsList" or "PracticeBindings" or "FaqList";
     public static CollapsibleSection FlatSection(
         Transform parent,
         string title,
@@ -170,7 +173,7 @@ public static partial class GenerateUI {
         label.text = title;
         label.characterSpacing = -3f;
         label.raycastTarget = false;
-        if(parent == null || parent.name != "PanelsList") Localize(label, LocaleKeyFromText("SECTION", title), title);
+        if(!IsDynamicTitleList(parent)) Localize(label, LocaleKeyFromText("SECTION", title), title);
         GameObject bodyObj = new("Body");
         bodyObj.transform.SetParent(sectionRect, false);
         RectTransform bodyRect = bodyObj.AddComponent<RectTransform>();
@@ -224,26 +227,28 @@ public static partial class GenerateUI {
             bodyLE.preferredHeight = exp ? 0f : content;
             openSeq = GTweenSequenceBuilder.New()
                 .Join(GTweenExtensions.Tween(
-                    () => bodyLE.preferredHeight,
+                    () => bodyLE == null ? to : bodyLE.preferredHeight,
                     x => {
+                        if(bodyLE == null) return;
                         bodyLE.preferredHeight = Mathf.Max(0f, x);
-                        LayoutRebuilder.ForceRebuildLayoutImmediate(sectionRect);
+                        if(sectionRect != null) LayoutRebuilder.ForceRebuildLayoutImmediate(sectionRect);
                     },
                     to,
                     0.16f
                 ).SetEasing(exp ? Easing.OutBack : Easing.OutSine))
                 .Join(GTweenExtensions.Tween(
-                    () => bodyCg.alpha,
-                    x => bodyCg.alpha = x,
+                    () => bodyCg == null ? (exp ? 1f : 0f) : bodyCg.alpha,
+                    x => { if(bodyCg != null) bodyCg.alpha = x; },
                     exp ? 1f : 0f,
                     0.16f
                 ).SetEasing(Easing.OutSine))
                 .AppendCallback(() => {
+                    if(bodyObj == null || bodyLE == null) return;
                     if(c.Expanded) {
-                        bodyLayout.enabled = true;
-                        bodyFitter.enabled = true;
+                        if(bodyLayout != null) bodyLayout.enabled = true;
+                        if(bodyFitter != null) bodyFitter.enabled = true;
                         bodyLE.preferredHeight = -1f;
-                        LayoutRebuilder.ForceRebuildLayoutImmediate(sectionRect);
+                        if(sectionRect != null) LayoutRebuilder.ForceRebuildLayoutImmediate(sectionRect);
                     }
                     else {
                         bodyObj.SetActive(false);

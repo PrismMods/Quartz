@@ -96,6 +96,8 @@ public static partial class UiHider {
         => IsFeatureActive() && (SelectedProfile.HideEverything || SelectedProfile.HideHitErrorMeter);
     internal static bool ShouldHideLastFloorFlash()
         => IsFeatureActive() && (SelectedProfile.HideEverything || SelectedProfile.HideLastFloorFlash);
+    internal static bool ShouldHideShortcutHints()
+        => IsFeatureActive() && (SelectedProfile.HideEverything || SelectedProfile.HideShortcutHints);
     private static bool ShouldToggleRecordingMode() {
         if(!Conf.Enabled || !Conf.UseShortcut || Keybind.Capturing) return false;
         KeyCode key = (KeyCode)Conf.ShortcutKey;

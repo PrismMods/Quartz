@@ -10,6 +10,7 @@ public sealed class TufService : IRuntimeService {
     public IReadOnlyList<TufLevel> Levels => levels;
     public TufListState State { get; private set; } = TufListState.Idle;
     public string Error { get; private set; } = "";
+    public bool OfflineError { get; private set; }
     public string Query { get; private set; } = "";
     public TufSort Sort { get; private set; } = TufSort.Recent;
     public bool Ascending { get; private set; }
@@ -17,6 +18,8 @@ public sealed class TufService : IRuntimeService {
     public bool LoadingMore { get; private set; }
     public bool IsBusy => actions?.IsBusy ?? false;
     public bool ShowInstalled { get; private set; }
+    public int InstalledCount => index?.Data.Count ?? 0;
+    public int InfoRevision { get; private set; }
     internal TufDownloadService Downloads => downloads;
     internal TufLevelLauncher Launcher => launcher;
     public TufDifficultyFilter DifficultyFilter { get; private set; } = TufDifficultyFilter.AllRanked;
@@ -45,6 +48,10 @@ public sealed class TufService : IRuntimeService {
     private bool disposed;
     private SettingsFile<TufSettings> settings;
     private SettingsFile<TufInstallIndex> index;
+    private const int MaxInfoProbes = 25;
+    private readonly HashSet<int> infoProbed = [];
+    private readonly HashSet<int> chartProbed = [];
+    private CancellationTokenSource infoRequest;
     private int quantumMinIndex;
     private int quantumMaxIndex = TufDifficultyFilter.QuantumNames.Count - 1;
     public void Initialize() {
@@ -85,6 +92,7 @@ public sealed class TufService : IRuntimeService {
         }
         State = TufListState.Loading;
         Error = "";
+        OfflineError = false;
         Notify();
         debounce = new CancellationTokenSource();
         DebouncedRefresh(debounce.Token);
@@ -123,6 +131,10 @@ public sealed class TufService : IRuntimeService {
         appendFailed = false;
         Refresh();
     }
+    public void ShowInstalledLevels() {
+        if(!ShowInstalled) ToggleInstalled();
+        else Refresh();
+    }
     public void SetDifficultyRange(int minIndex, int maxIndex) =>
         SetDifficultyFilter(DifficultyFilter.WithRange(minIndex, maxIndex));
     public void ToggleSpecialDifficulty(string name) =>
@@ -151,6 +163,13 @@ public sealed class TufService : IRuntimeService {
         settings.Data.ShowPreviews = value;
         settings.RequestSave();
         if(!value) TufPreviewCache.Clear();
+        Notify();
+    }
+    public bool GridView => settings?.Data.GridView ?? false;
+    public void SetGridView(bool value) {
+        if(settings == null || settings.Data.GridView == value) return;
+        settings.Data.GridView = value;
+        settings.RequestSave();
         Notify();
     }
     public bool LinkTufHelperLite => settings?.Data.LinkTufHelperLite ?? false;
@@ -212,7 +231,8 @@ public sealed class TufService : IRuntimeService {
             foreach(string dir in Directory.EnumerateDirectories(root.Path)) {
                 if(!TufInstallPaths.IsLevelFolderName(Path.GetFileName(dir), out int id)) continue;
                 if(index.Data.Find(id) != null) continue;
-                if(TufArchive.SelectChart(dir) == null) continue;
+                string chart = TufArchive.SelectChart(dir);
+                if(chart == null) continue;
                 long stamp;
                 try { stamp = Directory.GetCreationTimeUtc(dir).Ticks; } catch { stamp = 0; }
                 index.Data.Adopt(id, dir, stamp);
@@ -231,7 +251,77 @@ public sealed class TufService : IRuntimeService {
         bool pruned = index.Data.PruneMissing();
         AdoptOrphans();
         if(pruned) index.RequestSave();
+        BackfillInstalledInfo();
         RebuildInstalledList();
+    }
+    private void BackfillInstalledInfo() {
+        if(index == null) return;
+        List<(int Id, string Folder)> charts = [];
+        List<int> missing = [];
+        foreach(TufInstallEntry entry in index.Data.Entries) {
+            if(string.IsNullOrEmpty(entry.Song) && chartProbed.Add(entry.Id)) charts.Add((entry.Id, entry.Folder));
+            if(entry.NeedsInfo && missing.Count < MaxInfoProbes && infoProbed.Add(entry.Id)) missing.Add(entry.Id);
+        }
+        if(charts.Count > 0) ReadChartInfo(charts);
+        if(missing.Count > 0) FetchMissingInfo(missing);
+    }
+    private async void ReadChartInfo(List<(int Id, string Folder)> pending) {
+        List<(int Id, TufChartInfo Info)> found = await Task.Run(() => {
+            List<(int, TufChartInfo)> results = [];
+            foreach((int id, string folder) in pending) {
+                TufChartInfo info = TufChartInfo.Read(TufArchive.SelectChart(folder));
+                if(info != null) results.Add((id, info));
+            }
+            return results;
+        }).ConfigureAwait(false);
+        if(found.Count == 0) return;
+        MainThread.Enqueue(() => ApplyChartInfo(found));
+    }
+    private void ApplyChartInfo(List<(int Id, TufChartInfo Info)> found) {
+        if(disposed || index == null) return;
+        bool changed = false;
+        foreach((int id, TufChartInfo info) in found) {
+            TufInstallEntry entry = index.Data.Find(id);
+            if(entry != null && entry.ApplyChart(info)) changed = true;
+        }
+        if(!changed) return;
+        InfoRevision++;
+        index.RequestSave();
+        if(ShowInstalled) RebuildInstalledList();
+        else Notify();
+    }
+    private async void FetchMissingInfo(List<int> ids) {
+        infoRequest ??= new CancellationTokenSource();
+        CancellationToken token = infoRequest.Token;
+        List<TufLevel> fetched = [];
+        foreach(int id in ids) {
+            if(disposed || token.IsCancellationRequested) return;
+            try {
+                TufLevel level = await api.FetchLevelAsync(id, token).ConfigureAwait(false);
+                if(level != null) fetched.Add(level);
+            } catch(OperationCanceledException) when(token.IsCancellationRequested) {
+                return;
+            } catch(Exception e) {
+                MainCore.Log.Wrn($"[TUF] could not fetch info for level {id}: {e.Message}");
+                foreach(int pending in ids) if(pending != id) infoProbed.Remove(pending);
+                break;
+            }
+        }
+        if(fetched.Count == 0) return;
+        MainThread.Enqueue(() => ApplyFetchedInfo(fetched));
+    }
+    private void ApplyFetchedInfo(List<TufLevel> fetched) {
+        if(disposed || index == null) return;
+        bool changed = false;
+        foreach(TufLevel level in fetched) {
+            TufInstallEntry entry = index.Data.Find(level.Id);
+            if(entry != null && entry.ApplyLevel(level)) changed = true;
+        }
+        if(!changed) return;
+        InfoRevision++;
+        index.RequestSave();
+        if(ShowInstalled) RebuildInstalledList();
+        else Notify();
     }
     private void RebuildInstalledList() {
         if(index == null) return;
@@ -250,6 +340,7 @@ public sealed class TufService : IRuntimeService {
         LoadingMore = false;
         appendFailed = false;
         Error = "";
+        OfflineError = false;
         State = levels.Count == 0 ? TufListState.Empty : TufListState.Ready;
         Notify();
     }
@@ -428,18 +519,24 @@ public sealed class TufService : IRuntimeService {
             State = TufListState.Loading;
             Error = "";
         }
+        OfflineError = false;
         Notify();
         try {
             TufPage page = await api.FetchAsync(query, sort, ascending, append ? nextOffset : 0, filter, token);
             MainThread.Enqueue(() => ApplyPage(page, append, token, generation, query, sort, ascending, filter));
-        } catch(OperationCanceledException) { }
+        } catch(OperationCanceledException) when(token.IsCancellationRequested) { }
         catch(Exception e) {
+            bool offline = e is OperationCanceledException || TufNetworkPolicy.IsOfflineError(e);
+            string message = e is OperationCanceledException
+                ? MainCore.Tr.Get("TUF_TIMEOUT", "The request to TUF timed out.")
+                : e.Message;
             MainThread.Enqueue(() => {
                 if(!RequestIsCurrent(token, generation, query, sort, ascending, filter)) return;
                 LoadingMore = false;
                 appendFailed = append;
                 State = TufListState.Error;
-                Error = e.Message;
+                Error = message;
+                OfflineError = offline;
                 Notify();
             });
         }
@@ -513,12 +610,14 @@ public sealed class TufService : IRuntimeService {
         debounce?.Cancel();
         listRequest?.Cancel();
         moveRequest?.Cancel();
+        infoRequest?.Cancel();
         actions?.Dispose();
         downloads?.Cancel();
         launcher?.Cancel();
         debounce?.Dispose();
         listRequest?.Dispose();
         moveRequest?.Dispose();
+        infoRequest?.Dispose();
         downloads?.Dispose();
         api?.Dispose();
         TufPreviewCache.Clear();

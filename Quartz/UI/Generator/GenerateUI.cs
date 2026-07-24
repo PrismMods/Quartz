@@ -500,8 +500,8 @@ public static partial class GenerateUI {
                 )
                 .Join(
                     GTweenExtensions.Tween(
-                        () => listCg.alpha,
-                        x => listCg.alpha = x,
+                        () => listCg == null ? targetAlpha : listCg.alpha,
+                        x => { if(listCg != null) listCg.alpha = x; },
                         targetAlpha,
                         0.16f
                     ).SetEasing(Easing.OutSine)
@@ -700,12 +700,8 @@ public static partial class GenerateUI {
     public static string LocaleKeyFromId(string id, string suffix = null) {
         if(string.IsNullOrWhiteSpace(id)) return null;
         string key = NormalizeLocaleKey(id);
-        if(key.StartsWith("PANEL")) {
-            int i = "PANEL".Length;
-            while(i < key.Length && char.IsDigit(key[i])) i++;
-            if(i > "PANEL".Length && i < key.Length && key[i] == '_')
-                key = "PANEL" + key[i..];
-        }
+        key = StripIndexedPrefix(key, "PANEL");
+        key = StripIndexedPrefix(key, "PRACTICE");
         if(key.StartsWith("PANEL_PICK_")) {
             key = "PANEL_STAT_" + key["PANEL_PICK_".Length..];
         }
@@ -715,6 +711,12 @@ public static partial class GenerateUI {
     public static string LocaleKeyFromText(string prefix, string text) {
         string key = NormalizeLocaleKey(text);
         return string.IsNullOrEmpty(prefix) ? key : NormalizeLocaleKey(prefix) + "_" + key;
+    }
+    private static string StripIndexedPrefix(string key, string prefix) {
+        if(key == null || !key.StartsWith(prefix)) return key;
+        int i = prefix.Length;
+        while(i < key.Length && char.IsDigit(key[i])) i++;
+        return i > prefix.Length && i < key.Length && key[i] == '_' ? prefix + key[i..] : key;
     }
     private static string NormalizeLocaleKey(string value) {
         if(string.IsNullOrWhiteSpace(value)) return null;

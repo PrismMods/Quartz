@@ -51,6 +51,7 @@ public static class PageFactory {
         PageGameplay.JudgementRestrictionPage(UICore.Pages[(int)OriginalMenuState.GameplayJudgement]);
         PageGameplay.DeathLimitPage(UICore.Pages[(int)OriginalMenuState.GameplayDeath]);
         PageGameplay.AutoDeafenPage(UICore.Pages[(int)OriginalMenuState.GameplayAutoDeafen]);
+        PageGameplay.PracticePage(UICore.Pages[(int)OriginalMenuState.GameplayPractice]);
         PageVisuals.EffectRemoverPage(UICore.Pages[(int)OriginalMenuState.VisualsEffectRemover]);
         PageVisuals.HideJudgementsPage(UICore.Pages[(int)OriginalMenuState.VisualsHideJudgements]);
         PageVisuals.VisualTweaksPage(UICore.Pages[(int)OriginalMenuState.VisualsVisualTweaks]);
@@ -70,6 +71,7 @@ public static class PageFactory {
         TufBrowserUI.Create(UICore.Pages[(int)OriginalMenuState.NostalgiaTuf]);
         TufPacksUI.Create(UICore.Pages[(int)OriginalMenuState.NostalgiaTufPacks]);
         TufSettingsUI.Create(UICore.Pages[(int)OriginalMenuState.NostalgiaTufSettings]);
+        PageHelp.FaqPage(UICore.Pages[(int)OriginalMenuState.HelpFaq]);
         PageSearch.Create(UICore.Pages[(int)OriginalMenuState.Search]);
         PageAddons.Create(UICore.Pages[(int)OriginalMenuState.Addons]);
         if(Quartz.Core.Info.IsDev) PageDeveloper.Create(UICore.Pages[(int)OriginalMenuState.Developer]);

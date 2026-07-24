@@ -15,6 +15,7 @@ public sealed class UiHiderProfile {
     public bool HideResult = false;
     public bool HideHitErrorMeter = false;
     public bool HideLastFloorFlash = false;
+    public bool HideShortcutHints = false;
     public JToken Serialize() {
         return new JObject {
             [nameof(HideEverything)] = HideEverything,
@@ -28,6 +29,7 @@ public sealed class UiHiderProfile {
             [nameof(HideResult)] = HideResult,
             [nameof(HideHitErrorMeter)] = HideHitErrorMeter,
             [nameof(HideLastFloorFlash)] = HideLastFloorFlash,
+            [nameof(HideShortcutHints)] = HideShortcutHints,
         };
     }
     public void Deserialize(JToken token) {
@@ -43,6 +45,7 @@ public sealed class UiHiderProfile {
         HideResult = IOUtils.Read(token, nameof(HideResult), HideResult);
         HideHitErrorMeter = IOUtils.Read(token, nameof(HideHitErrorMeter), HideHitErrorMeter);
         HideLastFloorFlash = IOUtils.Read(token, nameof(HideLastFloorFlash), HideLastFloorFlash);
+        HideShortcutHints = IOUtils.Read(token, nameof(HideShortcutHints), HideShortcutHints);
     }
 }
 public sealed class UiHiderSettings : ISettingsFile {

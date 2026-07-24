@@ -462,28 +462,30 @@ internal static partial class PagePanels {
         cg.alpha = open ? 0f : 1f;
         GTween seq = GTweenSequenceBuilder.New()
             .Join(GTweenExtensions.Tween(
-                () => le.preferredHeight,
+                () => le == null ? (open ? content : 0f) : le.preferredHeight,
                 x => {
+                    if(le == null) return;
                     le.preferredHeight = Mathf.Max(0f, x);
-                    LayoutRebuilder.ForceRebuildLayoutImmediate(section);
+                    if(section != null) LayoutRebuilder.ForceRebuildLayoutImmediate(section);
                 },
                 open ? content : 0f,
                 0.16f
             ).SetEasing(open ? Easing.OutBack : Easing.OutSine))
             .Join(GTweenExtensions.Tween(
-                () => cg.alpha,
-                x => cg.alpha = x,
+                () => cg == null ? (open ? 1f : 0f) : cg.alpha,
+                x => { if(cg != null) cg.alpha = x; },
                 open ? 1f : 0f,
                 0.16f
             ).SetEasing(Easing.OutSine))
             .AppendCallback(() => {
+                if(le == null) return;
                 if(open) {
-                    layout.enabled = true;
-                    fitter.enabled = true;
+                    if(layout != null) layout.enabled = true;
+                    if(fitter != null) fitter.enabled = true;
                     le.preferredHeight = -1f;
-                    LayoutRebuilder.ForceRebuildLayoutImmediate(section);
+                    if(section != null) LayoutRebuilder.ForceRebuildLayoutImmediate(section);
                 } else {
-                    GenerateUI.ClearChildren(rect);
+                    if(rect != null) GenerateUI.ClearChildren(rect);
                     le.preferredHeight = 0f;
                     onClosed?.Invoke();
                 }

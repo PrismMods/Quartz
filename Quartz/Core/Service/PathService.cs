@@ -11,6 +11,7 @@ public sealed class PathService(string rootPath) {
     public string TufPath => Path.Combine(RootPath, "TUF");
     public string TufLevelsPath => Path.Combine(TufPath, "Levels");
     public string UserResourcePath => Path.Combine(RootPath, "UserResources.json");
+    public string FaqPath => Path.Combine(RootPath, "FAQ.json");
     public void Initialize() {
         Directory.CreateDirectory(RootPath);
         Directory.CreateDirectory(LangPath);

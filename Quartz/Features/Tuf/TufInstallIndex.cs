@@ -15,6 +15,49 @@ public sealed class TufInstallEntry {
     public string DownloadUrl = "";
     public string VideoLink = "";
     public long InstalledAtUtc;
+    public bool NeedsInfo => string.IsNullOrEmpty(Song) || string.IsNullOrEmpty(Difficulty);
+    public bool ApplyChart(TufChartInfo? info) {
+        if(info == null) return false;
+        bool changed = false;
+        if(string.IsNullOrEmpty(Song) && info.Song.Length > 0) {
+            Song = info.Song;
+            changed = true;
+        }
+        if(string.IsNullOrEmpty(Artist) && info.Artist.Length > 0) {
+            Artist = info.Artist;
+            changed = true;
+        }
+        if(string.IsNullOrEmpty(Creator) && info.Creator.Length > 0) {
+            Creator = info.Creator;
+            changed = true;
+        }
+        return changed;
+    }
+    public bool ApplyLevel(TufLevel? level) {
+        if(level == null || level.Id != Id) return false;
+        bool changed = false;
+        changed |= Replace(ref Song, level.Song);
+        changed |= Replace(ref Artist, level.Artist);
+        changed |= Replace(ref Creator, level.Creator);
+        changed |= Replace(ref Difficulty, level.Difficulty);
+        changed |= Replace(ref DifficultyColor, level.DifficultyColor);
+        changed |= Replace(ref VideoLink, level.VideoLink);
+        changed |= Replace(ref DownloadUrl, level.DownloadUri?.ToString() ?? "");
+        if(Clears != level.Clears) {
+            Clears = level.Clears;
+            changed = true;
+        }
+        if(Likes != level.Likes) {
+            Likes = level.Likes;
+            changed = true;
+        }
+        return changed;
+    }
+    private static bool Replace(ref string field, string value) {
+        if(string.IsNullOrEmpty(value) || string.Equals(field, value, StringComparison.Ordinal)) return false;
+        field = value;
+        return true;
+    }
     public JObject Serialize() => new() {
         [nameof(Id)] = Id,
         [nameof(Song)] = Song,
