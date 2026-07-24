@@ -1,0 +1,35 @@
+Quartz/IO/FaqDocument.cs
+  s_c946fbec1e2d3a::t_b147b19ec465ba 1,52-65
+Quartz.Tests/Quartz.Tests.csproj
+  s_c946fbec1e2d3a::t_7831f72b4d0e63 38-45
+Quartz/Quartz.csproj
+  s_c946fbec1e2d3a::t_e47dd27ef6ca21 191-196
+Quartz/Resource/Export/FAQ.json
+  s_f86c7886fb2a31::t_4fa19a1c328db1 1-371
+agents/project.md
+  s_c946fbec1e2d3a::t_559c53f3d89d56 214
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "95249665c0b59773db604f29d8b41bd0fe1d9d38",
+  "prompts": {},
+  "sessions": {
+    "s_c946fbec1e2d3a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "059ed993-d3e5-43a3-9504-59518050ddea",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_f86c7886fb2a31": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f5330ef4-c56e-40fc-a161-b7a6fbf01735",
+        "model": "unknown"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
