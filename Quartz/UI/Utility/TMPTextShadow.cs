@@ -238,6 +238,7 @@ public static class TMPTextShadow {
         mat.SetFloat("_UnderlayOffsetY", Mathf.Clamp(offsetY / fs * UnderlayOffsetScale, -1f, 1f));
         mat.SetFloat("_UnderlaySoftness", 0f);
         mat.SetFloat("_UnderlayDilate", 0f);
+        text.UpdateMeshPadding();
         root.UnderlayAppliedMat = text.fontSharedMaterial;
         root.UnderlayAppliedX = offsetX;
         root.UnderlayAppliedY = offsetY;
