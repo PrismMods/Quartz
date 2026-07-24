@@ -591,6 +591,7 @@
     "PROFILE_STATUS_NAME_INVALID": "请先输入方案名称。",
     "PROFILE_STATUS_NAME_TAKEN": "该名称已被占用。",
     "PROGRESSBAR_BACKCOLOR": "进度条背景色",
+    "PROGRESSBAR_UNLITCOLOR": "未点亮分段颜色",
     "PROGRESSBAR_FILLCOLOR": "填充基础色",
     "PROGRESSBAR_FILLGRADIENT": "填充渐变效果",
     "PROGRESSBAR_STOP_COLOR": "渐变节点{0}颜色",
