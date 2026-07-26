@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "progressbar", "entry": "Quartz.Features.ProgressBar.ProgressBarModule",
+  "name": "Progress Bar", "nameKey": "SECTION_PROGRESS_BAR", "group": "overlay", "order": 30,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": ["overlay"], "settingsFiles": [], "langPrefixes": []
+}

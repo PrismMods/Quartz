@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "overlay", "entry": "Quartz.Overlay.OverlayModule",
+  "name": "Overlay Core", "nameKey": "MODULE_OVERLAY_CORE", "group": "overlay", "order": 5,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": [], "settingsFiles": ["Overlay.json"], "langPrefixes": ["OVERLAY_"]
+}

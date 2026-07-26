@@ -1,0 +1,26 @@
+{
+  "ko-KR": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "DESC_TW_BCP": "행성의 코어와 스파크 파티클을 제거합니다.",
+    "DESC_TW_CP": "레벨의 체크포인트 아이콘과 동작을 제거합니다. 죽으면 항상 처음부터 다시 시작합니다. 끄고 아이콘을 복구하려면 레벨을 다시 불러오세요.",
+    "DESC_TW_GLOW": "행성이 타일에 닿을 때 생기는 글로우 플래시를 억제합니다.",
+    "DESC_TW_MENUBPM": "메뉴 토끼의 두 속도를 기본 1x / 2x 대신 아래 BPM으로 설정합니다. 메뉴를 다시 열면 적용됩니다.",
+    "DESC_TW_MENUMUSIC": "타이틀과 섬 선택 화면의 테마 음악을 음소거합니다. 즉시 적용되며 플레이 음악은 유지됩니다.",
+    "DESC_TW_NOPAUSE": "Auto-play 중 창 포커스 해제 등으로 게임이 자동 일시정지되는 것을 막습니다.",
+    "DESC_TW_PGLOW": "행성 주변에 그려지는 글로우 스프라이트를 숨깁니다.",
+    "DESC_TW_SCROLL": "레벨 플레이 중 마우스 휠 입력을 무시합니다. 실수로 스크롤되는 것을 막을 수 있습니다.",
+    "SECTION_MAIN_MENU": "메인 메뉴",
+    "SECTION_VISUAL_TWEAKS": "비주얼 수정",
+    "TW_BCP": "공 코어 파티클 제거",
+    "TW_CP": "모든 체크포인트 제거",
+    "TW_GLOW": "타일 히트 글로우 끄기",
+    "TW_MENUBPM": "사용자 지정 메뉴 BPM",
+    "TW_MENUHIGHBPM": "높은 BPM",
+    "TW_MENUMUSIC": "메뉴 음악 끄기",
+    "TW_MENUSLOWBPM": "느린 BPM",
+    "TW_NOPAUSE": "자동 일시정지 끄기",
+    "TW_PGLOW": "행성 글로우 제거",
+    "TW_SCROLL": "플레이 중 스크롤 차단",
+    "TWEAKS_GENERAL": "일반"
+  }
+}

@@ -1,11 +1,12 @@
 using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
 namespace Quartz.Compat.Game;
-internal static class Refl {
+public static class Refl {
     internal const BindingFlags Any = BindingFlags.Public | BindingFlags.NonPublic
         | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy;
-    internal static Type Type(string name) {
+    public static Type Type(string name) {
         if(string.IsNullOrEmpty(name)) return null;
         try {
             return typeof(ADOBase).Assembly.GetType(name)
@@ -67,24 +68,33 @@ internal static class Refl {
         internal T Get<T>(object instance, T fallback = default) =>
             Get(instance) is T t ? t : fallback;
     }
-    internal static MethodInfo Method(Type owner, string name, int argCount = -1) {
+    private static readonly ConcurrentDictionary<(Type Owner, string Name, int ArgCount), MethodInfo> MethodCache = new();
+    private static readonly ConcurrentDictionary<MethodInfo, ParameterInfo[]> ParamCache = new();
+    public static MethodInfo Method(Type owner, string name, int argCount = -1) {
         if(owner == null || string.IsNullOrEmpty(name)) return null;
+        return MethodCache.GetOrAdd(
+            (owner, name, argCount),
+            static key => ResolveMethod(key.Owner, key.Name, key.ArgCount));
+    }
+    private static MethodInfo ResolveMethod(Type owner, string name, int argCount) {
         try {
             MethodInfo[] all = owner.GetMethods(Any).Where(m => m.Name == name).ToArray();
             if(all.Length == 0) return null;
             if(argCount < 0) return all[0];
-            return all.FirstOrDefault(m => m.GetParameters().Length == argCount)
-                ?? all.FirstOrDefault(m => m.GetParameters().Length >= argCount
-                    && m.GetParameters().Skip(argCount).All(p => p.IsOptional))
+            return all.FirstOrDefault(m => Params(m).Length == argCount)
+                ?? all.FirstOrDefault(m => Params(m).Length >= argCount
+                    && Params(m).Skip(argCount).All(p => p.IsOptional))
                 ?? all[0];
         } catch {
             return null;
         }
     }
-    internal static object Invoke(MethodInfo m, object instance, params object[] args) {
+    private static ParameterInfo[] Params(MethodInfo m) =>
+        ParamCache.GetOrAdd(m, static target => target.GetParameters());
+    public static object Invoke(MethodInfo m, object instance, params object[] args) {
         if(m == null) return null;
         try {
-            ParameterInfo[] ps = m.GetParameters();
+            ParameterInfo[] ps = Params(m);
             if(args.Length < ps.Length) {
                 object[] padded = new object[ps.Length];
                 Array.Copy(args, padded, args.Length);

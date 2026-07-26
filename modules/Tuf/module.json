@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "tuf", "entry": "Quartz.Features.Tuf.TufModule",
+  "name": "TUF", "nameKey": "TUF", "group": "tuf", "order": 30,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": [], "settingsFiles": [], "langPrefixes": ["TUF_"]
+}

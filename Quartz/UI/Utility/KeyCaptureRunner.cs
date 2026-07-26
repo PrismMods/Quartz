@@ -1,17 +1,16 @@
 using UnityEngine;
 namespace Quartz.UI.Utility;
-internal sealed class KeyCaptureRunner : MonoBehaviour {
+public sealed class KeyCaptureRunner : MonoBehaviour {
     public Func<bool> IsListening;
     public Func<bool> ShouldCancel;
     public Action<KeyCode> OnCaptured;
     public Action OnCancelled;
-    public Action OnDestroyed;
     private static readonly KeyCode[] allKeys = (KeyCode[])Enum.GetValues(typeof(KeyCode));
     private bool prevHookRAlt;
     private bool prevHookRCtrl;
     private void Update() {
-        bool hookRAlt = Features.KeyLimiter.KeyLimiter.HookKeyHeld(KeyCode.RightAlt);
-        bool hookRCtrl = Features.KeyLimiter.KeyLimiter.HookKeyHeld(KeyCode.RightControl);
+        bool hookRAlt = Quartz.Game.HookKeys.Held(KeyCode.RightAlt);
+        bool hookRCtrl = Quartz.Game.HookKeys.Held(KeyCode.RightControl);
         bool rAltEdge = hookRAlt && !prevHookRAlt;
         bool rCtrlEdge = hookRCtrl && !prevHookRCtrl;
         prevHookRAlt = hookRAlt;
@@ -42,5 +41,4 @@ internal sealed class KeyCaptureRunner : MonoBehaviour {
             }
         }
     }
-    private void OnDestroy() => OnDestroyed?.Invoke();
 }

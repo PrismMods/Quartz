@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<ModuleId>autodeafen</ModuleId>
+		<AssemblyName>Quartz.Module.AutoDeafen</AssemblyName>
+	</PropertyGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Lang\*.json" />
+	</ItemGroup>
+</Project>

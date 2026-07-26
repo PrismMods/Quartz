@@ -1,7 +1,7 @@
 #nullable enable
 using System.Text;
 namespace Quartz.IO;
-internal static class AtomicFile {
+public static class AtomicFile {
     public static void WriteAllText(string path, string contents) => WriteAllBytes(path, Encoding.UTF8.GetBytes(contents ?? string.Empty));
     public static void WriteAllBytes(string path, byte[] contents) {
         if(string.IsNullOrEmpty(path)) throw new ArgumentException("Destination path is required.", nameof(path));

@@ -285,21 +285,7 @@ public static class SettingsImporter {
         }
     }
     private static void PostImportRefresh() {
-        Try(() => { Features.ChatterBlocker.ChatterBlocker.EnsureConf(); Features.ChatterBlocker.ChatterBlocker.Save(); });
-        Try(() => { Features.KeyLimiter.KeyLimiter.EnsureConf(); Features.KeyLimiter.KeyLimiter.Save(); });
-        Try(() => { Features.KeyViewer.KeyViewerOverlay.EnsureConf(); Features.KeyViewer.KeyViewerOverlay.SyncKeysToKeyLimiter(); });
-        Try(() => { Features.KeyViewer.KeyViewerOverlay.Rebuild(); });
-        Try(() => { Features.KeyViewer.KeyViewerOverlay.Apply(); });
-        Try(() => { Features.KeyViewer.KeyViewerOverlay.Save(); });
-        Try(() => { Features.Combo.ComboOverlay.EnsureConf(); Features.Combo.ComboOverlay.Apply(); Features.Combo.ComboOverlay.Save(); });
-        Try(() => { Features.Judgement.JudgementOverlay.EnsureConf(); Features.Judgement.JudgementOverlay.Apply(); Features.Judgement.JudgementOverlay.Save(); });
-        Try(() => { Features.ProgressBar.ProgressBarOverlay.EnsureConf(); Features.ProgressBar.ProgressBarOverlay.Apply(); Features.ProgressBar.ProgressBarOverlay.Save(); });
-        Try(() => { Features.Tweaks.Tweaks.EnsureConf(); Features.Tweaks.Tweaks.RefreshAll(); Features.Tweaks.Tweaks.Save(); });
-        Try(() => { Features.OttoIcon.OttoIcon.EnsureConf(); Features.OttoIcon.OttoIcon.Refresh(); Features.OttoIcon.OttoIcon.Save(); });
-        Try(() => { Features.PlanetColors.PlanetColors.EnsureConf(); Features.PlanetColors.PlanetColors.Refresh(); Features.PlanetColors.PlanetColors.Save(); });
-        Try(() => { Features.UiHider.UiHider.EnsureConf(); Features.UiHider.UiHider.ApplyNow(); Features.UiHider.UiHider.Save(); });
-        Try(() => { Features.Restriction.Restriction.EnsureConf(); Features.Restriction.Restriction.Save(); });
-        Try(() => { Features.EffectRemover.EffectRemover.EnsureConf(); Features.EffectRemover.EffectRemover.RefreshEditorSaveButtons(); Features.EffectRemover.EffectRemover.Save(); });
+        Quartz.Interop.ImportRegistry.RefreshAll();
     }
     private static void Try(Action action) {
         try { action(); } catch(Exception e) { MainCore.Log.Wrn($"[SettingsImporter] refresh step failed: {e.Message}"); }

@@ -48,6 +48,14 @@ public abstract class UIObject {
     protected void RegisterTick() => _tickables.Add(this);
     protected void UnregisterTick() => _tickables.Remove(this);
     public virtual void Tick() { }
+    public virtual void OnHidden() { }
+    public static void NotifyHidden() {
+        for(int i = 0; i < _tickables.Count; i++) {
+            UIObject o = _tickables[i];
+            if(o.Rect == null) continue;
+            o.OnHidden();
+        }
+    }
     public static void TickAll() {
         for(int i = 0; i < _tickables.Count; i++) {
             UIObject o = _tickables[i];

@@ -1,0 +1,22 @@
+{
+  "en-US": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "DESC_KL_CAPTURE": "Press any key to add/remove it from the allowed list. Escape cancels.",
+    "DESC_KL_PROFILE_NAME": "Rename the current profile, e.g. \"12 Keys\".",
+    "KCB_MS": "Threshold (ms)",
+    "KL_ALLOWED_KEYS": "Allowed Keys",
+    "KL_ADD_PROFILE": "Add Profile",
+    "KL_CAPTURE": "Add / Remove Key",
+    "KL_CLEAR": "Clear All",
+    "KL_NO_ALLOWED_KEYS": "No allowed keys.",
+    "KL_PROFILE_LABEL": "Profile",
+    "KL_PROFILE_NAME": "Profile Name",
+    "KL_REMOVE_PROFILE": "Remove Profile",
+    "KL_SYNC_LOCKED": "Keys are managed by the Key Viewer (Sync Keys to Key Limiter is on).",
+    "SECTION_KEY_LIMITER": "Key Limiter",
+    "SECTION_KEYBOARD_CHATTER_BLOCKER": "Keyboard Chatter Blocker",
+    "KL_HOME_KEYS": "{0}: {1} keys · {2}",
+    "KL_HOME_ON": "limiting",
+    "KL_HOME_OFF": "off"
+  }
+}

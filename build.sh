@@ -89,6 +89,20 @@ case "$TARGET" in
     *)    echo "ERROR: unknown target '$TARGET' (use ML | UMM | both)"; exit 1 ;;
 esac
 
+# Features now ship as modules beside the core DLL. Build and deploy them in the
+# same pass: a core that has shed a feature, running next to a game folder that
+# still lacks that feature's module, simply loses the feature — and a STALE core
+# beside fresh modules double-registers its pages. Keep the two in lockstep.
+echo ">> building modules ($CONFIG)..."
+dotnet build modules/AllModules.proj -c "$CONFIG" -p:DeployToGame=true
+
+# The zips the csproj just wrote predate the modules, so fold them in now. An
+# upgrading user's first launch copies out of Module.bundled/ rather than
+# downloading — without this the install zips would silently drop every
+# already-extracted feature.
+tools/bundle-modules.sh
+
 echo ">> done."
 [[ "$TARGET" == "ML"  || "$TARGET" == "both" ]] && echo ">> MelonLoader:     Mods/Quartz.dll + UserData/Quartz/* — dist/Quartz.zip"
 [[ "$TARGET" == "UMM" || "$TARGET" == "both" ]] && echo ">> UnityModManager: UMMMods/Quartz (or Mods/Quartz) + Quartz/UserData/* — dist/QuartzUmm.zip"
+echo ">> Modules:          <data root>/Module/*.qmod — dist/modules/"

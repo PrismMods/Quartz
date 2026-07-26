@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<ModuleId>nostalgia-visuals</ModuleId>
+		<AssemblyName>Quartz.Module.NostalgiaVisuals</AssemblyName>
+	</PropertyGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Lang\*.json" />
+	</ItemGroup>
+	<ItemGroup>
+		<!-- Shares Nostalgia's settings file and helpers; the manifest dep loads it first. -->
+		<ProjectReference Include="../Nostalgia/Nostalgia.csproj" Private="false" />
+	</ItemGroup>
+</Project>

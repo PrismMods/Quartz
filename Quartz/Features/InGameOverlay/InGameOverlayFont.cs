@@ -178,6 +178,12 @@ internal sealed class GameFontMirror : MonoBehaviour {
         public Text Source;
         public TextMeshProUGUI Twin;
         public string LastRaw;
+        public int WrapState = -1;
+        public bool FitValid;
+        public float FitBoxW;
+        public float FitSourceSize;
+        public float FitMult;
+        public float FitSize;
     }
     private const string TwinName = "QuartzInGameFontTwin";
     private static GameFontMirror instance;
@@ -255,42 +261,65 @@ internal sealed class GameFontMirror : MonoBehaviour {
         Text source = pair.Source;
         TextMeshProUGUI twin = pair.Twin;
         TMP_FontAsset want = FontManager.Current;
-        if(want != null && twin.font != want) twin.font = want;
+        if(want != null && twin.font != want) {
+            twin.font = want;
+            pair.FitValid = false;
+        }
         if(pair.LastRaw != source.text) {
             pair.LastRaw = source.text;
             twin.text = source.text;
+            pair.FitValid = false;
         }
         if(twin.color != source.color) twin.color = source.color;
-        if(twin.richText != source.supportRichText) twin.richText = source.supportRichText;
+        if(twin.richText != source.supportRichText) {
+            twin.richText = source.supportRichText;
+            pair.FitValid = false;
+        }
         FontStyles style = MapStyle(source.fontStyle);
-        if(twin.fontStyle != style) twin.fontStyle = style;
+        if(twin.fontStyle != style) {
+            twin.fontStyle = style;
+            pair.FitValid = false;
+        }
         TextAlignmentOptions alignment = MapAlignment(source.alignment);
         if(twin.alignment != alignment) twin.alignment = alignment;
-        bool wrap = source.horizontalOverflow == HorizontalWrapMode.Wrap;
-        if(TextCompat.GetWrap(twin) != wrap) TextCompat.SetWrap(twin, wrap);
+        int wrapState = source.horizontalOverflow == HorizontalWrapMode.Wrap ? 1 : 0;
+        if(pair.WrapState != wrapState) {
+            TextCompat.SetWrap(twin, wrapState == 1);
+            pair.WrapState = wrapState;
+            pair.FitValid = false;
+        }
         if(twin.overflowMode != TextOverflowModes.Overflow) twin.overflowMode = TextOverflowModes.Overflow;
         float mult = InGameOverlayFont.SizeMultiplier(pair.Cat);
         if(source.resizeTextForBestFit) {
             float maxPx = source.resizeTextMaxSize > 0 ? source.resizeTextMaxSize : source.fontSize;
             if(!twin.enableAutoSizing) twin.enableAutoSizing = true;
             if(twin.fontSizeMin != 1f) twin.fontSizeMin = 1f;
+            pair.FitValid = false;
             float max = Mathf.Max(1f, maxPx) * mult;
             if(twin.fontSizeMax != max) twin.fontSizeMax = max;
         } else {
             if(twin.enableAutoSizing) twin.enableAutoSizing = false;
             float boxW = source.rectTransform.rect.width;
-            float size = source.fontSize;
-            if(boxW > 0f) {
-                float wantW = twin.GetPreferredValues(twin.text).x;
-                if(wantW > boxW) size = source.fontSize * (boxW / wantW) * 0.98f;
+            float sourceSize = source.fontSize;
+            if(!pair.FitValid || pair.FitBoxW != boxW || pair.FitSourceSize != sourceSize || pair.FitMult != mult) {
+                float size = sourceSize * mult;
+                if(boxW > 0f) {
+                    if(twin.fontSize != size) twin.fontSize = size;
+                    float wantW = twin.GetPreferredValues().x;
+                    if(wantW > boxW) size *= boxW / wantW * 0.98f;
+                }
+                pair.FitBoxW = boxW;
+                pair.FitSourceSize = sourceSize;
+                pair.FitMult = mult;
+                pair.FitSize = size;
+                pair.FitValid = true;
             }
-            size *= mult;
-            if(twin.fontSize != size) twin.fontSize = size;
+            if(twin.fontSize != pair.FitSize) twin.fontSize = pair.FitSize;
         }
         if(twin.enabled != source.enabled) twin.enabled = source.enabled;
         float srcAlpha = source.canvasRenderer.GetAlpha();
         if(twin.canvasRenderer.GetAlpha() != srcAlpha) twin.canvasRenderer.SetAlpha(srcAlpha);
-        source.canvasRenderer.SetAlpha(0f);
+        if(srcAlpha != 0f) source.canvasRenderer.SetAlpha(0f);
     }
     private static FontStyles MapStyle(FontStyle style) => style switch {
         FontStyle.Bold => FontStyles.Bold,

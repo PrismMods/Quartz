@@ -1,6 +1,5 @@
 using HarmonyLib;
 using Quartz.Core;
-using Quartz.Features.Panels;
 using Quartz.UI.Generator;
 using UnityEngine;
 namespace Quartz.Addons;
@@ -33,11 +32,11 @@ public sealed class AddonContext {
     }
     public void RegisterStat(string statId, string label, string category, Func<string> valueProvider) {
         bool reported = false;
-        PanelsOverlay.RegisterStat(new PanelsOverlay.StatDef {
+        Quartz.Overlay.StatRegistry.Register(new Quartz.Overlay.StatSource {
             Id = statId,
             Label = label,
             Category = string.IsNullOrEmpty(category) ? "Addons" : category,
-            Value = _ => {
+            Value = () => {
                 try {
                     return valueProvider();
                 } catch(Exception e) {
@@ -64,7 +63,17 @@ public sealed class AddonContext {
         tagNames.Add(name);
     }
     public void RegisterTab(string title, Action<Transform> build) =>
-        AddonUI.Register(Id, title, GenerateUI.LocaleKeyFromText("ADDON_", title), build);
+        Quartz.UI.Nav.NavRegistry.AddPage(new Quartz.UI.Nav.NavPage {
+            Key = "addon." + Id + "." + Quartz.UI.Generator.GenerateUI.LocaleKeyFromText("", title),
+            CategoryKey = Quartz.UI.Nav.CorePages.AddonsCategoryKey,
+            Order = 100 + tabCount++,
+            Title = title,
+            LocaleKey = GenerateUI.LocaleKeyFromText("ADDON_", title),
+            OwnerId = Id,
+            OwnScroll = false,
+            Build = content => build(content),
+        });
+    private int tabCount;
     internal void Cleanup() {
         try {
             harmony?.UnpatchAll(harmony.Id);
@@ -72,11 +81,11 @@ public sealed class AddonContext {
             MainCore.Log.Err($"[Addon:{Id}] unpatch failed: {e}");
         }
         harmony = null;
-        foreach(string statId in statIds) PanelsOverlay.UnregisterStat(statId);
+        foreach(string statId in statIds) Quartz.Overlay.StatRegistry.Unregister(statId);
         statIds.Clear();
         foreach(string tagName in tagNames) AddonTags.Unregister(tagName);
         tagNames.Clear();
-        AddonUI.UnregisterAddon(Id);
+        Quartz.UI.Nav.NavRegistry.RemoveOwner(Id);
         if(settings is IO.ISettingsHandle handle) {
             handle.Save();
             IO.SettingsRegistry.Unregister(handle);

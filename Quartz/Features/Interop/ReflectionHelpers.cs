@@ -4,9 +4,9 @@ using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
 using Quartz.Core;
-using Quartz.Features.UiHider;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
+using Quartz.Utility;
 namespace Quartz.Features.Interop;
 public static class ReflectionHelpers {
     private const BindingFlags AllMembers =
@@ -166,7 +166,7 @@ public static class ReflectionHelpers {
         }
         return false;
     }
-    public static int NormalizeKeyInt(int raw) => (int)Features.KeyLimiter.KeyLimiter.NormalizeKey((KeyCode)raw);
+    public static int NormalizeKeyInt(int raw) => (int)KeyCodes.Normalize((KeyCode)raw);
     public static string[] ReadStringArray(object value) {
         if(value is not IEnumerable enumerable || value is string) return null;
         List<string> result = [];
@@ -282,40 +282,5 @@ public static class ReflectionHelpers {
             } catch { }
         }
         return null;
-    }
-    public static int ApplyAdofaiHideUiProfile(object profile, UiHiderProfile target) =>
-        profile == null ? 0 : ApplyHideUiProfile(name => TryGetBool(profile, name, out bool v) ? v : null, target);
-    public static int ApplyAdofaiHideUiProfileXml(XElement profile, UiHiderProfile target) =>
-        profile == null ? 0 : ApplyHideUiProfile(name => TryReadXmlBool(profile, name, out bool v) ? v : null, target);
-    private static int ApplyHideUiProfile(Func<string, bool?> read, UiHiderProfile target) {
-        if(target == null) return 0;
-        int count = 0;
-        void Flag(string name, Action<bool> set) {
-            if(read(name) is { } v) { set(v); count++; }
-        }
-        Flag("HideEverything", v => target.HideEverything = v);
-        Flag("HideJudgment", v => target.HideJudgment = v);
-        Flag("HideMissIndicators", v => target.HideMissIndicators = v);
-        Flag("HideTitle", v => target.HideTitle = v);
-        Flag("HideOtto", v => target.HideOtto = v);
-        Flag("HideTimingTarget", v => target.HideTimingTarget = v);
-        Flag("HideNoFailIcon", v => target.HideNoFailIcon = v);
-        Flag("HideBeta", v => target.HideBeta = v);
-        Flag("HideResult", v => target.HideResult = v);
-        Flag("HideHitErrorMeter", v => target.HideHitErrorMeter = v);
-        Flag("HideLastFloorFlash", v => target.HideLastFloorFlash = v);
-        return count;
-    }
-    public static void ApplyShortcutModifier(object shortcut) =>
-        SetShortcutModifier(name => TryGetBool(shortcut, name, out bool v) && v);
-    public static void ApplyShortcutModifierXml(XElement shortcut) =>
-        SetShortcutModifier(name => TryReadXmlBool(shortcut, name, out bool v) && v);
-    private static void SetShortcutModifier(Func<string, bool> pressed) {
-        Features.UiHider.UiHider.Conf.ShortcutModifier = (int)(
-            pressed("PressCtrl") ? Keybind.KeyModifier.Ctrl
-            : pressed("PressAlt") ? Keybind.KeyModifier.Alt
-            : pressed("PressShift") ? Keybind.KeyModifier.Shift
-            : Keybind.KeyModifier.None
-        );
     }
 }

@@ -1,0 +1,13 @@
+{
+  "ko-KR": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "DESC_OTTO_HIGHBPM_ON": "켜면 레벨의 최고 BPM이 300 이상일 때 아래 색상을 사용합니다. 끄면 일반 색상만 사용합니다.",
+    "OTTO_COLOR": "Otto 색상",
+    "OTTO_HIGHBPM_COLOR": "고BPM 색상",
+    "OTTO_HIGHBPM_ON": "고BPM 색상 분리",
+    "OTTO_OFFSET_X": "X 오프셋",
+    "OTTO_OFFSET_Y": "Y 오프셋",
+    "SECTION_OTTO_ICON": "Otto 아이콘",
+    "OTTOICON_ENABLE": "Otto 아이콘 활성화"
+  }
+}

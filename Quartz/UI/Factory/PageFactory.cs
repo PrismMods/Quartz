@@ -18,63 +18,24 @@ public static class PageFactory {
         PagesContaner.pivot = new Vector2(0.5f, 0.5f);
         PagesContaner.offsetMin = Vector2.zero;
         PagesContaner.offsetMax = new Vector2(0, -60);
-        for(int i = 0; i < Enum.GetValues(typeof(OriginalMenuState)).Length; i++) CreatePageBase(i);
-        foreach(Quartz.Addons.AddonUI.PageDef def in Quartz.Addons.AddonUI.Pages) {
+        Quartz.UI.Nav.CorePages.EnsureRegistered();
+        foreach(Quartz.UI.Nav.NavPage def in Quartz.UI.Nav.NavRegistry.AllVisible()) {
             RectTransform page = CreatePageBase(def.State);
-            RectTransform content = CreateScrollablePage(page);
+            RectTransform target = def.OwnScroll ? page : CreateScrollablePage(page);
             try {
-                def.Build(content);
+                def.Build(target);
             } catch(Exception e) {
-                Quartz.Core.MainCore.Log.Err($"[Addon:{def.AddonId}] tab '{def.Title}' build threw: {e}");
-                GenerateUI.AddMutedText(GenerateUI.Row(content, 40f)).text = $"'{def.Title}' failed to build — see log";
+                string owner = def.OwnerId == null ? "UI" : "Addon:" + def.OwnerId;
+                Quartz.Core.MainCore.Log.Err($"[{owner}] page '{def.Key}' build threw: {e}");
+                RectTransform fallback = def.OwnScroll ? CreateScrollablePage(page) : target;
+                GenerateUI.AddMutedText(GenerateUI.Row(fallback, 40f)).text = $"'{def.Title}' failed to build — see log";
             }
         }
         if(!UICore.Pages.ContainsKey(UICore.CurrentMenuState))
-            UICore.CurrentMenuState = (int)OriginalMenuState.OverlayGeneral;
+            UICore.CurrentMenuState = Quartz.UI.Nav.NavRegistry.FirstVisibleState();
         UICore.Pages[UICore.CurrentMenuState].GetComponent<CanvasGroup>().alpha = 1f;
         UICore.Pages[UICore.CurrentMenuState].GetComponent<CanvasGroup>().interactable = true;
         UICore.Pages[UICore.CurrentMenuState].GetComponent<CanvasGroup>().blocksRaycasts = true;
-        PageCredits.Create(UICore.Pages[(int)OriginalMenuState.Credits]);
-        PageProfiles.Create(UICore.Pages[(int)OriginalMenuState.Profiles]);
-        PageImport.Create(UICore.Pages[(int)OriginalMenuState.Import]);
-        PageSettings.Create(UICore.Pages[(int)OriginalMenuState.Settings]);
-        PageOverlayGeneral.Create(UICore.Pages[(int)OriginalMenuState.OverlayGeneral]);
-        PageKeyViewer.Create(UICore.Pages[(int)OriginalMenuState.KeyViewer]);
-        PageProgressBar.Create(UICore.Pages[(int)OriginalMenuState.ProgressBar]);
-        PageCombo.Create(UICore.Pages[(int)OriginalMenuState.Combo]);
-        PageJudgement.Create(UICore.Pages[(int)OriginalMenuState.Judgement]);
-        PageSongTitle.Create(UICore.Pages[(int)OriginalMenuState.SongTitle]);
-        PagePanels.Create(UICore.Pages[(int)OriginalMenuState.Panels]);
-        PageCalibration.Create(UICore.Pages[(int)OriginalMenuState.Calibration]);
-        PageGameplay.KeyLimiterPage(UICore.Pages[(int)OriginalMenuState.GameplayKeyLimiter]);
-        PageGameplay.ChatterBlockerPage(UICore.Pages[(int)OriginalMenuState.GameplayChatter]);
-        PageGameplay.JudgementRestrictionPage(UICore.Pages[(int)OriginalMenuState.GameplayJudgement]);
-        PageGameplay.DeathLimitPage(UICore.Pages[(int)OriginalMenuState.GameplayDeath]);
-        PageGameplay.AutoDeafenPage(UICore.Pages[(int)OriginalMenuState.GameplayAutoDeafen]);
-        PageGameplay.PracticePage(UICore.Pages[(int)OriginalMenuState.GameplayPractice]);
-        PageVisuals.EffectRemoverPage(UICore.Pages[(int)OriginalMenuState.VisualsEffectRemover]);
-        PageVisuals.HideJudgementsPage(UICore.Pages[(int)OriginalMenuState.VisualsHideJudgements]);
-        PageVisuals.VisualTweaksPage(UICore.Pages[(int)OriginalMenuState.VisualsVisualTweaks]);
-        PageVisuals.PlanetColorsPage(UICore.Pages[(int)OriginalMenuState.VisualsPlanetColors]);
-        PageVisuals.OttoIconPage(UICore.Pages[(int)OriginalMenuState.VisualsOttoIcon]);
-        PageVisuals.UiHidingPage(UICore.Pages[(int)OriginalMenuState.VisualsUiHiding]);
-        PageTweaks.GeneralPage(UICore.Pages[(int)OriginalMenuState.TweaksGeneral]);
-        PageTweaks.OptimizerPage(UICore.Pages[(int)OriginalMenuState.TweaksOptimizer]);
-        PageTweaks.MainMenuPage(UICore.Pages[(int)OriginalMenuState.TweaksMainMenu]);
-        PageEditor.TileReadoutPage(UICore.Pages[(int)OriginalMenuState.EditorTileReadout]);
-        PageEditor.BgaPage(UICore.Pages[(int)OriginalMenuState.EditorBga]);
-        PageEditor.FlipRotatePage(UICore.Pages[(int)OriginalMenuState.EditorFlipRotate]);
-        NostalgiaUI.GameplayPage(UICore.Pages[(int)OriginalMenuState.NostalgiaGameplay]);
-        NostalgiaUI.VisualsPage(UICore.Pages[(int)OriginalMenuState.NostalgiaVisuals]);
-        NostalgiaUI.TweaksPage(UICore.Pages[(int)OriginalMenuState.NostalgiaTweaks]);
-        NostalgiaUI.EditorPage(UICore.Pages[(int)OriginalMenuState.NostalgiaEditor]);
-        TufBrowserUI.Create(UICore.Pages[(int)OriginalMenuState.NostalgiaTuf]);
-        TufPacksUI.Create(UICore.Pages[(int)OriginalMenuState.NostalgiaTufPacks]);
-        TufSettingsUI.Create(UICore.Pages[(int)OriginalMenuState.NostalgiaTufSettings]);
-        PageHelp.FaqPage(UICore.Pages[(int)OriginalMenuState.HelpFaq]);
-        PageSearch.Create(UICore.Pages[(int)OriginalMenuState.Search]);
-        PageAddons.Create(UICore.Pages[(int)OriginalMenuState.Addons]);
-        if(Quartz.Core.Info.IsDev) PageDeveloper.Create(UICore.Pages[(int)OriginalMenuState.Developer]);
         foreach(var kv in UICore.Pages)
             kv.Value.gameObject.SetActive(kv.Key == UICore.CurrentMenuState);
         return PagesContaner;

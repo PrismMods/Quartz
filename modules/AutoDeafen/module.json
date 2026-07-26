@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "autodeafen", "entry": "Quartz.Features.AutoDeafen.AutoDeafenModule",
+  "name": "Auto Deafen", "nameKey": "SECTION_AUTO_DEAFEN_DISCORD", "group": "gameplay", "order": 50,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": [], "settingsFiles": ["AutoDeafen.json"], "langPrefixes": ["AUTODEAFEN_"]
+}

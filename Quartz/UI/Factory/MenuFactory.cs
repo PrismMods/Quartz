@@ -13,6 +13,7 @@ using Quartz.Tween;
 using GTweens.Builders;
 using GTweens.Easings;
 using TMPro;
+using Quartz.UI.Nav;
 namespace Quartz.UI.Factory;
 public static class MenuFactory {
     public static Action<int> OnStateChanged;
@@ -22,115 +23,44 @@ public static class MenuFactory {
         public Image bg;
         public GTween hoverSeq;
         public TMP_Text label;
+        public string categoryKey;
         public bool isCategory;
     }
     private static readonly List<MenuItem> items = [];
     private static readonly List<MenuItem> subItems = [];
-    private static readonly Dictionary<int, (string Title, string Key, int State)[]> CategoryChildren = new() {
-        [(int)OriginalMenuState.OverlayGeneral] = [
-            ("General", "OVERLAY_GENERAL", (int)OriginalMenuState.OverlayGeneral),
-            ("Key Viewer", "SECTION_KEY_VIEWER", (int)OriginalMenuState.KeyViewer),
-            ("Progress Bar", "SECTION_PROGRESS_BAR", (int)OriginalMenuState.ProgressBar),
-            ("Combo", "SECTION_COMBO", (int)OriginalMenuState.Combo),
-            ("Judgement", "SECTION_JUDGEMENT", (int)OriginalMenuState.Judgement),
-            ("Song Title", "SECTION_SONG_TITLE", (int)OriginalMenuState.SongTitle),
-            ("Panels", "SECTION_PANELS", (int)OriginalMenuState.Panels),
-            ("Calibration", "SECTION_CALIBRATION", (int)OriginalMenuState.Calibration),
-        ],
-        [(int)OriginalMenuState.GameplayKeyLimiter] = [
-            ("Key Limiter", "SECTION_KEY_LIMITER", (int)OriginalMenuState.GameplayKeyLimiter),
-            ("Keyboard Chatter Blocker", "SECTION_KEYBOARD_CHATTER_BLOCKER", (int)OriginalMenuState.GameplayChatter),
-            ("Judgement Restriction", "SECTION_JUDGEMENT_RESTRICTION", (int)OriginalMenuState.GameplayJudgement),
-            ("Death Limit", "SECTION_DEATH_LIMIT", (int)OriginalMenuState.GameplayDeath),
-            ("Auto Deafen (Discord)", "SECTION_AUTO_DEAFEN_DISCORD", (int)OriginalMenuState.GameplayAutoDeafen),
-            ("Practice Difficulty", "SECTION_PRACTICE_DIFFICULTY", (int)OriginalMenuState.GameplayPractice),
-        ],
-        [(int)OriginalMenuState.VisualsEffectRemover] = [
-            ("Effect Remover", "SECTION_EFFECT_REMOVER", (int)OriginalMenuState.VisualsEffectRemover),
-            ("Hide Judgements", "SECTION_HIDE_JUDGEMENTS", (int)OriginalMenuState.VisualsHideJudgements),
-            ("Visual Tweaks", "SECTION_VISUAL_TWEAKS", (int)OriginalMenuState.VisualsVisualTweaks),
-            ("Planet Colors", "SECTION_PLANET_COLORS", (int)OriginalMenuState.VisualsPlanetColors),
-            ("Otto Icon", "SECTION_OTTO_ICON", (int)OriginalMenuState.VisualsOttoIcon),
-            ("UI Hiding", "SECTION_UI_HIDING", (int)OriginalMenuState.VisualsUiHiding),
-        ],
-        [(int)OriginalMenuState.TweaksGeneral] = [
-            ("General", "TWEAKS_GENERAL", (int)OriginalMenuState.TweaksGeneral),
-            ("Optimizer", "SECTION_OPTIMIZER", (int)OriginalMenuState.TweaksOptimizer),
-            ("Main Menu", "SECTION_MAIN_MENU", (int)OriginalMenuState.TweaksMainMenu),
-        ],
-        [(int)OriginalMenuState.EditorTileReadout] = [
-            ("Selected Tile Readout", "SECTION_SELECTED_TILE_READOUT", (int)OriginalMenuState.EditorTileReadout),
-            ("BGA Mod", "SECTION_BGA_MOD", (int)OriginalMenuState.EditorBga),
-            ("Flip & Rotate Tiles", "SECTION_FLIP_ROTATE_TILES", (int)OriginalMenuState.EditorFlipRotate),
-        ],
-        [(int)OriginalMenuState.NostalgiaGameplay] = [
-            ("Gameplay", "GAMEPLAY", (int)OriginalMenuState.NostalgiaGameplay),
-            ("Visuals", "VISUALS", (int)OriginalMenuState.NostalgiaVisuals),
-            ("Tweaks", "TWEAKS", (int)OriginalMenuState.NostalgiaTweaks),
-            ("Editor", "EDITOR", (int)OriginalMenuState.NostalgiaEditor),
-        ],
-        [(int)OriginalMenuState.NostalgiaTuf] = [
-            ("Levels", "TUF_LEVELS", (int)OriginalMenuState.NostalgiaTuf),
-            ("Packs", "TUF_PACKS", (int)OriginalMenuState.NostalgiaTufPacks),
-            ("Settings", "TUF_SETTINGS", (int)OriginalMenuState.NostalgiaTufSettings),
-        ],
-        [(int)OriginalMenuState.HelpFaq] = [
-            ("FAQ", "FAQ", (int)OriginalMenuState.HelpFaq),
-        ],
-    };
-    public static int CategoryFor(int state) {
-        foreach(var kvp in CategoryChildren)
-            foreach(var c in kvp.Value)
-                if(c.State == state) return kvp.Key;
-        return state;
-    }
-    private static int activeCategoryKey = -1;
-    private static readonly Dictionary<int, int> lastChildForCategory = [];
+    public static string CategoryFor(int state) => NavRegistry.CategoryKeyFor(state);
+    private static string activeCategoryKey;
+    private static readonly Dictionary<string, string> lastChildForCategory = new(StringComparer.Ordinal);
     private static GameObject updateBadge;
     private static bool updateHooked;
     public static void CreateMenu(Transform parent) {
         items.Clear();
         subItems.Clear();
-        activeCategoryKey = -1;
-        var addonPages = Quartz.Addons.AddonUI.Pages;
-        if(addonPages.Count > 0) {
-            var children = new (string Title, string Key, int State)[addonPages.Count + 1];
-            children[0] = ("Addons", "ADDONS", (int)OriginalMenuState.Addons);
-            for(int i = 0; i < addonPages.Count; i++)
-                children[i + 1] = (addonPages[i].Title, addonPages[i].LocaleKey, addonPages[i].State);
-            CategoryChildren[(int)OriginalMenuState.Addons] = children;
-        } else {
-            CategoryChildren.Remove((int)OriginalMenuState.Addons);
-        }
-        List<int> stale = [];
-        foreach(var kvp in lastChildForCategory)
-            if(Quartz.Addons.AddonUI.IsAddonState(kvp.Value)
-               && !addonPages.Any(p => p.State == kvp.Value)) stale.Add(kvp.Key);
-        foreach(int key in stale) lastChildForCategory.Remove(key);
+        activeCategoryKey = null;
+        CorePages.EnsureRegistered();
+        PruneStaleLastChildren();
         float iconUnits = 28f * MainCore.Conf.UIScale;
-        CreateItem(parent, "Overlay", MainCore.Spr.Get(UISprite.Monitor128, iconUnits), (int)OriginalMenuState.OverlayGeneral);
-        CreateItem(parent, "Gameplay", MainCore.Spr.Get(UISprite.Gamepad128, iconUnits), (int)OriginalMenuState.GameplayKeyLimiter);
-        CreateItem(parent, "Visuals", MainCore.Spr.Get(UISprite.Image128, iconUnits), (int)OriginalMenuState.VisualsEffectRemover);
-        CreateItem(parent, "Tweaks", MainCore.Spr.Get(UISprite.AdjustmentsHorizontal128, iconUnits), (int)OriginalMenuState.TweaksGeneral);
-        CreateItem(parent, "Editor", MainCore.Spr.Get(UISprite.Wrench128, iconUnits), (int)OriginalMenuState.EditorTileReadout);
-        CreateItem(parent, "Nostalgia", MainCore.Spr.Get(UISprite.ClockRewind128, iconUnits), (int)OriginalMenuState.NostalgiaGameplay);
-        CreateItem(parent, "TUF", MainCore.Spr.Get(UISprite.TufLogo, iconUnits), (int)OriginalMenuState.NostalgiaTuf);
-        CreateItem(parent, "Search", MainCore.Spr.Get(UISprite.MagnifyingGlass128, iconUnits), (int)OriginalMenuState.Search);
-        CreateItem(parent, "Profiles", MainCore.Spr.Get(UISprite.Users128, iconUnits), (int)OriginalMenuState.Profiles);
-        CreateItem(parent, "Import", MainCore.Spr.Get(UISprite.Book128, iconUnits), (int)OriginalMenuState.Import);
-        CreateItem(parent, "Addons", MainCore.Spr.Get(UISprite.Wrench128, iconUnits), (int)OriginalMenuState.Addons);
-        var settings = CreateItem(parent, "Settings", MainCore.Spr.Get(UISprite.Gear128, iconUnits), (int)OriginalMenuState.Settings);
-        CreateItem(parent, "Help", MainCore.Spr.Get(UISprite.QuestionMarkCircle128, iconUnits), (int)OriginalMenuState.HelpFaq);
-        CreateItem(parent, "Credits", MainCore.Spr.Get(UISprite.Star128, iconUnits), (int)OriginalMenuState.Credits);
-        if(Info.IsDev) {
-            CreateItem(parent, "Developer", MainCore.Spr.Get(UISprite.Wrench128, iconUnits), (int)OriginalMenuState.Developer);
+        MenuItem settings = null;
+        foreach(NavCategory category in NavRegistry.Categories) {
+            IReadOnlyList<NavPage> children = NavRegistry.PagesIn(category.Key);
+            if(children.Count == 0) continue;
+            float scale = category.IconScale <= 0f ? 1f : category.IconScale;
+            Sprite icon = category.IconAsset != null
+                ? SpriteRegistry.Get(category.IconAsset)
+                : MainCore.Spr.Get(category.Icon, iconUnits * scale);
+            MenuItem item = CreateItem(
+                parent, category.Title, category.LocaleKey, icon, category.Key, children[0].State, 28f * scale);
+            if(category.Key == "settings") settings = item;
         }
-        CreateUpdateBadge(settings.obj.transform);
-        if(!updateHooked) {
-            UpdateService.OnChanged += RefreshUpdateBadge;
-            updateHooked = true;
+        updateBadge = null;
+        if(settings != null) {
+            CreateUpdateBadge(settings.obj.transform);
+            if(!updateHooked) {
+                UpdateService.OnChanged += RefreshUpdateBadge;
+                updateHooked = true;
+            }
+            RefreshUpdateBadge();
         }
-        RefreshUpdateBadge();
         RefreshSubMenu(CategoryFor(UICore.CurrentMenuState), animate: false);
         ApplyState(UICore.CurrentMenuState, true);
     }
@@ -156,7 +86,7 @@ public static class MenuFactory {
     public static void RefreshTheme() {
         ApplyState(UICore.CurrentMenuState, true);
     }
-    public static MenuItem CreateItem(Transform parent, string name, Sprite icon, int state) {
+    public static MenuItem CreateItem(Transform parent, string name, string localeKey, Sprite icon, string categoryKey, int state, float iconSize = 28f) {
         GameObject item = new(name);
         item.transform.SetParent(parent, false);
         RectTransform rect = item.AddComponent<RectTransform>();
@@ -172,8 +102,8 @@ public static class MenuFactory {
         iconRect.anchorMin = new(0, 0.5f);
         iconRect.anchorMax = new(0, 0.5f);
         iconRect.pivot = new(0, 0.5f);
-        iconRect.anchoredPosition = new(24, 0);
-        iconRect.sizeDelta = new(28, 28);
+        iconRect.anchoredPosition = new(24f - (iconSize - 28f) * 0.5f, 0);
+        iconRect.sizeDelta = new(iconSize, iconSize);
         Image iconImg = iconObj.AddComponent<Image>();
         iconImg.sprite = icon;
         iconImg.raycastTarget = false;
@@ -192,17 +122,32 @@ public static class MenuFactory {
         label.alignment = TextAlignmentOptions.Left;
         label.verticalAlignment = VerticalAlignmentOptions.Middle;
         label.characterSpacing = -3f;
-        label.gameObject.AddComponent<TextLocalization>().Init(name.ToUpperInvariant(), name);
+        label.gameObject.AddComponent<TextLocalization>().Init(localeKey ?? name.ToUpperInvariant(), name);
         MenuItem menuItem = new() {
             obj = item,
             bg = bg,
             state = state,
+            categoryKey = categoryKey,
             label = label,
             isCategory = true
         };
         items.Add(menuItem);
         WireItemInteractions(menuItem, item, bg);
         return menuItem;
+    }
+    private static void CreateSubSeparator(Transform parent) {
+        RectTransform rect = GenerateUI.Row(parent, 11f);
+        rect.gameObject.name = "Separator";
+        GameObject lineObj = new("Line");
+        lineObj.transform.SetParent(rect, false);
+        RectTransform line = lineObj.AddComponent<RectTransform>();
+        line.anchorMin = new(0f, 0.5f);
+        line.anchorMax = new(1f, 0.5f);
+        line.offsetMin = new(24f, -0.5f);
+        line.offsetMax = new(-16f, 0.5f);
+        Image image = lineObj.AddComponent<Image>();
+        image.color = UIColors.MenuHover;
+        image.raycastTarget = false;
     }
     private static void CreateSubItem(Transform parent, string title, string key, int state) {
         RectTransform rect = GenerateUI.Row(parent, 40f);
@@ -229,15 +174,29 @@ public static class MenuFactory {
         subItems.Add(menuItem);
         WireItemInteractions(menuItem, rect.gameObject, bg);
     }
-    private static void RefreshSubMenu(int categoryKey, bool animate) {
+    private static void RefreshSubMenu(string categoryKey, bool animate) {
         if(categoryKey == activeCategoryKey) return;
         activeCategoryKey = categoryKey;
         foreach(var it in subItems) it.hoverSeq?.Kill();
         subItems.Clear();
         GenerateUI.ClearChildren(UICore.SubMenuContent);
-        bool has = CategoryChildren.TryGetValue(categoryKey, out var children);
-        if(has) foreach((string title, string key, int state) in children) CreateSubItem(UICore.SubMenuContent, title, key, state);
+        NavCategory category = NavRegistry.Category(categoryKey);
+        bool has = NavRegistry.ShowsSubmenu(category);
+        if(has) {
+            bool first = true;
+            foreach(NavPage child in NavRegistry.PagesIn(categoryKey)) {
+                if(child.SeparatorBefore && !first) CreateSubSeparator(UICore.SubMenuContent);
+                CreateSubItem(UICore.SubMenuContent, child.Title, child.LocaleKey, child.State);
+                first = false;
+            }
+        }
         UICore.SetSubMenuVisible(has, animate);
+    }
+    private static void PruneStaleLastChildren() {
+        List<string> stale = [];
+        foreach(var kvp in lastChildForCategory)
+            if(NavRegistry.ByKey(kvp.Value) == null) stale.Add(kvp.Key);
+        foreach(string key in stale) lastChildForCategory.Remove(key);
     }
     private static void WireItemInteractions(MenuItem menuItem, GameObject item, Image bg) {
         var trigger = item.AddComponent<EventTrigger>();
@@ -258,24 +217,28 @@ public static class MenuFactory {
         HoverFade(EventTriggerType.PointerExit, static () => UIColors.MenuNormal, 0.25f);
         UnityUtils.AddClickEvent(trigger, _ => {
             if(IsSelected(menuItem, UICore.CurrentMenuState)) return;
-            SetState(menuItem.isCategory
-                ? lastChildForCategory.GetValueOrDefault(menuItem.state, menuItem.state)
-                : menuItem.state);
+            SetState(menuItem.isCategory ? LastChildState(menuItem) : menuItem.state);
         });
+    }
+    private static int LastChildState(MenuItem category) {
+        if(category.categoryKey == null) return category.state;
+        string lastKey = lastChildForCategory.GetValueOrDefault(category.categoryKey);
+        int state = lastKey == null ? -1 : NavRegistry.StateFor(lastKey);
+        return state >= 0 ? state : category.state;
     }
     public static void SetState(int to) {
         int from = UICore.CurrentMenuState;
         if(from == to) return;
         UICore.CurrentMenuState = to;
-        int cat = CategoryFor(to);
-        if(CategoryChildren.ContainsKey(cat)) lastChildForCategory[cat] = to;
+        string cat = CategoryFor(to);
+        if(cat != null) lastChildForCategory[cat] = NavRegistry.KeyFor(to);
         RefreshSubMenu(cat, animate: true);
         PageSwicher.SwitchPage(from, to);
         ApplyState(to);
         OnStateChanged?.Invoke(to);
     }
     private static bool IsSelected(MenuItem it, int currentState) =>
-        it.isCategory ? CategoryFor(currentState) == it.state : it.state == currentState;
+        it.isCategory ? CategoryFor(currentState) == it.categoryKey : it.state == currentState;
     private static void ApplyState(int id, bool noAnimate = false) {
         ApplyStateList(items, id, noAnimate);
         ApplyStateList(subItems, id, noAnimate);

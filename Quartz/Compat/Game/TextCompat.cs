@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using TMPro;
 namespace Quartz.Compat.Game;
-internal static class TextCompat {
+public static class TextCompat {
     private const int WrapNoWrap = 0;
     private const int WrapNormal = 1;
     private static bool resolved;

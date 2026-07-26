@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "judgement", "entry": "Quartz.Features.Judgement.JudgementModule",
+  "name": "Judgement", "nameKey": "SECTION_JUDGEMENT", "group": "overlay", "order": 50,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": ["overlay"], "settingsFiles": [], "langPrefixes": []
+}

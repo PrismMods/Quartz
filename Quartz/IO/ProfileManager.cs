@@ -18,6 +18,8 @@ public static partial class ProfileManager {
     private static readonly HashSet<string> excluded = new(StringComparer.OrdinalIgnoreCase) {
         "PlayCount.json",
         "Profiles.json",
+        "CalibrationTimings.json",
+        "FAQ.json",
     };
     private static readonly string[] presetImposed = [nameof(CoreSettings.Language)];
     public static string Active { get; private set; } = DEFAULT_NAME;

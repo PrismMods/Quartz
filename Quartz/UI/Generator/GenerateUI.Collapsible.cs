@@ -45,14 +45,23 @@ public static partial class GenerateUI {
     public static CollapsibleSection FlatSection(
         Transform parent,
         string title,
+        Action<bool> onToggle,
+        bool toggleValue,
+        string enableLabel,
+        string enableId
+    ) => FlatSection(parent, title, onToggle, toggleValue, enableLabel, enableId, false);
+    public static CollapsibleSection FlatSection(
+        Transform parent,
+        string title,
         Action<bool> onToggle = null,
         bool toggleValue = false,
         string enableLabel = null,
-        string enableId = null
+        string enableId = null,
+        bool toggleDefault = false
     ) {
         Localize(AddTextH1(Row(parent)), LocaleKeyFromText("SECTION", title), title);
         if(onToggle != null)
-            Toggle(Row(parent), false, toggleValue, onToggle, enableLabel ?? ("Enable " + title), enableId);
+            Toggle(Row(parent), toggleDefault, toggleValue, onToggle, enableLabel ?? ("Enable " + title), enableId);
         RectTransform body = parent as RectTransform;
         return new CollapsibleSection {
             Title = title,

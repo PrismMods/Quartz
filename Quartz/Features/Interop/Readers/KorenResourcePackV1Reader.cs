@@ -1,13 +1,7 @@
 using System.Collections;
 using System.Xml.Linq;
 using Quartz.Core;
-using Quartz.Features.Combo;
-using Quartz.Features.EffectRemover;
-using Quartz.Features.Judgement;
-using Quartz.Features.PlanetColors;
-using Quartz.Features.ProgressBar;
-using Quartz.Features.Restriction;
-using Quartz.Features.Tweaks;
+using Quartz.Interop;
 using UnityEngine;
 using static Quartz.Features.Interop.ReflectionHelpers;
 using static Quartz.Features.Interop.Readers.KeyViewerImportShared;
@@ -51,138 +45,34 @@ internal static class KorenResourcePackV1Reader {
         SettingsImportKeyViewerPart keyViewerParts
     ) {
         int count = 0;
-        if(TryConvertBool(r.Scalar("KCBOn"), out bool kcbOn)) {
-            Features.ChatterBlocker.ChatterBlocker.EnsureConf();
-            Features.ChatterBlocker.ChatterBlocker.Conf.Enabled = kcbOn;
-            count++;
-        }
-        if(TryConvertFloat(r.Scalar("KCBThresholdMs"), out float kcbMs)) {
-            Features.ChatterBlocker.ChatterBlocker.EnsureConf();
-            Features.ChatterBlocker.ChatterBlocker.Conf.ThresholdMs = Mathf.Max(0f, kcbMs);
-            count++;
-        }
-        if(TryConvertBool(r.Scalar("KeyLimiterOn"), out bool klOn)) {
-            Features.KeyLimiter.KeyLimiter.EnsureConf();
-            Features.KeyLimiter.KeyLimiter.Conf.Enabled = klOn;
-            count++;
-        }
-        int[] klKeys = r.Keys("KeyLimiterAllowed");
-        if(klKeys is { Length: > 0 }) {
-            Features.KeyLimiter.KeyLimiter.SetAllowedKeys(klKeys);
-            count++;
-        }
         ImportedKeyViewer kv = ReadKeyViewerFromV1(r);
         if(kv.Available != SettingsImportKeyViewerPart.None) {
-            count += ApplyKeyViewerImport(kv, keyViewerMode, keyViewerParts);
+            count += DeliverKeyViewer(kv, keyViewerMode, keyViewerParts);
         }
-        ComboOverlay.EnsureConf();
-        if(TryConvertBool(r.Scalar("comboOn"), out bool comboOn)) { ComboOverlay.Conf.Enabled = comboOn; count++; }
-        if(TryConvertBool(r.Scalar("EnableAutoCombo"), out bool autoCombo)) { ComboOverlay.Conf.CountAuto = autoCombo; count++; }
-        if(TryConvertInt(r.Scalar("ComboColorMax"), out int comboMax)) { ComboOverlay.Conf.ColorMax = comboMax; count++; }
-        if(TryConvertBool(r.Scalar("XPerfectComboEnabled"), out bool xperfCombo)) { ComboOverlay.Conf.XPerfectComboEnabled = xperfCombo; count++; }
-        if(V1Color(r, "ComboColorLow") is { } comboLow) { ComboOverlay.Conf.SetColorLow(comboLow); count++; }
-        if(V1Color(r, "ComboColorHigh") is { } comboHigh) { ComboOverlay.Conf.SetColorHigh(comboHigh); count++; }
-        JudgementOverlay.EnsureConf();
-        if(TryConvertBool(r.Scalar("judgementOn"), out bool judgeOn)) { JudgementOverlay.Conf.Enabled = judgeOn; count++; }
-        if(TryConvertFloat(r.Scalar("judgementPositionY"), out float judgeY)) { JudgementOverlay.Conf.OffsetY = judgeY; count++; }
-        if(TryConvertFloat(r.Scalar("judgementSize"), out float judgeSize)) { JudgementOverlay.Conf.Size = judgeSize; count++; }
-        if(TryConvertFloat(r.Scalar("judgementSpacing"), out float judgeSpace)) { JudgementOverlay.Conf.Spacing = judgeSpace; count++; }
-        ProgressBarOverlay.EnsureConf();
-        if(TryConvertBool(r.Scalar("progressBarOn"), out bool pbOn)) { ProgressBarOverlay.Conf.Enabled = pbOn; count++; }
-        if(V1Color(r, "ProgressBarFill") is { } pbFill) { ProgressBarOverlay.Conf.SetFillColor(pbFill); count++; }
-        if(V1Color(r, "ProgressBarBack") is { } pbBack) { ProgressBarOverlay.Conf.SetBackColor(pbBack); count++; }
-        if(V1Color(r, "ProgressBarBorder") is { } pbBorder) { ProgressBarOverlay.Conf.SetOutlineColor(pbBorder); count++; }
-        Features.OttoIcon.OttoIcon.EnsureConf();
-        if(TryConvertBool(r.Scalar("ChangeOttoIcon"), out bool ottoOn)) { Features.OttoIcon.OttoIcon.Conf.Enabled = ottoOn; count++; }
-        if(V1Color(r, "Otto") is { } ottoColor) { Features.OttoIcon.OttoIcon.Conf.SetColor(ottoColor); count++; }
-        if(TryConvertFloat(r.Scalar("OttoOffsetX"), out float ottoX)) { Features.OttoIcon.OttoIcon.Conf.OffsetX = ottoX; count++; }
-        if(TryConvertFloat(r.Scalar("OttoOffsetY"), out float ottoY)) { Features.OttoIcon.OttoIcon.Conf.OffsetY = ottoY; count++; }
-        Features.PlanetColors.PlanetColors.EnsureConf();
-        PlanetColorsSettings planet = Features.PlanetColors.PlanetColors.Conf;
-        if(TryConvertBool(r.Scalar("ChangeBallColor"), out bool ballOn)) { planet.Enabled = ballOn; count++; }
-        for(int slot = 0; slot < 3; slot++) {
-            string prefix = "BallPlanet" + (slot + 1);
-            if(V1Color(r, prefix) is { } ballColor) { planet.SetBallRgb(slot, ballColor); count++; }
-            if(TryConvertFloat(r.Scalar(prefix + "Opacity"), out float ballOp)) { planet.BallOpacity[slot] = Mathf.Clamp01(ballOp); count++; }
-        }
-        if(TryConvertBool(r.Scalar("ChangeRingColor"), out bool ringOn)) { planet.EnableRingRecolor = ringOn; count++; }
-        if(V1Color(r, "Ring") is { } ringColor) { planet.SetRingRgb(ringColor); count++; }
-        Features.Restriction.Restriction.EnsureConf();
-        RestrictionSettings restrict = Features.Restriction.Restriction.Conf;
-        if(TryConvertBool(r.Scalar("JRestrictOn"), out bool jrOn)) { restrict.JRestrictEnabled = jrOn; count++; }
-        if(TryConvertInt(r.Scalar("JRestrictMode"), out int jrMode)) { restrict.JRestrictMode = jrMode; count++; }
-        if(TryConvertFloat(r.Scalar("JRestrictAccuracy"), out float jrAcc)) { restrict.JRestrictAccuracy = jrAcc; count++; }
-        if(TryConvertInt(r.Scalar("JRestrictAllowedMask"), out int jrMask)) { restrict.JRestrictAllowedMask = jrMask; count++; }
-        if(TryConvertBool(r.Scalar("DeathLimitOn"), out bool dlOn)) { restrict.DeathLimitEnabled = dlOn; count++; }
-        if(TryConvertBool(r.Scalar("DeathLimitMaxDeathsOn"), out bool dlDeathsOn)) { restrict.MaxDeathsOn = dlDeathsOn; count++; }
-        if(TryConvertInt(r.Scalar("DeathLimitMaxDeaths"), out int dlDeaths)) { restrict.MaxDeaths = dlDeaths; count++; }
-        if(TryConvertBool(r.Scalar("DeathLimitMaxMissesOn"), out bool dlMissOn)) { restrict.MaxMissesOn = dlMissOn; count++; }
-        if(TryConvertInt(r.Scalar("DeathLimitMaxMisses"), out int dlMiss)) { restrict.MaxMisses = dlMiss; count++; }
-        if(TryConvertBool(r.Scalar("DeathLimitMaxOverloadsOn"), out bool dlOverOn)) { restrict.MaxOverloadsOn = dlOverOn; count++; }
-        if(TryConvertInt(r.Scalar("DeathLimitMaxOverloads"), out int dlOver)) { restrict.MaxOverloads = dlOver; count++; }
-        Features.Tweaks.Tweaks.EnsureConf();
-        TweaksSettings tweaks = Features.Tweaks.Tweaks.Conf;
-        void TweakFlag(string name, Action<bool> set) {
-            if(TryConvertBool(r.Scalar(name), out bool v)) { set(v); count++; }
-        }
-        TweakFlag("RemoveAllCheckpoints", v => tweaks.RemoveAllCheckpoints = v);
-        TweakFlag("RemoveBallCoreParticles", v => tweaks.RemoveBallCoreParticles = v);
-        TweakFlag("DisableTileHitGlow", v => tweaks.DisableTileHitGlow = v);
-        TweakFlag("RemovePlanetGlow", v => tweaks.RemovePlanetGlow = v);
-        TweakFlag("DisableAutoPause", v => tweaks.DisableAutoPause = v);
-        TweakFlag("BlockMouseWheelScrollWhilePlaying", v => tweaks.BlockMouseWheelScrollWhilePlaying = v);
-        Features.EffectRemover.EffectRemover.EnsureConf();
-        EffectRemoverSettings effect = Features.EffectRemover.EffectRemover.Conf;
-        if(TryConvertBool(r.Scalar("EffectRemoverOn"), out bool erOn)) { effect.On = erOn; count++; }
-        if(TryConvertFloat(r.Scalar("EffectRemoverCameraZoomScale"), out float erZoom)) { effect.CameraZoomScale = erZoom; count++; }
-        void EffectFlag(string name, Action<bool> set) {
-            if(TryConvertBool(r.Scalar(name), out bool v)) { set(v); count++; }
-        }
-        EffectFlag("EffectRemoverEnableSave", v => effect.EnableSave = v);
-        EffectFlag("EffectRemoverResetTrackAnimation", v => effect.ResetTrackAnimation = v);
-        EffectFlag("EffectRemoverResetTrackColor", v => effect.ResetTrackColor = v);
-        EffectFlag("EffectRemoverRemoveAllDecorations", v => effect.RemoveAllDecorations = v);
-        EffectFlag("EffectRemoverResetTrackOpacity", v => effect.LimitTrackOpacity = v);
-        EffectFlag("EffectRemoverSetCameraZoom", v => effect.SetCameraZoom = v);
-        EffectFlag("EffectRemoverFilters", v => effect.Filters = v);
-        EffectFlag("EffectRemoverAdvancedFilters", v => effect.AdvancedFilters = v);
-        EffectFlag("EffectRemoverParticles", v => effect.Particles = v);
-        EffectFlag("EffectRemoverDecorations", v => effect.Decorations = v);
-        EffectFlag("EffectRemoverBackgrounds", v => effect.Backgrounds = v);
-        EffectFlag("EffectRemoverCameras", v => effect.Cameras = v);
-        EffectFlag("EffectRemoverRepeatEvents", v => effect.RepeatEvents = v);
-        EffectFlag("EffectRemoverFrameRate", v => effect.FrameRate = v);
-        EffectFlag("EffectRemoverHitSounds", v => effect.HitSounds = v);
-        EffectFlag("EffectRemoverPlanetOrbit", v => effect.PlanetOrbit = v);
-        EffectFlag("EffectRemoverPlanetScale", v => effect.PlanetScale = v);
-        EffectFlag("EffectRemoverPlanetRadius", v => effect.PlanetRadius = v);
-        EffectFlag("EffectRemoverTrackAnimations", v => effect.TrackAnimations = v);
-        EffectFlag("EffectRemoverTrackPositions", v => effect.TrackPositions = v);
-        EffectFlag("EffectRemoverTrackMoves", v => effect.TrackMoves = v);
-        EffectFlag("EffectRemoverTrackColors", v => effect.TrackColors = v);
-        EffectFlag("EffectRemoverHoldSounds", v => effect.HoldSounds = v);
-        EffectFlag("EffectRemoverHideIcons", v => effect.HideIcons = v);
+        count += ImportRegistry.Deliver(new ImportSource(ImportSourceKind.KorenResourcePackV1, r.Scalar, r.Keys, r.Labels));
         return count;
     }
     private static int ImportV1UiHider(object live) {
-        Features.UiHider.UiHider.EnsureConf();
-        int count = 0;
-        count += ApplyAdofaiHideUiProfile(GetMemberValue(live, "UiHidingPlayingProfile"), Features.UiHider.UiHider.Conf.Playing);
-        count += ApplyAdofaiHideUiProfile(GetMemberValue(live, "UiHidingRecordingProfile"), Features.UiHider.UiHider.Conf.Recording);
-        if(TryGetBool(live, "UiHidingRecordingMode", out bool rec)) { Features.UiHider.UiHider.Conf.RecordingMode = rec; count++; }
-        if(TryGetBool(live, "UiHidingUseRecordingModeShortcut", out bool useShortcut)) { Features.UiHider.UiHider.Conf.UseShortcut = useShortcut; count++; }
-        if(TryGetBool(live, "UiHidingShortcutCtrl", out bool ctrl) && ctrl) {
-            Features.UiHider.UiHider.Conf.ShortcutModifier = (int)Keybind.KeyModifier.Ctrl;
-        } else if(TryGetBool(live, "UiHidingShortcutAlt", out bool alt) && alt) {
-            Features.UiHider.UiHider.Conf.ShortcutModifier = (int)Keybind.KeyModifier.Alt;
-        } else if(TryGetBool(live, "UiHidingShortcutShift", out bool shift) && shift) {
-            Features.UiHider.UiHider.Conf.ShortcutModifier = (int)Keybind.KeyModifier.Shift;
-        } else {
-            Features.UiHider.UiHider.Conf.ShortcutModifier = (int)Keybind.KeyModifier.None;
-        }
-        if(TryGetInt(live, "UiHidingShortcutKey", out int key)) { Features.UiHider.UiHider.Conf.ShortcutKey = NormalizeKeyInt(key); count++; }
-        if(TryGetBool(live, "UiHidingOn", out bool on)) { Features.UiHider.UiHider.Conf.Enabled = on; count++; }
-        return count;
+        ImportSource source = new(ImportSourceKind.KorenResourcePackV1, name => GetMemberValue(live, name));
+        if(GetMemberValue(live, "UiHidingPlayingProfile") is { } playing)
+            source.Put(ImportKeys.UiHiderPlayingProfile,
+                (Func<string, bool?>)(name => TryGetBool(playing, name, out bool v) ? v : null));
+        if(GetMemberValue(live, "UiHidingRecordingProfile") is { } recording)
+            source.Put(ImportKeys.UiHiderRecordingProfile,
+                (Func<string, bool?>)(name => TryGetBool(recording, name, out bool v) ? v : null));
+        if(TryGetBool(live, "UiHidingRecordingMode", out bool rec)) source.Put(ImportKeys.UiHiderRecordingMode, rec);
+        if(TryGetBool(live, "UiHidingUseRecordingModeShortcut", out bool useShortcut))
+            source.Put(ImportKeys.UiHiderUseShortcut, useShortcut);
+        source.Put(ImportKeys.UiHiderShortcut, (Func<string, bool>)(name => name switch {
+            "PressCtrl" => TryGetBool(live, "UiHidingShortcutCtrl", out bool ctrl) && ctrl,
+            "PressAlt" => TryGetBool(live, "UiHidingShortcutAlt", out bool alt) && alt,
+            "PressShift" => TryGetBool(live, "UiHidingShortcutShift", out bool shift) && shift,
+            _ => false,
+        }));
+        if(TryGetInt(live, "UiHidingShortcutKey", out int key))
+            source.Put(ImportKeys.UiHiderShortcutKey, NormalizeKeyInt(key));
+        if(TryGetBool(live, "UiHidingOn", out bool on)) source.Put(ImportKeys.UiHiderEnabled, on);
+        return ImportRegistry.Deliver(source);
     }
     private static ImportedKeyViewer ReadKeyViewerFromV1(V1Reader r) {
         ImportedKeyViewer kv = new();

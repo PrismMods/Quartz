@@ -163,6 +163,9 @@ echo "Building ${tag} (MelonLoader) ..."
 dotnet build Quartz/Quartz.csproj -c Release
 echo "Building ${tag} (UnityModManager) ..."
 dotnet build Quartz/Quartz.csproj -c Release -p:LoaderTarget=UMM
+echo "Building ${tag} (modules) ..."
+rm -rf dist/modules
+dotnet build modules/AllModules.proj -c Release
 
 # Quartz.zip is the full MelonLoader install (DLL + lang + fonts), built by the
 # csproj PostBuild target. Ship the bare DLL alongside it too, so anyone still
@@ -176,6 +179,42 @@ quartz_umm_zip="dist/QuartzUmm.zip"
 [ -f "$quartz_zip" ] || { echo "dist/Quartz.zip missing — aborting" >&2; exit 1; }
 [ -f "$quartz_umm_zip" ] || { echo "dist/QuartzUmm.zip missing — aborting" >&2; exit 1; }
 
+# Modules: the catalog is generated from whatever dist/modules/ holds, then
+# checked against it. Deliberately NOT a hand-maintained per-module asset list —
+# that is the thing the module system exists to delete.
+catalog="dist/modules.json"
+modules_zip="dist/QuartzModules.zip"
+tools/gen-catalog.sh "$tag" "$catalog"
+jq -e . "$catalog" >/dev/null || { echo "dist/modules.json is not valid JSON — aborting" >&2; exit 1; }
+on_disk=$(find dist/modules -name '*.qmod' 2>/dev/null | wc -l | tr -d ' ')
+in_catalog=$(jq '.modules | length' "$catalog")
+[ "$on_disk" = "$in_catalog" ] || {
+  echo "catalog lists ${in_catalog} module(s) but dist/modules has ${on_disk} — aborting" >&2; exit 1; }
+while read -r id want; do
+  got=$( (shasum -a 256 "dist/modules/${id}.qmod" 2>/dev/null || sha256sum "dist/modules/${id}.qmod") | cut -d' ' -f1)
+  [ "$got" = "$want" ] || { echo "catalog sha256 for ${id} does not match the file — aborting" >&2; exit 1; }
+done < <(jq -r '.modules[] | "\(.id) \(.sha256)"' "$catalog")
+rm -f "$modules_zip"
+module_assets=()
+module_bundle=()
+if [ "$in_catalog" -gt 0 ]; then
+  (cd dist/modules && zip -q -X "../$(basename "$modules_zip")" ./*.qmod ./*.qmod.json)
+  [ -f "$modules_zip" ] || { echo "dist/QuartzModules.zip missing — aborting" >&2; exit 1; }
+  module_assets=(dist/modules/*.qmod dist/modules/*.qmod.json "$modules_zip")
+  module_bundle=("$modules_zip")
+  # Fold the verified modules into both install zips under the data root's
+  # Module.bundled/. That is the offline source the first-launch migration
+  # copies from, so an upgrading user keeps every feature they had enabled
+  # without needing the network. Transitional — dropped in Phase 6.
+  tools/bundle-modules.sh
+  # Every module that ships must have a migration rule, or upgrading users
+  # silently lose that feature on first launch.
+  while read -r id; do
+    grep -q "Id = \"${id}\"" Quartz/Modules/ModuleMigration.cs \
+      || { echo "module '${id}' has no rule in ModuleMigration.Table — aborting" >&2; exit 1; }
+  done < <(jq -r '.modules[].id' "$catalog" | grep -v '^sample$')
+fi
+
 # gh wants the body from a file (preserves markdown + newlines).
 notes_tmp=$(mktemp)
 printf '%s\n' "$body" > "$notes_tmp"
@@ -185,10 +224,10 @@ echo "Publishing ${title} ..."
 if gh release view "$tag" >/dev/null 2>&1; then
   # Re-publish: refresh title + notes, then replace the assets.
   gh release edit "$tag" --title "$title" --notes-file "$notes_tmp"
-  gh release upload "$tag" "$quartz_zip" "$quartz_dll" "$quartz_umm_zip" --clobber
+  gh release upload "$tag" "$quartz_zip" "$quartz_dll" "$quartz_umm_zip" "$catalog" "${module_assets[@]}" --clobber
 else
   # shellcheck disable=SC2086
-  gh release create "$tag" "$quartz_zip" "$quartz_dll" "$quartz_umm_zip" --title "$title" --notes-file "$notes_tmp" $flags
+  gh release create "$tag" "$quartz_zip" "$quartz_dll" "$quartz_umm_zip" "$catalog" "${module_assets[@]}" --title "$title" --notes-file "$notes_tmp" $flags
 fi
 
 # --- Roll this channel's "latest" pointer --------------------------------
@@ -226,16 +265,17 @@ roll_pointer() {
       "$chan" "$title" "$owner" "$repo" "$tag"
     printf 'These links always serve the newest %s build:\n\n' "$chan"
     printf -- '- [Quartz.zip](https://github.com/%s/%s/releases/download/%s/Quartz.zip) — MelonLoader\n' "$owner" "$repo" "$roll_tag"
-    printf -- '- [QuartzUmm.zip](https://github.com/%s/%s/releases/download/%s/QuartzUmm.zip) — UnityModManager\n\n' "$owner" "$repo" "$roll_tag"
+    printf -- '- [QuartzUmm.zip](https://github.com/%s/%s/releases/download/%s/QuartzUmm.zip) — UnityModManager\n' "$owner" "$repo" "$roll_tag"
+    printf -- '- [modules.json](https://github.com/%s/%s/releases/download/%s/modules.json) — module catalog\n\n' "$owner" "$repo" "$roll_tag"
     printf -- '---\n\n%s\n' "$body"
   } > "$roll_notes"
 
   if gh release view "$roll_tag" >/dev/null 2>&1; then
     gh release edit "$roll_tag" --title "$roll_title" --notes-file "$roll_notes" \
-      && gh release upload "$roll_tag" "$quartz_zip" "$quartz_dll" "$quartz_umm_zip" --clobber
+      && gh release upload "$roll_tag" "$quartz_zip" "$quartz_dll" "$quartz_umm_zip" "$catalog" "${module_bundle[@]}" --clobber
   else
     # shellcheck disable=SC2086
-    gh release create "$roll_tag" "$quartz_zip" "$quartz_dll" "$quartz_umm_zip" \
+    gh release create "$roll_tag" "$quartz_zip" "$quartz_dll" "$quartz_umm_zip" "$catalog" "${module_bundle[@]}" \
       --title "$roll_title" --notes-file "$roll_notes" $roll_flags
   fi
   local rc=$?

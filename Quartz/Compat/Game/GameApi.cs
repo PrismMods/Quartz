@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -221,6 +222,8 @@ public static class GameApi {
         return true;
     }
     private static readonly MethodInfo HookKeyToUnityKeyMethod = ResolveHookKeyMapper();
+    private static readonly Func<SkyHook.KeyLabel, KeyCode> HookKeyToUnityKeyBound = BindHookKeyMapper();
+    private static readonly ConcurrentDictionary<SkyHook.KeyLabel, KeyCode> HookKeyCache = new();
     private static MethodInfo ResolveHookKeyMapper() {
         try {
             Assembly skyhook = typeof(SkyHook.SkyHookManager).Assembly;
@@ -230,8 +233,26 @@ public static class GameApi {
             return null;
         }
     }
-    public static KeyCode HookKeyToUnityKey(SkyHook.KeyLabel label) =>
-        Refl.Invoke(HookKeyToUnityKeyMethod, null, label) as KeyCode? ?? KeyCode.None;
+    private static Func<SkyHook.KeyLabel, KeyCode> BindHookKeyMapper() {
+        try {
+            MethodInfo m = HookKeyToUnityKeyMethod;
+            if(m == null || !m.IsStatic || m.ReturnType != typeof(KeyCode)) return null;
+            ParameterInfo[] ps = m.GetParameters();
+            if(ps.Length != 1 || ps[0].ParameterType != typeof(SkyHook.KeyLabel)) return null;
+            return Delegate.CreateDelegate(typeof(Func<SkyHook.KeyLabel, KeyCode>), m)
+                as Func<SkyHook.KeyLabel, KeyCode>;
+        } catch {
+            return null;
+        }
+    }
+    public static KeyCode HookKeyToUnityKey(SkyHook.KeyLabel label) {
+        Func<SkyHook.KeyLabel, KeyCode> bound = HookKeyToUnityKeyBound;
+        if(bound != null) return bound(label);
+        if(HookKeyCache.TryGetValue(label, out KeyCode cached)) return cached;
+        KeyCode resolved = Refl.Invoke(HookKeyToUnityKeyMethod, null, label) as KeyCode? ?? KeyCode.None;
+        HookKeyCache[label] = resolved;
+        return resolved;
+    }
     private static readonly MethodInfo RdStringGet = Refl.Method(typeof(RDString), "Get", 1);
     public static string GameString(string key) =>
         Refl.Invoke(RdStringGet, null, key) as string ?? key;

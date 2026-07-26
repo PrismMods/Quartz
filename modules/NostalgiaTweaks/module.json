@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "nostalgia-tweaks", "entry": "Quartz.Features.Nostalgia.NostalgiaTweaksModule",
+  "name": "Nostalgia Tweaks", "nameKey": "NOSTALGIA_TWEAKS", "group": "nostalgia", "order": 30,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": ["nostalgia"], "settingsFiles": [], "langPrefixes": []
+}

@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="$(MSBuildProjectDirectory)/../build/Version.targets" />
+
 	<PropertyGroup>
 		<TargetFramework>netstandard2.1</TargetFramework>
 		<!-- A managed MelonLoader/UMM mod is loaded as IL regardless of PE arch, so
@@ -12,8 +15,9 @@
 		<AssemblyName>Quartz</AssemblyName>
 		<LangVersion>latest</LangVersion>
 		<IsPackable>false</IsPackable>
-		<AssemblyVersion>2.0.0.0</AssemblyVersion>
-		<FileVersion>2.0.0.0</FileVersion>
+		<AssemblyVersion>$(QuartzAssemblyVersion)</AssemblyVersion>
+		<FileVersion>$(QuartzAssemblyVersion)</FileVersion>
+		<InformationalVersion>$(QuartzDisplayVersion)</InformationalVersion>
 		<NeutralLanguage>en-US</NeutralLanguage>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
@@ -188,9 +192,14 @@
 
 	<ItemGroup>
 		<EmbeddedResource Include="Resource\Embedded\**\*" />
-		<!-- The shipped FAQ (also copied to the data root as an ExportFile) is
-		     embedded as the in-binary fallback FaqDocument.Default reads when the
-		     on-disk copy is missing or unreadable. Single authored source. -->
+		<!-- The FAQ is maintainer-authored and read-only at runtime: embedded only,
+		     never copied to the data root, so there is no on-disk copy for a user to
+		     edit and for the next update to silently overwrite. -->
+		<!-- Offline fallback for the module browser: groups render on a fresh
+		     install that has never reached the network. -->
+		<EmbeddedResource Include="Modules\Catalog.Default.json">
+			<LogicalName>Quartz.Modules.Catalog.Default.json</LogicalName>
+		</EmbeddedResource>
 		<EmbeddedResource Include="Resource\Export\FAQ.json">
 			<LogicalName>Quartz.FAQ.Default.json</LogicalName>
 		</EmbeddedResource>
@@ -202,21 +211,8 @@
 	     the value lives in exactly one place and is never hand-edited. -->
 	<Target Name="GenerateBuildInfo" BeforeTargets="CoreCompile">
 		<PropertyGroup>
-			<_InfoText>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)/Core/Info.cs'))</_InfoText>
-			<_Version>$([System.Text.RegularExpressions.Regex]::Match($(_InfoText), '\bVersion\s*=\s*"([^"]+)"').Groups[1].Value)</_Version>
-			<_Channel>$([System.Text.RegularExpressions.Regex]::Match($(_InfoText), '\bChannel\s*=\s*"([^"]+)"').Groups[1].Value)</_Channel>
-
-			<_BuildsPath>$(MSBuildProjectDirectory)/../build.json</_BuildsPath>
-			<_BuildsText Condition="Exists('$(_BuildsPath)')">$([System.IO.File]::ReadAllText('$(_BuildsPath)'))</_BuildsText>
-
-			<!-- Match  "&lt;version&gt;": { ... "&lt;channel&gt;": &lt;n&gt; ...  (lazy across whitespace / other channels). -->
-			<_VerEsc>$([System.Text.RegularExpressions.Regex]::Escape($(_Version)))</_VerEsc>
-			<_Pattern>"$(_VerEsc)"\s*:\s*\{[^}]*?"$(_Channel)"\s*:\s*(\d+)</_Pattern>
-			<_Build>$([System.Text.RegularExpressions.Regex]::Match('$(_BuildsText)', '$(_Pattern)').Groups[1].Value)</_Build>
-			<_Build Condition="'$(_Build)' == ''">0</_Build>
-
 			<_BuildInfoFile>$(IntermediateOutputPath)BuildInfo.g.cs</_BuildInfoFile>
-			<_BuildInfoBody>namespace Quartz.Core { internal static class BuildInfo { public const int Number = $(_Build)%3B } }</_BuildInfoBody>
+			<_BuildInfoBody>namespace Quartz.Core { internal static class BuildInfo { public const int Number = $(QuartzBuild)%3B } }</_BuildInfoBody>
 		</PropertyGroup>
 
 		<MakeDir Directories="$(IntermediateOutputPath)" />
@@ -226,7 +222,7 @@
 			<Compile Include="$(_BuildInfoFile)" />
 		</ItemGroup>
 
-		<Message Importance="high" Text="BuildInfo: $(_Version) $(_Channel) build $(_Build)" />
+		<Message Importance="high" Text="BuildInfo: $(QuartzVersion) $(QuartzChannel) build $(QuartzBuild)" />
 	</Target>
 
 	<!-- Auto-install: drop Quartz.dll into Mods, export language files to UserData/Quartz,
@@ -241,7 +237,7 @@
 		<Delete Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" Files="$(GamePath)/Mods/Koren.dll;$(GamePath)/Mods/Quartz.Loader.ML.dll;$(GamePath)/UserLibs/Quartz.dll" TreatErrorsAsWarnings="true" />
 
 		<ItemGroup>
-			<ExportFiles Include="Resource/Export/**/*.*" Exclude="Resource/Export/**/.DS_Store;Resource/Export/**/.claude-flow/**" />
+			<ExportFiles Include="Resource/Export/**/*.*" Exclude="Resource/Export/**/.DS_Store;Resource/Export/**/.claude-flow/**;Resource/Export/FAQ.json" />
 		</ItemGroup>
 
 		<MakeDir Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" Directories="$(GamePath)/UserData/Quartz" />
@@ -264,30 +260,14 @@
 	     AutoInstall also copies it into the game's UMMMods/ (or Mods/) for local
 	     testing. -->
 	<Target Name="PostBuildUmm" AfterTargets="Build" Condition="'$(LoaderTarget)' == 'UMM' And '$(TargetPath)' != ''">
-		<!-- Recompute the display version (Info.cs + build.json), same logic as
-		     GenerateBuildInfo, to stamp Info.json's Version. -->
+		<!-- Stamp Info.json's Version from build/Version.targets. -->
 		<PropertyGroup>
-			<_InfoText>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)/Core/Info.cs'))</_InfoText>
-			<_Version>$([System.Text.RegularExpressions.Regex]::Match($(_InfoText), '\bVersion\s*=\s*"([^"]+)"').Groups[1].Value)</_Version>
-			<_Channel>$([System.Text.RegularExpressions.Regex]::Match($(_InfoText), '\bChannel\s*=\s*"([^"]+)"').Groups[1].Value)</_Channel>
-
-			<_BuildsPath>$(MSBuildProjectDirectory)/../build.json</_BuildsPath>
-			<_BuildsText Condition="Exists('$(_BuildsPath)')">$([System.IO.File]::ReadAllText('$(_BuildsPath)'))</_BuildsText>
-			<_VerEsc>$([System.Text.RegularExpressions.Regex]::Escape($(_Version)))</_VerEsc>
-			<_Pattern>"$(_VerEsc)"\s*:\s*\{[^}]*?"$(_Channel)"\s*:\s*(\d+)</_Pattern>
-			<_Build>$([System.Text.RegularExpressions.Regex]::Match('$(_BuildsText)', '$(_Pattern)').Groups[1].Value)</_Build>
-			<_Build Condition="'$(_Build)' == ''">0</_Build>
-
-			<!-- Stable drops the channel + build; pre-release mirrors Info.DisplayVersion. -->
-			<_DisplayVersion Condition="'$(_Channel)' == 'stable'">$(_Version)</_DisplayVersion>
-			<_DisplayVersion Condition="'$(_DisplayVersion)' == ''">$(_Version)-$(_Channel)-$(_Build)</_DisplayVersion>
-
 			<_InfoTemplate>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)/Resource/Umm/Info.json'))</_InfoTemplate>
-			<_InfoJson>$(_InfoTemplate.Replace('__VERSION__', '$(_DisplayVersion)'))</_InfoJson>
+			<_InfoJson>$(_InfoTemplate.Replace('__VERSION__', '$(QuartzDisplayVersion)'))</_InfoJson>
 		</PropertyGroup>
 
 		<ItemGroup>
-			<ExportFiles Include="Resource/Export/**/*.*" Exclude="Resource/Export/**/.DS_Store;Resource/Export/**/.claude-flow/**" />
+			<ExportFiles Include="Resource/Export/**/*.*" Exclude="Resource/Export/**/.DS_Store;Resource/Export/**/.claude-flow/**;Resource/Export/FAQ.json" />
 		</ItemGroup>
 
 		<!-- Stage: $(PackageStageRoot)/Quartz/ (mod folder at zip root). -->

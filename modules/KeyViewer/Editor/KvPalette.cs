@@ -1,0 +1,33 @@
+using UnityEngine;
+namespace Quartz.UI.Editor;
+internal static class KvPalette {
+    private static Color Hex(string hex)
+        => ColorUtility.TryParseHtmlString(hex, out Color c) ? c : Color.magenta;
+    internal static readonly Color Primary = Hex("#1A191E");
+    internal static readonly Color CanvasWell = Hex("#3A3943");
+    internal static readonly Color ButtonPrimary = Hex("#000000");
+    internal static readonly Color ButtonHover = Hex("#1F1F23");
+    internal static readonly Color ButtonActive = Hex("#2A2A30");
+    internal static readonly Color TextWhite = Hex("#FFFFFF");
+    internal static readonly Color TextDim = Hex("#DBDEE8");
+    internal static readonly Color Border = Hex("#3A3943");
+    internal static readonly Color SurfaceHover = Hex("#303036");
+    internal static readonly Color DangerBg = Hex("#3C1E1E");
+    internal static readonly Color DangerHover = Hex("#442222");
+    internal static readonly Color PanelBg = Hex("#1F1F24");
+    internal static readonly Color TabTrack = Hex("#26262C");
+    internal static readonly Color TabActive = Hex("#3A3943");
+    internal static readonly Color TabIdleText = Hex("#9395A1");
+    internal static readonly Color GridLine = Hex("#19191C");
+    internal static float Scale => 1.5f * Mathf.Clamp(Quartz.Core.MainCore.Conf?.UIScale ?? 1f, 0.8f, 1.6f);
+    internal static float BarHeight => 60f * Scale;
+    internal static float BarPad => 10f * Scale;
+    internal static float PillHeight => 40f * Scale;
+    internal static float PillPad => 5f * Scale;
+    internal static float GroupGap => 10f * Scale;
+    internal static float IconButton => 30f * Scale;
+    internal static float IconSize => 18f * Scale;
+    internal static float Radius => 7f * Scale;
+    internal static float RadiusSmall => 4f * Scale;
+    internal static float PanelWidth => 220f * Scale;
+}

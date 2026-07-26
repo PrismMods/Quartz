@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "planetcolors", "entry": "Quartz.Features.PlanetColors.PlanetColorsModule",
+  "name": "Planet Colors", "nameKey": "SECTION_PLANET_COLORS", "group": "visuals", "order": 40,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": [], "settingsFiles": ["PlanetColors.json"], "langPrefixes": ["PC_", "PLANET_"]
+}

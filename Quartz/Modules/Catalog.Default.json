@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "core": { "version": "", "abi": 1, "tag": "" },
+  "groups": [
+    { "key": "overlay",  "title": "Overlay",  "titleKey": "OVERLAY",   "order": 10 },
+    { "key": "gameplay", "title": "Gameplay", "titleKey": "GAMEPLAY",  "order": 20 },
+    { "key": "visuals",  "title": "Visuals",  "titleKey": "VISUALS",   "order": 30 },
+    { "key": "tools",    "title": "Tools",    "titleKey": "TOOLS",     "order": 40 },
+    { "key": "legacy",   "title": "Legacy",   "titleKey": "NOSTALGIA", "order": 50 },
+    { "key": "editor",   "title": "Editor",   "titleKey": "EDITOR",    "order": 60 }
+  ],
+  "modules": []
+}

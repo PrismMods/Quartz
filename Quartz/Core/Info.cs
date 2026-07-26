@@ -12,6 +12,8 @@ public static class Info {
         ? $"{Version}-{SemVer.ChannelTag(ChannelKind)}-{Build}"
         : Version;
     public static SemVer Current => SemVer.TryParse(DisplayVersion, out SemVer v) ? v : default;
+    public const int ModuleAbi = 1;
+    public const int AddonAbi = 1;
     public const string Description = ":thumbs_up:";
     public const string GithubLink = "https://github.com/PrismMods/Quartz";
     public const string RepoOwner = "PrismMods";

@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "uihider", "entry": "Quartz.Features.UiHider.UiHiderModule",
+  "name": "UI Hiding", "nameKey": "SECTION_UI_HIDING", "group": "visuals", "order": 60,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": [], "settingsFiles": ["UiHider.json"], "langPrefixes": ["UIH_"]
+}

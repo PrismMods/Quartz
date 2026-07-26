@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "id": "sample",
+  "entry": "Quartz.Features.Sample.SampleModule",
+  "name": "Sample",
+  "nameKey": "MODULE_SAMPLE",
+  "group": "tweaks",
+  "order": 900,
+  "version": "__VERSION__",
+  "coreAbi": __COREABI__,
+  "minCoreVersion": "",
+  "deps": [],
+  "settingsFiles": [],
+  "langPrefixes": []
+}

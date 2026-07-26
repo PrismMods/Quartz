@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "calibration", "entry": "Quartz.Features.Calibration.CalibrationModule",
+  "name": "Calibration", "nameKey": "SECTION_CALIBRATION", "group": "overlay", "order": 80,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": [], "settingsFiles": ["Calibration.json"], "langPrefixes": ["CALIB_", "CALIBRATION_"]
+}

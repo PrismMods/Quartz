@@ -232,7 +232,7 @@ public static class UpdateToast {
         Hide();
         if(UICore.IsReorganizing) UICore.ExitReorganize();
         UICore.Open();
-        MenuFactory.SetState((int)OriginalMenuState.Settings);
+        MenuFactory.SetState(Quartz.UI.Nav.NavRegistry.StateFor(Quartz.UI.Nav.CorePages.SettingsPageKey));
         PageSettings.ScrollToUpdates();
     }
     private static void RenderText() {

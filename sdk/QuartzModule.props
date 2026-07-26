@@ -1,0 +1,120 @@
+<!--
+  QuartzModule.props — shared build settings for first-party Quartz modules
+  (the ones under modules/ in this repo).
+
+  Builds on QuartzAddon.props, which already carries the netstandard2.1 target,
+  the game/Unity/Harmony/Newtonsoft references and the Quartz API reference. On
+  top of that this adds:
+    • compiler settings matching the MOD (implicit usings, nullable warnings),
+      so extracted feature sources compile unchanged after a plain `git mv`,
+    • ModuleInfo.g.cs, stamping the assembly with id/version/coreAbi, and
+    • packaging into dist/modules/<id>.qmod + <id>.qmod.json.
+
+  A module .csproj only needs ModuleId and AssemblyName; the namespace and the
+  embedded-resource prefix come from the project file name. See
+  modules/Sample/Sample.csproj.
+-->
+<Project>
+
+  <Import Project="$(MSBuildThisFileDirectory)QuartzAddon.props" />
+  <Import Project="$(MSBuildThisFileDirectory)../build/Version.targets" />
+
+  <PropertyGroup>
+    <!-- Match the mod, not the third-party addon SDK: extracted feature files
+         are written against these settings. -->
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>warnings</Nullable>
+    <DefineConstants>$(DefineConstants);QUARTZ_MODULE</DefineConstants>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <!-- Keep the source namespace: extraction stays a pure `git mv`, and embedded
+         resources get Quartz.Features.<Name>.* logical names.
+         Derived from the project file name, NOT from a csproj property: this props
+         is imported from modules/Directory.Build.props, which is evaluated before
+         the project body, so anything the csproj sets is still empty here. -->
+    <RootNamespace>Quartz.Features.$(MSBuildProjectName)</RootNamespace>
+    <!-- Modules package as .qmod; skip the addon SDK's .qaddon step. -->
+    <SkipAddonPackage>true</SkipAddonPackage>
+    <ModuleExtension>.qmod</ModuleExtension>
+    <ModuleDistDir>$(MSBuildThisFileDirectory)../dist/modules</ModuleDistDir>
+    <ModuleManifestSource Condition="'$(ModuleManifestSource)' == ''">$(MSBuildProjectDirectory)/module.json</ModuleManifestSource>
+    <!-- Per-loader module folders (see the deploy step below). -->
+    <MlModuleDir>$(GamePath)/UserData/Quartz/Module</MlModuleDir>
+    <UmmInstallRoot Condition="'$(UmmInstallRoot)' == '' And Exists('$(GamePath)/UMMMods')">$(GamePath)/UMMMods</UmmInstallRoot>
+    <UmmInstallRoot Condition="'$(UmmInstallRoot)' == ''">$(GamePath)/Mods</UmmInstallRoot>
+    <UmmModuleDir>$(UmmInstallRoot)/Quartz/UserData/Module</UmmModuleDir>
+    <!-- Under obj/: outside the default Compile glob, so the generated file is
+         added exactly once instead of also being picked up as a source file. -->
+    <_ModuleInfoFile>$(MSBuildProjectDirectory)/obj/ModuleInfo.g.cs</_ModuleInfoFile>
+    <_ModuleManifestOut>$(MSBuildProjectDirectory)/obj/$(ModuleId).qmod.json</_ModuleManifestOut>
+  </PropertyGroup>
+
+  <!-- The mod itself references DOTween (the game's tween library); the addon SDK
+       does not, because a third-party addon rarely needs it. Extracted features
+       do, so modules get it too. Loader assemblies (MelonLoader/UnityModManager)
+       stay out on purpose: a module must work under either loader. -->
+  <ItemGroup>
+    <Reference Include="DOTween" Condition="Exists('$(ManagedDir)/DOTween.dll')"><HintPath>$(ManagedDir)/DOTween.dll</HintPath></Reference>
+  </ItemGroup>
+
+  <Target Name="_QuartzModuleCheck" BeforeTargets="_QuartzModuleInfo">
+    <Error Condition="'$(ModuleId)' == ''" Text="A Quartz module project must set &lt;ModuleId&gt;." />
+    <Error Condition="!Exists('$(ModuleManifestSource)')"
+           Text="Module manifest not found at '$(ModuleManifestSource)'. Every module ships a module.json beside its .csproj." />
+  </Target>
+
+  <!-- Stamp the binary so ModuleService can reject a manifest that was edited to
+       claim a different id/version/ABI than the assembly actually has. -->
+  <Target Name="_QuartzModuleInfo" BeforeTargets="CoreCompile">
+    <PropertyGroup>
+      <_ModuleInfoBody>[assembly: Quartz.Modules.QuartzModuleInfo("$(ModuleId)", "$(QuartzDisplayVersion)", $(QuartzModuleAbi))]</_ModuleInfoBody>
+    </PropertyGroup>
+    <MakeDir Directories="$(MSBuildProjectDirectory)/obj" />
+    <WriteLinesToFile File="$(_ModuleInfoFile)" Lines="$(_ModuleInfoBody)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+    <ItemGroup>
+      <Compile Include="$(_ModuleInfoFile)" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Take the authored module.json and inject the fields the build owns
+       (version + coreAbi), so they can never drift from the binary. -->
+  <Target Name="_QuartzModuleManifest" AfterTargets="Build">
+    <PropertyGroup>
+      <_ManifestText>$([System.IO.File]::ReadAllText('$(ModuleManifestSource)'))</_ManifestText>
+      <_ManifestText>$(_ManifestText.Replace('__VERSION__', '$(QuartzDisplayVersion)'))</_ManifestText>
+      <_ManifestText>$(_ManifestText.Replace('__COREABI__', '$(QuartzModuleAbi)'))</_ManifestText>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(_ModuleManifestOut)" Lines="$(_ManifestText)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+  </Target>
+
+  <Target Name="_QuartzModulePackage" AfterTargets="_QuartzModuleManifest">
+    <ItemGroup>
+      <_QuartzModuleArtifacts Include="$(ModuleDistDir)/$(ModuleId)$(ModuleExtension);$(ModuleDistDir)/$(ModuleId).qmod.json" />
+    </ItemGroup>
+    <MakeDir Directories="$(ModuleDistDir)" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(ModuleDistDir)/$(ModuleId)$(ModuleExtension)" OverwriteReadOnlyFiles="true" />
+    <Copy SourceFiles="$(_ModuleManifestOut)" DestinationFiles="$(ModuleDistDir)/$(ModuleId).qmod.json" OverwriteReadOnlyFiles="true" />
+    <Message Importance="high" Text="Quartz module: $(ModuleDistDir)/$(ModuleId)$(ModuleExtension)" />
+    <!-- Opt in to dropping it straight into the game: -p:DeployToGame=true
+
+         The module folder is <data root>/Module, and the data root differs per
+         loader: MelonLoader keeps it at <game>/UserData/Quartz, UnityModManager
+         at <mods>/Quartz/UserData. Deploy to whichever install(s) exist —
+         targeting only one silently drops the files somewhere nothing reads. -->
+    <MakeDir Condition="'$(DeployToGame)' == 'true' And Exists('$(MlModuleDir)/..')"
+             Directories="$(MlModuleDir)" />
+    <Copy Condition="'$(DeployToGame)' == 'true' And Exists('$(MlModuleDir)')"
+          SourceFiles="@(_QuartzModuleArtifacts)" DestinationFolder="$(MlModuleDir)" />
+    <Message Condition="'$(DeployToGame)' == 'true' And Exists('$(MlModuleDir)')"
+             Importance="high" Text="Deployed (MelonLoader): $(MlModuleDir)/$(ModuleId)$(ModuleExtension)" />
+    <MakeDir Condition="'$(DeployToGame)' == 'true' And Exists('$(UmmModuleDir)/..')"
+             Directories="$(UmmModuleDir)" />
+    <Copy Condition="'$(DeployToGame)' == 'true' And Exists('$(UmmModuleDir)')"
+          SourceFiles="@(_QuartzModuleArtifacts)" DestinationFolder="$(UmmModuleDir)" />
+    <Message Condition="'$(DeployToGame)' == 'true' And Exists('$(UmmModuleDir)')"
+             Importance="high" Text="Deployed (UnityModManager): $(UmmModuleDir)/$(ModuleId)$(ModuleExtension)" />
+    <Warning Condition="'$(DeployToGame)' == 'true' And !Exists('$(MlModuleDir)') And !Exists('$(UmmModuleDir)')"
+             Text="DeployToGame was set but no Quartz install was found (looked for '$(MlModuleDir)' and '$(UmmModuleDir)'). Run the mod once so it creates its data folder." />
+  </Target>
+
+</Project>

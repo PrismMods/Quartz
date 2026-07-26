@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "songtitle", "entry": "Quartz.Features.SongTitle.SongTitleModule",
+  "name": "Song Title", "nameKey": "SECTION_SONG_TITLE", "group": "overlay", "order": 60,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": ["overlay"], "settingsFiles": ["SongTitle.json"], "langPrefixes": ["ST_", "SONGTITLE_"]
+}

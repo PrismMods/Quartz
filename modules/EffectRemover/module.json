@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "effectremover", "entry": "Quartz.Features.EffectRemover.EffectRemoverModule",
+  "name": "Effect Remover", "nameKey": "SECTION_EFFECT_REMOVER", "group": "visuals", "order": 10,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": [], "settingsFiles": ["EffectRemover.json"], "langPrefixes": ["FXRM_", "EFFECTREMOVER_"]
+}

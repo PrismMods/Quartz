@@ -1,6 +1,6 @@
 using System.Reflection;
 namespace Quartz.Features.Interop;
-internal static class XPerfectBridge {
+public static class XPerfectBridge {
     public enum Judge {
         None = 0,
         X = 1,

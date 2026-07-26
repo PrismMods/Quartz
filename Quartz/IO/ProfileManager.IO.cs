@@ -173,6 +173,7 @@ public static partial class ProfileManager {
         MainCore.Tr.Language = string.IsNullOrWhiteSpace(MainCore.Conf.Language)
             ? Translator.FALLBACK_LANGUAGE
             : MainCore.Conf.Language;
+        Addons.AddonService.Reload();
     }
     private static void SavePointer() {
         AtomicFile.WriteAllText(

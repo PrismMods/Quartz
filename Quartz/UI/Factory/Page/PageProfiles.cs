@@ -97,48 +97,10 @@ internal static class PageProfiles {
         OverlayCalibration.EnsureCaptured();
         float fx = conf.CalibWidth > 0f ? Screen.width / conf.CalibWidth : 1f;
         float fy = conf.CalibHeight > 0f ? Screen.height / conf.CalibHeight : 1f;
-        Features.Panels.PanelsOverlay.EnsureConf();
-        foreach(Features.Panels.PanelConfig pc in Features.Panels.PanelsOverlay.Conf.Panels) {
-            pc.PosX *= fx;
-            pc.PosY *= fy;
-        }
-        Features.Combo.ComboOverlay.EnsureConf();
-        Features.Combo.ComboSettings combo = Features.Combo.ComboOverlay.Conf;
-        combo.OffsetX *= fx;
-        combo.OffsetY *= fy;
-        Features.Judgement.JudgementOverlay.EnsureConf();
-        Features.Judgement.JudgementSettings jud = Features.Judgement.JudgementOverlay.Conf;
-        jud.OffsetX *= fx;
-        jud.OffsetY *= fy;
-        Features.ProgressBar.ProgressBarOverlay.EnsureConf();
-        Features.ProgressBar.ProgressBarSettings pbar = Features.ProgressBar.ProgressBarOverlay.Conf;
-        pbar.OffsetX *= fx;
-        pbar.TopOffset *= fy;
-        Features.SongTitle.SongTitleOverlay.EnsureConf();
-        Features.SongTitle.SongTitleSettings song = Features.SongTitle.SongTitleOverlay.Conf;
-        song.OffsetX *= fx;
-        song.OffsetY *= fy;
-        Features.KeyViewer.KeyViewerOverlay.EnsureConf();
-        Features.KeyViewer.KeyViewerSettings kv = Features.KeyViewer.KeyViewerOverlay.Conf;
-        kv.OffsetX *= fx;
-        kv.OffsetY *= fy;
-        kv.DmOffsetX *= fx;
-        kv.DmOffsetY *= fy;
+        Quartz.Overlay.OverlayRescale.ApplyAll(fx, fy);
         conf.CalibWidth = Screen.width;
         conf.CalibHeight = Screen.height;
         MainCore.ConfMgr?.RequestSave();
-        Features.Panels.PanelsOverlay.Apply();
-        Features.Panels.PanelsOverlay.Save();
-        Features.Combo.ComboOverlay.Apply();
-        Features.Combo.ComboOverlay.Save();
-        Features.Judgement.JudgementOverlay.Apply();
-        Features.Judgement.JudgementOverlay.Save();
-        Features.ProgressBar.ProgressBarOverlay.Apply();
-        Features.ProgressBar.ProgressBarOverlay.Save();
-        Features.SongTitle.SongTitleOverlay.Apply();
-        Features.SongTitle.SongTitleOverlay.Save();
-        Features.KeyViewer.KeyViewerOverlay.Apply();
-        Features.KeyViewer.KeyViewerOverlay.Save();
         if(statusText != null)
             statusText.text = MainCore.Tr.Get("PROFILE_RECALIBRATED", "Recalibrated overlays to this display.");
     }

@@ -2,6 +2,8 @@ using System.Collections;
 using System.Globalization;
 using System.Xml.Linq;
 using UnityEngine;
+using Quartz.Interop;
+using Quartz.Utility;
 using static Quartz.Features.Interop.ReflectionHelpers;
 namespace Quartz.Features.Interop.Readers;
 internal static class ChatterBlockerReader {
@@ -13,57 +15,43 @@ internal static class ChatterBlockerReader {
         object setting = GetStaticMember(mainType, "setting");
         object profile = GetStaticMember(mainType, "selectedKeyLimiterProfile");
         if(setting != null) {
-            if(TryGetInt(setting, "inputInterval", out int interval)) {
-                Features.ChatterBlocker.ChatterBlocker.EnsureConf();
-                Features.ChatterBlocker.ChatterBlocker.Conf.ThresholdMs = Mathf.Max(0, interval);
-                count++;
-            }
-            if(TryGetBool(setting, "enableKeyLimiter", out bool limiterOn)) {
-                Features.KeyLimiter.KeyLimiter.EnsureConf();
-                Features.KeyLimiter.KeyLimiter.Conf.Enabled = limiterOn;
-                count++;
-            }
+            ImportSource source = new(ImportSourceKind.KeyboardChatterBlocker, static _ => null);
+            if(TryGetInt(setting, "inputInterval", out int interval))
+                source.Put(ImportKeys.ChatterThresholdMs, interval);
+            if(TryGetBool(setting, "enableKeyLimiter", out bool limiterOn))
+                source.Put(ImportKeys.KeyLimiterEnabled, limiterOn);
             profile ??= FindSelectedProfile(GetMemberValue(setting, "keyLimiterProfiles"));
             int[] keys = ReadChatterBlockerProfileKeys(profile);
             if(keys.Length > 0) {
-                Features.KeyLimiter.KeyLimiter.SetAllowedKeys(keys);
-                count++;
+                source.Put(ImportKeys.KeyLimiterAllowedKeys, keys);
                 importedKeys = true;
             }
+            count += ImportRegistry.Deliver(source);
         }
         if(count == 0 || !importedKeys) count += ImportChatterBlockerXml(option, count == 0, !importedKeys);
         if(count > 0) {
-            Features.ChatterBlocker.ChatterBlocker.EnsureConf();
-            Features.ChatterBlocker.ChatterBlocker.Conf.Enabled = true;
-            count++;
+            ImportSource enable = new(ImportSourceKind.KeyboardChatterBlocker, static _ => null);
+            enable.Put(ImportKeys.ChatterEnabled, true);
+            count += ImportRegistry.Deliver(enable);
         }
         return count;
     }
     private static int ImportChatterBlockerXml(SettingsImportOption option, bool importBasics, bool importKeys) {
         XDocument doc = LoadXml(option, "Setting.xml");
         if(doc == null) return 0;
-        int count = 0;
+        ImportSource source = new(ImportSourceKind.KeyboardChatterBlocker, static _ => null);
         if(importBasics) {
-            if(TryReadXmlInt(doc, "inputInterval", out int interval)) {
-                Features.ChatterBlocker.ChatterBlocker.EnsureConf();
-                Features.ChatterBlocker.ChatterBlocker.Conf.ThresholdMs = Mathf.Max(0, interval);
-                count++;
-            }
-            if(TryReadXmlBool(doc, "enableKeyLimiter", out bool limiterOn)) {
-                Features.KeyLimiter.KeyLimiter.EnsureConf();
-                Features.KeyLimiter.KeyLimiter.Conf.Enabled = limiterOn;
-                count++;
-            }
+            if(TryReadXmlInt(doc, "inputInterval", out int interval))
+                source.Put(ImportKeys.ChatterThresholdMs, interval);
+            if(TryReadXmlBool(doc, "enableKeyLimiter", out bool limiterOn))
+                source.Put(ImportKeys.KeyLimiterEnabled, limiterOn);
         }
         if(importKeys) {
             XElement profile = FindSelectedProfileElement(doc, "KeyLimiterProfile");
             int[] keys = ReadChatterBlockerProfileKeys(profile);
-            if(keys.Length > 0) {
-                Features.KeyLimiter.KeyLimiter.SetAllowedKeys(keys);
-                count++;
-            }
+            if(keys.Length > 0) source.Put(ImportKeys.KeyLimiterAllowedKeys, keys);
         }
-        return count;
+        return ImportRegistry.Deliver(source);
     }
     private static int[] ReadChatterBlockerProfileKeys(object profile) {
         List<int> result = [];
@@ -84,7 +72,7 @@ internal static class ChatterBlockerReader {
     private static void AddChatterBlockerKeys(List<int> result, int[] keys) {
         foreach(int raw in keys) {
             int key = raw;
-            if(key == (int)KeyCode.None || Features.KeyLimiter.KeyLimiter.IsMouseKey((KeyCode)key) || result.Contains(key)) continue;
+            if(key == (int)KeyCode.None || KeyCodes.IsMouse((KeyCode)key) || result.Contains(key)) continue;
             result.Add(key);
         }
     }
@@ -96,8 +84,8 @@ internal static class ChatterBlockerReader {
     }
     private static void AddVk(List<int> result, int vk) {
         if(vk is < ushort.MinValue or > ushort.MaxValue) return;
-        int key = (int)Features.KeyLimiter.KeyLimiter.NormalizeNumericKey(LegacyAsyncKeyOffset + vk);
-        if(key == (int)KeyCode.None || Features.KeyLimiter.KeyLimiter.IsMouseKey((KeyCode)key) || result.Contains(key)) return;
+        int key = (int)KeyCodes.NormalizeNumeric(LegacyAsyncKeyOffset + vk);
+        if(key == (int)KeyCode.None || KeyCodes.IsMouse((KeyCode)key) || result.Contains(key)) return;
         result.Add(key);
     }
     private static object FindSelectedProfile(object profiles) {

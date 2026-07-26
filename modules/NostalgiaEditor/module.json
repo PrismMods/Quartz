@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "nostalgia-editor", "entry": "Quartz.Features.Nostalgia.NostalgiaEditorModule",
+  "name": "Nostalgia Editor", "nameKey": "NOSTALGIA_EDITOR", "group": "nostalgia", "order": 40,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": ["nostalgia"], "settingsFiles": [], "langPrefixes": []
+}

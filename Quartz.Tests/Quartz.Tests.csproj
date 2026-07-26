@@ -13,26 +13,31 @@
 		<Compile Include="../Quartz/IO/ProfileNames.cs" Link="Source/ProfileNames.cs" />
 		<Compile Include="../Quartz/IO/ProfileBundle.cs" Link="Source/ProfileBundle.cs" />
 		<Compile Include="../Quartz/IO/FaqDocument.cs" Link="Source/FaqDocument.cs" />
-		<Compile Include="../Quartz/Features/KeyViewer/KeyViewerCss.cs" Link="Source/KeyViewerCss.cs" />
-		<Compile Include="../Quartz/Features/KeyViewer/KeyViewerPersistence.cs" Link="Source/KeyViewerPersistence.cs" />
-		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvElement.cs" Link="Source/KvElement.cs" />
-		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvDocument.cs" Link="Source/KvDocument.cs" />
-		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvExportShaping.cs" Link="Source/KvExportShaping.cs" />
-		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvSnap.cs" Link="Source/KvSnap.cs" />
-		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvHistory.cs" Link="Source/KvHistory.cs" />
-		<Compile Include="../Quartz/Features/Tuf/TufModels.cs" Link="Source/TufModels.cs" />
-		<Compile Include="../Quartz/Features/Tuf/TufSettings.cs" Link="Source/TufSettings.cs" />
+		<Compile Include="../modules/KeyViewer/KeyViewerCss.cs" Link="Source/KeyViewerCss.cs" />
+		<Compile Include="../modules/KeyViewer/KeyViewerPersistence.cs" Link="Source/KeyViewerPersistence.cs" />
+		<Compile Include="../modules/KeyViewer/Layout/KvElement.cs" Link="Source/KvElement.cs" />
+		<Compile Include="../modules/KeyViewer/Layout/KvDocument.cs" Link="Source/KvDocument.cs" />
+		<Compile Include="../modules/KeyViewer/Layout/KvExportShaping.cs" Link="Source/KvExportShaping.cs" />
+		<Compile Include="../modules/KeyViewer/Layout/KvSnap.cs" Link="Source/KvSnap.cs" />
+		<Compile Include="../modules/KeyViewer/Layout/KvHistory.cs" Link="Source/KvHistory.cs" />
+		<Compile Include="../modules/Tuf/TufModels.cs" Link="Source/TufModels.cs" />
+		<Compile Include="../modules/Tuf/TufSettings.cs" Link="Source/TufSettings.cs" />
 		<Compile Include="../Quartz/IO/Interface/ISettingsFile.cs" Link="Source/ISettingsFile.cs" />
-		<Compile Include="../Quartz/Features/Tuf/TufApiQuery.cs" Link="Source/TufApiQuery.cs" />
-		<Compile Include="../Quartz/Features/Tuf/TufNetworkPolicy.cs" Link="Source/TufNetworkPolicy.cs" />
-		<Compile Include="../Quartz/Features/Tuf/TufArchive.cs" Link="Source/TufArchive.cs" />
-		<Compile Include="../Quartz/Features/Tuf/TufDiskSpace.cs" Link="Source/TufDiskSpace.cs" />
-		<Compile Include="../Quartz/Features/Tuf/TufInstallPaths.cs" Link="Source/TufInstallPaths.cs" />
-		<Compile Include="../Quartz/Features/Tuf/TufInstallIndex.cs" Link="Source/TufInstallIndex.cs" />
-		<Compile Include="../Quartz/Features/Tuf/TufChartInfo.cs" Link="Source/TufChartInfo.cs" />
-		<Compile Include="../Quartz/Features/Tuf/TufCredits.cs" Link="Source/TufCredits.cs" />
-		<Compile Include="../Quartz/Features/Tuf/TufPackModels.cs" Link="Source/TufPackModels.cs" />
-		<Compile Include="../Quartz/Features/Tuf/TufPackApiClient.cs" Link="Source/TufPackApiClient.cs" />
+		<Compile Include="../modules/Tuf/TufApiQuery.cs" Link="Source/TufApiQuery.cs" />
+		<Compile Include="../Quartz/Modules/ModuleManifest.cs" Link="Source/ModuleManifest.cs" />
+		<Compile Include="../Quartz/Modules/ModuleState.cs" Link="Source/ModuleState.cs" />
+		<Compile Include="../Quartz/Modules/ModuleOrder.cs" Link="Source/ModuleOrder.cs" />
+		<Compile Include="../Quartz/Modules/ModuleMigration.cs" Link="Source/ModuleMigration.cs" />
+		<Compile Include="../Quartz/Net/NetworkPolicy.cs" Link="Source/NetworkPolicy.cs" />
+		<Compile Include="../modules/Tuf/TufNetworkPolicy.cs" Link="Source/TufNetworkPolicy.cs" />
+		<Compile Include="../modules/Tuf/TufArchive.cs" Link="Source/TufArchive.cs" />
+		<Compile Include="../modules/Tuf/TufDiskSpace.cs" Link="Source/TufDiskSpace.cs" />
+		<Compile Include="../modules/Tuf/TufInstallPaths.cs" Link="Source/TufInstallPaths.cs" />
+		<Compile Include="../modules/Tuf/TufInstallIndex.cs" Link="Source/TufInstallIndex.cs" />
+		<Compile Include="../modules/Tuf/TufChartInfo.cs" Link="Source/TufChartInfo.cs" />
+		<Compile Include="../modules/Tuf/TufCredits.cs" Link="Source/TufCredits.cs" />
+		<Compile Include="../modules/Tuf/TufPackModels.cs" Link="Source/TufPackModels.cs" />
+		<Compile Include="../modules/Tuf/TufPackApiClient.cs" Link="Source/TufPackApiClient.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

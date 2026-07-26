@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "panels", "entry": "Quartz.Features.Panels.PanelsModule",
+  "name": "Panels", "nameKey": "SECTION_PANELS", "group": "overlay", "order": 70,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": ["overlay"], "settingsFiles": [], "langPrefixes": []
+}

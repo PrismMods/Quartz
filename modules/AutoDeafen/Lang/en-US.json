@@ -1,0 +1,19 @@
+{
+  "en-US": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "AD_AUTHORIZE": "Authorize (Open Discord)",
+    "AD_CLIENT_ID": "Discord Client ID",
+    "AD_COPY_URL": "Copy Authorize URL",
+    "AD_KB_ALT": "Keybind Alt",
+    "AD_KB_CTRL": "Keybind Ctrl",
+    "AD_KB_META": "Keybind Win",
+    "AD_KB_SHIFT": "Keybind Shift",
+    "AD_PCT": "Deafen At %",
+    "AD_SKIP_AUTO": "Don't Deafen While Auto Is On",
+    "AD_START": "Only When Starting From 0%",
+    "AD_TUTORIAL": "Watch Tutorial",
+    "AD_UNLINK": "Unlink",
+    "SECTION_AUTO_DEAFEN_DISCORD": "Auto Deafen (Discord)",
+    "AUTODEAFEN_ENABLE": "Enable Auto Deafen (Discord)"
+  }
+}

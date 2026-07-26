@@ -1,0 +1,17 @@
+{
+  "zh-CN": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "SECTION_SONG_TITLE": "谱面标题显示",
+    "SONGTITLE_FORMAT": "文字格式——可用变量{artist}曲师、{title}曲名",
+    "SONGTITLE_FONTSIZE": "字体大小",
+    "SONGTITLE_MASTER": "整体缩放尺寸",
+    "SONGTITLE_COLOR": "文字颜色",
+    "SONGTITLE_SHADOW": "文字阴影",
+    "SONGTITLE_SHADOW_X": "阴影横向偏移",
+    "SONGTITLE_SHADOW_Y": "阴影纵向偏移",
+    "SONGTITLE_SHADOW_SOFT": "阴影模糊度",
+    "SONGTITLE_SHADOW_COLOR": "阴影颜色",
+    "SONGTITLE_PLACEHOLDER_ARTIST": "曲师",
+    "SONGTITLE_PLACEHOLDER_TITLE": "曲名"
+  }
+}

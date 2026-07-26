@@ -1,6 +1,4 @@
-using Quartz.Features.Combo;
-using Quartz.Features.Judgement;
-using Quartz.Features.ProgressBar;
+using Quartz.Interop;
 using UnityEngine;
 using static Quartz.Features.Interop.ReflectionHelpers;
 using static Quartz.Features.Interop.Readers.KeyViewerImportShared;
@@ -24,74 +22,43 @@ internal static class JipperResourcePackReader {
             ?? GetStaticMember(SettingsImporter.FindType(option, "JipperResourcePack.Jongyeol.JStatus"), "Settings");
         if(settings == null) return 0;
         if(!TryGetBool(settings, "ShowProgressBar", out bool barOn)) return 0;
-        int count = 0;
-        ProgressBarOverlay.EnsureConf();
-        ProgressBarOverlay.Conf.Enabled = barOn;
-        count++;
-        if(TryGetColorRangeEndpoints(GetMemberValue(settings, "ProgressBarColor"), out Color fill, out _)) {
-            ProgressBarOverlay.Conf.SetFillColor(fill);
-            count++;
-        }
-        if(TryGetColorRangeEndpoints(GetMemberValue(settings, "ProgressBarBackgroundColor"), out Color back, out _)) {
-            ProgressBarOverlay.Conf.SetBackColor(back);
-            count++;
-        }
-        if(TryGetColorRangeEndpoints(GetMemberValue(settings, "ProgressBarBorderColor"), out Color border, out _)) {
-            ProgressBarOverlay.Conf.SetOutlineColor(border);
-            count++;
-        }
-        return count;
+        ImportSource source = new(ImportSourceKind.JipperResourcePack, name => GetMemberValue(settings, name));
+        source.Put(ImportKeys.ProgressBarEnabled, barOn);
+        if(TryGetColorRangeEndpoints(GetMemberValue(settings, "ProgressBarColor"), out Color fill, out _))
+            source.Put(ImportKeys.ProgressBarFill, fill);
+        if(TryGetColorRangeEndpoints(GetMemberValue(settings, "ProgressBarBackgroundColor"), out Color back, out _))
+            source.Put(ImportKeys.ProgressBarBack, back);
+        if(TryGetColorRangeEndpoints(GetMemberValue(settings, "ProgressBarBorderColor"), out Color border, out _))
+            source.Put(ImportKeys.ProgressBarBorder, border);
+        return ImportRegistry.Deliver(source);
     }
     private static int ImportJrpCombo(SettingsImportOption option) {
         object settings = GetStaticMember(SettingsImporter.FindType(option, "JipperResourcePack.OverlayContents.Combo"), "Settings")
             ?? GetStaticMember(SettingsImporter.FindType(option, "JipperResourcePack.Jongyeol.JCombo"), "Settings");
         if(settings == null) return 0;
-        int count = 0;
-        ComboOverlay.EnsureConf();
-        ComboOverlay.Conf.Enabled = true;
-        count++;
-        if(TryGetBool(settings, "EnableAutoCombo", out bool auto)) {
-            ComboOverlay.Conf.CountAuto = auto;
-            count++;
-        }
-        if(TryGetInt(settings, "ComboColorMax", out int colorMax)) {
-            ComboOverlay.Conf.ColorMax = colorMax;
-            count++;
-        }
+        ImportSource source = new(ImportSourceKind.JipperResourcePack, name => GetMemberValue(settings, name));
+        source.Put(ImportKeys.ComboEnabled, true);
+        if(TryGetBool(settings, "EnableAutoCombo", out bool auto)) source.Put(ImportKeys.ComboCountAuto, auto);
+        if(TryGetInt(settings, "ComboColorMax", out int colorMax)) source.Put(ImportKeys.ComboColorMax, colorMax);
         if(TryGetColorRangeEndpoints(GetMemberValue(settings, "ComboColor"), out Color low, out Color high)) {
-            ComboOverlay.Conf.SetColorLow(low);
-            ComboOverlay.Conf.SetColorHigh(high);
-            count++;
+            source.Put(ImportKeys.ComboColorLow, low);
+            source.Put(ImportKeys.ComboColorHigh, high);
         }
-        return count;
+        return ImportRegistry.Deliver(source);
     }
     private static int ImportJrpJudgement(SettingsImportOption option) {
         object settings = GetStaticMember(SettingsImporter.FindType(option, "JipperResourcePack.OverlayContents.Judgement"), "Settings");
         if(settings == null) return 0;
-        int count = 0;
-        JudgementOverlay.EnsureConf();
-        JudgementOverlay.Conf.Enabled = true;
-        count++;
-        if(TryGetBool(settings, "LocationUp", out bool up)) {
-            JudgementOverlay.Conf.OffsetY = up ? 90f : 0f;
-            count++;
-        }
-        return count;
+        ImportSource source = new(ImportSourceKind.JipperResourcePack, name => GetMemberValue(settings, name));
+        source.Put(ImportKeys.JudgementEnabled, true);
+        if(TryGetBool(settings, "LocationUp", out bool up)) source.Put(ImportKeys.JudgementOffsetY, up ? 90f : 0f);
+        return ImportRegistry.Deliver(source);
     }
     private static int ImportJrpResourceChanger(SettingsImportOption option) {
         object settings = GetStaticMember(SettingsImporter.FindType(option, "JipperResourcePack.ResourceChanger"), "_settings");
         if(settings == null) return 0;
-        int count = 0;
-        if(TryGetBool(settings, "ChangeRabbit", out bool otto)) {
-            Features.OttoIcon.OttoIcon.EnsureConf();
-            Features.OttoIcon.OttoIcon.Conf.Enabled = otto;
-            count++;
-        }
-        if(TryGetBool(settings, "ChangeBallColor", out bool ball)) {
-            Features.PlanetColors.PlanetColors.EnsureConf();
-            Features.PlanetColors.PlanetColors.Conf.Enabled = ball;
-            count++;
-        }
+        int count = ImportRegistry.Deliver(
+            new ImportSource(ImportSourceKind.JipperResourcePack, name => GetMemberValue(settings, name)));
         return count;
     }
     private static int ImportJrpKeyViewer(
@@ -104,6 +71,6 @@ internal static class JipperResourcePackReader {
         if(settings == null) return 0;
         ImportedKeyViewer imported = ReadKeyViewerFromObject(settings);
         if(imported == null || imported.Available == SettingsImportKeyViewerPart.None) return 0;
-        return ApplyKeyViewerImport(imported, mode, parts);
+        return DeliverKeyViewer(imported, mode, parts);
     }
 }

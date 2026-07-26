@@ -1,3 +1,4 @@
+using Quartz.Interop;
 using Newtonsoft.Json.Linq;
 using static Quartz.Features.Interop.ReflectionHelpers;
 using static Quartz.Features.Interop.Readers.KeyViewerImportShared;
@@ -19,7 +20,7 @@ internal static class JipperKeyViewerReader {
             }
         }
         if(imported == null || imported.Available == SettingsImportKeyViewerPart.None) return 0;
-        return ApplyKeyViewerImport(imported, mode, parts);
+        return DeliverKeyViewer(imported, mode, parts);
     }
     private static IEnumerable<string> JkvConfigPaths(SettingsImportOption option) {
         string dir = option.Directory;

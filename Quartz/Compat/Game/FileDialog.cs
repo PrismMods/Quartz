@@ -3,7 +3,7 @@ using System.Reflection;
 using UnityEngine;
 using Quartz.Core;
 namespace Quartz.Compat.Game;
-internal static class FileDialog {
+public static class FileDialog {
     private static bool resolved;
     private static MethodInfo pickFile;
     private static MethodInfo pickFolder;

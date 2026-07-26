@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "ottoicon", "entry": "Quartz.Features.OttoIcon.OttoIconModule",
+  "name": "Otto Icon", "nameKey": "SECTION_OTTO_ICON", "group": "visuals", "order": 50,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": [], "settingsFiles": ["OttoIcon.json"], "langPrefixes": ["OTTO_", "OTTOICON_"]
+}

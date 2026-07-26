@@ -105,10 +105,14 @@ public class Translator {
                         }
                     }
                     if(stringDict.Count > 0) {
-                        newTranslations[property.Name] = stringDict;
+                        if(!newTranslations.TryGetValue(property.Name, out var existing))
+                            newTranslations[property.Name] = existing = new Dictionary<string, string>();
+                        foreach(var kv in stringDict) existing[kv.Key] = kv.Value;
                     }
                     if(arrayDict.Count > 0) {
-                        newTranslationsArr[property.Name] = arrayDict;
+                        if(!newTranslationsArr.TryGetValue(property.Name, out var existingArr))
+                            newTranslationsArr[property.Name] = existingArr = new Dictionary<string, string[]>();
+                        foreach(var kv in arrayDict) existingArr[kv.Key] = kv.Value;
                     }
                 }
             } catch(Exception e) {
@@ -130,6 +134,36 @@ public class Translator {
             .OrderBy(kv => kv.Key, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(kv => kv.Key, kv => kv.Value);
         Finish();
+    }
+    public bool Merge(string json, string source) {
+        if(string.IsNullOrWhiteSpace(json)) return false;
+        try {
+            JObject root = JObject.Parse(json);
+            int blocks = 0;
+            foreach(var property in root.Properties()) {
+                if(property.Value is not JObject block) continue;
+                if(!block.TryGetValue(KTLKey, out var ktToken) || ktToken.ToString() != ExpectedKTLValue) {
+                    Log($"{LOG_PREFIX_WARNING}Invalid or missing {KTLKey} in {source}, block: {property.Name}, passing");
+                    continue;
+                }
+                if(!translations.TryGetValue(property.Name, out var strings))
+                    translations[property.Name] = strings = [];
+                if(!translationsArr.TryGetValue(property.Name, out var arrays))
+                    translationsArr[property.Name] = arrays = [];
+                foreach(var kv in block) {
+                    if(kv.Key == KTLKey) continue;
+                    if(kv.Value is JArray arr) arrays[kv.Key] = arr.Select(v => v.ToString()).ToArray();
+                    else strings[kv.Key] = kv.Value?.ToString() ?? "";
+                }
+                blocks++;
+            }
+            if(blocks > 0) Log($"{LOG_PREFIX}Merged {blocks} language block(s) from {source}.");
+            return blocks > 0;
+        } catch(Exception e) {
+            Log($"{LOG_PREFIX_ERROR}Could not merge translations from {source}");
+            Log($"{LOG_PREFIX_EXCEPTION}{e.GetType().Name}: {e.Message}");
+            return false;
+        }
     }
     private void Finish() {
         Log($"{LOG_PREFIX}Finished loading translations.");

@@ -1,0 +1,31 @@
+{
+  "en-US": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "DESC_EDITOR_BGA_HIDE_PLANET_DECO": "Also hides decorations attached to a planet while BGA Mod is hiding the level. Background and camera-anchored decorations are left visible.",
+    "DESC_EDITOR_BGA_HIDE_TILE_DECO": "Also hides decorations attached to tiles while BGA Mod is hiding the level. Background and camera-anchored decorations are left visible.",
+    "DESC_EDITOR_BGA_MOD": "Hides every tile and planet while the level is playing, so only the background shows — for recording a background animation (BGA) to composite gameplay over. The editor's edit view is unaffected; hiding only kicks in during play-test or actual gameplay.",
+    "DESC_EDITOR_SHOW_FLOOR_ANGLE": "Shows the total angle (in degrees) of the selected tiles, on one of the tiles in the level editor. Affects the in-game editor, not this settings window.",
+    "DESC_EDITOR_SHOW_FLOOR_BEATS": "Shows the selected tiles' length in beats (total angle ÷ 180), on one of the tiles in the level editor. Affects the in-game editor, not this settings window.",
+    "DESC_EDITOR_SHOW_FLOOR_COUNT": "Shows how many tiles are selected, on one of the tiles in the level editor. Affects the in-game editor, not this settings window.",
+    "DESC_EDITOR_SHOW_FLOOR_DURATION": "Shows how long the selected tiles take to play, in seconds, on one of the tiles in the level editor. Affects the in-game editor, not this settings window.",
+    "DESC_EDITOR_USE_TULTTAK_BEHAVIOR": "Matches the Tulttak mod's behaviour by leaving the last selected tile out of the angle, beats, and duration totals.",
+    "EDITOR_BGA_HIDE_PLANET_DECO": "Disable planet decorations",
+    "EDITOR_BGA_HIDE_TILE_DECO": "Disable tile decorations",
+    "EDITOR_BGA_MOD": "Hide tiles and planets",
+    "EDITOR_SHOW_FLOOR_ANGLE": "Show selected tiles' angle",
+    "EDITOR_SHOW_FLOOR_BEATS": "Show selected tiles' beats",
+    "EDITOR_SHOW_FLOOR_COUNT": "Show selected tiles' count",
+    "EDITOR_SHOW_FLOOR_DURATION": "Show selected tiles' duration (in seconds)",
+    "EDITOR_USE_TULTTAK_BEHAVIOR": "Prevent the last tile from being counted in timing calculation",
+    "SECTION_SELECTED_TILE_READOUT": "Selected Tile Readout",
+    "SECTION_BGA_MOD": "BGA Mod",
+    "SECTION_FLIP_ROTATE_TILES": "Flip & Rotate Tiles",
+    "EDITOR_FLIP_ADJUST": "Adjust Position Track when flipping",
+    "DESC_EDITOR_FLIP_ADJUST": "When you flip the selected tiles horizontally or vertically, also mirror the coordinates stored in each tile's Position Track events, so anything positioned by those events flips along with the tiles.",
+    "EDITOR_ROTATE_ADJUST": "Adjust Position Track when rotating",
+    "DESC_EDITOR_ROTATE_ADJUST": "When you rotate the selected tiles, also rotate the coordinates stored in each tile's Position Track events by the same angle, so anything positioned by those events turns along with the tiles.",
+    "EDITOR_CUSTOM_ANGLE": "Use a custom rotation angle",
+    "DESC_EDITOR_CUSTOM_ANGLE": "Rotate the selected tiles by the angle below instead of the default 90° when you use the rotate shortcut. The 180° rotate shortcut always stays 180°.",
+    "EDITOR_CUSTOM_ANGLE_VALUE": "Rotation angle"
+  }
+}

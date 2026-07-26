@@ -1,0 +1,17 @@
+{
+  "en-US": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "SECTION_SONG_TITLE": "Song Title",
+    "SONGTITLE_FORMAT": "Format — use {artist} and {title}",
+    "SONGTITLE_FONTSIZE": "Font Size",
+    "SONGTITLE_MASTER": "Master Size",
+    "SONGTITLE_COLOR": "Text Color",
+    "SONGTITLE_SHADOW": "Shadow",
+    "SONGTITLE_SHADOW_X": "Shadow X",
+    "SONGTITLE_SHADOW_Y": "Shadow Y",
+    "SONGTITLE_SHADOW_SOFT": "Shadow Softness",
+    "SONGTITLE_SHADOW_COLOR": "Shadow Color",
+    "SONGTITLE_PLACEHOLDER_ARTIST": "Artist",
+    "SONGTITLE_PLACEHOLDER_TITLE": "Title"
+  }
+}

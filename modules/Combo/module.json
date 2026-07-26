@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "combo", "entry": "Quartz.Features.Combo.ComboModule",
+  "name": "Combo", "nameKey": "SECTION_COMBO", "group": "overlay", "order": 40,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": ["overlay"], "settingsFiles": [], "langPrefixes": []
+}

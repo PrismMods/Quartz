@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<ModuleId>nostalgia</ModuleId>
+		<AssemblyName>Quartz.Module.Nostalgia</AssemblyName>
+	</PropertyGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Resource\**\*" />
+		<EmbeddedResource Include="Lang\*.json" />
+	</ItemGroup>
+</Project>

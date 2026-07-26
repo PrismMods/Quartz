@@ -1,0 +1,33 @@
+{
+  "zh-CN": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "SECTION_PRACTICE_DIFFICULTY": "练习难度",
+    "PRACTICE_ENABLE": "启用练习难度",
+    "PRACTICE_HINT": "为难度和变速倍率绑定按键。两者仅在尝试之间生效，不会在运行中改变：难度保持到当前尝试结束，变速倍率会写入谱面的Pitch设置，效果等同于手动输入。仍在队列中的操作会显示箭头指示。",
+    "PRACTICE_NO_BINDINGS": "暂无绑定按键。",
+    "PRACTICE_ADD": "添加按键",
+    "DESC_PRACTICE_ADD": "添加新的按键绑定，最多16个。",
+    "PRACTICE_BINDING": "按键 {0}",
+    "PRACTICE_UNBOUND": "点击绑定按键",
+    "PRACTICE_KEY": "按键",
+    "DESC_PRACTICE_KEY": "按下任意按键完成绑定，ESC取消。",
+    "PRACTICE_DIFFICULTY": "难度",
+    "PRACTICE_SPEED": "变速倍率",
+    "PRACTICE_SETSDIFF": "应用难度",
+    "PRACTICE_SETSSPEED": "应用变速",
+    "PRACTICE_REMOVE": "移除",
+    "PRACTICE_INDICATOR": "指示器",
+    "PRACTICE_SHOWINDICATOR": "显示难度读数",
+    "DESC_PRACTICE_SHOWINDICATOR": "显示游戏实际使用的难度，游戏内选择器并不总是实时更新。",
+    "PRACTICE_SHOWSPEED": "显示变速倍率",
+    "DESC_PRACTICE_SHOWSPEED": "在难度旁边显示谱面当前的Pitch值。",
+    "PRACTICE_INGAMEONLY": "仅在游戏中显示",
+    "PRACTICE_FONTSIZE": "字体大小",
+    "PRACTICE_COLOR": "文字颜色",
+    "PRACTICE_RESETPOS": "重置位置",
+    "PRACTICE_DIFF_LENIENT": "宽松",
+    "PRACTICE_DIFF_NORMAL": "普通",
+    "PRACTICE_DIFF_STRICT": "严格",
+    "PRACTICE_DIFF_UNKNOWN": "未知难度"
+  }
+}

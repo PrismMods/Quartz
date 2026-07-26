@@ -26,7 +26,7 @@ public class UISlider : UIObject {
     public Action<float> OnChanged;
     public Action<float> OnComplete;
     public Func<float, float> Filter;
-    internal float MinFill;
+    public float MinFill;
     private Color? accentOverride;
     public Color AccentColor => accentOverride ?? UIColors.ObjectActive;
     public RectTransform FillRect { get; }

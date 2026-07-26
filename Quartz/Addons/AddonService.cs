@@ -42,7 +42,6 @@ public static class AddonService {
     private static SettingsFile<AddonsSettings> confMgr;
     private static UnityEngine.Events.UnityAction<Scene, LoadSceneMode> sceneHandler;
     private static Action<bool, bool> modChangedHandler;
-    private static ResolveEventHandler modIdentityResolver;
     private static bool initialized;
     public static readonly IRuntimeService Service = new ServiceAdapter();
     public static readonly IRuntimeTick Ticker = new TickAdapter();
@@ -56,7 +55,6 @@ public static class AddonService {
     private static void Initialize() {
         if(initialized) return;
         initialized = true;
-        HookModIdentityResolver();
         confMgr = SettingsFile<AddonsSettings>.Loaded("Addons.json");
         sceneHandler = (scene, _) => AddonEvents.RaiseSceneLoaded(scene);
         SceneManager.sceneLoaded += sceneHandler;
@@ -71,7 +69,6 @@ public static class AddonService {
         if(!initialized) return;
         initialized = false;
         UnloadAll();
-        AddonUI.Clear();
         AddonEvents.Clear();
         AddonTags.Clear();
         if(sceneHandler != null) {
@@ -82,23 +79,8 @@ public static class AddonService {
             MainCore.OnModEnabledChanged -= modChangedHandler;
             modChangedHandler = null;
         }
-        UnhookModIdentityResolver();
         confMgr?.Save();
         confMgr = null;
-    }
-    private static void HookModIdentityResolver() {
-        if(modIdentityResolver != null) return;
-        Assembly mod = typeof(QuartzAddon).Assembly;
-        modIdentityResolver = (_, args) => {
-            string name = new AssemblyName(args.Name).Name;
-            return name is "Quartz" or "QuartzUmm" ? mod : null;
-        };
-        AppDomain.CurrentDomain.AssemblyResolve += modIdentityResolver;
-    }
-    private static void UnhookModIdentityResolver() {
-        if(modIdentityResolver == null) return;
-        AppDomain.CurrentDomain.AssemblyResolve -= modIdentityResolver;
-        modIdentityResolver = null;
     }
     private static void Tick() {
         for(int i = 0; i < handles.Count; i++) {
@@ -166,10 +148,8 @@ public static class AddonService {
         LoadAll();
         ApplyActive();
         if(UICore.Pages.Count > 0) {
-            if(AddonUI.IsAddonState(UICore.CurrentMenuState)
-               && !AddonUI.Pages.Any(p => p.State == UICore.CurrentMenuState)) {
-                UICore.CurrentMenuState = (int)OriginalMenuState.Addons;
-            }
+            if(Quartz.UI.Nav.NavRegistry.ByState(UICore.CurrentMenuState) == null)
+                UICore.CurrentMenuState = Quartz.UI.Nav.NavRegistry.StateFor(Quartz.UI.Nav.CorePages.AddonsPageKey);
             UICore.Rebuild();
         }
     }
@@ -274,7 +254,7 @@ public static class AddonService {
             if(!handle.Enabled) continue;
             Assembly assembly = null;
             try {
-                assembly = LoadPrecompiled(unit.path);
+                assembly = Quartz.Plugins.PluginImage.Load(unit.path);
             } catch(Exception e) {
                 handle.Error = $"failed to load {Path.GetExtension(unit.path)}: {e.Message}";
             }
@@ -285,25 +265,8 @@ public static class AddonService {
             InstantiateAddon(handle, assembly);
         }
     }
-    private static Assembly LoadPrecompiled(string path) {
-        byte[] image = File.ReadAllBytes(path);
-        string pdb = Path.ChangeExtension(path, ".pdb");
-        if(File.Exists(pdb)) {
-            try {
-                return Assembly.Load(image, File.ReadAllBytes(pdb));
-            } catch {
-            }
-        }
-        return Assembly.Load(image);
-    }
     private static void InstantiateAddon(Handle handle, Assembly assembly) {
-        Type[] types;
-        try {
-            types = assembly.GetTypes();
-        } catch(ReflectionTypeLoadException e) {
-            types = e.Types.Where(t => t != null).ToArray();
-        }
-        List<Type> addonTypes = [.. types.Where(t => !t.IsAbstract && typeof(QuartzAddon).IsAssignableFrom(t))];
+        List<Type> addonTypes = Quartz.Plugins.PluginEntryScan.FindAll<QuartzAddon>(assembly);
         if(addonTypes.Count == 0) {
             handle.Error = "no QuartzAddon subclass found — define `public class MyAddon : Quartz.Addons.QuartzAddon`";
             return;

@@ -260,7 +260,7 @@ public static partial class GenerateUI {
         slider.Set(Apply(value), false);
         return slider;
     }
-    internal static void AddSliderValueEditor(
+    public static void AddSliderValueEditor(
         UISlider slider,
         RectTransform rect,
         TextMeshProUGUI valueText,
@@ -768,7 +768,7 @@ public static partial class GenerateUI {
         img.color = c;
         return obj;
     }
-    internal static UISlider SnapSlider(
+    public static UISlider SnapSlider(
         Transform body, string label, string id,
         float defVal, float min, float max, float val,
         string format, float step,
@@ -787,7 +787,7 @@ public static partial class GenerateUI {
         s.OnComplete = v => { setter(v); live?.Invoke(); save?.Invoke(); };
         return s;
     }
-    internal static UIToggle ToggleTip(
+    public static UIToggle ToggleTip(
         Transform parent,
         bool defaultValue,
         bool value,
@@ -800,7 +800,7 @@ public static partial class GenerateUI {
         toggle.Rect.AddToolTip("DESC_" + id.ToUpperInvariant(), tooltip);
         return toggle;
     }
-    internal static HorizontalLayoutGroup ButtonRow(RectTransform row, float spacing = 12f) {
+    public static HorizontalLayoutGroup ButtonRow(RectTransform row, float spacing = 12f) {
         HorizontalLayoutGroup layout = row.gameObject.AddComponent<HorizontalLayoutGroup>();
         layout.spacing = spacing;
         layout.padding = new RectOffset(16, 12, 0, 0);
@@ -811,14 +811,14 @@ public static partial class GenerateUI {
         layout.childAlignment = TextAnchor.MiddleLeft;
         return layout;
     }
-    internal static void FixWidth(UIButton button, float width) {
+    public static void FixWidth(UIButton button, float width) {
         LayoutElement le = button.Rect.gameObject.AddComponent<LayoutElement>();
         le.preferredWidth = width;
         le.minWidth = width;
         le.flexibleWidth = 0f;
     }
-    internal static string Tr(string key, string def) => MainCore.Tr.Get(key, def);
-    internal static void MiniButton(Transform parent, string text, string key, float rightOffset, float width, Action onClick) {
+    public static string Tr(string key, string def) => MainCore.Tr.Get(key, def);
+    public static void MiniButton(Transform parent, string text, string key, float rightOffset, float width, Action onClick) {
         GameObject obj = new("MiniBtn_" + text);
         obj.transform.SetParent(parent, false);
         RectTransform rect = obj.AddComponent<RectTransform>();
@@ -840,7 +840,7 @@ public static partial class GenerateUI {
             if(btn == InputButton.Left) onClick();
         });
     }
-    internal static Action<T> SegmentedControl<T>(
+    public static Action<T> SegmentedControl<T>(
         Transform row,
         IReadOnlyList<T> values,
         Func<T, string> display,
@@ -904,7 +904,7 @@ public static partial class GenerateUI {
             Refresh();
         };
     }
-    internal static RectTransform MakeBody(Transform parent, string name) {
+    public static RectTransform MakeBody(Transform parent, string name) {
         GameObject obj = new(name);
         obj.transform.SetParent(parent, false);
         RectTransform rect = obj.AddComponent<RectTransform>();

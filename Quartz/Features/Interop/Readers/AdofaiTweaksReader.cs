@@ -1,8 +1,7 @@
 using System.Collections;
 using System.Xml.Linq;
-using Quartz.Features.Restriction;
-using Quartz.Features.UiHider;
 using UnityEngine;
+using Quartz.Interop;
 using static Quartz.Features.Interop.ReflectionHelpers;
 namespace Quartz.Features.Interop.Readers;
 internal static class AdofaiTweaksReader {
@@ -26,121 +25,112 @@ internal static class AdofaiTweaksReader {
         };
     }
     private static int ImportAdofaiKeyLimiterObject(object settings) {
-        int count = 0;
-        if(TryGetBool(settings, "IsEnabled", out bool enabled)) {
-            Features.KeyLimiter.KeyLimiter.EnsureConf();
-            Features.KeyLimiter.KeyLimiter.Conf.Enabled = enabled;
-            count++;
-        }
+        ImportSource source = new(ImportSourceKind.AdofaiTweaks, static _ => null);
+        if(TryGetBool(settings, "IsEnabled", out bool enabled)) source.Put(ImportKeys.KeyLimiterEnabled, enabled);
         int[] keys = ReadKeyCodesFromMember(settings, "ActiveKeys");
-        if(keys.Length > 0) {
-            Features.KeyLimiter.KeyLimiter.SetAllowedKeys(keys);
-            count++;
-        }
-        return count;
+        if(keys.Length > 0) source.Put(ImportKeys.KeyLimiterAllowedKeys, keys);
+        return ImportRegistry.Deliver(source);
     }
     private static int ImportAdofaiKeyViewerObject(object settings) {
         object profile = GetActiveIndexedProfile(settings, "Profiles", "ProfileIndex");
         int[] keys = ReadKeyCodesFromMember(profile, "ActiveKeys");
         if(keys.Length == 0) return 0;
-        Features.KeyLimiter.KeyLimiter.SetAllowedKeys(keys);
-        return 1;
+        return DeliverAllowedKeys(keys);
+    }
+    private static int DeliverAllowedKeys(int[] keys) {
+        ImportSource source = new(ImportSourceKind.AdofaiTweaks, static _ => null);
+        source.Put(ImportKeys.KeyLimiterAllowedKeys, keys);
+        return ImportRegistry.Deliver(source);
     }
     private static int ImportAdofaiMiscObject(object settings) {
         if(TryGetBool(settings, "IsEnabled", out bool enabled) && enabled
             && TryGetBool(settings, "DisableEditorZoom", out bool noZoom) && noZoom) {
-            Features.Tweaks.Tweaks.EnsureConf();
-            Features.Tweaks.Tweaks.Conf.BlockMouseWheelScrollWhilePlaying = true;
-            return 1;
+            return DeliverBlockScroll();
         }
         return 0;
     }
     private static int ImportAdofaiHideUiObject(object settings) {
         if(!TryGetBool(settings, "IsEnabled", out bool enabled) || !enabled) return 0;
-        Features.UiHider.UiHider.EnsureConf();
-        int count = 0;
-        count += ApplyAdofaiHideUiProfile(GetMemberValue(settings, "PlayingProfile"), Features.UiHider.UiHider.Conf.Playing);
-        count += ApplyAdofaiHideUiProfile(GetMemberValue(settings, "RecordingProfile"), Features.UiHider.UiHider.Conf.Recording);
-        if(TryGetBool(settings, "RecordingMode", out bool rec)) {
-            Features.UiHider.UiHider.Conf.RecordingMode = rec;
-            count++;
-        }
-        if(TryGetBool(settings, "UseRecordingModeShortcut", out bool useShortcut)) {
-            Features.UiHider.UiHider.Conf.UseShortcut = useShortcut;
-            count++;
-        }
+        ImportSource source = new(ImportSourceKind.AdofaiTweaks, name => GetMemberValue(settings, name));
+        Put(source, ImportKeys.UiHiderPlayingProfile, ObjectProfile(GetMemberValue(settings, "PlayingProfile")));
+        Put(source, ImportKeys.UiHiderRecordingProfile, ObjectProfile(GetMemberValue(settings, "RecordingProfile")));
+        if(TryGetBool(settings, "RecordingMode", out bool rec)) source.Put(ImportKeys.UiHiderRecordingMode, rec);
+        if(TryGetBool(settings, "UseRecordingModeShortcut", out bool useShortcut))
+            source.Put(ImportKeys.UiHiderUseShortcut, useShortcut);
         object shortcut = GetMemberValue(settings, "RecordingModeShortcut");
         if(shortcut != null) {
-            ApplyShortcutModifier(shortcut);
-            if(TryGetInt(shortcut, "PressKey", out int key)) {
-                Features.UiHider.UiHider.Conf.ShortcutKey = NormalizeKeyInt(key);
-                count++;
-            }
+            source.Put(ImportKeys.UiHiderShortcut, (Func<string, bool>)(name => TryGetBool(shortcut, name, out bool v) && v));
+            if(TryGetInt(shortcut, "PressKey", out int key))
+                source.Put(ImportKeys.UiHiderShortcutKey, NormalizeKeyInt(key));
         }
-        if(count > 0) {
-            Features.UiHider.UiHider.Conf.Enabled = true;
-            count++;
-        }
-        return count;
+        return ImportRegistry.Deliver(source);
+    }
+    private static Func<string, bool?> ObjectProfile(object profile) =>
+        profile == null ? null : name => TryGetBool(profile, name, out bool v) ? v : null;
+    private static Func<string, bool?> XmlProfile(XElement profile) =>
+        profile == null ? null : name => TryReadXmlBool(profile, name, out bool v) ? v : null;
+    private static void Put(ImportSource source, string key, Func<string, bool?> read) {
+        if(read != null) source.Put(key, read);
     }
     private static int ImportAdofaiRestrictObject(object settings) {
         if(!TryGetBool(settings, "IsEnabled", out bool enabled) || !enabled) return 0;
         if(!TryGetBool(settings, "RestrictJudgment", out bool restrict) || !restrict) return 0;
         bool[] restricted = ReadBoolArray(GetMemberValue(settings, "RestrictedJudgments"));
         if(restricted.Length == 0) return 0;
-        return ApplyRestrictMask(restricted);
+        return DeliverRestrictMask(restricted);
+    }
+    private static int DeliverBlockScroll() {
+        ImportSource source = new(ImportSourceKind.AdofaiTweaks, static _ => null);
+        source.Put(ImportKeys.TweaksBlockScroll, true);
+        return ImportRegistry.Deliver(source);
+    }
+    private static int DeliverRestrictMask(bool[] restricted) {
+        int allowedMask = 0;
+        for(int i = 0; i < restricted.Length; i++)
+            if(!restricted[i]) allowedMask |= 1 << i;
+        ImportSource source = new(ImportSourceKind.AdofaiTweaks, static _ => null);
+        source.Put(ImportKeys.RestrictionAllowedMask, allowedMask);
+        return ImportRegistry.Deliver(source);
     }
     private static int ImportAdofaiTweaksXml(SettingsImportOption option) {
         int count = 0;
         XDocument keyLimiter = LoadXml(option, "KeyLimiterSettings.xml");
         if(keyLimiter != null) {
-            if(TryReadXmlBool(keyLimiter, "IsEnabled", out bool enabled)) {
-                Features.KeyLimiter.KeyLimiter.EnsureConf();
-                Features.KeyLimiter.KeyLimiter.Conf.Enabled = enabled;
-                count++;
-            }
+            ImportSource source = new(ImportSourceKind.AdofaiTweaks, static _ => null);
+            if(TryReadXmlBool(keyLimiter, "IsEnabled", out bool enabled))
+                source.Put(ImportKeys.KeyLimiterEnabled, enabled);
             int[] keys = ReadKeyCodesFromXml(keyLimiter.Root, "ActiveKeys");
-            if(keys.Length > 0) {
-                Features.KeyLimiter.KeyLimiter.SetAllowedKeys(keys);
-                count++;
-            }
+            if(keys.Length > 0) source.Put(ImportKeys.KeyLimiterAllowedKeys, keys);
+            count += ImportRegistry.Deliver(source);
         }
         XDocument keyViewer = LoadXml(option, "KeyViewerSettings.xml");
         if(keyViewer != null) {
             int[] keys = ReadAdofaiKeyViewerXmlKeys(keyViewer);
             if(keys.Length > 0) {
-                Features.KeyLimiter.KeyLimiter.SetAllowedKeys(keys);
-                count++;
+                count += DeliverAllowedKeys(keys);
             }
         }
         XDocument misc = LoadXml(option, "MiscellaneousSettings.xml");
         if(misc != null
             && TryReadXmlBool(misc, "IsEnabled", out bool miscOn) && miscOn
             && TryReadXmlBool(misc, "DisableEditorZoom", out bool noZoom) && noZoom) {
-            Features.Tweaks.Tweaks.EnsureConf();
-            Features.Tweaks.Tweaks.Conf.BlockMouseWheelScrollWhilePlaying = true;
-            count++;
+            count += DeliverBlockScroll();
         }
         XDocument hideUi = LoadXml(option, "HideUiElementsSettings.xml");
         if(hideUi != null && TryReadXmlBool(hideUi, "IsEnabled", out bool hideOn) && hideOn) {
-            Features.UiHider.UiHider.EnsureConf();
-            int profileCount = 0;
-            profileCount += ApplyAdofaiHideUiProfileXml(FindFirstDescendant(hideUi, "PlayingProfile"), Features.UiHider.UiHider.Conf.Playing);
-            profileCount += ApplyAdofaiHideUiProfileXml(FindFirstDescendant(hideUi, "RecordingProfile"), Features.UiHider.UiHider.Conf.Recording);
-            if(TryReadXmlBool(hideUi, "RecordingMode", out bool rec)) { Features.UiHider.UiHider.Conf.RecordingMode = rec; profileCount++; }
-            if(TryReadXmlBool(hideUi, "UseRecordingModeShortcut", out bool useSc)) { Features.UiHider.UiHider.Conf.UseShortcut = useSc; profileCount++; }
+            ImportSource source = new(ImportSourceKind.AdofaiTweaks, static _ => null);
+            Put(source, ImportKeys.UiHiderPlayingProfile, XmlProfile(FindFirstDescendant(hideUi, "PlayingProfile")));
+            Put(source, ImportKeys.UiHiderRecordingProfile, XmlProfile(FindFirstDescendant(hideUi, "RecordingProfile")));
+            if(TryReadXmlBool(hideUi, "RecordingMode", out bool rec)) source.Put(ImportKeys.UiHiderRecordingMode, rec);
+            if(TryReadXmlBool(hideUi, "UseRecordingModeShortcut", out bool useSc))
+                source.Put(ImportKeys.UiHiderUseShortcut, useSc);
             XElement shortcut = FindFirstDescendant(hideUi, "RecordingModeShortcut");
             if(shortcut != null) {
-                ApplyShortcutModifierXml(shortcut);
-                if(TryReadXmlKeyCode(shortcut, "PressKey", out int key)) {
-                    Features.UiHider.UiHider.Conf.ShortcutKey = NormalizeKeyInt(key);
-                    profileCount++;
-                }
+                source.Put(ImportKeys.UiHiderShortcut, (Func<string, bool>)(name => TryReadXmlBool(shortcut, name, out bool v) && v));
+                if(TryReadXmlKeyCode(shortcut, "PressKey", out int key))
+                    source.Put(ImportKeys.UiHiderShortcutKey, NormalizeKeyInt(key));
             }
-            if(profileCount > 0) {
-                Features.UiHider.UiHider.Conf.Enabled = true;
-                count += profileCount + 1;
-            }
+            count += ImportRegistry.Deliver(source);
         }
         XDocument restrict = LoadXml(option, "RestrictGameplaySettings.xml");
         if(restrict != null
@@ -148,23 +138,10 @@ internal static class AdofaiTweaksReader {
             && TryReadXmlBool(restrict, "RestrictJudgment", out bool rJ) && rJ) {
             bool[] restricted = ReadXmlBoolArray(restrict, "RestrictedJudgments");
             if(restricted.Length > 0) {
-                count += ApplyRestrictMask(restricted);
+                count += DeliverRestrictMask(restricted);
             }
         }
         return count;
-    }
-    private static int ApplyRestrictMask(bool[] restricted) {
-        int allowedMask = 0;
-        for(int i = 0; i < restricted.Length; i++) {
-            if(!restricted[i]) {
-                allowedMask |= 1 << i;
-            }
-        }
-        Features.Restriction.Restriction.EnsureConf();
-        Features.Restriction.Restriction.Conf.JRestrictEnabled = true;
-        Features.Restriction.Restriction.Conf.JRestrictMode = 3;
-        Features.Restriction.Restriction.Conf.JRestrictAllowedMask = allowedMask;
-        return 3;
     }
     private static List<object> GetAdofaiTweaksRuntimeSettings(SettingsImportOption option) {
         List<object> settings = [];

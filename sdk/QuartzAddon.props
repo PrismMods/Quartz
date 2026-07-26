@@ -106,7 +106,7 @@
 
   <!-- Emit <name>.qaddon beside the built dll. A .qaddon is just the compiled
        assembly under the extension the loader recognises. -->
-  <Target Name="_QuartzAddonPackage" AfterTargets="Build">
+  <Target Name="_QuartzAddonPackage" AfterTargets="Build" Condition="'$(SkipAddonPackage)' != 'true'">
     <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(TargetDir)$(AssemblyName).qaddon" OverwriteReadOnlyFiles="true" />
     <Message Importance="high" Text="Quartz addon: $(TargetDir)$(AssemblyName).qaddon" />
     <!-- Opt in to dropping it straight into the game: -p:DeployToGame=true -->

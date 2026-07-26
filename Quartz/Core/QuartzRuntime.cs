@@ -3,25 +3,9 @@ using Quartz.Async;
 using Quartz.Compat;
 using Quartz.Compat.Interface;
 using Quartz.Core.Service;
-using Quartz.Features.Calibration;
 using Quartz.Features.PlayCount;
-using Quartz.Features.Combo;
-using Quartz.Features.Editor;
-using Quartz.Features.EffectRemover;
 using Quartz.Features.InGameOverlay;
-using Quartz.Features.Optimizer;
-using Quartz.Features.Judgement;
-using Quartz.Features.KeyViewer;
-using Quartz.Features.Nostalgia;
-using Quartz.Features.OttoIcon;
-using Quartz.Features.Panels;
-using Quartz.Features.PlanetColors;
-using Quartz.Features.ProgressBar;
-using Quartz.Features.SongTitle;
-using Quartz.Features.Status;
-using Quartz.Features.Tweaks;
-using Quartz.Features.Tuf;
-using Quartz.Features.UiHider;
+using Quartz.Game.Stats;
 using Quartz.IO;
 using Quartz.Resource;
 using Quartz.UI;
@@ -51,8 +35,6 @@ public sealed class QuartzRuntime {
     private TweenService tweenService;
     private HarmonyService harmonyService;
     private PlayCount playCount;
-    private TufService tufService;
-    private TufPackService packService;
     private UnityEngine.Events.UnityAction<UnityEngine.SceneManagement.Scene, UnityEngine.SceneManagement.LoadSceneMode> xperfectGuardHandler;
     public QuartzRuntime(IQuartzHost host) {
         Host = host;
@@ -195,9 +177,10 @@ public sealed class QuartzRuntime {
                 Logger.Wrn($"[Startup] couldn't remove {stale}: {e.Message}");
             }
         }
+        Quartz.Plugins.PluginIdentityResolver.Hook();
         CreateRootObject();
         RootObject.AddComponent<MainThread>();
-        SaveGate.DeferWrites = static () => Features.Status.GameStats.InGame && !UI.UICore.IsOpen;
+        SaveGate.DeferWrites = static () => Game.Stats.GameStats.InGame && !UI.UICore.IsOpen;
         Config.Load();
         ProfileManager.Initialize();
         Logger.Msg($"[Startup] paths + config took {sw.ElapsedMilliseconds} ms");
@@ -211,30 +194,25 @@ public sealed class QuartzRuntime {
         tweenService = new TweenService(TweensContext);
         harmonyService = new HarmonyService();
         playCount = new PlayCount();
-        tufService = new TufService();
-        packService = new TufPackService();
         services.Add(Localization);
+        services.Add(Quartz.Modules.ModuleService.Service);
         services.Add(Quartz.Addons.AddonService.Service);
-        services.Add(tufService);
-        services.Add(packService);
         services.Add(uiService);
         services.Add(tweenService);
         services.Add(playCount);
         services.Add(harmonyService);
-        Optimizer.Initialize();
         ticks.Add(playCount);
         ticks.Add(harmonyService);
         ticks.Add(uiService);
         ticks.Add(tweenService);
-        ticks.Add(Optimizer.Ticker);
+        ticks.Add(Quartz.Modules.ModuleService.Ticker);
         ticks.Add(Quartz.Addons.AddonService.Ticker);
-        ticks.Add(EditorFeature.Ticker);
-        ticks.Add(CalibrationTimingLogger.Ticker);
         services.Initialize(Logger);
         Quartz.Features.Interop.XPerfectRecursionGuard.TryApply(harmonyService.Harmony);
         xperfectGuardHandler = (_, _) => Quartz.Features.Interop.XPerfectRecursionGuard.TryApply(harmonyService.Harmony);
         UnityEngine.SceneManagement.SceneManager.sceneLoaded += xperfectGuardHandler;
         sw.Restart();
+        RegisterOverlayHooks();
         RegisterFeatures();
         SetModEnabled(Config.Data.Active, false);
         Logger.Msg($"[Startup] SetModEnabled took {sw.ElapsedMilliseconds} ms");
@@ -258,7 +236,6 @@ public sealed class QuartzRuntime {
         Safe(() => SetModEnabled(false, true));
         Safe(() => FontManager.OnFontChanged -= InGameOverlayFont.Refresh);
         Safe(InGameOverlayFont.Unhook);
-        Safe(Optimizer.Unhook);
         Safe(() => {
             if(xperfectGuardHandler != null) {
                 UnityEngine.SceneManagement.SceneManager.sceneLoaded -= xperfectGuardHandler;
@@ -266,7 +243,6 @@ public sealed class QuartzRuntime {
             }
         });
         Safe(() => Config.Save());
-        Safe(CalibrationTimingLogger.FlushIfDirty);
         Safe(() => ProfileManager.CaptureActive());
         Safe(() => services.Dispose());
         Safe(() => Sprite.Dispose());
@@ -276,35 +252,13 @@ public sealed class QuartzRuntime {
             Safe(() => Object.Destroy(RootObject));
             RootObject = null;
         }
+        Safe(Quartz.Plugins.PluginIdentityResolver.Unhook);
         Logger.Msg("Bye");
     }
+    private static void RegisterOverlayHooks() {
+    }
     private void RegisterFeatures() {
-        features.OnEnable("PanelsOverlay", () => PanelsOverlay.Initialize(RootObject));
-        features.OnEnable("ComboOverlay", () => ComboOverlay.Initialize(RootObject));
-        features.OnEnable("ProgressBarOverlay", () => ProgressBarOverlay.Initialize(RootObject));
-        features.OnEnable("JudgementOverlay", () => JudgementOverlay.Initialize(RootObject));
-        features.OnEnable("KeyViewerOverlay", () => KeyViewerOverlay.Initialize(RootObject));
-        features.OnEnable("SongTitleOverlay", () => SongTitleOverlay.Initialize(RootObject));
-        features.OnEnable("PracticeOverlay", () => Features.Practice.PracticeOverlay.Initialize(RootObject));
-        features.OnEnable("CalibrationPopup", CalibrationPopupUI.Initialize);
-        features.Register("EffectRemover", EffectRemover.RefreshEditorSaveButtons, EffectRemover.RestoreEditorSaveButtons);
-        features.Register("Tweaks", Tweaks.RefreshAll, Tweaks.RestoreAll);
-        features.Register("PlanetColors", PlanetColors.Refresh, PlanetColors.Restore);
-        features.Register("OttoIcon", OttoIcon.Refresh, OttoIcon.Restore);
-        features.Register("Optimizer", Optimizer.Apply, Optimizer.Restore);
         features.Register("InGameOverlayFont", InGameOverlayFont.Refresh, InGameOverlayFont.RestoreAll);
-        features.Register("Nostalgia", Nostalgia.Refresh, Nostalgia.Restore);
-        features.OnDisable("PracticeOverlay", Features.Practice.PracticeOverlay.Dispose);
-        features.OnDisable("SongTitleOverlay", SongTitleOverlay.Dispose);
-        features.OnDisable("KeyViewerOverlay", KeyViewerOverlay.Dispose);
-        features.OnDisable("JudgementOverlay", JudgementOverlay.Dispose);
-        features.OnDisable("ProgressBarOverlay", ProgressBarOverlay.Dispose);
-        features.OnDisable("ComboOverlay", ComboOverlay.Dispose);
-        features.OnDisable("PanelsOverlay", PanelsOverlay.Dispose);
-        features.OnDisable("CalibrationPopup", CalibrationPopupUI.Dispose);
-        features.OnDisable("UiHider", UiHider.Restore);
-        features.OnDisable("EditorFeature", EditorFeature.Restore);
-        features.OnDisable("AutoDeafen", Features.AutoDeafen.AutoDeafen.Stop);
     }
     public void SetModEnabled(bool enabled, bool isDispose) {
         if(State.IsEnabled == enabled) return;

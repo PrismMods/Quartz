@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "keyviewer", "entry": "Quartz.Features.KeyViewer.KeyViewerModule",
+  "name": "Key Viewer", "nameKey": "SECTION_KEY_VIEWER", "group": "overlay", "order": 20,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": ["keylimiter", "overlay"], "settingsFiles": ["KeyViewer.json"], "langPrefixes": ["KVI_", "KV_"]
+}

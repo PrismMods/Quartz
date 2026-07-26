@@ -20,55 +20,12 @@ using GTweens.Easings;
 using GTweenExtensions = GTweens.Extensions.GTweenExtensions;
 using TMPro;
 namespace Quartz.UI;
-public enum OriginalMenuState {
-    OverlayGeneral,
-    KeyViewer,
-    ProgressBar,
-    Combo,
-    Judgement,
-    SongTitle,
-    Panels,
-    Calibration,
-    GameplayKeyLimiter,
-    GameplayChatter,
-    GameplayJudgement,
-    GameplayDeath,
-    GameplayAutoDeafen,
-    GameplayPractice,
-    VisualsEffectRemover,
-    VisualsHideJudgements,
-    VisualsVisualTweaks,
-    VisualsPlanetColors,
-    VisualsOttoIcon,
-    VisualsUiHiding,
-    TweaksGeneral,
-    TweaksOptimizer,
-    TweaksMainMenu,
-    EditorTileReadout,
-    EditorBga,
-    EditorFlipRotate,
-    NostalgiaGameplay,
-    NostalgiaVisuals,
-    NostalgiaTweaks,
-    NostalgiaEditor,
-    NostalgiaTuf,
-    NostalgiaTufPacks,
-    NostalgiaTufSettings,
-    Profiles,
-    Import,
-    Addons,
-    Settings,
-    Search,
-    Credits,
-    Developer,
-    HelpFaq,
-}
 public static class UICore {
     private static GameObject canvasObj;
     private static Canvas canvas;
     private static CanvasScaler canvasScaler;
     public static readonly Dictionary<int, RectTransform> Pages = [];
-    public static int CurrentMenuState = (int)OriginalMenuState.OverlayGeneral;
+    public static int CurrentMenuState = -1;
     public static bool IsReorganizing { get; private set; }
     public static readonly Vector2 ReferenceResolution = new(1920, 1080);
     private static Action<TranslationFailState> _onPageSettings;
@@ -151,10 +108,18 @@ public static class UICore {
             .Init("EXIT_REORGANIZE", "Exit Reorganize");
         exitReorganizeObj.SetActive(false);
     }
+    public static event Action<bool> OnReorganizeChanged;
+    private static void RaiseReorganize(bool entering) {
+        try {
+            OnReorganizeChanged?.Invoke(entering);
+        } catch(Exception e) {
+            MainCore.Log.Err($"[UI] reorganize listener threw: {e.Message}");
+        }
+    }
     public static void EnterReorganize() {
         if(IsReorganizing) return;
         IsReorganizing = true;
-        CalibrationPopupUI.BeginReorganize();
+        RaiseReorganize(true);
         if(panelCanvasGroup != null) {
             panelCanvasGroup.interactable = false;
             panelCanvasGroup.blocksRaycasts = false;
@@ -175,7 +140,7 @@ public static class UICore {
         if(!IsReorganizing) return;
         IsReorganizing = false;
         Reorganizer.Deselect();
-        CalibrationPopupUI.EndReorganize();
+        RaiseReorganize(false);
         if(Panel != null) Panel.gameObject.SetActive(true);
         if(panelCanvasGroup != null) {
             panelCanvasGroup.interactable = true;
@@ -864,6 +829,7 @@ public static class UICore {
             RefreshBand(false);
         }
     }
+    private static bool canvasWasVisible;
     public static void HandleUpdate() {
         if(canvasObj == null) return;
         Keybind.KeyModifier mod = (Keybind.KeyModifier)MainCore.Conf.ToggleModifier;
@@ -881,7 +847,14 @@ public static class UICore {
         }
         if(Input.GetKeyUp(key)) holdingToggle = false;
         ToggleBinds.HandleUpdate();
-        if(!canvasObj.activeSelf) return;
+        if(!canvasObj.activeSelf) {
+            if(canvasWasVisible) {
+                canvasWasVisible = false;
+                UIObject.NotifyHidden();
+            }
+            return;
+        }
+        canvasWasVisible = true;
         UIObject.TickAll();
         Tooltip.Tick();
     }

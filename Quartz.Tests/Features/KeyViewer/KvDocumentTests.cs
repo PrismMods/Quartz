@@ -492,6 +492,73 @@ static class KvDocumentTests {
         Assert(KvExportShaping.DetectDmNoteGaps(JObject.Parse(doc.ToJson()))
             is [KvExportShaping.GapNoteShadows], "a note shadow that is on is");
     }
+    private const string NestedPreset = """
+        {
+          "selectedKeyType": "custom-a",
+          "customTabs": [ { "id": "custom-a", "name": "Nested" } ],
+          "keys": { "custom-a": ["Z"] },
+          "keyPositions": {
+            "custom-a": [
+              { "className": "outer blue", "useInlineStyles": true,
+                "position": { "dx": 1, "dy": 2, "width": 60, "height": 60,
+                              "count": 0, "noteColor": "#FFFFFF", "noteOpacity": 80 } }
+            ]
+          }
+        }
+        """;
+    public static void TestClassAndInlinePriorityRoundTrip() {
+        KvDocument flat = KvDocument.Parse(Preset);
+        KvElement key = flat.Elements("4key", KvElementKind.Key)[0];
+        Assert(key.UseInlineStyles, "useInlineStyles is read off a flat element");
+        Assert(key.ClassName.Length == 0, "an element without className reads empty");
+        key.ClassName = "  blue special  ";
+        Assert(key.ClassName == "blue special", "className is trimmed on write");
+        JObject afterFlat = JObject.Parse(flat.ToJson());
+        JObject k0 = (JObject)afterFlat["keyPositions"]!["4key"]![0]!;
+        Assert(k0["className"]!.ToString() == "blue special", "className is written to the element");
+        Assert(k0["useInlineStyles"]!.ToObject<bool>(), "useInlineStyles survives the round trip");
+        key.ClassName = "";
+        key.UseInlineStyles = false;
+        JObject cleared = (JObject)JObject.Parse(flat.ToJson())["keyPositions"]!["4key"]![0]!;
+        Assert(cleared["className"] == null, "an empty className removes the field");
+        Assert(cleared["useInlineStyles"] == null, "turning inline priority off removes the field");
+        KvDocument nested = KvDocument.Parse(NestedPreset);
+        KvElement outer = nested.Elements("custom-a", KvElementKind.Key)[0];
+        Assert(outer.ClassName == "outer blue", "className is read off the outer object of a nested element");
+        Assert(outer.UseInlineStyles, "useInlineStyles is read off the outer object of a nested element");
+        outer.ClassName = "rewritten";
+        JObject entry = (JObject)JObject.Parse(nested.ToJson())["keyPositions"]!["custom-a"]![0]!;
+        Assert(entry["className"]!.ToString() == "rewritten", "the outer object is rewritten");
+        Assert(entry["position"]!["className"]!.ToString() == "rewritten", "the inner object is rewritten too");
+        outer.ClassName = "";
+        JObject gone = (JObject)JObject.Parse(nested.ToJson())["keyPositions"]!["custom-a"]![0]!;
+        Assert(gone["className"] == null && gone["position"]!["className"] == null,
+            "clearing className removes it from both objects");
+    }
+    public static void TestExportKeepsOnlyTheSelectedTab() {
+        KvDocument doc = KvDocument.Parse(Preset);
+        doc.EnsureTab("custom-a", "Second");
+        doc.Add("custom-a", KvElement.Wrap(new JObject { ["dx"] = 5f, ["dy"] = 6f }, KvElementKind.Key, "Q"));
+        doc.SetRenderAnchor("4key", 1f, 2f);
+        doc.SetRenderAnchor("custom-a", 3f, 4f);
+        doc.SelectedTab = "custom-a";
+        JObject root = JObject.Parse(doc.ToJson());
+        Assert(((JObject)root["keyPositions"]!).Count == 2, "both tabs are in the saved layout");
+        KvExportShaping.KeepOnlyTab(root, "custom-a");
+        foreach(string table in new[] { "keys", "keyPositions", "quartzRenderAnchors" }) {
+            JObject byTab = (JObject)root[table]!;
+            Assert(byTab.Count == 1 && byTab["custom-a"] != null, table + " keeps only the exported tab");
+        }
+        Assert(root["selectedKeyType"]!.ToString() == "custom-a", "the export selects the exported tab");
+        JArray custom = (JArray)root["customTabs"]!;
+        Assert(custom.Count == 1 && custom[0]!["id"]!.ToString() == "custom-a", "customTabs keeps only the exported tab");
+        Assert(KvDocument.Parse(root.ToString()).Elements("custom-a", KvElementKind.Key).Count == 1,
+            "the single-tab export still parses as a preset");
+        JObject builtin = JObject.Parse(doc.ToJson());
+        KvExportShaping.KeepOnlyTab(builtin, "4key");
+        Assert(builtin["customTabs"] == null, "exporting a builtin tab drops the custom tab list");
+        Assert(((JObject)builtin["keyPositions"]!)["4key"] is JArray { Count: 3 }, "the builtin tab keeps its keys");
+    }
     private static bool HasQuartzKey(JToken node) {
         switch(node) {
             case JObject obj:

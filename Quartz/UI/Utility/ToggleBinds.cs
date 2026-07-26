@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 namespace Quartz.UI.Utility;
-internal static class ToggleBinds {
+public static class ToggleBinds {
     private static readonly Dictionary<string, List<UIToggle>> live = [];
     private static readonly List<string> pending = [];
     public static void Register(string id, UIToggle toggle) {

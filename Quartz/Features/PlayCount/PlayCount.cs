@@ -12,6 +12,7 @@ using Newtonsoft.Json.Linq;
 using UnityEngine;
 using System.Reflection;
 using Quartz.Compat.Game;
+using Quartz.Game.Stats;
 namespace Quartz.Features.PlayCount;
 public sealed class PlayCount : IRuntimeService, IRuntimeTick {
     private static readonly Dictionary<string, PlayData> playDatas = new();
@@ -26,12 +27,12 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
     public void Dispose() => FlushIfDirty();
     public void Tick() {
         if(!MainCore.IsModEnabled) return;
-        bool inGame = Status.GameStats.InGame;
+        bool inGame = GameStats.InGame;
         if(gameStateKnown && wasInGame && !inGame) FlushIfDirty();
         wasInGame = inGame;
         gameStateKnown = true;
         if(!inGame) return;
-        ObserveProgress(Status.GameStats.Progress);
+        ObserveProgress(GameStats.Progress);
     }
     public static PlayData For(string key) {
         if(!playDatas.TryGetValue(key, out PlayData d)) {
@@ -64,9 +65,9 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
         SpanOf(CurrentRunStart(), bestObservedThisRun) > SpanOf(storedStart, storedEnd);
     private static float CurrentRunStart() {
         try {
-            return Status.ProgressTracker.RunStartedFromFirstTile
+            return ProgressTracker.RunStartedFromFirstTile
                 ? 0f
-                : Mathf.Clamp01(Status.ProgressTracker.RunStartProgress);
+                : Mathf.Clamp01(ProgressTracker.RunStartProgress);
         } catch {
             return 0f;
         }
@@ -131,7 +132,7 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
             return 0f;
         }
     }
-    internal static string ComputeMapKey() {
+    public static string ComputeMapKey() {
         bool isOfficial;
         try {
             isOfficial = ADOBase.isOfficialLevel;

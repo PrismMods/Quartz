@@ -1,0 +1,22 @@
+{
+  "ko-KR": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "JPOP_AUTO": "자동플레이 타일",
+    "JPOP_EARLYPERFECT": "빠름",
+    "JPOP_LATEPERFECT": "느림",
+    "JPOP_MISS": "미스",
+    "JPOP_MULTIPRESS": "다중입력",
+    "JPOP_OVERLOAD_FAIL": "과부하",
+    "JPOP_OVERLOAD_NOFAIL": "과부하 (실패방지 모드)",
+    "JPOP_PERFECT": "정확",
+    "JPOP_TOOEARLY": "너무 빠름",
+    "JPOP_TOOLATE": "너무 느림",
+    "JPOP_VERYEARLY": "빠름!",
+    "JPOP_VERYLATE": "느림!",
+    "JPOP_XPERFECT": "X 퍼펙트",
+    "JPOP_PLUSPERFECT": "+ 퍼펙트",
+    "JPOP_MINUSPERFECT": "- 퍼펙트",
+    "SECTION_HIDE_JUDGEMENTS": "판정 숨기기",
+    "SECTION_JUDGEMENT": "판정"
+  }
+}

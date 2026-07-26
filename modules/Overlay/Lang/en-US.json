@@ -1,0 +1,12 @@
+{
+  "en-US": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "DESC_OVERLAY_ENABLED": "Master switch for every overlay HUD — panels, progress bar, combo and judgement.",
+    "OVERLAY_GENERAL": "General",
+    "OVERLAY_ENABLED": "Enable Overlays",
+    "OVERLAY_FPS_SMOOTH": "FPS Update Interval",
+    "DESC_OVERLAY_FPS_SMOOTH": "How long the FPS counter holds each value before updating. 0 = every frame; higher makes the number tick more slowly and steadily.",
+    "OVERLAY_REORGANIZE": "Reorganize",
+    "MODULE_OVERLAY_CORE": "Overlay Core"
+  }
+}

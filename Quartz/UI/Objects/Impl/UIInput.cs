@@ -147,6 +147,29 @@ public sealed class UIInput : UIObject {
         UpdatePlaceholder(focused);
         UpdateIconImage(focused);
     }
+    public override void OnHidden() {
+        if(!hasFocused && !caretLooping) return;
+        hasFocused = false;
+        caretLooping = false;
+        caretTween?.Kill();
+        placeholderTween?.Kill();
+        iconTween?.Kill();
+        if(InputField != null) {
+            Color caret = UIColors.ObjectActive;
+            caret.a = 0f;
+            InputField.caretColor = caret;
+        }
+        if(Placeholder != null) {
+            Color p = Placeholder.color;
+            p.a = 0.2f;
+            Placeholder.color = p;
+        }
+        if(IconImage != null) {
+            Color icon = IconImage.color;
+            icon.a = 0.2f;
+            IconImage.color = icon;
+        }
+    }
     public override void Dispose() {
         base.Dispose();
         caretTween?.Kill();

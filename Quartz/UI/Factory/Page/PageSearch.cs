@@ -58,54 +58,10 @@ internal static class PageSearch {
         return normalized;
     }
     private static string TabName(int state) {
-        if(Quartz.Addons.AddonUI.IsAddonState(state)) {
-            foreach(var def in Quartz.Addons.AddonUI.Pages)
-                if(def.State == state) return GenerateUI.Tr(def.LocaleKey, def.Title);
-            return "?";
-        }
-        return TabNameFixed(state);
+        Quartz.UI.Nav.NavPage page = Quartz.UI.Nav.NavRegistry.ByState(state);
+        if(page == null) return "?";
+        return page.SearchLabel != null ? page.SearchLabel() : GenerateUI.Tr(page.LocaleKey, page.Title);
     }
-    private static string TabNameFixed(int state) => (OriginalMenuState)state switch {
-        OriginalMenuState.OverlayGeneral => GenerateUI.Tr("OVERLAY_GENERAL", "General"),
-        OriginalMenuState.KeyViewer => GenerateUI.Tr("SECTION_KEY_VIEWER", "Key Viewer"),
-        OriginalMenuState.ProgressBar => GenerateUI.Tr("SECTION_PROGRESS_BAR", "Progress Bar"),
-        OriginalMenuState.Combo => GenerateUI.Tr("SECTION_COMBO", "Combo"),
-        OriginalMenuState.Judgement => GenerateUI.Tr("SECTION_JUDGEMENT", "Judgement"),
-        OriginalMenuState.SongTitle => GenerateUI.Tr("SECTION_SONG_TITLE", "Song Title"),
-        OriginalMenuState.Panels => GenerateUI.Tr("SECTION_PANELS", "Panels"),
-        OriginalMenuState.Calibration => GenerateUI.Tr("SECTION_CALIBRATION", "Calibration"),
-        OriginalMenuState.GameplayKeyLimiter => GenerateUI.Tr("SECTION_KEY_LIMITER", "Key Limiter"),
-        OriginalMenuState.GameplayChatter => GenerateUI.Tr("SECTION_KEYBOARD_CHATTER_BLOCKER", "Keyboard Chatter Blocker"),
-        OriginalMenuState.GameplayJudgement => GenerateUI.Tr("SECTION_JUDGEMENT_RESTRICTION", "Judgement Restriction"),
-        OriginalMenuState.GameplayDeath => GenerateUI.Tr("SECTION_DEATH_LIMIT", "Death Limit"),
-        OriginalMenuState.GameplayAutoDeafen => GenerateUI.Tr("SECTION_AUTO_DEAFEN_DISCORD", "Auto Deafen (Discord)"),
-        OriginalMenuState.GameplayPractice => GenerateUI.Tr("SECTION_PRACTICE_DIFFICULTY", "Practice Difficulty"),
-        OriginalMenuState.VisualsEffectRemover => GenerateUI.Tr("SECTION_EFFECT_REMOVER", "Effect Remover"),
-        OriginalMenuState.VisualsHideJudgements => GenerateUI.Tr("SECTION_HIDE_JUDGEMENTS", "Hide Judgements"),
-        OriginalMenuState.VisualsVisualTweaks => GenerateUI.Tr("SECTION_VISUAL_TWEAKS", "Visual Tweaks"),
-        OriginalMenuState.VisualsPlanetColors => GenerateUI.Tr("SECTION_PLANET_COLORS", "Planet Colors"),
-        OriginalMenuState.VisualsOttoIcon => GenerateUI.Tr("SECTION_OTTO_ICON", "Otto Icon"),
-        OriginalMenuState.VisualsUiHiding => GenerateUI.Tr("SECTION_UI_HIDING", "UI Hiding"),
-        OriginalMenuState.TweaksGeneral => GenerateUI.Tr("TWEAKS_GENERAL", "General"),
-        OriginalMenuState.TweaksOptimizer => GenerateUI.Tr("SECTION_OPTIMIZER", "Optimizer"),
-        OriginalMenuState.TweaksMainMenu => GenerateUI.Tr("SECTION_MAIN_MENU", "Main Menu"),
-        OriginalMenuState.EditorTileReadout => GenerateUI.Tr("SECTION_SELECTED_TILE_READOUT", "Selected Tile Readout"),
-        OriginalMenuState.EditorBga => GenerateUI.Tr("SECTION_BGA_MOD", "BGA Mod"),
-        OriginalMenuState.EditorFlipRotate => GenerateUI.Tr("SECTION_FLIP_ROTATE_TILES", "Flip & Rotate Tiles"),
-        OriginalMenuState.NostalgiaGameplay or OriginalMenuState.NostalgiaVisuals
-            or OriginalMenuState.NostalgiaTweaks or OriginalMenuState.NostalgiaEditor
-            => GenerateUI.Tr("NOSTALGIA", "Nostalgia"),
-        OriginalMenuState.NostalgiaTuf => GenerateUI.Tr("TUF", "TUF"),
-        OriginalMenuState.NostalgiaTufSettings => GenerateUI.Tr("TUF", "TUF") + " · " + GenerateUI.Tr("TUF_SETTINGS", "Settings"),
-        OriginalMenuState.Profiles => GenerateUI.Tr("PROFILES", "Profiles"),
-        OriginalMenuState.Import => GenerateUI.Tr("IMPORT", "Import"),
-        OriginalMenuState.Addons => GenerateUI.Tr("ADDONS", "Addons"),
-        OriginalMenuState.Settings => GenerateUI.Tr("SETTINGS", "Settings"),
-        OriginalMenuState.HelpFaq => GenerateUI.Tr("HELP", "Help") + " · " + GenerateUI.Tr("FAQ", "FAQ"),
-        OriginalMenuState.Credits => GenerateUI.Tr("CREDITS", "Credits"),
-        OriginalMenuState.Developer => GenerateUI.Tr("DEVELOPER", "Developer"),
-        _ => "?",
-    };
     private static void RunSearch(string query) {
         if(resultsContainer == null) return;
         GenerateUI.ClearChildren(resultsContainer);
@@ -165,7 +121,7 @@ internal static class PageSearch {
     private static List<Entry> BuildIndex() {
         List<Entry> list = [];
         foreach(KeyValuePair<int, RectTransform> page in UICore.Pages) {
-            if(page.Key == (int)OriginalMenuState.Search || page.Value == null) continue;
+            if(page.Key == Quartz.UI.Nav.NavRegistry.StateFor(Quartz.UI.Nav.CorePages.SearchPageKey) || page.Value == null) continue;
             Walk(page.Value, page.Key, null, list);
         }
         return list;

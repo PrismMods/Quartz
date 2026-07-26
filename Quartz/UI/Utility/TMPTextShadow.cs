@@ -53,6 +53,7 @@ public static class TMPTextShadow {
         Vector2 baseOffset = new(offsetX, offsetY);
         float spread = soft * 0.25f;
         List<TextMeshProUGUI> layers = root.Layers;
+        bool sourceWrap = TextCompat.GetWrap(text);
         for(int i = 0; i < layers.Count; i++) {
             TextMeshProUGUI layer = layers[i];
             bool active = i < layerCount;
@@ -64,7 +65,7 @@ public static class TMPTextShadow {
                 layerOffset += SoftnessOffset(i - 1, spread);
                 layerColor.a *= 0.28f;
             }
-            SyncLayer(text, layer, layerColor, layerOffset, root.StrippedText);
+            SyncLayer(text, layer, layerColor, layerOffset, root.StrippedText, sourceWrap);
         }
     }
     public static void Remove(TextMeshProUGUI text) {
@@ -146,7 +147,8 @@ public static class TMPTextShadow {
         TextMeshProUGUI layer,
         Color color,
         Vector2 offset,
-        string strippedText
+        string strippedText,
+        bool sourceWrap
     ) {
         RectTransform rect = layer.rectTransform;
         rect.anchorMin = Vector2.zero;
@@ -167,7 +169,7 @@ public static class TMPTextShadow {
         layer.wordSpacing = source.wordSpacing;
         layer.paragraphSpacing = source.paragraphSpacing;
         layer.richText = source.richText;
-        TextCompat.SetWrap(layer, TextCompat.GetWrap(source));
+        TextCompat.SetWrap(layer, sourceWrap);
         layer.overflowMode = source.overflowMode;
         layer.enableAutoSizing = source.enableAutoSizing;
         layer.fontSizeMin = source.fontSizeMin;
@@ -207,6 +209,14 @@ public static class TMPTextShadow {
             _ => new Vector2(-spread, -spread),
         };
     }
+    private const float UnderlayPaddingEpsilon = 0.01f;
+    private static Material ResolveMaterial(TextMeshProUGUI text, ShadowRoot root) {
+        Material cached = root.MatInstance;
+        if(cached != null && ReferenceEquals(text.fontSharedMaterial, cached)) return cached;
+        Material mat = text.fontMaterial;
+        root.MatInstance = mat;
+        return mat;
+    }
     private static void ApplyUnderlay(
         TextMeshProUGUI text,
         ShadowRoot root,
@@ -219,37 +229,49 @@ public static class TMPTextShadow {
         if(shared == null) return;
         if(!on) {
             if(!ReferenceEquals(shared, root.UnderlayAppliedMat)) return;
-            Material off = text.fontMaterial;
+            Material off = ResolveMaterial(text, root);
             if(off != null) off.DisableKeyword("UNDERLAY_ON");
             root.UnderlayAppliedMat = null;
             root.UnderlayDisabledMat = null;
+            root.UnderlayKeywordMat = null;
             return;
         }
         float fs = text.fontSize <= 0f ? 1f : text.fontSize;
-        if(ReferenceEquals(shared, root.UnderlayAppliedMat)
-           && offsetX == root.UnderlayAppliedX && offsetY == root.UnderlayAppliedY
-           && fs == root.UnderlayAppliedFontSize && color == root.UnderlayAppliedColor) return;
-        Material mat = text.fontMaterial;
+        float ux = Mathf.Clamp(offsetX / fs * UnderlayOffsetScale, -1f, 1f);
+        float uy = Mathf.Clamp(offsetY / fs * UnderlayOffsetScale, -1f, 1f);
+        bool sameMat = ReferenceEquals(shared, root.UnderlayAppliedMat);
+        if(sameMat
+           && ux == root.UnderlayAppliedX && uy == root.UnderlayAppliedY
+           && color == root.UnderlayAppliedColor) return;
+        Material mat = ResolveMaterial(text, root);
         if(mat == null) return;
-        mat.EnableKeyword("UNDERLAY_ON");
-        mat.DisableKeyword("UNDERLAY_INNER");
-        mat.SetColor("_UnderlayColor", color);
-        mat.SetFloat("_UnderlayOffsetX", Mathf.Clamp(offsetX / fs * UnderlayOffsetScale, -1f, 1f));
-        mat.SetFloat("_UnderlayOffsetY", Mathf.Clamp(offsetY / fs * UnderlayOffsetScale, -1f, 1f));
+        if(!ReferenceEquals(mat, root.UnderlayKeywordMat)) {
+            mat.EnableKeyword("UNDERLAY_ON");
+            mat.DisableKeyword("UNDERLAY_INNER");
+            root.UnderlayKeywordMat = mat;
+        }
+        if(!sameMat || color != root.UnderlayAppliedColor) mat.SetColor("_UnderlayColor", color);
+        mat.SetFloat("_UnderlayOffsetX", ux);
+        mat.SetFloat("_UnderlayOffsetY", uy);
         mat.SetFloat("_UnderlaySoftness", 0f);
         mat.SetFloat("_UnderlayDilate", 0f);
-        text.UpdateMeshPadding();
+        if(!sameMat
+           || Mathf.Abs(ux - root.UnderlayPaddedX) > UnderlayPaddingEpsilon
+           || Mathf.Abs(uy - root.UnderlayPaddedY) > UnderlayPaddingEpsilon) {
+            text.UpdateMeshPadding();
+            root.UnderlayPaddedX = ux;
+            root.UnderlayPaddedY = uy;
+        }
         root.UnderlayAppliedMat = text.fontSharedMaterial;
-        root.UnderlayAppliedX = offsetX;
-        root.UnderlayAppliedY = offsetY;
-        root.UnderlayAppliedFontSize = fs;
+        root.UnderlayAppliedX = ux;
+        root.UnderlayAppliedY = uy;
         root.UnderlayAppliedColor = color;
         root.UnderlayDisabledMat = null;
     }
     private static void DisableUnderlay(TextMeshProUGUI text, ShadowRoot root) {
         Material shared = text.fontSharedMaterial;
         if(shared == null || ReferenceEquals(shared, root.UnderlayDisabledMat)) return;
-        Material mat = text.fontMaterial;
+        Material mat = ResolveMaterial(text, root);
         if(mat == null) return;
         mat.DisableKeyword("UNDERLAY_ON");
         mat.DisableKeyword("UNDERLAY_INNER");
@@ -259,15 +281,19 @@ public static class TMPTextShadow {
         mat.SetFloat("_UnderlayDilate", 0f);
         root.UnderlayDisabledMat = text.fontSharedMaterial;
         root.UnderlayAppliedMat = null;
+        root.UnderlayKeywordMat = null;
     }
     private sealed class ShadowRoot : MonoBehaviour {
         public TextMeshProUGUI Target;
         public RectTransform Rect;
         public Material UnderlayDisabledMat;
         public Material UnderlayAppliedMat;
+        public Material UnderlayKeywordMat;
+        public Material MatInstance;
         public float UnderlayAppliedX;
         public float UnderlayAppliedY;
-        public float UnderlayAppliedFontSize;
+        public float UnderlayPaddedX;
+        public float UnderlayPaddedY;
         public Color UnderlayAppliedColor;
         public CanvasGroup Group;
         public string LastSourceText;

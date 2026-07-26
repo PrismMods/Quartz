@@ -1,0 +1,33 @@
+{
+  "en-US": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "SECTION_PRACTICE_DIFFICULTY": "Practice Difficulty",
+    "PRACTICE_ENABLE": "Enable Practice Difficulty",
+    "PRACTICE_HINT": "Bind a key to a difficulty and a pitch. Both land between attempts, never mid-run: difficulty is held until the current attempt ends, and pitch is written into the level's own Pitch setting once, exactly as if you typed it in. The readout shows anything still queued with an arrow.",
+    "PRACTICE_NO_BINDINGS": "No keys bound yet.",
+    "PRACTICE_ADD": "Add Key",
+    "DESC_PRACTICE_ADD": "Adds another key binding. Up to 16.",
+    "PRACTICE_BINDING": "Key {0}",
+    "PRACTICE_UNBOUND": "Click to bind a key",
+    "PRACTICE_KEY": "Key",
+    "DESC_PRACTICE_KEY": "Press any key to bind it. Escape cancels.",
+    "PRACTICE_DIFFICULTY": "Difficulty",
+    "PRACTICE_SPEED": "Pitch",
+    "PRACTICE_SETSDIFF": "Applies Difficulty",
+    "PRACTICE_SETSSPEED": "Applies Pitch",
+    "PRACTICE_REMOVE": "Remove",
+    "PRACTICE_INDICATOR": "Indicator",
+    "PRACTICE_SHOWINDICATOR": "Show Difficulty Readout",
+    "DESC_PRACTICE_SHOWINDICATOR": "Draws the difficulty the game is actually on, which the in-game selector does not always keep up to date.",
+    "PRACTICE_SHOWSPEED": "Show Pitch",
+    "DESC_PRACTICE_SHOWSPEED": "Shows the level's current Pitch next to the difficulty.",
+    "PRACTICE_INGAMEONLY": "Only While Playing",
+    "PRACTICE_FONTSIZE": "Font Size",
+    "PRACTICE_COLOR": "Text Color",
+    "PRACTICE_RESETPOS": "Reset Position",
+    "PRACTICE_DIFF_LENIENT": "Lenient",
+    "PRACTICE_DIFF_NORMAL": "Normal",
+    "PRACTICE_DIFF_STRICT": "Strict",
+    "PRACTICE_DIFF_UNKNOWN": "Difficulty ?"
+  }
+}
