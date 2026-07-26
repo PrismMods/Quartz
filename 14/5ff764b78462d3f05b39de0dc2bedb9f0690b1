@@ -1,0 +1,23 @@
+Quartz/Modules/ModuleContext.cs
+  s_4758459650c24f::t_82b025a4102a47 98-99,108,171
+Quartz/Localization/Translator.cs
+  s_4758459650c24f::t_d2e16edc3ed356 76,86
+  s_4758459650c24f::t_82b025a4102a47 252-259
+  s_4758459650c24f::t_129bb7c8d50a74 15-20,144,147-156,178-185,260,262
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "145ff764b78462d3f05b39de0dc2bedb9f0690b1",
+  "prompts": {},
+  "sessions": {
+    "s_4758459650c24f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d544457d-b243-4ed8-a01b-7b5331b552df",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
