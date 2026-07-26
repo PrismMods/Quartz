@@ -1,0 +1,28 @@
+scripts/i18n_sync.py
+  s_4758459650c24f::t_26e96e6ab5b47d 106-119
+  s_4758459650c24f::t_9a5ab0727a3ccf 129-149,151-160,162,164,166,169-170,173-174,177-184,191-194,196-234
+  s_4758459650c24f::t_975ef459e0c249 39-71
+  s_4758459650c24f::t_c8bdc1abfd717f 72
+.github/workflows/i18n-pull.yml
+  s_4758459650c24f::t_b0ea6b2716451b 43-48
+  s_4758459650c24f::t_570bc80050e808 62,68-69,71-73
+.github/workflows/i18n-push.yml
+  s_4758459650c24f::t_26e96e6ab5b47d 71-78
+  s_4758459650c24f::t_570bc80050e808 36-38,40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "f21a08dbcc719c6bf7f79a24129ad87a41aea183",
+  "prompts": {},
+  "sessions": {
+    "s_4758459650c24f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d544457d-b243-4ed8-a01b-7b5331b552df",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
