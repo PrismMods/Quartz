@@ -12,6 +12,12 @@ public class Translator {
     private readonly string KTLKey;
     private readonly string ExpectedKTLValue;
     private volatile Dictionary<string, Dictionary<string, string>> translations = [];
+    // Modules hand their language blocks over at load time, but Load() rebuilds the
+    // dictionaries from disk and would drop every one of them — which is why a module
+    // page's name showed English while core categories were translated. Keep the
+    // blocks and re-apply them after every load, newest per source wins.
+    private readonly Dictionary<string, string> mergedSources = new(StringComparer.Ordinal);
+    private readonly object mergedLock = new();
     private volatile Dictionary<string, Dictionary<string, string[]>> translationsArr = [];
     public const string FALLBACK_LANGUAGE = "DEFAULT";
     public string Language {
@@ -67,6 +73,7 @@ public class Translator {
             Log($"[Translator Exception] {e.GetType().Name}: {e.Message}");
             translations = newTranslations;
             translationsArr = newTranslationsArr;
+            ReapplyMerged();
             Finish();
             return;
         }
@@ -76,6 +83,7 @@ public class Translator {
             Log($"{LOG_PREFIX_WARNING}No translation files found");
             translations = newTranslations;
             translationsArr = newTranslationsArr;
+            ReapplyMerged();
             Finish();
             return;
         }
@@ -133,9 +141,19 @@ public class Translator {
         translationsArr = newTranslationsArr
             .OrderBy(kv => kv.Key, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(kv => kv.Key, kv => kv.Value);
+        ReapplyMerged();
         Finish();
     }
-    public bool Merge(string json, string source) {
+    public bool Merge(string json, string source) => Merge(json, source, remember: true);
+    private void ReapplyMerged() {
+        KeyValuePair<string, string>[] blocks;
+        lock(mergedLock) {
+            if(mergedSources.Count == 0) return;
+            blocks = [.. mergedSources];
+        }
+        foreach(KeyValuePair<string, string> entry in blocks) Merge(entry.Value, entry.Key, remember: false);
+    }
+    private bool Merge(string json, string source, bool remember) {
         if(string.IsNullOrWhiteSpace(json)) return false;
         try {
             JObject root = JObject.Parse(json);
@@ -157,8 +175,14 @@ public class Translator {
                 }
                 blocks++;
             }
-            if(blocks > 0) Log($"{LOG_PREFIX}Merged {blocks} language block(s) from {source}.");
-            return blocks > 0;
+            if(blocks > 0) {
+                if(remember) {
+                    lock(mergedLock) mergedSources[source] = json;
+                    Log($"{LOG_PREFIX}Merged {blocks} language block(s) from {source}.");
+                }
+                return true;
+            }
+            return false;
         } catch(Exception e) {
             Log($"{LOG_PREFIX_ERROR}Could not merge translations from {source}");
             Log($"{LOG_PREFIX_EXCEPTION}{e.GetType().Name}: {e.Message}");
@@ -225,7 +249,17 @@ public class Translator {
         if(translationsArr.TryGetValue(Language, out var lang) && lang.TryGetValue(key, out var values)) return values.Length;
         return 0;
     }
+    // Prefix-based: a module registers one block per language, each under its own
+    // source, so unloading has to drop them all.
+    public void Forget(string sourcePrefix) {
+        if(string.IsNullOrEmpty(sourcePrefix)) return;
+        lock(mergedLock) {
+            foreach(string key in mergedSources.Keys.Where(k => k.StartsWith(sourcePrefix, StringComparison.Ordinal)).ToList())
+                mergedSources.Remove(key);
+        }
+    }
     public void Release() {
+        lock(mergedLock) mergedSources.Clear();
         translations = [];
         translationsArr = [];
         logAction = null;

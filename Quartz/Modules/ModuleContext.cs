@@ -95,6 +95,8 @@ public sealed class ModuleContext {
     public ResourceManager Resources(Type anyTypeInModule, string prefix) =>
         new(anyTypeInModule.Assembly, prefix);
     public bool RegisterTranslations(string json) => MainCore.Tr.Merge(json, "module " + Id);
+    private bool RegisterTranslations(string json, string resourceName) =>
+        MainCore.Tr.Merge(json, "module " + Id + " " + resourceName);
     public bool RegisterTranslations(Type anyTypeInModule, string resourceName) {
         try {
             using Stream stream = anyTypeInModule.Assembly.GetManifestResourceStream(resourceName);
@@ -103,7 +105,7 @@ public sealed class ModuleContext {
                 return false;
             }
             using StreamReader reader = new(stream);
-            return RegisterTranslations(reader.ReadToEnd());
+            return RegisterTranslations(reader.ReadToEnd(), resourceName);
         } catch(Exception e) {
             Err($"couldn't read translations '{resourceName}': {e.Message}");
             return false;
@@ -166,6 +168,7 @@ public sealed class ModuleContext {
             Quartz.Interop.ImportRegistry.Unregister(Id);
             importHandlers = false;
         }
+        MainCore.Tr.Forget("module " + Id);
         if(homeCards.Count > 0) {
             Quartz.UI.Home.HomeRegistry.RemoveOwner(Id);
             homeCards.Clear();
