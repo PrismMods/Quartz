@@ -33,7 +33,11 @@ on:
   push:
     branches: [main]
     paths:
+      # Every module ships its own Lang/ directory, and i18n_sync.py unions them all
+      # into the single per-language file translators work on. A module-only string
+      # change MUST reach i18n or the hourly pull proposes deleting it.
       - "Quartz/Resource/Export/Lang/**"
+      - "modules/*/Lang/**"
   workflow_dispatch:
 
 jobs:
@@ -64,7 +68,14 @@ jobs:
       - name: Validate what we are about to publish
         # Our own files, our own validator — a dev committing broken JSON here would
         # otherwise ship it to every translator.
-        run: python3 quartz/scripts/validate_i18n.py quartz/Quartz/Resource/Export/Lang quartz/Quartz/Resource/Export/Lang/en-US.json
+        run: |
+          python3 quartz/scripts/validate_i18n.py quartz/Quartz/Resource/Export/Lang quartz/Quartz/Resource/Export/Lang/en-US.json
+          for d in quartz/modules/*/Lang; do
+            [ -d "$d" ] || continue
+            # Each module is measured against its OWN en-US: its Lang dir holds only
+            # that module's keys, so core's reference would flag all of them as dead.
+            python3 quartz/scripts/validate_i18n.py "$d" "$d/en-US.json"
+          done
       - name: Merge our languages into i18n
         # Reads the i18n checkout purely as JSON data and never executes anything
         # from it, so translator-controlled content cannot reach I18N_PAT.

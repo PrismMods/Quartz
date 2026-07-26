@@ -40,7 +40,12 @@ jobs:
           path: i18n
       - name: Validate incoming translations
         # this repo's validator, run against i18n's data — see security note above
-        run: python3 quartz/scripts/validate_i18n.py i18n/Lang quartz/Quartz/Resource/Export/Lang/en-US.json
+        run: |
+          # i18n holds ONE file per language covering core + every module, so it must
+          # be validated against the UNION en-US, not core's alone — otherwise every
+          # module key reads as a dead key.
+          python3 quartz/scripts/i18n_sync.py merged-ref quartz/Quartz/Resource/Export/Lang /tmp/en-US-merged.json
+          python3 quartz/scripts/validate_i18n.py i18n/Lang /tmp/en-US-merged.json
       - name: Merge translations in (never delete a key)
         # Was a wholesale `cp`, which let a stale i18n erase live strings: its ko-KR
         # lagged this repo by 31 keys, so it proposed deleting 31 Korean strings
@@ -54,13 +59,18 @@ jobs:
         run: |
           git config user.name "quartz-i18n-bot"
           git config user.email "i18n-bot@users.noreply.github.com"
-          git add Quartz/Resource/Export/Lang
+          git add Quartz/Resource/Export/Lang modules/*/Lang
           # Hard guard: a pull must never change a language THIS repo authors,
           # whatever the merge step did. Reset each to HEAD in both index and
           # worktree so it can never appear in the sync commit. The list comes from
           # i18n_sync.py's OWNED_HERE so it cannot drift out of step with the merge.
           for code in $(python3 scripts/i18n_sync.py owned); do
+            # Every authoring root, not just core: a module's en-US/ko-KR is owned
+            # here too, so a pull must never rewrite one.
             git checkout HEAD -- "Quartz/Resource/Export/Lang/$code.json"
+            for d in modules/*/Lang; do
+              [ -f "$d/$code.json" ] && git checkout HEAD -- "$d/$code.json"
+            done
           done
           if git diff --cached --quiet; then
             echo "no translation changes"
