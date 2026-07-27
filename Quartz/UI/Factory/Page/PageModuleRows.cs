@@ -6,6 +6,7 @@ using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 namespace Quartz.UI.Factory.Page;
 internal static class PageModuleRows {
     public static void Installed(Transform parent, ModuleService.Handle handle) {
@@ -70,6 +71,7 @@ internal static class PageModuleRows {
         RectTransform row = GenerateUI.Row(parent, 60f);
         GenerateUI.ButtonRow(row);
         UIButton install = GenerateUI.Button(row, () => ModuleBundle.Install(id), name, "modules_install_" + id);
+        install.Rect.gameObject.AddComponent<LayoutElement>().flexibleWidth = 1f;
         install.Rect.AddToolTip(
             "DESC_MODULES_INSTALL_BUNDLED",
             "Installs this module from the copy that shipped with Quartz — no download needed."
@@ -88,6 +90,7 @@ internal static class PageModuleRows {
             if(blocked || ModuleInstallService.Busy) return;
             ModuleInstallService.Install(entry.Id);
         }, name, "modules_install_" + entry.Id);
+        install.Rect.gameObject.AddComponent<LayoutElement>().flexibleWidth = 1f;
         install.Rect.AddToolTip(Describe(entry, blocked, offline));
         TextMeshProUGUI meta = GenerateUI.AddMutedText(GenerateUI.Row(parent, 30f), 15f, 0.4f, true);
         meta.overflowMode = TextOverflowModes.Ellipsis;
