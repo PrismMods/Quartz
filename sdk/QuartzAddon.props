@@ -99,7 +99,7 @@
 
   <Target Name="_QuartzAddonCheckGame" BeforeTargets="ResolveAssemblyReferences">
     <Error Condition="!Exists('$(MSBuildThisFileDirectory)QuartzAddon.dll')"
-           Text="QuartzAddon.dll not found next to QuartzAddon.props ($(MSBuildThisFileDirectory)). Copy it from the mod's sdk/ folder." />
+           Text="QuartzAddon.dll not found next to QuartzAddon.props ($(MSBuildThisFileDirectory)). It is a build output and is not committed — download it into that folder: curl -L -o &quot;$(MSBuildThisFileDirectory)QuartzAddon.dll&quot; https://github.com/PrismMods/Quartz/releases/download/latest-alpha/QuartzAddon.dll  (see sdk/README.md)" />
     <Error Condition="!Exists('$(ManagedDir)')"
            Text="Game 'Managed' folder not found at '$(ManagedDir)'. Set GamePath (and GameData) in Directory.Build.props next to your addon, or pass -p:GamePath=... -p:GameData=... — see sdk/README.md." />
   </Target>

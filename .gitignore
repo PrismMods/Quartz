@@ -2,6 +2,11 @@
 bin/
 obj/
 /dist/
+# The addon SDK reference assembly. Emitted by the mod build (PublishAddonSdk)
+# with a fresh MVID every time, so tracking it made the tree dirty after any
+# build. Modders get it from the release instead — tools/release.sh attaches it
+# to every release, including the rolling latest-alpha pointer.
+/sdk/QuartzAddon.dll
 # Roslyn compiler artifacts leaked to repo root by the addon system's C# compiler
 /Microsoft.CodeAnalysis.*
 
