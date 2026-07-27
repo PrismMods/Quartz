@@ -1,0 +1,183 @@
+modules/Tuf/TufApiClient.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 4,12
+modules/Nostalgia/NostalgiaLegacyCLS.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 56,173,177,211,226
+Quartz/Features/Interop/Readers/JipperKeyViewerReader.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 5,20
+Quartz.Tests/Features/Tuf/TufSecurityTests.cs
+  s_dd0035a49fb7d2::t_caf7362796f07a 108
+modules/UiHider/UiHider.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 64,128,175,191
+modules/Tweaks/TweaksPatches.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 5,60,77,140-141,176
+Quartz/Features/Interop/XPerfectBridge.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 2,107,133,135
+Quartz/Core/Service/LangUpdateService.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 9,23
+modules/Tuf/TufPackService.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 77
+modules/Tuf/TufPackApiClient.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 5,16
+Quartz.Tests/Features/Tuf/TufDiskSpaceTests.cs
+  s_dd0035a49fb7d2::t_caf7362796f07a 5,63
+modules/PlanetColors/PlanetColorsPatches.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 5,42
+modules/PlanetColors/PlanetColors.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 66,78,93,115,124,137,148,151,176,210,214-216,218,233,258,262,294,301,320,336
+Quartz/Core/QuartzRuntime.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 133,233
+  s_dd0035a49fb7d2::t_a61f616e3c6031 44
+modules/UiHider/UiHiderPatches.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 4,55,57
+modules/Editor/EditorBgaMod.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 4,28,41,49,124
+Quartz/Features/Interop/UmmInterop.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 3,63,84
+modules/KeyViewer/KeyViewerOverlay.DmNoteParsing.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 396
+modules/KeyViewer/Layout/KvStore.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 312,317
+Quartz/Game/Stats/ProgressTracker.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 15,18,22,50,58
+modules/Optimizer/Optimizer.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 90,127-128
+Quartz/Update/UpdateService.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 57,275,289,303
+Quartz/Modules/ModuleInstallService.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 18,179
+modules/KeyLimiter/ChatterBlocker.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 62,205
+modules/KeyLimiter/KeyLimiterSettings.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 4,70
+modules/Nostalgia/NostalgiaPatches.Etc.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 2,12
+Quartz/Features/Interop/ReflectionHelpers.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 156,282
+modules/SongTitle/SongTitleOverlay.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 208
+modules/Tuf/TufLevelLauncher.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 26
+Quartz/Compat/Game/GameUi.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 1,19
+modules/KeyViewer/KeyViewerSettings.Serialization.cs
+  s_dd0035a49fb7d2::t_848d022c698bfe 273
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 6
+  s_dd0035a49fb7d2::t_e4baa60b1ec700 246
+Quartz/Compat/Game/GameApi.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 154
+modules/Restriction/Restriction.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 27
+Quartz/UI/Utility/NativeCursor.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 5,39
+modules/AutoDeafen/DiscordOAuthServer.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 119,134,137,153,355,363
+Quartz/IO/AtomicFile.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 3,24,33
+Quartz/UI/Objects/Impl/UIColorPicker.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 353
+Quartz/IO/ProfileManager.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 152
+Quartz.Tests/Features/Tuf/TufInstallTests.cs
+  s_dd0035a49fb7d2::t_caf7362796f07a 5,155
+modules/Calibration/CalibrationSettings.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 4,54
+Quartz/Features/Interop/SettingsImporter.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 177,327
+modules/Optimizer/LeakGuardPatches.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 5,36,56,68,86,101,107,127
+Quartz/Features/PlayCount/PlayCount.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 146,164
+Quartz/Compat/Game/TextCompat.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 4,20,24,45
+modules/Practice/PracticeDifficulty.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 70,79
+Quartz/Modules/ModuleCatalogService.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 25
+modules/Tuf/TufChartInfo.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 5,46
+modules/NostalgiaVisuals/NostalgiaVisualsPatches.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 10,102,140,152,155,158
+Quartz/IO/ProfileManager.IO.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 89,93,128
+  s_dd0035a49fb7d2::t_484bcc87601777 33
+modules/Tweaks/Tweaks.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 51,57,72,182,184,192,237,273,293,295,310,314-316,324-326,328-329,353,371,382,397,404,423,444,453
+modules/PlanetColors/PlanetColorsSettings.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 5,166,172
+Quartz/Game/HookKeys.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 26
+modules/Tuf/TufInstallPaths.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 1,39
+Quartz/Plugins/PluginEntryScan.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 2,20
+Quartz/Resource/FontManager.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 51,321
+modules/OttoIcon/OttoIcon.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 188
+modules/Editor/Editor.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 97,173
+Quartz/Features/Interop/RequiredModsGate.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 40,61
+Quartz/Plugins/PluginIdentityResolver.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 2,12,19,34
+Quartz/Core/MainCore.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 43
+modules/AutoDeafen/AutoDeafen.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 143,197-198
+modules/Practice/PracticePitch.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 30,34,43
+modules/KeyViewer/Layout/KvDocument.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 4,123
+Quartz.Tests/Program.cs
+  s_dd0035a49fb7d2::t_8c19af25f660a5 5-11
+modules/Tuf/TufDownloadService.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 33,35,45,155,236-237,241
+Quartz.Tests/Core/DiagTests.cs
+  s_dd0035a49fb7d2::t_ac9a1879cb74db 1-32,35-72
+  s_dd0035a49fb7d2::t_44827e188de26d 33-34
+modules/AutoDeafen/DiscordRpc.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 33-34,67,92
+modules/Tuf/TufPreviewCache.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 126,134,309
+Quartz/IO/CoreSettings.cs
+  s_dd0035a49fb7d2::t_eea501724333d0 143
+  s_dd0035a49fb7d2::t_0953faa72dbb6b 134
+modules/Tuf/TufHelperLiteLink.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 55
+modules/Tuf/TufMainLevel.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 63,123
+modules/PlanetColors/PlanetColors.Overlay.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 44,72-73,75,109,122,221
+modules/Editor/EditorFloorReadout.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 12,53
+Quartz/Game/Stats/TimingScale.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 1,9
+Quartz/Plugins/PluginImage.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 2,11
+modules/Nostalgia/NostalgiaTweaks.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 23,39,41,49,51,53,68,70,76,110
+modules/Tuf/TufArchive.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 4,133,138,146
+modules/Nostalgia/Nostalgia.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 41,46,51,62-63
+Quartz/Game/Stats/Bpm.cs
+  s_dd0035a49fb7d2::t_22479bef5eb9a5 32
+Quartz.Tests/Features/Tuf/TufChartInfoTests.cs
+  s_dd0035a49fb7d2::t_caf7362796f07a 4,71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "17477c5c41f4a7213bd5f5da7dbb801afa3bba81",
+  "prompts": {},
+  "sessions": {
+    "s_dd0035a49fb7d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3fa3f501-86e0-4efa-8cc4-f4216865e0f3",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
