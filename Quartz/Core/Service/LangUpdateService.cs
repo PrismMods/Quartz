@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using Quartz.Core;
 namespace Quartz.Core.Service;
 public static class LangUpdateService {
     private const int MaxFileBytes = 2 * 1024 * 1024;
@@ -19,8 +20,7 @@ public static class LangUpdateService {
     private static HttpClient CreateClient() {
         try {
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
         HttpClient client = new() { Timeout = System.TimeSpan.FromSeconds(20) };
         client.DefaultRequestHeaders.UserAgent.ParseAdd("Quartz-Translations");
         return client;

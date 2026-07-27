@@ -48,15 +48,13 @@ public static partial class Tweaks {
     private static void SetAllPlayerSpeed(double speed) {
         try {
             GameApi.SetPlanetSpeed(speed);
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static void SetMenuSong2(bool fast) {
         try {
             AudioSource song2 = ADOBase.conductor?.song2;
             if(song2 != null) song2.volume = fast ? 0.7f : 0f;
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static scrConductor lastMuteConductor;
     private static bool lastMuteTarget;
@@ -71,8 +69,7 @@ public static partial class Tweaks {
             if(conductor.song2 != null && conductor.song2.mute != target) conductor.song2.mute = target;
             lastMuteConductor = conductor;
             lastMuteTarget = target;
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static readonly Dictionary<int, bool> particleActiveStates = [];
     private static readonly Dictionary<int, bool> particleRendererEnabledStates = [];
@@ -182,9 +179,9 @@ public static partial class Tweaks {
     private static void RemoveCheckpointVisual(ffxCheckpoint checkpoint) {
         if(checkpoint == null) return;
         scrFloor floor = null;
-        try { floor = checkpoint.floor; } catch { }
+        try { floor = checkpoint.floor; } catch(Exception e) { Diag.Ignore(e); }
         if(floor == null) {
-            try { floor = checkpoint.GetComponent<scrFloor>(); } catch { }
+            try { floor = checkpoint.GetComponent<scrFloor>(); } catch(Exception e) { Diag.Ignore(e); }
         }
         if(floor == null) return;
         try {
@@ -192,8 +189,7 @@ public static partial class Tweaks {
                 floor.floorIcon = FloorIcon.None;
                 floor.UpdateIconSprite(true);
             }
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     public static void RefreshBallCoreParticlesTweak() => RefreshBallCoreParticlesTweak(false);
     private static void RefreshBallCoreParticlesTweak(bool forceRestore) {
@@ -238,8 +234,7 @@ public static partial class Tweaks {
                 value = property.GetValue(renderer, null);
                 return true;
             }
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
         return false;
     }
     private static MemberInfo GetPlanetRendererMember(Type type, string name) {
@@ -275,8 +270,7 @@ public static partial class Tweaks {
             try {
                 int rootId = particleObject.GetInstanceID();
                 if(particleActiveStates.ContainsKey(rootId) && !particleObject.activeSelf) return;
-            } catch {
-            }
+            } catch(Exception e) { Diag.Ignore(e); }
             DisableParticleSystemTree(particles, particleObject);
             return;
         }
@@ -296,9 +290,9 @@ public static partial class Tweaks {
             try {
                 if(!floorGlowActiveStates.ContainsKey(id)) floorGlowActiveStates[id] = glow.gameObject.activeSelf;
                 glow.gameObject.SetActive(false);
-            } catch { }
+            } catch(Exception e) { Diag.Ignore(e); }
         } else if(floorGlowActiveStates.TryGetValue(id, out bool wasActive)) {
-            try { glow.gameObject.SetActive(wasActive); } catch { }
+            try { glow.gameObject.SetActive(wasActive); } catch(Exception e) { Diag.Ignore(e); }
             floorGlowActiveStates.Remove(id);
         }
     }
@@ -313,14 +307,13 @@ public static partial class Tweaks {
             if(color.a <= 0.001f && floor.floorRenderer.cachedColor.a > 0.001f)
                 color = floor.floorRenderer.cachedColor;
             floor.floorRenderer.color = color;
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static void DisableParticleSystemTree(ParticleSystem particles, GameObject particleObject) {
         RememberActiveState(particleObject);
-        try { particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear); } catch { }
-        try { particles.Clear(true); } catch { }
-        try { DisableParticleSystemEmission(particles); } catch { }
+        try { particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear); } catch(Exception e) { Diag.Ignore(e); }
+        try { particles.Clear(true); } catch(Exception e) { Diag.Ignore(e); }
+        try { DisableParticleSystemEmission(particles); } catch(Exception e) { Diag.Ignore(e); }
         DisableRenderers(particleObject);
         try {
             ParticleSystem[] children = particleObject.GetComponentsInChildren<ParticleSystem>(true);
@@ -328,13 +321,12 @@ public static partial class Tweaks {
                 ParticleSystem child = children[i];
                 if(child == null) continue;
                 RememberActiveState(child.gameObject);
-                try { child.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear); } catch { }
-                try { child.Clear(true); } catch { }
-                try { DisableParticleSystemEmission(child); } catch { }
+                try { child.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear); } catch(Exception e) { Diag.Ignore(e); }
+                try { child.Clear(true); } catch(Exception e) { Diag.Ignore(e); }
+                try { DisableParticleSystemEmission(child); } catch(Exception e) { Diag.Ignore(e); }
             }
-        } catch {
-        }
-        try { particleObject.SetActive(false); } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
+        try { particleObject.SetActive(false); } catch(Exception e) { Diag.Ignore(e); }
     }
     private static void DisableParticleSystemEmission(ParticleSystem particles) {
         int id = particles.GetInstanceID();
@@ -358,8 +350,7 @@ public static partial class Tweaks {
                 if(!particleRendererEnabledStates.ContainsKey(id)) particleRendererEnabledStates[id] = renderer.enabled;
                 renderer.enabled = false;
             }
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static void RestoreParticleSystemTree(GameObject particleObject) {
         if(particleObject == null) return;
@@ -377,8 +368,7 @@ public static partial class Tweaks {
             for(int i = 0; i < particles.Length; i++) {
                 RestoreParticleSystemSettings(particles[i]);
             }
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
         try {
             Renderer[] renderers = particleObject.GetComponentsInChildren<Renderer>(true);
             for(int i = 0; i < renderers.Length; i++) {
@@ -389,8 +379,7 @@ public static partial class Tweaks {
                 renderer.enabled = wasEnabled;
                 particleRendererEnabledStates.Remove(id);
             }
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static void RestoreParticleSystemSettings(ParticleSystem particles) {
         if(particles == null) return;
@@ -405,16 +394,14 @@ public static partial class Tweaks {
                 emission.rateOverTime = rate;
                 particleEmissionRateStates.Remove(id);
             }
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
         try {
             if(particleMaxParticleStates.TryGetValue(id, out int maxParticles)) {
                 ParticleSystem.MainModule main = particles.main;
                 main.maxParticles = maxParticles;
                 particleMaxParticleStates.Remove(id);
             }
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static GameObject[] CollectGameObjects(GameObject root) {
         Transform[] transforms = root.GetComponentsInChildren<Transform>(true);
@@ -433,7 +420,7 @@ public static partial class Tweaks {
         if(obj == null) return;
         int id = obj.GetInstanceID();
         if(!particleActiveStates.TryGetValue(id, out bool wasActive)) return;
-        try { obj.SetActive(wasActive); } catch { }
+        try { obj.SetActive(wasActive); } catch(Exception e) { Diag.Ignore(e); }
         particleActiveStates.Remove(id);
     }
     private static bool IsSafePauseCallSite() {
@@ -454,7 +441,7 @@ public static partial class Tweaks {
                 }
                 if(dt == typeof(PauseMenu)) return true;
             }
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         return false;
     }
     private static void ResetEditorPlayModePauseState() {
@@ -463,6 +450,6 @@ public static partial class Tweaks {
             if(editor == null) return;
             GameApi.ClearEditorPlayModePause(editor);
             if(editor.buttonAuto != null) editor.buttonAuto.interactable = true;
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
 }

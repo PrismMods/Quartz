@@ -2,6 +2,7 @@ using System.Collections;
 using HarmonyLib;
 using UnityEngine;
 using Object = UnityEngine.Object;
+using Quartz.Core;
 namespace Quartz.Features.Optimizer;
 public static class LeakGuardPatches {
     private static readonly HashSet<Sprite> OwnedThumbnails = [];
@@ -32,7 +33,7 @@ public static class LeakGuardPatches {
                     Object.Destroy(__instance.spareRT2);
                     __instance.spareRT2 = null;
                 }
-            } catch { }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
     }
     [HarmonyPatch(typeof(scrCamera), nameof(scrCamera.SetCustomFrameRate))]
@@ -52,7 +53,7 @@ public static class LeakGuardPatches {
                 MeshRenderer quad = CamQuadMesh(__instance);
                 if(quad != null && quad.sharedMaterial != null)
                     __state = quad.sharedMaterial.mainTexture as RenderTexture;
-            } catch { }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
         private static void Postfix(scrCamera __instance, RenderTexture __state) {
             if(__state == null) return;
@@ -64,7 +65,7 @@ public static class LeakGuardPatches {
                 if(ReferenceEquals(__state, current) || ReferenceEquals(__state, CamRT(__instance))) return;
                 __state.Release();
                 Object.Destroy(__state);
-            } catch { }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
     }
     [HarmonyPatch(typeof(WorkshopLevelList), "SelectLevel")]
@@ -82,7 +83,7 @@ public static class LeakGuardPatches {
                 Texture2D tex = __state.texture;
                 Object.Destroy(__state);
                 if(tex != null) Object.Destroy(tex);
-            } catch { }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
     }
     [HarmonyPatch(typeof(PracticeTimeline), nameof(PracticeTimeline.Init))]
@@ -97,13 +98,13 @@ public static class LeakGuardPatches {
                 Texture current = __instance.waveRaw != null ? __instance.waveRaw.texture : null;
                 if(ReferenceEquals(__state, current)) return;
                 if(__state is Texture2D old && old.name == "Waveform") Object.Destroy(old);
-            } catch { }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
     }
     internal static void SweepStaticCaches() {
         try {
             FloorMesh.cache.Clear();
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         PruneFilterDictionaries();
         OwnedThumbnails.Clear();
     }
@@ -123,7 +124,7 @@ public static class LeakGuardPatches {
                         DeadKeys.Add(key);
                 foreach(object key in DeadKeys) dict.Remove(key);
             }
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         DeadKeys.Clear();
     }
 }

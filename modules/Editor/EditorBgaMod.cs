@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Quartz.Compat.Game;
+using Quartz.Core;
 namespace Quartz.Features.Editor;
 public static partial class EditorFeature {
     internal static bool ShouldHideForBga => Enabled && Conf.BgaMod && IsPlaying;
@@ -24,8 +25,7 @@ public static partial class EditorFeature {
                 try {
                     SetFloorsVisible(true);
                     SetPlanetsVisible(true);
-                } catch {
-                }
+                } catch(Exception e) { Diag.Ignore(e); }
                 bgaApplied = false;
                 particleRendererCache.Clear();
             }
@@ -38,8 +38,7 @@ public static partial class EditorFeature {
             if(floors != null && floors.Count > 0 && (!bgaApplied || FloorsLookVisible(floors)))
                 SetFloorsVisible(floors, false);
             bgaApplied = true;
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
         ReconcileBgaDecorations(true);
     }
     private static void RestoreBga() {
@@ -47,8 +46,7 @@ public static partial class EditorFeature {
             try {
                 SetFloorsVisible(true);
                 SetPlanetsVisible(true);
-            } catch {
-            }
+            } catch(Exception e) { Diag.Ignore(e); }
             bgaApplied = false;
             particleRendererCache.Clear();
         }
@@ -123,8 +121,7 @@ public static partial class EditorFeature {
         try {
             UpdateDecoSet(bgaTileDecos, ref bgaTileScanCount, bgaActive && Conf.BgaHideTileDeco, DecoKind.Tile);
             UpdateDecoSet(bgaPlanetDecos, ref bgaPlanetScanCount, bgaActive && Conf.BgaHidePlanetDeco, DecoKind.Planet);
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static void UpdateDecoSet(Dictionary<scrDecoration, bool> flagged, ref int scannedCount, bool hide, DecoKind kind) {
         if(hide) {

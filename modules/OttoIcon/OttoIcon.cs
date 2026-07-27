@@ -185,8 +185,7 @@ public static class OttoIcon {
             spriteStateImage = null;
             hasOriginalTransform = false;
             trackedTransformImage = null;
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     [HarmonyPatch(typeof(scnEditor), "OttoUpdate")]
     private static class OttoUpdatePatch {

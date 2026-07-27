@@ -1,5 +1,6 @@
 #nullable enable
 using System.Text;
+using Quartz.Core;
 namespace Quartz.IO;
 public static class AtomicFile {
     public static void WriteAllText(string path, string contents) => WriteAllBytes(path, Encoding.UTF8.GetBytes(contents ?? string.Empty));
@@ -20,9 +21,7 @@ public static class AtomicFile {
                     File.Replace(tempPath, fullPath, null);
                     committed = true;
                     return;
-                } catch(PlatformNotSupportedException) {
-                } catch(IOException) {
-                }
+                } catch(PlatformNotSupportedException e) { Diag.Ignore(e); } catch(IOException e) { Diag.Ignore(e); }
                 File.Copy(tempPath, fullPath, true);
                 File.Delete(tempPath);
                 committed = true;
@@ -31,7 +30,7 @@ public static class AtomicFile {
             File.Move(tempPath, fullPath);
             committed = true;
         } finally {
-            if(!committed) try { File.Delete(tempPath); } catch { }
+            if(!committed) try { File.Delete(tempPath); } catch(Exception e) { Diag.Ignore(e); }
         }
     }
 }

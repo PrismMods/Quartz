@@ -1,6 +1,7 @@
 using Newtonsoft.Json.Linq;
 using Quartz.IO;
 using Quartz.IO.Interface;
+using Quartz.Core;
 namespace Quartz.Features.KeyLimiter;
 public sealed class KeyLimiterProfile {
     public string Name = "";
@@ -66,7 +67,7 @@ public sealed class KeyLimiterSettings : ISettingsFile {
         if(token is not JArray arr) return [];
         List<int> keys = [];
         foreach(JToken t in arr)
-            try { keys.Add((int)t); } catch { }
+            try { keys.Add((int)t); } catch(Exception e) { Diag.Ignore(e); }
         return [.. keys];
     }
 }

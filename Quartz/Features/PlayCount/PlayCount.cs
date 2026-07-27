@@ -143,8 +143,7 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
             try {
                 string official = ADOBase.currentLevel;
                 if(!string.IsNullOrEmpty(official)) return "official:" + official;
-            } catch {
-            }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
         string fileMapKey = TryGetLevelFileMapKey();
         if(!string.IsNullOrEmpty(fileMapKey)) return fileMapKey;
@@ -162,8 +161,7 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
                     return "new:" + Sha256(sb.ToString());
                 }
             }
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
         return "unknown";
     }
     private static readonly object hashGate = new();

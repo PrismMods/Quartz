@@ -63,8 +63,7 @@ public static partial class PlanetColors {
             PlanetarySystem system = GameApi.Planetary(ADOBase.controller);
             scrPlanet[] planets = GetSystemPlanets(system);
             if(planets.Length > 0) return planets;
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
         try { return FindObjectsCompat<scrPlanet>(); }
         catch { return EmptyPlanets; }
     }
@@ -76,8 +75,7 @@ public static partial class PlanetColors {
                 if(system.planetRed == planet) return true;
                 if(system.planetBlue == planet) return false;
             }
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
         try { return planet != null && planet.planetIndex == 0; }
         catch { return true; }
     }
@@ -92,8 +90,7 @@ public static partial class PlanetColors {
                 int index = system.allPlanets != null ? system.allPlanets.IndexOf(planet) : -1;
                 if(index >= 0) return Mathf.Clamp(index, 0, PlanetColorsSettings.Slots - 1);
             }
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
         try { return Mathf.Clamp(planet.planetIndex, 0, PlanetColorsSettings.Slots - 1); }
         catch { return 0; }
     }
@@ -115,8 +112,7 @@ public static partial class PlanetColors {
             if(planet == null) continue;
             try {
                 if(planet.planetRenderer == renderer) return planet;
-            } catch {
-            }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
         return null;
     }
@@ -125,8 +121,7 @@ public static partial class PlanetColors {
         try {
             if(planet.planetRenderer != null)
                 rendererSlots[planet.planetRenderer.GetInstanceID()] = GetPlanetSlot(planet);
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static Color BallColor(int slot) => Conf.GetBallColor(slot);
     private static Color TailColor(int slot) => Conf.GetTailColor(slot);
@@ -139,7 +134,7 @@ public static partial class PlanetColors {
         for(int i = 0; i < planets.Length; i++)
             ApplyPlanetColor(planets[i]);
         if(!OverlayEnabled) DisableAllOverlays();
-        try { ApplyLogoColor(scrLogoText.instance); } catch { }
+        try { ApplyLogoColor(scrLogoText.instance); } catch(Exception e) { Diag.Ignore(e); }
     }
     public static void Restore() {
         DisableAllOverlays();
@@ -150,10 +145,10 @@ public static partial class PlanetColors {
             bool wasApplying = applying;
             applying = true;
             try { planet.planetRenderer.LoadPlanetColor(IsRedPlanet(planet)); }
-            catch { }
+            catch(Exception e) { Diag.Ignore(e); }
             finally { applying = wasApplying; }
         }
-        try { scrLogoText.instance?.UpdateColors(); } catch { }
+        try { scrLogoText.instance?.UpdateColors(); } catch(Exception e) { Diag.Ignore(e); }
         rendererSlots.Clear();
     }
     private static MethodInfo logoColorMethod;
@@ -178,8 +173,7 @@ public static partial class PlanetColors {
             logoColorInvokeArgs[0] = color;
             logoColorInvokeArgs[1] = isFire;
             method.Invoke(logoText, logoColorInvokeArgs);
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static MethodInfo GetLogoColorMethod(Type type) {
         if(logoColorMethodResolved) return logoColorMethod;
@@ -213,16 +207,15 @@ public static partial class PlanetColors {
             slot = Mathf.Clamp(slot, 0, PlanetColorsSettings.Slots - 1);
             Color ballColor = BallColor(slot);
             Color tailColor = TailColor(slot);
-            try { renderer.DisableAllSpecialPlanets(); } catch { }
+            try { renderer.DisableAllSpecialPlanets(); } catch(Exception e) { Diag.Ignore(e); }
             try {
                 if(renderer.sprite != null && ADOBase.gc != null && ADOBase.gc.tex_planetWhite != null)
                     renderer.sprite.sprite = ADOBase.gc.tex_planetWhite;
-            } catch {
-            }
-            try { renderer.SetPlanetColor(ballColor); } catch { }
-            try { renderer.SetTailColor(tailColor); } catch { }
+            } catch(Exception e) { Diag.Ignore(e); }
+            try { renderer.SetPlanetColor(ballColor); } catch(Exception e) { Diag.Ignore(e); }
+            try { renderer.SetTailColor(tailColor); } catch(Exception e) { Diag.Ignore(e); }
             ApplyTailParticleColor(renderer, tailColor);
-            try { renderer.SetCoreColor(ballColor); } catch { }
+            try { renderer.SetCoreColor(ballColor); } catch(Exception e) { Diag.Ignore(e); }
             InvokeRendererColor(renderer, "SetFaceColor", ballColor);
             ApplyPlanetGlowColor(renderer, ballColor);
             ApplyOverlayToPlanet(renderer, slot);
@@ -237,8 +230,7 @@ public static partial class PlanetColors {
             Color next = color;
             next.a = glow.color.a;
             if(glow.color != next) glow.color = next;
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static void ApplyTailParticleColor(PlanetRenderer renderer, Color tailColor) {
         if(renderer == null) return;
@@ -263,13 +255,11 @@ public static partial class PlanetColors {
                 setParticleSystemColorMethod.Invoke(renderer, particleColorInvokeArgs);
                 return;
             }
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
         try {
             ParticleSystem.MainModule main = particles.main;
             main.startColor = new ParticleSystem.MinMaxGradient(startColor);
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static void EnsureSetParticleSystemColorMethod() {
         if(setParticleSystemColorResolved) return;
@@ -301,16 +291,14 @@ public static partial class PlanetColors {
             if(!GameApi.TryGetRingColor(renderer, out Color current) || current.a == 0f) return;
             current.a = 0f;
             GameApi.SetRingColor(renderer, current);
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static void EnsureRingAccessors() {
         if(ringAccessorsResolved) return;
         ringAccessorsResolved = true;
         try {
             onlyRingRef = AccessTools.FieldRefAccess<PlanetRenderer, bool>("onlyRing");
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static bool IsOnlyRing(PlanetRenderer renderer) {
         EnsureRingAccessors();
@@ -329,8 +317,7 @@ public static partial class PlanetColors {
                 colorInvokeArgs[0] = color;
                 method.Invoke(renderer, colorInvokeArgs);
             }
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static bool TryGetMemberValue(object target, string name, out object value) {
         value = null;
@@ -346,8 +333,7 @@ public static partial class PlanetColors {
                 value = property.GetValue(target, null);
                 return true;
             }
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
         return false;
     }
     private static MemberInfo GetMember(Type type, string name) {

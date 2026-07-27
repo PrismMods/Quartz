@@ -151,7 +151,7 @@ public static class GameApi {
                 ParameterInfo[] ps = m.GetParameters();
                 if(ps.Length == argCount && ps[0].ParameterType == firstArg) return m;
             }
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         return null;
     }
     private static object TransformOperation(string name) {

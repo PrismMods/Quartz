@@ -149,8 +149,7 @@ public static partial class ProfileManager {
             foreach(string file in Directory.GetFiles(DirOf(name), "*.json")) {
                 try {
                     files[Path.GetFileName(file)] = JToken.Parse(File.ReadAllText(file));
-                } catch {
-                }
+                } catch(Exception e) { Diag.Ignore(e); }
             }
             JObject bundle = new() {
                 ["Type"] = BUNDLE_TYPE,

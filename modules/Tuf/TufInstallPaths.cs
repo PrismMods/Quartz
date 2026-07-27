@@ -1,3 +1,4 @@
+using Quartz.Core;
 #nullable enable
 namespace Quartz.Features.Tuf;
 public static class TufInstallPaths {
@@ -35,7 +36,7 @@ public static class TufInstallPaths {
                 if(Directory.Exists(rootFull)
                     && (File.GetAttributes(rootFull) & FileAttributes.ReparsePoint) != 0) return false;
                 return true;
-            } catch { }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
         return false;
     }

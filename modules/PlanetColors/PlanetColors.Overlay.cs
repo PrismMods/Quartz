@@ -41,8 +41,7 @@ public static partial class PlanetColors {
             bool visible = OverlayVisibleThisFrame && overlay.sprite != null && PlanetIsShowing(entry);
             if(overlay.gameObject.activeSelf != visible) overlay.gameObject.SetActive(visible);
             if(visible) SyncOverlayAlpha(overlay, entry);
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static bool PlanetIsShowing(OverlayEntry entry) {
         SpriteRenderer source = entry?.Source;
@@ -70,10 +69,10 @@ public static partial class PlanetColors {
         foreach(Sprite sprite in overlaySprites.Values) {
             if(sprite == null) continue;
             Texture2D tex = null;
-            try { tex = sprite.texture; } catch { }
-            try { UnityEngine.Object.Destroy(sprite); } catch { }
+            try { tex = sprite.texture; } catch(Exception e) { Diag.Ignore(e); }
+            try { UnityEngine.Object.Destroy(sprite); } catch(Exception e) { Diag.Ignore(e); }
             if(tex != null) {
-                try { UnityEngine.Object.Destroy(tex); } catch { }
+                try { UnityEngine.Object.Destroy(tex); } catch(Exception e) { Diag.Ignore(e); }
             }
         }
         overlaySprites.Clear();
@@ -107,8 +106,7 @@ public static partial class PlanetColors {
             SyncOverlayAlpha(overlay, entry);
             bool visible = OverlayActive && PlanetIsShowing(entry);
             if(overlay.gameObject.activeSelf != visible) overlay.gameObject.SetActive(visible);
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static void HideOverlay(PlanetRenderer renderer) {
         if(renderer == null) return;
@@ -121,8 +119,7 @@ public static partial class PlanetColors {
         }
         try {
             if(overlay.gameObject.activeSelf) overlay.gameObject.SetActive(false);
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     public static void DisableAllOverlays() {
         overlayPurgeBuffer.Clear();
@@ -221,7 +218,7 @@ public static partial class PlanetColors {
         try {
             if(Path.IsPathRooted(path)) return path;
             string levelPath = null;
-            try { levelPath = ADOBase.levelPath; } catch { }
+            try { levelPath = ADOBase.levelPath; } catch(Exception e) { Diag.Ignore(e); }
             if(!string.IsNullOrEmpty(levelPath)) {
                 string dir = Path.GetDirectoryName(levelPath);
                 if(!string.IsNullOrEmpty(dir)) return Path.Combine(dir, path);

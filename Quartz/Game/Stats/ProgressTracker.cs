@@ -12,14 +12,14 @@ public static class ProgressTracker {
         if(seqID > 0) return false;
         try {
             if(scnGame.instance != null && scnGame.instance.checkpointsUsed > 0) return false;
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         try {
             if(scrController.checkpointsUsed > 0) return false;
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         try {
             scrController c = scrController.instance;
             if(c != null && c.currentSeqID > 0) return false;
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         return true;
     }
     public static void CaptureRunStart(int seqID = 0) {
@@ -47,7 +47,7 @@ public static class ProgressTracker {
                 float t = start != null ? (float)start.entryTime : 0f;
                 return Mathf.Clamp01(t / total);
             }
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         return GameStats.MapTimeRatio;
     }
     private static float StartProgress(scrController c, int seqID) {
@@ -55,7 +55,7 @@ public static class ProgressTracker {
             scrLevelMaker lm = scrLevelMaker.instance;
             int count = lm != null && lm.listFloors != null ? lm.listFloors.Count : 0;
             if(seqID > 0 && count > 0) return Mathf.Clamp01((seqID + 1f) / count);
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         float progress = c != null ? c.percentComplete : 0f;
         if(progress > 0f) return Mathf.Clamp01(progress);
         return 0f;

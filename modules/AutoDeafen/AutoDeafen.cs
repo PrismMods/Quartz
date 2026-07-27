@@ -140,7 +140,7 @@ public static class AutoDeafen {
     private static void Undeafen() {
         if(!desiredDeaf) return;
         desiredDeaf = false;
-        try { ApplyDeaf(false); } catch { }
+        try { ApplyDeaf(false); } catch(Exception e) { Diag.Ignore(e); }
     }
     public static void Stop() {
         Undeafen();
@@ -194,8 +194,8 @@ public static class AutoDeafen {
     }
     private static void StopRpc() {
         if(rpc == null) return;
-        try { rpc.SetDeaf(false); } catch { }
-        try { rpc.Stop(); } catch { }
+        try { rpc.SetDeaf(false); } catch(Exception e) { Diag.Ignore(e); }
+        try { rpc.Stop(); } catch(Exception e) { Diag.Ignore(e); }
         rpc = null;
         desiredDeaf = false;
         configClientId = null;

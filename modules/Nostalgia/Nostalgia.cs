@@ -38,17 +38,17 @@ public static partial class Nostalgia {
     public static void ApplyDeathSound() {
         try {
             if(Enabled) GCS.playDeathSound = !Conf.DisableDeathSound;
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     public static void ApplyEditorFloors() {
         try {
             if(scnEditor.instance != null) scnEditor.instance.ApplyEventsToFloors();
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     public static void Refresh() {
         EnsureConf();
         ApplyDeathSound();
-        try { RDC.useOldAuto = ShouldWeakAuto; } catch { }
+        try { RDC.useOldAuto = ShouldWeakAuto; } catch(Exception e) { Diag.Ignore(e); }
         ToggleDifficulty(!ShouldHideDifficulty);
         ToggleNoFail(!ShouldHideNoFail);
         ToggleSign(!ShouldDisableAnnounceSign);
@@ -59,8 +59,8 @@ public static partial class Nostalgia {
     static partial void ToggleLegacyCLSImpl(bool active);
     public static void ToggleLegacyCLS(bool active) => ToggleLegacyCLSImpl(active);
     public static void Restore() {
-        try { GCS.playDeathSound = true; } catch { }
-        try { RDC.useOldAuto = false; } catch { }
+        try { GCS.playDeathSound = true; } catch(Exception e) { Diag.Ignore(e); }
+        try { RDC.useOldAuto = false; } catch(Exception e) { Diag.Ignore(e); }
         ToggleDifficulty(true);
         ToggleNoFail(true);
         ToggleSign(true);

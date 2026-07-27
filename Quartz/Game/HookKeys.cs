@@ -23,8 +23,7 @@ public static class HookKeys {
         if(handlers == null) return;
         try {
             handlers(key, down);
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     public static bool Held(KeyCode key) => Ask(key, static s => s.Held);
     public static bool Tracked(KeyCode key) => Ask(key, static s => s.Tracked);

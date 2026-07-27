@@ -2,6 +2,7 @@
 using System.IO.Compression;
 using Quartz.Features.Tuf;
 using static Asserts;
+using Quartz.Core;
 static class TufDiskSpaceTests {
     public static void TestSpaceProbeFailsOpen() {
         string temp = Path.GetTempPath();
@@ -59,7 +60,7 @@ static class TufDiskSpaceTests {
             TufArchive.Extract(ordinary, outDir);
             Assert(File.Exists(Path.Combine(outDir, "main.adofai")), "a normal archive still extracts");
         } finally {
-            try { Directory.Delete(temp, true); } catch { }
+            try { Directory.Delete(temp, true); } catch(Exception e) { Diag.Ignore(e); }
         }
     }
     static void AssertThrows(Action action, string message) {

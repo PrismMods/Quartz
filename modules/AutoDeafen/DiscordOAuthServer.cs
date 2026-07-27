@@ -116,7 +116,7 @@ internal static class DiscordOAuthServer {
             process.StandardInput.Write(text);
             process.StandardInput.Close();
             if(process.WaitForExit(2000)) return process.ExitCode == 0;
-            try { process.Kill(); } catch { }
+            try { process.Kill(); } catch(Exception e) { Diag.Ignore(e); }
             return false;
         } catch {
             return false;
@@ -131,10 +131,10 @@ internal static class DiscordOAuthServer {
             listeners.Add(v4);
             try {
                 TcpListener v6 = new(IPAddress.IPv6Loopback, port);
-                try { v6.Server.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IPv6Only, true); } catch { }
+                try { v6.Server.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IPv6Only, true); } catch(Exception e) { Diag.Ignore(e); }
                 v6.Start();
                 listeners.Add(v6);
-            } catch { }
+            } catch(Exception e) { Diag.Ignore(e); }
             running = true;
             thread = new Thread(Run) { IsBackground = true, Name = "Quartz-DiscordOAuth" };
             thread.Start();
@@ -150,7 +150,7 @@ internal static class DiscordOAuthServer {
     private static void StopLocked() {
         running = false;
         for(int i = 0; i < listeners.Count; i++)
-            try { listeners[i].Stop(); } catch { }
+            try { listeners[i].Stop(); } catch(Exception e) { Diag.Ignore(e); }
         listeners.Clear();
         thread = null;
     }
@@ -352,7 +352,7 @@ internal static class DiscordOAuthServer {
         try {
             Application.OpenURL(url);
             return;
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         try {
             if(Environment.OSVersion.Platform == PlatformID.MacOSX)
                 Process.Start("open", url);
@@ -360,7 +360,7 @@ internal static class DiscordOAuthServer {
                 Process.Start("xdg-open", url);
             else
                 Process.Start(url);
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private sealed class Request {
         internal readonly string Method;

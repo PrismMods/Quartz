@@ -105,7 +105,7 @@ static class TufSecurityTests {
             Assert(File.Exists(Path.Combine(unicodeExtracted, "레벨", "이미지.png")), "unicode asset name preserved");
             Assert(Path.GetFileName(TufArchive.SelectChart(unicodeExtracted)) == "메인.adofai", "unicode chart selected");
         } finally {
-            try { Directory.Delete(temp, true); } catch { }
+            try { Directory.Delete(temp, true); } catch(Exception e) { Diag.Ignore(e); }
         }
     }
     private static void MakeZip(string path, Action<ZipArchive> write) {

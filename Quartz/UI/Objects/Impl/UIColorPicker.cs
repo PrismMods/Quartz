@@ -350,8 +350,7 @@ public sealed class UIColorPicker : UIObject {
                 return true;
             }
         }
-        catch {
-        }
+        catch(Exception e) { Diag.Ignore(e); }
         return false;
     }
     public override void Dispose() {

@@ -67,7 +67,7 @@ public static class PracticeDifficulty {
             scnEditor editor = ADOBase.editor;
             if(editor != null && editor.editorDifficultySelector != null)
                 Traverse.Create(editor.editorDifficultySelector).Method("UpdateDifficultyDisplay").GetValue();
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         try {
             scrUIController ui = scrUIController.instance;
             if(ui == null) return;
@@ -76,6 +76,6 @@ public static class PracticeDifficulty {
                 difficultyIndex.SetValue(CurrentDifficulty);
                 Traverse.Create(ui).Method("UpdateDifficultyUI").GetValue();
             }
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
 }

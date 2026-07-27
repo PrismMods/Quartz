@@ -2,6 +2,7 @@ using Newtonsoft.Json.Linq;
 using Quartz.IO;
 using Quartz.IO.Interface;
 using UnityEngine;
+using Quartz.Core;
 namespace Quartz.Features.PlanetColors;
 public sealed class PlanetColorsSettings : ISettingsFile {
     public const int Slots = 3;
@@ -162,13 +163,13 @@ public sealed class PlanetColorsSettings : ISettingsFile {
     private static void ReadFloats(JToken token, string name, float[] target, float min, float max) {
         if(token?[name] is not JArray arr) return;
         for(int i = 0; i < target.Length && i < arr.Count; i++) {
-            try { target[i] = Mathf.Clamp((float)arr[i], min, max); } catch { }
+            try { target[i] = Mathf.Clamp((float)arr[i], min, max); } catch(Exception e) { Diag.Ignore(e); }
         }
     }
     private static void ReadStrings(JToken token, string name, string[] target) {
         if(token?[name] is not JArray arr) return;
         for(int i = 0; i < target.Length && i < arr.Count; i++) {
-            try { target[i] = arr[i]?.Type == JTokenType.Null ? "" : (string)arr[i] ?? ""; } catch { }
+            try { target[i] = arr[i]?.Type == JTokenType.Null ? "" : (string)arr[i] ?? ""; } catch(Exception e) { Diag.Ignore(e); }
         }
     }
 }

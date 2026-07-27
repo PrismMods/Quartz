@@ -1,4 +1,5 @@
 using System.Reflection;
+using Quartz.Core;
 namespace Quartz.Plugins;
 public static class PluginIdentityResolver {
     private static ResolveEventHandler handler;
@@ -8,16 +9,14 @@ public static class PluginIdentityResolver {
         if(assembly == null) return;
         try {
             current[assembly.GetName().Name] = assembly;
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     public static void Withdraw(Assembly assembly) {
         if(assembly == null) return;
         try {
             string name = assembly.GetName().Name;
             if(current.TryGetValue(name, out Assembly held) && ReferenceEquals(held, assembly)) current.Remove(name);
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     public static void Hook() {
         if(refCount++ > 0) return;
@@ -32,8 +31,7 @@ public static class PluginIdentityResolver {
             for(int i = loaded.Length - 1; i >= 0; i--) {
                 try {
                     if(loaded[i].GetName().Name == name) return loaded[i];
-                } catch {
-                }
+                } catch(Exception e) { Diag.Ignore(e); }
             }
             return null;
         };

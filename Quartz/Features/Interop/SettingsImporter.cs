@@ -174,7 +174,7 @@ public static class SettingsImporter {
                     && obj.TryGetValue("Id", StringComparison.OrdinalIgnoreCase, out JToken t)) {
                     return t?.ToString();
                 }
-            } catch { }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
         return null;
     }
@@ -324,7 +324,7 @@ public static class SettingsImporter {
                         Type t = asm.GetType(fullName, false);
                         if(t != null) return t;
                     }
-                } catch { }
+                } catch(Exception e) { Diag.Ignore(e); }
             }
         }
         return null;

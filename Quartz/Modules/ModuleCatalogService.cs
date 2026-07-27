@@ -22,8 +22,7 @@ public static class ModuleCatalogService {
     private static HttpClient CreateClient() {
         try {
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
         HttpClient client = new(new HttpClientHandler { AllowAutoRedirect = false }) {
             Timeout = TimeSpan.FromSeconds(20),
         };

@@ -1,3 +1,4 @@
+using Quartz.Core;
 namespace Quartz.Compat.Game;
 public static class GameUi {
     public static void HideDifficultyContainer(scrUIController uiController) {
@@ -15,6 +16,6 @@ public static class GameUi {
                 uiController.difficultyButtonLeft.enabled = false;
             if(uiController.difficultyButtonRight != null && uiController.difficultyButtonRight.enabled)
                 uiController.difficultyButtonRight.enabled = false;
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
 }

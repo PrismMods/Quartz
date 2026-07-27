@@ -1,4 +1,5 @@
 using System.Reflection;
+using Quartz.Core;
 namespace Quartz.Features.Interop;
 public static class XPerfectBridge {
     public enum Judge {
@@ -103,7 +104,7 @@ public static class XPerfectBridge {
             hookInstalled = true;
             try {
                 AppDomain.CurrentDomain.AssemblyLoad += OnAssemblyLoad;
-            } catch { }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
         if(!assembliesChanged) return;
         assembliesChanged = false;
@@ -129,9 +130,8 @@ public static class XPerfectBridge {
             if(installed) {
                 try {
                     AppDomain.CurrentDomain.AssemblyLoad -= OnAssemblyLoad;
-                } catch { }
+                } catch(Exception e) { Diag.Ignore(e); }
             }
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
 }

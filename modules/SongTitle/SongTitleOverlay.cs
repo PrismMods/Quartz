@@ -205,8 +205,7 @@ public static class SongTitleOverlay {
                     hiddenTitleGraphics[id] = g;
                 }
                 if(g != null && g.enabled) g.enabled = false;
-            } catch {
-            }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
         private static void PruneDestroyedTitleGraphics() {
             List<int> dead = null;

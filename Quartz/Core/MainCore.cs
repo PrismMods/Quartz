@@ -40,8 +40,7 @@ public static class MainCore {
         } catch {
             try {
                 Runtime.Dispose();
-            } catch {
-            }
+            } catch(Exception e) { Diag.Ignore(e); }
             Runtime = null;
             throw;
         }

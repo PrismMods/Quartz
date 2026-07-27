@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using static Quartz.Features.Nostalgia.Nostalgia;
+using Quartz.Core;
 namespace Quartz.Features.Nostalgia;
 public static class NostalgiaVisualsPatches {
     private static readonly HashSet<int> twirlArrowFloors = [];
@@ -20,7 +21,6 @@ public static class NostalgiaVisualsPatches {
             }
         }
     }
-
     [HarmonyPatch(typeof(scrFloor), "UpdateIconSprite")]
     private static class ShowSpeedChangePatch {
         private static void Prefix(scrFloor __instance) {
@@ -55,7 +55,6 @@ public static class NostalgiaVisualsPatches {
             }
         }
     }
-
     [HarmonyPatch]
     private static class LegacyFlashPatch {
         private static MethodBase TargetMethod() => GameApi.OnDamageTarget;
@@ -65,7 +64,6 @@ public static class NostalgiaVisualsPatches {
             scrFlash.FlashEx(Color.red.WithAlpha(0.5f), Color.clear, 0.6f);
         }
     }
-
     [HarmonyPatch(typeof(scrHitTextMesh), "Show")]
     private static class NoJudgeAnimationPatch {
         private static void Postfix(scrHitTextMesh __instance) {
@@ -75,7 +73,6 @@ public static class NostalgiaVisualsPatches {
         }
     }
     private static scrPlanet legacyHitPlanet;
-
     [HarmonyPatch]
     private static class LegacySwitchChosenPatch {
         private static bool Prepare() => GameApi.SwitchChosenTarget != null && GameApi.LegacyShowHitTextTarget != null;
@@ -83,7 +80,6 @@ public static class NostalgiaVisualsPatches {
         private static void Prefix(scrPlanet __instance) => legacyHitPlanet = __instance;
         private static void Finalizer() => legacyHitPlanet = null;
     }
-
     [HarmonyPatch]
     private static class LegacyLateJudgementPatch {
         private static bool Prepare() => GameApi.LegacyShowHitTextTarget != null;
@@ -103,10 +99,9 @@ public static class NostalgiaVisualsPatches {
                 Vector3 pos = other.transform.position;
                 pos.y += 1f;
                 position = pos;
-            } catch { }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
     }
-
     [HarmonyPatch]
     private static class LateJudgementPatch {
         private static MethodBase TargetMethod() => GameApi.ShowHitTextTarget;
@@ -142,7 +137,7 @@ public static class NostalgiaVisualsPatches {
                     if(hitTextMeshTextPosRef != null) hitTextMeshTextPosRef(newest) = pos;
                     newest.transform.position = pos;
                 }
-            } catch { }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
     }
     private static bool hitTextAccessorsResolved;
@@ -154,20 +149,18 @@ public static class NostalgiaVisualsPatches {
         hitTextAccessorsResolved = true;
         try {
             cachedHitTextsField = AccessTools.Field(GameApi.ShowHitTextTarget?.DeclaringType, "cachedHitTexts");
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         try {
             hitTextMeshFrameShownRef = AccessTools.FieldRefAccess<scrHitTextMesh, int>("frameShown");
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         try {
             hitTextMeshTextPosRef = AccessTools.FieldRefAccess<scrHitTextMesh, Vector3>("textPos");
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
-
     [HarmonyPatch(typeof(scrController), "StartLoadingScene")]
     private static class TwirlSceneResetPatch {
         private static void Postfix() => twirlArrowFloors.Clear();
     }
-
     [HarmonyPatch(typeof(scrFloor), "UpdateIconSprite")]
     private static class LegacyTwirlPatch {
         private static void Postfix(scrFloor __instance) {

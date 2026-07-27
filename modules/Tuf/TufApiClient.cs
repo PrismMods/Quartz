@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;
+using Quartz.Core;
 namespace Quartz.Features.Tuf;
 public sealed class TufApiClient : IDisposable {
     private const int MaxJsonBytes = 2 * 1024 * 1024;
@@ -8,7 +9,7 @@ public sealed class TufApiClient : IDisposable {
     private readonly HttpClient http;
     private CancellationTokenSource staleRequest;
     public TufApiClient() {
-        try { ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12; } catch { }
+        try { ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12; } catch(Exception e) { Diag.Ignore(e); }
         http = new HttpClient(new HttpClientHandler {
             AllowAutoRedirect = false
         }) {

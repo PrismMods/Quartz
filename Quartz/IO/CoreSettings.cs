@@ -131,7 +131,7 @@ public sealed class CoreSettings : ISettingsFile {
             foreach(var prop in collapsibleStates.Properties()) {
                 try {
                     CollapsibleStates[prop.Name] = prop.Value.Value<bool>();
-                } catch { }
+                } catch(Exception e) { Diag.Warn(e, "Settings/CollapsibleStates:" + prop.Name); }
             }
         }
         ToggleKeybinds.Clear();
@@ -140,7 +140,7 @@ public sealed class CoreSettings : ISettingsFile {
                 try {
                     if(prop.Value is not JArray pair || pair.Count != 2) continue;
                     ToggleKeybinds[prop.Name] = (pair[0].Value<int>(), pair[1].Value<int>());
-                } catch { }
+                } catch(Exception e) { Diag.Warn(e, "Settings/ToggleKeybinds:" + prop.Name); }
             }
         }
         AccentR = IOUtils.Read(token, nameof(AccentR), AccentR);

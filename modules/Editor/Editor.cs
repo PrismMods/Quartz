@@ -94,8 +94,7 @@ public static partial class EditorFeature {
             } else if(!want && applied) {
                 DisableHorizontal();
             }
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static void EnableHorizontal() {
         GameObject template = ADOBase.gc?.prefab_property;
@@ -171,8 +170,7 @@ public static partial class EditorFeature {
             settings.ShowPanel(settings.selectedEventType, events.cacheEventIndex);
             events.HideAllInspectorTabs();
             events.ShowInspector(false, false);
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static void RebuildPanel(
         InspectorPanel panel,

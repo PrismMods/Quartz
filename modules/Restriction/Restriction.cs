@@ -24,7 +24,7 @@ public static class Restriction {
             scrController c = scrController.instance;
             if(c == null || failTriggered) return;
             failTriggered = GameApi.FailByHitbox(c, reason);
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     public static string JudgementName(HitMargin hit) {
         string key = hit switch {

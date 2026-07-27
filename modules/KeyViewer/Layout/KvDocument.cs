@@ -1,6 +1,7 @@
 using System.Globalization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Quartz.Core;
 namespace Quartz.Features.KeyViewer.Layout;
 internal sealed class KvDocument {
     private const string DefaultTabId = "custom-quartz";
@@ -119,7 +120,7 @@ internal sealed class KvDocument {
         bool enabled = false;
         try {
             enabled = Root["useCustomCSS"]?.ToObject<bool>() ?? false;
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         string content = (Root["customCSS"] as JObject)?["content"]?.ToString() ?? "";
         return (enabled, content);
     }

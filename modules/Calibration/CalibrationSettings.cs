@@ -1,6 +1,7 @@
 using Newtonsoft.Json.Linq;
 using Quartz.IO;
 using Quartz.IO.Interface;
+using Quartz.Core;
 namespace Quartz.Features.Calibration;
 public sealed class CalibrationSettings : ISettingsFile {
     public bool ShowPopupOnDeath = true;
@@ -50,8 +51,7 @@ public sealed class CalibrationSettings : ISettingsFile {
             foreach(JProperty prop in offsets.Properties()) {
                 try {
                     FloatOffsetByDevice[prop.Name] = prop.Value.Value<float>();
-                } catch {
-                }
+                } catch(Exception e) { Diag.Ignore(e); }
             }
         }
     }

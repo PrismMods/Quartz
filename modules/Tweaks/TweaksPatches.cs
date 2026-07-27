@@ -2,6 +2,7 @@ using HarmonyLib;
 using UnityEngine;
 using System.Reflection;
 using Quartz.Compat.Game;
+using Quartz.Core;
 namespace Quartz.Features.Tweaks;
 public static partial class Tweaks {
     [HarmonyPatch(typeof(scrController), "StartLoadingScene")]
@@ -56,8 +57,7 @@ public static partial class Tweaks {
                 if(!lightUpDisableGlowStates.ContainsKey(id))
                     lightUpDisableGlowStates[id] = __instance.disableGlow;
                 __instance.disableGlow = true;
-            } catch {
-            }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
         private static void Postfix(scrFloor __instance) {
             if(__instance == null) return;
@@ -74,8 +74,7 @@ public static partial class Tweaks {
                         __instance.disableGlow = wasDisabled;
                         lightUpDisableGlowStates.Remove(id);
                     }
-                } catch {
-                }
+                } catch(Exception e) { Diag.Ignore(e); }
             }
             if(!disable) return;
             suppressNextRandomColorFloorIds.Add(id);
@@ -138,8 +137,8 @@ public static partial class Tweaks {
     private static class PlanetStartPatch {
         private static void Postfix(scrPlanet __instance) {
             InvalidateRendererCache();
-            try { ApplyBallCoreParticlesTweak(__instance.planetRenderer); } catch { }
-            try { ApplyPlanetGlowTweak(__instance.planetRenderer); } catch { }
+            try { ApplyBallCoreParticlesTweak(__instance.planetRenderer); } catch(Exception e) { Diag.Ignore(e); }
+            try { ApplyPlanetGlowTweak(__instance.planetRenderer); } catch(Exception e) { Diag.Ignore(e); }
         }
     }
     [HarmonyPatch(typeof(scrController), "TogglePauseGame")]
@@ -174,7 +173,7 @@ public static partial class Tweaks {
     private static class MenuBpmInitPatch {
         private static void Postfix() {
             try { ApplyInitialMenuBpm(); }
-            catch { }
+            catch(Exception e) { Diag.Ignore(e); }
         }
     }
     [HarmonyPatch]

@@ -2,6 +2,7 @@ using Quartz.Interop;
 using Newtonsoft.Json.Linq;
 using static Quartz.Features.Interop.ReflectionHelpers;
 using static Quartz.Features.Interop.Readers.KeyViewerImportShared;
+using Quartz.Core;
 namespace Quartz.Features.Interop.Readers;
 internal static class JipperKeyViewerReader {
     public static int ImportJipperKeyViewer(
@@ -16,7 +17,7 @@ internal static class JipperKeyViewerReader {
         if(imported == null || imported.Available == SettingsImportKeyViewerPart.None) {
             string json = ReadFirstText(JkvConfigPaths(option));
             if(!string.IsNullOrEmpty(json)) {
-                try { imported = ReadKeyViewerFromJson(JObject.Parse(json)); } catch { }
+                try { imported = ReadKeyViewerFromJson(JObject.Parse(json)); } catch(Exception e) { Diag.Ignore(e); }
             }
         }
         if(imported == null || imported.Available == SettingsImportKeyViewerPart.None) return 0;

@@ -54,8 +54,7 @@ public static class UpdateService {
     private static HttpClient CreateClient() {
         try {
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
         HttpClient client = new() { Timeout = System.TimeSpan.FromSeconds(20) };
         client.DefaultRequestHeaders.UserAgent.ParseAdd("Quartz-Updater");
         client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
@@ -273,8 +272,7 @@ public static class UpdateService {
             string tmp = dest + ".krnew";
             try {
                 if(File.Exists(tmp)) File.Delete(tmp);
-            } catch {
-            }
+            } catch(Exception e) { Diag.Ignore(e); }
             entry.ExtractToFile(tmp, true);
             ReplaceFile(tmp, dest);
         }
@@ -288,8 +286,7 @@ public static class UpdateService {
                 string old = dest + ".old";
                 try {
                     if(File.Exists(old)) File.Delete(old);
-                } catch {
-                }
+                } catch(Exception e) { Diag.Ignore(e); }
                 File.Move(dest, old);
             }
         }
@@ -303,8 +300,7 @@ public static class UpdateService {
             string old = path + ".old";
             try {
                 if(File.Exists(old)) File.Delete(old);
-            } catch {
-            }
+            } catch(Exception e) { Diag.Ignore(e); }
             try {
                 File.Move(path, old);
             } catch(System.Exception ex) {

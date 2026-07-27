@@ -59,8 +59,7 @@ public static class ChatterBlocker {
     private static void RecordKeyStats(scrController controller, object key) {
         try {
             GameApi.RecordKeyPress(controller, key);
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static int overCounterResetFrame = -1;
     private static void ResetKeyLimiterOverCounter(scrController controller) {
@@ -203,8 +202,7 @@ public static class ChatterBlocker {
                 bool down = ev.Type == SkyHook.EventType.KeyPressed;
                 KeyLimiter.KeyLimiter.NoteHookEvent(key, down);
                 Quartz.Game.HookKeys.RaiseKeyEvent(key, down);
-            } catch {
-            }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
     }
 }

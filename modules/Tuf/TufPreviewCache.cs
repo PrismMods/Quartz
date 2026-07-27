@@ -123,7 +123,7 @@ public static class TufPreviewCache {
                 byte[] cached = File.ReadAllBytes(path);
                 if(cached.Length > 0) return cached;
             }
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         Uri? image = ResolveImageUri(source);
         if(image == null) return null;
         byte[]? data = Download(image, MaxJpegBytes, TrustedImageHost);
@@ -131,7 +131,7 @@ public static class TufPreviewCache {
         try {
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             File.WriteAllBytes(path, data);
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         return data;
     }
     private static Uri? ResolveImageUri(TufPreviewSource source) {
@@ -306,7 +306,7 @@ public static class TufPreviewCache {
         }
     }
     private static HttpClient BuildClient() {
-        try { ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12; } catch { }
+        try { ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12; } catch(Exception e) { Diag.Ignore(e); }
         HttpClient client = new(new HttpClientHandler {
             AllowAutoRedirect = false
         }) {

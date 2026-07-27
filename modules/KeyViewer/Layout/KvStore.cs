@@ -309,13 +309,11 @@ internal static partial class KvStore {
     private static void Msg(string message) {
         try {
             MainCore.Log.Msg("[KeyViewer] " + message);
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static void Err(string message) {
         try {
             MainCore.Log.Err("[KeyViewer] " + message);
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
 }

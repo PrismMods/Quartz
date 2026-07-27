@@ -20,7 +20,7 @@ public static partial class Nostalgia {
         try {
             if(comp != null && comp.gameObject.activeSelf != active)
                 comp.gameObject.SetActive(active);
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static readonly string[] DifficultyFields = {
         "difficultyContainer", "difficultyFadeContainer", "difficultyImage",
@@ -36,9 +36,9 @@ public static partial class Nostalgia {
                     foreach(string f in DifficultyFields) SetUiActive(ui, f, true);
                 return;
             }
-            try { GCS.difficulty = Difficulty.Strict; } catch { }
+            try { GCS.difficulty = Difficulty.Strict; } catch(Exception e) { Diag.Ignore(e); }
             if(editor != null) {
-                try { Traverse.Create(editor.editorDifficultySelector).Method("UpdateDifficultyDisplay").GetValue(); } catch { }
+                try { Traverse.Create(editor.editorDifficultySelector).Method("UpdateDifficultyDisplay").GetValue(); } catch(Exception e) { Diag.Ignore(e); }
                 SetGoActive(editor.editorDifficultySelector, false);
             }
             if(ui == null) return;
@@ -46,11 +46,11 @@ public static partial class Nostalgia {
                 try {
                     Traverse.Create(ui).Field("currentDifficultyIndex").SetValue(2);
                     Traverse.Create(ui).Method("UpdateDifficultyUI").GetValue();
-                } catch { }
+                } catch(Exception e) { Diag.Ignore(e); }
             } else {
-                try { Traverse.Create(ui).Method("UpdateDifficultyUI", Difficulty.Strict).GetValue(); } catch { }
+                try { Traverse.Create(ui).Method("UpdateDifficultyUI", Difficulty.Strict).GetValue(); } catch(Exception e) { Diag.Ignore(e); }
             }
-            try { GCS.difficulty = Difficulty.Strict; } catch { }
+            try { GCS.difficulty = Difficulty.Strict; } catch(Exception e) { Diag.Ignore(e); }
             foreach(string f in DifficultyFields) SetUiActive(ui, f, false);
         } catch(Exception e) {
             MainCore.Log.Wrn($"[Nostalgia] ToggleDifficulty failed: {e.Message}");
@@ -65,15 +65,15 @@ public static partial class Nostalgia {
                 if(ui != null) SetUiActive(ui, "noFailImage", true);
                 return;
             }
-            try { GCS.useNoFail = false; } catch { }
+            try { GCS.useNoFail = false; } catch(Exception e) { Diag.Ignore(e); }
             if(scrController.instance != null) {
-                try { scrController.instance.noFail = false; } catch { }
+                try { scrController.instance.noFail = false; } catch(Exception e) { Diag.Ignore(e); }
             }
             if(editor != null) {
                 try {
                     editor.buttonNoFail.GetComponent<Image>().color =
                         new Color(0.42352942f, 0.42352942f, 0.42352942f);
-                } catch { }
+                } catch(Exception e) { Diag.Ignore(e); }
                 SetGoActive(editor.buttonNoFail, false);
             }
             if(ui != null) SetUiActive(ui, "noFailImage", false);
@@ -107,7 +107,7 @@ public static partial class Nostalgia {
                 ? new Vector2(nofail.anchoredPosition.x, diffOrigPos.Value.y)
                 : diffOrigPos.Value;
             if(diff.anchoredPosition != target) diff.anchoredPosition = target;
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     public static void ToggleSign(bool show) {
         NewsSign[] newsSigns = Object.FindObjectsByType<NewsSign>(FindObjectsSortMode.None);

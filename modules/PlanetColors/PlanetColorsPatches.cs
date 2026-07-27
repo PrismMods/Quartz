@@ -2,6 +2,7 @@ using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
 using Quartz.Compat.Game;
+using Quartz.Core;
 namespace Quartz.Features.PlanetColors;
 public static partial class PlanetColors {
     private static IEnumerable<MethodBase> ExistingMethods(Type type, params string[] names) {
@@ -38,7 +39,7 @@ public static partial class PlanetColors {
             InvalidatePlanetCache();
             if(ShouldChange) {
                 ApplyPlanetColor(__instance);
-                try { ApplyPlanetRing(__instance.planetRenderer); } catch { }
+                try { ApplyPlanetRing(__instance.planetRenderer); } catch(Exception e) { Diag.Ignore(e); }
             }
         }
     }

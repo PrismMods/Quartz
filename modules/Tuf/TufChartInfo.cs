@@ -2,6 +2,7 @@
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Quartz.Core;
 namespace Quartz.Features.Tuf;
 public sealed class TufChartInfo {
     private const long MaxScanBytes = 64L * 1024 * 1024;
@@ -42,7 +43,7 @@ public sealed class TufChartInfo {
                     TufInput.CapDisplay(settings.Value<string>("author"), ""));
                 return info.IsEmpty ? null : info;
             }
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         return null;
     }
 }

@@ -1,6 +1,7 @@
 using HarmonyLib;
 using System.Reflection;
 using UnityEngine;
+using Quartz.Core;
 namespace Quartz.Features.UiHider;
 public static partial class UiHider {
     [HarmonyPatch(typeof(scrHitTextMesh), "Show")]
@@ -51,9 +52,9 @@ public static partial class UiHider {
         if(setText == null) return;
         try {
             foreach(UnityEngine.Object found in Resources.FindObjectsOfTypeAll(ShortcutTextType)) {
-                try { setText.Invoke(found, null); } catch { }
+                try { setText.Invoke(found, null); } catch(Exception e) { Diag.Ignore(e); }
             }
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     [HarmonyPatch(typeof(scrController), "StartLoadingScene")]
     private static class ClearCachesOnSceneChangePatch {

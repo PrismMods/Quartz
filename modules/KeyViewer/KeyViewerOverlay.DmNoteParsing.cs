@@ -393,7 +393,7 @@ public static partial class KeyViewerOverlay {
                 int a = h.Length == 8 ? Convert.ToInt32(h[6..8], 16) : Mathf.RoundToInt(alpha * 255f);
                 return new Color(r / 255f, g / 255f, b / 255f, a / 255f);
             }
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         return new Color(1f, 1f, 1f, alpha);
     }
     private static string JStr(JObject p, string key, string def) {

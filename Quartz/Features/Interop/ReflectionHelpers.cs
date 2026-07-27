@@ -153,7 +153,7 @@ public static class ReflectionHelpers {
             try { key = NormalizeKeyInt(Convert.ToInt32(value, CultureInfo.InvariantCulture)); return true; } catch { return false; }
         }
         if(value is IConvertible and not string) {
-            try { key = NormalizeKeyInt(Convert.ToInt32(value, CultureInfo.InvariantCulture)); return true; } catch { }
+            try { key = NormalizeKeyInt(Convert.ToInt32(value, CultureInfo.InvariantCulture)); return true; } catch(Exception e) { Diag.Ignore(e); }
         }
         string text = value.ToString();
         if(int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsed)) {
@@ -279,7 +279,7 @@ public static class ReflectionHelpers {
         foreach(string path in paths) {
             try {
                 if(!string.IsNullOrEmpty(path) && File.Exists(path)) return File.ReadAllText(path);
-            } catch { }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
         return null;
     }

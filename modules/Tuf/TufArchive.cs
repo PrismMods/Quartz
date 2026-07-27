@@ -1,6 +1,7 @@
 #nullable enable
 using System.IO.Compression;
 using System.Text;
+using Quartz.Core;
 namespace Quartz.Features.Tuf;
 public static class TufArchive {
     public const int MaxEntries = 10_000;
@@ -129,12 +130,12 @@ public static class TufArchive {
         if(!hasHigh) return name;
         byte[] raw = new byte[name.Length];
         for(int i = 0; i < name.Length; i++) raw[i] = (byte)name[i];
-        try { return new UTF8Encoding(false, true).GetString(raw); } catch { }
+        try { return new UTF8Encoding(false, true).GetString(raw); } catch(Exception e) { Diag.Ignore(e); }
         foreach(int codePage in LegacyCodePages) {
             try {
                 string decoded = Encoding.GetEncoding(codePage).GetString(raw);
                 if(decoded.IndexOf('\uFFFD') < 0) return decoded;
-            } catch { }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
         return name;
     }
@@ -142,7 +143,7 @@ public static class TufArchive {
         e is NotSupportedException or IOException or UnauthorizedAccessException
           or InvalidDataException or ArgumentException or System.Security.SecurityException;
     private static void TryDelete(string path) {
-        try { if(File.Exists(path)) File.Delete(path); } catch { }
+        try { if(File.Exists(path)) File.Delete(path); } catch(Exception e) { Diag.Ignore(e); }
     }
     private static bool IsSymlink(ZipArchiveEntry entry) {
         int unixMode = (entry.ExternalAttributes >> 16) & 0xF000;

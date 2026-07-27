@@ -29,7 +29,7 @@ internal static class Bpm {
                     autoTileTimes.Enqueue(now);
                     autoKpsFrame = -1;
                 }
-            } catch { }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
     }
     internal static void GetBpmValues(out float tileBpm, out float actualBpm) {

@@ -1,4 +1,5 @@
 using System.Reflection;
+using Quartz.Core;
 namespace Quartz.Plugins;
 public static class PluginEntryScan {
     public static Type[] Types(Assembly assembly) {
@@ -16,8 +17,7 @@ public static class PluginEntryScan {
             Type named = null;
             try {
                 named = assembly.GetType(preferredTypeName, false);
-            } catch {
-            }
+            } catch(Exception e) { Diag.Ignore(e); }
             if(named != null && !named.IsAbstract && typeof(T).IsAssignableFrom(named)) return named;
         }
         List<Type> found = FindAll<T>(assembly);

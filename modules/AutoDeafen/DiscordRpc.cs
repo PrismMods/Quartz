@@ -30,8 +30,8 @@ internal sealed class DiscordRpc {
     internal void SetDeaf(bool deaf) => desiredDeaf = deaf;
     internal void Stop() {
         running = false;
-        try { if(ready) ApplyDeaf(false); } catch { }
-        try { stream?.Dispose(); } catch { }
+        try { if(ready) ApplyDeaf(false); } catch(Exception e) { Diag.Ignore(e); }
+        try { stream?.Dispose(); } catch(Exception e) { Diag.Ignore(e); }
         stream = null;
         ready = false;
     }
@@ -64,7 +64,7 @@ internal sealed class DiscordRpc {
             status = "error: " + ex.Message;
             MainCore.Log.Wrn("[AutoDeafen] discord rpc error: " + ex);
         } finally {
-            try { stream?.Dispose(); } catch { }
+            try { stream?.Dispose(); } catch(Exception e) { Diag.Ignore(e); }
             stream = null;
             ready = false;
         }
@@ -89,7 +89,7 @@ internal sealed class DiscordRpc {
                 NamedPipeClientStream pipe = new(".", "discord-ipc-" + i, PipeDirection.InOut);
                 pipe.Connect(2000);
                 return pipe;
-            } catch { }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
         return null;
     }

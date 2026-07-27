@@ -27,11 +27,11 @@ public static class PracticePitch {
         try {
             scnEditor editor = ADOBase.editor;
             if(editor != null && editor.levelData != null) return editor.levelData;
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         try {
             scnGame game = ADOBase.customLevel;
             if(game != null && game.levelData != null) return game.levelData;
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         return null;
     }
     private static void RefreshInspector() {
@@ -40,6 +40,6 @@ public static class PracticePitch {
             InspectorPanel settings = editor == null ? null : editor.settingsPanel;
             if(settings == null || !settings.isActiveAndEnabled) return;
             settings.ShowPanel(settings.selectedEventType, settings.cacheEventIndex);
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using TMPro;
+using Quartz.Core;
 namespace Quartz.Compat.Game;
 public static class TextCompat {
     private const int WrapNoWrap = 0;
@@ -16,13 +17,11 @@ public static class TextCompat {
             try {
                 modeProp.SetValue(text, Enum.ToObject(modeType, wrap ? WrapNormal : WrapNoWrap), null);
                 return;
-            } catch {
-            }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
         try {
             legacyProp?.SetValue(text, wrap, null);
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     public static object CaptureWrap(TMP_Text text) {
         if(text == null) return null;
@@ -43,8 +42,7 @@ public static class TextCompat {
                 return;
             }
             if(legacyProp != null && captured is bool b) legacyProp.SetValue(text, b, null);
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     public static bool GetWrap(TMP_Text text) {
         if(text == null) return true;

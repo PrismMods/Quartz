@@ -3,6 +3,7 @@ using Quartz.Features.KeyViewer.Layout;
 using Quartz.IO;
 using Quartz.IO.Interface;
 using UnityEngine;
+using Quartz.Core;
 namespace Quartz.Features.KeyViewer;
 public sealed partial class KeyViewerSettings : ISettingsFile {
     public JToken Serialize() {
@@ -242,8 +243,7 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
             foreach(var prop in counts.Properties()) {
                 try {
                     Counts[prop.Name] = prop.Value.Value<int>();
-                } catch {
-                }
+                } catch(Exception e) { Diag.Warn(e, "KeyViewer/Counts:" + prop.Name); }
             }
         }
     }
@@ -270,7 +270,7 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
         if(token[nameof(FootKeysByStyle)] is JArray keysOuter && keysOuter.Count == FootKeysByStyle.Length) {
             for(int s = 0; s < FootKeysByStyle.Length; s++) {
                 if(keysOuter[s] is not JArray arr || arr.Count != FootKeysByStyle[s].Length) continue;
-                try { for(int i = 0; i < arr.Count; i++) FootKeysByStyle[s][i] = arr[i].Value<int>(); } catch { }
+                try { for(int i = 0; i < arr.Count; i++) FootKeysByStyle[s][i] = arr[i].Value<int>(); } catch(Exception e) { Diag.Warn(e, "KeyViewer/FootKeys:style" + s); }
             }
         } else if(token["FootKeys"] is JArray legacyKeys) {
             SeedFootFromFlat(legacyKeys);

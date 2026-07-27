@@ -23,7 +23,7 @@ public sealed class TufLevelLauncher : MonoBehaviour {
         try {
             foreach(string root in trustedRoots?.Invoke() ?? Array.Empty<string>())
                 if(!string.IsNullOrEmpty(root) && TufArchive.IsChartUnderRoot(chart, root)) return true;
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         return false;
     }
     public bool Launch(string chartPath, Action<bool, string> completed) {

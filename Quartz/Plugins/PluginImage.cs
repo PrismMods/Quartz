@@ -1,4 +1,5 @@
 using System.Reflection;
+using Quartz.Core;
 namespace Quartz.Plugins;
 public static class PluginImage {
     public static Assembly Load(string path) {
@@ -7,8 +8,7 @@ public static class PluginImage {
         if(File.Exists(pdb)) {
             try {
                 return Assembly.Load(image, File.ReadAllBytes(pdb));
-            } catch {
-            }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
         return Assembly.Load(image);
     }

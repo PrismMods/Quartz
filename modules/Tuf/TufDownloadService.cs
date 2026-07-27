@@ -30,9 +30,9 @@ public sealed class TufDownloadService : IDisposable {
         if(File.Exists(marker)) return;
         try {
             foreach(string dir in Directory.GetDirectories(levelsRoot))
-                try { Directory.Delete(dir, true); } catch { }
+                try { Directory.Delete(dir, true); } catch(Exception e) { Diag.Ignore(e); }
             foreach(string file in Directory.GetFiles(levelsRoot))
-                try { File.Delete(file); } catch { }
+                try { File.Delete(file); } catch(Exception e) { Diag.Ignore(e); }
             File.WriteAllText(marker, "2");
         } catch(Exception e) {
             MainCore.Log.Wrn("[TUF] could not migrate the level cache layout: " + e.Message);
@@ -42,7 +42,7 @@ public sealed class TufDownloadService : IDisposable {
         try {
             TufInstallRoot resolved = resolveRoot?.Invoke() ?? default;
             if(!string.IsNullOrEmpty(resolved.Path)) return new(Path.GetFullPath(resolved.Path), resolved.Linked);
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         return new(levelsRoot, false);
     }
     public bool TryGetCachedChart(int id, out string chart) => TryGetCachedChart(id, null, out chart);
@@ -152,8 +152,7 @@ public sealed class TufDownloadService : IDisposable {
         try {
             Directory.Move(source, target);
             return target;
-        } catch(IOException) {
-        }
+        } catch(IOException e) { Diag.Ignore(e); }
         try {
             CopyDirectory(source, target, token);
         } catch {
@@ -234,12 +233,12 @@ public sealed class TufDownloadService : IDisposable {
         Cancel();
         http.Dispose();
     }
-    private static void CleanupFile(string path) { try { if(File.Exists(path)) File.Delete(path); } catch { } }
-    private static void CleanupDirectory(string path) { try { if(Directory.Exists(path)) Directory.Delete(path, true); } catch { } }
+    private static void CleanupFile(string path) { try { if(File.Exists(path)) File.Delete(path); } catch(Exception e) { Diag.Ignore(e); } }
+    private static void CleanupDirectory(string path) { try { if(Directory.Exists(path)) Directory.Delete(path, true); } catch(Exception e) { Diag.Ignore(e); } }
     private static void CleanupStage(string path) {
         try {
             if(Directory.Exists(path) && !Directory.EnumerateFileSystemEntries(path).Any()) Directory.Delete(path);
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static StringComparison PathComparison =>
         Path.DirectorySeparatorChar == '\\' ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;

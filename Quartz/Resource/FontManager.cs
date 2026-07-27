@@ -48,8 +48,7 @@ public static partial class FontManager {
     private static bool EnsureTmpSettings() {
         try {
             if(TMP_Settings.instance != null) return false;
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
         try {
             tmpSettingsInstanceField ??= typeof(TMP_Settings).GetField("s_Instance", BindingFlags.Static | BindingFlags.NonPublic);
             if(tmpSettingsInstanceField == null) return false;
@@ -319,7 +318,7 @@ public static partial class FontManager {
                         foreach(int cp in CjkProbe)
                             if(f.HasCharacter((char)cp, false, tryAdd)) hit++;
                         if(hit >= 3) { cjkFallback = f; break; }
-                    } catch { }
+                    } catch(Exception e) { Diag.Ignore(e); }
                 }
             }
             if(cjkFallback != null) MainCore.Log.Msg($"[FontManager] CJK fallback: {cjkFallback.name}");

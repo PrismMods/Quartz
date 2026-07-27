@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Reflection;
+using Quartz.Core;
 namespace Quartz.Features.Interop;
 public static class UmmInterop {
     private static bool resolved;
@@ -59,7 +60,7 @@ public static class UmmInterop {
                     if(info != null && ReadMember(info, "Id") is string id && !string.IsNullOrEmpty(id)) ids.Add(id);
                 }
             }
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         return ids;
     }
     public static string ModsPath() {
@@ -80,7 +81,7 @@ public static class UmmInterop {
                     if(info != null && ReadMember(info, "Id") is string id && !string.IsNullOrEmpty(id)) ids.Add(id);
                 }
             }
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         return ids;
     }
     private static object ReadMember(object target, string name) {

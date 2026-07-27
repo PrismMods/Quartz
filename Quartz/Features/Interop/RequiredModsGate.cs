@@ -37,7 +37,7 @@ public static class RequiredModsGate {
         foreach(string melon in MelonNames()) Add(names, melon);
         try {
             foreach(Assembly asm in AppDomain.CurrentDomain.GetAssemblies()) Add(names, asm.GetName().Name);
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         return names;
     }
     private static void Add(HashSet<string> names, string raw) {
@@ -58,7 +58,7 @@ public static class RequiredModsGate {
                     if(info?.GetType().GetProperty("Name", BindingFlags.Public | BindingFlags.Instance)?.GetValue(info) is string name) names.Add(name);
                 }
             }
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         return names;
     }
 }

@@ -41,6 +41,7 @@ public sealed class QuartzRuntime {
         Version = new Version(Info.Version);
         Assembly = Assembly.GetExecutingAssembly();
         Logger = new QuartzLogger(host.QuartzLogger);
+        Diag.Bind(Logger.Wrn);
         State = new ModState();
         Paths = new PathService(host.QuartzFilePath);
         Config = new SettingsFile<CoreSettings>(Paths.ConfigPath);
@@ -129,8 +130,7 @@ public sealed class QuartzRuntime {
                     n += MergeMove(child, Path.Combine(dest, Path.GetFileName(child)));
                 try {
                     if(Directory.GetFileSystemEntries(src).Length == 0) Directory.Delete(src);
-                } catch {
-                }
+                } catch(Exception e) { Diag.Ignore(e); }
                 return n;
             }
             if(!File.Exists(src)) return 0;
@@ -230,8 +230,7 @@ public sealed class QuartzRuntime {
         static void Safe(Action step) {
             try {
                 step();
-            } catch {
-            }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
         Safe(() => SetModEnabled(false, true));
         Safe(() => FontManager.OnFontChanged -= InGameOverlayFont.Refresh);

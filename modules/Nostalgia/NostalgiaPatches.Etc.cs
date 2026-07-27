@@ -1,4 +1,5 @@
 using HarmonyLib;
+using Quartz.Core;
 namespace Quartz.Features.Nostalgia;
 public static partial class Nostalgia {
     [HarmonyPatch(typeof(scnLevelSelect), "Start")]
@@ -8,7 +9,7 @@ public static partial class Nostalgia {
             SetBackground();
             if(ShouldDisableAnnounceSign) ToggleSign(false);
             ApplyDeathSound();
-            try { RDC.useOldAuto = ShouldWeakAuto; } catch { }
+            try { RDC.useOldAuto = ShouldWeakAuto; } catch(Exception e) { Diag.Ignore(e); }
         }
     }
 }

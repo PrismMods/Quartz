@@ -87,8 +87,7 @@ public static class Optimizer {
         try {
             Process proc = Process.GetCurrentProcess();
             if(proc.PriorityClass != priority) proc.PriorityClass = priority;
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
         if(!Active) return;
@@ -125,8 +124,8 @@ public static class Optimizer {
     private static bool TryReserveNoGcBudget() => GC.TryStartNoGCRegion(GCReserveBytes, true);
     private static void ResumeGC() {
         if(usingNoGcRegion) {
-            try { GC.EndNoGCRegion(); } catch { }
-            try { GC.Collect(); } catch { }
+            try { GC.EndNoGCRegion(); } catch(Exception e) { Diag.Ignore(e); }
+            try { GC.Collect(); } catch(Exception e) { Diag.Ignore(e); }
         }
         usingNoGcRegion = false;
         gcDeferred = false;

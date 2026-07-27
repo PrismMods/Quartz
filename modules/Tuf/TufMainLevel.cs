@@ -60,7 +60,7 @@ internal static class TufMainLevel {
                 foreach(DLCManager mgr in managers)
                     if(mgr != null && mgr.IsDLCLevel(world))
                         return StoreUrlFor(mgr);
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         return null;
     }
     private static string StoreUrlFor(DLCManager mgr) {
@@ -120,7 +120,7 @@ internal static class TufMainLevel {
                         return mgr.installed && mgr.upToDate;
                 return true;
             }
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         return !LooksLikeDlcWorld(world);
     }
     private static bool LooksLikeDlcWorld(string world) {

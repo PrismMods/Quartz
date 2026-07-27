@@ -74,7 +74,7 @@ public sealed class TufPackService : IRuntimeService {
                 debounce = null;
             }
             FetchPacks(false);
-        } catch(OperationCanceledException) { }
+        } catch(OperationCanceledException e) { Diag.Ignore(e); }
     }
     public void SetSort(TufPackSort value) {
         if(Sort == value) return;

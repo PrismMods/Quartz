@@ -52,7 +52,7 @@ public static class TufHelperLiteLink {
                 if(Directory.Exists(Path.Combine(dir.FullName, "UMMMods"))
                     || Directory.Exists(Path.Combine(dir.FullName, "Mods"))) return dir.FullName;
             }
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         return null;
     }
 }

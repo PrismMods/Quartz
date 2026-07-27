@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using Quartz.Features.Tuf;
 using static Asserts;
+using Quartz.Core;
 static class TufInstallTests {
     public static void TestLevelFolderNaming() {
         Assert(TufInstallPaths.IsLevelFolderName("123", out int plain) && plain == 123, "plain id folder");
@@ -151,6 +152,6 @@ static class TufInstallTests {
         return temp;
     }
     static void Cleanup(string temp) {
-        try { Directory.Delete(temp, true); } catch { }
+        try { Directory.Delete(temp, true); } catch(Exception e) { Diag.Ignore(e); }
     }
 }

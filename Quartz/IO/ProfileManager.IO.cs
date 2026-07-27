@@ -30,7 +30,7 @@ public static partial class ProfileManager {
                     try {
                         JToken b = JToken.Parse(File.ReadAllText(file));
                         if(IsProfileBundle(b)) name = b["Name"]?.Value<string>();
-                    } catch { }
+                    } catch(Exception e) { Diag.Warn(e, "Profiles/preset:" + Path.GetFileName(file)); }
                     name = Sanitize(name) ?? Sanitize(Path.GetFileNameWithoutExtension(file));
                     if(name != null) list.Add(new PresetInfo(file, name));
                 }
@@ -86,11 +86,11 @@ public static partial class ProfileManager {
                 throw;
             }
             if(Directory.Exists(backup)) {
-                try { Directory.Delete(backup, true); } catch { }
+                try { Directory.Delete(backup, true); } catch(Exception e) { Diag.Ignore(e); }
             }
         } finally {
             if(Directory.Exists(staging)) {
-                try { Directory.Delete(staging, true); } catch { }
+                try { Directory.Delete(staging, true); } catch(Exception e) { Diag.Ignore(e); }
             }
         }
     }
@@ -125,7 +125,7 @@ public static partial class ProfileManager {
     private static void CompleteSwitch() {
         if(File.Exists(SwitchMarkerPath)) File.Delete(SwitchMarkerPath);
         if(Directory.Exists(SwitchRollbackPath)) {
-            try { Directory.Delete(SwitchRollbackPath, true); } catch { }
+            try { Directory.Delete(SwitchRollbackPath, true); } catch(Exception e) { Diag.Ignore(e); }
         }
     }
     private static void RecoverInterruptedSwitch() {

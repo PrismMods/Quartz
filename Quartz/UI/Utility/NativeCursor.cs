@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
+using Quartz.Core;
 namespace Quartz.UI.Utility;
 public enum ResizeCursorShape {
     Horizontal,
@@ -35,8 +36,7 @@ public static class NativeCursor {
                 MacSet(NSCursorByName("arrowCursor"));
                 return;
             }
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
         Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
     }
     private const int IDC_ARROW = 32512;

@@ -1,6 +1,7 @@
 #nullable enable
 using Quartz.Features.Tuf;
 using static Asserts;
+using Quartz.Core;
 static class TufChartInfoTests {
     public static void TestReadsSettingsAfterChartData() {
         string temp = NewTemp();
@@ -67,6 +68,6 @@ static class TufChartInfoTests {
         return temp;
     }
     static void Cleanup(string temp) {
-        try { Directory.Delete(temp, true); } catch { }
+        try { Directory.Delete(temp, true); } catch(Exception e) { Diag.Ignore(e); }
     }
 }

@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 using Quartz.Compat.Game;
+using Quartz.Core;
 namespace Quartz.Features.Editor;
 public static partial class EditorFeature {
     internal static bool ShouldShowFloorReadout => Enabled && Conf.ShowAny;
@@ -49,8 +50,7 @@ public static partial class EditorFeature {
                 return;
             }
             UpdateReadout(editor);
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static void UpdateReadout(scnEditor editor) {
         List<scrFloor> selected = editor.selectedFloors;

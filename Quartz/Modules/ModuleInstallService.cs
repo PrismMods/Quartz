@@ -15,8 +15,7 @@ public static class ModuleInstallService {
     private static HttpClient CreateClient() {
         try {
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
         HttpClient client = new(new HttpClientHandler { AllowAutoRedirect = false }) {
             Timeout = Timeout.InfiniteTimeSpan,
         };
@@ -177,8 +176,7 @@ public static class ModuleInstallService {
     private static void Delete(string path) {
         try {
             if(File.Exists(path)) File.Delete(path);
-        } catch {
-        }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private static void Raise() {
         try {

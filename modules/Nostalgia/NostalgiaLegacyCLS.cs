@@ -53,7 +53,7 @@ public static partial class Nostalgia {
         clsSearchField.onEndEdit.AddListener(_ => ToggleSearchModeCLS(false));
     }
     private static void SetClsResponsive(bool value) {
-        try { Traverse.Create(scnCLS.instance).Property("responsive").SetValue(value); } catch { }
+        try { Traverse.Create(scnCLS.instance).Property("responsive").SetValue(value); } catch(Exception e) { Diag.Ignore(e); }
     }
     private static Text MakeFieldText(Transform parent, string name, bool placeholder) {
         GameObject obj = new(name);
@@ -170,11 +170,11 @@ public sealed class WorkshopShortcut : MonoBehaviour {
     private Action<object> toggleSpeedTrial;
     private Action<object> toggleNoFail;
     private void Awake() {
-        try { optionsPanelsRef = AccessTools.FieldRefAccess<scnCLS, object>("optionsPanels"); } catch { }
+        try { optionsPanelsRef = AccessTools.FieldRefAccess<scnCLS, object>("optionsPanels"); } catch(Exception e) { Diag.Ignore(e); }
         try {
             MethodInfo getter = AccessTools.PropertyGetter(typeof(scnCLS), "responsive");
             if(getter != null) responsiveGetter = (Func<scnCLS, bool>)Delegate.CreateDelegate(typeof(Func<scnCLS, bool>), getter);
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     private void Update() {
         if(!Nostalgia.ShouldLegacyCLS
@@ -208,7 +208,7 @@ public sealed class WorkshopShortcut : MonoBehaviour {
                 t.Field("sortingMethod").SetValue(next);
                 t.Method("SelectOption", [next, true]).GetValue();
                 t.Method("UpdateSorting").GetValue();
-            } catch { }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
     }
     private object GetOptionsPanels() =>
@@ -223,7 +223,7 @@ public sealed class WorkshopShortcut : MonoBehaviour {
         try {
             MethodInfo method = optionsPanels != null ? AccessTools.Method(optionsPanels.GetType(), methodName) : null;
             if(method != null) return target => method.Invoke(target, null);
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         return target => Traverse.Create(target).Method(methodName).GetValue();
     }
 }

@@ -61,7 +61,7 @@ public static partial class UiHider {
         bool hideBeta = profile != null && (hideEverything || profile.HideBeta);
         bool hideTitle = profile != null && (hideEverything || profile.HideTitle);
         bool hideMeter = profile != null && (hideEverything || profile.HideHitErrorMeter);
-        try { RDC.noHud = hideEverything; } catch { }
+        try { RDC.noHud = hideEverything; } catch(Exception e) { Diag.Ignore(e); }
         ReconcileHitErrorMeter(hideMeter);
         scrUIController uiController = scrUIController.instance;
         if(uiController == null) return;
@@ -125,7 +125,7 @@ public static partial class UiHider {
                 }
                 object target = scnEditor.instance;
                 if(target != null) return Convert.ToBoolean(isEditingLevelProperty.GetValue(target, null));
-            } catch { }
+            } catch(Exception e) { Diag.Ignore(e); }
         }
         return scnEditor.instance != null && scnGame.instance == null;
     }
@@ -172,7 +172,7 @@ public static partial class UiHider {
         try {
             if(member is FieldInfo field) return field.GetValue(owner);
             if(member is PropertyInfo property) return property.GetValue(owner, null);
-        } catch { }
+        } catch(Exception e) { Diag.Ignore(e); }
         return null;
     }
     internal static GameObject GetGameObject(object value) {
@@ -188,7 +188,7 @@ public static partial class UiHider {
         }
         PropertyInfo property = AccessTools.Property(value.GetType(), "enabled");
         if(property == null || !property.CanWrite) return;
-        try { property.SetValue(value, enabled, null); } catch { }
+        try { property.SetValue(value, enabled, null); } catch(Exception e) { Diag.Ignore(e); }
     }
     private static void SetMemberGameObjectActiveIfMatches(object owner, string memberName, bool hide)
         => SetGameObjectActiveIfMatches(GetGameObject(GetMemberValueCached(owner, memberName)), hide);
