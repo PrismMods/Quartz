@@ -21,6 +21,12 @@
 
 	<ItemGroup>
 		<Compile Include="../Quartz/Core/SemVer.cs" Link="Source/SemVer.cs" />
+		<!-- The late-binding layer. Refl.cs is deliberately free of game types so it
+		     can be linked here; the one member that needs the game's assembly
+		     (Type(string), which roots at ADOBase) lives in the Refl.Game.cs partial
+		     and stays out of this project. -->
+		<Compile Include="../Quartz/Core/Diag.cs" Link="Source/Diag.cs" />
+		<Compile Include="../Quartz/Compat/Game/Refl.cs" Link="Source/Refl.cs" />
 		<Compile Include="../Quartz/IO/AtomicFile.cs" Link="Source/AtomicFile.cs" />
 		<Compile Include="../Quartz/IO/ProfileNames.cs" Link="Source/ProfileNames.cs" />
 		<Compile Include="../Quartz/IO/ProfileBundle.cs" Link="Source/ProfileBundle.cs" />

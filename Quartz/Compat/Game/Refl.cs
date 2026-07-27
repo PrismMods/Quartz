@@ -2,19 +2,11 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
+using Quartz.Core;
 namespace Quartz.Compat.Game;
-public static class Refl {
+public static partial class Refl {
     internal const BindingFlags Any = BindingFlags.Public | BindingFlags.NonPublic
         | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy;
-    public static Type Type(string name) {
-        if(string.IsNullOrEmpty(name)) return null;
-        try {
-            return typeof(ADOBase).Assembly.GetType(name)
-                ?? typeof(ADOBase).Assembly.GetType("ADOFAI." + name);
-        } catch {
-            return null;
-        }
-    }
     internal sealed class Member {
         private readonly PropertyInfo prop;
         private readonly FieldInfo fieldInfo;
@@ -41,7 +33,11 @@ public static class Refl {
         private static T Walk<T>(Type owner, Func<Type, T> pick) where T : class {
             for(Type t = owner; t != null; t = t.BaseType) {
                 T found = null;
-                try { found = pick(t); } catch { }
+                try {
+                    found = pick(t);
+                } catch(Exception e) {
+                    Diag.Ignore(e);
+                }
                 if(found != null) return found;
             }
             return null;
@@ -51,7 +47,8 @@ public static class Refl {
             try {
                 if(prop != null) return prop.CanRead ? prop.GetValue(instance, null) : null;
                 return fieldInfo?.GetValue(instance);
-            } catch {
+            } catch(Exception e) {
+                Diag.Ignore(e);
                 return null;
             }
         }
@@ -62,7 +59,8 @@ public static class Refl {
                     return;
                 }
                 fieldInfo?.SetValue(instance, value);
-            } catch {
+            } catch(Exception e) {
+                Diag.Ignore(e);
             }
         }
         internal T Get<T>(object instance, T fallback = default) =>
@@ -85,7 +83,8 @@ public static class Refl {
                 ?? all.FirstOrDefault(m => Params(m).Length >= argCount
                     && Params(m).Skip(argCount).All(p => p.IsOptional))
                 ?? all[0];
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }
@@ -103,7 +102,8 @@ public static class Refl {
                 args = padded;
             }
             return m.Invoke(instance, args);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }
