@@ -1,0 +1,21 @@
+scripts/check_conventions.py
+  s_dd0035a49fb7d2::t_53e3d19f38e784 1-133
+.github/workflows/ci.yml
+  s_dd0035a49fb7d2::t_43147d301bd21e 10-20,33-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "0e9e73b87232e27d4a27e6f770f946614716345f",
+  "prompts": {},
+  "sessions": {
+    "s_dd0035a49fb7d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3fa3f501-86e0-4efa-8cc4-f4216865e0f3",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
