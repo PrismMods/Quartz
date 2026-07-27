@@ -19,14 +19,12 @@ public static class NostalgiaTweaksPatches {
             return true;
         }
     }
-
     [HarmonyPatch(typeof(NewsSign), "Awake")]
     private static class HideAnnounceSignPatch {
         private static void Postfix() {
             if(ShouldDisableAnnounceSign) ToggleSign(false);
         }
     }
-
     [HarmonyPatch]
     private static class PlaySfxPatch {
         private static MethodBase TargetMethod() =>
@@ -49,7 +47,6 @@ public static class NostalgiaTweaksPatches {
             return true;
         }
     }
-
     [HarmonyPatch(typeof(scrConductor), "PlayHitTimes")]
     private static class PlayHitTimesPatch {
         private static bool prevFastTakeoff;

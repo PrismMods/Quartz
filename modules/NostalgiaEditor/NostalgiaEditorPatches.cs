@@ -32,7 +32,6 @@ public static class NostalgiaEditorPatches {
             return true;
         }
     }
-
     [HarmonyPatch(typeof(scrShowIfDebug), "Update")]
     private static class WeakAutoPatch {
         private static void Prefix() {
@@ -42,21 +41,18 @@ public static class NostalgiaEditorPatches {
             if(ShouldWeakAuto) RDC.useOldAuto = true;
         }
     }
-
     [HarmonyPatch(typeof(scnEditor), "get_highBPM")]
     private static class WhiteAutoHighBpmPatch {
         private static void Postfix(ref bool __result) {
             if(ShouldWhiteAuto) __result = false;
         }
     }
-
     [HarmonyPatch(typeof(scnGame), "ResetScene")]
     private static class WhiteAutoResetPatch {
         private static void Postfix() {
             if(ShouldWhiteAuto && scnEditor.instance != null) scnEditor.instance.autoFailed = false;
         }
     }
-
     [HarmonyPatch(typeof(scnEditor), "Awake")]
     private static class LegacyEditorButtonsPatch {
         private static void Postfix() {
@@ -64,7 +60,6 @@ public static class NostalgiaEditorPatches {
             RemoveShadowAddOutline(Enabled && Conf.LegacyEditorButtonsDesigns);
         }
     }
-
     [HarmonyPatch(typeof(RDString), "GetWithCheck")]
     private static class LegacyTextsPatch {
         private static void Postfix(ref string __result) {
@@ -82,7 +77,6 @@ public static class NostalgiaEditorPatches {
             }
         }
     }
-
     [HarmonyPatch]
     private static class HideDifficultyApplyPatch {
         private static IEnumerable<MethodBase> TargetMethods() => new[] {
@@ -95,7 +89,6 @@ public static class NostalgiaEditorPatches {
             if(ShouldHideDifficulty) ToggleDifficulty(false);
         }
     }
-
     [HarmonyPatch]
     private static class HideDifficultyCancelPatch {
         private static IEnumerable<MethodBase> TargetMethods() => new[] {
@@ -104,7 +97,6 @@ public static class NostalgiaEditorPatches {
         }.Where(m => m != null);
         private static bool Prefix() => !ShouldHideDifficulty;
     }
-
     [HarmonyPatch]
     private static class HideNoFailApplyPatch {
         private static IEnumerable<MethodBase> TargetMethods() => new[] {
@@ -115,12 +107,10 @@ public static class NostalgiaEditorPatches {
             if(ShouldHideNoFail) ToggleNoFail(false);
         }
     }
-
     [HarmonyPatch(typeof(scnEditor), "ToggleNoFail")]
     private static class EditorToggleNoFailPatch {
         private static bool Prefix() => !ShouldHideNoFail;
     }
-
     [HarmonyPatch(typeof(scnEditor), "LateUpdate")]
     private static class EditorReHidePatch {
         private static void Postfix(scnEditor __instance) {
@@ -137,7 +127,6 @@ public static class NostalgiaEditorPatches {
             RepositionDifficulty();
         }
     }
-
     [HarmonyPatch]
     private static class ClsToggleNoFailPatch {
         private static MethodBase TargetMethod() =>
