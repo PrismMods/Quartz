@@ -1,7 +1,9 @@
+#nullable enable annotations
 using System.IO.Compression;
 using System.Net;
 using Quartz.Features.Tuf;
 using static Asserts;
+using Quartz.Core;
 static class TufSecurityTests {
     public static void TestInputAndNetworkPolicy() {
         string noisy = "  hello\t\r\n world  ";

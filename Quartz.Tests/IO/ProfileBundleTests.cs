@@ -1,3 +1,4 @@
+#nullable enable annotations
 using System.Text;
 using Newtonsoft.Json.Linq;
 using Quartz.IO;

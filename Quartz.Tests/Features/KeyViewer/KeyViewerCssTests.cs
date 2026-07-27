@@ -1,3 +1,4 @@
+#nullable enable annotations
 using Quartz.Features.KeyViewer;
 using static Asserts;
 static class KeyViewerCssTests {

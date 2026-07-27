@@ -29,7 +29,7 @@ internal static class PageModuleRows {
         TextCompat.SetWrap(status, hasError);
         status.overflowMode = TextOverflowModes.Ellipsis;
         status.verticalAlignment = hasError ? VerticalAlignmentOptions.Top : VerticalAlignmentOptions.Middle;
-        if(hasError) {
+        if(error != null) {
             status.color = UIColors.SoftRed;
             status.text = error;
             statusRow.AddToolTip(error.Length > 900 ? error[..900] + "…" : error);
