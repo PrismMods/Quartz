@@ -32,6 +32,12 @@
 		<Compile Include="../Quartz/IO/ProfileBundle.cs" Link="Source/ProfileBundle.cs" />
 		<Compile Include="../Quartz/IO/FaqDocument.cs" Link="Source/FaqDocument.cs" />
 		<Compile Include="../modules/KeyViewer/KeyViewerCss.cs" Link="Source/KeyViewerCss.cs" />
+		<Compile Include="../modules/KeyViewer/KeyViewerCssModel.cs" Link="Source/KeyViewerCssModel.cs" />
+		<Compile Include="../modules/KeyViewer/KeyViewerCss.Selectors.cs" Link="Source/KeyViewerCss.Selectors.cs" />
+		<Compile Include="../modules/KeyViewer/KeyViewerCss.Map.cs" Link="Source/KeyViewerCss.Map.cs" />
+		<Compile Include="../modules/KeyViewer/KeyViewerCss.Values.cs" Link="Source/KeyViewerCss.Values.cs" />
+		<Compile Include="../modules/KeyViewer/KeyViewerCss.Color.cs" Link="Source/KeyViewerCss.Color.cs" />
+		<Compile Include="../modules/KeyViewer/KeyViewerCss.Tokens.cs" Link="Source/KeyViewerCss.Tokens.cs" />
 		<Compile Include="../modules/KeyViewer/KeyViewerPersistence.cs" Link="Source/KeyViewerPersistence.cs" />
 		<Compile Include="../modules/KeyViewer/Layout/KvElement.cs" Link="Source/KvElement.cs" />
 		<Compile Include="../modules/KeyViewer/Layout/KvDocument.cs" Link="Source/KvDocument.cs" />

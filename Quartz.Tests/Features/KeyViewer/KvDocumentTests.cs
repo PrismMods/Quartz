@@ -1,7 +1,7 @@
 using Newtonsoft.Json.Linq;
 using Quartz.Features.KeyViewer.Layout;
 using static Asserts;
-static class KvDocumentTests {
+static partial class KvDocumentTests {
     private const string Preset = """
         {
           "selectedKeyType": "4key",
@@ -53,74 +53,6 @@ static class KvDocumentTests {
           "someFutureDmNoteField": { "added": "after this code was written" }
         }
         """;
-    public static void TestMergeKeepsExistingTabsAndAddsImported() {
-        KvDocument mine = KvDocument.Parse("""
-            {"selectedKeyType":"custom-a",
-             "customTabs":[{"id":"custom-a","name":"Main"},{"id":"custom-b","name":"Alt"}],
-             "keys":{"custom-a":["Z"],"custom-b":["X"]},
-             "keyPositions":{
-               "custom-a":[{"dx":0,"dy":0,"width":60,"height":60,"count":5,"noteColor":"#FFF","noteOpacity":80}],
-               "custom-b":[{"dx":0,"dy":0,"width":60,"height":60,"count":0,"noteColor":"#FFF","noteOpacity":80}]}}
-            """);
-        KvDocument imported = KvDocument.Parse("""
-            {"selectedKeyType":"custom-a",
-             "customTabs":[{"id":"custom-a","name":"Main"}],
-             "keys":{"custom-a":["C"]},
-             "keyPositions":{"custom-a":[{"dx":9,"dy":0,"width":60,"height":60,"count":0,"noteColor":"#0F0","noteOpacity":80}]}}
-            """);
-        int before = 0;
-        foreach(string _ in mine.Tabs) before++;
-        string added = mine.MergeFrom(imported);
-        int after = 0;
-        foreach(string _ in mine.Tabs) after++;
-        Assert(after == before + 1, "the imported tab is added, existing tabs kept");
-        Assert(added != null && mine.HasTab(added), "the added tab id is returned and real");
-        Assert(added != "custom-a", "the imported tab gets a fresh id, not the colliding one");
-        Assert(mine.TabName(added) != "Main" && mine.TabName(added).StartsWith("Main"), "name de-duped: " + mine.TabName(added));
-        Assert(mine.Elements("custom-a", KvElementKind.Key)[0].Count == 5, "existing element data is preserved");
-        Assert(mine.Elements(added, KvElementKind.Key)[0].GlobalKey == "C", "the imported binding came across");
-        JObject after2 = JObject.Parse(mine.ToJson());
-        Assert(((JObject)after2["keys"]!).Count == 3, "three tabs serialize");
-    }
-    public static void TestEmbeddedCssIsExtractedForImport() {
-        KvDocument styled = KvDocument.Parse("""
-            {"selectedKeyType":"t","useCustomCSS":true,
-             "customCSS":{"path":"/x.css","content":".key { color: red }"},
-             "keys":{"t":["Z"]},
-             "keyPositions":{"t":[{"dx":0,"dy":0,"width":60,"height":60,"count":0,"noteColor":"#FFF","noteOpacity":80}]}}
-            """);
-        (bool enabled, string content) = styled.EmbeddedCss();
-        Assert(enabled, "useCustomCSS is surfaced");
-        Assert(content == ".key { color: red }", "the CSS content is surfaced");
-        (bool none, string empty) = KvDocument.Parse("""
-            {"selectedKeyType":"t","keys":{"t":["Z"]},
-             "keyPositions":{"t":[{"dx":0,"dy":0,"width":60,"height":60,"count":0,"noteColor":"#FFF","noteOpacity":80}]}}
-            """).EmbeddedCss();
-        Assert(!none && empty.Length == 0, "a preset without CSS reports none");
-    }
-    public static void TestRenameTabIsUniqueAndReversible() {
-        string preset = """
-            {"selectedKeyType":"custom-a",
-             "customTabs":[{"id":"custom-a","name":"16 Keys"},{"id":"custom-b","name":"16 Keys 2"}],
-             "keys":{"custom-a":["Z"],"custom-b":["X"]},
-             "keyPositions":{
-               "custom-a":[{"dx":0,"dy":0,"width":60,"height":60,"count":0,"noteColor":"#FFF","noteOpacity":80}],
-               "custom-b":[{"dx":0,"dy":0,"width":60,"height":60,"count":0,"noteColor":"#FFF","noteOpacity":80}]}}
-            """;
-        KvDocument doc = KvDocument.Parse(preset);
-        Assert(doc.RenameTab("custom-a", "Main") == "Main", "a free name is taken as-is");
-        Assert(doc.TabName("custom-a") == "Main", "the rename is reflected");
-        string taken = doc.RenameTab("custom-a", "16 Keys 2");
-        Assert(taken != "16 Keys 2" && taken.StartsWith("16 Keys 2"), "a taken name is uniquified: " + taken);
-        Assert(doc.RenameTab("custom-b", "16 Keys 2") == "16 Keys 2", "renaming to the current name keeps it");
-        Assert(doc.RenameTab("custom-a", "   ") == null, "a blank name is refused");
-        Assert(doc.RenameTab("nope", "X") == null, "an unknown tab is refused");
-        JObject after = JObject.Parse(doc.ToJson());
-        bool found = false;
-        foreach(JToken t in (JArray)after["customTabs"]!)
-            if(t["id"]!.ToString() == "custom-b" && t["name"]!.ToString() == "16 Keys 2") found = true;
-        Assert(found, "renamed tab names round-trip through customTabs");
-    }
     public static void TestRoundTripPreservesUnmodelledData() {
         KvDocument doc = KvDocument.Parse(Preset);
         KvElement first = doc.Elements("4key", KvElementKind.Key)[0];
@@ -244,31 +176,6 @@ static class KvDocumentTests {
         keys[1].PerKeyKps = true;
         Assert(keys[1].CountInTotal && !keys[1].Foot, "per-key KPS is independent of the total and the foot marker");
     }
-    public static void TestTabsCreateNameAndRemove() {
-        KvDocument doc = KvDocument.Empty();
-        string first = doc.SelectedTab;
-        Assert(!doc.RemoveTab(first), "the last tab cannot be removed — SelectedTab must name a tab that exists");
-        string a = doc.NewTabId();
-        Assert(a.StartsWith("custom-"), "new tab ids follow DM Note's custom-{millis}");
-        doc.EnsureTab(a, doc.UniqueTabName("8 Keys"));
-        string b = doc.NewTabId();
-        Assert(b != a, "a second id does not collide with the first");
-        Assert(doc.UniqueTabName("8 Keys") == "8 Keys 2", "a duplicate preset name is suffixed — DM Note rejects duplicates");
-        doc.EnsureTab(b, doc.UniqueTabName("8 Keys"));
-        Assert(doc.TabName(b) == "8 Keys 2", "the registered name is what comes back");
-        Assert(doc.TabName("custom-unregistered") == "custom-unregistered", "an unregistered tab falls back to its id");
-        Assert(doc.CustomTabCount == 3, "every tab here is a registered custom tab");
-        doc.Add(b, KvElement.Wrap([], KvElementKind.Key));
-        doc.SelectedTab = b;
-        Assert(doc.RemoveTab(b), "a tab that is not the last one goes");
-        Assert(doc.SelectedTab == a, "removing the selected tab selects the one before it");
-        JObject after = JObject.Parse(doc.ToJson());
-        foreach(string table in new[] { "keys", "keyPositions" })
-            Assert(after[table]![b] == null, table + " loses the removed tab");
-        foreach(JToken entry in (JArray)after["customTabs"]!)
-            Assert(entry["id"]!.ToString() != b, "customTabs loses the removed tab");
-        Assert(after["selectedKeyType"]!.ToString() == a, "the surviving selection is written out");
-    }
     public static void TestBoundKeyElementsMatchWhatTheViewerDraws() {
         const string tab = "4key";
         KvDocument doc = KvDocument.Parse(Preset);
@@ -286,136 +193,6 @@ static class KvDocumentTests {
             "unhiding puts it back, foot keys included, in document order");
         Assert(doc.Elements(tab, KvElementKind.Stat).Count == 1 && doc.Elements(tab, KvElementKind.Knob).Count == 1,
             "the stat and knob this preset carries are bound to no key and stay out");
-    }
-    public static void TestRemoveTabLeavesUnmodelledTablesAlone() {
-        KvDocument doc = KvDocument.Parse(Preset);
-        doc.EnsureTab("custom-other", "Other");
-        doc.SelectedTab = "custom-other";
-        Assert(doc.RemoveTab("4key"), "a builtin tab is removable like any other");
-        JObject after = JObject.Parse(doc.ToJson());
-        Assert(after["tabNoteOverrides"]!["4key"] != null, "tabNoteOverrides is left as authored");
-        Assert(after["keys"]!["4key"] == null, "the tables Quartz owns are still pruned");
-    }
-    private static readonly string[] RequiredEverywhere =
-        ["dx", "dy", "width", "height", "count", "noteColor", "noteOpacity"];
-    private static readonly string[] IntegerFields =
-        ["count", "noteOpacity", "noteGlowOpacity", "noteBorderOpacity", "zIndex"];
-    private static readonly Dictionary<string, string[]> EnumFields = new() {
-        ["noteAlignment"] = ["left", "center", "right"],
-    };
-    private static readonly string[] DmNoteStatTypes = ["kps", "total"];
-    private static readonly Dictionary<string, string[]> CounterEnumFields = new() {
-        ["placement"] = ["inside", "outside"],
-        ["align"] = ["top", "bottom", "left", "right"],
-        ["alignMode"] = ["center", "between"],
-    };
-    private static string DmNoteImportViolation(string json) {
-        JObject root = JObject.Parse(json);
-        JObject keys = root["keys"] as JObject;
-        foreach((string table, string[] disc) in new (string, string[])[] {
-            ("keyPositions", []),
-            ("statPositions", ["statType"]),
-            ("graphPositions", ["statType", "graphType", "graphSpeed", "graphColor"]),
-            ("knobPositions", []),
-        }) {
-            if(root[table] is not JObject byTab) continue;
-            foreach(JProperty tab in byTab.Properties()) {
-                if(tab.Value is not JArray arr) continue;
-                for(int i = 0; i < arr.Count; i++) {
-                    JObject outer = arr[i] as JObject;
-                    JObject p = outer?["position"] as JObject ?? outer;
-                    if(p == null) return $"{table}[{tab.Name}][{i}] is not an object";
-                    string where = $"{table}[{tab.Name}][{i}]";
-                    foreach(string req in RequiredEverywhere)
-                        if(p[req] == null) return $"{where} missing required '{req}'";
-                    foreach(string d in disc)
-                        if((outer ?? p)[d] == null) return $"{where} missing '{d}'";
-                    if(table == "statPositions") {
-                        string statType = ((outer ?? p)["statType"] ?? p["statType"])?.ToString();
-                        if(statType != null && Array.IndexOf(DmNoteStatTypes, statType) < 0)
-                            return $"{where}.statType='{statType}' is not a legal DM Note stat readout";
-                    }
-                    foreach(string f in IntegerFields) {
-                        JToken t = p[f];
-                        if(t != null && t.Type == JTokenType.Float)
-                            return $"{where}.{f} is a float ({t}); DM Note declares it an integer";
-                    }
-                    foreach((string f, string[] legal) in EnumFields) {
-                        JToken t = p[f];
-                        if(t != null && Array.IndexOf(legal, t.ToString()) < 0)
-                            return $"{where}.{f}='{t}' is not a legal DM Note value";
-                    }
-                    if(p["counter"] is JObject counter)
-                        foreach((string f, string[] legal) in CounterEnumFields) {
-                            JToken t = counter[f];
-                            if(t != null && Array.IndexOf(legal, t.ToString()) < 0)
-                                return $"{where}.counter.{f}='{t}' is not a legal DM Note value";
-                        }
-                    JToken nc = p["noteColor"];
-                    if(nc is { Type: not JTokenType.String } and JObject nco
-                       && (nco["top"] == null || nco["bottom"] == null))
-                        return $"{where}.noteColor object is not a valid gradient";
-                }
-                if(table == "keyPositions" && keys?[tab.Name] is JArray names && names.Count != arr.Count)
-                    return $"keys[{tab.Name}]={names.Count} but keyPositions={arr.Count} (not parallel)";
-            }
-        }
-        return null;
-    }
-    public static void TestGeneratedLayoutPassesDmNoteImport() {
-        KvDocument doc = KvDocument.Empty();
-        string tab = doc.SelectedTab;
-        KvElement key = KvElement.Wrap([], KvElementKind.Key, "Z");
-        key.MoveTo(0f, 0f);
-        key.Raw["noteColor"] = new JObject { ["type"] = "gradient", ["top"] = "#FFF", ["bottom"] = "#000" };
-        key.Raw["counter"] = new JObject { ["enabled"] = true, ["align"] = "bottom", ["placement"] = "inside" };
-        key.Z = 0;
-        doc.Add(tab, key);
-        KvElement stat = KvElement.Wrap([], KvElementKind.Stat, "");
-        stat.StatType = "kps";
-        stat.MoveTo(0f, 60f);
-        stat.Z = 1;
-        doc.Add(tab, stat);
-        KvElement graph = KvElement.Wrap([], KvElementKind.Graph, "");
-        graph.StatType = "kpsAvg";
-        graph.Raw["graphType"] = "line";
-        graph.Raw["graphSpeed"] = 1000;
-        graph.Raw["graphColor"] = "#86EFAC";
-        graph.MoveTo(0f, 120f);
-        graph.Z = 2;
-        doc.Add(tab, graph);
-        string violation = DmNoteImportViolation(doc.ToJson());
-        Assert(violation == null, "generated layout must pass DM Note import, but: " + violation);
-    }
-    public static void TestDmNoteImportValidatorCatchesFloatIntField() {
-        string bad = """
-            {"selectedKeyType":"t","keys":{"t":["Z"]},
-             "keyPositions":{"t":[{"dx":0,"dy":0,"width":60,"height":60,"count":0,
-               "noteColor":"#FFF","noteOpacity":80,"zIndex":0.5}]}}
-            """;
-        Assert(DmNoteImportViolation(bad) != null, "a float in an integer field must be flagged");
-        Assert(DmNoteImportViolation(Preset) == null, "the fixture preset satisfies the import rules");
-    }
-    public static void TestRenderAnchorPersistsAndDiesWithItsTab() {
-        KvDocument doc = KvDocument.Empty();
-        string tab = doc.SelectedTab;
-        Assert(!doc.TryGetRenderAnchor(tab, out _, out _), "a fresh tab has no anchor until the renderer seeds it");
-        doc.SetRenderAnchor(tab, 123.5f, -40f);
-        Assert(doc.TryGetRenderAnchor(tab, out float x, out float y) && x == 123.5f && y == -40f,
-            "the anchor reads back what was set");
-        KvDocument reloaded = KvDocument.Parse(doc.ToJson());
-        Assert(reloaded.TryGetRenderAnchor(tab, out x, out y) && x == 123.5f && y == -40f,
-            "the anchor survives a serialize/parse round-trip");
-        string second = doc.NewTabId();
-        doc.EnsureTab(second, doc.UniqueTabName("Other"));
-        doc.SetRenderAnchor(second, 1f, 2f);
-        doc.Add(second, KvElement.Wrap([], KvElementKind.Key));
-        doc.SelectedTab = second;
-        Assert(doc.RemoveTab(second), "the second tab goes");
-        Assert(!doc.TryGetRenderAnchor(second, out _, out _), "a removed tab's anchor is pruned with it");
-        Assert(doc.TryGetRenderAnchor(tab, out _, out _), "the surviving tab keeps its anchor");
-        Assert((JObject.Parse(doc.ToJson())["quartzRenderAnchors"] as JObject)?[second] == null,
-            "the pruned anchor is gone from the serialized document too");
     }
     public static void TestExportFormatsSplitQuartzOnlyData() {
         KvDocument doc = KvDocument.Empty();
@@ -452,45 +229,6 @@ static class KvDocumentTests {
             && qkvKey["quartzLabelEnabled"]?.Value<bool>() == false
             && qkvKey["quartzCounterShowWhilePressed"]?.Value<bool>() == false,
             "the Quartz export keeps every per-element extension");
-    }
-    public static void TestDmNoteGapsReportOnlyWhatIsUsed() {
-        KvDocument plain = KvDocument.Empty();
-        string plainTab = plain.SelectedTab;
-        plain.Add(plainTab, KvElement.Wrap([], KvElementKind.Key, "Z"));
-        KvElement kps = KvElement.Wrap([], KvElementKind.Stat, "");
-        kps.StatType = "total";
-        plain.Add(plainTab, kps);
-        plain.SetRenderAnchor(plainTab, 12f, 0f);
-        List<string> none = KvExportShaping.DetectDmNoteGaps(JObject.Parse(plain.ToJson()));
-        Assert(none.Count == 0, "a DM-Note-expressible layout reports no gaps, but got: " + string.Join(", ", none));
-        KvDocument doc = KvDocument.Empty();
-        string tab = doc.SelectedTab;
-        KvElement key = KvElement.Wrap([], KvElementKind.Key, "Z");
-        key.PressedText = "!";
-        key.GhostKey = "X";
-        key.CountInTotal = false;
-        doc.Add(tab, key);
-        KvElement stat = KvElement.Wrap([], KvElementKind.Stat, "");
-        stat.StatType = "kpsMax";
-        doc.Add(tab, stat);
-        List<string> gaps = KvExportShaping.DetectDmNoteGaps(JObject.Parse(doc.ToJson()));
-        Assert(string.Join(",", gaps) == string.Join(",", new[] {
-            KvExportShaping.GapStats, KvExportShaping.GapGhostKeys,
-            KvExportShaping.GapPressedLabels, KvExportShaping.GapCountInTotal,
-        }), "the gap list names what is used, in report order, but got: " + string.Join(", ", gaps));
-    }
-    public static void TestDmNoteGapsIgnoreDisabledNoteShadow() {
-        KvDocument doc = KvDocument.Empty();
-        string tab = doc.SelectedTab;
-        KvElement key = KvElement.Wrap([], KvElementKind.Key, "Z");
-        key.Raw["quartzNoteShadow"] = false;
-        key.Raw["quartzNoteShadowColor"] = "rgba(0, 0, 0, 0.5)";
-        doc.Add(tab, key);
-        Assert(KvExportShaping.DetectDmNoteGaps(JObject.Parse(doc.ToJson())).Count == 0,
-            "a note shadow that is switched off is not a gap");
-        key.Raw["quartzNoteShadow"] = true;
-        Assert(KvExportShaping.DetectDmNoteGaps(JObject.Parse(doc.ToJson()))
-            is [KvExportShaping.GapNoteShadows], "a note shadow that is on is");
     }
     private const string NestedPreset = """
         {
@@ -534,30 +272,6 @@ static class KvDocumentTests {
         JObject gone = (JObject)JObject.Parse(nested.ToJson())["keyPositions"]!["custom-a"]![0]!;
         Assert(gone["className"] == null && gone["position"]!["className"] == null,
             "clearing className removes it from both objects");
-    }
-    public static void TestExportKeepsOnlyTheSelectedTab() {
-        KvDocument doc = KvDocument.Parse(Preset);
-        doc.EnsureTab("custom-a", "Second");
-        doc.Add("custom-a", KvElement.Wrap(new JObject { ["dx"] = 5f, ["dy"] = 6f }, KvElementKind.Key, "Q"));
-        doc.SetRenderAnchor("4key", 1f, 2f);
-        doc.SetRenderAnchor("custom-a", 3f, 4f);
-        doc.SelectedTab = "custom-a";
-        JObject root = JObject.Parse(doc.ToJson());
-        Assert(((JObject)root["keyPositions"]!).Count == 2, "both tabs are in the saved layout");
-        KvExportShaping.KeepOnlyTab(root, "custom-a");
-        foreach(string table in new[] { "keys", "keyPositions", "quartzRenderAnchors" }) {
-            JObject byTab = (JObject)root[table]!;
-            Assert(byTab.Count == 1 && byTab["custom-a"] != null, table + " keeps only the exported tab");
-        }
-        Assert(root["selectedKeyType"]!.ToString() == "custom-a", "the export selects the exported tab");
-        JArray custom = (JArray)root["customTabs"]!;
-        Assert(custom.Count == 1 && custom[0]!["id"]!.ToString() == "custom-a", "customTabs keeps only the exported tab");
-        Assert(KvDocument.Parse(root.ToString()).Elements("custom-a", KvElementKind.Key).Count == 1,
-            "the single-tab export still parses as a preset");
-        JObject builtin = JObject.Parse(doc.ToJson());
-        KvExportShaping.KeepOnlyTab(builtin, "4key");
-        Assert(builtin["customTabs"] == null, "exporting a builtin tab drops the custom tab list");
-        Assert(((JObject)builtin["keyPositions"]!)["4key"] is JArray { Count: 3 }, "the builtin tab keeps its keys");
     }
     private static bool HasQuartzKey(JToken node) {
         switch(node) {
