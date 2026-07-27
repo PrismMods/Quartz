@@ -1,0 +1,29 @@
+agents/project.md
+  s_dd0035a49fb7d2::t_4c8c7edc2c82cb 193
+sdk/README.md
+  s_dd0035a49fb7d2::t_9c89f60c7bc27f 20-32
+  s_dd0035a49fb7d2::t_d97def8d21b0e4 33
+tools/release.sh
+  s_dd0035a49fb7d2::t_95f4cf19c12ed3 182-191
+  s_dd0035a49fb7d2::t_026c54903d5394 237,240,279-280,286,289
+.gitignore
+  s_dd0035a49fb7d2::t_11763482f05e9e 5-9
+sdk/QuartzAddon.props
+  s_dd0035a49fb7d2::t_f4870248456f05 102
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "780f94a6bf7ca6800ba2092dfa1e62b52fb2d84a",
+  "prompts": {},
+  "sessions": {
+    "s_dd0035a49fb7d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3fa3f501-86e0-4efa-8cc4-f4216865e0f3",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
