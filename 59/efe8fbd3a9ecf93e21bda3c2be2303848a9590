@@ -1,0 +1,35 @@
+Quartz.Tests/IO/ProfileBundleTests.cs
+  s_dd0035a49fb7d2::t_9a3239e618e82b 1
+Quartz.Tests/Quartz.Tests.csproj
+  s_dd0035a49fb7d2::t_3500903d1ec8b0 14-19
+  s_dd0035a49fb7d2::t_31a3c025953c6f 6-12
+Quartz.Tests/Support/Assert.cs
+  s_dd0035a49fb7d2::t_91e6694ef9ed25 1,3
+Quartz/UI/Factory/Page/PageModuleRows.cs
+  s_dd0035a49fb7d2::t_45d2bb6232bfeb 32
+Quartz.Tests/Features/Tuf/TufSecurityTests.cs
+  s_dd0035a49fb7d2::t_caf7362796f07a 6
+  s_dd0035a49fb7d2::t_9a3239e618e82b 1
+Quartz.Tests/Features/KeyViewer/KeyViewerCssTests.cs
+  s_dd0035a49fb7d2::t_9a3239e618e82b 1
+Quartz/Quartz.csproj
+  s_dd0035a49fb7d2::t_725ac806cc8ed9 32-37
+sdk/QuartzModule.props
+  s_dd0035a49fb7d2::t_91f2a5034c75cf 30-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "59efe8fbd3a9ecf93e21bda3c2be2303848a9590",
+  "prompts": {},
+  "sessions": {
+    "s_dd0035a49fb7d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3fa3f501-86e0-4efa-8cc4-f4216865e0f3",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
