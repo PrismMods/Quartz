@@ -7,6 +7,17 @@ on:
     branches: [main]
 
 jobs:
+  conventions:
+    name: Check conventions
+    runs-on: ubuntu-latest
+    # Rules the compiler can't enforce (file size, no silent exception swallowing).
+    # Runs over the whole tree — including the mod and module sources CI can't
+    # compile — because it only reads text.
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check conventions
+        run: python3 scripts/check_conventions.py
+
   test:
     name: Run tests
     runs-on: ubuntu-latest
@@ -19,6 +30,8 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.x"
+      # TreatWarningsAsErrors is set in Quartz.Tests.csproj, so this step is also
+      # the warning gate for every mod source the test project links.
       - name: Build
         run: dotnet build Quartz.Tests/Quartz.Tests.csproj --configuration Debug
       # Quartz.Tests is a custom console runner (OutputType Exe), not an xUnit/NUnit
