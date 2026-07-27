@@ -43,7 +43,13 @@ internal static class PageModuleRows {
         RemoveButton(row, () => ModuleService.Remove(id),
             "DESC_MODULES_REMOVE",
             "Deletes this module's files from disk. Its settings are kept, so re-installing restores them.");
-    public static void RemoveButton(RectTransform row, Action confirmed, string tipKey, string tipText) {
+    public static void RemoveButton(
+        RectTransform row,
+        Action confirmed,
+        string tipKey,
+        string tipText,
+        float rightOffset = 8f
+    ) {
         bool armed = false;
         UIButton remove = null;
         remove = GenerateUI.Button(row, () => {
@@ -57,13 +63,30 @@ internal static class PageModuleRows {
             }
             confirmed();
         }, "Remove", "modules_remove").SetSecondary();
-        RectTransform rect = remove.Rect;
+        Anchor(remove, rightOffset);
+        remove.Rect.AddToolTip(tipKey, tipText);
+    }
+    public static void InstallAllButton(
+        RectTransform row,
+        Action install,
+        string tipKey,
+        string tipText,
+        float rightOffset = 8f
+    ) {
+        UIButton button = GenerateUI.Button(row, () => {
+            if(ModuleInstallService.Busy) return;
+            install();
+        }, "Install All", "modules_install_tab");
+        Anchor(button, rightOffset);
+        button.Rect.AddToolTip(tipKey, tipText);
+    }
+    private static void Anchor(UIButton button, float rightOffset) {
+        RectTransform rect = button.Rect;
         rect.anchorMin = new Vector2(1f, 0.5f);
         rect.anchorMax = new Vector2(1f, 0.5f);
         rect.pivot = new Vector2(1f, 0.5f);
         rect.sizeDelta = new Vector2(140f, 46f);
-        rect.anchoredPosition = new Vector2(-8f, 0f);
-        remove.Rect.AddToolTip(tipKey, tipText);
+        rect.anchoredPosition = new Vector2(-rightOffset, 0f);
     }
     public static void Bundled(Transform parent, ModuleManifest manifest) {
         string id = manifest.Id;

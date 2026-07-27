@@ -33,13 +33,18 @@ public static class ModuleInstallService {
         }
         return plan;
     }
-    public static async void Install(string id) {
-        if(Busy) return;
+    public static void Install(string id) => InstallAll([id]);
+    public static async void InstallAll(IReadOnlyList<string> ids) {
+        if(Busy || ids == null || ids.Count == 0) return;
         ModuleCatalog catalog = ModuleCatalogService.Catalog;
         if(catalog == null) return;
-        List<string> plan = PlanInstall(id);
+        List<string> plan = [];
+        HashSet<string> seen = new(StringComparer.Ordinal);
+        foreach(string wanted in ids)
+            foreach(string needed in PlanInstall(wanted))
+                if(seen.Add(needed)) plan.Add(needed);
         if(plan.Count == 0) return;
-        ActiveId = id;
+        ActiveId = plan[0];
         Progress = 0f;
         Error = null;
         Raise();
@@ -52,6 +57,7 @@ public static class ModuleInstallService {
                     failure = $"'{plan[i]}' is not in the catalog";
                     break;
                 }
+                ActiveId = plan[i];
                 int index = i;
                 try {
                     await Task.Run(() => Fetch(entry, fraction => Report(index, plan.Count, fraction)))
@@ -82,7 +88,7 @@ public static class ModuleInstallService {
                 MainCore.Log.Msg($"[Modules] installed {string.Join(", ", installed)}");
                 ModuleService.LoadInstalled(installed);
             } else {
-                MainCore.Log.Err($"[Modules] install of '{id}' failed: {reason}");
+                MainCore.Log.Err($"[Modules] install of '{string.Join(", ", ids)}' failed: {reason}");
             }
             Raise();
         });

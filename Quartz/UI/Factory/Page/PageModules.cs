@@ -97,6 +97,12 @@ internal static class PageModules {
             IReadOnlyList<ModuleService.Handle> installed = ModuleCategories.Installed(key);
             IReadOnlyList<ModuleCatalogEntry> available = ModuleCategories.Available(key);
             IReadOnlyList<ModuleManifest> bundled = ModuleCategories.Bundled(key);
+            List<string> catalogIds = [];
+            foreach(ModuleCatalogEntry entry in available)
+                if(entry.CoreAbi == Info.ModuleAbi) catalogIds.Add(entry.Id);
+            List<string> bundledIds = [];
+            foreach(ModuleManifest manifest in bundled) bundledIds.Add(manifest.Id);
+            int buttons = (installed.Count > 0 ? 1 : 0) + (catalogIds.Count + bundledIds.Count > 0 ? 1 : 0);
             RectTransform tabRow = GenerateUI.Row(content.transform, 64f);
             GenerateUI.Toggle(
                 tabRow,
@@ -105,8 +111,21 @@ internal static class PageModules {
                 v => ModuleCategories.SetEnabled(key, v),
                 MainCore.Tr.Get(category.LocaleKey, category.Title),
                 "modules_tab_" + key,
-                installed.Count > 0 ? 168f : 52f
+                buttons switch { 0 => 52f, 1 => 168f, _ => 316f }
             );
+            if(catalogIds.Count > 0 || bundledIds.Count > 0) {
+                PageModuleRows.InstallAllButton(
+                    tabRow,
+                    () => {
+                        foreach(string moduleId in bundledIds) ModuleBundle.Install(moduleId);
+                        ModuleInstallService.InstallAll(catalogIds);
+                    },
+                    "DESC_MODULES_INSTALL_TAB",
+                    "Installs every module this tab offers — the ones bundled with Quartz go in instantly, "
+                        + "the rest download from GitHub.",
+                    buttons > 1 ? 156f : 8f
+                );
+            }
             if(installed.Count > 0) {
                 List<string> ids = [];
                 foreach(ModuleService.Handle handle in installed) ids.Add(handle.Id);
