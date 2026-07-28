@@ -1,0 +1,250 @@
+modules/KeyLimiter/KeyLimiter.Ticker.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 27
+modules/KeyViewer/Layout/KvDocument.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 110
+  s_76e351fa613eb2::t_25f2fd7a34f05a 109
+modules/Restriction/Restriction.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 80
+  s_76e351fa613eb2::t_25f2fd7a34f05a 79
+modules/Nostalgia/NostalgiaTweaks.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 15
+  s_76e351fa613eb2::t_de0a7c38028db8 16
+Quartz/Features/Interop/SettingsImporter.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 339
+  s_76e351fa613eb2::t_25f2fd7a34f05a 128,338
+Quartz/Modules/ModuleCatalogService.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 126,145
+  s_76e351fa613eb2::t_de0a7c38028db8 127,146
+Quartz/Game/Stats/GameStats.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 41,48,52,56,60,64,74,83,89,95,124,132,142,148,155,166,190,230
+modules/KeyViewer/KeyViewerSettings.Serialization.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 154,290,325,348
+  s_76e351fa613eb2::t_de0a7c38028db8 155,326,349
+Quartz/Game/Stats/ProgressTracker.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 32
+  s_76e351fa613eb2::t_de0a7c38028db8 33
+modules/KeyViewer/KeyViewerOverlay.Input.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 18
+  s_76e351fa613eb2::t_de0a7c38028db8 19
+Quartz/Modules/ModuleService.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 318
+  s_76e351fa613eb2::t_de0a7c38028db8 319
+modules/KeyViewer/Editor/KvProps.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 5
+  s_76e351fa613eb2::t_25f2fd7a34f05a 11,16,21
+Quartz/Core/Service/LocalizationService.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 24
+modules/PlanetColors/PlanetColors.Overlay.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 135,182,231
+  s_76e351fa613eb2::t_25f2fd7a34f05a 30,134,181,230
+modules/Tuf/TufBrowserView.Actions.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 129
+modules/KeyViewer/Editor/KvCanvasView.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 154
+  s_76e351fa613eb2::t_de0a7c38028db8 155
+modules/Tuf/TufLevelLauncher.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 178,186,194,209,222
+modules/PlanetColors/PlanetColors.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 68,80,95,276
+  s_76e351fa613eb2::t_de0a7c38028db8 277
+modules/KeyViewer/KeyViewerOverlay.DmNoteParsing.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 410,417
+Quartz/IO/FaqDocument.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 64
+  s_76e351fa613eb2::t_de0a7c38028db8 3,65
+Quartz/IO/IOUtils.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 12,24,37,50,63,76,89
+  s_76e351fa613eb2::t_de0a7c38028db8 3,13,25,38,51,64,77,90
+Quartz/Game/Stats/XAccuracyCalc.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 5
+  s_76e351fa613eb2::t_25f2fd7a34f05a 84
+Quartz/Modules/ModuleState.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 21
+  s_76e351fa613eb2::t_de0a7c38028db8 3,22
+modules/Tuf/TufSettings.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 56,98
+  s_76e351fa613eb2::t_de0a7c38028db8 4,99
+modules/AutoDeafen/DiscordOAuthServer.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 122
+  s_76e351fa613eb2::t_25f2fd7a34f05a 121
+modules/Tuf/TufService.Fetch.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 32
+Quartz/UI/Utility/NativeCursor.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 25
+  s_76e351fa613eb2::t_de0a7c38028db8 26
+Quartz/Features/PlayCount/PlayCount.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 84,167,176,226
+  s_76e351fa613eb2::t_de0a7c38028db8 85,168,177,227
+modules/Tuf/TufPackService.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 119,179
+modules/Optimizer/Optimizer.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 43
+  s_76e351fa613eb2::t_de0a7c38028db8 44
+Quartz/UI/Factory/Page/PageSettings.Helpers.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 239
+  s_76e351fa613eb2::t_de0a7c38028db8 240
+Quartz/Core/Diag.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 35,44
+  s_76e351fa613eb2::t_de0a7c38028db8 36,45
+Quartz/Features/Interop/UmmInterop.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 21,37,73,99
+  s_76e351fa613eb2::t_25f2fd7a34f05a 20,36,72,98
+modules/Tuf/TufService.Installed.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 92
+  s_76e351fa613eb2::t_25f2fd7a34f05a 26,91
+modules/Tweaks/TweaksPatches.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 70,90,150,154,185
+  s_76e351fa613eb2::t_de0a7c38028db8 186
+Quartz/Compat/Game/GameApi.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 161,233,246,280
+  s_76e351fa613eb2::t_de0a7c38028db8 162,234,247,281
+modules/Tuf/TufService.Library.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 117
+  s_76e351fa613eb2::t_25f2fd7a34f05a 47,116
+modules/KeyViewer/Layout/KvElement.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 47,52,61
+  s_76e351fa613eb2::t_de0a7c38028db8 2
+modules/AutoDeafen/DiscordRpc.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 148
+  s_76e351fa613eb2::t_25f2fd7a34f05a 147
+Quartz/Game/Stats/Hold.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 1
+  s_76e351fa613eb2::t_25f2fd7a34f05a 13
+modules/Tuf/TufLevelActionRunner.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 99
+  s_76e351fa613eb2::t_de0a7c38028db8 100
+modules/Tuf/TufInstallIndex.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 96
+  s_76e351fa613eb2::t_c2bcd9d837c81d 159
+  s_76e351fa613eb2::t_de0a7c38028db8 4
+modules/KeyLimiter/KeyLimiter.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 48,269,290
+  s_76e351fa613eb2::t_25f2fd7a34f05a 30,47,268,289
+modules/KeyViewer/KvInput.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 87
+  s_76e351fa613eb2::t_de0a7c38028db8 88
+modules/Editor/EditorBgaMod.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 22
+modules/Tweaks/Tweaks.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 364
+  s_76e351fa613eb2::t_25f2fd7a34f05a 65,117,123,129,160,363
+Quartz/Modules/ModuleMigration.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 2,60
+  s_76e351fa613eb2::t_25f2fd7a34f05a 59
+Quartz/Modules/ModuleMigration.Io.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 52
+  s_76e351fa613eb2::t_25f2fd7a34f05a 51
+modules/Practice/PracticePitch.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 10
+Quartz/Features/Interop/XPerfectBridge.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 35,77,87
+  s_76e351fa613eb2::t_de0a7c38028db8 36,78,88
+modules/Tuf/TufPacksView.Rows.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 222
+Quartz/Compat/Game/TextCompat.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 32,54,72
+  s_76e351fa613eb2::t_de0a7c38028db8 33,55,73
+Quartz/Game/Stats/Bpm.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 56
+  s_76e351fa613eb2::t_de0a7c38028db8 57
+modules/UiHider/UiHider.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 109,146,214,218,233
+  s_76e351fa613eb2::t_de0a7c38028db8 110,147
+Quartz/Compat/Game/Refl.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 19,27
+  s_76e351fa613eb2::t_25f2fd7a34f05a 18,26
+Quartz/IO/SettingsFile.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 20,168
+  s_76e351fa613eb2::t_25f2fd7a34f05a 19,167
+modules/Practice/PracticeDifficulty.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 15,37
+modules/AutoDeafen/AutoDeafen.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 182,185
+Quartz/Core/Service/LangUpdateService.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 109
+  s_76e351fa613eb2::t_de0a7c38028db8 110
+modules/KeyViewer/KeyViewerCss.Color.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 63
+  s_76e351fa613eb2::t_de0a7c38028db8 7,64
+modules/KeyViewer/Layout/KvMigrationPlan.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 38
+  s_76e351fa613eb2::t_de0a7c38028db8 1,39
+modules/OttoIcon/OttoIcon.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 74
+Quartz/Compat/Game/FileDialog.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 71,92,103,123
+  s_76e351fa613eb2::t_25f2fd7a34f05a 70,91,102,122
+Quartz/Utility/Math/Evaluator.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 2,18
+  s_76e351fa613eb2::t_25f2fd7a34f05a 17
+modules/Tuf/TufDiskSpace.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 1,28
+  s_76e351fa613eb2::t_25f2fd7a34f05a 14,27
+Quartz/Features/Interop/Readers/EnhancedEffectRemoverReader.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 4,19
+  s_76e351fa613eb2::t_25f2fd7a34f05a 18
+modules/Tuf/TufDownloadService.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 56,69
+Quartz/Features/Interop/ReflectionHelpers.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 39,74,86
+  s_76e351fa613eb2::t_25f2fd7a34f05a 38,73,85,156,219,257
+modules/Tuf/TufPackApiClient.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 184
+modules/Editor/Editor.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 90
+modules/Tuf/TufPreviewCache.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 163,186
+Quartz/Resource/ResourceManager.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 73
+  s_76e351fa613eb2::t_de0a7c38028db8 74
+Quartz/Addons/AddonService.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 259
+Quartz/Compat/Game/GameVersion.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 3,26
+  s_76e351fa613eb2::t_25f2fd7a34f05a 25
+Quartz/Interop/ImportSource.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 2,24,32,40
+  s_76e351fa613eb2::t_25f2fd7a34f05a 23,31,39
+modules/Tuf/TufInstallPaths.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 29,51,61,74,88
+modules/KeyLimiter/ChatterBlocker.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 177
+  s_76e351fa613eb2::t_25f2fd7a34f05a 148,168,176
+modules/KeyViewer/Layout/KvStore.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 169
+  s_76e351fa613eb2::t_25f2fd7a34f05a 168
+modules/Tuf/TufMainLevel.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 93,137,145
+  s_76e351fa613eb2::t_de0a7c38028db8 94,146
+modules/Editor/EditorFloorReadout.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 35,196
+  s_76e351fa613eb2::t_de0a7c38028db8 36,197
+modules/Panels/PanelsOverlay.LivePanel.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 143,199
+  s_76e351fa613eb2::t_25f2fd7a34f05a 80,142,198
+Quartz/Features/Interop/RequiredModsGate.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 14
+  s_76e351fa613eb2::t_25f2fd7a34f05a 13
+Quartz/IO/ProfileManager.cs
+  s_76e351fa613eb2::t_de0a7c38028db8 59
+  s_76e351fa613eb2::t_25f2fd7a34f05a 58
+Quartz/Modules/ModuleBundle.cs
+  s_76e351fa613eb2::t_25f2fd7a34f05a 27,79
+  s_76e351fa613eb2::t_de0a7c38028db8 28,80
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "dc934b68ece8bc226d9b31659f66c62ab81264bc",
+  "prompts": {},
+  "sessions": {
+    "s_76e351fa613eb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "33998417-21c5-469e-b06f-136bf038c139",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
