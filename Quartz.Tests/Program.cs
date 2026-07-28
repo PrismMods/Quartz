@@ -128,6 +128,11 @@ List<(string Name, Action Run)> tests = [
     ("Monotonic easings never travel backwards", EasingTests.TestMonotonicCurvesNeverGoBackwards),
     ("Bounce actually bounces and never overshoots", EasingTests.TestBounceLandsOnItsPlateaus),
     ("Back easings overshoot deliberately at both ends", EasingTests.TestBackCurvesOvershootOnPurpose),
+    ("Every data path stays inside the data root", PathServiceTests.TestEveryPathStaysUnderTheRoot),
+    ("Initialize creates the folders and writes no files", PathServiceTests.TestInitializeCreatesTheFoldersButNoFiles),
+    ("Feature enable and disable run every step in registration order", FeatureRegistryTests.TestEnableAndDisableRunEveryRegisteredStepInOrder),
+    ("A feature may register only one side of the pair", FeatureRegistryTests.TestNullStepsAreDroppedRatherThanInvoked),
+    ("An empty feature registry is safe to drive", FeatureRegistryTests.TestAnEmptyRegistryIsSafeToDrive),
 ];
 int failed = 0;
 foreach((string name, Action run) in tests) {
