@@ -1,0 +1,43 @@
+modules/Editor/EditorDecoPreview.cs
+  s_390d0fd70da269::t_9d257eeefcb6c8 113-117,123
+  s_390d0fd70da269::t_8c7662e9ac284a 102-111
+  s_390d0fd70da269::t_8e7d2a0b971fc1 119
+  s_390d0fd70da269::t_fca14f85922d41 1-15,17-23,26-29,38,40-88,90-91,95-101,112,118,120-122,124-136,145-149
+  s_390d0fd70da269::t_0b825b2ea11e38 89,92-94
+  s_390d0fd70da269::t_25b0baa29d4d91 16
+  s_390d0fd70da269::t_e39b6249c7d3f7 25
+  s_390d0fd70da269::t_19b5b8d4e4c39a 137-144
+  s_390d0fd70da269::t_f033102556bffb 24,30-37,39
+modules/Editor/Lang/en-US.json
+  s_390d0fd70da269::t_ef0da50e86aab7 29-33
+modules/Editor/Lang/ko-KR.json
+  s_390d0fd70da269::t_2117fe051e1e24 29-33
+modules/Editor/Lang/zh-CN.json
+  s_390d0fd70da269::t_e141a04f4c3048 29-33
+modules/Editor/PageEditor.cs
+  s_390d0fd70da269::t_3a70998c7d70c3 58-71
+modules/Editor/Editor.cs
+  s_390d0fd70da269::t_99f6106b12c207 39
+modules/Editor/EditorModule.cs
+  s_390d0fd70da269::t_e6443e2b7ac745 13
+modules/Editor/EditorSettings.cs
+  s_390d0fd70da269::t_cf4c00fa42eb48 19
+  s_390d0fd70da269::t_4b1f87a19b5a30 37
+  s_390d0fd70da269::t_c66afa38c74ea5 55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "01fbe23acb53f9ec1d152d6be59de364dd7d75d0",
+  "prompts": {},
+  "sessions": {
+    "s_390d0fd70da269": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "19c1b2fb-cfd4-4b77-b902-26324d0386fb",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
