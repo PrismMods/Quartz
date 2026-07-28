@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Build a Release and publish it to GitHub with Quartz.zip + Quartz.dll +
-# QuartzUmm.zip (the UnityModManager build) attached.
+# QuartzUmm.zip (UnityModManager) + QuartzModules.zip (every module) attached.
 # Pre-release channels (alpha/beta/rc) are flagged as pre-releases.
 #
 # Release identity (Version + Channel) comes from Quartz/Core/Info.cs — set those
@@ -189,41 +189,55 @@ quartz_umm_zip="dist/QuartzUmm.zip"
 sdk_dll="sdk/QuartzAddon.dll"
 [ -f "$sdk_dll" ] || { echo "sdk/QuartzAddon.dll missing — aborting" >&2; exit 1; }
 
-# Modules: the catalog is generated from whatever dist/modules/ holds, then
-# checked against it. Deliberately NOT a hand-maintained per-module asset list —
-# that is the thing the module system exists to delete.
+# Modules ship as ONE asset: QuartzModules.zip, every .qmod and .qmod.json in a
+# flat zip. Attaching them loose put 50+ files on the release page and buried the
+# two zips a human actually downloads; the whole set is smaller than one install
+# zip, so the installer fetches it once and extracts what it needs. The catalog
+# is generated from whatever dist/modules/ holds and then checked against it —
+# deliberately NOT a hand-maintained per-module asset list, which is the thing
+# the module system exists to delete.
 catalog="dist/modules.json"
 modules_zip="dist/QuartzModules.zip"
-tools/gen-catalog.sh "$tag" "$catalog"
-jq -e . "$catalog" >/dev/null || { echo "dist/modules.json is not valid JSON — aborting" >&2; exit 1; }
 on_disk=$(find dist/modules -name '*.qmod' 2>/dev/null | wc -l | tr -d ' ')
+[ "$on_disk" -gt 0 ] || { echo "dist/modules holds no modules — the module build failed; aborting" >&2; exit 1; }
+rm -f "$modules_zip"
+(cd dist/modules && zip -q -X "../$(basename "$modules_zip")" ./*.qmod ./*.qmod.json)
+[ -f "$modules_zip" ] || { echo "dist/QuartzModules.zip missing — aborting" >&2; exit 1; }
+tools/gen-catalog.sh "$tag" "$modules_zip" "$catalog"
+jq -e . "$catalog" >/dev/null || { echo "dist/modules.json is not valid JSON — aborting" >&2; exit 1; }
 in_catalog=$(jq '.modules | length' "$catalog")
 [ "$on_disk" = "$in_catalog" ] || {
   echo "catalog lists ${in_catalog} module(s) but dist/modules has ${on_disk} — aborting" >&2; exit 1; }
+sha_of() { (shasum -a 256 "$1" 2>/dev/null || sha256sum "$1") | cut -d' ' -f1; }
 while read -r id want; do
-  got=$( (shasum -a 256 "dist/modules/${id}.qmod" 2>/dev/null || sha256sum "dist/modules/${id}.qmod") | cut -d' ' -f1)
-  [ "$got" = "$want" ] || { echo "catalog sha256 for ${id} does not match the file — aborting" >&2; exit 1; }
+  [ "$(sha_of "dist/modules/${id}.qmod")" = "$want" ] \
+    || { echo "catalog sha256 for ${id} does not match the file — aborting" >&2; exit 1; }
 done < <(jq -r '.modules[] | "\(.id) \(.sha256)"' "$catalog")
-rm -f "$modules_zip"
-module_assets=()
-module_bundle=()
-if [ "$in_catalog" -gt 0 ]; then
-  (cd dist/modules && zip -q -X "../$(basename "$modules_zip")" ./*.qmod ./*.qmod.json)
-  [ -f "$modules_zip" ] || { echo "dist/QuartzModules.zip missing — aborting" >&2; exit 1; }
-  module_assets=(dist/modules/*.qmod dist/modules/*.qmod.json "$modules_zip")
-  module_bundle=("$modules_zip")
-  # Fold the verified modules into both install zips under the data root's
-  # Module.bundled/. That is the offline source the first-launch migration
-  # copies from, so an upgrading user keeps every feature they had enabled
-  # without needing the network. Transitional — dropped in Phase 6.
-  tools/bundle-modules.sh
-  # Every module that ships must have a migration rule, or upgrading users
-  # silently lose that feature on first launch.
-  while read -r id; do
-    grep -q "Id = \"${id}\"" Quartz/Modules/ModuleMigration.cs \
-      || { echo "module '${id}' has no rule in ModuleMigration.Table — aborting" >&2; exit 1; }
-  done < <(jq -r '.modules[].id' "$catalog" | grep -v '^sample$')
-fi
+# The installer verifies this before it trusts a single byte out of the zip.
+[ "$(sha_of "$modules_zip")" = "$(jq -r '.bundle.sha256' "$catalog")" ] \
+  || { echo "catalog sha256 for the module bundle does not match the zip — aborting" >&2; exit 1; }
+# The installer looks each module up inside the zip by "<id>.qmod" / "<id>.qmod.json".
+# A catalog entry with no matching zip member is a module nobody can install.
+zip_members=$(unzip -Z1 "$modules_zip")
+while read -r id; do
+  for member in "${id}.qmod" "${id}.qmod.json"; do
+    grep -qxF "$member" <<<"$zip_members" \
+      || { echo "the module bundle has no '${member}' but the catalog lists it — aborting" >&2; exit 1; }
+  done
+done < <(jq -r '.modules[].id' "$catalog")
+module_assets=("$modules_zip")
+module_bundle=("$modules_zip")
+# Fold the verified modules into both install zips under the data root's
+# Module.bundled/. That is the offline source the first-launch migration
+# copies from, so an upgrading user keeps every feature they had enabled
+# without needing the network. Transitional — dropped in Phase 6.
+tools/bundle-modules.sh
+# Every module that ships must have a migration rule, or upgrading users
+# silently lose that feature on first launch.
+while read -r id; do
+  grep -q "Id = \"${id}\"" Quartz/Modules/ModuleMigration.cs \
+    || { echo "module '${id}' has no rule in ModuleMigration.Table — aborting" >&2; exit 1; }
+done < <(jq -r '.modules[].id' "$catalog")
 
 # gh wants the body from a file (preserves markdown + newlines).
 notes_tmp=$(mktemp)

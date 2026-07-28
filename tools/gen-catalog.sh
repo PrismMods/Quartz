@@ -2,23 +2,31 @@
 # gen-catalog.sh — build dist/modules.json from the manifests in dist/modules/.
 #
 # Every <id>.qmod.json emitted by a module build is copied into the catalog and
-# annotated with what only the release knows: the asset size, its sha256, and
-# the absolute download URL pinned to THIS tag.
+# annotated with what only the release knows: the asset size and its sha256.
 #
-# The URL points at the concrete tag rather than the rolling latest-<channel>
+# Modules ship as ONE asset — QuartzModules.zip, every .qmod and .qmod.json in a
+# flat zip — described by the catalog's top-level "bundle". Attaching 50+ loose
+# assets to a release buried the two files a human actually downloads, and the
+# whole set is smaller than a single install zip, so fetching it once beats
+# fetching modules one at a time. The installer verifies the bundle's sha256,
+# then re-verifies each module's own sha256 after extracting it.
+#
+# URLs point at the concrete tag rather than the rolling latest-<channel>
 # pointer on purpose: the rolling release then only has to carry modules.json
-# itself, instead of re-uploading every module asset on each publish.
+# itself, instead of re-uploading the bundle on each publish.
 #
 # Output is sorted by module id so re-cutting the same build is byte-identical.
 #
-# Usage: tools/gen-catalog.sh <tag> [output]
+# Usage: tools/gen-catalog.sh <tag> [bundle] [output]
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
 tag="${1:-}"
-out="${2:-dist/modules.json}"
-[ -n "$tag" ] || { echo "usage: tools/gen-catalog.sh <tag> [output]" >&2; exit 1; }
+bundle="${2:-dist/QuartzModules.zip}"
+out="${3:-dist/modules.json}"
+[ -n "$tag" ] || { echo "usage: tools/gen-catalog.sh <tag> [bundle] [output]" >&2; exit 1; }
+[ -f "$bundle" ] || { echo "catalog: ${bundle} missing — build and zip the modules first" >&2; exit 1; }
 
 command -v jq >/dev/null || { echo "jq is required" >&2; exit 1; }
 
@@ -50,12 +58,10 @@ for manifest in dist/modules/*.qmod.json; do
   [ -z "$core_version" ] && core_version=$(jq -r '.version' "$manifest")
   entries=$(jq \
     --slurpfile m "$manifest" \
-    --arg url "${base}/${id}.qmod" \
-    --arg murl "${base}/${id}.qmod.json" \
     --arg sha "$(sha256 "$binary")" \
     --arg msha "$(sha256 "$manifest")" \
     --argjson size "$(filesize "$binary")" \
-    '. + [$m[0] + {assetName: ($m[0].id + ".qmod"), url: $url, manifestUrl: $murl,
+    '. + [$m[0] + {assetName: ($m[0].id + ".qmod"),
                    size: $size, sha256: $sha, manifestSha256: $msha}]' \
     <<<"$entries")
 done
@@ -66,8 +72,14 @@ jq -S --sort-keys \
   --arg version "$core_version" \
   --arg tag "$tag" \
   --argjson abi "$abi" \
+  --arg bundleName "$(basename "$bundle")" \
+  --arg bundleUrl "${base}/$(basename "$bundle")" \
+  --arg bundleSha "$(sha256 "$bundle")" \
+  --argjson bundleSize "$(filesize "$bundle")" \
   --argjson modules "$(jq 'sort_by(.id)' <<<"$entries")" \
-  '{schema: 1, core: {version: $version, abi: $abi, tag: $tag}, groups: ., modules: $modules}' \
+  '{schema: 1, core: {version: $version, abi: $abi, tag: $tag},
+    bundle: {assetName: $bundleName, url: $bundleUrl, size: $bundleSize, sha256: $bundleSha},
+    groups: ., modules: $modules}' \
   tools/module-groups.json > "$out"
 
-echo "Catalog: ${out} ($(jq '.modules | length' "$out") module(s), tag ${tag})"
+echo "Catalog: ${out} ($(jq '.modules | length' "$out") module(s) in $(basename "$bundle"), tag ${tag})"

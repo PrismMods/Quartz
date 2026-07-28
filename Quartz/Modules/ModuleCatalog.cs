@@ -28,9 +28,14 @@ public sealed class ModuleGroup {
 public sealed class ModuleCatalog {
     public const int Schema = 1;
     public const int MaxBytes = 2 * 1024 * 1024;
+    public const int MaxBundleBytes = 64 * 1024 * 1024;
     public string CoreVersion = "";
     public string CoreTag = "";
     public int CoreAbi = -1;
+    public string BundleUrl = "";
+    public string BundleSha256 = "";
+    public long BundleSize;
+    public bool HasBundle => !string.IsNullOrWhiteSpace(BundleUrl) && IsSha256(BundleSha256);
     public readonly List<ModuleGroup> Groups = [];
     public readonly List<ModuleCatalogEntry> Modules = [];
     public ModuleCatalogEntry Find(string id) {
@@ -64,6 +69,11 @@ public sealed class ModuleCatalog {
             catalog.CoreVersion = core["version"]?.ToString() ?? "";
             catalog.CoreTag = core["tag"]?.ToString() ?? "";
             catalog.CoreAbi = core["abi"] is { Type: JTokenType.Integer } abi ? (int)abi : -1;
+        }
+        if(root["bundle"] is JObject bundle) {
+            catalog.BundleUrl = bundle["url"]?.ToString() ?? "";
+            catalog.BundleSha256 = bundle["sha256"]?.ToString() ?? "";
+            catalog.BundleSize = bundle["size"] is { Type: JTokenType.Integer } bundleSize ? (long)bundleSize : 0;
         }
         if(root["groups"] is JArray groups) {
             foreach(JToken item in groups) {
@@ -99,9 +109,8 @@ public sealed class ModuleCatalog {
         string sha = module["sha256"]?.ToString();
         string manifestSha = module["manifestSha256"]?.ToString();
         if(!IsSha256(sha) || !IsSha256(manifestSha)) return null;
-        string url = module["url"]?.ToString();
-        string manifestUrl = module["manifestUrl"]?.ToString();
-        if(string.IsNullOrWhiteSpace(url) || string.IsNullOrWhiteSpace(manifestUrl)) return null;
+        string url = module["url"]?.ToString() ?? "";
+        string manifestUrl = module["manifestUrl"]?.ToString() ?? "";
         return new ModuleCatalogEntry {
             Id = id,
             Name = module["name"]?.ToString() ?? id,

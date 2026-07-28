@@ -50,6 +50,7 @@
 		<Compile Include="../modules/Tuf/TufApiQuery.cs" Link="Source/TufApiQuery.cs" />
 		<Compile Include="../Quartz/Modules/ModuleManifest.cs" Link="Source/ModuleManifest.cs" />
 		<Compile Include="../Quartz/Modules/ModuleState.cs" Link="Source/ModuleState.cs" />
+		<Compile Include="../Quartz/Modules/ModuleCatalog.cs" Link="Source/ModuleCatalog.cs" />
 		<Compile Include="../Quartz/Modules/ModuleOrder.cs" Link="Source/ModuleOrder.cs" />
 		<Compile Include="../Quartz/Modules/ModuleMigration.cs" Link="Source/ModuleMigration.cs" />
 		<Compile Include="../Quartz/Net/NetworkPolicy.cs" Link="Source/NetworkPolicy.cs" />
