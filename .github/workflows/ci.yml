@@ -6,6 +6,17 @@ on:
   pull_request:
     branches: [main]
 
+# A new push to the same branch supersedes the old one; nothing here is worth
+# finishing a run for once its commit is no longer the tip.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+# Actions are pinned by commit SHA, not by tag: a tag is mutable, and a moved tag
+# would silently change what runs against this repo. Comments keep it readable.
 jobs:
   conventions:
     name: Check conventions
@@ -14,7 +25,7 @@ jobs:
     # Runs over the whole tree — including the mod and module sources CI can't
     # compile — because it only reads text.
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Check conventions
         run: python3 scripts/check_conventions.py
 
@@ -26,8 +37,8 @@ jobs:
     # test project (Quartz.Tests) links only pure-logic source files and builds
     # standalone on net10.0, so it runs here without the game.
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
         with:
           dotnet-version: "10.0.x"
       # TreatWarningsAsErrors is set in Quartz.Tests.csproj, so this step is also
