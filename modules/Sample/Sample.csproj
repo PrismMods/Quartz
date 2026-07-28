@@ -1,6 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<ModuleId>sample</ModuleId>
-		<AssemblyName>Quartz.Module.Sample</AssemblyName>
-	</PropertyGroup>
-</Project>
