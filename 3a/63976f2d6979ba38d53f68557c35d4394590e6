@@ -1,0 +1,19 @@
+.gitignore
+  s_76e351fa613eb2::t_2c5329a8f5c0f7 38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "3a63976f2d6979ba38d53f68557c35d4394590e6",
+  "prompts": {},
+  "sessions": {
+    "s_76e351fa613eb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "33998417-21c5-469e-b06f-136bf038c139",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
