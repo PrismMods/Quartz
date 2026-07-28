@@ -1,0 +1,42 @@
+Quartz/Modules/ModuleInstallService.cs
+  s_459a8904d3219b::t_1aa7dfe64f8c2c 1
+  s_459a8904d3219b::t_d818878b888610 112-149,154,160-170
+  s_459a8904d3219b::t_057485ca57a7a5 52,55-63,70,77,83
+  s_459a8904d3219b::t_f03fa91e865618 71-72,74
+Quartz.Tests/Program.cs
+  s_459a8904d3219b::t_35278c81682a92 59-62
+tools/release.sh
+  s_459a8904d3219b::t_76966824cd561f 192-198,202-207,211,213-214,216,226-238
+  s_459a8904d3219b::t_17756eecf202b8 3
+  s_459a8904d3219b::t_deabfc0092cb36 217-225
+  s_459a8904d3219b::t_199e9b6701b51a 239-240
+Quartz.Tests/Modules/ModuleCatalogTests.cs
+  s_459a8904d3219b::t_cbeee5b9fc910b 1-59
+Quartz.Tests/Quartz.Tests.csproj
+  s_459a8904d3219b::t_c4a55bdb29b267 53
+Quartz/Modules/ModuleCatalog.cs
+  s_459a8904d3219b::t_7b83b738e42c6f 73-77
+  s_459a8904d3219b::t_d305d9726ab3e4 31,35-38
+  s_459a8904d3219b::t_4a84ff6048ba07 112-113
+tools/gen-catalog.sh
+  s_459a8904d3219b::t_71d860ffeb19dd 26-29
+  s_459a8904d3219b::t_03fa9f95079f4f 75-78,80-82,85
+  s_459a8904d3219b::t_4fb0f376a9eec6 64
+  s_459a8904d3219b::t_ba3649a8013f07 5,7-14,16,20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "f3a0bbc6a1adb3a994774c1cc58d8dda85b4e786",
+  "prompts": {},
+  "sessions": {
+    "s_459a8904d3219b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3edd775d-bf80-4ba2-830b-9ee5844a95ec",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
