@@ -55,6 +55,20 @@ internal static partial class PageEditor {
             "Disable planet decorations", "editor_bga_hide_planet_deco",
             "Also hides decorations attached to a planet while BGA Mod is hiding the level. Background and camera-anchored decorations are left visible.");
     }
+    public static void DecoPreviewPage(RectTransform parent) {
+        EditorFeature.EnsureConf();
+        EditorSettings conf = EditorFeature.Conf;
+        EditorSettings def = new();
+        RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
+        var sec = GenerateUI.FlatSection(content.transform, "Decoration Preview");
+        GenerateUI.ToggleTip(sec.Body, def.DecoPreview, conf.DecoPreview,
+            v => { conf.DecoPreview = v; EditorFeature.RefreshDecoPreview(); EditorFeature.Save(); },
+            "Preview decoration images in the list", "editor_deco_preview",
+            "Replaces the generic icon next to each entry in the level editor's decoration list with the decoration's own image, scaled to fit and shown at full brightness, so you can tell entries apart without selecting them. Text and object entries keep their generic icon; a particle whose image is missing falls back to one too.");
+        GenerateUI.Localize(GenerateUI.AddMutedText(GenerateUI.Row(sec.Body)),
+            "EDITOR_DECO_PREVIEW_CREDIT",
+            "Ported from DecoPreview by rdzip, licensed under the GNU GPL v3.");
+    }
     public static void FlipRotatePage(RectTransform parent) {
         EditorFeature.EnsureConf();
         EditorSettings conf = EditorFeature.Conf;

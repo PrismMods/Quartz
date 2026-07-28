@@ -16,6 +16,7 @@ public sealed class EditorSettings : ISettingsFile {
     public bool AdjustOnRotate = false;
     public bool CustomAngleRotation = false;
     public float CustomAngle = 90f;
+    public bool DecoPreview = false;
     public bool ShowAny =>
         ShowFloorAngle || ShowFloorBeats || ShowFloorCount || ShowFloorDuration;
     public JToken Serialize() {
@@ -33,6 +34,7 @@ public sealed class EditorSettings : ISettingsFile {
             [nameof(AdjustOnRotate)] = AdjustOnRotate,
             [nameof(CustomAngleRotation)] = CustomAngleRotation,
             [nameof(CustomAngle)] = CustomAngle,
+            [nameof(DecoPreview)] = DecoPreview,
         };
     }
     public void Deserialize(JToken token) {
@@ -50,5 +52,6 @@ public sealed class EditorSettings : ISettingsFile {
         AdjustOnRotate = IOUtils.Read(token, nameof(AdjustOnRotate), AdjustOnRotate);
         CustomAngleRotation = IOUtils.Read(token, nameof(CustomAngleRotation), CustomAngleRotation);
         CustomAngle = IOUtils.Read(token, nameof(CustomAngle), CustomAngle);
+        DecoPreview = IOUtils.Read(token, nameof(DecoPreview), DecoPreview);
     }
 }

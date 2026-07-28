@@ -26,6 +26,10 @@
     "DESC_EDITOR_ROTATE_ADJUST": "선택한 타일을 회전할 때, 각 타일의 길 위치(Position Track) 이벤트에 저장된 좌표도 같은 각도로 회전하여 해당 이벤트로 배치된 요소가 타일과 함께 회전하도록 합니다.",
     "EDITOR_CUSTOM_ANGLE": "사용자 지정 회전 각도 사용",
     "DESC_EDITOR_CUSTOM_ANGLE": "회전 단축키를 사용할 때 기본 90° 대신 아래에서 지정한 각도로 선택한 타일을 회전합니다. 180° 회전 단축키는 항상 180°로 유지됩니다.",
-    "EDITOR_CUSTOM_ANGLE_VALUE": "회전 각도"
+    "EDITOR_CUSTOM_ANGLE_VALUE": "회전 각도",
+    "SECTION_DECORATION_PREVIEW": "데코레이션 미리보기",
+    "EDITOR_DECO_PREVIEW": "목록에서 데코레이션 이미지 미리보기",
+    "DESC_EDITOR_DECO_PREVIEW": "레벨 에디터 데코레이션 목록의 각 항목 옆에 있는 기본 아이콘을 해당 데코레이션의 실제 이미지로 바꾸고, 비율에 맞게 크기를 조정해 원래 밝기로 표시합니다. 항목을 선택하지 않아도 구분할 수 있습니다. 텍스트와 오브젝트 항목은 기본 아이콘을 유지하며, 이미지를 찾을 수 없는 파티클도 기본 아이콘으로 표시됩니다.",
+    "EDITOR_DECO_PREVIEW_CREDIT": "rdzip의 DecoPreview를 이식했으며, GNU GPL v3 라이선스를 따릅니다."
   }
 }

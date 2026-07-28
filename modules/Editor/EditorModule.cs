@@ -10,6 +10,7 @@ public sealed class EditorModule : QuartzModule {
         Page("editor.tilereadout", 10, "Selected Tile Readout", "SECTION_SELECTED_TILE_READOUT", PageEditor.TileReadoutPage);
         Page("editor.bga", 20, "BGA Mod", "SECTION_BGA_MOD", PageEditor.BgaPage);
         Page("editor.fliprotate", 30, "Flip & Rotate Tiles", "SECTION_FLIP_ROTATE_TILES", PageEditor.FlipRotatePage);
+        Page("editor.decopreview", 40, "Decoration Preview", "SECTION_DECORATION_PREVIEW", PageEditor.DecoPreviewPage);
         Context.PatchAll(typeof(EditorModule));
         Context.OnModDisable("EditorFeature", EditorFeature.Restore);
     }

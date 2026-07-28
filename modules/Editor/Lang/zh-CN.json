@@ -26,6 +26,10 @@
     "DESC_EDITOR_ROTATE_ADJUST": "旋转选中轨道时，同时按相同角度旋转每个轨道的位置轨道事件中存储的坐标，使这些事件定位的物体随轨道一起旋转。",
     "EDITOR_CUSTOM_ANGLE": "使用自定义旋转角度",
     "DESC_EDITOR_CUSTOM_ANGLE": "使用旋转快捷键时，按下方角度旋转选中轨道而非默认90°；180°旋转快捷键始终保持180°。",
-    "EDITOR_CUSTOM_ANGLE_VALUE": "旋转角度"
+    "EDITOR_CUSTOM_ANGLE_VALUE": "旋转角度",
+    "SECTION_DECORATION_PREVIEW": "装饰预览",
+    "EDITOR_DECO_PREVIEW": "在列表中预览装饰图像",
+    "DESC_EDITOR_DECO_PREVIEW": "将关卡编辑器装饰列表中每个条目旁的通用图标替换为该装饰自身的图像，按比例缩放并以原始亮度显示，无需选中即可区分各个条目。文本和物件条目保留通用图标；找不到图像的粒子也会回退为通用图标。",
+    "EDITOR_DECO_PREVIEW_CREDIT": "移植自 rdzip 的 DecoPreview，采用 GNU GPL v3 许可证。"
   }
 }

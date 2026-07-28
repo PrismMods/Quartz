@@ -36,6 +36,7 @@ public static partial class EditorFeature {
         if(applied) DisableHorizontal();
         ClearReadout();
         RestoreBga();
+        RestoreDecoPreview();
     }
     private static bool applied;
     private static bool captured;
