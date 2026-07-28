@@ -43,3 +43,9 @@ CLAUDE.md
 AGENTS.md
 .agents
 .codex
+
+# Generated stub build output. The stub SOURCES under stubs/ are committed (that is
+# how CI compiles the mod without a game install); the assemblies they compile into
+# are not — see stubs/README.md.
+/stubs/bin/
+/stubs/*/obj/

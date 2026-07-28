@@ -56,6 +56,10 @@
     <HarmonyDll Condition="'$(HarmonyDll)' == '' And Exists('$(ManagedDir)/UnityModManager/0Harmony.dll')">$(ManagedDir)/UnityModManager/0Harmony.dll</HarmonyDll>
   </PropertyGroup>
 
+  <!-- Redirect every game reference at stubs/ when -p:UseStubs=true (CI compiles
+       the modules without a game install). Must sit above the ItemGroups below. -->
+  <Import Project="$(MSBuildThisFileDirectory)../build/Stubs.props" />
+
   <!-- Compile-only: nothing here is copied into the addon output; at runtime the
        game and the loaded Quartz mod provide the real assemblies. -->
   <ItemDefinitionGroup>

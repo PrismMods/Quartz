@@ -96,6 +96,10 @@
 		<UmmAutoInstall Condition="'$(AutoInstall)' == 'true' And '$(MelonLoaderPresent)' != 'true'">true</UmmAutoInstall>
 	</PropertyGroup>
 
+	<!-- Redirect every game reference at stubs/ when -p:UseStubs=true. Must sit
+	     above the reference ItemGroups: MSBuild evaluates in document order. -->
+	<Import Project="$(MSBuildProjectDirectory)/../build/Stubs.props" />
+
 	<!-- Game/runtime assemblies already exist beside the game executable. Keeping
 	     them compile-only avoids copying tens of megabytes into every bin folder. -->
 	<ItemDefinitionGroup>
@@ -176,7 +180,8 @@
 		<PropertyGroup>
 			<AssemblySearchPaths>$(AssemblySearchPaths);$(LibDir)</AssemblySearchPaths>
 		</PropertyGroup>
-		<Warning Condition="Exists('$(LibDir)/Assembly-CSharp.dll')"
+		<!-- Not under UseStubs: there the stub Assembly-CSharp IS the intended source. -->
+		<Warning Condition="'$(UseStubs)' != 'true' And Exists('$(LibDir)/Assembly-CSharp.dll')"
 		         Text="lib/Assembly-CSharp.dll is ignored — the game's own assembly is always taken from the install so it can't go stale. Delete it to silence this." />
 	</Target>
 
@@ -235,7 +240,7 @@
 	     and package the same install layout into dist/Quartz.zip.
 	     Also removes the pre-merge two-DLL layout (Mods/Quartz.Loader.ML.dll + UserLibs/Quartz.dll)
 	     so MelonLoader doesn't load the mod twice. MelonLoader build only. -->
-	<Target Name="PostBuild" AfterTargets="Build" Condition="'$(LoaderTarget)' != 'UMM'">
+	<Target Name="PostBuild" AfterTargets="Build" Condition="'$(LoaderTarget)' != 'UMM' And '$(QuartzSkipPackaging)' != 'true'">
 		<MakeDir Directories="$(GamePath)/Mods" Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" />
 		<Copy Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" SourceFiles="$(TargetPath)" DestinationFolder="$(GamePath)/Mods" SkipUnchangedFiles="true" />
 		<!-- Remove the old single-DLL (pre-rename KorenResourcePack v2) and the
@@ -265,7 +270,7 @@
 	     self-updater, which extracts over the mods dir, lands on the same paths).
 	     AutoInstall also copies it into the game's UMMMods/ (or Mods/) for local
 	     testing. -->
-	<Target Name="PostBuildUmm" AfterTargets="Build" Condition="'$(LoaderTarget)' == 'UMM' And '$(TargetPath)' != ''">
+	<Target Name="PostBuildUmm" AfterTargets="Build" Condition="'$(LoaderTarget)' == 'UMM' And '$(TargetPath)' != '' And '$(QuartzSkipPackaging)' != 'true'">
 		<!-- Stamp Info.json's Version from build/Version.targets. -->
 		<PropertyGroup>
 			<_InfoTemplate>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)/Resource/Umm/Info.json'))</_InfoTemplate>
