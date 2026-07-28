@@ -1,0 +1,28 @@
+Quartz/Features/PlayCount/PlayCount.cs
+  s_896a7873058b4d::t_40b1a32d3768de 40-48
+  s_896a7873058b4d::t_ed7fec484c2fef 37,127,143
+  s_896a7873058b4d::t_bf8620df2b5d59 283
+  s_896a7873058b4d::t_b3b3b5001737f2 128
+  s_896a7873058b4d::t_8ef06b9d8a7fe3 23
+  s_896a7873058b4d::t_80ce6efd78769a 282
+  s_896a7873058b4d::t_e453847cbb7b71 78
+  s_896a7873058b4d::t_62f1b19541329a 144
+  s_896a7873058b4d::t_8ddc73c1520107 24
+  s_896a7873058b4d::t_dabe4c053f09b3 49,102-108,111-122
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "55cb6a7df7fc48477f98fb5c8000e29db3a318c0",
+  "prompts": {},
+  "sessions": {
+    "s_896a7873058b4d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8ae9b222-4700-4d31-97a0-a678b550c3df",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
