@@ -1,0 +1,31 @@
+Quartz/Modules/ModuleContext.cs
+  s_ed94408dbb9d86::t_a35ee6be836a0e 52-56
+Quartz/Modules/ModuleBundle.cs
+  s_ed94408dbb9d86::t_78c0a5d48cd691 9-18
+Quartz/Modules/ModuleMigration.cs
+  s_ed94408dbb9d86::t_98db0149e2890c 47-50
+Quartz.Tests/Modules/ModuleMigrationTests.cs
+  s_ed94408dbb9d86::t_8ab7700607a929 63-73
+Quartz/Modules/ModuleMigration.Io.cs
+  s_ed94408dbb9d86::t_4de251f62547da 48-56
+  s_ed94408dbb9d86::t_1223adb29e4677 37
+  s_ed94408dbb9d86::t_232baa63ca6b66 57
+Quartz.Tests/Program.cs
+  s_ed94408dbb9d86::t_263eec5807b117 76
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "bb3e463fe187161a7e02af38775d4a97b13fad44",
+  "prompts": {},
+  "sessions": {
+    "s_ed94408dbb9d86": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "548b970c-8753-40d1-959d-9571d4c0eb34",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
