@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using Quartz.Core;
 namespace Quartz.Compat.Game;
 public static class GameVersion {
     public const int LastLegacyRelease = 136;
@@ -21,7 +22,8 @@ public static class GameVersion {
             if(f == null) return;
             object raw = f.IsLiteral ? f.GetRawConstantValue() : f.GetValue(null);
             if(raw is int i) release = i;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             release = 0;
         }
     }

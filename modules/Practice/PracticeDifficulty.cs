@@ -12,7 +12,7 @@ public static class PracticeDifficulty {
     public static void Save() => ConfMgr?.Save();
     public static int CurrentDifficulty {
         get {
-            try { return Mathf.Clamp((int)GCS.difficulty, 0, DifficultyCount - 1); } catch { return -1; }
+            try { return Mathf.Clamp((int)GCS.difficulty, 0, DifficultyCount - 1); } catch(Exception e) { Diag.Ignore(e); return -1; }
         }
     }
     public static int CurrentPitch => PracticePitch.LevelPitch;
@@ -34,7 +34,7 @@ public static class PracticeDifficulty {
             try {
                 scrController controller = scrController.instance;
                 return controller != null && controller.gameworld && controller.currentSeqID > 1;
-            } catch { return false; }
+            } catch(Exception e) { Diag.Ignore(e); return false; }
         }
     }
     public static void SetDifficulty(int index) {

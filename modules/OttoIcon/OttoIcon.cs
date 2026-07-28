@@ -71,7 +71,7 @@ public static class OttoIcon {
             resolvedReplacement = replacement;
         }
         bool autoState;
-        try { autoState = RDC.auto; } catch { autoState = false; }
+        try { autoState = RDC.auto; } catch(Exception e) { Diag.Ignore(e); autoState = false; }
         Color targetColor = autoState ? ActiveColor : IdleColor;
         RectTransform rt = autoImage.rectTransform;
         Vector2 targetPosition = new(Conf.OffsetX, Conf.OffsetY);

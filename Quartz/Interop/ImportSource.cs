@@ -1,4 +1,5 @@
 using UnityEngine;
+using Quartz.Core;
 namespace Quartz.Interop;
 public static class ImportSourceKind {
     public const string KeyboardChatterBlocker = "KeyboardChatterBlocker";
@@ -19,21 +20,24 @@ public sealed class ImportSource(
     public object Scalar(string name) {
         try {
             return scalar?.Invoke(name);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }
     public int[] Keys(string name) {
         try {
             return keys?.Invoke(name);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }
     public string[] Labels(string name) {
         try {
             return labels?.Invoke(name);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }

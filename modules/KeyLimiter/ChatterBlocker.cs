@@ -145,7 +145,7 @@ public static class ChatterBlocker {
             }
             bool held;
             try { held = UnityEngine.Input.GetKey(key); }
-            catch { continue; }
+            catch(Exception e) { Diag.Ignore(e); continue; }
             if(!held) held = KeyLimiter.KeyLimiter.HookKeyHeld(key);
             if(held && !injectedKeyHeldPrev.Contains(key)) {
                 RecordKeyStats(controller, key);
@@ -165,7 +165,7 @@ public static class ChatterBlocker {
             KeyCode key = injectedReleaseScratch[i];
             bool held;
             try { held = UnityEngine.Input.GetKey(key); }
-            catch { held = false; }
+            catch(Exception e) { Diag.Ignore(e); held = false; }
             if(!held) held = KeyLimiter.KeyLimiter.HookKeyHeld(key);
             if(!held) injectedKeyHeldPrev.Remove(key);
         }
@@ -173,7 +173,8 @@ public static class ChatterBlocker {
     private static bool AsyncKeyboardActive() {
         try {
             return GameApi.AsyncKeyboardActive();
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return false;
         }
     }

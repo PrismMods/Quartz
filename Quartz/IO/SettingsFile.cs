@@ -16,7 +16,8 @@ public static class SaveGate {
         get {
             try {
                 return DeferWrites?.Invoke() ?? false;
-            } catch {
+            } catch(Exception e) {
+                Diag.Ignore(e);
                 return false;
             }
         }
@@ -163,7 +164,8 @@ public sealed class SettingsFile<T> : ISettingsHandle where T : class, ISettings
                     _ = Task.Run(() => WriteJson(json, seq));
                 request.Dispose();
             });
-        } catch(OperationCanceledException) {
+        } catch(OperationCanceledException e) {
+            Diag.Ignore(e);
             lock(requestLock) {
                 if(ReferenceEquals(saveCts, request)) saveCts = null;
             }

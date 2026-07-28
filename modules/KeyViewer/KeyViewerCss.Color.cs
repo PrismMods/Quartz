@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using Quartz.Core;
 namespace Quartz.Features.KeyViewer;
 public sealed partial class KeyViewerStylesheet {
     public static bool TryParseColor(string v, out CssColor color) {
@@ -59,7 +60,8 @@ public sealed partial class KeyViewerStylesheet {
                         h2.Length == 8 ? Convert.ToInt32(h2.Substring(6, 2), 16) / 255f : 1f);
                     return true;
             }
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return false;
         }
         return false;

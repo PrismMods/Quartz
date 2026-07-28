@@ -53,7 +53,7 @@ public sealed class TufDownloadService : IDisposable {
             string folder = folderOverride ?? LevelFolder(id);
             chart = TufArchive.SelectChart(folder);
             return chart != null && TufArchive.IsChartUnderRoot(chart, folder);
-        } catch { return false; }
+        } catch(Exception e) { Diag.Ignore(e); return false; }
     }
     public string LevelFolder(int id) {
         TufInstallRoot root = ActiveRoot();
@@ -66,7 +66,7 @@ public sealed class TufDownloadService : IDisposable {
             string folder = folderOverride ?? LevelFolder(id);
             return TufArchive.ListCharts(folder)
                 .Where(c => TufArchive.IsChartUnderRoot(c, folder)).ToList();
-        } catch { return Array.Empty<string>(); }
+        } catch(Exception e) { Diag.Ignore(e); return Array.Empty<string>(); }
     }
     public async Task<string> DownloadAsync(TufLevel level, Action<TufItemState, float> progress, CancellationToken token) {
         if(level == null || level.Id <= 0 || !TufNetworkPolicy.IsAllowedDownloadUri(level.DownloadUri))

@@ -407,14 +407,14 @@ public static partial class KeyViewerOverlay {
     private static T JVal<T>(JObject p, string key, T def) {
         JToken t = p?[key];
         if(t == null || t.Type == JTokenType.Null) return def;
-        try { return t.ToObject<T>(); } catch { return def; }
+        try { return t.ToObject<T>(); } catch(Exception e) { Diag.Ignore(e); return def; }
     }
     private static float JFloat(JObject p, string key, float def) => JVal(p, key, def);
     private static int JInt(JObject p, string key, int def) => JVal(p, key, def);
     private static bool JBool(JObject p, string key, bool def) => JVal(p, key, def);
     private static float JTokenFloat(JToken t, float def) {
         if(t == null || t.Type == JTokenType.Null) return def;
-        try { return t.ToObject<float>(); } catch { return def; }
+        try { return t.ToObject<float>(); } catch(Exception e) { Diag.Ignore(e); return def; }
     }
     private static TMPro.FontStyles DmFontStyles(int weight, bool italic, bool underline, bool strikethrough) {
         TMPro.FontStyles styles = TMPro.FontStyles.Normal;

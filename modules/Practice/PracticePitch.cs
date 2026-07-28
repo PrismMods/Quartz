@@ -7,7 +7,7 @@ public static class PracticePitch {
         get {
             LevelData data = Current();
             if(data == null) return 100;
-            try { return data.pitch; } catch { return 100; }
+            try { return data.pitch; } catch(Exception e) { Diag.Ignore(e); return 100; }
         }
     }
     public static void SetLevelPitch(int percent) {

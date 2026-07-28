@@ -1,4 +1,5 @@
 using Newtonsoft.Json.Linq;
+using Quartz.Core;
 namespace Quartz.Features.KeyViewer.Layout;
 internal enum KvElementKind {
     Key,
@@ -43,12 +44,12 @@ internal sealed partial class KvElement {
     private float Num(string key, float fallback) {
         JToken t = Raw[key];
         if(t == null || t.Type == JTokenType.Null) return fallback;
-        try { return t.ToObject<float>(); } catch { return fallback; }
+        try { return t.ToObject<float>(); } catch(Exception e) { Diag.Ignore(e); return fallback; }
     }
     private bool Flag(string key, bool fallback) {
         JToken t = Raw[key];
         if(t == null || t.Type == JTokenType.Null) return fallback;
-        try { return t.ToObject<bool>(); } catch { return fallback; }
+        try { return t.ToObject<bool>(); } catch(Exception e) { Diag.Ignore(e); return fallback; }
     }
     private string Str(string key, string fallback) {
         JToken t = Raw[key];
@@ -57,7 +58,7 @@ internal sealed partial class KvElement {
     private bool FlagEither(string key, bool fallback) {
         JObject outer = Container;
         if(!ReferenceEquals(outer, Raw) && outer[key] is { Type: not JTokenType.Null } t) {
-            try { return t.ToObject<bool>(); } catch { return fallback; }
+            try { return t.ToObject<bool>(); } catch(Exception e) { Diag.Ignore(e); return fallback; }
         }
         return Flag(key, fallback);
     }

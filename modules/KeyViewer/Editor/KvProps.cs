@@ -2,22 +2,23 @@ using System.Globalization;
 using Newtonsoft.Json.Linq;
 using Quartz.Features.KeyViewer;
 using UnityEngine;
+using Quartz.Core;
 namespace Quartz.UI.Editor;
 internal static class KvProps {
     internal static float Float(JObject o, string key, float fallback) {
         JToken t = o?[key];
         if(t == null || t.Type == JTokenType.Null) return fallback;
-        try { return t.ToObject<float>(); } catch { return fallback; }
+        try { return t.ToObject<float>(); } catch(Exception e) { Diag.Ignore(e); return fallback; }
     }
     internal static int Int(JObject o, string key, int fallback) {
         JToken t = o?[key];
         if(t == null || t.Type == JTokenType.Null) return fallback;
-        try { return t.ToObject<int>(); } catch { return fallback; }
+        try { return t.ToObject<int>(); } catch(Exception e) { Diag.Ignore(e); return fallback; }
     }
     internal static bool Bool(JObject o, string key, bool fallback) {
         JToken t = o?[key];
         if(t == null || t.Type == JTokenType.Null) return fallback;
-        try { return t.ToObject<bool>(); } catch { return fallback; }
+        try { return t.ToObject<bool>(); } catch(Exception e) { Diag.Ignore(e); return fallback; }
     }
     internal static string Str(JObject o, string key, string fallback) {
         JToken t = o?[key];

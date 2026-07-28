@@ -219,6 +219,6 @@ internal sealed partial class TufPacksView : MonoBehaviour {
             return string.IsNullOrEmpty(level.ChartsRoot)
                 ? Path.GetFileName(chart)
                 : Path.GetRelativePath(level.ChartsRoot, chart);
-        } catch { return Path.GetFileName(chart); }
+        } catch(Exception e) { Diag.Ignore(e); return Path.GetFileName(chart); }
     }
 }

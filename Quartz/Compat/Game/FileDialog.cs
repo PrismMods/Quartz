@@ -67,7 +67,8 @@ public static class FileDialog {
             Array all = Array.CreateInstance(sfbExtensionFilter, 1);
             all.SetValue(filter, 0);
             return all;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }
@@ -87,7 +88,8 @@ public static class FileDialog {
         Type browser = null;
         try {
             browser = Assembly.Load("UnityFileDialog")?.GetType("UnityFileDialog.FileBrowser");
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             browser = null;
         }
         if(browser == null) {
@@ -97,7 +99,8 @@ public static class FileDialog {
                     browser = a.GetType("UnityFileDialog.FileBrowser");
                     break;
                 }
-            } catch {
+            } catch(Exception e) {
+                Diag.Ignore(e);
                 browser = null;
             }
         }
@@ -116,7 +119,8 @@ public static class FileDialog {
             sfbOpenFile = Overload(sfb, "OpenFilePanel", 4, 2, sfbExtensionFilter.MakeArrayType());
             sfbOpenFolder = Refl.Method(sfb, "OpenFolderPanel", 3);
             sfbSaveFile = Overload(sfb, "SaveFilePanel", 4, 3, sfbExtensionFilter.MakeArrayType());
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             sfbOpenFile = null;
             sfbOpenFolder = null;
             sfbSaveFile = null;

@@ -106,7 +106,8 @@ public static class LangUpdateService {
             using SHA256 sha = SHA256.Create();
             using FileStream stream = new(path, FileMode.Open, FileAccess.Read, FileShare.Read);
             return ToHex(sha.ComputeHash(stream));
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }

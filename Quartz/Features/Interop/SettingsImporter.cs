@@ -125,7 +125,7 @@ public static class SettingsImporter {
             try {
                 if(string.IsNullOrEmpty(root) || !Directory.Exists(root)) continue;
                 dirs = Directory.GetDirectories(root);
-            } catch { continue; }
+            } catch(Exception e) { Diag.Ignore(e); continue; }
             foreach(string dir in dirs) {
                 string id = ReadInfoJsonId(dir);
                 string folder = Path.GetFileName(dir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
@@ -335,7 +335,8 @@ public static class SettingsImporter {
             return File.Exists(path)
                 ? Path.GetDirectoryName(path)
                 : path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return path;
         }
     }

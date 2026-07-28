@@ -1,4 +1,5 @@
 using Newtonsoft.Json.Linq;
+using Quartz.Core;
 namespace Quartz.Modules;
 public static partial class ModuleMigration {
     public sealed class Rule {
@@ -55,7 +56,8 @@ public static partial class ModuleMigration {
             JObject value;
             try {
                 value = read?.Invoke(fileName);
-            } catch {
+            } catch(Exception e) {
+                Diag.Ignore(e);
                 value = null;
             }
             seen[fileName] = value;

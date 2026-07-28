@@ -106,7 +106,8 @@ internal sealed class KvDocument {
             x = ax.ToObject<float>();
             y = ay.ToObject<float>();
             return true;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return false;
         }
     }

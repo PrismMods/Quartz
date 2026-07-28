@@ -81,7 +81,8 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
             return ProgressTracker.RunStartedFromFirstTile
                 ? 0f
                 : Mathf.Clamp01(ProgressTracker.RunStartProgress);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return 0f;
         }
     }
@@ -163,7 +164,8 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
         try {
             scrController c = scrController.instance;
             return c != null ? Mathf.Clamp01(c.percentComplete) : 0f;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return 0f;
         }
     }
@@ -171,7 +173,8 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
         bool isOfficial;
         try {
             isOfficial = ADOBase.isOfficialLevel;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             isOfficial = false;
         }
         if(isOfficial) {
@@ -220,7 +223,8 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
             }
             if(start) _ = Task.Run(() => HashLevelFile(path, cacheKey, pendingKey));
             return pendingKey;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }

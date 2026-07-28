@@ -76,7 +76,8 @@ public static class Restriction {
                     float acc = MistakesAccess.PercentAcc(m);
                     if(float.IsNaN(acc) || float.IsInfinity(acc)) return false;
                     return acc * 100f < Conf.JRestrictAccuracy;
-                } catch {
+                } catch(Exception e) {
+                    Diag.Ignore(e);
                     return false;
                 }
             }

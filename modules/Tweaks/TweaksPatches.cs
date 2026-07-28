@@ -67,7 +67,7 @@ public static partial class Tweaks {
             if(!disable && !hasSavedState) return;
             int id;
             try { id = __instance.GetInstanceID(); }
-            catch { return; }
+            catch(Exception e) { Diag.Ignore(e); return; }
             if(hasSavedState) {
                 try {
                     if(lightUpDisableGlowStates.TryGetValue(id, out bool wasDisabled)) {
@@ -87,7 +87,7 @@ public static partial class Tweaks {
             if(!ShouldDisableTileHitGlow || __instance == null) return true;
             int id;
             try { id = __instance.GetInstanceID(); }
-            catch { return true; }
+            catch(Exception e) { Diag.Ignore(e); return true; }
             if(lightUpDepth <= 0 && !suppressNextRandomColorFloorIds.Remove(id)) return true;
             SuppressFloorHitGlow(__instance);
             return false;
@@ -147,11 +147,11 @@ public static partial class Tweaks {
             if(!ShouldDisableAutoPause || __instance == null) return true;
             bool autoOn;
             try { autoOn = RDC.auto; }
-            catch { return true; }
+            catch(Exception e) { Diag.Ignore(e); return true; }
             if(!autoOn) return true;
             bool currentlyPaused;
             try { currentlyPaused = __instance.paused; }
-            catch { return true; }
+            catch(Exception e) { Diag.Ignore(e); return true; }
             if(currentlyPaused) return true;
             if(IsSafePauseCallSite()) return true;
             ResetEditorPlayModePauseState();
@@ -182,7 +182,8 @@ public static partial class Tweaks {
         private static bool Prefix(ffxMenuPlanetSpeedChange __instance) {
             try {
                 return !HandleMenuBpmToggle(__instance.floor);
-            } catch {
+            } catch(Exception e) {
+                Diag.Ignore(e);
                 return true;
             }
         }

@@ -55,7 +55,8 @@ public static partial class ProfileManager {
                     .Select(Path.GetFileName)
                     .OrderBy(n => n, StringComparer.OrdinalIgnoreCase)
             ];
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return [Active];
         }
     }

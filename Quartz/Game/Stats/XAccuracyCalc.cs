@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Quartz.Compat.Game;
+using Quartz.Core;
 namespace Quartz.Game.Stats
 {
     internal static class XAccuracyCalc
@@ -80,7 +81,7 @@ namespace Quartz.Game.Stats
                 if (double.IsNaN(max) || double.IsInfinity(max)) return 1f;
                 return Mathf.Clamp01((float)max);
             }
-            catch { return 1f; }
+            catch(Exception e) { Diag.Ignore(e); return 1f; }
         }
     }
 }

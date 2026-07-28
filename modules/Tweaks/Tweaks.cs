@@ -62,7 +62,7 @@ public static partial class Tweaks {
         if(conductor == null) return;
         bool target;
         try { target = ShouldDisableMenuMusic && ADOBase.isLevelSelect; }
-        catch { return; }
+        catch(Exception e) { Diag.Ignore(e); return; }
         if(!target && !lastMuteTarget && ReferenceEquals(conductor, lastMuteConductor)) return;
         try {
             if(conductor.song != null && conductor.song.mute != target) conductor.song.mute = target;
@@ -114,19 +114,19 @@ public static partial class Tweaks {
     private static ffxCheckpoint[] GetCheckpoints() {
         if(cachedCheckpoints != null) return cachedCheckpoints;
         try { cachedCheckpoints = FindObjectsCompat<ffxCheckpoint>(); }
-        catch { cachedCheckpoints = EmptyCheckpoints; }
+        catch(Exception e) { Diag.Ignore(e); cachedCheckpoints = EmptyCheckpoints; }
         return cachedCheckpoints ?? EmptyCheckpoints;
     }
     private static PlanetRenderer[] GetPlanetRenderers() {
         if(cachedRenderers != null) return cachedRenderers;
         try { cachedRenderers = FindObjectsCompat<PlanetRenderer>(); }
-        catch { cachedRenderers = EmptyRenderers; }
+        catch(Exception e) { Diag.Ignore(e); cachedRenderers = EmptyRenderers; }
         return cachedRenderers ?? EmptyRenderers;
     }
     private static scrFloor[] GetFloors() {
         if(cachedFloors != null) return cachedFloors;
         try { cachedFloors = FindObjectsCompat<scrFloor>(); }
-        catch { cachedFloors = EmptyFloors; }
+        catch(Exception e) { Diag.Ignore(e); cachedFloors = EmptyFloors; }
         return cachedFloors ?? EmptyFloors;
     }
     public static void RefreshAll() {
@@ -157,7 +157,7 @@ public static partial class Tweaks {
     private static void ApplyPlanetGlowTweak(PlanetRenderer renderer, bool forceRestore = false) {
         if(renderer == null) return;
         SpriteRenderer glow;
-        try { glow = renderer.glow; } catch { return; }
+        try { glow = renderer.glow; } catch(Exception e) { Diag.Ignore(e); return; }
         if(glow == null) return;
         int id = glow.GetInstanceID();
         if(ShouldRemovePlanetGlow && !forceRestore) {
@@ -360,7 +360,8 @@ public static partial class Tweaks {
             for(int i = 0; i < objects.Length; i++) {
                 RestoreActiveState(objects[i]);
             }
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             RestoreActiveState(particleObject);
         }
         try {

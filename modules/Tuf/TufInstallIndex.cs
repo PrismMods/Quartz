@@ -1,6 +1,7 @@
 #nullable enable
 using Newtonsoft.Json.Linq;
 using Quartz.IO.Interface;
+using Quartz.Core;
 namespace Quartz.Features.Tuf;
 public sealed class TufInstallEntry {
     public int Id;
@@ -92,7 +93,7 @@ public sealed class TufInstallEntry {
                 VideoLink = TufInput.CapDisplay(token[nameof(VideoLink)]?.Value<string>(), "", 300),
                 InstalledAtUtc = token[nameof(InstalledAtUtc)]?.Value<long>() ?? 0
             };
-        } catch { return null; }
+        } catch(Exception e) { Diag.Ignore(e); return null; }
     }
     public TufLevel ToLevel() {
         Uri? uri = Uri.TryCreate(DownloadUrl, UriKind.Absolute, out Uri? parsed)
@@ -155,7 +156,7 @@ public sealed class TufInstallIndex : ISettingsFile {
     }
     public bool PruneMissing() {
         int removed = entries.RemoveAll(e => {
-            try { return !Directory.Exists(e.Folder); } catch { return true; }
+            try { return !Directory.Exists(e.Folder); } catch(Exception error) { Diag.Ignore(error); return true; }
         });
         return removed > 0;
     }

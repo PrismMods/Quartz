@@ -165,7 +165,8 @@ internal static partial class KvStore {
                     _ = Task.Run(() => WriteJson(json, seq));
                 request.Dispose();
             });
-        } catch(OperationCanceledException) {
+        } catch(OperationCanceledException e) {
+            Diag.Ignore(e);
             ClearRequest(request);
         } catch(Exception e) {
             ClearRequest(request);

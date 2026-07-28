@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Quartz.Core;
 namespace Quartz.Modules;
 public sealed partial class ModuleState {
     public const int Schema = 1;
@@ -17,7 +18,8 @@ public sealed partial class ModuleState {
         JObject root;
         try {
             root = JObject.Parse(json);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return state;
         }
         if(root["modules"] is JObject modules) {

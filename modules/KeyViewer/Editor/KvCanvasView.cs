@@ -151,7 +151,8 @@ internal sealed partial class KvCanvas {
         if(t == null || t.Type == JTokenType.Null) return fallback;
         try {
             return t.ToObject<float>();
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return fallback;
         }
     }

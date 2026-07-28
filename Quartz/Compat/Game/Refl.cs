@@ -15,14 +15,16 @@ public static partial class Refl {
             foreach(string n in names) {
                 try {
                     prop = owner.GetProperty(n, Any);
-                } catch(AmbiguousMatchException) {
+                } catch(AmbiguousMatchException e) {
+                    Diag.Ignore(e);
                     prop = Walk(owner, t => t.GetProperty(n, Declared));
                 }
                 if(prop != null && prop.GetIndexParameters().Length == 0) return;
                 prop = null;
                 try {
                     fieldInfo = owner.GetField(n, Any);
-                } catch(AmbiguousMatchException) {
+                } catch(AmbiguousMatchException e) {
+                    Diag.Ignore(e);
                     fieldInfo = Walk(owner, t => t.GetField(n, Declared));
                 }
                 if(fieldInfo != null) return;

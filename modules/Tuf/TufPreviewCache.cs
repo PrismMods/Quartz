@@ -160,7 +160,7 @@ public static class TufPreviewCache {
         if(json == null || json.Length == 0) return null;
         try {
             return JObject.Parse(System.Text.Encoding.UTF8.GetString(json)).Value<string>("videoLink");
-        } catch { return null; }
+        } catch(Exception e) { Diag.Ignore(e); return null; }
     }
     internal static Uri? NormalizeIconUrl(string? iconUrl) {
         if(string.IsNullOrWhiteSpace(iconUrl)
@@ -183,7 +183,7 @@ public static class TufPreviewCache {
             JObject root = JObject.Parse(System.Text.Encoding.UTF8.GetString(json));
             if(root.Value<int?>("code") != 0) return null;
             pic = root["data"]?.Value<string>("pic");
-        } catch { return null; }
+        } catch(Exception e) { Diag.Ignore(e); return null; }
         if(string.IsNullOrWhiteSpace(pic)
             || !Uri.TryCreate(pic, UriKind.Absolute, out Uri? picUri)) return null;
         string host = picUri.Host.ToLowerInvariant();

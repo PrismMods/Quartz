@@ -1,5 +1,6 @@
 using Newtonsoft.Json.Linq;
 using UnityEngine;
+using Quartz.Core;
 namespace Quartz.IO;
 public static class IOUtils {
     #region Generic
@@ -8,7 +9,8 @@ public static class IOUtils {
         if(value == null) return fallback;
         try {
             return value.Value<T>();
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return fallback;
         }
     }
@@ -19,7 +21,8 @@ public static class IOUtils {
         if(value == null || value is not JArray arr || arr.Count < 2) return fallback;
         try {
             return new Vector2((float)arr[0], (float)arr[1]);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return fallback;
         }
     }
@@ -31,7 +34,8 @@ public static class IOUtils {
         if(value == null || value is not JArray arr || arr.Count < 3) return fallback;
         try {
             return new Vector3((float)arr[0], (float)arr[1], (float)arr[2]);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return fallback;
         }
     }
@@ -43,7 +47,8 @@ public static class IOUtils {
         if(value == null || value is not JArray arr || arr.Count < 4) return fallback;
         try {
             return new Vector4((float)arr[0], (float)arr[1], (float)arr[2], (float)arr[3]);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return fallback;
         }
     }
@@ -55,7 +60,8 @@ public static class IOUtils {
         if(value == null || value is not JArray arr || arr.Count < 4) return fallback;
         try {
             return new Rect((float)arr[0], (float)arr[1], (float)arr[2], (float)arr[3]);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return fallback;
         }
     }
@@ -67,7 +73,8 @@ public static class IOUtils {
         if(value == null || value is not JArray arr || arr.Count < 4) return fallback;
         try {
             return new Quaternion((float)arr[0], (float)arr[1], (float)arr[2], (float)arr[3]);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return fallback;
         }
     }
@@ -79,7 +86,8 @@ public static class IOUtils {
         if(value == null || value is not JArray arr || arr.Count < 4) return fallback;
         try {
             return new Color((float)arr[0], (float)arr[1], (float)arr[2], (float)arr[3]);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return fallback;
         }
     }

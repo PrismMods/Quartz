@@ -27,7 +27,7 @@ public static partial class PlanetColors {
     private static bool IsEditingLevel {
         get {
             try { return scnEditor.instance is { playMode: false }; }
-            catch { return false; }
+            catch(Exception e) { Diag.Ignore(e); return false; }
         }
     }
     private static void ReconcileOverlayVisibility(PlanetRenderer renderer) {
@@ -131,7 +131,8 @@ public static partial class PlanetColors {
             }
             try {
                 if(overlay.gameObject.activeSelf) overlay.gameObject.SetActive(false);
-            } catch {
+            } catch(Exception e) {
+                Diag.Ignore(e);
                 overlayPurgeBuffer.Add(pair.Key);
             }
         }
@@ -177,7 +178,8 @@ public static partial class PlanetColors {
             PlanetSprite sprite = renderer.sprite;
             if(sprite == null) return null;
             return sprite.GetComponent<SpriteRenderer>();
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }
@@ -225,7 +227,8 @@ public static partial class PlanetColors {
             }
             string root = MainCore.Paths?.RootPath;
             return string.IsNullOrEmpty(root) ? path : Path.Combine(root, path);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return path;
         }
     }

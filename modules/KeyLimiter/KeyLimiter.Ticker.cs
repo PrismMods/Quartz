@@ -24,7 +24,7 @@ public static partial class KeyLimiter {
                 KeyCode key = candidates[i];
                 bool held;
                 try { held = UnityEngine.Input.GetKey(key); }
-                catch { continue; }
+                catch(Exception e) { Diag.Ignore(e); continue; }
                 if(!held && IsHookTrackedKey(key)) held = HookKeyHeld(key);
                 if(held && !priming && !prevHeld.Contains(key)) {
                     prevHeld.Add(key);

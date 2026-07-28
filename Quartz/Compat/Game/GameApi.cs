@@ -158,7 +158,8 @@ public static class GameApi {
         try {
             Type op = FloorHelperType?.GetNestedType("TransformOperation", Refl.Any);
             return op is { IsEnum: true } ? Enum.Parse(op, name) : null;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }
@@ -229,7 +230,8 @@ public static class GameApi {
             Assembly skyhook = typeof(SkyHook.SkyHookManager).Assembly;
             Type t = skyhook.GetType("SkyHook.SkyHookKeyMapper") ?? skyhook.GetType("SkyHook.AsyncKeyMapper");
             return Refl.Method(t, "SkyHookKeyToUnityKey", 1) ?? Refl.Method(t, "AsyncKeyToUnityKey", 1);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }
@@ -241,7 +243,8 @@ public static class GameApi {
             if(ps.Length != 1 || ps[0].ParameterType != typeof(SkyHook.KeyLabel)) return null;
             return Delegate.CreateDelegate(typeof(Func<SkyHook.KeyLabel, KeyCode>), m)
                 as Func<SkyHook.KeyLabel, KeyCode>;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }
@@ -274,7 +277,8 @@ public static class GameApi {
                 return LevelEventGetMethod is { IsGenericMethodDefinition: true }
                     ? LevelEventGetMethod.MakeGenericMethod(typeof(T))
                     : null;
-            } catch {
+            } catch(Exception e) {
+                Diag.Ignore(e);
                 return null;
             }
         }

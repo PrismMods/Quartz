@@ -44,7 +44,7 @@ public sealed partial class TufService : IRuntimeService {
             return false;
         }
         string full;
-        try { full = Path.GetFullPath(path); } catch { reason = "invalid"; return false; }
+        try { full = Path.GetFullPath(path); } catch(Exception e) { Diag.Ignore(e); reason = "invalid"; return false; }
         if(!TufInstallPaths.IsUsableLibraryRoot(full, out reason)) return false;
         if(string.Equals(Path.GetFullPath(ResolveInstallRoot().Path), full, PathComparison)) return true;
         if(TufInstallPaths.IsSameOrNested(full, MainCore.Paths.TufLevelsPath)) {
@@ -113,7 +113,8 @@ public sealed partial class TufService : IRuntimeService {
                     MoveDone++;
                     Notify();
                 });
-            } catch(OperationCanceledException) {
+            } catch(OperationCanceledException e) {
+                Diag.Ignore(e);
                 break;
             } catch(Exception e) {
                 failures++;

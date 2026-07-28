@@ -84,7 +84,8 @@ public static class KvInputQueue {
         nextHookCheck = now + HookCheckIntervalSeconds;
         try {
             hookActive = AsyncInputManager.isActive;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             hookActive = false;
         }
     }

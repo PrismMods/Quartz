@@ -48,7 +48,8 @@ public static partial class ModuleMigration {
         string path = Path.Combine(MainCore.Paths.RootPath, fileName.Replace('/', Path.DirectorySeparatorChar));
         try {
             return File.Exists(path) ? JObject.Parse(File.ReadAllText(path)) : null;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }

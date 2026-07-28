@@ -29,7 +29,8 @@ public static class TextCompat {
         try {
             if(modeProp != null) return modeProp.GetValue(text, null);
             return legacyProp?.GetValue(text, null);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }
@@ -50,7 +51,8 @@ public static class TextCompat {
         try {
             if(modeProp != null) return Convert.ToInt32(modeProp.GetValue(text, null)) != WrapNoWrap;
             return legacyProp?.GetValue(text, null) is not bool b || b;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return true;
         }
     }
@@ -67,7 +69,8 @@ public static class TextCompat {
                 modeType = null;
             }
             legacyProp = typeof(TMP_Text).GetProperty("enableWordWrapping", Refl.Any);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             modeProp = null;
             modeType = null;
             legacyProp = null;

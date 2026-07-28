@@ -23,7 +23,7 @@ public sealed partial class TufService : IRuntimeService {
                 string chart = TufArchive.SelectChart(dir);
                 if(chart == null) continue;
                 long stamp;
-                try { stamp = Directory.GetCreationTimeUtc(dir).Ticks; } catch { stamp = 0; }
+                try { stamp = Directory.GetCreationTimeUtc(dir).Ticks; } catch(Exception e) { Diag.Ignore(e); stamp = 0; }
                 index.Data.Adopt(id, dir, stamp);
                 changed = true;
             }
@@ -88,7 +88,8 @@ public sealed partial class TufService : IRuntimeService {
             try {
                 TufLevel level = await api.FetchLevelAsync(id, token).ConfigureAwait(false);
                 if(level != null) fetched.Add(level);
-            } catch(OperationCanceledException) when(token.IsCancellationRequested) {
+            } catch(OperationCanceledException e) {
+                Diag.Ignore(e);
                 return;
             } catch(Exception e) {
                 MainCore.Log.Wrn($"[TUF] could not fetch info for level {id}: {e.Message}");

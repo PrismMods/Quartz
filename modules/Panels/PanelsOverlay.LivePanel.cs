@@ -77,7 +77,7 @@ public static partial class PanelsOverlay {
                         if(string.IsNullOrEmpty(value)) continue;
                     } else {
                         try { value = stat.Value(c); }
-                        catch { continue; }
+                        catch(Exception e) { Diag.Ignore(e); continue; }
                         if(value == null) continue;
                     }
                     if(entry.ShowLabel) {
@@ -139,7 +139,8 @@ public static partial class PanelsOverlay {
             if(name == "text" || PanelsOverlay.FindStat(name) is not { } stat) return null;
             try {
                 return stat.Value(config) ?? "";
-            } catch {
+            } catch(Exception e) {
+                Diag.Ignore(e);
                 return "";
             }
         }
@@ -194,7 +195,8 @@ public static partial class PanelsOverlay {
                     }
                     default: return 1f;
                 }
-            } catch {
+            } catch(Exception e) {
+                Diag.Ignore(e);
                 return 1f;
             }
         }

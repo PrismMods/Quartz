@@ -118,7 +118,8 @@ internal static class DiscordOAuthServer {
             if(process.WaitForExit(2000)) return process.ExitCode == 0;
             try { process.Kill(); } catch(Exception e) { Diag.Ignore(e); }
             return false;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return false;
         }
     }

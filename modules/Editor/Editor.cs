@@ -87,7 +87,7 @@ public static partial class EditorFeature {
     private static void Reconcile() {
         bool want;
         try { want = ShouldUseHorizontalProperties; }
-        catch { return; }
+        catch(Exception e) { Diag.Ignore(e); return; }
         try {
             if(want && !applied) {
                 EnableHorizontal();

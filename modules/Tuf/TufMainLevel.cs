@@ -90,7 +90,8 @@ internal static class TufMainLevel {
                 steamInitializedResolved = true;
             }
             return steamInitializedProp?.GetValue(null) is true;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return false;
         }
     }
@@ -133,7 +134,7 @@ internal static class TufMainLevel {
         foreach(char c in world)
             if(!char.IsLetterOrDigit(c)) return false;
         try { return GameApi.WorldTable()?.Contains(world) == true; }
-        catch { return false; }
+        catch(Exception e) { Diag.Ignore(e); return false; }
     }
     private static bool IsRealLevel(string world, string lvl) {
         try {
@@ -141,7 +142,8 @@ internal static class TufMainLevel {
             if(levelCount < 0) return false;
             if(lvl == "X") return true;
             return int.TryParse(lvl, out int n) && n >= 1 && n <= levelCount;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return false;
         }
     }

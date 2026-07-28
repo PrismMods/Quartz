@@ -70,7 +70,8 @@ public sealed class ResourceManager(Assembly assembly, string resourcePath) : ID
                 offset += read;
             }
             return offset == data.Length ? data : null;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }

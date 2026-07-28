@@ -1,6 +1,7 @@
 #nullable enable
 using Newtonsoft.Json.Linq;
 using Quartz.IO.Interface;
+using Quartz.Core;
 namespace Quartz.Features.Tuf;
 public sealed class TufSettings : ISettingsFile {
     public int Sort = (int)TufSort.Recent;
@@ -52,7 +53,7 @@ public sealed class TufSettings : ISettingsFile {
     public void RememberRoot(string? root) {
         if(string.IsNullOrWhiteSpace(root)) return;
         string full;
-        try { full = Path.GetFullPath(root); } catch { return; }
+        try { full = Path.GetFullPath(root); } catch(Exception e) { Diag.Ignore(e); return; }
         if(!KnownRoots.Any(r => string.Equals(r, full, PathComparison))) KnownRoots.Add(full);
     }
     private static StringComparison PathComparison =>
@@ -94,7 +95,8 @@ public sealed class TufSettings : ISettingsFile {
             if(token[key] is not JToken value) return fallback;
             object? parsed = value.ToObject(typeof(T));
             return parsed is T typed ? typed : fallback;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return fallback;
         }
     }

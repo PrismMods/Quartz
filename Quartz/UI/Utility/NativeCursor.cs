@@ -22,7 +22,8 @@ public static class NativeCursor {
             if(isWindows) ApplyWindows(shape);
             else if(isMac) ApplyMac(shape);
             else ApplyTexture(shape);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             ApplyTexture(shape);
         }
     }

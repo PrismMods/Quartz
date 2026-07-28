@@ -12,7 +12,8 @@ public static partial class Nostalgia {
                && comp != null && comp.gameObject.activeSelf != active)
                 comp.gameObject.SetActive(active);
             return Traverse.Create(instance).Field(field).GetValue() != null;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return false;
         }
     }

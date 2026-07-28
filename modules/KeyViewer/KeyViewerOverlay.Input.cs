@@ -15,7 +15,8 @@ public static partial class KeyViewerOverlay {
                 KeyCode twin = NumpadNavTwin(key);
                 if(twin != KeyCode.None && Input.GetKey(twin)) return true;
             }
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return false;
         }
         return IsHookFallbackKey(key) && KeyLimiter.KeyLimiter.HookKeyHeld(key);

@@ -1,4 +1,5 @@
 using System.Globalization;
+using Quartz.Core;
 namespace Quartz.Utility.Math;
 public enum EvalState {
     OK,
@@ -13,7 +14,8 @@ public static class Evaluator {
         double evaluated;
         try {
             evaluated = new Parser(exprStr).Parse();
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return (currentVal, EvalState.Error);
         }
         if(double.IsNaN(evaluated) || double.IsInfinity(evaluated)) return (currentVal, EvalState.Error);

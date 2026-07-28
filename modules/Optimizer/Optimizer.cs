@@ -40,7 +40,8 @@ public static class Optimizer {
         defaultRunInBackground = Application.runInBackground;
         try {
             defaultPriority = Process.GetCurrentProcess().PriorityClass;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             defaultPriority = ProcessPriorityClass.Normal;
         }
         defaultsCaptured = true;

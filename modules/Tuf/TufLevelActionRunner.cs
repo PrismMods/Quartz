@@ -96,7 +96,8 @@ internal sealed class TufLevelActionRunner {
                 installed?.Invoke(level);
                 FinishAction(level, TufItemState.Load, "");
             });
-        } catch(OperationCanceledException) {
+        } catch(OperationCanceledException e) {
+            Diag.Ignore(e);
             MainThread.Enqueue(() => FinishAction(level, TufItemState.Download, ""));
         }
         catch(Exception e) {

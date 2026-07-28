@@ -144,7 +144,8 @@ internal sealed class DiscordRpc {
             JObject r = Command("AUTHENTICATE", new { access_token = accessToken });
             JToken data = r["data"];
             return data != null && data["user"] != null;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return false;
         }
     }

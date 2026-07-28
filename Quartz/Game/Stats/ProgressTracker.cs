@@ -29,7 +29,8 @@ public static class ProgressTracker {
             RunStartedFromFirstTile = IsFirstTileRunStart(seqID);
             RunStartProgress = RunStartedFromFirstTile ? 0f : StartProgress(c, seqID);
             RunStartMapTimeRatio = RunStartedFromFirstTile ? 0f : StartMapTimeRatio(seqID);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             RunStartedFromFirstTile = true;
             RunStartProgress = 0f;
             RunStartMapTimeRatio = 0f;

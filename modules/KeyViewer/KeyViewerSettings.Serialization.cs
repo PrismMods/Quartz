@@ -151,7 +151,8 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
         string dmPreset = IOUtils.Read(token, nameof(DmPresetJson), DmPresetJson) ?? "";
         try {
             DmPresetJson = KeyViewerPersistence.SanitizeDmPreset(dmPreset);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             DmPresetJson = dmPreset;
         }
         DmSelectedTab = IOUtils.Read(token, nameof(DmSelectedTab), DmSelectedTab) ?? "4key";
@@ -286,7 +287,7 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
     }
     private void SeedFootFromFlat(JArray flat) {
         int[] values = new int[flat.Count];
-        try { for(int i = 0; i < values.Length; i++) values[i] = flat[i].Value<int>(); } catch { return; }
+        try { for(int i = 0; i < values.Length; i++) values[i] = flat[i].Value<int>(); } catch(Exception e) { Diag.Ignore(e); return; }
         foreach(int[] dest in FootKeysByStyle) {
             int n = Mathf.Min(dest.Length, values.Length);
             for(int i = 0; i < n; i++) dest[i] = values[i];
@@ -321,7 +322,8 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
                     arr[b + 2].Value<float>(), arr[b + 3].Value<float>());
             }
             return result;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return fallback;
         }
     }
@@ -343,7 +345,8 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
             T[] result = new T[arr.Count];
             for(int i = 0; i < arr.Count; i++) result[i] = read(arr[i]);
             return result;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return fallback;
         }
     }

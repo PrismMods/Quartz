@@ -32,7 +32,8 @@ public static class XPerfectBridge {
             bool result;
             try {
                 result = enabledProp == null || (enabledProp.GetValue(null, null) is bool b && b);
-            } catch {
+            } catch(Exception e) {
+                Diag.Ignore(e);
                 result = false;
             }
             activeFrame = UnityEngine.Time.frameCount;
@@ -73,7 +74,8 @@ public static class XPerfectBridge {
             if(v == null) return Judge.None;
             int i = System.Convert.ToInt32(v);
             return i is < 0 or > 3 ? Judge.None : (Judge)i;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return fallback;
         }
     }
@@ -82,7 +84,8 @@ public static class XPerfectBridge {
         try {
             object v = ReadStaticMember(member);
             return v == null ? 0 : System.Convert.ToInt32(v);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return 0;
         }
     }

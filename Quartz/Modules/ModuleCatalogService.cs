@@ -123,7 +123,8 @@ public static class ModuleCatalogService {
     private static string ReadCache() {
         try {
             return File.Exists(CachePath) ? File.ReadAllText(CachePath) : null;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }
@@ -141,7 +142,8 @@ public static class ModuleCatalogService {
             if(stream == null) return null;
             using StreamReader reader = new(stream);
             return reader.ReadToEnd();
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }

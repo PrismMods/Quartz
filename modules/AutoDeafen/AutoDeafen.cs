@@ -179,10 +179,10 @@ public static class AutoDeafen {
     }
     private static bool InRealPlay() {
         try { return scnGame.instance != null; }
-        catch { return false; }
+        catch(Exception e) { Diag.Ignore(e); return false; }
     }
     private static bool Autoplaying {
-        get { try { return RDC.auto; } catch { return false; } }
+        get { try { return RDC.auto; } catch(Exception e) { Diag.Ignore(e); return false; } }
     }
     private static void Restart(string clientId, string token) {
         StopRpc();

@@ -53,7 +53,8 @@ internal static class Bpm {
             actualBpm = floor.nextfloor && dt > 1e-9
                 ? (float)(60.0 / dt * conductor.song.pitch)
                 : tileBpm;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             tileBpm = 0f;
             actualBpm = 0f;
         }

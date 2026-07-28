@@ -106,7 +106,8 @@ public static partial class UiHider {
         try {
             return Keybind.ModifierHeld((Keybind.KeyModifier)Conf.ShortcutModifier)
                 && Input.GetKeyDown(key);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return false;
         }
     }
@@ -142,7 +143,8 @@ public static partial class UiHider {
                     try {
                         isEditingLevelStaticFunc =
                             (Func<bool>)Delegate.CreateDelegate(typeof(Func<bool>), isEditingLevelGetter);
-                    } catch {
+                    } catch(Exception e) {
+                        Diag.Ignore(e);
                         isEditingLevelStaticFunc = null;
                     }
                 }
@@ -209,11 +211,11 @@ public static partial class UiHider {
     }
     private static bool HitErrorMeterEnabledInGame() {
         try { return Persistence.hitErrorMeterSize != ErrorMeterSize.Off; }
-        catch { return true; }
+        catch(Exception e) { Diag.Ignore(e); return true; }
     }
     private static bool HasSteamBranchName() {
         try { return !string.IsNullOrEmpty(GCS.steamBranchName); }
-        catch { return false; }
+        catch(Exception e) { Diag.Ignore(e); return false; }
     }
     private static Type betaType;
     private static bool betaTypeResolved;
@@ -228,7 +230,7 @@ public static partial class UiHider {
         int scene = SceneManager.GetActiveScene().GetHashCode();
         if(cachedBetaObjects == null || cachedBetaSceneHandle != scene) {
             try { cachedBetaObjects = Resources.FindObjectsOfTypeAll(betaType); }
-            catch { cachedBetaObjects = null; }
+            catch(Exception e) { Diag.Ignore(e); cachedBetaObjects = null; }
             cachedBetaSceneHandle = scene;
         }
         if(cachedBetaObjects == null) return;

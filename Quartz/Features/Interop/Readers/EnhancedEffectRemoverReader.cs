@@ -1,6 +1,7 @@
 using Newtonsoft.Json.Linq;
 using Quartz.Interop;
 using static Quartz.Features.Interop.ReflectionHelpers;
+using Quartz.Core;
 namespace Quartz.Features.Interop.Readers;
 internal static class EnhancedEffectRemoverReader {
     public static int ImportEnhancedEffectRemover(SettingsImportOption option) {
@@ -14,7 +15,8 @@ internal static class EnhancedEffectRemoverReader {
         JObject root;
         try {
             root = JObject.Parse(json);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return 0;
         }
         return ImportRegistry.Deliver(Source(name =>

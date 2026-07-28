@@ -1,3 +1,4 @@
+using Quartz.Core;
 #nullable enable
 namespace Quartz.Features.Tuf;
 public static class TufDiskSpace {
@@ -10,7 +11,7 @@ public static class TufDiskSpace {
             int bestLength = -1;
             foreach(DriveInfo drive in DriveInfo.GetDrives()) {
                 string name;
-                try { name = drive.Name; } catch { continue; }
+                try { name = drive.Name; } catch(Exception e) { Diag.Ignore(e); continue; }
                 if(string.IsNullOrEmpty(name) || name.Length <= bestLength) continue;
                 if(!full.StartsWith(name, PathComparison)) continue;
                 best = drive;
@@ -23,7 +24,8 @@ public static class TufDiskSpace {
             }
             long available = best.AvailableFreeSpace;
             return available < 0 ? null : available;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }

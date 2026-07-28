@@ -35,7 +35,8 @@ public static class ReflectionHelpers {
             if(f != null) return f.GetValue(target);
             PropertyInfo p = t.GetProperty(name, BindingFlags.Public | BindingFlags.Instance);
             return p?.GetValue(target);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }
@@ -69,7 +70,8 @@ public static class ReflectionHelpers {
         try {
             value = Convert.ToInt32(raw is JValue jv ? jv.Value : raw, CultureInfo.InvariantCulture);
             return true;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return int.TryParse(raw.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out value);
         }
     }
@@ -80,7 +82,8 @@ public static class ReflectionHelpers {
         try {
             value = Convert.ToSingle(raw is JValue jv ? jv.Value : raw, CultureInfo.InvariantCulture);
             return true;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return float.TryParse(raw.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out value);
         }
     }
@@ -150,7 +153,7 @@ public static class ReflectionHelpers {
             return true;
         }
         if(value.GetType().IsEnum) {
-            try { key = NormalizeKeyInt(Convert.ToInt32(value, CultureInfo.InvariantCulture)); return true; } catch { return false; }
+            try { key = NormalizeKeyInt(Convert.ToInt32(value, CultureInfo.InvariantCulture)); return true; } catch(Exception e) { Diag.Ignore(e); return false; }
         }
         if(value is IConvertible and not string) {
             try { key = NormalizeKeyInt(Convert.ToInt32(value, CultureInfo.InvariantCulture)); return true; } catch(Exception e) { Diag.Ignore(e); }
@@ -213,7 +216,7 @@ public static class ReflectionHelpers {
                 XmlResolver = null,
             });
             return XDocument.Load(reader);
-        } catch { return null; }
+        } catch(Exception e) { Diag.Ignore(e); return null; }
     }
     public static int[] ReadKeyCodesFromXml(XElement parent, string listName) {
         if(parent == null) return [];
@@ -251,7 +254,7 @@ public static class ReflectionHelpers {
         XElement element = FindFirstDescendant(root, name);
         if(element == null) return false;
         if(int.TryParse(element.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out value)) return true;
-        try { value = (int)(KeyCode)Enum.Parse(typeof(KeyCode), element.Value, true); return true; } catch { return false; }
+        try { value = (int)(KeyCode)Enum.Parse(typeof(KeyCode), element.Value, true); return true; } catch(Exception e) { Diag.Ignore(e); return false; }
     }
     public static bool TryParseBool(string text, out bool value) {
         value = false;

@@ -1,5 +1,6 @@
 using System.Reflection;
 using Newtonsoft.Json.Linq;
+using Quartz.Core;
 namespace Quartz.IO;
 public sealed class FaqEntry {
     public string Category;
@@ -60,7 +61,8 @@ public static class FaqDocument {
             using StreamReader reader = new(stream);
             string text = reader.ReadToEnd();
             return string.IsNullOrWhiteSpace(text) ? EmptyDocument : text;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return EmptyDocument;
         }
     }

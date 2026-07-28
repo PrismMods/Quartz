@@ -32,7 +32,8 @@ public static class Diag {
         if(target == null) return;
         try {
             target(message);
-        } catch(Exception) {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             Interlocked.Increment(ref sinkFailures);
         }
     }
@@ -40,7 +41,8 @@ public static class Diag {
         try {
             string raw = Environment.GetEnvironmentVariable("QUARTZ_DIAG");
             return raw == "1" || string.Equals(raw, "true", StringComparison.OrdinalIgnoreCase);
-        } catch(Exception) {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             Interlocked.Increment(ref sinkFailures);
             return false;
         }

@@ -175,7 +175,7 @@ public sealed class TufLevelLauncher : MonoBehaviour {
         AccessTools.Field(typeof(scnEditor), "_unsavedChanges");
     private static bool HasUnsavedChanges(scnEditor editor) {
         try { return UnsavedChangesField?.GetValue(editor) is true; }
-        catch { return false; }
+        catch(Exception e) { Diag.Ignore(e); return false; }
     }
     private static string PopupMessage(GameObject popup) {
         try {
@@ -183,7 +183,7 @@ public sealed class TufLevelLauncher : MonoBehaviour {
             string value = text != null ? text.text?.Trim() : null;
             if(string.IsNullOrWhiteSpace(value)) return null;
             return value.Length <= 300 ? value : value[..300] + "…";
-        } catch { return null; }
+        } catch(Exception e) { Diag.Ignore(e); return null; }
     }
     private static bool SamePath(string a, string b) {
         if(string.IsNullOrWhiteSpace(a) || string.IsNullOrWhiteSpace(b)) return false;
@@ -191,7 +191,7 @@ public sealed class TufLevelLauncher : MonoBehaviour {
             StringComparison comparison = Path.DirectorySeparatorChar == '\\'
                 ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
             return string.Equals(Path.GetFullPath(a), Path.GetFullPath(b), comparison);
-        } catch { return false; }
+        } catch(Exception e) { Diag.Ignore(e); return false; }
     }
     private static bool ClearTufHelperLaunchState() {
         bool mainCleared = TrySetStatic("TUFHelper.Main", "isInTUFHelper", false, false);
@@ -206,7 +206,7 @@ public sealed class TufLevelLauncher : MonoBehaviour {
     private static bool TrySetStatic(string typeName, string memberName, object value, bool property) {
         Type type;
         try { type = AccessTools.TypeByName(typeName); }
-        catch { return true; }
+        catch(Exception e) { Diag.Ignore(e); return true; }
         if(type == null) return true;
         try {
             if(property) {
@@ -219,7 +219,7 @@ public sealed class TufLevelLauncher : MonoBehaviour {
                 member.SetValue(null, value);
             }
             return true;
-        } catch { return false; }
+        } catch(Exception e) { Diag.Ignore(e); return false; }
     }
     private static string Tr(string key, string fallback) => MainCore.Tr.Get(key, fallback);
     private static string Tr(string key, string fallback, object value) =>

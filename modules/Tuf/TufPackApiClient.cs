@@ -181,7 +181,7 @@ public sealed class TufPackApiClient : IDisposable {
     }
     private static string? ExtractCreator(JToken level) => TufCredits.Extract(level);
     private static int SafeInt(JToken? token, string name) {
-        try { return token?.Value<int?>(name) ?? 0; } catch { return 0; }
+        try { return token?.Value<int?>(name) ?? 0; } catch(Exception e) { Diag.Ignore(e); return 0; }
     }
     private static async Task<byte[]> ReadBoundedAsync(Stream stream, int max, CancellationToken token) {
         using MemoryStream output = new();

@@ -17,7 +17,8 @@ public static class UmmInterop {
             findMod = ummType.GetMethod("FindMod", BindingFlags.Public | BindingFlags.Static);
             modEntries = ummType.GetField("modEntries", BindingFlags.Public | BindingFlags.Static);
             modsPathProp = ummType.GetProperty("modsPath", BindingFlags.Public | BindingFlags.Static);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             ummType = null;
         }
     }
@@ -32,7 +33,8 @@ public static class UmmInterop {
         if(findMod == null || string.IsNullOrEmpty(id)) return null;
         try {
             return findMod.Invoke(null, [id]);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }
@@ -67,7 +69,8 @@ public static class UmmInterop {
         Resolve();
         try {
             return modsPathProp?.GetValue(null, null) as string;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }
@@ -92,7 +95,8 @@ public static class UmmInterop {
             if(f != null) return f.GetValue(target);
             PropertyInfo p = t.GetProperty(name, BindingFlags.Public | BindingFlags.Instance);
             return p?.GetValue(target);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }

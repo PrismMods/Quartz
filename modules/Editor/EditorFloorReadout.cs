@@ -32,7 +32,8 @@ public static partial class EditorFeature {
                 && ADOBase.isLevelEditor
                 && scnEditor.instance != null
                 && !scnEditor.instance.playMode;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return;
         }
         if(!want) {
@@ -192,7 +193,8 @@ public static partial class EditorFeature {
             double arc;
             try {
                 arc = ADOBase.lm.CalculateSingleFloorAngleLength(floor);
-            } catch {
+            } catch(Exception e) {
+                Diag.Ignore(e);
                 arc = floor.angleLength;
             }
             float speedFactor = i == 0 ? 1f : selected[0].speed / floor.speed;

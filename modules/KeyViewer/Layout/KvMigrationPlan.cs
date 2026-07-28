@@ -1,3 +1,4 @@
+using Quartz.Core;
 namespace Quartz.Features.KeyViewer.Layout;
 internal enum KvMigrationSource {
     None,
@@ -34,7 +35,8 @@ internal static class KvMigrationPlan {
         if(string.IsNullOrWhiteSpace(json)) return null;
         try {
             return KvDocument.Parse(json);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return null;
         }
     }

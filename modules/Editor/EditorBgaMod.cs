@@ -19,7 +19,7 @@ public static partial class EditorFeature {
     private static void ReconcileBga() {
         bool want;
         try { want = ShouldHideForBga; }
-        catch { return; }
+        catch(Exception e) { Diag.Ignore(e); return; }
         if(!want) {
             if(bgaApplied) {
                 try {

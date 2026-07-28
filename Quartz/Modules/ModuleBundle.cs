@@ -24,7 +24,8 @@ public static class ModuleBundle {
             ModuleManifest manifest;
             try {
                 manifest = ModuleManifest.Parse(File.ReadAllText(file), out _);
-            } catch {
+            } catch(Exception e) {
+                Diag.Ignore(e);
                 continue;
             }
             if(manifest == null || manifest.Id != id) continue;
@@ -75,7 +76,8 @@ public static class ModuleBundle {
         ModuleManifest manifest;
         try {
             manifest = ModuleManifest.Parse(File.ReadAllText(ManifestOf(id)), out _);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return;
         }
         if(manifest == null) return;

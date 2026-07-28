@@ -38,30 +38,30 @@ public static class GameStats {
                 if (ed != null && ed.inStrictlyEditingMode) return false;
             }
             return true;
-        } catch { return false; }
+        } catch(Exception e) { Diag.Ignore(e); return false; }
     });
     public static float Progress => progressCache.Get(static () => {
         try {
             scrController c = scrController.instance;
             if (c == null || c.currentSeqID == 0) return 0f;
             return c.percentComplete;
-        } catch { return 0f; }
+        } catch(Exception e) { Diag.Ignore(e); return 0f; }
     });
     public static float Accuracy => accuracyCache.Get(static () => {
         try { return MistakesAccess.PercentAcc(MistakesAccess.Get()); }
-        catch { return 1f; }
+        catch(Exception e) { Diag.Ignore(e); return 1f; }
     });
     public static float XAccuracy => xAccuracyCache.Get(static () => {
         try { return MistakesAccess.PercentXAcc(MistakesAccess.Get()); }
-        catch { return 1f; }
+        catch(Exception e) { Diag.Ignore(e); return 1f; }
     });
     public static float MaxXAccuracy => maxXAccuracyCache.Get(static () => {
         try { return XAccuracyCalc.MaxRatio(); }
-        catch { return 1f; }
+        catch(Exception e) { Diag.Ignore(e); return 1f; }
     });
     public static int CheckpointCount => checkpointCache.Get(static () => {
         try { return scnGame.instance != null ? scnGame.instance.checkpointsUsed : 0; }
-        catch { return 0; }
+        catch(Exception e) { Diag.Ignore(e); return 0; }
     });
     public static void GetBpm(out float tileBpm, out float currentBpm) => Bpm.GetBpmValues(out tileBpm, out currentBpm);
     public static string HoldBehaviorLabel => Hold.GetHoldBehaviorLabel();
@@ -71,7 +71,7 @@ public static class GameStats {
         try {
             scrConductor c = scrConductor.instance;
             return c != null && c.song != null ? c.song.pitch : 1f;
-        } catch { return 1f; }
+        } catch(Exception e) { Diag.Ignore(e); return 1f; }
     });
     public static int XPerfectX => Quartz.Features.Interop.XPerfectBridge.XCount();
     public static int XPerfectPlus => Quartz.Features.Interop.XPerfectBridge.PlusCount();
@@ -80,19 +80,19 @@ public static class GameStats {
         try {
             var g = scnGame.instance;
             return g != null && g.levelData != null ? g.levelData.artist ?? "" : "";
-        } catch { return ""; }
+        } catch(Exception e) { Diag.Ignore(e); return ""; }
     });
     public static string SongTitle => songTitleCache.Get(static () => {
         try {
             var g = scnGame.instance;
             return g != null && g.levelData != null ? g.levelData.song ?? "" : "";
-        } catch { return ""; }
+        } catch(Exception e) { Diag.Ignore(e); return ""; }
     });
     public static string SongTitleRaw => songTitleRawCache.Get(static () => {
         try {
             scrController c = scrController.instance;
             return c != null && c.txtLevelName != null ? c.txtLevelName.text ?? "" : "";
-        } catch { return ""; }
+        } catch(Exception e) { Diag.Ignore(e); return ""; }
     });
     public static bool RunCleared => ProgressTracker.RunCleared;
     public static bool RunHasStartProgress => !ProgressTracker.RunStartedFromFirstTile
@@ -121,7 +121,7 @@ public static class GameStats {
                     musicTimeCache = FormatTime(a.time, hour) + " / " + FormatTime(a.clip.length, hour);
                 }
                 return musicTimeCache;
-            } catch { return "0:00 / 0:00"; }
+            } catch(Exception e) { Diag.Ignore(e); return "0:00 / 0:00"; }
         }
     }
     public static float MusicTimeRatio => musicRatioCache.Get(static () => {
@@ -129,7 +129,7 @@ public static class GameStats {
             AudioSource song = scrConductor.instance != null ? scrConductor.instance.song : null;
             if(song == null || song.clip == null || song.clip.length <= 0f) return 0f;
             return Mathf.Clamp01(song.time / song.clip.length);
-        } catch { return 0f; }
+        } catch(Exception e) { Diag.Ignore(e); return 0f; }
     });
     public static float MapTimeRatio => mapRatioCache.Get(static () => {
         try {
@@ -139,20 +139,20 @@ public static class GameStats {
             float total = MapTotalSeconds();
             if(total <= 0f) return 0f;
             return Mathf.Clamp01(time / total);
-        } catch { return 0f; }
+        } catch(Exception e) { Diag.Ignore(e); return 0f; }
     });
     public static float MapTimeSeconds => mapSecondsCache.Get(static () => {
         try {
             scrConductor cd = scrConductor.instance;
             return cd == null ? 0f : (float)(cd.addoffset + cd.songposition_minusi);
-        } catch { return 0f; }
+        } catch(Exception e) { Diag.Ignore(e); return 0f; }
     });
     public static float MapTotalTimeSeconds => MapTotalSeconds();
     public static int MapFloorCount => mapFloorCountCache.Get(static () => {
         try {
             scrLevelMaker lm = scrLevelMaker.instance;
             return lm != null && lm.listFloors != null ? lm.listFloors.Count : 0;
-        } catch { return 0; }
+        } catch(Exception e) { Diag.Ignore(e); return 0; }
     });
     public static float MapTimeAtProgress(float ratio) {
         try {
@@ -163,7 +163,7 @@ public static class GameStats {
             int index = Mathf.Clamp(Mathf.CeilToInt(Mathf.Clamp01(ratio) * count) - 1, 0, count - 1);
             scrFloor floor = lm.listFloors[index];
             return floor != null ? (float)floor.entryTime : -1f;
-        } catch { return -1f; }
+        } catch(Exception e) { Diag.Ignore(e); return -1f; }
     }
     public static string MapTimeText {
         get {
@@ -187,7 +187,7 @@ public static class GameStats {
                     }
                 }
                 return mapTimeCache;
-            } catch { return "0:00"; }
+            } catch(Exception e) { Diag.Ignore(e); return "0:00"; }
         }
     }
     public static int Fps => fpsCache.Get(static () => {
@@ -227,7 +227,7 @@ public static class GameStats {
             if(lm == null || lm.listFloors == null || lm.listFloors.Count == 0) return 0f;
             scrFloor last = lm.listFloors[lm.listFloors.Count - 1];
             return last != null ? (float)last.entryTime : 0f;
-        } catch { return 0f; }
+        } catch(Exception e) { Diag.Ignore(e); return 0f; }
     });
     private static string FormatTime(float seconds, bool forceHour = false) {
         if(seconds < 0f) seconds = 0f;

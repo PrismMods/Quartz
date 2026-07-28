@@ -10,7 +10,8 @@ public static class RequiredModsGate {
             try {
                 __result = HasMissingMods(mods);
                 return false;
-            } catch {
+            } catch(Exception e) {
+                Diag.Ignore(e);
                 return true;
             }
         }

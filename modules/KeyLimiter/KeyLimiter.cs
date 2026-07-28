@@ -27,7 +27,7 @@ public static partial class KeyLimiter {
     public static bool IsMenuBlockEnabled() => MainCore.IsModEnabled && MainCore.Conf.BlockInputsWhileMenuOpen;
     public static bool IsMenuBlockActive() => Quartz.UI.UICore.IsOpen && IsMenuBlockEnabled() && !Autoplaying;
     private static bool Autoplaying {
-        get { try { return RDC.auto; } catch { return false; } }
+        get { try { return RDC.auto; } catch(Exception e) { Diag.Ignore(e); return false; } }
     }
     private static int cachedPlayerControlFrame = -1;
     private static bool cachedPlayerControl;
@@ -44,7 +44,8 @@ public static partial class KeyLimiter {
             SetCachedPlayerControl(((StateBehaviour)controller).stateMachine.GetState() is States state
                 && state == States.PlayerControl);
             return cachedPlayerControl;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             SetCachedPlayerControl(false);
             return false;
         }
@@ -264,7 +265,8 @@ public static partial class KeyLimiter {
         try {
             RuntimePlatform platform = Application.platform;
             return platform == player || platform == editor;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return false;
         }
     }
@@ -284,7 +286,8 @@ public static partial class KeyLimiter {
         try {
             held = CGEventSourceKeyState(KCGEventSourceStateHidSystemState, vk);
             return true;
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return false;
         }
     }

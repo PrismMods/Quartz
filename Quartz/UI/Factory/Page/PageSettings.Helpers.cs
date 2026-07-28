@@ -236,7 +236,8 @@ internal static partial class PageSettings {
     private static bool HasGlyph(char c) {
         try {
             return FontManager.Current != null && FontManager.Current.HasCharacter(c, true, true);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return false;
         }
     }

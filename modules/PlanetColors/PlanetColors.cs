@@ -65,7 +65,7 @@ public static partial class PlanetColors {
             if(planets.Length > 0) return planets;
         } catch(Exception e) { Diag.Ignore(e); }
         try { return FindObjectsCompat<scrPlanet>(); }
-        catch { return EmptyPlanets; }
+        catch(Exception e) { Diag.Ignore(e); return EmptyPlanets; }
     }
     private static bool IsRedPlanet(scrPlanet planet) {
         try {
@@ -77,7 +77,7 @@ public static partial class PlanetColors {
             }
         } catch(Exception e) { Diag.Ignore(e); }
         try { return planet != null && planet.planetIndex == 0; }
-        catch { return true; }
+        catch(Exception e) { Diag.Ignore(e); return true; }
     }
     private static int GetPlanetSlot(scrPlanet planet) {
         if(planet == null) return 0;
@@ -92,7 +92,7 @@ public static partial class PlanetColors {
             }
         } catch(Exception e) { Diag.Ignore(e); }
         try { return Mathf.Clamp(planet.planetIndex, 0, PlanetColorsSettings.Slots - 1); }
-        catch { return 0; }
+        catch(Exception e) { Diag.Ignore(e); return 0; }
     }
     private static int GetPlanetSlot(PlanetRenderer renderer) {
         if(renderer == null) return 0;
@@ -273,7 +273,8 @@ public static partial class PlanetColors {
         try {
             setParticleSystemColorFast = (Action<PlanetRenderer, ParticleSystem, Color, Color>)Delegate.CreateDelegate(
                 typeof(Action<PlanetRenderer, ParticleSystem, Color, Color>), setParticleSystemColorMethod);
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             setParticleSystemColorFast = null;
         }
     }

@@ -315,7 +315,8 @@ public static class ModuleService {
         QuartzModuleInfoAttribute stamp;
         try {
             stamp = assembly.GetCustomAttribute<QuartzModuleInfoAttribute>();
-        } catch {
+        } catch(Exception e) {
+            Diag.Ignore(e);
             return true;
         }
         if(stamp == null) return true;

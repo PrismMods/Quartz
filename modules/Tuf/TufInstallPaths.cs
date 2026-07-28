@@ -26,7 +26,7 @@ public static class TufInstallPaths {
             if((File.GetAttributes(full) & FileAttributes.ReparsePoint) != 0) return false;
             if(!IsLevelFolderName(Path.GetFileName(full), out _)) return false;
             parent = Path.GetDirectoryName(full);
-        } catch { return false; }
+        } catch(Exception e) { Diag.Ignore(e); return false; }
         if(string.IsNullOrEmpty(parent)) return false;
         foreach(string? root in roots) {
             if(string.IsNullOrWhiteSpace(root)) continue;
@@ -48,7 +48,7 @@ public static class TufInstallPaths {
         }
         string full;
         try { full = Path.GetFullPath(folder); }
-        catch { reason = "invalid"; return false; }
+        catch(Exception e) { Diag.Ignore(e); reason = "invalid"; return false; }
         if(!Directory.Exists(full)) {
             reason = "missing";
             return false;
@@ -58,7 +58,7 @@ public static class TufInstallPaths {
                 reason = "symlink";
                 return false;
             }
-        } catch { reason = "invalid"; return false; }
+        } catch(Exception e) { Diag.Ignore(e); reason = "invalid"; return false; }
         if(string.Equals(Path.GetFullPath(Path.GetPathRoot(full) ?? ""), full, PathComparison)) {
             reason = "volume-root";
             return false;
@@ -71,7 +71,7 @@ public static class TufInstallPaths {
                 reason = "not-empty";
                 return false;
             }
-        } catch { reason = "unreadable"; return false; }
+        } catch(Exception e) { Diag.Ignore(e); reason = "unreadable"; return false; }
         return true;
     }
     private static bool IsIgnorableRootEntry(string name) =>
@@ -85,7 +85,7 @@ public static class TufInstallPaths {
             string right = Path.GetFullPath(b);
             if(string.Equals(left, right, PathComparison)) return true;
             return Contains(left, right) || Contains(right, left);
-        } catch { return false; }
+        } catch(Exception e) { Diag.Ignore(e); return false; }
     }
     private static bool Contains(string outer, string inner) {
         string prefix = outer.EndsWith(Path.DirectorySeparatorChar.ToString())

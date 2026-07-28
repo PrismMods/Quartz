@@ -1,3 +1,4 @@
+using Quartz.Core;
 namespace Quartz.Game.Stats;
 internal static class Hold {
     internal static string GetHoldBehaviorLabel() {
@@ -9,6 +10,6 @@ internal static class Hold {
                 HoldBehavior.NoHoldNeeded => "No Holding Required",
                 _ => behavior.ToString(),
             };
-        } catch { return null; }
+        } catch(Exception e) { Diag.Ignore(e); return null; }
     }
 }

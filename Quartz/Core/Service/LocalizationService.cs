@@ -21,6 +21,7 @@ public sealed class LocalizationService(
             await Translator.Load(langPath);
             if(await LangUpdateService.FetchAsync(langPath) > 0) await Translator.Load(langPath);
         } catch(System.Exception e) {
+            Diag.Ignore(e);
             logger.Wrn($"[LangUpdate] startup refresh failed: {e.Message}");
         }
     }

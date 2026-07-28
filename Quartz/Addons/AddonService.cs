@@ -256,6 +256,7 @@ public static class AddonService {
             try {
                 assembly = Quartz.Plugins.PluginImage.Load(unit.path);
             } catch(Exception e) {
+                Diag.Ignore(e);
                 handle.Error = $"failed to load {Path.GetExtension(unit.path)}: {e.Message}";
             }
             if(assembly == null) {

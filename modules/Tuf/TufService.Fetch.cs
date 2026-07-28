@@ -29,7 +29,7 @@ public sealed partial class TufService : IRuntimeService {
         try {
             TufPage page = await api.FetchAsync(query, sort, ascending, append ? nextOffset : 0, filter, token);
             MainThread.Enqueue(() => ApplyPage(page, append, token, generation, query, sort, ascending, filter));
-        } catch(OperationCanceledException) when(token.IsCancellationRequested) { }
+        } catch(OperationCanceledException e) { Diag.Ignore(e); }
         catch(Exception e) {
             bool offline = e is OperationCanceledException || TufNetworkPolicy.IsOfflineError(e);
             string message = e is OperationCanceledException
