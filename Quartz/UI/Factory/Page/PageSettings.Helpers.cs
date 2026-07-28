@@ -158,14 +158,17 @@ internal static partial class PageSettings {
         UpdateInfo info = UpdateService.Available;
         bool available = status == UpdateStatus.Available && info != null;
         bool skipped = status == UpdateStatus.Skipped;
+        bool canRestart = status == UpdateStatus.Installed && GameRestarter.Available;
+        if(status != UpdateStatus.Installed) updateRestartError = null;
         updateStatusText.text = status switch {
             UpdateStatus.Checking => GenerateUI.Tr("UPDATE_CHECKING", "Checking for updates…"),
             UpdateStatus.UpToDate => GenerateUI.Tr("UPDATE_UP_TO_DATE", "You're up to date."),
             UpdateStatus.Available => GenerateUI.Tr("UPDATE_AVAILABLE", "Update available:"),
             UpdateStatus.Installing => GenerateUI.Tr("UPDATE_DOWNLOADING", "Downloading update…"),
-            UpdateStatus.Installed => string.IsNullOrEmpty(UpdateService.Message)
-                ? GenerateUI.Tr("UPDATE_INSTALLED", "Update installed — restart the game to apply.")
-                : UpdateService.Message,
+            UpdateStatus.Installed => updateRestartError
+                ?? (string.IsNullOrEmpty(UpdateService.Message)
+                    ? GenerateUI.Tr("UPDATE_INSTALLED", "Update installed — restart the game to apply.")
+                    : UpdateService.Message),
             UpdateStatus.Skipped => string.Format(
                 GenerateUI.Tr("UPDATE_SKIPPED", "Skipped {0} — it won't be offered again."),
                 UpdateService.SkippedTag
@@ -188,11 +191,13 @@ internal static partial class PageSettings {
             updateProgressLabel.text = $"{Mathf.RoundToInt(p * 100f)}%";
         }
         updateActionRow.SetActive(available);
-        updateButtonRow.SetActive(available || skipped);
+        updateButtonRow.SetActive(available || skipped || canRestart);
         updateNotesButton?.Rect.gameObject.SetActive(available);
         updateSkipButton?.Rect.gameObject.SetActive(available);
         updateInstallButton?.Rect.gameObject.SetActive(available);
         updateUndoButton?.Rect.gameObject.SetActive(skipped);
+        updateRestartButton?.Rect.gameObject.SetActive(canRestart);
+        if(!canRestart) DisarmRestart();
         if(available && info != null) {
             string arrow = HasGlyph('→') ? "→" : ">";
             string simulated = UpdateService.DevSimulate
@@ -206,6 +211,27 @@ internal static partial class PageSettings {
             updateVersionText.text = "";
         }
         if(updateCheckButton != null) updateCheckButton.SetBlocked(status is UpdateStatus.Checking or UpdateStatus.Installing);
+    }
+    private static void RestartGame() {
+        if(updateRestartButton == null) return;
+        if(!updateRestartArmed) {
+            updateRestartArmed = true;
+            updateRestartButton.Label.text = GenerateUI.Tr("UPDATE_RESTART_CONFIRM", "Restart now?");
+            return;
+        }
+        updateRestartError = null;
+        if(GameRestarter.Restart()) return;
+        DisarmRestart();
+        updateRestartError = GenerateUI.Tr(
+            "UPDATE_RESTART_FAILED",
+            "Couldn't restart automatically — close and reopen the game."
+        );
+        RefreshUpdates();
+    }
+    private static void DisarmRestart() {
+        updateRestartArmed = false;
+        if(updateRestartButton != null)
+            updateRestartButton.Label.text = GenerateUI.Tr("UPDATE_RESTART", "Restart Game");
     }
     private static bool HasGlyph(char c) {
         try {

@@ -15,10 +15,22 @@ using TMPro;
 namespace Quartz.UI;
 public static class UpdateToast {
     private const float WIDTH = 360f;
+    private const float RESTART_WIDTH = 440f;
     private const float HEIGHT = 64f;
     private const float AUTO_HIDE_SECONDS = 10f;
-    private static readonly Vector2 ShownPos = new(-24f, -24f);
-    private static readonly Vector2 HiddenPos = new(WIDTH + 24f, -24f);
+    private const float RESTART_BUTTON_WIDTH = 120f;
+    private const string RestartTag = "restart";
+    private static Vector2 ShownPos => new(-24f, -24f);
+    private static float CurrentWidth => restartMode ? RESTART_WIDTH : WIDTH;
+    private static Vector2 HiddenPos => new(CurrentWidth + 24f, -24f);
+    private static bool restartMode;
+    private static bool restartArmed;
+    private static bool restartFailed;
+    private static GameObject restartObj;
+    private static Image restartBg;
+    private static TextMeshProUGUI restartLabel;
+    private static RectTransform titleRect;
+    private static RectTransform hintRect;
     private static GameObject canvasObj;
     private static GameObject toastObj;
     private static RectTransform toastRect;
@@ -61,7 +73,7 @@ public static class UpdateToast {
         toastRect.anchorMin = new(1f, 1f);
         toastRect.anchorMax = new(1f, 1f);
         toastRect.pivot = new(1f, 1f);
-        toastRect.sizeDelta = new(WIDTH, HEIGHT);
+        toastRect.sizeDelta = new(CurrentWidth, HEIGHT);
         toastRect.anchoredPosition = HiddenPos;
         group = toastObj.AddComponent<CanvasGroup>();
         bg = toastObj.AddComponent<Image>();
@@ -97,7 +109,7 @@ public static class UpdateToast {
             MainCore.TC.Play(hoverSeq);
         });
         Add(EventTriggerType.PointerExit, () => {
-            if(visible) StartAutoHide();
+            if(visible && !restartMode) StartAutoHide();
             hoverSeq?.Kill();
             hoverSeq = bg.GTColor(UIColors.TopBar, 0.25f)
                 .SetEasing(Easing.OutSine);
@@ -119,7 +131,8 @@ public static class UpdateToast {
         {
             GameObject title = new("Title");
             title.transform.SetParent(toastObj.transform, false);
-            RectTransform rect = title.AddComponent<RectTransform>();
+            titleRect = title.AddComponent<RectTransform>();
+            RectTransform rect = titleRect;
             rect.anchorMin = new(0f, 1f);
             rect.anchorMax = new(1f, 1f);
             rect.pivot = new(0f, 1f);
@@ -138,7 +151,8 @@ public static class UpdateToast {
         {
             GameObject hint = new("Hint");
             hint.transform.SetParent(toastObj.transform, false);
-            RectTransform rect = hint.AddComponent<RectTransform>();
+            hintRect = hint.AddComponent<RectTransform>();
+            RectTransform rect = hintRect;
             rect.anchorMin = new(0f, 1f);
             rect.anchorMax = new(1f, 1f);
             rect.pivot = new(0f, 1f);
@@ -176,20 +190,80 @@ public static class UpdateToast {
             AddClose(EventTriggerType.PointerEnter, () => xImg.color = Color.white);
             AddClose(EventTriggerType.PointerExit, () => xImg.color = new Color(1f, 1f, 1f, 0.55f));
         }
+        BuildRestartButton();
         toastObj.SetActive(false);
+    }
+    private static void BuildRestartButton() {
+        restartObj = new("Restart");
+        restartObj.transform.SetParent(toastObj.transform, false);
+        RectTransform rect = restartObj.AddComponent<RectTransform>();
+        rect.anchorMin = new(1f, 0.5f);
+        rect.anchorMax = new(1f, 0.5f);
+        rect.pivot = new(1f, 0.5f);
+        rect.anchoredPosition = new(-46f, 0f);
+        rect.sizeDelta = new(RESTART_BUTTON_WIDTH, 34f);
+        restartBg = restartObj.AddComponent<Image>();
+        restartBg.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P1024);
+        restartBg.type = Image.Type.Sliced;
+        restartBg.color = UIColors.ObjectButton;
+        GameObject label = new("Label");
+        label.transform.SetParent(restartObj.transform, false);
+        RectTransform labelRect = label.AddComponent<RectTransform>();
+        labelRect.anchorMin = Vector2.zero;
+        labelRect.anchorMax = Vector2.one;
+        labelRect.offsetMin = new(6f, 0f);
+        labelRect.offsetMax = new(-6f, 0f);
+        restartLabel = label.AddComponent<TextMeshProUGUI>();
+        restartLabel.font = FontManager.Current;
+        restartLabel.fontSize = 15f;
+        restartLabel.color = Color.white;
+        restartLabel.alignment = TextAlignmentOptions.Center;
+        restartLabel.verticalAlignment = VerticalAlignmentOptions.Middle;
+        restartLabel.characterSpacing = -3f;
+        restartLabel.overflowMode = TextOverflowModes.Ellipsis;
+        restartLabel.raycastTarget = false;
+        var trigger = restartObj.AddComponent<EventTrigger>();
+        Utility.UnityUtils.AddClickEvent(trigger, _ => OnRestartClicked());
+        void AddRestart(EventTriggerType type, Action cb) {
+            var e = new EventTrigger.Entry { eventID = type };
+            e.callback.AddListener(_ => cb());
+            trigger.triggers.Add(e);
+        }
+        AddRestart(EventTriggerType.PointerEnter, () => restartBg.color = UIColors.ObjectActiveLightBright);
+        AddRestart(EventTriggerType.PointerExit, () => restartBg.color = UIColors.ObjectButton);
+        restartObj.SetActive(false);
+    }
+    private static void OnRestartClicked() {
+        if(!restartArmed) {
+            restartArmed = true;
+            RenderText();
+            return;
+        }
+        restartFailed = false;
+        if(GameRestarter.Restart()) return;
+        restartArmed = false;
+        restartFailed = true;
+        RenderText();
     }
     private static void Refresh() {
         if(canvasObj == null) return;
         UpdateStatus status = UpdateService.Status;
         UpdateInfo info = UpdateService.Available;
         if(status == UpdateStatus.Idle) dismissedTag = null;
-        if(status == UpdateStatus.Available && info != null && info.Tag != dismissedTag) Show(info.Tag, info.Name);
+        if(status == UpdateStatus.Installed && GameRestarter.Available && dismissedTag != RestartTag)
+            Show(RestartTag, null, true);
+        else if(status == UpdateStatus.Available && info != null && info.Tag != dismissedTag)
+            Show(info.Tag, info.Name, false);
         else Hide();
     }
-    private static void Show(string tag, string name) {
+    private static void Show(string tag, string name, bool restart) {
         if(visible && shownTag == tag) return;
         shownTag = tag;
         shownName = name;
+        restartMode = restart;
+        restartArmed = false;
+        restartFailed = false;
+        ApplyLayout();
         RenderText();
         bg.color = UIColors.TopBar;
         visible = true;
@@ -200,7 +274,16 @@ public static class UpdateToast {
             .Join(group.GTFade(1f, 0.3f).SetEasing(Easing.OutSine))
             .Build();
         MainCore.TC.Play(moveSeq);
-        StartAutoHide();
+        if(!restartMode) StartAutoHide();
+    }
+    private static void ApplyLayout() {
+        toastRect.sizeDelta = new(CurrentWidth, HEIGHT);
+        float textRight = restartMode ? -(RESTART_BUTTON_WIDTH + 56f) : -38f;
+        if(titleRect != null) titleRect.offsetMax = new(textRight, titleRect.offsetMax.y);
+        if(hintRect != null) hintRect.offsetMax = new(textRight, hintRect.offsetMax.y);
+        if(restartObj == null) return;
+        restartObj.SetActive(restartMode);
+        if(restartMode && restartBg != null) restartBg.color = UIColors.ObjectButton;
     }
     private static void StartAutoHide() {
         autoHideSeq?.Kill();
@@ -237,6 +320,20 @@ public static class UpdateToast {
     }
     private static void RenderText() {
         if(titleText == null) return;
+        if(restartMode) {
+            titleText.text = MainCore.Tr.Get("UPDATE_INSTALLED_TITLE", "Update installed");
+            hintText.text = restartFailed
+                ? MainCore.Tr.Get(
+                    "UPDATE_RESTART_FAILED",
+                    "Couldn't restart automatically — close and reopen the game.")
+                : MainCore.Tr.Get("UPDATE_RESTART_HINT", "Restart to apply it");
+            if(restartLabel != null) {
+                restartLabel.text = restartArmed
+                    ? MainCore.Tr.Get("UPDATE_RESTART_CONFIRM", "Restart now?")
+                    : MainCore.Tr.Get("UPDATE_RESTART", "Restart Game");
+            }
+            return;
+        }
         titleText.text = $"{MainCore.Tr.Get("UPDATE_AVAILABLE", "Update available:")} {shownTag}";
         hintText.text = string.IsNullOrEmpty(shownName)
             ? MainCore.Tr.Get("UPDATE_TOAST_HINT", "Click to open Settings")
@@ -261,6 +358,14 @@ public static class UpdateToast {
         bg = null;
         titleText = null;
         hintText = null;
+        titleRect = null;
+        hintRect = null;
+        restartObj = null;
+        restartBg = null;
+        restartLabel = null;
+        restartMode = false;
+        restartArmed = false;
+        restartFailed = false;
         visible = false;
         shownTag = null;
         shownName = null;

@@ -163,6 +163,17 @@ internal static partial class PageSettings {
         ).SetSecondary();
         GenerateUI.FixWidth(updateUndoButton, 100f);
         updateUndoButton.Label.gameObject.AddComponent<TextLocalization>().Init("UPDATE_UNDO", "Undo");
+        updateRestartButton = GenerateUI.Button(
+            updateButtonRect,
+            RestartGame,
+            "Restart Game",
+            "update_restart"
+        );
+        GenerateUI.FixWidth(updateRestartButton, 170f);
+        updateRestartButton.Rect.AddToolTip(
+            "DESC_UPDATE_RESTART",
+            "Closes the game and starts it again — through Steam when the game was launched from Steam, otherwise by relaunching it directly."
+        );
         if(!updateHooked) {
             UpdateService.OnChanged += RefreshUpdates;
             MainCore.Tr.OnLanguageChanged += _ => RefreshUpdates();

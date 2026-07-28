@@ -40,6 +40,9 @@ internal static partial class PageSettings {
     private static UIButton updateSkipButton;
     private static UIButton updateInstallButton;
     private static UIButton updateUndoButton;
+    private static UIButton updateRestartButton;
+    private static bool updateRestartArmed;
+    private static string updateRestartError;
     private static GameObject updateProgressRow;
     private static RectTransform updateProgressFill;
     private static TextMeshProUGUI updateProgressLabel;
