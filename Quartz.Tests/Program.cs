@@ -73,6 +73,7 @@ List<(string Name, Action Run)> tests = [
     ("An unreadable settings file never stops the migration", ModuleMigrationTests.TestAnUnreadableSettingsFileNeverStopsTheMigration),
     ("Every migration rule targets a valid module id", ModuleMigrationTests.TestEveryRuleTargetsAValidModuleId),
     ("Every module split targets valid module ids", ModuleMigrationTests.TestEverySplitTargetsValidModuleIds),
+    ("A split also refreshes the module it was split out of", ModuleMigrationTests.TestASplitAlsoRefreshesTheModuleItWasSplitOutOf),
     ("KeyViewer class and inline-style priority round-trip on flat and nested elements", KvDocumentTests.TestClassAndInlinePriorityRoundTrip),
     ("KeyViewer export carries only the selected tab", KvDocumentTests.TestExportKeepsOnlyTheSelectedTab),
     ("KeyViewer editor grid step tracks zoom", KvSnapTests.TestGridStepTracksZoom),

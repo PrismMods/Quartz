@@ -44,6 +44,10 @@ public static partial class ModuleMigration {
     public static readonly Split[] Splits = [
         new Split { From = "judgement", To = "hidejudgements" },
     ];
+    public static bool NeedsSourceRefresh(string installed, string bundled) {
+        if(string.IsNullOrEmpty(installed) || string.IsNullOrEmpty(bundled)) return false;
+        return SemVer.Compare(installed, bundled) < 0;
+    }
     public sealed class Plan {
         public bool IsUpgrade;
         public readonly List<string> Install = [];

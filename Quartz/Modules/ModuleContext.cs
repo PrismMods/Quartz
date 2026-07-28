@@ -49,6 +49,11 @@ public sealed class ModuleContext {
         page.OwnerId = Id;
         if(string.IsNullOrWhiteSpace(page.Key)) page.Key = Id + ".page" + pageCount;
         pageCount++;
+        NavPage existing = NavRegistry.ByKey(page.Key);
+        if(existing != null) {
+            Wrn($"page '{page.Key}' is already registered by '{existing.OwnerId ?? "core"}' — keeping that one");
+            return existing;
+        }
         return NavRegistry.AddPage(page);
     }
     public void RegisterStat(string statId, string label, string category, Func<string> valueProvider) {

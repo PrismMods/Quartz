@@ -60,6 +60,17 @@ static class ModuleMigrationTests {
             "the overlay counter stays behind — the popup hider no longer drags it along");
         Assert(half.Install.FindAll(id => id == "hidejudgements").Count == 1, "a module is never planned twice");
     }
+    public static void TestASplitAlsoRefreshesTheModuleItWasSplitOutOf() {
+        Assert(ModuleMigration.NeedsSourceRefresh("2.0.0-alpha-90", "2.0.0-alpha-93"),
+            "a source module older than the bundled copy still owns the split-out page, so it is replaced");
+        Assert(!ModuleMigration.NeedsSourceRefresh("2.0.0-alpha-93", "2.0.0-alpha-93"),
+            "an already-current source module is left alone");
+        Assert(!ModuleMigration.NeedsSourceRefresh("2.0.1", "2.0.0-alpha-93"),
+            "a newer source module — say one installed from the catalog — is never downgraded");
+        Assert(!ModuleMigration.NeedsSourceRefresh(null, "2.0.0-alpha-93")
+            && !ModuleMigration.NeedsSourceRefresh("2.0.0-alpha-90", null),
+            "an unreadable version on either side leaves the install untouched");
+    }
     public static void TestEverySplitTargetsValidModuleIds() {
         foreach(ModuleMigration.Split split in ModuleMigration.Splits) {
             Assert(ModuleManifest.IsValidId(split.From), $"'{split.From}' is a loadable module id");

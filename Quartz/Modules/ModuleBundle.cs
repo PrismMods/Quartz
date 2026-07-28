@@ -6,6 +6,16 @@ public static class ModuleBundle {
     public static bool Has(string id) => id != null && File.Exists(BinaryOf(id)) && File.Exists(ManifestOf(id));
     private static string BinaryOf(string id) => System.IO.Path.Combine(Path, id + ModuleService.ModuleExtension);
     private static string ManifestOf(string id) => System.IO.Path.Combine(Path, id + ModuleService.ManifestExtension);
+    public static string VersionAt(string manifestPath) {
+        try {
+            if(manifestPath == null || !File.Exists(manifestPath)) return null;
+            return ModuleManifest.Parse(File.ReadAllText(manifestPath), out _)?.Version;
+        } catch(Exception e) {
+            Diag.Ignore(e);
+            return null;
+        }
+    }
+    public static string VersionOf(string id) => Has(id) ? VersionAt(ManifestOf(id)) : null;
     public static IReadOnlyList<ModuleManifest> Available() {
         List<ModuleManifest> found = [];
         string root = Path;

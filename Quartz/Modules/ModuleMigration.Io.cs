@@ -34,6 +34,7 @@ public static partial class ModuleMigration {
         bool changed = false;
         foreach(Split split in Splits) {
             if(!state.Modules.TryGetValue(split.From, out ModuleState.Entry from)) continue;
+            RefreshSplitSource(split.From);
             if(state.Modules.ContainsKey(split.To)) continue;
             if(!ModuleBundle.Copy(split.To)) continue;
             ModuleState.Entry entry = state.For(split.To);
@@ -43,6 +44,16 @@ public static partial class ModuleMigration {
             MainCore.Log.Msg($"[Modules] '{split.To}' split out of '{split.From}' — installed automatically");
         }
         if(changed) state.Save();
+    }
+    private static void RefreshSplitSource(string id) {
+        string bundled = ModuleBundle.VersionOf(id);
+        string installed = ModuleBundle.VersionAt(
+            Path.Combine(MainCore.Paths.ModulePath, id + ModuleService.ManifestExtension));
+        if(!NeedsSourceRefresh(installed, bundled)) return;
+        if(!ModuleBundle.Copy(id)) return;
+        MainCore.Log.Msg(
+            $"[Modules] refreshed '{id}' from the bundled v{bundled} — the installed v{installed} predates a split "
+            + "and still owns pages the split-out module registers");
     }
     private static JObject ReadSettings(string fileName) {
         string path = Path.Combine(MainCore.Paths.RootPath, fileName.Replace('/', Path.DirectorySeparatorChar));
