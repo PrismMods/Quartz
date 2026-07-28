@@ -121,6 +121,13 @@ List<(string Name, Action Run)> tests = [
     ("TUF recognizes Bilibili BV links and rejects the rest", TufThumbnailTests.TestBilibiliLinkShapes),
     ("TUF video resolution reports the source and prefers YouTube", TufThumbnailTests.TestResolvePrefersYouTubeAndReportsKind),
     ("TUF thumbnail URLs are built from the approved host, never the input", TufThumbnailTests.TestThumbnailUrlStaysOnTheApprovedHost),
+    ("Every easing starts and ends exactly on its endpoints", EasingTests.TestEveryEasingHitsBothEndpoints),
+    ("Every easing stays finite across the whole range", EasingTests.TestEveryEasingStaysFiniteAcrossTheRange),
+    ("Linear is exact and an unmapped easing falls back to it", EasingTests.TestLinearIsExactAndUnknownFallsBackToIt),
+    ("Ease-in lags linear and ease-out leads it", EasingTests.TestInAndOutCurvesSitOnOppositeSidesOfLinear),
+    ("Monotonic easings never travel backwards", EasingTests.TestMonotonicCurvesNeverGoBackwards),
+    ("Bounce actually bounces and never overshoots", EasingTests.TestBounceLandsOnItsPlateaus),
+    ("Back easings overshoot deliberately at both ends", EasingTests.TestBackCurvesOvershootOnPurpose),
 ];
 int failed = 0;
 foreach((string name, Action run) in tests) {
