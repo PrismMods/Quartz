@@ -4,7 +4,7 @@ using Quartz.Features.Interop;
 using Quartz.IO;
 using UnityEngine;
 using Quartz.Compat.Game;
-namespace Quartz.Features.Judgement;
+namespace Quartz.Features.HideJudgements;
 public static class JudgementPopupHider {
     public static SettingsFile<JudgementPopupHiderSettings> ConfMgr { get; private set; }
     public static JudgementPopupHiderSettings Conf => ConfMgr?.Data;

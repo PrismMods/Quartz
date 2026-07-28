@@ -1,22 +1,6 @@
 {
   "en-US": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
-    "JPOP_AUTO": "Auto",
-    "JPOP_EARLYPERFECT": "Early Perfect",
-    "JPOP_LATEPERFECT": "Late Perfect",
-    "JPOP_MISS": "Miss",
-    "JPOP_MULTIPRESS": "Multipress",
-    "JPOP_OVERLOAD_FAIL": "Overload (Fail)",
-    "JPOP_OVERLOAD_NOFAIL": "Overload (No Fail)",
-    "JPOP_PERFECT": "Perfect",
-    "JPOP_TOOEARLY": "Too Early",
-    "JPOP_TOOLATE": "Too Late",
-    "JPOP_VERYEARLY": "Very Early",
-    "JPOP_VERYLATE": "Very Late",
-    "JPOP_XPERFECT": "X Perfect",
-    "JPOP_PLUSPERFECT": "+ Perfect",
-    "JPOP_MINUSPERFECT": "- Perfect",
-    "SECTION_HIDE_JUDGEMENTS": "Hide Judgements",
     "SECTION_JUDGEMENT": "Judgement"
   }
 }

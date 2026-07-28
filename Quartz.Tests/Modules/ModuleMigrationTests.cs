@@ -46,16 +46,26 @@ static class ModuleMigrationTests {
         foreach(string id in new[] { "tweaks", "restriction", "calibration", "optimizer", "editor", "nostalgia", "tuf" })
             Assert(plan.Install.Contains(id), $"'{id}' has no master toggle, so an upgrade keeps it");
     }
-    public static void TestJudgementComesAlongIfEitherHalfWasOn() {
+    public static void TestJudgementAndHideJudgementsCarryOverSeparately() {
         ModuleMigration.Plan off = ModuleMigration.Decide(Files(
             ("Judgement.json", """{"Enabled":false}"""),
             ("JudgementPopupHider.json", """{"Enabled":false}""")));
-        Assert(!off.Install.Contains("judgement"), "both halves off means the module is not carried over");
+        Assert(!off.Install.Contains("judgement") && !off.Install.Contains("hidejudgements"),
+            "both halves off means neither module is carried over");
         ModuleMigration.Plan half = ModuleMigration.Decide(Files(
             ("Judgement.json", """{"Enabled":false}"""),
             ("JudgementPopupHider.json", """{"Enabled":true}""")));
-        Assert(half.Install.Contains("judgement"), "the popup hider alone still needs the Judgement module");
-        Assert(half.Install.FindAll(id => id == "judgement").Count == 1, "a module is never planned twice");
+        Assert(half.Install.Contains("hidejudgements"), "the popup hider carries over on its own");
+        Assert(!half.Install.Contains("judgement"),
+            "the overlay counter stays behind — the popup hider no longer drags it along");
+        Assert(half.Install.FindAll(id => id == "hidejudgements").Count == 1, "a module is never planned twice");
+    }
+    public static void TestEverySplitTargetsValidModuleIds() {
+        foreach(ModuleMigration.Split split in ModuleMigration.Splits) {
+            Assert(ModuleManifest.IsValidId(split.From), $"'{split.From}' is a loadable module id");
+            Assert(ModuleManifest.IsValidId(split.To), $"'{split.To}' is a loadable module id");
+            Assert(split.From != split.To, "a module cannot be split out of itself");
+        }
     }
     public static void TestAnUnreadableSettingsFileNeverStopsTheMigration() {
         ModuleMigration.Plan plan = ModuleMigration.Decide(name =>

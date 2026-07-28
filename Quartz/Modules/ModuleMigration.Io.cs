@@ -29,6 +29,21 @@ public static partial class ModuleMigration {
             ? "[Modules] first run on an existing install — no modules to carry over"
             : $"[Modules] carried {installed.Count} feature(s) over from your previous install: {string.Join(", ", installed)}");
     }
+    public static void ApplySplits(ModuleState state) {
+        if(state == null) return;
+        bool changed = false;
+        foreach(Split split in Splits) {
+            if(!state.Modules.TryGetValue(split.From, out ModuleState.Entry from)) continue;
+            if(state.Modules.ContainsKey(split.To)) continue;
+            if(!ModuleBundle.Copy(split.To)) continue;
+            ModuleState.Entry entry = state.For(split.To);
+            entry.Enabled = from.Enabled;
+            entry.Source = "split";
+            changed = true;
+            MainCore.Log.Msg($"[Modules] '{split.To}' split out of '{split.From}' — installed automatically");
+        }
+        if(changed) state.Save();
+    }
     private static JObject ReadSettings(string fileName) {
         string path = Path.Combine(MainCore.Paths.RootPath, fileName.Replace('/', Path.DirectorySeparatorChar));
         try {

@@ -1,7 +1,7 @@
 using Newtonsoft.Json.Linq;
 using Quartz.IO;
 using Quartz.IO.Interface;
-namespace Quartz.Features.Judgement;
+namespace Quartz.Features.HideJudgements;
 public sealed class JudgementPopupHiderSettings : ISettingsFile {
     public bool Enabled = true;
     public int HiddenMask = 1 << JudgementPopupHider.XPerfectPerfectBit;

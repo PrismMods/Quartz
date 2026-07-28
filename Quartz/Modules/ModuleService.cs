@@ -41,6 +41,7 @@ public static class ModuleService {
         initialized = true;
         state = ModuleState.Load();
         ModuleMigration.RunOnce(state);
+        ModuleMigration.ApplySplits(state);
         modChangedHandler = (_, _) => ApplyActive();
         MainCore.OnModEnabledChanged += modChangedHandler;
         LoadAll();

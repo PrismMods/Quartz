@@ -15,7 +15,7 @@ public static partial class ModuleMigration {
         new Rule { Id = "progressbar", FileName = "ProgressBar.json", Field = "Enabled", Default = true },
         new Rule { Id = "songtitle", FileName = "SongTitle.json", Field = "Enabled", Default = true },
         new Rule { Id = "judgement", FileName = "Judgement.json", Field = "Enabled", Default = true },
-        new Rule { Id = "judgement", FileName = "JudgementPopupHider.json", Field = "Enabled", Default = true },
+        new Rule { Id = "hidejudgements", FileName = "JudgementPopupHider.json", Field = "Enabled", Default = true },
         new Rule { Id = "planetcolors", FileName = "PlanetColors.json", Field = "Enabled", Default = true },
         new Rule { Id = "ottoicon", FileName = "OttoIcon.json", Field = "Enabled", Default = true },
         new Rule { Id = "keylimiter", FileName = "ChatterBlocker.json", Field = "Enabled", Default = true },
@@ -35,6 +35,13 @@ public static partial class ModuleMigration {
         new Rule { Id = "nostalgia-tweaks", FileName = "Nostalgia.json" },
         new Rule { Id = "nostalgia-editor", FileName = "Nostalgia.json" },
         new Rule { Id = "tuf", FileName = "TUF/Settings.json" },
+    ];
+    public sealed class Split {
+        public string From;
+        public string To;
+    }
+    public static readonly Split[] Splits = [
+        new Split { From = "judgement", To = "hidejudgements" },
     ];
     public sealed class Plan {
         public bool IsUpgrade;

@@ -1,6 +1,6 @@
 using Quartz.Core;
 using Quartz.Features.Interop;
-using Quartz.Features.Judgement;
+using Quartz.Features.HideJudgements;
 using Quartz.Resource;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;

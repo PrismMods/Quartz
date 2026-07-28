@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "hidejudgements", "entry": "Quartz.Features.HideJudgements.HideJudgementsModule",
+  "name": "Hide Judgements", "nameKey": "SECTION_HIDE_JUDGEMENTS", "group": "visuals", "order": 20,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": [], "settingsFiles": ["JudgementPopupHider.json"], "langPrefixes": ["JPOP_", "HIDEJUDGEMENTS_"]
+}
