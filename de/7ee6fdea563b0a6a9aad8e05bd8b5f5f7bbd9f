@@ -1,0 +1,19 @@
+scripts/check_conventions.py
+  s_05ba7c70196809::t_85281808813788 10,158-188,193
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "de7ee6fdea563b0a6a9aad8e05bd8b5f5f7bbd9f",
+  "prompts": {},
+  "sessions": {
+    "s_05ba7c70196809": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "24e3ad21-42f8-4cb2-a251-640334d9f67b",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
