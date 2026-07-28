@@ -7,6 +7,7 @@ regressed silently once and nothing caught it.
 
 Exits 1 on the first failing rule so CI turns red.
 """
+import json
 import re
 import sys
 from pathlib import Path
@@ -154,10 +155,42 @@ def check_no_silent_swallow(files):
     return bad, "every exception swallow states its intent"
 
 
+def check_patch_targets(files):
+    """Every Harmony patch target must still exist in the game.
+
+    Mono drops a whole patched method at JIT time when a prefix names a game API
+    that is gone, so the feature dies silently - sometimes with the feature switched
+    OFF - and the only trace is a line in Player.log. Patch targets are named by
+    string (nameof, or Harmony's string form), so neither the compiler nor the
+    stub-backed build can catch it.
+
+    tools/StubGen resolves every one of those names against the installed game and
+    records the verdict in stubs/PATCH-TARGETS.json. That needs the game, so it runs
+    on a maintainer's machine (tools/gen-stubs.sh); this check reads the committed
+    result, which needs nothing.
+    """
+    manifest = ROOT / "stubs" / "PATCH-TARGETS.json"
+    if not manifest.is_file():
+        return ["stubs/PATCH-TARGETS.json is missing - run tools/gen-stubs.sh"], ""
+    try:
+        data = json.loads(manifest.read_text(encoding="utf-8"))
+    except ValueError as error:
+        return [f"stubs/PATCH-TARGETS.json is not valid JSON: {error}"], ""
+    broken = [t for t in data.get("targets", []) if not t.get("resolved")]
+    if not data.get("targets"):
+        return ["stubs/PATCH-TARGETS.json lists no targets - run tools/gen-stubs.sh"], ""
+    bad = [
+        f"{t.get('type')}.{t.get('member')} (patched, but not in {t.get('assembly')})"
+        for t in broken
+    ]
+    return bad, f"all {len(data['targets'])} Harmony patch targets resolve"
+
+
 CHECKS = [
     ("file size", check_file_size),
     ("silent catch", check_no_silent_catch),
     ("silent swallow", check_no_silent_swallow),
+    ("patch targets", check_patch_targets),
 ]
 
 
