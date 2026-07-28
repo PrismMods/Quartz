@@ -89,14 +89,14 @@ internal static partial class PageEditor {
             v => conf.CustomAngleRotation = v,
             "Use a custom rotation angle", "editor_custom_angle",
             "Rotate the selected tiles by the angle below instead of the default 90° when you use the rotate shortcut. The 180° rotate shortcut always stays 180°.");
-        static float angleFilter(float v) => Mathf.Clamp(Mathf.Round(v), 1f, 359f);
+        static float angleFilter(float v) => Mathf.Clamp(Mathf.Round(v * 1000f) / 1000f, 1f, 359f);
         UISlider angle = GenerateUI.Slider(
             GenerateUI.Row(sec.Body),
             def.CustomAngle,
             1f, 359f, conf.CustomAngle, angleFilter, null, null,
             "Rotation angle", "editor_custom_angle_value"
         );
-        angle.Format = "0°";
+        angle.Format = "0.###°";
         angle.OnChanged = v => conf.CustomAngle = v;
         angle.OnComplete = v => { conf.CustomAngle = v; EditorFeature.Save(); };
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(sec.Body)), "HEADING_SHORTCUTS", "Shortcuts");
