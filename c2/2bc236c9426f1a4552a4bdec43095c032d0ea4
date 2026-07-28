@@ -1,0 +1,19 @@
+tools/release.sh
+  s_459a8904d3219b::t_48908b74329fd3 138-155,157,159
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "c22bc236c9426f1a4552a4bdec43095c032d0ea4",
+  "prompts": {},
+  "sessions": {
+    "s_459a8904d3219b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3edd775d-bf80-4ba2-830b-9ee5844a95ec",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
