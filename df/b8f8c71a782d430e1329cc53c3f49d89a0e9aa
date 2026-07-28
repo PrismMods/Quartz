@@ -1,0 +1,31 @@
+Quartz/UI/Factory/Page/PageCredits.cs
+  s_390d0fd70da269::t_8a224a970c7826 22
+  s_390d0fd70da269::t_2d98f9b800357a 25
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_390d0fd70da269::t_23f33e5cb7cafe 41
+Quartz/Resource/Export/Lang/en-US.json
+  s_390d0fd70da269::t_23f33e5cb7cafe 41
+THIRD-PARTY-NOTICES.md
+  s_390d0fd70da269::t_9236e6f3cbc7eb 1-10,16-17,22-46,50-52
+  s_390d0fd70da269::t_e077bb220dc2cc 11-15,18-21,47-49
+CREDITS.md
+  s_390d0fd70da269::t_a1054c6c350a57 4-5,12-16
+Quartz/Resource/Export/Lang/zh-CN.json
+  s_390d0fd70da269::t_23f33e5cb7cafe 41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "dfb8f8c71a782d430e1329cc53c3f49d89a0e9aa",
+  "prompts": {},
+  "sessions": {
+    "s_390d0fd70da269": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "19c1b2fb-cfd4-4b77-b902-26324d0386fb",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
