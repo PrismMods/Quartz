@@ -177,6 +177,19 @@ if [ "$bumped" -eq 1 ]; then
   echo "Build number: ${cur} -> ${next}  (${ver} ${chan})"
 fi
 
+# --- Preflight: the committed stubs must still describe the installed game ------
+# stubs/ is what CI compiles the whole tree against, and stubs/PATCH-TARGETS.json is
+# what proves every Harmony patch still has a target. Both are generated from a real
+# install, so only a release (which happens on a machine that has one) can confirm
+# they are current. Shipping past a stale stub set means CI has been green about an
+# API that no longer exists — check before the build, not after.
+echo "Verifying stubs against the installed game ..."
+tools/gen-stubs.sh --check || {
+  echo "stubs are stale — run tools/gen-stubs.sh and commit the result" >&2
+  exit 1
+}
+python3 scripts/check_conventions.py || exit 1
+
 echo "Building ${tag} (MelonLoader) ..."
 dotnet build Quartz/Quartz.csproj -c Release
 echo "Building ${tag} (UnityModManager) ..."
