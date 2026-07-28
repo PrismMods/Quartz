@@ -1,0 +1,21 @@
+Quartz.Tests/Program.cs
+  s_76e351fa613eb2::t_7f90e2368f3f41 124-130
+Quartz.Tests/Core/EasingTests.cs
+  s_76e351fa613eb2::t_968cb4b27e6fe8 1-87
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "a83be546f5e1e0fb4cea266addc9abc80816427c",
+  "prompts": {},
+  "sessions": {
+    "s_76e351fa613eb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "33998417-21c5-469e-b06f-136bf038c139",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
