@@ -20,6 +20,8 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
     private static int sessionAttempts;
     private static float bestObservedThisRun;
     private static bool runHadFail;
+    private static bool runUsedAuto;
+    private static bool runCounted;
     private static bool dirty;
     private static bool wasInGame;
     private static bool gameStateKnown;
@@ -32,7 +34,18 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
         wasInGame = inGame;
         gameStateKnown = true;
         if(!inGame) return;
+        if(AutoOn) TaintAuto();
         ObserveProgress(GameStats.Progress);
+    }
+    private static bool AutoOn {
+        get {
+            try {
+                return RDC.auto;
+            } catch(Exception e) {
+                Diag.Ignore(e);
+                return false;
+            }
+        }
     }
     public static PlayData For(string key) {
         if(!playDatas.TryGetValue(key, out PlayData d)) {
@@ -62,7 +75,7 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
     }
     private static float SpanOf(float start, float end) => Mathf.Max(0f, end - start);
     private static bool LiveRunWins(float storedStart, float storedEnd) =>
-        SpanOf(CurrentRunStart(), bestObservedThisRun) > SpanOf(storedStart, storedEnd);
+        !runUsedAuto && SpanOf(CurrentRunStart(), bestObservedThisRun) > SpanOf(storedStart, storedEnd);
     private static float CurrentRunStart() {
         try {
             return ProgressTracker.RunStartedFromFirstTile
@@ -84,15 +97,35 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
             currentMapKey = key;
             sessionAttempts = 0;
         }
-        sessionAttempts++;
         bestObservedThisRun = 0f;
         runHadFail = false;
+        runUsedAuto = false;
+        runCounted = false;
+        if(AutoOn) {
+            runUsedAuto = true;
+            return;
+        }
+        sessionAttempts++;
         PlayData d = For(key);
         d.TotalAttempts++;
+        runCounted = true;
+        dirty = true;
+    }
+    private static void TaintAuto() {
+        if(runUsedAuto) return;
+        runUsedAuto = true;
+        if(!runCounted) return;
+        runCounted = false;
+        if(sessionAttempts > 0) sessionAttempts--;
+        if(string.IsNullOrEmpty(currentMapKey)) return;
+        PlayData d = For(currentMapKey);
+        if(d.TotalAttempts > 0) d.TotalAttempts--;
         dirty = true;
     }
     private static void OnRunDeath() {
         if(string.IsNullOrEmpty(currentMapKey)) return;
+        if(AutoOn) TaintAuto();
+        if(runUsedAuto) return;
         if(!runHadFail) {
             float progress = CurrentProgress();
             if(progress > bestObservedThisRun) bestObservedThisRun = progress;
@@ -107,6 +140,8 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
     }
     private static void OnRunClear() {
         if(string.IsNullOrEmpty(currentMapKey)) return;
+        if(AutoOn) TaintAuto();
+        if(runUsedAuto) return;
         PlayData d = For(currentMapKey);
         float runStart = CurrentRunStart();
         if(!runHadFail) {
@@ -244,6 +279,8 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
         sessionAttempts = 0;
         bestObservedThisRun = 0f;
         runHadFail = false;
+        runUsedAuto = false;
+        runCounted = false;
         dirty = false;
         try {
             string path = FilePath;
