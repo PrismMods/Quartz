@@ -1,0 +1,91 @@
+Quartz/GTweens/Source/Enums/ResetMode.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/Compat/Interface/IRuntimeTick.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/Core/SemVer.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/IO/Interface/ISettingsFile.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/GTweens/Source/TweenBehaviours/CallbackTweenBehaviour.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/GTweens/Source/Interpolators/FloatInterpolator.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/GTweens/Source/TweenBehaviours/WaitTimeTween.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/GTweens/Source/TweenBehaviours/InterpolationTweenBehaviour.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/GTweens/Source/Interpolators/IInterpolator.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/Core/ModState.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/Plugins/PluginIdentityResolver.cs
+  s_76e351fa613eb2::t_00103abb4620b6 11-12,19
+Quartz.Tests/Quartz.Tests.csproj
+  s_76e351fa613eb2::t_e4e066dbb0e5b3 24-61
+Quartz/GTweens/Source/Tweeners/Vector3RotationTweener.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/GTweens/Source/TweenBehaviours/TweenBehaviour.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/Plugins/PluginImage.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/GTweens/Source/Delegates/ValidationDelegates.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/Core/RuntimeTicks.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/Compat/Interface/IRuntimeService.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/GTweens/Source/Easings/PresetEasingDelegateFactory.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/GTweens/Source/Interpolators/IntInterpolator.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+modules/KeyViewer/KeyViewerPersistence.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/GTweens/Source/Tweeners/ITweener.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/Compat/Interface/IQuartzLogger.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/Modules/ModuleOrder.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+modules/KeyViewer/Layout/KvSnap.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/GTweens/Source/Easings/EasingDelegate.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/Core/Service/PathService.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/GTweens/Source/Enums/RotationMode.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/IO/Interface/ICopyable.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/GTweens/Source/TweenBehaviours/ITweenBehaviour.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/GTweens/Source/Interpolators/SystemVector3RotationInterpolator.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/Core/FeatureRegistry.cs
+  s_76e351fa613eb2::t_6b3d2a0916528d 8
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/GTweens/Source/Easings/Easing.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+Quartz/Compat/Interface/IQuartzHost.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+modules/Tuf/TufNetworkPolicy.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+  s_76e351fa613eb2::t_6b3d2a0916528d 6
+Quartz/Interop/ImportKeys.cs
+  s_76e351fa613eb2::t_a2cf437f574318 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "a888de6d203c839c058cd7562974c702c6b9e470",
+  "prompts": {},
+  "sessions": {
+    "s_76e351fa613eb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "33998417-21c5-469e-b06f-136bf038c139",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
