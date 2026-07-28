@@ -1,0 +1,19 @@
+Quartz/UI/Utility/DragHandler.cs
+  s_5919a7de9d8577::t_b987e428390060 7-8,39-64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "1c4d096c954a335dbb41983c0a8f2c2fc6db8544",
+  "prompts": {},
+  "sessions": {
+    "s_5919a7de9d8577": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "299b8ab0-bd73-491d-ad37-60d704b4e33c",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
