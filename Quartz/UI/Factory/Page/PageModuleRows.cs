@@ -11,16 +11,19 @@ namespace Quartz.UI.Factory.Page;
 internal static class PageModuleRows {
     public static void Installed(Transform parent, ModuleService.Handle handle) {
         string id = handle.Id;
+        string nameKey = handle.Manifest?.NameKey;
         RectTransform row = GenerateUI.Row(parent, 64f);
-        GenerateUI.Toggle(
+        UIToggle toggle = GenerateUI.Toggle(
             row,
             true,
             handle.Enabled,
             v => ModuleService.SetEnabled(id, v),
-            handle.Name,
+            nameKey == null ? handle.Name : MainCore.Tr.Get(nameKey, handle.Name),
             "module_" + id,
             168f
         );
+        if(nameKey != null)
+            toggle.Label?.GetComponent<Quartz.Localization.TextLocalization>()?.Init(nameKey, handle.Name);
         Remove(row, id);
         string error = handle.Error;
         bool hasError = error != null;

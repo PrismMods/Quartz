@@ -43,6 +43,7 @@
     "PCOL_TAILOP2": "Planet 2 Tail Opacity",
     "PCOL_TAILOP3": "Planet 3 Tail Opacity",
     "PCOL_TAILOP4": "Planet 4 Tail Opacity",
-    "PLANETCOLORS_ENABLE": "Enable Planet Colors"
+    "PLANETCOLORS_ENABLE": "Enable Planet Colors",
+    "SECTION_PLANET_COLORS": "Planet Colors"
   }
 }
