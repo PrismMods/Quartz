@@ -1,0 +1,21 @@
+Quartz.Tests/Program.cs
+  s_76e351fa613eb2::t_7f90e2368f3f41 119-123
+Quartz.Tests/Features/Tuf/TufThumbnailTests.cs
+  s_76e351fa613eb2::t_9af2163bc41f88 1-57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "082e15dbfb8d816f568b5984f81842d040d88e01",
+  "prompts": {},
+  "sessions": {
+    "s_76e351fa613eb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "33998417-21c5-469e-b06f-136bf038c139",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
