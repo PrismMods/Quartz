@@ -1,0 +1,14 @@
+<Project>
+
+	<!-- Shadows the repo-root Directory.Build.props for everything under
+	     modules/, so import that one explicitly or every module silently loses
+	     GamePath/GameData and fails to resolve the game assemblies. -->
+	<PropertyGroup>
+		<_QuartzRootProps>$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', $(MSBuildThisFileDirectory)../))</_QuartzRootProps>
+	</PropertyGroup>
+
+	<Import Project="$(_QuartzRootProps)" Condition="Exists($(_QuartzRootProps))" />
+
+	<Import Project="$(MSBuildThisFileDirectory)../sdk/QuartzModule.props" />
+
+</Project>

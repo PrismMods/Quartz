@@ -21,8 +21,10 @@ obj/
 *.swo
 *~
 
-# Local machine config (per-developer GamePath — use Directory.Build.example.props as template)
-Directory.Build.props
+# Local machine config (per-developer GamePath — use Directory.Build.example.props as template).
+# Anchored: unanchored, this also swallowed modules/Directory.Build.props, which is
+# shared build logic every module needs and not machine config.
+/Directory.Build.props
 
 # Per-developer reference assemblies standing in for whatever the game install
 # lacks. Other people's binaries — never committed.
