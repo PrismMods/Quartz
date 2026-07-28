@@ -116,6 +116,11 @@ List<(string Name, Action Run)> tests = [
     ("TUF install entries merge chart and API info", TufChartInfoTests.TestEntryMetadataMerge),
     ("TUF pack list parses string ids and counts", TufPackParseTests.TestPackListParsing),
     ("TUF pack tree flattens, dedups, and credits charters", TufPackParseTests.TestPackTreeParsing),
+    ("TUF recognizes every YouTube link shape a charter might paste", TufThumbnailTests.TestYouTubeLinkShapes),
+    ("TUF rejects non-YouTube and malformed video links", TufThumbnailTests.TestNonYouTubeAndMalformedLinks),
+    ("TUF recognizes Bilibili BV links and rejects the rest", TufThumbnailTests.TestBilibiliLinkShapes),
+    ("TUF video resolution reports the source and prefers YouTube", TufThumbnailTests.TestResolvePrefersYouTubeAndReportsKind),
+    ("TUF thumbnail URLs are built from the approved host, never the input", TufThumbnailTests.TestThumbnailUrlStaysOnTheApprovedHost),
 ];
 int failed = 0;
 foreach((string name, Action run) in tests) {
