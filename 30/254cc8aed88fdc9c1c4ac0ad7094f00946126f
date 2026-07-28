@@ -1,0 +1,58 @@
+Quartz/Update/GameRestarter.cs
+  s_5919a7de9d8577::t_2581f6e8abb90e 57-64
+  s_5919a7de9d8577::t_20414fdeaccdd0 176-183
+  s_5919a7de9d8577::t_30ef2802a1bc3b 118,122
+  s_5919a7de9d8577::t_3dee6f5febfabe 37-44
+  s_5919a7de9d8577::t_ddf5b42ac91f36 263-264
+  s_5919a7de9d8577::t_d121091f11a1bd 1-36,45-56,65-117,119-121,123-175,184-262,265-273
+Quartz/UI/Factory/Page/PageSettings.Updates.cs
+  s_5919a7de9d8577::t_bbbcc0716626bd 166-176
+Quartz/Resource/Export/Lang/en-US.json
+  s_5919a7de9d8577::t_b154b423993014 107
+  s_5919a7de9d8577::t_d52ea8c681671f 469-471
+  s_5919a7de9d8577::t_22a76a1186a5ec 472
+  s_5919a7de9d8577::t_2c573b26ca34c8 467
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_5919a7de9d8577::t_285ec29a83bc45 472
+  s_5919a7de9d8577::t_6ff14853d33553 107
+  s_5919a7de9d8577::t_9d1f85053ca8fa 469-471
+  s_5919a7de9d8577::t_479868de05308c 467
+Quartz/Resource/Export/Lang/zh-CN.json
+  s_5919a7de9d8577::t_3677ca35bf523c 488-490
+  s_5919a7de9d8577::t_8a4b5c4a6ac539 486
+  s_5919a7de9d8577::t_9ece793e77d6f3 491
+  s_5919a7de9d8577::t_334fa8961f3518 112
+Quartz/UI/Factory/Page/PageSettings.cs
+  s_5919a7de9d8577::t_f8fca2771a186d 43-45
+Quartz/UI/Factory/Page/PageSettings.Helpers.cs
+  s_5919a7de9d8577::t_1bef8b2d50f4e2 215-235
+  s_5919a7de9d8577::t_1da6bb257dee27 161-162
+  s_5919a7de9d8577::t_8179a8aa0ac15c 168-171
+  s_5919a7de9d8577::t_d76d548068c6f7 194,199-200
+Quartz/UI/UpdateToast.cs
+  s_5919a7de9d8577::t_b4240bbd507622 154-155
+  s_5919a7de9d8577::t_9e63d631b7c151 253-256,259,263-266,277-286
+  s_5919a7de9d8577::t_224b28ee7e8cc3 18,21-33
+  s_5919a7de9d8577::t_598ac28711f370 134-135
+  s_5919a7de9d8577::t_d2b3e4fe84eaf9 112
+  s_5919a7de9d8577::t_0182943f315371 193,196-247
+  s_5919a7de9d8577::t_f44cc414947348 76
+  s_5919a7de9d8577::t_052dfdf18bd014 323-336
+  s_5919a7de9d8577::t_ca0b021d62872c 361-368
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "30254cc8aed88fdc9c1c4ac0ad7094f00946126f",
+  "prompts": {},
+  "sessions": {
+    "s_5919a7de9d8577": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "299b8ab0-bd73-491d-ad37-60d704b4e33c",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
