@@ -1,0 +1,47 @@
+Quartz.Tests/Modules/ModuleMigrationTests.cs
+  s_896a7873058b4d::t_6b55805e29224b 49,53-54,58-68
+modules/HideJudgements/JudgementPopupHider.cs
+  s_896a7873058b4d::t_51e6d327612810 1-58
+modules/HideJudgements/JudgementPopupHiderSettings.cs
+  s_896a7873058b4d::t_51e6d327612810 1-16
+Quartz/Modules/ModuleMigration.cs
+  s_896a7873058b4d::t_8436bc4baf9bd9 18
+  s_896a7873058b4d::t_04ae673d379eea 39-45
+modules/HideJudgements/Lang/ko-KR.json
+  s_896a7873058b4d::t_4a08d56d943400 1-21
+modules/HideJudgements/PageHideJudgements.cs
+  s_896a7873058b4d::t_51e6d327612810 1-73
+modules/HideJudgements/HideJudgementsModule.cs
+  s_896a7873058b4d::t_89ee017513372a 1-17
+Quartz/Modules/ModuleMigration.Io.cs
+  s_896a7873058b4d::t_ef4dd6eab3f23f 32-46
+modules/HideJudgements/Lang/en-US.json
+  s_896a7873058b4d::t_13824ba1e283d6 1-21
+Quartz.Tests/Program.cs
+  s_896a7873058b4d::t_5ffd879864b4c3 71
+  s_896a7873058b4d::t_786062310b690d 68
+modules/HideJudgements/HideJudgements.csproj
+  s_896a7873058b4d::t_833ae0e9d02cac 1-9
+Quartz/Modules/ModuleService.cs
+  s_896a7873058b4d::t_fabbccab28c82a 44
+modules/HideJudgements/module.json
+  s_896a7873058b4d::t_bada91474db5a7 1-6
+modules/HideJudgements/Lang/zh-CN.json
+  s_896a7873058b4d::t_179e195388dc7a 1-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "0cabdd4a56529f4557e64e7fad46eeb830f4e935",
+  "prompts": {},
+  "sessions": {
+    "s_896a7873058b4d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8ae9b222-4700-4d31-97a0-a678b550c3df",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
