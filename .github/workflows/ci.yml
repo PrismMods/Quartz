@@ -21,28 +21,72 @@ jobs:
   conventions:
     name: Check conventions
     runs-on: ubuntu-latest
-    # Rules the compiler can't enforce (file size, no silent exception swallowing).
-    # Runs over the whole tree — including the mod and module sources CI can't
-    # compile — because it only reads text.
+    # Rules the compiler can't enforce: file size, no silent exception swallowing,
+    # and no Harmony patch pointing at a game member that no longer exists (that
+    # last one reads stubs/PATCH-TARGETS.json, which tools/gen-stubs.sh produces on
+    # a machine that has the game). Text and JSON only, so it needs no toolchain.
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Check conventions
         run: python3 scripts/check_conventions.py
 
-  test:
-    name: Run tests
+  compile:
+    name: Compile everything
     runs-on: ubuntu-latest
-    # The mod itself can't build in CI: it links the game's managed DLLs, which
-    # only exist beside a local game install (see Quartz.csproj / build.sh). The
-    # test project (Quartz.Tests) links only pure-logic source files and builds
-    # standalone on net10.0, so it runs here without the game.
+    # The whole mod — core, both loader targets, and every module — compiled with
+    # TreatWarningsAsErrors on a machine that has never seen the game.
+    #
+    # It links the game's managed assemblies, which normally only exist beside a
+    # local install. stubs/ holds generated compile-only stand-ins for exactly the
+    # API our own IL names (see stubs/README.md), and -p:UseStubs=true redirects
+    # every HintPath at them. Without this job ~92% of the tree had no compile gate
+    # on a pull request at all.
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
         with:
           dotnet-version: "10.0.x"
-      # TreatWarningsAsErrors is set in Quartz.Tests.csproj, so this step is also
-      # the warning gate for every mod source the test project links.
+
+      - name: Build reference stubs
+        run: dotnet build stubs/Stubs.proj -c Release
+
+      # GamePath/GameData are cleared explicitly so a stray auto-detect can never
+      # make this job pass against a real install instead of the stubs.
+      - name: Compile the mod (MelonLoader)
+        run: >
+          dotnet build Quartz/Quartz.csproj -c Release
+          -p:UseStubs=true -p:GamePath= -p:GameData=
+
+      - name: Compile the mod (UnityModManager)
+        run: >
+          dotnet build Quartz/Quartz.csproj -c Release -p:LoaderTarget=UMM
+          -p:UseStubs=true -p:GamePath= -p:GameData=
+
+      # Must follow the core build: each module references sdk/QuartzAddon.dll, the
+      # reference assembly the core build emits.
+      - name: Compile every module
+        run: >
+          dotnet build modules/AllModules.proj -c Release
+          -p:UseStubs=true -p:GamePath= -p:GameData=
+
+      # The generator is what keeps stubs/ honest, so it must not be allowed to rot.
+      - name: Compile the stub generator
+        run: dotnet build tools/StubGen/StubGen.csproj -c Release
+
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    # Quartz.Tests links every mod source that compiles without Unity or the game
+    # (the set was established by trying each file, not by inspection) and runs the
+    # ones with behaviour worth asserting. It targets net10.0 and needs no stubs.
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: "10.0.x"
+      # TreatWarningsAsErrors is set in Quartz.Tests.csproj, so this step is also a
+      # warning gate for every mod source the test project links — under net10.0's
+      # BCL annotations, which are stricter than netstandard2.1's.
       - name: Build
         run: dotnet build Quartz.Tests/Quartz.Tests.csproj --configuration Debug
       # Quartz.Tests is a custom console runner (OutputType Exe), not an xUnit/NUnit
