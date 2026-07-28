@@ -135,10 +135,28 @@ fi
 footer="$blurb"
 if [ -n "$prev_tag" ]; then footer="${footer}  ·  ${prev_tag}…${tag}"; fi
 
+# Lead with the two files a human is here for. GitHub lists assets alphabetically
+# with no hint which is the mod, so without this the answer to "what do I click"
+# is buried — that is the whole reason modules ship as one zip now.
+dl="https://github.com/${owner}/${repo}/releases/download/${tag}"
+downloads=$(cat <<EOF
+## Download
+
+| | |
+|---|---|
+| **[Quartz.zip]($dl/Quartz.zip)** | MelonLoader — start here |
+| **[QuartzUmm.zip]($dl/QuartzUmm.zip)** | UnityModManager |
+
+Every feature is included; you pick what to turn on from **Modules** inside the game. Step-by-step instructions are in the [install guide](https://quartzz.xyz/docs/install/).
+
+The other files below are for the mod itself — you don't need to download them.
+EOF
+)
+
 if [ -n "$changelog" ]; then
-  body=$(printf '%s\n\n---\n%s\n' "$changelog" "$footer")
+  body=$(printf '%s\n\n---\n\n%s\n\n---\n%s\n' "$downloads" "$changelog" "$footer")
 else
-  body="$footer"
+  body=$(printf '%s\n\n---\n%s\n' "$downloads" "$footer")
 fi
 
 title="$tag"
