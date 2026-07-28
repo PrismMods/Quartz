@@ -21,6 +21,44 @@
 
 	<ItemGroup>
 		<Compile Include="../Quartz/Core/SemVer.cs" Link="Source/SemVer.cs" />
+		<!-- Every remaining source that compiles without the game. The set was
+		     established by trying each file standalone, not by inspection; anything
+		     absent here genuinely needs Unity or the game assemblies. Keeping them
+		     linked means their logic is reachable from a test at all. -->
+		<Compile Include="../Quartz/Compat/Interface/IQuartzHost.cs" Link="Source/IQuartzHost.cs" />
+		<Compile Include="../Quartz/Compat/Interface/IQuartzLogger.cs" Link="Source/IQuartzLogger.cs" />
+		<Compile Include="../Quartz/Compat/Interface/IRuntimeService.cs" Link="Source/IRuntimeService.cs" />
+		<Compile Include="../Quartz/Compat/Interface/IRuntimeTick.cs" Link="Source/IRuntimeTick.cs" />
+		<Compile Include="../Quartz/Compat/QuartzLogger.cs" Link="Source/QuartzLogger.cs" />
+		<Compile Include="../Quartz/Core/FeatureRegistry.cs" Link="Source/FeatureRegistry.cs" />
+		<Compile Include="../Quartz/Core/ModState.cs" Link="Source/ModState.cs" />
+		<Compile Include="../Quartz/Core/RuntimeServices.cs" Link="Source/RuntimeServices.cs" />
+		<Compile Include="../Quartz/Core/RuntimeTicks.cs" Link="Source/RuntimeTicks.cs" />
+		<Compile Include="../Quartz/Core/Service/PathService.cs" Link="Source/PathService.cs" />
+		<Compile Include="../Quartz/GTweens/Source/Delegates/ValidationDelegates.cs" Link="Source/ValidationDelegates.cs" />
+		<Compile Include="../Quartz/GTweens/Source/Easings/Easing.cs" Link="Source/Easing.cs" />
+		<Compile Include="../Quartz/GTweens/Source/Easings/EasingDelegate.cs" Link="Source/EasingDelegate.cs" />
+		<Compile Include="../Quartz/GTweens/Source/Easings/PresetEasingDelegateFactory.cs" Link="Source/PresetEasingDelegateFactory.cs" />
+		<Compile Include="../Quartz/GTweens/Source/Enums/ResetMode.cs" Link="Source/ResetMode.cs" />
+		<Compile Include="../Quartz/GTweens/Source/Enums/RotationMode.cs" Link="Source/RotationMode.cs" />
+		<Compile Include="../Quartz/GTweens/Source/Interpolators/FloatInterpolator.cs" Link="Source/FloatInterpolator.cs" />
+		<Compile Include="../Quartz/GTweens/Source/Interpolators/IInterpolator.cs" Link="Source/IInterpolator.cs" />
+		<Compile Include="../Quartz/GTweens/Source/Interpolators/IntInterpolator.cs" Link="Source/IntInterpolator.cs" />
+		<Compile Include="../Quartz/GTweens/Source/Interpolators/SystemVector3RotationInterpolator.cs" Link="Source/SystemVector3RotationInterpolator.cs" />
+		<Compile Include="../Quartz/GTweens/Source/TweenBehaviours/CallbackTweenBehaviour.cs" Link="Source/CallbackTweenBehaviour.cs" />
+		<Compile Include="../Quartz/GTweens/Source/TweenBehaviours/ITweenBehaviour.cs" Link="Source/ITweenBehaviour.cs" />
+		<Compile Include="../Quartz/GTweens/Source/TweenBehaviours/InterpolationTweenBehaviour.cs" Link="Source/InterpolationTweenBehaviour.cs" />
+		<Compile Include="../Quartz/GTweens/Source/TweenBehaviours/TweenBehaviour.cs" Link="Source/TweenBehaviour.cs" />
+		<Compile Include="../Quartz/GTweens/Source/TweenBehaviours/WaitTimeTween.cs" Link="Source/WaitTimeTween.cs" />
+		<Compile Include="../Quartz/GTweens/Source/Tweeners/ITweener.cs" Link="Source/ITweener.cs" />
+		<Compile Include="../Quartz/GTweens/Source/Tweeners/Vector3RotationTweener.cs" Link="Source/Vector3RotationTweener.cs" />
+		<Compile Include="../Quartz/IO/Interface/ICopyable.cs" Link="Source/ICopyable.cs" />
+		<Compile Include="../Quartz/Interop/ImportKeys.cs" Link="Source/ImportKeys.cs" />
+		<Compile Include="../Quartz/Plugins/PluginIdentityResolver.cs" Link="Source/PluginIdentityResolver.cs" />
+		<Compile Include="../Quartz/Plugins/PluginImage.cs" Link="Source/PluginImage.cs" />
+		<Compile Include="../modules/KeyViewer/Layout/KvMigrationPlan.cs" Link="Source/KvMigrationPlan.cs" />
+		<Compile Include="../modules/Tuf/TufThumbnail.cs" Link="Source/TufThumbnail.cs" />
+
 		<!-- The late-binding layer. Refl.cs is deliberately free of game types so it
 		     can be linked here; the one member that needs the game's assembly
 		     (Type(string), which roots at ADOBase) lives in the Refl.Game.cs partial

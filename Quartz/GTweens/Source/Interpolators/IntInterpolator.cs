@@ -1,3 +1,4 @@
+#nullable enable
 ﻿using GTweens.Easings;
 namespace GTweens.Interpolators;
 public sealed class IntInterpolator : IInterpolator<int> {

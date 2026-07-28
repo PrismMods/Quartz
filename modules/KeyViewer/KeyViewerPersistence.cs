@@ -1,3 +1,4 @@
+#nullable enable
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 namespace Quartz.Features.KeyViewer;

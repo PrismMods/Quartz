@@ -1,3 +1,4 @@
+#nullable enable
 ﻿using GTweens.Enums;
 namespace GTweens.TweenBehaviours;
 public sealed class WaitTimeTweenBehaviour : TweenBehaviour {

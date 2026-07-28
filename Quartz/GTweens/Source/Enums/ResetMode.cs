@@ -1,3 +1,4 @@
+#nullable enable
 ﻿namespace GTweens.Enums;
 public enum ResetMode {
     InitialValues,

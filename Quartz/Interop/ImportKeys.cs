@@ -1,3 +1,4 @@
+#nullable enable
 namespace Quartz.Interop;
 public static class ImportKeys {
     public const string UiHiderPlayingProfile = "uihider.playing";

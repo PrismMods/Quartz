@@ -8,13 +8,15 @@ public static class PluginIdentityResolver {
     public static void Publish(Assembly assembly) {
         if(assembly == null) return;
         try {
-            current[assembly.GetName().Name] = assembly;
+            string name = assembly.GetName().Name;
+            if(!string.IsNullOrEmpty(name)) current[name] = assembly;
         } catch(Exception e) { Diag.Ignore(e); }
     }
     public static void Withdraw(Assembly assembly) {
         if(assembly == null) return;
         try {
             string name = assembly.GetName().Name;
+            if(string.IsNullOrEmpty(name)) return;
             if(current.TryGetValue(name, out Assembly held) && ReferenceEquals(held, assembly)) current.Remove(name);
         } catch(Exception e) { Diag.Ignore(e); }
     }

@@ -1,3 +1,4 @@
+#nullable enable
 ﻿using GTweens.Easings;
 using GTweens.Enums;
 using GTweens.Tweeners;

@@ -1,3 +1,4 @@
+#nullable enable
 namespace Quartz.Core.Service;
 public sealed class PathService(string rootPath) {
     public string RootPath { get; } = rootPath;

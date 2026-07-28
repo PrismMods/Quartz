@@ -1,3 +1,4 @@
+#nullable enable
 ﻿namespace GTweens.Easings;
 public static class PresetEasingDelegateFactory {
     const float C1 = 1.70158f;

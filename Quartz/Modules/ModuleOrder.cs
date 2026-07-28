@@ -1,3 +1,4 @@
+#nullable enable
 namespace Quartz.Modules;
 public static class ModuleOrder {
     public sealed class Result {

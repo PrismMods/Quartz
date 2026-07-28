@@ -1,3 +1,4 @@
+#nullable enable
 namespace Quartz.Features.KeyViewer.Layout;
 internal readonly struct KvRect(float x, float y, float w, float h) {
     internal readonly float X = x, Y = y, W = w, H = h;

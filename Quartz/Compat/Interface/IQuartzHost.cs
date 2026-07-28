@@ -1,3 +1,4 @@
+#nullable enable
 namespace Quartz.Compat.Interface;
 public interface IQuartzHost {
     IQuartzLogger QuartzLogger { get; }

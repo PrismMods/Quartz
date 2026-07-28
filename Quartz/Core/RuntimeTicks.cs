@@ -1,3 +1,4 @@
+#nullable enable
 using Quartz.Compat.Interface;
 namespace Quartz.Core;
 public sealed class RuntimeTicks {
