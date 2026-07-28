@@ -102,9 +102,62 @@ def check_no_silent_catch(files):
     return bad, "no empty catch blocks"
 
 
+SILENT_EXEMPT_DIRS = ("Quartz.Tests",)
+HANDLED = ("Diag.", "throw", "Log", "Err(", "Warn(", "Error(", "Console.")
+CATCH_HEAD = re.compile(
+    r"\bcatch\b[ \t]*"
+    r"(?:\(\s*[A-Za-z0-9_.]+(?:\s+(?P<var>[A-Za-z_]\w*))?\s*\)[ \t]*)?"
+    r"(?:when\s*\([^)]*\)[ \t]*)?\{"
+)
+
+
+def catch_bodies(masked):
+    """(offset, body) for every catch block, brace-matched."""
+    for match in CATCH_HEAD.finditer(masked):
+        depth = 0
+        open_brace = match.end() - 1
+        for index in range(open_brace, len(masked)):
+            if masked[index] == "{":
+                depth += 1
+            elif masked[index] == "}":
+                depth -= 1
+                if depth == 0:
+                    yield match, masked[open_brace + 1:index]
+                    break
+
+
+def check_no_silent_swallow(files):
+    """A swallow must state its intent, whatever shape the body is.
+
+    The empty-catch rule above only sees `catch { }`. `catch { return false; }` reads
+    exactly the same to a reader and hides exactly as much - and 191 of those had
+    accumulated behind the narrower rule. A catch is fine when it rethrows, logs, or
+    even just names the exception; it is a silent swallow when the failure leaves no
+    trace at all, and then it says Diag.Ignore(e) so the reader knows that was meant.
+
+    Quartz.Tests is exempt: its Diag tests assert on the swallow counter, so seeding
+    Diag calls into their own catches would change what they measure.
+    """
+    bad = []
+    for path, _, masked in files:
+        relative = path.relative_to(ROOT)
+        if relative.parts[0] in SILENT_EXEMPT_DIRS:
+            continue
+        for match, body in catch_bodies(masked):
+            if any(token in body for token in HANDLED):
+                continue
+            var = match.group("var")
+            if var and re.search(r"\b" + re.escape(var) + r"\b", body):
+                continue
+            line = masked.count("\n", 0, match.start()) + 1
+            bad.append(f"{relative}:{line}")
+    return bad, "every exception swallow states its intent"
+
+
 CHECKS = [
     ("file size", check_file_size),
     ("silent catch", check_no_silent_catch),
+    ("silent swallow", check_no_silent_swallow),
 ]
 
 
