@@ -35,6 +35,7 @@ Thumbs.db
 # Misc
 *.cache
 *.log
+__pycache__/
 
 .claude
 .mcp.json
