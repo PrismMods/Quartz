@@ -38,7 +38,7 @@
     "COLOR_SHORT": "颜色",
     "COMBO": "连击数",
     "CREDITS": "制作信息",
-    "CREDITS_BODY": "<color=#FFFFFF66>界面基于Overlayer模组（modlist.org）制作</color>\n<color=#FFFFFF88>感谢使用Quartz模组。</color>\n<size=12><color=#FFFFFF33>\n基于GPLv3协议开源</color></size>",
+    "CREDITS_BODY": "<color=#FFFFFF66>界面基于Overlayer模组（modlist.org）制作</color>\n<color=#FFFFFF66>装饰预览移植自 DecoPreview（rdzip），GPLv3</color>\n<color=#FFFFFF88>感谢使用Quartz模组。</color>\n<size=12><color=#FFFFFF33>\n基于GPLv3协议开源</color></size>",
     "CREDITS_SUBTITLE": "作者：koren、sbrothers7 及其他贡献者",
     "DEATHLIMIT_ENABLE": "启用失败次数限制",
     "DELETE_SHORT": "删除",

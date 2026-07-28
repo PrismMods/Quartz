@@ -19,9 +19,10 @@ internal static class PageCredits {
         string creditsBody =
             "<color=#FFFFFF66>UI based on Overlayer (modlist.org)</color>\n" +
             "<color=#FFFFFF66>Key Viewer editor icons by DM Note (lee-sihun)</color>\n" +
+            "<color=#FFFFFF66>Decoration Preview ported from DecoPreview (rdzip), GPLv3</color>\n" +
             "<color=#FFFFFF88>Thank you for using Quartz.</color>\n" +
             "<size=12><color=#FFFFFF33>\nLicensed under GPLv3</color></size>";
-        var creditsTmp = CenteredText(parent, "Credits", 900, 220, -180, 26);
+        var creditsTmp = CenteredText(parent, "Credits", 900, 264, -200, 26);
         creditsTmp.text = creditsBody;
         creditsTmp.lineSpacing = 18;
         creditsTmp.gameObject.AddComponent<TextLocalization>().Init("CREDITS_BODY", creditsBody);

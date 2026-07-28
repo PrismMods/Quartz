@@ -38,7 +38,7 @@
     "COLOR_SHORT": "색상",
     "COMBO": "콤보",
     "CREDITS": "크레딧",
-    "CREDITS_BODY": "<color=#FFFFFF66>UI는 Overlayer(modlist.org)를 기반으로 합니다</color>\n<color=#FFFFFF66>키 뷰어 편집기 아이콘: DM Note(lee-sihun)</color>\n<color=#FFFFFF88>Quartz를 사용해 주셔서 감사합니다.</color>\n<size=12><color=#FFFFFF33>\nGPLv3 라이선스</color></size>",
+    "CREDITS_BODY": "<color=#FFFFFF66>UI는 Overlayer(modlist.org)를 기반으로 합니다</color>\n<color=#FFFFFF66>키 뷰어 편집기 아이콘: DM Note(lee-sihun)</color>\n<color=#FFFFFF66>데코레이션 미리보기: DecoPreview(rdzip) 이식, GPLv3</color>\n<color=#FFFFFF88>Quartz를 사용해 주셔서 감사합니다.</color>\n<size=12><color=#FFFFFF33>\nGPLv3 라이선스</color></size>",
     "CREDITS_SUBTITLE": "koren, sbrothers7 등 제작.",
     "DEATHLIMIT_ENABLE": "죽음 개수 제한 활성화",
     "DELETE_SHORT": "X",
