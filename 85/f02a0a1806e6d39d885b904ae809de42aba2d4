@@ -1,0 +1,29 @@
+modules/Tuf/Lang/en-US.json
+  s_0dd1fd485b97bd::t_2a15e5ef2dff97 37
+modules/Tuf/Lang/ko-KR.json
+  s_0dd1fd485b97bd::t_2a15e5ef2dff97 37
+modules/Tuf/Lang/zh-CN.json
+  s_0dd1fd485b97bd::t_2a15e5ef2dff97 37
+modules/Tuf/TufLevelLauncher.cs
+  s_0dd1fd485b97bd::t_db8a7150ddd761 12
+  s_0dd1fd485b97bd::t_7e68622c267308 41-42,45,50,55
+  s_0dd1fd485b97bd::t_82af170399e6b6 62-67,71-75,78,87-107,109,112
+  s_0dd1fd485b97bd::t_d3fef79a5cb623 108
+  s_0dd1fd485b97bd::t_9cca477cffe3fc 110-111
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "85f02a0a1806e6d39d885b904ae809de42aba2d4",
+  "prompts": {},
+  "sessions": {
+    "s_0dd1fd485b97bd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "397f96b7-ac82-4a48-93e6-22f042cc49c6",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
