@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 namespace Quartz.Features.Tuf;
 public sealed class TufLevelLauncher : MonoBehaviour {
+    private const int ExitPlayFrames = 180;
     private string levelsRoot;
     private Func<IEnumerable<string>> trustedRoots;
     private Coroutine pending;
@@ -37,44 +38,73 @@ public sealed class TufLevelLauncher : MonoBehaviour {
                 throw new InvalidOperationException(Tr("TUF_LAUNCH_STATE_ERROR",
                     "Could not clear conflicting TUFHelper launch state."));
             DiscordController.shouldUpdatePresence = true;
-            scnEditor active = scnEditor.instance;
-            if(SceneManager.GetActiveScene().name == "scnEditor"
-               && active != null && active.initialized && !active.playMode) {
-                if(HasUnsavedChanges(active)) {
-                    Complete(false, Tr("TUF_UNSAVED_EDITOR",
-                        "Save or discard your editor changes, then try again."));
-                    return false;
-                }
+            scnEditor active = CurrentEditor();
+            if(active != null) {
                 MainCore.Log.Msg("[TUF] opening chart in current editor: " + expected);
                 ShowLoadingCover();
-                pending = StartCoroutine(Guarded(OpenAndLoad(active, expected)));
+                pending = StartCoroutine(Guarded(OpenInCurrentEditor(active, expected)));
                 return true;
             }
             MainCore.Log.Msg("[TUF] opening editor for chart: " + expected);
             ShowLoadingCover();
+            scnEditor stale = scnEditor.instance;
             GCS.sceneToLoad = "scnEditor";
             GCS.worldEntrance = null;
             scnEditor.levelToOpenOnLoad = null;
             SceneManager.LoadScene("scnEditor");
-            pending = StartCoroutine(Guarded(WaitAndLoad(expected)));
+            pending = StartCoroutine(Guarded(WaitAndLoad(stale, expected)));
             return true;
         } catch(Exception e) {
             Complete(false, Tr("TUF_LAUNCH_FAILED", "Could not launch the TUF level: {0}", e.Message));
             return false;
         }
     }
-    private IEnumerator WaitAndLoad(string expected) {
+    private static scnEditor CurrentEditor() {
+        if(SceneManager.GetActiveScene().name != "scnEditor") return null;
+        scnEditor editor = scnEditor.instance;
+        return editor != null && editor.initialized ? editor : null;
+    }
+    private IEnumerator WaitAndLoad(scnEditor stale, string expected) {
         float initDeadline = Time.realtimeSinceStartup + 15f;
         scnEditor editor = null;
         while(Time.realtimeSinceStartup < initDeadline) {
-            editor = scnEditor.instance;
-            if(editor != null && editor.initialized) break;
+            scnEditor candidate = scnEditor.instance;
+            if(candidate != null && candidate.initialized && !ReferenceEquals(candidate, stale)) {
+                editor = candidate;
+                break;
+            }
             yield return null;
         }
-        if(editor == null || !editor.initialized) {
+        if(editor == null) {
             MainCore.Log.Wrn("[TUF] editor initialization did not complete");
             Complete(false, Tr("TUF_EDITOR_INIT_FAILED",
                 "Editor initialization was interrupted; check other mods."));
+            yield break;
+        }
+        IEnumerator load = OpenAndLoad(editor, expected);
+        while(load.MoveNext()) yield return load.Current;
+    }
+    private IEnumerator OpenInCurrentEditor(scnEditor editor, string expected) {
+        if(editor.playMode) {
+            MainCore.Log.Msg("[TUF] leaving editor play mode before loading the chart");
+            editor.SwitchToEditMode();
+            for(int frame = 0; frame < ExitPlayFrames && editor != null && editor.playMode; frame++)
+                yield return null;
+            if(editor == null) {
+                Complete(false, Tr("TUF_EDITOR_CLOSED", "Editor closed before the TUF level could load."));
+                yield break;
+            }
+            if(editor.playMode) {
+                MainCore.Log.Wrn("[TUF] the editor stayed in play mode; cannot load the chart");
+                Complete(false, Tr("TUF_EXIT_PLAY_FAILED",
+                    "Could not leave play mode; stop the run yourself, then try again."));
+                yield break;
+            }
+            yield return null;
+        }
+        if(HasUnsavedChanges(editor)) {
+            Complete(false, Tr("TUF_UNSAVED_EDITOR",
+                "Save or discard your editor changes, then try again."));
             yield break;
         }
         IEnumerator load = OpenAndLoad(editor, expected);

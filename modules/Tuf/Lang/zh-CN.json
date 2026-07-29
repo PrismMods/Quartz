@@ -34,6 +34,7 @@
     "TUF_UNAVAILABLE": "不可用",
     "TUF_CANCEL": "取消",
     "TUF_UNSAVED_EDITOR": "请先保存或放弃编辑器当前修改，然后重试。",
+    "TUF_EXIT_PLAY_FAILED": "无法退出游玩模式，请自行停止本次游玩后重试。",
     "TUF_CHART_LOAD_REJECTED": "游戏无法加载该谱面——可能需要其他模组支持。",
     "TUF_LAUNCH_INVALID_PATH": "可游玩谱面路径无效。",
     "TUF_LAUNCH_STATE_ERROR": "无法清除冲突的TUFHelper启动状态。",

@@ -34,6 +34,7 @@
     "TUF_UNAVAILABLE": "Unavailable",
     "TUF_CANCEL": "Cancel",
     "TUF_UNSAVED_EDITOR": "Save or discard your editor changes, then try again.",
+    "TUF_EXIT_PLAY_FAILED": "Could not leave play mode; stop the run yourself, then try again.",
     "TUF_CHART_LOAD_REJECTED": "The game could not load this level — it may require another mod.",
     "TUF_LAUNCH_INVALID_PATH": "Playable chart path is invalid.",
     "TUF_LAUNCH_STATE_ERROR": "Could not clear conflicting TUFHelper launch state.",
