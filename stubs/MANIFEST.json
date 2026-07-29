@@ -1275,6 +1275,7 @@
           "System.Void scnEditor::RotateFloor180(scrFloor,System.Boolean)",
           "System.Void scnEditor::RotateSelection(System.Boolean)",
           "System.Void scnEditor::RotateSelection180()",
+          "System.Void scnEditor::SaveLevel()",
           "System.Void scnEditor::SwitchToEditMode(System.Boolean)",
           "System.Void scnEditor::ToggleNoFail()",
           "UnityEngine.GameObject scnEditor::notificationPopupContainer",

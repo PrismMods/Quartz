@@ -112,11 +112,12 @@ internal sealed class TufLevelActionRunner {
         Update(level, TufItemState.Loading, 1f, "");
         launcher.Launch(chart, (success, error) => MainThread.Enqueue(() => {
             if(disposed) return;
+            bool aborted = !success && string.IsNullOrEmpty(error);
             if(!success) {
-                MainCore.Log.Wrn("[TUF] automatic play failed: " + error);
+                if(!aborted) MainCore.Log.Wrn("[TUF] automatic play failed: " + error);
                 UICore.Open(true);
             }
-            FinishAction(level, success ? TufItemState.Load : TufItemState.Retry, error);
+            FinishAction(level, success || aborted ? TufItemState.Load : TufItemState.Retry, error);
         }));
     }
     private void FinishAction(TufLevel level, TufItemState state, string error) {

@@ -10,11 +10,13 @@ using UnityEngine.UI;
 namespace Quartz.Features.Tuf;
 public sealed class TufLevelLauncher : MonoBehaviour {
     private const int ExitPlayFrames = 180;
+    private const int SaveFrames = 30;
     private string levelsRoot;
     private Func<IEnumerable<string>> trustedRoots;
     private Coroutine pending;
     private Action<bool, string> completion;
     private GameObject loadingCover;
+    private int dialogChoice = TufUnsavedDialog.Pending;
     public void Initialize(string root, Func<IEnumerable<string>> trustedRoots = null) {
         levelsRoot = Path.GetFullPath(root);
         this.trustedRoots = trustedRoots;
@@ -103,12 +105,46 @@ public sealed class TufLevelLauncher : MonoBehaviour {
             yield return null;
         }
         if(HasUnsavedChanges(editor)) {
-            Complete(false, Tr("TUF_UNSAVED_EDITOR",
-                "Save or discard your editor changes, then try again."));
-            yield break;
+            IEnumerator ask = ResolveUnsavedChanges(editor);
+            while(ask.MoveNext()) yield return ask.Current;
+            if(completion == null) yield break;
         }
         IEnumerator load = OpenAndLoad(editor, expected);
         while(load.MoveNext()) yield return load.Current;
+    }
+    private IEnumerator ResolveUnsavedChanges(scnEditor editor) {
+        UICore.Close(true);
+        dialogChoice = TufUnsavedDialog.Pending;
+        TufUnsavedDialog.Show(choice => dialogChoice = choice);
+        while(dialogChoice == TufUnsavedDialog.Pending) {
+            if(editor == null) {
+                TufUnsavedDialog.Close();
+                Complete(false, Tr("TUF_EDITOR_CLOSED", "Editor closed before the TUF level could load."));
+                yield break;
+            }
+            if(!TufUnsavedDialog.IsOpen) dialogChoice = TufUnsavedDialog.Cancel;
+            else yield return null;
+        }
+        if(dialogChoice == TufUnsavedDialog.Cancel) {
+            MainCore.Log.Msg("[TUF] chart load cancelled at the unsaved-changes prompt");
+            Complete(false, "");
+            yield break;
+        }
+        if(dialogChoice != TufUnsavedDialog.Save) {
+            SetUnsavedChanges(editor, false);
+            yield break;
+        }
+        editor.SaveLevel();
+        for(int frame = 0; frame < SaveFrames && editor != null && HasUnsavedChanges(editor); frame++)
+            yield return null;
+        if(editor == null) {
+            Complete(false, Tr("TUF_EDITOR_CLOSED", "Editor closed before the TUF level could load."));
+            yield break;
+        }
+        if(HasUnsavedChanges(editor)) {
+            MainCore.Log.Wrn("[TUF] the editor still reports unsaved changes after saving");
+            Complete(false, Tr("TUF_SAVE_FAILED", "Your editor changes could not be saved."));
+        }
     }
     private IEnumerator Guarded(IEnumerator operation) {
         while(true) {
@@ -195,6 +231,7 @@ public sealed class TufLevelLauncher : MonoBehaviour {
     }
     private void Complete(bool success, string error) {
         pending = null;
+        TufUnsavedDialog.Close();
         HideLoadingCover();
         if(success) UICore.Close(true);
         Action<bool, string> callback = completion;
@@ -203,9 +240,20 @@ public sealed class TufLevelLauncher : MonoBehaviour {
     }
     private static readonly FieldInfo UnsavedChangesField =
         AccessTools.Field(typeof(scnEditor), "_unsavedChanges");
+    private static readonly PropertyInfo UnsavedChangesProperty =
+        AccessTools.Property(typeof(scnEditor), "unsavedChanges");
     private static bool HasUnsavedChanges(scnEditor editor) {
         try { return UnsavedChangesField?.GetValue(editor) is true; }
         catch(Exception e) { Diag.Ignore(e); return false; }
+    }
+    private static void SetUnsavedChanges(scnEditor editor, bool value) {
+        try {
+            if(UnsavedChangesProperty?.GetSetMethod(true) != null) {
+                UnsavedChangesProperty.SetValue(editor, value, null);
+                return;
+            }
+            UnsavedChangesField?.SetValue(editor, value);
+        } catch(Exception e) { Diag.Warn(e, "TUF/DiscardEditorChanges"); }
     }
     private static string PopupMessage(GameObject popup) {
         try {
@@ -259,6 +307,7 @@ public sealed class TufLevelLauncher : MonoBehaviour {
         if(completion != null) Complete(false, "");
         else {
             pending = null;
+            TufUnsavedDialog.Close();
             HideLoadingCover();
         }
     }

@@ -739,6 +739,7 @@ public unsafe partial class scnEditor : global::ADOBase {
     public void RotateFloor180(global::scrFloor floor, bool remakePath = default) => throw null;
     public void RotateSelection(bool CW = default) => throw null;
     public void RotateSelection180() => throw null;
+    public void SaveLevel() => throw null;
     public bool SelectionIsEmpty() => throw null;
     public bool SelectionIsSingle() => throw null;
     public void SwitchToEditMode(bool clsToEditor = default) => throw null;
