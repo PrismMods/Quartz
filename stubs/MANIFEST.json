@@ -3562,6 +3562,7 @@
       {
         "type": "UnityEngine.Quaternion",
         "members": [
+          "System.Boolean UnityEngine.Quaternion::Equals(UnityEngine.Quaternion)",
           "System.Single UnityEngine.Quaternion::kEpsilon",
           "System.Single UnityEngine.Quaternion::w",
           "System.Single UnityEngine.Quaternion::x",
@@ -4694,6 +4695,7 @@
       {
         "type": "UnityEngine.UI.Graphic",
         "members": [
+          "System.Boolean UnityEngine.UI.Graphic::get_raycastTarget()",
           "System.Boolean UnityEngine.UI.Graphic::raycastTarget()",
           "System.Void UnityEngine.UI.Graphic::.ctor()",
           "System.Void UnityEngine.UI.Graphic::OnPopulateMesh(UnityEngine.UI.VertexHelper)",

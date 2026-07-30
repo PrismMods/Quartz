@@ -597,6 +597,7 @@ namespace UnityEngine {
         public float z;
         public static global::UnityEngine.Quaternion identity { get => throw null; }
         public Quaternion(float x, float y, float z, float w) => throw null;
+        public bool Equals(global::UnityEngine.Quaternion other) => throw null;
         public static global::UnityEngine.Quaternion Euler(global::UnityEngine.Vector3 euler) => throw null;
         public static global::UnityEngine.Quaternion Euler(float x, float y, float z) => throw null;
         bool global::System.IEquatable<global::UnityEngine.Quaternion>.Equals(global::UnityEngine.Quaternion other) => throw null;

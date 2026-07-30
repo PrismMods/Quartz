@@ -27,18 +27,18 @@ resources, and no types the mod never touches.
 | `Unity.TextMeshPro` | 29 | 294 |
 | `UnityEngine` | 0 | 0 |
 | `UnityEngine.AudioModule` | 18 | 70 |
-| `UnityEngine.CoreModule` | 75 | 972 |
+| `UnityEngine.CoreModule` | 75 | 973 |
 | `UnityEngine.ImageConversionModule` | 1 | 1 |
 | `UnityEngine.InputLegacyModule` | 1 | 12 |
 | `UnityEngine.ParticleSystemModule` | 8 | 46 |
 | `UnityEngine.TextCoreFontEngineModule` | 1 | 0 |
 | `UnityEngine.TextRenderingModule` | 7 | 31 |
-| `UnityEngine.UI` | 96 | 370 |
+| `UnityEngine.UI` | 96 | 371 |
 | `UnityEngine.UIElementsModule` | 13 | 7 |
 | `UnityEngine.UIModule` | 7 | 31 |
 | `UnityModManager` | 3 | 8 |
 
-**451 types, 3109 members.**
+**451 types, 3111 members.**
 
 ## How it is used
 

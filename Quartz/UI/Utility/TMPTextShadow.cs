@@ -38,7 +38,8 @@ public static class TMPTextShadow {
             root.Group.blocksRaycasts = false;
         }
         if(!shadowRoot.gameObject.activeSelf) shadowRoot.gameObject.SetActive(true);
-        root.Group.alpha = on ? 1f : 0f;
+        float wantAlpha = on ? 1f : 0f;
+        if(root.Group.alpha != wantAlpha) root.Group.alpha = wantAlpha;
         if(!on) return;
         SyncRootRect(text.rectTransform, shadowRoot);
         KeepRootBehindTarget(text, shadowRoot);
@@ -134,13 +135,20 @@ public static class TMPTextShadow {
         else if(rootIndex < textIndex - 1) root.SetSiblingIndex(textIndex - 1);
     }
     private static void SyncRootRect(RectTransform source, RectTransform root) {
-        root.anchorMin = source.anchorMin;
-        root.anchorMax = source.anchorMax;
-        root.pivot = source.pivot;
-        root.localScale = source.localScale;
-        root.localRotation = source.localRotation;
-        root.offsetMin = source.offsetMin;
-        root.offsetMax = source.offsetMax;
+        Vector2 v = source.anchorMin;
+        if(root.anchorMin != v) root.anchorMin = v;
+        v = source.anchorMax;
+        if(root.anchorMax != v) root.anchorMax = v;
+        v = source.pivot;
+        if(root.pivot != v) root.pivot = v;
+        Vector3 scale = source.localScale;
+        if(root.localScale != scale) root.localScale = scale;
+        Quaternion rot = source.localRotation;
+        if(!root.localRotation.Equals(rot)) root.localRotation = rot;
+        v = source.offsetMin;
+        if(root.offsetMin != v) root.offsetMin = v;
+        v = source.offsetMax;
+        if(root.offsetMax != v) root.offsetMax = v;
     }
     private static void SyncLayer(
         TextMeshProUGUI source,
@@ -151,31 +159,32 @@ public static class TMPTextShadow {
         bool sourceWrap
     ) {
         RectTransform rect = layer.rectTransform;
-        rect.anchorMin = Vector2.zero;
-        rect.anchorMax = Vector2.one;
-        rect.pivot = source.rectTransform.pivot;
-        rect.localScale = Vector3.one;
-        rect.localRotation = Quaternion.identity;
+        if(rect.anchorMin != Vector2.zero) rect.anchorMin = Vector2.zero;
+        if(rect.anchorMax != Vector2.one) rect.anchorMax = Vector2.one;
+        Vector2 pivot = source.rectTransform.pivot;
+        if(rect.pivot != pivot) rect.pivot = pivot;
+        if(rect.localScale != Vector3.one) rect.localScale = Vector3.one;
+        if(!rect.localRotation.Equals(Quaternion.identity)) rect.localRotation = Quaternion.identity;
         if(rect.offsetMin != offset) rect.offsetMin = offset;
         if(rect.offsetMax != offset) rect.offsetMax = offset;
-        layer.font = source.font;
-        layer.text = strippedText;
-        layer.fontSize = source.fontSize;
-        layer.fontStyle = source.fontStyle;
-        layer.alignment = source.alignment;
-        layer.color = color;
-        layer.lineSpacing = source.lineSpacing;
-        layer.characterSpacing = source.characterSpacing;
-        layer.wordSpacing = source.wordSpacing;
-        layer.paragraphSpacing = source.paragraphSpacing;
-        layer.richText = source.richText;
-        TextCompat.SetWrap(layer, sourceWrap);
-        layer.overflowMode = source.overflowMode;
-        layer.enableAutoSizing = source.enableAutoSizing;
-        layer.fontSizeMin = source.fontSizeMin;
-        layer.fontSizeMax = source.fontSizeMax;
-        layer.margin = source.margin;
-        layer.raycastTarget = false;
+        if(layer.font != source.font) layer.font = source.font;
+        if(!ReferenceEquals(layer.text, strippedText)) layer.text = strippedText;
+        if(layer.fontSize != source.fontSize) layer.fontSize = source.fontSize;
+        if(layer.fontStyle != source.fontStyle) layer.fontStyle = source.fontStyle;
+        if(layer.alignment != source.alignment) layer.alignment = source.alignment;
+        if(layer.color != color) layer.color = color;
+        if(layer.lineSpacing != source.lineSpacing) layer.lineSpacing = source.lineSpacing;
+        if(layer.characterSpacing != source.characterSpacing) layer.characterSpacing = source.characterSpacing;
+        if(layer.wordSpacing != source.wordSpacing) layer.wordSpacing = source.wordSpacing;
+        if(layer.paragraphSpacing != source.paragraphSpacing) layer.paragraphSpacing = source.paragraphSpacing;
+        if(layer.richText != source.richText) layer.richText = source.richText;
+        if(TextCompat.GetWrap(layer) != sourceWrap) TextCompat.SetWrap(layer, sourceWrap);
+        if(layer.overflowMode != source.overflowMode) layer.overflowMode = source.overflowMode;
+        if(layer.enableAutoSizing != source.enableAutoSizing) layer.enableAutoSizing = source.enableAutoSizing;
+        if(layer.fontSizeMin != source.fontSizeMin) layer.fontSizeMin = source.fontSizeMin;
+        if(layer.fontSizeMax != source.fontSizeMax) layer.fontSizeMax = source.fontSizeMax;
+        if(layer.margin != source.margin) layer.margin = source.margin;
+        if(layer.raycastTarget) layer.raycastTarget = false;
     }
     private static readonly Regex ColorTagRegex =
         new(@"</?color[^>]*>", RegexOptions.IgnoreCase);
