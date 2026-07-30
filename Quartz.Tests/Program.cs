@@ -138,7 +138,10 @@ List<(string Name, Action Run)> tests = [
     ("KeyViewer dmnote migration falls back to simple when the preset is unusable", KvMigrationPlanTests.TestDmNoteFallsBackToSimpleWhenThePresetIsUnusable),
     ("KeyViewer layout emptiness is measured across every tab", KvMigrationPlanTests.TestEmptinessIsMeasuredAcrossEveryTab),
     ("KeyViewer dmnote conversion keeps a selected tab that exists", KvMigrationPlanTests.TestFromDmPresetKeepsTheSelectedTabWhenItExists),
+    ("Late-bound reference-typed reads never allocate", AllocationTests.TestReferenceTypedReadsAreAllocationFree),
+    ("A warm reflection method-lookup cache never allocates", AllocationTests.TestMethodLookupOnAWarmCacheIsAllocationFree),
 ];
+if(args.Contains("--bench")) AllocationTests.ReportBaseline();
 int failed = 0;
 foreach((string name, Action run) in tests) {
     try {
