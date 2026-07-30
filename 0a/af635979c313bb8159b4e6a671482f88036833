@@ -1,0 +1,32 @@
+Quartz/GTweens/Source/Contexts/GTweensContext.cs
+  s_aeaaa0cec2e235::t_21f7c78db50aa0 54-55
+modules/KeyViewer/Editor/KvCanvasInput.cs
+  s_aeaaa0cec2e235::t_21f7c78db50aa0 61
+Quartz/UI/Generator/GenerateUI.KeyBind.cs
+  s_aeaaa0cec2e235::t_21f7c78db50aa0 128
+Quartz/Features/Interop/XPerfectBridge.cs
+  s_aeaaa0cec2e235::t_7929c647bcca4f 140
+  s_aeaaa0cec2e235::t_831f5e540d9b55 104-110
+Quartz/UI/Utility/KeyCaptureRunner.cs
+  s_aeaaa0cec2e235::t_d2d54399bddc82 11,13-16,19-22
+modules/Panels/PanelsOverlay.LivePanel.cs
+  s_aeaaa0cec2e235::t_21f7c78db50aa0 113-116
+Quartz/Core/QuartzRuntime.cs
+  s_aeaaa0cec2e235::t_21f7c78db50aa0 255-257
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.17",
+  "base_commit_sha": "0aaf635979c313bb8159b4e6a671482f88036833",
+  "prompts": {},
+  "sessions": {
+    "s_aeaaa0cec2e235": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "60c3fbd9-fdf8-4a3c-a5c7-80827902651c",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
