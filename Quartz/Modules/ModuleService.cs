@@ -42,7 +42,7 @@ public static class ModuleService {
         state = ModuleState.Load();
         ModuleMigration.RunOnce(state);
         ModuleMigration.ApplySplits(state);
-        modChangedHandler = (_, _) => ApplyActive();
+        modChangedHandler = (_, isDispose) => ApplyActive(!isDispose);
         MainCore.OnModEnabledChanged += modChangedHandler;
         LoadAll();
         ApplyActive();
@@ -334,25 +334,27 @@ public static class ModuleService {
         }
         return true;
     }
-    private static void ApplyActive() {
+    private static void ApplyActive(bool unpatchOnDisable = true) {
         foreach(Handle handle in handles) {
             bool should = MainCore.IsModEnabled && handle.Enabled && handle.Loaded;
             if(should == handle.Active) continue;
             if(should) {
                 try {
+                    ModuleContext context = handle.Context;
+                    context?.ApplyPatches();
                     handle.Instance.OnEnable();
-                    handle.Context.RunEnableSteps();
+                    context?.RunEnableSteps();
                     handle.Active = true;
                 } catch(Exception e) {
                     handle.Error = $"OnEnable threw: {e}";
                     MainCore.Log.Err($"[Module:{handle.Id}] OnEnable threw: {e}");
                 }
             } else {
-                SafeDisable(handle);
+                SafeDisable(handle, unpatchOnDisable);
             }
         }
     }
-    private static void SafeDisable(Handle handle) {
+    private static void SafeDisable(Handle handle, bool unpatch = true) {
         if(!handle.Active) return;
         handle.Active = false;
         try {
@@ -361,6 +363,7 @@ public static class ModuleService {
         } catch(Exception e) {
             MainCore.Log.Err($"[Module:{handle.Id}] OnDisable threw: {e}");
         }
+        if(unpatch) handle.Context?.RemovePatches();
     }
     private static void Teardown(Handle handle) {
         SafeDisable(handle);

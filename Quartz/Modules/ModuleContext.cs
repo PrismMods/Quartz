@@ -30,14 +30,40 @@ public sealed class ModuleContext {
     public void Wrn(string message) => MainCore.Log.Wrn($"[Module:{Id}] {message}");
     public void Err(string message) => MainCore.Log.Err($"[Module:{Id}] {message}");
     public HarmonyLib.Harmony Harmony => harmony ??= new HarmonyLib.Harmony("quartz.module." + Id);
+    private System.Reflection.Assembly patchAssembly;
+    private readonly ModulePatchGate patchGate = new();
     public void PatchAll(Type anyTypeInModule) {
-        foreach(Type type in Quartz.Plugins.PluginEntryScan.Types(anyTypeInModule.Assembly)) {
+        if(anyTypeInModule == null) throw new ArgumentNullException(nameof(anyTypeInModule));
+        patchAssembly = anyTypeInModule.Assembly;
+        if(patchGate.SourceArrived()) ApplyPatchClasses();
+    }
+    internal void ApplyPatches() {
+        if(patchGate.Want()) ApplyPatchClasses();
+    }
+    private void ApplyPatchClasses() {
+        IEnumerable<Type> types;
+        try {
+            types = Quartz.Plugins.PluginEntryScan.Types(patchAssembly);
+        } catch(Exception e) {
+            Err($"couldn't enumerate patch classes: {e.Message}");
+            return;
+        }
+        foreach(Type type in types) {
             try {
                 Harmony.CreateClassProcessor(type).Patch();
             } catch(Exception e) {
                 Err($"skipped patch class {type.FullName}: {e.Message}");
             }
         }
+    }
+    internal void RemovePatches() {
+        if(!patchGate.Release()) return;
+        try {
+            harmony?.UnpatchAll(harmony.Id);
+        } catch(Exception e) {
+            Err($"unpatch failed: {e}");
+        }
+        harmony = null;
     }
     public SettingsFile<T> Settings<T>(string fileName) where T : class, ISettingsFile, new() {
         SettingsFile<T> file = SettingsFile<T>.Loaded(fileName);
@@ -149,12 +175,9 @@ public sealed class ModuleContext {
         }
     }
     internal void Cleanup() {
-        try {
-            harmony?.UnpatchAll(harmony.Id);
-        } catch(Exception e) {
-            Err($"unpatch failed: {e}");
-        }
-        harmony = null;
+        RemovePatches();
+        patchGate.Forget();
+        patchAssembly = null;
         foreach(string statId in statIds) StatRegistry.Unregister(statId);
         statIds.Clear();
         foreach(string tagName in tagNames) Quartz.Addons.AddonTags.Unregister(tagName);
