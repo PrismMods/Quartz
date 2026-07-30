@@ -67,6 +67,24 @@ public static partial class Refl {
         }
         internal T Get<T>(object instance, T fallback = default) =>
             Get(instance) is T t ? t : fallback;
+        internal Func<TOwner, TValue> BindGetter<TOwner, TValue>() =>
+            Bind<Func<TOwner, TValue>>(false);
+        internal Func<TValue> BindStaticGetter<TValue>() =>
+            Bind<Func<TValue>>(true);
+        private TDelegate Bind<TDelegate>(bool wantStatic) where TDelegate : Delegate {
+            MethodInfo getter = prop == null || !prop.CanRead ? null : prop.GetGetMethod(true);
+            if(getter == null || getter.IsStatic != wantStatic) return null;
+            return BindMethod<TDelegate>(getter);
+        }
+    }
+    public static TDelegate BindMethod<TDelegate>(MethodInfo m) where TDelegate : Delegate {
+        if(m == null) return null;
+        try {
+            return Delegate.CreateDelegate(typeof(TDelegate), m) as TDelegate;
+        } catch(Exception e) {
+            Diag.Ignore(e);
+            return null;
+        }
     }
     private static readonly ConcurrentDictionary<(Type Owner, string Name, int ArgCount), MethodInfo> MethodCache = new();
     private static readonly ConcurrentDictionary<MethodInfo, ParameterInfo[]> ParamCache = new();

@@ -140,6 +140,10 @@ List<(string Name, Action Run)> tests = [
     ("KeyViewer dmnote conversion keeps a selected tab that exists", KvMigrationPlanTests.TestFromDmPresetKeepsTheSelectedTabWhenItExists),
     ("Late-bound reference-typed reads never allocate", AllocationTests.TestReferenceTypedReadsAreAllocationFree),
     ("A warm reflection method-lookup cache never allocates", AllocationTests.TestMethodLookupOnAWarmCacheIsAllocationFree),
+    ("The allocation harness measures itself correctly", Alloc.SelfTest),
+    ("A bound property getter reads without boxing", AllocationTests.TestABoundPropertyGetterDoesNotBox),
+    ("A bound method call boxes neither arguments nor return", AllocationTests.TestABoundMethodDoesNotBoxItsArgumentsOrReturn),
+    ("Delegate binding is inert on mismatches", AllocationTests.TestBindingIsInertOnMismatchesRatherThanThrowing),
 ];
 if(args.Contains("--bench")) AllocationTests.ReportBaseline();
 int failed = 0;

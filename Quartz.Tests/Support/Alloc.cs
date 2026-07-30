@@ -1,11 +1,8 @@
 using System.Runtime.CompilerServices;
 static class Alloc {
-    private static object sink;
-    public static object Sink { get => sink; set => sink = value; }
-    public static long BytesPerOp(Action body, int iterations = 4096) {
-        long total = BytesFor(body, iterations);
-        return total / iterations;
-    }
+    private static class Sink<T> { internal static T Value; }
+    public static long BytesPerOp(Action body, int iterations = 4096) =>
+        BytesFor(body, iterations) / iterations;
     public static long BytesFor(Action body, int iterations = 4096) {
         if(body == null) throw new ArgumentNullException(nameof(body));
         if(iterations < 1) throw new ArgumentOutOfRangeException(nameof(iterations));
@@ -22,5 +19,13 @@ static class Alloc {
         if(a != b) throw new InvalidOperationException("allocation counter is not stable on this runtime; measurements would be noise");
     }
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public static void Consume<T>(T value) => sink = value;
+    public static void Consume<T>(T value) => Sink<T>.Value = value;
+    public static void SelfTest() {
+        long viaSink = BytesPerOp(static () => Consume(1.5f));
+        if(viaSink != 0)
+            throw new InvalidOperationException("Alloc.Consume must not allocate for a value type, measured " + viaSink + " B/op");
+        long viaBox = BytesPerOp(static () => Consume<object>(1.5f));
+        if(viaBox <= 0)
+            throw new InvalidOperationException("the harness failed to see a known boxing allocation, measured " + viaBox + " B/op");
+    }
 }

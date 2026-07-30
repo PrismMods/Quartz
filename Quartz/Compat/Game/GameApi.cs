@@ -30,10 +30,14 @@ public static class GameApi {
             return ctrl == null ? null : CtrlMistakes.Get(ctrl) as scrMistakesManager;
         }
     }
+    private static readonly Func<scrMistakesManager, float> AccPercentFast =
+        AccPercent.BindGetter<scrMistakesManager, float>();
+    private static readonly Func<scrMistakesManager, float> XAccPercentFast =
+        XAccPercent.BindGetter<scrMistakesManager, float>();
     public static float PercentAcc(scrMistakesManager m) =>
-        m == null ? 1f : AccPercent.Get(m, 1f);
+        m == null ? 1f : AccPercentFast != null ? AccPercentFast(m) : AccPercent.Get(m, 1f);
     public static float PercentXAcc(scrMistakesManager m) =>
-        m == null ? 1f : XAccPercent.Get(m, 1f);
+        m == null ? 1f : XAccPercentFast != null ? XAccPercentFast(m) : XAccPercent.Get(m, 1f);
     public static int PlayerCount() {
         if(!PlayerCountMember.Exists) return 1;
         int n = PlayerCountMember.Get(null, 1);
@@ -100,10 +104,22 @@ public static class GameApi {
     }
     private static readonly Refl.Member PlanetarySpeedMember = new(typeof(PlanetarySystem), "speed");
     private static readonly Refl.Member CtrlSpeedMember = new(typeof(scrController), "speed");
+    private static readonly AccessTools.FieldRef<PlanetarySystem, double> PlanetarySpeedFast =
+        BindPlanetarySpeed();
+    private static AccessTools.FieldRef<PlanetarySystem, double> BindPlanetarySpeed() {
+        try {
+            return PlanetarySpeedMember.Exists
+                ? AccessTools.FieldRefAccess<PlanetarySystem, double>("speed")
+                : null;
+        } catch(Exception e) {
+            Diag.Ignore(e);
+            return null;
+        }
+    }
     public static double PlanetSpeed(scrController ctrl) {
         if(ctrl == null) return 1.0;
         if(PlanetarySpeedMember.Exists && Planetary(ctrl) is PlanetarySystem ps)
-            return PlanetarySpeedMember.Get(ps, 1.0);
+            return PlanetarySpeedFast != null ? PlanetarySpeedFast(ps) : PlanetarySpeedMember.Get(ps, 1.0);
         return CtrlSpeedMember.Get(ctrl, 1.0);
     }
     public static void SetPlanetSpeed(double speed) {
@@ -272,6 +288,8 @@ public static class GameApi {
         new(typeof(ADOFAI.LevelEvent), "data");
     private static class EventGetter<T> {
         internal static readonly MethodInfo Bound = Bind();
+        internal static readonly Func<ADOFAI.LevelEvent, string, T, T> Fast =
+            Refl.BindMethod<Func<ADOFAI.LevelEvent, string, T, T>>(Bound);
         private static MethodInfo Bind() {
             try {
                 return LevelEventGetMethod is { IsGenericMethodDefinition: true }
@@ -283,8 +301,12 @@ public static class GameApi {
             }
         }
     }
-    public static T EventGet<T>(ADOFAI.LevelEvent ev, string key) =>
-        ev == null ? default : Refl.Invoke(EventGetter<T>.Bound, ev, key) is T t ? t : default;
+    public static T EventGet<T>(ADOFAI.LevelEvent ev, string key) {
+        if(ev == null) return default;
+        Func<ADOFAI.LevelEvent, string, T, T> fast = EventGetter<T>.Fast;
+        if(fast != null) return fast(ev, key, default);
+        return Refl.Invoke(EventGetter<T>.Bound, ev, key) is T t ? t : default;
+    }
     private static readonly Refl.Member SceneLevelSelectMember =
         new(Refl.Type("GCNS"), "sceneLevelSelect");
     private static readonly Refl.Member CameraInstanceMember = new(typeof(scrCamera), "instance");
