@@ -223,6 +223,23 @@ public static class AddonService {
         }
         handles.Clear();
     }
+    private static readonly Dictionary<string, (long Ticks, long Length, Assembly Image)> images =
+        new(StringComparer.Ordinal);
+    private static Assembly LoadImageOnce(string path) {
+        long ticks = 0;
+        long length = -1;
+        try {
+            FileInfo info = new(path);
+            ticks = info.LastWriteTimeUtc.Ticks;
+            length = info.Length;
+        } catch(Exception e) { Diag.Ignore(e); }
+        if(images.TryGetValue(path, out (long Ticks, long Length, Assembly Image) cached)
+            && cached.Ticks == ticks && cached.Length == length && cached.Image != null)
+            return cached.Image;
+        Assembly loaded = Quartz.Plugins.PluginImage.Load(path);
+        images[path] = (ticks, length, loaded);
+        return loaded;
+    }
     private static void LoadAll() {
         string root = MainCore.Paths.AddonsPath;
         List<(string id, string path)> units = [];
@@ -254,7 +271,7 @@ public static class AddonService {
             if(!handle.Enabled) continue;
             Assembly assembly = null;
             try {
-                assembly = Quartz.Plugins.PluginImage.Load(unit.path);
+                assembly = LoadImageOnce(unit.path);
             } catch(Exception e) {
                 Diag.Ignore(e);
                 handle.Error = $"failed to load {Path.GetExtension(unit.path)}: {e.Message}";
