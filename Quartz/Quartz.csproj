@@ -202,7 +202,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="Resource\Embedded\**\*" />
+		<!-- Exclude, not just glob: an unfiltered '**\*' embedded the Finder's
+		     .DS_Store into every shipped Quartz.dll (8,196 B of it). The Exclude
+		     list mirrors the one on ExportFiles below — keep them in step. -->
+		<EmbeddedResource Include="Resource\Embedded\**\*"
+		                  Exclude="Resource\Embedded\**\.DS_Store;Resource\Embedded\**\Thumbs.db;Resource\Embedded\**\desktop.ini;Resource\Embedded\**\*.orig;Resource\Embedded\**\*.rej;Resource\Embedded\**\*~" />
 		<!-- The FAQ is maintainer-authored and read-only at runtime: embedded only,
 		     never copied to the data root, so there is no on-disk copy for a user to
 		     edit and for the next update to silently overwrite. -->
