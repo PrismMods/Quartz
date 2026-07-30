@@ -1,0 +1,20 @@
+Quartz/Addons/AddonService.cs
+  s_aeaaa0cec2e235::t_208fa9b94d3a01 226-242
+  s_aeaaa0cec2e235::t_5d1b61e228ec1d 274
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.17",
+  "base_commit_sha": "0831bdc6c090a6dd4c39b5ba04937781d87fb87c",
+  "prompts": {},
+  "sessions": {
+    "s_aeaaa0cec2e235": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "60c3fbd9-fdf8-4a3c-a5c7-80827902651c",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
