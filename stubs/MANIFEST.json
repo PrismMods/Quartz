@@ -3950,7 +3950,6 @@
           "System.Void UnityEngine.Texture2D::SetPixel(System.Int32,System.Int32,UnityEngine.Color)",
           "System.Void UnityEngine.Texture2D::SetPixels(UnityEngine.Color[])",
           "System.Void UnityEngine.Texture2D::SetPixels32(UnityEngine.Color32[])",
-          "UnityEngine.Color UnityEngine.Texture2D::GetPixel(System.Int32,System.Int32)",
           "UnityEngine.Color32[] UnityEngine.Texture2D::GetPixels32()"
         ]
       },

@@ -819,7 +819,6 @@ namespace UnityEngine {
         public void Apply(bool updateMipmaps) => throw null;
         public void Apply(bool updateMipmaps, bool makeNoLongerReadable) => throw null;
         public void Compress(bool highQuality) => throw null;
-        public global::UnityEngine.Color GetPixel(int x, int y) => throw null;
         public global::UnityEngine.Color32[] GetPixels32() => throw null;
         public void SetPixel(int x, int y, global::UnityEngine.Color color) => throw null;
         public void SetPixels(global::UnityEngine.Color[] colors) => throw null;
