@@ -114,13 +114,31 @@ sealed class Emitter {
 
         HashSet<string> emitted = new(StringComparer.Ordinal);
         bool hasParameterless = false;
+        bool hasEqualityOperator = false;
+        bool hasObjectEquals = false;
+        bool hasGetHashCode = false;
         foreach(MethodDefinition m in req.Methods
             .OrderBy(m => m.Name, StringComparer.Ordinal)
             .ThenBy(m => m.Parameters.Count)) {
             if(IsAccessor(m)) continue;
             if(m.IsConstructor && !m.IsStatic && m.Parameters.Count == 0) hasParameterless = true;
+            if(m.IsStatic && m.Name is "op_Equality" or "op_Inequality") hasEqualityOperator = true;
+            if(m.Name == "Equals" && m.Parameters.Count == 1
+                && m.Parameters[0].ParameterType.FullName == "System.Object") hasObjectEquals = true;
+            if(m.Name == "GetHashCode" && m.Parameters.Count == 0) hasGetHashCode = true;
             if(!emitted.Add(Signature(m))) continue;
             Method(m, def);
+        }
+
+        // C# warns (CS0660/CS0661) on any type that declares == or != without also
+        // overriding Equals/GetHashCode. We only emit the members the mod names, and
+        // the mod never names Equals on a Vector3 — so the stub declared the operators
+        // alone and every COLD build carried 10 warnings. They were invisible locally
+        // because an incremental build skips CoreCompile, and CI builds cold.
+        // The real Unity types do override both, so emitting them is also more faithful.
+        if(hasEqualityOperator && !def.IsInterface) {
+            if(!hasObjectEquals) Line("public override bool Equals(object obj) => throw null;");
+            if(!hasGetHashCode) Line("public override int GetHashCode() => throw null;");
         }
 
         // Without an accessible parameterless constructor a derived stub cannot chain,

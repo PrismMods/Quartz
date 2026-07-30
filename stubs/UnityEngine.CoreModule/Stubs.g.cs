@@ -86,6 +86,8 @@ namespace UnityEngine {
         public static bool operator ==(global::UnityEngine.Color lhs, global::UnityEngine.Color rhs) => throw null;
         public static bool operator !=(global::UnityEngine.Color lhs, global::UnityEngine.Color rhs) => throw null;
         public static global::UnityEngine.Color operator *(global::UnityEngine.Color a, global::UnityEngine.Color b) => throw null;
+        public override bool Equals(object obj) => throw null;
+        public override int GetHashCode() => throw null;
         bool global::System.IEquatable<global::UnityEngine.Color>.Equals(global::UnityEngine.Color other) => throw null;
     }
     public unsafe partial struct Color32 : global::System.IEquatable<global::UnityEngine.Color32> {
@@ -583,6 +585,8 @@ namespace UnityEngine {
         public static bool operator ==(global::UnityEngine.Object x, global::UnityEngine.Object y) => throw null;
         public static implicit operator bool(global::UnityEngine.Object exists) => throw null;
         public static bool operator !=(global::UnityEngine.Object x, global::UnityEngine.Object y) => throw null;
+        public override bool Equals(object obj) => throw null;
+        public override int GetHashCode() => throw null;
         protected Object() { }
     }
     public unsafe partial struct Quaternion : global::System.IEquatable<global::UnityEngine.Quaternion> {
@@ -956,6 +960,8 @@ namespace UnityEngine {
         public static global::UnityEngine.Vector2 operator *(global::UnityEngine.Vector2 a, float d) => throw null;
         public static global::UnityEngine.Vector2 operator *(global::UnityEngine.Vector2 a, global::UnityEngine.Vector2 b) => throw null;
         public static global::UnityEngine.Vector2 operator -(global::UnityEngine.Vector2 a, global::UnityEngine.Vector2 b) => throw null;
+        public override bool Equals(object obj) => throw null;
+        public override int GetHashCode() => throw null;
         bool global::System.IEquatable<global::UnityEngine.Vector2>.Equals(global::UnityEngine.Vector2 other) => throw null;
     }
     public unsafe partial struct Vector3 : global::System.IEquatable<global::UnityEngine.Vector3> {
@@ -973,6 +979,8 @@ namespace UnityEngine {
         public static bool operator ==(global::UnityEngine.Vector3 lhs, global::UnityEngine.Vector3 rhs) => throw null;
         public static bool operator !=(global::UnityEngine.Vector3 lhs, global::UnityEngine.Vector3 rhs) => throw null;
         public static global::UnityEngine.Vector3 operator *(global::UnityEngine.Vector3 a, float d) => throw null;
+        public override bool Equals(object obj) => throw null;
+        public override int GetHashCode() => throw null;
         bool global::System.IEquatable<global::UnityEngine.Vector3>.Equals(global::UnityEngine.Vector3 other) => throw null;
     }
     public unsafe partial struct Vector4 : global::System.IEquatable<global::UnityEngine.Vector4> {
@@ -985,6 +993,8 @@ namespace UnityEngine {
         public static bool operator ==(global::UnityEngine.Vector4 lhs, global::UnityEngine.Vector4 rhs) => throw null;
         public static implicit operator global::UnityEngine.Vector4(global::UnityEngine.Vector2 v) => throw null;
         public static bool operator !=(global::UnityEngine.Vector4 lhs, global::UnityEngine.Vector4 rhs) => throw null;
+        public override bool Equals(object obj) => throw null;
+        public override int GetHashCode() => throw null;
         bool global::System.IEquatable<global::UnityEngine.Vector4>.Equals(global::UnityEngine.Vector4 other) => throw null;
     }
     public sealed unsafe partial class WaitForEndOfFrame : global::UnityEngine.YieldInstruction {
