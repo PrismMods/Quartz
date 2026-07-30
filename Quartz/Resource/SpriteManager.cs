@@ -127,12 +127,14 @@ public sealed class SpriteManager(ResourceManager resource) : IDisposable {
         int sh = src.height;
         float rx = (float)sw / size;
         float ry = (float)sh / size;
-        Texture2D tex = new(size, size, TextureFormat.RGBA32, false, true);
+        Color32[] source = src.GetPixels32();
+        Color32[] output = new Color32[size * size];
         for(int y = 0; y < size; y++) {
             float y0 = y * ry;
             float y1 = y0 + ry;
             int yi0 = (int)y0;
             int yi1 = Mathf.Min(sh, Mathf.CeilToInt(y1));
+            int row = y * size;
             for(int x = 0; x < size; x++) {
                 float x0 = x * rx;
                 float x1 = x0 + rx;
@@ -141,21 +143,29 @@ public sealed class SpriteManager(ResourceManager resource) : IDisposable {
                 float r = 0f, g = 0f, b = 0f, a = 0f, w = 0f;
                 for(int sy = yi0; sy < yi1; sy++) {
                     float wy = Mathf.Min(y1, sy + 1) - Mathf.Max(y0, sy);
+                    int srcRow = sy * sw;
                     for(int sx = xi0; sx < xi1; sx++) {
                         float wx = Mathf.Min(x1, sx + 1) - Mathf.Max(x0, sx);
                         float ww = wx * wy;
-                        Color c = src.GetPixel(sx, sy);
-                        r += c.r * c.a * ww;
-                        g += c.g * c.a * ww;
-                        b += c.b * c.a * ww;
-                        a += c.a * ww;
+                        Color32 c = source[srcRow + sx];
+                        float ca = c.a * ww;
+                        r += c.r * ca;
+                        g += c.g * ca;
+                        b += c.b * ca;
+                        a += ca;
                         w += ww;
                     }
                 }
                 float invA = a > 0f ? 1f / a : 0f;
-                tex.SetPixel(x, y, new Color(r * invA, g * invA, b * invA, a / w));
+                output[row + x] = new Color32(
+                    (byte)Mathf.Clamp(Mathf.RoundToInt(r * invA), 0, 255),
+                    (byte)Mathf.Clamp(Mathf.RoundToInt(g * invA), 0, 255),
+                    (byte)Mathf.Clamp(Mathf.RoundToInt(b * invA), 0, 255),
+                    (byte)Mathf.Clamp(Mathf.RoundToInt(a / w), 0, 255));
             }
         }
+        Texture2D tex = new(size, size, TextureFormat.RGBA32, false, true);
+        tex.SetPixels32(output);
         tex.Apply(false);
         tex.filterMode = FilterMode.Bilinear;
         tex.wrapMode = TextureWrapMode.Clamp;

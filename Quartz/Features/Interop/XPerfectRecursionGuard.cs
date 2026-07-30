@@ -5,8 +5,26 @@ namespace Quartz.Features.Interop;
 internal static class XPerfectRecursionGuard {
     [ThreadStatic] private static int depth;
     private static bool applied;
+    private static bool hookInstalled;
+    private static bool assembliesChanged = true;
+    private static void OnAssemblyLoad(object sender, AssemblyLoadEventArgs args) => assembliesChanged = true;
+    internal static void Unhook() {
+        if(!hookInstalled) return;
+        hookInstalled = false;
+        try {
+            AppDomain.CurrentDomain.AssemblyLoad -= OnAssemblyLoad;
+        } catch(Exception e) { Diag.Ignore(e); }
+    }
     public static void TryApply(HarmonyLib.Harmony harmony) {
         if(applied || harmony == null) return;
+        if(!hookInstalled) {
+            hookInstalled = true;
+            try {
+                AppDomain.CurrentDomain.AssemblyLoad += OnAssemblyLoad;
+            } catch(Exception e) { Diag.Ignore(e); }
+        }
+        if(!assembliesChanged) return;
+        assembliesChanged = false;
         try {
             Type patchType = AccessTools.TypeByName("XPerfect.HitMarginPatch");
             if(patchType == null) return;
@@ -14,6 +32,7 @@ internal static class XPerfectRecursionGuard {
             if(target == null) {
                 MainCore.Log.Msg("[XPerfectGuard] XPerfect.HitMarginPatch.Postfix not found; guard not installed.");
                 applied = true;
+                Unhook();
                 return;
             }
             MethodInfo prefix = typeof(XPerfectRecursionGuard).GetMethod(
@@ -22,6 +41,7 @@ internal static class XPerfectRecursionGuard {
                 nameof(GuardFinalizer), BindingFlags.Static | BindingFlags.NonPublic);
             PatchCompat(harmony, target, new HarmonyMethod(prefix), new HarmonyMethod(finalizer));
             applied = true;
+            Unhook();
             MainCore.Log.Msg("[XPerfectGuard] Installed reentry guard on XPerfect.HitMarginPatch.Postfix.");
         } catch (Exception ex) {
             MainCore.Log.Msg("[XPerfectGuard] Install failed: " + ex.Message);

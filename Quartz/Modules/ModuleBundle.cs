@@ -16,21 +16,32 @@ public static class ModuleBundle {
         }
     }
     public static string VersionOf(string id) => Has(id) ? VersionAt(ManifestOf(id)) : null;
-    public static IReadOnlyList<ModuleManifest> Available() {
-        List<ModuleManifest> found = [];
+    private static List<ModuleManifest> scanned;
+    private static string scannedRoot;
+    private static DateTime scannedStamp;
+    private static List<ModuleManifest> Scan() {
         string root = Path;
+        DateTime stamp;
+        try {
+            if(!Directory.Exists(root)) return scanned = [];
+            stamp = Directory.GetLastWriteTimeUtc(root);
+        } catch(Exception e) {
+            MainCore.Log.Wrn($"[Modules] couldn't read the bundled folder: {e.Message}");
+            return scanned = [];
+        }
+        if(scanned != null && scannedRoot == root && scannedStamp == stamp) return scanned;
+        List<ModuleManifest> found = [];
         string[] files;
         try {
-            if(!Directory.Exists(root)) return found;
             files = Directory.GetFiles(root, "*" + ModuleService.ManifestExtension);
         } catch(Exception e) {
             MainCore.Log.Wrn($"[Modules] couldn't read the bundled folder: {e.Message}");
-            return found;
+            return scanned = [];
         }
         foreach(string file in files) {
             string id = System.IO.Path.GetFileName(file);
             id = id[..^ModuleService.ManifestExtension.Length];
-            if(!Has(id) || ModuleService.Find(id) != null) continue;
+            if(!Has(id)) continue;
             ModuleManifest manifest;
             try {
                 manifest = ModuleManifest.Parse(File.ReadAllText(file), out _);
@@ -46,6 +57,15 @@ public static class ModuleBundle {
             int byOrder = a.Order.CompareTo(b.Order);
             return byOrder != 0 ? byOrder : string.CompareOrdinal(a.Id, b.Id);
         });
+        scannedRoot = root;
+        scannedStamp = stamp;
+        return scanned = found;
+    }
+    public static IReadOnlyList<ModuleManifest> Available() {
+        List<ModuleManifest> all = Scan();
+        List<ModuleManifest> found = new(all.Count);
+        foreach(ModuleManifest manifest in all)
+            if(ModuleService.Find(manifest.Id) == null) found.Add(manifest);
         return found;
     }
     public static bool Copy(string id) {
