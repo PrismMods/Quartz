@@ -8,14 +8,20 @@ public sealed class KeyCaptureRunner : MonoBehaviour {
     private static readonly KeyCode[] allKeys = (KeyCode[])Enum.GetValues(typeof(KeyCode));
     private bool prevHookRAlt;
     private bool prevHookRCtrl;
+    private bool wasListening;
     private void Update() {
+        if(IsListening == null || !IsListening()) {
+            wasListening = false;
+            return;
+        }
         bool hookRAlt = Quartz.Game.HookKeys.Held(KeyCode.RightAlt);
         bool hookRCtrl = Quartz.Game.HookKeys.Held(KeyCode.RightControl);
-        bool rAltEdge = hookRAlt && !prevHookRAlt;
-        bool rCtrlEdge = hookRCtrl && !prevHookRCtrl;
+        bool firstListeningFrame = !wasListening;
+        wasListening = true;
+        bool rAltEdge = !firstListeningFrame && hookRAlt && !prevHookRAlt;
+        bool rCtrlEdge = !firstListeningFrame && hookRCtrl && !prevHookRCtrl;
         prevHookRAlt = hookRAlt;
         prevHookRCtrl = hookRCtrl;
-        if(IsListening == null || !IsListening()) return;
         if(Input.GetKeyDown(KeyCode.Escape) || (ShouldCancel?.Invoke() ?? false)) {
             OnCancelled?.Invoke();
             return;

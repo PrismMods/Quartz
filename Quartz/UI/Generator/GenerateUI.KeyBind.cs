@@ -125,6 +125,7 @@ internal sealed class KeyCapture : MonoBehaviour {
             OnCleared?.Invoke();
             return;
         }
+        if(!Input.anyKeyDown) return;
         for(int i = 0; i < AllKeys.Length; i++) {
             KeyCode kc = AllKeys[i];
             if(kc == KeyCode.None) continue;

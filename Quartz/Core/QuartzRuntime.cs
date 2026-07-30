@@ -252,6 +252,9 @@ public sealed class QuartzRuntime {
             RootObject = null;
         }
         Safe(Quartz.Plugins.PluginIdentityResolver.Unhook);
+        Safe(Quartz.Features.Interop.XPerfectBridge.Unhook);
+        Safe(Quartz.Features.Interop.XPerfectRecursionGuard.Unhook);
+        Safe(Diag.Unbind);
         Logger.Msg("Bye");
     }
     private static void RegisterOverlayHooks() {

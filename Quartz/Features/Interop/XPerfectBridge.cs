@@ -101,6 +101,13 @@ public static class XPerfectBridge {
         return field ?? type.GetField("<" + name + ">k__BackingField", flags);
     }
     private static void OnAssemblyLoad(object sender, AssemblyLoadEventArgs args) => assembliesChanged = true;
+    internal static void Unhook() {
+        if(!hookInstalled) return;
+        hookInstalled = false;
+        try {
+            AppDomain.CurrentDomain.AssemblyLoad -= OnAssemblyLoad;
+        } catch(Exception e) { Diag.Ignore(e); }
+    }
     private static void EnsureResolved() {
         if(installed) return;
         if(!hookInstalled) {
@@ -130,11 +137,7 @@ public static class XPerfectBridge {
             Type mainType = xpAsm.GetType("XPerfect.Main");
             if(mainType != null) enabledProp = mainType.GetProperty("Enabled", BindingFlags.Public | BindingFlags.Static);
             installed = lastJudgeMember != null;
-            if(installed) {
-                try {
-                    AppDomain.CurrentDomain.AssemblyLoad -= OnAssemblyLoad;
-                } catch(Exception e) { Diag.Ignore(e); }
-            }
+            if(installed) Unhook();
         } catch(Exception e) { Diag.Ignore(e); }
     }
 }

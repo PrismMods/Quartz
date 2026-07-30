@@ -58,7 +58,7 @@ internal sealed partial class KvCanvas {
             UpdateGesture();
             if(!Input.GetMouseButton(0)) PointerUp();
         }
-        if(PointerOverViewport() || focused) HandleZoomKeys();
+        if(focused || PointerOverViewport()) HandleZoomKeys();
         if(focused) HandleKeyboard();
     }
     private void HandleWheel(Vector2 wheel) {

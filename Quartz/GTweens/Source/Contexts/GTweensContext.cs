@@ -51,6 +51,8 @@ public sealed class GTweensContext {
         TickDurationMs = _updateStopwatch.ElapsedMilliseconds;
     }
     public void Clear() {
+        foreach(GTween tween in _aliveTweens) tween.IsAlive = false;
+        foreach(GTween tween in _tweensToAdd) tween.IsAlive = false;
         _aliveTweens.Clear();
         _tweensToAdd.Clear();
         _tweensToRemove.Clear();

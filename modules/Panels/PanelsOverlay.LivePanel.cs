@@ -110,7 +110,10 @@ public static partial class PanelsOverlay {
                 p.Rect.gameObject.SetActive(active);
                 if(active) p.Dirty = true;
             }
-            if(!active) return;
+            if(!active) {
+                p.Dirty = false;
+                return;
+            }
             TMP_FontAsset font = FontManager.Current;
             bool fontChanged = p.Text.font != font;
             if(fontChanged) p.Text.font = font;
