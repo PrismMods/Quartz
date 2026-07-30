@@ -1,0 +1,22 @@
+tools/StubGen/Emitter.cs
+  s_aeaaa0cec2e235::t_cb21cab75f5116 117-119,125-128,133-141
+  s_aeaaa0cec2e235::t_4e530fc348642b 142-143
+stubs/UnityEngine.CoreModule/Stubs.g.cs
+  s_aeaaa0cec2e235::t_48bcb39b76d69c 89-90,588-589,963-964,982-983,996-997
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.17",
+  "base_commit_sha": "fae3e8e52d10b2df8da549448ffdffbe6b52694f",
+  "prompts": {},
+  "sessions": {
+    "s_aeaaa0cec2e235": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "60c3fbd9-fdf8-4a3c-a5c7-80827902651c",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
