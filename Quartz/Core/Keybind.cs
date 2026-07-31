@@ -29,6 +29,20 @@ public static class Keybind {
             if(CmdKeys[i] == key) return true;
         return false;
     }
+    private static readonly bool[] UsableKeys = BuildUsableKeys();
+    private static bool[] BuildUsableKeys() {
+        KeyCode[] all = (KeyCode[])System.Enum.GetValues(typeof(KeyCode));
+        int max = 0;
+        for(int i = 0; i < all.Length; i++)
+            if((int)all[i] > max) max = (int)all[i];
+        bool[] table = new bool[max + 1];
+        for(int i = 0; i < all.Length; i++) table[(int)all[i]] = true;
+        return table;
+    }
+    public static bool IsUsableKey(KeyCode key) {
+        int index = (int)key;
+        return index > 0 && index < UsableKeys.Length && UsableKeys[index];
+    }
     public static bool IsModifier(KeyCode key) {
         switch(key) {
             case KeyCode.LeftControl or KeyCode.RightControl

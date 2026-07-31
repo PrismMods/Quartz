@@ -102,7 +102,7 @@ public static partial class UiHider {
     private static bool ShouldToggleRecordingMode() {
         if(!Conf.Enabled || !Conf.UseShortcut || Keybind.Capturing) return false;
         KeyCode key = (KeyCode)Conf.ShortcutKey;
-        if(key == KeyCode.None) return false;
+        if(!Keybind.IsUsableKey(key)) return false;
         try {
             return Keybind.ModifierHeld((Keybind.KeyModifier)Conf.ShortcutModifier)
                 && Input.GetKeyDown(key);

@@ -145,7 +145,7 @@ public static class PracticeInput {
         if(UICore.IsOpen || UICore.IsReorganizing) return;
         if(Time.unscaledTime - lastApply < 0.2f) return;
         foreach(PracticeBinding binding in conf.Bindings) {
-            if(binding.Key == KeyCode.None || !Input.GetKeyDown(binding.Key)) continue;
+            if(!Keybind.IsUsableKey(binding.Key) || !Input.GetKeyDown(binding.Key)) continue;
             lastApply = Time.unscaledTime;
             PracticeDifficulty.Apply(binding);
             return;
