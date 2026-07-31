@@ -21,6 +21,7 @@ public static class GameStats {
     private static FrameCached<int> checkpointCache;
     private static FrameCached<float> pitchCache;
     private static FrameCached<float> musicRatioCache;
+    private static FrameCached<float> musicSecondsCache;
     private static FrameCached<float> mapRatioCache;
     private static FrameCached<float> mapTotalCache;
     private static FrameCached<float> mapSecondsCache;
@@ -112,13 +113,14 @@ public static class GameStats {
             try {
                 AudioSource a = scrConductor.instance != null ? scrConductor.instance.song : null;
                 if(a == null || a.clip == null) return "0:00 / 0:00";
-                int curSec = (int)Mathf.Max(0f, a.time);
+                float t = MusicTimeNow();
+                int curSec = (int)Mathf.Max(0f, t);
                 int lenSec = (int)Mathf.Max(0f, a.clip.length);
                 if(curSec != musicTimeCurSec || lenSec != musicTimeLenSec) {
                     musicTimeCurSec = curSec;
                     musicTimeLenSec = lenSec;
                     bool hour = a.clip.length >= 3600f;
-                    musicTimeCache = FormatTime(a.time, hour) + " / " + FormatTime(a.clip.length, hour);
+                    musicTimeCache = FormatTime(t, hour) + " / " + FormatTime(a.clip.length, hour);
                 }
                 return musicTimeCache;
             } catch(Exception e) { Diag.Ignore(e); return "0:00 / 0:00"; }
@@ -128,25 +130,30 @@ public static class GameStats {
         try {
             AudioSource song = scrConductor.instance != null ? scrConductor.instance.song : null;
             if(song == null || song.clip == null || song.clip.length <= 0f) return 0f;
-            return Mathf.Clamp01(song.time / song.clip.length);
+            return Mathf.Clamp01(MusicTimeNow() / song.clip.length);
         } catch(Exception e) { Diag.Ignore(e); return 0f; }
     });
-    public static float MapTimeRatio => mapRatioCache.Get(static () => {
+    private static float MusicTimeNow() => musicSecondsCache.Get(static () =>
+        ProgressTracker.RunTimeFrozen ? ProgressTracker.FrozenMusicTimeSeconds : RawMusicTimeSeconds());
+    internal static float RawMusicTimeSeconds() {
         try {
-            scrConductor cd = scrConductor.instance;
-            if(cd == null) return 0f;
-            float time = (float)(cd.addoffset + cd.songposition_minusi);
-            float total = MapTotalSeconds();
-            if(total <= 0f) return 0f;
-            return Mathf.Clamp01(time / total);
+            AudioSource song = scrConductor.instance != null ? scrConductor.instance.song : null;
+            return song == null ? 0f : Mathf.Max(0f, song.time);
         } catch(Exception e) { Diag.Ignore(e); return 0f; }
+    }
+    public static float MapTimeRatio => mapRatioCache.Get(static () => {
+        float total = MapTotalSeconds();
+        if(total <= 0f) return 0f;
+        return Mathf.Clamp01(MapTimeSeconds / total);
     });
-    public static float MapTimeSeconds => mapSecondsCache.Get(static () => {
+    public static float MapTimeSeconds => mapSecondsCache.Get(static () =>
+        ProgressTracker.RunTimeFrozen ? ProgressTracker.FrozenMapTimeSeconds : RawMapTimeSeconds());
+    internal static float RawMapTimeSeconds() {
         try {
             scrConductor cd = scrConductor.instance;
             return cd == null ? 0f : (float)(cd.addoffset + cd.songposition_minusi);
         } catch(Exception e) { Diag.Ignore(e); return 0f; }
-    });
+    }
     public static float MapTotalTimeSeconds => MapTotalSeconds();
     public static int MapFloorCount => mapFloorCountCache.Get(static () => {
         try {
@@ -168,9 +175,8 @@ public static class GameStats {
     public static string MapTimeText {
         get {
             try {
-                scrConductor cd = scrConductor.instance;
-                if(cd == null) return "0:00";
-                float t = (float)(cd.addoffset + cd.songposition_minusi);
+                if(scrConductor.instance == null) return "0:00";
+                float t = MapTimeSeconds;
                 float total = MapTotalSeconds();
                 if(t < 0f) t = 0f;
                 if(total > 0f && t > total) t = total;

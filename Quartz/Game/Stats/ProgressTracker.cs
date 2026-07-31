@@ -8,6 +8,20 @@ public static class ProgressTracker {
     public static float RunStartMapTimeRatio;
     public static bool RunStartedFromFirstTile = true;
     public static bool RunCleared;
+    public static bool RunTimeFrozen;
+    public static float FrozenMapTimeSeconds;
+    public static float FrozenMusicTimeSeconds;
+    public static void FreezeRunTime() {
+        if(RunTimeFrozen) return;
+        FrozenMapTimeSeconds = GameStats.RawMapTimeSeconds();
+        FrozenMusicTimeSeconds = GameStats.RawMusicTimeSeconds();
+        RunTimeFrozen = true;
+    }
+    public static void ThawRunTime() {
+        RunTimeFrozen = false;
+        FrozenMapTimeSeconds = 0f;
+        FrozenMusicTimeSeconds = 0f;
+    }
     public static bool IsFirstTileRunStart(int seqID = 0) {
         if(seqID > 0) return false;
         try {
@@ -24,6 +38,7 @@ public static class ProgressTracker {
     }
     public static void CaptureRunStart(int seqID = 0) {
         RunCleared = false;
+        ThawRunTime();
         try {
             scrController c = scrController.instance;
             RunStartedFromFirstTile = IsFirstTileRunStart(seqID);
@@ -90,10 +105,18 @@ public static class ProgressTracker {
         }
     }
     [HarmonyPatch(typeof(StateBehaviour), "ChangeState", new[] { typeof(Enum) })]
-    private static class ClearedPatch {
+    private static class RunStatePatch {
         private static void Postfix(Enum newState) {
             if(!MainCore.IsModEnabled) return;
-            if(newState is States.Won) RunCleared = true;
+            if(newState is not States state) return;
+            if(state == States.Won) {
+                RunCleared = true;
+                FreezeRunTime();
+            } else if(state == States.Fail) {
+                FreezeRunTime();
+            } else if(state != States.Fail2) {
+                ThawRunTime();
+            }
         }
     }
 }
