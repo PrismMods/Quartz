@@ -1,0 +1,19 @@
+modules/Tuf/TufPreviewCache.cs
+  s_aeaaa0cec2e235::t_187331cbcaf13e 93-94,96,267,270,278-279
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.19",
+  "base_commit_sha": "0e36d65553f60aaec147d89d69057c6c27f0abfc",
+  "prompts": {},
+  "sessions": {
+    "s_aeaaa0cec2e235": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "60c3fbd9-fdf8-4a3c-a5c7-80827902651c",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
