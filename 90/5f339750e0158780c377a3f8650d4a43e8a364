@@ -1,0 +1,57 @@
+Quartz/UI/Factory/Page/PageModuleRows.cs
+  s_b98891b436a070::t_92697ef98ea2aa 47-59,71
+  s_b98891b436a070::t_825fbd1b63246a 161
+  s_b98891b436a070::t_0ec2827ec00eb8 185,189,194-198
+  s_b98891b436a070::t_a4434aecd7850c 143,153
+  s_b98891b436a070::t_d723d99bc9f79f 29
+  s_b98891b436a070::t_725978af6054b4 122,129,132-133,135-137
+  s_b98891b436a070::t_8b0acbada46eef 30
+  s_b98891b436a070::t_1589a1fc6f7769 134
+  s_e9a041eecadfc5::t_def80ddc31276d 4,8,11,14,25,28,31-45,73,75,77-80,83-86,90-101,103,105,110-112,123-128,130-131,138-139,142,144-145,150-151,154,156,160,165-170,172-173,176
+Quartz/Localization/TextLocalization.cs
+  s_b98891b436a070::t_4c645da3b684c2 25-26
+  s_b98891b436a070::t_2c3501171d3991 8-9
+  s_b98891b436a070::t_5092a5711e07ff 27-29
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_b98891b436a070::t_146a9969372e22 377,379-380,382-386,392-393,395-396,398-399,401
+  s_e9a041eecadfc5::t_cad567d86ce4d9 389,391,400,402,405-407
+Quartz/UI/Factory/Page/PageModuleCategory.cs
+  s_e9a041eecadfc5::t_08e9c639ae43a2 34-35
+Quartz/UI/Factory/Page/PageModules.cs
+  s_e9a041eecadfc5::t_cca942799f93e3 134-138
+  s_e9a041eecadfc5::t_1fb53295a74c46 5,9,14-22,24-31,34-35,39-40,43,54,57,66-69,72-75,78-81,83,85-89,106-109,112-117,122-129,131-133,174-215,223-240,242,244-255,257-262,264-273,279-329,331-342,355-362
+  s_e9a041eecadfc5::t_de188dd1ed6126 354
+  s_e9a041eecadfc5::t_068fc48fceb608 217
+  s_e9a041eecadfc5::t_8e7829a0c36818 274-278
+  s_b98891b436a070::t_5587e366dbc443 82
+  s_e9a041eecadfc5::t_efcebef81937e8 32-33
+  s_e9a041eecadfc5::t_9630c4e6097830 41-42
+  s_e9a041eecadfc5::t_44dcf74810701c 90-105
+Quartz/Resource/Export/Lang/en-US.json
+  s_e9a041eecadfc5::t_3812a1f3d781e0 389,391,400,402,405-407
+  s_b98891b436a070::t_146a9969372e22 377,379-380,382-386,392-393,395-396,398-399,401
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.19",
+  "base_commit_sha": "905f339750e0158780c377a3f8650d4a43e8a364",
+  "prompts": {},
+  "sessions": {
+    "s_b98891b436a070": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fe3860d0-4763-410c-ade3-07db1da1add5",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_e9a041eecadfc5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bbd46683-1e7f-42a2-bf26-3ac90c5ae700",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
