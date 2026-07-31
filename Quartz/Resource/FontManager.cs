@@ -32,17 +32,15 @@ public static partial class FontManager {
     private static string[] available;
     private static bool scanned;
     public static void Initialize() {
-        bool primed = EnsureTmpSettings();
-        try {
-            defaultFont = BuildDefaultFont();
-            Current = defaultFont;
-            CurrentName = DefaultName;
-            string saved = MainCore.Conf.FontName;
-            if(!string.IsNullOrEmpty(saved) && saved != DefaultName && saved != DefaultFontFile) SetFont(saved, false);
-        } finally {
-            if(primed) ReleaseTmpSettings();
+        string saved = MainCore.Conf.FontName;
+        if(!string.IsNullOrEmpty(saved) && saved != DefaultName && saved != DefaultFontFile) {
+            SetFont(saved, false);
+            return;
         }
+        Current = DefaultFont;
+        CurrentName = DefaultName;
     }
+    private static TMP_FontAsset DefaultFont => defaultFont ??= BuildDefaultFont();
     private static FieldInfo tmpSettingsInstanceField;
     private static TMP_Settings tmpSettingsFallback;
     private static bool EnsureTmpSettings() {
@@ -71,6 +69,14 @@ public static partial class FontManager {
         }
     }
     private static TMP_FontAsset BuildDefaultFont() {
+        bool primed = EnsureTmpSettings();
+        try {
+            return BuildDefaultFontCore();
+        } finally {
+            if(primed) ReleaseTmpSettings();
+        }
+    }
+    private static TMP_FontAsset BuildDefaultFontCore() {
         EnsureScanned();
         if(fontFiles.TryGetValue(DefaultFontFile, out string path)) {
             Font font = null;
@@ -135,7 +141,7 @@ public static partial class FontManager {
     public static void SetFont(string name, bool save) {
         TMP_FontAsset asset = Resolve(name);
         if(asset == null) {
-            asset = defaultFont;
+            asset = DefaultFont;
             name = DefaultName;
         }
         Current = asset;
@@ -268,7 +274,7 @@ public static partial class FontManager {
         fontFiles.Clear();
         customNames.Clear();
     }
-    public static TMP_FontAsset GetFont(string name) => Resolve(name) ?? defaultFont;
+    public static TMP_FontAsset GetFont(string name) => Resolve(name) ?? DefaultFont;
     public static void ApplyToAll() {
         if(MainCore.Root == null || Current == null) return;
         TMP_FontAsset menuFont = MenuFontAsset ?? Current;
@@ -328,10 +334,11 @@ public static partial class FontManager {
         return cjkFallback;
     }
     private static TMP_FontAsset Resolve(string name) {
-        if(string.IsNullOrEmpty(name) || name == DefaultName || name == AddSentinel) return defaultFont;
+        if(string.IsNullOrEmpty(name) || name == DefaultName || name == AddSentinel) return DefaultFont;
         if(cache.TryGetValue(name, out TMP_FontAsset cached)) return cached;
         EnsureScanned();
         if(!fontFiles.TryGetValue(name, out string path)) return null;
+        bool primed = EnsureTmpSettings();
         Font font = null;
         try {
             font = new Font(path);
@@ -346,6 +353,8 @@ public static partial class FontManager {
             if(font != null) UnityEngine.Object.Destroy(font);
             MainCore.Log.Wrn($"[FontManager] build '{name}' failed: {e.Message}");
             return null;
+        } finally {
+            if(primed) ReleaseTmpSettings();
         }
     }
     public static void Dispose() {
