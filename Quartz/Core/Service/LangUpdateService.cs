@@ -28,7 +28,7 @@ public static class LangUpdateService {
     public static async Task<int> FetchAsync(string langPath) {
         if(string.IsNullOrEmpty(langPath)) return 0;
         try {
-            JObject files = await FetchManifest();
+            JObject files = await FetchManifest().ConfigureAwait(false);
             if(files == null) return 0;
             Directory.CreateDirectory(langPath);
             int written = 0;
@@ -39,7 +39,7 @@ public static class LangUpdateService {
                 if(name.Equals(EnglishFile, System.StringComparison.OrdinalIgnoreCase)) continue;
                 string dest = Path.Combine(langPath, name);
                 if(HashFileSha256(dest) == want) continue;
-                if(await FetchOne(name, want, dest)) written++;
+                if(await FetchOne(name, want, dest).ConfigureAwait(false)) written++;
             }
             if(written > 0) MainCore.Log.Msg($"[LangUpdate] updated {written} translation file(s)");
             return written;
@@ -50,12 +50,12 @@ public static class LangUpdateService {
     }
     private static async Task<JObject> FetchManifest() {
         string json;
-        using(HttpResponseMessage resp = await Http.GetAsync(ManifestUrl)) {
+        using(HttpResponseMessage resp = await Http.GetAsync(ManifestUrl).ConfigureAwait(false)) {
             if(!resp.IsSuccessStatusCode) {
                 MainCore.Log.Wrn($"[LangUpdate] manifest fetch failed: HTTP {(int)resp.StatusCode} — keeping the bundled translations");
                 return null;
             }
-            json = await resp.Content.ReadAsStringAsync();
+            json = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
         if(JObject.Parse(json)["files"] is JObject files) return files;
         MainCore.Log.Wrn("[LangUpdate] manifest has no 'files' map — keeping the bundled translations");
@@ -69,9 +69,9 @@ public static class LangUpdateService {
     private static async Task<bool> FetchOne(string name, string wantSha, string dest) {
         try {
             byte[] bytes;
-            using(HttpResponseMessage resp = await Http.GetAsync($"{RawRoot}/Lang/{name}")) {
+            using(HttpResponseMessage resp = await Http.GetAsync($"{RawRoot}/Lang/{name}").ConfigureAwait(false)) {
                 if(!resp.IsSuccessStatusCode) return Reject(name, $"HTTP {(int)resp.StatusCode}");
-                bytes = await resp.Content.ReadAsByteArrayAsync();
+                bytes = await resp.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
             }
             if(bytes.Length > MaxFileBytes) return Reject(name, $"bigger than {MaxFileBytes} bytes");
             if(HashBytesSha256(bytes) != wantSha) return Reject(name, "sha256 doesn't match the manifest");
