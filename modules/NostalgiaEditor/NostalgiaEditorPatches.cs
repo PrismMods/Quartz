@@ -34,11 +34,12 @@ public static class NostalgiaEditorPatches {
     }
     [HarmonyPatch(typeof(scrShowIfDebug), "Update")]
     private static class WeakAutoPatch {
-        private static void Prefix() {
+        private static void Prefix(out bool __state) {
+            __state = RDC.useOldAuto;
             if(ShouldWeakAuto) RDC.useOldAuto = false;
         }
-        private static void Postfix() {
-            if(ShouldWeakAuto) RDC.useOldAuto = true;
+        private static void Postfix(bool __state) {
+            if(RDC.useOldAuto != __state) RDC.useOldAuto = __state;
         }
     }
     [HarmonyPatch(typeof(scnEditor), "get_highBPM")]

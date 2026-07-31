@@ -829,6 +829,7 @@
           "System.Boolean RDC::auto()",
           "System.Boolean RDC::get_auto()",
           "System.Boolean RDC::get_runningOnSteamDeck()",
+          "System.Boolean RDC::get_useOldAuto()",
           "System.Boolean RDC::noHud()",
           "System.Boolean RDC::runningOnSteamDeck()",
           "System.Boolean RDC::useOldAuto()",

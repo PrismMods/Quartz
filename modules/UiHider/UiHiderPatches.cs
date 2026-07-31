@@ -21,13 +21,12 @@ public static partial class UiHider {
     }
     [HarmonyPatch(typeof(scrShowIfDebug), "Update")]
     private static class HideAutoplayTextPatch {
-        private static bool prevAuto;
-        private static void Prefix() {
-            prevAuto = RDC.auto;
+        private static void Prefix(out bool __state) {
+            __state = RDC.auto;
             if(ShouldHideOtto()) RDC.auto = false;
         }
-        private static void Postfix() {
-            RDC.auto = prevAuto;
+        private static void Postfix(bool __state) {
+            if(RDC.auto != __state) RDC.auto = __state;
         }
     }
     [HarmonyPatch(typeof(scnEditor), "SwitchToEditMode")]

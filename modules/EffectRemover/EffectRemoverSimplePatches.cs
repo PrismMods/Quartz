@@ -101,14 +101,21 @@ public static partial class EffectRemover {
     [HarmonyPatch(typeof(ffxMoveFloorPlus), "StartEffect")]
     private static class SimpleMovePatch {
         private static bool Prepare() => AccessTools.Method(typeof(ffxMoveFloorPlus), "StartEffect") != null;
-        private static int origStart;
-        private static int origEnd;
-        private static void Prefix(ffxMoveFloorPlus __instance) {
+        private struct Saved {
+            public bool Applied;
+            public int Start;
+            public int End;
+        }
+        private static void Prefix(ffxMoveFloorPlus __instance, out Saved __state) {
+            __state = default;
             if(!SimpleMoveActive) return;
+            __state.Applied = true;
             int max = Conf.SimpleMoveTrackMax;
             int index = scrController.instance.currFloor.seqID;
-            origStart = __instance.start;
-            origEnd = __instance.end;
+            int origStart = __instance.start;
+            int origEnd = __instance.end;
+            __state.Start = origStart;
+            __state.End = origEnd;
             if(origEnd < index + max / 2) {
                 __instance.start = Math.Max(origEnd - max - 1, origStart);
             } else if(origStart > index - max / 2) {
@@ -118,10 +125,10 @@ public static partial class EffectRemover {
                 __instance.end = Math.Min(index + max / 2, origEnd);
             }
         }
-        private static void Postfix(ffxMoveFloorPlus __instance) {
-            if(!SimpleMoveActive) return;
-            __instance.start = origStart;
-            __instance.end = origEnd;
+        private static void Postfix(ffxMoveFloorPlus __instance, Saved __state) {
+            if(!__state.Applied) return;
+            __instance.start = __state.Start;
+            __instance.end = __state.End;
         }
     }
 }

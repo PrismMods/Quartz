@@ -49,17 +49,22 @@ public static class NostalgiaTweaksPatches {
     }
     [HarmonyPatch(typeof(scrConductor), "PlayHitTimes")]
     private static class PlayHitTimesPatch {
-        private static bool prevFastTakeoff;
-        private static bool prevEndingCymbal;
-        private static void Prefix(scrConductor __instance) {
-            prevFastTakeoff = __instance.fastTakeoff;
+        private struct Saved {
+            public bool FastTakeoff;
+            public bool EndingCymbal;
+        }
+        private static void Prefix(scrConductor __instance, out Saved __state) {
+            __state = default;
+            if(__instance == null) return;
+            __state.FastTakeoff = __instance.fastTakeoff;
+            __state.EndingCymbal = __instance.playEndingCymbal;
             if(ShouldDisableCountdownSound) __instance.fastTakeoff = true;
-            prevEndingCymbal = __instance.playEndingCymbal;
             if(ShouldDisableEndingSound) __instance.playEndingCymbal = false;
         }
-        private static void Postfix(scrConductor __instance) {
-            __instance.fastTakeoff = prevFastTakeoff;
-            __instance.playEndingCymbal = prevEndingCymbal;
+        private static void Postfix(scrConductor __instance, Saved __state) {
+            if(__instance == null) return;
+            __instance.fastTakeoff = __state.FastTakeoff;
+            __instance.playEndingCymbal = __state.EndingCymbal;
         }
     }
 }
