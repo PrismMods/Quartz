@@ -1,4 +1,5 @@
 using Quartz.Async;
+using Quartz.Core;
 using Quartz.UI;
 using Quartz.UI.Nav;
 namespace Quartz.Modules;
@@ -41,6 +42,7 @@ public static class ModuleCategories {
         foreach(ModuleCatalogEntry entry in catalog.Modules) {
             if(entry.Group != categoryKey) continue;
             if(ModuleService.Find(entry.Id) != null) continue;
+            if(PrefersBundle(entry, ModuleBundle.Find(entry.Id))) continue;
             found.Add(entry);
         }
         return found;
@@ -48,9 +50,18 @@ public static class ModuleCategories {
     public static IReadOnlyList<ModuleManifest> Bundled(string categoryKey) {
         List<ModuleManifest> found = [];
         if(string.IsNullOrEmpty(categoryKey)) return found;
-        foreach(ModuleManifest manifest in ModuleBundle.Available())
-            if(manifest.Group == categoryKey) found.Add(manifest);
+        foreach(ModuleManifest manifest in ModuleBundle.Available()) {
+            if(manifest.Group != categoryKey) continue;
+            if(!PrefersBundle(ModuleCatalogService.Catalog?.Find(manifest.Id), manifest)) continue;
+            found.Add(manifest);
+        }
         return found;
+    }
+    private static bool PrefersBundle(ModuleCatalogEntry entry, ModuleManifest bundled) {
+        if(bundled == null) return false;
+        if(entry == null || entry.CoreAbi != Info.ModuleAbi) return true;
+        if(ModuleCatalogService.Source != CatalogSource.Network) return true;
+        return !ModuleCatalog.IsNewer(entry.Version, bundled.Version);
     }
     public static string Group(ModuleService.Handle handle) => handle?.Manifest?.Group ?? "";
 }

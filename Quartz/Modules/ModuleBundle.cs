@@ -61,6 +61,12 @@ public static class ModuleBundle {
         scannedStamp = stamp;
         return scanned = found;
     }
+    public static ModuleManifest Find(string id) {
+        if(id == null) return null;
+        foreach(ModuleManifest manifest in Scan())
+            if(manifest.Id == id) return manifest;
+        return null;
+    }
     public static IReadOnlyList<ModuleManifest> Available() {
         List<ModuleManifest> all = Scan();
         List<ModuleManifest> found = new(all.Count);

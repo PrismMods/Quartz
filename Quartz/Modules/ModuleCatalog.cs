@@ -44,6 +44,15 @@ public sealed class ModuleCatalog {
             if(entry.Id == id) return entry;
         return null;
     }
+    public static string TrimV(string version) =>
+        version != null && version.StartsWith("v", StringComparison.OrdinalIgnoreCase) ? version[1..] : version;
+    public static bool IsNewer(string candidate, string current) {
+        if(string.IsNullOrWhiteSpace(candidate)) return false;
+        if(string.Equals(candidate, current, StringComparison.OrdinalIgnoreCase)) return false;
+        if(Version.TryParse(TrimV(candidate), out Version remote) && Version.TryParse(TrimV(current ?? ""), out Version local))
+            return remote > local;
+        return true;
+    }
     public static bool IsSha256(string value) {
         if(value == null || value.Length != 64) return false;
         foreach(char c in value)
