@@ -1,0 +1,33 @@
+Quartz/UI/Transition/PageSwicher.cs
+  s_aeaaa0cec2e235::t_d05ab2a62fe047 12
+Quartz/UI/Factory/Page/PageSearch.cs
+  s_aeaaa0cec2e235::t_d05ab2a62fe047 122
+Quartz/UI/Factory/PageFactory.cs
+  s_aeaaa0cec2e235::t_561f8f981dc171 44,48
+  s_aeaaa0cec2e235::t_f29748c7bfba20 9-27,32
+Quartz/UI/Factory/Page/PageSettings.Helpers.cs
+  s_aeaaa0cec2e235::t_70f35b9ac15689 245
+Quartz/UI/Utility/ToggleBinds.cs
+  s_aeaaa0cec2e235::t_d05ab2a62fe047 56-59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.19",
+  "base_commit_sha": "372bd6b88057833992c958d68fd6d28059020183",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_aeaaa0cec2e235": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "60c3fbd9-fdf8-4a3c-a5c7-80827902651c",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
