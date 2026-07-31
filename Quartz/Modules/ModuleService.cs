@@ -90,11 +90,16 @@ public static class ModuleService {
         State.Save();
         if(handle != null) handle.Enabled = enabled;
         MainThread.Enqueue(() => {
-            if(enabled) {
-                LoadOne(id);
-                LoadDependents(id);
-            } else {
-                UnloadOne(id);
+            BeginScanBatch();
+            try {
+                if(enabled) {
+                    LoadOne(id);
+                    LoadDependents(id);
+                } else {
+                    UnloadOne(id);
+                }
+            } finally {
+                EndScanBatch();
             }
             ApplyActive();
             RebuildUI();
@@ -102,9 +107,14 @@ public static class ModuleService {
     }
     public static void LoadInstalled(IReadOnlyList<string> ids) {
         if(ids == null) return;
-        foreach(string id in ids) {
-            handles.RemoveAll(h => h.Id == id && !h.Loaded);
-            LoadOne(id);
+        BeginScanBatch();
+        try {
+            foreach(string id in ids) {
+                handles.RemoveAll(h => h.Id == id && !h.Loaded);
+                LoadOne(id);
+            }
+        } finally {
+            EndScanBatch();
         }
         ApplyActive();
         RebuildUI();
@@ -125,7 +135,33 @@ public static class ModuleService {
             UICore.CurrentMenuState = Quartz.UI.Nav.NavRegistry.FirstVisibleState();
         UICore.Rebuild();
     }
+    private static int scanHold;
+    private static List<ModuleManifest> scanFound;
+    private static Dictionary<string, string> scanRejected;
+    private static Dictionary<string, string> scanPaths;
+    private static void BeginScanBatch() => scanHold++;
+    private static void EndScanBatch() {
+        if(scanHold > 0) scanHold--;
+        if(scanHold > 0) return;
+        scanFound = null;
+        scanRejected = null;
+        scanPaths = null;
+    }
     private static List<ModuleManifest> ScanManifests(out Dictionary<string, string> rejected, out Dictionary<string, string> paths) {
+        if(scanHold > 0 && scanFound != null) {
+            rejected = scanRejected;
+            paths = scanPaths;
+            return scanFound;
+        }
+        List<ModuleManifest> scanned = ScanManifestsUncached(out rejected, out paths);
+        if(scanHold > 0) {
+            scanFound = scanned;
+            scanRejected = rejected;
+            scanPaths = paths;
+        }
+        return scanned;
+    }
+    private static List<ModuleManifest> ScanManifestsUncached(out Dictionary<string, string> rejected, out Dictionary<string, string> paths) {
         rejected = new Dictionary<string, string>(StringComparer.Ordinal);
         paths = new Dictionary<string, string>(StringComparer.Ordinal);
         List<ModuleManifest> found = [];
