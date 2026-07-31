@@ -30,8 +30,10 @@ public static partial class UICore {
     public static readonly Vector2 ReferenceResolution = new(1920, 1080);
     private static Action<TranslationFailState> _onPageSettings;
     private static Action<TranslationFailState> _onRefresh;
+    private static Action<string> _onLanguageRebuild;
     private static Action<int> _onDockTabChanged;
     private static Action _onPaneChanged;
+    private static bool rebuildQueued;
     public static void Initialize() {
         canvasObj = new GameObject("QuartzUICanvas");
         canvasObj.transform.SetParent(MainCore.Root.transform, false);
@@ -59,10 +61,13 @@ public static partial class UICore {
             if(state == TranslationFailState.Success) {
                 themeImages = null;
                 TextLocalization.RefreshAll();
+                RequestPagesRebuild();
             }
         };
+        _onLanguageRebuild = _ => RequestPagesRebuild();
         MainCore.Tr.OnLoadEnd += _onPageSettings;
         MainCore.Tr.OnLoadEnd += _onRefresh;
+        MainCore.Tr.OnLanguageChanged += _onLanguageRebuild;
         _onDockTabChanged = _ => {
             ContextPane.Clear();
             LivePreviewPane.Clear();
@@ -80,6 +85,18 @@ public static partial class UICore {
         if(panelCanvasGroup != null && !IsReorganizing) panelCanvasGroup.alpha = MainCore.Conf.PanelOpacity;
         if(save) MainCore.ConfMgr.RequestSave();
     }
+    // Deferred one pump so the rebuild never tears down UI objects whose own
+    // OnLanguageChanged/OnLoadEnd handlers are still pending in the same event
+    // snapshot (a destroyed dropdown's refresh closure would throw on its dead TMP).
+    private static void RequestPagesRebuild() {
+        if(rebuildQueued) return;
+        rebuildQueued = true;
+        MainThread.Enqueue(() => {
+            rebuildQueued = false;
+            if(Panel == null) return;
+            Rebuild();
+        });
+    }
     public static void Rebuild() {
         bool wasOpen = isOpen;
         if(wasOpen) Close(true);
@@ -90,6 +107,7 @@ public static partial class UICore {
         LastPanelPosition = position;
         LastPanelSize = size;
         if(wasOpen) Open(true);
+        else if(isOpen) Close(true);
         if(isOpen) {
             Panel.anchoredPosition = position;
             Panel.sizeDelta = size;
@@ -98,6 +116,7 @@ public static partial class UICore {
     public static void Dispose() {
         MainCore.Tr.OnLoadEnd -= _onPageSettings;
         MainCore.Tr.OnLoadEnd -= _onRefresh;
+        MainCore.Tr.OnLanguageChanged -= _onLanguageRebuild;
         MenuFactory.OnStateChanged -= _onDockTabChanged;
         Panes.PaneState.Changed -= _onPaneChanged;
         bandSeq?.Kill();
