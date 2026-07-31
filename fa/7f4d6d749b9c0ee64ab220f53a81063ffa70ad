@@ -1,0 +1,14 @@
+Quartz/Resource/Export/Lang/ko-KR.json
+  h_6eeb8441a8a159 50,392
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.19",
+  "base_commit_sha": "fa7f4d6d749b9c0ee64ab220f53a81063ffa70ad",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
