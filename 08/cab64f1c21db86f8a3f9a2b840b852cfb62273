@@ -1,0 +1,25 @@
+Quartz/Modules/ModuleCatalog.cs
+  s_b98891b436a070::t_4e714f2db9dfab 47-55
+Quartz/Modules/ModuleCategories.cs
+  s_b98891b436a070::t_e9374e85accee1 45,53-57,60-64
+  s_b98891b436a070::t_398f7c1656db7c 2
+  s_b98891b436a070::t_97138b2f052d30 65
+Quartz/Modules/ModuleBundle.cs
+  s_b98891b436a070::t_8d7d49dc52bfde 64-69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.19",
+  "base_commit_sha": "08cab64f1c21db86f8a3f9a2b840b852cfb62273",
+  "prompts": {},
+  "sessions": {
+    "s_b98891b436a070": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fe3860d0-4763-410c-ade3-07db1da1add5",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
