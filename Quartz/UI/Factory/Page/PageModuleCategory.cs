@@ -31,7 +31,8 @@ internal static class PageModuleCategory {
                 .Init("MODULES_CATEGORY_EMPTY", "Nothing for this tab yet.");
             return;
         }
-        foreach(ModuleService.Handle handle in installed) PageModuleRows.Installed(content.transform, handle);
+        foreach(ModuleService.Handle handle in installed)
+            PageModuleRows.Installed(content.transform, handle, PageModules.UpdateFor(handle));
         if(available.Count == 0 && bundled.Count == 0) return;
         GenerateUI.AddTextH1(GenerateUI.Row(content.transform))
             .gameObject.AddComponent<TextLocalization>().Init("MODULES_BROWSE", "Get more features");

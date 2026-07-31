@@ -5,7 +5,8 @@ namespace Quartz.Localization;
 public class TextLocalization : MonoBehaviour {
     public string Key;
     public string Default;
-    public string Value => tr?.Get(Key, Default) ?? Default;
+    public string Suffix;
+    public string Value => (tr?.Get(Key, Default) ?? Default) + Suffix;
     private Translator tr;
     private TMP_Text tmp;
     private static readonly HashSet<TextLocalization> instances = [];
@@ -18,6 +19,11 @@ public class TextLocalization : MonoBehaviour {
         tr = translator ?? MainCore.Tr;
         Key = key;
         Default = defaultValue;
+        UpdateText();
+        return this;
+    }
+    public TextLocalization WithSuffix(string suffix) {
+        Suffix = suffix;
         UpdateText();
         return this;
     }
