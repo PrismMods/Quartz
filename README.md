@@ -47,6 +47,15 @@
 > [!WARNING]
 > On Mac, this replaces the entire folder instead of just adding the files. drag the files in manually.
 
+## Thanks for donations
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><img src="https://cdn.discordapp.com/avatars/1056056739734233189/a1480d6fddb9339810c858d2b74484d4.webp?size=1024" width="100px;" alt="Refreshin"/><br /><sub><b>Refreshin</b></sub></a><br /><a title="Special Donor">🔥</a></td>
+    </tr>
+  </tbody>
+</table>
+
 ## Screenshots!!
 ![Main Menu](readme/mainmenu.png)
 ![Credits](readme/credits.png)
