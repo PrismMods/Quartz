@@ -1,0 +1,19 @@
+Quartz/Modules/ModuleService.cs
+  s_aeaaa0cec2e235::t_c97da5a05a0efb 93-102,110-117,138-149,151-164
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.19",
+  "base_commit_sha": "92748765d4b43649ba2d3d9cb7be22a58501b3fa",
+  "prompts": {},
+  "sessions": {
+    "s_aeaaa0cec2e235": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "60c3fbd9-fdf8-4a3c-a5c7-80827902651c",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
