@@ -1,0 +1,23 @@
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_6d7b0d0d5871d7::t_b2c4297954ae89 49-50
+Quartz/Resource/Export/Lang/en-US.json
+  s_6d7b0d0d5871d7::t_b2c4297954ae89 49-50
+Quartz/UI/Factory/Page/PageCredits.cs
+  s_6d7b0d0d5871d7::t_0ef2e217de5441 25-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.19",
+  "base_commit_sha": "f8047093b739c753c65be0f7e8bb66c85e1449f5",
+  "prompts": {},
+  "sessions": {
+    "s_6d7b0d0d5871d7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "08a01095-73be-4b92-b32e-94b5e1f63c06",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
