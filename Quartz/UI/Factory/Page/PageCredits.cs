@@ -22,6 +22,11 @@ internal static class PageCredits {
         Block(content, 76f, 22f, "CREDITS_TEAM_BODY",
             "koren — lead developer\n" +
             "sbrothers7 — developer");
+        Header(content, "CREDITS_TESTERS", "Mod Testers");
+        Block(content, 108f, 22f, "CREDITS_TESTERS_BODY",
+            "Refreshin\n" +
+            "JeulGemi\n" +
+            "Yul");
         Header(content, "CREDITS_PORTS", "Ported & referenced work");
         Block(content, 250f, 20f, "CREDITS_PORTS_BODY",
             "Overlayer — UI foundation (modlist.org)\n" +
