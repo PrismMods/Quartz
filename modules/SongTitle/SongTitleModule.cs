@@ -22,4 +22,5 @@ public sealed class SongTitleModule : QuartzModule {
         Context.OnModDisable("SongTitleOverlay", SongTitleOverlay.Dispose);
     }
     public override void OnUnload() => SongTitleOverlay.Dispose();
+    public override void OnTick() => SongTitleOverlay.Gate();
 }

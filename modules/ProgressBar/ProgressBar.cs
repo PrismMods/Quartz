@@ -21,6 +21,18 @@ public static class ProgressBarOverlay {
     private static Image fill;
     private static GameObject dragObj;
     private static Updater updater;
+    private static bool ShouldShow() => OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame;
+    private static bool gateWant;
+    private static bool gateRunning = true;
+    internal static void Gate() {
+        if(updater == null) return;
+        bool want = ShouldShow() || UICore.IsReorganizing;
+        bool run = want || gateWant;
+        gateWant = want;
+        if(gateRunning == run) return;
+        gateRunning = run;
+        updater.enabled = run;
+    }
     public static void EnsureConf() => ConfMgr ??= SettingsFile<ProgressBarSettings>.Loaded("ProgressBar.json");
     internal const string BandId = "progressbar";
     internal static float BottomEdge() {
@@ -87,6 +99,8 @@ public static class ProgressBarOverlay {
         drag.AddComponent<DragHandler>();
         drag.SetActive(false);
         updater = canvasObj.AddComponent<Updater>();
+        gateWant = true;
+        gateRunning = true;
         Apply();
     }
     public static void Apply() {
@@ -178,7 +192,7 @@ public static class ProgressBarOverlay {
         private float lastGradientNow = float.NaN;
         private void Update() {
             if(bar == null) return;
-            bool show = OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame;
+            bool show = ShouldShow();
             if(bar.gameObject.activeSelf != show) bar.gameObject.SetActive(show);
             if(dragObj != null && dragObj.activeSelf) dragObj.SetActive(false);
             if(!show) return;

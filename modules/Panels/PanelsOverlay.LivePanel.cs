@@ -34,7 +34,7 @@ public static partial class PanelsOverlay {
         private bool lastReorganizing;
         private void Update() {
             bool isReorganizing = UICore.IsReorganizing;
-            bool show = (OverlaySwitch.Enabled && GameStats.InGame) || isReorganizing;
+            bool show = ShouldShow();
             if(raycaster != null && raycaster.enabled != isReorganizing) raycaster.enabled = isReorganizing;
             float now = Time.unscaledTime;
             bool stateChanged = show != lastShow || isReorganizing != lastReorganizing;

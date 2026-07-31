@@ -19,4 +19,5 @@ public sealed class ComboModule : QuartzModule {
         Context.OnModDisable("ComboOverlay", ComboOverlay.Dispose);
     }
     public override void OnUnload() => ComboOverlay.Dispose();
+    public override void OnTick() => ComboOverlay.Gate();
 }

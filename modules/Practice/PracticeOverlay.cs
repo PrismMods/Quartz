@@ -19,6 +19,22 @@ public static class PracticeOverlay {
     private static TextMeshProUGUI text;
     private static GameObject dragObj;
     private static Updater updater;
+    private static bool ShouldShow() =>
+        (OverlaySwitch.Enabled && Conf.Enabled && Conf.ShowIndicator
+            && (!Conf.IndicatorOnlyInGame || GameStats.InGame)) || UICore.IsReorganizing;
+    private static bool gateWant;
+    private static bool gateRunning = true;
+    internal static void Gate() {
+        if(updater == null) return;
+        PracticeInput.Poll();
+        PracticeDifficulty.FlushPendingDifficulty();
+        bool want = ShouldShow() || UICore.IsReorganizing;
+        bool run = want || gateWant;
+        gateWant = want;
+        if(gateRunning == run) return;
+        gateRunning = run;
+        updater.enabled = run;
+    }
     public static void Initialize(GameObject rootObject) {
         if(canvasObj != null) return;
         PracticeDifficulty.EnsureConf();
@@ -44,6 +60,8 @@ public static class PracticeOverlay {
         dragObj = ReorganizeHandle.CreateDragSurface(root,
             () => MainCore.Tr.Get("SECTION_PRACTICE_DIFFICULTY", "Practice Difficulty"), PracticeDifficulty.Save);
         updater = canvasObj.AddComponent<Updater>();
+        gateWant = true;
+        gateRunning = true;
         Apply();
     }
     public static void Apply() {
@@ -101,11 +119,8 @@ public static class PracticeOverlay {
         private void OnTranslationsLoaded(TranslationFailState state) => bodyValid = false;
         private void Update() {
             if(root == null || text == null) return;
-            PracticeInput.Poll();
-            PracticeDifficulty.FlushPendingDifficulty();
             bool isReorganizing = UICore.IsReorganizing;
-            bool show = (OverlaySwitch.Enabled && Conf.Enabled && Conf.ShowIndicator
-                && (!Conf.IndicatorOnlyInGame || GameStats.InGame)) || isReorganizing;
+            bool show = ShouldShow();
             if(raycaster != null && raycaster.enabled != isReorganizing) raycaster.enabled = isReorganizing;
             if(root.gameObject.activeSelf != show) root.gameObject.SetActive(show);
             if(dragObj != null && dragObj.activeSelf != isReorganizing) dragObj.SetActive(isReorganizing);

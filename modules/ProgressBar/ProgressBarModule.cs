@@ -20,4 +20,5 @@ public sealed class ProgressBarModule : QuartzModule {
         Context.OnModDisable("ProgressBarOverlay", ProgressBarOverlay.Dispose);
     }
     public override void OnUnload() => ProgressBarOverlay.Dispose();
+    public override void OnTick() => ProgressBarOverlay.Gate();
 }

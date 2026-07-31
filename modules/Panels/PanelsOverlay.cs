@@ -10,6 +10,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 using TMPro;
+using Quartz.Overlay;
 namespace Quartz.Features.Panels;
 public static partial class PanelsOverlay {
     public static SettingsFile<PanelsSettings> ConfMgr { get; private set; }
@@ -164,6 +165,19 @@ public static partial class PanelsOverlay {
     private static GraphicRaycaster raycaster;
     private static readonly List<LivePanel> panels = [];
     private static Updater updater;
+    private static bool ShouldShow() =>
+        (OverlaySwitch.Enabled && GameStats.InGame) || UICore.IsReorganizing;
+    private static bool gateWant;
+    private static bool gateRunning = true;
+    internal static void Gate() {
+        if(updater == null) return;
+        bool want = ShouldShow() || UICore.IsReorganizing;
+        bool run = want || gateWant;
+        gateWant = want;
+        if(gateRunning == run) return;
+        gateRunning = run;
+        updater.enabled = run;
+    }
     public static void EnsureConf() => ConfMgr ??= SettingsFile<PanelsSettings>.Loaded("OverlayPanels.json");
     internal static void Rescale(float fx, float fy) {
         EnsureConf();
@@ -181,6 +195,8 @@ public static partial class PanelsOverlay {
         canvasObj = UnityUtils.CreateOverlayCanvas("QuartzPanelsCanvas", root.transform, 32760, out raycaster);
         BuildPanels();
         updater = canvasObj.AddComponent<Updater>();
+        gateWant = true;
+        gateRunning = true;
     }
     public static void Dispose() {
         if(canvasObj == null) return;

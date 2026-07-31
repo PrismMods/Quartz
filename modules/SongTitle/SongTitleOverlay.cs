@@ -23,6 +23,19 @@ public static class SongTitleOverlay {
     private static TextMeshProUGUI text;
     private static GameObject dragObj;
     private static Updater updater;
+    private static bool ShouldShow() =>
+        (OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame) || UICore.IsReorganizing;
+    private static bool gateWant;
+    private static bool gateRunning = true;
+    internal static void Gate() {
+        if(updater == null) return;
+        bool want = ShouldShow() || UICore.IsReorganizing;
+        bool run = want || gateWant;
+        gateWant = want;
+        if(gateRunning == run) return;
+        gateRunning = run;
+        updater.enabled = run;
+    }
     private static string bbArtist;
     private static string bbTitle;
     private static string bbFmt;
@@ -70,6 +83,8 @@ public static class SongTitleOverlay {
         text.text = "";
         dragObj = ReorganizeHandle.CreateDragSurface(root, () => MainCore.Tr.Get("SONG_TITLE", "Song Title"), Save);
         updater = canvasObj.AddComponent<Updater>();
+        gateWant = true;
+        gateRunning = true;
         Apply();
     }
     public static void Apply() {
@@ -166,7 +181,7 @@ public static class SongTitleOverlay {
         private void Update() {
             if(root == null || text == null) return;
             bool isReorganizing = UICore.IsReorganizing;
-            bool show = (OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame) || isReorganizing;
+            bool show = ShouldShow();
             if(raycaster != null && raycaster.enabled != isReorganizing) raycaster.enabled = isReorganizing;
             if(root.gameObject.activeSelf != show) root.gameObject.SetActive(show);
             if(dragObj != null && dragObj.activeSelf != isReorganizing) dragObj.SetActive(isReorganizing);

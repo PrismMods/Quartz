@@ -18,4 +18,5 @@ public sealed class PanelsModule : QuartzModule {
         Context.OnModDisable("PanelsOverlay", PanelsOverlay.Dispose);
     }
     public override void OnUnload() => PanelsOverlay.Dispose();
+    public override void OnTick() => PanelsOverlay.Gate();
 }

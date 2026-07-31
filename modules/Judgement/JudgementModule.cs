@@ -19,4 +19,5 @@ public sealed class JudgementModule : QuartzModule {
         Context.OnModDisable("JudgementOverlay", JudgementOverlay.Dispose);
     }
     public override void OnUnload() => JudgementOverlay.Dispose();
+    public override void OnTick() => JudgementOverlay.Gate();
 }

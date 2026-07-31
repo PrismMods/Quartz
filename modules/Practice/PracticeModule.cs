@@ -21,4 +21,5 @@ public sealed class PracticeModule : QuartzModule {
         Context.OnModDisable("PracticeOverlay", PracticeOverlay.Dispose);
     }
     public override void OnUnload() => PracticeOverlay.Dispose();
+    public override void OnTick() => PracticeOverlay.Gate();
 }
