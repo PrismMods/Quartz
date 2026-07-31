@@ -1,0 +1,33 @@
+modules/KeyViewer/KeyViewerOverlay.Update.cs
+  s_aeaaa0cec2e235::t_599e38f6a4dc7e 13-22,97
+modules/KeyViewer/KeyViewerOverlay.cs
+  s_aeaaa0cec2e235::t_743c873fc2bdc3 68
+Quartz/UI/Utility/NativeCursor.cs
+  s_aeaaa0cec2e235::t_31148afe76361d 52-58
+  s_aeaaa0cec2e235::t_1acc36b795785e 79-80,82-87,96-98
+modules/KeyViewer/KeyViewerOverlay.DmNote.cs
+  s_aeaaa0cec2e235::t_743c873fc2bdc3 9,135-136,140-143
+Quartz/UI/Utility/UIScrollController.cs
+  s_aeaaa0cec2e235::t_937609635f217a 15,77-78,98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.19",
+  "base_commit_sha": "f2017e462e5318805c5849c6f9bd3cecb5a7c23b",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_aeaaa0cec2e235": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "60c3fbd9-fdf8-4a3c-a5c7-80827902651c",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
