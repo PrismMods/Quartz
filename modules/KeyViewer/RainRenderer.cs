@@ -345,9 +345,18 @@ internal sealed class RainManager : MonoBehaviour {
         graphic.raycastTarget = false;
         graphic.color = Color.white;
         graphic.SetSource(groups);
+        enabled = true;
     }
     public void Enqueue(RawRain raw) {
-        if(raw != null) pending.Enqueue(raw);
+        if(raw == null) return;
+        pending.Enqueue(raw);
+        if(!enabled) enabled = true;
+    }
+    private bool IsIdle() {
+        if(pending.Count > 0) return false;
+        for(int i = 0; i < groups.Length; i++)
+            if(groups[i].Count > 0) return false;
+        return true;
     }
     public void Clear() {
         pending.Clear();
@@ -404,5 +413,6 @@ internal sealed class RainManager : MonoBehaviour {
             if(write < active.Count) active.RemoveRange(write, active.Count - write);
         }
         if(dirty) graphic.SetFrame(now);
+        if(IsIdle()) enabled = false;
     }
 }
