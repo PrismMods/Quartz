@@ -90,9 +90,10 @@ public static class TufPreviewCache {
     internal static void Pump() {
         if(mainQueue.IsEmpty) return;
         if(Quartz.Game.Stats.GameStats.InGame && !Quartz.UI.UICore.IsOpen) return;
-        Stopwatch stopwatch = Stopwatch.StartNew();
+        long startedAt = Stopwatch.GetTimestamp();
+        long budgetTicks = (long)(MaxMillisPerFrame * Stopwatch.Frequency / 1000.0);
         int ops = 0;
-        while(ops < MaxOpsPerFrame && stopwatch.Elapsed.TotalMilliseconds < MaxMillisPerFrame
+        while(ops < MaxOpsPerFrame && Stopwatch.GetTimestamp() - startedAt < budgetTicks
             && mainQueue.TryDequeue(out Action? action)) {
             try { action(); } catch(Exception e) { MainCore.Log.Msg("[TUF] preview step failed: " + e.Message); }
             ops++;
@@ -263,9 +264,10 @@ public static class TufPreviewCache {
             }
             if(!entries.TryGetValue(key, out Entry? entry)) entry = entries[key] = new Entry();
             if(entry.Texture != null) UnityEngine.Object.Destroy(entry.Texture);
+            bool alreadyTracked = entry.Status == Status.Ready;
             entry.Texture = texture;
             entry.Status = Status.Ready;
-            insertionOrder.Enqueue(key);
+            if(!alreadyTracked) insertionOrder.Enqueue(key);
             EvictIfNeeded();
         }
         Changed?.Invoke();
@@ -273,8 +275,8 @@ public static class TufPreviewCache {
     private static void EvictIfNeeded() {
         while(insertionOrder.Count > MaxTextures) {
             string old = insertionOrder.Dequeue();
-            if(!entries.TryGetValue(old, out Entry? entry) || entry.Texture == null) continue;
-            UnityEngine.Object.Destroy(entry.Texture);
+            if(!entries.TryGetValue(old, out Entry? entry)) continue;
+            if(entry.Texture != null) UnityEngine.Object.Destroy(entry.Texture);
             entries.Remove(old);
         }
     }
