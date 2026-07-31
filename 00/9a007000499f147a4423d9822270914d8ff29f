@@ -1,0 +1,19 @@
+build.json
+  s_b0fd2824275fb7::t_2324b263695e8e 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.19",
+  "base_commit_sha": "009a007000499f147a4423d9822270914d8ff29f",
+  "prompts": {},
+  "sessions": {
+    "s_b0fd2824275fb7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5a0e3d8b-d66e-4940-abc4-e0862bf11438",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
