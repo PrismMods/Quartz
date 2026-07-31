@@ -50,6 +50,15 @@
 > [!WARNING]
 > 맥에서는 폴더 전체를 덮어 씌워버리기 때문에 각 파일을 수동으로 옮겨야 합니다.
 
+## 특별후원자들
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><img src="https://cdn.discordapp.com/avatars/1056056739734233189/a1480d6fddb9339810c858d2b74484d4.webp?size=1024" width="100px;" alt="Refreshin"/><br /><sub><b>개운</b></sub></a><br /><a>🔥</a></td>
+    </tr>
+  </tbody>
+</table>
+
 ## 스크린샷
 
 ![메인 메뉴](readme/mainmenu.png)
