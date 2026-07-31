@@ -8,6 +8,13 @@ namespace Quartz.UI.Home;
 public static class HomeUI {
     public const float CardHeight = 148f;
     public const float StatHeight = 96f;
+    public static RectTransform Grid(Transform parent) {
+        RectTransform row = Grid(parent, 0f);
+        LayoutElement le = row.GetComponent<LayoutElement>();
+        le.preferredHeight = -1f;
+        le.minHeight = -1f;
+        return row;
+    }
     public static RectTransform Grid(Transform parent, float height) {
         RectTransform row = GenerateUI.Row(parent, height);
         HorizontalLayoutGroup layout = row.gameObject.AddComponent<HorizontalLayoutGroup>();
@@ -29,6 +36,8 @@ public static class HomeUI {
         bg.type = Image.Type.Sliced;
         bg.color = Color.Lerp(UIColors.PanelBG, UIColors.ObjectBG, 0.55f);
         bg.raycastTarget = false;
+        LayoutElement cardLe = cardObj.AddComponent<LayoutElement>();
+        cardLe.minHeight = 96f;
         VerticalLayoutGroup layout = cardObj.AddComponent<VerticalLayoutGroup>();
         layout.padding = new RectOffset(18, 18, 14, 14);
         layout.spacing = 2f;
@@ -48,8 +57,15 @@ public static class HomeUI {
         }
         return cardObj.transform;
     }
-    public static void Stat(Transform grid, string value, string label) {
+    public static void Stat(Transform grid, string value, string label) => Stat(grid, value, label, null);
+    public static void Stat(Transform grid, string value, string label, Action onClick) {
         Transform card = Card(grid, null);
+        if(onClick != null) {
+            card.GetComponent<Image>().raycastTarget = true;
+            GenerateUI.AddButton(card.gameObject, btn => {
+                if(btn == UnityEngine.EventSystems.PointerEventData.InputButton.Left) onClick();
+            });
+        }
         TextMeshProUGUI number = GenerateUI.AddText(GenerateUI.Row(card, 40f), true);
         number.text = value;
         number.fontSize = 30f;
@@ -60,6 +76,11 @@ public static class HomeUI {
         TextMeshProUGUI caption = GenerateUI.AddMutedText(GenerateUI.Row(card, 24f), 15f, 0.5f, true);
         caption.text = label;
         caption.overflowMode = TextOverflowModes.Ellipsis;
+    }
+    public static void Spacer(Transform grid) {
+        GameObject obj = new("Spacer");
+        obj.transform.SetParent(grid, false);
+        obj.AddComponent<RectTransform>();
     }
     public static TextMeshProUGUI Line(Transform parent, string text) {
         TextMeshProUGUI label = GenerateUI.AddMutedText(GenerateUI.Row(parent, 26f), 15f, 0.5f, true);
