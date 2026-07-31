@@ -1,0 +1,19 @@
+Quartz/Core/Service/LangUpdateService.cs
+  s_aeaaa0cec2e235::t_c496ec83793d10 31,42,53,58,72,74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.19",
+  "base_commit_sha": "634aec93f114c26d722951e9afce7b668403b603",
+  "prompts": {},
+  "sessions": {
+    "s_aeaaa0cec2e235": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "60c3fbd9-fdf8-4a3c-a5c7-80827902651c",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
