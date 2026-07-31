@@ -6,10 +6,30 @@ using UnityEngine.UI;
 namespace Quartz.UI.Factory;
 public static class PageFactory {
     public static RectTransform PagesContaner;
+    private static readonly Dictionary<int, (Quartz.UI.Nav.NavPage Def, RectTransform Target)> unbuilt = [];
+    public static void EnsureBuilt(int state) {
+        if(!unbuilt.TryGetValue(state, out (Quartz.UI.Nav.NavPage Def, RectTransform Target) entry)) return;
+        unbuilt.Remove(state);
+        try {
+            entry.Def.Build(entry.Target);
+        } catch(Exception e) {
+            string owner = entry.Def.OwnerId == null ? "UI" : "Addon:" + entry.Def.OwnerId;
+            Quartz.Core.MainCore.Log.Err($"[{owner}] page '{entry.Def.Key}' build threw: {e}");
+            RectTransform fallback = entry.Def.OwnScroll ? CreateScrollablePage(entry.Target) : entry.Target;
+            GenerateUI.AddMutedText(GenerateUI.Row(fallback, 40f)).text = $"'{entry.Def.Title}' failed to build — see log";
+        }
+    }
+    public static void EnsureAllBuilt() {
+        if(unbuilt.Count == 0) return;
+        int[] states = new int[unbuilt.Count];
+        unbuilt.Keys.CopyTo(states, 0);
+        for(int i = 0; i < states.Length; i++) EnsureBuilt(states[i]);
+    }
     public static RectTransform CreatePages(GameObject panel) {
         GenerateUI.ClearSections();
         ToggleBinds.ClearLive();
         UICore.Pages.Clear();
+        unbuilt.Clear();
         GameObject pagesContainer = new("PagesContainer");
         pagesContainer.transform.SetParent(panel.transform, false);
         PagesContaner = pagesContainer.AddComponent<RectTransform>();
@@ -21,18 +41,11 @@ public static class PageFactory {
         Quartz.UI.Nav.CorePages.EnsureRegistered();
         foreach(Quartz.UI.Nav.NavPage def in Quartz.UI.Nav.NavRegistry.AllVisible()) {
             RectTransform page = CreatePageBase(def.State);
-            RectTransform target = def.OwnScroll ? page : CreateScrollablePage(page);
-            try {
-                def.Build(target);
-            } catch(Exception e) {
-                string owner = def.OwnerId == null ? "UI" : "Addon:" + def.OwnerId;
-                Quartz.Core.MainCore.Log.Err($"[{owner}] page '{def.Key}' build threw: {e}");
-                RectTransform fallback = def.OwnScroll ? CreateScrollablePage(page) : target;
-                GenerateUI.AddMutedText(GenerateUI.Row(fallback, 40f)).text = $"'{def.Title}' failed to build — see log";
-            }
+            unbuilt[def.State] = (def, def.OwnScroll ? page : CreateScrollablePage(page));
         }
         if(!UICore.Pages.ContainsKey(UICore.CurrentMenuState))
             UICore.CurrentMenuState = Quartz.UI.Nav.NavRegistry.FirstVisibleState();
+        EnsureBuilt(UICore.CurrentMenuState);
         UICore.Pages[UICore.CurrentMenuState].GetComponent<CanvasGroup>().alpha = 1f;
         UICore.Pages[UICore.CurrentMenuState].GetComponent<CanvasGroup>().interactable = true;
         UICore.Pages[UICore.CurrentMenuState].GetComponent<CanvasGroup>().blocksRaycasts = true;

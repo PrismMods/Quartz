@@ -119,6 +119,7 @@ internal static class PageSearch {
         return cachedIndex;
     }
     private static List<Entry> BuildIndex() {
+        Quartz.UI.Factory.PageFactory.EnsureAllBuilt();
         List<Entry> list = [];
         foreach(KeyValuePair<int, RectTransform> page in UICore.Pages) {
             if(page.Key == Quartz.UI.Nav.NavRegistry.StateFor(Quartz.UI.Nav.CorePages.SearchPageKey) || page.Value == null) continue;

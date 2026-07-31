@@ -9,6 +9,7 @@ public class PageSwicher {
     private static GTween pageSeq;
     public static bool SwitchPage(int from, int to) {
         if(from == to) return false;
+        Quartz.UI.Factory.PageFactory.EnsureBuilt(to);
         if(!UICore.Pages.TryGetValue(from, out RectTransform fromPage)) return false;
         if(!UICore.Pages.TryGetValue(to, out RectTransform toPage)) return false;
         CanvasGroup fromCg = fromPage.GetComponent<CanvasGroup>();

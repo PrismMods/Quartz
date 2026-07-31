@@ -242,6 +242,7 @@ internal static partial class PageSettings {
         }
     }
     internal static void OnTranslatorLoadEnd() {
+        if(languageDropdown == null) return;
         string[] langs = [.. MainCore.Tr.GetLanguages().OrderBy(x => x, StringComparer.OrdinalIgnoreCase)];
         languageDropdown.SetValues(langs);
         languageDropdown.Set(

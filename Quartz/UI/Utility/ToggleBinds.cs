@@ -53,7 +53,10 @@ public static class ToggleBinds {
         return field != null && field.isFocused;
     }
     private static void Fire(string id) {
-        if(!live.TryGetValue(id, out List<UIToggle> list)) return;
+        if(!live.TryGetValue(id, out List<UIToggle> list)) {
+            Quartz.UI.Factory.PageFactory.EnsureAllBuilt();
+            if(!live.TryGetValue(id, out list)) return;
+        }
         UIToggle primary = null;
         for(int i = list.Count - 1; i >= 0; i--) {
             UIToggle toggle = list[i];
