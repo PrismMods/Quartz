@@ -6,6 +6,7 @@ namespace Quartz.Features.KeyViewer;
 public static partial class KeyViewerOverlay {
     private static void BuildDmNote() {
         built = true;
+        lastSyncedFont = null;
         GameObject rainObj = new("RainLayer");
         rainObj.transform.SetParent(root, false);
         RectTransform rainLayer = rainObj.AddComponent<RectTransform>();
@@ -131,11 +132,15 @@ public static partial class KeyViewerOverlay {
             nextKpsSample = now + 0.05f;
         }
         TMP_FontAsset font = FontManager.Current;
+        bool syncFont = !ReferenceEquals(font, lastSyncedFont);
+        if(syncFont) lastSyncedFont = font;
         float displayDelay = dmKeyDisplayDelayMs / 1000f;
         bool instantDisplay = displayDelay <= 0.0001f;
         foreach(Box box in boxes) {
-            if(box.Label != null && box.Label.font != font) { box.Label.font = font; box.GradLabelText = null; }
-            if(box.Value != null && box.Value.font != font) { box.Value.font = font; box.GradValueText = null; box.CounterStrokeMat = null; }
+            if(syncFont) {
+                if(box.Label != null) { box.Label.font = font; box.GradLabelText = null; }
+                if(box.Value != null) { box.Value.font = font; box.GradValueText = null; box.CounterStrokeMat = null; }
+            }
             DmNoteSpec spec = box.Dm;
             if(spec == null) continue;
             if(spec.IsStat) {

@@ -10,7 +10,16 @@ namespace Quartz.Features.KeyViewer;
 public static partial class KeyViewerOverlay {
     private sealed class Updater : MonoBehaviour {
         private static bool CanRebuild => !GameStats.InGame || Quartz.UI.UICore.IsOpen;
-        private void OnApplicationFocus(bool hasFocus) => KvInputQueue.SetFocused(hasFocus);
+        private bool focusKnown;
+        private bool hasFocus = true;
+        private void Awake() {
+            hasFocus = Application.isFocused;
+            focusKnown = true;
+        }
+        private void OnApplicationFocus(bool focus) {
+            hasFocus = focus;
+            focusKnown = true;
+        }
         private void LateUpdate() {
             if(cssDownloadArrived && CanRebuild) {
                 cssDownloadArrived = false;
@@ -85,7 +94,7 @@ public static partial class KeyViewerOverlay {
             gameStateKnown = true;
             bool isReorganizing = UICore.IsReorganizing;
             bool show = OverlaySwitch.Enabled && Conf.Enabled && (Conf.ShowOutsideGame || inGame) || isReorganizing;
-            bool focused = Application.isFocused;
+            bool focused = focusKnown ? hasFocus : Application.isFocused;
             bool independent = Conf.Enabled && Conf.IndependentInput;
             KvInputQueue.SetWanted(independent);
             KvInputQueue.SetFocused(focused);

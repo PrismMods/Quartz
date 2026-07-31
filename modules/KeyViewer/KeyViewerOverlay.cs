@@ -65,6 +65,7 @@ public static partial class KeyViewerOverlay {
     private static int kpsSum;
     private static int kpsSamples;
     private static float nextKpsSample;
+    private static TMPro.TMP_FontAsset lastSyncedFont;
     private static int totalCount;
     private static bool countsDirty;
     private static float nextCountsSave;

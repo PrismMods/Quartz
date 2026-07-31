@@ -49,7 +49,13 @@ public static class NativeCursor {
     private static extern IntPtr LoadCursorW(IntPtr hInstance, IntPtr lpCursorName);
     [DllImport("user32.dll")]
     private static extern IntPtr SetCursor(IntPtr hCursor);
-    private static IntPtr LoadWinCursor(int id) => LoadCursorW(IntPtr.Zero, (IntPtr)id);
+    private static readonly Dictionary<int, IntPtr> winCursors = new();
+    private static IntPtr LoadWinCursor(int id) {
+        if(winCursors.TryGetValue(id, out IntPtr cached)) return cached;
+        IntPtr loaded = LoadCursorW(IntPtr.Zero, (IntPtr)id);
+        winCursors[id] = loaded;
+        return loaded;
+    }
     private static void ApplyWindows(ResizeCursorShape shape) {
         int id = shape switch {
             ResizeCursorShape.Horizontal => IDC_SIZEWE,
@@ -70,7 +76,15 @@ public static class NativeCursor {
     private static extern byte objc_msgSend_bool(IntPtr receiver, IntPtr selector, IntPtr arg);
     private static IntPtr nsCursorClass;
     private static IntPtr respondsSel;
+    private static IntPtr setSel;
+    private static readonly Dictionary<string, IntPtr> macCursors = new(StringComparer.Ordinal);
     private static IntPtr NSCursorByName(string selName) {
+        if(macCursors.TryGetValue(selName, out IntPtr cached)) return cached;
+        IntPtr resolved = ResolveNSCursor(selName);
+        macCursors[selName] = resolved;
+        return resolved;
+    }
+    private static IntPtr ResolveNSCursor(string selName) {
         if(nsCursorClass == IntPtr.Zero) nsCursorClass = objc_getClass("NSCursor");
         if(nsCursorClass == IntPtr.Zero) return IntPtr.Zero;
         if(respondsSel == IntPtr.Zero) respondsSel = sel_registerName("respondsToSelector:");
@@ -79,7 +93,9 @@ public static class NativeCursor {
         return objc_msgSend(nsCursorClass, sel);
     }
     private static void MacSet(IntPtr cursor) {
-        if(cursor != IntPtr.Zero) objc_msgSend(cursor, sel_registerName("set"));
+        if(cursor == IntPtr.Zero) return;
+        if(setSel == IntPtr.Zero) setSel = sel_registerName("set");
+        objc_msgSend(cursor, setSel);
     }
     private static void ApplyMac(ResizeCursorShape shape) {
         IntPtr cursor = shape switch {

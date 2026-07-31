@@ -12,6 +12,7 @@ public class UIScrollController : MonoBehaviour {
     private bool rightDragging;
     private float targetY;
     private GTween scrollTween;
+    private float tweenedTo = float.NaN;
     private void Awake() {
         if(content != null) targetY = content.anchoredPosition.y;
     }
@@ -73,6 +74,8 @@ public class UIScrollController : MonoBehaviour {
         targetY = Mathf.Clamp(targetY, 0f, maxOffset);
     }
     private void ApplyTween() {
+        if(scrollTween != null && tweenedTo.Equals(targetY)) return;
+        tweenedTo = targetY;
         scrollTween?.Kill();
         scrollTween = GTweenExtensions.Tween(
             () => content.anchoredPosition.y,
@@ -92,6 +95,7 @@ public class UIScrollController : MonoBehaviour {
     public void SetContent(RectTransform content, RectTransform viewport) {
         this.content = content;
         this.viewport = viewport;
+        tweenedTo = float.NaN;
         if(content != null) targetY = content.anchoredPosition.y;
     }
 }
