@@ -1,0 +1,50 @@
+modules/Judgement/JudgementOverlay.cs
+  s_aeaaa0cec2e235::t_a88280b906381c 31-43,209
+  s_aeaaa0cec2e235::t_e846fb30f87d28 77-78
+modules/Panels/PanelsOverlay.cs
+  s_aeaaa0cec2e235::t_e846fb30f87d28 198-199
+  s_aeaaa0cec2e235::t_a88280b906381c 168-180
+  s_aeaaa0cec2e235::t_59ab0ad8bf8de5 13
+modules/Combo/ComboModule.cs
+  s_aeaaa0cec2e235::t_cc8b43f63cf813 22
+modules/Practice/PracticeModule.cs
+  s_aeaaa0cec2e235::t_cc8b43f63cf813 24
+modules/Practice/PracticeOverlay.cs
+  s_aeaaa0cec2e235::t_e846fb30f87d28 63-64
+  s_aeaaa0cec2e235::t_cc8b43f63cf813 22-37,123
+modules/ProgressBar/ProgressBarModule.cs
+  s_aeaaa0cec2e235::t_59ab0ad8bf8de5 23
+modules/SongTitle/SongTitleOverlay.cs
+  s_aeaaa0cec2e235::t_e846fb30f87d28 86-87
+  s_aeaaa0cec2e235::t_a88280b906381c 26-38,184
+modules/Panels/PanelsModule.cs
+  s_aeaaa0cec2e235::t_cc8b43f63cf813 21
+modules/Judgement/JudgementModule.cs
+  s_aeaaa0cec2e235::t_cc8b43f63cf813 22
+modules/SongTitle/SongTitleModule.cs
+  s_aeaaa0cec2e235::t_cc8b43f63cf813 25
+modules/Combo/ComboOverlay.cs
+  s_aeaaa0cec2e235::t_a88280b906381c 25-37,189
+  s_aeaaa0cec2e235::t_e846fb30f87d28 62-63
+modules/ProgressBar/ProgressBar.cs
+  s_aeaaa0cec2e235::t_e846fb30f87d28 102-103
+  s_aeaaa0cec2e235::t_a88280b906381c 24-35,195
+modules/Panels/PanelsOverlay.LivePanel.cs
+  s_aeaaa0cec2e235::t_a88280b906381c 37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.19",
+  "base_commit_sha": "76bc52e42436cf36fa9f32cbf4b9e9e5a42ae3f9",
+  "prompts": {},
+  "sessions": {
+    "s_aeaaa0cec2e235": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "60c3fbd9-fdf8-4a3c-a5c7-80827902651c",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
