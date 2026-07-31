@@ -1,0 +1,23 @@
+Quartz/Core/Keybind.cs
+  s_aeaaa0cec2e235::t_41761913baff6d 32-45
+modules/Practice/PracticeOverlay.cs
+  s_aeaaa0cec2e235::t_446438fbc1067c 148
+modules/UiHider/UiHider.cs
+  s_aeaaa0cec2e235::t_446438fbc1067c 105
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.19",
+  "base_commit_sha": "7ea8073bfba1b4dd4968a3d0297a0bd361ed2604",
+  "prompts": {},
+  "sessions": {
+    "s_aeaaa0cec2e235": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "60c3fbd9-fdf8-4a3c-a5c7-80827902651c",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
