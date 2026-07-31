@@ -140,4 +140,44 @@ static class ReflTests {
             return true;
         }
     }
+#pragma warning disable CS0414
+    class ReadBase {
+        private string BasePrivate = "base-private";
+        public string BasePublic = "base-public";
+    }
+#pragma warning restore CS0414
+    class ReadDerived : ReadBase {
+        public int Number = 7;
+        public string Prop => "prop";
+        public string this[int i] => "indexer";
+    }
+    public static void TestTryReadFindsFieldsAndPropertiesByRuntimeType() {
+        object target = new ReadDerived();
+        Assert(Refl.TryRead(target, "Number", out object number) && number is 7,
+            "a public field on the runtime type is readable");
+        Assert(Refl.TryRead(target, "Prop", out object prop) && (string)prop == "prop",
+            "a readable property is readable");
+        Assert(Refl.TryRead(target, "BasePublic", out object basePublic) && (string)basePublic == "base-public",
+            "an inherited public field is readable");
+        Assert(Refl.TryRead(target, "BasePrivate", out object basePrivate) && (string)basePrivate == "base-private",
+            "a private field on a base type is reachable through the walk");
+    }
+    public static void TestTryReadIsInertOnMissesAndNulls() {
+        Assert(!Refl.TryRead(null, "Number", out _), "a null target reads nothing");
+        Assert(!Refl.TryRead(new ReadDerived(), null, out _), "a null name reads nothing");
+        Assert(!Refl.TryRead(new ReadDerived(), "", out _), "an empty name reads nothing");
+        Assert(!Refl.TryRead(new ReadDerived(), "nothingNamedThis", out object missing) && missing == null,
+            "an absent member reads nothing and yields null");
+    }
+    public static void TestTryReadNeverResolvesAnIndexer() {
+        Assert(!Refl.TryRead(new ReadDerived(), "Item", out _),
+            "the compiler-generated indexer must never resolve as a member");
+    }
+    public static void TestTryReadCachesHitsAndMisses() {
+        object target = new ReadDerived();
+        Refl.TryRead(target, "Number", out _);
+        Refl.TryRead(target, "nothingNamedThis", out _);
+        long hit = Alloc.BytesPerOp(() => Alloc.Consume(Refl.TryRead(target, "nothingNamedThis", out _)));
+        Assert(hit == 0, "a cached miss must not re-run reflection or allocate, measured " + hit + " B/op");
+    }
 }

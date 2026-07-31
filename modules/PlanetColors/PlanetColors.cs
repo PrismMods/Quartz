@@ -18,7 +18,6 @@ public static partial class PlanetColors {
     }
     private static bool applying;
     private static readonly Dictionary<int, int> rendererSlots = [];
-    private static readonly Dictionary<(Type, string), MemberInfo> memberCache = [];
     private static readonly Dictionary<string, MethodInfo> colorMethodCache = [];
     private static readonly object[] colorInvokeArgs = new object[1];
     private static MethodInfo setParticleSystemColorMethod;
@@ -32,8 +31,6 @@ public static partial class PlanetColors {
     private static int cachedSystemCount = -1;
     private static scrPlanet[] cachedSystemPlanets;
     private static readonly Color TailStartColorMultiplier = new(0.5f, 0.5f, 0.5f, 1f);
-    private const BindingFlags MemberFlags =
-        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
     public static void ClearSceneCaches() {
         InvalidatePlanetCache();
         rendererSlots.Clear();
@@ -320,40 +317,8 @@ public static partial class PlanetColors {
             }
         } catch(Exception e) { Diag.Ignore(e); }
     }
-    private static bool TryGetMemberValue(object target, string name, out object value) {
-        value = null;
-        if(target == null || string.IsNullOrEmpty(name)) return false;
-        MemberInfo member = GetMember(target.GetType(), name);
-        if(member == null) return false;
-        try {
-            if(member is FieldInfo field) {
-                value = field.GetValue(target);
-                return true;
-            }
-            if(member is PropertyInfo property && property.GetIndexParameters().Length == 0) {
-                value = property.GetValue(target, null);
-                return true;
-            }
-        } catch(Exception e) { Diag.Ignore(e); }
-        return false;
-    }
-    private static MemberInfo GetMember(Type type, string name) {
-        if(type == null || string.IsNullOrEmpty(name)) return null;
-        var key = (type, name);
-        if(memberCache.TryGetValue(key, out MemberInfo cached)) return cached;
-        for(Type t = type; t != null; t = t.BaseType) {
-            FieldInfo field = t.GetField(name, MemberFlags);
-            if(field != null) {
-                memberCache[key] = field;
-                return field;
-            }
-            PropertyInfo property = t.GetProperty(name, MemberFlags);
-            if(property != null && property.GetIndexParameters().Length == 0) {
-                memberCache[key] = property;
-                return property;
-            }
-        }
-        memberCache[key] = null;
-        return null;
-    }
+    private const BindingFlags MemberFlags =
+        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+    private static bool TryGetMemberValue(object target, string name, out object value) =>
+        Refl.TryRead(target, name, out value);
 }

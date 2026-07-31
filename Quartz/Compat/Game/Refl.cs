@@ -77,6 +77,39 @@ public static partial class Refl {
             return BindMethod<TDelegate>(getter);
         }
     }
+    private const BindingFlags InstanceMembers =
+        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+    private static readonly ConcurrentDictionary<(Type Owner, string Name), MemberInfo> InstanceMemberCache = new();
+    public static bool TryRead(object target, string name, out object value) {
+        value = null;
+        if(target == null || string.IsNullOrEmpty(name)) return false;
+        MemberInfo member = InstanceMemberCache.GetOrAdd(
+            (target.GetType(), name),
+            static key => ResolveInstanceMember(key.Owner, key.Name));
+        if(member == null) return false;
+        try {
+            if(member is FieldInfo field) {
+                value = field.GetValue(target);
+                return true;
+            }
+            if(member is PropertyInfo prop) {
+                value = prop.GetValue(target, null);
+                return true;
+            }
+        } catch(Exception e) { Diag.Ignore(e); }
+        return false;
+    }
+    private static MemberInfo ResolveInstanceMember(Type owner, string name) {
+        for(Type t = owner; t != null; t = t.BaseType) {
+            try {
+                FieldInfo field = t.GetField(name, InstanceMembers);
+                if(field != null) return field;
+                PropertyInfo prop = t.GetProperty(name, InstanceMembers);
+                if(prop != null && prop.GetIndexParameters().Length == 0) return prop;
+            } catch(Exception e) { Diag.Ignore(e); }
+        }
+        return null;
+    }
     public static TDelegate BindMethod<TDelegate>(MethodInfo m) where TDelegate : Delegate {
         if(m == null) return null;
         try {

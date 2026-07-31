@@ -79,7 +79,6 @@ public static partial class Tweaks {
     private static readonly Dictionary<int, bool> lightUpDisableGlowStates = [];
     private static readonly Dictionary<int, bool> planetGlowEnabledStates = [];
     private static readonly Dictionary<int, bool> floorGlowActiveStates = [];
-    private static readonly Dictionary<(Type, string), MemberInfo> planetRendererMemberCache = [];
     private static readonly Dictionary<int, (ParticleSystem, ParticleSystem)> planetParticleCache = [];
     private static readonly HashSet<int> suppressNextRandomColorFloorIds = [];
     private static readonly ffxCheckpoint[] EmptyCheckpoints = [];
@@ -89,8 +88,6 @@ public static partial class Tweaks {
     private static PlanetRenderer[] cachedRenderers;
     private static scrFloor[] cachedFloors;
     private static int lightUpDepth;
-    private const BindingFlags PlanetRendererMemberFlags =
-        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
     private static T[] FindObjectsCompat<T>() where T : UnityEngine.Object
         => UnityEngine.Object.FindObjectsByType<T>(FindObjectsSortMode.None);
     public static void ClearSceneCaches() {
@@ -220,43 +217,8 @@ public static partial class Tweaks {
         => GetPlanetRendererParticle(renderer, "sparks");
     private static ParticleSystem GetPlanetRendererParticle(PlanetRenderer renderer, string name)
         => TryGetPlanetRendererMemberValue(renderer, name, out object value) ? value as ParticleSystem : null;
-    private static bool TryGetPlanetRendererMemberValue(PlanetRenderer renderer, string name, out object value) {
-        value = null;
-        if(renderer == null || string.IsNullOrEmpty(name)) return false;
-        MemberInfo member = GetPlanetRendererMember(renderer.GetType(), name);
-        if(member == null) return false;
-        try {
-            if(member is FieldInfo field) {
-                value = field.GetValue(renderer);
-                return true;
-            }
-            if(member is PropertyInfo property && property.GetIndexParameters().Length == 0) {
-                value = property.GetValue(renderer, null);
-                return true;
-            }
-        } catch(Exception e) { Diag.Ignore(e); }
-        return false;
-    }
-    private static MemberInfo GetPlanetRendererMember(Type type, string name) {
-        if(type == null || string.IsNullOrEmpty(name)) return null;
-        var key = (type, name);
-        if(planetRendererMemberCache.TryGetValue(key, out MemberInfo cached))
-            return cached;
-        for(Type t = type; t != null; t = t.BaseType) {
-            FieldInfo field = t.GetField(name, PlanetRendererMemberFlags);
-            if(field != null) {
-                planetRendererMemberCache[key] = field;
-                return field;
-            }
-            PropertyInfo property = t.GetProperty(name, PlanetRendererMemberFlags);
-            if(property != null && property.GetIndexParameters().Length == 0) {
-                planetRendererMemberCache[key] = property;
-                return property;
-            }
-        }
-        planetRendererMemberCache[key] = null;
-        return null;
-    }
+    private static bool TryGetPlanetRendererMemberValue(PlanetRenderer renderer, string name, out object value) =>
+        Refl.TryRead(renderer, name, out value);
     private static bool IsRemovedPlanetParticle(PlanetRenderer renderer, ParticleSystem particles) {
         if(renderer == null || particles == null) return false;
         (ParticleSystem core, ParticleSystem sparks) = GetPlanetParticles(renderer);
