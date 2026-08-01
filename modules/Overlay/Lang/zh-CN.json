@@ -7,6 +7,6 @@
     "OVERLAY_FPS_SMOOTH": "FPS刷新间隔",
     "DESC_OVERLAY_FPS_SMOOTH": "FPS计数器每次数值保持时间；0=每帧更新，数值越大刷新越慢越平稳。",
     "OVERLAY_REORGANIZE": "布局调整模式",
-    "MODULE_OVERLAY_CORE": "叠加层核心"
+    "MODULE_OVERLAY_CORE": "覆盖层核心"
   }
 }

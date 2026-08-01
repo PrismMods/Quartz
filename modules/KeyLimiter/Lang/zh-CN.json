@@ -15,7 +15,7 @@
     "KL_SYNC_LOCKED": "按键列表由按键显示器同步管理（同步开关已开启）。",
     "SECTION_KEY_LIMITER": "按键限制器",
     "SECTION_KEYBOARD_CHATTER_BLOCKER": "按键误触屏蔽器",
-    "KL_HOME_KEYS": "{0}：{1} 个按键 · {2}",
+    "KL_HOME_KEYS": "{0}：{1}个按键 · {2}",
     "KL_HOME_ON": "限制中",
     "KL_HOME_OFF": "关闭"
   }

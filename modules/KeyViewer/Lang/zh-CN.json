@@ -183,8 +183,8 @@
     "KVI_COUNTER_SHOWWHILEPRESSING": "按下时显示计数器",
     "KVI_DISPLAY_PRESSED": "按下时标签（留空=同空闲时）",
     "KVI_LABEL_ENABLED": "显示标签",
-    "KVI_HOME_ON": "开",
-    "KVI_HOME_OFF": "关",
-    "KVI_HOME_RAIN": "雨滴 {0} · 速度 {1:0} px/s"
+    "KVI_HOME_ON": "开启",
+    "KVI_HOME_OFF": "关闭",
+    "KVI_HOME_RAIN": "雨键{0} · 速度{1:0}px/s"
   }
 }

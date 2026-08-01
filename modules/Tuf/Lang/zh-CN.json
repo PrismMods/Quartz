@@ -33,13 +33,13 @@
     "TUF_RETRY": "重试",
     "TUF_UNAVAILABLE": "不可用",
     "TUF_CANCEL": "取消",
-    "TUF_UNSAVED_TITLE": "编辑器中有未保存的修改",
-    "TUF_UNSAVED_BODY": "编辑器中打开的关卡有尚未保存的修改。要在加载此 TUF 关卡前保存吗？",
+    "TUF_UNSAVED_TITLE": "编辑器有未保存的更改",
+    "TUF_UNSAVED_BODY": "编辑器中打开的谱面有未保存的更改。加载此TUF谱面前请先保存。",
     "TUF_UNSAVED_SAVE": "保存",
     "TUF_UNSAVED_DISCARD": "放弃",
     "TUF_UNSAVED_CANCEL": "取消",
-    "TUF_SAVE_FAILED": "无法保存编辑器中的修改。",
-    "TUF_EXIT_PLAY_FAILED": "无法退出游玩模式，请自行停止本次游玩后重试。",
+    "TUF_SAVE_FAILED": "编辑器更改无法保存。",
+    "TUF_EXIT_PLAY_FAILED": "无法退出游玩模式；请先停止对局，然后重试。",
     "TUF_CHART_LOAD_REJECTED": "游戏无法加载该谱面——可能需要其他模组支持。",
     "TUF_LAUNCH_INVALID_PATH": "可游玩谱面路径无效。",
     "TUF_LAUNCH_STATE_ERROR": "无法清除冲突的TUFHelper启动状态。",
@@ -103,6 +103,6 @@
     "TUF_PLAY": "游玩",
     "TUF_MAIN_LAUNCH_FAILED": "无法打开基础游戏谱面。",
     "TUF_BUY_DLC": "购买DLC",
-    "TUF_HOME_INSTALLED": "已安装 {0} 个关卡"
+    "TUF_HOME_INSTALLED": "已安装{0}首谱面"
   }
 }

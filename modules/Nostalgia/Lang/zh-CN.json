@@ -59,9 +59,9 @@
     "DESC_NOST_ANNOUNCE": "隐藏大厅内公告新闻立牌。",
     "DESC_NOST_OLDBG": "将大厅背景替换为早期原版背景。",
     "DESC_NOST_OLDBG_B": "切换第二版复古大厅背景，关闭为A版，开启为B版。",
-    "NOSTALGIA_GAMEPLAY": "怀旧 玩法",
-    "NOSTALGIA_VISUALS": "怀旧 视觉",
-    "NOSTALGIA_TWEAKS": "怀旧 调整",
-    "NOSTALGIA_EDITOR": "怀旧 编辑器"
+    "NOSTALGIA_GAMEPLAY": "怀旧游戏玩法",
+    "NOSTALGIA_VISUALS": "怀旧视觉效果",
+    "NOSTALGIA_TWEAKS": "怀旧微调",
+    "NOSTALGIA_EDITOR": "怀旧编辑器"
   }
 }
