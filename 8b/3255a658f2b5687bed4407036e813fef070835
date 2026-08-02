@@ -1,0 +1,23 @@
+Quartz/Core/SemVer.cs
+  s_2c905f833228a4::t_cdf79516ba391f 68,73-76,82-92
+Quartz/Update/UpdateService.cs
+  s_2c905f833228a4::t_dd57a8b7be1011 116
+  s_2c905f833228a4::t_95c762f32f642e 124-125
+  s_2c905f833228a4::t_e03ecb18577d83 146
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.19",
+  "base_commit_sha": "8b3255a658f2b5687bed4407036e813fef070835",
+  "prompts": {},
+  "sessions": {
+    "s_2c905f833228a4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48c171f4-73f8-435c-9734-244013f1b050",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
