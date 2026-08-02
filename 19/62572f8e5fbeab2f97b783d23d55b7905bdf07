@@ -1,0 +1,45 @@
+stubs/README.md
+  s_bfef9d0e014131::t_3c466c5f8deb74 20,41
+stubs/Assembly-CSharp/Stubs.g.cs
+  s_bfef9d0e014131::t_3c466c5f8deb74 794-795,845
+  s_64d0a708ce84bb::t_bbc7576dddf7a2 881,884
+stubs/PATCH-TARGETS.json
+  s_bfef9d0e014131::t_3c466c5f8deb74 383-388,431-433
+  s_64d0a708ce84bb::t_bbc7576dddf7a2 467-472,491-496,509-514,617-619
+  s_9605f8a13e30be::t_0bbef3bb9b17d4 434-436,620-622
+stubs/MANIFEST.json
+  s_bfef9d0e014131::t_3c466c5f8deb74 1350-1351,1407
+  s_64d0a708ce84bb::t_bbc7576dddf7a2 1454,1457
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.19",
+  "base_commit_sha": "1962572f8e5fbeab2f97b783d23d55b7905bdf07",
+  "prompts": {},
+  "sessions": {
+    "s_64d0a708ce84bb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b619c886-8fa0-4349-ae33-d2d5bb5cb732",
+        "model": "claude-opus-5"
+      },
+      "human_author": null
+    },
+    "s_9605f8a13e30be": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fe1ce82d-b4fe-4b3b-b894-fca33ea7c5b4",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_bfef9d0e014131": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ed6b4dda-a6c3-4d7f-be1f-d541084142bd",
+        "model": "claude-opus-5"
+      },
+      "human_author": null
+    }
+  }
+}
