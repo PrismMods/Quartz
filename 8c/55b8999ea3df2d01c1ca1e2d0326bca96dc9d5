@@ -1,0 +1,19 @@
+Quartz/UI/Generator/GenerateUI.Button.cs
+  s_d9f79e0569ff50::t_e745db3bd57d31 72
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.19",
+  "base_commit_sha": "8c55b8999ea3df2d01c1ca1e2d0326bca96dc9d5",
+  "prompts": {},
+  "sessions": {
+    "s_d9f79e0569ff50": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "93ce3f26-c4dc-4935-8961-22b46b3b9257",
+        "model": "claude-opus-5"
+      },
+      "human_author": null
+    }
+  }
+}
