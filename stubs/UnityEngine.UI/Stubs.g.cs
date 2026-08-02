@@ -27,6 +27,7 @@ namespace UnityEngine.EventSystems {
     public unsafe partial class EventSystem : global::UnityEngine.EventSystems.UIBehaviour {
         public static global::UnityEngine.EventSystems.EventSystem current { get => throw null; set { } }
         public global::UnityEngine.GameObject currentSelectedGameObject { get => throw null; }
+        public void SetSelectedGameObject(global::UnityEngine.GameObject selected) => throw null;
         protected EventSystem() { }
     }
     public unsafe partial class EventTrigger : global::UnityEngine.MonoBehaviour, global::UnityEngine.EventSystems.IPointerDownHandler, global::UnityEngine.EventSystems.IPointerUpHandler, global::UnityEngine.EventSystems.IPointerClickHandler, global::UnityEngine.EventSystems.IBeginDragHandler, global::UnityEngine.EventSystems.IDragHandler, global::UnityEngine.EventSystems.IEndDragHandler {
@@ -199,6 +200,20 @@ namespace UnityEngine.UI {
             Points = 3,
             Picas = 4,
         }
+    }
+    public unsafe partial struct ColorBlock : global::System.IEquatable<global::UnityEngine.UI.ColorBlock> {
+        private float m_ColorMultiplier;
+        private global::UnityEngine.Color m_DisabledColor;
+        private float m_FadeDuration;
+        private global::UnityEngine.Color m_HighlightedColor;
+        private global::UnityEngine.Color m_NormalColor;
+        private global::UnityEngine.Color m_PressedColor;
+        private global::UnityEngine.Color m_SelectedColor;
+        public global::UnityEngine.Color highlightedColor { get => throw null; set { } }
+        public global::UnityEngine.Color normalColor { get => throw null; set { } }
+        public global::UnityEngine.Color pressedColor { get => throw null; set { } }
+        public global::UnityEngine.Color selectedColor { get => throw null; set { } }
+        bool global::System.IEquatable<global::UnityEngine.UI.ColorBlock>.Equals(global::UnityEngine.UI.ColorBlock other) => throw null;
     }
     public unsafe partial class ContentSizeFitter : global::UnityEngine.EventSystems.UIBehaviour {
         public global::UnityEngine.UI.ContentSizeFitter.FitMode horizontalFit { get => throw null; set { } }
@@ -436,6 +451,7 @@ namespace UnityEngine.UI {
         }
     }
     public unsafe partial class Selectable : global::UnityEngine.EventSystems.UIBehaviour, global::UnityEngine.EventSystems.IPointerDownHandler, global::UnityEngine.EventSystems.IPointerUpHandler {
+        public global::UnityEngine.UI.ColorBlock colors { get => throw null; set { } }
         public global::UnityEngine.UI.Image image { get => throw null; set { } }
         public bool interactable { get => throw null; set { } }
         public global::UnityEngine.UI.SpriteState spriteState { get => throw null; set { } }

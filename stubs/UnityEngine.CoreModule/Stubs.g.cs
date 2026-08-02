@@ -138,6 +138,10 @@ namespace UnityEngine {
         Auto = 0,
         ForceSoftware = 1,
     }
+    public unsafe partial class DefaultExecutionOrder : global::System.Attribute {
+        public DefaultExecutionOrder(int order) => throw null;
+        protected DefaultExecutionOrder() { }
+    }
     public unsafe partial struct EntityId : global::System.IEquatable<global::UnityEngine.EntityId>, global::System.IComparable<global::UnityEngine.EntityId> {
         private int m_Data;
         int global::System.IComparable<global::UnityEngine.EntityId>.CompareTo(global::UnityEngine.EntityId other) => throw null;
@@ -155,9 +159,11 @@ namespace UnityEngine {
     public sealed unsafe partial class GameObject : global::UnityEngine.Object {
         public bool activeInHierarchy { get => throw null; }
         public bool activeSelf { get => throw null; }
+        public int layer { get => throw null; set { } }
         public global::UnityEngine.Transform transform { get => throw null; }
         public GameObject() => throw null;
         public GameObject(string name) => throw null;
+        public GameObject(string name, params global::System.Type[] components) => throw null;
         public T AddComponent<T>() where T : global::UnityEngine.Component => throw null;
         public T GetComponent<T>() => throw null;
         public T GetComponentInChildren<T>(bool includeInactive) => throw null;
@@ -579,6 +585,7 @@ namespace UnityEngine {
         public static void Destroy(global::UnityEngine.Object obj) => throw null;
         public static void DestroyImmediate(global::UnityEngine.Object obj) => throw null;
         public static void DontDestroyOnLoad(global::UnityEngine.Object target) => throw null;
+        public static T FindAnyObjectByType<T>() where T : global::UnityEngine.Object => throw null;
         public static T[] FindObjectsByType<T>(global::UnityEngine.FindObjectsSortMode sortMode) where T : global::UnityEngine.Object => throw null;
         public int GetInstanceID() => throw null;
         public static T Instantiate<T>(T original, global::UnityEngine.Transform parent) where T : global::UnityEngine.Object => throw null;
@@ -908,9 +915,12 @@ namespace UnityEngine {
     public unsafe partial class Time {
         public static int frameCount { get => throw null; }
         public static float realtimeSinceStartup { get => throw null; }
+        public static double realtimeSinceStartupAsDouble { get => throw null; }
         public static float time { get => throw null; }
+        public static float timeScale { get => throw null; set { } }
         public static float unscaledDeltaTime { get => throw null; }
         public static float unscaledTime { get => throw null; }
+        public static double unscaledTimeAsDouble { get => throw null; }
         protected Time() { }
     }
     public unsafe partial class Transform : global::UnityEngine.Component, global::System.Collections.IEnumerable {
@@ -1013,6 +1023,7 @@ namespace UnityEngine.Events {
         protected UnityEvent() { }
     }
     public abstract unsafe partial class UnityEventBase {
+        public void RemoveAllListeners() => throw null;
         protected UnityEventBase() { }
     }
     public unsafe partial class UnityEvent<T0> : global::UnityEngine.Events.UnityEventBase {

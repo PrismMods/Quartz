@@ -70,11 +70,14 @@ namespace DG.Tweening {
         public static int DOKill(this global::UnityEngine.Component target, bool complete = default) => throw null;
     }
     public abstract unsafe partial class Tween : global::DG.Tweening.Core.ABSSequentiable {
+        public bool active { get => throw null; }
         protected Tween() { }
     }
     public unsafe delegate void TweenCallback();
     public static unsafe partial class TweenExtensions {
         public static void Kill(this global::DG.Tweening.Tween t, bool complete = default) => throw null;
+        public static T Pause<T>(this T t) where T : global::DG.Tweening.Tween => throw null;
+        public static T Play<T>(this T t) where T : global::DG.Tweening.Tween => throw null;
     }
     public static unsafe partial class TweenSettingsExtensions {
         public static global::DG.Tweening.Sequence Insert(this global::DG.Tweening.Sequence s, float atPosition, global::DG.Tweening.Tween t) => throw null;

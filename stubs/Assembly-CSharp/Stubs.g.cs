@@ -25,6 +25,7 @@ public unsafe partial class ADOBase : global::RDTools.RDBaseDll {
     public static string levelPath { get => throw null; }
     public static global::scnLevelSelect levelSelect { get => throw null; }
     public static global::scrLevelMaker lm { get => throw null; }
+    public static global::scrPlayerManager playerManager { get => throw null; }
     public bool practiceAvailable { get => throw null; }
     protected ADOBase() { }
 }
@@ -46,6 +47,8 @@ public unsafe partial struct AsyncKeyCode {
 }
 public unsafe partial class AudioManager : global::ADOBase {
     public static global::AudioManager Instance { get => throw null; }
+    public global::UnityEngine.AudioClip FindOrLoadAudioClip(string clipName, string internalLevelName = default, bool fromBundle = default) => throw null;
+    public static global::UnityEngine.AudioSource Play(string snd, double time, global::UnityEngine.Audio.AudioMixerGroup group, float volume = default, int priority = default) => throw null;
     public void StopAllSounds() => throw null;
     protected AudioManager() { }
 }
@@ -223,6 +226,7 @@ public unsafe partial class GCS {
     public static bool webVersion;
     public static string worldEntrance;
     public const string zipExtension = "zipExtension";
+    public static int checkpointNum { get => throw null; set { } }
     protected GCS() { }
 }
 public static unsafe partial class GOExtensions {
@@ -335,6 +339,7 @@ public unsafe partial class PlanetRenderer : global::ADOBase {
     public global::UnityEngine.SpriteRenderer faceDetails;
     public global::UnityEngine.SpriteRenderer faceSprite;
     public global::UnityEngine.SpriteRenderer glow;
+    public global::scrRing ringComp;
     public global::UnityEngine.SpriteRenderer samuraiSprite;
     public global::UnityEngine.ParticleSystem sparks;
     public global::PlanetSprite sprite;
@@ -355,9 +360,12 @@ public unsafe partial class PlanetSprite : global::ADOBase {
 }
 public unsafe partial class PlanetarySystem : global::ADOBase {
     public global::System.Collections.Generic.List<global::scrPlanet> allPlanets;
+    public global::scrPlanet chosenPlanet;
+    public bool isCW;
     public global::scrPlanet planetBlue;
     public global::System.Collections.Generic.List<global::scrPlanet> planetList;
     public global::scrPlanet planetRed;
+    public double speed;
     protected PlanetarySystem() { }
     public enum DeathAnimation : int {
         Explode = 0,
@@ -400,6 +408,7 @@ public unsafe partial class PracticeTimeline : global::ADOBase {
 }
 public unsafe partial class RDC {
     public static bool auto { get => throw null; set { } }
+    public static bool debug { get => throw null; set { } }
     public static bool noHud { get => throw null; set { } }
     public static bool runningOnSteamDeck { get => throw null; set { } }
     public static bool useOldAuto { get => throw null; set { } }
@@ -660,7 +669,9 @@ public unsafe partial class ffxMoveFloorPlus : global::ffxPlusBase {
 }
 public abstract unsafe partial class ffxPlusBase : global::ADOBase {
     public global::scrCamera cam;
+    public float degreeOffset;
     public global::scrFloor floor;
+    public virtual void SetStartTime(float bpm, float degreeOffset = default) => throw null;
     protected ffxPlusBase() { }
 }
 public unsafe partial class ffxScreenScrollPlus : global::ffxPlusBase {
@@ -806,19 +817,29 @@ public unsafe partial class scrCamera : global::ADOBase {
 public unsafe partial class scrConductor : global::ADOBase {
     public double addoffset;
     public float bpm;
+    public float countdownSpeedMultiplier;
+    public double crotchetAtStart;
     public static global::CalibrationPreset currentPreset;
+    public double deltaSongPos;
+    public double dspTime;
+    public double dspTimeSong;
     public bool fastTakeoff;
     public global::UnityEngine.Audio.AudioMixerGroup hitSoundGroup;
+    public float hitSoundVolume;
     public bool isGameWorld;
     public bool playEndingCymbal;
+    public double prev_dspTime;
     public global::UnityEngine.AudioSource song;
     public global::UnityEngine.AudioSource song2;
+    public global::UnityEngine.AudioSource song3;
     public static float calibration_i { get => throw null; }
     public static global::scrConductor instance { get => throw null; }
     public double songposition_minusi { get => throw null; set { } }
+    public double GetCountdownTime(int i) => throw null;
     public void KillAllSounds() => throw null;
     public void PlayHitTimes() => throw null;
     public static void SaveCurrentPreset() => throw null;
+    public void ScrubMusicToTime(double newTime) => throw null;
     protected scrConductor() { }
     public enum DuckState : int {
         None = 0,
@@ -835,8 +856,10 @@ public unsafe partial class scrController : global::MonsterLove.StateMachine.Sta
     public global::System.Collections.Generic.List<global::PlanetRenderer> dummyPlanets;
     public global::scrFloor firstFloor;
     public bool gameworld;
+    public bool goShown;
     public bool noFail;
     public global::PauseMenu pauseMenu;
+    public float startVolume;
     public global::UnityEngine.UI.Text txtAllStrictClear;
     public global::UnityEngine.UI.Text txtCongrats;
     public global::UnityEngine.UI.Text txtLevelName;
@@ -844,6 +867,8 @@ public unsafe partial class scrController : global::MonsterLove.StateMachine.Sta
     public static global::scrController instance { get => throw null; }
     public bool paused { get => throw null; set { } }
     public float percentComplete { get => throw null; }
+    public global::scrPlayer playerOne { get => throw null; }
+    public float tileSize { get => throw null; }
     public void EnterLevel(string worldAndLevel, bool speedTrial = default) => throw null;
     public void FailAction(bool overload = default, bool multipress = default, string failMessage = default, bool hitbox = default) => throw null;
     public void OnLandOnPortal(global::scrPlanet planetThatWon, global::Portal portalDestination, string portalArguments) => throw null;
@@ -853,10 +878,12 @@ public unsafe partial class scrController : global::MonsterLove.StateMachine.Sta
     public void SetPracticeMode(bool practice) => throw null;
     public void StartLoadingScene(global::WipeDirection wipeDirection = default) => throw null;
     public bool TogglePauseGame() => throw null;
+    public void UpdateInput() => throw null;
     public global::System.Collections.IEnumerator WaitForStartCo(int seqID = default, bool remakeFloors = default) => throw null;
     protected scrController() { }
 }
 public unsafe partial class scrCountdown : global::ADOBase {
+    public void CancelGo() => throw null;
     protected scrCountdown() { }
 }
 public abstract unsafe partial class scrDecoration : global::ADOBase {
@@ -902,12 +929,16 @@ public unsafe partial class scrFloor : global::ADOBase {
     public bool midSpin;
     public global::UnityEngine.LineRenderer multiplanetLine;
     public global::scrFloor nextfloor;
+    public int numPlanets;
     public float opacity;
     public bool outline;
     public global::UnityEngine.SpriteRenderer outlineSprite;
+    public float radiusScale;
     public int seqID;
     public global::TrackColorType specialColorType;
     public float speed;
+    public global::UnityEngine.Vector3 startPos;
+    public bool stickToFloor;
     public char stringDirection;
     public global::UnityEngine.SpriteRenderer topGlow;
     public void LightUp(global::HitMargin hitmargin = default) => throw null;
@@ -946,6 +977,7 @@ public unsafe partial class scrLevelMaker : global::ADOBase {
     public global::System.Collections.Generic.List<global::scrFloor> listFloors;
     public global::scrLevelMaker2 lm2;
     public static global::scrLevelMaker instance { get => throw null; }
+    public void CalculateFloorEntryTimes() => throw null;
     public double CalculateSingleFloorAngleLength(global::scrFloor cf) => throw null;
     protected scrLevelMaker() { }
 }
@@ -970,13 +1002,46 @@ public unsafe partial class scrMistakesManager : global::ADOClass {
     protected scrMistakesManager() { }
 }
 public unsafe partial class scrPlanet : global::ADOBase {
+    public double angle;
     public const float basePlanetScale = 78f;
+    public float cosmeticAngle;
+    public float cosmeticRadius;
     public global::scrFloor currfloor;
     public global::scrPlanet other;
     public int planetIndex;
     public global::PlanetRenderer planetRenderer;
     public global::PlanetarySystem planetarySystem;
+    public global::scrPlayer player;
+    public double snappedLastAngle { get => throw null; }
+    public double targetExitAngle { get => throw null; }
+    public void Update_RefreshAngles() => throw null;
     protected scrPlanet() { }
+}
+public unsafe partial class scrPlayer : global::ADOBase {
+    public bool alive;
+    public global::System.Collections.Generic.List<double> keyTimes;
+    public double lastHit;
+    public float lockInput;
+    public global::PlanetarySystem planetarySystem;
+    public bool responsive;
+    public global::scrFloor currFloor { get => throw null; }
+    public bool Hit(bool isAuto = default) => throw null;
+    public void UnlockInput() => throw null;
+    public bool ValidInputWasTriggered() => throw null;
+    protected scrPlayer() { }
+}
+public unsafe partial class scrPlayerManager : global::ADOBase {
+    public const int MaxPlayers = 79;
+    public global::System.Collections.Generic.IEnumerator<global::scrPlayer> GetEnumerator() => throw null;
+    protected scrPlayerManager() { }
+}
+public unsafe partial class scrPressToStart : global::ADOBase {
+    public void HideText() => throw null;
+    protected scrPressToStart() { }
+}
+public unsafe partial class scrRing : global::ADOBase {
+    public void Switch(bool chosen, bool instant = default) => throw null;
+    protected scrRing() { }
 }
 public unsafe partial class scrSfx : global::ADOBase {
     protected scrSfx() { }
@@ -998,7 +1063,9 @@ public unsafe partial class scrUIController : global::ADOBase {
     protected scrUIController() { }
 }
 public unsafe partial class scrVfxPlus : global::ADOBase {
+    public global::System.Collections.Generic.List<global::DG.Tweening.Tween> pausedTweens;
     public static global::scrVfxPlus instance { get => throw null; }
+    public void ScrubToTime(float t) => throw null;
     protected scrVfxPlus() { }
 }
 public unsafe partial class scrVisualDecoration : global::scrDecoration {
@@ -1012,7 +1079,7 @@ namespace ADOFAI {
         public int cacheEventIndex;
         public global::System.Collections.Generic.List<global::ADOFAI.PropertiesPanel> panelsList;
         public global::ADOFAI.LevelEventType selectedEventType;
-        public const float tabHeight = 79f;
+        public const float tabHeight = 80f;
         public global::UnityEngine.RectTransform tabs;
         public void HideAllInspectorTabs() => throw null;
         public void Init(global::System.Collections.Generic.Dictionary<string, global::ADOFAI.LevelEventInfo> levelEventsInfo, bool floorPanel) => throw null;
@@ -1037,7 +1104,7 @@ namespace ADOFAI {
         protected LevelData() { }
     }
     public unsafe partial class LevelEvent {
-        public const int NoFloor = 80;
+        public const int NoFloor = 81;
         public bool active;
         public global::ADOFAI.LevelEventType eventType;
         public int floor;

@@ -14,5 +14,6 @@
 namespace UnityEngine {
     public static unsafe partial class ImageConversion {
         public static bool LoadImage(this global::UnityEngine.Texture2D tex, byte[] data) => throw null;
+        public static bool LoadImage(this global::UnityEngine.Texture2D tex, byte[] data, bool markNonReadable) => throw null;
     }
 }

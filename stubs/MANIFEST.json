@@ -118,7 +118,9 @@
           "scrController ADOBase::controller()",
           "scrController ADOBase::get_controller()",
           "scrLevelMaker ADOBase::get_lm()",
-          "scrLevelMaker ADOBase::lm()"
+          "scrLevelMaker ADOBase::lm()",
+          "scrPlayerManager ADOBase::get_playerManager()",
+          "scrPlayerManager ADOBase::playerManager()"
         ]
       },
       {
@@ -340,7 +342,9 @@
         "members": [
           "AudioManager AudioManager::Instance()",
           "AudioManager AudioManager::get_Instance()",
-          "System.Void AudioManager::StopAllSounds()"
+          "System.Void AudioManager::StopAllSounds()",
+          "UnityEngine.AudioClip AudioManager::FindOrLoadAudioClip(System.String,System.String,System.Boolean)",
+          "UnityEngine.AudioSource AudioManager::Play(System.String,System.Double,UnityEngine.Audio.AudioMixerGroup,System.Single,System.Int32)"
         ]
       },
       {
@@ -515,7 +519,9 @@
           "System.Int32 GCS::MAXIMUM_ALLOWED_KEYS",
           "System.Int32 GCS::MAXIMUM_UNLOCKED_ALLOWED_KEYS",
           "System.Int32 GCS::MINIMUM_USED_KEYS_RESULT",
+          "System.Int32 GCS::checkpointNum()",
           "System.Int32 GCS::customLevelIndex",
+          "System.Int32 GCS::get_checkpointNum()",
           "System.Int32 GCS::multipressOverload",
           "System.Single GCS::ALLOWED_KEYS_RESET_TIME",
           "System.Single GCS::HITMARGIN_ABSOLUTE_MINIMUM_SECONDS",
@@ -754,7 +760,8 @@
           "UnityEngine.SpriteRenderer PlanetRenderer::faceDetails",
           "UnityEngine.SpriteRenderer PlanetRenderer::faceSprite",
           "UnityEngine.SpriteRenderer PlanetRenderer::glow",
-          "UnityEngine.SpriteRenderer PlanetRenderer::samuraiSprite"
+          "UnityEngine.SpriteRenderer PlanetRenderer::samuraiSprite",
+          "scrRing PlanetRenderer::ringComp"
         ]
       },
       {
@@ -768,8 +775,11 @@
       {
         "type": "PlanetarySystem",
         "members": [
+          "System.Boolean PlanetarySystem::isCW",
           "System.Collections.Generic.List\u00601\u003CscrPlanet\u003E PlanetarySystem::allPlanets",
           "System.Collections.Generic.List\u00601\u003CscrPlanet\u003E PlanetarySystem::planetList",
+          "System.Double PlanetarySystem::speed",
+          "scrPlanet PlanetarySystem::chosenPlanet",
           "scrPlanet PlanetarySystem::planetBlue",
           "scrPlanet PlanetarySystem::planetRed"
         ]
@@ -827,7 +837,9 @@
         "type": "RDC",
         "members": [
           "System.Boolean RDC::auto()",
+          "System.Boolean RDC::debug()",
           "System.Boolean RDC::get_auto()",
+          "System.Boolean RDC::get_debug()",
           "System.Boolean RDC::get_runningOnSteamDeck()",
           "System.Boolean RDC::get_useOldAuto()",
           "System.Boolean RDC::noHud()",
@@ -1177,6 +1189,8 @@
       {
         "type": "ffxPlusBase",
         "members": [
+          "System.Single ffxPlusBase::degreeOffset",
+          "System.Void ffxPlusBase::SetStartTime(System.Single,System.Single)",
           "scrCamera ffxPlusBase::cam",
           "scrFloor ffxPlusBase::floor"
         ]
@@ -1370,18 +1384,29 @@
           "System.Boolean scrConductor::fastTakeoff",
           "System.Boolean scrConductor::isGameWorld",
           "System.Boolean scrConductor::playEndingCymbal",
+          "System.Double scrConductor::GetCountdownTime(System.Int32)",
           "System.Double scrConductor::addoffset",
+          "System.Double scrConductor::crotchetAtStart",
+          "System.Double scrConductor::deltaSongPos",
+          "System.Double scrConductor::dspTime",
+          "System.Double scrConductor::dspTimeSong",
           "System.Double scrConductor::get_songposition_minusi()",
+          "System.Double scrConductor::prev_dspTime",
           "System.Double scrConductor::songposition_minusi()",
           "System.Single scrConductor::bpm",
           "System.Single scrConductor::calibration_i()",
+          "System.Single scrConductor::countdownSpeedMultiplier",
           "System.Single scrConductor::get_calibration_i()",
+          "System.Single scrConductor::hitSoundVolume",
           "System.Void scrConductor::KillAllSounds()",
           "System.Void scrConductor::PlayHitTimes()",
           "System.Void scrConductor::SaveCurrentPreset()",
+          "System.Void scrConductor::ScrubMusicToTime(System.Double)",
+          "System.Void scrConductor::set_songposition_minusi(System.Double)",
           "UnityEngine.Audio.AudioMixerGroup scrConductor::hitSoundGroup",
           "UnityEngine.AudioSource scrConductor::song",
           "UnityEngine.AudioSource scrConductor::song2",
+          "UnityEngine.AudioSource scrConductor::song3",
           "scrConductor scrConductor::get_instance()",
           "scrConductor scrConductor::instance()"
         ]
@@ -1404,6 +1429,7 @@
           "System.Boolean scrController::TogglePauseGame()",
           "System.Boolean scrController::gameworld",
           "System.Boolean scrController::get_paused()",
+          "System.Boolean scrController::goShown",
           "System.Boolean scrController::noFail",
           "System.Boolean scrController::paused()",
           "System.Collections.Generic.List\u00601\u003CPlanetRenderer\u003E scrController::dummyPlanets",
@@ -1412,7 +1438,10 @@
           "System.Int32 scrController::currentSeqID",
           "System.Single scrController::boothModeDebounceCooldownTime",
           "System.Single scrController::get_percentComplete()",
+          "System.Single scrController::get_tileSize()",
           "System.Single scrController::percentComplete()",
+          "System.Single scrController::startVolume",
+          "System.Single scrController::tileSize()",
           "System.Void scrController::EnterLevel(System.String,System.Boolean)",
           "System.Void scrController::FailAction(System.Boolean,System.Boolean,System.String,System.Boolean)",
           "System.Void scrController::OnLandOnPortal(scrPlanet,Portal,System.String)",
@@ -1421,6 +1450,7 @@
           "System.Void scrController::RestartProgress()",
           "System.Void scrController::SetPracticeMode(System.Boolean)",
           "System.Void scrController::StartLoadingScene(WipeDirection)",
+          "System.Void scrController::UpdateInput()",
           "UnityEngine.UI.Text scrController::txtAllStrictClear",
           "UnityEngine.UI.Text scrController::txtCongrats",
           "UnityEngine.UI.Text scrController::txtLevelName",
@@ -1428,12 +1458,16 @@
           "scrController scrController::instance()",
           "scrFloor scrController::currFloor()",
           "scrFloor scrController::firstFloor",
-          "scrFloor scrController::get_currFloor()"
+          "scrFloor scrController::get_currFloor()",
+          "scrPlayer scrController::get_playerOne()",
+          "scrPlayer scrController::playerOne()"
         ]
       },
       {
         "type": "scrCountdown",
-        "members": []
+        "members": [
+          "System.Void scrCountdown::CancelGo()"
+        ]
       },
       {
         "type": "scrDecoration",
@@ -1472,6 +1506,7 @@
           "System.Boolean scrFloor::isportal",
           "System.Boolean scrFloor::midSpin",
           "System.Boolean scrFloor::outline",
+          "System.Boolean scrFloor::stickToFloor",
           "System.Char scrFloor::stringDirection",
           "System.Double scrFloor::angleLength",
           "System.Double scrFloor::entryTime",
@@ -1479,9 +1514,11 @@
           "System.Double scrFloor::exitangle",
           "System.Double scrFloor::marginScale",
           "System.Int32 scrFloor::SortingOrderOffset",
+          "System.Int32 scrFloor::numPlanets",
           "System.Int32 scrFloor::seqID",
           "System.Single scrFloor::floatDirection",
           "System.Single scrFloor::opacity",
+          "System.Single scrFloor::radiusScale",
           "System.Single scrFloor::speed",
           "System.String scrFloor::checkpointIconFilename",
           "System.String scrFloor::gizmoIconFilename",
@@ -1500,6 +1537,7 @@
           "UnityEngine.SpriteRenderer scrFloor::legacyFloorSpriteRenderer",
           "UnityEngine.SpriteRenderer scrFloor::outlineSprite",
           "UnityEngine.SpriteRenderer scrFloor::topGlow",
+          "UnityEngine.Vector3 scrFloor::startPos",
           "scrFloor scrFloor::nextfloor",
           "scrHoldRenderer scrFloor::holdRenderer",
           "scrLetterPress scrFloor::editorNumText"
@@ -1539,6 +1577,7 @@
           "System.Single[] scrLevelMaker::floorAngles",
           "System.String scrLevelMaker::FloorContainerName",
           "System.String scrLevelMaker::leveldata",
+          "System.Void scrLevelMaker::CalculateFloorEntryTimes()",
           "scrLevelMaker scrLevelMaker::get_instance()",
           "scrLevelMaker scrLevelMaker::instance()",
           "scrLevelMaker2 scrLevelMaker::lm2"
@@ -1578,10 +1617,54 @@
         "members": [
           "PlanetRenderer scrPlanet::planetRenderer",
           "PlanetarySystem scrPlanet::planetarySystem",
+          "System.Double scrPlanet::angle",
+          "System.Double scrPlanet::get_snappedLastAngle()",
+          "System.Double scrPlanet::get_targetExitAngle()",
+          "System.Double scrPlanet::snappedLastAngle()",
+          "System.Double scrPlanet::targetExitAngle()",
           "System.Int32 scrPlanet::planetIndex",
           "System.Single scrPlanet::basePlanetScale",
+          "System.Single scrPlanet::cosmeticAngle",
+          "System.Single scrPlanet::cosmeticRadius",
+          "System.Void scrPlanet::Update_RefreshAngles()",
           "scrFloor scrPlanet::currfloor",
-          "scrPlanet scrPlanet::other"
+          "scrPlanet scrPlanet::other",
+          "scrPlayer scrPlanet::player"
+        ]
+      },
+      {
+        "type": "scrPlayer",
+        "members": [
+          "PlanetarySystem scrPlayer::planetarySystem",
+          "System.Boolean scrPlayer::Hit(System.Boolean)",
+          "System.Boolean scrPlayer::ValidInputWasTriggered()",
+          "System.Boolean scrPlayer::alive",
+          "System.Boolean scrPlayer::responsive",
+          "System.Collections.Generic.List\u00601\u003CSystem.Double\u003E scrPlayer::keyTimes",
+          "System.Double scrPlayer::lastHit",
+          "System.Single scrPlayer::lockInput",
+          "System.Void scrPlayer::UnlockInput()",
+          "scrFloor scrPlayer::currFloor()",
+          "scrFloor scrPlayer::get_currFloor()"
+        ]
+      },
+      {
+        "type": "scrPlayerManager",
+        "members": [
+          "System.Collections.Generic.IEnumerator\u00601\u003CscrPlayer\u003E scrPlayerManager::GetEnumerator()",
+          "System.Int32 scrPlayerManager::MaxPlayers"
+        ]
+      },
+      {
+        "type": "scrPressToStart",
+        "members": [
+          "System.Void scrPressToStart::HideText()"
+        ]
+      },
+      {
+        "type": "scrRing",
+        "members": [
+          "System.Void scrRing::Switch(System.Boolean,System.Boolean)"
         ]
       },
       {
@@ -1611,6 +1694,8 @@
       {
         "type": "scrVfxPlus",
         "members": [
+          "System.Collections.Generic.List\u00601\u003CDG.Tweening.Tween\u003E scrVfxPlus::pausedTweens",
+          "System.Void scrVfxPlus::ScrubToTime(System.Single)",
           "scrVfxPlus scrVfxPlus::get_instance()",
           "scrVfxPlus scrVfxPlus::instance()"
         ]
@@ -1762,7 +1847,10 @@
       },
       {
         "type": "DG.Tweening.Tween",
-        "members": []
+        "members": [
+          "System.Boolean DG.Tweening.Tween::active()",
+          "System.Boolean DG.Tweening.Tween::get_active()"
+        ]
       },
       {
         "type": "DG.Tweening.TweenCallback",
@@ -1773,7 +1861,9 @@
       {
         "type": "DG.Tweening.TweenExtensions",
         "members": [
-          "System.Void DG.Tweening.TweenExtensions::Kill(DG.Tweening.Tween,System.Boolean)"
+          "System.Void DG.Tweening.TweenExtensions::Kill(DG.Tweening.Tween,System.Boolean)",
+          "T DG.Tweening.TweenExtensions::Pause(T)",
+          "T DG.Tweening.TweenExtensions::Play(T)"
         ]
       },
       {
@@ -2379,6 +2469,7 @@
           "UnityEngine.Color TMPro.TMP_InputField::get_caretColor()",
           "UnityEngine.Color TMPro.TMP_InputField::selectionColor()",
           "UnityEngine.RectTransform TMPro.TMP_InputField::textViewport()",
+          "UnityEngine.UI.Graphic TMPro.TMP_InputField::get_placeholder()",
           "UnityEngine.UI.Graphic TMPro.TMP_InputField::placeholder()"
         ]
       },
@@ -2795,6 +2886,14 @@
         ]
       },
       {
+        "type": "UnityEngine.AudioListener",
+        "members": [
+          "System.Boolean UnityEngine.AudioListener::get_pause()",
+          "System.Boolean UnityEngine.AudioListener::pause()",
+          "System.Void UnityEngine.AudioListener::set_pause(System.Boolean)"
+        ]
+      },
+      {
         "type": "UnityEngine.AudioSettings",
         "members": [
           "System.Double UnityEngine.AudioSettings::dspTime()",
@@ -2806,28 +2905,42 @@
       {
         "type": "UnityEngine.AudioSource",
         "members": [
+          "System.Boolean UnityEngine.AudioSource::get_isPlaying()",
           "System.Boolean UnityEngine.AudioSource::get_mute()",
+          "System.Boolean UnityEngine.AudioSource::ignoreListenerPause()",
+          "System.Boolean UnityEngine.AudioSource::isPlaying()",
           "System.Boolean UnityEngine.AudioSource::loop()",
           "System.Boolean UnityEngine.AudioSource::mute()",
           "System.Boolean UnityEngine.AudioSource::playOnAwake()",
+          "System.Int32 UnityEngine.AudioSource::get_timeSamples()",
           "System.Int32 UnityEngine.AudioSource::priority()",
           "System.Int32 UnityEngine.AudioSource::timeSamples()",
           "System.Single UnityEngine.AudioSource::get_pitch()",
           "System.Single UnityEngine.AudioSource::get_time()",
+          "System.Single UnityEngine.AudioSource::get_volume()",
           "System.Single UnityEngine.AudioSource::pitch()",
+          "System.Single UnityEngine.AudioSource::spatialBlend()",
           "System.Single UnityEngine.AudioSource::time()",
           "System.Single UnityEngine.AudioSource::volume()",
+          "System.Void UnityEngine.AudioSource::Pause()",
+          "System.Void UnityEngine.AudioSource::Play()",
           "System.Void UnityEngine.AudioSource::PlayScheduled(System.Double)",
+          "System.Void UnityEngine.AudioSource::SetScheduledEndTime(System.Double)",
           "System.Void UnityEngine.AudioSource::Stop()",
+          "System.Void UnityEngine.AudioSource::UnPause()",
           "System.Void UnityEngine.AudioSource::set_clip(UnityEngine.AudioClip)",
+          "System.Void UnityEngine.AudioSource::set_ignoreListenerPause(System.Boolean)",
           "System.Void UnityEngine.AudioSource::set_loop(System.Boolean)",
           "System.Void UnityEngine.AudioSource::set_mute(System.Boolean)",
           "System.Void UnityEngine.AudioSource::set_outputAudioMixerGroup(UnityEngine.Audio.AudioMixerGroup)",
           "System.Void UnityEngine.AudioSource::set_pitch(System.Single)",
           "System.Void UnityEngine.AudioSource::set_playOnAwake(System.Boolean)",
           "System.Void UnityEngine.AudioSource::set_priority(System.Int32)",
+          "System.Void UnityEngine.AudioSource::set_spatialBlend(System.Single)",
+          "System.Void UnityEngine.AudioSource::set_time(System.Single)",
           "System.Void UnityEngine.AudioSource::set_timeSamples(System.Int32)",
           "System.Void UnityEngine.AudioSource::set_volume(System.Single)",
+          "UnityEngine.Audio.AudioMixerGroup UnityEngine.AudioSource::get_outputAudioMixerGroup()",
           "UnityEngine.Audio.AudioMixerGroup UnityEngine.AudioSource::outputAudioMixerGroup()",
           "UnityEngine.AudioClip UnityEngine.AudioSource::clip()",
           "UnityEngine.AudioClip UnityEngine.AudioSource::get_clip()"
@@ -3029,6 +3142,12 @@
         ]
       },
       {
+        "type": "UnityEngine.DefaultExecutionOrder",
+        "members": [
+          "System.Void UnityEngine.DefaultExecutionOrder::.ctor(System.Int32)"
+        ]
+      },
+      {
         "type": "UnityEngine.EntityId",
         "members": [
           "System.Int32 UnityEngine.EntityId::m_Data"
@@ -3061,7 +3180,9 @@
       },
       {
         "type": "UnityEngine.Events.UnityEventBase",
-        "members": []
+        "members": [
+          "System.Void UnityEngine.Events.UnityEventBase::RemoveAllListeners()"
+        ]
       },
       {
         "type": "UnityEngine.Events.UnityEvent\u00601",
@@ -3093,9 +3214,13 @@
           "System.Boolean UnityEngine.GameObject::activeSelf()",
           "System.Boolean UnityEngine.GameObject::get_activeInHierarchy()",
           "System.Boolean UnityEngine.GameObject::get_activeSelf()",
+          "System.Int32 UnityEngine.GameObject::get_layer()",
+          "System.Int32 UnityEngine.GameObject::layer()",
           "System.Void UnityEngine.GameObject::.ctor()",
           "System.Void UnityEngine.GameObject::.ctor(System.String)",
+          "System.Void UnityEngine.GameObject::.ctor(System.String,System.Type[])",
           "System.Void UnityEngine.GameObject::SetActive(System.Boolean)",
+          "System.Void UnityEngine.GameObject::set_layer(System.Int32)",
           "T UnityEngine.GameObject::AddComponent()",
           "T UnityEngine.GameObject::GetComponent()",
           "T UnityEngine.GameObject::GetComponentInChildren(System.Boolean)",
@@ -3556,6 +3681,7 @@
           "System.Void UnityEngine.Object::DestroyImmediate(UnityEngine.Object)",
           "System.Void UnityEngine.Object::DontDestroyOnLoad(UnityEngine.Object)",
           "System.Void UnityEngine.Object::set_name(System.String)",
+          "T UnityEngine.Object::FindAnyObjectByType()",
           "T UnityEngine.Object::Instantiate(T,UnityEngine.Transform)",
           "T[] UnityEngine.Object::FindObjectsByType(UnityEngine.FindObjectsSortMode)"
         ]
@@ -4049,16 +4175,23 @@
       {
         "type": "UnityEngine.Time",
         "members": [
+          "System.Double UnityEngine.Time::get_realtimeSinceStartupAsDouble()",
+          "System.Double UnityEngine.Time::get_unscaledTimeAsDouble()",
+          "System.Double UnityEngine.Time::realtimeSinceStartupAsDouble()",
+          "System.Double UnityEngine.Time::unscaledTimeAsDouble()",
           "System.Int32 UnityEngine.Time::frameCount()",
           "System.Int32 UnityEngine.Time::get_frameCount()",
           "System.Single UnityEngine.Time::get_realtimeSinceStartup()",
           "System.Single UnityEngine.Time::get_time()",
+          "System.Single UnityEngine.Time::get_timeScale()",
           "System.Single UnityEngine.Time::get_unscaledDeltaTime()",
           "System.Single UnityEngine.Time::get_unscaledTime()",
           "System.Single UnityEngine.Time::realtimeSinceStartup()",
           "System.Single UnityEngine.Time::time()",
+          "System.Single UnityEngine.Time::timeScale()",
           "System.Single UnityEngine.Time::unscaledDeltaTime()",
-          "System.Single UnityEngine.Time::unscaledTime()"
+          "System.Single UnityEngine.Time::unscaledTime()",
+          "System.Void UnityEngine.Time::set_timeScale(System.Single)"
         ]
       },
       {
@@ -4185,7 +4318,8 @@
       {
         "type": "UnityEngine.ImageConversion",
         "members": [
-          "System.Boolean UnityEngine.ImageConversion::LoadImage(UnityEngine.Texture2D,System.Byte[])"
+          "System.Boolean UnityEngine.ImageConversion::LoadImage(UnityEngine.Texture2D,System.Byte[])",
+          "System.Boolean UnityEngine.ImageConversion::LoadImage(UnityEngine.Texture2D,System.Byte[],System.Boolean)"
         ]
       }
     ]
@@ -4404,6 +4538,7 @@
       {
         "type": "UnityEngine.EventSystems.EventSystem",
         "members": [
+          "System.Void UnityEngine.EventSystems.EventSystem::SetSelectedGameObject(UnityEngine.GameObject)",
           "UnityEngine.EventSystems.EventSystem UnityEngine.EventSystems.EventSystem::current()",
           "UnityEngine.EventSystems.EventSystem UnityEngine.EventSystems.EventSystem::get_current()",
           "UnityEngine.GameObject UnityEngine.EventSystems.EventSystem::currentSelectedGameObject()",
@@ -4673,6 +4808,26 @@
           "UnityEngine.UI.CanvasScaler/Unit UnityEngine.UI.CanvasScaler/Unit::Millimeters",
           "UnityEngine.UI.CanvasScaler/Unit UnityEngine.UI.CanvasScaler/Unit::Picas",
           "UnityEngine.UI.CanvasScaler/Unit UnityEngine.UI.CanvasScaler/Unit::Points"
+        ]
+      },
+      {
+        "type": "UnityEngine.UI.ColorBlock",
+        "members": [
+          "System.Single UnityEngine.UI.ColorBlock::m_ColorMultiplier",
+          "System.Single UnityEngine.UI.ColorBlock::m_FadeDuration",
+          "System.Void UnityEngine.UI.ColorBlock::set_highlightedColor(UnityEngine.Color)",
+          "System.Void UnityEngine.UI.ColorBlock::set_normalColor(UnityEngine.Color)",
+          "System.Void UnityEngine.UI.ColorBlock::set_pressedColor(UnityEngine.Color)",
+          "System.Void UnityEngine.UI.ColorBlock::set_selectedColor(UnityEngine.Color)",
+          "UnityEngine.Color UnityEngine.UI.ColorBlock::highlightedColor()",
+          "UnityEngine.Color UnityEngine.UI.ColorBlock::m_DisabledColor",
+          "UnityEngine.Color UnityEngine.UI.ColorBlock::m_HighlightedColor",
+          "UnityEngine.Color UnityEngine.UI.ColorBlock::m_NormalColor",
+          "UnityEngine.Color UnityEngine.UI.ColorBlock::m_PressedColor",
+          "UnityEngine.Color UnityEngine.UI.ColorBlock::m_SelectedColor",
+          "UnityEngine.Color UnityEngine.UI.ColorBlock::normalColor()",
+          "UnityEngine.Color UnityEngine.UI.ColorBlock::pressedColor()",
+          "UnityEngine.Color UnityEngine.UI.ColorBlock::selectedColor()"
         ]
       },
       {
@@ -5090,11 +5245,14 @@
         "members": [
           "System.Boolean UnityEngine.UI.Selectable::interactable()",
           "System.Void UnityEngine.UI.Selectable::Select()",
+          "System.Void UnityEngine.UI.Selectable::set_colors(UnityEngine.UI.ColorBlock)",
           "System.Void UnityEngine.UI.Selectable::set_image(UnityEngine.UI.Image)",
           "System.Void UnityEngine.UI.Selectable::set_interactable(System.Boolean)",
           "System.Void UnityEngine.UI.Selectable::set_spriteState(UnityEngine.UI.SpriteState)",
           "System.Void UnityEngine.UI.Selectable::set_targetGraphic(UnityEngine.UI.Graphic)",
           "System.Void UnityEngine.UI.Selectable::set_transition(UnityEngine.UI.Selectable/Transition)",
+          "UnityEngine.UI.ColorBlock UnityEngine.UI.Selectable::colors()",
+          "UnityEngine.UI.ColorBlock UnityEngine.UI.Selectable::get_colors()",
           "UnityEngine.UI.Graphic UnityEngine.UI.Selectable::targetGraphic()",
           "UnityEngine.UI.Image UnityEngine.UI.Selectable::image()",
           "UnityEngine.UI.Selectable/Transition UnityEngine.UI.Selectable::transition()",
