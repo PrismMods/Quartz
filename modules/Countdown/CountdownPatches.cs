@@ -37,7 +37,17 @@ internal static class CountdownPatches {
             if(CountdownFeature.Coordinator?.PrepareInitialScrub(floorNum) == true)
                 forceDontStartMusicFourTilesBefore = true;
         }
-        private static void Postfix() => CountdownHaywire.PullBackAudioSeek();
+        private static void Postfix() => CountdownHaywire.OnScrubCompleted();
+    }
+    [HarmonyPatch(typeof(scrConductor), nameof(scrConductor.ScrubMusicToTime))]
+    internal static class HaywireScrubMusicPatch {
+        private static void Prefix(scrConductor __instance, ref double newTime, out double __state) {
+            __state = CountdownHaywire.ClaimAudioShift(__instance, newTime);
+            newTime -= __state;
+        }
+        private static void Postfix(scrConductor __instance, double __state) {
+            if(__state != 0.0) CountdownHaywire.RestoreLogicalClock(__instance, __state);
+        }
     }
     [HarmonyPatch(typeof(scrController), "OnMusicScheduled")]
     internal static class MusicScheduledPatch {

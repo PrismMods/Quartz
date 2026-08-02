@@ -820,6 +820,7 @@ public unsafe partial class scrConductor : global::ADOBase {
     public double addoffset;
     public float bpm;
     public float countdownSpeedMultiplier;
+    public int countdownTicks;
     public double crotchetAtStart;
     public static global::CalibrationPreset currentPreset;
     public double deltaSongPos;
@@ -831,6 +832,7 @@ public unsafe partial class scrConductor : global::ADOBase {
     public bool isGameWorld;
     public bool playEndingCymbal;
     public double prev_dspTime;
+    public bool separateCountdownTime;
     public global::UnityEngine.AudioSource song;
     public global::UnityEngine.AudioSource song2;
     public global::UnityEngine.AudioSource song3;

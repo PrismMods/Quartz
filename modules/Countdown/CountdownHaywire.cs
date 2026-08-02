@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using ADOFAI;
 using Quartz.Core;
-using UnityEngine;
 namespace Quartz.Features.Countdown;
 internal static class CountdownHaywire {
     private static readonly List<KeyValuePair<int, float>> ModifiedFloors = [];
     private static List<scrFloor> stretchedFloorsRef;
+    private static bool audioShiftApplied;
     internal static double TimelineShift { get; private set; }
     internal static bool SpeedOverrideActive { get; private set; }
     internal static bool AttemptPending { get; set; }
@@ -29,6 +29,7 @@ internal static class CountdownHaywire {
         stretchedFloorsRef = null;
         SpeedOverrideActive = false;
         TimelineShift = 0.0;
+        audioShiftApplied = false;
     }
     internal static void ApplyStretch(int checkpoint = -1) {
         try {
@@ -70,17 +71,46 @@ internal static class CountdownHaywire {
         TimelineShift = floors[cp + 1].entryTime - firstHitEntryOld;
         stretchedFloorsRef = floors;
         SpeedOverrideActive = true;
+        audioShiftApplied = false;
         CountdownWorld.Log(
             $"haywire clamp: {tickBpm:0.#} BPM -> {tickBpm * factor:0.#} BPM "
                 + $"(speed x{factor} on tiles {firstStretched}-{cp}, timeline +{TimelineShift:0.###}s)");
     }
-    internal static void PullBackAudioSeek() {
-        if(!SpeedOverrideActive || TimelineShift == 0.0) return;
-        scrConductor conductor = scrConductor.instance;
-        if(conductor == null || conductor.song == null || conductor.song.clip == null) return;
-        float newTime = conductor.song.time - (float)TimelineShift;
-        conductor.song.time = Mathf.Clamp(newTime, 0f, conductor.song.clip.length - 0.01f);
-        AttemptPending = false;
+    internal static double ClaimAudioShift(scrConductor conductor, double scrubTime) {
+        if(audioShiftApplied || !SpeedOverrideActive || TimelineShift == 0.0) return 0.0;
+        if(conductor == null || conductor.song == null || conductor.song.clip == null) return 0.0;
+        float pitch = conductor.song.pitch;
+        if(pitch <= 0f || float.IsNaN(pitch) || float.IsInfinity(pitch)) return 0.0;
+        audioShiftApplied = true;
+        double countdownLead =
+            conductor.separateCountdownTime ? conductor.crotchetAtStart * conductor.countdownTicks : 0.0;
+        double baseSongTime = scrubTime + conductor.addoffset - countdownLead;
+        double limit = Math.Max(0.0, conductor.song.clip.length - 0.01);
+        double target = Math.Min(limit, Math.Max(0.0, baseSongTime - TimelineShift));
+        double shift = baseSongTime - target;
+        double residual = TimelineShift - shift;
+        if(Math.Abs(residual) > 0.0005)
+            CountdownWorld.Log(
+                $"haywire audio pull-back clamped inside the clip: moved {shift:0.###}s "
+                    + $"of {TimelineShift:0.###}s ({residual:0.###}s residual desync)");
+        else
+            CountdownWorld.Log(
+                $"haywire audio pull-back: scrub {scrubTime:0.###}s -> song {target:0.###}s "
+                    + $"(shift {shift:0.###}s)");
+        return shift;
+    }
+    internal static void RestoreLogicalClock(scrConductor conductor, double shift) {
+        if(conductor == null || conductor.song == null) return;
+        float pitch = conductor.song.pitch;
+        if(pitch <= 0f || float.IsNaN(pitch) || float.IsInfinity(pitch)) return;
+        conductor.dspTimeSong -= shift / pitch;
+        if(ADOBase.playerManager == null) return;
+        foreach(scrPlayer player in ADOBase.playerManager) {
+            if(player != null) player.lastHit += shift;
+        }
+    }
+    internal static void OnScrubCompleted() {
+        if(SpeedOverrideActive) AttemptPending = false;
     }
     private static void RebakeFxStartTimes(List<scrFloor> floors) {
         scrConductor conductor = scrConductor.instance;
