@@ -1,0 +1,34 @@
+modules/Restriction/Lang/en-US.json
+  s_61abbc3d7492fa::t_87a22743fb11e6 6-7,15-17,37-41
+modules/Restriction/Lang/ko-KR.json
+  s_61abbc3d7492fa::t_87a22743fb11e6 6-7,15-17,37-41
+modules/Restriction/RestrictionSettings.cs
+  s_61abbc3d7492fa::t_57a5393f357f29 4,6-22,24,30-31,47-49,66-73
+Quartz/UI/Generator/GenerateUI.Collapsible.cs
+  s_61abbc3d7492fa::t_24003010a81bc6 44
+modules/Restriction/PageRestriction.cs
+  s_61abbc3d7492fa::t_00ab4b2a532370 94-157
+  s_61abbc3d7492fa::t_0f5384d7bc89a2 179-220
+  s_61abbc3d7492fa::t_56157f0529c827 221
+modules/Restriction/Restriction.cs
+  s_61abbc3d7492fa::t_c6ca63a143fbc0 52-68
+  s_61abbc3d7492fa::t_d94df738f8ec49 114
+Quartz/UI/Generator/GenerateUI.Text.cs
+  s_61abbc3d7492fa::t_4686e01f423edc 58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "1d8f4072b8287dde3acc53351d2b023fddff1805",
+  "prompts": {},
+  "sessions": {
+    "s_61abbc3d7492fa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "aabcd74b-d353-4cb4-9e1b-bac82625ebe4",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
