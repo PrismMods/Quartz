@@ -1,0 +1,44 @@
+Quartz/UI/Factory/Page/PageAddons.cs
+  s_1a655173b600f6::t_8f7d5e9fcaae33 128
+Quartz/UI/Factory/Page/PageProfiles.cs
+  s_1a655173b600f6::t_c609443a726440 163,186
+Quartz/UI/Factory/Page/PageDeveloper.cs
+  s_1a655173b600f6::t_8fd8a603d554c8 1
+  s_1a655173b600f6::t_4820aba90b8aa6 85
+  s_1a655173b600f6::t_e6dece5442560a 46-57
+Quartz/UI/Factory/Page/PageCredits.cs
+  s_1a655173b600f6::t_ed50b2fa4af8bb 17
+Quartz/Localization/Translator.cs
+  s_1a655173b600f6::t_d96a1997a14c10 244,246
+  s_1a655173b600f6::t_7fbd2c9407a685 215-218
+Quartz/UI/Factory/Page/PageHome.cs
+  s_1a655173b600f6::t_27a737959e03f8 24
+Quartz/Resource/ResourceManager.cs
+  s_1a655173b600f6::t_b0556f91acdea2 151
+  s_1a655173b600f6::t_e1afa7403f3577 12
+Quartz/Core/AprilFools.cs
+  s_1a655173b600f6::t_04b6c793b85224 8,11-14,17-19,22
+  s_1a655173b600f6::t_f87fd07cfe6dd3 44-47,51-53
+  s_1a655173b600f6::t_b94021bc304804 3,7,9-10,16,20-21
+  s_1a655173b600f6::t_1257ba0535c7be 1-2,4-6,15,23-43,48-50,54
+Quartz/Resource/SpriteManager.cs
+  s_1a655173b600f6::t_dfd5bb830c9a16 110-114,119
+Quartz/Core/Info.cs
+  s_1a655173b600f6::t_57b66621b31a3f 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.19",
+  "base_commit_sha": "3f8fad17dd21306a266bbcd0535b01d9be5c18e6",
+  "prompts": {},
+  "sessions": {
+    "s_1a655173b600f6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a16dface-79c4-47c7-bda2-b97f746bdf33",
+        "model": "claude-opus-5"
+      },
+      "human_author": null
+    }
+  }
+}
