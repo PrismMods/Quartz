@@ -113,6 +113,7 @@ public static class UpdateService {
         }
         JArray releases = JArray.Parse(json);
         SemVer current = Info.Current;
+        ReleaseChannel preferred = MainCore.Conf.GetUpdateChannel();
         string skipped = MainCore.Conf.SkippedVersion ?? string.Empty;
         UpdateInfo best = null;
         foreach(JToken rel in releases) {
@@ -120,7 +121,8 @@ public static class UpdateService {
             string tag = (string)rel["tag_name"];
             if(string.IsNullOrEmpty(tag) || (!forceLatest && tag == skipped)) continue;
             if(!SemVer.TryParse(tag, out SemVer v)) continue;
-            if(!MainCore.Conf.AcceptsChannel(v.Channel) || (!forceLatest && v.CompareTo(current) <= 0)) continue;
+            if(!MainCore.Conf.AcceptsChannel(v.Channel)
+                || (!forceLatest && SemVer.CompareForChannel(v, current, preferred) <= 0)) continue;
             string zipName = MainCore.Host.UpdateAssetName;
             bool allowDllFallback = zipName == "Quartz.zip";
             string zipUrl = null;
@@ -141,7 +143,7 @@ public static class UpdateService {
             }
             string assetUrl = zipUrl ?? dllUrl;
             if(assetUrl == null) continue;
-            if(best == null || v.CompareTo(best.Version) > 0) {
+            if(best == null || SemVer.CompareForChannel(v, best.Version, preferred) > 0) {
                 best = new UpdateInfo {
                     Tag = tag,
                     Name = ParseReleaseName((string)rel["name"], tag),

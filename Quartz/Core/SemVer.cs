@@ -65,16 +65,30 @@ public readonly struct SemVer : IComparable<SemVer> {
         version = new SemVer(major, minor, patch, channel, build);
         return true;
     }
-    public int CompareTo(SemVer other) {
+    public int CompareCore(SemVer other) {
         int c = Major.CompareTo(other.Major);
         if(c != 0) return c;
         c = Minor.CompareTo(other.Minor);
         if(c != 0) return c;
-        c = Patch.CompareTo(other.Patch);
+        return Patch.CompareTo(other.Patch);
+    }
+    public int CompareTo(SemVer other) {
+        int c = CompareCore(other);
         if(c != 0) return c;
         c = Channel.CompareTo(other.Channel);
         if(c != 0) return c;
         return Channel == ReleaseChannel.Stable ? 0 : Build.CompareTo(other.Build);
+    }
+    public static int CompareForChannel(SemVer a, SemVer b, ReleaseChannel preferred) {
+        int c = a.CompareCore(b);
+        if(c != 0) return c;
+        if(a.Channel == b.Channel)
+            return a.Channel == ReleaseChannel.Stable ? 0 : a.Build.CompareTo(b.Build);
+        if(a.Channel == ReleaseChannel.Stable) return 1;
+        if(b.Channel == ReleaseChannel.Stable) return -1;
+        if(a.Channel == preferred) return 1;
+        if(b.Channel == preferred) return -1;
+        return a.Channel.CompareTo(b.Channel);
     }
     public static int Compare(string a, string b) {
         SemVer va = TryParse(a, out SemVer pa) ? pa : default;
