@@ -3,7 +3,7 @@ public static class Info {
     public const string Name = "Quartz";
     public const string Author = "koren";
     public const string Version = "2.0.0";
-    public const string Channel = "alpha";
+    public const string Channel = "beta";
     public static readonly int Build = BuildInfo.Number;
     public static ReleaseChannel ChannelKind => SemVer.ParseChannel(Channel);
     public static bool IsPrerelease => ChannelKind != ReleaseChannel.Stable;
