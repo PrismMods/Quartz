@@ -1,0 +1,25 @@
+stubs/Unity.TextMeshPro/Stubs.g.cs
+  s_85e8e7a78a72ba::t_7b68ab36c81082 190-192,194,249-251
+modules/Panels/PanelsOverlay.Images.cs
+  s_85e8e7a78a72ba::t_3d7d0c4cd7f105 127-128
+stubs/README.md
+  s_85e8e7a78a72ba::t_7b68ab36c81082 27,41
+stubs/MANIFEST.json
+  s_85e8e7a78a72ba::t_7b68ab36c81082 2589-2592,2596,2707-2710
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "1c338d491c5a40577b56ed71fb570614b69d07ac",
+  "prompts": {},
+  "sessions": {
+    "s_85e8e7a78a72ba": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f3d5e757-9ec7-4da0-89d1-3f96167976ec",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
