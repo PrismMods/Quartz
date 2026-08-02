@@ -160,7 +160,7 @@ internal static class PageProfiles {
         try {
             path = FileDialog.PickFile(
                 null,
-                "Quartz Profile",
+                Info.DisplayName + " Profile",
                 [.. ProfileManager.ImportExtensions, "json"],
                 GenerateUI.Tr("PROFILE_IMPORT_TITLE", "Import Quartz Profile")
             );
@@ -183,7 +183,7 @@ internal static class PageProfiles {
             path = FileDialog.SaveFile(
                 null,
                 $"{name}.{ProfileManager.EXPORT_EXTENSION}",
-                "Quartz Profile",
+                Info.DisplayName + " Profile",
                 [ProfileManager.EXPORT_EXTENSION],
                 GenerateUI.Tr("PROFILE_EXPORT_TITLE", "Export Quartz Profile")
             );

@@ -21,7 +21,7 @@ internal static class PageHome {
         RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(content.transform)), "HOME", "Home");
         TextMeshProUGUI version = GenerateUI.AddMutedText(GenerateUI.Row(content.transform, 30f), 17f, 0.45f, true);
-        version.text = Info.Name + " — " + Info.DisplayVersion;
+        version.text = Info.DisplayName + " — " + Info.DisplayVersion;
         Banner(content);
         RefreshUpdateBanner();
         UpdateService.OnChanged -= RefreshUpdateBanner;

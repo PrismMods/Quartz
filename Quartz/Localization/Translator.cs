@@ -212,9 +212,10 @@ public class Translator {
             || (translationsArr.TryGetValue(language, out var langArr) && langArr.ContainsKey(key));
     }
     public string Get(string key, string defaultValue) {
-        if(IsDefault) return defaultValue;
-        if(translations.TryGetValue(Language, out var langDict) && langDict.TryGetValue(key, out var val)) return val;
-        return defaultValue;
+        if(IsDefault) return Quartz.Core.AprilFools.Rebrand(defaultValue);
+        if(translations.TryGetValue(Language, out var langDict) && langDict.TryGetValue(key, out var val))
+            return Quartz.Core.AprilFools.Rebrand(val);
+        return Quartz.Core.AprilFools.Rebrand(defaultValue);
     }
     public string GetForLanguage(string key, string language, string defaultValue) {
         if(string.IsNullOrEmpty(language) || language == FALLBACK_LANGUAGE) return defaultValue;
@@ -240,9 +241,9 @@ public class Translator {
         if(translationsArr.TryGetValue(Language, out var lang)
             && lang.TryGetValue(key, out var values)
             && index >= 0 && index < values.Length) {
-            return values[index];
+            return Quartz.Core.AprilFools.Rebrand(values[index]);
         }
-        return defaultValue;
+        return Quartz.Core.AprilFools.Rebrand(defaultValue);
     }
     public int GetArrCount(string key) {
         if(IsDefault) return 0;

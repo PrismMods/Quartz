@@ -1,3 +1,4 @@
+using Quartz.Async;
 using Quartz.Core;
 using Quartz.UI.Generator;
 using Quartz.Update;
@@ -42,6 +43,18 @@ internal static class PageDeveloper {
             "Refresh Status",
             "dev_refresh"
         );
+        var seasonalSec = GenerateUI.Collapsible(content.transform, "Seasonal", startExpanded: true);
+        GenerateUI.Toggle(
+            GenerateUI.Row(seasonalSec.Body),
+            false,
+            AprilFools.DevForced,
+            static v => {
+                AprilFools.SetDevForced(v);
+                MainThread.Enqueue(UICore.Rebuild);
+            },
+            "Force April Fools",
+            "dev_april_fools"
+        );
         var statusSec = GenerateUI.Collapsible(content.transform, "Status", startExpanded: true);
         statusText = GenerateUI.AddText(GenerateUI.Row(statusSec.Body, 320f));
         statusText.alignment = TextAlignmentOptions.TopLeft;
@@ -69,6 +82,7 @@ internal static class PageDeveloper {
             $"Available:       {(available == null ? "none" : available.Tag)}",
             $"Skipped version: {skipped}",
             $"Simulate update: {UpdateService.DevSimulate}",
+            $"April Fools:     {AprilFools.Active}{(AprilFools.DevForced ? " (forced)" : "")}",
             $"Repo:            {Info.RepoOwner}/{Info.RepoName}",
             $"Last message:    {UpdateService.Message}",
         });

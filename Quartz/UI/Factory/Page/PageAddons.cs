@@ -125,7 +125,7 @@ internal static class PageAddons {
         try {
             path = FileDialog.PickFile(
                 null,
-                "Quartz Addon",
+                Info.DisplayName + " Addon",
                 AddonService.ImportExtensions,
                 GenerateUI.Tr("ADDONS_ADD_TITLE", "Add Quartz Addon")
             );

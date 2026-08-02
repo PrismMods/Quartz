@@ -1,6 +1,7 @@
 namespace Quartz.Core;
 public static class Info {
     public const string Name = "Quartz";
+    public static string DisplayName => AprilFools.Active ? AprilFools.BrandName : Name;
     public const string Author = "koren";
     public const string Version = "2.0.0";
     public const string Channel = "beta";

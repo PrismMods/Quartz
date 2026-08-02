@@ -107,11 +107,16 @@ public sealed class SpriteManager(ResourceManager resource) : IDisposable {
         cache[key] = sprite;
         return sprite;
     }
-    public Sprite Get(UISprite sprite) => spriteMap.TryGetValue(sprite, out Asset asset) ? Get(asset) : null;
+    public Sprite Get(UISprite sprite) => spriteMap.TryGetValue(sprite, out Asset asset) ? Get(Seasonal(asset)) : null;
+    private Asset Seasonal(Asset asset) {
+        if(asset != Asset.QuartzLogo || !AprilFools.Active) return asset;
+        return resource.Get<Texture2D>(Asset.QuizLogo) == null ? asset : Asset.QuizLogo;
+    }
     public Sprite Get(UISprite sprite, float units) {
         object key = (sprite, units);
         if(cache.TryGetValue(key, out Sprite cached)) return cached;
         if(!spriteMap.TryGetValue(sprite, out Asset asset)) return null;
+        asset = Seasonal(asset);
         Texture2D source = resource.Get<Texture2D>(asset);
         if(source == null) return null;
         int target = Mathf.Max(2, Mathf.RoundToInt(units * UIPixelScale()));

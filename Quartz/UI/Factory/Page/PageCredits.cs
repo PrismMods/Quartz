@@ -14,7 +14,7 @@ internal static class PageCredits {
         logoImg.sprite = MainCore.Spr.Get(UISprite.QuartzLogo);
         logoImg.preserveAspect = true;
         TextMeshProUGUI title = Line(content, 60f, 38f);
-        title.text = "Quartz";
+        title.text = Info.DisplayName;
         TextMeshProUGUI subtitle = Line(content, 40f, 20f, 0.45f);
         GenerateUI.Localize(subtitle, "CREDITS_SUBTITLE", "by koren, sbrothers7, and more.");
         GenerateUI.Row(content.transform, 20f);
