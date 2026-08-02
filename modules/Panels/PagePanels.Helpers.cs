@@ -60,8 +60,19 @@ internal static partial class PagePanels {
             if(stat.Id == id) return stat.Label;
         return id;
     }
-    private static void BuildTextEntryInput(Transform bg, StatEntry entry, Action save) {
-        GameObject inputObj = new("TextInput");
+    private static void BuildTextEntryInput(Transform bg, StatEntry entry, Action save) =>
+        BuildEntryInput(
+            bg, "TextInput", "PANEL_TEXT_PLACEHOLDER", "Custom text…", 64,
+            entry.Text, v => entry.Text = v, save);
+    private static void BuildImageEntryInput(Transform bg, StatEntry entry, Action save) =>
+        BuildEntryInput(
+            bg, "ImageInput", "PANEL_IMAGE_PLACEHOLDER", "Image file or full path…", 260,
+            entry.Image, v => entry.Image = v, save);
+    private static void BuildEntryInput(
+        Transform bg, string name, string placeholderKey, string placeholderText,
+        int limit, string value, Action<string> onChanged, Action save
+    ) {
+        GameObject inputObj = new(name);
         inputObj.transform.SetParent(bg, false);
         RectTransform inputRect = inputObj.AddComponent<RectTransform>();
         inputRect.anchorMin = new Vector2(0f, 0f);
@@ -82,16 +93,16 @@ internal static partial class PagePanels {
         placeholder.alignment = TextAlignmentOptions.Left;
         TextCompat.NoWrap(placeholder);
         placeholder.color = new Color(1f, 1f, 1f, 0.3f);
-        GenerateUI.Localize(placeholder, "PANEL_TEXT_PLACEHOLDER", "Custom text…");
+        GenerateUI.Localize(placeholder, placeholderKey, placeholderText);
         SetFullRect(placeholder.rectTransform, 10f);
         field.textViewport = inputRect;
         field.textComponent = text;
         field.placeholder = placeholder;
         field.lineType = TMP_InputField.LineType.SingleLine;
         field.richText = false;
-        field.characterLimit = 64;
-        field.SetTextWithoutNotify(entry.Text ?? "");
-        field.onValueChanged.AddListener(v => entry.Text = v);
+        field.characterLimit = limit;
+        field.SetTextWithoutNotify(value ?? "");
+        field.onValueChanged.AddListener(v => onChanged(v));
         field.onEndEdit.AddListener(_ => save());
     }
     private static void SetFullRect(RectTransform rect, float xPad) {

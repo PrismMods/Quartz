@@ -64,6 +64,7 @@ public static partial class PanelsOverlay {
         new() { Id = "fps", Category = "Other", Label = "FPS", Value = _ =>
             GameStats.Fps.ToString(CultureInfo.InvariantCulture) },
         new() { Id = "text", Category = "Other", Label = "Text", Value = _ => null },
+        new() { Id = "image", Category = "Other", Label = "Image", Value = _ => null },
     ];
     private static readonly Dictionary<string, StatDef> CatalogById = Catalog.ToDictionary(
         stat => stat.Id,
@@ -202,6 +203,8 @@ public static partial class PanelsOverlay {
         if(canvasObj == null) return;
         SyncPositionsToConfig();
         ConfMgr?.Save();
+        foreach(LivePanel p in panels) ReleasePanelImages(p);
+        DisposeImageCache();
         Object.Destroy(canvasObj);
         canvasObj = null;
         raycaster = null;
@@ -211,8 +214,10 @@ public static partial class PanelsOverlay {
     public static void Rebuild(PanelConfig skipPositionSync = null) {
         if(canvasObj == null) return;
         SyncPositionsToConfig(skipPositionSync);
-        foreach(LivePanel p in panels)
+        foreach(LivePanel p in panels) {
+            ReleasePanelImages(p);
             if(p.Rect != null) Object.Destroy(p.Rect.gameObject);
+        }
         panels.Clear();
         BuildPanels();
         Apply();

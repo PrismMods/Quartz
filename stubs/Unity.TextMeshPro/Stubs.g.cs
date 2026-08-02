@@ -34,6 +34,7 @@ namespace TMPro {
         public static int ID_OutlineWidth;
     }
     public abstract unsafe partial class TMP_Asset : global::UnityEngine.ScriptableObject {
+        public global::UnityEngine.Material material { get => throw null; set { } }
         protected TMP_Asset() { }
     }
     public unsafe partial class TMP_Character : global::TMPro.TMP_TextElement {
@@ -182,8 +183,24 @@ namespace TMPro {
         private float m_Top;
     }
     public unsafe partial class TMP_Settings : global::UnityEngine.ScriptableObject {
+        public static global::TMPro.TMP_SpriteAsset defaultSpriteAsset { get => throw null; set { } }
         public static global::TMPro.TMP_Settings instance { get => throw null; }
         protected TMP_Settings() { }
+    }
+    public unsafe partial class TMP_SpriteAsset : global::TMPro.TMP_Asset {
+        public global::UnityEngine.Texture spriteSheet;
+        public global::System.Collections.Generic.List<global::TMPro.TMP_SpriteCharacter> spriteCharacterTable { get => throw null; }
+        public global::System.Collections.Generic.List<global::TMPro.TMP_SpriteGlyph> spriteGlyphTable { get => throw null; }
+        public void UpdateLookupTables() => throw null;
+        protected TMP_SpriteAsset() { }
+    }
+    public unsafe partial class TMP_SpriteCharacter : global::TMPro.TMP_TextElement {
+        public string name { get => throw null; set { } }
+        public TMP_SpriteCharacter(uint unicode, global::TMPro.TMP_SpriteGlyph glyph) => throw null;
+        protected TMP_SpriteCharacter() { }
+    }
+    public unsafe partial class TMP_SpriteGlyph : global::UnityEngine.TextCore.Glyph {
+        public TMP_SpriteGlyph() => throw null;
     }
     public abstract unsafe partial class TMP_Text : global::UnityEngine.UI.MaskableGraphic {
         public global::TMPro.TextAlignmentOptions alignment { get => throw null; set { } }
@@ -203,6 +220,7 @@ namespace TMPro {
         public float paragraphSpacing { get => throw null; set { } }
         public global::UnityEngine.RectTransform rectTransform { get => throw null; }
         public bool richText { get => throw null; set { } }
+        public global::TMPro.TMP_SpriteAsset spriteAsset { get => throw null; set { } }
         public virtual string text { get => throw null; set { } }
         public global::TMPro.TMP_TextInfo textInfo { get => throw null; }
         public global::UnityEngine.Transform transform { get => throw null; }
@@ -217,6 +235,7 @@ namespace TMPro {
         protected TMP_Text() { }
     }
     public unsafe partial class TMP_TextElement {
+        public float scale { get => throw null; set { } }
         protected TMP_TextElement() { }
     }
     public enum TMP_TextElementType : int {

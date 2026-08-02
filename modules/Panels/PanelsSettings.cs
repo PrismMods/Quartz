@@ -9,6 +9,8 @@ public sealed class StatEntry {
     public bool Enabled = true;
     public bool ShowLabel = true;
     public string Text = "";
+    public string Image = "";
+    public float ImageScale = 1f;
     public StatColor Color;
     public StatEntry() { }
     public StatEntry(string id) => Id = id;
@@ -20,6 +22,8 @@ public sealed class StatEntry {
             [nameof(ShowLabel)] = ShowLabel,
         };
         if(!string.IsNullOrEmpty(Text)) obj[nameof(Text)] = Text;
+        if(!string.IsNullOrEmpty(Image)) obj[nameof(Image)] = Image;
+        if(Mathf.Abs(ImageScale - 1f) > 0.0001f) obj[nameof(ImageScale)] = ImageScale;
         if(Color != null) obj[nameof(Color)] = Color.Serialize();
         return obj;
     }
@@ -30,6 +34,8 @@ public sealed class StatEntry {
         e.Enabled = IOUtils.Read(token, nameof(Enabled), e.Enabled);
         e.ShowLabel = IOUtils.Read(token, nameof(ShowLabel), e.ShowLabel);
         e.Text = IOUtils.Read(token, nameof(Text), e.Text);
+        e.Image = IOUtils.Read(token, nameof(Image), e.Image);
+        e.ImageScale = IOUtils.Read(token, nameof(ImageScale), e.ImageScale);
         if(token[nameof(Color)] is JObject color) e.Color = StatColor.Deserialize(color);
         return e;
     }

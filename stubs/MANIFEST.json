@@ -2367,7 +2367,11 @@
       },
       {
         "type": "TMPro.TMP_Asset",
-        "members": []
+        "members": [
+          "System.Void TMPro.TMP_Asset::set_material(UnityEngine.Material)",
+          "UnityEngine.Material TMPro.TMP_Asset::get_material()",
+          "UnityEngine.Material TMPro.TMP_Asset::material()"
+        ]
       },
       {
         "type": "TMPro.TMP_Character",
@@ -2577,7 +2581,34 @@
         "type": "TMPro.TMP_Settings",
         "members": [
           "TMPro.TMP_Settings TMPro.TMP_Settings::get_instance()",
-          "TMPro.TMP_Settings TMPro.TMP_Settings::instance()"
+          "TMPro.TMP_Settings TMPro.TMP_Settings::instance()",
+          "TMPro.TMP_SpriteAsset TMPro.TMP_Settings::defaultSpriteAsset()",
+          "TMPro.TMP_SpriteAsset TMPro.TMP_Settings::get_defaultSpriteAsset()"
+        ]
+      },
+      {
+        "type": "TMPro.TMP_SpriteAsset",
+        "members": [
+          "System.Collections.Generic.List\u00601\u003CTMPro.TMP_SpriteCharacter\u003E TMPro.TMP_SpriteAsset::get_spriteCharacterTable()",
+          "System.Collections.Generic.List\u00601\u003CTMPro.TMP_SpriteCharacter\u003E TMPro.TMP_SpriteAsset::spriteCharacterTable()",
+          "System.Collections.Generic.List\u00601\u003CTMPro.TMP_SpriteGlyph\u003E TMPro.TMP_SpriteAsset::get_spriteGlyphTable()",
+          "System.Collections.Generic.List\u00601\u003CTMPro.TMP_SpriteGlyph\u003E TMPro.TMP_SpriteAsset::spriteGlyphTable()",
+          "System.Void TMPro.TMP_SpriteAsset::UpdateLookupTables()",
+          "UnityEngine.Texture TMPro.TMP_SpriteAsset::spriteSheet"
+        ]
+      },
+      {
+        "type": "TMPro.TMP_SpriteCharacter",
+        "members": [
+          "System.String TMPro.TMP_SpriteCharacter::name()",
+          "System.Void TMPro.TMP_SpriteCharacter::.ctor(System.UInt32,TMPro.TMP_SpriteGlyph)",
+          "System.Void TMPro.TMP_SpriteCharacter::set_name(System.String)"
+        ]
+      },
+      {
+        "type": "TMPro.TMP_SpriteGlyph",
+        "members": [
+          "System.Void TMPro.TMP_SpriteGlyph::.ctor()"
         ]
       },
       {
@@ -2623,6 +2654,7 @@
           "System.Void TMPro.TMP_Text::set_overflowMode(TMPro.TextOverflowModes)",
           "System.Void TMPro.TMP_Text::set_paragraphSpacing(System.Single)",
           "System.Void TMPro.TMP_Text::set_richText(System.Boolean)",
+          "System.Void TMPro.TMP_Text::set_spriteAsset(TMPro.TMP_SpriteAsset)",
           "System.Void TMPro.TMP_Text::set_text(System.String)",
           "System.Void TMPro.TMP_Text::set_verticalAlignment(TMPro.VerticalAlignmentOptions)",
           "System.Void TMPro.TMP_Text::set_wordSpacing(System.Single)",
@@ -2630,6 +2662,7 @@
           "TMPro.FontStyles TMPro.TMP_Text::get_fontStyle()",
           "TMPro.TMP_FontAsset TMPro.TMP_Text::font()",
           "TMPro.TMP_FontAsset TMPro.TMP_Text::get_font()",
+          "TMPro.TMP_SpriteAsset TMPro.TMP_Text::spriteAsset()",
           "TMPro.TMP_TextInfo TMPro.TMP_Text::get_textInfo()",
           "TMPro.TMP_TextInfo TMPro.TMP_Text::textInfo()",
           "TMPro.TextAlignmentOptions TMPro.TMP_Text::alignment()",
@@ -2653,7 +2686,10 @@
       },
       {
         "type": "TMPro.TMP_TextElement",
-        "members": []
+        "members": [
+          "System.Single TMPro.TMP_TextElement::scale()",
+          "System.Void TMPro.TMP_TextElement::set_scale(System.Single)"
+        ]
       },
       {
         "type": "TMPro.TMP_TextElementType",
@@ -3614,12 +3650,16 @@
       {
         "type": "UnityEngine.Material",
         "members": [
+          "System.Void UnityEngine.Material::.ctor(UnityEngine.Shader)",
           "System.Void UnityEngine.Material::DisableKeyword(System.String)",
           "System.Void UnityEngine.Material::EnableKeyword(System.String)",
           "System.Void UnityEngine.Material::SetColor(System.Int32,UnityEngine.Color)",
           "System.Void UnityEngine.Material::SetColor(System.String,UnityEngine.Color)",
           "System.Void UnityEngine.Material::SetFloat(System.Int32,System.Single)",
           "System.Void UnityEngine.Material::SetFloat(System.String,System.Single)",
+          "System.Void UnityEngine.Material::set_mainTexture(UnityEngine.Texture)",
+          "UnityEngine.Shader UnityEngine.Material::get_shader()",
+          "UnityEngine.Shader UnityEngine.Material::shader()",
           "UnityEngine.Texture UnityEngine.Material::get_mainTexture()",
           "UnityEngine.Texture UnityEngine.Material::mainTexture()"
         ]
@@ -3974,6 +4014,12 @@
         ]
       },
       {
+        "type": "UnityEngine.Shader",
+        "members": [
+          "UnityEngine.Shader UnityEngine.Shader::Find(System.String)"
+        ]
+      },
+      {
         "type": "UnityEngine.Sprite",
         "members": [
           "UnityEngine.Bounds UnityEngine.Sprite::bounds()",
@@ -4085,7 +4131,8 @@
           "System.Void UnityEngine.Texture2D::SetPixel(System.Int32,System.Int32,UnityEngine.Color)",
           "System.Void UnityEngine.Texture2D::SetPixels(UnityEngine.Color[])",
           "System.Void UnityEngine.Texture2D::SetPixels32(UnityEngine.Color32[])",
-          "UnityEngine.Color32[] UnityEngine.Texture2D::GetPixels32()"
+          "UnityEngine.Color32[] UnityEngine.Texture2D::GetPixels32()",
+          "UnityEngine.Rect[] UnityEngine.Texture2D::PackTextures(UnityEngine.Texture2D[],System.Int32,System.Int32,System.Boolean)"
         ]
       },
       {
@@ -4449,7 +4496,39 @@
     "types": [
       {
         "type": "UnityEngine.TextCore.Glyph",
-        "members": []
+        "members": [
+          "System.Int32 UnityEngine.TextCore.Glyph::atlasIndex()",
+          "System.Single UnityEngine.TextCore.Glyph::scale()",
+          "System.UInt32 UnityEngine.TextCore.Glyph::index()",
+          "System.Void UnityEngine.TextCore.Glyph::set_atlasIndex(System.Int32)",
+          "System.Void UnityEngine.TextCore.Glyph::set_glyphRect(UnityEngine.TextCore.GlyphRect)",
+          "System.Void UnityEngine.TextCore.Glyph::set_index(System.UInt32)",
+          "System.Void UnityEngine.TextCore.Glyph::set_metrics(UnityEngine.TextCore.GlyphMetrics)",
+          "System.Void UnityEngine.TextCore.Glyph::set_scale(System.Single)",
+          "UnityEngine.TextCore.GlyphMetrics UnityEngine.TextCore.Glyph::metrics()",
+          "UnityEngine.TextCore.GlyphRect UnityEngine.TextCore.Glyph::glyphRect()"
+        ]
+      },
+      {
+        "type": "UnityEngine.TextCore.GlyphMetrics",
+        "members": [
+          "System.Single UnityEngine.TextCore.GlyphMetrics::m_Height",
+          "System.Single UnityEngine.TextCore.GlyphMetrics::m_HorizontalAdvance",
+          "System.Single UnityEngine.TextCore.GlyphMetrics::m_HorizontalBearingX",
+          "System.Single UnityEngine.TextCore.GlyphMetrics::m_HorizontalBearingY",
+          "System.Single UnityEngine.TextCore.GlyphMetrics::m_Width",
+          "System.Void UnityEngine.TextCore.GlyphMetrics::.ctor(System.Single,System.Single,System.Single,System.Single,System.Single)"
+        ]
+      },
+      {
+        "type": "UnityEngine.TextCore.GlyphRect",
+        "members": [
+          "System.Int32 UnityEngine.TextCore.GlyphRect::m_Height",
+          "System.Int32 UnityEngine.TextCore.GlyphRect::m_Width",
+          "System.Int32 UnityEngine.TextCore.GlyphRect::m_X",
+          "System.Int32 UnityEngine.TextCore.GlyphRect::m_Y",
+          "System.Void UnityEngine.TextCore.GlyphRect::.ctor(System.Int32,System.Int32,System.Int32,System.Int32)"
+        ]
       }
     ]
   },
@@ -5447,6 +5526,7 @@
           "System.Void UnityEngine.Canvas::set_renderMode(UnityEngine.RenderMode)",
           "System.Void UnityEngine.Canvas::set_sortingOrder(System.Int32)",
           "UnityEngine.Canvas/WillRenderCanvases UnityEngine.Canvas::willRenderCanvases",
+          "UnityEngine.Material UnityEngine.Canvas::GetDefaultCanvasMaterial()",
           "UnityEngine.RenderMode UnityEngine.Canvas::renderMode()"
         ]
       },

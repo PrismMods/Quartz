@@ -529,6 +529,8 @@ namespace UnityEngine {
     }
     public unsafe partial class Material : global::UnityEngine.Object {
         public global::UnityEngine.Texture mainTexture { get => throw null; set { } }
+        public global::UnityEngine.Shader shader { get => throw null; set { } }
+        public Material(global::UnityEngine.Shader shader) => throw null;
         public void DisableKeyword(string keyword) => throw null;
         public void EnableKeyword(string keyword) => throw null;
         public void SetColor(string name, global::UnityEngine.Color value) => throw null;
@@ -747,6 +749,10 @@ namespace UnityEngine {
         public static T CreateInstance<T>() where T : global::UnityEngine.ScriptableObject => throw null;
         protected ScriptableObject() { }
     }
+    public sealed unsafe partial class Shader : global::UnityEngine.Object {
+        public static global::UnityEngine.Shader Find(string name) => throw null;
+        private Shader() { }
+    }
     public sealed unsafe partial class Sprite : global::UnityEngine.Object {
         public global::UnityEngine.Bounds bounds { get => throw null; }
         public global::UnityEngine.Texture2D texture { get => throw null; }
@@ -828,6 +834,7 @@ namespace UnityEngine {
         public void Apply(bool updateMipmaps, bool makeNoLongerReadable) => throw null;
         public void Compress(bool highQuality) => throw null;
         public global::UnityEngine.Color32[] GetPixels32() => throw null;
+        public global::UnityEngine.Rect[] PackTextures(global::UnityEngine.Texture2D[] textures, int padding, int maximumAtlasSize, bool makeNoLongerReadable) => throw null;
         public void SetPixel(int x, int y, global::UnityEngine.Color color) => throw null;
         public void SetPixels(global::UnityEngine.Color[] colors) => throw null;
         public void SetPixels32(global::UnityEngine.Color32[] colors) => throw null;

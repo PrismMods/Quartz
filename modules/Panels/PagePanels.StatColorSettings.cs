@@ -1,4 +1,5 @@
 using Quartz.Overlay;
+using Quartz.Compat.Game;
 using Quartz.Core;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
@@ -7,10 +8,11 @@ using Quartz.Features.Panels;
 namespace Quartz.UI.Factory.Page;
 internal static partial class PagePanels {
     private static void BuildStatColorSettings(
-        Transform parent, StatEntry entry, Action save, Action rebuild, string idp
+        Transform parent, StatEntry entry, Action save, Action rebuild, string idp, Action refreshRow
     ) {
         StatColor color = entry.EnsureColor();
         bool hasRatio = StatColor.HasRatio(entry.Id);
+        if(entry.Id == "image") BuildImageSettings(parent, entry, save, idp, refreshRow);
         if(entry.Id == "fps") {
             GenerateUI.SnapSlider(
                 parent, "FPS Update Interval", "overlay_fps_smooth",
@@ -126,6 +128,52 @@ internal static partial class PagePanels {
                 "Perfect Color",
                 idp + "_statcolor_perfectcolor"
             );
+        }
+    }
+    private static void BuildImageSettings(
+        Transform parent, StatEntry entry, Action save, string idp, Action refreshRow
+    ) {
+        GenerateUI.Button(
+            GenerateUI.Row(parent),
+            () => {
+                string picked = PickPanelImage();
+                if(string.IsNullOrEmpty(picked)) return;
+                entry.Image = picked;
+                save();
+                refreshRow();
+            },
+            "Choose Image",
+            idp + "_image_choose"
+        ).Rect.AddToolTip(
+            "DESC_PANEL_IMAGE_CHOOSE",
+            "Pick a PNG or JPG. A bare file name is looked up in the PanelImages folder, "
+            + "so a config stays portable when the image lives there."
+        );
+        GenerateUI.Button(
+            GenerateUI.Row(parent),
+            () => FileDialog.Reveal(PanelsOverlay.EnsureImagesDir()),
+            "Open Images Folder",
+            idp + "_image_folder"
+        ).SetSecondary();
+        GenerateUI.SnapSlider(
+            parent, "Image Size", idp + "_image_size",
+            1f, PanelsOverlay.MinImageScale, PanelsOverlay.MaxImageScale, entry.ImageScale,
+            "0.00'x'", 0.05f,
+            v => entry.ImageScale = v, null, save
+        ).Rect.AddToolTip(
+            "DESC_PANEL_IMAGE_SIZE",
+            "Image height as a multiple of this panel's font size."
+        );
+    }
+    private static string PickPanelImage() {
+        try {
+            return FileDialog.PickFile(
+                PanelsOverlay.EnsureImagesDir(), "Image", ["png", "jpg", "jpeg"],
+                "Select panel image"
+            );
+        } catch(Exception e) {
+            MainCore.Log.Err($"[{nameof(PagePanels)}] panel image PickFile failed: {e}");
+            return null;
         }
     }
 }

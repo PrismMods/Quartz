@@ -25,6 +25,12 @@ public static partial class PanelsOverlay {
         public string SeparatorSource;
         public string Separator;
         public Func<string, string> ResolveToken;
+        public TMP_SpriteAsset Sprites;
+        public Texture2D Atlas;
+        public Material SpriteMaterial;
+        public int ImageSignature;
+        public float ImageRetryAt;
+        public readonly Dictionary<StatEntry, string> ImageTags = [];
     }
     private sealed class Updater : MonoBehaviour {
         private const float TextRefreshInterval = 0.05f;
@@ -59,6 +65,7 @@ public static partial class PanelsOverlay {
             sb.Clear();
             if(show) {
                 PanelConfig c = p.Config;
+                SyncPanelImages(p);
                 if(p.Separator == null || p.SeparatorSource != c.LabelSeparator) {
                     p.SeparatorSource = c.LabelSeparator;
                     p.Separator = EffectiveSeparator(c.LabelSeparator);
@@ -75,6 +82,8 @@ public static partial class PanelsOverlay {
                         if(string.IsNullOrEmpty(entry.Text)) continue;
                         value = Quartz.Addons.AddonTags.Interpolate(entry.Text, p.ResolveToken ??= MakeResolver(c));
                         if(string.IsNullOrEmpty(value)) continue;
+                    } else if(entry.Id == "image") {
+                        if(!p.ImageTags.TryGetValue(entry, out value)) continue;
                     } else {
                         try { value = stat.Value(c); }
                         catch(Exception e) { Diag.Ignore(e); continue; }

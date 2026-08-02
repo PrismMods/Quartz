@@ -97,6 +97,11 @@
     <Reference Include="UnityEngine.InputLegacyModule"><HintPath>$(ManagedDir)/UnityEngine.InputLegacyModule.dll</HintPath></Reference>
     <Reference Include="UnityEngine.ParticleSystemModule"><HintPath>$(ManagedDir)/UnityEngine.ParticleSystemModule.dll</HintPath></Reference>
     <Reference Include="UnityEngine.TextRenderingModule"><HintPath>$(ManagedDir)/UnityEngine.TextRenderingModule.dll</HintPath></Reference>
+    <!-- Glyph/GlyphRect/GlyphMetrics, needed to build a TMP sprite asset at runtime.
+         This module was renamed (UnityEngine.TextCoreModule on the Unity 2019 game
+         builds), so anything naming these types must be reached through a guarded
+         call site — see PanelsOverlay.TryBuildPanelSprites. -->
+    <Reference Include="UnityEngine.TextCoreFontEngineModule" Condition="Exists('$(ManagedDir)/UnityEngine.TextCoreFontEngineModule.dll')"><HintPath>$(ManagedDir)/UnityEngine.TextCoreFontEngineModule.dll</HintPath></Reference>
     <Reference Include="UnityEngine.UI"><HintPath>$(ManagedDir)/UnityEngine.UI.dll</HintPath></Reference>
     <Reference Include="UnityEngine.UIModule"><HintPath>$(ManagedDir)/UnityEngine.UIModule.dll</HintPath></Reference>
   </ItemGroup>

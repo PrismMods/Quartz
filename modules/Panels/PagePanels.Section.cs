@@ -103,7 +103,7 @@ internal static partial class PagePanels {
         void RebuildColorBody(StatEntry entry) {
             if(!colorBodies.TryGetValue(entry, out StatColorBody body)) return;
             GenerateUI.ClearChildren(body.Rect);
-            BuildStatColorSettings(body.Rect, entry, Save, () => RebuildColorBody(entry), idp);
+            BuildStatColorSettings(body.Rect, entry, Save, () => RebuildColorBody(entry), idp, RebuildRows);
             body.Layout.enabled = true;
             body.Fitter.enabled = true;
             body.LE.preferredHeight = -1f;
@@ -118,7 +118,7 @@ internal static partial class PagePanels {
             }
             colorExpanded.Add(entry);
             GenerateUI.ClearChildren(body.Rect);
-            BuildStatColorSettings(body.Rect, entry, Save, () => RebuildColorBody(entry), idp);
+            BuildStatColorSettings(body.Rect, entry, Save, () => RebuildColorBody(entry), idp, RebuildRows);
             AnimateColorBody(body, true);
         }
         void RebuildRows() {
@@ -146,7 +146,7 @@ internal static partial class PagePanels {
                 StatColorBody body = CreateColorBody(rows.transform);
                 colorBodies[entry] = body;
                 if(colorExpanded.Contains(entry)) {
-                    BuildStatColorSettings(body.Rect, entry, Save, () => RebuildColorBody(entry), idp);
+                    BuildStatColorSettings(body.Rect, entry, Save, () => RebuildColorBody(entry), idp, RebuildRows);
                     body.LE.preferredHeight = -1f;
                     body.CG.alpha = 1f;
                 }
@@ -160,7 +160,7 @@ internal static partial class PagePanels {
                     replaceTarget.Id = statId;
                 } else {
                     StatEntry added = new(statId);
-                    if(statId == "text") added.ShowLabel = false;
+                    if(statId is "text" or "image") added.ShowLabel = false;
                     panel.Stats.Add(added);
                 }
                 Save();

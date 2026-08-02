@@ -32,7 +32,7 @@ internal static partial class PagePanels {
             bool headerAdded = false;
             foreach(PanelsOverlay.StatDef stat in allStats) {
                 if(stat.Category != category) continue;
-                if(stat.Id != "text" && panel.Stats.Exists(e => e.Id == stat.Id)) continue;
+                if(stat.Id is not ("text" or "image") && panel.Stats.Exists(e => e.Id == stat.Id)) continue;
                 if(!headerAdded) {
                     headerAdded = true;
                     GenerateUI.AddLocalizedMutedText(
@@ -72,6 +72,8 @@ internal static partial class PagePanels {
         drag.OnReordered = commitOrder;
         if(entry.Id == "text") {
             BuildTextEntryInput(bg, entry, save);
+        } else if(entry.Id == "image") {
+            BuildImageEntryInput(bg, entry, save);
         } else {
             var label = GenerateUI.AddText(bg, true);
             GenerateUI.Localize(

@@ -13,6 +13,28 @@
 
 namespace UnityEngine.TextCore {
     public unsafe partial class Glyph {
+        public int atlasIndex { get => throw null; set { } }
+        public global::UnityEngine.TextCore.GlyphRect glyphRect { get => throw null; set { } }
+        public uint index { get => throw null; set { } }
+        public global::UnityEngine.TextCore.GlyphMetrics metrics { get => throw null; set { } }
+        public float scale { get => throw null; set { } }
         protected Glyph() { }
+    }
+    public unsafe partial struct GlyphMetrics : global::System.IEquatable<global::UnityEngine.TextCore.GlyphMetrics> {
+        private float m_Height;
+        private float m_HorizontalAdvance;
+        private float m_HorizontalBearingX;
+        private float m_HorizontalBearingY;
+        private float m_Width;
+        public GlyphMetrics(float width, float height, float bearingX, float bearingY, float advance) => throw null;
+        bool global::System.IEquatable<global::UnityEngine.TextCore.GlyphMetrics>.Equals(global::UnityEngine.TextCore.GlyphMetrics other) => throw null;
+    }
+    public unsafe partial struct GlyphRect : global::System.IEquatable<global::UnityEngine.TextCore.GlyphRect> {
+        private int m_Height;
+        private int m_Width;
+        private int m_X;
+        private int m_Y;
+        public GlyphRect(int x, int y, int width, int height) => throw null;
+        bool global::System.IEquatable<global::UnityEngine.TextCore.GlyphRect>.Equals(global::UnityEngine.TextCore.GlyphRect other) => throw null;
     }
 }

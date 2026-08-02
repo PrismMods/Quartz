@@ -19,6 +19,7 @@ namespace UnityEngine {
         public int sortingOrder { get => throw null; set { } }
         public static event global::UnityEngine.Canvas.WillRenderCanvases willRenderCanvases { add { } remove { } }
         public static void ForceUpdateCanvases() => throw null;
+        public static global::UnityEngine.Material GetDefaultCanvasMaterial() => throw null;
         private Canvas() { }
         public unsafe delegate void WillRenderCanvases();
     }
