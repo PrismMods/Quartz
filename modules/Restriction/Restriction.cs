@@ -49,6 +49,23 @@ public static class Restriction {
         string name = JudgementName(hit);
         return msg.Replace("{judgement}", name).Replace("{judgment}", name);
     }
+    private static bool InRestrictedSection() {
+        RestrictionSettings conf = Conf;
+        if(conf == null || !conf.JRestrictSectionsEnabled) return true;
+        List<JudgementSection> sections = conf.JRestrictSections;
+        if(sections == null || sections.Count == 0) return false;
+        float percent;
+        try {
+            percent = GameStats.Progress * 100f;
+        } catch(Exception e) {
+            Diag.Ignore(e);
+            return false;
+        }
+        if(float.IsNaN(percent) || float.IsInfinity(percent)) return false;
+        foreach(JudgementSection section in sections)
+            if(section.Contains(percent)) return true;
+        return false;
+    }
     private static bool ShouldFailFor(HitMargin margin) {
         int marginInt = (int)margin;
         switch(Conf.JRestrictMode) {
@@ -94,7 +111,7 @@ public static class Restriction {
         } else if(hit == HitMargin.FailOverload) {
             overloadCount++;
         }
-        if(jrOn && ShouldFailFor(hit)) {
+        if(jrOn && InRestrictedSection() && ShouldFailFor(hit)) {
             TriggerFail(FormatJrMessage(Conf.JRestrictMessage, hit));
             return;
         }

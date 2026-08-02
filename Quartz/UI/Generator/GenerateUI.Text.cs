@@ -55,6 +55,7 @@ public static partial class GenerateUI {
         string key = NormalizeLocaleKey(id);
         key = StripIndexedPrefix(key, "PANEL");
         key = StripIndexedPrefix(key, "PRACTICE");
+        key = StripIndexedPrefix(key, "JRSEC");
         if(key.StartsWith("PANEL_PICK_")) {
             key = "PANEL_STAT_" + key["PANEL_PICK_".Length..];
         }

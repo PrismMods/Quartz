@@ -91,6 +91,70 @@ public static class PageRestriction {
                 entries[i].Id
             );
         }
+        GenerateUI.Localize(
+            GenerateUI.AddTextH1(GenerateUI.Row(sec.Body)),
+            "JR_SECTIONS",
+            "Sections"
+        );
+        GameObject sectionList = null;
+        RectTransform sectionAddRow = null;
+        void RefreshSectionRows() {
+            sectionList?.SetActive(conf.JRestrictSectionsEnabled);
+            sectionAddRow?.gameObject.SetActive(conf.JRestrictSectionsEnabled);
+        }
+        GenerateUI.Toggle(
+            GenerateUI.Row(sec.Body),
+            def.JRestrictSectionsEnabled,
+            conf.JRestrictSectionsEnabled,
+            v => {
+                conf.JRestrictSectionsEnabled = v;
+                RefreshSectionRows();
+                Restriction.Save();
+            },
+            "Restrict Only In Sections",
+            "jr_sections_on"
+        ).Rect.AddToolTip(
+            "DESC_JR_SECTIONS_ON",
+            "Only enforce the restriction while the run is inside one of the ranges below. Off: the whole level is restricted."
+        );
+        sectionList = new GameObject("JudgementSections");
+        sectionList.transform.SetParent(sec.Body, false);
+        sectionList.AddComponent<RectTransform>();
+        GenerateUI.FitVertical(sectionList, 6f);
+        Action rebuildSections = null;
+        rebuildSections = () => {
+            if(sectionList == null) return;
+            GenerateUI.ClearChildren(sectionList.transform);
+            GenerateUI.PruneSections();
+            if(conf.JRestrictSections.Count == 0) {
+                GenerateUI.AddLocalizedMutedText(
+                    GenerateUI.Row(sectionList.transform),
+                    "JR_NO_SECTIONS",
+                    "No sections yet, so the restriction never fires.",
+                    19f
+                );
+                return;
+            }
+            for(int i = 0; i < conf.JRestrictSections.Count; i++)
+                BuildSectionRows(sectionList.transform, conf, i, rebuildSections);
+        };
+        sectionAddRow = GenerateUI.Row(sec.Body);
+        GenerateUI.Button(
+            sectionAddRow,
+            () => {
+                if(conf.JRestrictSections.Count >= RestrictionSettings.MaxSections) return;
+                conf.JRestrictSections.Add(new JudgementSection());
+                Restriction.Save();
+                rebuildSections();
+            },
+            "Add Section",
+            "jr_sections_add"
+        ).Rect.AddToolTip(
+            "DESC_JR_SECTIONS_ADD",
+            "Adds another percentage range of the level. Up to 16."
+        );
+        rebuildSections();
+        RefreshSectionRows();
         var message = GenerateUI.Input(
             GenerateUI.Row(sec.Body),
             def.JRestrictMessage,
@@ -111,6 +175,49 @@ public static class PageRestriction {
         var hint = GenerateUI.AddMutedText(hintRow, 16f, 0.45f);
         GenerateUI.Localize(hint, "JR_MESSAGE_HINT", "Use {judgement} for the judgement you broke.");
         RefreshConditionalRows();
+    }
+    private static void BuildSectionRows(Transform parent, RestrictionSettings conf, int index, Action rebuild) {
+        JudgementSection section = conf.JRestrictSections[index];
+        string idp = "jrsec" + index;
+        GenerateUI.CollapsibleSection block = GenerateUI.Collapsible(
+            parent,
+            string.Format(MainCore.Tr.Get("JR_SECTION", "Section {0}"), index + 1),
+            false
+        );
+        Transform body = block.Body;
+        static float PercentFilter(float v) => Mathf.Clamp(Mathf.Round(v * 10f) / 10f, 0f, 100f);
+        UISlider start = GenerateUI.Slider(
+            GenerateUI.Row(body),
+            0f, 0f, 100f, section.Start, PercentFilter, null, null,
+            "Start (%)", idp + "_start"
+        );
+        start.Format = "0.0' %'";
+        start.OnChanged = v => section.Start = PercentFilter(v);
+        start.OnComplete = v => {
+            section.Start = PercentFilter(v);
+            Restriction.Save();
+        };
+        UISlider end = GenerateUI.Slider(
+            GenerateUI.Row(body),
+            100f, 0f, 100f, section.End, PercentFilter, null, null,
+            "End (%)", idp + "_end"
+        );
+        end.Format = "0.0' %'";
+        end.OnChanged = v => section.End = PercentFilter(v);
+        end.OnComplete = v => {
+            section.End = PercentFilter(v);
+            Restriction.Save();
+        };
+        GenerateUI.Button(
+            GenerateUI.Row(body),
+            () => {
+                conf.JRestrictSections.RemoveAt(index);
+                Restriction.Save();
+                rebuild();
+            },
+            "Remove",
+            idp + "_remove"
+        ).SetSecondary();
     }
     private static string ModeName(int mode) => mode switch {
         0 => MainCore.Tr.Get("JR_MODE_MIN_ACCURACY", "Minimum Accuracy"),
