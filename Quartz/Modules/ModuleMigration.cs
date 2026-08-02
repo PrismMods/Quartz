@@ -25,6 +25,7 @@ public static partial class ModuleMigration {
         new Rule { Id = "uihider", FileName = "UiHider.json", Field = "Enabled", Default = false },
         new Rule { Id = "practice", FileName = "Practice.json", Field = "Enabled", Default = false },
         new Rule { Id = "autodeafen", FileName = "AutoDeafen.json", Field = "Enabled", Default = false },
+        new Rule { Id = "countdown", FileName = "Countdown.json", Field = "Enabled", Default = true },
         new Rule { Id = "tweaks", FileName = "Tweaks.json" },
         new Rule { Id = "restriction", FileName = "Restriction.json" },
         new Rule { Id = "calibration", FileName = "Calibration.json" },
