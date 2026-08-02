@@ -4,7 +4,7 @@ using ADOFAI;
 using Quartz.Core;
 namespace Quartz.Features.Countdown;
 internal static class CountdownHaywire {
-    private static readonly List<KeyValuePair<int, float>> ModifiedFloors = [];
+    private static readonly List<StretchedFloorState> ModifiedFloors = [];
     private static List<scrFloor> stretchedFloorsRef;
     private static bool audioShiftApplied;
     internal static double TimelineShift { get; private set; }
@@ -16,8 +16,12 @@ internal static class CountdownHaywire {
         scrLevelMaker maker = scrLevelMaker.instance;
         List<scrFloor> floors = maker?.listFloors;
         if(maker != null && floors != null && ReferenceEquals(floors, stretchedFloorsRef)) {
-            foreach(KeyValuePair<int, float> pair in ModifiedFloors) {
-                if(pair.Key < floors.Count) floors[pair.Key].speed = pair.Value;
+            foreach(StretchedFloorState state in ModifiedFloors) {
+                if(state.Index >= floors.Count) continue;
+                scrFloor floor = floors[state.Index];
+                floor.speed = state.Speed;
+                floor.extraBeats = state.ExtraBeats;
+                floor.holdLength = state.HoldLength;
             }
             maker.CalculateFloorEntryTimes();
             RebakeFxStartTimes(floors);
@@ -62,9 +66,21 @@ internal static class CountdownHaywire {
         if(factor == 1.0) return;
         int firstStretched = Math.Max(1, cp - 5);
         double firstHitEntryOld = floors[cp + 1].entryTime;
+        float heldBeats = 0f;
+        double holdBeatDrift = 0.0;
         for(int i = firstStretched; i <= cp; i++) {
-            ModifiedFloors.Add(new KeyValuePair<int, float>(i, floors[i].speed));
-            floors[i].speed *= (float)factor;
+            scrFloor floor = floors[i];
+            ModifiedFloors.Add(new StretchedFloorState(i, floor.speed, floor.extraBeats, floor.holdLength));
+            floor.speed *= (float)factor;
+            if(floor.extraBeats > 0f) {
+                heldBeats += floor.extraBeats;
+                floor.extraBeats *= (float)factor;
+            }
+            if(floor.holdLength <= 0) continue;
+            int scaledHold = Math.Max(0, (int)Math.Round(floor.holdLength * factor, MidpointRounding.AwayFromZero));
+            heldBeats += floor.holdLength * 2;
+            holdBeatDrift += (scaledHold / factor - floor.holdLength) * 2;
+            floor.holdLength = scaledHold;
         }
         maker.CalculateFloorEntryTimes();
         RebakeFxStartTimes(floors);
@@ -75,6 +91,14 @@ internal static class CountdownHaywire {
         CountdownWorld.Log(
             $"haywire clamp: {tickBpm:0.#} BPM -> {tickBpm * factor:0.#} BPM "
                 + $"(speed x{factor} on tiles {firstStretched}-{cp}, timeline +{TimelineShift:0.###}s)");
+        if(heldBeats > 0f)
+            CountdownWorld.Log(
+                $"haywire held {heldBeats:0.###} pause/free-roam/hold beats at their real length "
+                    + $"(extraBeats and holdLength x{factor} on the stretched tiles"
+                    + (Math.Abs(holdBeatDrift) > 0.0005
+                        ? $", {holdBeatDrift:+0.###;-0.###} beats of hold rounding"
+                        : "")
+                    + ")");
     }
     internal static double ClaimAudioShift(scrConductor conductor, double scrubTime) {
         if(audioShiftApplied || !SpeedOverrideActive || TimelineShift == 0.0) return 0.0;

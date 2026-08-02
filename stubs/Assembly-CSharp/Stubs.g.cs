@@ -923,10 +923,12 @@ public unsafe partial class scrFloor : global::ADOBase {
     public double entryTime;
     public double entryangle;
     public double exitangle;
+    public float extraBeats;
     public float floatDirection;
     public global::FloorIcon floorIcon;
     public global::FloorRenderer floorRenderer;
     public const string gizmoIconFilename = "gizmoIconFilename";
+    public int holdLength;
     public global::scrHoldRenderer holdRenderer;
     public global::UnityEngine.SpriteRenderer iconsprite;
     public bool isCCW;

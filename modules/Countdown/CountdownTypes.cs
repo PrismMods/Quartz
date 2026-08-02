@@ -23,6 +23,12 @@ internal readonly struct AudioRuntimeSnapshot(
     internal bool ConductorEnabled { get; } = conductorEnabled;
     internal double SongPosition { get; } = songPosition;
 }
+internal readonly struct StretchedFloorState(int index, float speed, float extraBeats, int holdLength) {
+    internal int Index { get; } = index;
+    internal float Speed { get; } = speed;
+    internal float ExtraBeats { get; } = extraBeats;
+    internal int HoldLength { get; } = holdLength;
+}
 internal readonly struct ScheduledHitSound(string soundName, double time, float volume) {
     internal string SoundName { get; } = soundName;
     internal double Time { get; } = time;
