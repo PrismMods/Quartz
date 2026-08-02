@@ -187,7 +187,11 @@ namespace TMPro {
         public static global::TMPro.TMP_Settings instance { get => throw null; }
         protected TMP_Settings() { }
     }
+    public unsafe partial class TMP_Sprite : global::TMPro.TMP_TextElement_Legacy {
+        protected TMP_Sprite() { }
+    }
     public unsafe partial class TMP_SpriteAsset : global::TMPro.TMP_Asset {
+        public global::System.Collections.Generic.List<global::TMPro.TMP_Sprite> spriteInfoList;
         public global::UnityEngine.Texture spriteSheet;
         public global::System.Collections.Generic.List<global::TMPro.TMP_SpriteCharacter> spriteCharacterTable { get => throw null; }
         public global::System.Collections.Generic.List<global::TMPro.TMP_SpriteGlyph> spriteGlyphTable { get => throw null; }
@@ -241,6 +245,9 @@ namespace TMPro {
     public enum TMP_TextElementType : int {
         Character = 0,
         Sprite = 1,
+    }
+    public unsafe partial class TMP_TextElement_Legacy {
+        protected TMP_TextElement_Legacy() { }
     }
     public unsafe partial class TMP_TextInfo {
         public int characterCount;

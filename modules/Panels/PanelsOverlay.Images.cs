@@ -124,6 +124,8 @@ public static partial class PanelsOverlay {
             asset.name = "QuartzPanelSprites";
             asset.spriteSheet = atlas;
             asset.material = material;
+            asset.spriteInfoList = [];
+            asset.UpdateLookupTables();
             asset.spriteCharacterTable.Clear();
             asset.spriteGlyphTable.Clear();
             for(int i = 0; i < uvs.Length; i++) {

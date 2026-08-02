@@ -2587,8 +2587,13 @@
         ]
       },
       {
+        "type": "TMPro.TMP_Sprite",
+        "members": []
+      },
+      {
         "type": "TMPro.TMP_SpriteAsset",
         "members": [
+          "System.Collections.Generic.List\u00601\u003CTMPro.TMP_Sprite\u003E TMPro.TMP_SpriteAsset::spriteInfoList",
           "System.Collections.Generic.List\u00601\u003CTMPro.TMP_SpriteCharacter\u003E TMPro.TMP_SpriteAsset::get_spriteCharacterTable()",
           "System.Collections.Generic.List\u00601\u003CTMPro.TMP_SpriteCharacter\u003E TMPro.TMP_SpriteAsset::spriteCharacterTable()",
           "System.Collections.Generic.List\u00601\u003CTMPro.TMP_SpriteGlyph\u003E TMPro.TMP_SpriteAsset::get_spriteGlyphTable()",
@@ -2698,6 +2703,10 @@
           "TMPro.TMP_TextElementType TMPro.TMP_TextElementType::Character",
           "TMPro.TMP_TextElementType TMPro.TMP_TextElementType::Sprite"
         ]
+      },
+      {
+        "type": "TMPro.TMP_TextElement_Legacy",
+        "members": []
       },
       {
         "type": "TMPro.TMP_TextInfo",

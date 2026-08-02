@@ -24,7 +24,7 @@ resources, and no types the mod never touches.
 | `Newtonsoft.Json` | 18 | 113 |
 | `RDTools` | 2 | 0 |
 | `SkyHook.Unity` | 4 | 130 |
-| `Unity.TextMeshPro` | 32 | 314 |
+| `Unity.TextMeshPro` | 34 | 315 |
 | `UnityEngine` | 0 | 0 |
 | `UnityEngine.AudioModule` | 19 | 87 |
 | `UnityEngine.CoreModule` | 77 | 993 |
@@ -38,7 +38,7 @@ resources, and no types the mod never touches.
 | `UnityEngine.UIModule` | 7 | 32 |
 | `UnityModManager` | 3 | 8 |
 
-**464 types, 3286 members.**
+**466 types, 3287 members.**
 
 ## How it is used
 
