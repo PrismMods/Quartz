@@ -313,6 +313,9 @@ internal static class PageModules {
             if(entry.CoreAbi == Info.ModuleAbi) catalogIds.Add(entry.Id);
         List<string> bundledIds = [];
         foreach(ModuleManifest manifest in bundled) bundledIds.Add(manifest.Id);
+        List<string> updateIds = [];
+        foreach(ModuleService.Handle handle in installed)
+            if(UpdateFor(handle) != null) updateIds.Add(handle.Id);
         if(catalogIds.Count + bundledIds.Count == 0 && installed.Count == 0) return;
         RectTransform row = GenerateUI.Row(body, 50f);
         GenerateUI.ButtonRow(row);
@@ -327,6 +330,19 @@ internal static class PageModules {
                 "DESC_MODULES_INSTALL_TAB",
                 "Installs every module this tab offers — the ones bundled with Quartz go in instantly, "
                     + "the rest download from GitHub."
+            );
+        }
+        if(updateIds.Count > 1) {
+            UIButton update = GenerateUI.Button(row, () => {
+                if(ModuleInstallService.Busy) return;
+                foreach(string moduleId in updateIds) MarkPendingUpdate(moduleId);
+                ModuleInstallService.InstallAll(updateIds);
+            }, "Update All", "modules_update_tab");
+            GenerateUI.FixWidth(update, 170f);
+            update.Rect.AddToolTip(
+                "DESC_MODULES_UPDATE_TAB",
+                "Downloads the newer version of every module in this tab that has one. Restart the game "
+                    + "afterwards to use them."
             );
         }
         if(installed.Count > 0) {
