@@ -791,6 +791,8 @@ public unsafe partial class scnGame : global::ADOBase {
     public float highestBPM;
     public static global::scnGame instance;
     public global::ADOFAI.LevelData levelData;
+    public void ApplyEventsToFloors(global::System.Collections.Generic.List<global::scrFloor> floors) => throw null;
+    public static void ApplyEventsToFloors(global::System.Collections.Generic.List<global::scrFloor> floors, global::ADOFAI.LevelData levelData, global::scrLevelMaker lm, global::System.Collections.Generic.List<global::ADOFAI.LevelEvent> events) => throw null;
     public bool Play(int seqID = default, bool remakeFloors = default) => throw null;
     public void ResetScene(bool isResetCustomLevel = default) => throw null;
     protected scnGame() { }
@@ -840,6 +842,7 @@ public unsafe partial class scrConductor : global::ADOBase {
     public void PlayHitTimes() => throw null;
     public static void SaveCurrentPreset() => throw null;
     public void ScrubMusicToTime(double newTime) => throw null;
+    public void SetupConductorWithLevelData(global::ADOFAI.LevelData levelData) => throw null;
     protected scrConductor() { }
     public enum DuckState : int {
         None = 0,
@@ -875,8 +878,10 @@ public unsafe partial class scrController : global::MonsterLove.StateMachine.Sta
     public void QuitToMainMenu() => throw null;
     public void Restart(bool fromBeginning = default) => throw null;
     public void RestartProgress() => throw null;
+    public void Scrub(int floorNum, bool forceDontStartMusicFourTilesBefore = default) => throw null;
     public void SetPracticeMode(bool practice) => throw null;
     public void StartLoadingScene(global::WipeDirection wipeDirection = default) => throw null;
+    public void Start_Rewind(int _currentSeqID = default) => throw null;
     public bool TogglePauseGame() => throw null;
     public void UpdateInput() => throw null;
     public global::System.Collections.IEnumerator WaitForStartCo(int seqID = default, bool remakeFloors = default) => throw null;

@@ -382,6 +382,12 @@
     },
     {
       "type": "scnGame",
+      "member": "ApplyEventsToFloors",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "scnGame",
       "member": "Play",
       "resolved": true,
       "assembly": "Assembly-CSharp"
@@ -424,6 +430,12 @@
     },
     {
       "type": "scrConductor",
+      "member": "SetupConductorWithLevelData",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "scrConductor",
       "member": "Update",
       "resolved": true,
       "assembly": "Assembly-CSharp"
@@ -454,6 +466,12 @@
     },
     {
       "type": "scrController",
+      "member": "OnMusicScheduled",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "scrController",
       "member": "QuitToMainMenu",
       "resolved": true,
       "assembly": "Assembly-CSharp"
@@ -472,6 +490,12 @@
     },
     {
       "type": "scrController",
+      "member": "Scrub",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "scrController",
       "member": "Start",
       "resolved": true,
       "assembly": "Assembly-CSharp"
@@ -479,6 +503,12 @@
     {
       "type": "scrController",
       "member": "StartLoadingScene",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "scrController",
+      "member": "Start_Rewind",
       "resolved": true,
       "assembly": "Assembly-CSharp"
     },
@@ -581,6 +611,12 @@
     {
       "type": "scrPlanet",
       "member": "Start",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "scrPlayer",
+      "member": "Hit",
       "resolved": true,
       "assembly": "Assembly-CSharp"
     },

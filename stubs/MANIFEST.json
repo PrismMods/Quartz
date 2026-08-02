@@ -1347,6 +1347,8 @@
           "System.Int32 scnGame::checkpointsUsed",
           "System.Single scnGame::highestBPM",
           "System.String scnGame::NoTag",
+          "System.Void scnGame::ApplyEventsToFloors(System.Collections.Generic.List\u00601\u003CscrFloor\u003E)",
+          "System.Void scnGame::ApplyEventsToFloors(System.Collections.Generic.List\u00601\u003CscrFloor\u003E,ADOFAI.LevelData,scrLevelMaker,System.Collections.Generic.List\u00601\u003CADOFAI.LevelEvent\u003E)",
           "System.Void scnGame::ResetScene(System.Boolean)",
           "scnGame scnGame::instance"
         ]
@@ -1402,6 +1404,7 @@
           "System.Void scrConductor::PlayHitTimes()",
           "System.Void scrConductor::SaveCurrentPreset()",
           "System.Void scrConductor::ScrubMusicToTime(System.Double)",
+          "System.Void scrConductor::SetupConductorWithLevelData(ADOFAI.LevelData)",
           "System.Void scrConductor::set_songposition_minusi(System.Double)",
           "UnityEngine.Audio.AudioMixerGroup scrConductor::hitSoundGroup",
           "UnityEngine.AudioSource scrConductor::song",
@@ -1448,8 +1451,10 @@
           "System.Void scrController::QuitToMainMenu()",
           "System.Void scrController::Restart(System.Boolean)",
           "System.Void scrController::RestartProgress()",
+          "System.Void scrController::Scrub(System.Int32,System.Boolean)",
           "System.Void scrController::SetPracticeMode(System.Boolean)",
           "System.Void scrController::StartLoadingScene(WipeDirection)",
+          "System.Void scrController::Start_Rewind(System.Int32)",
           "System.Void scrController::UpdateInput()",
           "UnityEngine.UI.Text scrController::txtAllStrictClear",
           "UnityEngine.UI.Text scrController::txtCongrats",
