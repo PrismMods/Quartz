@@ -87,6 +87,19 @@ public static class ModuleBundle {
             return false;
         }
     }
+    public static void RefreshInstalled() {
+        string root = MainCore.Paths.ModulePath;
+        List<string> done = [];
+        foreach(ModuleMigration.Refresh refresh in ModuleMigration.PlanRefresh(Scan(), id =>
+            File.Exists(System.IO.Path.Combine(root, id + ModuleService.ModuleExtension))
+                ? VersionAt(System.IO.Path.Combine(root, id + ModuleService.ManifestExtension))
+                : null)) {
+            if(!Copy(refresh.Id)) continue;
+            done.Add($"{refresh.Id} v{refresh.From} -> v{refresh.To}");
+        }
+        if(done.Count == 0) return;
+        MainCore.Log.Msg($"[Modules] refreshed from the bundle: {string.Join(", ", done)}");
+    }
     public static void Install(string id) {
         List<string> installed = [];
         foreach(string needed in WithDeps(id)) {

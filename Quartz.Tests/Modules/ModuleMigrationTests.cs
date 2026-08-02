@@ -71,6 +71,36 @@ static class ModuleMigrationTests {
             && !ModuleMigration.NeedsSourceRefresh("2.0.0-alpha-90", null),
             "an unreadable version on either side leaves the install untouched");
     }
+    private static ModuleManifest B(string id, string version) =>
+        new() { Id = id, Name = id, CoreAbi = 1, Version = version };
+    private static List<string> Ids(List<ModuleMigration.Refresh> plan) => plan.ConvertAll(r => r.Id);
+    public static void TestAModUpdateRefreshesEveryStaleInstalledModule() {
+        List<ModuleMigration.Refresh> plan = ModuleMigration.PlanRefresh(
+            [B("panels", "2.0.0-alpha-102"), B("keyviewer", "2.0.0-alpha-102"), B("combo", "2.0.0-alpha-102")],
+            id => id switch {
+                "panels" => "2.0.0-alpha-101",
+                "keyviewer" => "2.0.0-alpha-102",
+                _ => null,
+            });
+        Assert(Ids(plan) is ["panels"], "only the module the update actually moves forward is rewritten");
+        Assert(plan[0].From == "2.0.0-alpha-101" && plan[0].To == "2.0.0-alpha-102",
+            "the plan carries both versions so the log can say what moved");
+    }
+    public static void TestARefreshNeverInstallsOrDowngradesAModule() {
+        Assert(ModuleMigration.PlanRefresh([B("panels", "2.0.0-alpha-102")], _ => null).Count == 0,
+            "a module the user never installed is not dragged in by a mod update");
+        Assert(ModuleMigration.PlanRefresh([B("panels", "2.0.0-alpha-102")], _ => "2.0.1").Count == 0,
+            "a newer module — say one installed from the catalog — is never rolled back");
+    }
+    public static void TestAnUnreadableInstalledModuleNeverStopsTheRefresh() {
+        List<ModuleMigration.Refresh> plan = ModuleMigration.PlanRefresh(
+            [B("panels", "2.0.0-alpha-102"), B("combo", "2.0.0-alpha-102")],
+            id => id == "panels" ? throw new IOException("locked") : "2.0.0-alpha-101");
+        Assert(Ids(plan) is ["combo"], "one unreadable module is skipped and the rest still refresh");
+        Assert(ModuleMigration.PlanRefresh(null, _ => null).Count == 0
+            && ModuleMigration.PlanRefresh([B("panels", "2.0.0-alpha-102")], null).Count == 0,
+            "a missing bundle or reader plans nothing rather than throwing");
+    }
     public static void TestEverySplitTargetsValidModuleIds() {
         foreach(ModuleMigration.Split split in ModuleMigration.Splits) {
             Assert(ModuleManifest.IsValidId(split.From), $"'{split.From}' is a loadable module id");

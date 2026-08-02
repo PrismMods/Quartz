@@ -49,6 +49,30 @@ public static partial class ModuleMigration {
         if(string.IsNullOrEmpty(installed) || string.IsNullOrEmpty(bundled)) return false;
         return SemVer.Compare(installed, bundled) < 0;
     }
+    public sealed class Refresh {
+        public string Id;
+        public string From;
+        public string To;
+    }
+    public static List<Refresh> PlanRefresh(
+        IReadOnlyList<ModuleManifest> bundled, Func<string, string> installedVersion
+    ) {
+        List<Refresh> stale = [];
+        if(bundled == null || installedVersion == null) return stale;
+        foreach(ModuleManifest manifest in bundled) {
+            if(manifest?.Id == null) continue;
+            string installed;
+            try {
+                installed = installedVersion(manifest.Id);
+            } catch(Exception e) {
+                Diag.Ignore(e);
+                continue;
+            }
+            if(!NeedsSourceRefresh(installed, manifest.Version)) continue;
+            stale.Add(new Refresh { Id = manifest.Id, From = installed, To = manifest.Version });
+        }
+        return stale;
+    }
     public sealed class Plan {
         public bool IsUpgrade;
         public readonly List<string> Install = [];
