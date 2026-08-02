@@ -1,0 +1,35 @@
+stubs/README.md
+  s_f7e9406c1140a9::t_41a824fc20db48 20,41
+modules/Countdown/CountdownTypes.cs
+  s_f7e9406c1140a9::t_2900da87351b57 27-29,31
+  s_f7e9406c1140a9::t_4b5d8e9339b040 26,30
+stubs/Assembly-CSharp/Stubs.g.cs
+  s_f7e9406c1140a9::t_41a824fc20db48 931
+  s_f7e9406c1140a9::t_268e023d2f6b29 926
+stubs/MANIFEST.json
+  s_f7e9406c1140a9::t_268e023d2f6b29 1527
+  s_f7e9406c1140a9::t_41a824fc20db48 1524
+modules/Countdown/CountdownHaywire.cs
+  s_f7e9406c1140a9::t_b70885c0fdc7e0 70,73,79-83
+  s_f7e9406c1140a9::t_f6526711c06754 69,72,74-78,94-95
+  s_f7e9406c1140a9::t_ed1f9d57550e5a 7
+  s_f7e9406c1140a9::t_bbcb7968613492 96-101
+  s_f7e9406c1140a9::t_6d5acc70850744 19-23
+  s_f7e9406c1140a9::t_293587be6a5482 24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "815591626d8731403936d6e0f7ca60221ca068b3",
+  "prompts": {},
+  "sessions": {
+    "s_f7e9406c1140a9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6c1e6ea-e178-4047-a863-a73d517c8067",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
