@@ -69,6 +69,7 @@ public static partial class GenerateUI {
         hoverRect.pivot = new Vector2(0.5f, 0.5f);
         hoverRect.offsetMin = Vector2.zero;
         hoverRect.offsetMax = Vector2.zero;
+        hover.AddComponent<LayoutElement>().ignoreLayout = true;
         Image hoverImage = hover.AddComponent<Image>();
         hoverImage.sprite = MainCore.Spr.Get(UISliceSprite.CircleOutline256P2048);
         hoverImage.type = Image.Type.Sliced;
