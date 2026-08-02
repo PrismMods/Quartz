@@ -37,6 +37,7 @@ public static partial class UICore {
     private const float BandMaxHeight = 500f;
     private const float DefaultBandHeight = 260f;
     private const float MinPageHeight = 200f;
+    private const string WordmarkFont = "Linotte Semi Bold";
     private static bool subMenuHasChildren;
     private static float bandHeight;
     private static float bandShown;
@@ -220,6 +221,25 @@ public static partial class UICore {
             logoRect.sizeDelta = new(46f, 46f);
             var btn = logo.AddComponent<NonRaycastButton>();
             btn.onClick += ToggleMenu;
+        }
+        {
+            GameObject wordmark = new("Wordmark");
+            wordmark.transform.SetParent(topBar.transform, false);
+            var wordmarkText = wordmark.AddComponent<TextMeshProUGUI>();
+            wordmarkText.text = Info.DisplayName.ToUpperInvariant();
+            wordmarkText.font = FontManager.GetFont(WordmarkFont);
+            wordmarkText.fontSize = 24f;
+            wordmarkText.characterSpacing = 6f;
+            wordmarkText.color = new Color(1f, 1f, 1f, 0.92f);
+            wordmarkText.alignment = TextAlignmentOptions.MidlineLeft;
+            wordmarkText.raycastTarget = false;
+            wordmark.AddComponent<FontExempt>();
+            var wordmarkRect = wordmark.GetComponent<RectTransform>();
+            wordmarkRect.anchorMin = new(0, 0.5f);
+            wordmarkRect.anchorMax = new(0, 0.5f);
+            wordmarkRect.pivot = new(0, 0.5f);
+            wordmarkRect.anchoredPosition = new(68, 0);
+            wordmarkRect.sizeDelta = new(220f, 46f);
         }
         {
             GameObject close = new("Close");
