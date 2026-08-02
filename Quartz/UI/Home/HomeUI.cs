@@ -19,7 +19,7 @@ public static class HomeUI {
         RectTransform row = GenerateUI.Row(parent, height);
         HorizontalLayoutGroup layout = row.gameObject.AddComponent<HorizontalLayoutGroup>();
         layout.spacing = 12f;
-        layout.padding = new RectOffset(16, 16, 0, 0);
+        layout.padding = new RectOffset(0, 0, 0, 0);
         layout.childControlWidth = true;
         layout.childControlHeight = true;
         layout.childForceExpandWidth = true;

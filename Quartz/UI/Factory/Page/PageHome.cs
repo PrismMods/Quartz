@@ -100,7 +100,7 @@ internal static class PageHome {
     private static void Banner(RectTransform content) {
         RectTransform row = GenerateUI.Row(content.transform, 64f);
         bannerRow = row.gameObject;
-        RectTransform bg = GenerateUI.BackGround(250f);
+        RectTransform bg = GenerateUI.BackGround(0f);
         bg.SetParent(row, false);
         bg.GetComponent<UnityEngine.UI.Image>().color = Color.Lerp(UIColors.PanelBG, UIColors.ObjectActive, 0.3f);
         bannerText = GenerateUI.AddText(bg, true);
@@ -109,7 +109,7 @@ internal static class PageHome {
         bannerText.verticalAlignment = VerticalAlignmentOptions.Middle;
         bannerText.overflowMode = TextOverflowModes.Ellipsis;
         bannerText.rectTransform.offsetMin = new Vector2(18f, 0f);
-        bannerText.rectTransform.offsetMax = new Vector2(-190f, 0f);
+        bannerText.rectTransform.offsetMax = new Vector2(-200f, 0f);
         UIButton open = GenerateUI.Button(row, static () => Go(CorePages.SettingsPageKey),
             "Open Settings", "home_update_open");
         RectTransform rect = open.Rect;
@@ -117,7 +117,7 @@ internal static class PageHome {
         rect.anchorMax = new Vector2(1f, 0.5f);
         rect.pivot = new Vector2(1f, 0.5f);
         rect.sizeDelta = new Vector2(170f, 46f);
-        rect.anchoredPosition = new Vector2(-258f, 0f);
+        rect.anchoredPosition = new Vector2(-18f, 0f);
         bannerButton = rect.gameObject;
     }
     private static void RefreshUpdateBanner() {
