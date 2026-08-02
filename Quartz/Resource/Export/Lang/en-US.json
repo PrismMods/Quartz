@@ -42,7 +42,7 @@
     "CREDITS_DONORS_BODY": "Refreshin",
     "CREDITS_LICENSE": "Licensed under GPLv3",
     "CREDITS_PORTS": "Ported & referenced work",
-    "CREDITS_PORTS_BODY": "Overlayer — UI foundation (modlist.org)\nDM Note (lee-sihun) — Key Viewer editor icons\nDecoPreview (rdzip) — Decoration Preview, GPLv3\nBackToThePast (tjwogud) — Nostalgia\nFlipAndRotateTiles (tjwogud) — Flip & Rotate Tiles\nAdofaiTweaks — editor tile-angle readout\nHzHitSoundRenderer — Render All Hit Sounds\nJipperKeyViewer — 108-key layout preset",
+    "CREDITS_PORTS_BODY": "Overlayer — UI foundation (modlist.org)\nDM Note (lee-sihun) — Key Viewer editor icons\nDecoPreview (rdzip) — Decoration Preview, GPLv3\nBackToThePast (tjwogud) — Nostalgia\nFlipAndRotateTiles (tjwogud) — Flip & Rotate Tiles\nAdofaiTweaks — editor tile-angle readout\nHzHitSoundRenderer — Render All Hit Sounds\nJipperKeyViewer — 108-key layout preset\nenhanced-countdown (IMPL / KGH1113) — Countdown: Metronome mode",
     "CREDITS_SUBTITLE": "by koren, sbrothers7, and more.",
     "CREDITS_TEAM": "Team",
     "CREDITS_TEAM_BODY": "koren — lead developer\nsbrothers7 — developer",

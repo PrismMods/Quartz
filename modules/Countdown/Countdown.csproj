@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<ModuleId>countdown</ModuleId>
+		<AssemblyName>Quartz.Module.Countdown</AssemblyName>
+	</PropertyGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Resource\**\*" />
+		<EmbeddedResource Include="Lang\*.json" />
+	</ItemGroup>
+</Project>

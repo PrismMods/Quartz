@@ -28,7 +28,7 @@ internal static class PageCredits {
             "JeulGemi\n" +
             "Yul");
         Header(content, "CREDITS_PORTS", "Ported & referenced work");
-        Block(content, 250f, 20f, "CREDITS_PORTS_BODY",
+        Block(content, 278f, 20f, "CREDITS_PORTS_BODY",
             "Overlayer — UI foundation (modlist.org)\n" +
             "DM Note (lee-sihun) — Key Viewer editor icons\n" +
             "DecoPreview (rdzip) — Decoration Preview, GPLv3\n" +
@@ -36,7 +36,8 @@ internal static class PageCredits {
             "FlipAndRotateTiles (tjwogud) — Flip & Rotate Tiles\n" +
             "AdofaiTweaks — editor tile-angle readout\n" +
             "HzHitSoundRenderer — Render All Hit Sounds\n" +
-            "JipperKeyViewer — 108-key layout preset");
+            "JipperKeyViewer — 108-key layout preset\n" +
+            "enhanced-countdown (IMPL / KGH1113) — Countdown: Metronome mode");
         Header(content, "CREDITS_DONORS", "Special Donor");
         TextMeshProUGUI donors = Line(content, 40f, 22f, 0.7f);
         GenerateUI.Localize(donors, "CREDITS_DONORS_BODY", "Refreshin");
