@@ -1,0 +1,77 @@
+modules/Panels/PanelsOverlay.Images.cs
+  s_ae9241fc887634::t_439a8b18cc43f4 18
+  s_ae9241fc887634::t_864c5fe12a6a02 95,97-108
+  s_ae9241fc887634::t_71b3eb1c73984d 3
+  s_ae9241fc887634::t_203cd723fdd98f 110
+  s_ae9241fc887634::t_29bd13b35408fe 1,4-17,19-81,83-85,88-91,94,96,109,111-199
+  s_ae9241fc887634::t_e3f18c17e3fb4f 92-93
+  s_ae9241fc887634::t_0ffc3e9f12300b 82,86-87
+  s_ae9241fc887634::t_9e0834627a076c 2
+modules/Panels/Lang/ko-KR.json
+  s_ae9241fc887634::t_2961c47406ffe3 6
+  s_ae9241fc887634::t_f5a720bbaf2fbe 7,15,30-33,61,75
+stubs/UnityEngine.CoreModule/Stubs.g.cs
+  s_ae9241fc887634::t_280cd221dd6210 532-533,752-755,837
+modules/Panels/PagePanels.Stats.cs
+  s_ae9241fc887634::t_76eeaeed8316e8 75-76
+  s_ae9241fc887634::t_0c39f430591ac1 35
+stubs/Unity.TextMeshPro/Stubs.g.cs
+  s_ae9241fc887634::t_280cd221dd6210 37,186,190-204,223,238
+stubs/README.md
+  s_ae9241fc887634::t_280cd221dd6210 27,30,34,38,41
+modules/Panels/Lang/en-US.json
+  s_ae9241fc887634::t_f5a720bbaf2fbe 7,15,30-33,61,75
+  s_ae9241fc887634::t_2961c47406ffe3 6
+stubs/UnityEngine.UIModule/Stubs.g.cs
+  s_ae9241fc887634::t_280cd221dd6210 22
+modules/Panels/PagePanels.Helpers.cs
+  s_ae9241fc887634::t_2656c4b4fb270f 63-75
+  s_ae9241fc887634::t_8934581d997af6 96,103-105
+modules/Panels/PagePanels.StatColorSettings.cs
+  s_ae9241fc887634::t_c95969e9f51e7d 2,11,15
+  s_ae9241fc887634::t_d1a5cb5df0c13f 149
+  s_ae9241fc887634::t_48a7ecd673fc14 133-148,150-170,172-178
+  s_ae9241fc887634::t_ab10ae917b4999 171
+modules/Panels/PagePanels.Section.cs
+  s_ae9241fc887634::t_88190788eb7ac9 163
+  s_ae9241fc887634::t_b6cde9658ababc 149
+  s_ae9241fc887634::t_0dc99ca091de8d 121
+  s_ae9241fc887634::t_d3f0a0c1d591ae 106
+modules/Panels/Lang/zh-CN.json
+  s_ae9241fc887634::t_f5a720bbaf2fbe 7,15,30-33,61,75
+  s_ae9241fc887634::t_2961c47406ffe3 6
+sdk/QuartzAddon.props
+  s_ae9241fc887634::t_21e29390d06749 100-104
+stubs/UnityEngine.TextCoreFontEngineModule/Stubs.g.cs
+  s_ae9241fc887634::t_280cd221dd6210 16-20,23-39
+modules/Panels/PanelsSettings.cs
+  s_ae9241fc887634::t_1f209986b7889b 37-38
+  s_ae9241fc887634::t_7c7a831724ff08 12-13
+  s_ae9241fc887634::t_c5f5f72b9e5e85 25-26
+modules/Panels/PanelsOverlay.cs
+  s_ae9241fc887634::t_be5b3882813661 67
+  s_ae9241fc887634::t_8e56cbba3b4a31 206-207
+  s_ae9241fc887634::t_7baa551476340b 217-218,220
+stubs/MANIFEST.json
+  s_ae9241fc887634::t_280cd221dd6210 2370-2374,2584-2611,2657,2665,2689-2692,3653,3660-3662,4016-4021,4134-4135,4499-4531,5529
+modules/Panels/PanelsOverlay.LivePanel.cs
+  s_ae9241fc887634::t_b38d6d28a6c7fd 28-33
+  s_ae9241fc887634::t_416bb90f423dbb 68
+  s_ae9241fc887634::t_c7bb1e2d4d96aa 85-86
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "96529ae349688ea386f6ec42d0467ca2717fad9d",
+  "prompts": {},
+  "sessions": {
+    "s_ae9241fc887634": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2d04daa1-2dbe-4504-9d3b-9e7fc5acf10c",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
