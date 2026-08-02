@@ -1,0 +1,35 @@
+stubs/Assembly-CSharp/Assembly-CSharp.csproj
+  s_9605f8a13e30be::t_179b5517f882b8 26
+stubs/UnityEngine.AudioModule/Stubs.g.cs
+  s_9605f8a13e30be::t_179b5517f882b8 49-52,60-61,68,72-73,75,77
+stubs/UnityEngine.ImageConversionModule/Stubs.g.cs
+  s_9605f8a13e30be::t_179b5517f882b8 17
+stubs/MANIFEST.json
+  s_9605f8a13e30be::t_179b5517f882b8 121-123,345-347,522,524,763-764,778,781-782,840,842,1192-1193,1387,1389-1392,1394,1398,1400,1404-1405,1409,1432,1441,1443-1444,1453,1461-1463,1468-1470,1509,1517,1521,1540,1580,1620-1624,1627-1629,1631-1667,1697-1698,1850-1853,1864-1866,2472,2888-2895,2908,2910-2911,2915,2920,2922,2925-2926,2928,2930,2932,2939-2940,2943,3144-3149,3183-3185,3217-3218,3221,3223,3684,4178-4181,4186,4191,4193-4194,4321-4322,4541,4813-4832,5248,5254-5255
+stubs/Assembly-CSharp/Stubs.g.cs
+  s_9605f8a13e30be::t_179b5517f882b8 28,50-51,229,342,363-364,368,411,672,674,820-821,823-825,828,831,834,838,842,859,862,870-871,881,886,932,936,940-941,980,1005,1007-1008,1014-1017,1020-1045,1066,1068,1082,1107
+stubs/UnityEngine.UI/Stubs.g.cs
+  s_9605f8a13e30be::t_179b5517f882b8 30,204-217,454
+stubs/UnityEngine.CoreModule/Stubs.g.cs
+  s_9605f8a13e30be::t_179b5517f882b8 141-144,162,166,588,918,920,923,1026
+stubs/README.md
+  s_9605f8a13e30be::t_179b5517f882b8 20,22,27,29-31,36,41
+stubs/DOTween/Stubs.g.cs
+  s_9605f8a13e30be::t_179b5517f882b8 73,79-80
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.19",
+  "base_commit_sha": "27ba5c7d0dc5e52209f0c90e18a3c2613c27b76a",
+  "prompts": {},
+  "sessions": {
+    "s_9605f8a13e30be": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fe1ce82d-b4fe-4b3b-b894-fca33ea7c5b4",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
