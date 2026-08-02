@@ -1,0 +1,23 @@
+Quartz/UI/Home/HomeUI.cs
+  s_5486452fae48bd::t_e841357d15adde 22
+Quartz/UI/Factory/Page/PageHome.cs
+  s_5486452fae48bd::t_d3f3d178a68c20 103
+  s_5486452fae48bd::t_54742b9599b8c0 112
+  s_5486452fae48bd::t_53267dcf24d058 120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.19",
+  "base_commit_sha": "3bb94ed82435386df8bb0509be3c0e642405f930",
+  "prompts": {},
+  "sessions": {
+    "s_5486452fae48bd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "927f58e7-a00c-490e-9eb1-31a116b0161b",
+        "model": "claude-opus-5"
+      },
+      "human_author": null
+    }
+  }
+}
