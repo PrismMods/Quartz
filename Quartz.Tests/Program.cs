@@ -1,6 +1,7 @@
 List<(string Name, Action Run)> tests = [
     ("SemVer parses and orders channels", SemVerTests.TestSemVer),
     ("SemVer formats and parses channels", SemVerTests.TestSemVerFormatAndChannels),
+    ("SemVer ranks updates inside the selected channel", SemVerTests.TestSemVerChannelPreference),
     ("AtomicFile replaces without temp debris", AtomicFileTests.TestAtomicFile),
     ("Diag counts deliberate swallows without logging them", DiagTests.TestIgnoreIsCountedAndSilentByDefault),
     ("Diag verbose mode surfaces swallowed exceptions", DiagTests.TestVerboseSurfacesIgnoredExceptions),

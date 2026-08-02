@@ -28,4 +28,30 @@ static class SemVerTests {
         Assert(SemVer.Compare("not-a-version", "2.0.0") < 0, "unparseable sorts oldest");
         Assert(SemVer.Compare("2.0.0", "2.0.0") == 0, "identical strings compare equal");
     }
+    public static void TestSemVerChannelPreference() {
+        SemVer alpha98 = new(2, 0, 0, ReleaseChannel.Alpha, 98);
+        SemVer alpha99 = new(2, 0, 0, ReleaseChannel.Alpha, 99);
+        SemVer beta1 = new(2, 0, 0, ReleaseChannel.Beta, 1);
+        SemVer rc1 = new(2, 0, 0, ReleaseChannel.ReleaseCandidate, 1);
+        SemVer stable = new(2, 0, 0, ReleaseChannel.Stable, 0);
+        SemVer nextAlpha = new(2, 0, 1, ReleaseChannel.Alpha, 1);
+        Assert(SemVer.CompareForChannel(beta1, alpha98, ReleaseChannel.Alpha) < 0,
+            "alpha channel must not be offered a same-version beta");
+        Assert(SemVer.CompareForChannel(alpha98, beta1, ReleaseChannel.Alpha) > 0,
+            "alpha channel returns to its own lane from beta");
+        Assert(SemVer.CompareForChannel(alpha99, alpha98, ReleaseChannel.Alpha) > 0,
+            "newer build wins inside the selected lane");
+        Assert(SemVer.CompareForChannel(beta1, alpha98, ReleaseChannel.Beta) > 0,
+            "beta channel prefers beta over a same-version alpha");
+        Assert(SemVer.CompareForChannel(stable, alpha98, ReleaseChannel.Alpha) > 0,
+            "the final release supersedes its own prereleases");
+        Assert(SemVer.CompareForChannel(stable, beta1, ReleaseChannel.Beta) > 0,
+            "beta channel still takes the final release");
+        Assert(SemVer.CompareForChannel(nextAlpha, stable, ReleaseChannel.Alpha) > 0,
+            "a higher core version always wins");
+        Assert(SemVer.CompareForChannel(rc1, beta1, ReleaseChannel.Stable) > 0,
+            "unpreferred prereleases keep their normal order");
+        Assert(SemVer.CompareForChannel(alpha98, alpha98, ReleaseChannel.Alpha) == 0,
+            "the installed build is never an upgrade over itself");
+    }
 }
