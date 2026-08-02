@@ -52,7 +52,7 @@ internal static partial class PageSettings {
         );
         channelDropdown.Rect.AddToolTip(
             "DESC_UPDATE_CHANNEL",
-            "Which builds to receive when updating. Alpha includes every build; each step up is more stable, with Stable being only final releases."
+            "Which builds to receive when updating. Alpha gets new builds first and each step up is more stable, with Stable being only final releases. Updates stay in the channel you pick, so Alpha offers the newest alpha rather than a beta of the same version."
         );
         var updateCheckRow = GenerateUI.Row(content.transform);
         updateCheckButton = GenerateUI.Button(

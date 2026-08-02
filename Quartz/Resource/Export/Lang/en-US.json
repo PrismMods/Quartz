@@ -112,7 +112,7 @@
     "DESC_PROFILE_RECALIBRATE": "Re-baseline overlay positions to this monitor, keeping them exactly where they are now. Positions then scale proportionally if the profile is used on a different-sized display.",
     "DESC_SETTINGS_FONT": "Font for this mod's own settings window. \"Same as overlay font\" follows the Font picker above.",
     "DESC_SHOW_TOOLTIP": "This is a Tooltip!",
-    "DESC_UPDATE_CHANNEL": "Which builds to receive when updating. Alpha includes every build; each step up is more stable, with Stable being only final releases.",
+    "DESC_UPDATE_CHANNEL": "Which builds to receive when updating. Alpha gets new builds first and each step up is more stable, with Stable being only final releases. Updates stay in the channel you pick, so Alpha offers the newest alpha rather than a beta of the same version.",
     "DESC_UPDATE_NOTES": "Opens this release's notes on GitHub.",
     "DESC_UPDATE_RESTART": "Closes the game and starts it again — through Steam when the game was launched from Steam, otherwise by relaunching it directly.",
     "DESC_UPDATE_SKIP": "Hides this version. You'll still be offered the next release.",
