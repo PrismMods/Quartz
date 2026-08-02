@@ -1,0 +1,19 @@
+THIRD-PARTY-NOTICES.md
+  s_ee6ecf06e279f6::t_a8775556b34a56 95-97
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.19",
+  "base_commit_sha": "e4d5c9bc3999a7322da234ce738c9eeee836e26d",
+  "prompts": {},
+  "sessions": {
+    "s_ee6ecf06e279f6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "309c7209-b91d-42a6-b5aa-883a6914e3e8",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
