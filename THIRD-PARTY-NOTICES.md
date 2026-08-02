@@ -92,8 +92,9 @@ that exact timestamp.
 - Metronome tempo, meter, volume, and the icon/panel/planet-animation toggles
   are persisted in `Countdown.json` with a localized settings page (en-US,
   ko-KR, zh-CN), instead of living only for the duration of an editor session.
-  Turning the metronome off in the in-game panel now clears the persisted
-  `Enabled` setting rather than a session flag.
+  Turning the metronome off in the in-game panel stays session-scoped and
+  restarts the play-test with the game's own countdown, leaving the persisted
+  `Enabled` setting untouched.
 - The `AsyncInputManager` clock fields used to re-base input timing after the
   freeze are read and written through cached reflection, so a game build that
   renames or drops them degrades to a no-op instead of breaking the patched
