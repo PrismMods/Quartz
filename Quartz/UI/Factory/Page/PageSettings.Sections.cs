@@ -39,6 +39,7 @@ internal static partial class PageSettings {
             value => {
                 MainCore.Tr.Language = value;
                 MainCore.Conf.Language = value;
+                MainCore.Conf.LanguageAutoDetected = true;
                 MainCore.ConfMgr.RequestSave();
                 TextLocalization.RefreshAll();
             },

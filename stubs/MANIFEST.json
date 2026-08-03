@@ -3022,7 +3022,9 @@
           "System.Void UnityEngine.Application::Quit()",
           "System.Void UnityEngine.Application::set_runInBackground(System.Boolean)",
           "UnityEngine.RuntimePlatform UnityEngine.Application::get_platform()",
-          "UnityEngine.RuntimePlatform UnityEngine.Application::platform()"
+          "UnityEngine.RuntimePlatform UnityEngine.Application::platform()",
+          "UnityEngine.SystemLanguage UnityEngine.Application::get_systemLanguage()",
+          "UnityEngine.SystemLanguage UnityEngine.Application::systemLanguage()"
         ]
       },
       {

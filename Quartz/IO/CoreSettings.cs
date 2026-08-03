@@ -6,6 +6,7 @@ namespace Quartz.IO;
 public sealed class CoreSettings : ISettingsFile {
     public bool Active = true;
     public string Language = "en-US";
+    public bool LanguageAutoDetected = false;
     public bool IsFirstRun = true;
     public bool ShowOnStartup = false;
     public bool Tooltip = true;
@@ -60,6 +61,7 @@ public sealed class CoreSettings : ISettingsFile {
         return new JObject {
             [nameof(Active)] = Active,
             [nameof(Language)] = Language,
+            [nameof(LanguageAutoDetected)] = LanguageAutoDetected,
             [nameof(IsFirstRun)] = IsFirstRun,
             [nameof(ShowOnStartup)] = ShowOnStartup,
             [nameof(Tooltip)] = Tooltip,
@@ -98,6 +100,9 @@ public sealed class CoreSettings : ISettingsFile {
     public void Deserialize(JToken token) {
         Active = IOUtils.Read(token, nameof(Active), Active);
         Language = IOUtils.Read(token, nameof(Language), Language);
+        // A config written before auto-detect existed belongs to someone who already has a
+        // language — treat the missing key as "already done" so an upgrade never overrides it.
+        LanguageAutoDetected = IOUtils.Read(token, nameof(LanguageAutoDetected), true);
         IsFirstRun = IOUtils.Read(token, nameof(IsFirstRun), IsFirstRun);
         ShowOnStartup = IOUtils.Read(token, nameof(ShowOnStartup), ShowOnStartup);
         Tooltip = IOUtils.Read(token, nameof(Tooltip), Tooltip);

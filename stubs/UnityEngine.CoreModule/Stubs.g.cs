@@ -21,6 +21,7 @@ namespace UnityEngine {
         public static bool isFocused { get => throw null; }
         public static global::UnityEngine.RuntimePlatform platform { get => throw null; }
         public static bool runInBackground { get => throw null; set { } }
+        public static global::UnityEngine.SystemLanguage systemLanguage { get => throw null; }
         public static void OpenURL(string url) => throw null;
         public static void Quit() => throw null;
         protected Application() { }
