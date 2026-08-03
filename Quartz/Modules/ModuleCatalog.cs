@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Quartz.Core;
 namespace Quartz.Modules;
 public sealed class ModuleCatalogEntry {
     public string Id;
@@ -49,9 +50,10 @@ public sealed class ModuleCatalog {
     public static bool IsNewer(string candidate, string current) {
         if(string.IsNullOrWhiteSpace(candidate)) return false;
         if(string.Equals(candidate, current, StringComparison.OrdinalIgnoreCase)) return false;
-        if(Version.TryParse(TrimV(candidate), out Version remote) && Version.TryParse(TrimV(current ?? ""), out Version local))
-            return remote > local;
-        return true;
+        if(string.IsNullOrWhiteSpace(current)) return true;
+        return SemVer.TryParse(candidate, out SemVer remote)
+            && SemVer.TryParse(current, out SemVer local)
+            && remote.CompareTo(local) > 0;
     }
     public static bool IsSha256(string value) {
         if(value == null || value.Length != 64) return false;

@@ -56,4 +56,22 @@ static class ModuleCatalogTests {
         Assert(!ModuleCatalog.Parse(Catalog(noUrl, ""), out _).HasBundle,
             "a bundle with nowhere to download from is never offered");
     }
+    public static void TestAnOlderCatalogIsNeverOfferedAsAnUpdate() {
+        Assert(!ModuleCatalog.IsNewer("2.0.0-alpha-102", "2.0.0-alpha-103"),
+            "a stale catalog behind the installed build is not an update");
+        Assert(ModuleCatalog.IsNewer("2.0.0-alpha-103", "2.0.0-alpha-102"),
+            "a catalog ahead of the installed build still is one");
+        Assert(!ModuleCatalog.IsNewer("2.0.0-alpha-103", "2.0.0-alpha-103"),
+            "the same build is not an update");
+        Assert(!ModuleCatalog.IsNewer("v2.0.0-alpha-102", "2.0.0-alpha-103"),
+            "a leading v does not turn a downgrade into an update");
+        Assert(ModuleCatalog.IsNewer("2.0.0", "2.0.0-alpha-103"),
+            "a stable build outranks the prereleases it was built from");
+        Assert(!ModuleCatalog.IsNewer("2.0.0-alpha-103", "2.0.0"),
+            "a prerelease never replaces the stable build of the same version");
+        Assert(!ModuleCatalog.IsNewer("nightly", "2.0.0-alpha-103"),
+            "an unreadable catalog version is not treated as newer");
+        Assert(ModuleCatalog.IsNewer("2.0.0-alpha-103", null),
+            "an entry still upgrades a module whose installed version is unknown");
+    }
 }
