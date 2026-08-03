@@ -65,6 +65,7 @@ internal static class CountdownHaywire {
         double factor = ChoosePow2Factor(tickBpm, conf.MinBpm, Math.Max(conf.MinBpm, conf.MaxBpm));
         if(factor == 1.0) return;
         int firstStretched = Math.Max(1, cp - 5);
+        maker.CalculateFloorEntryTimes();
         double firstHitEntryOld = floors[cp + 1].entryTime;
         float heldBeats = 0f;
         double holdBeatDrift = 0.0;
