@@ -1,0 +1,40 @@
+Quartz/Resource/Export/Lang/en-US.json
+  s_3025e933209d9d::t_1ffc1563787c53 134
+Quartz/IO/CoreSettings.cs
+  s_3025e933209d9d::t_488b478fcf7005 91-92
+  s_3025e933209d9d::t_fbc8fc94721c69 134-135
+  s_3025e933209d9d::t_9c4a31865412f1 34-35
+Quartz/UI/UICore.Reorganize.cs
+  s_3025e933209d9d::t_f641cee9ba5753 33,38-45,49-55
+  s_3025e933209d9d::t_efc1dd460b2bfe 131
+  s_3025e933209d9d::t_fccafa04febe5e 169
+  s_3025e933209d9d::t_83027346fb3b68 214-217
+  s_3025e933209d9d::t_746438cf710882 46-48
+  s_3025e933209d9d::t_b94d7efa16b87f 71-74
+  s_3025e933209d9d::t_1699209df17131 164,166-168,170-213,218-231
+  s_3025e933209d9d::t_3af7c8ffd517b2 93-104
+  s_3025e933209d9d::t_9313ca8a4d3357 3
+  s_3025e933209d9d::t_4518796579fc2b 77-92,105-113
+  s_3025e933209d9d::t_ea99b3ab85d1ee 165
+Quartz/UI/UICore.Shell.cs
+  s_3025e933209d9d::t_91dcc93e39d88e 53,55
+  s_3025e933209d9d::t_f8114ec6cb73f9 54
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_3025e933209d9d::t_1ffc1563787c53 134
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "df67cf8788ef2d3584637e4497c0e2609d5fea18",
+  "prompts": {},
+  "sessions": {
+    "s_3025e933209d9d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "792a1e84-21a6-468c-b16e-4b68356466da",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
