@@ -1,0 +1,19 @@
+modules/Countdown/CountdownHaywire.cs
+  s_f7e9406c1140a9::t_47d53654cd63ef 68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "3caacba020374fe31e558210df2481b48cc40e22",
+  "prompts": {},
+  "sessions": {
+    "s_f7e9406c1140a9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6c1e6ea-e178-4047-a863-a73d517c8067",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
