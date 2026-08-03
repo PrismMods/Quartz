@@ -9,7 +9,6 @@ public enum Asset {
     SUIT_Regular,
     SUIT_Medium,
     QuartzLogo,
-    QuizLogo,
     OV5LogoOutline256,
     Circle256,
     CircleHalf256,
@@ -53,6 +52,7 @@ public enum Asset {
     Folder128,
     QuestionMarkCircle128,
     Tabub,
+    QuizLogo,
 }
 public sealed class ResourceManager(Assembly assembly, string resourcePath) : IDisposable {
     private readonly Dictionary<string, object> cache = [];
@@ -148,7 +148,6 @@ public sealed class ResourceManager(Assembly assembly, string resourcePath) : ID
         [Asset.SUIT_Regular] = "Font.SUIT-Regular.otf",
         [Asset.SUIT_Medium] = "Font.SUIT-Medium.otf",
         [Asset.QuartzLogo] = "Image.QuartzLogo.png",
-        [Asset.QuizLogo] = "Image.QuizLogo.png",
         [Asset.OV5LogoOutline256] = "Image.OV5LogoOutline256.png",
         [Asset.Circle256] = "Image.Circle256.png",
         [Asset.CircleHalf256] = "Image.CircleHalf256.png",
@@ -191,6 +190,7 @@ public sealed class ResourceManager(Assembly assembly, string resourcePath) : ID
         [Asset.ChevronDown128] = "Image.ChevronDown128.png",
         [Asset.Folder128] = "Image.Folder128.png",
         [Asset.QuestionMarkCircle128] = "Image.QuestionMarkCircle128.png",
-        [Asset.Tabub] = "Image.Tabub.png"
+        [Asset.Tabub] = "Image.Tabub.png",
+        [Asset.QuizLogo] = "Image.QuizLogo.png"
     };
 }
