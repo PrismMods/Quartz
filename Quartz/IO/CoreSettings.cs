@@ -31,6 +31,8 @@ public sealed class CoreSettings : ISettingsFile {
     public float CalibWidth = 0f;
     public float CalibHeight = 0f;
     public float KvInspectorWidth = 0f;
+    public float ExitReorganizeX = 0f;
+    public float ExitReorganizeY = -40f;
     public Dictionary<string, bool> CollapsibleStates = [];
     public Dictionary<string, (int Modifier, int Key)> ToggleKeybinds = [];
     public int ToggleModifier = (int)Keybind.KeyModifier.Alt;
@@ -86,6 +88,8 @@ public sealed class CoreSettings : ISettingsFile {
             [nameof(CalibWidth)] = CalibWidth,
             [nameof(CalibHeight)] = CalibHeight,
             [nameof(KvInspectorWidth)] = KvInspectorWidth,
+            [nameof(ExitReorganizeX)] = ExitReorganizeX,
+            [nameof(ExitReorganizeY)] = ExitReorganizeY,
             [nameof(ToggleModifier)] = ToggleModifier,
             [nameof(ToggleKey)] = ToggleKey,
             [nameof(UpdateChannel)] = UpdateChannel,
@@ -127,6 +131,8 @@ public sealed class CoreSettings : ISettingsFile {
         CalibWidth = IOUtils.Read(token, nameof(CalibWidth), CalibWidth);
         CalibHeight = IOUtils.Read(token, nameof(CalibHeight), CalibHeight);
         KvInspectorWidth = IOUtils.Read(token, nameof(KvInspectorWidth), KvInspectorWidth);
+        ExitReorganizeX = IOUtils.Read(token, nameof(ExitReorganizeX), ExitReorganizeX);
+        ExitReorganizeY = IOUtils.Read(token, nameof(ExitReorganizeY), ExitReorganizeY);
         ToggleModifier = IOUtils.Read(token, nameof(ToggleModifier), ToggleModifier);
         ToggleKey = IOUtils.Read(token, nameof(ToggleKey), ToggleKey);
         UpdateChannel = IOUtils.Read(token, nameof(UpdateChannel), UpdateChannel);

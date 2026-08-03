@@ -131,6 +131,7 @@
     "EDITOR_HORIZONTAL_PROPERTIES": "가로 속성",
     "EFFECTREMOVER_ENABLE": "이펙트 제거 활성화",
     "EXIT_REORGANIZE": "재배치 종료",
+    "EXIT_REORGANIZE_TIP": "길게 눌러 버튼을 옮기고, 휠 클릭으로 되돌립니다",
     "FAQ": "자주 묻는 질문",
     "FAQ_EMPTY": "FAQ.json에 질문이 아직 없습니다.",
     "FAQ_ERROR": "FAQ.json을 읽지 못해 기본 질문을 표시합니다 — {0}",

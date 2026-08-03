@@ -50,6 +50,9 @@ public static partial class UICore {
     private static CanvasGroup panelCanvasGroup;
     private static CanvasGroup exitReorganizeCanvasGroup;
     private static GTween reorganizeSeq;
+    private static GTween exitReorganizeHoldSeq;
+    private static GTween exitReorganizeResetSeq;
+    private static Color exitReorganizeIdleColor;
     private static GameObject exitReorganizeObj;
     public static float PanelScale {
         get;

@@ -131,6 +131,7 @@
     "EDITOR_HORIZONTAL_PROPERTIES": "Horizontal Properties",
     "EFFECTREMOVER_ENABLE": "Enable Effect Remover",
     "EXIT_REORGANIZE": "Exit Reorganize",
+    "EXIT_REORGANIZE_TIP": "Hold to move this button, middle click to reset it",
     "FAQ": "FAQ",
     "FAQ_EMPTY": "FAQ.json has no questions in it yet.",
     "FAQ_ERROR": "FAQ.json couldn't be read, showing the built-in questions instead — {0}",
