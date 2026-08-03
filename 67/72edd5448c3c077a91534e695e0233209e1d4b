@@ -1,0 +1,24 @@
+Quartz.Tests/Modules/ModuleCatalogTests.cs
+  s_f7e9406c1140a9::t_aa4c23a846b23a 59-76
+Quartz/Modules/ModuleCatalog.cs
+  s_f7e9406c1140a9::t_ad40fd297d018b 3
+  s_f7e9406c1140a9::t_801ca5d7247dfd 53-56
+Quartz.Tests/Program.cs
+  s_f7e9406c1140a9::t_4c42eebbd3bc25 68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "6772edd5448c3c077a91534e695e0233209e1d4b",
+  "prompts": {},
+  "sessions": {
+    "s_f7e9406c1140a9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c6c1e6ea-e178-4047-a863-a73d517c8067",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
