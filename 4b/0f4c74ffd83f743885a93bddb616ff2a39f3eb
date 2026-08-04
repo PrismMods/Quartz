@@ -1,0 +1,43 @@
+modules/OttoIcon/PageOttoIcon.cs
+  s_b8fe5bf706131f::t_65b31012ca0d35 1,5-6
+  s_b8fe5bf706131f::t_9114ed3c583f92 26-54
+stubs/MANIFEST.json
+  s_b8fe5bf706131f::t_bb6c1dcdb41474 5056
+modules/OttoIcon/Lang/zh-CN.json
+  s_b8fe5bf706131f::t_a85d7180d9c815 5-6,8-11
+modules/OttoIcon/Lang/ko-KR.json
+  s_b8fe5bf706131f::t_a51fbd43fcb838 5-6,8-11
+stubs/README.md
+  s_b8fe5bf706131f::t_bb6c1dcdb41474 36,41
+modules/OttoIcon/Lang/en-US.json
+  s_b8fe5bf706131f::t_b3fde97151f915 5-6,8-11
+modules/OttoIcon/OttoIconModule.cs
+  s_b8fe5bf706131f::t_4304b86ae38e12 24-27
+modules/OttoIcon/OttoIconSettings.cs
+  s_b8fe5bf706131f::t_2de5bc67bc35b8 19-20
+  s_b8fe5bf706131f::t_46d4fc36e9aa91 39-40
+  s_b8fe5bf706131f::t_4549b0e29f8f97 49-50
+modules/OttoIcon/OttoIcon.cs
+  s_b8fe5bf706131f::t_b738fb6570df53 47,50-52
+  s_b8fe5bf706131f::t_30d87b5c674722 61
+  s_b8fe5bf706131f::t_642260ef866e97 78-79,83,91,95-97,103,114-187,191,201,205
+  s_b8fe5bf706131f::t_c207463d8ab8c9 24-29
+  s_b8fe5bf706131f::t_e05be975ea56fc 2,8
+  s_b8fe5bf706131f::t_db10e354e2e41b 270
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "4b0f4c74ffd83f743885a93bddb616ff2a39f3eb",
+  "prompts": {},
+  "sessions": {
+    "s_b8fe5bf706131f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a97834d7-ff46-4981-a68a-961604834ce5",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
