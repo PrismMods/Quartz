@@ -21,5 +21,8 @@ public sealed class OttoIconModule : QuartzModule {
         Context.OnModEnable("OttoIcon", OttoIcon.Refresh);
         Context.OnModDisable("OttoIcon", OttoIcon.Restore);
     }
-    public override void OnUnload() => OttoIcon.Restore();
+    public override void OnUnload() {
+        OttoIcon.Restore();
+        OttoIcon.DisposeCustomImage();
+    }
 }

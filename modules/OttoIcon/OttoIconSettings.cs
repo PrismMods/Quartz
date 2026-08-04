@@ -16,6 +16,8 @@ public sealed class OttoIconSettings : ISettingsFile {
     public float HighBpmA = 1f;
     public float OffsetX = -10f;
     public float OffsetY = 5f;
+    public string ImagePath = "";
+    public bool TintImage = false;
     public Color GetColor() => IOUtils.Rgba(R, G, B, A);
     public void SetColor(Color c) => IOUtils.SetRgba(c, ref R, ref G, ref B, ref A);
     public Color GetHighBpmColor() => IOUtils.Rgba(HighBpmR, HighBpmG, HighBpmB, HighBpmA);
@@ -34,6 +36,8 @@ public sealed class OttoIconSettings : ISettingsFile {
             [nameof(HighBpmA)] = HighBpmA,
             [nameof(OffsetX)] = OffsetX,
             [nameof(OffsetY)] = OffsetY,
+            [nameof(ImagePath)] = ImagePath,
+            [nameof(TintImage)] = TintImage,
     };
     public void Deserialize(JToken token) {
         Enabled = IOUtils.Read(token, nameof(Enabled), Enabled);
@@ -42,5 +46,7 @@ public sealed class OttoIconSettings : ISettingsFile {
         IOUtils.ReadRgba(token, "HighBpm", ref HighBpmR, ref HighBpmG, ref HighBpmB, ref HighBpmA);
         OffsetX = IOUtils.Read(token, nameof(OffsetX), OffsetX);
         OffsetY = IOUtils.Read(token, nameof(OffsetY), OffsetY);
+        ImagePath = IOUtils.Read(token, nameof(ImagePath), ImagePath) ?? "";
+        TintImage = IOUtils.Read(token, nameof(TintImage), TintImage);
     }
 }

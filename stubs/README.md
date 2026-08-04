@@ -33,12 +33,12 @@ resources, and no types the mod never touches.
 | `UnityEngine.ParticleSystemModule` | 8 | 46 |
 | `UnityEngine.TextCoreFontEngineModule` | 3 | 21 |
 | `UnityEngine.TextRenderingModule` | 7 | 31 |
-| `UnityEngine.UI` | 97 | 390 |
+| `UnityEngine.UI` | 97 | 391 |
 | `UnityEngine.UIElementsModule` | 13 | 7 |
 | `UnityEngine.UIModule` | 7 | 32 |
 | `UnityModManager` | 3 | 8 |
 
-**466 types, 3291 members.**
+**466 types, 3292 members.**
 
 ## How it is used
 

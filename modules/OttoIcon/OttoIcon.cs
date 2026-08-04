@@ -1,9 +1,11 @@
 using HarmonyLib;
+using Quartz.Compat.Game;
 using Quartz.Core;
 using Quartz.IO;
 using Quartz.Resource;
 using UnityEngine;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 namespace Quartz.Features.OttoIcon;
 public static class OttoIcon {
     public static SettingsFile<OttoIconSettings> ConfMgr { get; private set; }
@@ -19,8 +21,12 @@ public static class OttoIcon {
     private const float Scale = 0.85f;
     private const float IdleDimFactor = 0.343f;
     private static bool IsHighBpm => scnGame.instance != null && scnGame.instance.highestBPM >= 300f;
-    private static Color ActiveColor =>
-        Conf.UseHighBpmColor && IsHighBpm ? Conf.GetHighBpmColor() : Conf.GetColor();
+    private static Color ActiveColor {
+        get {
+            if(customSprite != null && !Conf.TintImage) return Color.white;
+            return Conf.UseHighBpmColor && IsHighBpm ? Conf.GetHighBpmColor() : Conf.GetColor();
+        }
+    }
     private static Color IdleColor {
         get {
             Color c = ActiveColor;
@@ -38,8 +44,12 @@ public static class OttoIcon {
     private static Vector2 originalAnchoredPosition;
     private static Vector3 originalLocalScale;
     private static Color originalColor;
+    private static bool originalPreserveAspect;
     private static Image trackedTransformImage;
     private static Sprite resolvedReplacement;
+    private static Sprite customSprite;
+    private static Texture2D customTexture;
+    private static string customPath = "";
     private static bool applyStateValid;
     private static scnEditor cachedEditor;
     private static Image cachedImage;
@@ -48,6 +58,7 @@ public static class OttoIcon {
     private static Color cachedTargetColor;
     private static Vector2 cachedPosition;
     private static Vector3 cachedScale;
+    private static bool cachedPreserveAspect;
     private static void InvalidateApplyState() {
         applyStateValid = false;
         cachedEditor = null;
@@ -64,15 +75,12 @@ public static class OttoIcon {
         if(editor == null) return;
         Image autoImage = editor.autoImage;
         if(autoImage == null) return;
-        Sprite replacement = resolvedReplacement;
-        if(replacement == null) {
-            replacement = MainCore.Spr.Get(Asset.OttoAuto);
-            if(replacement == null) return;
-            resolvedReplacement = replacement;
-        }
+        Sprite replacement = ResolveReplacement();
+        if(replacement == null) return;
         bool autoState;
         try { autoState = RDC.auto; } catch(Exception e) { Diag.Ignore(e); autoState = false; }
         Color targetColor = autoState ? ActiveColor : IdleColor;
+        bool preserveAspect = customSprite != null;
         RectTransform rt = autoImage.rectTransform;
         Vector2 targetPosition = new(Conf.OffsetX, Conf.OffsetY);
         Vector3 targetScale = Vector3.one * Scale;
@@ -80,15 +88,19 @@ public static class OttoIcon {
             originalAnchoredPosition = rt.anchoredPosition;
             originalLocalScale = rt.localScale;
             originalColor = autoImage.color;
+            originalPreserveAspect = autoImage.preserveAspect;
             trackedTransformImage = autoImage;
             hasOriginalTransform = true;
         }
-        if(ApplyStateMatches(editor, autoImage, replacement, autoState, targetColor, targetPosition, targetScale)) return;
+        if(ApplyStateMatches(
+            editor, autoImage, replacement, autoState, targetColor, targetPosition, targetScale, preserveAspect
+        )) return;
         if(autoImage.sprite != replacement) originalSprite = autoImage.sprite;
         OverrideAutoSpriteArray(editor, replacement);
         if(autoImage.sprite != replacement) autoImage.sprite = replacement;
         OverrideAutoButtonSpriteState(autoImage, replacement);
         if(autoImage.color != targetColor) autoImage.color = targetColor;
+        if(autoImage.preserveAspect != preserveAspect) autoImage.preserveAspect = preserveAspect;
         if(rt.anchoredPosition != targetPosition) rt.anchoredPosition = targetPosition;
         if(rt.localScale != targetScale) rt.localScale = targetScale;
         applyStateValid = true;
@@ -99,10 +111,84 @@ public static class OttoIcon {
         cachedTargetColor = targetColor;
         cachedPosition = targetPosition;
         cachedScale = targetScale;
+        cachedPreserveAspect = preserveAspect;
+    }
+    private static Sprite ResolveReplacement() {
+        EnsureCustomImage();
+        if(customSprite != null) return customSprite;
+        resolvedReplacement ??= MainCore.Spr.Get(Asset.OttoAuto);
+        return resolvedReplacement;
+    }
+    private static void EnsureCustomImage() {
+        string path = Conf.ImagePath ?? "";
+        if(string.Equals(path, customPath, StringComparison.Ordinal)) return;
+        DisposeCustomImage();
+        customPath = path;
+        if(path.Length > 0) LoadCustomImage(path);
+    }
+    private static void LoadCustomImage(string path) {
+        try {
+            if(!File.Exists(path)) return;
+            Texture2D texture = new(2, 2, TextureFormat.RGBA32, false) {
+                name = "QuartzOttoIcon",
+                wrapMode = TextureWrapMode.Clamp,
+                filterMode = FilterMode.Bilinear,
+            };
+            if(!texture.LoadImage(File.ReadAllBytes(path))) {
+                Object.Destroy(texture);
+                return;
+            }
+            customTexture = texture;
+            customSprite = SpriteManager.Create(texture);
+        } catch(Exception e) {
+            MainCore.Log.Wrn($"[OttoIcon] image load failed ({path}): {e.Message}");
+        }
+    }
+    internal static void DisposeCustomImage() {
+        if(customSprite != null) Object.Destroy(customSprite);
+        if(customTexture != null) Object.Destroy(customTexture);
+        customSprite = null;
+        customTexture = null;
+        customPath = "";
+        InvalidateApplyState();
+    }
+    public static bool HasCustomImage {
+        get {
+            EnsureConf();
+            return !string.IsNullOrWhiteSpace(Conf.ImagePath);
+        }
+    }
+    public static bool ImportImage(out string error) {
+        error = null;
+        EnsureConf();
+        string picked;
+        try {
+            picked = FileDialog.PickFile("", "Image", ["png", "jpg", "jpeg"], "Select Otto image");
+        } catch(Exception e) {
+            error = "Picker failed: " + e.Message;
+            MainCore.Log.Err($"[OttoIcon] PickFile failed: {e}");
+            return false;
+        }
+        if(string.IsNullOrEmpty(picked)) return false;
+        Conf.ImagePath = picked;
+        EnsureCustomImage();
+        Refresh();
+        Save();
+        if(customSprite != null) return true;
+        error = "Could not read that image";
+        MainCore.Log.Wrn($"[OttoIcon] could not read {picked}");
+        return false;
+    }
+    public static void ClearImage() {
+        EnsureConf();
+        Conf.ImagePath = "";
+        EnsureCustomImage();
+        Refresh();
+        Save();
     }
     private static bool ApplyStateMatches(
         scnEditor editor, Image autoImage, Sprite replacement,
-        bool autoState, Color targetColor, Vector2 targetPosition, Vector3 targetScale
+        bool autoState, Color targetColor, Vector2 targetPosition, Vector3 targetScale, bool preserveAspect
     ) {
         if(!applyStateValid) return false;
         return cachedEditor == editor
@@ -112,9 +198,11 @@ public static class OttoIcon {
             && cachedTargetColor == targetColor
             && cachedPosition == targetPosition
             && cachedScale == targetScale
+            && cachedPreserveAspect == preserveAspect
             && autoImage != null
             && autoImage.sprite == replacement
             && autoImage.color == targetColor
+            && autoImage.preserveAspect == preserveAspect
             && autoImage.rectTransform.anchoredPosition == targetPosition
             && autoImage.rectTransform.localScale == targetScale;
     }
@@ -179,6 +267,7 @@ public static class OttoIcon {
                     rt.localScale = originalLocalScale;
                 }
                 editor.autoImage.color = originalColor;
+                editor.autoImage.preserveAspect = originalPreserveAspect;
             }
             hasOriginalSpriteState = false;
             spriteStateButton = null;

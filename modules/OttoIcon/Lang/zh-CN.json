@@ -2,7 +2,13 @@
   "zh-CN": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "DESC_OTTO_HIGHBPM_ON": "开启：谱面最高BPM≥300时自动切换高BPM专属配色（原版会变红）；关闭：全程使用常规配色。",
+    "DESC_OTTO_IMAGE": "选择任意PNG或JPG替换自动播放图标。未选择时使用模组自带的猫。",
+    "DESC_OTTO_TINT_IMAGE": "开启：自定义图片也按下方配色着色，与自带图标一致；关闭：保留图片原色，仅在自动播放关闭时变暗。",
     "OTTO_COLOR": "自动播放图标配色",
+    "OTTO_IMAGE": "自定义图标图片",
+    "OTTO_IMAGE_CLEAR": "使用自带图片",
+    "OTTO_IMAGE_DEFAULT": "正在使用自带的猫",
+    "OTTO_TINT_IMAGE": "为自定义图片着色",
     "OTTO_HIGHBPM_COLOR": "高BPM专属配色",
     "OTTO_HIGHBPM_ON": "高BPM切换专属配色",
     "OTTO_OFFSET_X": "横向偏移",

@@ -1,6 +1,9 @@
+using Quartz.Core;
 using Quartz.Features.OttoIcon;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
+using Quartz.UI.Utility;
+using TMPro;
 using UnityEngine;
 namespace Quartz.UI.Factory.Page;
 public static class PageOttoIcon {
@@ -19,6 +22,35 @@ public static class PageOttoIcon {
             },
             conf.Enabled,
             "Enable Otto Icon", "ottoicon_enable", def.Enabled
+        );
+        TextMeshProUGUI imageStatus = GenerateUI.AddMutedText(GenerateUI.Row(sec.Body, 30f), 17f, 0.45f);
+        void RefreshImageStatus() => imageStatus.text = OttoIcon.HasCustomImage
+            ? Path.GetFileName(conf.ImagePath)
+            : MainCore.Tr.Get("OTTO_IMAGE_DEFAULT", "Using the built-in cat");
+        GenerateUI.Button(
+            GenerateUI.Row(sec.Body),
+            () => { OttoIcon.ImportImage(out _); RefreshImageStatus(); },
+            "Custom Otto Image",
+            "otto_image"
+        ).Rect.AddToolTip(
+            "DESC_OTTO_IMAGE",
+            "Pick any PNG or JPG to stand in for Otto. Without one, the cat that ships with the mod is used."
+        );
+        GenerateUI.Button(
+            GenerateUI.Row(sec.Body),
+            () => { OttoIcon.ClearImage(); RefreshImageStatus(); },
+            "Use Built-in Image",
+            "otto_image_clear"
+        ).SetSecondary();
+        RefreshImageStatus();
+        GenerateUI.ToggleTip(
+            sec.Body,
+            def.TintImage,
+            conf.TintImage,
+            v => { conf.TintImage = v; OttoIcon.Refresh(); OttoIcon.Save(); },
+            "Tint Custom Image",
+            "otto_tint_image",
+            "On: your own image is painted with the colors below, like the built-in one. Off: it keeps its own colors and only dims while auto is off."
         );
         GenerateUI.ColorPicker(
             GenerateUI.Row(sec.Body),

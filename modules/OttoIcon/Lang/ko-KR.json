@@ -2,7 +2,13 @@
   "ko-KR": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "DESC_OTTO_HIGHBPM_ON": "켜면 레벨의 최고 BPM이 300 이상일 때 아래 색상을 사용합니다. 끄면 일반 색상만 사용합니다.",
+    "DESC_OTTO_IMAGE": "Otto 자리에 넣을 PNG 또는 JPG를 고릅니다. 고르지 않으면 모드에 들어 있는 고양이가 쓰입니다.",
+    "DESC_OTTO_TINT_IMAGE": "켜면 내 이미지도 기본 이미지처럼 아래 색상으로 물듭니다. 끄면 원래 색을 유지하고 자동 재생이 꺼져 있을 때만 어두워집니다.",
     "OTTO_COLOR": "Otto 색상",
+    "OTTO_IMAGE": "Otto 이미지 지정",
+    "OTTO_IMAGE_CLEAR": "기본 이미지 사용",
+    "OTTO_IMAGE_DEFAULT": "기본 고양이 사용 중",
+    "OTTO_TINT_IMAGE": "내 이미지에도 색상 적용",
     "OTTO_HIGHBPM_COLOR": "고BPM 색상",
     "OTTO_HIGHBPM_ON": "고BPM 색상 분리",
     "OTTO_OFFSET_X": "X 오프셋",

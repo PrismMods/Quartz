@@ -5053,6 +5053,7 @@
       {
         "type": "UnityEngine.UI.Image",
         "members": [
+          "System.Boolean UnityEngine.UI.Image::get_preserveAspect()",
           "System.Boolean UnityEngine.UI.Image::preserveAspect()",
           "System.Int32 UnityEngine.UI.Image::fillOrigin()",
           "System.Single UnityEngine.UI.Image::fillAmount()",
