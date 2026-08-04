@@ -1,0 +1,21 @@
+Quartz/Resource/ResourceManager.cs
+  s_b8fe5bf706131f::t_11fdd6a34954a1 9-55
+Quartz/Resource/SpriteManager.cs
+  s_b8fe5bf706131f::t_11fdd6a34954a1 7-46,49-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "92b815f38914945b3dafc522af36ef519065aab3",
+  "prompts": {},
+  "sessions": {
+    "s_b8fe5bf706131f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a97834d7-ff46-4981-a68a-961604834ce5",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
