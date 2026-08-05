@@ -9,8 +9,12 @@ internal static class CountdownWorld {
     internal static bool IsAsyncInputActive => AsyncInputManager.isActive;
     internal static int ResolveStartFloor(int requestedFloor) =>
         requestedFloor >= 0 ? requestedFloor : GCS.checkpointNum;
+    internal static bool IsAutoplayOn {
+        get { try { return RDC.auto; } catch(Exception e) { Diag.Ignore(e); return false; } }
+    }
     internal static bool CanArm(scrController controller, int startFloor) =>
-        ADOBase.isLevelEditor && startFloor > 0 && controller != null && controller == ADOBase.controller;
+        ADOBase.isLevelEditor && startFloor > 0 && controller != null && controller == ADOBase.controller
+        && !IsAutoplayOn;
     internal static bool CanPrepareInitialScrub(scrController controller, int floorNumber) =>
         controller != null && ADOBase.isLevelEditor && floorNumber > 0 && floorNumber == GCS.checkpointNum;
     internal static bool CanHandleMusicScheduled(scrController controller) =>

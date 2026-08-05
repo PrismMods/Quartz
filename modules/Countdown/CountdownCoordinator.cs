@@ -42,6 +42,10 @@ internal sealed class CountdownCoordinator {
     }
     internal bool PreparePlayerUpdate(scrPlayer player, ref ulong? targetTick) {
         if(!IsFrozen) return true;
+        if(CountdownWorld.IsAutoplayOn) {
+            RestoreAndReset("autoplay enabled");
+            return true;
+        }
         if(!CountdownWorld.IsRuntimeValid(session.Controller)) {
             RestoreAndReset("run became invalid");
             return true;
