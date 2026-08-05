@@ -1,0 +1,26 @@
+modules/Countdown/CountdownPatches.cs
+  s_d001fd66482c73::t_50b2cf4b76e7fa 96
+modules/Countdown/CountdownHaywire.cs
+  s_d001fd66482c73::t_7870c6fce7bb9a 44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "feadb4b2530344e96af9bcf6b12a3fd9ea5ded6b",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_d001fd66482c73": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "430f9a94-b4ed-46e0-99db-9f9c8177505d",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
