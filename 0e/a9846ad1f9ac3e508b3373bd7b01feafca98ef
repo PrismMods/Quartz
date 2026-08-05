@@ -1,0 +1,40 @@
+modules/Countdown/CountdownPatches.cs
+  s_d001fd66482c73::t_e17794d127d2f3 25-26,28
+  s_d001fd66482c73::t_640cb4f6f8f414 39-46,48-51
+stubs/README.md
+  s_d001fd66482c73::t_0c928a1fc8c140 20,22,30,41
+stubs/UnityEngine.CoreModule/Stubs.g.cs
+  s_d001fd66482c73::t_0c928a1fc8c140 532,676
+stubs/Assembly-CSharp/Stubs.g.cs
+  s_d001fd66482c73::t_0c928a1fc8c140 816-818,842,925
+stubs/DOTween/Stubs.g.cs
+  s_d001fd66482c73::t_0c928a1fc8c140 23
+stubs/MANIFEST.json
+  s_d001fd66482c73::t_0c928a1fc8c140 1379-1383,1404,1408,1530,1788-1789,3681,3683,3899,3901
+stubs/PATCH-TARGETS.json
+  s_d001fd66482c73::t_0c928a1fc8c140 648-652
+  s_d001fd66482c73::t_c8063e18dd3421 647
+modules/Countdown/CountdownScreenFx.cs
+  s_d001fd66482c73::t_cad58cad3e68dd 1-61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "0ea9846ad1f9ac3e508b3373bd7b01feafca98ef",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_d001fd66482c73": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "430f9a94-b4ed-46e0-99db-9f9c8177505d",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
