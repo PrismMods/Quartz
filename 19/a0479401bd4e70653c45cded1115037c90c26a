@@ -1,0 +1,26 @@
+modules/Countdown/CountdownCoordinator.cs
+  s_d001fd66482c73::t_4a51f57f924d9c 45-48
+modules/Countdown/CountdownWorld.cs
+  s_d001fd66482c73::t_3a44f09a1aa766 12-14,16-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "19a0479401bd4e70653c45cded1115037c90c26a",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_d001fd66482c73": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "430f9a94-b4ed-46e0-99db-9f9c8177505d",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
