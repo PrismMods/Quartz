@@ -645,6 +645,12 @@
       "assembly": "Assembly-CSharp"
     },
     {
+      "type": "scrVfxPlus",
+      "member": "ScrubToTime",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
       "type": "scrVisualDecoration",
       "member": "OnDestroy",
       "resolved": true,

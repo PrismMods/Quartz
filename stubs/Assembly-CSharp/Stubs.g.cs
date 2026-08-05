@@ -813,6 +813,9 @@ public unsafe partial class scrButtonURL : global::ADOBase {
 }
 public unsafe partial class scrCamera : global::ADOBase {
     public const float DefaultCameraOrthoSize = 69f;
+    public global::UnityEngine.Renderer flashPlusRendererBg;
+    public global::UnityEngine.Renderer flashPlusRendererFg;
+    public static global::scrCamera instance { get => throw null; set { } }
     public void SetCustomFrameRate(bool enable, float frame = default) => throw null;
     protected scrCamera() { }
 }
@@ -836,6 +839,7 @@ public unsafe partial class scrConductor : global::ADOBase {
     public global::UnityEngine.AudioSource song;
     public global::UnityEngine.AudioSource song2;
     public global::UnityEngine.AudioSource song3;
+    public float adjustedCountdownTicks { get => throw null; }
     public static float calibration_i { get => throw null; }
     public static global::scrConductor instance { get => throw null; }
     public double songposition_minusi { get => throw null; set { } }
@@ -918,6 +922,7 @@ public unsafe partial class scrFloor : global::ADOBase {
     public bool auto;
     public global::UnityEngine.SpriteRenderer bottomGlow;
     public const string checkpointIconFilename = "checkpointIconFilename";
+    public int countdownTicks;
     public bool disableGlow;
     public global::scrLetterPress editorNumText;
     public double entryTime;

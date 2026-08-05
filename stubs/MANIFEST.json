@@ -1376,7 +1376,11 @@
         "type": "scrCamera",
         "members": [
           "System.Single scrCamera::DefaultCameraOrthoSize",
-          "System.Void scrCamera::SetCustomFrameRate(System.Boolean,System.Single)"
+          "System.Void scrCamera::SetCustomFrameRate(System.Boolean,System.Single)",
+          "UnityEngine.Renderer scrCamera::flashPlusRendererBg",
+          "UnityEngine.Renderer scrCamera::flashPlusRendererFg",
+          "scrCamera scrCamera::get_instance()",
+          "scrCamera scrCamera::instance()"
         ]
       },
       {
@@ -1397,9 +1401,11 @@
           "System.Double scrConductor::prev_dspTime",
           "System.Double scrConductor::songposition_minusi()",
           "System.Int32 scrConductor::countdownTicks",
+          "System.Single scrConductor::adjustedCountdownTicks()",
           "System.Single scrConductor::bpm",
           "System.Single scrConductor::calibration_i()",
           "System.Single scrConductor::countdownSpeedMultiplier",
+          "System.Single scrConductor::get_adjustedCountdownTicks()",
           "System.Single scrConductor::get_calibration_i()",
           "System.Single scrConductor::hitSoundVolume",
           "System.Void scrConductor::KillAllSounds()",
@@ -1521,6 +1527,7 @@
           "System.Double scrFloor::exitangle",
           "System.Double scrFloor::marginScale",
           "System.Int32 scrFloor::SortingOrderOffset",
+          "System.Int32 scrFloor::countdownTicks",
           "System.Int32 scrFloor::holdLength",
           "System.Int32 scrFloor::numPlanets",
           "System.Int32 scrFloor::seqID",
@@ -1778,7 +1785,8 @@
       {
         "type": "DG.Tweening.DOTween",
         "members": [
-          "DG.Tweening.Sequence DG.Tweening.DOTween::Sequence()"
+          "DG.Tweening.Sequence DG.Tweening.DOTween::Sequence()",
+          "System.Int32 DG.Tweening.DOTween::Kill(System.Object,System.Boolean)"
         ]
       },
       {
@@ -3670,7 +3678,9 @@
           "System.Void UnityEngine.Material::SetColor(System.String,UnityEngine.Color)",
           "System.Void UnityEngine.Material::SetFloat(System.Int32,System.Single)",
           "System.Void UnityEngine.Material::SetFloat(System.String,System.Single)",
+          "System.Void UnityEngine.Material::set_color(UnityEngine.Color)",
           "System.Void UnityEngine.Material::set_mainTexture(UnityEngine.Texture)",
+          "UnityEngine.Color UnityEngine.Material::color()",
           "UnityEngine.Shader UnityEngine.Material::get_shader()",
           "UnityEngine.Shader UnityEngine.Material::shader()",
           "UnityEngine.Texture UnityEngine.Material::get_mainTexture()",
@@ -3886,7 +3896,9 @@
           "System.Void UnityEngine.Renderer::set_sortingLayerID(System.Int32)",
           "System.Void UnityEngine.Renderer::set_sortingLayerName(System.String)",
           "System.Void UnityEngine.Renderer::set_sortingOrder(System.Int32)",
+          "UnityEngine.Material UnityEngine.Renderer::get_material()",
           "UnityEngine.Material UnityEngine.Renderer::get_sharedMaterial()",
+          "UnityEngine.Material UnityEngine.Renderer::material()",
           "UnityEngine.Material UnityEngine.Renderer::sharedMaterial()"
         ]
       },

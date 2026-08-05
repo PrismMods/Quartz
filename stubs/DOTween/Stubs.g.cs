@@ -20,6 +20,7 @@ namespace DG.Tweening {
         W = 16,
     }
     public unsafe partial class DOTween {
+        public static int Kill(object targetOrId, bool complete = default) => throw null;
         public static global::DG.Tweening.Sequence Sequence() => throw null;
         protected DOTween() { }
     }

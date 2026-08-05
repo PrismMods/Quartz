@@ -529,6 +529,7 @@ namespace UnityEngine {
         private LineRenderer() { }
     }
     public unsafe partial class Material : global::UnityEngine.Object {
+        public global::UnityEngine.Color color { get => throw null; set { } }
         public global::UnityEngine.Texture mainTexture { get => throw null; set { } }
         public global::UnityEngine.Shader shader { get => throw null; set { } }
         public Material(global::UnityEngine.Shader shader) => throw null;
@@ -672,6 +673,7 @@ namespace UnityEngine {
     }
     public unsafe partial class Renderer : global::UnityEngine.Component {
         public bool enabled { get => throw null; set { } }
+        public global::UnityEngine.Material material { get => throw null; set { } }
         public global::UnityEngine.Material sharedMaterial { get => throw null; set { } }
         public int sortingLayerID { get => throw null; set { } }
         public string sortingLayerName { get => throw null; set { } }

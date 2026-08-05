@@ -22,8 +22,10 @@ internal static class CountdownPatches {
     }
     [HarmonyPatch(typeof(scrController), nameof(scrController.Start_Rewind))]
     internal static class StartRewindPatch {
-        private static void Prefix(scrController __instance, int _currentSeqID) =>
+        private static void Prefix(scrController __instance, int _currentSeqID) {
+            CountdownScreenFx.ResetVolatileState();
             CountdownFeature.Coordinator?.OnStartRewind(__instance, _currentSeqID);
+        }
         private static void Postfix() {
             CountdownHaywire.PendingCheckpoint = -1;
             if(GCS.checkpointNum == 0) return;
@@ -34,10 +36,19 @@ internal static class CountdownPatches {
     [HarmonyPatch(typeof(scrController), nameof(scrController.Scrub))]
     internal static class InitialScrubPatch {
         private static void Prefix(int floorNum, ref bool forceDontStartMusicFourTilesBefore) {
-            if(CountdownFeature.Coordinator?.PrepareInitialScrub(floorNum) == true)
-                forceDontStartMusicFourTilesBefore = true;
+            CountdownScreenFx.ResetVolatileState();
+            if(CountdownFeature.Coordinator?.PrepareInitialScrub(floorNum) != true) return;
+            forceDontStartMusicFourTilesBefore = true;
+            CountdownScrubWindow.Arm(floorNum);
         }
-        private static void Postfix() => CountdownHaywire.OnScrubCompleted();
+        private static void Postfix() {
+            CountdownScrubWindow.Disarm();
+            CountdownHaywire.OnScrubCompleted();
+        }
+    }
+    [HarmonyPatch(typeof(scrVfxPlus), nameof(scrVfxPlus.ScrubToTime))]
+    internal static class VfxScrubWindowPatch {
+        private static void Prefix(ref float t) => t = CountdownScrubWindow.Restore(t);
     }
     [HarmonyPatch(typeof(scrConductor), nameof(scrConductor.ScrubMusicToTime))]
     internal static class HaywireScrubMusicPatch {
