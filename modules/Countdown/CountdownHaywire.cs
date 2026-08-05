@@ -41,6 +41,7 @@ internal static class CountdownHaywire {
             Stretch(checkpoint);
         } catch(Exception e) {
             CountdownWorld.Warn(e, "Haywire");
+            try { RestoreSpeeds(); } catch(Exception inner) { CountdownWorld.Warn(inner, "Haywire"); }
             ClearBookkeeping();
         }
     }

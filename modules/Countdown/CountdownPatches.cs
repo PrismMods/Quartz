@@ -93,6 +93,7 @@ internal static class CountdownPatches {
         new[] { typeof(List<scrFloor>), typeof(LevelData), typeof(scrLevelMaker), typeof(List<LevelEvent>) })]
     internal static class HaywireApplyEventsPatch {
         private static void Postfix() {
+            CountdownHaywire.RestoreSpeeds();
             CountdownHaywire.ClearBookkeeping();
             if(CountdownHaywire.AttemptPending) CountdownHaywire.ApplyStretch();
         }
