@@ -1,0 +1,19 @@
+Quartz/Core/Info.cs
+  s_d052f31f3c367d::t_a5654d23681a4e 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "4db9eb221f961f223b8f1ef601583e063bbf9d73",
+  "prompts": {},
+  "sessions": {
+    "s_d052f31f3c367d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "39b322a7-8fd4-4ee3-a74c-496ead8fe3f5",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
