@@ -131,6 +131,7 @@
     "EDITOR_HORIZONTAL_PROPERTIES": "横向参数布局",
     "EFFECTREMOVER_ENABLE": "启用特效清除器",
     "EXIT_REORGANIZE": "退出布局调整",
+    "EXIT_REORGANIZE_TIP": "长按可移动此按钮，鼠标中键点击重置",
     "FAQ": "常见问题",
     "FAQ_EMPTY": "FAQ.json中还没有任何问题。",
     "FAQ_ERROR": "FAQ.json无法读取，显示内置问题——{0}",
