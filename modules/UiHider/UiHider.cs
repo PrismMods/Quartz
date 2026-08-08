@@ -63,6 +63,7 @@ public static partial class UiHider {
         bool hideMeter = profile != null && (hideEverything || profile.HideHitErrorMeter);
         try { RDC.noHud = hideEverything; } catch(Exception e) { Diag.Ignore(e); }
         ReconcileHitErrorMeter(hideMeter);
+        if(HasSteamBranchName()) SetBetaObjectsActiveIfMatches(hideBeta);
         scrUIController uiController = scrUIController.instance;
         if(uiController == null) return;
         if(IsEditingLevel() || scnEditor.instance != null) {
@@ -80,7 +81,6 @@ public static partial class UiHider {
                 hideTimingTarget);
             SetMemberGameObjectActiveIfMatches(uiController, "difficultyFadeContainer", hideTimingTarget);
         }
-        if(HasSteamBranchName()) SetBetaObjectsActiveIfMatches(hideBeta);
         SetGameObjectActiveIfMatches(
             uiController.txtLevelName != null ? uiController.txtLevelName.gameObject : null,
             hideTitle);
@@ -179,6 +179,7 @@ public static partial class UiHider {
     }
     internal static GameObject GetGameObject(object value) {
         if(value == null) return null;
+        if(value is UnityEngine.Object unityObject && unityObject == null) return null;
         if(value is GameObject gameObject) return gameObject;
         return value is Component component ? component.gameObject : null;
     }
@@ -221,6 +222,17 @@ public static partial class UiHider {
     private static bool betaTypeResolved;
     private static UnityEngine.Object[] cachedBetaObjects;
     private static int cachedBetaSceneHandle;
+    private static readonly HashSet<int> betaHiddenIds = [];
+    internal static void ClearBetaCache() {
+        cachedBetaObjects = null;
+        cachedBetaSceneHandle = 0;
+        betaHiddenIds.Clear();
+    }
+    private static bool IsBetaCacheAlive() {
+        for(int i = 0; i < cachedBetaObjects.Length; i++)
+            if(cachedBetaObjects[i] == null) return false;
+        return true;
+    }
     private static void SetBetaObjectsActiveIfMatches(bool hide) {
         if(!betaTypeResolved) {
             betaType = AccessTools.TypeByName("scrEnableIfBeta");
@@ -228,14 +240,25 @@ public static partial class UiHider {
         }
         if(betaType == null) return;
         int scene = SceneManager.GetActiveScene().GetHashCode();
-        if(cachedBetaObjects == null || cachedBetaSceneHandle != scene) {
+        if(cachedBetaObjects == null || cachedBetaSceneHandle != scene || !IsBetaCacheAlive()) {
             try { cachedBetaObjects = Resources.FindObjectsOfTypeAll(betaType); }
             catch(Exception e) { Diag.Ignore(e); cachedBetaObjects = null; }
             cachedBetaSceneHandle = scene;
         }
         if(cachedBetaObjects == null) return;
-        for(int i = 0; i < cachedBetaObjects.Length; i++)
-            SetGameObjectActiveIfMatches(GetGameObject(cachedBetaObjects[i]), hide);
+        for(int i = 0; i < cachedBetaObjects.Length; i++) {
+            GameObject gameObject = GetGameObject(cachedBetaObjects[i]);
+            if(gameObject == null) continue;
+            int id = gameObject.GetInstanceID();
+            if(hide) {
+                if(!gameObject.activeSelf) continue;
+                gameObject.SetActive(false);
+                betaHiddenIds.Add(id);
+                continue;
+            }
+            if(!betaHiddenIds.Remove(id) || gameObject.activeSelf) continue;
+            gameObject.SetActive(true);
+        }
     }
     private static Ticker ticker;
     private static void EnsureTicker() {

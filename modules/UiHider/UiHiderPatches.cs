@@ -57,7 +57,10 @@ public static partial class UiHider {
     }
     [HarmonyPatch(typeof(scrController), "StartLoadingScene")]
     private static class ClearCachesOnSceneChangePatch {
-        private static void Postfix() => ClearMemberValueCache();
+        private static void Postfix() {
+            ClearMemberValueCache();
+            ClearBetaCache();
+        }
     }
     private static class HideResultTextAndFlashPatches {
         private static bool shouldIgnoreFlashOnce;
