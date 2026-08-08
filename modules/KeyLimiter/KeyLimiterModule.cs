@@ -8,6 +8,13 @@ public sealed class KeyLimiterModule : QuartzModule {
             Context.RegisterTranslations(typeof(KeyLimiterModule), $"Quartz.Features.KeyLimiter.Lang.{lang}.json");
         KeyLimiter.EnsureConf();
         ChatterBlocker.ChatterBlocker.EnsureConf();
+        ChartKeyLimiter.EnsureConf();
+        EnumToStringPatch.Bind(Context.Harmony);
+        Quartz.Resource.ResourceManager assets = Context.Resources(typeof(KeyLimiterModule), "Quartz.Features.KeyLimiter.Assets.");
+        byte[] icon = assets.Load("KeyLimiterEvent.png");
+        if(icon != null) Context.RegisterSprite(ChartKeyLimiter.SpriteKey, icon);
+        Context.OnModDisable("chart key limiter", ChartKeyLimiter.Unregister);
+        Context.OnModEnable("chart key limiter", ChartKeyLimiter.Apply);
         Context.AddPage(new NavPage {
             Key = "gameplay.keylimiter",
             CategoryKey = "gameplay",
@@ -47,5 +54,6 @@ public sealed class KeyLimiterModule : QuartzModule {
         });
         Context.RegisterImportHandler(new KeyLimiterImport());
         Context.PatchAll(typeof(KeyLimiterModule));
+        ChartKeyLimiter.Apply();
     }
 }

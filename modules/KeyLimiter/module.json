@@ -2,6 +2,6 @@
   "schema": 1, "id": "keylimiter", "entry": "Quartz.Features.KeyLimiter.KeyLimiterModule",
   "name": "Key Limiter", "nameKey": "SECTION_KEY_LIMITER", "group": "gameplay", "order": 10,
   "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
-  "deps": [], "settingsFiles": ["KeyLimiter.json", "ChatterBlocker.json"],
+  "deps": [], "settingsFiles": ["KeyLimiter.json", "ChatterBlocker.json", "ChartKeyLimiter.json"],
   "langPrefixes": ["KL_", "KCB_"]
 }

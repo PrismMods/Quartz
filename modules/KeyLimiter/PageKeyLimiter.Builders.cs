@@ -163,6 +163,7 @@ public static partial class PageKeyLimiter {
         syncLockChangedHandler = ApplySyncLock;
         Quartz.Game.KeyBindSync.Changed += syncLockChangedHandler;
         ApplySyncLock();
+        CreateChartKeyLimiter(sec.Body);
     }
     private static KeyCode setCaptureKey = KeyCode.None;
     private static void CreateKeyRow(Transform parent, KeyCode key, bool locked) {

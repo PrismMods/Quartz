@@ -5,5 +5,6 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<EmbeddedResource Include="Lang\*.json" />
+		<EmbeddedResource Include="Assets\*.png" />
 	</ItemGroup>
 </Project>

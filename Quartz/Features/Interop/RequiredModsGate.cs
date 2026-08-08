@@ -16,6 +16,17 @@ public static class RequiredModsGate {
             }
         }
     }
+    private static readonly HashSet<string> provided = new(StringComparer.Ordinal);
+    public static void Provide(string modName) {
+        string norm = Norm(modName);
+        if(norm.Length == 0) return;
+        lock(provided) provided.Add(norm);
+    }
+    public static void Unprovide(string modName) {
+        string norm = Norm(modName);
+        if(norm.Length == 0) return;
+        lock(provided) provided.Remove(norm);
+    }
     internal static bool HasMissingMods(object[] mods) {
         if(mods == null || mods.Length == 0) return false;
         HashSet<string> loaded = null;
@@ -34,6 +45,7 @@ public static class RequiredModsGate {
     }
     private static HashSet<string> LoadedModNames() {
         HashSet<string> names = new(StringComparer.Ordinal);
+        lock(provided) names.UnionWith(provided);
         foreach(string id in UmmInterop.ActiveModIds()) Add(names, id);
         foreach(string melon in MelonNames()) Add(names, melon);
         try {

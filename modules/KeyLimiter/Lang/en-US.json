@@ -17,6 +17,10 @@
     "SECTION_KEYBOARD_CHATTER_BLOCKER": "Keyboard Chatter Blocker",
     "KL_HOME_KEYS": "{0}: {1} keys · {2}",
     "KL_HOME_ON": "limiting",
-    "KL_HOME_OFF": "off"
+    "KL_HOME_OFF": "off",
+    "KL_CHART_SECTION": "Chart Key Limiter",
+    "KL_CHART_NOTE": "Adds a Key Limiter event to the level editor. A chart can cap how many distinct keys you may use from one tile onward and pick what an extra press does: ignore it, kill the run, or fire tagged events. Reopen the level after changing this.",
+    "DESC_CHARTKEYLIMITER_ENABLE": "Lets levels carry a Key Limiter event and enforces it while you play.",
+    "CHARTKEYLIMITER_ENABLE": "Enable Chart Key Limiter"
   }
 }

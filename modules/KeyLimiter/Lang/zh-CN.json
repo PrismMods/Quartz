@@ -17,6 +17,10 @@
     "SECTION_KEYBOARD_CHATTER_BLOCKER": "按键误触屏蔽器",
     "KL_HOME_KEYS": "{0}：{1}个按键 · {2}",
     "KL_HOME_ON": "限制中",
-    "KL_HOME_OFF": "关闭"
+    "KL_HOME_OFF": "关闭",
+    "KL_CHART_SECTION": "谱面按键限制",
+    "KL_CHART_NOTE": "在关卡编辑器中加入按键限制事件。谱面可以从某一块地砖开始限制可用的按键数量，并选择超出按键时的行为：忽略、判定失败或触发带标签的事件。修改后需重新打开关卡才会生效。",
+    "DESC_CHARTKEYLIMITER_ENABLE": "允许关卡携带按键限制事件，并在游玩时执行。",
+    "CHARTKEYLIMITER_ENABLE": "启用谱面按键限制"
   }
 }
