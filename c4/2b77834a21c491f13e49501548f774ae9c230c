@@ -1,0 +1,27 @@
+stubs/PATCH-TARGETS.json
+  s_27bd0be01e27b3::t_d193ef71f6bb54 5-10,23-28,395-400,641-646
+stubs/README.md
+  s_27bd0be01e27b3::t_d193ef71f6bb54 19-20,41
+stubs/MANIFEST.json
+  s_27bd0be01e27b3::t_d193ef71f6bb54 10,26-33,38,43-44,66-78,164-260,281,291,302,304,310,314-315,327-349,352-362,478-494,740-741,1143-1157,1433-1438,1440-1442,1444-1445,1607,1780,1904,1919,1921
+stubs/Assembly-CSharp/Stubs.g.cs
+  s_27bd0be01e27b3::t_d193ef71f6bb54 35-37,254-255,506,513-519,697,703-704,710,714,724,729,732-739,741-742,745,749,753,761,862,1020,1102,1112,1115,1166-1259,1264,1278,1287,1291,1295,1298-1299,1310-1324,1326-1334,1435-1443
+stubs/0Harmony/Stubs.g.cs
+  s_27bd0be01e27b3::t_d193ef71f6bb54 19,28-33,38,40-41,58-66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "c42b77834a21c491f13e49501548f774ae9c230c",
+  "prompts": {},
+  "sessions": {
+    "s_27bd0be01e27b3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f5751522-4ca5-4731-8a85-0e36ab3b7eab",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
