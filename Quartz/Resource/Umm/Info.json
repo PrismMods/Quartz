@@ -1,8 +1,0 @@
-{
-  "Id": "Quartz",
-  "DisplayName": "Quartz",
-  "Author": "koren",
-  "Version": "__VERSION__",
-  "AssemblyName": "QuartzUmm.dll",
-  "EntryMethod": "Quartz.LoaderUmm.Load"
-}

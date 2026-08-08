@@ -1,9 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<ModuleId>planetcolors</ModuleId>
-		<AssemblyName>Quartz.Module.PlanetColors</AssemblyName>
-	</PropertyGroup>
-	<ItemGroup>
-		<EmbeddedResource Include="Lang\*.json" />
-	</ItemGroup>
-</Project>

@@ -1,9 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<ModuleId>ottoicon</ModuleId>
-		<AssemblyName>Quartz.Module.OttoIcon</AssemblyName>
-	</PropertyGroup>
-	<ItemGroup>
-		<EmbeddedResource Include="Lang\*.json" />
-	</ItemGroup>
-</Project>

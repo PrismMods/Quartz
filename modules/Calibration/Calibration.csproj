@@ -1,9 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<ModuleId>calibration</ModuleId>
-		<AssemblyName>Quartz.Module.Calibration</AssemblyName>
-	</PropertyGroup>
-	<ItemGroup>
-		<EmbeddedResource Include="Lang\*.json" />
-	</ItemGroup>
-</Project>

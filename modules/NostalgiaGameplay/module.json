@@ -1,6 +1,0 @@
-{
-  "schema": 1, "id": "nostalgia-gameplay", "entry": "Quartz.Features.Nostalgia.NostalgiaGameplayModule",
-  "name": "Nostalgia Gameplay", "nameKey": "NOSTALGIA_GAMEPLAY", "group": "nostalgia", "order": 10,
-  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
-  "deps": ["nostalgia"], "settingsFiles": [], "langPrefixes": []
-}

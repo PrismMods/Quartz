@@ -1,9 +1,0 @@
-[
-  { "key": "overlay",   "title": "Overlay",   "titleKey": "OVERLAY",   "order": 10 },
-  { "key": "gameplay",  "title": "Gameplay",  "titleKey": "GAMEPLAY",  "order": 20 },
-  { "key": "visuals",   "title": "Visuals",   "titleKey": "VISUALS",   "order": 30 },
-  { "key": "tweaks",    "title": "Tweaks",    "titleKey": "TWEAKS",    "order": 40 },
-  { "key": "editor",    "title": "Editor",    "titleKey": "EDITOR",    "order": 50 },
-  { "key": "nostalgia", "title": "Nostalgia", "titleKey": "NOSTALGIA", "order": 60 },
-  { "key": "tuf",       "title": "TUF",       "titleKey": "TUF",       "order": 70 }
-]

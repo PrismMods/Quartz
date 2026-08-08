@@ -1,9 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<ModuleId>keylimiter</ModuleId>
-		<AssemblyName>Quartz.Module.KeyLimiter</AssemblyName>
-	</PropertyGroup>
-	<ItemGroup>
-		<EmbeddedResource Include="Lang\*.json" />
-	</ItemGroup>
-</Project>
