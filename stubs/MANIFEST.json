@@ -447,6 +447,53 @@
         ]
       },
       {
+        "type": "Filter",
+        "members": [
+          "Filter Filter::Aberration",
+          "Filter Filter::Arcade",
+          "Filter Filter::Blizzard",
+          "Filter Filter::Blur",
+          "Filter Filter::BlurFocus",
+          "Filter Filter::Compression",
+          "Filter Filter::Contrast",
+          "Filter Filter::Drawing",
+          "Filter Filter::EdgeBlackLine",
+          "Filter Filter::EightiesTV",
+          "Filter Filter::FiftiesTV",
+          "Filter Filter::Fisheye",
+          "Filter Filter::Funk",
+          "Filter Filter::GaussianBlur",
+          "Filter Filter::Glitch",
+          "Filter Filter::Grain",
+          "Filter Filter::Grayscale",
+          "Filter Filter::Handheld",
+          "Filter Filter::HexagonBlack",
+          "Filter Filter::Invert",
+          "Filter Filter::LED",
+          "Filter Filter::LightWater",
+          "Filter Filter::MotionBlur",
+          "Filter Filter::Neon",
+          "Filter Filter::NightVision",
+          "Filter Filter::OilPaint",
+          "Filter Filter::Petals",
+          "Filter Filter::PetalsInstant",
+          "Filter Filter::PixelSnow",
+          "Filter Filter::Pixelate",
+          "Filter Filter::Posterize",
+          "Filter Filter::Rain",
+          "Filter Filter::Sepia",
+          "Filter Filter::Sharpen",
+          "Filter Filter::Static",
+          "Filter Filter::SuperDot",
+          "Filter Filter::Tunnel",
+          "Filter Filter::VHS",
+          "Filter Filter::WaterDrop",
+          "Filter Filter::Waves",
+          "Filter Filter::Weird3D",
+          "System.Int32 Filter::value__"
+        ]
+      },
+      {
         "type": "FloorIcon",
         "members": [
           "FloorIcon FloorIcon::AnimatedDoubleRabbit",
@@ -904,6 +951,7 @@
           "System.String RDString::BoothButtonKeySuffix",
           "System.String RDString::DivekickKeySuffix",
           "System.String RDString::GamepadKeySuffix",
+          "System.String RDString::GetEnumValue(T)",
           "System.String RDString::GetWithCheck(System.String,System.Boolean\u0026,System.Collections.Generic.Dictionary\u00602\u003CSystem.String,System.Object\u003E)",
           "System.String RDString::MobileKeySuffix",
           "System.String RDString::NintendoSwitchFaceRightCharacter",
@@ -1215,7 +1263,9 @@
       },
       {
         "type": "ffxSetFilterPlus",
-        "members": []
+        "members": [
+          "Filter ffxSetFilterPlus::filter"
+        ]
       },
       {
         "type": "ffxShakeScreenPlus",
@@ -1377,6 +1427,7 @@
         "members": [
           "System.Single scrCamera::DefaultCameraOrthoSize",
           "System.Void scrCamera::SetCustomFrameRate(System.Boolean,System.Single)",
+          "UnityEngine.Camera scrCamera::Bgcamstatic",
           "UnityEngine.Renderer scrCamera::flashPlusRendererBg",
           "UnityEngine.Renderer scrCamera::flashPlusRendererFg",
           "scrCamera scrCamera::get_instance()",
@@ -3060,7 +3111,9 @@
           "System.Int32 UnityEngine.Camera::kMaxBladeCount",
           "System.Int32 UnityEngine.Camera::kMinBladeCount",
           "System.Single UnityEngine.Camera::kMaxAperture",
-          "System.Single UnityEngine.Camera::kMinAperture"
+          "System.Single UnityEngine.Camera::kMinAperture",
+          "System.Void UnityEngine.Camera::set_clearFlags(UnityEngine.CameraClearFlags)",
+          "UnityEngine.CameraClearFlags UnityEngine.Camera::clearFlags()"
         ]
       },
       {
@@ -3105,6 +3158,17 @@
           "System.Int32 UnityEngine.Camera/StereoscopicEye::value__",
           "UnityEngine.Camera/StereoscopicEye UnityEngine.Camera/StereoscopicEye::Left",
           "UnityEngine.Camera/StereoscopicEye UnityEngine.Camera/StereoscopicEye::Right"
+        ]
+      },
+      {
+        "type": "UnityEngine.CameraClearFlags",
+        "members": [
+          "System.Int32 UnityEngine.CameraClearFlags::value__",
+          "UnityEngine.CameraClearFlags UnityEngine.CameraClearFlags::Color",
+          "UnityEngine.CameraClearFlags UnityEngine.CameraClearFlags::Depth",
+          "UnityEngine.CameraClearFlags UnityEngine.CameraClearFlags::Nothing",
+          "UnityEngine.CameraClearFlags UnityEngine.CameraClearFlags::Skybox",
+          "UnityEngine.CameraClearFlags UnityEngine.CameraClearFlags::SolidColor"
         ]
       },
       {

@@ -42,6 +42,7 @@ namespace UnityEngine {
         public const int kMaxBladeCount = 1;
         public const float kMinAperture = 2f;
         public const int kMinBladeCount = 3;
+        public global::UnityEngine.CameraClearFlags clearFlags { get => throw null; set { } }
         private Camera() { }
         public enum GateFitMode : int {
             Vertical = 1,
@@ -67,6 +68,13 @@ namespace UnityEngine {
             Off = 0,
             ShowFiltered = 1,
         }
+    }
+    public enum CameraClearFlags : int {
+        Skybox = 1,
+        Color = 2,
+        SolidColor = 2,
+        Depth = 3,
+        Nothing = 4,
     }
     public unsafe partial struct Color : global::System.IEquatable<global::UnityEngine.Color> {
         public float a;

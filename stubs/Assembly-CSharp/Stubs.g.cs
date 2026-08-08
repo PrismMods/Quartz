@@ -118,6 +118,49 @@ public unsafe partial class EventsArray<T> : global::System.Collections.Generic.
 public static unsafe partial class ExtensionMethods {
     public static global::UnityEngine.Color WithAlpha(this global::UnityEngine.Color color, float alpha) => throw null;
 }
+public enum Filter : int {
+    Grayscale = 0,
+    Sepia = 1,
+    Invert = 2,
+    VHS = 3,
+    EightiesTV = 4,
+    FiftiesTV = 5,
+    Arcade = 6,
+    LED = 7,
+    Rain = 8,
+    Blizzard = 9,
+    PixelSnow = 10,
+    Compression = 11,
+    Glitch = 12,
+    Pixelate = 13,
+    Waves = 14,
+    Static = 15,
+    Grain = 16,
+    MotionBlur = 17,
+    Fisheye = 18,
+    Aberration = 19,
+    Drawing = 20,
+    Neon = 21,
+    Handheld = 22,
+    NightVision = 23,
+    Funk = 24,
+    Tunnel = 25,
+    Weird3D = 26,
+    Blur = 27,
+    BlurFocus = 28,
+    GaussianBlur = 29,
+    HexagonBlack = 30,
+    Posterize = 31,
+    Sharpen = 32,
+    Contrast = 33,
+    EdgeBlackLine = 34,
+    OilPaint = 35,
+    SuperDot = 36,
+    WaterDrop = 37,
+    LightWater = 38,
+    Petals = 39,
+    PetalsInstant = 40,
+}
 public enum FloorIcon : int {
     None = 0,
     Snail = 1,
@@ -455,6 +498,7 @@ public static unsafe partial class RDString {
     public const string NintendoSwitchKeySuffix = "NintendoSwitchKeySuffix";
     public const string StringsFilePrefix = "StringsFilePrefix";
     public const string StringsFolder = "StringsFolder";
+    public static string GetEnumValue<T>(T value) => throw null;
     public static string GetWithCheck(string key, out bool exists, global::System.Collections.Generic.Dictionary<string, object> parameters = default) => throw null;
     public static void SetLocalizedFont(this global::UnityEngine.UI.Text text) => throw null;
     public static void SetLocalizedFont(this global::TMPro.TMP_Text text) => throw null;
@@ -687,6 +731,7 @@ public unsafe partial class ffxSetFilterAdvancedPlus : global::ffxPlusBase {
     protected ffxSetFilterAdvancedPlus() { }
 }
 public unsafe partial class ffxSetFilterPlus : global::ffxPlusBase {
+    public global::Filter filter;
     protected ffxSetFilterPlus() { }
 }
 public unsafe partial class ffxShakeScreenPlus : global::ffxPlusBase {
@@ -812,6 +857,7 @@ public unsafe partial class scrButtonURL : global::ADOBase {
     protected scrButtonURL() { }
 }
 public unsafe partial class scrCamera : global::ADOBase {
+    public global::UnityEngine.Camera Bgcamstatic;
     public const float DefaultCameraOrthoSize = 69f;
     public global::UnityEngine.Renderer flashPlusRendererBg;
     public global::UnityEngine.Renderer flashPlusRendererFg;
