@@ -12,6 +12,7 @@ public sealed class EffectRemoverSettings : ISettingsFile {
     public bool IsEnhanced => !IsSimple;
     public const int MoveTrackUpperBound = 100;
     public bool SimpleFilter = false;
+    public List<Filter> SimpleFilterExcludeList = [];
     public bool SimpleAdvancedFilter = false;
     public bool SimpleBloom = false;
     public bool SimpleFlash = false;
@@ -54,6 +55,7 @@ public sealed class EffectRemoverSettings : ISettingsFile {
             [nameof(On)] = On,
             [nameof(Mode)] = Mode,
             [nameof(SimpleFilter)] = SimpleFilter,
+            [nameof(SimpleFilterExcludeList)] = new JArray(SimpleFilterExcludeList.Select(f => f.ToString())),
             [nameof(SimpleAdvancedFilter)] = SimpleAdvancedFilter,
             [nameof(SimpleBloom)] = SimpleBloom,
             [nameof(SimpleFlash)] = SimpleFlash,
@@ -97,6 +99,7 @@ public sealed class EffectRemoverSettings : ISettingsFile {
         On = IOUtils.Read(token, nameof(On), On);
         Mode = IOUtils.Read(token, nameof(Mode), Mode);
         SimpleFilter = IOUtils.Read(token, nameof(SimpleFilter), SimpleFilter);
+        SimpleFilterExcludeList = ReadFilterList(token);
         SimpleAdvancedFilter = IOUtils.Read(token, nameof(SimpleAdvancedFilter), SimpleAdvancedFilter);
         SimpleBloom = IOUtils.Read(token, nameof(SimpleBloom), SimpleBloom);
         SimpleFlash = IOUtils.Read(token, nameof(SimpleFlash), SimpleFlash);
@@ -135,5 +138,17 @@ public sealed class EffectRemoverSettings : ISettingsFile {
         CameraZoomScale = IOUtils.Read(token, nameof(CameraZoomScale), CameraZoomScale);
         ResetTrackAnimation = IOUtils.Read(token, nameof(ResetTrackAnimation), ResetTrackAnimation);
         ResetTrackColor = IOUtils.Read(token, nameof(ResetTrackColor), ResetTrackColor);
+    }
+    private static List<Filter> ReadFilterList(JToken token) {
+        List<Filter> result = [];
+        if(token?[nameof(SimpleFilterExcludeList)] is not JArray arr) return result;
+        foreach(JToken item in arr) {
+            if(item.Type == JTokenType.String
+                && Enum.TryParse((string)item, out Filter f)
+                && !result.Contains(f)) {
+                result.Add(f);
+            }
+        }
+        return result;
     }
 }

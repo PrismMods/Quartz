@@ -264,11 +264,36 @@ public static class PageEffectRemover {
     private static void CreateSimpleEffectRemover(
         Transform parent, EffectRemoverSettings conf, EffectRemoverSettings def) {
         void Save() => EffectRemover.Save();
+        GenerateUI.CollapsibleSection excludeSection = null;
         GenerateUI.ToggleTip(
             parent, def.SimpleFilter, conf.SimpleFilter,
-            v => { conf.SimpleFilter = v; Save(); },
+            v => {
+                conf.SimpleFilter = v;
+                excludeSection?.Section.gameObject.SetActive(v);
+                Save();
+            },
             "Disable Filters", "fxrm_s_filter",
             "Turns off VFX filters (Grayscale, Arcade, etc.) at runtime without changing the chart.");
+        excludeSection = GenerateUI.Collapsible(parent, "Excluded Filters", startExpanded: false);
+        foreach(Filter value in System.Enum.GetValues(typeof(Filter))) {
+            Filter filter = value;
+            GenerateUI.Toggle(
+                GenerateUI.Row(excludeSection.Body),
+                false,
+                conf.SimpleFilterExcludeList.Contains(filter),
+                v => {
+                    if(v) {
+                        if(!conf.SimpleFilterExcludeList.Contains(filter)) conf.SimpleFilterExcludeList.Add(filter);
+                    } else {
+                        conf.SimpleFilterExcludeList.Remove(filter);
+                    }
+                    Save();
+                },
+                RDString.GetEnumValue(filter),
+                $"fxrm_s_filter_ex_{filter}"
+            );
+        }
+        excludeSection.Section.gameObject.SetActive(conf.SimpleFilter);
         GenerateUI.ToggleTip(
             parent, def.SimpleAdvancedFilter, conf.SimpleAdvancedFilter,
             v => { conf.SimpleAdvancedFilter = v; Save(); },

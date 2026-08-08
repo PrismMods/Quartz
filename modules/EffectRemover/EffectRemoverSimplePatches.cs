@@ -18,8 +18,9 @@ public static partial class EffectRemover {
     [HarmonyPatch(typeof(ffxSetFilterPlus), "SetFilter")]
     private static class SimpleFilterPatch {
         private static bool Prepare() => AccessTools.Method(typeof(ffxSetFilterPlus), "SetFilter") != null;
-        private static void Prefix(ref bool __0) {
-            if(SimpleFilterActive) __0 = false;
+        private static void Prefix(ffxSetFilterPlus __instance, ref bool __0) {
+            if(!SimpleFilterActive) return;
+            if(!Conf.SimpleFilterExcludeList.Contains(__instance.filter)) __0 = false;
         }
     }
     [HarmonyPatch(typeof(scrController), "WaitForStartCo")]
@@ -63,7 +64,10 @@ public static partial class EffectRemover {
     [HarmonyPatch(typeof(ffxHallOfMirrorsPlus), "StartEffect")]
     private static class SimpleHomPatch {
         private static bool Prepare() => AccessTools.Method(typeof(ffxHallOfMirrorsPlus), "StartEffect") != null;
-        private static bool Prefix() => !SimpleHomActive;
+        private static void Postfix(ffxHallOfMirrorsPlus __instance) {
+            if(!SimpleHomActive) return;
+            __instance.cam.Bgcamstatic.clearFlags = CameraClearFlags.Color;
+        }
     }
     [HarmonyPatch(typeof(ffxShakeScreenPlus), "StartEffect")]
     private static class SimpleShakePatch {
