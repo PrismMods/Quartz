@@ -7,6 +7,7 @@
         "members": [
           "HarmonyLib.AccessTools/FieldRef\u00602\u003CT,F\u003E HarmonyLib.AccessTools::FieldRefAccess(System.String)",
           "System.Collections.Generic.List\u00601\u003CSystem.Reflection.MethodInfo\u003E HarmonyLib.AccessTools::GetDeclaredMethods(System.Type)",
+          "System.Collections.Generic.List\u00601\u003CSystem.String\u003E HarmonyLib.AccessTools::GetMethodNames(System.Type)",
           "System.Reflection.FieldInfo HarmonyLib.AccessTools::Field(System.Type,System.String)",
           "System.Reflection.MethodInfo HarmonyLib.AccessTools::Method(System.Type,System.String,System.Type[],System.Type[])",
           "System.Reflection.MethodInfo HarmonyLib.AccessTools::PropertyGetter(System.Type,System.String)",
@@ -23,14 +24,24 @@
         ]
       },
       {
+        "type": "HarmonyLib.CodeInstruction",
+        "members": [
+          "System.Object HarmonyLib.CodeInstruction::operand",
+          "System.Reflection.Emit.OpCode HarmonyLib.CodeInstruction::opcode",
+          "System.Void HarmonyLib.CodeInstruction::.ctor(System.Reflection.Emit.OpCode,System.Object)"
+        ]
+      },
+      {
         "type": "HarmonyLib.Harmony",
         "members": [
           "HarmonyLib.PatchClassProcessor HarmonyLib.Harmony::CreateClassProcessor(System.Type)",
+          "System.Reflection.MethodInfo HarmonyLib.Harmony::Patch(System.Reflection.MethodBase,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod)",
           "System.String HarmonyLib.Harmony::Id()",
           "System.String HarmonyLib.Harmony::get_Id()",
           "System.Void HarmonyLib.Harmony::.ctor(System.String)",
           "System.Void HarmonyLib.Harmony::PatchAll(System.Reflection.Assembly)",
-          "System.Void HarmonyLib.Harmony::UnpatchAll(System.String)"
+          "System.Void HarmonyLib.Harmony::Unpatch(System.Reflection.MethodBase,HarmonyLib.HarmonyPatchType,System.String)",
+          "System.Void HarmonyLib.Harmony::UnpatchSelf()"
         ]
       },
       {
@@ -50,6 +61,19 @@
           "System.Void HarmonyLib.HarmonyPatch::.ctor(System.Type,System.String)",
           "System.Void HarmonyLib.HarmonyPatch::.ctor(System.Type,System.String,HarmonyLib.MethodType)",
           "System.Void HarmonyLib.HarmonyPatch::.ctor(System.Type,System.String,System.Type[])"
+        ]
+      },
+      {
+        "type": "HarmonyLib.HarmonyPatchType",
+        "members": [
+          "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::All",
+          "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::Finalizer",
+          "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::ILManipulator",
+          "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::Postfix",
+          "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::Prefix",
+          "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::ReversePatch",
+          "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::Transpiler",
+          "System.Int32 HarmonyLib.HarmonyPatchType::value__"
         ]
       },
       {
@@ -138,6 +162,103 @@
         ]
       },
       {
+        "type": "ADOFAI.EditorConstants",
+        "members": [
+          "System.Collections.Generic.HashSet\u00601\u003CADOFAI.LevelEventType\u003E ADOFAI.EditorConstants::soloTypes",
+          "System.Int32 ADOFAI.EditorConstants::ConditionalArraySize",
+          "System.Int32 ADOFAI.EditorConstants::adofaiFileVersion",
+          "System.String ADOFAI.EditorConstants::key_actions",
+          "System.String ADOFAI.EditorConstants::key_active",
+          "System.String ADOFAI.EditorConstants::key_angleData",
+          "System.String ADOFAI.EditorConstants::key_artist",
+          "System.String ADOFAI.EditorConstants::key_artistLinks",
+          "System.String ADOFAI.EditorConstants::key_artistPermission",
+          "System.String ADOFAI.EditorConstants::key_author",
+          "System.String ADOFAI.EditorConstants::key_backgroundColor",
+          "System.String ADOFAI.EditorConstants::key_bgDisplayMode",
+          "System.String ADOFAI.EditorConstants::key_bgImage",
+          "System.String ADOFAI.EditorConstants::key_bgImageColor",
+          "System.String ADOFAI.EditorConstants::key_bgLockRot",
+          "System.String ADOFAI.EditorConstants::key_bgShowDefault",
+          "System.String ADOFAI.EditorConstants::key_bgSmoothing",
+          "System.String ADOFAI.EditorConstants::key_bgVideo",
+          "System.String ADOFAI.EditorConstants::key_bpm",
+          "System.String ADOFAI.EditorConstants::key_camPosition",
+          "System.String ADOFAI.EditorConstants::key_camRelativeTo",
+          "System.String ADOFAI.EditorConstants::key_camRotation",
+          "System.String ADOFAI.EditorConstants::key_camZoom",
+          "System.String ADOFAI.EditorConstants::key_congratsText",
+          "System.String ADOFAI.EditorConstants::key_countdownTicks",
+          "System.String ADOFAI.EditorConstants::key_decorations",
+          "System.String ADOFAI.EditorConstants::key_defaultBGShapeColor",
+          "System.String ADOFAI.EditorConstants::key_defaultBGShapeType",
+          "System.String ADOFAI.EditorConstants::key_defaultBGTileColor",
+          "System.String ADOFAI.EditorConstants::key_defaultTextColor",
+          "System.String ADOFAI.EditorConstants::key_defaultTextShadowColor",
+          "System.String ADOFAI.EditorConstants::key_difficulty",
+          "System.String ADOFAI.EditorConstants::key_disableV15Features",
+          "System.String ADOFAI.EditorConstants::key_doStartCamOnLowVFX",
+          "System.String ADOFAI.EditorConstants::key_enabled",
+          "System.String ADOFAI.EditorConstants::key_eventType",
+          "System.String ADOFAI.EditorConstants::key_floor",
+          "System.String ADOFAI.EditorConstants::key_floorIconOutlines",
+          "System.String ADOFAI.EditorConstants::key_hitsound",
+          "System.String ADOFAI.EditorConstants::key_hitsoundVolume",
+          "System.String ADOFAI.EditorConstants::key_legacyCamRelativeTo",
+          "System.String ADOFAI.EditorConstants::key_legacyFlash",
+          "System.String ADOFAI.EditorConstants::key_legacySpriteTiles",
+          "System.String ADOFAI.EditorConstants::key_legacyTween",
+          "System.String ADOFAI.EditorConstants::key_levelDesc",
+          "System.String ADOFAI.EditorConstants::key_levelTags",
+          "System.String ADOFAI.EditorConstants::key_locked",
+          "System.String ADOFAI.EditorConstants::key_loopBG",
+          "System.String ADOFAI.EditorConstants::key_offset",
+          "System.String ADOFAI.EditorConstants::key_parallax",
+          "System.String ADOFAI.EditorConstants::key_pathData",
+          "System.String ADOFAI.EditorConstants::key_perfectText",
+          "System.String ADOFAI.EditorConstants::key_pitch",
+          "System.String ADOFAI.EditorConstants::key_planetEase",
+          "System.String ADOFAI.EditorConstants::key_planetEasePartBehavior",
+          "System.String ADOFAI.EditorConstants::key_planetEaseParts",
+          "System.String ADOFAI.EditorConstants::key_previewIcon",
+          "System.String ADOFAI.EditorConstants::key_previewIconColor",
+          "System.String ADOFAI.EditorConstants::key_previewImage",
+          "System.String ADOFAI.EditorConstants::key_previewSongDuration",
+          "System.String ADOFAI.EditorConstants::key_previewSongStart",
+          "System.String ADOFAI.EditorConstants::key_pulseOnFloor",
+          "System.String ADOFAI.EditorConstants::key_requiredMods",
+          "System.String ADOFAI.EditorConstants::key_scalingRatio",
+          "System.String ADOFAI.EditorConstants::key_secondaryTrackColor",
+          "System.String ADOFAI.EditorConstants::key_seizureWarning",
+          "System.String ADOFAI.EditorConstants::key_separateCountdownTime",
+          "System.String ADOFAI.EditorConstants::key_settings",
+          "System.String ADOFAI.EditorConstants::key_showDefaultBGTile",
+          "System.String ADOFAI.EditorConstants::key_song",
+          "System.String ADOFAI.EditorConstants::key_songFilename",
+          "System.String ADOFAI.EditorConstants::key_specialArtistType",
+          "System.String ADOFAI.EditorConstants::key_speedTrialAim",
+          "System.String ADOFAI.EditorConstants::key_stickToFloors",
+          "System.String ADOFAI.EditorConstants::key_tileShape",
+          "System.String ADOFAI.EditorConstants::key_trackAnimation",
+          "System.String ADOFAI.EditorConstants::key_trackBeatsAhead",
+          "System.String ADOFAI.EditorConstants::key_trackBeatsBehind",
+          "System.String ADOFAI.EditorConstants::key_trackColor",
+          "System.String ADOFAI.EditorConstants::key_trackColorAnimDuration",
+          "System.String ADOFAI.EditorConstants::key_trackColorPulse",
+          "System.String ADOFAI.EditorConstants::key_trackColorType",
+          "System.String ADOFAI.EditorConstants::key_trackDisappearAnimation",
+          "System.String ADOFAI.EditorConstants::key_trackGlowIntensity",
+          "System.String ADOFAI.EditorConstants::key_trackPulseLength",
+          "System.String ADOFAI.EditorConstants::key_trackShadowColor",
+          "System.String ADOFAI.EditorConstants::key_trackStyle",
+          "System.String ADOFAI.EditorConstants::key_trackTexture",
+          "System.String ADOFAI.EditorConstants::key_trackTextureScale",
+          "System.String ADOFAI.EditorConstants::key_version",
+          "System.String ADOFAI.EditorConstants::key_visible",
+          "System.String ADOFAI.EditorConstants::key_volume"
+        ]
+      },
+      {
         "type": "ADOFAI.InspectorPanel",
         "members": [
           "ADOFAI.LevelEventType ADOFAI.InspectorPanel::selectedEventType",
@@ -157,6 +278,7 @@
           "ADOFAI.LevelEvent ADOFAI.LevelData::backgroundSettings",
           "ADOFAI.LevelEvent ADOFAI.LevelData::cameraSettings",
           "ADOFAI.LevelEvent ADOFAI.LevelData::decorationSettings",
+          "ADOFAI.LevelEvent ADOFAI.LevelData::levelSettings",
           "ADOFAI.LevelEvent ADOFAI.LevelData::miscSettings",
           "ADOFAI.LevelEvent ADOFAI.LevelData::songSettings",
           "ADOFAI.LevelEvent ADOFAI.LevelData::trackSettings",
@@ -166,6 +288,7 @@
           "System.Int32 ADOFAI.LevelData::pitch()",
           "System.Single ADOFAI.LevelData::bpm()",
           "System.Single ADOFAI.LevelData::get_bpm()",
+          "System.String ADOFAI.LevelData::Encode()",
           "System.String ADOFAI.LevelData::artist()",
           "System.String ADOFAI.LevelData::get_artist()",
           "System.String ADOFAI.LevelData::get_song()",
@@ -176,16 +299,20 @@
       {
         "type": "ADOFAI.LevelEvent",
         "members": [
+          "ADOFAI.LevelEventInfo ADOFAI.LevelEvent::info",
           "ADOFAI.LevelEventType ADOFAI.LevelEvent::eventType",
+          "System.Boolean ADOFAI.LevelEvent::GetBool(System.String)",
           "System.Boolean ADOFAI.LevelEvent::active",
           "System.Int32 ADOFAI.LevelEvent::GetInt(System.String)",
           "System.Int32 ADOFAI.LevelEvent::NoFloor",
           "System.Int32 ADOFAI.LevelEvent::floor",
           "System.Object ADOFAI.LevelEvent::Item(System.String)",
+          "System.Object ADOFAI.LevelEvent::get_Item(System.String)",
           "System.Single ADOFAI.LevelEvent::GetFloat(System.String)",
           "System.String ADOFAI.LevelEvent::GetString(System.String)",
           "System.Void ADOFAI.LevelEvent::.ctor(System.Int32,ADOFAI.LevelEventType,ADOFAI.LevelEventInfo)",
-          "System.Void ADOFAI.LevelEvent::set_Item(System.String,System.Object)"
+          "System.Void ADOFAI.LevelEvent::set_Item(System.String,System.Object)",
+          "T ADOFAI.LevelEvent::Get(System.String,T)"
         ]
       },
       {
@@ -198,8 +325,41 @@
         ]
       },
       {
+        "type": "ADOFAI.LevelEventCategory",
+        "members": [
+          "ADOFAI.LevelEventCategory ADOFAI.LevelEventCategory::Conveniences",
+          "ADOFAI.LevelEventCategory ADOFAI.LevelEventCategory::DecorationFx",
+          "ADOFAI.LevelEventCategory ADOFAI.LevelEventCategory::Favorites",
+          "ADOFAI.LevelEventCategory ADOFAI.LevelEventCategory::FxModifiers",
+          "ADOFAI.LevelEventCategory ADOFAI.LevelEventCategory::Gameplay",
+          "ADOFAI.LevelEventCategory ADOFAI.LevelEventCategory::Jank",
+          "ADOFAI.LevelEventCategory ADOFAI.LevelEventCategory::TrackFx",
+          "ADOFAI.LevelEventCategory ADOFAI.LevelEventCategory::VisualFx",
+          "System.Int32 ADOFAI.LevelEventCategory::value__"
+        ]
+      },
+      {
+        "type": "ADOFAI.LevelEventExecutionTime",
+        "members": [
+          "ADOFAI.LevelEventExecutionTime ADOFAI.LevelEventExecutionTime::OnBar",
+          "ADOFAI.LevelEventExecutionTime ADOFAI.LevelEventExecutionTime::OnPrebar",
+          "ADOFAI.LevelEventExecutionTime ADOFAI.LevelEventExecutionTime::Special",
+          "System.Int32 ADOFAI.LevelEventExecutionTime::value__"
+        ]
+      },
+      {
         "type": "ADOFAI.LevelEventInfo",
-        "members": []
+        "members": [
+          "ADOFAI.LevelEventExecutionTime ADOFAI.LevelEventInfo::executionTime",
+          "ADOFAI.LevelEventType ADOFAI.LevelEventInfo::type",
+          "System.Boolean ADOFAI.LevelEventInfo::isDecoration",
+          "System.Boolean ADOFAI.LevelEventInfo::useGroups",
+          "System.Collections.Generic.Dictionary\u00602\u003CSystem.String,ADOFAI.PropertyInfo\u003E ADOFAI.LevelEventInfo::propertiesInfo",
+          "System.Collections.Generic.List\u00601\u003CADOFAI.LevelEventCategory\u003E ADOFAI.LevelEventInfo::categories",
+          "System.Nullable\u00601\u003CSystem.Boolean\u003E ADOFAI.LevelEventInfo::allowFirstFloor",
+          "System.String ADOFAI.LevelEventInfo::name",
+          "System.Void ADOFAI.LevelEventInfo::.ctor()"
+        ]
       },
       {
         "type": "ADOFAI.LevelEventType",
@@ -313,6 +473,23 @@
         "members": [
           "TMPro.TMP_Text ADOFAI.Property::label",
           "UnityEngine.RectTransform ADOFAI.Property::controlContainer"
+        ]
+      },
+      {
+        "type": "ADOFAI.PropertyInfo",
+        "members": [
+          "System.Object ADOFAI.PropertyInfo::value_default",
+          "System.Object[] ADOFAI.PropertyInfo::enumExceptions",
+          "System.String ADOFAI.PropertyInfo::enumTypeString",
+          "System.String ADOFAI.PropertyInfo::name",
+          "System.Type ADOFAI.PropertyInfo::enumType",
+          "System.Void ADOFAI.PropertyInfo::.ctor(System.Collections.Generic.Dictionary\u00602\u003CSystem.String,System.Object\u003E,ADOFAI.LevelEventInfo)"
+        ]
+      },
+      {
+        "type": "ADOStartup",
+        "members": [
+          "System.Void ADOStartup::SetupLevelEventsInfo()"
         ]
       },
       {
@@ -560,6 +737,8 @@
           "System.Boolean GCS::useNoFail",
           "System.Boolean GCS::usingCheckpoints",
           "System.Boolean GCS::webVersion",
+          "System.Collections.Generic.Dictionary\u00602\u003CADOFAI.LevelEventType,System.String\u003E GCS::levelEventTypeString",
+          "System.Collections.Generic.Dictionary\u00602\u003CADOFAI.LevelEventType,UnityEngine.Sprite\u003E GCS::levelEventIcons",
           "System.Collections.Generic.Dictionary\u00602\u003CSystem.String,ADOFAI.LevelEventInfo\u003E GCS::levelEventsInfo",
           "System.Collections.Generic.Dictionary\u00602\u003CSystem.String,ADOFAI.LevelEventInfo\u003E GCS::settingsInfo",
           "System.Int32 GCS::LargeFloorSize",
@@ -961,7 +1140,21 @@
           "System.Void RDString::SetLocalizedFont(TMPro.TMP_Text)",
           "System.Void RDString::SetLocalizedFont(UnityEngine.TextMesh)",
           "System.Void RDString::SetLocalizedFont(UnityEngine.UI.Text)",
-          "UnityEngine.SystemLanguage RDString::FallbackLanguage"
+          "UnityEngine.SystemLanguage RDString::FallbackLanguage",
+          "UnityEngine.SystemLanguage RDString::language"
+        ]
+      },
+      {
+        "type": "RDUtils",
+        "members": []
+      },
+      {
+        "type": "RDUtils/UnCamelCaseOptions",
+        "members": [
+          "RDUtils/UnCamelCaseOptions RDUtils/UnCamelCaseOptions::None",
+          "RDUtils/UnCamelCaseOptions RDUtils/UnCamelCaseOptions::SpaceBeforeNumbers",
+          "RDUtils/UnCamelCaseOptions RDUtils/UnCamelCaseOptions::UnderbarToSpace",
+          "System.Int32 RDUtils/UnCamelCaseOptions::value__"
         ]
       },
       {
@@ -1237,8 +1430,19 @@
       {
         "type": "ffxPlusBase",
         "members": [
+          "ADOFAI.LevelEvent ffxPlusBase::sourceLevelEvent",
+          "System.Boolean ffxPlusBase::runManually",
+          "System.Boolean ffxPlusBase::triggered",
+          "System.Collections.Generic.List\u00601\u003CscrFloor\u003E ffxPlusBase::floors",
+          "System.Int32 ffxPlusBase::floorID",
+          "System.Single ffxPlusBase::crotchet",
           "System.Single ffxPlusBase::degreeOffset",
+          "System.Void ffxPlusBase::.ctor()",
+          "System.Void ffxPlusBase::Decode(ADOFAI.LevelEvent)",
+          "System.Void ffxPlusBase::PrepVfx()",
           "System.Void ffxPlusBase::SetStartTime(System.Single,System.Single)",
+          "System.Void ffxPlusBase::StartEffect(scrPlanet)",
+          "System.Void ffxPlusBase::StartEffectWithOffset(scrPlanet)",
           "scrCamera ffxPlusBase::cam",
           "scrFloor ffxPlusBase::floor"
         ]
@@ -1400,6 +1604,7 @@
           "System.Void scnGame::ApplyEventsToFloors(System.Collections.Generic.List\u00601\u003CscrFloor\u003E)",
           "System.Void scnGame::ApplyEventsToFloors(System.Collections.Generic.List\u00601\u003CscrFloor\u003E,ADOFAI.LevelData,scrLevelMaker,System.Collections.Generic.List\u00601\u003CADOFAI.LevelEvent\u003E)",
           "System.Void scnGame::ResetScene(System.Boolean)",
+          "ffxPlusBase scnGame::ApplyEvent(ADOFAI.LevelEvent,System.Single,System.Single,System.Collections.Generic.List\u00601\u003CscrFloor\u003E,System.Single,System.Nullable\u00601\u003CSystem.Int32\u003E)",
           "scnGame scnGame::instance"
         ]
       },
@@ -1572,6 +1777,7 @@
           "System.Boolean scrFloor::outline",
           "System.Boolean scrFloor::stickToFloor",
           "System.Char scrFloor::stringDirection",
+          "System.Collections.Generic.List\u00601\u003CffxPlusBase\u003E scrFloor::plusEffects",
           "System.Double scrFloor::angleLength",
           "System.Double scrFloor::entryTime",
           "System.Double scrFloor::entryangle",
@@ -1695,6 +1901,7 @@
           "System.Single scrPlanet::cosmeticRadius",
           "System.Void scrPlanet::Update_RefreshAngles()",
           "scrFloor scrPlanet::currfloor",
+          "scrPlanet scrPlanet::SwitchChosen()",
           "scrPlanet scrPlanet::other",
           "scrPlayer scrPlanet::player"
         ]
@@ -1709,7 +1916,9 @@
           "System.Boolean scrPlayer::responsive",
           "System.Collections.Generic.List\u00601\u003CSystem.Double\u003E scrPlayer::keyTimes",
           "System.Double scrPlayer::lastHit",
+          "System.Int32 scrPlayer::playerID",
           "System.Single scrPlayer::lockInput",
+          "System.Void scrPlayer::Die(System.Boolean,System.Boolean,System.String,System.Boolean)",
           "System.Void scrPlayer::UnlockInput()",
           "scrFloor scrPlayer::currFloor()",
           "scrFloor scrPlayer::get_currFloor()"

@@ -32,6 +32,9 @@ public unsafe partial class ADOBase : global::RDTools.RDBaseDll {
 public unsafe partial class ADOClass : global::RDTools.RDClassDll {
     protected ADOClass() { }
 }
+public static unsafe partial class ADOStartup {
+    public static void SetupLevelEventsInfo() => throw null;
+}
 public unsafe partial struct AnyKeyCode {
     public readonly global::System.Func<object, object, bool> equalsCriteria;
     public readonly object value;
@@ -248,6 +251,8 @@ public unsafe partial class GCS {
     public const float framesPerTileLimit = 37f;
     public static string internalLevelName;
     public const string jsonExtension = "jsonExtension";
+    public static global::System.Collections.Generic.Dictionary<global::ADOFAI.LevelEventType, global::UnityEngine.Sprite> levelEventIcons;
+    public static global::System.Collections.Generic.Dictionary<global::ADOFAI.LevelEventType, string> levelEventTypeString;
     public static global::System.Collections.Generic.Dictionary<string, global::ADOFAI.LevelEventInfo> levelEventsInfo;
     public const string levelExtension = "levelExtension";
     public const string levelZipExtension = "levelZipExtension";
@@ -498,11 +503,19 @@ public static unsafe partial class RDString {
     public const string NintendoSwitchKeySuffix = "NintendoSwitchKeySuffix";
     public const string StringsFilePrefix = "StringsFilePrefix";
     public const string StringsFolder = "StringsFolder";
+    public static global::UnityEngine.SystemLanguage language;
     public static string GetEnumValue<T>(T value) => throw null;
     public static string GetWithCheck(string key, out bool exists, global::System.Collections.Generic.Dictionary<string, object> parameters = default) => throw null;
     public static void SetLocalizedFont(this global::UnityEngine.UI.Text text) => throw null;
     public static void SetLocalizedFont(this global::TMPro.TMP_Text text) => throw null;
     public static void SetLocalizedFont(this global::UnityEngine.TextMesh text) => throw null;
+}
+public static unsafe partial class RDUtils {
+    public enum UnCamelCaseOptions : int {
+        None = 0,
+        SpaceBeforeNumbers = 1,
+        UnderbarToSpace = 2,
+    }
 }
 public unsafe partial class SaveStateScope : global::System.IDisposable {
     public SaveStateScope(global::scnEditor editor, bool clearRedo = default, bool dataHasChanged = default, bool skipSaving = default) => throw null;
@@ -681,24 +694,24 @@ public unsafe partial class WorkshopLevelList : global::UnityEngine.MonoBehaviou
     protected WorkshopLevelList() { }
 }
 public unsafe partial class ffxBloomPlus : global::ffxPlusBase {
-    public virtual void StartEffect(global::scrPlanet planet) => throw null;
+    public override void StartEffect(global::scrPlanet planet) => throw null;
     protected ffxBloomPlus() { }
 }
 public unsafe partial class ffxCheckpoint : global::ffxPlusBase {
     public virtual bool runOnHit { get => throw null; }
     public virtual void Awake() => throw null;
-    public virtual void Decode(global::ADOFAI.LevelEvent evnt) => throw null;
-    public virtual void StartEffect(global::scrPlanet planet) => throw null;
+    public override void Decode(global::ADOFAI.LevelEvent evnt) => throw null;
+    public override void StartEffect(global::scrPlanet planet) => throw null;
     protected ffxCheckpoint() { }
 }
 public unsafe partial class ffxFlashPlus : global::ffxPlusBase {
     public global::UnityEngine.Color endColor;
     public global::UnityEngine.Color startColor;
-    public virtual void StartEffect(global::scrPlanet planet) => throw null;
+    public override void StartEffect(global::scrPlanet planet) => throw null;
     protected ffxFlashPlus() { }
 }
 public unsafe partial class ffxHallOfMirrorsPlus : global::ffxPlusBase {
-    public virtual void StartEffect(global::scrPlanet planet) => throw null;
+    public override void StartEffect(global::scrPlanet planet) => throw null;
     protected ffxHallOfMirrorsPlus() { }
 }
 public unsafe partial class ffxMenuPlanetSpeedChange : global::ffxPlusBase {
@@ -708,26 +721,36 @@ public unsafe partial class ffxMenuPlanetSpeedChange : global::ffxPlusBase {
 public unsafe partial class ffxMoveFloorPlus : global::ffxPlusBase {
     public int end;
     public int start;
-    public virtual void StartEffect(global::scrPlanet planet) => throw null;
+    public override void StartEffect(global::scrPlanet planet) => throw null;
     protected ffxMoveFloorPlus() { }
 }
 public abstract unsafe partial class ffxPlusBase : global::ADOBase {
     public global::scrCamera cam;
+    public float crotchet;
     public float degreeOffset;
     public global::scrFloor floor;
+    public int floorID;
+    public global::System.Collections.Generic.List<global::scrFloor> floors;
+    public bool runManually;
+    public global::ADOFAI.LevelEvent sourceLevelEvent;
+    public bool triggered;
+    protected ffxPlusBase() => throw null;
+    public virtual void Decode(global::ADOFAI.LevelEvent evnt) => throw null;
+    public virtual void PrepVfx() => throw null;
     public virtual void SetStartTime(float bpm, float degreeOffset = default) => throw null;
-    protected ffxPlusBase() { }
+    public virtual void StartEffect(global::scrPlanet planet) => throw null;
+    public void StartEffectWithOffset(global::scrPlanet planet = default) => throw null;
 }
 public unsafe partial class ffxScreenScrollPlus : global::ffxPlusBase {
-    public virtual void StartEffect(global::scrPlanet planet) => throw null;
+    public override void StartEffect(global::scrPlanet planet) => throw null;
     protected ffxScreenScrollPlus() { }
 }
 public unsafe partial class ffxScreenTilePlus : global::ffxPlusBase {
-    public virtual void StartEffect(global::scrPlanet planet) => throw null;
+    public override void StartEffect(global::scrPlanet planet) => throw null;
     protected ffxScreenTilePlus() { }
 }
 public unsafe partial class ffxSetFilterAdvancedPlus : global::ffxPlusBase {
-    public virtual void StartEffect(global::scrPlanet planet) => throw null;
+    public override void StartEffect(global::scrPlanet planet) => throw null;
     protected ffxSetFilterAdvancedPlus() { }
 }
 public unsafe partial class ffxSetFilterPlus : global::ffxPlusBase {
@@ -735,7 +758,7 @@ public unsafe partial class ffxSetFilterPlus : global::ffxPlusBase {
     protected ffxSetFilterPlus() { }
 }
 public unsafe partial class ffxShakeScreenPlus : global::ffxPlusBase {
-    public virtual void StartEffect(global::scrPlanet planet) => throw null;
+    public override void StartEffect(global::scrPlanet planet) => throw null;
     protected ffxShakeScreenPlus() { }
 }
 public unsafe partial class scnCLS : global::ADOBase {
@@ -836,6 +859,7 @@ public unsafe partial class scnGame : global::ADOBase {
     public float highestBPM;
     public static global::scnGame instance;
     public global::ADOFAI.LevelData levelData;
+    public static global::ffxPlusBase ApplyEvent(global::ADOFAI.LevelEvent evnt, float bpm, float pitch, global::System.Collections.Generic.List<global::scrFloor> floors, float offset = default, global::System.Nullable<int> customFloorID = default) => throw null;
     public void ApplyEventsToFloors(global::System.Collections.Generic.List<global::scrFloor> floors) => throw null;
     public static void ApplyEventsToFloors(global::System.Collections.Generic.List<global::scrFloor> floors, global::ADOFAI.LevelData levelData, global::scrLevelMaker lm, global::System.Collections.Generic.List<global::ADOFAI.LevelEvent> events) => throw null;
     public bool Play(int seqID = default, bool remakeFloors = default) => throw null;
@@ -993,6 +1017,7 @@ public unsafe partial class scrFloor : global::ADOBase {
     public float opacity;
     public bool outline;
     public global::UnityEngine.SpriteRenderer outlineSprite;
+    public global::System.Collections.Generic.List<global::ffxPlusBase> plusEffects;
     public float radiusScale;
     public int seqID;
     public global::TrackColorType specialColorType;
@@ -1074,6 +1099,7 @@ public unsafe partial class scrPlanet : global::ADOBase {
     public global::scrPlayer player;
     public double snappedLastAngle { get => throw null; }
     public double targetExitAngle { get => throw null; }
+    public global::scrPlanet SwitchChosen() => throw null;
     public void Update_RefreshAngles() => throw null;
     protected scrPlanet() { }
 }
@@ -1083,8 +1109,10 @@ public unsafe partial class scrPlayer : global::ADOBase {
     public double lastHit;
     public float lockInput;
     public global::PlanetarySystem planetarySystem;
+    public int playerID;
     public bool responsive;
     public global::scrFloor currFloor { get => throw null; }
+    public void Die(bool overload = default, bool multipress = default, string failMessage = default, bool hitbox = default) => throw null;
     public bool Hit(bool isAuto = default) => throw null;
     public void UnlockInput() => throw null;
     public bool ValidInputWasTriggered() => throw null;
@@ -1135,11 +1163,105 @@ public unsafe partial class scrVisualDecoration : global::scrDecoration {
     protected scrVisualDecoration() { }
 }
 namespace ADOFAI {
+    public static unsafe partial class EditorConstants {
+        public const int ConditionalArraySize = 80;
+        public const int adofaiFileVersion = 81;
+        public const string key_actions = "key_actions";
+        public const string key_active = "key_active";
+        public const string key_angleData = "key_angleData";
+        public const string key_artist = "key_artist";
+        public const string key_artistLinks = "key_artistLinks";
+        public const string key_artistPermission = "key_artistPermission";
+        public const string key_author = "key_author";
+        public const string key_backgroundColor = "key_backgroundColor";
+        public const string key_bgDisplayMode = "key_bgDisplayMode";
+        public const string key_bgImage = "key_bgImage";
+        public const string key_bgImageColor = "key_bgImageColor";
+        public const string key_bgLockRot = "key_bgLockRot";
+        public const string key_bgShowDefault = "key_bgShowDefault";
+        public const string key_bgSmoothing = "key_bgSmoothing";
+        public const string key_bgVideo = "key_bgVideo";
+        public const string key_bpm = "key_bpm";
+        public const string key_camPosition = "key_camPosition";
+        public const string key_camRelativeTo = "key_camRelativeTo";
+        public const string key_camRotation = "key_camRotation";
+        public const string key_camZoom = "key_camZoom";
+        public const string key_congratsText = "key_congratsText";
+        public const string key_countdownTicks = "key_countdownTicks";
+        public const string key_decorations = "key_decorations";
+        public const string key_defaultBGShapeColor = "key_defaultBGShapeColor";
+        public const string key_defaultBGShapeType = "key_defaultBGShapeType";
+        public const string key_defaultBGTileColor = "key_defaultBGTileColor";
+        public const string key_defaultTextColor = "key_defaultTextColor";
+        public const string key_defaultTextShadowColor = "key_defaultTextShadowColor";
+        public const string key_difficulty = "key_difficulty";
+        public const string key_disableV15Features = "key_disableV15Features";
+        public const string key_doStartCamOnLowVFX = "key_doStartCamOnLowVFX";
+        public const string key_enabled = "key_enabled";
+        public const string key_eventType = "key_eventType";
+        public const string key_floor = "key_floor";
+        public const string key_floorIconOutlines = "key_floorIconOutlines";
+        public const string key_hitsound = "key_hitsound";
+        public const string key_hitsoundVolume = "key_hitsoundVolume";
+        public const string key_legacyCamRelativeTo = "key_legacyCamRelativeTo";
+        public const string key_legacyFlash = "key_legacyFlash";
+        public const string key_legacySpriteTiles = "key_legacySpriteTiles";
+        public const string key_legacyTween = "key_legacyTween";
+        public const string key_levelDesc = "key_levelDesc";
+        public const string key_levelTags = "key_levelTags";
+        public const string key_locked = "key_locked";
+        public const string key_loopBG = "key_loopBG";
+        public const string key_offset = "key_offset";
+        public const string key_parallax = "key_parallax";
+        public const string key_pathData = "key_pathData";
+        public const string key_perfectText = "key_perfectText";
+        public const string key_pitch = "key_pitch";
+        public const string key_planetEase = "key_planetEase";
+        public const string key_planetEasePartBehavior = "key_planetEasePartBehavior";
+        public const string key_planetEaseParts = "key_planetEaseParts";
+        public const string key_previewIcon = "key_previewIcon";
+        public const string key_previewIconColor = "key_previewIconColor";
+        public const string key_previewImage = "key_previewImage";
+        public const string key_previewSongDuration = "key_previewSongDuration";
+        public const string key_previewSongStart = "key_previewSongStart";
+        public const string key_pulseOnFloor = "key_pulseOnFloor";
+        public const string key_requiredMods = "key_requiredMods";
+        public const string key_scalingRatio = "key_scalingRatio";
+        public const string key_secondaryTrackColor = "key_secondaryTrackColor";
+        public const string key_seizureWarning = "key_seizureWarning";
+        public const string key_separateCountdownTime = "key_separateCountdownTime";
+        public const string key_settings = "key_settings";
+        public const string key_showDefaultBGTile = "key_showDefaultBGTile";
+        public const string key_song = "key_song";
+        public const string key_songFilename = "key_songFilename";
+        public const string key_specialArtistType = "key_specialArtistType";
+        public const string key_speedTrialAim = "key_speedTrialAim";
+        public const string key_stickToFloors = "key_stickToFloors";
+        public const string key_tileShape = "key_tileShape";
+        public const string key_trackAnimation = "key_trackAnimation";
+        public const string key_trackBeatsAhead = "key_trackBeatsAhead";
+        public const string key_trackBeatsBehind = "key_trackBeatsBehind";
+        public const string key_trackColor = "key_trackColor";
+        public const string key_trackColorAnimDuration = "key_trackColorAnimDuration";
+        public const string key_trackColorPulse = "key_trackColorPulse";
+        public const string key_trackColorType = "key_trackColorType";
+        public const string key_trackDisappearAnimation = "key_trackDisappearAnimation";
+        public const string key_trackGlowIntensity = "key_trackGlowIntensity";
+        public const string key_trackPulseLength = "key_trackPulseLength";
+        public const string key_trackShadowColor = "key_trackShadowColor";
+        public const string key_trackStyle = "key_trackStyle";
+        public const string key_trackTexture = "key_trackTexture";
+        public const string key_trackTextureScale = "key_trackTextureScale";
+        public const string key_version = "key_version";
+        public const string key_visible = "key_visible";
+        public const string key_volume = "key_volume";
+        public static readonly global::System.Collections.Generic.HashSet<global::ADOFAI.LevelEventType> soloTypes;
+    }
     public unsafe partial class InspectorPanel : global::ADOBase {
         public int cacheEventIndex;
         public global::System.Collections.Generic.List<global::ADOFAI.PropertiesPanel> panelsList;
         public global::ADOFAI.LevelEventType selectedEventType;
-        public const float tabHeight = 80f;
+        public const float tabHeight = 171f;
         public global::UnityEngine.RectTransform tabs;
         public void HideAllInspectorTabs() => throw null;
         public void Init(global::System.Collections.Generic.Dictionary<string, global::ADOFAI.LevelEventInfo> levelEventsInfo, bool floorPanel) => throw null;
@@ -1153,6 +1275,7 @@ namespace ADOFAI {
         public global::ADOFAI.LevelEvent decorationSettings;
         public global::DecorationsArray<global::ADOFAI.LevelEvent> decorations;
         public global::EventsArray<global::ADOFAI.LevelEvent> levelEvents;
+        public global::ADOFAI.LevelEvent levelSettings;
         public global::ADOFAI.LevelEvent miscSettings;
         public global::ADOFAI.LevelEvent songSettings;
         public global::ADOFAI.LevelEvent trackSettings;
@@ -1161,15 +1284,19 @@ namespace ADOFAI {
         public int pitch { get => throw null; }
         public string song { get => throw null; }
         public void Decode(global::System.Collections.Generic.Dictionary<string, object> dict, out global::ADOFAI.LoadResult status) => throw null;
+        public string Encode() => throw null;
         protected LevelData() { }
     }
     public unsafe partial class LevelEvent {
-        public const int NoFloor = 81;
+        public const int NoFloor = 172;
         public bool active;
         public global::ADOFAI.LevelEventType eventType;
         public int floor;
+        public global::ADOFAI.LevelEventInfo info;
         public object this[string key] { get => throw null; set { } }
         public LevelEvent(int newFloor, global::ADOFAI.LevelEventType type, global::ADOFAI.LevelEventInfo customInfo) => throw null;
+        public T Get<T>(string key, T defaultValue = default) => throw null;
+        public bool GetBool(string key) => throw null;
         public float GetFloat(string key) => throw null;
         public int GetInt(string key) => throw null;
         public string GetString(string key) => throw null;
@@ -1180,8 +1307,31 @@ namespace ADOFAI {
             NeedsTaroDLC = 2,
         }
     }
+    public enum LevelEventCategory : int {
+        Gameplay = 0,
+        TrackFx = 1,
+        DecorationFx = 2,
+        VisualFx = 3,
+        FxModifiers = 4,
+        Conveniences = 5,
+        Jank = 6,
+        Favorites = 7,
+    }
+    public enum LevelEventExecutionTime : int {
+        OnPrebar = 0,
+        OnBar = 1,
+        Special = 2,
+    }
     public unsafe partial class LevelEventInfo {
-        protected LevelEventInfo() { }
+        public global::System.Nullable<bool> allowFirstFloor;
+        public global::System.Collections.Generic.List<global::ADOFAI.LevelEventCategory> categories;
+        public global::ADOFAI.LevelEventExecutionTime executionTime;
+        public bool isDecoration;
+        public string name;
+        public global::System.Collections.Generic.Dictionary<string, global::ADOFAI.PropertyInfo> propertiesInfo;
+        public global::ADOFAI.LevelEventType type;
+        public bool useGroups;
+        public LevelEventInfo() => throw null;
     }
     public enum LevelEventType : int {
         None = 0,
@@ -1281,6 +1431,15 @@ namespace ADOFAI {
         public global::UnityEngine.RectTransform controlContainer;
         public global::TMPro.TMP_Text label;
         protected Property() { }
+    }
+    public unsafe partial class PropertyInfo {
+        public object[] enumExceptions;
+        public global::System.Type enumType;
+        public string enumTypeString;
+        public string name;
+        public object value_default;
+        public PropertyInfo(global::System.Collections.Generic.Dictionary<string, object> dict, global::ADOFAI.LevelEventInfo levelEventInfo) => throw null;
+        protected PropertyInfo() { }
     }
 }
 namespace ADOFAI.Editor.Actions {

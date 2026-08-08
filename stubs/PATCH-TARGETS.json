@@ -3,6 +3,12 @@
   "unresolved": 0,
   "targets": [
     {
+      "type": "ADOStartup",
+      "member": "SetupLevelEventsInfo",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
       "type": "AudioManager",
       "member": "StopAllSounds",
       "resolved": true,
@@ -11,6 +17,12 @@
     {
       "type": "ADOFAI.LevelData",
       "member": "Decode",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "ADOFAI.LevelData",
+      "member": "Encode",
       "resolved": true,
       "assembly": "Assembly-CSharp"
     },
@@ -382,6 +394,12 @@
     },
     {
       "type": "scnGame",
+      "member": "ApplyEvent",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "scnGame",
       "member": "ApplyEventsToFloors",
       "resolved": true,
       "assembly": "Assembly-CSharp"
@@ -617,6 +635,12 @@
     {
       "type": "scrPlanet",
       "member": "Start",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "scrPlanet",
+      "member": "SwitchChosen",
       "resolved": true,
       "assembly": "Assembly-CSharp"
     },

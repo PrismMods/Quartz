@@ -16,6 +16,7 @@ namespace HarmonyLib {
         public static global::System.Reflection.FieldInfo Field(global::System.Type type, string name) => throw null;
         public static global::HarmonyLib.AccessTools.FieldRef<T, F> FieldRefAccess<T, F>(string fieldName) => throw null;
         public static global::System.Collections.Generic.List<global::System.Reflection.MethodInfo> GetDeclaredMethods(global::System.Type type) => throw null;
+        public static global::System.Collections.Generic.List<string> GetMethodNames(global::System.Type type) => throw null;
         public static global::System.Type[] GetTypesFromAssembly(global::System.Reflection.Assembly assembly) => throw null;
         public static global::System.Type Inner(global::System.Type type, string name) => throw null;
         public static global::System.Reflection.MethodInfo Method(global::System.Type type, string name, global::System.Type[] parameters = default, global::System.Type[] generics = default) => throw null;
@@ -24,12 +25,20 @@ namespace HarmonyLib {
         public static global::System.Type TypeByName(string name) => throw null;
         public unsafe delegate ref F FieldRef<T, F>(T instance = default);
     }
+    public unsafe partial class CodeInstruction {
+        public global::System.Reflection.Emit.OpCode opcode;
+        public object operand;
+        public CodeInstruction(global::System.Reflection.Emit.OpCode opcode, object operand = default) => throw null;
+        protected CodeInstruction() { }
+    }
     public unsafe partial class Harmony : global::System.IDisposable {
         public string Id { get => throw null; }
         public Harmony(string id) => throw null;
         public global::HarmonyLib.PatchClassProcessor CreateClassProcessor(global::System.Type type) => throw null;
+        public global::System.Reflection.MethodInfo Patch(global::System.Reflection.MethodBase original, global::HarmonyLib.HarmonyMethod prefix = default, global::HarmonyLib.HarmonyMethod postfix = default, global::HarmonyLib.HarmonyMethod transpiler = default, global::HarmonyLib.HarmonyMethod finalizer = default, global::HarmonyLib.HarmonyMethod ilmanipulator = default) => throw null;
         public void PatchAll(global::System.Reflection.Assembly assembly) => throw null;
-        public void UnpatchAll(string harmonyID = default) => throw null;
+        public void Unpatch(global::System.Reflection.MethodBase original, global::HarmonyLib.HarmonyPatchType type, string harmonyID = default) => throw null;
+        public void UnpatchSelf() => throw null;
         protected Harmony() { }
         void global::System.IDisposable.Dispose() => throw null;
     }
@@ -45,6 +54,15 @@ namespace HarmonyLib {
         public HarmonyPatch(global::System.Type declaringType, string methodName) => throw null;
         public HarmonyPatch(global::System.Type declaringType, string methodName, params global::System.Type[] argumentTypes) => throw null;
         public HarmonyPatch(global::System.Type declaringType, string methodName, global::HarmonyLib.MethodType methodType) => throw null;
+    }
+    public enum HarmonyPatchType : int {
+        All = 0,
+        Prefix = 1,
+        Postfix = 2,
+        Transpiler = 3,
+        Finalizer = 4,
+        ReversePatch = 5,
+        ILManipulator = 6,
     }
     public enum MethodType : int {
         Normal = 0,
