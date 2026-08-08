@@ -1,0 +1,21 @@
+modules/KeyViewer/KvExternalDriver.cs
+  s_6dd6db7b2dc311::t_a4d8b6f3008443 1-39
+modules/KeyViewer/KvInput.cs
+  s_6dd6db7b2dc311::t_ba5ddc6ab67ef3 9-58,77,79,83-85,88-105,150
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "faa52682d01c7cf14e3e24570ba5304152c82f74",
+  "prompts": {},
+  "sessions": {
+    "s_6dd6db7b2dc311": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ab83e955-d79f-43c1-841e-10adf76dd9f4",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
