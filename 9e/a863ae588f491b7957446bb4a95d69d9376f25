@@ -1,0 +1,28 @@
+modules/EffectRemover/EffectRemoverSettings.cs
+  s_8e989bccca2e8c::t_29a07f914bc6d9 102
+  s_8e989bccca2e8c::t_f42deca841db78 142-152
+  s_8e989bccca2e8c::t_cf0dd1b23345d4 15
+  s_8e989bccca2e8c::t_3ebb6fd6719430 58
+  s_8e989bccca2e8c::t_5379a9d53f02ab 153
+modules/EffectRemover/PageEffectRemover.cs
+  s_8e989bccca2e8c::t_db972d7031c103 267,270-274,277-296
+modules/EffectRemover/EffectRemoverSimplePatches.cs
+  s_8e989bccca2e8c::t_678d621f260279 67-70
+  s_8e989bccca2e8c::t_603c3857f21838 21-23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "9ea863ae588f491b7957446bb4a95d69d9376f25",
+  "prompts": {},
+  "sessions": {
+    "s_8e989bccca2e8c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8b394789-77e7-444e-b256-e023ce1b61db",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
