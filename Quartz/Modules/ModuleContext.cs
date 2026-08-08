@@ -59,7 +59,7 @@ public sealed class ModuleContext {
     internal void RemovePatches() {
         if(!patchGate.Release()) return;
         try {
-            harmony?.UnpatchAll(harmony.Id);
+            harmony?.UnpatchSelf();
         } catch(Exception e) {
             Err($"unpatch failed: {e}");
         }

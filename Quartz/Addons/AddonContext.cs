@@ -76,7 +76,7 @@ public sealed class AddonContext {
     private int tabCount;
     internal void Cleanup() {
         try {
-            harmony?.UnpatchAll(harmony.Id);
+            harmony?.UnpatchSelf();
         } catch(Exception e) {
             MainCore.Log.Err($"[Addon:{Id}] unpatch failed: {e}");
         }
