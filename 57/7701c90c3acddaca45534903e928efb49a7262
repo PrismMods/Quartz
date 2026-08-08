@@ -1,0 +1,58 @@
+modules/KeyLimiter/Lang/zh-CN.json
+  s_ea743327793ac3::t_b22d301e5266a5 20-24
+modules/KeyLimiter/FfxKeyLimiter.cs
+  s_ea743327793ac3::t_16942766c991ce 6,14,36
+  s_ea743327793ac3::t_a4715a7dd636d6 1-5,7-13,15-35,37-40
+modules/KeyLimiter/ChartEventTags.cs
+  s_ea743327793ac3::t_b58ce0a4a3c921 1-37
+modules/KeyLimiter/Lang/en-US.json
+  s_ea743327793ac3::t_b22d301e5266a5 20-24
+modules/KeyLimiter/PageKeyLimiter.Chart.cs
+  s_ea743327793ac3::t_04c9bf53d3522a 6,11-19,25-26,29,31-33
+  s_ea743327793ac3::t_2bc1d03e8e958a 1-5,7-10,20-24,27-28,30,34-36
+modules/KeyLimiter/KeyLimiterModule.cs
+  s_ea743327793ac3::t_56369a69398a30 11-17
+  s_ea743327793ac3::t_d8cfdb446e6abe 57
+modules/KeyLimiter/Lang/ko-KR.json
+  s_ea743327793ac3::t_b22d301e5266a5 20-24
+Quartz/Features/Interop/RequiredModsGate.cs
+  s_ea743327793ac3::t_adfdb6160b71b7 48
+  s_ea743327793ac3::t_9aaac258a4f149 19-29
+modules/KeyLimiter/ChartKeyLimiterPatches.cs
+  s_ea743327793ac3::t_23abe3729362eb 92,97,99-104,106-107,112,137,146-147,157,159-163
+  s_ea743327793ac3::t_1f39c8b062eaf3 1-91,93-96,98,105,108-111,113-136,138-145,148-156,158,164-195
+modules/KeyLimiter/ChartKeyLimiterSettings.cs
+  s_ea743327793ac3::t_c7f5332dccdeb0 1-13
+modules/KeyLimiter/ChartKeyLimiter.cs
+  s_ea743327793ac3::t_e97ea256ef86c2 1-50,52,54-55,57-67,70-178
+  s_ea743327793ac3::t_d4b5687109e8fa 51
+  s_ea743327793ac3::t_9b968584defad1 68-69
+  s_ea743327793ac3::t_55603ca1f342f4 53,56
+modules/KeyLimiter/KeyLimiter.csproj
+  s_ea743327793ac3::t_9124658ddf8609 8
+modules/KeyLimiter/ChartKeyLimiterState.cs
+  s_ea743327793ac3::t_2026ded6c31dd2 2
+  s_ea743327793ac3::t_c46c9255df8944 1,3-72
+modules/KeyLimiter/ChartKeyLimiterStrings.cs
+  s_ea743327793ac3::t_06b9bb8061deac 1-67
+modules/KeyLimiter/PageKeyLimiter.Builders.cs
+  s_ea743327793ac3::t_f33462790b0818 166
+modules/KeyLimiter/module.json
+  s_ea743327793ac3::t_df4bb94e1d5e40 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "577701c90c3acddaca45534903e928efb49a7262",
+  "prompts": {},
+  "sessions": {
+    "s_ea743327793ac3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "afb48d59-e42b-43e3-93f6-3ba7589bf0e3",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
