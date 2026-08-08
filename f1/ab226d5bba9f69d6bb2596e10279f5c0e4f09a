@@ -1,0 +1,26 @@
+stubs/Assembly-CSharp/Stubs.g.cs
+  s_8e989bccca2e8c::t_bb0b6792cace9c 121-163,501,734,860
+stubs/MANIFEST.json
+  s_8e989bccca2e8c::t_bb0b6792cace9c 449-495,954,1266-1268,1430,3114-3116,3163-3173
+stubs/README.md
+  s_8e989bccca2e8c::t_bb0b6792cace9c 20,30,41
+stubs/UnityEngine.CoreModule/Stubs.g.cs
+  s_8e989bccca2e8c::t_bb0b6792cace9c 45,72-77
+  s_8e989bccca2e8c::t_3a690b6d3910d9 78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "f1ab226d5bba9f69d6bb2596e10279f5c0e4f09a",
+  "prompts": {},
+  "sessions": {
+    "s_8e989bccca2e8c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8b394789-77e7-444e-b256-e023ce1b61db",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
