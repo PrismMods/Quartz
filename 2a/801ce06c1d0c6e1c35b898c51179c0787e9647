@@ -1,0 +1,23 @@
+Quartz/Modules/ModuleContext.cs
+  s_27bd0be01e27b3::t_b2b0b67422a2f2 62
+Quartz/Core/Service/HarmonyService.cs
+  s_27bd0be01e27b3::t_b0911e083a53f8 33
+Quartz/Addons/AddonContext.cs
+  s_27bd0be01e27b3::t_01f7d121534bc8 79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "2a801ce06c1d0c6e1c35b898c51179c0787e9647",
+  "prompts": {},
+  "sessions": {
+    "s_27bd0be01e27b3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f5751522-4ca5-4731-8a85-0e36ab3b7eab",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
