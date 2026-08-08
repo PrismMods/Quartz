@@ -1,0 +1,28 @@
+modules/EffectRemover/Lang/en-US.json
+  s_8e989bccca2e8c::t_86457b1e7d6a29 48
+modules/EffectRemover/Lang/ko-KR.json
+  s_8e989bccca2e8c::t_e4db63e12b1311 48
+Quartz/Resource/Export/Lang/ko-KR.json
+  h_6eeb8441a8a159 50,423
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.21",
+  "base_commit_sha": "b0db637dc9bf7105769b6ba62251449e51a10b3f",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_8e989bccca2e8c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8b394789-77e7-444e-b256-e023ce1b61db",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
