@@ -40,7 +40,7 @@
     "KVI_DISPLAY": "标签（留空=自动）",
     "KVI_SEC_COUNT": "按键计数",
     "KVI_COUNTINTOTAL": "计入总数",
-    "DESC_KVI_COUNTINTOTAL": "将此按键的按下次数计入总统计；对踏板按键或不希望统计的元素可关闭此项。",
+    "DESC_KVI_COUNTINTOTAL": "将此按键的按下次数计入总统计；对脚键或不希望统计的元素可关闭此项。",
     "KVI_COUNT": "按下次数",
     "KVI_COUNT_RESET": "重置计数",
     "KVI_SEC_GEOMETRY": "位置和尺寸",

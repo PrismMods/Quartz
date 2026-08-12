@@ -21,7 +21,7 @@
     "JR_ALLOW_MISS": "允许失误……",
     "JR_ALLOW_MULTIPRESS": "允许多重按键！",
     "JR_ALLOW_OVERLOAD_FAIL": "允许按太快……",
-    "JR_ALLOW_OVERLOAD_NOFAIL": "允许按太快……（不失败）",
+    "JR_ALLOW_OVERLOAD_NOFAIL": "允许按太快……（不会失败模式）",
     "JR_ALLOW_PERFECT": "允许完美！判定",
     "JR_ALLOW_TOOEARLY": "允许太快！判定",
     "JR_ALLOW_TOOLATE": "允许太慢！判定",

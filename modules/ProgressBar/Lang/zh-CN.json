@@ -3,7 +3,7 @@
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "DESC_PROGRESSBAR_PREFILLSTART": "从存档点/编辑器试玩开局时，进度条直接填充至对应位置，而非从零开始。",
     "DESC_PROGRESSBAR_USEMAPTIME": "进度条按谱面已播放时间推进而非按完成轨道数；填充进度每帧连续移动而非在每个轨道上步进。",
-    "DESC_PROGRESSBAR_FILLGRADIENT": "对局进度0%至100%填充色渐变切换，而非单一纯色。",
+    "DESC_PROGRESSBAR_FILLGRADIENT": "关卡进度0%至100%填充色渐变切换，而非单一纯色。",
     "DESC_PROGRESSBAR_STYLE": "Modern为悬浮圆角进度条；Bar将进度条分割为发光分段；Line为紧贴屏幕顶部或底部边缘的细长线条。",
     "DESC_PROGRESSBAR_LINEEDGE": "线条固定的屏幕边缘；始终横跨全屏宽度，紧贴该边缘。",
     "PROGRESSBAR_BACKCOLOR": "进度条背景色",
@@ -28,7 +28,7 @@
     "PROGRESSBAR_LINEEDGE_LABEL": "屏幕边缘",
     "PROGRESSBAR_LINEEDGE_TOP": "顶部",
     "PROGRESSBAR_LINEEDGE_BOTTOM": "底部",
-    "SECTION_PROGRESS_BAR": "对局进度条",
-    "PROGRESSBAR_ENABLE": "启用对局进度条"
+    "SECTION_PROGRESS_BAR": "关卡进度条",
+    "PROGRESSBAR_ENABLE": "启用关卡进度条"
   }
 }
