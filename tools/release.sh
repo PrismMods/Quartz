@@ -172,6 +172,16 @@ if [ "$dry_run" -eq 1 ]; then
   exit 0
 fi
 
+# A release tag must describe exactly the tree that produced its binaries.
+# Refuse staged, unstaged, and untracked source changes before bumping the build
+# number; otherwise the uploaded assets can contain code absent from the tag.
+dirty=$(git status --porcelain --untracked-files=normal)
+if [ -n "$dirty" ]; then
+  echo "working tree is not clean — commit or set aside every change before releasing:" >&2
+  printf '%s\n' "$dirty" >&2
+  exit 1
+fi
+
 # --- Commit the build-number bump (prerelease only) ----------------------
 if [ "$bumped" -eq 1 ]; then
   tmp=$(mktemp)
