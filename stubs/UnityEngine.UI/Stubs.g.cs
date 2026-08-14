@@ -329,6 +329,7 @@ namespace UnityEngine.UI {
     }
     public unsafe partial class InputField : global::UnityEngine.UI.Selectable, global::UnityEngine.EventSystems.IBeginDragHandler, global::UnityEngine.EventSystems.IDragHandler, global::UnityEngine.EventSystems.IEndDragHandler, global::UnityEngine.EventSystems.IPointerClickHandler {
         public global::UnityEngine.Color caretColor { get => throw null; set { } }
+        public bool isFocused { get => throw null; }
         public global::UnityEngine.UI.InputField.EndEditEvent onEndEdit { get => throw null; set { } }
         public global::UnityEngine.UI.InputField.OnChangeEvent onValueChanged { get => throw null; set { } }
         public global::UnityEngine.UI.Graphic placeholder { get => throw null; set { } }

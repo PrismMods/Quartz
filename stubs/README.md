@@ -16,7 +16,7 @@ resources, and no types the mod never touches.
 
 | Assembly | Types | Members |
 |---|---:|---:|
-| `0Harmony` | 11 | 51 |
+| `0Harmony` | 12 | 52 |
 | `Assembly-CSharp` | 144 | 1169 |
 | `Assembly-CSharp-firstpass` | 3 | 14 |
 | `DOTween` | 15 | 61 |
@@ -24,21 +24,21 @@ resources, and no types the mod never touches.
 | `Newtonsoft.Json` | 18 | 113 |
 | `RDTools` | 2 | 0 |
 | `SkyHook.Unity` | 4 | 130 |
-| `Unity.TextMeshPro` | 34 | 315 |
+| `Unity.TextMeshPro` | 34 | 318 |
 | `UnityEngine` | 0 | 0 |
 | `UnityEngine.AudioModule` | 19 | 87 |
-| `UnityEngine.CoreModule` | 78 | 1007 |
+| `UnityEngine.CoreModule` | 78 | 1016 |
 | `UnityEngine.ImageConversionModule` | 1 | 2 |
 | `UnityEngine.InputLegacyModule` | 1 | 12 |
 | `UnityEngine.ParticleSystemModule` | 8 | 46 |
 | `UnityEngine.TextCoreFontEngineModule` | 3 | 21 |
 | `UnityEngine.TextRenderingModule` | 7 | 31 |
-| `UnityEngine.UI` | 97 | 391 |
+| `UnityEngine.UI` | 97 | 394 |
 | `UnityEngine.UIElementsModule` | 13 | 7 |
-| `UnityEngine.UIModule` | 7 | 32 |
+| `UnityEngine.UIModule` | 7 | 35 |
 | `UnityModManager` | 3 | 8 |
 
-**477 types, 3521 members.**
+**478 types, 3540 members.**
 
 ## How it is used
 

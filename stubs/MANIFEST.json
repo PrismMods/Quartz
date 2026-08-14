@@ -35,13 +35,12 @@
         "type": "HarmonyLib.Harmony",
         "members": [
           "HarmonyLib.PatchClassProcessor HarmonyLib.Harmony::CreateClassProcessor(System.Type)",
-          "System.Reflection.MethodInfo HarmonyLib.Harmony::Patch(System.Reflection.MethodBase,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod)",
+          "HarmonyLib.PatchProcessor HarmonyLib.Harmony::CreateProcessor(System.Reflection.MethodBase)",
           "System.String HarmonyLib.Harmony::Id()",
           "System.String HarmonyLib.Harmony::get_Id()",
           "System.Void HarmonyLib.Harmony::.ctor(System.String)",
           "System.Void HarmonyLib.Harmony::PatchAll(System.Reflection.Assembly)",
-          "System.Void HarmonyLib.Harmony::Unpatch(System.Reflection.MethodBase,HarmonyLib.HarmonyPatchType,System.String)",
-          "System.Void HarmonyLib.Harmony::UnpatchSelf()"
+          "System.Void HarmonyLib.Harmony::Unpatch(System.Reflection.MethodBase,HarmonyLib.HarmonyPatchType,System.String)"
         ]
       },
       {
@@ -92,6 +91,13 @@
         "type": "HarmonyLib.PatchClassProcessor",
         "members": [
           "System.Collections.Generic.List\u00601\u003CSystem.Reflection.MethodInfo\u003E HarmonyLib.PatchClassProcessor::Patch()"
+        ]
+      },
+      {
+        "type": "HarmonyLib.PatchProcessor",
+        "members": [
+          "HarmonyLib.PatchProcessor HarmonyLib.PatchProcessor::AddPrefix(HarmonyLib.HarmonyMethod)",
+          "System.Reflection.MethodInfo HarmonyLib.PatchProcessor::Patch()"
         ]
       },
       {
@@ -2715,6 +2721,7 @@
           "System.Boolean TMPro.TMP_InputField::customCaretColor()",
           "System.Boolean TMPro.TMP_InputField::get_isFocused()",
           "System.Boolean TMPro.TMP_InputField::isFocused()",
+          "System.Boolean TMPro.TMP_InputField::onFocusSelectAll()",
           "System.Boolean TMPro.TMP_InputField::richText()",
           "System.Int32 TMPro.TMP_InputField::caretWidth()",
           "System.Int32 TMPro.TMP_InputField::characterLimit()",
@@ -2730,6 +2737,7 @@
           "System.Void TMPro.TMP_InputField::set_contentType(TMPro.TMP_InputField/ContentType)",
           "System.Void TMPro.TMP_InputField::set_customCaretColor(System.Boolean)",
           "System.Void TMPro.TMP_InputField::set_lineType(TMPro.TMP_InputField/LineType)",
+          "System.Void TMPro.TMP_InputField::set_onFocusSelectAll(System.Boolean)",
           "System.Void TMPro.TMP_InputField::set_placeholder(UnityEngine.UI.Graphic)",
           "System.Void TMPro.TMP_InputField::set_richText(System.Boolean)",
           "System.Void TMPro.TMP_InputField::set_selectionColor(UnityEngine.Color)",
@@ -2749,6 +2757,7 @@
           "UnityEngine.Color TMPro.TMP_InputField::caretColor()",
           "UnityEngine.Color TMPro.TMP_InputField::get_caretColor()",
           "UnityEngine.Color TMPro.TMP_InputField::selectionColor()",
+          "UnityEngine.RectTransform TMPro.TMP_InputField::get_textViewport()",
           "UnityEngine.RectTransform TMPro.TMP_InputField::textViewport()",
           "UnityEngine.UI.Graphic TMPro.TMP_InputField::get_placeholder()",
           "UnityEngine.UI.Graphic TMPro.TMP_InputField::placeholder()"
@@ -3385,13 +3394,16 @@
         "members": [
           "System.Boolean UnityEngine.Color::op_Equality(UnityEngine.Color,UnityEngine.Color)",
           "System.Boolean UnityEngine.Color::op_Inequality(UnityEngine.Color,UnityEngine.Color)",
+          "System.Single UnityEngine.Color::Item(System.Int32)",
           "System.Single UnityEngine.Color::a",
           "System.Single UnityEngine.Color::b",
           "System.Single UnityEngine.Color::g",
+          "System.Single UnityEngine.Color::get_Item(System.Int32)",
           "System.Single UnityEngine.Color::r",
           "System.Void UnityEngine.Color::.ctor(System.Single,System.Single,System.Single)",
           "System.Void UnityEngine.Color::.ctor(System.Single,System.Single,System.Single,System.Single)",
           "System.Void UnityEngine.Color::RGBToHSV(UnityEngine.Color,System.Single\u0026,System.Single\u0026,System.Single\u0026)",
+          "System.Void UnityEngine.Color::set_Item(System.Int32,System.Single)",
           "UnityEngine.Color UnityEngine.Color::HSVToRGB(System.Single,System.Single,System.Single)",
           "UnityEngine.Color UnityEngine.Color::Lerp(UnityEngine.Color,UnityEngine.Color,System.Single)",
           "UnityEngine.Color UnityEngine.Color::black()",
@@ -3404,6 +3416,8 @@
           "UnityEngine.Color UnityEngine.Color::get_red()",
           "UnityEngine.Color UnityEngine.Color::get_white()",
           "UnityEngine.Color UnityEngine.Color::magenta()",
+          "UnityEngine.Color UnityEngine.Color::op_Addition(UnityEngine.Color,UnityEngine.Color)",
+          "UnityEngine.Color UnityEngine.Color::op_Multiply(UnityEngine.Color,System.Single)",
           "UnityEngine.Color UnityEngine.Color::op_Multiply(UnityEngine.Color,UnityEngine.Color)",
           "UnityEngine.Color UnityEngine.Color::red()",
           "UnityEngine.Color UnityEngine.Color::white()"
@@ -3972,6 +3986,7 @@
           "System.Int32 UnityEngine.Mathf::Min(System.Int32,System.Int32)",
           "System.Int32 UnityEngine.Mathf::RoundToInt(System.Single)",
           "System.Single UnityEngine.Mathf::Abs(System.Single)",
+          "System.Single UnityEngine.Mathf::Atan2(System.Single,System.Single)",
           "System.Single UnityEngine.Mathf::Ceil(System.Single)",
           "System.Single UnityEngine.Mathf::Clamp(System.Single,System.Single,System.Single)",
           "System.Single UnityEngine.Mathf::Clamp01(System.Single)",
@@ -3990,6 +4005,7 @@
           "System.Single UnityEngine.Mathf::PI",
           "System.Single UnityEngine.Mathf::Pow(System.Single,System.Single)",
           "System.Single UnityEngine.Mathf::Rad2Deg",
+          "System.Single UnityEngine.Mathf::Repeat(System.Single,System.Single)",
           "System.Single UnityEngine.Mathf::Round(System.Single)",
           "System.Single UnityEngine.Mathf::Sin(System.Single)",
           "System.Single UnityEngine.Mathf::Sqrt(System.Single)"
@@ -4591,6 +4607,7 @@
         "members": [
           "System.Boolean UnityEngine.Vector2::op_Equality(UnityEngine.Vector2,UnityEngine.Vector2)",
           "System.Boolean UnityEngine.Vector2::op_Inequality(UnityEngine.Vector2,UnityEngine.Vector2)",
+          "System.Single UnityEngine.Vector2::Dot(UnityEngine.Vector2,UnityEngine.Vector2)",
           "System.Single UnityEngine.Vector2::get_magnitude()",
           "System.Single UnityEngine.Vector2::get_sqrMagnitude()",
           "System.Single UnityEngine.Vector2::kEpsilon",
@@ -4630,6 +4647,7 @@
           "System.Single UnityEngine.Vector3::z",
           "System.Void UnityEngine.Vector3::.ctor(System.Single,System.Single)",
           "System.Void UnityEngine.Vector3::.ctor(System.Single,System.Single,System.Single)",
+          "UnityEngine.Vector3 UnityEngine.Vector3::LerpUnclamped(UnityEngine.Vector3,UnityEngine.Vector3,System.Single)",
           "UnityEngine.Vector3 UnityEngine.Vector3::get_one()",
           "UnityEngine.Vector3 UnityEngine.Vector3::get_zero()",
           "UnityEngine.Vector3 UnityEngine.Vector3::one()",
@@ -5155,6 +5173,7 @@
       {
         "type": "UnityEngine.UI.CanvasScaler",
         "members": [
+          "System.Single UnityEngine.UI.CanvasScaler::get_matchWidthOrHeight()",
           "System.Single UnityEngine.UI.CanvasScaler::matchWidthOrHeight()",
           "System.Void UnityEngine.UI.CanvasScaler::set_matchWidthOrHeight(System.Single)",
           "System.Void UnityEngine.UI.CanvasScaler::set_referenceResolution(UnityEngine.Vector2)",
@@ -5426,6 +5445,8 @@
       {
         "type": "UnityEngine.UI.InputField",
         "members": [
+          "System.Boolean UnityEngine.UI.InputField::get_isFocused()",
+          "System.Boolean UnityEngine.UI.InputField::isFocused()",
           "System.String UnityEngine.UI.InputField::get_text()",
           "System.String UnityEngine.UI.InputField::text()",
           "System.Void UnityEngine.UI.InputField::ActivateInputField()",
@@ -5824,6 +5845,8 @@
           "System.Void UnityEngine.Canvas::set_pixelPerfect(System.Boolean)",
           "System.Void UnityEngine.Canvas::set_renderMode(UnityEngine.RenderMode)",
           "System.Void UnityEngine.Canvas::set_sortingOrder(System.Int32)",
+          "UnityEngine.Camera UnityEngine.Canvas::get_worldCamera()",
+          "UnityEngine.Camera UnityEngine.Canvas::worldCamera()",
           "UnityEngine.Canvas/WillRenderCanvases UnityEngine.Canvas::willRenderCanvases",
           "UnityEngine.Material UnityEngine.Canvas::GetDefaultCanvasMaterial()",
           "UnityEngine.RenderMode UnityEngine.Canvas::renderMode()"
@@ -5865,7 +5888,8 @@
         "type": "UnityEngine.RectTransformUtility",
         "members": [
           "System.Boolean UnityEngine.RectTransformUtility::RectangleContainsScreenPoint(UnityEngine.RectTransform,UnityEngine.Vector2,UnityEngine.Camera)",
-          "System.Boolean UnityEngine.RectTransformUtility::ScreenPointToLocalPointInRectangle(UnityEngine.RectTransform,UnityEngine.Vector2,UnityEngine.Camera,UnityEngine.Vector2\u0026)"
+          "System.Boolean UnityEngine.RectTransformUtility::ScreenPointToLocalPointInRectangle(UnityEngine.RectTransform,UnityEngine.Vector2,UnityEngine.Camera,UnityEngine.Vector2\u0026)",
+          "UnityEngine.Vector2 UnityEngine.RectTransformUtility::WorldToScreenPoint(UnityEngine.Camera,UnityEngine.Vector3)"
         ]
       },
       {

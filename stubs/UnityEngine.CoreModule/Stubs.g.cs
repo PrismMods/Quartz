@@ -81,6 +81,7 @@ namespace UnityEngine {
         public float b;
         public float g;
         public float r;
+        public float this[int index] { get => throw null; set { } }
         public static global::UnityEngine.Color black { get => throw null; }
         public static global::UnityEngine.Color blue { get => throw null; }
         public static global::UnityEngine.Color clear { get => throw null; }
@@ -92,8 +93,10 @@ namespace UnityEngine {
         public static global::UnityEngine.Color HSVToRGB(float H, float S, float V) => throw null;
         public static global::UnityEngine.Color Lerp(global::UnityEngine.Color a, global::UnityEngine.Color b, float t) => throw null;
         public static void RGBToHSV(global::UnityEngine.Color rgbColor, out float H, out float S, out float V) => throw null;
+        public static global::UnityEngine.Color operator +(global::UnityEngine.Color a, global::UnityEngine.Color b) => throw null;
         public static bool operator ==(global::UnityEngine.Color lhs, global::UnityEngine.Color rhs) => throw null;
         public static bool operator !=(global::UnityEngine.Color lhs, global::UnityEngine.Color rhs) => throw null;
+        public static global::UnityEngine.Color operator *(global::UnityEngine.Color a, float b) => throw null;
         public static global::UnityEngine.Color operator *(global::UnityEngine.Color a, global::UnityEngine.Color b) => throw null;
         public override bool Equals(object obj) => throw null;
         public override int GetHashCode() => throw null;
@@ -558,6 +561,7 @@ namespace UnityEngine {
         public static float Abs(float f) => throw null;
         public static int Abs(int value) => throw null;
         public static bool Approximately(float a, float b) => throw null;
+        public static float Atan2(float y, float x) => throw null;
         public static float Ceil(float f) => throw null;
         public static int CeilToInt(float f) => throw null;
         public static float Clamp(float value, float min, float max) => throw null;
@@ -576,6 +580,7 @@ namespace UnityEngine {
         public static float Min(float a, float b) => throw null;
         public static int Min(int a, int b) => throw null;
         public static float Pow(float f, float p) => throw null;
+        public static float Repeat(float t, float length) => throw null;
         public static float Round(float f) => throw null;
         public static int RoundToInt(float f) => throw null;
         public static float Sin(float f) => throw null;
@@ -975,6 +980,7 @@ namespace UnityEngine {
         public float sqrMagnitude { get => throw null; }
         public static global::UnityEngine.Vector2 zero { get => throw null; }
         public Vector2(float x, float y) => throw null;
+        public static float Dot(global::UnityEngine.Vector2 lhs, global::UnityEngine.Vector2 rhs) => throw null;
         public static global::UnityEngine.Vector2 LerpUnclamped(global::UnityEngine.Vector2 a, global::UnityEngine.Vector2 b, float t) => throw null;
         public static global::UnityEngine.Vector2 Max(global::UnityEngine.Vector2 lhs, global::UnityEngine.Vector2 rhs) => throw null;
         public static global::UnityEngine.Vector2 Min(global::UnityEngine.Vector2 lhs, global::UnityEngine.Vector2 rhs) => throw null;
@@ -1003,6 +1009,7 @@ namespace UnityEngine {
         public Vector3(float x, float y) => throw null;
         public Vector3(float x, float y, float z) => throw null;
         public static float Distance(global::UnityEngine.Vector3 a, global::UnityEngine.Vector3 b) => throw null;
+        public static global::UnityEngine.Vector3 LerpUnclamped(global::UnityEngine.Vector3 a, global::UnityEngine.Vector3 b, float t) => throw null;
         public static global::UnityEngine.Vector3 operator +(global::UnityEngine.Vector3 a, global::UnityEngine.Vector3 b) => throw null;
         public static bool operator ==(global::UnityEngine.Vector3 lhs, global::UnityEngine.Vector3 rhs) => throw null;
         public static bool operator !=(global::UnityEngine.Vector3 lhs, global::UnityEngine.Vector3 rhs) => throw null;

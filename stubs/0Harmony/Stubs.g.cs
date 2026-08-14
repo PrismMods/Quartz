@@ -35,10 +35,9 @@ namespace HarmonyLib {
         public string Id { get => throw null; }
         public Harmony(string id) => throw null;
         public global::HarmonyLib.PatchClassProcessor CreateClassProcessor(global::System.Type type) => throw null;
-        public global::System.Reflection.MethodInfo Patch(global::System.Reflection.MethodBase original, global::HarmonyLib.HarmonyMethod prefix = default, global::HarmonyLib.HarmonyMethod postfix = default, global::HarmonyLib.HarmonyMethod transpiler = default, global::HarmonyLib.HarmonyMethod finalizer = default, global::HarmonyLib.HarmonyMethod ilmanipulator = default) => throw null;
+        public global::HarmonyLib.PatchProcessor CreateProcessor(global::System.Reflection.MethodBase original) => throw null;
         public void PatchAll(global::System.Reflection.Assembly assembly) => throw null;
         public void Unpatch(global::System.Reflection.MethodBase original, global::HarmonyLib.HarmonyPatchType type, string harmonyID = default) => throw null;
-        public void UnpatchSelf() => throw null;
         protected Harmony() { }
         void global::System.IDisposable.Dispose() => throw null;
     }
@@ -75,6 +74,11 @@ namespace HarmonyLib {
     public unsafe partial class PatchClassProcessor {
         public global::System.Collections.Generic.List<global::System.Reflection.MethodInfo> Patch() => throw null;
         protected PatchClassProcessor() { }
+    }
+    public unsafe partial class PatchProcessor {
+        public global::HarmonyLib.PatchProcessor AddPrefix(global::HarmonyLib.HarmonyMethod prefix) => throw null;
+        public global::System.Reflection.MethodInfo Patch() => throw null;
+        protected PatchProcessor() { }
     }
     public unsafe partial class Traverse {
         public static global::HarmonyLib.Traverse Create(object root) => throw null;

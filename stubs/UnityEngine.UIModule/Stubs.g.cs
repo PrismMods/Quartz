@@ -17,6 +17,7 @@ namespace UnityEngine {
         public bool pixelPerfect { get => throw null; set { } }
         public global::UnityEngine.RenderMode renderMode { get => throw null; set { } }
         public int sortingOrder { get => throw null; set { } }
+        public global::UnityEngine.Camera worldCamera { get => throw null; set { } }
         public static event global::UnityEngine.Canvas.WillRenderCanvases willRenderCanvases { add { } remove { } }
         public static void ForceUpdateCanvases() => throw null;
         public static global::UnityEngine.Material GetDefaultCanvasMaterial() => throw null;
@@ -40,6 +41,7 @@ namespace UnityEngine {
     public sealed unsafe partial class RectTransformUtility {
         public static bool RectangleContainsScreenPoint(global::UnityEngine.RectTransform rect, global::UnityEngine.Vector2 screenPoint, global::UnityEngine.Camera cam) => throw null;
         public static bool ScreenPointToLocalPointInRectangle(global::UnityEngine.RectTransform rect, global::UnityEngine.Vector2 screenPoint, global::UnityEngine.Camera cam, out global::UnityEngine.Vector2 localPoint) => throw null;
+        public static global::UnityEngine.Vector2 WorldToScreenPoint(global::UnityEngine.Camera cam, global::UnityEngine.Vector3 worldPoint) => throw null;
         private RectTransformUtility() { }
     }
     public enum RenderMode : int {
