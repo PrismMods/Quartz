@@ -90,17 +90,20 @@ internal sealed class KeyCapture : MonoBehaviour {
     private static readonly KeyCode[] AllKeys = (KeyCode[])System.Enum.GetValues(typeof(KeyCode));
     private void Awake() => enabled = false;
     public void Begin() {
-        if(listening) return;
+        if(listening && KeyCaptureCoordinator.Owns(this)) return;
         listening = true;
         enabled = true;
-        Keybind.Capturing = true;
+        if(!KeyCaptureCoordinator.Claim(this, Cancel)) {
+            if(listening) Cancel();
+            return;
+        }
         Display.text = MainCore.Tr.Get("PRESS_A_KEY", "Press a key...");
     }
     private void Refresh() => Display.text = Bound ? Keybind.Format(Modifier, Key) : "";
     private void Stop() {
         listening = false;
         enabled = false;
-        Keybind.Capturing = false;
+        KeyCaptureCoordinator.Release(this);
     }
     private void Cancel() {
         Stop();

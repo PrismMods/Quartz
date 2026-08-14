@@ -70,6 +70,9 @@ internal sealed partial class KvInspector {
         Push();
     }
     internal void Dispose() {
+        listening = false;
+        ghostListening = false;
+        capture?.EndCapture();
         canvas.SelectionChanged -= OnSelectionChanged;
         canvas.Changed -= SyncToolbar;
         canvas.InputSuppressed = null;
@@ -83,6 +86,7 @@ internal sealed partial class KvInspector {
     private void OnSelectionChanged() {
         listening = false;
         ghostListening = false;
+        capture?.EndCapture();
         SyncToolbar();
         Push();
         if(tab != InspTab.Settings) scroll?.ScrollTo(0f);

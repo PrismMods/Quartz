@@ -15,6 +15,7 @@ public static class KeyCaptureService {
         onKey = captured;
         onEnded = ended;
         IsCapturing = true;
+        if(!runner.BeginCapture() && IsCapturing) End(KeyCode.None);
     }
     public static void Cancel() => End(KeyCode.None);
     private static void End(KeyCode key) {
@@ -24,6 +25,7 @@ public static class KeyCaptureService {
         Action ended = onEnded;
         onKey = null;
         onEnded = null;
+        runner?.EndCapture();
         try {
             captured?.Invoke(key);
         } catch(Exception e) {

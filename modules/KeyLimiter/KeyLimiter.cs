@@ -6,6 +6,7 @@ using System.Threading;
 using UnityEngine;
 using Quartz.Compat.Game;
 using Quartz.Game;
+using Quartz.UI.Utility;
 using Quartz.Utility;
 namespace Quartz.Features.KeyLimiter;
 public static partial class KeyLimiter {
@@ -185,6 +186,7 @@ public static partial class KeyLimiter {
     public static bool TryMacPhysicalKeyHeld(KeyCode key, out bool held) =>
         HookInput.TryMacPhysicalKeyHeld(key, out held);
     public static bool IsCapturing { get; private set; }
+    private static readonly object captureOwner = new();
     private static Action<KeyCode> captureOnKey;
     private static Action captureOnEnded;
     public static void StartCapture(Action<KeyCode> onKey, Action onEnded) {
@@ -192,14 +194,17 @@ public static partial class KeyLimiter {
         IsCapturing = true;
         captureOnKey = onKey;
         captureOnEnded = onEnded;
-        Keybind.Capturing = true;
+        if(!KeyCaptureCoordinator.Claim(captureOwner, CancelCapture)) {
+            if(IsCapturing) EndCapture(KeyCode.None);
+            return;
+        }
         Changed?.Invoke();
     }
     public static void CancelCapture() => EndCapture(KeyCode.None);
     private static void EndCapture(KeyCode key) {
         if(!IsCapturing) return;
         IsCapturing = false;
-        Keybind.Capturing = false;
+        KeyCaptureCoordinator.Release(captureOwner);
         Action<KeyCode> onKey = captureOnKey;
         Action onEnded = captureOnEnded;
         captureOnKey = null;

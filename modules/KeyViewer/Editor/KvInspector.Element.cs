@@ -91,6 +91,7 @@ internal sealed partial class KvInspector {
             listening = true;
             ghostListening = false;
             Push();
+            capture.BeginCapture();
         }).Rect.AddToolTip("DESC_KVI_REBIND", "Click, then press the new key for this element. Esc cancels.");
         TextMeshProUGUI ghost = GenerateUI.AddMutedText(GenerateUI.Row(root, 30f), 17f, 0.6f);
         ghost.text = string.Format(MainCore.Tr.Get("KVI_GHOST_CURRENT", "Ghost key: {0}"), KeyLabel(el.GhostKeyCodeValue, el.GhostKey));
@@ -98,6 +99,7 @@ internal sealed partial class KvInspector {
             ghostListening = true;
             listening = false;
             Push();
+            capture.BeginCapture();
         }).SetNeutral().Rect.AddToolTip(
             "DESC_KVI_GHOST_SET",
             "Click, then press a second key that lights this element up without counting as a press. Esc cancels."

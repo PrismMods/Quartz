@@ -184,15 +184,18 @@ public static class PageAutoDeafen {
         private bool listening;
         private static readonly KeyCode[] AllKeys = (KeyCode[])System.Enum.GetValues(typeof(KeyCode));
         public void Begin() {
-            if(listening) return;
+            if(listening && KeyCaptureCoordinator.Owns(this)) return;
             listening = true;
-            Keybind.Capturing = true;
+            if(!KeyCaptureCoordinator.Claim(this, Cancel)) {
+                if(listening) Cancel();
+                return;
+            }
             Display.text = MainCore.Tr.Get("PRESS_A_KEY", "Press a key...");
         }
         private void Refresh() => Display.text = Keybind.KeyName((KeyCode)Conf.ShortcutKey);
         private void Cancel() {
             listening = false;
-            Keybind.Capturing = false;
+            KeyCaptureCoordinator.Release(this);
             Refresh();
         }
         private void OnDisable() {
@@ -210,7 +213,7 @@ public static class PageAutoDeafen {
                 if(!Input.GetKeyDown(kc)) continue;
                 Conf.ShortcutKey = (int)kc;
                 listening = false;
-                Keybind.Capturing = false;
+                KeyCaptureCoordinator.Release(this);
                 Refresh();
                 AutoDeafen.Save();
                 return;
