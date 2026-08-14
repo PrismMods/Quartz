@@ -1,0 +1,22 @@
+Quartz/UI/Objects/UIObject.cs
+  s_b0814b8c0da421::t_4a326ffbe1fae2 76-80
+Quartz/UI/UICore.cs
+  s_b0814b8c0da421::t_4a326ffbe1fae2 153-156,158-166,179-186
+  s_b0814b8c0da421::t_496b06751e59a0 150-152
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "7018028a20f4da4b3d210e3019af35d48a722b77",
+  "prompts": {},
+  "sessions": {
+    "s_b0814b8c0da421": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a00073-e0af-7120-8ff7-123c5a557a34",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
