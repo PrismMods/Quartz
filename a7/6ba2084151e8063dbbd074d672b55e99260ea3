@@ -1,0 +1,22 @@
+modules/SongTitle/Lang/en-US.json
+  h_6eeb8441a8a159 6-7
+modules/SongTitle/Lang/ko-KR.json
+  h_6eeb8441a8a159 6-7
+modules/SongTitle/PageSongTitle.cs
+  h_6eeb8441a8a159 40-48
+modules/SongTitle/SongTitleOverlay.cs
+  h_6eeb8441a8a159 2,44,47,139,146,148-149,155,159,164,168-189
+modules/SongTitle/SongTitleSettings.cs
+  h_6eeb8441a8a159 9,25,46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "a76ba2084151e8063dbbd074d672b55e99260ea3",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
