@@ -77,6 +77,7 @@
 		<Compile Include="../modules/KeyViewer/KeyViewerCss.Values.cs" Link="Source/KeyViewerCss.Values.cs" />
 		<Compile Include="../modules/KeyViewer/KeyViewerCss.Color.cs" Link="Source/KeyViewerCss.Color.cs" />
 		<Compile Include="../modules/KeyViewer/KeyViewerCss.Tokens.cs" Link="Source/KeyViewerCss.Tokens.cs" />
+		<Compile Include="../modules/KeyViewer/CssAssetDownloader.cs" Link="Source/CssAssetDownloader.cs" />
 		<Compile Include="../modules/KeyViewer/KeyViewerPersistence.cs" Link="Source/KeyViewerPersistence.cs" />
 		<Compile Include="../modules/KeyViewer/Js/KvJsPlugin.cs" Link="Source/KvJsPlugin.cs" />
 		<Compile Include="../modules/KeyViewer/Js/KvJsTemplate.cs" Link="Source/KvJsTemplate.cs" />

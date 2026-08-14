@@ -1,7 +1,5 @@
-using System.Net;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
 using Quartz.Core;
 using Quartz.Resource;
 using Quartz.UI.Utility;
@@ -79,25 +77,29 @@ public static partial class KeyViewerOverlay {
         string url = PickFontUrl(face);
         string path = CachedFontPath(face);
         if(url == null || path == null) return;
-        lock(cssFontLock) cssFontPending.Add(face.Family);
+        lock(cssFontLock) {
+            if(!cssFontPending.Add(face.Family)) return;
+        }
         StartCssDownload(url, path, $"CSS font download failed ({face.Family})",
             "QuartzCssFont", cssFontLock, cssFontPending, face.Family);
     }
     private static void StartCssDownload(string url, string path, string failWhat,
         string threadName, object gate, HashSet<string> pending, string pendingKey) {
-        var thread = new Thread(() => {
-            try {
-                ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
-                using var client = new WebClient();
-                File.WriteAllBytes(path, client.DownloadData(url));
-                cssDownloadArrived = true;
-            } catch(Exception ex) {
-                MainCore.Log.Msg($"[KeyViewer] {failWhat}: {ex.Message}");
-            } finally {
-                lock(gate) pending.Remove(pendingKey);
-            }
-        }) { IsBackground = true, Name = threadName };
-        thread.Start();
+        _ = DownloadCssAssetAsync(url, path, failWhat, threadName, gate, pending, pendingKey);
+    }
+    private static async Task DownloadCssAssetAsync(string url, string path, string failWhat,
+        string operationName, object gate, HashSet<string> pending, string pendingKey) {
+        using CancellationTokenSource timeout = new(CssAssetDownloader.DownloadTimeout);
+        try {
+            await CssAssetDownloader.DownloadToFileAsync(url, path, timeout.Token).ConfigureAwait(false);
+            cssDownloadArrived = true;
+        } catch(OperationCanceledException) when(timeout.IsCancellationRequested) {
+            MainCore.Log.Msg($"[KeyViewer] {failWhat} [{operationName}]: timed out.");
+        } catch(Exception ex) {
+            MainCore.Log.Msg($"[KeyViewer] {failWhat} [{operationName}]: {ex.Message}");
+        } finally {
+            lock(gate) pending.Remove(pendingKey);
+        }
     }
     private static string Hash(string s) {
         using var md5 = MD5.Create();
