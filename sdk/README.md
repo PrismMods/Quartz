@@ -102,10 +102,58 @@ Everything an addon overrides or calls lives in `Quartz.Addons`:
 
 - `QuartzAddon` — base class; override `OnLoad` / `OnEnable` / `OnDisable` /
   `OnTick` / `OnUnload` and the `Id` / `Name` / `Version` / `Author` metadata.
+  Optional metadata: `Repo` (`"owner/repo"` — Quartz checks GitHub releases and
+  shows an update line on the Addons page), `Requires` (hard dependencies by
+  addon id; a missing or disabled one shows an actionable error instead of a
+  half-loaded addon) and `LoadAfter` (soft ordering). Optional interop:
+  override `OnCall(object[])` / `GetApi()` to let other addons talk to yours.
 - `AddonContext` (as `Context`) — `Msg`/`Wrn`/`Err`, `GetSettings<T>` /
-  `SaveSettings`, `RegisterStat`, `RegisterTag`, `RegisterTab`, `Harmony` /
-  `PatchAll`.
+  `SaveSettings`, `RegisterSettingsTab` (see below), `RegisterStat`,
+  `RegisterTag`, `RegisterTab`, `RegisterAction` (buttons under your addon on
+  the Addons page), `RegisterTranslations` (raw JSON or an embedded resource,
+  same format as the mod's Lang files), `Harmony` / `PatchAll`, and `DataPath`
+  (a per-addon folder under `UserData/Quartz/Addons/<id>`, created on first
+  use, removed with the addon). Note the settings file `Addon.<id>.json` lives
+  in the profile root, so it is per-profile; `DataPath` is global.
+  Statics: `AddonContext.Loader` / `IsMelonLoader` / `IsUnityModManager`
+  (which mod loader is hosting Quartz), and `IsAddonLoaded(id)` /
+  `CallAddon(id, args...)` / `GetAddonApi(id)` for addon-to-addon calls with
+  no compile-time reference.
 - `AddonEvents` — `LevelStart`, `LevelEnd`, `Hit`, `SceneLoaded`,
   `ModEnabledChanged`.
 
-See the worked `AddonExample` for every one of these in use.
+## Auto-generated settings UI
+
+Call `Context.GetSettings<T>()` then `Context.RegisterSettingsTab("My Tab")`
+and Quartz builds a settings tab from your settings class — no UI code. Every
+public field/property becomes a control by type:
+
+| Member type | Control |
+|---|---|
+| `bool` | toggle |
+| `enum`, `string` + `[Choices("A", "B")]` | dropdown |
+| `int` / `float` / `double` + `[Slider(min, max, step)]` | slider |
+| `int` / `float` / `double` | text input (parsed) |
+| `string` | text input |
+| `UnityEngine.Color` | color picker |
+| `Dictionary<string, string>`, `List<KeyValuePair<string, string>>` | key/value row editor |
+
+Attributes: `[Section("Title")]` inserts a header, `[Name("Label")]` overrides
+the label (default: the member name split on case), `[Desc("...")]` adds a
+tooltip, `[ReloadRequired]` reloads all addons after that option is saved, and
+`[Ignore]` skips a member. Middle-click resets a control to the value from
+`new T()`. Labels localize automatically under `ADDON_<ID>_<MEMBER>` keys —
+supply other languages via `RegisterTranslations`.
+
+Need something the table can't do? Build that tab by hand with
+`Context.RegisterTab` and `Quartz.UI.Generator.GenerateUI` instead — toggles,
+sliders, dropdowns, inputs, color pickers, key/value rows (`DictRows`),
+headers (`Header`) and more, the same builders the mod's own pages use.
+
+## Fail-fast loading
+
+Quartz pre-JITs every method of an addon at load. If the addon was built
+against an older Quartz and touches an API that changed, it fails on the
+Addons page with the exact member name — instead of exploding mid-run.
+
+See the worked example at `examples/AddonExample` for all of this in use.

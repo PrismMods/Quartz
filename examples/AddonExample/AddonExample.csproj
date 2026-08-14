@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../sdk/QuartzAddon.props" />
+  <PropertyGroup>
+    <AssemblyName>AddonExample</AssemblyName>
+  </PropertyGroup>
+</Project>
