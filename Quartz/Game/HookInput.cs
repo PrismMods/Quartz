@@ -27,7 +27,6 @@ public static class HookInput {
     private const int HookBitCapacity = HookBitWords << 6;
     private static readonly long[] hookHeldBits = new long[HookBitWords];
     private static readonly long[] hookSeenBits = new long[HookBitWords];
-    private static volatile bool hookActive;
     private static readonly bool WinRuntimeCached =
         ResolvePlatform(RuntimePlatform.WindowsPlayer, RuntimePlatform.WindowsEditor);
     private static readonly bool MacRuntimeCached =
@@ -93,19 +92,12 @@ public static class HookInput {
         if(!IsHookTrackedKey(key)) return;
         if(pressed) HookBitSet(ref hookHeldBits[word], mask);
         else HookBitClear(ref hookHeldBits[word], mask);
-        bool anyHeld = false;
-        for(int i = 0; i < HookBitWords; i++) {
-            if(Volatile.Read(ref hookHeldBits[i]) == 0L) continue;
-            anyHeld = true;
-            break;
-        }
-        hookActive = anyHeld;
     }
     public static bool HookEverSaw(KeyCode key) =>
         HookBitSlot(key, out int word, out long mask)
         && (Volatile.Read(ref hookSeenBits[word]) & mask) != 0L;
     public static bool HookKeyHeld(KeyCode key) {
-        if(!hookActive || key == KeyCode.None) return false;
+        if(key == KeyCode.None) return false;
         return HookBitSlot(key, out int word, out long mask)
             && (Volatile.Read(ref hookHeldBits[word]) & mask) != 0L;
     }
