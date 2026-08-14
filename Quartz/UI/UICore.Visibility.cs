@@ -254,6 +254,8 @@ public static partial class UICore {
         LastPanelSize = targetSize;
         MainCore.Conf.PanelWidth = 0f;
         MainCore.Conf.PanelHeight = 0f;
+        MainCore.Conf.PanelWidthFrac = 0f;
+        MainCore.Conf.PanelHeightFrac = 0f;
         MainCore.ConfMgr.RequestSave();
         panelTweener?.Kill();
         resetSequence?.Kill();
