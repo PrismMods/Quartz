@@ -7,9 +7,27 @@
 		<EmbeddedResource Include="Lang\*.json" />
 	</ItemGroup>
 	<ItemGroup>
-		<!-- Compile-time reference only: the key-limiter module ships its own .qmod,
-		     so Private=false keeps its DLL out of this one. Load order comes from
-		     the manifest's deps, and PluginIdentityResolver binds it at runtime. -->
+		<!-- Custom JS plugin engine (DM Note-style). Compile-time refs point at the
+		     vendored DLLs; at runtime the module byte-loads them from embedded
+		     resources via KvJsAssemblies (a byte-loaded module has no probing path,
+		     so a loose DLL next to the .qmod would never resolve). -->
+		<Reference Include="Jint">
+			<HintPath>libs/Jint.dll</HintPath>
+		</Reference>
+		<Reference Include="Acornima">
+			<HintPath>libs/Acornima.dll</HintPath>
+		</Reference>
+		<EmbeddedResource Include="libs\Jint.dll" LogicalName="Quartz.KeyViewer.Js.Jint.dll" />
+		<EmbeddedResource Include="libs\Acornima.dll" LogicalName="Quartz.KeyViewer.Js.Acornima.dll" />
+		<EmbeddedResource Include="libs\System.Runtime.CompilerServices.Unsafe.dll" LogicalName="Quartz.KeyViewer.Js.System.Runtime.CompilerServices.Unsafe.dll" />
+		<EmbeddedResource Include="libs\THIRD-PARTY-NOTICES.md" LogicalName="Quartz.KeyViewer.Js.THIRD-PARTY-NOTICES.md" />
+	</ItemGroup>
+	<ItemGroup>
+		<!-- Compile-time reference only, and an OPTIONAL one at runtime: the key
+		     limiter is no longer a manifest dep, because the standalone KeyViewer
+		     build ships without it. Every use of it is funnelled through
+		     KvKeyLimiterBridge, which checks the module is loaded first — see the
+		     remarks there before adding a second call site. -->
 		<ProjectReference Include="../KeyLimiter/KeyLimiter.csproj" Private="false" />
 	</ItemGroup>
 	<ItemGroup>

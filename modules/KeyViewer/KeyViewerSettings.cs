@@ -1,4 +1,5 @@
 using Newtonsoft.Json.Linq;
+using Quartz.Features.KeyViewer.Js;
 using Quartz.Features.KeyViewer.Layout;
 using Quartz.IO;
 using Quartz.IO.Interface;
@@ -60,6 +61,8 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
     public bool DmCssEnabled = false;
     public string DmCssText = "";
     public string DmCssPath = "";
+    public bool JsPluginsEnabled = false;
+    public List<KvJsPluginRecord> JsPlugins = [];
     public int[] Key10 = [113, 51, 52, 116, 111, 45, 61, 92, 32, 104];
     public int[] Key12 = [113, 51, 52, 116, 111, 45, 61, 92, 32, 98, 104, 46];
     public int[] Key16 = [113, 51, 52, 116, 111, 45, 61, 92, 32, 98, 104, 46, 97, 304, 273, 13];

@@ -12,13 +12,29 @@ incorporates work from the projects listed below. Each entry names the upstream
 author, where the original lives, the licence it was released under, and what
 Quartz changed — the notice GPLv3 §5(a) asks a modified work to carry.
 
-Nothing here is vendored verbatim: every port is rewritten against Quartz's
-module, settings, localization, and diagnostics layers. The behaviour is the
-upstream behaviour; the code around it is not the upstream code.
+Feature ports are rewritten against Quartz's module, settings, localization,
+and diagnostics layers. Binary dependencies, where an entry says one is
+vendored, are shipped unchanged under their upstream licence.
 
 Quartz ports other mods' features besides the ones listed here. This file only
 lists entries whose upstream licence has been checked against the actual
 repository, so it is not yet a complete inventory.
+
+## KeyViewer JavaScript engine
+
+The KeyViewer module embeds these unmodified runtime dependencies in its
+`.qmod`, so JavaScript plugins work without loose DLLs:
+
+- **Jint 4.16.0**, Copyright (c) 2013 Sebastien Ros, BSD 2-Clause.
+  Source: https://github.com/sebastienros/jint/tree/v4.16.0
+- **Acornima 1.7.0**, Copyright (c) Adam Simon, BSD 3-Clause.
+  Source: https://github.com/adams85/acornima/tree/v1.7.0
+- **System.Runtime.CompilerServices.Unsafe 6.0.0**, Copyright (c) .NET
+  Foundation and Contributors, MIT.
+  Source: https://github.com/dotnet/runtime/tree/v6.0.0
+
+The complete licence texts are embedded beside the binaries from
+`modules/KeyViewer/libs/THIRD-PARTY-NOTICES.md`.
 
 ## DecoPreview
 

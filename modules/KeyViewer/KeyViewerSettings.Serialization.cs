@@ -63,6 +63,8 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
             [nameof(DmCssEnabled)] = DmCssEnabled,
             [nameof(DmCssText)] = DmCssText,
             [nameof(DmCssPath)] = DmCssPath,
+            [nameof(JsPluginsEnabled)] = JsPluginsEnabled,
+            [nameof(JsPlugins)] = new JArray(JsPlugins.Select(static p => p.Serialize())),
             [nameof(Key10)] = new JArray(Key10),
             [nameof(Key12)] = new JArray(Key12),
             [nameof(Key16)] = new JArray(Key16),
@@ -188,6 +190,15 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
         DmCssEnabled = IOUtils.Read(token, nameof(DmCssEnabled), DmCssEnabled);
         DmCssText = IOUtils.Read(token, nameof(DmCssText), DmCssText) ?? "";
         DmCssPath = IOUtils.Read(token, nameof(DmCssPath), DmCssPath) ?? "";
+        JsPluginsEnabled = IOUtils.Read(token, nameof(JsPluginsEnabled), JsPluginsEnabled);
+        JsPlugins.Clear();
+        if(token[nameof(JsPlugins)] is JArray jsPlugins) {
+            foreach(JToken entry in jsPlugins) {
+                if(entry is not JObject) continue;
+                try { JsPlugins.Add(Js.KvJsPluginRecord.Deserialize(entry)); }
+                catch(Exception e) { Diag.Warn(e, "KeyViewer/JsPlugin"); }
+            }
+        }
         Key10 = ReadKeys(token, nameof(Key10), Key10);
         Key12 = ReadKeys(token, nameof(Key12), Key12);
         Key16 = ReadKeys(token, nameof(Key16), Key16);

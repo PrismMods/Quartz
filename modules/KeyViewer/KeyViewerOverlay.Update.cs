@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Quartz.Overlay;
+using Quartz.Features.KeyViewer.Js;
 namespace Quartz.Features.KeyViewer;
 public static partial class KeyViewerOverlay {
     private sealed class Updater : MonoBehaviour {
@@ -86,6 +87,7 @@ public static partial class KeyViewerOverlay {
             return 3f * inv * inv * p1 + 6f * inv * s * (p2 - p1) + 3f * s * s * (1f - p2);
         }
         private void Update() {
+            KvJsRuntime.Tick(KvClock.Now);
             if(root == null) return;
             float now = KvClock.Now;
             bool inGame = GameStats.InGame;

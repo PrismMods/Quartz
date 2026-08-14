@@ -12,6 +12,7 @@ using Object = UnityEngine.Object;
 using TMPro;
 using Quartz.Compat.Game;
 using Quartz.Utility;
+using Quartz.Features.KeyViewer.Js;
 namespace Quartz.Features.KeyViewer;
 public static partial class KeyViewerOverlay {
     public static void Initialize(GameObject rootObject) {
@@ -60,6 +61,7 @@ public static partial class KeyViewerOverlay {
         tabubActive = false;
         layoutRebuildPending = false;
         BuildDmNote();
+        KvJsRuntime.Attach(root);
         SyncKeysToKeyLimiter();
     }
     public static void RequestLayoutRebuild() {
@@ -238,6 +240,7 @@ public static partial class KeyViewerOverlay {
     }
     public static void Dispose() {
         if(canvasObj == null) return;
+        KvJsRuntime.Detach();
         KvInputQueue.Shutdown();
         keyMap.Clear();
         pollBoxes.Clear();

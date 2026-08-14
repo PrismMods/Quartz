@@ -1,16 +1,21 @@
 using Quartz.Modules;
+using Quartz.Features.KeyViewer.Js;
 using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
 namespace Quartz.Features.KeyViewer;
 public sealed class KeyViewerModule : QuartzModule {
     private Action<UnityEngine.KeyCode, bool> hookHandler;
+    private Action<UnityEngine.KeyCode, bool> jsHookHandler;
     public override void OnLoad() {
         foreach(string lang in new[] { "en-US", "ko-KR", "zh-CN" })
             Context.RegisterTranslations(typeof(KeyViewerModule), $"Quartz.Features.KeyViewer.Lang.{lang}.json");
         KeyViewerOverlay.EnsureConf();
+        if(KvJsAssemblies.EnsureLoaded()) KvJsRuntime.Reload(KeyViewerOverlay.Conf);
         Layout.KvStore.RegisterHandle();
         hookHandler = KvInputQueue.Push;
         Quartz.Game.HookKeys.KeyEvent += hookHandler;
+        jsHookHandler = KvJsRuntime.OnKeyEvent;
+        Quartz.Game.HookKeys.KeyEvent += jsHookHandler;
         Context.RegisterRescalable("keyviewer", KeyViewerOverlay.Rescale);
         Context.AddPage(new NavPage {
             Key = "overlay.keyviewer",
@@ -52,7 +57,12 @@ public sealed class KeyViewerModule : QuartzModule {
             Quartz.Game.HookKeys.KeyEvent -= hookHandler;
             hookHandler = null;
         }
+        if(jsHookHandler != null) {
+            Quartz.Game.HookKeys.KeyEvent -= jsHookHandler;
+            jsHookHandler = null;
+        }
         Layout.KvStore.UnregisterHandle();
+        KvJsRuntime.Shutdown();
         KeyViewerOverlay.Dispose();
     }
 }

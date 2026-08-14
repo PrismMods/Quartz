@@ -97,6 +97,7 @@ internal static partial class PageKeyViewer {
         RefreshTabubStatus();
         UIToggle syncLimiter = DmSyncLimiter(body, conf, def, compact: true);
         Action refreshCss = AppendDmCss(body, conf, compact: true);
+        Action refreshJs = AppendJsPlugins(body, conf, compact: true);
         Action refreshTuning = AppendDmTuning(body, conf, compact: true, includeOffsets: false);
         Action refreshGhostRainDots = AppendGhostRainDots(body, conf, def, compact: true);
         DmButton(
@@ -123,6 +124,7 @@ internal static partial class PageKeyViewer {
             RefreshTabubStatus();
             syncLimiter.Set(conf.SyncToKeyLimiter, false);
             refreshCss();
+            refreshJs();
             refreshTuning();
             refreshGhostRainDots();
         };
