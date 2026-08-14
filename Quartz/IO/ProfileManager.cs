@@ -27,7 +27,11 @@ public static partial class ProfileManager {
     private static string PointerPath => Path.Combine(MainCore.Paths.RootPath, "Profiles.json");
     private static string SwitchMarkerPath => Path.Combine(ProfilesPath, ".switch.json");
     private static string SwitchRollbackPath => Path.Combine(ProfilesPath, ".switch-rollback");
-    private static string DirOf(string name) => Path.Combine(ProfilesPath, name);
+    private static bool TryDirOf(string name, out string path) =>
+        ProfileNames.TryResolveDirectory(ProfilesPath, name, out path);
+    private static string DirOf(string name) => TryDirOf(name, out string path)
+        ? path
+        : throw new ArgumentException("Profile name is invalid.", nameof(name));
     public static void Initialize() {
         try {
             Directory.CreateDirectory(ProfilesPath);
@@ -36,7 +40,7 @@ public static partial class ProfileManager {
             if(File.Exists(PointerPath)) {
                 JToken token = JToken.Parse(File.ReadAllText(PointerPath));
                 string name = token["Active"]?.Value<string>();
-                if(!string.IsNullOrWhiteSpace(name) && Directory.Exists(DirOf(name))) Active = name;
+                if(TryDirOf(name, out string activeDir) && Directory.Exists(activeDir)) Active = name;
             }
             if(!Directory.Exists(DirOf(Active))) {
                 Active = DEFAULT_NAME;
@@ -53,6 +57,7 @@ public static partial class ProfileManager {
                 Directory.GetDirectories(ProfilesPath)
                     .Where(path => !Path.GetFileName(path).StartsWith(".", StringComparison.Ordinal))
                     .Select(Path.GetFileName)
+                    .Where(name => TryDirOf(name, out _))
                     .OrderBy(n => n, StringComparer.OrdinalIgnoreCase)
             ];
         } catch(Exception e) {
@@ -61,7 +66,7 @@ public static partial class ProfileManager {
         }
     }
     public static bool Exists(string name)
-        => !string.IsNullOrEmpty(name) && Directory.Exists(DirOf(name));
+        => TryDirOf(name, out string path) && Directory.Exists(path);
     public static string Sanitize(string name) => ProfileNames.Sanitize(name);
     public static bool Create(string name) {
         name = Sanitize(name);
@@ -82,9 +87,9 @@ public static partial class ProfileManager {
         return Create(name) ? name : null;
     }
     public static bool Delete(string name) {
-        if(name == Active || !Exists(name)) return false;
+        if(name == Active || !TryDirOf(name, out string path) || !Directory.Exists(path)) return false;
         try {
-            Directory.Delete(DirOf(name), true);
+            Directory.Delete(path, true);
             return true;
         } catch(Exception e) {
             MainCore.Log.Err($"[{nameof(ProfileManager)}] Delete '{name}' failed: {e}");
@@ -93,6 +98,7 @@ public static partial class ProfileManager {
     }
     public static bool CaptureActive() {
         try {
+            if(!TryDirOf(Active, out _)) throw new IOException("active profile name is invalid");
             if(!SettingsRegistry.SaveAll()) return false;
             CaptureTo(Active);
             return true;
@@ -102,14 +108,14 @@ public static partial class ProfileManager {
         }
     }
     public static bool Apply(string name) {
-        if(name == Active || !Exists(name)) return false;
+        if(name == Active || !TryDirOf(name, out string targetDir) || !Directory.Exists(targetDir)) return false;
         string previous = Active;
         Dictionary<string, string> previousFiles = null;
         bool runtimeStopped = false;
         bool switchStarted = false;
         try {
             if(!CaptureActive()) throw new IOException("could not capture the active profile before switching");
-            Dictionary<string, string> targetFiles = ReadSettingsDirectory(DirOf(name), validateJson: true);
+            Dictionary<string, string> targetFiles = ReadSettingsDirectory(targetDir, validateJson: true);
             previousFiles = ReadSettingsDirectory(MainCore.Paths.RootPath, validateJson: false);
             BeginSwitch(previous, previousFiles);
             switchStarted = true;
@@ -143,11 +149,11 @@ public static partial class ProfileManager {
         }
     }
     public static bool Export(string name, string destPath) {
-        if(!Exists(name) || string.IsNullOrEmpty(destPath)) return false;
+        if(!TryDirOf(name, out string profileDir) || !Directory.Exists(profileDir) || string.IsNullOrEmpty(destPath)) return false;
         try {
             if(name == Active && !CaptureActive()) return false;
             JObject files = [];
-            foreach(string file in Directory.GetFiles(DirOf(name), "*.json")) {
+            foreach(string file in Directory.GetFiles(profileDir, "*.json")) {
                 try {
                     files[Path.GetFileName(file)] = JToken.Parse(File.ReadAllText(file));
                 } catch(Exception e) { Diag.Ignore(e); }

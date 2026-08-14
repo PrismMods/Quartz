@@ -100,7 +100,7 @@ public static partial class ProfileManager {
             int oldMarker = name.LastIndexOf(".old-", StringComparison.Ordinal);
             int stageMarker = name.LastIndexOf(".stage-", StringComparison.Ordinal);
             if(oldMarker > 1 && IsSwapSuffix(name, oldMarker + 5)) {
-                string target = DirOf(name[1..oldMarker]);
+                if(!TryDirOf(name[1..oldMarker], out string target)) continue;
                 if(!Directory.Exists(target)) Directory.Move(directory, target);
                 else Directory.Delete(directory, true);
             } else if(stageMarker > 1 && IsSwapSuffix(name, stageMarker + 7)) {
@@ -135,7 +135,8 @@ public static partial class ProfileManager {
         }
         JObject marker = JObject.Parse(File.ReadAllText(SwitchMarkerPath));
         string previous = marker.Value<string>("Previous");
-        if(string.IsNullOrWhiteSpace(previous) || !Directory.Exists(SwitchRollbackPath)) {
+        if(!TryDirOf(previous, out string previousDir) || !Directory.Exists(previousDir)
+            || !Directory.Exists(SwitchRollbackPath)) {
             throw new IOException("profile switch rollback data is incomplete");
         }
         Dictionary<string, string> rollback = ReadSettingsDirectory(SwitchRollbackPath, validateJson: true);
@@ -176,6 +177,7 @@ public static partial class ProfileManager {
         Addons.AddonService.Reload();
     }
     private static void SavePointer() {
+        if(!TryDirOf(Active, out _)) throw new IOException("active profile name is invalid");
         AtomicFile.WriteAllText(
             PointerPath,
             new JObject { ["Active"] = Active }.ToString()

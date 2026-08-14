@@ -25,4 +25,27 @@ public static class ProfileNames {
         string clean = Sanitize(label) ?? "Imported";
         return Sanitize("Imported - " + clean) ?? "Imported";
     }
+    internal static bool TryResolveDirectory(string root, string name, out string path) {
+        path = null;
+        if(string.IsNullOrWhiteSpace(root)) return false;
+        string clean = Sanitize(name);
+        if(clean == null || !string.Equals(clean, name, StringComparison.Ordinal)) return false;
+        try {
+            string rootFull = Path.GetFullPath(root);
+            string prefix = rootFull.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal)
+                || rootFull.EndsWith(Path.AltDirectorySeparatorChar.ToString(), StringComparison.Ordinal)
+                ? rootFull
+                : rootFull + Path.DirectorySeparatorChar;
+            string candidate = Path.GetFullPath(Path.Combine(rootFull, name));
+            StringComparison comparison = Path.DirectorySeparatorChar == '\\'
+                ? StringComparison.OrdinalIgnoreCase
+                : StringComparison.Ordinal;
+            if(!candidate.StartsWith(prefix, comparison)) return false;
+            path = candidate;
+            return true;
+        } catch(Exception e) {
+            Quartz.Core.Diag.Ignore(e);
+            return false;
+        }
+    }
 }
