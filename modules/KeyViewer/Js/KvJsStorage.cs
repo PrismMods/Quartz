@@ -1,5 +1,6 @@
 using Newtonsoft.Json.Linq;
 using Quartz.Core;
+using Quartz.IO;
 namespace Quartz.Features.KeyViewer.Js;
 internal static class KvJsStorage {
     private static Dictionary<string, string> data;
@@ -60,11 +61,14 @@ internal static class KvJsStorage {
     }
     public static void Flush() {
         if(!dirty || data == null) return;
-        dirty = false;
         try {
             JObject obj = [];
             foreach((string key, string value) in data) obj[key] = value;
-            File.WriteAllText(FilePath, obj.ToString(Newtonsoft.Json.Formatting.None));
-        } catch(Exception e) { Diag.Warn(e, "KeyViewerJs/StorageSave"); }
+            AtomicFile.WriteAllText(FilePath, obj.ToString(Newtonsoft.Json.Formatting.None));
+            dirty = false;
+        } catch(Exception e) {
+            nextSave = KvClock.Now + SaveDebounceSeconds;
+            Diag.Warn(e, "KeyViewerJs/StorageSave");
+        }
     }
 }
