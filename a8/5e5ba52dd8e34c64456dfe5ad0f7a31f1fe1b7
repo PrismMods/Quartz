@@ -1,0 +1,14 @@
+Quartz/Compat/Game/GameVersion.cs
+  h_6eeb8441a8a159 20-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "a85e5ba52dd8e34c64456dfe5ad0f7a31f1fe1b7",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
