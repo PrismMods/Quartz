@@ -47,6 +47,7 @@ public sealed partial class UIColorPicker : UIObject {
     private readonly Action<Color> onComplete;
     private readonly Texture2D texture;
     private readonly Sprite textureSprite;
+    private readonly Color32[] texturePixels;
     private readonly float popupWidth;
     private readonly float popupHeight;
     private float hue;
@@ -131,6 +132,7 @@ public sealed partial class UIColorPicker : UIObject {
             filterMode = FilterMode.Bilinear,
             wrapMode = TextureWrapMode.Clamp
         };
+        texturePixels = new Color32[TextureSize * TextureSize];
         textureSprite = Sprite.Create(texture, new Rect(0f, 0f, TextureSize, TextureSize), new Vector2(0.5f, 0.5f), 100f);
         wheelRect.GetComponent<Image>().sprite = textureSprite;
         Set(value, false);

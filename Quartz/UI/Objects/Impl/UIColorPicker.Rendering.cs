@@ -5,7 +5,6 @@ public sealed partial class UIColorPicker {
         if(renderedHue >= 0f && Mathf.Abs(Mathf.DeltaAngle(renderedHue * 360f, hue * 360f)) < 0.5f) return;
         renderedHue = hue;
         Color hueColor = Color.HSVToRGB(hue, 1f, 1f);
-        Color32[] pixels = new Color32[TextureSize * TextureSize];
         Vector2 huePoint = Direction(hue) * TriangleRadius;
         Vector2 whitePoint = Direction(hue + (1f / 3f)) * TriangleRadius;
         Vector2 blackPoint = Direction(hue - (1f / 3f)) * TriangleRadius;
@@ -24,10 +23,10 @@ public sealed partial class UIColorPicker {
                     color = (hueColor * weights.x) + (Color.white * weights.y) + (Color.black * weights.z);
                     color.a = 1f;
                 }
-                pixels[(y * TextureSize) + x] = color;
+                texturePixels[(y * TextureSize) + x] = color;
             }
         }
-        texture.SetPixels32(pixels);
+        texture.SetPixels32(texturePixels);
         texture.Apply(false, false);
     }
     private static Vector2 Direction(float turns) {
