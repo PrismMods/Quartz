@@ -1,0 +1,20 @@
+Quartz/Game/HookInput.cs
+  h_6eeb8441a8a159 1-245
+Quartz/Game/HookKeys.cs
+  h_6eeb8441a8a159 28-33
+modules/KeyLimiter/KeyLimiter.cs
+  h_6eeb8441a8a159 8,91,147,159,174-186
+modules/KeyViewer/KeyViewerOverlay.Input.cs
+  h_6eeb8441a8a159 3,7,11,23,27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "d7e5dc895fea2eded1e28ec02accb7e4f963813a",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
