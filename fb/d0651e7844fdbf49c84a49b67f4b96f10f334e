@@ -1,0 +1,19 @@
+Quartz/UI/UICore.cs
+  s_22165f3fdb098d::t_a68aba1977a522 26-28,34-57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "fbd0651e7844fdbf49c84a49b67f4b96f10f334e",
+  "prompts": {},
+  "sessions": {
+    "s_22165f3fdb098d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5d1365ba-2d0a-4e23-951b-ec7879d0099e",
+        "model": "unknown"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
