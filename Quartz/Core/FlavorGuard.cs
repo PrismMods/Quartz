@@ -1,36 +1,45 @@
-#if QUARTZ_KEYVIEWER
-using System.Reflection;
 namespace Quartz.Core;
 /// <summary>
-/// Keeps the standalone KeyViewer build dormant when a full Quartz is already
-/// loaded in the same process.
+/// Keeps a second Quartz build dormant when another loader/flavour is already
+/// active in the same process.
 /// </summary>
 /// <remarks>
-/// Both builds register the same uGUI menu on the same keybind, so two of them
-/// at once is an unreadable double menu. The full build is the superset, so it
-/// wins and this one steps aside rather than fighting it.
-/// <para>
-/// Both loader identities are checked, not just "Quartz": under a
-/// MelonLoader-to-UnityModManager bridge the full build present in the process
-/// is the UMM one, and a guard that only knew the MelonLoader name would wave it
-/// straight through — which is the exact setup this most needs to catch.
-/// </para>
+/// Every build registers the same uGUI menu and keybind. Loader ordering is not
+/// guaranteed, so the guard gives one loader an initialization lease while the
+/// others wait. A failed initializer releases its lease and lets a waiter try.
 /// </remarks>
 internal static class FlavorGuard {
-    // Deliberately says "remove", not "turn off": this runs once at load, and a
-    // loader's off switch does not unload the assembly, so toggling Quartz off in
-    // the panel would leave the standalone dormant anyway and look like a bug.
-    internal const string Message =
-        "A full Quartz install is already loaded — QuartzKeyViewer stays off to avoid a double menu. "
-        + "To use the standalone Key Viewer, remove (or move aside) the Quartz mod folder and restart the game. "
-        + "To keep Quartz, remove QuartzKeyViewer instead and use Quartz's own Key Viewer.";
-    internal static bool FullQuartzLoaded() {
-        foreach(Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()) {
-            try {
-                if(assembly.GetName().Name is "Quartz" or "QuartzUmm") return true;
-            } catch(Exception e) { Diag.Ignore(e); }
+    private const string OwnerSlot = "PrismMods.Quartz.ActiveBuild.Owner";
+    private const string IdentitySlot = "PrismMods.Quartz.ActiveBuild.Identity";
+    private static readonly string claimGate = string.Intern("PrismMods.Quartz.FlavorGuard");
+    /// <summary>Creates an opaque token owned by one loader instance.</summary>
+    internal static object CreateLease() => new();
+    internal static bool TryClaim(object lease, out string conflict) {
+        if(lease == null) throw new ArgumentNullException(nameof(lease));
+        string self = typeof(FlavorGuard).Assembly.GetName().Name;
+        lock(claimGate) {
+            object owner = AppDomain.CurrentDomain.GetData(OwnerSlot);
+            if(owner != null && !ReferenceEquals(owner, lease)) {
+                conflict = AppDomain.CurrentDomain.GetData(IdentitySlot) as string ?? "unknown Quartz build";
+                return false;
+            }
+            // Publish the diagnostic identity before the owner. Both reads happen
+            // under claimGate, so a contender never observes a partial claim.
+            AppDomain.CurrentDomain.SetData(IdentitySlot, self);
+            AppDomain.CurrentDomain.SetData(OwnerSlot, lease);
+            conflict = null;
+            return true;
         }
-        return false;
     }
+    internal static void Release(object lease) {
+        if(lease == null) throw new ArgumentNullException(nameof(lease));
+        lock(claimGate) {
+            if(!ReferenceEquals(AppDomain.CurrentDomain.GetData(OwnerSlot), lease)) return;
+            AppDomain.CurrentDomain.SetData(OwnerSlot, null);
+            AppDomain.CurrentDomain.SetData(IdentitySlot, null);
+        }
+    }
+    internal static string Message(string conflict) =>
+        $"Another Quartz build ({conflict}) is initializing or active — {Info.Name} is waiting dormant "
+        + "to avoid a double menu.";
 }
-#endif

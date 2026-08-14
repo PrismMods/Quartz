@@ -69,6 +69,18 @@ jobs:
           dotnet build modules/AllModules.proj -c Release
           -p:UseStubs=true -p:GamePath= -p:GameData=
 
+      # Standalone uses different compile symbols, assembly names, resources,
+      # loaders, and packaging. A successful full build does not cover that path.
+      - name: Compile standalone Key Viewer (MelonLoader)
+        run: >
+          dotnet build Quartz/Quartz.csproj -c Release -p:Flavor=KeyViewer
+          -p:UseStubs=true -p:GamePath= -p:GameData= -p:AutoInstall=false
+
+      - name: Compile standalone Key Viewer (UnityModManager)
+        run: >
+          dotnet build Quartz/Quartz.csproj -c Release -p:Flavor=KeyViewer -p:LoaderTarget=UMM
+          -p:UseStubs=true -p:GamePath= -p:GameData= -p:AutoInstall=false
+
       # The generator is what keeps stubs/ honest, so it must not be allowed to rot.
       - name: Compile the stub generator
         run: dotnet build tools/StubGen/StubGen.csproj -c Release
