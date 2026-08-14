@@ -37,6 +37,15 @@ public static class PageSongTitle {
             "songtitle_format"
         );
         fmt.InputField.characterLimit = 80;
+        GenerateUI.ToggleTip(
+            sec.Body,
+            def.StripFormatting,
+            conf.StripFormatting,
+            v => { conf.StripFormatting = v; Save(); },
+            "Strip Rich Text",
+            "songtitle_strip",
+            "Remove rich text tags (size, color, ...) and line breaks from the title."
+        );
         GenerateUI.SnapSlider(sec.Body, "Font Size", "songtitle_fontsize",
             def.FontSize, 12f, 120f, conf.FontSize, "0 px", 1f,
             v => conf.FontSize = v, Apply, Save);

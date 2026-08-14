@@ -3,6 +3,8 @@
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "SECTION_SONG_TITLE": "노래 제목",
     "SONGTITLE_FORMAT": "형식 — {artist} 및 {title} 사용",
+    "SONGTITLE_STRIP": "서식 태그 제거",
+    "DESC_SONGTITLE_STRIP": "제목에서 리치 텍스트 태그(size, color 등)와 줄바꿈을 제거합니다.",
     "SONGTITLE_FONTSIZE": "폰트 크기",
     "SONGTITLE_MASTER": "전체 크기",
     "SONGTITLE_COLOR": "글자 색상",

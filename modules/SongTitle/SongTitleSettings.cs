@@ -6,6 +6,7 @@ namespace Quartz.Features.SongTitle;
 public sealed class SongTitleSettings : ISettingsFile {
     public bool Enabled = true;
     public string Format = "{artist} - {title}";
+    public bool StripFormatting = false;
     public float FontSize = 40f;
     public float MasterSize = 1f;
     public float OffsetX = 0f;
@@ -21,6 +22,7 @@ public sealed class SongTitleSettings : ISettingsFile {
     public JToken Serialize() => new JObject {
         [nameof(Enabled)] = Enabled,
         [nameof(Format)] = Format,
+        [nameof(StripFormatting)] = StripFormatting,
         [nameof(FontSize)] = FontSize,
         [nameof(MasterSize)] = MasterSize,
         [nameof(OffsetX)] = OffsetX,
@@ -41,6 +43,7 @@ public sealed class SongTitleSettings : ISettingsFile {
     public void Deserialize(JToken token) {
         Enabled = IOUtils.Read(token, nameof(Enabled), Enabled);
         Format = IOUtils.Read(token, nameof(Format), Format);
+        StripFormatting = IOUtils.Read(token, nameof(StripFormatting), StripFormatting);
         FontSize = IOUtils.Read(token, nameof(FontSize), FontSize);
         MasterSize = IOUtils.Read(token, nameof(MasterSize), MasterSize);
         OffsetX = IOUtils.Read(token, nameof(OffsetX), OffsetX);

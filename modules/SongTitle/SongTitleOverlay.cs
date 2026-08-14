@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text;
 using System.Text.RegularExpressions;
 using HarmonyLib;
 using Quartz.Core;
@@ -40,8 +41,10 @@ public static class SongTitleOverlay {
     private static string bbTitle;
     private static string bbFmt;
     private static bool bbReorg;
+    private static bool bbStrip;
     private static string bbResult;
     private static string bbRawSource;
+    private static bool bbRawStrip;
     private static string bbRawResult;
     private static readonly Dictionary<int, Graphic> hiddenTitleGraphics = [];
     public static void EnsureConf() => ConfMgr ??= SettingsFile<SongTitleSettings>.Loaded("SongTitle.json");
@@ -133,31 +136,56 @@ public static class SongTitleOverlay {
     internal static string BuildBody(bool isReorganizing) {
         string artist = GameStats.SongArtist;
         string title = GameStats.SongTitle;
+        bool strip = Conf.StripFormatting;
         if(string.IsNullOrEmpty(artist) && string.IsNullOrEmpty(title)) {
             if(isReorganizing) {
                 artist = MainCore.Tr.Get("SONGTITLE_PLACEHOLDER_ARTIST", "Artist");
                 title = MainCore.Tr.Get("SONGTITLE_PLACEHOLDER_TITLE", "Title");
             } else {
                 string raw = GameStats.SongTitleRaw;
-                if(bbRawResult == null || raw != bbRawSource) {
+                if(bbRawResult == null || raw != bbRawSource || strip != bbRawStrip) {
                     bbRawSource = raw;
-                    bbRawResult = NormalizeColorTags(raw);
+                    bbRawStrip = strip;
+                    bbRawResult = Render(raw, strip);
                 }
                 return bbRawResult;
             }
         }
         string fmt = string.IsNullOrEmpty(Conf.Format) ? "{artist} - {title}" : Conf.Format;
-        if(bbResult != null && isReorganizing == bbReorg
+        if(bbResult != null && isReorganizing == bbReorg && strip == bbStrip
             && artist == bbArtist && title == bbTitle && fmt == bbFmt) {
             return bbResult;
         }
-        string result = NormalizeColorTags(fmt.Replace("{artist}", artist).Replace("{title}", title));
+        string result = Render(fmt.Replace("{artist}", artist).Replace("{title}", title), strip);
         bbArtist = artist;
         bbTitle = title;
         bbFmt = fmt;
         bbReorg = isReorganizing;
+        bbStrip = strip;
         bbResult = result;
         return result;
+    }
+    private static string Render(string s, bool strip) =>
+        strip ? StripFormatting(s) : NormalizeColorTags(s);
+    private static readonly Regex RichTagRegex = new(@"</?[a-zA-Z#][^<>]*>", RegexOptions.None);
+    internal static string StripFormatting(string s) {
+        if(string.IsNullOrEmpty(s)) return s;
+        if(s.IndexOf('<') >= 0) s = RichTagRegex.Replace(s, string.Empty);
+        s = s.Replace("\\n", " ").Replace("\\r", " ");
+        StringBuilder sb = new(s.Length);
+        bool pendingSpace = false;
+        foreach(char c in s) {
+            if(char.IsWhiteSpace(c)) {
+                if(sb.Length > 0) pendingSpace = true;
+                continue;
+            }
+            if(pendingSpace) {
+                sb.Append(' ');
+                pendingSpace = false;
+            }
+            sb.Append(c);
+        }
+        return sb.ToString();
     }
     private static readonly Regex HexColorTagRegex =
         new(@"<color=#([0-9a-fA-F]+)>", RegexOptions.IgnoreCase);
