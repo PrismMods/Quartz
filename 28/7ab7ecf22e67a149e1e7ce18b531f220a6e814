@@ -1,0 +1,26 @@
+Quartz/UI/UICore.cs
+  s_1d3ce8b9874788::t_180ddfd2d58281 158-159
+Quartz/UI/UICore.FirstRun.cs
+  s_1d3ce8b9874788::t_8ea3fca68b4a01 159
+  s_1d3ce8b9874788::t_4142696194d03f 30-37,39-40,44-45
+  s_1d3ce8b9874788::t_de6fa519f33cc4 116-134,140-145
+  s_1d3ce8b9874788::t_23530b834839af 46-53
+Quartz/UI/UICore.Visibility.cs
+  s_1d3ce8b9874788::t_8dae5e96e05c4f 175-182
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "287ab7ecf22e67a149e1e7ce18b531f220a6e814",
+  "prompts": {},
+  "sessions": {
+    "s_1d3ce8b9874788": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e608dda1-426d-479a-ba20-ca10a839227a",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
