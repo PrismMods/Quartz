@@ -136,7 +136,10 @@ public sealed class QuartzRuntime {
             if(!File.Exists(src)) return 0;
             if(Directory.Exists(dest)) return 0;
             if(File.Exists(dest)) {
-                File.Delete(src);
+                // A previous partial migration or a user-created file can leave
+                // both locations populated. Never guess which copy is newer:
+                // keep the loose source so the conflict remains recoverable.
+                Logger.Wrn($"[Startup] kept conflicting legacy file '{Path.GetFileName(src)}'; destination already exists");
                 return 0;
             }
             Directory.CreateDirectory(Path.GetDirectoryName(dest));
