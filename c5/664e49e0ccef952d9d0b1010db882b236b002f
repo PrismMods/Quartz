@@ -1,0 +1,26 @@
+stubs/0Harmony/Stubs.g.cs
+  h_6eeb8441a8a159 38,78-82
+stubs/MANIFEST.json
+  h_6eeb8441a8a159 38,43,96-102,2724,2740,2760,3397,3401,3406,3419-3420,3989,4008,4610,4650,5176,5448-5449,5848-5849,5891-5892
+stubs/README.md
+  h_6eeb8441a8a159 19,27,30,36,38,41
+stubs/Unity.TextMeshPro/Stubs.g.cs
+  h_6eeb8441a8a159 106
+stubs/UnityEngine.CoreModule/Stubs.g.cs
+  h_6eeb8441a8a159 84,96,99,564,583,983,1012
+stubs/UnityEngine.UI/Stubs.g.cs
+  h_6eeb8441a8a159 332
+stubs/UnityEngine.UIModule/Stubs.g.cs
+  h_6eeb8441a8a159 20,44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "c5664e49e0ccef952d9d0b1010db882b236b002f",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
