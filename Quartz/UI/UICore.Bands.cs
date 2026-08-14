@@ -81,7 +81,9 @@ public static partial class UICore {
         BottomBand.anchorMin = new(0, 0);
         BottomBand.anchorMax = new(1, 0);
         BottomBand.pivot = new(0.5f, 0f);
-        BottomBand.offsetMin = new(MENU_WIDTH, 0f);
+        // SnapShellLayout corrects this on the first layout pass anyway; seeding it
+        // right just avoids a one-frame band indent in the single-page shell.
+        BottomBand.offsetMin = new(ShellNavHidden ? 0f : MENU_WIDTH, 0f);
         BottomBand.offsetMax = new(0f, bandHeight);
         var image = band.AddComponent<Image>();
         image.color = UIColors.TopBar;

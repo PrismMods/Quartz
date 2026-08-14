@@ -109,14 +109,17 @@ public static partial class UICore {
             Menu.anchorMax = new(0, 1);
             Menu.pivot = new(0, 0.5f);
             Menu.sizeDelta = new(MENU_WIDTH, -TOP_BAR_HEIGHT);
-            Menu.anchoredPosition = MenuOpenPosition;
+            // Single-page shell (the standalone KeyViewer build) starts with the rail
+            // already parked off-canvas, which also drops the page's left inset to 0
+            // so the one page fills the panel.
+            isMenuOpen = !ShellNavHidden;
+            Menu.anchoredPosition = isMenuOpen ? MenuOpenPosition : MenuClosedPosition;
             var image = menu.AddComponent<Image>();
             image.color = UIColors.MenuBG;
             menuCanvasGroup = Menu.gameObject.AddComponent<CanvasGroup>();
-            menuCanvasGroup.alpha = 1f;
-            menuCanvasGroup.interactable = true;
-            menuCanvasGroup.blocksRaycasts = true;
-            isMenuOpen = true;
+            menuCanvasGroup.alpha = isMenuOpen ? 1f : 0f;
+            menuCanvasGroup.interactable = isMenuOpen;
+            menuCanvasGroup.blocksRaycasts = isMenuOpen;
             GameObject content = new("Content");
             content.transform.SetParent(Menu, false);
             MenuContent = content.AddComponent<RectTransform>();
@@ -223,7 +226,8 @@ public static partial class UICore {
             logoRect.anchoredPosition = new(14, 0);
             logoRect.sizeDelta = new(46f, 46f);
             var btn = logo.AddComponent<NonRaycastButton>();
-            btn.onClick += ToggleMenu;
+            // No rail to summon in the single-page shell, so the logo is just a logo.
+            if(!ShellNavHidden) btn.onClick += ToggleMenu;
         }
         {
             GameObject wordmark = new("Wordmark");

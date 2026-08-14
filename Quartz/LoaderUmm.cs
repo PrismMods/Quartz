@@ -15,6 +15,14 @@ public sealed class LoaderUmm : IQuartzHost, IQuartzLogger {
     }
     public static bool Load(UnityModManager.ModEntry modEntry) {
         if(instance != null) return true;
+#if QUARTZ_KEYVIEWER
+        // Returning false leaves the mod listed but inactive in the UMM panel,
+        // which is the visible half of the same guard the MelonLoader build has.
+        if(FlavorGuard.FullQuartzLoaded()) {
+            modEntry.Logger.Error(FlavorGuard.Message);
+            return false;
+        }
+#endif
         instance = new LoaderUmm(modEntry);
         bool initialized = false;
         modEntry.OnUpdate = (entry, _) => {
@@ -49,7 +57,7 @@ public sealed class LoaderUmm : IQuartzHost, IQuartzLogger {
     public string ModsPath => modPath;
     public string UserLibsPath => modPath;
     public bool SupportsSelfUpdate => true;
-    public string UpdateAssetName => "QuartzUmm.zip";
+    public string UpdateAssetName => Info.Name + "Umm.zip";
     public string UpdateExtractRoot =>
         Directory.GetParent(modPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))?.FullName;
     public void QuartzMsg(string msg) => logger.Log(msg);

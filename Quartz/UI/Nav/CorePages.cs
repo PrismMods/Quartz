@@ -22,9 +22,20 @@ internal static class CorePages {
         Visuals();
         Standalone();
     }
+    // Everything the standalone KeyViewer build hides. It is meant to be exactly one
+    // page, so every core category except the one holding the key viewer is gated on
+    // this. Kept as a predicate rather than #if so the registry shape — page keys,
+    // states, search entries — stays identical between the two builds.
+    private static bool CoreNav => !Info.KeyViewerOnly;
     private static void Categories() {
-        Category(HomeCategoryKey, "Home", "HOME", UISprite.QuartzLogo, 0, iconScale: 1.45f);
-        Category(ModulesCategoryKey, "Modules", "MODULES", UISprite.Wrench128, 5, alwaysSubmenu: true);
+        Category(HomeCategoryKey, "Home", "HOME", UISprite.QuartzLogo, 0, iconScale: 1.45f,
+            visible: static () => CoreNav);
+        // The KeyViewer flavour ships a fixed module set, so the store — and the
+        // addons page that lives in the same category — would only offer things it
+        // is not meant to install. Registered but hidden: one predicate instead of
+        // a conditional-compilation hole through the page registry.
+        Category(ModulesCategoryKey, "Modules", "MODULES", UISprite.Wrench128, 5, alwaysSubmenu: true,
+            visible: static () => CoreNav);
         Category("overlay", "Overlay", "OVERLAY", UISprite.Monitor128, 10, togglable: true);
         Category("gameplay", "Gameplay", "GAMEPLAY", UISprite.Gamepad128, 20, togglable: true);
         Category("visuals", "Visuals", "VISUALS", UISprite.Image128, 30, togglable: true);
@@ -34,13 +45,13 @@ internal static class CorePages {
         // Pages come from the nostalgia module; the category hides itself when it is not installed.
         Category("nostalgia", "Nostalgia", "NOSTALGIA", UISprite.ClockRewind128, 60, togglable: true);
         Category("tuf", "TUF", "TUF", UISprite.TufLogo, 70, togglable: true);
-        Category("search", "Search", "SEARCH", UISprite.MagnifyingGlass128, 80);
-        Category("profiles", "Profiles", "PROFILES", UISprite.Users128, 90);
-        Category("import", "Import", "IMPORT", UISprite.Book128, 100);
-        Category("settings", "Settings", "SETTINGS", UISprite.Gear128, 120);
-        Category("help", "Help", "HELP", UISprite.QuestionMarkCircle128, 130, alwaysSubmenu: true);
-        Category("credits", "Credits", "CREDITS", UISprite.Star128, 140);
-        Category("developer", "Developer", "DEVELOPER", UISprite.Wrench128, 150, visible: static () => Info.IsDev);
+        Category("search", "Search", "SEARCH", UISprite.MagnifyingGlass128, 80, visible: static () => CoreNav);
+        Category("profiles", "Profiles", "PROFILES", UISprite.Users128, 90, visible: static () => CoreNav);
+        Category("import", "Import", "IMPORT", UISprite.Book128, 100, visible: static () => CoreNav);
+        Category("settings", "Settings", "SETTINGS", UISprite.Gear128, 120, visible: static () => CoreNav);
+        Category("help", "Help", "HELP", UISprite.QuestionMarkCircle128, 130, alwaysSubmenu: true, visible: static () => CoreNav);
+        Category("credits", "Credits", "CREDITS", UISprite.Star128, 140, visible: static () => CoreNav);
+        Category("developer", "Developer", "DEVELOPER", UISprite.Wrench128, 150, visible: static () => CoreNav && Info.IsDev);
     }
     private static void Overlay() {
     }
@@ -53,22 +64,24 @@ internal static class CorePages {
         Page(SearchPageKey, "search", 10, "Search", "SEARCH", PageSearch.Create);
         Page("profiles.main", "profiles", 10, "Profiles", "PROFILES", PageProfiles.Create);
         Page("import.main", "import", 10, "Import", "IMPORT", PageImport.Create);
-        Page(ModulesPageKey, ModulesCategoryKey, 0, "All Modules", "MODULES_ALL", PageModules.Create);
+        Page(ModulesPageKey, ModulesCategoryKey, 0, "All Modules", "MODULES_ALL", PageModules.Create,
+            visible: static () => CoreNav);
         foreach(NavCategory category in NavRegistry.AllCategories) {
             if(!category.Togglable) continue;
             string key = category.Key;
             Page("modules." + key, ModulesCategoryKey, category.Order, category.Title, category.LocaleKey,
                 rect => PageModuleCategory.Create(rect, key),
                 () => GenerateUI.Tr("MODULES", "Modules") + " · " + GenerateUI.Tr(category.LocaleKey, category.Title),
-                () => Quartz.Modules.ModuleCategories.IsEnabled(key));
+                () => CoreNav && Quartz.Modules.ModuleCategories.IsEnabled(key));
         }
-        Page(AddonsPageKey, AddonsCategoryKey, 90, "Addons", "ADDONS", PageAddons.Create, separatorBefore: true);
+        Page(AddonsPageKey, AddonsCategoryKey, 90, "Addons", "ADDONS", PageAddons.Create, separatorBefore: true,
+            visible: static () => CoreNav);
         Page(SettingsPageKey, "settings", 10, "Settings", "SETTINGS", PageSettings.Create);
         Page("help.faq", "help", 10, "FAQ", "FAQ", PageHelp.FaqPage,
             static () => GenerateUI.Tr("HELP", "Help") + " · " + GenerateUI.Tr("FAQ", "FAQ"));
         Page("credits.main", "credits", 10, "Credits", "CREDITS", PageCredits.Create);
         Page("developer.main", "developer", 10, "Developer", "DEVELOPER", PageDeveloper.Create,
-            visible: static () => Info.IsDev);
+            visible: static () => CoreNav && Info.IsDev);
     }
     private static void Category(
         string key, string title, string localeKey, UISprite icon, int order,

@@ -269,9 +269,16 @@ public static partial class UICore {
         MainCore.TC.Play(resetSequence);
     }
     private static bool isMenuOpen = false;
+    /// <summary>
+    /// Single-page shell: no category rail, no submenu, and nothing that can summon
+    /// them. The standalone KeyViewer build has exactly one page, so the rail would
+    /// be a column holding one entry that never changes anything.
+    /// </summary>
+    internal static bool ShellNavHidden => Info.KeyViewerOnly;
     private static Vector2 MenuOpenPosition => new(0f, -TOP_BAR_HEIGHT * 0.5f);
     private static Vector2 MenuClosedPosition => new(-MENU_WIDTH, -TOP_BAR_HEIGHT * 0.5f);
     public static void OpenMenu() {
+        if(ShellNavHidden) return;
         isMenuOpen = true;
         Menu.anchoredPosition = MenuClosedPosition;
         menuCanvasGroup.interactable = true;
@@ -285,6 +292,7 @@ public static partial class UICore {
         ApplyShellLayout(true, 0.4f);
     }
     public static void ToggleMenu() {
+        if(ShellNavHidden) return;
         if(isMenuOpen) CloseMenu();
         else OpenMenu();
     }

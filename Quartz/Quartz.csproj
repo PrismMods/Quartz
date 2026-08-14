@@ -55,6 +55,13 @@
 		<PackageStageModsDir>$(PackageStageRoot)/Mods</PackageStageModsDir>
 		<PackageStageDataDir>$(PackageStageRoot)/UserData/Quartz</PackageStageDataDir>
 		<DistZipPath>$(DistDir)/Quartz.zip</DistZipPath>
+		<!-- MelonLoader data root of the local test install; the KeyViewer flavour
+		     moves it, so the two builds never share Settings.json or Module/. -->
+		<MlDataRoot>$(GamePath)/UserData/Quartz</MlDataRoot>
+
+		<!-- Flavour: Full (everything, the default) or KeyViewer (the same core
+		     shipping only the key-viewer module and its deps, as its own mod). -->
+		<Flavor Condition="'$(Flavor)' == ''">Full</Flavor>
 	</PropertyGroup>
 
 	<!-- UMM build overrides: separate obj/bin so it never clobbers the ML build's
@@ -93,7 +100,42 @@
 		     too would load the mod twice. The QuartzUmm.zip is still built either
 		     way — this gate is purely about the local test install. -->
 		<MelonLoaderPresent Condition="Exists('$(GamePath)/MelonLoader/net35/MelonLoader.dll')">true</MelonLoaderPresent>
-		<UmmAutoInstall Condition="'$(AutoInstall)' == 'true' And '$(MelonLoaderPresent)' != 'true'">true</UmmAutoInstall>
+		<UmmAutoInstall Condition="'$(UmmAutoInstall)' == '' And '$(AutoInstall)' == 'true' And '$(MelonLoaderPresent)' != 'true'">true</UmmAutoInstall>
+	</PropertyGroup>
+
+	<!-- KeyViewer flavour: identical core, distinct identity. Same reasoning as the
+	     UMM block above — a separate assembly name, obj/bin, data root and zip, so
+	     it can sit beside a full Quartz install without either one touching the
+	     other's files. QUARTZ_KEYVIEWER flips Info.Name, which is what actually
+	     moves the data root, the Harmony id and the update asset name.
+	     Must come AFTER the UMM block: it overrides that block's AssemblyName. -->
+	<PropertyGroup Condition="'$(Flavor)' == 'KeyViewer'">
+		<DefineConstants>$(DefineConstants);QUARTZ_KEYVIEWER</DefineConstants>
+		<AssemblyName>QuartzKeyViewer</AssemblyName>
+		<IntermediateOutputPath>obj/kv/$(Configuration)/</IntermediateOutputPath>
+		<OutputPath>bin/kv/$(Configuration)/</OutputPath>
+		<PackageStageRoot>$(IntermediateOutputPath)dist-stage</PackageStageRoot>
+		<PackageStageModsDir>$(PackageStageRoot)/Mods</PackageStageModsDir>
+		<PackageStageDataDir>$(PackageStageRoot)/UserData/QuartzKeyViewer</PackageStageDataDir>
+		<DistZipPath>$(DistDir)/QuartzKeyViewer.zip</DistZipPath>
+		<MlDataRoot>$(GamePath)/UserData/QuartzKeyViewer</MlDataRoot>
+		<!-- The modules this flavour ships. overlay is keyviewer's only manifest
+		     dep. The key limiter is deliberately absent: KvKeyLimiterBridge makes
+		     it optional, so "Sync Keys to Key Limiter" just isn't offered here. -->
+		<KeyViewerModuleIds>keyviewer;overlay</KeyViewerModuleIds>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Flavor)' == 'KeyViewer' And '$(LoaderTarget)' == 'UMM'">
+		<AssemblyName>QuartzKeyViewerUmm</AssemblyName>
+		<IntermediateOutputPath>obj/kv-umm/$(Configuration)/</IntermediateOutputPath>
+		<OutputPath>bin/kv-umm/$(Configuration)/</OutputPath>
+		<PackageStageRoot>$(IntermediateOutputPath)dist-stage</PackageStageRoot>
+		<DistZipPath>$(DistDir)/QuartzKeyViewerUmm.zip</DistZipPath>
+		<UmmModFolderName>QuartzKeyViewer</UmmModFolderName>
+		<UmmModDir>$(UmmInstallRoot)/$(UmmModFolderName)</UmmModDir>
+		<UmmStageModDir>$(PackageStageRoot)/$(UmmModFolderName)</UmmStageModDir>
+		<UmmStageDataDir>$(UmmStageModDir)/UserData</UmmStageDataDir>
+		<UmmModDataDir>$(UmmModDir)/UserData</UmmModDataDir>
 	</PropertyGroup>
 
 	<!-- Redirect every game reference at stubs/ when -p:UseStubs=true. Must sit
@@ -259,13 +301,27 @@
 			<ExportFiles Include="Resource/Export/**/*.*" Exclude="Resource/Export/**/.DS_Store;Resource/Export/**/.claude-flow/**;Resource/Export/FAQ.json" />
 		</ItemGroup>
 
-		<MakeDir Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" Directories="$(GamePath)/UserData/Quartz" />
-		<Copy Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(GamePath)/UserData/Quartz/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+		<MakeDir Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" Directories="$(MlDataRoot)" />
+		<Copy Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(MlDataRoot)/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
 
 		<RemoveDir Directories="$(PackageStageRoot)" Condition="'$(TargetPath)' != ''" />
 		<MakeDir Directories="$(DistDir);$(PackageStageModsDir);$(PackageStageDataDir)" Condition="'$(TargetPath)' != ''" />
 		<Copy Condition="'$(TargetPath)' != ''" SourceFiles="$(TargetPath)" DestinationFolder="$(PackageStageModsDir)" />
 		<Copy Condition="'$(TargetPath)' != ''" SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(PackageStageDataDir)/%(RecursiveDir)%(Filename)%(Extension)')" />
+		<!-- Flavour modules ship pre-installed in Module/, not in Module.bundled/:
+		     the module browser is hidden here, so nothing would ever install them
+		     out of the bundle. A module in Module/ with no state entry defaults to
+		     enabled, so the key viewer is live on first launch. -->
+		<ItemGroup Condition="'$(Flavor)' == 'KeyViewer'">
+			<FlavorModuleId Include="$(KeyViewerModuleIds)" />
+			<!-- Binary + manifest: ModuleService needs both beside each other. -->
+			<FlavorModule Include="@(FlavorModuleId->'$(DistDir)/modules/%(Identity).qmod')" />
+			<FlavorModule Include="@(FlavorModuleId->'$(DistDir)/modules/%(Identity).qmod.json')" />
+		</ItemGroup>
+		<Error Condition="'$(Flavor)' == 'KeyViewer' And '@(FlavorModule)' == ''"
+		       Text="No modules in $(DistDir)/modules — build modules/KeyViewer/KeyViewer.csproj first (tools/build-keyviewer.sh does this)." />
+		<Copy Condition="'$(Flavor)' == 'KeyViewer' And '$(TargetPath)' != ''" SourceFiles="@(FlavorModule)" DestinationFolder="$(PackageStageDataDir)/Module" />
+		<Copy Condition="'$(Flavor)' == 'KeyViewer' And '$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" SourceFiles="@(FlavorModule)" DestinationFolder="$(MlDataRoot)/Module" SkipUnchangedFiles="true" />
 		<Delete Files="$(DistZipPath)" Condition="'$(TargetPath)' != ''" TreatErrorsAsWarnings="true" />
 		<ZipDirectory SourceDirectory="$(PackageStageRoot)" DestinationFile="$(DistZipPath)" Condition="'$(TargetPath)' != ''" />
 		<Message Importance="high" Text="Zip: $(DistZipPath)" Condition="'$(TargetPath)' != ''" />
@@ -283,6 +339,10 @@
 		<PropertyGroup>
 			<_InfoTemplate>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)/Resource/Umm/Info.json'))</_InfoTemplate>
 			<_InfoJson>$(_InfoTemplate.Replace('__VERSION__', '$(QuartzDisplayVersion)'))</_InfoJson>
+			<!-- Id and assembly follow the flavour: UMM keys installs off Info.json's
+			     Id, so a shared one would make the two builds overwrite each other. -->
+			<_InfoJson>$(_InfoJson.Replace('__ID__', '$(UmmModFolderName)'))</_InfoJson>
+			<_InfoJson>$(_InfoJson.Replace('__ASSEMBLY__', '$(TargetFileName)'))</_InfoJson>
 		</PropertyGroup>
 
 		<ItemGroup>
@@ -295,6 +355,17 @@
 		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(UmmStageModDir)" />
 		<WriteLinesToFile File="$(UmmStageModDir)/Info.json" Lines="$(_InfoJson)" Overwrite="true" />
 		<Copy SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(UmmStageDataDir)/%(RecursiveDir)%(Filename)%(Extension)')" />
+
+		<!-- Same pre-installed Module/ as the ML flavour zip; see PostBuild. -->
+		<ItemGroup Condition="'$(Flavor)' == 'KeyViewer'">
+			<FlavorModuleId Include="$(KeyViewerModuleIds)" />
+			<FlavorModule Include="@(FlavorModuleId->'$(DistDir)/modules/%(Identity).qmod')" />
+			<FlavorModule Include="@(FlavorModuleId->'$(DistDir)/modules/%(Identity).qmod.json')" />
+		</ItemGroup>
+		<Error Condition="'$(Flavor)' == 'KeyViewer' And '@(FlavorModule)' == ''"
+		       Text="No modules in $(DistDir)/modules — build modules/KeyViewer/KeyViewer.csproj first (tools/build-keyviewer.sh does this)." />
+		<Copy Condition="'$(Flavor)' == 'KeyViewer'" SourceFiles="@(FlavorModule)" DestinationFolder="$(UmmStageDataDir)/Module" />
+		<Copy Condition="'$(Flavor)' == 'KeyViewer' And '$(UmmAutoInstall)' == 'true'" SourceFiles="@(FlavorModule)" DestinationFolder="$(UmmModDataDir)/Module" SkipUnchangedFiles="true" />
 
 		<Delete Files="$(DistZipPath)" TreatErrorsAsWarnings="true" />
 		<ZipDirectory SourceDirectory="$(PackageStageRoot)" DestinationFile="$(DistZipPath)" />
@@ -317,7 +388,10 @@
 	     unifies its "QuartzUmm" identity in AddonService.HookModIdentityResolver).
 	     ML build only — the UMM reference assembly would carry the wrong
 	     identity for a portable addon. -->
-	<Target Name="PublishAddonSdk" AfterTargets="Build" Condition="'$(LoaderTarget)' != 'UMM' And Exists('$(TargetRefPath)')">
+	<!-- Flavour builds are excluded too: their reference assembly is named
+	     QuartzKeyViewer, and publishing it would silently break every module and
+	     addon that compiles against sdk/QuartzAddon.dll expecting "Quartz". -->
+	<Target Name="PublishAddonSdk" AfterTargets="Build" Condition="'$(LoaderTarget)' != 'UMM' And '$(Flavor)' == 'Full' And Exists('$(TargetRefPath)')">
 		<MakeDir Directories="$(MSBuildProjectDirectory)/../sdk" />
 		<Copy SourceFiles="$(TargetRefPath)" DestinationFiles="$(MSBuildProjectDirectory)/../sdk/QuartzAddon.dll" SkipUnchangedFiles="true" />
 		<Message Importance="high" Text="Addon SDK: sdk/QuartzAddon.dll" />

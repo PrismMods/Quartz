@@ -11,13 +11,23 @@ using Quartz.Compat.Interface;
 namespace Quartz;
 public class Loader : MelonMod, IQuartzHost, IQuartzLogger {
     public IQuartzLogger QuartzLogger => this;
-    public string QuartzFilePath => Path.Combine(MelonEnvironment.UserDataDirectory, "Quartz");
+    // Info.Name, not a literal: the KeyViewer flavour ships as its own mod and must
+    // not read or write the full build's UserData/Quartz folder.
+    public string QuartzFilePath => Path.Combine(MelonEnvironment.UserDataDirectory, Info.Name);
     public string ModsPath => MelonEnvironment.ModsDirectory;
     public string UserLibsPath => MelonEnvironment.UserLibsDirectory;
     public bool SupportsSelfUpdate => true;
-    public string UpdateAssetName => "Quartz.zip";
+    public string UpdateAssetName => Info.Name + ".zip";
     public string UpdateExtractRoot => Directory.GetParent(MelonEnvironment.ModsDirectory)?.FullName;
-    public override void OnInitializeMelon() => MainCore.Initialize(this);
+    public override void OnInitializeMelon() {
+#if QUARTZ_KEYVIEWER
+        if(FlavorGuard.FullQuartzLoaded()) {
+            MelonLogger.Error(FlavorGuard.Message);
+            return;
+        }
+#endif
+        MainCore.Initialize(this);
+    }
     public override void OnDeinitializeMelon() => MainCore.Dispose();
     public override void OnUpdate() => MainCore.Tick();
     public void QuartzMsg(string msg) => MelonLogger.Msg(msg);

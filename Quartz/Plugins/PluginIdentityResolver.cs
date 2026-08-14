@@ -25,7 +25,10 @@ public static class PluginIdentityResolver {
         Assembly mod = typeof(PluginIdentityResolver).Assembly;
         handler = (_, args) => {
             string name = new AssemblyName(args.Name).Name;
-            if(name is "Quartz" or "QuartzUmm") return mod;
+            // Modules and addons are compiled once against sdk/QuartzAddon.dll, whose
+            // identity is "Quartz". Every shipped core — UMM build, KeyViewer flavour —
+            // answers to that name so the same .qmod loads under all of them.
+            if(name is "Quartz" or "QuartzUmm" or "QuartzKeyViewer" or "QuartzKeyViewerUmm") return mod;
             if(name == null) return null;
             if(current.TryGetValue(name, out Assembly live)) return live;
             if(!name.StartsWith("Quartz.Module.", StringComparison.Ordinal)) return null;
