@@ -26,6 +26,12 @@ if [[ "$AUTOINSTALL" == "1" ]]; then
     INSTALL_ARGS=(-p:AutoInstall=true)
 fi
 
+# Module projects compile against the generated sdk/QuartzAddon.dll, which is
+# deliberately not committed. Refresh it first so this script also works from a
+# clean checkout; never auto-install this full-core bootstrap build.
+echo ">> refreshing the Quartz module SDK ($CONFIG)..."
+dotnet build Quartz/Quartz.csproj -c "$CONFIG" -p:Flavor=Full -p:LoaderTarget=ML -p:AutoInstall=false
+
 # The key-viewer module project references KeyLimiter and Overlay, so this one
 # build produces all three .qmod files the flavour ships. The core's packaging
 # step reads them straight out of dist/modules.
