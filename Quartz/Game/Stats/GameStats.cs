@@ -151,7 +151,7 @@ public static class GameStats {
     internal static float RawMapTimeSeconds() {
         try {
             scrConductor cd = scrConductor.instance;
-            return cd == null ? 0f : (float)(cd.addoffset + cd.songposition_minusi);
+            return cd == null ? 0f : Mathf.Max(0f, (float)cd.songposition_minusi);
         } catch(Exception e) { Diag.Ignore(e); return 0f; }
     }
     public static float MapTotalTimeSeconds => MapTotalSeconds();
