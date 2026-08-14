@@ -1,0 +1,24 @@
+examples/AddonExample/AddonExample.cs
+  s_f148d4f7814f51::t_3d3c8b72ac71e9 72
+  s_f148d4f7814f51::t_1ac6829c3cb693 1-71,73-101
+examples/AddonExample/AddonExample.csproj
+  s_f148d4f7814f51::t_06c258f3a994f5 1-6
+sdk/README.md
+  s_f148d4f7814f51::t_6bdd48e7b43f2c 105-109,111-121,125-159
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "bc0b85ab8b0072c8b1b07a36aa2aa67250fd1d59",
+  "prompts": {},
+  "sessions": {
+    "s_f148d4f7814f51": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "792eead4-2548-4292-b5ef-13bc36e9dbdb",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
