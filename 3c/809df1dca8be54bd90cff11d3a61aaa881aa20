@@ -1,0 +1,14 @@
+build.sh
+  h_6eeb8441a8a159 79-92,95-96,98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "3c809df1dca8be54bd90cff11d3a61aaa881aa20",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
