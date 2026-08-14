@@ -19,8 +19,9 @@ internal static class EnumToStringPatch {
                 MainCore.Log.Err("[KeyLimiter] Enum.ToString() is missing, chart key limiter events stay off");
                 return false;
             }
-            harmony.Patch(target, prefix: new HarmonyMethod(
-                AccessTools.Method(typeof(EnumToStringPatch), nameof(Prefix))));
+            harmony.CreateProcessor(target)
+                .AddPrefix(new HarmonyMethod(AccessTools.Method(typeof(EnumToStringPatch), nameof(Prefix))))
+                .Patch();
             applied = true;
             return true;
         } catch(Exception e) {

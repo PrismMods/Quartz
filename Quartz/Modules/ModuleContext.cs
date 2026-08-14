@@ -49,6 +49,7 @@ public sealed class ModuleContext {
             return;
         }
         foreach(Type type in types) {
+            if(!Core.Service.HarmonyService.IsPatchClass(type)) continue;
             try {
                 Harmony.CreateClassProcessor(type).Patch();
             } catch(Exception e) {
@@ -59,7 +60,7 @@ public sealed class ModuleContext {
     internal void RemovePatches() {
         if(!patchGate.Release()) return;
         try {
-            harmony?.UnpatchSelf();
+            Quartz.Compat.HarmonyCompat.UnpatchOwn(harmony);
         } catch(Exception e) {
             Err($"unpatch failed: {e}");
         }

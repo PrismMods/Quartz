@@ -23,14 +23,14 @@ public sealed class HarmonyService : IRuntimeService, IRuntimeTick {
             }
         }
     }
-    private static bool IsPatchClass(Type type) {
+    internal static bool IsPatchClass(Type type) {
         if(type.GetCustomAttributes(typeof(HarmonyPatch), true).Length > 0) return true;
         foreach(System.Reflection.MethodInfo m in AccessTools.GetDeclaredMethods(type))
             if(m.GetCustomAttributes(typeof(HarmonyPatch), true).Length > 0) return true;
         return false;
     }
     public void Dispose() {
-        Harmony?.UnpatchSelf();
+        Quartz.Compat.HarmonyCompat.UnpatchOwn(Harmony);
         Harmony = null;
     }
 }

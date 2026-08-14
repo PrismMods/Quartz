@@ -118,8 +118,12 @@
 	     is resolved from lib/ instead (see AddLibSearchPath). The Exists() guards
 	     therefore accept either location, or an install missing e.g. MelonLoader
 	     would drop the reference item entirely and never reach the fallback.
-	     0Harmony is the same HarmonyX types under MelonLoader and UMM; prefer
-	     MelonLoader's copy, fall back to UMM's, then to lib/. -->
+	     0Harmony is HarmonyX under both loaders but NOT the same version: UMM
+	     ships an older one (2.4.2) than MelonLoader (2.10.2) and signatures
+	     differ (Harmony.Patch gained an ilmanipulator parameter, so the 5-argument
+	     overload only exists in the older one). Compile against UMM's copy — the
+	     lower common denominator — so the same call binds under both runtimes;
+	     fall back to MelonLoader's, then to lib/. -->
 	<ItemGroup>
 		<Reference Include="Newtonsoft.Json"><HintPath>$(ManagedDir)/Newtonsoft.Json.dll</HintPath></Reference>
 		<!-- Prefer the exact System.* assemblies shipped with the game over the
@@ -131,8 +135,8 @@
 		<Reference Include="System.Memory" Condition="Exists('$(ManagedDir)/System.Memory.dll') Or Exists('$(LibDir)/System.Memory.dll')"><HintPath>$(ManagedDir)/System.Memory.dll</HintPath></Reference>
 		<Reference Include="System.ValueTuple" Condition="Exists('$(ManagedDir)/System.ValueTuple.dll') Or Exists('$(LibDir)/System.ValueTuple.dll')"><HintPath>$(ManagedDir)/System.ValueTuple.dll</HintPath></Reference>
 		<Reference Include="0Harmony">
-			<HintPath Condition="Exists('$(GamePath)/MelonLoader/net35/0Harmony.dll')">$(GamePath)/MelonLoader/net35/0Harmony.dll</HintPath>
-			<HintPath Condition="!Exists('$(GamePath)/MelonLoader/net35/0Harmony.dll')">$(ManagedDir)/UnityModManager/0Harmony.dll</HintPath>
+			<HintPath Condition="Exists('$(ManagedDir)/UnityModManager/0Harmony.dll')">$(ManagedDir)/UnityModManager/0Harmony.dll</HintPath>
+			<HintPath Condition="!Exists('$(ManagedDir)/UnityModManager/0Harmony.dll')">$(GamePath)/MelonLoader/net35/0Harmony.dll</HintPath>
 		</Reference>
 <!-- UnityFileDialog is NOT referenced: 3.x ships it in Managed/, r136 does not.
 		     A compile-time reference would make the assembly unloadable on r136, so

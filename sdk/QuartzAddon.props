@@ -51,9 +51,11 @@
   </PropertyGroup>
   <PropertyGroup>
     <ManagedDir>$(GamePath)/$(GameData)/Managed</ManagedDir>
-    <!-- 0Harmony ships under MelonLoader (primary) or UMM; prefer MelonLoader's. -->
-    <HarmonyDll Condition="Exists('$(GamePath)/MelonLoader/net35/0Harmony.dll')">$(GamePath)/MelonLoader/net35/0Harmony.dll</HarmonyDll>
-    <HarmonyDll Condition="'$(HarmonyDll)' == '' And Exists('$(ManagedDir)/UnityModManager/0Harmony.dll')">$(ManagedDir)/UnityModManager/0Harmony.dll</HarmonyDll>
+    <!-- 0Harmony ships under UMM or MelonLoader and the two are different HarmonyX
+         versions (UMM 2.4.2, MelonLoader 2.10.2) with differing signatures. Prefer
+         UMM's — the lower common denominator — so one build runs under both. -->
+    <HarmonyDll Condition="Exists('$(ManagedDir)/UnityModManager/0Harmony.dll')">$(ManagedDir)/UnityModManager/0Harmony.dll</HarmonyDll>
+    <HarmonyDll Condition="'$(HarmonyDll)' == '' And Exists('$(GamePath)/MelonLoader/net35/0Harmony.dll')">$(GamePath)/MelonLoader/net35/0Harmony.dll</HarmonyDll>
   </PropertyGroup>
 
   <!-- Redirect every game reference at stubs/ when -p:UseStubs=true (CI compiles
