@@ -11,6 +11,8 @@ public enum EvalState {
 public static class Evaluator {
     public static (float result, EvalState state) Evaluate(string exprStr, float currentVal, float? min = null, float? max = null) {
         if(string.IsNullOrWhiteSpace(exprStr)) return (currentVal, EvalState.Error);
+        if(double.TryParse(exprStr, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out double direct))
+            return Validate(direct, currentVal, min, max);
         double evaluated;
         try {
             evaluated = new Parser(exprStr).Parse();
@@ -18,12 +20,13 @@ public static class Evaluator {
             Diag.Ignore(e);
             return (currentVal, EvalState.Error);
         }
+        return Validate(evaluated, currentVal, min, max);
+    }
+    private static (float result, EvalState state) Validate(double evaluated, float currentVal, float? min, float? max) {
         if(double.IsNaN(evaluated) || double.IsInfinity(evaluated)) return (currentVal, EvalState.Error);
         float result = (float)evaluated;
-        if(min.HasValue && max.HasValue) {
-            if(result < min.Value) return (min.Value, EvalState.UnderRange);
-            if(result > max.Value) return (max.Value, EvalState.OverRange);
-        }
+        if(min.HasValue && result < min.Value) return (min.Value, EvalState.UnderRange);
+        if(max.HasValue && result > max.Value) return (max.Value, EvalState.OverRange);
         if(UnityEngine.Mathf.Approximately(result, currentVal)) return (result, EvalState.Same);
         return (result, EvalState.OK);
     }
