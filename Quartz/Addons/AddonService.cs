@@ -35,6 +35,8 @@ public static class AddonService {
         public QuartzAddon Instance;
         internal AddonContext Context;
         internal bool Active;
+        internal object Api;
+        internal bool ApiRequested;
         public bool Loaded => Instance != null && Error == null;
     }
     private static readonly List<Handle> handles = [];
@@ -133,6 +135,8 @@ public static class AddonService {
         handle.Context?.Cleanup();
         handle.Instance = null;
         handle.Context = null;
+        handle.Api = null;
+        handle.ApiRequested = false;
     }
     public static void SetAddonEnabled(Handle handle, bool enabled) {
         if(handle.Enabled == enabled) return;
@@ -211,6 +215,12 @@ public static class AddonService {
         } catch(Exception e) {
             MainCore.Log.Wrn($"[Addons] couldn't remove settings for '{handle.Id}': {e.Message}");
         }
+        try {
+            string data = Path.Combine(MainCore.Paths.AddonsPath, handle.Id);
+            if(Directory.Exists(data)) Directory.Delete(data, true);
+        } catch(Exception e) {
+            MainCore.Log.Wrn($"[Addons] couldn't remove data for '{handle.Id}': {e.Message}");
+        }
         confMgr.Data.Enabled.Remove(handle.UnitId);
         confMgr.RequestSave();
         MainCore.Log.Msg($"[Addons] removed '{handle.Name}'");
@@ -280,8 +290,133 @@ public static class AddonService {
                 if(handle.Error != null) MainCore.Log.Err($"[Addon:{handle.Id}] {handle.Error}");
                 continue;
             }
+            string jitError = PreJitCheck(assembly);
+            if(jitError != null) {
+                handle.Error = $"failed compatibility check — rebuild against the current QuartzAddon.dll. {jitError}";
+                MainCore.Log.Err($"[Addon:{handle.Id}] {handle.Error}");
+                continue;
+            }
             InstantiateAddon(handle, assembly);
         }
+        RunOnLoads();
+    }
+    private static string PreJitCheck(Assembly assembly) {
+        try {
+            foreach(Type type in Quartz.Plugins.PluginEntryScan.Types(assembly)) {
+                if(type.ContainsGenericParameters) continue;
+                const BindingFlags all = BindingFlags.DeclaredOnly | BindingFlags.Instance
+                    | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+                foreach(MethodBase method in type.GetMethods(all).Cast<MethodBase>().Concat(type.GetConstructors(all))) {
+                    if(method.IsAbstract || method.ContainsGenericParameters) continue;
+                    try {
+                        System.Runtime.CompilerServices.RuntimeHelpers.PrepareMethod(method.MethodHandle);
+                    } catch(Exception e) when(
+                        e is TypeLoadException or MissingMemberException or MemberAccessException or BadImageFormatException
+                    ) {
+                        return $"{type.FullName}.{method.Name}: {e.Message}";
+                    }
+                }
+            }
+        } catch(Exception e) {
+            Diag.Ignore(e);
+        }
+        return null;
+    }
+    private static void RunOnLoads() {
+        List<Handle> pending = handles.Where(h => h.Instance != null && h.Error == null).ToList();
+        List<Handle> ordered = SortForLoad(pending);
+        foreach(Handle handle in ordered) {
+            QuartzAddon instance = handle.Instance;
+            if(instance == null) continue;
+            string blocked = null;
+            foreach(string req in instance.Requires ?? []) {
+                Handle dep = FindHandle(req);
+                blocked = dep switch {
+                    null => $"requires '{req}' — install it, then reload",
+                    { Enabled: false } => $"requires '{req}' — enable it, then reload",
+                    { Loaded: false } => $"requires '{req}', which failed to load",
+                    _ => null,
+                };
+                if(blocked != null) break;
+            }
+            if(blocked != null) {
+                handle.Error = blocked;
+                MainCore.Log.Err($"[Addon:{handle.Id}] {blocked}");
+                handle.Context?.Cleanup();
+                handle.Context = null;
+                handle.Instance = null;
+                continue;
+            }
+            try {
+                instance.OnLoad();
+                MainCore.Log.Msg($"[Addons] loaded '{handle.Name}' v{handle.Version}{(handle.Author.Length > 0 ? $" by {handle.Author}" : "")}");
+            } catch(Exception e) {
+                handle.Error = $"OnLoad threw: {e}";
+                MainCore.Log.Err($"[Addon:{handle.Id}] {handle.Error}");
+                handle.Context?.Cleanup();
+                handle.Context = null;
+                handle.Instance = null;
+            }
+        }
+    }
+    private static List<Handle> SortForLoad(List<Handle> pending) {
+        Dictionary<Handle, List<Handle>> after = pending.ToDictionary(h => h, _ => new List<Handle>());
+        foreach(Handle handle in pending) {
+            QuartzAddon instance = handle.Instance;
+            if(instance == null) continue;
+            IEnumerable<string> befores = (instance.Requires ?? []).Concat(instance.LoadAfter ?? []);
+            foreach(string id in befores) {
+                Handle dep = FindHandle(id);
+                if(dep != null && dep != handle && after.ContainsKey(dep)) after[handle].Add(dep);
+            }
+        }
+        List<Handle> ordered = [];
+        HashSet<Handle> done = [];
+        HashSet<Handle> visiting = [];
+        bool cycle = false;
+        void Visit(Handle h) {
+            if(done.Contains(h)) return;
+            if(!visiting.Add(h)) {
+                cycle = true;
+                return;
+            }
+            foreach(Handle dep in after[h]) Visit(dep);
+            visiting.Remove(h);
+            done.Add(h);
+            ordered.Add(h);
+        }
+        foreach(Handle handle in pending) Visit(handle);
+        if(cycle) MainCore.Log.Wrn("[Addons] dependency cycle detected — load order falls back to scan order inside the cycle");
+        return ordered;
+    }
+    internal static Handle FindHandle(string id) {
+        if(string.IsNullOrEmpty(id)) return null;
+        foreach(Handle handle in handles)
+            if(string.Equals(handle.Id, id, StringComparison.OrdinalIgnoreCase)) return handle;
+        return null;
+    }
+    internal static QuartzAddon FindLoaded(string id) {
+        Handle handle = FindHandle(id);
+        return handle is { Loaded: true } ? handle.Instance : null;
+    }
+    internal static object ApiOf(string id) {
+        Handle handle = FindHandle(id);
+        if(handle is not { Loaded: true }) return null;
+        if(!handle.ApiRequested) {
+            handle.ApiRequested = true;
+            try {
+                handle.Api = handle.Instance.GetApi();
+            } catch(Exception e) {
+                MainCore.Log.Err($"[Addon:{handle.Id}] GetApi threw: {e}");
+            }
+        }
+        return handle.Api;
+    }
+    internal static string OwnerOfAssembly(Assembly assembly) {
+        if(assembly == null) return null;
+        foreach(Handle handle in handles)
+            if(handle.Instance != null && handle.Instance.GetType().Assembly == assembly) return handle.Id;
+        return null;
     }
     private static void InstantiateAddon(Handle handle, Assembly assembly) {
         List<Type> addonTypes = Quartz.Plugins.PluginEntryScan.FindAll<QuartzAddon>(assembly);
@@ -306,10 +441,8 @@ public static class AddonService {
             handle.Context = new AddonContext(id);
             instance.Context = handle.Context;
             handle.Instance = instance;
-            instance.OnLoad();
-            MainCore.Log.Msg($"[Addons] loaded '{handle.Name}' v{handle.Version}{(handle.Author.Length > 0 ? $" by {handle.Author}" : "")}");
         } catch(Exception e) {
-            handle.Error = $"OnLoad threw: {e}";
+            handle.Error = $"couldn't create addon instance: {e}";
             MainCore.Log.Err($"[Addon:{handle.Id}] {handle.Error}");
             handle.Context?.Cleanup();
             handle.Context = null;

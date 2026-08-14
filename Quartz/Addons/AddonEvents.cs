@@ -25,7 +25,7 @@ public static class AddonEvents {
             try {
                 handler();
             } catch(Exception e) {
-                MainCore.Log.Err($"[Addons] event handler threw: {e}");
+                MainCore.Log.Err($"[Addon:{OwnerOf(handler)}] event handler threw: {e}");
             }
         }
     }
@@ -35,8 +35,16 @@ public static class AddonEvents {
             try {
                 handler(arg);
             } catch(Exception e) {
-                MainCore.Log.Err($"[Addons] event handler threw: {e}");
+                MainCore.Log.Err($"[Addon:{OwnerOf(handler)}] event handler threw: {e}");
             }
+        }
+    }
+    private static string OwnerOf(Delegate handler) {
+        try {
+            return AddonService.OwnerOfAssembly(handler.Method?.DeclaringType?.Assembly) ?? "?";
+        } catch(Exception e) {
+            Diag.Ignore(e);
+            return "?";
         }
     }
     [HarmonyPatch(typeof(scnGame), "Play")]

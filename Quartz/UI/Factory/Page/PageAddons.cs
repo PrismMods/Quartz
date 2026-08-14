@@ -92,6 +92,29 @@ internal static class PageAddons {
                 string src = Path.GetFileName(h.SourcePath);
                 string by = string.IsNullOrEmpty(h.Author) ? "" : $" · {h.Author}";
                 status.text = $"v{h.Version}{by} · {src}";
+                AddonUpdateCheck.Check(h.Instance.Repo, h.Version, result => {
+                    if(status == null) return;
+                    string accent = ColorUtility.ToHtmlStringRGB(UIColors.ObjectActiveBright);
+                    string updateText = string.Format(
+                        MainCore.Tr.Get("ADDONS_UPDATE_AVAILABLE", "update {0} available — click to open"),
+                        result.Tag
+                    );
+                    status.text += $" · <color=#{accent}>{updateText}</color>";
+                    GenerateUI.AddButton(statusRow.gameObject, btn => {
+                        if(btn == UnityEngine.EventSystems.PointerEventData.InputButton.Left)
+                            Application.OpenURL(result.Url);
+                    }, false);
+                });
+            }
+            if(h.Context != null && h.Context.Actions.Count > 0) {
+                for(int i = 0; i < h.Context.Actions.Count; i += 3) {
+                    var actionRow = GenerateUI.Row(content.transform, 44f);
+                    GenerateUI.ButtonRow(actionRow);
+                    foreach((string label, Action run) in h.Context.Actions.Skip(i).Take(3)) {
+                        UIButton actionBtn = GenerateUI.Button(actionRow, run, label, null).SetSecondary();
+                        GenerateUI.FixWidth(actionBtn, 200f);
+                    }
+                }
             }
             var removeRow = GenerateUI.Row(content.transform, 44f);
             GenerateUI.ButtonRow(removeRow);

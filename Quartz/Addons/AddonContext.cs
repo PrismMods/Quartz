@@ -3,13 +3,41 @@ using Quartz.Core;
 using Quartz.UI.Generator;
 using UnityEngine;
 namespace Quartz.Addons;
+public enum QuartzLoader {
+    MelonLoader,
+    UnityModManager,
+}
 public sealed class AddonContext {
+    public static QuartzLoader Loader =>
+#if QUARTZ_UMM
+        QuartzLoader.UnityModManager;
+#else
+        QuartzLoader.MelonLoader;
+#endif
+    public static bool IsMelonLoader => Loader == QuartzLoader.MelonLoader;
+    public static bool IsUnityModManager => Loader == QuartzLoader.UnityModManager;
     public string Id { get; }
+    public string DataPath {
+        get {
+            string path = Path.Combine(MainCore.Paths.AddonsPath, Id);
+            Directory.CreateDirectory(path);
+            return path;
+        }
+    }
     private HarmonyLib.Harmony harmony;
     private readonly List<string> statIds = [];
     private readonly List<string> tagNames = [];
+    private readonly List<(string Label, Action Run)> actions = [];
+    internal IReadOnlyList<(string Label, Action Run)> Actions => actions;
     private object settings;
+    private object settingsData;
+    private object settingsDefaults;
+    private bool mergedTranslations;
     internal AddonContext(string id) => Id = id;
+    public static bool IsAddonLoaded(string id) => AddonService.FindLoaded(id) != null;
+    public static object GetAddonApi(string id) => AddonService.ApiOf(id);
+    public static object CallAddon(string id, params object[] args)
+        => AddonService.FindLoaded(id)?.OnCall(args ?? []);
     public void Msg(string message) => MainCore.Log.Msg($"[Addon:{Id}] {message}");
     public void Wrn(string message) => MainCore.Log.Wrn($"[Addon:{Id}] {message}");
     public void Err(string message) => MainCore.Log.Err($"[Addon:{Id}] {message}");
@@ -22,6 +50,8 @@ public sealed class AddonContext {
         AddonSettings<T> file = new(Path.Combine(MainCore.Paths.RootPath, $"Addon.{Id}.json"));
         file.Load();
         settings = file;
+        settingsData = file.Data;
+        settingsDefaults = new T();
         return file.Data;
     }
     public void SaveSettings() {
@@ -62,6 +92,42 @@ public sealed class AddonContext {
         });
         tagNames.Add(name);
     }
+    public void RegisterAction(string label, Action action) {
+        if(action == null) throw new ArgumentNullException(nameof(action));
+        actions.Add((label, () => {
+            try {
+                action();
+            } catch(Exception e) {
+                Err($"action '{label}' threw: {e}");
+            }
+        }));
+    }
+    public bool RegisterTranslations(string json) {
+        mergedTranslations = true;
+        return MainCore.Tr.Merge(json, "addon " + Id);
+    }
+    public bool RegisterTranslations(Type anyTypeInAddon, string resourceName) {
+        try {
+            using Stream stream = anyTypeInAddon.Assembly.GetManifestResourceStream(resourceName);
+            if(stream == null) {
+                Wrn($"translation resource '{resourceName}' not found");
+                return false;
+            }
+            using StreamReader reader = new(stream);
+            mergedTranslations = true;
+            return MainCore.Tr.Merge(reader.ReadToEnd(), "addon " + Id + " " + resourceName);
+        } catch(Exception e) {
+            Err($"couldn't read translations '{resourceName}': {e.Message}");
+            return false;
+        }
+    }
+    public void RegisterSettingsTab(string title = null) {
+        if(settingsData == null)
+            throw new InvalidOperationException($"addon '{Id}' must call GetSettings<T>() before RegisterSettingsTab()");
+        object data = settingsData;
+        object defaults = settingsDefaults;
+        RegisterTab(title ?? Id, content => AddonSettingsUI.Build(content, this, data, defaults, SaveSettings));
+    }
     public void RegisterTab(string title, Action<Transform> build) =>
         Quartz.UI.Nav.NavRegistry.AddPage(new Quartz.UI.Nav.NavPage {
             Key = "addon." + Id + "." + Quartz.UI.Generator.GenerateUI.LocaleKeyFromText("", title),
@@ -85,11 +151,18 @@ public sealed class AddonContext {
         statIds.Clear();
         foreach(string tagName in tagNames) AddonTags.Unregister(tagName);
         tagNames.Clear();
+        actions.Clear();
+        if(mergedTranslations) {
+            MainCore.Tr.Forget("addon " + Id);
+            mergedTranslations = false;
+        }
         Quartz.UI.Nav.NavRegistry.RemoveOwner(Id);
         if(settings is IO.ISettingsHandle handle) {
             handle.Save();
             IO.SettingsRegistry.Unregister(handle);
         }
         settings = null;
+        settingsData = null;
+        settingsDefaults = null;
     }
 }
