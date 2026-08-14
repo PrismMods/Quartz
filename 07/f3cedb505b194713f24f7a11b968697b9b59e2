@@ -1,0 +1,94 @@
+modules/KeyViewer/KeyViewerSettings.cs
+  s_f4baba75a727bc::t_38051834d72c5b 2,64-65
+modules/KeyViewer/PageKeyViewer.EditorSettings.cs
+  s_f4baba75a727bc::t_92f08ca45e30f7 100
+  s_f4baba75a727bc::t_035167edc6a958 127
+modules/KeyViewer/Js/KvJsRuntime.cs
+  s_f4baba75a727bc::t_ed24c75eee5345 37,123,149-151
+  s_f4baba75a727bc::t_300c5f883e1e17 286
+  s_f4baba75a727bc::t_21a3302172e6af 327,357,418,422-424,426,432,434-435,446,464,531,545,550,552,561,571,603,642,644,656
+  s_f4baba75a727bc::t_e332010ecfc5b9 1-25,27-36,38-122,124-148,152-167,169-268,271-285,287-290,292-295,297,299-326,328-331,339-356,358-372,374-413,415-417,419-421,425,427-431,433,436-445,447-463,465-530,532-544,546-549,551,553-560,562-570,572-602,604-641,643,645-655,657
+  s_f4baba75a727bc::t_cc1b8368db3276 26,168,269-270,291,296,298,332-338,373,414
+modules/KeyViewer/Js/KvJsPlugin.cs
+  s_22165f3fdb098d::t_01135ba0d0628f 1-44
+modules/KeyViewer/KeyViewerSettings.Serialization.cs
+  s_f4baba75a727bc::t_38051834d72c5b 66-67,193-201
+modules/KeyViewer/KeyViewerOverlay.Lifecycle.cs
+  s_f4baba75a727bc::t_38051834d72c5b 15,64
+  s_f4baba75a727bc::t_db4b7032b31c0c 243
+modules/KeyViewer/KeyViewerOverlay.Update.cs
+  s_f4baba75a727bc::t_38051834d72c5b 9,90
+modules/KeyViewer/KeyViewer.csproj
+  s_22165f3fdb098d::t_6a9c59557bbc1d 10-22,24-25
+  s_f4baba75a727bc::t_aad6496ad3e13d 23
+  s_22165f3fdb098d::t_7fb907a3dd867b 26-28
+  s_f4baba75a727bc::t_7342c568e728c0 29-30
+modules/KeyViewer/Js/KvJsAssemblies.cs
+  s_22165f3fdb098d::t_d96aac45c29f91 1-55
+Quartz.Tests/Program.cs
+  s_f4baba75a727bc::t_5c70d6df11e2cb 42-44
+modules/KeyViewer/PageKeyViewer.Js.cs
+  s_f4baba75a727bc::t_912a7f8fb1af5e 54-55
+  s_f4baba75a727bc::t_92f08ca45e30f7 1-53,56-102
+modules/KeyViewer/Js/KvJsTemplate.cs
+  s_22165f3fdb098d::t_b853be2d0476f2 1-4,7-142,144-146,149-223
+  s_22165f3fdb098d::t_f7fc05da7167bc 143
+  s_22165f3fdb098d::t_97291b9b770caf 147-148
+  s_22165f3fdb098d::t_9c7a95f1271711 5-6
+modules/KeyViewer/Js/KvJsSvg.cs
+  s_f4baba75a727bc::t_38e706ba3c82e8 28,129,138-139,152
+  s_22165f3fdb098d::t_989f9ae0503ccd 1-27,29-128,130-137,140-151,153-319
+modules/KeyViewer/Js/KvJsStorage.cs
+  s_22165f3fdb098d::t_07949861f3d01d 1-70
+Quartz.Tests/Quartz.Tests.csproj
+  s_f4baba75a727bc::t_5c70d6df11e2cb 80-82
+modules/KeyViewer/KeyViewerOverlay.Js.cs
+  s_f4baba75a727bc::t_21a3302172e6af 1-20
+modules/KeyViewer/Js/README.md
+  s_f4baba75a727bc::t_aad6496ad3e13d 1-62
+modules/KeyViewer/Js/KvJsVNode.cs
+  s_22165f3fdb098d::t_625fb03c62d8bc 1-16
+modules/KeyViewer/libs/THIRD-PARTY-NOTICES.md
+  s_f4baba75a727bc::t_aad6496ad3e13d 1-92
+modules/KeyViewer/KeyViewerModule.cs
+  s_f4baba75a727bc::t_38051834d72c5b 2,13,65
+  s_f4baba75a727bc::t_71bd8f49076470 8,17-18,60-62
+  s_f4baba75a727bc::t_1e97ef393412fe 63
+THIRD-PARTY-NOTICES.md
+  s_f4baba75a727bc::t_aad6496ad3e13d 15-17,23-37
+  s_f4baba75a727bc::t_44deccfb849c42 38
+Quartz.Tests/Features/KeyViewer/KvJsTests.cs
+  s_f4baba75a727bc::t_5c70d6df11e2cb 1-52
+modules/KeyViewer/Js/KvJsRenderer.cs
+  s_f4baba75a727bc::t_21a3302172e6af 50,55
+  s_f4baba75a727bc::t_3e40ae1a340bc7 1-24,32-34,36-44,46-49,51-54,56-158,162-166,169-170,173-181,184-185,188-208,213-310
+  s_f4baba75a727bc::t_8c32ea7a578578 25-31,35,45
+  s_f4baba75a727bc::t_559c082cbdf4e1 159-161,167-168,171-172,182-183,186-187,209-212
+modules/KeyViewer/Js/KvJsStyle.cs
+  s_f4baba75a727bc::t_3e40ae1a340bc7 25,103-105
+  s_22165f3fdb098d::t_872d20bf439abf 1-24,26-102,106-276
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "07f3cedb505b194713f24f7a11b968697b9b59e2",
+  "prompts": {},
+  "sessions": {
+    "s_22165f3fdb098d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5d1365ba-2d0a-4e23-951b-ec7879d0099e",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_f4baba75a727bc": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0004b-dc48-7412-ad65-65349c347b69",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
