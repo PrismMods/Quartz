@@ -1,0 +1,45 @@
+Quartz.Tests/IO/UpdateInstallTransactionTests.cs
+  s_b0814b8c0da421::t_7c40dd3ed5c8f3 16-17,20,38,62,76-88,96,107-110,112-114,116-126,128-129
+  s_b0814b8c0da421::t_c3623154c38177 1-15,18-19,21-37,39-61,63-75,131-132
+  s_b0814b8c0da421::t_e73059080e1be3 89-95,97-106
+  s_b0814b8c0da421::t_21926c4d17a3b2 111,115,127,130
+Quartz/Update/UpdateService.cs
+  s_b0814b8c0da421::t_7c40dd3ed5c8f3 238,241,244,251
+  s_b0814b8c0da421::t_c3623154c38177 236-237,239-240,242-243,249-250
+Quartz/Update/UpdateInstallTransaction.cs
+  s_b0814b8c0da421::t_f0e0f91cda49d4 282-283
+  s_b0814b8c0da421::t_5d0277dbd95cf5 3,143
+  s_b0814b8c0da421::t_7c40dd3ed5c8f3 29-30,34,36,61-62,76-77,81-88,91,93-96,105,108,114-118,123-124,140,152-153,155-156,187-221,223-266,272-275,284-289,293-294
+  s_b0814b8c0da421::t_9440234f9a66f1 267-271
+  s_b0814b8c0da421::t_e73059080e1be3 45,222
+  s_b0814b8c0da421::t_94cdae645f4bbc 16-18,139,141-142,144,170-172,182-183
+  s_b0814b8c0da421::t_c3623154c38177 1-2,4-15,19-28,31-33,35,37-44,46-60,63-75,78-80,89-90,92,97-104,106-107,109-113,119-122,125-138,145-151,154,157-169,173-181,184-186,276-281,290-292,295-298
+Quartz.Tests/IO/AtomicFileTests.cs
+  s_f148d4f7814f51::t_8783093a2c7b4f 91
+Quartz.Tests/Quartz.Tests.csproj
+  s_b0814b8c0da421::t_c3623154c38177 69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "85142c22a7defe2b11116f85dc1e68a606d581c6",
+  "prompts": {},
+  "sessions": {
+    "s_b0814b8c0da421": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a00073-e0af-7120-8ff7-123c5a557a34",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_f148d4f7814f51": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "792eead4-2548-4292-b5ef-13bc36e9dbdb",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
