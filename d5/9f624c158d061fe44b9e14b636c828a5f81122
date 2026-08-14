@@ -1,0 +1,96 @@
+modules/KeyViewer/Editor/KvCanvas.cs
+  s_ae146fc48aa72a::t_a765d91fb0e919 18
+modules/KeyViewer/KeyViewerPersistence.cs
+  s_ae146fc48aa72a::t_602113ae026bc9 14
+modules/KeyViewer/Js/KvJsAssemblies.cs
+  s_ae146fc48aa72a::t_602113ae026bc9 10,40
+modules/KeyViewer/KeyViewer.csproj
+  s_ae146fc48aa72a::t_602113ae026bc9 10-12,14-15
+  s_ae146fc48aa72a::t_a765d91fb0e919 13
+  s_ae146fc48aa72a::t_52c5e6d029ecb9 9
+modules/KeyViewer/Layout/KvStore.cs
+  s_b0814b8c0da421::t_20afe3ccca63bb 223,228,230-231
+Quartz.Tests/Quartz.Tests.csproj
+  s_f148d4f7814f51::t_da994791447e68 81
+  s_f148d4f7814f51::t_893ffb082571bf 124
+Quartz.Tests/Program.cs
+  s_b0814b8c0da421::t_fb8534c4a84336 42-43
+  s_ae146fc48aa72a::t_602113ae026bc9 49
+Quartz.Tests/Features/KeyViewer/KvDocumentTests.cs
+  s_ae146fc48aa72a::t_602113ae026bc9 105-114,117-120,126-129,131-133,136,220
+  s_b0814b8c0da421::t_c2d8f6bafe1781 198-202
+  s_b0814b8c0da421::t_20afe3ccca63bb 161-162,171-197,203-219
+  s_b0814b8c0da421::t_ee359306812f8b 115-116,135,138-160,163,165-170
+  s_ae146fc48aa72a::t_a765d91fb0e919 121-125,130,137
+  s_b0814b8c0da421::t_8867599a032c28 134,164
+modules/KeyViewer/KeyViewerOverlay.Image.cs
+  s_b0814b8c0da421::t_a189faaa0c1dbe 76-77,88,90-92,94
+  s_ae146fc48aa72a::t_602113ae026bc9 2,10,14,74,87,89,93,95,97-106
+  s_b0814b8c0da421::t_e2350da4996df2 64-65
+  s_ae146fc48aa72a::t_3878b538fbeb9d 96
+  s_ae146fc48aa72a::t_a765d91fb0e919 82-86
+  s_b0814b8c0da421::t_f6eafa47612e3b 7,15-25,29-32,37,44-45,49,54-55,58-63,66-73
+modules/KeyViewer/Editor/KvCanvasView.cs
+  s_ae146fc48aa72a::t_a765d91fb0e919 62,77-105
+  s_ae146fc48aa72a::t_884b1d6f1bb779 106
+modules/KeyViewer/Layout/KvDocument.cs
+  s_b0814b8c0da421::t_c2d8f6bafe1781 17,19
+  s_b0814b8c0da421::t_804fdbe83390d4 334,352-353
+  s_b0814b8c0da421::t_5c4a4e49bf6f8d 57,60,186-190,192,194,231-240,243,246-248,257,260-262,266-267,271,273,298,301,319-326,329-332,335-350
+  s_b0814b8c0da421::t_b1e4d89f2183ef 209-212,215,221-222,226
+  s_b0814b8c0da421::t_443e420ab030dc 58-59,333
+  s_b0814b8c0da421::t_c7580f14308882 263-265,293,327-328
+  s_b0814b8c0da421::t_20afe3ccca63bb 6-15,18,20-45,173-185,191,205,241-242,245,249-256,259,274-277,285,294-297,303,305-311,313-316
+  s_b0814b8c0da421::t_ad1d2ec537d277 16
+  s_ae146fc48aa72a::t_602113ae026bc9 47,198-202,208,213-214,216-220,223-225,227-230,244,258,268-270,272,278-279,284,286-292,299-300,302,304,312,317-318,351,354-362
+  s_ae146fc48aa72a::t_3878b538fbeb9d 280-283
+Quartz.Tests/Features/KeyViewer/KeyViewerCssTests.cs
+  s_ae146fc48aa72a::t_602113ae026bc9 160-162,169-170
+modules/KeyViewer/KeyViewerOverlay.Tabub.cs
+  s_b0814b8c0da421::t_a71b1b0d5bc87a 59-60
+Quartz.Tests/Features/KeyViewer/KvImageSafetyTests.cs
+  s_b0814b8c0da421::t_c2f513b55e1077 20-22
+  s_b0814b8c0da421::t_a189faaa0c1dbe 23-33
+  s_b0814b8c0da421::t_038e0948fc3d65 2
+  s_b0814b8c0da421::t_fb8534c4a84336 1,3-19,34-66
+modules/KeyViewer/libs/THIRD-PARTY-NOTICES.md
+  s_ae146fc48aa72a::t_602113ae026bc9 1,5-10
+  s_b0814b8c0da421::t_6c62f10d51d783 11-213
+  s_b0814b8c0da421::t_a479d0d7be2ecd 214
+modules/KeyViewer/KvImageSafety.cs
+  s_b0814b8c0da421::t_a9226a2d22ba3a 26-27
+  s_b0814b8c0da421::t_a189faaa0c1dbe 3-6,16-19,21,24,29,31-46,48
+  s_b0814b8c0da421::t_dc1ba4e56f8f1f 1-2,7-15,20,22-23,25,28,30,47,49-89
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "d59f624c158d061fe44b9e14b636c828a5f81122",
+  "prompts": {},
+  "sessions": {
+    "s_ae146fc48aa72a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a00080-a7c1-7b00-8a47-8edc1bd16c0f",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_b0814b8c0da421": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a00073-e0af-7120-8ff7-123c5a557a34",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_f148d4f7814f51": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "792eead4-2548-4292-b5ef-13bc36e9dbdb",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
