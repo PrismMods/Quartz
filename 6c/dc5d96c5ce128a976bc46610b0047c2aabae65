@@ -1,0 +1,37 @@
+Quartz.Tests/Features/KeyViewer/CssAssetDownloaderTests.cs
+  s_b0814b8c0da421::t_d35dbde90d482e 1-34,45-51
+  s_b0814b8c0da421::t_381d01eaef2ffb 35-44
+modules/KeyViewer/CssAssetDownloader.cs
+  s_b0814b8c0da421::t_381d01eaef2ffb 67-68,72-86
+  s_b0814b8c0da421::t_d35dbde90d482e 1-66,69-71,87-120
+modules/KeyViewer/KeyViewerOverlay.CssFont.cs
+  s_b0814b8c0da421::t_d35dbde90d482e 80-82,88-102
+Quartz.Tests/IO/AtomicFileTests.cs
+  s_f148d4f7814f51::t_55fe03ae86d411 92
+Quartz.Tests/Quartz.Tests.csproj
+  s_f148d4f7814f51::t_460f85b8d0dbc6 80
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "6cdc5d96c5ce128a976bc46610b0047c2aabae65",
+  "prompts": {},
+  "sessions": {
+    "s_b0814b8c0da421": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a00073-e0af-7120-8ff7-123c5a557a34",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_f148d4f7814f51": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "792eead4-2548-4292-b5ef-13bc36e9dbdb",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
