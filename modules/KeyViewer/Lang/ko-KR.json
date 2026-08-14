@@ -1,7 +1,15 @@
 {
   "ko-KR": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "0NATIVELANG": "한국어",
     "SECTION_KEY_VIEWER": "키뷰어",
+    "KEYVIEWER_JS_TITLE": "JavaScript 플러그인",
+    "KEYVIEWER_JS_ENABLED": "JavaScript 플러그인 활성화",
+    "DESC_KEYVIEWER_JS_ENABLED": "가져온 DM Note 스타일 JavaScript 플러그인을 제한된 Jint 샌드박스에서 실행합니다. 신뢰하는 플러그인만 불러오세요.",
+    "KEYVIEWER_JS_IMPORT": "JavaScript 플러그인 가져오기",
+    "DESC_KEYVIEWER_JS_IMPORT": "DM Note의 선언형 defineElement API용 .js 또는 .mjs 플러그인을 가져옵니다.",
+    "KEYVIEWER_JS_RELOAD": "플러그인 파일 다시 불러오기",
+    "KEYVIEWER_JS_CLEAR": "모든 플러그인 제거",
     "KVI_TAB_ELEMENT": "요소",
     "KVI_TAB_STYLE": "스타일",
     "KVI_TAB_NOTE": "레인",

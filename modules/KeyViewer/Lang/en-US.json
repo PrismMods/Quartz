@@ -1,7 +1,15 @@
 {
   "en-US": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "0NATIVELANG": "English",
     "SECTION_KEY_VIEWER": "Key Viewer",
+    "KEYVIEWER_JS_TITLE": "JavaScript Plugins",
+    "KEYVIEWER_JS_ENABLED": "Enable JavaScript Plugins",
+    "DESC_KEYVIEWER_JS_ENABLED": "Runs imported DM Note-style JavaScript plugins inside a limited Jint sandbox. Only load plugins you trust.",
+    "KEYVIEWER_JS_IMPORT": "Import JavaScript Plugin",
+    "DESC_KEYVIEWER_JS_IMPORT": "Import a .js or .mjs plugin written for DM Note's declarative defineElement API.",
+    "KEYVIEWER_JS_RELOAD": "Reload Plugin Files",
+    "KEYVIEWER_JS_CLEAR": "Remove All Plugins",
     "KVI_TAB_ELEMENT": "Element",
     "KVI_TAB_STYLE": "Style",
     "KVI_TAB_NOTE": "Rain",

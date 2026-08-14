@@ -1,7 +1,15 @@
 {
   "zh-CN": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "0NATIVELANG": "简体中文",
     "SECTION_KEY_VIEWER": "按键显示器",
+    "KEYVIEWER_JS_TITLE": "JavaScript 插件",
+    "KEYVIEWER_JS_ENABLED": "启用 JavaScript 插件",
+    "DESC_KEYVIEWER_JS_ENABLED": "在受限的 Jint 沙盒中运行导入的 DM Note 风格 JavaScript 插件。请仅加载可信插件。",
+    "KEYVIEWER_JS_IMPORT": "导入 JavaScript 插件",
+    "DESC_KEYVIEWER_JS_IMPORT": "导入为 DM Note 声明式 defineElement API 编写的 .js 或 .mjs 插件。",
+    "KEYVIEWER_JS_RELOAD": "重新加载插件文件",
+    "KEYVIEWER_JS_CLEAR": "移除所有插件",
     "KVI_TAB_ELEMENT": "元素",
     "KVI_TAB_STYLE": "样式",
     "KVI_TAB_NOTE": "雨键",
