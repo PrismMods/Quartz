@@ -1,0 +1,41 @@
+Quartz/Core/Service/PathService.cs
+  s_b0814b8c0da421::t_0437120a02406a 2
+  s_b0814b8c0da421::t_8ecfadc91df49c 25-36
+Quartz.Tests/IO/AtomicFileTests.cs
+  s_b0814b8c0da421::t_7bd291619fbeac 13-27
+  s_b0814b8c0da421::t_fcc1c94d0d5bb9 12
+  s_b0814b8c0da421::t_0437120a02406a 28,44-60,81-87,92-112
+  s_b0814b8c0da421::t_1f36631cd49bc1 29-43
+  s_b0814b8c0da421::t_75a756e3a09935 61-80
+  s_f148d4f7814f51::t_f9b2c93f4d6045 113-114
+Quartz/IO/AtomicFile.cs
+  s_b0814b8c0da421::t_8ecfadc91df49c 11-13,80,85-94,97,106-113,116-126,202-203
+  s_b0814b8c0da421::t_9a1e455afed792 19,51,78,99-102,148-154,201,204-216
+  s_b0814b8c0da421::t_7bd291619fbeac 45-47,58-62,64-68,70-71
+  s_b0814b8c0da421::t_de74cc9f8470db 105,114-115,135-140,145
+  s_b0814b8c0da421::t_0437120a02406a 6-10,17-18,20-36,39-40,42-43,48-50,52-57,72,75-77,79,81-84,95-96,98,103-104,127-134,141-144,146-147,155-200,217-221
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "e5e16ac4cf6cc01eed0ee04b6aca3b518ace036d",
+  "prompts": {},
+  "sessions": {
+    "s_b0814b8c0da421": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a00073-e0af-7120-8ff7-123c5a557a34",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_f148d4f7814f51": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "792eead4-2548-4292-b5ef-13bc36e9dbdb",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
