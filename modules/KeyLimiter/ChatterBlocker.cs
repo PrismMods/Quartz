@@ -193,17 +193,4 @@ public static class ChatterBlocker {
             return false;
         }
     }
-    [HarmonyPatch(typeof(SkyHookManager), "HookCallback")]
-    private static class HookCallbackPatch {
-        private static void Prefix(SkyHookEvent __0) {
-            try {
-                SkyHookEvent ev = __0;
-                if(KeyLimiter.KeyLimiter.IsMouseLabel(ev.Label)) return;
-                KeyCode key = KeyLimiter.KeyLimiter.HookKeyToPhysicalUnityKey(ev.Key, ev.Label);
-                bool down = ev.Type == SkyHook.EventType.KeyPressed;
-                KeyLimiter.KeyLimiter.NoteHookEvent(key, down);
-                Quartz.Game.HookKeys.RaiseKeyEvent(key, down);
-            } catch(Exception e) { Diag.Ignore(e); }
-        }
-    }
 }

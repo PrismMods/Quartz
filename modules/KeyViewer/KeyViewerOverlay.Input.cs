@@ -1,13 +1,14 @@
 using Quartz.Core;
 using Quartz.Features;
+using Quartz.Game;
 using UnityEngine;
 namespace Quartz.Features.KeyViewer;
 public static partial class KeyViewerOverlay {
-    private static readonly bool macRuntime = KeyLimiter.KeyLimiter.IsMacOSRuntime();
+    private static readonly bool macRuntime = HookInput.IsMacOSRuntime;
     private static readonly Dictionary<KeyCode, bool> hookFallback = new();
     private static bool KeyHeld(KeyCode key) {
         if(key == KeyCode.None) return false;
-        if(macRuntime && KeyLimiter.KeyLimiter.TryMacPhysicalKeyHeld(key, out bool physical))
+        if(macRuntime && HookInput.TryMacPhysicalKeyHeld(key, out bool physical))
             return physical;
         try {
             if(Input.GetKey(key)) return true;
@@ -19,11 +20,11 @@ public static partial class KeyViewerOverlay {
             Diag.Ignore(e);
             return false;
         }
-        return IsHookFallbackKey(key) && KeyLimiter.KeyLimiter.HookKeyHeld(key);
+        return IsHookFallbackKey(key) && HookKeys.Held(key);
     }
     private static bool IsHookFallbackKey(KeyCode key) {
         if(!hookFallback.TryGetValue(key, out bool tracked)) {
-            tracked = KeyLimiter.KeyLimiter.IsHookTrackedKey(key);
+            tracked = HookKeys.Tracked(key);
             hookFallback[key] = tracked;
         }
         return tracked;

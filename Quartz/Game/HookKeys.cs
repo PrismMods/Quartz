@@ -25,8 +25,12 @@ public static class HookKeys {
             handlers(key, down);
         } catch(Exception e) { Diag.Ignore(e); }
     }
-    public static bool Held(KeyCode key) => Ask(key, static s => s.Held);
-    public static bool Tracked(KeyCode key) => Ask(key, static s => s.Tracked);
+    // Core's own hook feed answers first; registered sources are the extension
+    // point for addons. Before HookInput existed the only source was the
+    // key-limiter module, so every caller here — including core's own key
+    // capture — silently reported nothing when that module wasn't installed.
+    public static bool Held(KeyCode key) => HookInput.HookKeyHeld(key) || Ask(key, static s => s.Held);
+    public static bool Tracked(KeyCode key) => HookInput.IsHookTrackedKey(key) || Ask(key, static s => s.Tracked);
     private static bool Ask(KeyCode key, Func<Source, Func<KeyCode, bool>> pick) {
         for(int i = 0; i < sources.Count; i++) {
             try {
