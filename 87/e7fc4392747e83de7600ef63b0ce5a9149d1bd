@@ -1,0 +1,45 @@
+Quartz/Addons/AddonSettingsUI.cs
+  s_f148d4f7814f51::t_a7611d9f07acff 1-165
+Quartz/Addons/QuartzAddon.cs
+  s_f148d4f7814f51::t_89989058abbecc 7-9,16-17
+Quartz/Addons/AddonUpdateCheck.cs
+  s_f148d4f7814f51::t_63816d5f316d99 1-64
+Quartz/Addons/AddonContext.cs
+  s_f148d4f7814f51::t_af154440cc0823 95-130
+  s_f148d4f7814f51::t_e9587a3ed0fe20 30-31,33-35,37-40
+  s_f148d4f7814f51::t_f8e28999a35691 154-158,165-166
+  s_f148d4f7814f51::t_63f75ad9af1471 6-9,11-18,20-26
+  s_f148d4f7814f51::t_0515a834a8097c 53-54
+Quartz/Addons/AddonService.cs
+  s_f148d4f7814f51::t_61ce454ecff897 329-330,332
+  s_f148d4f7814f51::t_561de35a9522f6 351
+  s_f148d4f7814f51::t_69ec00e3fc34b4 138-139
+  s_f148d4f7814f51::t_58b6e89759cb54 293-298,301-328,331,333-350,352-364,368-419
+  s_f148d4f7814f51::t_f4d761483344c0 365-367
+  s_f148d4f7814f51::t_2ba3d1eeed2ebe 218-223
+  s_f148d4f7814f51::t_d9785c94ce3e63 445
+  s_f148d4f7814f51::t_e163410441aeb0 38-39
+Quartz/UI/Factory/Page/PageAddons.cs
+  s_f148d4f7814f51::t_071730ecbc66a6 95-117
+Quartz/Addons/AddonConfigAttributes.cs
+  s_f148d4f7814f51::t_bfa524c21cc9da 1-27
+Quartz/Addons/AddonEvents.cs
+  s_f148d4f7814f51::t_fa4c988e1d4f86 28,38,42-47
+  s_f148d4f7814f51::t_ad8e7296737d4c 48-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "87e7fc4392747e83de7600ef63b0ce5a9149d1bd",
+  "prompts": {},
+  "sessions": {
+    "s_f148d4f7814f51": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "792eead4-2548-4292-b5ef-13bc36e9dbdb",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
