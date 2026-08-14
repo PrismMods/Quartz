@@ -76,10 +76,26 @@ fi
 # Second arg picks the loader target(s): ML | UMM | both (default both).
 TARGET="${2:-both}"
 
+# The csproj skips the UMM local install when MelonLoader is present, so the two
+# loaders never double-load. That silently freezes the UMM core while modules keep
+# deploying to both roots, which shows up much later as a MissingMethodException
+# from a module calling core API the stale DLL lacks. If a live UMM install is
+# already there, it is the one being played -- keep it current.
+UMM_FORCE=()
+GAMEDIR="${GP:-}"
+if [[ -z "$GAMEDIR" && -f Directory.Build.props ]]; then
+    GAMEDIR="$(sed -n 's:.*<GamePath>\(.*\)</GamePath>.*:\1:p' Directory.Build.props | head -1)"
+fi
+if [[ -n "$GAMEDIR" ]] && [[ -f "$GAMEDIR/Mods/Quartz/Info.json" || -f "$GAMEDIR/UMMMods/Quartz/Info.json" ]]; then
+    UMM_FORCE=(-p:UmmAutoInstall=true)
+fi
+
 build_one() {
     local loader="$1"
+    local extra=()
+    [[ "$loader" == "UMM" ]] && extra=("${UMM_FORCE[@]}")
     echo ">> building Quartz/Quartz.csproj ($CONFIG, LoaderTarget=$loader)..."
-    dotnet build Quartz/Quartz.csproj -c "$CONFIG" -p:AutoInstall=true -p:LoaderTarget="$loader"
+    dotnet build Quartz/Quartz.csproj -c "$CONFIG" -p:AutoInstall=true -p:LoaderTarget="$loader" "${extra[@]}"
 }
 
 case "$TARGET" in
