@@ -1,0 +1,19 @@
+Quartz/Modules/ModuleService.cs
+  s_b0814b8c0da421::t_1d9576891889b7 387-391,397
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "d1e282dfc6bf1b4a647a4f8317682663d59cee2c",
+  "prompts": {},
+  "sessions": {
+    "s_b0814b8c0da421": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a00073-e0af-7120-8ff7-123c5a557a34",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
