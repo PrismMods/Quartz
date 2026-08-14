@@ -1,0 +1,27 @@
+modules/KeyViewer/Js/KvJsRuntime.cs
+  s_b0814b8c0da421::t_b7b915a5cd7fd1 11
+modules/KeyViewer/Js/KvJsRuntime.Definition.cs
+  s_b0814b8c0da421::t_fe1616e514403d 1
+  s_b0814b8c0da421::t_b7b915a5cd7fd1 2-155
+modules/KeyViewer/Js/KvJsRuntime.PluginRuntime.cs
+  s_b0814b8c0da421::t_b7b915a5cd7fd1 1-225
+modules/KeyViewer/Js/KvJsRuntime.HostBridge.cs
+  s_b0814b8c0da421::t_b7b915a5cd7fd1 2-119
+  s_b0814b8c0da421::t_fe1616e514403d 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "a19e6699cc760c035afd978154df4f3743650242",
+  "prompts": {},
+  "sessions": {
+    "s_b0814b8c0da421": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a00073-e0af-7120-8ff7-123c5a557a34",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
