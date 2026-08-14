@@ -155,6 +155,8 @@ public static partial class UICore {
         UpdateToast.Dispose();
         Tooltip.Dispose();
         MainCore.TC.Clear();
+        // The helper lives outside canvasObj, so Destroy(canvasObj) below misses it.
+        DestroyFirstRunHelper();
         FontManager.MenuRoot = null;
         UnityEngine.Object.Destroy(canvasObj);
         canvasObj = null;

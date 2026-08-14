@@ -172,6 +172,14 @@ public static partial class UICore {
         Cursor.lockState = CursorLockMode.None;
         panelTweener.CompleteAndKill();
         resetSequence.CompleteAndKill();
+        // Before the noAnimate early-return, not after it: opening the menu is what
+        // completes the first-run tutorial, and ShowOnStartup plus Rebuild() both
+        // come through here with noAnimate set. Sitting below the return meant those
+        // paths left the "Press <key>" prompt on screen for good.
+        if(firstRunHelperActivated) {
+            firstRunHelperActivated = false;
+            EndFirstRunHelper();
+        }
         if(noAnimate) {
             Panel.anchoredPosition = LastPanelPosition;
             Panel.sizeDelta = LastPanelSize;
@@ -187,10 +195,6 @@ public static partial class UICore {
         panelTweener = Panel.GTAnchorPos(LastPanelPosition, 0.25f)
             .SetEasing(Easing.OutExpo);
         MainCore.TC.Play(panelTweener);
-        if(firstRunHelperActivated) {
-            firstRunHelperActivated = false;
-            EndFirstRunHelper();
-        }
     }
     private static int refreshedFontId = -1;
     private static int refreshedCharacterCount = -1;
