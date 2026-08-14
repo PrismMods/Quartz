@@ -1,0 +1,26 @@
+Quartz/Addons/AddonContext.cs
+  h_6eeb8441a8a159 79
+Quartz/Compat/HarmonyCompat.cs
+  h_6eeb8441a8a159 1-24
+Quartz/Core/Service/HarmonyService.cs
+  h_6eeb8441a8a159 26,33
+Quartz/Modules/ModuleContext.cs
+  h_6eeb8441a8a159 52,63
+Quartz/Quartz.csproj
+  h_6eeb8441a8a159 121-126,138-139
+modules/KeyLimiter/ChartKeyLimiterPatches.cs
+  h_6eeb8441a8a159 22-24
+sdk/QuartzAddon.props
+  h_6eeb8441a8a159 54-58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "ba87a93dcf8f4184e58ca055a86b476e0453075a",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
