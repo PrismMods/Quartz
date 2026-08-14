@@ -1,0 +1,21 @@
+modules/KeyViewer/KeyViewerOverlay.Lifecycle.cs
+  s_f4baba75a727bc::t_38051834d72c5b 94,103,114
+modules/KeyViewer/PageKeyViewer.EditorSettings.cs
+  s_f4baba75a727bc::t_d2236e122f2830 125
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "6831088fa99598c63974ca673006f081f1bec282",
+  "prompts": {},
+  "sessions": {
+    "s_f4baba75a727bc": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0004b-dc48-7412-ad65-65349c347b69",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
