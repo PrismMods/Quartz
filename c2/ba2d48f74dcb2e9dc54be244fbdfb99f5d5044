@@ -1,0 +1,21 @@
+Quartz/Update/GameRestarter.cs
+  s_b0814b8c0da421::t_c20e8724500933 291-295
+  s_b0814b8c0da421::t_77b9fe50b1bf08 283-290
+  s_b0814b8c0da421::t_b954b46b900364 181,269-281
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "c2ba2d48f74dcb2e9dc54be244fbdfb99f5d5044",
+  "prompts": {},
+  "sessions": {
+    "s_b0814b8c0da421": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a00073-e0af-7120-8ff7-123c5a557a34",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
