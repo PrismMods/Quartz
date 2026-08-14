@@ -1,0 +1,19 @@
+modules/KeyViewer/KeyViewerOverlay.Image.cs
+  s_ae146fc48aa72a::t_a765d91fb0e919 169,173
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "0657faa69813b4f2386d2fa651b8c3e20bdf0a37",
+  "prompts": {},
+  "sessions": {
+    "s_ae146fc48aa72a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a00080-a7c1-7b00-8a47-8edc1bd16c0f",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
