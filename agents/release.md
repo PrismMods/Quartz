@@ -35,8 +35,8 @@ With no notes flag it auto-drafts from commit subjects since the previous build'
 
 1. Bumps `build.json`, derives the tag `v${Version}-${Channel}-${next}`.
 2. Builds Release **twice** — MelonLoader, then `-p:LoaderTarget=UMM`.
-3. Creates the tag's release and uploads **three** assets: `Quartz.zip`, `Quartz.dll`, `QuartzUmm.zip`. `dist/QuartzUmm.zip` is a hard precondition; the script aborts without it, because the UMM updater's `UpdateAssetName` points at it.
-4. Force-rolls the **`latest-alpha`** tag and its pre-release onto the new build, re-uploading the same three assets. This is the pointer the in-game updater follows. Its name must stay non-SemVer-parseable — a parseable name would make `UpdateService.FetchLatest` offer the pointer itself as an upgrade.
+3. Builds both standalone Key Viewer loader packages after the module bundle, then creates the tag's release with `Quartz.zip`, `Quartz.dll`, `QuartzUmm.zip`, `QuartzKeyViewer.zip`, `QuartzKeyViewerUmm.zip`, the addon SDK, and module catalog/bundle assets. Every updater-targeted zip is a hard precondition.
+4. Force-rolls the **`latest-alpha`** tag and its pre-release onto the new build, re-uploading the same assets. This is the pointer the in-game updater follows. Its name must stay non-SemVer-parseable — a parseable name would make `UpdateService.FetchLatest` offer the pointer itself as an upgrade.
 
 ## The core gotcha: ranges over-count, so de-dup against prior notes
 
