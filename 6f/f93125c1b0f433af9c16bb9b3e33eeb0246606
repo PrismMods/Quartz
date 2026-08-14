@@ -1,0 +1,20 @@
+Quartz/UI/Generator/GenerateUI.Slider.cs
+  s_b0814b8c0da421::t_19eb3544bdc580 112-118,122,124,135-137,140,152,155,157,159
+  s_b0814b8c0da421::t_9e92fbb2e30f77 156
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "6ff93125c1b0f433af9c16bb9b3e33eeb0246606",
+  "prompts": {},
+  "sessions": {
+    "s_b0814b8c0da421": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a00073-e0af-7120-8ff7-123c5a557a34",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
