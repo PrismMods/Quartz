@@ -27,6 +27,9 @@ public sealed class CoreSettings : ISettingsFile {
     public float PanelOpacity = 1.0f;
     public float PanelWidth = 0f;
     public float PanelHeight = 0f;
+    public bool ColorPickerHorizontal = false;
+    public float PanelWidthFrac = 0f;
+    public float PanelHeightFrac = 0f;
     public float ContextBandHeight = 0f;
     public float CalibWidth = 0f;
     public float CalibHeight = 0f;
@@ -84,6 +87,9 @@ public sealed class CoreSettings : ISettingsFile {
             [nameof(PanelOpacity)] = PanelOpacity,
             [nameof(PanelWidth)] = PanelWidth,
             [nameof(PanelHeight)] = PanelHeight,
+            [nameof(ColorPickerHorizontal)] = ColorPickerHorizontal,
+            [nameof(PanelWidthFrac)] = PanelWidthFrac,
+            [nameof(PanelHeightFrac)] = PanelHeightFrac,
             [nameof(ContextBandHeight)] = ContextBandHeight,
             [nameof(CalibWidth)] = CalibWidth,
             [nameof(CalibHeight)] = CalibHeight,
@@ -127,6 +133,9 @@ public sealed class CoreSettings : ISettingsFile {
         PanelOpacity = IOUtils.Read(token, nameof(PanelOpacity), PanelOpacity);
         PanelWidth = IOUtils.Read(token, nameof(PanelWidth), PanelWidth);
         PanelHeight = IOUtils.Read(token, nameof(PanelHeight), PanelHeight);
+        ColorPickerHorizontal = IOUtils.Read(token, nameof(ColorPickerHorizontal), ColorPickerHorizontal);
+        PanelWidthFrac = IOUtils.Read(token, nameof(PanelWidthFrac), PanelWidthFrac);
+        PanelHeightFrac = IOUtils.Read(token, nameof(PanelHeightFrac), PanelHeightFrac);
         ContextBandHeight = IOUtils.Read(token, nameof(ContextBandHeight), ContextBandHeight);
         CalibWidth = IOUtils.Read(token, nameof(CalibWidth), CalibWidth);
         CalibHeight = IOUtils.Read(token, nameof(CalibHeight), CalibHeight);
