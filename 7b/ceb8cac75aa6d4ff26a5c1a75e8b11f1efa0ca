@@ -1,0 +1,19 @@
+Quartz/Resource/Export/Lang/zh-CN.json
+  s_b0814b8c0da421::t_2b6a896587af06 522
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "7bceb8cac75aa6d4ff26a5c1a75e8b11f1efa0ca",
+  "prompts": {},
+  "sessions": {
+    "s_b0814b8c0da421": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a00073-e0af-7120-8ff7-123c5a557a34",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
