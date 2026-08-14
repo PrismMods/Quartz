@@ -109,11 +109,19 @@ public static partial class GenerateUI {
             float v = Mathf.Lerp(min, max, t);
             slider.Set(Apply(v));
         }
+        bool isDragging = false;
+        bool gestureCompleted = false;
+        void CompleteGesture() {
+            if(gestureCompleted) return;
+            gestureCompleted = true;
+            slider.OnComplete?.Invoke(slider.Value);
+        }
         AddButton(rect.gameObject, e => {
             switch(e) {
                 case InputButton.Left:
+                    if(isDragging || gestureCompleted) break;
                     SetFromMouse();
-                    slider.OnComplete?.Invoke(slider.Value);
+                    CompleteGesture();
                     break;
                 case InputButton.Middle:
                     if(!MainCore.Conf.MiddleClickToDefault) break;
@@ -124,29 +132,31 @@ public static partial class GenerateUI {
         }, true);
         EventTrigger trigger = rect.gameObject.GetComponent<EventTrigger>()
             ?? rect.gameObject.AddComponent<EventTrigger>();
-        bool isDragging = false;
+        UnityUtils.AddEvent(EventTriggerType.PointerDown, e => {
+            if(e.button == InputButton.Left) gestureCompleted = false;
+        }, trigger);
         UnityUtils.AddEvent(EventTriggerType.BeginDrag, _ => {
             if(!UnityEngine.Input.GetMouseButton(0)) return;
+            gestureCompleted = false;
             isDragging = true;
             SetFromMouse();
         }, trigger);
         UnityUtils.AddEvent(EventTriggerType.Drag, _ => {
             if(isDragging && UnityEngine.Input.GetMouseButton(0)) {
                 SetFromMouse();
-            } else {
-                isDragging = false;
             }
         }, trigger);
         UnityUtils.AddEvent(EventTriggerType.EndDrag, _ => {
             if(isDragging) {
                 isDragging = false;
-                slider.OnComplete?.Invoke(slider.Value);
+                CompleteGesture();
             }
         }, trigger);
-        UnityUtils.AddEvent(EventTriggerType.PointerUp, _ => {
-            if(isDragging) {
+        UnityUtils.AddEvent(EventTriggerType.PointerUp, e => {
+            if(e.button == InputButton.Left && isDragging) {
+                if(UnityUtils.ReleasedInside(e, rect)) SetFromMouse();
                 isDragging = false;
-                slider.OnComplete?.Invoke(slider.Value);
+                CompleteGesture();
             }
         }, trigger);
         AddSliderValueEditor(slider, rect, valueText, () => Apply(defaultValue));
