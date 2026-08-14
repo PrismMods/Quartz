@@ -313,7 +313,7 @@ public static class AddonService {
                     } catch(Exception e) when(
                         e is TypeLoadException or MissingMemberException or MemberAccessException or BadImageFormatException
                     ) {
-                        return $"{type.FullName}.{method.Name}: {e.Message}";
+                        return type.FullName + "." + method.Name + ": " + e.Message;
                     }
                 }
             }
