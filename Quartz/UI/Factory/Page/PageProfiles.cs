@@ -124,7 +124,7 @@ internal static class PageProfiles {
                     applyBtn?.SetBlocked(true);
                     MainThread.Enqueue(() => {
                         if(ProfileManager.ApplyPreset(presetPath) != null) {
-                            UICore.Rebuild();
+                            UICore.Rebuild(true);
                         } else {
                             if(statusText != null)
                                 statusText.text = GenerateUI.Tr("PROFILE_STATUS_PRESET_FAILED", "Couldn't apply preset.");
@@ -205,7 +205,7 @@ internal static class PageProfiles {
         button.SetBlocked(true);
         MainThread.Enqueue(() => {
             if(ProfileManager.Apply(name)) {
-                UICore.Rebuild();
+                UICore.Rebuild(true);
             } else {
                 RebuildList();
             }

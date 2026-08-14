@@ -124,20 +124,21 @@ public static partial class UICore {
             Rebuild();
         });
     }
-    public static void Rebuild() {
+    public static void Rebuild() => Rebuild(false);
+    public static void Rebuild(bool reloadPanelSize) {
         bool wasOpen = isOpen;
         if(wasOpen) Close(true);
         Vector2 position = LastPanelPosition;
         Vector2 size = LastPanelSize;
         Dispose();
         Initialize();
-        LastPanelPosition = position;
-        LastPanelSize = size;
+        LastPanelPosition = reloadPanelSize ? Vector2.zero : position;
+        if(!reloadPanelSize) LastPanelSize = size;
         if(wasOpen) Open(true);
         else if(isOpen) Close(true);
         if(isOpen) {
-            Panel.anchoredPosition = position;
-            Panel.sizeDelta = size;
+            Panel.anchoredPosition = LastPanelPosition;
+            Panel.sizeDelta = LastPanelSize;
         }
     }
     public static void Dispose() {
