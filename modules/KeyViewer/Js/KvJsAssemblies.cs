@@ -7,6 +7,7 @@ internal static class KvJsAssemblies {
     private static bool failed;
     private static readonly string[] Names = [
         "System.Runtime.CompilerServices.Unsafe",
+        "SixLabors.ImageSharp",
         "Acornima",
         "Jint",
     ];
@@ -36,7 +37,7 @@ internal static class KvJsAssemblies {
             return true;
         } catch(Exception ex) {
             failed = true;
-            MainCore.Log.Msg("[KeyViewerJS] Failed to load JS engine assemblies: " + ex.Message);
+            MainCore.Log.Msg("[KeyViewer] Failed to load embedded assemblies: " + ex.Message);
             return false;
         }
     }

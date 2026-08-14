@@ -7,6 +7,13 @@
 		<EmbeddedResource Include="Lang\*.json" />
 	</ItemGroup>
 	<ItemGroup>
+		<!-- Unity's image decoder only handles its native formats. ImageSharp adds
+		     DM Note preset compatibility for embedded WebP/GIF/BMP images. -->
+		<PackageReference Include="SixLabors.ImageSharp" Version="2.1.13" GeneratePathProperty="true" PrivateAssets="all" />
+		<EmbeddedResource Include="$(PkgSixLabors_ImageSharp)/lib/netstandard2.1/SixLabors.ImageSharp.dll"
+			LogicalName="Quartz.KeyViewer.Js.SixLabors.ImageSharp.dll" />
+	</ItemGroup>
+	<ItemGroup>
 		<!-- Custom JS plugin engine (DM Note-style). Compile-time refs point at the
 		     vendored DLLs; at runtime the module byte-loads them from embedded
 		     resources via KvJsAssemblies (a byte-loaded module has no probing path,

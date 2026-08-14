@@ -157,13 +157,17 @@ static class KeyViewerCssTests {
               "keyPositions": { "4key": [{ "dx": 1, "inactiveImage": "data:image/png;base64,kept" }] },
               "statPositions": { "4key": [] },
               "graphPositions": { "4key": [] },
+              "embeddedLocalImages": [
+                { "imageId": "kept", "extension": "png", "dataBase64": "AAAA" }
+              ],
               "embeddedLocalFonts": { "huge": "discard" },
               "embeddedLocalSounds": { "huge": "discard" },
               "customJS": "discard"
             }
             """;
         string sanitized = KeyViewerPersistence.SanitizeDmPreset(preset);
-        Assert(sanitized.Contains("selectedKeyType") && sanitized.Contains("inactiveImage"), "runtime preset fields survive sanitization");
+        Assert(sanitized.Contains("selectedKeyType") && sanitized.Contains("inactiveImage")
+            && sanitized.Contains("embeddedLocalImages"), "runtime preset image fields survive sanitization");
         Assert(!sanitized.Contains("embeddedLocalFonts") && !sanitized.Contains("embeddedLocalSounds") && !sanitized.Contains("customJS"),
             "unused embedded preset payloads are discarded");
         bool invalidRejected = false;

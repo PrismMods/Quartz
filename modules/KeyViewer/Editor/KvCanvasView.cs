@@ -59,6 +59,7 @@ internal sealed partial class KvCanvas {
         float dim = el.Hidden ? DimAlpha : 1f;
         v.Fill.color = Fade(KeyViewerOverlay.HexToColor(RawStr(el, "backgroundColor", DefaultBg), 0.9f), dim);
         v.Border.color = Fade(KeyViewerOverlay.HexToColor(RawStr(el, "borderColor", DefaultBorder), 0.9f), dim);
+        PaintImage(v, el, dim);
         KeyViewerOverlay.DmNoteSpec spec = CounterSpec(el);
         if(v.Label != null && v.Label.gameObject.activeSelf != el.LabelEnabled)
             v.Label.gameObject.SetActive(el.LabelEnabled);
@@ -72,6 +73,36 @@ internal sealed partial class KvCanvas {
         }
         PaintCounter(v, el, spec, dim);
         if(v.Outline != null) v.Outline.enabled = selection.Contains(el);
+    }
+    private void PaintImage(Visual v, KvElement el, float dim) {
+        string inactive = RawStr(el, "inactiveImage", "").Trim();
+        string active = RawStr(el, "activeImage", "").Trim();
+        string source = inactive.Length > 0 ? inactive : active;
+        if(source.Length == 0) {
+            if(v.KeyImage != null) v.KeyImage.enabled = false;
+            return;
+        }
+        Texture2D texture = KeyViewerOverlay.ResolveImage(source, doc);
+        if(texture == null) {
+            if(v.KeyImage != null) v.KeyImage.enabled = false;
+            return;
+        }
+        if(v.KeyImage == null) {
+            Mask mask = v.Fill.GetComponent<Mask>() ?? v.Fill.gameObject.AddComponent<Mask>();
+            mask.showMaskGraphic = true;
+            GameObject imageObj = new("KeyImage");
+            imageObj.transform.SetParent(v.Fill.transform, false);
+            v.KeyImage = imageObj.AddComponent<RawImage>();
+            v.KeyImage.raycastTarget = false;
+            imageObj.transform.SetAsFirstSibling();
+        }
+        string specificFit = inactive.Length > 0
+            ? RawStr(el, "idleImageFit", "")
+            : RawStr(el, "activeImageFit", "");
+        string fit = specificFit.Length > 0 ? specificFit : RawStr(el, "imageFit", "cover");
+        KeyViewerOverlay.ApplyImageFit(v.KeyImage, texture, fit, el.W, el.H);
+        v.KeyImage.color = new Color(1f, 1f, 1f, dim);
+        v.KeyImage.enabled = true;
     }
     private void PaintCounter(Visual v, KvElement el, KeyViewerOverlay.DmNoteSpec spec, float dim) {
         if(v.Counter == null) return;

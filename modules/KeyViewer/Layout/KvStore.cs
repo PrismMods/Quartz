@@ -220,13 +220,15 @@ internal static partial class KvStore {
             Msg(error);
             return false;
         }
-        string added = Current.MergeFrom(doc);
+        string added = Current.MergeFrom(doc, out IReadOnlyList<KvEmbeddedImageWarning> imageWarnings);
         if(added != null) Current.SelectedTab = added;
         ApplyEmbeddedCss(doc);
         settingsApplied = ApplyTransferSettings(doc.Root);
         Save();
+        foreach(KvEmbeddedImageWarning warning in imageWarnings) Msg(warning.Message);
         Msg("Imported layout from " + path
-            + (settingsApplied > 0 ? " with " + settingsApplied + " Quartz setting(s)" : ""));
+            + (settingsApplied > 0 ? " with " + settingsApplied + " Quartz setting(s)" : "")
+            + (imageWarnings.Count > 0 ? "; skipped " + imageWarnings.Count + " embedded image(s)" : ""));
         return true;
     }
     private static void ApplyEmbeddedCss(KvDocument doc) {

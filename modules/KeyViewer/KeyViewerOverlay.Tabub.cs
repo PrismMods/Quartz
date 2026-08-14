@@ -56,12 +56,8 @@ public static partial class KeyViewerOverlay {
     private static void LoadTabubCustom(string path) {
         try {
             if(!File.Exists(path)) return;
-            Texture2D tex = new(2, 2, TextureFormat.RGBA32, false) {
-                wrapMode = TextureWrapMode.Clamp,
-                filterMode = FilterMode.Bilinear,
-            };
-            if(tex.LoadImage(File.ReadAllBytes(path))) tabubCustomTex = tex;
-            else Object.Destroy(tex);
+            Texture2D tex = LoadTex(ReadImageFile(path));
+            if(tex != null) tabubCustomTex = tex;
         } catch(Exception ex) {
             MainCore.Log.Msg("[KeyViewer] Tabub image load failed: " + ex.Message);
         }

@@ -102,6 +102,122 @@ static partial class KvDocumentTests {
         Assert(positions[0]["dx"]!.ToObject<float>() == 0f, "surviving position 0 tracks its name");
         Assert(positions[1]["dx"]!.ToObject<float>() == 140f, "surviving position 1 tracks its name");
     }
+    public static void TestMergeCarriesDmNoteEmbeddedImages() {
+        KvDocument imported = KvDocument.Parse("""
+            {
+              "selectedKeyType": "4key",
+              "keys": { "4key": ["Z"] },
+              "keyPositions": { "4key": [
+                { "dx": 0, "dy": 0, "width": 60, "height": 60,
+                  "inactiveImage": "dmnote-local-image://image-1" }
+              ] },
+              "embeddedLocalImages": [
+                { "imageId": "image-1", "extension": "webp", "dataBase64": "AQIDBA==" },
+                { "imageId": "unused", "extension": "png", "dataBase64": "BQYHCA==" }
+              ]
+            }
+            """);
+        KvDocument destination = KvDocument.Empty();
+        destination.Root["embeddedLocalImages"] = new JArray {
+            new JObject {
+                ["imageId"] = "image-1", ["extension"] = "png", ["dataBase64"] = "OLD=",
+            },
+        };
+        string tab = destination.MergeFrom(imported);
+        Assert(tab != null, "image-bearing tab merged");
+        KvElement key = destination.Elements(tab, KvElementKind.Key)[0];
+        string imageRef = key.Raw["inactiveImage"]!.ToString();
+        Assert(imageRef != "dmnote-local-image://image-1", "colliding image id is remapped");
+        Assert(destination.TryEmbeddedImage(imageRef, out string data, out string extension),
+            "merged image reference resolves against carried payload");
+        Assert(data == "AQIDBA==" && extension == "webp", "embedded image metadata survives merge");
+        Assert(destination.TryEmbeddedImage(KvDocument.DmLocalImagePrefix + "image-1", out data, out extension)
+            && data == "OLD=" && extension == "png", "an existing colliding image is never overwritten");
+        JObject roundTrip = JObject.Parse(destination.ToJson());
+        Assert(roundTrip["embeddedLocalImages"] is JArray { Count: 2 },
+            "used image payload survives while an unreferenced source image is not copied");
+
+        JObject firstImage = new() {
+            ["imageId"] = "one", ["extension"] = "png", ["dataBase64"] = "AQIDBA==",
+        };
+        long oneImageBudget = System.Text.Encoding.UTF8.GetByteCount(firstImage.ToString(Newtonsoft.Json.Formatting.None));
+        KvDocument limitedImport = KvDocument.Parse("""
+            {
+              "selectedKeyType": "4key",
+              "keys": { "4key": ["Z"] },
+              "keyPositions": { "4key": [
+                { "dx": 0, "dy": 0, "width": 60, "height": 60,
+                  "inactiveImage": "dmnote-local-image://one",
+                  "activeImage": "dmnote-local-image://two" }
+              ] },
+              "embeddedLocalImages": [
+                { "imageId": "one", "extension": "png", "dataBase64": "AQIDBA==" },
+                { "imageId": "two", "extension": "png", "dataBase64": "BQYHCA==" },
+                { "imageId": "orphan", "extension": "png", "dataBase64": "CQoLDA==" }
+              ]
+            }
+            """);
+        KvDocument limited = KvDocument.Empty();
+        string limitedTab = limited.MergeFrom(
+            limitedImport, oneImageBudget, out IReadOnlyList<KvEmbeddedImageWarning> budgetWarnings);
+        KvElement limitedKey = limited.Elements(limitedTab, KvElementKind.Key)[0];
+        Assert(limitedKey.Raw["inactiveImage"]?.ToString() == KvDocument.DmLocalImagePrefix + "one",
+            "an image inside the aggregate budget remains referenced");
+        Assert(limitedKey.Raw["activeImage"] == null,
+            "a reference whose payload exceeds the aggregate budget is pruned instead of left dangling");
+        JArray limitedImages = (JArray)limited.Root["embeddedLocalImages"]!;
+        Assert(limitedImages.Count == 1 && limitedImages[0]!["imageId"]!.ToString() == "one",
+            "the aggregate budget and reference scan admit only the one usable image");
+        Assert(budgetWarnings.Count == 1
+            && budgetWarnings[0].SourceId == "two"
+            && budgetWarnings[0].Reason == KvEmbeddedImageRejectionReason.OverBudget,
+            "a referenced payload rejected by the aggregate budget is reported once");
+
+        string unsafeMissingId = "missing\n" + new string('x', 120);
+        JObject rejectedRoot = new() {
+            ["selectedKeyType"] = "4key",
+            ["keys"] = new JObject { ["4key"] = new JArray("Z") },
+            ["keyPositions"] = new JObject {
+                ["4key"] = new JArray(new JObject {
+                    ["dx"] = 0, ["dy"] = 0, ["width"] = 60, ["height"] = 60,
+                    ["inactiveImage"] = KvDocument.DmLocalImagePrefix + unsafeMissingId,
+                    ["activeImage"] = KvDocument.DmLocalImagePrefix + "invalid",
+                }),
+            },
+            ["embeddedLocalImages"] = new JArray(new JObject {
+                ["imageId"] = "invalid", ["extension"] = "png", ["dataBase64"] = "not base64",
+            }),
+        };
+        KvDocument rejectedImport = KvDocument.Parse(rejectedRoot.ToString());
+        KvDocument rejectedDestination = KvDocument.Empty();
+        string rejectedTab = rejectedDestination.MergeFrom(
+            rejectedImport, out IReadOnlyList<KvEmbeddedImageWarning> rejectedWarnings);
+        Assert(rejectedWarnings.Count == 2, "every rejected referenced image produces one warning");
+        KvEmbeddedImageWarning missingWarning = rejectedWarnings.Single(w =>
+            w.Reason == KvEmbeddedImageRejectionReason.Missing);
+        Assert(missingWarning.SourceId == unsafeMissingId,
+            "the structured warning records the exact source id without a mutable side channel");
+        Assert(!missingWarning.Message.Contains('\n') && missingWarning.Message.Length < 220
+            && missingWarning.Message.Contains("missing"),
+            "the log-ready warning safely bounds and escapes the image id while retaining the reason");
+        Assert(rejectedWarnings.Any(w => w.SourceId == "invalid"
+            && w.Reason == KvEmbeddedImageRejectionReason.Invalid),
+            "an invalid referenced payload identifies its source id and reason");
+        KvElement rejectedKey = rejectedDestination.Elements(rejectedTab, KvElementKind.Key)[0];
+        Assert(rejectedKey.Raw["inactiveImage"] == null && rejectedKey.Raw["activeImage"] == null,
+            "rejected image references remain pruned from imported elements");
+
+        KvDocument malformedDestination = KvDocument.Empty();
+        malformedDestination.Root["embeddedLocalImages"] = new JObject { ["unexpected"] = true };
+        string malformedTab = malformedDestination.MergeFrom(
+            imported, out IReadOnlyList<KvEmbeddedImageWarning> malformedWarnings);
+        Assert(malformedTab != null && malformedWarnings.Count == 1
+            && malformedWarnings[0].SourceId == "image-1"
+            && malformedWarnings[0].Reason == KvEmbeddedImageRejectionReason.MalformedDestination,
+            "a malformed destination reports every referenced image it prevents from merging");
+        Assert(malformedDestination.Root["embeddedLocalImages"] is JObject,
+            "reporting a malformed destination never overwrites it");
+    }
     public static void TestAuthoredElementsCarryRequiredFields() {
         KvDocument doc = KvDocument.Empty();
         KvElement el = KvElement.Wrap([], KvElementKind.Key, "Z");

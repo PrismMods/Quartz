@@ -11,6 +11,7 @@ internal static class KeyViewerPersistence {
         "positions",
         "statPositions",
         "graphPositions",
+        "embeddedLocalImages",
     ];
     internal static float CountSaveDeadline(float now) => now + CountSaveIdleSeconds;
     internal static bool ShouldFlushCounts(bool dirty, bool inGame, float now, float deadline) =>

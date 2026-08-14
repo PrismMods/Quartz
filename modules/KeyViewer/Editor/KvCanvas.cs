@@ -15,6 +15,7 @@ internal sealed partial class KvCanvas {
         internal Image Fill;
         internal Image Border;
         internal Image Outline;
+        internal RawImage KeyImage;
         internal TextMeshProUGUI Label;
         internal TextMeshProUGUI Counter;
         internal float Radius = float.NaN;

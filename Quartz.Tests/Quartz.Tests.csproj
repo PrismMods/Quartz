@@ -78,6 +78,7 @@
 		<Compile Include="../modules/KeyViewer/KeyViewerCss.Color.cs" Link="Source/KeyViewerCss.Color.cs" />
 		<Compile Include="../modules/KeyViewer/KeyViewerCss.Tokens.cs" Link="Source/KeyViewerCss.Tokens.cs" />
 		<Compile Include="../modules/KeyViewer/CssAssetDownloader.cs" Link="Source/CssAssetDownloader.cs" />
+		<Compile Include="../modules/KeyViewer/KvImageSafety.cs" Link="Source/KvImageSafety.cs" />
 		<Compile Include="../modules/KeyViewer/KeyViewerPersistence.cs" Link="Source/KeyViewerPersistence.cs" />
 		<Compile Include="../modules/KeyViewer/Js/KvJsPlugin.cs" Link="Source/KvJsPlugin.cs" />
 		<Compile Include="../modules/KeyViewer/Js/KvJsTemplate.cs" Link="Source/KvJsTemplate.cs" />
@@ -120,5 +121,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="SixLabors.ImageSharp" Version="2.1.13" />
 	</ItemGroup>
 </Project>

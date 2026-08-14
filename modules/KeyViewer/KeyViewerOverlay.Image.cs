@@ -1,52 +1,109 @@
 using Quartz.Core;
+using Quartz.Features.KeyViewer.Layout;
 using UnityEngine;
 using UnityEngine.UI;
 namespace Quartz.Features.KeyViewer;
 public static partial class KeyViewerOverlay {
-    private static readonly Dictionary<string, Texture2D> cssImages = new(StringComparer.Ordinal);
+    private static readonly Dictionary<KvImageCacheKey, Texture2D> cssImages = [];
     private static readonly HashSet<string> cssImagePending = new(StringComparer.Ordinal);
     private static readonly object cssImageLock = new();
-    private static Texture2D ResolveImage(string src) {
+    internal static Texture2D ResolveImage(string src, KvDocument document = null) {
         if(string.IsNullOrWhiteSpace(src)) return null;
         string key = src.Trim();
-        if(cssImages.TryGetValue(key, out Texture2D cached)) return cached;
         try {
+            document ??= KvStore.Current;
+            if(document != null && document.TryEmbeddedImage(
+                key, out string dataBase64, out _, out object contentScope
+            )) {
+                KvImageCacheKey embeddedKey = KvImageCacheKey.Embedded(key, document, contentScope);
+                if(cssImages.TryGetValue(embeddedKey, out Texture2D embedded)) return embedded;
+                return TryDecodeImageBase64(dataBase64, out byte[] bytes)
+                    ? Cache(embeddedKey, LoadTex(bytes))
+                    : null;
+            }
+            KvImageCacheKey cacheKey = KvImageCacheKey.External(key);
+            if(cssImages.TryGetValue(cacheKey, out Texture2D cached)) return cached;
             if(key.StartsWith("data:", StringComparison.OrdinalIgnoreCase)) {
                 int comma = key.IndexOf(',');
                 int b64 = key.IndexOf("base64", StringComparison.OrdinalIgnoreCase);
-                if(comma > 0 && b64 > 0 && b64 < comma)
-                    return Cache(key, LoadTex(Convert.FromBase64String(key.Substring(comma + 1))));
-                return Cache(key, null);
+                if(comma > 0 && b64 > 0 && b64 < comma
+                    && TryDecodeImageBase64(key.Substring(comma + 1), out byte[] bytes))
+                    return Cache(cacheKey, LoadTex(bytes));
+                return null;
             }
             if(key.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
                 || key.StartsWith("https://", StringComparison.OrdinalIgnoreCase)) {
                 string path = ImageCachePath(key);
-                if(File.Exists(path)) return Cache(key, LoadTex(File.ReadAllBytes(path)));
+                if(File.Exists(path)) return Cache(cacheKey, LoadTex(ReadImageFile(path)));
                 StartImageDownload(key, path);
                 return null;
             }
             string file = key.StartsWith("file://", StringComparison.OrdinalIgnoreCase)
                 ? new Uri(key).LocalPath
                 : key;
-            if(IsLikelyLocalPath(file) && File.Exists(file)) return Cache(key, LoadTex(File.ReadAllBytes(file)));
+            if(IsLikelyLocalPath(file) && File.Exists(file))
+                return Cache(cacheKey, LoadTex(ReadImageFile(file)));
         } catch(Exception ex) {
             MainCore.Log.Msg("[KeyViewer] CSS image load failed: " + ex.Message);
         }
-        return Cache(key, null);
+        return null;
     }
     private static bool IsLikelyLocalPath(string v) =>
         v.Length > 1 && (v[0] == '/' || v.StartsWith("\\\\", StringComparison.Ordinal)
             || (char.IsLetter(v[0]) && v[1] == ':'));
-    private static Texture2D Cache(string key, Texture2D tex) {
-        cssImages[key] = tex;
+    private static Texture2D Cache(KvImageCacheKey key, Texture2D tex) {
+        if(tex != null) cssImages[key] = tex;
         return tex;
     }
+    private static bool TryDecodeImageBase64(string value, out byte[] bytes) {
+        bytes = null;
+        if(!KvImageSafety.CanDecodeBase64(value)) return false;
+        try {
+            bytes = Convert.FromBase64String(value);
+            return bytes.Length <= KvImageSafety.MaxEncodedBytes;
+        } catch(FormatException e) {
+            Diag.Ignore(e);
+            bytes = null;
+            return false;
+        }
+    }
+    private static byte[] ReadImageFile(string path) {
+        FileInfo info = new(path);
+        if(!info.Exists || info.Length <= 0 || info.Length > KvImageSafety.MaxEncodedBytes) return null;
+        return File.ReadAllBytes(path);
+    }
     private static Texture2D LoadTex(byte[] bytes) {
+        if(!KvImageSafety.TryIdentify(bytes, out _, out SixLabors.ImageSharp.Formats.IImageFormat format))
+            return null;
         var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false) {
             wrapMode = TextureWrapMode.Clamp,
             filterMode = FilterMode.Bilinear,
         };
-        return tex.LoadImage(bytes) ? tex : null;
+        bool loaded = false;
+        try {
+            loaded = tex.LoadImage(bytes);
+        } catch(Exception e) { Diag.Ignore(e); }
+        if(loaded) return tex;
+        UnityEngine.Object.Destroy(tex);
+        return LoadTexWithImageSharp(bytes, format);
+    }
+    private static Texture2D LoadTexWithImageSharp(
+        byte[] bytes, SixLabors.ImageSharp.Formats.IImageFormat format
+    ) {
+        try {
+            using SixLabors.ImageSharp.Image image = KvImageSafety.LoadFirstFrame(bytes, format);
+            using MemoryStream png = new();
+            image.Save(png, new SixLabors.ImageSharp.Formats.Png.PngEncoder());
+            var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false) {
+                wrapMode = TextureWrapMode.Clamp,
+                filterMode = FilterMode.Bilinear,
+            };
+            if(tex.LoadImage(png.ToArray())) return tex;
+            UnityEngine.Object.Destroy(tex);
+        } catch(Exception ex) {
+            MainCore.Log.Msg("[KeyViewer] Extended image decode failed: " + ex.Message);
+        }
+        return null;
     }
     private static string ImageCachePath(string url) {
         string dir = Path.Combine(MainCore.Paths.RootPath, "CssImages");
