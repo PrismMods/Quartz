@@ -178,7 +178,7 @@ public static class GameRestarter {
                     method == RestartMethod.Steam ? steamUrl : launchPath;
                 info.EnvironmentVariables["QUARTZ_RESTART_CWD"] = WorkingDir() ?? "";
                 info.EnvironmentVariables["QUARTZ_RESTART_ARGS"] = method == RestartMethod.Executable
-                    ? string.Join(" ", ForwardedArgs().Select(BatchQuote))
+                    ? SafeWindowsArgs()
                     : "";
             }
             using Process spawned = Process.Start(info);
@@ -266,8 +266,32 @@ public static class GameRestarter {
     }
     private static string ShellQuote(string value) =>
         "'" + (value ?? "").Replace("'", "'\\''", StringComparison.Ordinal) + "'";
+    private static string SafeWindowsArgs() {
+        string[] args = ForwardedArgs();
+        string[] quoted = new string[args.Length];
+        for(int i = 0; i < args.Length; i++) {
+            quoted[i] = BatchQuote(args[i]);
+            if(quoted[i] != null) continue;
+            // Dropping one positional argument can change the meaning of every
+            // argument after it. Forward either the exact list or none of it.
+            MainCore.Log.Wrn("[Update] dropped forwarded arguments because one value is unsafe for cmd.exe");
+            return "";
+        }
+        return string.Join(" ", quoted);
+    }
     private static string BatchQuote(string value) {
-        string clean = (value ?? "").Replace("\"", "", StringComparison.Ordinal);
-        return clean.Length != 0 && clean.IndexOf(' ') < 0 ? clean : "\"" + clean + "\"";
+        value ??= "";
+        const string unsafeChars = "\"&|<>^%!\r\n";
+        for(int i = 0; i < value.Length; i++) {
+            if(unsafeChars.IndexOf(value[i]) < 0) continue;
+            return null;
+        }
+        // Always quote: an unquoted argument from the current process would be
+        // reparsed as cmd.exe syntax after environment-variable expansion.
+        int trailingSlashes = 0;
+        for(int i = value.Length - 1; i >= 0 && value[i] == '\\'; i--) trailingSlashes++;
+        // Windows argv parsing consumes a backslash before the closing quote;
+        // double the trailing run so the child receives it verbatim.
+        return "\"" + value + new string('\\', trailingSlashes) + "\"";
     }
 }
