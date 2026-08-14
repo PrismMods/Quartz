@@ -1,0 +1,35 @@
+Quartz/UI/Utility/KeyCaptureService.cs
+  s_b0814b8c0da421::t_f1e62f91ec52c6 18,28
+Quartz/UI/Generator/GenerateUI.KeyBind.cs
+  s_b0814b8c0da421::t_ab131b76de9e1b 97-99
+  s_b0814b8c0da421::t_f1e62f91ec52c6 93,96,106
+modules/KeyLimiter/KeyLimiter.cs
+  s_b0814b8c0da421::t_0774e7ab8ff4d9 9,189,197-200,207
+modules/KeyViewer/Editor/KvInspector.cs
+  s_b0814b8c0da421::t_49e735185f7ae8 73-74,89
+  s_b0814b8c0da421::t_f1e62f91ec52c6 75
+Quartz/UI/Utility/KeyCaptureRunner.cs
+  s_b0814b8c0da421::t_6f00e19c462664 1
+  s_b0814b8c0da421::t_f1e62f91ec52c6 13-25,28,31,41,45,49,54,60,65-83,85-86,88-104,107-111
+  s_b0814b8c0da421::t_0774e7ab8ff4d9 84,87,105-106
+modules/KeyViewer/Editor/KvInspector.Element.cs
+  s_b0814b8c0da421::t_f1e62f91ec52c6 94,102
+modules/AutoDeafen/PageAutoDeafen.cs
+  s_b0814b8c0da421::t_0774e7ab8ff4d9 187,189-192,198,216
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "9c0a558505419f150176e769dfbcc3a14c8e661f",
+  "prompts": {},
+  "sessions": {
+    "s_b0814b8c0da421": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a00073-e0af-7120-8ff7-123c5a557a34",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
