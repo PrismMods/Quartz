@@ -1,0 +1,21 @@
+Quartz/UI/Objects/Impl/UIColorPicker.cs
+  s_b0814b8c0da421::t_02963d0cc3875c 14
+Quartz/UI/Objects/Impl/UIColorPicker.Rendering.cs
+  s_b0814b8c0da421::t_02963d0cc3875c 1-69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "9f1ab95f6eb9bb19d7363ee7a6ba0933835b22fb",
+  "prompts": {},
+  "sessions": {
+    "s_b0814b8c0da421": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a00073-e0af-7120-8ff7-123c5a557a34",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
