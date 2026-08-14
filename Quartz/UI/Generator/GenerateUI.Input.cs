@@ -43,6 +43,7 @@ public static partial class GenerateUI {
         Image iconImage = iconObj.AddComponent<Image>();
         iconImage.sprite = icon;
         iconImage.color = new Color(1f, 1f, 1f, 0.2f);
+        iconImage.enabled = icon != null;
         GameObject inputObj = new("Input");
         inputObj.transform.SetParent(rect, false);
         RectTransform inputRect = inputObj.AddComponent<RectTransform>();

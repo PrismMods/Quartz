@@ -34,6 +34,11 @@ public static partial class GenerateUI {
         bool noPad = false
     ) => Localize(AddMutedText(parent, size, alpha, noPad), key, defaultValue);
     public static TextMeshProUGUI AddTextH1(Transform parent) => CreateText(parent, 32f, true, true);
+    public static TextMeshProUGUI Header(Transform parent, string text, string id = null) {
+        TextMeshProUGUI tmp = AddTextH1(Row(parent));
+        tmp.text = text;
+        return string.IsNullOrEmpty(id) ? tmp : LocalizeById(tmp, id, text);
+    }
     public static TextMeshProUGUI Localize(TextMeshProUGUI text, string key, string defaultValue) {
         if(text == null) return null;
         text.text = defaultValue;
