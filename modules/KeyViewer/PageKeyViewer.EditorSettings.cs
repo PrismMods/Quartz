@@ -122,7 +122,7 @@ internal static partial class PageKeyViewer {
             tabubPercent.SetOnlyValue(conf.TabubPercent, true);
             tabubScale.SetOnlyValue(conf.TabubScale, true);
             RefreshTabubStatus();
-            syncLimiter.Set(conf.SyncToKeyLimiter, false);
+            syncLimiter?.Set(conf.SyncToKeyLimiter, false);
             refreshCss();
             refreshJs();
             refreshTuning();

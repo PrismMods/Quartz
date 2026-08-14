@@ -91,7 +91,7 @@ public static partial class KeyViewerOverlay {
     public static void SyncKeysToKeyLimiter() {
         EnsureConf();
         if(Conf is not { SyncToKeyLimiter: true }) return;
-        Features.KeyLimiter.KeyLimiter.EnsureConf();
+        if(!KvKeyLimiterBridge.Available) return;
         List<int> result = [];
         HashSet<int> seen = [];
         void Add(KeyCode key) {
@@ -100,7 +100,7 @@ public static partial class KeyViewerOverlay {
         }
         AddLayoutKeys(Add);
         if(result.Count == 0) return;
-        int[] current = Features.KeyLimiter.KeyLimiter.Conf.AllowedKeys;
+        int[] current = KvKeyLimiterBridge.AllowedKeys();
         if(current != null && current.Length == result.Count) {
             bool same = true;
             for(int i = 0; i < current.Length; i++) {
@@ -111,7 +111,7 @@ public static partial class KeyViewerOverlay {
             }
             if(same) return;
         }
-        Features.KeyLimiter.KeyLimiter.SetAllowedKeys([.. result]);
+        KvKeyLimiterBridge.SetAllowedKeys([.. result]);
     }
     private static void AddLayoutKeys(Action<KeyCode> add) {
         Layout.KvDocument doc = Layout.KvStore.Current;
