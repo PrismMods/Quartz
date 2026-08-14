@@ -29,29 +29,50 @@ public static partial class UICore {
     public static bool IsOpen => isOpen;
     public static Vector2 LastPanelPosition;
     public static Vector2 LastPanelSize;
-    public static Vector2 DefaultPanelSize => new(
-        Mathf.Min(1280f / MainCore.Conf.UIScale, Screen.width / MainCore.Conf.UIScale),
-        Mathf.Min(720f / MainCore.Conf.UIScale, Screen.height / MainCore.Conf.UIScale)
-    );
-    private static Vector2 LoadSavedPanelSize() {
-        float w = MainCore.Conf.PanelWidth;
-        float h = MainCore.Conf.PanelHeight;
-        if(w <= 0f || h <= 0f) return DefaultPanelSize;
-        float scale = MainCore.Conf.UIScale;
-        float minW = ResizeHandle.MIN_WIDTH / scale;
-        float minH = ResizeHandle.MIN_HEIGHT / scale;
-        float maxW = Screen.width / scale;
-        float maxH = Screen.height / scale;
+    public static Vector2 DefaultPanelSize {
+        get {
+            float scale = MainCore.Conf.UIScale <= 0f ? 1f : MainCore.Conf.UIScale;
+            return Vector2.Min(new Vector2(1280f / scale, 720f / scale), CanvasSize);
+        }
+    }
+    private static Vector2 MinPanelSize {
+        get {
+            float scale = MainCore.Conf.UIScale <= 0f ? 1f : MainCore.Conf.UIScale;
+            return Vector2.Min(
+                new Vector2(ResizeHandle.MIN_WIDTH / scale, ResizeHandle.MIN_HEIGHT / scale),
+                CanvasSize
+            );
+        }
+    }
+    private static Vector2 ClampToCanvas(Vector2 size) {
+        Vector2 canvas = CanvasSize;
+        Vector2 min = MinPanelSize;
         return new Vector2(
-            Mathf.Clamp(w, minW, Mathf.Max(minW, maxW)),
-            Mathf.Clamp(h, minH, Mathf.Max(minH, maxH))
+            Mathf.Clamp(size.x, min.x, Mathf.Max(min.x, canvas.x)),
+            Mathf.Clamp(size.y, min.y, Mathf.Max(min.y, canvas.y))
         );
+    }
+    private static Vector2 LoadSavedPanelSize() {
+        Vector2 canvas = CanvasSize;
+        float fw = MainCore.Conf.PanelWidthFrac;
+        float fh = MainCore.Conf.PanelHeightFrac;
+        if(fw <= 0f || fh <= 0f) {
+            float legacyW = MainCore.Conf.PanelWidth;
+            float legacyH = MainCore.Conf.PanelHeight;
+            if(legacyW <= 0f || legacyH <= 0f) return DefaultPanelSize;
+            fw = legacyW / canvas.x;
+            fh = legacyH / canvas.y;
+        }
+        return ClampToCanvas(new Vector2(fw * canvas.x, fh * canvas.y));
     }
     public static void SavePanelSize() {
         if(Panel == null) return;
+        Vector2 canvas = CanvasSize;
         LastPanelSize = Panel.sizeDelta;
-        MainCore.Conf.PanelWidth = Panel.sizeDelta.x;
-        MainCore.Conf.PanelHeight = Panel.sizeDelta.y;
+        MainCore.Conf.PanelWidthFrac = Mathf.Clamp01(Panel.sizeDelta.x / canvas.x);
+        MainCore.Conf.PanelHeightFrac = Mathf.Clamp01(Panel.sizeDelta.y / canvas.y);
+        MainCore.Conf.PanelWidth = 0f;
+        MainCore.Conf.PanelHeight = 0f;
         MainCore.ConfMgr.RequestSave();
         float clamped = ClampBand(bandHeight);
         if(!Mathf.Approximately(clamped, bandHeight)) {
@@ -60,13 +81,40 @@ public static partial class UICore {
         }
     }
     private static bool canvasWasVisible;
+    private static int lastScreenWidth;
+    private static int lastScreenHeight;
+    public static Vector2 ClampPanelPosition(Vector2 position, Vector2 size) {
+        Vector2 canvas = CanvasSize;
+        Vector2 limit = Vector2.Max((canvas - size) * 0.5f, Vector2.zero);
+        return new Vector2(
+            Mathf.Clamp(position.x, -limit.x, limit.x),
+            Mathf.Clamp(position.y, -limit.y, limit.y)
+        );
+    }
+    private static void HandleResolutionChange() {
+        if(Screen.width == lastScreenWidth && Screen.height == lastScreenHeight) return;
+        if(Panel == null || !TryGetCanvasSize(out _)) return;
+        lastScreenWidth = Screen.width;
+        lastScreenHeight = Screen.height;
+        LastPanelSize = LoadSavedPanelSize();
+        LastPanelPosition = ClampPanelPosition(LastPanelPosition, LastPanelSize);
+        Panel.sizeDelta = LastPanelSize;
+        Panel.anchoredPosition = LastPanelPosition;
+        float clamped = ClampBand(bandHeight);
+        if(!Mathf.Approximately(clamped, bandHeight)) {
+            bandHeight = clamped;
+            RefreshBand(false);
+        }
+    }
     public static void HandleUpdate() {
         if(canvasObj == null) return;
+        HandleResolutionChange();
         Keybind.KeyModifier mod = (Keybind.KeyModifier)MainCore.Conf.ToggleModifier;
         KeyCode key = (KeyCode)MainCore.Conf.ToggleKey;
         bool modHeld = Keybind.ModifierHeld(mod);
-        bool pressed = modHeld && Input.GetKey(key);
-        if(!Keybind.Capturing && modHeld && Input.GetKeyDown(key)) {
+        bool editing = UIInputBlocker.IsEditing;
+        bool pressed = !editing && modHeld && Input.GetKey(key);
+        if(!editing && !Keybind.Capturing && modHeld && Input.GetKeyDown(key)) {
             Toggle();
             holdStartTime = Time.unscaledTime;
             holdingToggle = true;
