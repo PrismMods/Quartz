@@ -1,0 +1,37 @@
+Quartz/Modules/ModuleService.cs
+  s_b0814b8c0da421::t_e1956f4ba858f9 8-9,180,219,263-268,431-434
+  s_b0814b8c0da421::t_23be22f910045a 435
+Quartz/Modules/ModuleRemovalPaths.cs
+  s_b0814b8c0da421::t_0db9f860359d9d 23-24
+  s_b0814b8c0da421::t_e1956f4ba858f9 1-12,14-22,25-35,44-48
+  s_b0814b8c0da421::t_df3d05997617e8 13,36-43
+Quartz.Tests/Modules/ModuleManifestTests.cs
+  s_b0814b8c0da421::t_e1956f4ba858f9 32-47,51-58
+  s_b0814b8c0da421::t_df3d05997617e8 48-50
+Quartz.Tests/Quartz.Tests.csproj
+  s_f148d4f7814f51::t_0dbf59ff3e5069 95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "b6e496fbef83ac5182e808c4b40d9518c0e55710",
+  "prompts": {},
+  "sessions": {
+    "s_b0814b8c0da421": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a00073-e0af-7120-8ff7-123c5a557a34",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_f148d4f7814f51": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "792eead4-2548-4292-b5ef-13bc36e9dbdb",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
