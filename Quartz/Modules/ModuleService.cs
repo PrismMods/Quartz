@@ -5,8 +5,8 @@ using Quartz.Core;
 using Quartz.UI;
 namespace Quartz.Modules;
 public static class ModuleService {
-    public const string ModuleExtension = ".qmod";
-    public const string ManifestExtension = ".qmod.json";
+    public const string ModuleExtension = ModuleRemovalPaths.BinaryExtension;
+    public const string ManifestExtension = ModuleRemovalPaths.ManifestExtension;
     public sealed class Handle {
         public ModuleManifest Manifest;
         public string Id => Manifest?.Id ?? "";
@@ -177,6 +177,7 @@ public static class ModuleService {
         }
         foreach(string file in files) {
             string stem = Path.GetFileNameWithoutExtension(file);
+            paths[stem] = file;
             string manifestPath = Path.Combine(root, stem + ManifestExtension);
             if(!File.Exists(manifestPath)) {
                 rejected[stem] = "missing " + stem + ManifestExtension;
@@ -215,11 +216,10 @@ public static class ModuleService {
                 rejected[stem] = $"needs Quartz {manifest.MinCoreVersion} or newer";
                 continue;
             }
-            if(paths.ContainsKey(manifest.Id)) {
+            if(found.Any(m => string.Equals(m.Id, manifest.Id, StringComparison.Ordinal))) {
                 rejected[stem] = "duplicate module id";
                 continue;
             }
-            paths[manifest.Id] = file;
             found.Add(manifest);
         }
         return found;
@@ -260,7 +260,12 @@ public static class ModuleService {
         ModuleManifest manifest = manifests.FirstOrDefault(m => m.Id == id);
         if(manifest == null) {
             string why = rejected.GetValueOrDefault(id, "not installed");
-            handles.Add(new Handle { Manifest = new ModuleManifest { Id = id, Name = id }, Enabled = true, Error = why });
+            handles.Add(new Handle {
+                Manifest = new ModuleManifest { Id = id, Name = id },
+                SourcePath = paths.GetValueOrDefault(id),
+                Enabled = true,
+                Error = why,
+            });
             MainCore.Log.Err($"[Module:{id}] {why}");
             return;
         }
@@ -423,10 +428,11 @@ public static class ModuleService {
     public static bool Remove(string id) {
         Handle handle = Find(id);
         if(handle == null) return false;
-        string binary = handle.SourcePath;
-        string manifest = binary == null
-            ? null
-            : Path.Combine(Path.GetDirectoryName(binary), Path.GetFileNameWithoutExtension(binary) + ManifestExtension);
+        if(!ModuleRemovalPaths.TryResolve(MainCore.Paths.ModulePath, handle.SourcePath, handle.Id,
+            out string binary, out string manifest)) {
+            MainCore.Log.Err($"[Modules] refused unsafe removal path for '{id}'");
+            return false;
+        }
         MainThread.Enqueue(() => {
             UnloadOne(id);
             try {

@@ -92,6 +92,7 @@
 		<Compile Include="../modules/Tuf/TufApiQuery.cs" Link="Source/TufApiQuery.cs" />
 		<Compile Include="../Quartz/Modules/ModulePatchGate.cs" Link="Source/ModulePatchGate.cs" />
 		<Compile Include="../Quartz/Modules/ModuleManifest.cs" Link="Source/ModuleManifest.cs" />
+		<Compile Include="../Quartz/Modules/ModuleRemovalPaths.cs" Link="Source/ModuleRemovalPaths.cs" />
 		<Compile Include="../Quartz/Modules/ModuleState.cs" Link="Source/ModuleState.cs" />
 		<Compile Include="../Quartz/Modules/ModuleCatalog.cs" Link="Source/ModuleCatalog.cs" />
 		<Compile Include="../Quartz/Modules/ModuleOrder.cs" Link="Source/ModuleOrder.cs" />

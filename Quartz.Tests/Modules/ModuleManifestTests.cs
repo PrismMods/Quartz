@@ -29,6 +29,33 @@ static class ModuleManifestTests {
             "a path-traversal id never reaches the loader");
         Assert(ModuleManifest.Parse(Good.Replace("[\"progressbar\"]", "[\"keyviewer\"]"), out _) == null,
             "a module cannot depend on itself");
+        TestRejectedModuleRemovalPaths();
+    }
+
+    private static void TestRejectedModuleRemovalPaths() {
+        string root = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "quartz-module-removal"));
+        string malformed = Path.Combine(root, "BAD manifest.qmod");
+        Assert(ModuleRemovalPaths.TryResolve(root, malformed, "BAD manifest", out string binary, out string manifest)
+            && binary == malformed
+            && manifest == Path.Combine(root, "BAD manifest.qmod.json"),
+            "a rejected module keeps its scanned binary and sibling manifest paths");
+
+        string mismatch = Path.Combine(root, "filename.qmod");
+        Assert(ModuleRemovalPaths.TryResolve(root, mismatch, "different-id", out binary, out manifest)
+            && binary == mismatch
+            && manifest == Path.Combine(root, "filename.qmod.json"),
+            "manifest id mismatches remove files by their scanned filename");
+        Assert(ModuleRemovalPaths.TryResolve(root + Path.DirectorySeparatorChar, malformed, "BAD manifest",
+            out binary, out manifest) && binary == malformed,
+            "a trailing separator on the module root does not reject a scanned file");
+
+        string outside = Path.Combine(Path.GetDirectoryName(root)!, "outside.qmod");
+        Assert(ModuleRemovalPaths.TryResolve(root, outside, "keyviewer", out binary, out manifest)
+            && binary == Path.Combine(root, "keyviewer.qmod")
+            && manifest == Path.Combine(root, "keyviewer.qmod.json"),
+            "an external source path is ignored in favor of a safe valid-id fallback");
+        Assert(!ModuleRemovalPaths.TryResolve(root, outside, "../escape", out _, out _),
+            "an external source plus unsafe id cannot become a removal target");
     }
     public static void TestModuleStateRoundTrips() {
         ModuleState state = new();
