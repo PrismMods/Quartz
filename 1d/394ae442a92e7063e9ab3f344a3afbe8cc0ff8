@@ -1,0 +1,19 @@
+Quartz/UI/UICore.Visibility.cs
+  s_1d3ce8b9874788::t_b21d8cb05579e4 32-49,51-52,55-67,70,72-75,84-108,111,115-117
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "1d394ae442a92e7063e9ab3f344a3afbe8cc0ff8",
+  "prompts": {},
+  "sessions": {
+    "s_1d3ce8b9874788": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e608dda1-426d-479a-ba20-ca10a839227a",
+        "model": "unknown"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
