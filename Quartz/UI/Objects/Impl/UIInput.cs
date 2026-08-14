@@ -51,7 +51,7 @@ public sealed class UIInput : UIObject {
         if(IsDisposed) return;
         value ??= string.Empty;
         Value = value;
-        if(InputField.text != value) InputField.text = value;
+        if(InputField.text != value) InputField.SetTextWithoutNotify(value);
         if(invoke) OnChanged?.Invoke(value);
         UpdateVisual();
     }
