@@ -73,7 +73,10 @@ public abstract class UIObject {
         }
     }
     public static void DisposeAll() {
-        for(int i = _tickables.Count - 1; i >= 0; i--) _tickables[i].Dispose();
-        _tickables.Clear();
+        while(_tickables.Count > 0) {
+            UIObject o = _tickables[^1];
+            _tickables.RemoveAt(_tickables.Count - 1);
+            o.Dispose();
+        }
     }
 }

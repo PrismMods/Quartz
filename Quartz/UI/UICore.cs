@@ -147,7 +147,23 @@ public static partial class UICore {
         MainCore.Tr.OnLanguageChanged -= _onLanguageRebuild;
         MenuFactory.OnStateChanged -= _onDockTabChanged;
         Panes.PaneState.Changed -= _onPaneChanged;
+        bool wasReorganizing = IsReorganizing;
+        IsReorganizing = false;
+        if(wasReorganizing) RaiseReorganize(false);
+        panelTweener?.Kill();
+        panelTweener = null;
+        resetSequence?.Kill();
+        resetSequence = null;
         bandSeq?.Kill();
+        bandSeq = null;
+        shellSeq?.Kill();
+        shellSeq = null;
+        reorganizeSeq?.Kill();
+        reorganizeSeq = null;
+        exitReorganizeHoldSeq?.Kill();
+        exitReorganizeHoldSeq = null;
+        exitReorganizeResetSeq?.Kill();
+        exitReorganizeResetSeq = null;
         themeImages = null;
         UIObject.DisposeAll();
         ToggleBinds.ClearLive();
@@ -160,5 +176,13 @@ public static partial class UICore {
         FontManager.MenuRoot = null;
         UnityEngine.Object.Destroy(canvasObj);
         canvasObj = null;
+        canvas = null;
+        canvasScaler = null;
+        Panel = null;
+        isOpen = false;
+        holdingToggle = false;
+        canvasWasVisible = false;
+        lastScreenWidth = 0;
+        lastScreenHeight = 0;
     }
 }
