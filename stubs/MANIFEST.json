@@ -2745,7 +2745,6 @@
           "System.Void TMPro.TMP_InputField::set_placeholder(UnityEngine.UI.Graphic)",
           "System.Void TMPro.TMP_InputField::set_richText(System.Boolean)",
           "System.Void TMPro.TMP_InputField::set_selectionColor(UnityEngine.Color)",
-          "System.Void TMPro.TMP_InputField::set_text(System.String)",
           "System.Void TMPro.TMP_InputField::set_textComponent(TMPro.TMP_Text)",
           "System.Void TMPro.TMP_InputField::set_textViewport(UnityEngine.RectTransform)",
           "TMPro.TMP_InputField/ContentType TMPro.TMP_InputField::contentType()",
