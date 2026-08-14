@@ -66,6 +66,7 @@
 		<Compile Include="../Quartz/Core/Diag.cs" Link="Source/Diag.cs" />
 		<Compile Include="../Quartz/Compat/Game/Refl.cs" Link="Source/Refl.cs" />
 		<Compile Include="../Quartz/IO/AtomicFile.cs" Link="Source/AtomicFile.cs" />
+		<Compile Include="../Quartz/Update/UpdateInstallTransaction.cs" Link="Source/UpdateInstallTransaction.cs" />
 		<Compile Include="../Quartz/IO/ProfileNames.cs" Link="Source/ProfileNames.cs" />
 		<Compile Include="../Quartz/IO/ProfileBundle.cs" Link="Source/ProfileBundle.cs" />
 		<Compile Include="../Quartz/IO/FaqDocument.cs" Link="Source/FaqDocument.cs" />

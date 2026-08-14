@@ -1,5 +1,4 @@
 using System.IO;
-using System.IO.Compression;
 using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
@@ -234,12 +233,22 @@ public static class UpdateService {
             string stagedZip = Path.Combine(staging, "Quartz.zip");
             await DownloadFile(info.AssetUrl, stagedZip, 0f, 1f);
             VerifyChecksum(stagedZip, info);
-            ExtractOverInstall(stagedZip);
+            string installRoot = MainCore.Host.UpdateExtractRoot;
+            if(string.IsNullOrEmpty(installRoot)) throw new System.Exception("couldn't resolve update extract root");
+            string payloadRoot = Path.Combine(staging, "Payload");
+            IReadOnlyList<StagedInstallFile> files = UpdateInstallTransaction.StageZip(
+                stagedZip,
+                payloadRoot,
+                installRoot
+            );
+            UpdateInstallTransaction.Commit(files, payloadRoot, installRoot);
         } else {
             string stagedQuartz = Path.Combine(staging, "Quartz.dll");
             await DownloadFile(info.AssetUrl, stagedQuartz, 0f, 1f);
             VerifyChecksum(stagedQuartz, info);
-            ReplaceFile(stagedQuartz, Path.Combine(MainCore.Host.ModsPath, "Quartz.dll"));
+            UpdateInstallTransaction.Commit([
+                new StagedInstallFile(stagedQuartz, Path.Combine(MainCore.Host.ModsPath, "Quartz.dll"))
+            ], staging, MainCore.Host.ModsPath);
         }
         DeleteIfExists(Path.Combine(MainCore.Host.ModsPath, "Quartz.Loader.ML.dll"));
         DeleteIfExists(Path.Combine(MainCore.Host.UserLibsPath, "Quartz.dll"));
@@ -254,45 +263,6 @@ public static class UpdateService {
             throw new System.Exception(
                 $"checksum mismatch for {info.Tag}: expected {info.AssetSha256}, got {actual}");
         }
-    }
-    private static void ExtractOverInstall(string zipPath) {
-        string gameRoot = MainCore.Host.UpdateExtractRoot;
-        if(string.IsNullOrEmpty(gameRoot)) throw new System.Exception("couldn't resolve update extract root");
-        string rootFull = Path.GetFullPath(gameRoot);
-        string rootPrefix = rootFull.EndsWith(Path.DirectorySeparatorChar.ToString())
-            ? rootFull
-            : rootFull + Path.DirectorySeparatorChar;
-        using ZipArchive archive = ZipFile.OpenRead(zipPath);
-        foreach(ZipArchiveEntry entry in archive.Entries) {
-            if(string.IsNullOrEmpty(entry.Name)) continue;
-            string dest = Path.GetFullPath(Path.Combine(gameRoot, entry.FullName));
-            if(!dest.StartsWith(rootPrefix, System.StringComparison.Ordinal)) {
-                MainCore.Log.Wrn($"[Update] skipped suspicious zip entry: {entry.FullName}");
-                continue;
-            }
-            Directory.CreateDirectory(Path.GetDirectoryName(dest));
-            string tmp = dest + ".krnew";
-            try {
-                if(File.Exists(tmp)) File.Delete(tmp);
-            } catch(Exception e) { Diag.Ignore(e); }
-            entry.ExtractToFile(tmp, true);
-            ReplaceFile(tmp, dest);
-        }
-    }
-    private static void ReplaceFile(string src, string dest) {
-        Directory.CreateDirectory(Path.GetDirectoryName(dest));
-        if(File.Exists(dest)) {
-            try {
-                File.Delete(dest);
-            } catch {
-                string old = dest + ".old";
-                try {
-                    if(File.Exists(old)) File.Delete(old);
-                } catch(Exception e) { Diag.Ignore(e); }
-                File.Move(dest, old);
-            }
-        }
-        File.Move(src, dest);
     }
     private static void RetireLegacyDll(string path) {
         if(string.IsNullOrEmpty(path) || !File.Exists(path)) return;

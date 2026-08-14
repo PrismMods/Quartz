@@ -88,6 +88,7 @@ static class AtomicFileTests {
         } finally {
             if(Directory.Exists(root)) Directory.Delete(root, true);
         }
+        UpdateInstallTransactionTests.Run();
     }
     private static void TestRecoverySkipsSymlinkDirectories(string root) {
         if(OperatingSystem.IsWindows()) return;
