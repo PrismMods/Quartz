@@ -14,6 +14,22 @@ static class KvJsTests {
         KvJsPluginRecord fallback = new() { Name = "My Fancy.Plugin.mjs", Content = lateHeader };
         Assert(fallback.PluginId == "my-fancy-plugin", "an @id after line 20 is ignored and the filename is normalized");
         Assert(KvJsPluginRecord.NormalizeId("!!.js") == "plugin", "an empty normalized id gets a stable fallback");
+        TestKeyEventQueue();
+    }
+
+    private static void TestKeyEventQueue() {
+        KvJsKeyEventQueue queue = new();
+        for(int i = 0; i < KvJsKeyEventQueue.Capacity; i++)
+            Assert(queue.TryEnqueue(i, (i & 1) == 0), "JS key queue accepts events up to its fixed capacity");
+        Assert(!queue.TryEnqueue(-1, false) && queue.TakeOverflow(), "JS key queue reports bounded overflow");
+        for(int i = 0; i < KvJsKeyEventQueue.Capacity; i++) {
+            Assert(queue.TryDequeue(out KvJsKeyEventQueue.Event ev), "queued JS key event is available");
+            Assert(ev.Key == i && ev.Down == ((i & 1) == 0), "JS key queue preserves key-event order and state");
+        }
+        Assert(!queue.TryDequeue(out _), "draining JS key queue consumes every event once");
+        Assert(queue.TryEnqueue(99, true)
+            && queue.TryDequeue(out KvJsKeyEventQueue.Event reused)
+            && reused.Key == 99 && reused.Down, "JS key queue reuses drained ring slots");
     }
 
     public static void TestPluginRecordRoundTrip() {

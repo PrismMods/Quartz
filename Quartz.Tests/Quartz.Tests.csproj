@@ -81,6 +81,7 @@
 		<Compile Include="../modules/KeyViewer/KvImageSafety.cs" Link="Source/KvImageSafety.cs" />
 		<Compile Include="../modules/KeyViewer/KeyViewerPersistence.cs" Link="Source/KeyViewerPersistence.cs" />
 		<Compile Include="../modules/KeyViewer/Js/KvJsPlugin.cs" Link="Source/KvJsPlugin.cs" />
+		<Compile Include="../modules/KeyViewer/Js/KvJsKeyEventQueue.cs" Link="Source/KvJsKeyEventQueue.cs" />
 		<Compile Include="../modules/KeyViewer/Js/KvJsTemplate.cs" Link="Source/KvJsTemplate.cs" />
 		<Compile Include="../modules/KeyViewer/Js/KvJsVNode.cs" Link="Source/KvJsVNode.cs" />
 		<Compile Include="../modules/KeyViewer/Layout/KvElement.cs" Link="Source/KvElement.cs" />

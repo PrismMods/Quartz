@@ -11,6 +11,9 @@ namespace Quartz.Features.KeyViewer.Js;
 internal static partial class KvJsRuntime {
     private const int MaxPluginBytes = 1024 * 1024;
     private static readonly List<PluginRuntime> plugins = [];
+    private static readonly KvJsKeyEventQueue keyEvents = new();
+    private static int keyEventGeneration;
+    private static int activeKeyEventGeneration;
     private static RectTransform attached;
     private static float now;
     private static bool rendering;
@@ -116,19 +119,23 @@ internal static partial class KvJsRuntime {
     internal static void Attach(RectTransform parent) {
         if(parent == null) return;
         if(attached != null) Detach();
+        StopKeyEvents();
         now = KvClock.Now;
         attached = parent;
         foreach(PluginRuntime plugin in plugins) plugin.Mount();
         RenderAll();
+        if(plugins.Count > 0) StartKeyEvents();
     }
 
     internal static void Detach() {
+        StopKeyEvents();
         foreach(PluginRuntime plugin in plugins) plugin.Unmount();
         attached = null;
     }
 
     internal static void Tick(float time) {
         now = time;
+        DrainKeyEvents();
         KvJsStorage.Tick(time);
         bool dirty = false;
         foreach(PluginRuntime plugin in plugins) {
@@ -139,12 +146,8 @@ internal static partial class KvJsRuntime {
     }
 
     internal static void OnKeyEvent(KeyCode key, bool down) {
-        string label = KvKeyNames.ToGlobalKeyOrRaw(key);
-        string state = down ? "DOWN" : "UP";
-        string mode = KvStore.Current?.SelectedTab ?? "";
-        string device = key >= KeyCode.Mouse0 && key <= KeyCode.Mouse6 ? "mouse"
-            : key >= KeyCode.JoystickButton0 ? "gamepad" : "keyboard";
-        foreach(PluginRuntime plugin in plugins) plugin.EmitKey(label, state, mode, device);
+        int generation = Volatile.Read(ref activeKeyEventGeneration);
+        if(generation != 0) keyEvents.TryEnqueue((int)key, down, generation);
     }
 
     internal static void Shutdown() {
@@ -152,6 +155,34 @@ internal static partial class KvJsRuntime {
         DisposePlugins();
         KvJsStorage.Flush();
         lastError = "";
+    }
+
+    private static void DrainKeyEvents() {
+        int generation = Volatile.Read(ref activeKeyEventGeneration);
+        while(keyEvents.TryDequeue(out KvJsKeyEventQueue.Event ev)) {
+            if(generation == 0 || ev.Generation != generation) continue;
+            KeyCode key = (KeyCode)ev.Key;
+            string label = KvKeyNames.ToGlobalKeyOrRaw(key);
+            string state = ev.Down ? "DOWN" : "UP";
+            string mode = KvStore.Current?.SelectedTab ?? "";
+            string device = key >= KeyCode.Mouse0 && key <= KeyCode.Mouse6 ? "mouse"
+                : key >= KeyCode.JoystickButton0 ? "gamepad" : "keyboard";
+            foreach(PluginRuntime plugin in plugins) plugin.EmitKey(label, state, mode, device);
+        }
+        if(keyEvents.TakeOverflow())
+            MainCore.Log.Wrn("[KeyViewerJS] Key event queue overflowed; some input was dropped.");
+    }
+
+    private static void StartKeyEvents() {
+        keyEvents.Clear();
+        int generation = Interlocked.Increment(ref keyEventGeneration);
+        if(generation == 0) generation = Interlocked.Increment(ref keyEventGeneration);
+        Volatile.Write(ref activeKeyEventGeneration, generation);
+    }
+
+    private static void StopKeyEvents() {
+        Volatile.Write(ref activeKeyEventGeneration, 0);
+        keyEvents.Clear();
     }
 
     private static void RenderAll() {
