@@ -166,12 +166,11 @@ public static partial class KeyViewerOverlay {
             box.LastImageTex = tex;
             box.LastImageFit = fit;
         }
-        bool dimmed = pressed && spec.ActiveTex == null && spec.IdleTex != null;
-        box.KeyImage.color = dimmed ? new Color(0.62f, 0.62f, 0.62f, 1f) : Color.white;
+        box.KeyImage.color = Color.white;
     }
     private static string Pick(string specific, string fallback) =>
         specific.Length > 0 ? specific : fallback.Length > 0 ? fallback : "cover";
-    private static void ApplyImageFit(RawImage ri, Texture2D tex, string fit, float rw, float rh) {
+    internal static void ApplyImageFit(RawImage ri, Texture2D tex, string fit, float rw, float rh) {
         ri.texture = tex;
         RectTransform rt = ri.rectTransform;
         float tw = Mathf.Max(tex.width, 1), th = Mathf.Max(tex.height, 1);
