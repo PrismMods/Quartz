@@ -2175,6 +2175,8 @@
       {
         "type": "MelonLoader.MelonBase",
         "members": [
+          "MelonLoader.MelonInfoAttribute MelonLoader.MelonBase::Info()",
+          "MelonLoader.MelonInfoAttribute MelonLoader.MelonBase::get_Info()",
           "System.Void MelonLoader.MelonBase::OnDeinitializeMelon()",
           "System.Void MelonLoader.MelonBase::OnInitializeMelon()",
           "System.Void MelonLoader.MelonBase::OnUpdate()"
@@ -2202,6 +2204,8 @@
       {
         "type": "MelonLoader.MelonInfoAttribute",
         "members": [
+          "System.String MelonLoader.MelonInfoAttribute::Name()",
+          "System.String MelonLoader.MelonInfoAttribute::get_Name()",
           "System.Void MelonLoader.MelonInfoAttribute::.ctor(System.Type,System.String,System.String,System.String,System.String)"
         ]
       },

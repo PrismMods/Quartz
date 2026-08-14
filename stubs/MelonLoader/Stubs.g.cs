@@ -16,6 +16,7 @@ namespace MelonLoader {
         public HarmonyDontPatchAllAttribute() => throw null;
     }
     public abstract unsafe partial class MelonBase {
+        public global::MelonLoader.MelonInfoAttribute Info { get => throw null; }
         public virtual void OnDeinitializeMelon() => throw null;
         public virtual void OnInitializeMelon() => throw null;
         public virtual void OnUpdate() => throw null;
@@ -35,6 +36,7 @@ namespace MelonLoader {
         protected MelonGameAttribute() { }
     }
     public unsafe partial class MelonInfoAttribute : global::System.Attribute {
+        public string Name { get => throw null; }
         public MelonInfoAttribute(global::System.Type type, string name, string version, string author, string downloadLink = default) => throw null;
         protected MelonInfoAttribute() { }
     }
