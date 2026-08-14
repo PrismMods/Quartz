@@ -1,0 +1,28 @@
+Quartz/IO/ProfileManager.cs
+  s_b0814b8c0da421::t_fcc1c94d0d5bb9 30-34,43,60,69,90,92,101,111,118,152,156
+Quartz/IO/ProfileManager.IO.cs
+  s_b0814b8c0da421::t_fcc1c94d0d5bb9 103
+  s_b0814b8c0da421::t_f1e657b6779e7f 138-139,180
+Quartz.Tests/IO/ProfileNamesTests.cs
+  s_b0814b8c0da421::t_fcc1c94d0d5bb9 14-19
+Quartz/IO/ProfileNames.cs
+  s_b0814b8c0da421::t_49cd356ce49eea 46-47
+  s_b0814b8c0da421::t_4adc08b54fb2f7 40-43
+  s_b0814b8c0da421::t_fcc1c94d0d5bb9 28-39,44-45,48-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "43b77bcf628fe31e919e734f3560c6b3a559b3ae",
+  "prompts": {},
+  "sessions": {
+    "s_b0814b8c0da421": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a00073-e0af-7120-8ff7-123c5a557a34",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
