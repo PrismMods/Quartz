@@ -384,12 +384,17 @@ public static class ModuleService {
                 try {
                     ModuleContext context = handle.Context;
                     context?.ApplyPatches();
+                    // Mark the handle active before entering module code so a
+                    // partial OnEnable can be unwound through the normal disable
+                    // path. Otherwise its Harmony patches survive the exception
+                    // forever: Active stays false, so later passes skip cleanup.
+                    handle.Active = true;
                     handle.Instance.OnEnable();
                     context?.RunEnableSteps();
-                    handle.Active = true;
                 } catch(Exception e) {
                     handle.Error = $"OnEnable threw: {e}";
                     MainCore.Log.Err($"[Module:{handle.Id}] OnEnable threw: {e}");
+                    SafeDisable(handle);
                 }
             } else {
                 SafeDisable(handle, unpatchOnDisable);
