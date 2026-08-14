@@ -41,6 +41,7 @@ public class UIToggle : UIObject {
         UpdateVisual(true);
     }
     public void Set(bool value, bool invoke = true) {
+        if(IsDisposed) return;
         Value = value;
         if(invoke) OnChanged?.Invoke(value);
         UpdateVisual();
@@ -48,6 +49,7 @@ public class UIToggle : UIObject {
     public void Toggle() => Set(!Value);
     public void Reset() => Set(DefaultValue);
     public void UpdateVisual(bool noAnimate = false) {
+        if(IsDisposed) return;
         circleSeq?.Kill();
         changeSeq?.Kill();
         CircleImage.sprite = MainCore.Spr.Get(Value ? UISprite.Circle256 : UISprite.ToggleCircle128);
@@ -62,14 +64,7 @@ public class UIToggle : UIObject {
             return;
         }
         circleSeq = GTweenSequenceBuilder.New()
-            .Join(
-                GTweenExtensions.Tween(
-                    () => CircleRect == null ? 26f : CircleRect.sizeDelta.x,
-                    x => { if(CircleRect != null) CircleRect.sizeDelta = new Vector2(x, x); },
-                    26f,
-                    0.3f
-                ).SetEasing(Easing.OutQuad)
-            )
+            .Join(CircleRect.GTSizeDelta(new(26f, 26f), 0.3f).SetEasing(Easing.OutQuad))
             .Join(
                 CircleImage.GTColor(Value ? UIColors.ObjectActive : UIColors.ObjectInactive, 0.15f)
                     .SetEasing(Easing.OutQuad)
@@ -79,8 +74,11 @@ public class UIToggle : UIObject {
         MainCore.TC.Play(changeSeq);
     }
     public override void Dispose() {
-        base.Dispose();
+        if(IsDisposed) return;
         circleSeq?.Kill();
         changeSeq?.Kill();
+        circleSeq = null;
+        changeSeq = null;
+        base.Dispose();
     }
 }

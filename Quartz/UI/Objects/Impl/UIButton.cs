@@ -44,6 +44,7 @@ public class UIButton : UIObject {
         return this;
     }
     public void OnHoverEnter() {
+        if(IsDisposed) return;
         hoverTween?.Kill();
         hoverTween = Background
             .GTColor(HoverColor(), 0.12f)
@@ -51,6 +52,7 @@ public class UIButton : UIObject {
         MainCore.TC.Play(hoverTween);
     }
     public void OnHoverExit() {
+        if(IsDisposed) return;
         hoverTween?.Kill();
         hoverTween = Background
             .GTColor(RestColor(), 0.12f)
@@ -58,10 +60,12 @@ public class UIButton : UIObject {
         MainCore.TC.Play(hoverTween);
     }
     public void Click(bool invoke = true) {
+        if(IsDisposed) return;
         if(invoke) OnClick?.Invoke();
         UpdateVisual();
     }
     public void UpdateVisual(bool noAnimate = false) {
+        if(IsDisposed) return;
         hoverTween?.Kill();
         if(noAnimate) {
             Background.color = RestColor();
@@ -73,7 +77,10 @@ public class UIButton : UIObject {
         MainCore.TC.Play(hoverTween);
     }
     public override void Dispose() {
-        base.Dispose();
+        if(IsDisposed) return;
         hoverTween?.Kill();
+        hoverTween = null;
+        OnClick = null;
+        base.Dispose();
     }
 }

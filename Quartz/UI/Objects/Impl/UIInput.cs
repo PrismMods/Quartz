@@ -13,6 +13,7 @@ public sealed class UIInput : UIObject {
     public string DefaultValue { get; }
     public string Value { get; private set; }
     public Action<string> OnChanged { get; }
+    public Action<string> OnComplete { get; set; }
     public TMP_InputField InputField { get; }
     public TextMeshProUGUI Placeholder { get; }
     public Image IconImage { get; }
@@ -43,9 +44,11 @@ public sealed class UIInput : UIObject {
         SetupInputField();
         InputField.SetTextWithoutNotify(value ?? string.Empty);
         InputField.onValueChanged.AddListener(OnValueChanged);
+        InputField.onEndEdit.AddListener(OnEndEdit);
         UpdateVisual(true);
     }
     public void Set(string value, bool invoke = true) {
+        if(IsDisposed) return;
         value ??= string.Empty;
         Value = value;
         if(InputField.text != value) InputField.text = value;
@@ -55,13 +58,20 @@ public sealed class UIInput : UIObject {
     public void Reset() {
         if(DefaultValue != null) Set(DefaultValue);
     }
+    private void OnEndEdit(string value) {
+        if(IsDisposed) return;
+        Value = value;
+        OnComplete?.Invoke(value);
+    }
     private void OnValueChanged(string value) {
+        if(IsDisposed) return;
         Value = value;
         UpdateVisual();
         UpdateCaretAnimation(InputField.isFocused);
         OnChanged?.Invoke(value);
     }
     public void UpdateVisual(bool noAnimate = false) {
+        if(IsDisposed) return;
         changeTween.CompleteAndKill();
         float target = (DefaultValue != null && DefaultValue != Value) ? 1f : 0f;
         if(noAnimate) {
@@ -140,6 +150,7 @@ public sealed class UIInput : UIObject {
     }
     bool hasFocused = false;
     public override void Tick() {
+        if(IsDisposed) return;
         bool focused = InputField.isFocused;
         if(focused == hasFocused) return;
         hasFocused = focused;
@@ -148,7 +159,7 @@ public sealed class UIInput : UIObject {
         UpdateIconImage(focused);
     }
     public override void OnHidden() {
-        if(!hasFocused && !caretLooping) return;
+        if(IsDisposed || (!hasFocused && !caretLooping)) return;
         hasFocused = false;
         caretLooping = false;
         caretTween?.Kill();
@@ -171,10 +182,15 @@ public sealed class UIInput : UIObject {
         }
     }
     public override void Dispose() {
-        base.Dispose();
+        if(IsDisposed) return;
         caretTween?.Kill();
         changeTween?.Kill();
         placeholderTween?.Kill();
         iconTween?.Kill();
+        caretTween = null;
+        changeTween = null;
+        placeholderTween = null;
+        iconTween = null;
+        base.Dispose();
     }
 }

@@ -9,6 +9,8 @@ public abstract class UIObject {
     private static readonly List<UIObject> _tickables = [];
     public string Id { get; }
     public RectTransform Rect { get; }
+    public bool IsDisposed { get; private set; }
+    public Action OnDisposed;
     protected CanvasGroup CanvasGroup {
         get {
             field ??= Rect.GetComponent<CanvasGroup>() ?? Rect.gameObject.AddComponent<CanvasGroup>();
@@ -21,6 +23,7 @@ public abstract class UIObject {
         Rect = rect;
     }
     public virtual void SetBlocked(bool blocked, bool noAnimate = false) {
+        if(IsDisposed) return;
         blockSeq?.Kill();
         float targetAlpha = blocked ? 0.4f : 1f;
         CanvasGroup cg = CanvasGroup;
@@ -42,8 +45,14 @@ public abstract class UIObject {
         MainCore.TC.Play(blockSeq);
     }
     public virtual void Dispose() {
+        if(IsDisposed) return;
         blockSeq?.Kill();
+        blockSeq = null;
         UnregisterTick();
+        IsDisposed = true;
+        Action disposed = OnDisposed;
+        OnDisposed = null;
+        try { disposed?.Invoke(); } catch(Exception e) { Diag.Ignore(e); }
     }
     protected void RegisterTick() => _tickables.Add(this);
     protected void UnregisterTick() => _tickables.Remove(this);

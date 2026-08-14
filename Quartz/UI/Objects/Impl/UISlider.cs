@@ -12,7 +12,7 @@ using GTweenExtensions = GTweens.Extensions.GTweenExtensions;
 using TMPro;
 namespace Quartz.UI.Objects.Impl;
 public class UISlider : UIObject {
-    public float DefaultValue { get; }
+    public float DefaultValue { get; private set; }
     public float Min;
     public float Max;
     public float Value { get; private set; }
@@ -83,7 +83,7 @@ public class UISlider : UIObject {
         UpdateVisual(true);
     }
     public void Set(float value, bool invoke = true) {
-        if(float.IsNaN(value)) return;
+        if(IsDisposed || float.IsNaN(value)) return;
         value = ApplyFilter(value);
         Value = Mathf.Clamp(value, Min, Max);
         if(invoke) OnChanged?.Invoke(Value);
@@ -94,8 +94,13 @@ public class UISlider : UIObject {
         Color fill = FillImage.color;
         FillImage.color = new(color.r, color.g, color.b, fill.a);
     }
+    public void SetDefaultValue(float value, bool noAnimate = false) {
+        if(IsDisposed || float.IsNaN(value)) return;
+        DefaultValue = Mathf.Clamp(ApplyFilter(value), Min, Max);
+        UpdateVisual(noAnimate);
+    }
     public void SetOnlyValue(float value, bool noAnimate = false) {
-        if(float.IsNaN(value)) return;
+        if(IsDisposed || float.IsNaN(value)) return;
         Value = Mathf.Clamp(ApplyFilter(value), Min, Max);
         UpdateVisual(noAnimate);
     }
@@ -104,14 +109,8 @@ public class UISlider : UIObject {
     private float FillFor(float t) => MinFill > 0f && t > 0f ? Mathf.Max(t, Mathf.Min(MinFill, 1f)) : t;
     private float ApplyFilter(float v) => Filter?.Invoke(v) ?? v;
     private void UpdateValueText() => ValueText?.text = Value.ToString(Format);
-    private float FillX(float fallback) => FillRect == null ? fallback : FillRect.anchorMax.x;
-    private void SetFillX(float x) {
-        if(FillRect == null) return;
-        Vector2 anchor = FillRect.anchorMax;
-        anchor.x = x;
-        FillRect.anchorMax = anchor;
-    }
     public void UpdateVisual(bool noAnimate = false) {
+        if(IsDisposed) return;
         fillSeq?.Kill();
         changeSeq?.Kill();
         UpdateValueText();
@@ -131,7 +130,7 @@ public class UISlider : UIObject {
         }
         fillSeq = GTweenSequenceBuilder.New()
             .Join(
-                GTweenExtensions.Tween(() => FillX(t), SetFillX, t, 0.6f).SetEasing(Easing.OutExpo)
+                FillRect.GTAnchorMaxX(t, 0.6f).SetEasing(Easing.OutExpo)
             ).Build();
         MainCore.TC.Play(fillSeq);
         changeSeq = GTweenSequenceBuilder.New()
@@ -175,6 +174,7 @@ public class UISlider : UIObject {
         SetStateVisuals(AccentColor, false);
     }
     private void SetStateVisuals(Color targetColor, bool isCalculating, float? value = null) {
+        if(IsDisposed) return;
         stateSeq?.Kill();
         float targetFillAlpha = isCalculating ? (value.HasValue ? 0.3f : 0f) : 1f;
         Color startOutline = OutlineImage.color;
@@ -203,16 +203,20 @@ public class UISlider : UIObject {
             fillSeq?.Kill();
             fillSeq = GTweenSequenceBuilder.New()
                 .Join(
-                    GTweenExtensions.Tween(() => FillX(target), SetFillX, target, 0.4f)
+                    FillRect.GTAnchorMaxX(target, 0.4f)
                         .SetEasing(Easing.OutExpo)
                 ).Build();
             MainCore.TC.Play(fillSeq);
         }
     }
     public override void Dispose() {
-        base.Dispose();
+        if(IsDisposed) return;
         fillSeq?.Kill();
         changeSeq?.Kill();
         stateSeq?.Kill();
+        fillSeq = null;
+        changeSeq = null;
+        stateSeq = null;
+        base.Dispose();
     }
 }

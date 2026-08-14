@@ -80,6 +80,27 @@ public static class GTweenExtensions {
                 to,
                 duration
             );
+        public GTween GTScale(Vector3 to, float duration) {
+            Vector3 from = target == null ? to : target.localScale;
+            return GTweens.Extensions.GTweenExtensions.Tween(
+                () => 0f,
+                x => { if(target != null) target.localScale = Vector3.LerpUnclamped(from, to, x); },
+                1f,
+                duration
+            );
+        }
+        public GTween GTAnchorMaxX(float to, float duration)
+            => GTweens.Extensions.GTweenExtensions.Tween(
+                () => target == null ? to : target.anchorMax.x,
+                x => {
+                    if(target == null) return;
+                    var anchor = target.anchorMax;
+                    anchor.x = x;
+                    target.anchorMax = anchor;
+                },
+                to,
+                duration
+            );
         public GTween GTSizeDelta(Vector2 to, float duration) {
             var from = target == null ? to : target.sizeDelta;
             return GTweens.Extensions.GTweenExtensions.Tween(

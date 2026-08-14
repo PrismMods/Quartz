@@ -65,6 +65,7 @@ public class UIDropDown<T> : UIObject {
         UpdateVisual(true);
     }
     public void Set(T value, bool invoke = true) {
+        if(IsDisposed) return;
         Value = value;
         Label.text = Display(Value);
         if(invoke) OnChanged?.Invoke(value);
@@ -72,6 +73,7 @@ public class UIDropDown<T> : UIObject {
         OnLayoutChanged?.Invoke();
     }
     public void SetValues(IReadOnlyList<T> values) {
+        if(IsDisposed) return;
         Values = values;
         RebuildList();
         if(!Values.Contains(Value) && Values.Count > 0) Set(Values[0], false);
@@ -84,6 +86,7 @@ public class UIDropDown<T> : UIObject {
     }
     private GTween listSeq;
     public void SetExpanded(bool expanded) {
+        if(IsDisposed) return;
         Expanded = expanded;
         if(expanded) ApplyItemFonts();
         AnimateList(expanded);
@@ -117,6 +120,7 @@ public class UIDropDown<T> : UIObject {
     }
     public void ToggleExpanded() => SetExpanded(!Expanded);
     public void UpdateVisual(bool noAnimate = false) {
+        if(IsDisposed) return;
         triangleSeq?.Kill();
         changeSeq?.Kill();
         bool isDefault = DefaultValue == null || EqualityComparer<T>.Default.Equals(DefaultValue, Value);
@@ -142,7 +146,7 @@ public class UIDropDown<T> : UIObject {
         MainCore.TC.Play(changeSeq);
     }
     public void RebuildList() {
-        if(ListObject == null) return;
+        if(IsDisposed || ListObject == null) return;
         foreach(Transform child in ListObject.transform) Object.Destroy(child.gameObject);
         rowTexts.Clear();
         foreach(T item in Values) {
@@ -190,9 +194,13 @@ public class UIDropDown<T> : UIObject {
         SetExpanded(false);
     }
     public override void Dispose() {
-        base.Dispose();
+        if(IsDisposed) return;
         triangleSeq?.Kill();
         changeSeq?.Kill();
         listSeq?.Kill();
+        triangleSeq = null;
+        changeSeq = null;
+        listSeq = null;
+        base.Dispose();
     }
 }
