@@ -20,8 +20,8 @@ internal sealed partial class KvInspector {
     }
     private static void MarkMixed(UIColorPicker p) {
         if(p == null) return;
-        if(p.ValueText != null) p.ValueText.text = MixedText;
-        if(p.SwatchImage != null) p.SwatchImage.color = MixedSwatch;
+        if(p.PreviewLabel != null) p.PreviewLabel.text = MixedText;
+        if(p.Preview != null) p.Preview.color = MixedSwatch;
     }
     private UISlider Num(
         RectTransform root, List<UIObject> tracked, string label, string id,

@@ -23,11 +23,38 @@ namespace Quartz.UI;
 public static partial class UICore {
     private static GameObject canvasObj;
     private static Canvas canvas;
+    public static GameObject CanvasObj => canvasObj;
+    public static Canvas Canvas => canvas;
+    public static RectTransform CanvasRect => canvasObj == null ? null : canvasObj.GetComponent<RectTransform>();
     private static CanvasScaler canvasScaler;
     public static readonly Dictionary<int, RectTransform> Pages = [];
     public static int CurrentMenuState = -1;
     public static bool IsReorganizing { get; private set; }
     public static readonly Vector2 ReferenceResolution = new(1920, 1080);
+    public static bool TryGetCanvasSize(out Vector2 size) {
+        float scale = MainCore.Conf.UIScale <= 0f ? 1f : MainCore.Conf.UIScale;
+        Vector2 reference = ReferenceResolution / scale;
+        int w = Screen.width;
+        int h = Screen.height;
+        if(w <= 0 || h <= 0 || reference.x <= 0f || reference.y <= 0f) {
+            size = reference;
+            return false;
+        }
+        float match = canvasScaler == null ? 0.5f : canvasScaler.matchWidthOrHeight;
+        float factor = Mathf.Pow(w / reference.x, 1f - match) * Mathf.Pow(h / reference.y, match);
+        if(factor <= 0.0001f) {
+            size = reference;
+            return false;
+        }
+        size = new Vector2(w / factor, h / factor);
+        return true;
+    }
+    public static Vector2 CanvasSize {
+        get {
+            TryGetCanvasSize(out Vector2 size);
+            return size;
+        }
+    }
     private static Action<TranslationFailState> _onPageSettings;
     private static Action<TranslationFailState> _onRefresh;
     private static Action<string> _onLanguageRebuild;

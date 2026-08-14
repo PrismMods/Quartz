@@ -1,362 +1,545 @@
 using Quartz.Core;
-using Quartz.Resource;
 using Quartz.Tween;
-using UnityEngine;
-using UnityEngine.UI;
-using Object = UnityEngine.Object;
+using Quartz.UI.Generator;
+using Quartz.Utility.Math;
 using GTweens.Builders;
 using GTweens.Easings;
-using GTweens.Extensions;
 using GTweens.Tweens;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using GTweenExtensions = GTweens.Extensions.GTweenExtensions;
 using TMPro;
 namespace Quartz.UI.Objects.Impl;
 public sealed class UIColorPicker : UIObject {
-    private const int SvTextureSize = 128;
-    private const int HueTextureHeight = 256;
+    private const int TextureSize = 256;
+    private const float PopupScale = 0.9f;
+    private const float RingInner = 0.37f;
+    private const float RingOuter = 0.49f;
+    private const float TriangleRadius = 0.32f;
     public Color DefaultValue { get; }
-    public Color Value { get; private set; }
-    public Action<Color> OnChanged { get; }
-    public Action<Color> OnComplete { get; }
     public TextMeshProUGUI Label { get; }
-    public TextMeshProUGUI ValueText { get; }
-    public Image SwatchImage { get; }
-    public Image PreviewImage { get; }
-    public Image ChangedImage { get; }
-    public sealed class ChannelSlider {
-        public readonly int Channel;
-        public readonly UISlider Slider;
-        public ChannelSlider(int channel, UISlider slider) {
-            Channel = channel;
-            Slider = slider;
-        }
-    }
-    private readonly LayoutElement rowLayout;
+    public Color Value { get; private set; }
+    public bool Expanded { get; private set; }
+    private readonly RectTransform canvasRect;
+    private readonly RectTransform popupRect;
+    private readonly GameObject popup;
+    private readonly GameObject popupBlocker;
+    private readonly CanvasGroup popupCanvas;
     private readonly GameObject body;
-    private readonly CanvasGroup bodyCanvasGroup;
-    private GTween expandSeq;
-    private readonly RectTransform rootRect;
-    private readonly RectTransform svRect;
-    private readonly RectTransform hueRect;
-    private readonly RectTransform svHandleRect;
-    private readonly RectTransform hueHandleRect;
-    private readonly RawImage svImage;
-    private readonly RawImage hueImage;
-    private readonly TMP_InputField hexInput;
-    private readonly ChannelSlider[] channelSliders;
-    private readonly float expandedHeight;
-    private bool suppressHexInput;
-    private bool suppressChannelSync;
-    private Texture2D svTexture;
-    private Texture2D hueTexture;
-    private Color32[] svPixels;
-    private bool texturesBuilt;
-    private float builtHue = float.NaN;
+    private readonly RectTransform bodyRect;
+    private readonly CanvasGroup bodyCanvas;
+    public Image Preview => preview;
+    public TextMeshProUGUI PreviewLabel => previewLabel;
+    private readonly Image preview;
+    private readonly TextMeshProUGUI previewLabel;
+    private readonly RectTransform wheelRect;
+    private readonly RectTransform hueHandle;
+    private readonly RectTransform colorHandle;
+    private readonly UIInput hexInput;
+    private readonly Image hexOutline;
+    private readonly UISlider[] sliders;
+    private readonly Image rgbModeBackground;
+    private readonly Image hsvModeBackground;
+    private readonly TextMeshProUGUI rgbModeLabel;
+    private readonly TextMeshProUGUI hsvModeLabel;
+    private readonly Action<Color> onChanged;
+    private readonly Action<Color> onComplete;
+    private readonly Texture2D texture;
+    private readonly Sprite textureSprite;
+    private readonly float popupWidth;
+    private readonly float popupHeight;
     private float hue;
     private float saturation;
     private float brightness;
-    public bool Expanded { get; private set; }
+    private float renderedHue = -1f;
+    private bool suppressHex;
+    private Color? pendingHexColor;
+    private bool hsvMode;
+    private DragTarget dragTarget;
+    private GTween popupTween, validationTween;
+    private enum DragTarget { None, Hue, Triangle }
     public UIColorPicker(
         string id,
         RectTransform rect,
-        LayoutElement rowLayout,
         GameObject body,
-        CanvasGroup bodyCanvasGroup,
+        CanvasGroup bodyCanvas,
+        Image preview,
+        TextMeshProUGUI previewLabel,
         TextMeshProUGUI label,
-        TextMeshProUGUI valueText,
-        Image swatchImage,
-        Image previewImage,
-        Image changedImage,
-        RectTransform svRect,
-        RawImage svImage,
-        RectTransform hueRect,
-        RawImage hueImage,
-        RectTransform svHandleRect,
-        RectTransform hueHandleRect,
-        TMP_InputField hexInput,
-        ChannelSlider[] channelSliders,
-        float expandedHeight,
+        RectTransform wheelRect,
+        RectTransform hueHandle,
+        RectTransform colorHandle,
+        UIInput hexInput,
+        Image sharedOutline,
+        UISlider[] sliders,
+        Image rgbModeBackground,
+        TextMeshProUGUI rgbModeLabel,
+        Image hsvModeBackground,
+        TextMeshProUGUI hsvModeLabel,
         Color defaultValue,
         Color value,
         Action<Color> onChanged,
-        Action<Color> onComplete
+        Action<Color> onComplete,
+        float popupWidth,
+        float popupHeight
     ) : base(id, rect) {
-        rootRect = rect;
-        this.rowLayout = rowLayout;
+        canvasRect = UICore.CanvasRect;
         this.body = body;
-        this.bodyCanvasGroup = bodyCanvasGroup;
+        this.bodyCanvas = bodyCanvas;
+        this.preview = preview;
+        this.previewLabel = previewLabel;
         Label = label;
-        ValueText = valueText;
-        SwatchImage = swatchImage;
-        PreviewImage = previewImage;
-        ChangedImage = changedImage;
-        this.svRect = svRect;
-        this.svImage = svImage;
-        this.hueRect = hueRect;
-        this.hueImage = hueImage;
-        this.svHandleRect = svHandleRect;
-        this.hueHandleRect = hueHandleRect;
+        this.wheelRect = wheelRect;
+        this.hueHandle = hueHandle;
+        this.colorHandle = colorHandle;
+        this.sliders = sliders;
+        this.rgbModeBackground = rgbModeBackground;
+        this.rgbModeLabel = rgbModeLabel;
+        this.hsvModeBackground = hsvModeBackground;
+        this.hsvModeLabel = hsvModeLabel;
         this.hexInput = hexInput;
-        this.channelSliders = channelSliders ?? Array.Empty<ChannelSlider>();
-        this.expandedHeight = expandedHeight;
-        DefaultValue = Normalize(defaultValue);
-        Value = Normalize(value);
-        OnChanged = onChanged;
-        OnComplete = onComplete;
-        if(SwatchImage != null) SwatchImage.gameObject.AddComponent<Quartz.UI.Utility.ThemeExempt>();
-        if(PreviewImage != null) PreviewImage.gameObject.AddComponent<Quartz.UI.Utility.ThemeExempt>();
-        SetupHexInput();
-        Color.RGBToHSV(Value, out hue, out saturation, out brightness);
+        hexOutline = sharedOutline;
+        this.onChanged = onChanged;
+        this.onComplete = onComplete;
+        this.popupWidth = popupWidth;
+        this.popupHeight = popupHeight;
+        DefaultValue = defaultValue;
+        popup = new GameObject("ColorPickerPopup");
+        popup.transform.SetParent(canvasRect, false);
+        popupRect = popup.AddComponent<RectTransform>();
+        popupRect.anchorMin = new Vector2(0.5f, 0.5f);
+        popupRect.anchorMax = new Vector2(0.5f, 0.5f);
+        popupRect.pivot = new Vector2(0f, 1f);
+        popupRect.sizeDelta = new Vector2(popupWidth, popupHeight);
+        popupCanvas = popup.AddComponent<CanvasGroup>();
+        RectTransform bodyTransform = body.GetComponent<RectTransform>();
+        bodyTransform.SetParent(popupRect, false);
+        bodyRect = bodyTransform;
+        bodyRect.anchorMin = Vector2.zero;
+        bodyRect.anchorMax = Vector2.one;
+        bodyRect.pivot = new Vector2(0.5f, 0.5f);
+        bodyRect.offsetMin = new Vector2(12f, 12f);
+        bodyRect.offsetMax = new Vector2(-12f, -12f);
+        popupBlocker = CreatePopupBlocker(canvasRect);
+        popupBlocker.SetActive(false);
+        GenerateUI.AddButton(popupBlocker, button => {
+            if(button == PointerEventData.InputButton.Left) SetExpanded(false);
+        }, false);
+        texture = new Texture2D(TextureSize, TextureSize, TextureFormat.RGBA32, false) {
+            name = $"ColorPicker_{id}",
+            filterMode = FilterMode.Bilinear,
+            wrapMode = TextureWrapMode.Clamp
+        };
+        textureSprite = Sprite.Create(texture, new Rect(0f, 0f, TextureSize, TextureSize), new Vector2(0.5f, 0.5f), 100f);
+        wheelRect.GetComponent<Image>().sprite = textureSprite;
+        Set(value, false);
+        SetMode(false);
         SetExpanded(false, true);
-        UpdateVisual(true);
-    }
-    public void Set(Color color, bool invoke = true) {
-        Value = Normalize(color);
-        Color.RGBToHSV(Value, out float h, out saturation, out brightness);
-        if(saturation > 0.0001f || brightness > 0.0001f) hue = h;
-        BuildSvTexture();
-        if(invoke) OnChanged?.Invoke(Value);
-        UpdateVisual();
-    }
-    public void Commit() {
-        OnComplete?.Invoke(Value);
-        UpdateVisual();
+        RegisterTick();
+        OnDisposed += () => {
+            if(popup != null) UnityEngine.Object.Destroy(popup);
+            if(popupBlocker != null) UnityEngine.Object.Destroy(popupBlocker);
+        };
     }
     public void ToggleExpanded() => SetExpanded(!Expanded);
+    public override void Tick() {
+        if(!IsDisposed && Expanded) PositionPopup();
+    }
     public void SetExpanded(bool expanded, bool noAnimate = false) {
+        if(IsDisposed) return;
+        popupTween?.Kill();
         Expanded = expanded;
-        if(expanded && !texturesBuilt) {
-            texturesBuilt = true;
-            BuildHueTexture();
-            BuildSvTexture();
-        }
-        if(body != null && !body.activeSelf) body.SetActive(true);
-        float targetHeight = expanded ? expandedHeight : 50f;
-        float targetAlpha = expanded ? 1f : 0f;
-        if(bodyCanvasGroup != null) {
-            bodyCanvasGroup.blocksRaycasts = expanded;
-            bodyCanvasGroup.interactable = expanded;
-        }
-        expandSeq?.Kill();
-        if(noAnimate) {
-            if(rowLayout != null) {
-                rowLayout.preferredHeight = targetHeight;
-                rowLayout.minHeight = 50f;
+        if(expanded) {
+            PositionPopup();
+            popup.SetActive(true);
+            popupBlocker.SetActive(true);
+            popupBlocker.transform.SetAsLastSibling();
+            popup.transform.SetAsLastSibling();
+            popupRect.localScale = new Vector3(PopupScale * 0.96f, PopupScale * 0.96f, 1f);
+            popupCanvas.alpha = 0f;
+            popupCanvas.interactable = true;
+            popupCanvas.blocksRaycasts = true;
+            body.SetActive(true);
+            Canvas.ForceUpdateCanvases();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(bodyRect);
+            UpdateHandles();
+            bodyCanvas.alpha = 1f;
+            if(noAnimate) {
+                popupRect.localScale = new Vector3(PopupScale, PopupScale, 1f);
+                popupCanvas.alpha = 1f;
+            } else {
+                popupTween = PlayPopupAnimation(true);
             }
-            if(bodyCanvasGroup != null) bodyCanvasGroup.alpha = targetAlpha;
-            if(rootRect != null) LayoutRebuilder.ForceRebuildLayoutImmediate(rootRect);
-            return;
-        }
-        GTweenSequenceBuilder builder = GTweenSequenceBuilder.New();
-        if(rowLayout != null) {
-            rowLayout.minHeight = 50f;
-            builder.Join(GTweenExtensions.Tween(
-                () => rowLayout == null ? targetHeight : rowLayout.preferredHeight,
-                x => {
-                    if(rowLayout == null) return;
-                    rowLayout.preferredHeight = Mathf.Max(50f, x);
-                    if(rootRect != null) LayoutRebuilder.ForceRebuildLayoutImmediate(rootRect);
-                },
-                targetHeight,
-                0.16f
-            ).SetEasing(Easing.OutBack));
-        }
-        if(bodyCanvasGroup != null) {
-            builder.Join(GTweenExtensions.Tween(
-                () => bodyCanvasGroup == null ? targetAlpha : bodyCanvasGroup.alpha,
-                x => { if(bodyCanvasGroup != null) bodyCanvasGroup.alpha = x; },
-                targetAlpha,
-                0.16f
-            ).SetEasing(Easing.OutSine));
-        }
-        expandSeq = builder.Build();
-        MainCore.TC.Play(expandSeq);
-    }
-    public void SetFromSvPointer(Vector2 screenPosition) {
-        if(!RectTransformUtility.ScreenPointToLocalPointInRectangle(svRect, screenPosition, null, out Vector2 local)) return;
-        Rect rect = svRect.rect;
-        saturation = Mathf.Clamp01(Mathf.InverseLerp(rect.xMin, rect.xMax, local.x));
-        brightness = Mathf.Clamp01(Mathf.InverseLerp(rect.yMin, rect.yMax, local.y));
-        SetFromHsv();
-    }
-    public void SetFromHuePointer(Vector2 screenPosition) {
-        if(!RectTransformUtility.ScreenPointToLocalPointInRectangle(hueRect, screenPosition, null, out Vector2 local)) return;
-        Rect rect = hueRect.rect;
-        hue = Mathf.Clamp01(Mathf.InverseLerp(rect.yMin, rect.yMax, local.y));
-        BuildSvTexture();
-        SetFromHsv();
-    }
-    public void SetChannelValue(int channel, float component) {
-        Color next = Value;
-        component = Mathf.Clamp01(component);
-        if(channel == 0) next.r = component;
-        else if(channel == 1) next.g = component;
-        else if(channel == 2) next.b = component;
-        else next.a = component;
-        suppressChannelSync = true;
-        Set(next);
-        suppressChannelSync = false;
-    }
-    private void SetFromHsv() {
-        Color next = Color.HSVToRGB(hue, saturation, brightness);
-        next.a = Value.a;
-        Value = next;
-        OnChanged?.Invoke(Value);
-        UpdateVisual();
-    }
-    private void UpdateVisual(bool noAnimate = false) {
-        string hex = ToHex(Value);
-        if(ValueText != null) ValueText.text = hex;
-        if(hexInput != null && !hexInput.isFocused && hexInput.text != hex) {
-            suppressHexInput = true;
-            hexInput.text = hex;
-            suppressHexInput = false;
-        }
-        if(SwatchImage != null) SwatchImage.color = Value;
-        if(PreviewImage != null) PreviewImage.color = Value;
-        if(ChangedImage != null) {
-            Color c = ChangedImage.color;
-            c.a = SameColor(Value, DefaultValue) ? 0f : 1f;
-            ChangedImage.color = c;
-        }
-        if(svHandleRect != null && svRect != null) {
-            Rect r = svRect.rect;
-            svHandleRect.anchoredPosition = new Vector2(
-                Mathf.Lerp(r.xMin, r.xMax, saturation),
-                Mathf.Lerp(r.yMin, r.yMax, brightness)
-            );
-        }
-        if(hueHandleRect != null && hueRect != null) {
-            Rect r = hueRect.rect;
-            hueHandleRect.anchoredPosition = new Vector2(
-                0f,
-                Mathf.Lerp(r.yMin, r.yMax, hue)
-            );
-        }
-        UpdateChannelSliders();
-    }
-    private void SetupHexInput() {
-        if(hexInput == null) return;
-        hexInput.lineType = TMP_InputField.LineType.SingleLine;
-        hexInput.richText = false;
-        hexInput.characterLimit = 9;
-        hexInput.customCaretColor = true;
-        hexInput.caretColor = Color.white;
-        hexInput.selectionColor = UIColors.MenuHover;
-        hexInput.onValueChanged.AddListener(value => {
-            if(suppressHexInput) return;
-            if(TryParseHex(value, out Color parsed)) Set(parsed);
-        });
-        hexInput.onEndEdit.AddListener(value => {
-            if(TryParseHex(value, out Color parsed)) {
-                Set(parsed);
-                Commit();
+        } else {
+            bodyCanvas.interactable = false;
+            bodyCanvas.blocksRaycasts = false;
+            popupCanvas.interactable = false;
+            popupCanvas.blocksRaycasts = false;
+            if(noAnimate) {
+                popup.SetActive(false);
+                popupBlocker.SetActive(false);
+                body.SetActive(false);
+                bodyCanvas.alpha = 0f;
+                popupCanvas.alpha = 0f;
                 return;
             }
-            UpdateVisual(true);
-        });
+            popupTween = PlayPopupAnimation(false).OnComplete(() => {
+                if(Expanded || IsDisposed) return;
+                popup.SetActive(false);
+                popupBlocker.SetActive(false);
+                body.SetActive(false);
+                bodyCanvas.alpha = 0f;
+            });
+        }
+        bodyCanvas.interactable = expanded;
+        bodyCanvas.blocksRaycasts = expanded;
     }
-    private void UpdateChannelSliders() {
-        if(suppressChannelSync) return;
-        for(int i = 0; i < channelSliders.Length; i++) {
-            ChannelSlider slider = channelSliders[i];
-            if(slider?.Slider == null) continue;
-            float value = slider.Channel == 0
-                ? Value.r
-                : slider.Channel == 1
-                    ? Value.g
-                    : slider.Channel == 2
-                        ? Value.b
-                        : Value.a;
-            slider.Slider.SetOnlyValue(value, true);
-        }
+    private GTween PlayPopupAnimation(bool opening) {
+        GTween sequence = GTweenSequenceBuilder.New()
+            .Join(popupRect.GTScale(
+                opening ? new Vector3(PopupScale, PopupScale, 1f) : new Vector3(PopupScale * 0.96f, PopupScale * 0.96f, 1f),
+                0.2f
+            ).SetEasing(Easing.OutBack))
+            .Join(popupCanvas.GTFade(opening ? 1f : 0f, 0.16f).SetEasing(Easing.OutSine))
+            .Build();
+        MainCore.TC.Play(sequence);
+        return sequence;
     }
-    private void BuildHueTexture() {
-        if(hueTexture == null) {
-            hueTexture = new Texture2D(1, HueTextureHeight, TextureFormat.RGBA32, false);
-            hueTexture.wrapMode = TextureWrapMode.Clamp;
-            hueTexture.filterMode = FilterMode.Bilinear;
-            if(hueImage != null) hueImage.texture = hueTexture;
-        }
-        for(int y = 0; y < HueTextureHeight; y++) {
-            float t = y / (HueTextureHeight - 1f);
-            hueTexture.SetPixel(0, y, Color.HSVToRGB(t, 1f, 1f));
-        }
-        hueTexture.Apply(false);
+    private static GameObject CreatePopupBlocker(RectTransform parent) {
+        GameObject blockerObject = new("ColorPickerPopupBlocker");
+        blockerObject.transform.SetParent(parent, false);
+        RectTransform blocker = blockerObject.AddComponent<RectTransform>();
+        blocker.anchorMin = Vector2.zero;
+        blocker.anchorMax = Vector2.one;
+        blocker.offsetMin = Vector2.zero;
+        blocker.offsetMax = Vector2.zero;
+        Image image = blockerObject.AddComponent<Image>();
+        image.color = Color.clear;
+        return blockerObject;
     }
-    private void BuildSvTexture() {
-        if(!texturesBuilt) return;
-        if(Mathf.Approximately(builtHue, hue)) return;
-        if(svTexture == null) {
-            svTexture = new Texture2D(SvTextureSize, SvTextureSize, TextureFormat.RGBA32, false);
-            svTexture.wrapMode = TextureWrapMode.Clamp;
-            svTexture.filterMode = FilterMode.Bilinear;
-            if(svImage != null) svImage.texture = svTexture;
+    private void PositionPopup() {
+        if(canvasRect == null || Rect == null) return;
+        Vector3 bottomWorld = Rect.TransformPoint(new Vector3(Rect.rect.xMin, Rect.rect.yMin, 0f));
+        Vector2 bottomScreen = RectTransformUtility.WorldToScreenPoint(null, bottomWorld);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, bottomScreen, null, out Vector2 bottomPosition);
+        float scaledWidth = popupWidth * PopupScale;
+        float scaledHeight = popupHeight * PopupScale;
+        float minX = canvasRect.rect.xMin + 8f;
+        float maxX = canvasRect.rect.xMax - scaledWidth - 8f;
+        bottomPosition.x = maxX >= minX ? Mathf.Clamp(bottomPosition.x, minX, maxX) : minX;
+        float minY = canvasRect.rect.yMin + scaledHeight + 8f;
+        float maxY = canvasRect.rect.yMax - 8f;
+        bottomPosition.y = maxY >= minY ? Mathf.Clamp(bottomPosition.y, minY, maxY) : maxY;
+        popupRect.pivot = new Vector2(0f, 1f);
+        popupRect.anchoredPosition = bottomPosition;
+    }
+    public void Reset() {
+        Set(DefaultValue);
+        onComplete?.Invoke(Value);
+    }
+    public void Set(Color value, bool invoke = true) {
+        if(IsDisposed) return;
+        value.r = Mathf.Clamp01(value.r);
+        value.g = Mathf.Clamp01(value.g);
+        value.b = Mathf.Clamp01(value.b);
+        value.a = Mathf.Clamp01(value.a);
+        Value = value;
+        Color.RGBToHSV(value, out float h, out saturation, out brightness);
+        if(saturation > 0.0001f && brightness > 0.0001f) hue = h;
+        UpdateVisuals();
+        if(invoke) onChanged?.Invoke(Value);
+    }
+    public void SetMode(bool useHsv) {
+        if(IsDisposed) return;
+        hsvMode = useHsv;
+        rgbModeBackground.color = useHsv ? Color.clear : UIColors.ObjectActive;
+        hsvModeBackground.color = useHsv ? UIColors.ObjectActive : Color.clear;
+        rgbModeLabel.color = useHsv ? new Color(1f, 1f, 1f, 0.55f) : Color.white;
+        hsvModeLabel.color = useHsv ? Color.white : new Color(1f, 1f, 1f, 0.55f);
+        string[] labels = useHsv ? ["H", "S", "V", "A"] : ["R", "G", "B", "A"];
+        Color.RGBToHSV(DefaultValue, out float defaultHue, out float defaultSaturation, out float defaultBrightness);
+        float[] defaults = useHsv
+            ? [defaultHue, defaultSaturation, defaultBrightness, DefaultValue.a]
+            : [DefaultValue.r, DefaultValue.g, DefaultValue.b, DefaultValue.a];
+        Color[] colors = useHsv
+            ? [
+                Color.HSVToRGB(hue, 1f, 1f),
+                new Color(0.38f, 0.78f, 1f, 1f),
+                new Color(1f, 0.82f, 0.35f, 1f),
+                new Color(0.45f, 0.45f, 0.45f, 1f)
+            ]
+            : [
+                new Color(1f, 0.42f, 0.44f, 1f),
+                new Color(0.48f, 0.82f, 0.48f, 1f),
+                new Color(0.56f, 0.56f, 0.9f, 1f),
+                new Color(0.45f, 0.45f, 0.45f, 1f)
+            ];
+        for(int i = 0; i < sliders.Length; i++) {
+            sliders[i].Label.text = labels[i];
+            sliders[i].FillImage.color = colors[i];
+            sliders[i].SetDefaultValue(defaults[i], true);
         }
-        svPixels ??= new Color32[SvTextureSize * SvTextureSize];
-        int i = 0;
-        for(int y = 0; y < SvTextureSize; y++) {
-            float v = y / (SvTextureSize - 1f);
-            for(int x = 0; x < SvTextureSize; x++) {
-                float s = x / (SvTextureSize - 1f);
-                svPixels[i++] = Color.HSVToRGB(hue, s, v);
+        UpdateSliderValues();
+    }
+    public void SetChannel(int channel, float value) {
+        if(IsDisposed) return;
+        value = Mathf.Clamp01(value);
+        if(!hsvMode) {
+            Color color = Value;
+            color[channel] = value;
+            Set(color);
+            return;
+        }
+        switch(channel) {
+            case 0: hue = value; break;
+            case 1: saturation = value; break;
+            case 2: brightness = value; break;
+            case 3:
+                Value = new Color(Value.r, Value.g, Value.b, value);
+                UpdateVisuals();
+                onChanged?.Invoke(Value);
+                return;
+        }
+        Color rgb = Color.HSVToRGB(hue, saturation, brightness);
+        rgb.a = Value.a;
+        Value = rgb;
+        UpdateVisuals();
+        onChanged?.Invoke(Value);
+    }
+    public void BeginPointer(PointerEventData data) {
+        if(IsDisposed || !TryGetPointerPosition(data, out Vector2 normalized)) return;
+        float distance = normalized.magnitude;
+        if(distance > 0.56f) return;
+        dragTarget = distance >= RingInner - 0.03f ? DragTarget.Hue : DragTarget.Triangle;
+        ApplyPointer(normalized);
+    }
+    public void DragPointer(PointerEventData data) {
+        if(IsDisposed || dragTarget == DragTarget.None || !TryGetPointerPosition(data, out Vector2 normalized)) return;
+        ApplyPointer(normalized);
+    }
+    public void EndPointer(PointerEventData data) {
+        if(dragTarget == DragTarget.None) return;
+        dragTarget = DragTarget.None;
+        onComplete?.Invoke(Value);
+    }
+    private bool TryGetPointerPosition(PointerEventData pointer, out Vector2 normalized) {
+        normalized = default;
+        if(pointer == null || pointer.button != PointerEventData.InputButton.Left) return false;
+        if(!RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            wheelRect, pointer.position, pointer.pressEventCamera, out Vector2 local
+        )) return false;
+        float radius = Mathf.Min(wheelRect.rect.width, wheelRect.rect.height);
+        if(radius <= 0f) return false;
+        normalized = local / radius;
+        return true;
+    }
+    private void ApplyPointer(Vector2 normalized) {
+        if(dragTarget == DragTarget.Hue) {
+            hue = Mathf.Repeat(Mathf.Atan2(normalized.y, normalized.x) / (Mathf.PI * 2f), 1f);
+            Color rgb = Color.HSVToRGB(hue, saturation, brightness);
+            rgb.a = Value.a;
+            Value = rgb;
+            UpdateVisuals();
+            onChanged?.Invoke(Value);
+            return;
+        }
+        Vector2 huePoint = Direction(hue) * TriangleRadius;
+        Vector2 whitePoint = Direction(hue + (1f / 3f)) * TriangleRadius;
+        Vector2 blackPoint = Direction(hue - (1f / 3f)) * TriangleRadius;
+        Vector2 point = ClosestPointOnTriangle(normalized, huePoint, whitePoint, blackPoint);
+        if(!Barycentric(point, huePoint, whitePoint, blackPoint, out Vector3 weights)) return;
+        saturation = weights.x / Mathf.Max(weights.x + weights.y, 0.0001f);
+        brightness = Mathf.Clamp01(weights.x + weights.y);
+        Color picked = Color.HSVToRGB(hue, saturation, brightness);
+        picked.a = Value.a;
+        Value = picked;
+        UpdateVisuals();
+        onChanged?.Invoke(Value);
+    }
+    public void ValidateHex(string text) {
+        if(IsDisposed || suppressHex) return;
+        string candidate = text.StartsWith("#") ? text : "#" + text;
+        bool validLength = candidate.Length is 4 or 5 or 7 or 9;
+        Color parsed = default;
+        bool valid = validLength && ColorUtility.TryParseHtmlString(candidate, out parsed);
+        pendingHexColor = valid ? parsed : null;
+        preview.color = valid ? parsed : Value;
+        UpdateLabelColor(preview.color);
+        Color stateColor = valid
+            ? UIColors.ObjectActiveMathOk
+            : IsPartialHex(text)
+                ? UIColors.ObjectActiveMathWarn
+                : UIColors.ObjectActiveMathErr;
+        SetHexValidationColor(stateColor);
+    }
+    public void CompleteHex(string text) {
+        if(IsDisposed) return;
+        ValidateHex(text);
+        if(pendingHexColor.HasValue) {
+            Set(pendingHexColor.Value);
+            onComplete?.Invoke(Value);
+        } else {
+            SetHexText();
+        }
+        pendingHexColor = null;
+        SetHexValidationColor(UIColors.ObjectActive, true);
+    }
+    private void UpdateVisuals() {
+        preview.color = Value;
+        UpdateLabelColor(Value);
+        UpdateSliderValues();
+        SetHexText();
+        UpdateTexture();
+        UpdateHandles();
+    }
+    private void UpdateLabelColor(Color background) {
+        if(previewLabel == null) return;
+        Color composite = Color.Lerp(UIColors.PanelBG, background, background.a);
+        float luminance = RelativeLuminance(composite);
+        float blackContrast = (luminance + 0.05f) / 0.05f;
+        float whiteContrast = 1.05f / (luminance + 0.05f);
+        previewLabel.color = whiteContrast >= blackContrast ? Color.white : Color.black;
+    }
+    private static float RelativeLuminance(Color color) {
+        static float Linearize(float channel) => channel <= 0.03928f
+            ? channel / 12.92f
+            : Mathf.Pow((channel + 0.055f) / 1.055f, 2.4f);
+        return 0.2126f * Linearize(color.r)
+            + 0.7152f * Linearize(color.g)
+            + 0.0722f * Linearize(color.b);
+    }
+    private void UpdateSliderValues() {
+        float[] values = hsvMode
+            ? [hue, saturation, brightness, Value.a]
+            : [Value.r, Value.g, Value.b, Value.a];
+        for(int i = 0; i < sliders.Length; i++) sliders[i].Set(values[i], false);
+        if(hsvMode && sliders.Length > 0) sliders[0].FillImage.color = Color.HSVToRGB(hue, 1f, 1f);
+    }
+    private void SetHexText() {
+        suppressHex = true;
+        hexInput.Set(CanonicalHex(Value), false);
+        suppressHex = false;
+    }
+    private static string CanonicalHex(Color value) => value.a >= 0.999f
+        ? "#" + ColorUtility.ToHtmlStringRGB(value)
+        : "#" + ColorUtility.ToHtmlStringRGBA(value);
+    private void SetHexValidationColor(Color color, bool resetText = false) {
+        if(hexOutline != null) {
+            validationTween?.Kill();
+            float alpha = 1f;
+            if(resetText) {
+                RectTransform header = hexOutline.rectTransform.parent as RectTransform;
+                Camera camera = UICore.Canvas != null ? UICore.Canvas.worldCamera : null;
+                alpha = header != null && RectTransformUtility.RectangleContainsScreenPoint(
+                    header, Input.mousePosition, camera
+                ) ? 1f : 0f;
             }
+            validationTween = hexOutline
+                .GTColor(new Color(color.r, color.g, color.b, alpha), 0.2f)
+                .SetEasing(Easing.OutSine);
+            MainCore.TC.Play(validationTween);
         }
-        svTexture.SetPixels32(svPixels);
-        svTexture.Apply(false);
-        builtHue = hue;
+        if(hexInput.InputField != null && hexInput.InputField.textComponent != null)
+            hexInput.InputField.textComponent.color = Color.white;
     }
-    private static bool SameColor(Color a, Color b) =>
-        Mathf.Abs(a.r - b.r) < 0.001f
-            && Mathf.Abs(a.g - b.g) < 0.001f
-            && Mathf.Abs(a.b - b.b) < 0.001f
-            && Mathf.Abs(a.a - b.a) < 0.001f;
-    private static Color Normalize(Color color) {
-        color.r = Mathf.Clamp01(color.r);
-        color.g = Mathf.Clamp01(color.g);
-        color.b = Mathf.Clamp01(color.b);
-        color.a = Mathf.Clamp01(color.a);
-        return color;
+    private static bool IsPartialHex(string text) {
+        if(string.IsNullOrEmpty(text)) return true;
+        int start = text[0] == '#' ? 1 : 0;
+        if(text.Length - start > 8) return false;
+        for(int i = start; i < text.Length; i++) {
+            char c = text[i];
+            bool isHex = c is (>= '0' and <= '9') or (>= 'a' and <= 'f') or (>= 'A' and <= 'F');
+            if(!isHex) return false;
+        }
+        return true;
     }
-    private static string ToHex(Color color) {
-        int r = Mathf.RoundToInt(Mathf.Clamp01(color.r) * 255f);
-        int g = Mathf.RoundToInt(Mathf.Clamp01(color.g) * 255f);
-        int b = Mathf.RoundToInt(Mathf.Clamp01(color.b) * 255f);
-        int a = Mathf.RoundToInt(Mathf.Clamp01(color.a) * 255f);
-        string rgb = "#" + r.ToString("X2") + g.ToString("X2") + b.ToString("X2");
-        return a >= 255 ? rgb : rgb + a.ToString("X2");
+    private void UpdateHandles() {
+        float size = Mathf.Min(wheelRect.rect.width, wheelRect.rect.height);
+        hueHandle.anchoredPosition = Direction(hue) * (size * 0.43f);
+        float hueWeight = saturation * brightness;
+        float whiteWeight = (1f - saturation) * brightness;
+        float blackWeight = 1f - brightness;
+        Vector2 position = Direction(hue) * hueWeight;
+        position += Direction(hue + (1f / 3f)) * whiteWeight;
+        position += Direction(hue - (1f / 3f)) * blackWeight;
+        colorHandle.anchoredPosition = position * (size * TriangleRadius);
     }
-    private static bool TryParseHex(string value, out Color color) {
-        color = Color.white;
-        if(string.IsNullOrWhiteSpace(value)) return false;
-        string hex = value.Trim().TrimStart('#');
-        try {
-            if(hex.Length == 3) {
-                color = new Color(
-                    Convert.ToInt32(hex.Substring(0, 1), 16) / 15f,
-                    Convert.ToInt32(hex.Substring(1, 1), 16) / 15f,
-                    Convert.ToInt32(hex.Substring(2, 1), 16) / 15f,
-                    1f
+    private void UpdateTexture() {
+        if(renderedHue >= 0f && Mathf.Abs(Mathf.DeltaAngle(renderedHue * 360f, hue * 360f)) < 0.5f) return;
+        renderedHue = hue;
+        Color hueColor = Color.HSVToRGB(hue, 1f, 1f);
+        Color32[] pixels = new Color32[TextureSize * TextureSize];
+        Vector2 huePoint = Direction(hue) * TriangleRadius;
+        Vector2 whitePoint = Direction(hue + (1f / 3f)) * TriangleRadius;
+        Vector2 blackPoint = Direction(hue - (1f / 3f)) * TriangleRadius;
+        for(int y = 0; y < TextureSize; y++) {
+            for(int x = 0; x < TextureSize; x++) {
+                Vector2 point = new(
+                    ((x + 0.5f) / TextureSize) - 0.5f,
+                    ((y + 0.5f) / TextureSize) - 0.5f
                 );
-                return true;
-            }
-            if(hex.Length == 6 || hex.Length == 8) {
-                color = new Color(
-                    Convert.ToInt32(hex.Substring(0, 2), 16) / 255f,
-                    Convert.ToInt32(hex.Substring(2, 2), 16) / 255f,
-                    Convert.ToInt32(hex.Substring(4, 2), 16) / 255f,
-                    hex.Length == 8 ? Convert.ToInt32(hex.Substring(6, 2), 16) / 255f : 1f
-                );
-                return true;
+                float distance = point.magnitude;
+                Color color = Color.clear;
+                if(distance is >= RingInner and <= RingOuter) {
+                    float angle = Mathf.Repeat(Mathf.Atan2(point.y, point.x) / (Mathf.PI * 2f), 1f);
+                    color = Color.HSVToRGB(angle, 1f, 1f);
+                } else if(Barycentric(point, huePoint, whitePoint, blackPoint, out Vector3 weights)) {
+                    color = (hueColor * weights.x) + (Color.white * weights.y) + (Color.black * weights.z);
+                    color.a = 1f;
+                }
+                pixels[(y * TextureSize) + x] = color;
             }
         }
-        catch(Exception e) { Diag.Ignore(e); }
-        return false;
+        texture.SetPixels32(pixels);
+        texture.Apply(false, false);
+    }
+    private static Vector2 Direction(float turns) {
+        float radians = turns * Mathf.PI * 2f;
+        return new Vector2(Mathf.Cos(radians), Mathf.Sin(radians));
+    }
+    private static bool Barycentric(Vector2 point, Vector2 a, Vector2 b, Vector2 c, out Vector3 weights) {
+        Vector2 v0 = b - a;
+        Vector2 v1 = c - a;
+        Vector2 v2 = point - a;
+        float denominator = (v0.x * v1.y) - (v1.x * v0.y);
+        if(Mathf.Abs(denominator) < 0.00001f) {
+            weights = default;
+            return false;
+        }
+        float y = ((v2.x * v1.y) - (v1.x * v2.y)) / denominator;
+        float z = ((v0.x * v2.y) - (v2.x * v0.y)) / denominator;
+        float x = 1f - y - z;
+        weights = new Vector3(x, y, z);
+        return x >= 0f && y >= 0f && z >= 0f;
+    }
+    private static Vector2 ClosestPointOnTriangle(Vector2 point, Vector2 a, Vector2 b, Vector2 c) {
+        if(Barycentric(point, a, b, c, out _)) return point;
+        Vector2 ab = ClosestPointOnSegment(point, a, b);
+        Vector2 bc = ClosestPointOnSegment(point, b, c);
+        Vector2 ca = ClosestPointOnSegment(point, c, a);
+        float abDistance = (point - ab).sqrMagnitude;
+        float bcDistance = (point - bc).sqrMagnitude;
+        float caDistance = (point - ca).sqrMagnitude;
+        if(abDistance <= bcDistance && abDistance <= caDistance) return ab;
+        return bcDistance <= caDistance ? bc : ca;
+    }
+    private static Vector2 ClosestPointOnSegment(Vector2 point, Vector2 a, Vector2 b) {
+        Vector2 segment = b - a;
+        float length = segment.sqrMagnitude;
+        if(length <= 0.00001f) return a;
+        return a + (segment * Mathf.Clamp01(Vector2.Dot(point - a, segment) / length));
     }
     public override void Dispose() {
+        if(IsDisposed) return;
+        validationTween?.Kill();
+        popupTween?.Kill();
+        validationTween = null;
+        popupTween = null;
+        foreach(UISlider slider in sliders) slider?.Dispose();
+        hexInput?.Dispose();
+        if(textureSprite != null) UnityEngine.Object.Destroy(textureSprite);
+        if(texture != null) UnityEngine.Object.Destroy(texture);
         base.Dispose();
-        expandSeq?.Kill();
-        if(svTexture != null) Object.Destroy(svTexture);
-        if(hueTexture != null) Object.Destroy(hueTexture);
     }
 }

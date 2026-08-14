@@ -159,6 +159,24 @@ internal static partial class PageSettings {
             "Setting that restores an item to its default value when you middle-click on it.\nYou can identify it by a small dot at the top-left of the item"
         );
         var middleClickToggleTr = middleClickToggle.Label.gameObject.AddComponent<TextLocalization>().Init("MIDDLE_CLICK_TO_SET_AS_DEFAULT", "Middle-click to set as default");
+        var pickerLayoutRow = GenerateUI.Row(content.transform);
+        UIToggle pickerLayoutToggle = GenerateUI.Toggle(
+            pickerLayoutRow,
+            defSet.ColorPickerHorizontal,
+            MainCore.Conf.ColorPickerHorizontal,
+            toggle => {
+                MainCore.Conf.ColorPickerHorizontal = toggle;
+                MainCore.ConfMgr.RequestSave();
+                UICore.Rebuild();
+            },
+            "Wide color picker",
+            "color_picker_horizontal"
+        );
+        pickerLayoutToggle.Rect.AddToolTip(
+            "DESC_COLOR_PICKER_HORIZONTAL",
+            "Lays the color picker out side by side instead of stacked.\nUseful on short windows where the tall picker does not fit"
+        );
+        var pickerLayoutToggleTr = pickerLayoutToggle.Label.gameObject.AddComponent<TextLocalization>().Init("COLOR_PICKER_HORIZONTAL", "Wide color picker");
     }
     private static void CreateAppearanceSection(RectTransform content, CoreSettings defSet) {
         static float uiScaleFilter(float v) {

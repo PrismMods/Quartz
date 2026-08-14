@@ -69,6 +69,7 @@ public class Tooltip {
         if(!MainCore.Conf.Tooltip || obj == null) return;
         seq?.Kill();
         obj.SetActive(true);
+        obj.transform.SetAsLastSibling();
         text.text = tip;
         Vector2 size = text.GetPreferredValues(tip);
         rect.sizeDelta = new(size.x + 32f, size.y + 32f);

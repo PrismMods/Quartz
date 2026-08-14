@@ -7,9 +7,13 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static UnityEngine.EventSystems.PointerEventData;
 using TMPro;
-using Quartz.Compat.Game;
 namespace Quartz.UI.Generator;
 public static partial class GenerateUI {
+    private const float PickerWheelSize = 280f;
+    private const float PickerVerticalWidth = 360f;
+    private const float PickerVerticalHeight = 624f;
+    private const float PickerHorizontalWidth = 640f;
+    private const float PickerHorizontalHeight = 344f;
     public static UIColorPicker ColorPicker(
         Transform parent,
         Color defaultValue,
@@ -21,250 +25,247 @@ public static partial class GenerateUI {
         bool showAlpha = true,
         float rightInset = 250f
     ) {
-        const float topPad = 12f;
-        const float hexHeight = 40f;
-        const float svHueHeight = 188f;
-        const float previewHeight = 40f;
-        const float rowGap = 12f;
-        const float sliderTop = topPad + hexHeight + rowGap + svHueHeight + rowGap + previewHeight + rowGap;
-        const float sliderStep = 58f;
-        const float sliderHeight = 50f;
-        int sliderCount = showAlpha ? 4 : 3;
-        float lastSliderBottom = sliderTop + (sliderCount - 1) * sliderStep + sliderHeight;
-        float bodyHeight = Mathf.Max(200f, lastSliderBottom) + 14f;
-        float expandedHeight = 62f + bodyHeight;
-        GameObject root = new("ColorPicker");
-        root.transform.SetParent(parent, false);
-        RectTransform rootRect = root.AddComponent<RectTransform>();
-        rootRect.anchorMin = Vector2.zero;
-        rootRect.anchorMax = Vector2.one;
-        rootRect.pivot = new(0.5f, 0.5f);
-        rootRect.offsetMin = Vector2.zero;
-        rootRect.offsetMax = Vector2.zero;
-        RectTransform header = BackGround();
-        header.SetParent(root.transform, false);
-        header.anchorMin = new(0f, 1f);
-        header.anchorMax = new(1f, 1f);
-        header.pivot = new(0.5f, 1f);
-        header.offsetMin = new(0f, -50f);
-        header.offsetMax = new(-rightInset, 0f);
+        bool horizontal = MainCore.Conf.ColorPickerHorizontal;
+        int channelCount = showAlpha ? 4 : 3;
+        GameObject rootObject = new("ColorPicker");
+        rootObject.transform.SetParent(parent, false);
+        RectTransform root = rootObject.AddComponent<RectTransform>();
+        root.anchorMin = Vector2.zero;
+        root.anchorMax = Vector2.one;
+        root.pivot = new(0.5f, 0.5f);
+        root.offsetMin = Vector2.zero;
+        root.offsetMax = Vector2.zero;
+        RectTransform header = BackGround(rightInset);
+        header.name = "Header";
+        header.SetParent(root, false);
         TextMeshProUGUI label = AddText(header);
         label.text = text;
         LocalizeById(label, id, text);
-        TextMeshProUGUI valueText = AddText(header);
-        valueText.alignment = TextAlignmentOptions.Right;
-        RectTransform valueRect = valueText.rectTransform;
-        valueRect.offsetMin = new(0f, 0f);
-        valueRect.offsetMax = new(-72f, 0f);
-        GameObject changed = AddSmallChangedCircle(header);
-        Image changedImg = changed.GetComponent<Image>();
-        GameObject swatch = new("Swatch");
-        swatch.transform.SetParent(header, false);
-        RectTransform swatchRect = swatch.AddComponent<RectTransform>();
-        swatchRect.anchorMin = new(1f, 0.5f);
-        swatchRect.anchorMax = new(1f, 0.5f);
-        swatchRect.pivot = new(0.5f, 0.5f);
-        swatchRect.anchoredPosition = new(-30f, 0f);
-        swatchRect.sizeDelta = new(32f, 32f);
-        Image swatchImg = swatch.AddComponent<Image>();
-        swatchImg.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
-        swatchImg.type = Image.Type.Sliced;
-        GameObject body = new("PickerBody");
-        body.transform.SetParent(root.transform, false);
-        RectTransform bodyRect = body.AddComponent<RectTransform>();
-        bodyRect.anchorMin = new(0f, 1f);
-        bodyRect.anchorMax = new(1f, 1f);
-        bodyRect.pivot = new(0.5f, 1f);
-        bodyRect.offsetMin = new(0f, -(62f + bodyHeight));
-        bodyRect.offsetMax = new(-rightInset, -62f);
-        Image bodyBg = body.AddComponent<Image>();
-        bodyBg.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
-        bodyBg.type = Image.Type.Sliced;
-        bodyBg.color = Color.Lerp(UIColors.ObjectBG, Color.black, 0.18f);
-        CanvasGroup bodyCg = body.AddComponent<CanvasGroup>();
-        GameObject sv = new("SaturationValue");
-        sv.transform.SetParent(body.transform, false);
-        RectTransform svRect = sv.AddComponent<RectTransform>();
-        svRect.anchorMin = new(0f, 1f);
-        svRect.anchorMax = new(0f, 1f);
-        svRect.pivot = new(0f, 1f);
-        svRect.anchoredPosition = new(16f, -(topPad + hexHeight + rowGap));
-        svRect.sizeDelta = new(188f, 188f);
-        RawImage svImage = sv.AddComponent<RawImage>();
-        GameObject svHandle = new("Handle");
-        svHandle.transform.SetParent(sv.transform, false);
-        RectTransform svHandleRect = svHandle.AddComponent<RectTransform>();
-        svHandleRect.anchorMin = new(0f, 1f);
-        svHandleRect.anchorMax = new(0f, 1f);
-        svHandleRect.pivot = new(0.5f, 0.5f);
-        svHandleRect.sizeDelta = new(18f, 18f);
-        Image svHandleImg = svHandle.AddComponent<Image>();
-        svHandleImg.sprite = MainCore.Spr.Get(UISliceSprite.CircleOutline256P2048);
-        svHandleImg.type = Image.Type.Sliced;
-        svHandleImg.color = Color.white;
-        svHandleImg.raycastTarget = false;
-        GameObject hue = new("Hue");
-        hue.transform.SetParent(body.transform, false);
-        RectTransform hueRect = hue.AddComponent<RectTransform>();
-        hueRect.anchorMin = new(0f, 1f);
-        hueRect.anchorMax = new(0f, 1f);
-        hueRect.pivot = new(0f, 1f);
-        hueRect.anchoredPosition = new(216f, -(topPad + hexHeight + rowGap));
-        hueRect.sizeDelta = new(28f, 188f);
-        RawImage hueImage = hue.AddComponent<RawImage>();
-        GameObject hueHandle = new("Handle");
-        hueHandle.transform.SetParent(hue.transform, false);
-        RectTransform hueHandleRect = hueHandle.AddComponent<RectTransform>();
-        hueHandleRect.anchorMin = new(0.5f, 1f);
-        hueHandleRect.anchorMax = new(0.5f, 1f);
-        hueHandleRect.pivot = new(0.5f, 0.5f);
-        hueHandleRect.sizeDelta = new(36f, 5f);
-        Image hueHandleImg = hueHandle.AddComponent<Image>();
-        hueHandleImg.color = Color.white;
-        hueHandleImg.raycastTarget = false;
-        GameObject preview = new("Preview");
-        preview.transform.SetParent(body.transform, false);
-        RectTransform previewRect = preview.AddComponent<RectTransform>();
-        previewRect.anchorMin = new(0f, 1f);
+        GameObject previewObject = new("Preview");
+        previewObject.transform.SetParent(header, false);
+        RectTransform previewRect = previewObject.AddComponent<RectTransform>();
+        previewRect.anchorMin = new(1f, 0f);
         previewRect.anchorMax = new(1f, 1f);
-        previewRect.pivot = new(0f, 1f);
-        previewRect.offsetMin = new(16f, -(sliderTop - rowGap));
-        previewRect.offsetMax = new(-16f, -(sliderTop - rowGap - previewHeight));
-        Image previewImg = preview.AddComponent<Image>();
-        previewImg.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
-        previewImg.type = Image.Type.Sliced;
-        GameObject hexObj = new("Hex");
-        hexObj.transform.SetParent(body.transform, false);
-        RectTransform hexRect = hexObj.AddComponent<RectTransform>();
-        hexRect.anchorMin = new(0f, 1f);
-        hexRect.anchorMax = new(1f, 1f);
-        hexRect.pivot = new(0f, 1f);
-        hexRect.offsetMin = new(16f, -(topPad + hexHeight));
-        hexRect.offsetMax = new(-16f, -topPad);
-        Image hexBg = hexObj.AddComponent<Image>();
-        hexBg.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
-        hexBg.type = Image.Type.Sliced;
-        hexBg.color = Color.Lerp(UIColors.ObjectBG, Color.black, 0.15f);
-        hexObj.AddComponent<RectMask2D>();
-        TMP_InputField hexInput = hexObj.AddComponent<TMP_InputField>();
-        GameObject hexTextObj = new("Text");
-        hexTextObj.transform.SetParent(hexObj.transform, false);
-        RectTransform hexTextRect = hexTextObj.AddComponent<RectTransform>();
-        hexTextRect.anchorMin = Vector2.zero;
-        hexTextRect.anchorMax = Vector2.one;
-        hexTextRect.offsetMin = new(12f, 0f);
-        hexTextRect.offsetMax = new(-8f, 0f);
-        TextMeshProUGUI hexText = hexTextObj.AddComponent<TextMeshProUGUI>();
-        hexText.font = FontManager.Current;
-        hexText.fontSize = 22f;
-        hexText.color = Color.white;
-        hexText.alignment = TextAlignmentOptions.Left;
-        hexText.verticalAlignment = VerticalAlignmentOptions.Middle;
-        hexText.characterSpacing = -3f;
-        TextCompat.NoWrap(hexText);
-        hexInput.textViewport = hexRect;
-        hexInput.textComponent = hexText;
+        previewRect.pivot = new(1f, 0.5f);
+        previewRect.sizeDelta = new(150f, 0f);
+        previewRect.anchoredPosition = new(-6f, 0f);
+        previewRect.offsetMin = new(previewRect.offsetMin.x, 8f);
+        previewRect.offsetMax = new(previewRect.offsetMax.x, -8f);
+        Image preview = previewObject.AddComponent<Image>();
+        preview.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
+        preview.type = Image.Type.Sliced;
+        TextMeshProUGUI previewLabel = AddText(previewRect, true);
+        previewLabel.name = "ColorLabel";
+        previewLabel.text = string.Empty;
+        previewLabel.fontSize = 16f;
+        previewLabel.alignment = TextAlignmentOptions.Center;
+        previewLabel.verticalAlignment = VerticalAlignmentOptions.Middle;
+        previewLabel.raycastTarget = false;
         UIColorPicker picker = null;
-        UIColorPicker.ChannelSlider CreateChannelSlider(string channelLabel, int channel, float top) {
-            float component = channel switch {
-                0 => value.r,
-                1 => value.g,
-                2 => value.b,
-                _ => value.a,
-            };
-            float componentDefault = channel switch {
-                0 => defaultValue.r,
-                1 => defaultValue.g,
-                2 => defaultValue.b,
-                _ => defaultValue.a,
-            };
-            UISlider slider = Slider(
-                body.transform,
-                componentDefault, 0f, 1f, component,
-                null,
-                v => picker?.SetChannelValue(channel, v),
-                _ => picker?.Commit(),
-                channelLabel,
-                id + "_ch" + channel
-            );
-            slider.Format = "0.00";
-            if(channel < 3) {
-                slider.SetAccent(channel == 0 ? UIColors.ChannelR : channel == 1 ? UIColors.ChannelG : UIColors.ChannelB);
-                slider.FillImage.gameObject.AddComponent<ThemeExempt>();
-            }
-            RectTransform sr = slider.Rect;
-            sr.anchorMin = new(0f, 1f);
-            sr.anchorMax = new(1f, 1f);
-            sr.pivot = new(0.5f, 1f);
-            sr.offsetMin = new(16f, -top - sliderHeight);
-            sr.offsetMax = new(-16f, -top);
-            return new UIColorPicker.ChannelSlider(channel, slider);
-        }
-        UIColorPicker.ChannelSlider redSlider = CreateChannelSlider("R", 0, sliderTop);
-        UIColorPicker.ChannelSlider greenSlider = CreateChannelSlider("G", 1, sliderTop + sliderStep);
-        UIColorPicker.ChannelSlider blueSlider = CreateChannelSlider("B", 2, sliderTop + sliderStep * 2f);
-        UIColorPicker.ChannelSlider alphaSlider = showAlpha ? CreateChannelSlider("A", 3, sliderTop + sliderStep * 3f) : null;
-        UIColorPicker.ChannelSlider[] sliders = showAlpha
-            ? new[] { redSlider, greenSlider, blueSlider, alphaSlider }
-            : new[] { redSlider, greenSlider, blueSlider };
-        picker = new UIColorPicker(
-            id,
-            rootRect,
-            parent.GetComponent<LayoutElement>(),
-            body,
-            bodyCg,
-            label,
-            valueText,
-            swatchImg,
-            previewImg,
-            changedImg,
-            svRect,
-            svImage,
-            hueRect,
-            hueImage,
-            svHandleRect,
-            hueHandleRect,
-            hexInput,
-            sliders,
-            expandedHeight,
-            defaultValue,
-            value,
-            onChanged,
-            onComplete
+        UIInput hexInput = Input(
+            header,
+            ColorUtility.ToHtmlStringRGBA(defaultValue),
+            ColorUtility.ToHtmlStringRGBA(value),
+            hex => picker?.ValidateHex(hex),
+            string.Empty,
+            null,
+            id + "_hex",
+            rightInset
         );
-        AddButton(header.gameObject, btn => {
-            switch(btn) {
+        hexInput.OnComplete = hex => picker?.CompleteHex(hex);
+        RectTransform hexRect = hexInput.Rect;
+        hexRect.name = "HexInput";
+        hexInput.ChangedImage.gameObject.SetActive(false);
+        if(hexInput.IconImage != null) hexInput.IconImage.gameObject.SetActive(false);
+        if(hexInput.InputField.textViewport is RectTransform hexViewport) {
+            hexViewport.offsetMin = new(6f, hexViewport.offsetMin.y);
+            hexViewport.offsetMax = new(-6f, hexViewport.offsetMax.y);
+        }
+        TMP_Text hexText = hexInput.InputField.textComponent;
+        hexText.fontSize = 17f;
+        hexText.alignment = TextAlignmentOptions.Center;
+        hexInput.InputField.onFocusSelectAll = false;
+        hexInput.InputField.characterLimit = 9;
+        Transform hexHover = hexRect.Find("Hover");
+        if(hexHover != null) hexHover.gameObject.SetActive(false);
+        GameObject bodyObject = new("Body");
+        bodyObject.transform.SetParent(root, false);
+        RectTransform body = bodyObject.AddComponent<RectTransform>();
+        body.anchorMin = Vector2.zero;
+        body.anchorMax = Vector2.one;
+        body.pivot = new(0.5f, 0.5f);
+        Image bodyBackground = bodyObject.AddComponent<Image>();
+        bodyBackground.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
+        bodyBackground.type = Image.Type.Sliced;
+        bodyBackground.color = UIColors.PanelBG;
+        CanvasGroup bodyCanvas = bodyObject.AddComponent<CanvasGroup>();
+        RectTransform wheelParent;
+        RectTransform controlParent;
+        if(horizontal) {
+            HorizontalLayoutGroup split = bodyObject.AddComponent<HorizontalLayoutGroup>();
+            split.padding = new RectOffset { left = 14, right = 14, top = 12, bottom = 12 };
+            split.spacing = 14f;
+            split.childControlWidth = true;
+            split.childControlHeight = true;
+            split.childForceExpandWidth = true;
+            split.childForceExpandHeight = true;
+            GameObject wheelColumn = new("WheelColumn");
+            wheelColumn.transform.SetParent(body, false);
+            wheelParent = wheelColumn.AddComponent<RectTransform>();
+            LayoutElement wheelColumnLayout = wheelColumn.AddComponent<LayoutElement>();
+            wheelColumnLayout.preferredWidth = PickerWheelSize;
+            wheelColumnLayout.minWidth = PickerWheelSize;
+            wheelColumnLayout.flexibleWidth = 0f;
+            GameObject controlColumn = new("ControlColumn");
+            controlColumn.transform.SetParent(body, false);
+            controlParent = controlColumn.AddComponent<RectTransform>();
+            VerticalLayoutGroup controlLayout = controlColumn.AddComponent<VerticalLayoutGroup>();
+            controlLayout.spacing = 6f;
+            controlLayout.childControlWidth = true;
+            controlLayout.childControlHeight = true;
+            controlLayout.childForceExpandWidth = true;
+            controlLayout.childForceExpandHeight = false;
+            controlLayout.childAlignment = TextAnchor.MiddleCenter;
+        } else {
+            VerticalLayoutGroup stack = bodyObject.AddComponent<VerticalLayoutGroup>();
+            stack.padding = new RectOffset { left = 14, right = 14, top = 12, bottom = 12 };
+            stack.spacing = 6f;
+            stack.childControlWidth = true;
+            stack.childControlHeight = true;
+            stack.childForceExpandWidth = true;
+            stack.childForceExpandHeight = false;
+            wheelParent = body;
+            controlParent = body;
+        }
+        RectTransform hexParent = horizontal ? controlParent : body;
+        hexRect.SetParent(hexParent, false);
+        hexRect.SetAsFirstSibling();
+        hexRect.anchorMin = Vector2.zero;
+        hexRect.anchorMax = Vector2.one;
+        hexRect.pivot = new(0.5f, 0.5f);
+        hexRect.offsetMin = Vector2.zero;
+        hexRect.offsetMax = Vector2.zero;
+        LayoutElement hexLayout = hexRect.gameObject.AddComponent<LayoutElement>();
+        hexLayout.preferredHeight = 40f;
+        hexLayout.minHeight = 40f;
+        GameObject wheelObject = new("Wheel");
+        wheelObject.transform.SetParent(wheelParent, false);
+        RectTransform wheel = wheelObject.AddComponent<RectTransform>();
+        if(horizontal) {
+            wheel.anchorMin = Vector2.zero;
+            wheel.anchorMax = Vector2.one;
+            wheel.offsetMin = Vector2.zero;
+            wheel.offsetMax = Vector2.zero;
+        } else {
+            LayoutElement wheelLayout = wheelObject.AddComponent<LayoutElement>();
+            wheelLayout.preferredHeight = PickerWheelSize;
+            wheelLayout.minHeight = PickerWheelSize;
+        }
+        Image wheelImage = wheelObject.AddComponent<Image>();
+        wheelImage.preserveAspect = true;
+        wheelImage.color = Color.white;
+        RectTransform hueHandle = CreateHandle(wheel, "HueHandle", new(15f, 15f));
+        RectTransform colorHandle = CreateHandle(wheel, "ColorHandle", new(13f, 13f));
+        RectTransform modeRow = Row(controlParent, 22f);
+        HorizontalLayoutGroup modeLayout = modeRow.gameObject.AddComponent<HorizontalLayoutGroup>();
+        modeLayout.spacing = 4f;
+        modeLayout.childControlWidth = true;
+        modeLayout.childControlHeight = true;
+        modeLayout.childForceExpandWidth = true;
+        modeLayout.childForceExpandHeight = true;
+        var (rgbModeBackground, rgbModeLabel) = CreateModeButton(modeRow, "RGB", () => picker?.SetMode(false));
+        var (hsvModeBackground, hsvModeLabel) = CreateModeButton(modeRow, "HSV", () => picker?.SetMode(true));
+        UISlider[] sliders = new UISlider[channelCount];
+        string[] names = ["R", "G", "B", "A"];
+        Color[] colors = [
+            new(1f, 0.42f, 0.44f, 1f),
+            new(0.48f, 0.82f, 0.48f, 1f),
+            new(0.56f, 0.56f, 0.9f, 1f),
+            new(0.45f, 0.45f, 0.45f, 1f)
+        ];
+        for(int i = 0; i < sliders.Length; i++) {
+            int channel = i;
+            RectTransform row = Row(controlParent, 36f);
+            sliders[i] = Slider(
+                row, defaultValue[i], 0f, 1f, value[i], null,
+                next => picker?.SetChannel(channel, next),
+                _ => { if(picker != null) onComplete?.Invoke(picker.Value); },
+                names[i], id + "_" + names[i].ToLowerInvariant(), 0f
+            );
+            sliders[i].Format = "F2";
+            sliders[i].Rect.offsetMax = Vector2.zero;
+            sliders[i].FillImage.color = colors[i];
+            sliders[i].Label.fontSize = 18f;
+        }
+        Image sharedOutline = AddOutlineHover(header.gameObject, header.gameObject.AddComponent<EventTrigger>());
+        picker = new UIColorPicker(
+            id, root, bodyObject, bodyCanvas, preview, previewLabel, label,
+            wheel, hueHandle, colorHandle, hexInput, sharedOutline, sliders,
+            rgbModeBackground, rgbModeLabel, hsvModeBackground, hsvModeLabel,
+            defaultValue, value, onChanged, onComplete,
+            horizontal ? PickerHorizontalWidth : PickerVerticalWidth,
+            horizontal ? PickerHorizontalHeight : PickerVerticalHeight
+        );
+        EventTrigger wheelTrigger = wheelObject.AddComponent<EventTrigger>();
+        UnityUtils.AddEvent(EventTriggerType.PointerDown, picker.BeginPointer, wheelTrigger);
+        UnityUtils.AddEvent(EventTriggerType.Drag, picker.DragPointer, wheelTrigger);
+        UnityUtils.AddEvent(EventTriggerType.PointerUp, picker.EndPointer, wheelTrigger);
+        UnityUtils.AddEvent(EventTriggerType.EndDrag, picker.EndPointer, wheelTrigger);
+        GameObject toggleArea = new("ToggleArea");
+        toggleArea.transform.SetParent(header, false);
+        RectTransform toggleRect = toggleArea.AddComponent<RectTransform>();
+        toggleRect.anchorMin = Vector2.zero;
+        toggleRect.anchorMax = new(1f, 1f);
+        toggleRect.offsetMin = Vector2.zero;
+        toggleRect.offsetMax = Vector2.zero;
+        Image toggleTarget = toggleArea.AddComponent<Image>();
+        toggleTarget.color = Color.clear;
+        AddButton(toggleArea, button => {
+            switch(button) {
                 case InputButton.Left:
                     picker.ToggleExpanded();
                     break;
                 case InputButton.Middle:
-                    if(MainCore.Conf.MiddleClickToDefault) {
-                        picker.Set(defaultValue);
-                        picker.Commit();
-                    }
+                    if(MainCore.Conf.MiddleClickToDefault) picker.Reset();
                     break;
             }
-        });
-        void AddPickerDrag(RectTransform target, Action<Vector2> setFromPointer) {
-            EventTrigger trigger = target.gameObject.AddComponent<EventTrigger>();
-            UnityUtils.AddEvent(EventTriggerType.PointerDown, e => {
-                PointerEventData p = e as PointerEventData;
-                if(p == null || p.button != InputButton.Left) return;
-                setFromPointer(p.position);
-            }, trigger);
-            UnityUtils.AddEvent(EventTriggerType.Drag, e => {
-                PointerEventData p = e as PointerEventData;
-                if(p == null || !UnityEngine.Input.GetMouseButton(0)) return;
-                setFromPointer(p.position);
-            }, trigger);
-            UnityUtils.AddEvent(EventTriggerType.PointerUp, e => {
-                PointerEventData p = e as PointerEventData;
-                if(p == null || p.button != InputButton.Left) return;
-                picker.Commit();
-            }, trigger);
-        }
-        AddPickerDrag(svRect, picker.SetFromSvPointer);
-        AddPickerDrag(hueRect, picker.SetFromHuePointer);
+        }, false);
         return picker;
+    }
+    private static (Image Background, TextMeshProUGUI Label) CreateModeButton(
+        Transform parent,
+        string text,
+        Action onClick
+    ) {
+        GameObject buttonObject = new(text);
+        buttonObject.transform.SetParent(parent, false);
+        RectTransform rect = buttonObject.AddComponent<RectTransform>();
+        Image background = buttonObject.AddComponent<Image>();
+        background.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
+        background.type = Image.Type.Sliced;
+        TextMeshProUGUI label = AddText(rect, true);
+        label.text = text;
+        label.fontSize = 17f;
+        label.alignment = TextAlignmentOptions.Center;
+        label.raycastTarget = false;
+        AddButton(buttonObject, button => {
+            if(button == InputButton.Left) onClick();
+        });
+        return (background, label);
+    }
+    private static RectTransform CreateHandle(RectTransform parent, string name, Vector2 size) {
+        GameObject handleObject = new(name);
+        handleObject.transform.SetParent(parent, false);
+        RectTransform rect = handleObject.AddComponent<RectTransform>();
+        rect.anchorMin = new(0.5f, 0.5f);
+        rect.anchorMax = new(0.5f, 0.5f);
+        rect.pivot = new(0.5f, 0.5f);
+        rect.sizeDelta = size;
+        Image image = handleObject.AddComponent<Image>();
+        image.sprite = MainCore.Spr.Get(UISliceSprite.CircleOutline256P2048);
+        image.type = Image.Type.Sliced;
+        image.color = Color.white;
+        image.raycastTarget = false;
+        return rect;
     }
 }

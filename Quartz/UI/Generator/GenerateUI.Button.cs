@@ -58,7 +58,7 @@ public static partial class GenerateUI {
     }
     private static void AddClick(EventTrigger trigger, Action<InputButton> onClick)
         => UnityUtils.AddClickEvent(trigger, e => onClick?.Invoke(e.button));
-    private static void AddOutlineHover(GameObject obj, EventTrigger trigger) {
+    internal static Image AddOutlineHover(GameObject obj, EventTrigger trigger) {
         GTween hoverSeq = null;
         GameObject hover = new("Hover");
         hover.transform.SetParent(obj.transform, false);
@@ -82,6 +82,7 @@ public static partial class GenerateUI {
         }
         UnityUtils.AddEvent(EventTriggerType.PointerEnter, e => FadeOutline(1f), trigger);
         UnityUtils.AddEvent(EventTriggerType.PointerExit, e => FadeOutline(0f), trigger);
+        return hoverImage;
     }
     public static void FixWidth(UIButton button, float width) {
         LayoutElement le = button.Rect.gameObject.AddComponent<LayoutElement>();
