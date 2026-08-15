@@ -1,0 +1,26 @@
+modules/KeyViewer/Layout/KvStore.Transfer.cs
+  s_558ce7f5bc693e::t_1d7461dbddc33b 42
+modules/KeyViewer/Layout/KvDocument.cs
+  s_558ce7f5bc693e::t_b0882199162180 327
+  s_558ce7f5bc693e::t_3c737036048d11 331
+  s_558ce7f5bc693e::t_d538a883ba2623 355
+modules/KeyViewer/Layout/KvExportEmbedding.cs
+  s_558ce7f5bc693e::t_95097977d5e693 1,3-41,43,45-52,54-119,121-144
+  s_558ce7f5bc693e::t_5770aae809a34c 2,42,44,53,120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "9d4d38e7ad3ae31b3ade61b9e3ab79d1f242bda9",
+  "prompts": {},
+  "sessions": {
+    "s_558ce7f5bc693e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "340bfbe4-c1a9-4e28-90a6-2966614b4d82",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
