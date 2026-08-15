@@ -1,0 +1,30 @@
+stubs/UnityModManager/Stubs.g.cs
+  s_23685525c0f3cf::t_d2554c14022266 18,32-37
+  s_23685525c0f3cf::t_ee6f09a7253d46 38
+stubs/README.md
+  s_23685525c0f3cf::t_d2554c14022266 23,39,41
+stubs/MANIFEST.json
+  s_23685525c0f3cf::t_d2554c14022266 5913-5914,5924-5930
+  s_23685525c0f3cf::t_5660e65a3581cd 5931
+stubs/Newtonsoft.Json/Stubs.g.cs
+  s_23685525c0f3cf::t_d2554c14022266 171
+tools/gen-stubs.sh
+  s_23685525c0f3cf::t_1336ac416419d0 84
+  s_23685525c0f3cf::t_e17c121b4ba2cf 60-69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "f52f4537c5e89a96e06339cb6d6ec6ff74c88dec",
+  "prompts": {},
+  "sessions": {
+    "s_23685525c0f3cf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b92a94b6-7640-495b-af05-e8576fc02199",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
