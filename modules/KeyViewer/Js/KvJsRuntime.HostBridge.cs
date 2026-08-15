@@ -113,7 +113,8 @@ internal static partial class KvJsRuntime {
             public int StorageClearByPrefix(string prefix) => KvJsStorage.ClearByPrefix(Prefix + prefix, now);
             public string StatsJson() => KeyViewerOverlay.JsStatsJson();
             public void ResetStats() => KeyViewerOverlay.ResetJsStats();
-            private string Prefix => owner.record.PluginId + ":";
+            private string cachedPrefix;
+            private string Prefix => cachedPrefix ??= owner.record.PluginId + ":";
         }
     }
 }

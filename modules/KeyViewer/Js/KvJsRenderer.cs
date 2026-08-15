@@ -114,8 +114,15 @@ internal static class KvJsRenderer {
         return row ? new Vector2(main, cross) : new Vector2(cross, main);
     }
 
+    private static List<Box> NormalChildren(Box box) {
+        List<Box> normal = new(box.Children.Count);
+        foreach(Box child in box.Children)
+            if(child.Style is not { Absolute: true }) normal.Add(child);
+        return normal;
+    }
+
     private static Vector2 MeasureGrid(Box box, int columns) {
-        List<Box> normal = box.Children.Where(static child => child.Style is not { Absolute: true }).ToList();
+        List<Box> normal = NormalChildren(box);
         if(normal.Count == 0) return Vector2.zero;
         int rows = (normal.Count + columns - 1) / columns;
         float[] colW = new float[columns];
@@ -125,8 +132,12 @@ internal static class KvJsRenderer {
             colW[i % columns] = Mathf.Max(colW[i % columns], child.Size.x + MarginX(child));
             rowH[i / columns] = Mathf.Max(rowH[i / columns], child.Size.y + MarginY(child));
         }
-        return new Vector2(colW.Sum() + box.Style.ColGap * Mathf.Max(0, columns - 1),
-            rowH.Sum() + box.Style.RowGap * Mathf.Max(0, rows - 1));
+        float colSum = 0f;
+        for(int i = 0; i < colW.Length; i++) colSum += colW[i];
+        float rowSum = 0f;
+        for(int i = 0; i < rowH.Length; i++) rowSum += rowH[i];
+        return new Vector2(colSum + box.Style.ColGap * Mathf.Max(0, columns - 1),
+            rowSum + box.Style.RowGap * Mathf.Max(0, rows - 1));
     }
 
     private static void LayoutChildren(Box box, bool row, bool grid, int columns) {
@@ -137,7 +148,7 @@ internal static class KvJsRenderer {
             LayoutAbsolute(box, innerW, innerH);
             return;
         }
-        List<Box> normal = box.Children.Where(static child => child.Style is not { Absolute: true }).ToList();
+        List<Box> normal = NormalChildren(box);
         float used = 0f;
         float grow = 0f;
         foreach(Box child in normal) {
@@ -192,7 +203,7 @@ internal static class KvJsRenderer {
     }
 
     private static void LayoutGrid(Box box, int columns) {
-        List<Box> normal = box.Children.Where(static child => child.Style is not { Absolute: true }).ToList();
+        List<Box> normal = NormalChildren(box);
         if(normal.Count == 0) return;
         int rows = (normal.Count + columns - 1) / columns;
         float innerW = Mathf.Max(0f, box.Size.x - box.Style.PadL - box.Style.PadR);
@@ -293,12 +304,19 @@ internal static class KvJsRenderer {
 
     private static float MarginX(Box box) => (box.Style?.MarL ?? 0f) + (box.Style?.MarR ?? 0f);
     private static float MarginY(Box box) => (box.Style?.MarT ?? 0f) + (box.Style?.MarB ?? 0f);
-    private static bool HasInlineRun(List<Box> children) => children.Count > 0 && children.All(static child => child.Inline);
+    private static bool HasInlineRun(List<Box> children) {
+        if(children.Count == 0) return false;
+        foreach(Box child in children)
+            if(!child.Inline) return false;
+        return true;
+    }
     private static bool IsInline(string tag) => tag?.ToLowerInvariant() is "span" or "strong" or "b" or "i" or "em" or "small" or "label";
     private static bool IsSkipped(string tag) => tag?.ToLowerInvariant() is "style" or "link" or "script" or "defs" or "meta";
     private static string SafeName(string value) {
         if(string.IsNullOrEmpty(value)) return "Panel";
-        char[] chars = value.Select(static c => char.IsLetterOrDigit(c) ? c : '_').ToArray();
+        char[] chars = value.ToCharArray();
+        for(int i = 0; i < chars.Length; i++)
+            if(!char.IsLetterOrDigit(chars[i])) chars[i] = '_';
         return new string(chars);
     }
     private static float AttrLength(KvJsVNode node, string name, float fallback, float basis) {

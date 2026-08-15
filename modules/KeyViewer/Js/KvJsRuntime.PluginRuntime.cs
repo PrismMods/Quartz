@@ -82,6 +82,8 @@ internal static partial class KvJsRuntime {
         private readonly List<JsValue> cleanups = [];
         private readonly Dictionary<int, Subscription> subscriptions = [];
         private readonly Dictionary<int, Timer> timers = [];
+        private readonly List<int> dueScratch = [];
+        private readonly List<Subscription> emitScratch = [];
         private int nextDefinition;
         private int nextSubscription;
         private int nextTimer;
@@ -121,8 +123,10 @@ internal static partial class KvJsRuntime {
 
         internal void Tick(float time) {
             if(timers.Count > 0) {
-                int[] due = timers.Values.Where(timer => time >= timer.Due).Select(timer => timer.Id).ToArray();
-                foreach(int id in due) {
+                dueScratch.Clear();
+                foreach(Timer timer in timers.Values)
+                    if(time >= timer.Due) dueScratch.Add(timer.Id);
+                foreach(int id in dueScratch) {
                     if(!timers.TryGetValue(id, out Timer timer)) continue;
                     if(timer.Repeat) timer.Due = time + timer.Period;
                     else timers.Remove(id);
@@ -167,8 +171,16 @@ internal static partial class KvJsRuntime {
         }
 
         private void Emit(string eventName, JsValue payload) {
-            Subscription[] targets = subscriptions.Values.Where(sub => sub.EventName == eventName).ToArray();
-            foreach(Subscription sub in targets) InvokeScoped(sub.DefinitionId, sub.Callback, payload);
+            int start = emitScratch.Count;
+            foreach(Subscription sub in subscriptions.Values)
+                if(sub.EventName == eventName) emitScratch.Add(sub);
+            int count = emitScratch.Count - start;
+            try {
+                for(int i = start; i < start + count; i++)
+                    InvokeScoped(emitScratch[i].DefinitionId, emitScratch[i].Callback, payload);
+            } finally {
+                emitScratch.RemoveRange(start, count);
+            }
         }
 
         private void InvokeScoped(string definitionId, JsValue callback, params object[] args) {
