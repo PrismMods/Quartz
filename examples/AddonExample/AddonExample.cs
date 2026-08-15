@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using Quartz.Addons;
+using Quartz.UI.Generator;
 using UnityEngine;
 
 public enum ExampleMode { Plain, Fancy }
@@ -60,6 +61,33 @@ public class AddonExample : QuartzAddon {
 
         // Auto-generated settings UI from ExampleSettings above (one line, no UI code).
         Context.RegisterSettingsTab("Example");
+
+        // Same auto-generated settings UI, but as its own top-level sidebar icon/category
+        // instead of a tab nested under Addons. Pass a PNG byte[] for a custom icon; null
+        // falls back to the default addon icon.
+        Context.RegisterTopLevelSettingsTab("Example", iconPng: null);
+
+        // A fully hand-built tab (own sidebar entry) for UI the auto-generated settings
+        // form can't express — GenerateUI is the same helper library the core UI uses.
+        Context.RegisterTopLevelTab("Example Tools", content => {
+            // Card-style addon header: name, description, author, optional icon
+            // (byte[] PNG or a file path; null/missing skips the icon).
+            GenerateUI.AddonHeader(content, Name, "Reference addon showing the SDK surface.", Author, iconPng: null);
+            GenerateUI.Header(content, "Example Tools", "example_tools_header");
+            GenerateUI.AddMutedText(GenerateUI.Row(content), 17f, 0.6f).text =
+                $"Hits so far: {hits}";
+            GenerateUI.Button(
+                GenerateUI.Row(content),
+                () => { hits++; Context.Msg("hit from custom tab, total " + hits); },
+                "Add Hit",
+                "example_tools_add_hit"
+            );
+            // Embed the auto-generated settings form inside this custom page —
+            // this is how to combine hand-built UI and [AddonConfig] settings in
+            // ONE tab (registering a settings tab and a custom tab under the same
+            // title throws: both map to the same nav key).
+            Context.BuildSettingsUI(content);
+        }, iconPng: null);
 
         // Which loader is hosting Quartz right now.
         Context.Msg("running under " + AddonContext.Loader);
