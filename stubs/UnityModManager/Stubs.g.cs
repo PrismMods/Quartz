@@ -15,6 +15,7 @@ namespace UnityModManagerNet {
     public unsafe partial class UnityModManager {
         protected UnityModManager() { }
         public unsafe partial class ModEntry {
+            public readonly global::UnityModManagerNet.UnityModManager.ModInfo Info;
             public readonly global::UnityModManagerNet.UnityModManager.ModEntry.ModLogger Logger;
             public global::System.Func<global::UnityModManagerNet.UnityModManager.ModEntry, bool, bool> OnToggle;
             public global::System.Func<global::UnityModManagerNet.UnityModManager.ModEntry, bool> OnUnload;
@@ -27,6 +28,13 @@ namespace UnityModManagerNet {
                 public void Warning(string str) => throw null;
                 protected ModLogger() { }
             }
+        }
+        public unsafe partial class ModInfo : global::System.IEquatable<global::UnityModManagerNet.UnityModManager.ModInfo> {
+            public string DisplayName;
+            public string Id;
+            public string Version;
+            protected ModInfo() { }
+            bool global::System.IEquatable<global::UnityModManagerNet.UnityModManager.ModInfo>.Equals(global::UnityModManagerNet.UnityModManager.ModInfo other) => throw null;
         }
     }
 }

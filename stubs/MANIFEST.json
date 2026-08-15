@@ -2167,16 +2167,8 @@
     "assembly": "MelonLoader",
     "types": [
       {
-        "type": "MelonLoader.HarmonyDontPatchAllAttribute",
-        "members": [
-          "System.Void MelonLoader.HarmonyDontPatchAllAttribute::.ctor()"
-        ]
-      },
-      {
         "type": "MelonLoader.MelonBase",
         "members": [
-          "MelonLoader.MelonInfoAttribute MelonLoader.MelonBase::Info()",
-          "MelonLoader.MelonInfoAttribute MelonLoader.MelonBase::get_Info()",
           "System.Void MelonLoader.MelonBase::OnDeinitializeMelon()",
           "System.Void MelonLoader.MelonBase::OnInitializeMelon()",
           "System.Void MelonLoader.MelonBase::OnUpdate()"
@@ -2204,8 +2196,6 @@
       {
         "type": "MelonLoader.MelonInfoAttribute",
         "members": [
-          "System.String MelonLoader.MelonInfoAttribute::Name()",
-          "System.String MelonLoader.MelonInfoAttribute::get_Name()",
           "System.Void MelonLoader.MelonInfoAttribute::.ctor(System.Type,System.String,System.String,System.String,System.String)"
         ]
       },
@@ -5920,7 +5910,8 @@
           "System.Func\u00602\u003CUnityModManagerNet.UnityModManager/ModEntry,System.Boolean\u003E UnityModManagerNet.UnityModManager/ModEntry::OnUnload",
           "System.Func\u00603\u003CUnityModManagerNet.UnityModManager/ModEntry,System.Boolean,System.Boolean\u003E UnityModManagerNet.UnityModManager/ModEntry::OnToggle",
           "System.String UnityModManagerNet.UnityModManager/ModEntry::Path",
-          "UnityModManagerNet.UnityModManager/ModEntry/ModLogger UnityModManagerNet.UnityModManager/ModEntry::Logger"
+          "UnityModManagerNet.UnityModManager/ModEntry/ModLogger UnityModManagerNet.UnityModManager/ModEntry::Logger",
+          "UnityModManagerNet.UnityModManager/ModInfo UnityModManagerNet.UnityModManager/ModEntry::Info"
         ]
       },
       {
@@ -5929,6 +5920,14 @@
           "System.Void UnityModManagerNet.UnityModManager/ModEntry/ModLogger::Error(System.String)",
           "System.Void UnityModManagerNet.UnityModManager/ModEntry/ModLogger::Log(System.String)",
           "System.Void UnityModManagerNet.UnityModManager/ModEntry/ModLogger::Warning(System.String)"
+        ]
+      },
+      {
+        "type": "UnityModManagerNet.UnityModManager/ModInfo",
+        "members": [
+          "System.String UnityModManagerNet.UnityModManager/ModInfo::DisplayName",
+          "System.String UnityModManagerNet.UnityModManager/ModInfo::Id",
+          "System.String UnityModManagerNet.UnityModManager/ModInfo::Version"
         ]
       }
     ]

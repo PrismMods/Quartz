@@ -166,9 +166,9 @@ namespace Newtonsoft.Json.Linq {
         public static explicit operator float(global::Newtonsoft.Json.Linq.JToken value) => throw null;
         public static explicit operator string(global::Newtonsoft.Json.Linq.JToken value) => throw null;
         public static explicit operator global::System.Nullable<bool>(global::Newtonsoft.Json.Linq.JToken value) => throw null;
-        public static implicit operator global::Newtonsoft.Json.Linq.JToken(float value) => throw null;
         public static implicit operator global::Newtonsoft.Json.Linq.JToken(bool value) => throw null;
         public static implicit operator global::Newtonsoft.Json.Linq.JToken(string value) => throw null;
+        public static implicit operator global::Newtonsoft.Json.Linq.JToken(float value) => throw null;
         public static implicit operator global::Newtonsoft.Json.Linq.JToken(int value) => throw null;
         public static implicit operator global::Newtonsoft.Json.Linq.JToken(long value) => throw null;
         protected JToken() { }

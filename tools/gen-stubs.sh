@@ -57,6 +57,16 @@ dotnet build modules/AllModules.proj -c Release -v quiet --nologo >/dev/null
 INPUTS=(--input "Quartz/bin/Release/netstandard2.1/Quartz.dll")
 [[ -f Quartz/bin/umm/Release/netstandard2.1/QuartzUmm.dll ]] \
     && INPUTS+=(--input "Quartz/bin/umm/Release/netstandard2.1/QuartzUmm.dll")
+# The bootstrap talks to the loaders directly (MelonMod, ModEntry.Info) and the
+# engine leans on Newtonsoft surface the payload never touched, so both loader
+# variants of each join the stub-deriving set.
+for dll in \
+    "Quartz.Bootstrap/bin/ml/Release/netstandard2.1/Quartz.Bootstrap.dll" \
+    "Quartz.Bootstrap/bin/umm/Release/netstandard2.1/QuartzUmm.Bootstrap.dll" \
+    "Quartz.UpdateEngine/bin/ml/Release/netstandard2.1/Quartz.UpdateEngine.dll" \
+    "Quartz.UpdateEngine/bin/umm/Release/netstandard2.1/QuartzUmm.UpdateEngine.dll"; do
+    [[ -f "$dll" ]] && INPUTS+=(--input "$dll")
+done
 for dll in modules/*/bin/Release/Quartz.Module.*.dll; do
     INPUTS+=(--input "$dll")
 done
@@ -71,7 +81,7 @@ LIBS=(--lib lib)
 dotnet run --project tools/StubGen/StubGen.csproj -c Release -v quiet --nologo -- \
     --game "$MANAGED" \
     "${LIBS[@]}" \
-    --source Quartz --source modules --source sdk \
+    --source Quartz --source Quartz.Bootstrap --source Quartz.UpdateEngine --source modules --source sdk \
     "${INPUTS[@]}" \
     --out stubs \
     ${MODE:+"$MODE"}
