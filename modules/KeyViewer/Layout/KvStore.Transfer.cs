@@ -39,6 +39,7 @@ internal static partial class KvStore {
     ];
     internal static string BuildExportJson(KvExportFormat format) {
         JObject root = ExportRoot();
+        foreach(string note in KvExportEmbedding.EmbedLocalImages(root)) Msg(note);
         KvExportShaping.Shape(root, format);
         if(format == KvExportFormat.Quartz) AttachSettings(root);
         return root.ToString(Formatting.Indented);

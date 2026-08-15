@@ -324,11 +324,11 @@ internal sealed class KvDocument {
             else position.Remove(field);
         }
     }
-    private static long StoredTokenBytes(JToken token) {
+    internal static long StoredTokenBytes(JToken token) {
         try { return System.Text.Encoding.UTF8.GetByteCount(token.ToString(Formatting.None)); }
         catch(Exception e) { Diag.Ignore(e); return long.MaxValue; }
     }
-    private static long SaturatingAdd(long left, long right) =>
+    internal static long SaturatingAdd(long left, long right) =>
         right >= long.MaxValue - left ? long.MaxValue : left + right;
     private static bool IsValidBase64(string value) {
         if(string.IsNullOrWhiteSpace(value) || value.Length > KvImageSafety.MaxBase64Characters) return false;
@@ -352,7 +352,7 @@ internal sealed class KvDocument {
         long decodedBytes = chars / 4 * 3 - padding;
         return chars > 0 && chars % 4 == 0 && decodedBytes <= KvImageSafety.MaxEncodedBytes;
     }
-    private static bool TryImageId(string reference, out string id) {
+    internal static bool TryImageId(string reference, out string id) {
         id = null;
         if(string.IsNullOrWhiteSpace(reference)) return false;
         string value = reference.Trim();
