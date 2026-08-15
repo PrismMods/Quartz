@@ -113,7 +113,7 @@ public static class SongTitleOverlay {
             isolateCanvas: true
         );
     }
-    public static void Save() => ConfMgr?.Save();
+    public static void Save() => ConfMgr?.RequestSave();
     public static void ResetPosition() {
         SongTitleSettings def = new();
         Conf.OffsetX = def.OffsetX;

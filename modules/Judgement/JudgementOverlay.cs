@@ -169,7 +169,7 @@ public static class JudgementOverlay {
         text.text = "0";
         return text;
     }
-    public static void Save() => ConfMgr?.Save();
+    public static void Save() => ConfMgr?.RequestSave();
     public static void ResetPosition() {
         JudgementSettings def = new();
         Conf.OffsetX = def.OffsetX;

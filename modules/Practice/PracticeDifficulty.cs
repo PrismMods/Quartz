@@ -9,7 +9,7 @@ public static class PracticeDifficulty {
     public static PracticeSettings Conf => ConfMgr?.Data;
     public const int DifficultyCount = 3;
     public static void EnsureConf() => ConfMgr ??= SettingsFile<PracticeSettings>.Loaded("Practice.json");
-    public static void Save() => ConfMgr?.Save();
+    public static void Save() => ConfMgr?.RequestSave();
     public static int CurrentDifficulty {
         get {
             try { return Mathf.Clamp((int)GCS.difficulty, 0, DifficultyCount - 1); } catch(Exception e) { Diag.Ignore(e); return -1; }

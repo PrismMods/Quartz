@@ -132,7 +132,7 @@ public static class ProgressBarOverlay {
         if(fill != null) fill.color = Conf.GetFillColorForProgress(now);
         ApplyOutline();
     }
-    public static void Save() => ConfMgr?.Save();
+    public static void Save() => ConfMgr?.RequestSave();
     public static void ResetPosition() {
         ProgressBarSettings def = new();
         Conf.OffsetX = def.OffsetX;

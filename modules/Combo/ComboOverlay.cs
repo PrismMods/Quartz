@@ -106,7 +106,7 @@ public static class ComboOverlay {
         float y = -(band + VerticalGap + Conf.OffsetY);
         return OverlayCalibration.Scale(new Vector2(Conf.OffsetX, y));
     }
-    public static void Save() => ConfMgr?.Save();
+    public static void Save() => ConfMgr?.RequestSave();
     public static void ResetPosition() {
         ComboSettings def = new();
         Conf.OffsetX = def.OffsetX;
