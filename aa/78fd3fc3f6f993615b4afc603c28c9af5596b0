@@ -1,0 +1,23 @@
+Quartz.Tests/Features/KeyViewer/KvDocumentTests.cs
+  s_558ce7f5bc693e::t_828772e27f77e9 392-456
+Quartz.Tests/Quartz.Tests.csproj
+  s_558ce7f5bc693e::t_d6df5864d59c09 100
+Quartz.Tests/Program.cs
+  s_558ce7f5bc693e::t_525d31e5e934e8 66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "aa78fd3fc3f6f993615b4afc603c28c9af5596b0",
+  "prompts": {},
+  "sessions": {
+    "s_558ce7f5bc693e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "340bfbe4-c1a9-4e28-90a6-2966614b4d82",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
