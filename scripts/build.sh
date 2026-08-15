@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Quartz build script.
-# Usage: ./build.sh [Config]
+# Usage: scripts/build.sh [Config]
 #   Config: Release (default) | Debug | Debug_IL2CPP | Release_IL2CPP
 # Builds Quartz.dll, auto-installs into the game (Mods + UserData/Quartz),
 # and writes dist/Quartz.zip.
@@ -11,13 +11,13 @@
 # FPS regression vs vanilla. Always test FPS against a Release build.
 set -euo pipefail
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 
 CONFIG="${1:-Release}"
 
 if [[ "$CONFIG" == Debug* ]]; then
     echo ">> NOTE: building $CONFIG — UNOPTIMIZED (Optimize=false). Slower per-frame code;"
-    echo ">>       do NOT use for FPS comparisons. Run ./build.sh (Release) for perf testing."
+    echo ">>       do NOT use for FPS comparisons. Run scripts/build.sh (Release) for perf testing."
 fi
 
 # --- Locate game install (auto-detect, override with GAMEPATH env var) ---
