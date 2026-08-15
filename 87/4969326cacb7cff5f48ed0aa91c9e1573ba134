@@ -1,0 +1,23 @@
+Quartz/Compat/Game/GameApi.cs
+  s_e9a36f061a487f::t_eb1518d3036de0 134-135,141-146
+modules/Editor/EditorBgaMod.cs
+  s_e9a36f061a487f::t_ae00f8fb2119c0 101
+  s_e9a36f061a487f::t_c33a040fb89de6 83-84,86
+  s_e9a36f061a487f::t_c9e269266ae85f 36-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "874969326cacb7cff5f48ed0aa91c9e1573ba134",
+  "prompts": {},
+  "sessions": {
+    "s_e9a36f061a487f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a85d324b-8e36-488c-bcfb-5b3de418be8c",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
