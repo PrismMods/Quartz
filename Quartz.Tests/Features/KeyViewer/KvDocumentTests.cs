@@ -389,6 +389,71 @@ static partial class KvDocumentTests {
         Assert(gone["className"] == null && gone["position"]!["className"] == null,
             "clearing className removes it from both objects");
     }
+    public static void TestExportEmbedsLocalImages() {
+        string dir = Path.Combine(Path.GetTempPath(), "quartz-kv-embed-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        try {
+            string png = Path.Combine(dir, "key.png");
+            byte[] pngBytes = Convert.FromBase64String(
+                "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==");
+            File.WriteAllBytes(png, pngBytes);
+            string missing = Path.Combine(dir, "missing.png");
+            JObject root = new() {
+                ["selectedKeyType"] = "4key",
+                ["keys"] = new JObject { ["4key"] = new JArray("Z", "X", "C", "V") },
+                ["keyPositions"] = new JObject {
+                    ["4key"] = new JArray(
+                        new JObject {
+                            ["dx"] = 0, ["dy"] = 0, ["width"] = 60, ["height"] = 60,
+                            ["inactiveImage"] = png, ["activeImage"] = png,
+                        },
+                        new JObject {
+                            ["dx"] = 70, ["dy"] = 0, ["width"] = 60, ["height"] = 60,
+                            ["position"] = new JObject { ["inactiveImage"] = "https://example.com/a.png" },
+                        },
+                        new JObject {
+                            ["dx"] = 140, ["dy"] = 0, ["width"] = 60, ["height"] = 60,
+                            ["inactiveImage"] = missing,
+                        },
+                        new JObject {
+                            ["dx"] = 210, ["dy"] = 0, ["width"] = 60, ["height"] = 60,
+                            ["inactiveImage"] = KvDocument.DmLocalImagePrefix + "keep",
+                        }),
+                },
+                ["embeddedLocalImages"] = new JArray(
+                    new JObject { ["imageId"] = "keep", ["extension"] = "png", ["dataBase64"] = "AQIDBA==" },
+                    new JObject { ["imageId"] = "orphan", ["extension"] = "png", ["dataBase64"] = "BQYHCA==" }),
+            };
+            List<string> notes = KvExportEmbedding.EmbedLocalImages(root);
+            JArray keys = (JArray)root["keyPositions"]!["4key"]!;
+            string idleRef = keys[0]!["inactiveImage"]!.ToString();
+            Assert(idleRef.StartsWith(KvDocument.DmLocalImagePrefix, StringComparison.Ordinal),
+                "a local file path is rewritten to an embedded reference");
+            Assert(idleRef == keys[0]!["activeImage"]!.ToString(),
+                "both fields reading the same file share one embedded image");
+            Assert(keys[1]!["position"]!["inactiveImage"]!.ToString() == "https://example.com/a.png",
+                "web references are left to travel as URLs");
+            Assert(keys[2]!["inactiveImage"]!.ToString() == missing,
+                "an unreadable path is left in place instead of dropped");
+            Assert(KvDocument.Parse(root.ToString()).TryEmbeddedImage(idleRef, out string data, out string extension)
+                && data == Convert.ToBase64String(pngBytes) && extension == "png",
+                "the embedded payload round-trips through a parsed export");
+            JArray images = (JArray)root["embeddedLocalImages"]!;
+            Assert(images.Count == 2, "the export carries the new image plus the still-referenced one");
+            bool keepSurvives = false, orphanSurvives = false;
+            foreach(JToken image in images) {
+                string id = image["imageId"]!.ToString();
+                if(id == "keep") keepSurvives = true;
+                if(id == "orphan") orphanSurvives = true;
+            }
+            Assert(keepSurvives && !orphanSurvives,
+                "referenced embedded images survive while unreferenced ones are pruned");
+            Assert(notes.Exists(n => n.Contains("not found")) && notes.Exists(n => n.Contains("Embedded 2")),
+                "the export reports what it embedded and what it could not");
+        } finally {
+            Directory.Delete(dir, true);
+        }
+    }
     private static bool HasQuartzKey(JToken node) {
         switch(node) {
             case JObject obj:

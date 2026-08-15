@@ -63,6 +63,7 @@ List<(string Name, Action Run)> tests = [
     ("KeyViewer DM Note import validator catches a float integer field", KvDocumentTests.TestDmNoteImportValidatorCatchesFloatIntField),
     ("KeyViewer .qkv keeps what the DM Note export has to give up", KvDocumentTests.TestExportFormatsSplitQuartzOnlyData),
     ("KeyViewer DM Note export warns only about what the layout uses", KvDocumentTests.TestDmNoteGapsReportOnlyWhatIsUsed),
+    ("KeyViewer export embeds local image files and prunes orphans", KvDocumentTests.TestExportEmbedsLocalImages),
     ("KeyViewer DM Note gap scan ignores a switched-off note shadow", KvDocumentTests.TestDmNoteGapsIgnoreDisabledNoteShadow),
     ("KeyViewer foot keys carry an explicit marker that round-trips", KvDocumentTests.TestFootMarkerIsExplicitAndRoundTrips),
     ("KeyViewer per-key KPS is absent by default and round-trips", KvDocumentTests.TestPerKeyKpsIsOptOutAndRoundTrips),

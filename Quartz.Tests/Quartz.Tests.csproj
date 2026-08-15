@@ -97,6 +97,7 @@
 		<Compile Include="../modules/KeyViewer/Layout/KvElement.cs" Link="Source/KvElement.cs" />
 		<Compile Include="../modules/KeyViewer/Layout/KvDocument.cs" Link="Source/KvDocument.cs" />
 		<Compile Include="../modules/KeyViewer/Layout/KvExportShaping.cs" Link="Source/KvExportShaping.cs" />
+		<Compile Include="../modules/KeyViewer/Layout/KvExportEmbedding.cs" Link="Source/KvExportEmbedding.cs" />
 		<Compile Include="../modules/KeyViewer/Layout/KvSnap.cs" Link="Source/KvSnap.cs" />
 		<Compile Include="../modules/KeyViewer/Layout/KvHistory.cs" Link="Source/KvHistory.cs" />
 		<Compile Include="../modules/Tuf/TufModels.cs" Link="Source/TufModels.cs" />
