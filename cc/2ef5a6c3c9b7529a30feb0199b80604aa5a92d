@@ -1,0 +1,23 @@
+scripts/build.sh
+  s_f64ed41f3c36a9::t_248874a5497d83 14
+  s_f64ed41f3c36a9::t_662bba718b86d8 20
+  s_f64ed41f3c36a9::t_731dae80271367 3
+scripts/test.sh
+  s_f64ed41f3c36a9::t_9c0c46e3670c9f 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "cc2ef5a6c3c9b7529a30feb0199b80604aa5a92d",
+  "prompts": {},
+  "sessions": {
+    "s_f64ed41f3c36a9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a886ccdd-de65-4e28-a78a-a6cc2ebe4d68",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
