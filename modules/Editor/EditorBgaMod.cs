@@ -33,7 +33,12 @@ public static partial class EditorFeature {
             return;
         }
         try {
-            SetPlanetsVisible(false);
+            List<PlanetRenderer> dummies = ADOBase.controller != null ? ADOBase.controller.dummyPlanets : null;
+            int dummyCount = dummies != null ? dummies.Count : 0;
+            if(!bgaApplied || dummyCount != hiddenDummyCount || planetProbe == null || planetProbe.enabled) {
+                SetPlanetsVisible(false);
+                hiddenDummyCount = dummyCount;
+            }
             List<scrFloor> floors = ADOBase.lm?.listFloors;
             if(floors != null && floors.Count > 0 && (!bgaApplied || FloorsLookVisible(floors)))
                 SetFloorsVisible(floors, false);
@@ -75,7 +80,10 @@ public static partial class EditorFeature {
             if(floor.holdRenderer != null) Set(floor.holdRenderer.m_meshRenderer, visible);
         }
     }
+    private static Renderer planetProbe;
+    private static int hiddenDummyCount;
     private static void SetPlanetsVisible(bool visible) {
+        if(!visible) planetProbe = null;
         foreach(PlanetarySystem system in GameApi.AllPlanetarySystems()) {
             List<scrPlanet> planets = system.planetList;
             if(planets == null) continue;
@@ -90,6 +98,7 @@ public static partial class EditorFeature {
     }
     private static void SetPlanetRendererVisible(PlanetRenderer pr, bool visible) {
         if(pr == null) return;
+        if(!visible && planetProbe == null && pr.sprite != null) planetProbe = pr.sprite.meshRenderer;
         Set(pr.sprite != null ? pr.sprite.meshRenderer : null, visible);
         Set(ParticleRenderer(pr.coreParticles), visible);
         Set(ParticleRenderer(pr.tailParticles), visible);

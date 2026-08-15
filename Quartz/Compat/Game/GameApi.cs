@@ -131,14 +131,19 @@ public static class GameApi {
         }
         foreach(PlanetarySystem sys in AllPlanetarySystems()) PlanetarySpeedMember.Set(sys, speed);
     }
+    private static Refl.Member playerPlanetarySystemMember;
+    private static Type playerPlanetarySystemOwner;
     public static IEnumerable<PlanetarySystem> AllPlanetarySystems() {
         object pm = PlayerManagerMember.Get(null);
         if(pm != null && PlayersMember.Get(pm) is IEnumerable players) {
-            Refl.Member perPlayer = null;
             foreach(object p in players) {
                 if(p == null) continue;
-                perPlayer ??= new Refl.Member(p.GetType(), "planetarySystem");
-                if(perPlayer.Get(p) is PlanetarySystem sys) yield return sys;
+                Type owner = p.GetType();
+                if(playerPlanetarySystemMember == null || playerPlanetarySystemOwner != owner) {
+                    playerPlanetarySystemMember = new Refl.Member(owner, "planetarySystem");
+                    playerPlanetarySystemOwner = owner;
+                }
+                if(playerPlanetarySystemMember.Get(p) is PlanetarySystem sys) yield return sys;
             }
             yield break;
         }
