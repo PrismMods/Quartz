@@ -1,0 +1,31 @@
+Quartz.Tests/Core/SemVerTests.cs
+  s_23685525c0f3cf::t_e646fd23c036c7 18
+  s_23685525c0f3cf::t_22821cf5c37099 49
+Quartz/IO/CoreSettings.cs
+  s_23685525c0f3cf::t_67f6ebbb0a6988 45-47,49
+  s_23685525c0f3cf::t_6591eff1753146 48
+Quartz/Core/SemVer.cs
+  h_6eeb8441a8a159 11
+  s_23685525c0f3cf::t_626ebf15cdd489 4-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "c36b47aa8e188ead857b078ec0550e74dac7fba1",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_23685525c0f3cf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b92a94b6-7640-495b-af05-e8576fc02199",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
