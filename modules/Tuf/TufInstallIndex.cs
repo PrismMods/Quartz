@@ -105,16 +105,17 @@ public sealed class TufInstallEntry {
 }
 public sealed class TufInstallIndex : ISettingsFile {
     private readonly List<TufInstallEntry> entries = [];
+    private readonly Dictionary<int, TufInstallEntry> byId = [];
     public IReadOnlyList<TufInstallEntry> Entries => entries;
     public int Count => entries.Count;
-    public TufInstallEntry? Find(int id) => entries.FirstOrDefault(e => e.Id == id);
+    public TufInstallEntry? Find(int id) => byId.TryGetValue(id, out TufInstallEntry? entry) ? entry : null;
     public void Record(TufLevel level, string folder) {
         if(level == null || level.Id <= 0 || string.IsNullOrWhiteSpace(folder)) return;
         TufInstallEntry? existing = Find(level.Id);
         long installedAt = existing?.InstalledAtUtc ?? 0;
         if(installedAt <= 0) installedAt = DateTime.UtcNow.Ticks;
         if(existing != null) entries.Remove(existing);
-        entries.Insert(0, new TufInstallEntry {
+        TufInstallEntry recorded = new() {
             Id = level.Id,
             Song = level.Song,
             Artist = level.Artist,
@@ -127,7 +128,9 @@ public sealed class TufInstallIndex : ISettingsFile {
             DownloadUrl = level.DownloadUri?.ToString() ?? "",
             VideoLink = level.VideoLink,
             InstalledAtUtc = installedAt
-        });
+        };
+        entries.Insert(0, recorded);
+        byId[level.Id] = recorded;
         Sort();
     }
     public TufInstallEntry Adopt(int id, string folder, long installedAtUtc) {
@@ -141,13 +144,15 @@ public sealed class TufInstallIndex : ISettingsFile {
             InstalledAtUtc = installedAtUtc
         };
         entries.Add(entry);
-        Sort();
+        byId[id] = entry;
         return entry;
     }
+    public void SortEntries() => Sort();
     public bool Remove(int id) {
         TufInstallEntry? entry = Find(id);
         if(entry == null) return false;
         entries.Remove(entry);
+        byId.Remove(id);
         return true;
     }
     public void SetFolder(int id, string folder) {
@@ -158,7 +163,12 @@ public sealed class TufInstallIndex : ISettingsFile {
         int removed = entries.RemoveAll(e => {
             try { return !Directory.Exists(e.Folder); } catch(Exception error) { Diag.Ignore(error); return true; }
         });
+        if(removed > 0) RebuildLookup();
         return removed > 0;
+    }
+    private void RebuildLookup() {
+        byId.Clear();
+        foreach(TufInstallEntry entry in entries) byId[entry.Id] = entry;
     }
     private void Sort() => entries.Sort((a, b) => b.InstalledAtUtc.CompareTo(a.InstalledAtUtc));
     public JToken Serialize() => new JObject {
@@ -167,11 +177,11 @@ public sealed class TufInstallIndex : ISettingsFile {
     };
     public void Deserialize(JToken token) {
         entries.Clear();
+        byId.Clear();
         if(token["Entries"] is not JArray array) return;
-        HashSet<int> seen = [];
         foreach(JToken item in array) {
             TufInstallEntry? entry = TufInstallEntry.Deserialize(item);
-            if(entry != null && seen.Add(entry.Id)) entries.Add(entry);
+            if(entry != null && byId.TryAdd(entry.Id, entry)) entries.Add(entry);
         }
         Sort();
     }

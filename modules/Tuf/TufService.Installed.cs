@@ -31,6 +31,7 @@ public sealed partial class TufService : IRuntimeService {
             MainCore.Log.Wrn("[TUF] could not scan the level library: " + e.Message);
         }
         if(!changed) return;
+        index.Data.SortEntries();
         settings?.Data.RememberRoot(root.Path);
         settings?.RequestSave();
         index.RequestSave();

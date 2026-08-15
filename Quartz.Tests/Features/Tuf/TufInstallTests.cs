@@ -134,6 +134,7 @@ static class TufInstallTests {
             TufInstallIndex index = new();
             index.Adopt(1, gone, 100);
             index.Adopt(2, Path.Combine(root, "2"), 200);
+            index.SortEntries();
             Assert(index.Count == 2, "orphans adopted");
             Assert(index.Entries[0].Id == 2, "newest install sorts first");
             Assert(index.Find(1)!.Song == "", "adopted entry has no metadata");
