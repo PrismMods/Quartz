@@ -1,0 +1,99 @@
+Quartz/UI/Factory/Page/PageSettings.Updates.cs
+  s_23685525c0f3cf::t_ee4c178a89ed87 50
+Quartz.Bootstrap/BootstrapCore.cs
+  s_23685525c0f3cf::t_a8925403fbaa71 1-28,30-31,33-36,39-63,65-66,68-76
+  s_23685525c0f3cf::t_3178731f4bfc51 64,67
+  s_23685525c0f3cf::t_5eacbc7834101a 32,38
+  s_23685525c0f3cf::t_d4f429a9adbdfa 29,37
+Quartz.UpdateEngine/EntryPoint.cs
+  s_23685525c0f3cf::t_436528d12b1bde 1,3-10,18-43
+  s_23685525c0f3cf::t_1986ffb50d77c0 2,11-17
+Quartz.slnx
+  s_23685525c0f3cf::t_1500050e698e8d 9-10
+Quartz.Bootstrap/LoaderMl.cs
+  s_23685525c0f3cf::t_deb79e7bda46da 1-17,26-58
+  s_23685525c0f3cf::t_a2bcf051d4c01c 18-25
+build/Axis.props
+  s_23685525c0f3cf::t_cd1c1d8af6db33 1-50
+Quartz.Bootstrap/LegacyCleanup.cs
+  s_23685525c0f3cf::t_b282e3d6fba48e 1-8,23-24,26-29,31,33-41,43-44,46-51,53-55
+  s_23685525c0f3cf::t_d4f429a9adbdfa 42,52
+  s_23685525c0f3cf::t_925e5dff859055 45
+  s_23685525c0f3cf::t_edee9b9ee413c7 30,32
+  s_23685525c0f3cf::t_cea422dc8bd7be 9-12,20
+  s_23685525c0f3cf::t_1a71df95176386 13-19,21-22,25
+Quartz.UpdateEngine/PackageInstaller.cs
+  s_23685525c0f3cf::t_c2bdb7870decef 67
+  s_23685525c0f3cf::t_21a4948967286e 91
+  s_23685525c0f3cf::t_5fbebd1bdeb512 1-66,68-90,92-125
+Quartz.Bootstrap/RuntimeStore.cs
+  s_23685525c0f3cf::t_3d796128f8378a 98
+  s_23685525c0f3cf::t_29b99cacf02dce 1-49,59-60,62-97,99-135,137-158,160-162
+  s_23685525c0f3cf::t_0281701b2e811f 50-58
+  s_23685525c0f3cf::t_d4f429a9adbdfa 61,136,159
+Quartz.Bootstrap/RuntimeCandidate.cs
+  s_23685525c0f3cf::t_4bd2c6ed267e4f 1-12
+Quartz/Update/UpdateLaunchPrefs.cs
+  s_23685525c0f3cf::t_a237fd448a7abc 1-39
+Quartz.Bootstrap/EngineClient.cs
+  s_23685525c0f3cf::t_9edea0ee118f05 1-55
+Quartz.UpdateEngine/UpdateManager.cs
+  s_23685525c0f3cf::t_6a468350dcf2ee 1-166
+tools/release.sh
+  s_23685525c0f3cf::t_68adc6776d1574 217-225,304,307,355,358
+Quartz/Resource/Umm/Info.json
+  s_23685525c0f3cf::t_634073ddc77164 7
+build.sh
+  s_23685525c0f3cf::t_4beeb40db4dc91 122-123
+Quartz.Bootstrap/RuntimeState.cs
+  s_23685525c0f3cf::t_50b6e484ca4fda 1-8
+scripts/check_conventions.py
+  s_23685525c0f3cf::t_92cc3546febcbb 16
+Quartz.Bootstrap/LoaderUmm.cs
+  s_23685525c0f3cf::t_4fcf123050052b 1-48
+Quartz.Bootstrap/DataSync.cs
+  s_23685525c0f3cf::t_5a72b422590968 17
+  s_23685525c0f3cf::t_62418886d241e1 1-16,18-20,22-27,29-31
+  s_23685525c0f3cf::t_d4f429a9adbdfa 21,28
+Quartz.Bootstrap/Quartz.Bootstrap.csproj
+  s_23685525c0f3cf::t_b7faa6245a5fbc 1-80
+Quartz/Loader.cs
+  s_23685525c0f3cf::t_fe24d052096269 1,7,9-14,16-20,25,36,38,46-53,61-71
+Quartz/LoaderUmm.cs
+  s_23685525c0f3cf::t_aba4aa14b0fc1e 4
+  s_23685525c0f3cf::t_619d843b06bf26 52
+Quartz.UpdateEngine/Quartz.UpdateEngine.csproj
+  s_23685525c0f3cf::t_76ec7c2540983b 1-73
+Quartz/Quartz.csproj
+  s_23685525c0f3cf::t_0984e1b0966890 4-6
+  s_23685525c0f3cf::t_d428936b46f74e 310-315,317-322,324-329,335,337-339,342-346
+  s_23685525c0f3cf::t_4111bc981bf5a3 375-376,382-384,386-388,397-401
+  s_23685525c0f3cf::t_aa73507ae4c8e5 422-428
+  s_23685525c0f3cf::t_6f363c4e1e0e43 148-149
+  s_23685525c0f3cf::t_e452e41737e681 206-213
+  s_23685525c0f3cf::t_b3359c899c7a87 144-147,150-153
+tools/build-keyviewer.sh
+  s_23685525c0f3cf::t_f4976151bb84de 54-55
+Quartz.Bootstrap/PayloadLoader.cs
+  s_23685525c0f3cf::t_630b8276e569a0 1-43
+Quartz/Update/UpdateService.cs
+  s_23685525c0f3cf::t_ca8eb4d354cf62 326,334
+Quartz.UpdateEngine/UpdatePrefs.cs
+  s_23685525c0f3cf::t_c0b54ec0bf04ea 1-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "51b73c10cf26cf3fcaba2c1d240bc0c7b9dab468",
+  "prompts": {},
+  "sessions": {
+    "s_23685525c0f3cf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b92a94b6-7640-495b-af05-e8576fc02199",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
