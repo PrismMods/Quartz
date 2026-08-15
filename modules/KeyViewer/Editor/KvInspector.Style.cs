@@ -1,8 +1,10 @@
 using Newtonsoft.Json.Linq;
+using Quartz.Core;
 using Quartz.Features.KeyViewer;
 using Quartz.Features.KeyViewer.Layout;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects;
+using Quartz.UI.Objects.Impl;
 using UnityEngine;
 namespace Quartz.UI.Editor;
 internal sealed partial class KvInspector {
@@ -62,8 +64,62 @@ internal sealed partial class KvInspector {
             });
         Header(root, "KVI_SEC_FONT_STYLE", "Font Style");
         FontStyleRows(root, tracked, boxes, "kvi_font", el => el.Raw, el => el.Raw);
+        ImageRows(root, tracked, batch, true);
         CssRows(root, tracked, batch);
     }
+    private const int ImagePathLimit = 1024;
+    private static readonly string[] ImageFits = ["cover", "contain", "fill", "none"];
+    private void ImageRows(RectTransform root, List<UIObject> tracked, KvElement[] batch, bool includeActive) {
+        Header(root, "KVI_SEC_IMAGE", "Image");
+        ImageField(root, tracked, batch, "kvi_image_idle", "Image (path or URL)", "inactiveImage")
+            .Rect.AddToolTip(
+                "DESC_KVI_IMAGE_IDLE",
+                "Absolute file path, file:// or http(s):// URL, or data: URI. Web images download once and are cached. The image is clipped to the element's shape."
+            );
+        if(includeActive) ImageField(
+            root, tracked, batch, "kvi_image_active", "Image While Pressed (path or URL)", "activeImage"
+        ).Rect.AddToolTip(
+            "DESC_KVI_IMAGE_ACTIVE",
+            "Shown only while the key is held. Leave empty to keep the idle image while pressed."
+        );
+        Segments(
+            root, ImageFits, ImageFitName, ImageFitKey,
+            MatchMulti(ImageFits, batch, el => KvProps.Str(el.Raw, "imageFit", "cover"), "cover"),
+            v => {
+                Edit(() => {
+                    foreach(KvElement el in batch) {
+                        if(v == "cover") el.Raw.Remove("imageFit");
+                        else el.Raw["imageFit"] = v;
+                    }
+                });
+                Push();
+            }
+        );
+    }
+    private UIInput ImageField(
+        RectTransform root, List<UIObject> tracked, KvElement[] batch,
+        string id, string placeholder, string field
+    ) => TextField(
+        root, tracked, batch, id, placeholder,
+        el => KvProps.Str(el.Raw, field, ""),
+        (el, v) => {
+            string s = (v ?? "").Trim();
+            if(s.Length == 0) el.Raw.Remove(field);
+            else el.Raw[field] = s;
+        }, ImagePathLimit
+    );
+    private static string ImageFitName(string s) => s switch {
+        "contain" => MainCore.Tr.Get("KVI_IMGFIT_CONTAIN", "Contain"),
+        "fill" => MainCore.Tr.Get("KVI_IMGFIT_FILL", "Stretch"),
+        "none" => MainCore.Tr.Get("KVI_IMGFIT_NONE", "None"),
+        _ => MainCore.Tr.Get("KVI_IMGFIT_COVER", "Cover"),
+    };
+    private static string ImageFitKey(string s) => s switch {
+        "contain" => "KVI_IMGFIT_CONTAIN",
+        "fill" => "KVI_IMGFIT_FILL",
+        "none" => "KVI_IMGFIT_NONE",
+        _ => "KVI_IMGFIT_COVER",
+    };
     private const int ClassNameLimit = 96;
     private void CssRows(RectTransform root, List<UIObject> tracked, KvElement[] batch) {
         Header(root, "KVI_SEC_CSS", "Custom CSS");
@@ -114,6 +170,7 @@ internal sealed partial class KvInspector {
         Num(root, tracked, "Border Width", "kvi_border_width", 3f, 0f, 20f, "0 px", 1f,
             batch, el => KvProps.Float(el.Raw, "borderWidth", 3f),
             (el, v) => el.Raw["borderWidth"] = v);
+        ImageRows(root, tracked, batch, false);
         CssRows(root, tracked, batch);
     }
     private void Box(
