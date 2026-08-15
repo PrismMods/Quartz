@@ -1,0 +1,28 @@
+Quartz.Tests/Core/BootstrapRuntimeTests.cs
+  s_23685525c0f3cf::t_cb7780bfc9c3b2 139-157
+  s_23685525c0f3cf::t_f06bcc41d64607 1-138,158-171
+Quartz.Tests/Program.cs
+  s_23685525c0f3cf::t_b635b2e0516972 6-12
+  s_23685525c0f3cf::t_5ca7f22119df0a 13
+Quartz.Tests/Quartz.Tests.csproj
+  s_23685525c0f3cf::t_dfa63954de90aa 77
+  s_23685525c0f3cf::t_b4ef36998bf480 70-76,78
+Quartz.Tests/Support/BootstrapFixtures.cs
+  s_23685525c0f3cf::t_11d22631522055 1-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "b459173c481019648f868d3b94245025484c4f24",
+  "prompts": {},
+  "sessions": {
+    "s_23685525c0f3cf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b92a94b6-7640-495b-af05-e8576fc02199",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
