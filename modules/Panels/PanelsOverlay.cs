@@ -311,6 +311,7 @@ public static partial class PanelsOverlay {
         text.color = Color.white;
         text.raycastTarget = false;
         text.text = "";
+        Quartz.Compat.Game.TextCompat.NoWrap(text);
         LivePanel panel = new() {
             Config = config,
             Rect = rect,
