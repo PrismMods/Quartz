@@ -1,0 +1,27 @@
+modules/SongTitle/SongTitleOverlay.cs
+  s_e9a36f061a487f::t_fc6a7bc519ce75 116
+modules/Judgement/JudgementOverlay.cs
+  s_e9a36f061a487f::t_3315e779c2fc06 172
+modules/Practice/PracticeDifficulty.cs
+  s_e9a36f061a487f::t_37a4017356fe5b 12
+modules/Combo/ComboOverlay.cs
+  s_e9a36f061a487f::t_1acf732a6769ee 109
+modules/ProgressBar/ProgressBar.cs
+  s_e9a36f061a487f::t_dce5705aae3f24 135
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "2078af51afd083ca97ce457bde29254ad1a2bc05",
+  "prompts": {},
+  "sessions": {
+    "s_e9a36f061a487f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a85d324b-8e36-488c-bcfb-5b3de418be8c",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
