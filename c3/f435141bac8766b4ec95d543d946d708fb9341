@@ -1,0 +1,23 @@
+stubs/0Harmony/Stubs.g.cs
+  s_d70875b57e2b7e::t_25c5c2747ed6d3 39-41,43,52-54,81-88,98-105
+stubs/MANIFEST.json
+  s_d70875b57e2b7e::t_25c5c2747ed6d3 39-41,46-47,57-59,97-107,121-131
+stubs/README.md
+  s_d70875b57e2b7e::t_25c5c2747ed6d3 19,41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "c3f435141bac8766b4ec95d543d946d708fb9341",
+  "prompts": {},
+  "sessions": {
+    "s_d70875b57e2b7e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e53182bb-0cca-4924-98c5-05438348ea76",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
