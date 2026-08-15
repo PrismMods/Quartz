@@ -26,10 +26,16 @@ internal static class PageSearch {
     private static List<Entry> cachedIndex;
     private static float cachedIndexTime;
     private static string cachedIndexLang;
+    private sealed class ResultRow {
+        public RectTransform Row;
+        public UI.Objects.Impl.UIButton Button;
+    }
+    private static readonly List<ResultRow> resultRows = [];
     private static RectTransform resultsContainer;
     private static TextMeshProUGUI statusText;
     public static void Create(RectTransform parent) {
         cachedIndex = null;
+        resultRows.Clear();
         RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
         var inputRow = GenerateUI.Row(content.transform);
         var input = GenerateUI.Input(
@@ -64,10 +70,10 @@ internal static class PageSearch {
     }
     private static void RunSearch(string query) {
         if(resultsContainer == null) return;
-        GenerateUI.ClearChildren(resultsContainer);
         string q = Norm(query ?? "");
         if(string.IsNullOrWhiteSpace(q)) {
             statusText.text = GenerateUI.Tr("SEARCH_HINT", "Type to search every tab — categories, toggles, buttons, everything.");
+            HideRowsFrom(0);
             return;
         }
         List<Entry> matches = [];
@@ -82,6 +88,7 @@ internal static class PageSearch {
         });
         if(matches.Count == 0) {
             statusText.text = GenerateUI.Tr("SEARCH_NO_RESULTS", "No results.");
+            HideRowsFrom(0);
             return;
         }
         int shown = Mathf.Min(matches.Count, MAX_RESULTS);
@@ -89,22 +96,31 @@ internal static class PageSearch {
             ? string.Format(GenerateUI.Tr("SEARCH_RESULTS_CAPPED", "{0} results (showing first {1})"), matches.Count, MAX_RESULTS)
             : string.Format(GenerateUI.Tr("SEARCH_RESULTS", "{0} result(s)"), matches.Count);
         for(int i = 0; i < shown; i++)
-            AddResultRow(matches[i]);
+            ShowResultRow(i, matches[i]);
+        HideRowsFrom(shown);
     }
-    private static void AddResultRow(Entry e) {
-        var row = GenerateUI.Row(resultsContainer);
+    private static void ShowResultRow(int index, Entry e) {
+        while(resultRows.Count <= index) {
+            var row = GenerateUI.Row(resultsContainer);
+            var btn = GenerateUI.Button(row, null, "", "search_result").SetSecondary();
+            btn.Label.overflowMode = TextOverflowModes.Ellipsis;
+            btn.Label.fontSize = 19f;
+            TextLocalization loc = btn.Label.GetComponent<TextLocalization>();
+            if(loc != null) Object.Destroy(loc);
+            resultRows.Add(new ResultRow { Row = row, Button = btn });
+        }
+        ResultRow slot = resultRows[index];
         string text = e.Text.Length > 60 ? e.Text[..57] + "…" : e.Text;
         string path = string.IsNullOrEmpty(e.Section)
             ? TabName(e.State)
             : $"{TabName(e.State)} › {e.Section}";
-        var btn = GenerateUI.Button(
-            row,
-            () => Navigate(e),
-            $"<alpha=#77>{path} ›<alpha=#FF> {text}",
-            "search_result"
-        ).SetSecondary();
-        btn.Label.overflowMode = TextOverflowModes.Ellipsis;
-        btn.Label.fontSize = 19f;
+        slot.Button.OnClick = () => Navigate(e);
+        slot.Button.Label.text = $"<alpha=#77>{path} ›<alpha=#FF> {text}";
+        slot.Row.gameObject.SetActive(true);
+    }
+    private static void HideRowsFrom(int from) {
+        for(int i = from; i < resultRows.Count; i++)
+            if(resultRows[i].Row != null) resultRows[i].Row.gameObject.SetActive(false);
     }
     private static List<Entry> Index() {
         if(cachedIndex != null
