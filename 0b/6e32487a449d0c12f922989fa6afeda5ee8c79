@@ -1,0 +1,19 @@
+build.json
+  s_23685525c0f3cf::t_bc715359111043 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "0b6e32487a449d0c12f922989fa6afeda5ee8c79",
+  "prompts": {},
+  "sessions": {
+    "s_23685525c0f3cf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b92a94b6-7640-495b-af05-e8576fc02199",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
