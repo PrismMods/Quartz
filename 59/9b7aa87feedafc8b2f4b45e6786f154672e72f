@@ -1,0 +1,36 @@
+examples/AddonExample/AddonExample.cs
+  s_e9c02feb5e4682::t_8bc1cb7f4a202a 85-89
+  s_635e2f7e4cf0c3::t_8b18837bab31ac 65-72,76-84,90
+  s_e9c02feb5e4682::t_5786e644b94e70 73-75
+  s_635e2f7e4cf0c3::t_0cf677bafbc9e6 6
+  s_635e2f7e4cf0c3::t_9de51953045b3d 91
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "599b7aa87feedafc8b2f4b45e6786f154672e72f",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_635e2f7e4cf0c3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "02b72f02-d034-4f36-829c-767aa5fb4317",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_e9c02feb5e4682": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a7146224-2309-4aaf-8760-41e6968bb969",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
