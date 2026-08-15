@@ -174,9 +174,12 @@ internal sealed partial class KvCanvas {
         selection.Clear();
         AfterSelectionChanged();
     }
+    private readonly HashSet<KvElement> selectionLookupScratch = [];
     private void AfterSelectionChanged() {
+        selectionLookupScratch.Clear();
+        foreach(KvElement el in selection) selectionLookupScratch.Add(el);
         foreach(Visual v in visuals)
-            if(v.Outline != null) v.Outline.enabled = selection.Contains(v.El);
+            if(v.Outline != null) v.Outline.enabled = selectionLookupScratch.Contains(v.El);
         SyncOverlay();
         SelectionChanged?.Invoke();
     }

@@ -6,6 +6,7 @@ internal sealed partial class KvCanvas {
     private readonly List<Vector2> dragOrigins = [];
     private readonly List<KvRect> dragOthers = [];
     private readonly List<KvElement> marqueeHits = [];
+    private readonly HashSet<KvElement> marqueeHitSet = [];
     private KvElement dragPrimary;
     private Vector2 dragPrimaryOrigin;
     private bool axisLatched;
@@ -66,10 +67,13 @@ internal sealed partial class KvCanvas {
         KvRect band = FromCorners(pressLayout, layout);
         ShowMarquee(band);
         marqueeHits.Clear();
-        if(pressAdditive) marqueeHits.AddRange(selectionAtPress);
+        marqueeHitSet.Clear();
+        if(pressAdditive)
+            foreach(KvElement el in selectionAtPress)
+                if(marqueeHitSet.Add(el)) marqueeHits.Add(el);
         foreach(Visual v in visuals) {
             if(v.El.Hidden) continue;
-            if(band.Intersects(RectOf(v.El)) && !marqueeHits.Contains(v.El)) marqueeHits.Add(v.El);
+            if(band.Intersects(RectOf(v.El)) && marqueeHitSet.Add(v.El)) marqueeHits.Add(v.El);
         }
         SetSelectionIfChanged(marqueeHits);
     }
