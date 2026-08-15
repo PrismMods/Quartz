@@ -42,8 +42,40 @@ public sealed class AddonContext {
     public void Wrn(string message) => MainCore.Log.Wrn($"[Addon:{Id}] {message}");
     public void Err(string message) => MainCore.Log.Err($"[Addon:{Id}] {message}");
     public HarmonyLib.Harmony Harmony => harmony ??= new HarmonyLib.Harmony("quartz.addon." + Id);
-    public void PatchAll(Type anyTypeInAddon) =>
+    public void PatchAll(Type anyTypeInAddon) {
         Harmony.PatchAll(anyTypeInAddon.Assembly);
+        OrderOwnPatchesAfterQuartz();
+    }
+    private static bool IsQuartzOwner(string owner) =>
+        owner == Info.Name || owner.StartsWith("quartz.module.", StringComparison.Ordinal);
+    private void OrderOwnPatchesAfterQuartz() {
+        foreach(System.Reflection.MethodBase original in Harmony.GetPatchedMethods().ToList()) {
+            HarmonyLib.Patches info = HarmonyLib.Harmony.GetPatchInfo(original);
+            if(info == null) continue;
+            string[] quartzOwners = info.Owners.Where(IsQuartzOwner).ToArray();
+            if(quartzOwners.Length == 0) continue;
+            Reapply(original, info.Prefixes, quartzOwners, hm => Harmony.Patch(original, prefix: hm));
+            Reapply(original, info.Postfixes, quartzOwners, hm => Harmony.Patch(original, postfix: hm));
+            Reapply(original, info.Transpilers, quartzOwners, hm => Harmony.Patch(original, transpiler: hm));
+            Reapply(original, info.Finalizers, quartzOwners, hm => Harmony.Patch(original, finalizer: hm));
+        }
+    }
+    private void Reapply(System.Reflection.MethodBase original, IEnumerable<HarmonyLib.Patch> patches, string[] quartzOwners, Action<HarmonyMethod> apply) {
+        foreach(HarmonyLib.Patch p in patches.Where(p => p.owner == Harmony.Id).ToList()) {
+            string[] after = p.after ?? [];
+            if(quartzOwners.All(o => after.Contains(o))) continue;
+            try {
+                Harmony.Unpatch(original, p.PatchMethod);
+                apply(new HarmonyMethod(p.PatchMethod) {
+                    priority = p.priority,
+                    before = p.before,
+                    after = after.Union(quartzOwners).ToArray(),
+                });
+            } catch(Exception e) {
+                Err($"couldn't reorder patch {p.PatchMethod?.Name} on {original.Name}: {e.Message}");
+            }
+        }
+    }
     public T GetSettings<T>() where T : class, new() {
         if(settings is AddonSettings<T> existing) return existing.Data;
         if(settings != null) throw new InvalidOperationException($"addon '{Id}' already loaded settings of type {settings.GetType()}");
@@ -139,7 +171,45 @@ public sealed class AddonContext {
             OwnScroll = false,
             Build = content => build(content),
         });
+    public void RegisterTopLevelSettingsTab(string title = null, byte[] iconPng = null) {
+        if(settingsData == null)
+            throw new InvalidOperationException($"addon '{Id}' must call GetSettings<T>() before RegisterTopLevelSettingsTab()");
+        object data = settingsData;
+        object defaults = settingsDefaults;
+        RegisterTopLevelTab(title ?? Id, content => AddonSettingsUI.Build(content, this, data, defaults, SaveSettings), iconPng);
+    }
+    public void RegisterTopLevelTab(string title, Action<Transform> build, byte[] iconPng = null) {
+        string key = "addon." + Id + ".top." + GenerateUI.LocaleKeyFromText("", title);
+        string iconKey = null;
+        if(iconPng != null) {
+            iconKey = key + ".icon";
+            Quartz.Resource.SpriteRegistry.Register(iconKey, iconPng);
+            spriteKeys.Add(iconKey);
+        }
+        Quartz.UI.Nav.NavRegistry.AddCategory(new Quartz.UI.Nav.NavCategory {
+            Key = key,
+            Title = title,
+            LocaleKey = GenerateUI.LocaleKeyFromText("ADDON_", title),
+            Icon = Quartz.Resource.UISprite.Layer128,
+            IconAsset = iconKey,
+            Order = 75 + topCount++,
+            OwnerId = Id,
+            Visible = static () => !Info.KeyViewerOnly,
+        });
+        Quartz.UI.Nav.NavRegistry.AddPage(new Quartz.UI.Nav.NavPage {
+            Key = key,
+            CategoryKey = key,
+            Order = 0,
+            Title = title,
+            LocaleKey = GenerateUI.LocaleKeyFromText("ADDON_", title),
+            OwnerId = Id,
+            OwnScroll = false,
+            Build = content => build(content),
+        });
+    }
     private int tabCount;
+    private int topCount;
+    private readonly List<string> spriteKeys = [];
     internal void Cleanup() {
         try {
             Quartz.Compat.HarmonyCompat.UnpatchOwn(harmony);
@@ -157,6 +227,8 @@ public sealed class AddonContext {
             mergedTranslations = false;
         }
         Quartz.UI.Nav.NavRegistry.RemoveOwner(Id);
+        foreach(string spriteKey in spriteKeys) Quartz.Resource.SpriteRegistry.Unregister(spriteKey);
+        spriteKeys.Clear();
         if(settings is IO.ISettingsHandle handle) {
             handle.Save();
             IO.SettingsRegistry.Unregister(handle);

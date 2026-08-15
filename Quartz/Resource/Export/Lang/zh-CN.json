@@ -15,6 +15,7 @@
     "ADDONS_RELOAD": "重载插件",
     "ADDONS_REMOVE": "删除插件",
     "ADDONS_REMOVE_CONFIRM": "确认删除？",
+    "ADDONS_RESTART_REQUIRED": "重启游戏以完全应用此更改。",
     "ADDONS_STATUS_DISABLED": "已禁用",
     "AD_KEY": "Discord密钥",
     "AD_MODE_BOT": "机器人模式",

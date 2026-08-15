@@ -31,6 +31,7 @@ public static class AddonService {
         public string Author;
         public string SourcePath;
         public bool Enabled;
+        public bool RequiresRestart;
         public string Error;
         public QuartzAddon Instance;
         internal AddonContext Context;
@@ -40,6 +41,8 @@ public static class AddonService {
         public bool Loaded => Instance != null && Error == null;
     }
     private static readonly List<Handle> handles = [];
+    private static readonly Dictionary<string, bool> launchEnabled = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly Dictionary<string, bool> restartFlags = new(StringComparer.OrdinalIgnoreCase);
     public static IReadOnlyList<Handle> Addons => handles;
     private static SettingsFile<AddonsSettings> confMgr;
     private static UnityEngine.Events.UnityAction<Scene, LoadSceneMode> sceneHandler;
@@ -138,6 +141,10 @@ public static class AddonService {
         handle.Api = null;
         handle.ApiRequested = false;
     }
+    public static bool NeedsRestart(Handle handle) =>
+        handle.RequiresRestart
+        && launchEnabled.TryGetValue(handle.UnitId, out bool atLaunch)
+        && atLaunch != handle.Enabled;
     public static void SetAddonEnabled(Handle handle, bool enabled) {
         if(handle.Enabled == enabled) return;
         handle.Enabled = enabled;
@@ -277,6 +284,8 @@ public static class AddonService {
                 SourcePath = unit.path,
                 Enabled = !confMgr.Data.Enabled.TryGetValue(unit.id, out bool en) || en,
             };
+            if(!launchEnabled.ContainsKey(unit.id)) launchEnabled[unit.id] = handle.Enabled;
+            handle.RequiresRestart = restartFlags.TryGetValue(unit.id, out bool restart) && restart;
             handles.Add(handle);
             if(!handle.Enabled) continue;
             Assembly assembly = null;
@@ -438,6 +447,8 @@ public static class AddonService {
             handle.Name = string.IsNullOrWhiteSpace(instance.Name) ? id : instance.Name;
             handle.Version = instance.Version ?? "";
             handle.Author = instance.Author ?? "";
+            handle.RequiresRestart = instance.RequiresRestart;
+            restartFlags[handle.UnitId] = handle.RequiresRestart;
             handle.Context = new AddonContext(id);
             instance.Context = handle.Context;
             handle.Instance = instance;

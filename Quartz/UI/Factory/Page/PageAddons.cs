@@ -106,6 +106,15 @@ internal static class PageAddons {
                     }, false);
                 });
             }
+            if(!hasError && AddonService.NeedsRestart(h)) {
+                var restartRow = GenerateUI.Row(content.transform, 30f);
+                var restartText = GenerateUI.AddMutedText(restartRow, 15f, 1f, true);
+                restartText.color = UIColors.ObjectActiveMathWarn;
+                restartText.gameObject.AddComponent<TextLocalization>().Init(
+                    "ADDONS_RESTART_REQUIRED",
+                    "Restart the game to fully apply this change."
+                );
+            }
             if(h.Context != null && h.Context.Actions.Count > 0) {
                 for(int i = 0; i < h.Context.Actions.Count; i += 3) {
                     var actionRow = GenerateUI.Row(content.transform, 44f);

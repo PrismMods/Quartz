@@ -15,6 +15,7 @@
     "ADDONS_RELOAD": "Reload Addons",
     "ADDONS_REMOVE": "Remove",
     "ADDONS_REMOVE_CONFIRM": "Sure?",
+    "ADDONS_RESTART_REQUIRED": "Restart the game to fully apply this change.",
     "ADDONS_STATUS_DISABLED": "Disabled",
     "AD_KEY": "Discord Key",
     "AD_MODE_BOT": "Bot",

@@ -27,7 +27,9 @@ public static class NavRegistry {
     }
     public static void RemoveOwner(string ownerId) {
         if(string.IsNullOrEmpty(ownerId)) return;
-        if(pages.RemoveAll(p => p.OwnerId == ownerId) > 0) Version++;
+        int removed = pages.RemoveAll(p => p.OwnerId == ownerId);
+        removed += categories.RemoveAll(c => c.OwnerId == ownerId);
+        if(removed > 0) Version++;
     }
     public static void Clear() {
         categories.Clear();

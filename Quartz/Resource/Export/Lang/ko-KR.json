@@ -15,6 +15,7 @@
     "ADDONS_RELOAD": "애드온 새로고침",
     "ADDONS_REMOVE": "제거",
     "ADDONS_REMOVE_CONFIRM": "삭제할까요?",
+    "ADDONS_RESTART_REQUIRED": "이 변경을 완전히 적용하려면 게임을 재시작하세요.",
     "ADDONS_STATUS_DISABLED": "비활성화됨",
     "AD_KEY": "디스코드 키",
     "AD_MODE_BOT": "봇",

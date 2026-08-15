@@ -7,6 +7,7 @@ public sealed class NavCategory {
     public UISprite Icon;
     public string IconAsset;
     public int Order;
+    public string OwnerId;
     public float IconScale = 1f;
     public bool AlwaysSubmenu;
     public bool Togglable;

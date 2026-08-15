@@ -7,6 +7,7 @@ public abstract class QuartzAddon {
     public virtual string Repo => "";
     public virtual string[] Requires => [];
     public virtual string[] LoadAfter => [];
+    public virtual bool RequiresRestart => false;
     public AddonContext Context { get; internal set; }
     public virtual void OnLoad() { }
     public virtual void OnEnable() { }

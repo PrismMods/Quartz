@@ -105,13 +105,20 @@ Everything an addon overrides or calls lives in `Quartz.Addons`:
   Optional metadata: `Repo` (`"owner/repo"` — Quartz checks GitHub releases and
   shows an update line on the Addons page), `Requires` (hard dependencies by
   addon id; a missing or disabled one shows an actionable error instead of a
-  half-loaded addon) and `LoadAfter` (soft ordering). Optional interop:
+  half-loaded addon), `LoadAfter` (soft ordering) and `RequiresRestart`
+  (return `true` if your addon can't cleanly enable/disable at runtime —
+  toggling it on the Addons page then shows a "restart the game" notice until
+  the game is restarted). Optional interop:
   override `OnCall(object[])` / `GetApi()` to let other addons talk to yours.
 - `AddonContext` (as `Context`) — `Msg`/`Wrn`/`Err`, `GetSettings<T>` /
   `SaveSettings`, `RegisterSettingsTab` (see below), `RegisterStat`,
-  `RegisterTag`, `RegisterTab`, `RegisterAction` (buttons under your addon on
+  `RegisterTag`, `RegisterTab`, `RegisterTopLevelTab` /
+  `RegisterTopLevelSettingsTab` (see below), `RegisterAction` (buttons under your addon on
   the Addons page), `RegisterTranslations` (raw JSON or an embedded resource,
-  same format as the mod's Lang files), `Harmony` / `PatchAll`, and `DataPath`
+  same format as the mod's Lang files), `Harmony` / `PatchAll` (patches applied
+  via `PatchAll` are ordered to run after Quartz's own patches on the same
+  method — addon prefixes see Quartz's setup, addon transpilers receive
+  Quartz-edited IL; raw `Harmony` calls skip this ordering), and `DataPath`
   (a per-addon folder under `UserData/Quartz/Addons/<id>`, created on first
   use, removed with the addon). Note the settings file `Addon.<id>.json` lives
   in the profile root, so it is per-profile; `DataPath` is global.
@@ -144,6 +151,17 @@ tooltip, `[ReloadRequired]` reloads all addons after that option is saved, and
 `[Ignore]` skips a member. Middle-click resets a control to the value from
 `new T()`. Labels localize automatically under `ADDON_<ID>_<MEMBER>` keys —
 supply other languages via `RegisterTranslations`.
+
+## Top-level tabs
+
+`RegisterTab` puts your tab under **Modules** next to the Addons page. If your
+addon deserves its own entry in the sidebar, use
+`Context.RegisterTopLevelTab("My Addon", content => ...)` — it appears as its
+own top-level item, between the core categories. Optional third argument: raw
+PNG bytes for the sidebar icon (a ~128×128 white-on-transparent PNG matches
+the built-in icons; omit it for a generic default). The auto-generated
+settings UI works there too: `Context.RegisterTopLevelSettingsTab("My Addon",
+iconPng)` after `GetSettings<T>()`.
 
 Need something the table can't do? Build that tab by hand with
 `Context.RegisterTab` and `Quartz.UI.Generator.GenerateUI` instead — toggles,
