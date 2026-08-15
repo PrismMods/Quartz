@@ -1,0 +1,24 @@
+Quartz/Addons/AddonContext.cs
+  s_e9c02feb5e4682::t_89c05faa219cc5 174-178
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "28e57ce8797d7be58d2ca6b9fadd5d2418006a17",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_e9c02feb5e4682": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a7146224-2309-4aaf-8760-41e6968bb969",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
