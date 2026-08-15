@@ -68,7 +68,9 @@
 			<_QuartzAuthor>$([System.Text.RegularExpressions.Regex]::Match($(_QuartzInfoText), '\bAuthor\s*=\s*"([^"]+)"').Groups[1].Value)</_QuartzAuthor>
 			<_QuartzGithubLink>$([System.Text.RegularExpressions.Regex]::Match($(_QuartzInfoText), '\bGithubLink\s*=\s*"([^"]+)"').Groups[1].Value)</_QuartzGithubLink>
 			<_BootstrapInfoFile>$(IntermediateOutputPath)BootstrapInfo.g.cs</_BootstrapInfoFile>
-			<_BootstrapInfoBody>namespace Quartz.Bootstrap { internal static class BootstrapInfo { public const string ModName = "$(QuartzModName)"%3B public const string Version = "$(QuartzDisplayVersion)"%3B public const string Author = "$(_QuartzAuthor)"%3B public const string GithubLink = "$(_QuartzGithubLink)"%3B public const string PayloadFileName = "$(QuartzPayloadName).dll"%3B public const string EngineFileName = "$(QuartzEngineName).dll"%3B } }</_BootstrapInfoBody>
+			<_QuartzRepoOwner>$([System.Text.RegularExpressions.Regex]::Match($(_QuartzInfoText), '\bRepoOwner\s*=\s*"([^"]+)"').Groups[1].Value)</_QuartzRepoOwner>
+			<_QuartzRepoName>$([System.Text.RegularExpressions.Regex]::Match($(_QuartzInfoText), '\bRepoName\s*=\s*"([^"]+)"').Groups[1].Value)</_QuartzRepoName>
+			<_BootstrapInfoBody>namespace Quartz.Bootstrap { internal static class BootstrapInfo { public const string ModName = "$(QuartzModName)"%3B public const string Version = "$(QuartzDisplayVersion)"%3B public const string Author = "$(_QuartzAuthor)"%3B public const string GithubLink = "$(_QuartzGithubLink)"%3B public const string PayloadFileName = "$(QuartzPayloadName).dll"%3B public const string EngineFileName = "$(QuartzEngineName).dll"%3B public const string RepoOwner = "$(_QuartzRepoOwner)"%3B public const string RepoName = "$(_QuartzRepoName)"%3B public const string AssetName = "$(QuartzUpdateAsset)"%3B public const string ZipRuntimeRel = "$(QuartzZipRuntimeRel)"%3B } }</_BootstrapInfoBody>
 		</PropertyGroup>
 		<MakeDir Directories="$(IntermediateOutputPath)" />
 		<WriteLinesToFile File="$(_BootstrapInfoFile)" Lines="$(_BootstrapInfoBody)" Overwrite="true" WriteOnlyWhenDifferent="true" />

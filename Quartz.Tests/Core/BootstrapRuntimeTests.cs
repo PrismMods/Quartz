@@ -155,6 +155,33 @@ static class BootstrapRuntimeTests {
             Assert(!File.Exists(Path.Combine(mods, BootstrapInfo.PayloadFileName) + ".old"), "the .old leftover is swept");
         } finally { Directory.Delete(root, true); }
     }
+    public static void TestRecoveryRestoresTheShippedRuntime() {
+        string root = NewRoot();
+        try {
+            Directory.CreateDirectory(root);
+            string zipPath = Path.Combine(root, "release.zip");
+            string prefix = "UserData/Quartz/Runtime/versions/" + Quartz.Bootstrap.BootstrapInfo.Version + "/";
+            using(FileStream stream = File.Create(zipPath))
+            using(ZipArchive zip = new(stream, ZipArchiveMode.Create)) {
+                AddEntry(zip, "Mods/Quartz.Bootstrap.dll", "bootstrap");
+                AddEntry(zip, prefix + Quartz.Bootstrap.BootstrapInfo.PayloadFileName, "payload");
+                AddEntry(zip, prefix + Quartz.Bootstrap.BootstrapInfo.EngineFileName, "engine");
+                AddEntry(zip, prefix + "runtime.json", $"{{\"Version\": \"{Quartz.Bootstrap.BootstrapInfo.Version}\"}}");
+                AddEntry(zip, "UserData/Quartz/Lang/en-US.json", "{}");
+            }
+            string restored = RecoveryInstaller.InstallArchive(zipPath, root);
+            Assert(restored == Path.Combine(root, "versions", Quartz.Bootstrap.BootstrapInfo.Version), "recovery restores its own version");
+            RuntimeStore store = new(root, _ => { });
+            RuntimeState state = store.LoadAndRepair();
+            Assert(state.Current == Quartz.Bootstrap.BootstrapInfo.Version, "the restored runtime seeds the store");
+            string incomplete = Path.Combine(root, "incomplete.zip");
+            using(FileStream stream = File.Create(incomplete))
+            using(ZipArchive zip = new(stream, ZipArchiveMode.Create)) {
+                AddEntry(zip, prefix + Quartz.Bootstrap.BootstrapInfo.PayloadFileName, "payload only");
+            }
+            Assert(Throws(() => RecoveryInstaller.InstallArchive(incomplete, root)), "an incomplete recovery package is rejected");
+        } finally { Directory.Delete(root, true); }
+    }
     private static void AddEntry(ZipArchive zip, string name, string contents) {
         using Stream entry = zip.CreateEntry(name).Open();
         using StreamWriter writer = new(entry);

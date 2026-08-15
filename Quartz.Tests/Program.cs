@@ -11,6 +11,7 @@ List<(string Name, Action Run)> tests = [
     ("Update packages with traversal or no runtime are rejected", BootstrapRuntimeTests.TestInstallerRejectsTraversalAndEmptyPackages),
     ("Data-sync refreshes shipped files and spares user files", BootstrapRuntimeTests.TestDataSyncCopiesAndRetires),
     ("Legacy retire signals the one-time handoff launch", BootstrapRuntimeTests.TestLegacyRetireSignalsTheHandoffLaunch),
+    ("Recovery restores the bootstrap's own shipped runtime", BootstrapRuntimeTests.TestRecoveryRestoresTheShippedRuntime),
     ("Diag counts deliberate swallows without logging them", DiagTests.TestIgnoreIsCountedAndSilentByDefault),
     ("Diag verbose mode surfaces swallowed exceptions", DiagTests.TestVerboseSurfacesIgnoredExceptions),
     ("Diag warnings always reach the log with their context", DiagTests.TestWarnAlwaysReachesTheSink),

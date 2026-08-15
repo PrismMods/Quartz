@@ -19,7 +19,17 @@ public static class BootstrapCore {
         Action<string> warn,
         Func<Assembly, Exception> tryStart) {
         RuntimeStore store = new(runtimeRoot, warn);
-        RuntimeState state = store.LoadAndRepair();
+        RuntimeState state;
+        try {
+            state = store.LoadAndRepair();
+        } catch(Exception storeError) {
+            // Nothing usable on disk (an installer that dropped Runtime/, a
+            // hand-gutted folder). Restore this bootstrap's own release and
+            // try once more; a second failure is the real error.
+            warn($"the runtime store is unusable ({storeError.Message})");
+            if(!RecoveryInstaller.TryRestore(runtimeRoot, msg, warn)) throw;
+            state = store.LoadAndRepair();
+        }
         RuntimeCandidate current = store.GetCandidate(state.Current);
         UpdateResolution resolution;
         try {

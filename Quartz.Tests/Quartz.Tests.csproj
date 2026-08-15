@@ -75,6 +75,7 @@
 		<Compile Include="../Quartz.Bootstrap/RuntimeStore.cs" Link="Source/RuntimeStore.cs" />
 		<Compile Include="../Quartz.Bootstrap/DataSync.cs" Link="Source/DataSync.cs" />
 		<Compile Include="../Quartz.Bootstrap/LegacyCleanup.cs" Link="Source/LegacyCleanup.cs" />
+		<Compile Include="../Quartz.Bootstrap/RecoveryInstaller.cs" Link="Source/RecoveryInstaller.cs" />
 		<Compile Include="../Quartz.UpdateEngine/PackageInstaller.cs" Link="Source/PackageInstaller.cs" />
 		<Compile Include="../Quartz/IO/ProfileNames.cs" Link="Source/ProfileNames.cs" />
 		<Compile Include="../Quartz/IO/ProfileBundle.cs" Link="Source/ProfileBundle.cs" />

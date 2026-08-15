@@ -9,6 +9,10 @@ namespace Quartz.Bootstrap {
         public const string GithubLink = "https://github.com/PrismMods/Quartz";
         public const string PayloadFileName = "Quartz.dll";
         public const string EngineFileName = "Quartz.UpdateEngine.dll";
+        public const string RepoOwner = "PrismMods";
+        public const string RepoName = "Quartz";
+        public const string AssetName = "Quartz.zip";
+        public const string ZipRuntimeRel = "UserData/Quartz/Runtime";
     }
 }
 namespace Quartz.UpdateEngine {
