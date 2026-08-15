@@ -1,0 +1,23 @@
+modules/KeyViewer/Editor/KvInspector.Style.cs
+  s_558ce7f5bc693e::t_6d9280a366411b 7
+  s_558ce7f5bc693e::t_c34cf302065bb5 173
+  s_558ce7f5bc693e::t_7a93c8f7ee210a 85
+  s_558ce7f5bc693e::t_931a4fae5678bf 67,70-84,86-122
+  s_558ce7f5bc693e::t_1d184331d3c6d5 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "cd491190a8ecc3baee4f051fd10beb92023ea664",
+  "prompts": {},
+  "sessions": {
+    "s_558ce7f5bc693e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "340bfbe4-c1a9-4e28-90a6-2966614b4d82",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
