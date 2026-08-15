@@ -1,0 +1,23 @@
+Quartz/Addons/AddonSettingsUI.cs
+  s_dcc13d8ac8f1aa::t_4b7f3272179a47 156
+  s_dcc13d8ac8f1aa::t_f36a6f524ee4e1 54-55
+  s_dcc13d8ac8f1aa::t_56993551114260 90,94-95,99-103,105
+sdk/README.md
+  s_dcc13d8ac8f1aa::t_b7904689ffc9f1 144
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "6ed2c3bef974a16433ea2574991302cbebc52e00",
+  "prompts": {},
+  "sessions": {
+    "s_dcc13d8ac8f1aa": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f88182c5-ee9b-4359-b15f-f52f0e4b1d96",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
