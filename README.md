@@ -56,7 +56,7 @@
   </tbody>
 </table>
 
-## Screenshots!!
+## Screenshots!! (may not be fully up to date)
 ![Main Menu](readme/mainmenu.png)
 ![Credits](readme/credits.png)
 ![In-Game](readme/ingame.png)
