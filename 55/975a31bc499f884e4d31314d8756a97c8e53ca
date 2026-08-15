@@ -1,0 +1,29 @@
+modules/Tuf/TufService.Installed.cs
+  s_e9a36f061a487f::t_474211d5baf6d2 34
+Quartz.Tests/Features/Tuf/TufInstallTests.cs
+  s_e9a36f061a487f::t_179bae712ab932 137
+modules/Tuf/TufInstallIndex.cs
+  s_e9a36f061a487f::t_1eecaa631de05b 108,111
+  s_e9a36f061a487f::t_df558cd23e537a 147,150,155
+  s_e9a36f061a487f::t_db5410889bad06 166,169-171
+  s_e9a36f061a487f::t_c927a2d9d7d123 131-133
+  s_e9a36f061a487f::t_baf71bd16bd93d 118
+  s_e9a36f061a487f::t_f77daa595e9987 180,184
+  s_e9a36f061a487f::t_fb08bc4155a867 172
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "55975a31bc499f884e4d31314d8756a97c8e53ca",
+  "prompts": {},
+  "sessions": {
+    "s_e9a36f061a487f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a85d324b-8e36-488c-bcfb-5b3de418be8c",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
