@@ -200,7 +200,6 @@ internal sealed partial class KvCanvas {
     private KvElement HitTest(Vector2 layout) {
         for(int i = visuals.Count - 1; i >= 0; i--) {
             KvElement el = visuals[i].El;
-            if(el.Hidden) continue;
             if(layout.x >= el.X && layout.x <= el.X + el.W
                 && layout.y >= el.Y && layout.y <= el.Y + el.H) return el;
         }

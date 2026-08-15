@@ -20,6 +20,7 @@ internal sealed partial class KvInspector {
             StatSegments(root, batch);
         }
         else if(AllGraphs(batch)) BuildGraph(root, tracked, batch);
+        BuildHiddenFlag(root, tracked);
         Header(root, "KVI_SEC_LABEL", "Label");
         Flag(
             root, tracked, "Show Label", "kvi_label_enabled", true,
@@ -70,7 +71,6 @@ internal sealed partial class KvInspector {
             Num(root, tracked, "Height", "kvi_h", first.H, KvElement.MinSize, 500f, "0 px", 1f,
                 batch, el => el.H, (el, v) => el.H = v);
         }
-        BuildHiddenFlag(root, tracked);
         if(!single) BuildArrange(root, tracked, batch);
     }
     private void StatSegments(RectTransform root, KvElement[] batch) => Segments(

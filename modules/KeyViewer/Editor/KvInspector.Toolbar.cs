@@ -97,11 +97,11 @@ internal sealed partial class KvInspector {
     private void BuildHiddenFlag(RectTransform root, List<UIObject> tracked) {
         UIToggle t = KvWidgets.Toggle(
             GenerateUI.Row(root), false, canvas.SelectionHidden(),
-            canvas.SetSelectionHidden, "Hidden", "kvi_hidden"
+            canvas.SetSelectionHidden, "Disabled", "kvi_hidden"
         );
         t.Rect.AddToolTip(
             "DESC_KVI_HIDDEN",
-            "Keep the selected elements in the layout but stop drawing them in game. Hidden elements dim on the canvas and cannot be clicked."
+            "Keep the selected elements in the layout but stop drawing them in game, and stop them counting presses. Disabled elements dim on the canvas, and stay selectable there so you can turn them back on."
         );
         tracked.Add(t);
     }

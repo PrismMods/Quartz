@@ -72,7 +72,6 @@ internal sealed partial class KvCanvas {
             foreach(KvElement el in selectionAtPress)
                 if(marqueeHitSet.Add(el)) marqueeHits.Add(el);
         foreach(Visual v in visuals) {
-            if(v.El.Hidden) continue;
             if(band.Intersects(RectOf(v.El)) && marqueeHitSet.Add(v.El)) marqueeHits.Add(v.El);
         }
         SetSelectionIfChanged(marqueeHits);
