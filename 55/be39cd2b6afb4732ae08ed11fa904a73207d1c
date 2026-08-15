@@ -1,0 +1,22 @@
+modules/KeyViewer/Editor/KvCanvasDrag.cs
+  s_e9a36f061a487f::t_05324bc18d5628 9
+  s_e9a36f061a487f::t_adb27eff711cac 70-73,76
+modules/KeyViewer/Editor/KvCanvas.cs
+  s_e9a36f061a487f::t_41be29997df3cd 177,179-180,182
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "55be39cd2b6afb4732ae08ed11fa904a73207d1c",
+  "prompts": {},
+  "sessions": {
+    "s_e9a36f061a487f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a85d324b-8e36-488c-bcfb-5b3de418be8c",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
