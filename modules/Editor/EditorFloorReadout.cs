@@ -19,6 +19,10 @@ public static partial class EditorFeature {
     private static string readoutCache;
     private static long readoutSig;
     private static bool hasReadoutSig;
+    private static int sigSelCount;
+    private static int sigFirstSeq;
+    private static int sigTailSeq;
+    private static float nextSigCheck;
     private const string AngleColor = "#ff5252";
     private const string BeatsColor = "#52a9ff";
     private const string CountColor = "#8a8a8a";
@@ -64,15 +68,29 @@ public static partial class EditorFeature {
             ClearReadout();
             return;
         }
-        long sig = ReadoutSignature(editor, selected);
         string text;
-        if(hasReadoutSig && sig == readoutSig) {
+        int selCount = selected.Count;
+        int firstSeq = selected[0] != null ? selected[0].seqID : -1;
+        int tailSeq = selected[selCount - 1] != null ? selected[selCount - 1].seqID : -1;
+        float now = Time.unscaledTime;
+        bool sameSelection = hasReadoutSig && selCount == sigSelCount
+            && firstSeq == sigFirstSeq && tailSeq == sigTailSeq;
+        if(sameSelection && now < nextSigCheck) {
             text = readoutCache;
         } else {
-            text = BuildReadout(editor, selected) ?? "";
-            readoutCache = text;
-            readoutSig = sig;
-            hasReadoutSig = true;
+            long sig = ReadoutSignature(editor, selected);
+            if(hasReadoutSig && sig == readoutSig) {
+                text = readoutCache;
+            } else {
+                text = BuildReadout(editor, selected) ?? "";
+                readoutCache = text;
+                readoutSig = sig;
+                hasReadoutSig = true;
+            }
+            sigSelCount = selCount;
+            sigFirstSeq = firstSeq;
+            sigTailSeq = tailSeq;
+            nextSigCheck = now + 0.1f;
         }
         if(text.Length == 0) {
             ClearReadout();
