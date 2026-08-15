@@ -171,6 +171,11 @@ public sealed class AddonContext {
             OwnScroll = false,
             Build = content => build(content),
         });
+    public void BuildSettingsUI(Transform content) {
+        if(settingsData == null)
+            throw new InvalidOperationException($"addon '{Id}' must call GetSettings<T>() before BuildSettingsUI()");
+        AddonSettingsUI.Build(content, this, settingsData, settingsDefaults, SaveSettings);
+    }
     public void RegisterTopLevelSettingsTab(string title = null, byte[] iconPng = null) {
         if(settingsData == null)
             throw new InvalidOperationException($"addon '{Id}' must call GetSettings<T>() before RegisterTopLevelSettingsTab()");
