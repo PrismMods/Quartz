@@ -1,0 +1,25 @@
+Quartz/UI/Generator/GenerateUI.AddonHeader.cs
+  s_e9c02feb5e4682::t_f89bafb14eb222 7
+  s_e9c02feb5e4682::t_810d0343c87b41 1-6,8-91
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "51609f1c252fcdd1997e610aa8f5cc2421b66bac",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_e9c02feb5e4682": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a7146224-2309-4aaf-8760-41e6968bb969",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
