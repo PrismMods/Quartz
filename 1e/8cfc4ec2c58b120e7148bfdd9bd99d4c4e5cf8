@@ -1,0 +1,20 @@
+modules/Editor/EditorFloorReadout.cs
+  s_e9a36f061a487f::t_91e5b3f3c6e196 22-25
+  s_e9a36f061a487f::t_ae9693dfcc958e 72-78,81-93
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "1e8cfc4ec2c58b120e7148bfdd9bd99d4c4e5cf8",
+  "prompts": {},
+  "sessions": {
+    "s_e9a36f061a487f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a85d324b-8e36-488c-bcfb-5b3de418be8c",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
