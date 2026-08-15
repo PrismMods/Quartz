@@ -51,6 +51,6 @@ case "$TARGET" in
 esac
 
 echo ">> done."
-[[ "$TARGET" == "ML"  || "$TARGET" == "both" ]] && echo ">> MelonLoader:     dist/QuartzKeyViewer.zip     (Mods/QuartzKeyViewer.dll + UserData/QuartzKeyViewer/)"
-[[ "$TARGET" == "UMM" || "$TARGET" == "both" ]] && echo ">> UnityModManager: dist/QuartzKeyViewerUmm.zip  (QuartzKeyViewer/QuartzKeyViewerUmm.dll + UserData/)"
+[[ "$TARGET" == "ML"  || "$TARGET" == "both" ]] && echo ">> MelonLoader:     dist/QuartzKeyViewer.zip     (Mods/QuartzKeyViewer.Bootstrap.dll + UserData/QuartzKeyViewer/Runtime/)"
+[[ "$TARGET" == "UMM" || "$TARGET" == "both" ]] && echo ">> UnityModManager: dist/QuartzKeyViewerUmm.zip  (QuartzKeyViewer/QuartzKeyViewerUmm.Bootstrap.dll + Runtime/)"
 exit 0

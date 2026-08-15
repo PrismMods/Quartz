@@ -1,6 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<Import Project="$(MSBuildProjectDirectory)/../build/Version.targets" />
+	<!-- Loader/flavour axis names shared with Quartz.Bootstrap and
+	     Quartz.UpdateEngine — the packaging targets below stage their DLLs. -->
+	<Import Project="$(MSBuildProjectDirectory)/../build/Axis.props" />
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.1</TargetFramework>
@@ -138,6 +141,16 @@
 		<UmmModDataDir>$(UmmModDir)/UserData</UmmModDataDir>
 	</PropertyGroup>
 
+	<!-- The bootstrap/engine DLLs the packaging targets stage, and the two JSON
+	     stamps the runtime store needs: state.json names the version to load,
+	     runtime.json marks each versioned folder so the bootstrap can verify it. -->
+	<PropertyGroup>
+		<QuartzBootstrapDll>$(MSBuildProjectDirectory)/../Quartz.Bootstrap/bin/$(QuartzAxis)/$(Configuration)/netstandard2.1/$(QuartzBootstrapName).dll</QuartzBootstrapDll>
+		<QuartzEngineDll>$(MSBuildProjectDirectory)/../Quartz.UpdateEngine/bin/$(QuartzAxis)/$(Configuration)/netstandard2.1/$(QuartzEngineName).dll</QuartzEngineDll>
+		<QuartzStateJson>{"SchemaVersion": 1, "Current": "$(QuartzDisplayVersion)"}</QuartzStateJson>
+		<QuartzRuntimeMarkerJson>{"Version": "$(QuartzDisplayVersion)"}</QuartzRuntimeMarkerJson>
+	</PropertyGroup>
+
 	<!-- Redirect every game reference at stubs/ when -p:UseStubs=true. Must sit
 	     above the reference ItemGroups: MSBuild evaluates in document order. -->
 	<Import Project="$(MSBuildProjectDirectory)/../build/Stubs.props" />
@@ -188,6 +201,14 @@
 	<!-- MelonLoader entry: ML build only. -->
 	<ItemGroup Condition="'$(LoaderTarget)' != 'UMM'">
 		<Reference Include="MelonLoader"><HintPath>$(GamePath)/MelonLoader/net35/MelonLoader.dll</HintPath></Reference>
+	</ItemGroup>
+
+	<!-- Build-order only: the packaging targets stage the bootstrap and update
+	     engine DLLs beside (or in front of) the payload. Global -p properties
+	     (LoaderTarget, Flavor, Configuration, UseStubs) flow into both. -->
+	<ItemGroup>
+		<ProjectReference Include="../Quartz.Bootstrap/Quartz.Bootstrap.csproj" ReferenceOutputAssembly="false" Private="false" />
+		<ProjectReference Include="../Quartz.UpdateEngine/Quartz.UpdateEngine.csproj" ReferenceOutputAssembly="false" Private="false" />
 	</ItemGroup>
 
 	<!-- UnityModManager entry: UMM build only. -->
@@ -286,27 +307,43 @@
 		<Message Importance="high" Text="BuildInfo: $(QuartzVersion) $(QuartzChannel) build $(QuartzBuild)" />
 	</Target>
 
-	<!-- Auto-install: drop Quartz.dll into Mods, export language files to UserData/Quartz,
-	     and package the same install layout into dist/Quartz.zip.
-	     Also removes the pre-merge two-DLL layout (Mods/Quartz.Loader.ML.dll + UserLibs/Quartz.dll)
-	     so MelonLoader doesn't load the mod twice. MelonLoader build only. -->
+	<!-- Auto-install: drop the bootstrap into Mods, the payload + update engine
+	     into the versioned runtime store under UserData/Quartz/Runtime, export
+	     language files to UserData/Quartz, and package the same install layout
+	     into dist/Quartz.zip. Mods/ carries ONLY Quartz.Bootstrap.dll — the
+	     payload lives in Runtime/versions/<version>/ where the bootstrap picks
+	     (and auto-updates) it. MelonLoader build only. -->
 	<Target Name="PostBuild" AfterTargets="Build" Condition="'$(LoaderTarget)' != 'UMM' And '$(QuartzSkipPackaging)' != 'true'">
+		<Error Condition="'$(TargetPath)' != '' And !Exists('$(QuartzBootstrapDll)')" Text="$(QuartzBootstrapDll) missing — the Quartz.Bootstrap project did not build." />
+		<Error Condition="'$(TargetPath)' != '' And !Exists('$(QuartzEngineDll)')" Text="$(QuartzEngineDll) missing — the Quartz.UpdateEngine project did not build." />
+		<PropertyGroup>
+			<_StageVersionDir>$(PackageStageDataDir)/Runtime/versions/$(QuartzDisplayVersion)</_StageVersionDir>
+			<_MlVersionDir>$(MlDataRoot)/Runtime/versions/$(QuartzDisplayVersion)</_MlVersionDir>
+		</PropertyGroup>
 		<MakeDir Directories="$(GamePath)/Mods" Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" />
-		<Copy Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" SourceFiles="$(TargetPath)" DestinationFolder="$(GamePath)/Mods" SkipUnchangedFiles="true" />
-		<!-- Remove the old single-DLL (pre-rename KorenResourcePack v2) and the
-		     pre-merge two-DLL layout so MelonLoader doesn't load the mod twice. -->
-		<Delete Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" Files="$(GamePath)/Mods/Koren.dll;$(GamePath)/Mods/Quartz.Loader.ML.dll;$(GamePath)/UserLibs/Quartz.dll" TreatErrorsAsWarnings="true" />
+		<Copy Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" SourceFiles="$(QuartzBootstrapDll)" DestinationFolder="$(GamePath)/Mods" SkipUnchangedFiles="true" />
+		<!-- Remove the pre-bootstrap layouts so MelonLoader doesn't load the mod
+		     twice: the payload-in-Mods layout ($(TargetFileName)), the old
+		     single-DLL (pre-rename KorenResourcePack v2), and the pre-merge
+		     two-DLL layout. -->
+		<Delete Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" Files="$(GamePath)/Mods/$(TargetFileName);$(GamePath)/Mods/Koren.dll;$(GamePath)/Mods/Quartz.Loader.ML.dll;$(GamePath)/UserLibs/Quartz.dll" TreatErrorsAsWarnings="true" />
 
 		<ItemGroup>
 			<ExportFiles Include="Resource/Export/**/*.*" Exclude="Resource/Export/**/.DS_Store;Resource/Export/**/.claude-flow/**;Resource/Export/FAQ.json" />
 		</ItemGroup>
 
-		<MakeDir Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" Directories="$(MlDataRoot)" />
+		<MakeDir Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" Directories="$(MlDataRoot);$(_MlVersionDir)" />
 		<Copy Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(MlDataRoot)/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+		<Copy Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" SourceFiles="$(TargetPath);$(QuartzEngineDll)" DestinationFolder="$(_MlVersionDir)" SkipUnchangedFiles="true" />
+		<WriteLinesToFile Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" File="$(_MlVersionDir)/runtime.json" Lines="$(QuartzRuntimeMarkerJson)" Overwrite="true" />
+		<WriteLinesToFile Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" File="$(MlDataRoot)/Runtime/state.json" Lines="$(QuartzStateJson)" Overwrite="true" />
 
 		<RemoveDir Directories="$(PackageStageRoot)" Condition="'$(TargetPath)' != ''" />
-		<MakeDir Directories="$(DistDir);$(PackageStageModsDir);$(PackageStageDataDir)" Condition="'$(TargetPath)' != ''" />
-		<Copy Condition="'$(TargetPath)' != ''" SourceFiles="$(TargetPath)" DestinationFolder="$(PackageStageModsDir)" />
+		<MakeDir Directories="$(DistDir);$(PackageStageModsDir);$(PackageStageDataDir);$(_StageVersionDir)" Condition="'$(TargetPath)' != ''" />
+		<Copy Condition="'$(TargetPath)' != ''" SourceFiles="$(QuartzBootstrapDll)" DestinationFolder="$(PackageStageModsDir)" />
+		<Copy Condition="'$(TargetPath)' != ''" SourceFiles="$(TargetPath);$(QuartzEngineDll)" DestinationFolder="$(_StageVersionDir)" />
+		<WriteLinesToFile Condition="'$(TargetPath)' != ''" File="$(_StageVersionDir)/runtime.json" Lines="$(QuartzRuntimeMarkerJson)" Overwrite="true" />
+		<WriteLinesToFile Condition="'$(TargetPath)' != ''" File="$(PackageStageDataDir)/Runtime/state.json" Lines="$(QuartzStateJson)" Overwrite="true" />
 		<Copy Condition="'$(TargetPath)' != ''" SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(PackageStageDataDir)/%(RecursiveDir)%(Filename)%(Extension)')" />
 		<!-- Flavour modules ship pre-installed in Module/, not in Module.bundled/:
 		     the module browser is hidden here, so nothing would ever install them
@@ -335,14 +372,20 @@
 	     AutoInstall also copies it into the game's UMMMods/ (or Mods/) for local
 	     testing. -->
 	<Target Name="PostBuildUmm" AfterTargets="Build" Condition="'$(LoaderTarget)' == 'UMM' And '$(TargetPath)' != '' And '$(QuartzSkipPackaging)' != 'true'">
+		<Error Condition="!Exists('$(QuartzBootstrapDll)')" Text="$(QuartzBootstrapDll) missing — the Quartz.Bootstrap project did not build." />
+		<Error Condition="!Exists('$(QuartzEngineDll)')" Text="$(QuartzEngineDll) missing — the Quartz.UpdateEngine project did not build." />
 		<!-- Stamp Info.json's Version from build/Version.targets. -->
 		<PropertyGroup>
 			<_InfoTemplate>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)/Resource/Umm/Info.json'))</_InfoTemplate>
 			<_InfoJson>$(_InfoTemplate.Replace('__VERSION__', '$(QuartzDisplayVersion)'))</_InfoJson>
 			<!-- Id and assembly follow the flavour: UMM keys installs off Info.json's
-			     Id, so a shared one would make the two builds overwrite each other. -->
+			     Id, so a shared one would make the two builds overwrite each other.
+			     The assembly UMM loads is the bootstrap; the payload lives in the
+			     versioned runtime store beside it. -->
 			<_InfoJson>$(_InfoJson.Replace('__ID__', '$(UmmModFolderName)'))</_InfoJson>
-			<_InfoJson>$(_InfoJson.Replace('__ASSEMBLY__', '$(TargetFileName)'))</_InfoJson>
+			<_InfoJson>$(_InfoJson.Replace('__ASSEMBLY__', '$(QuartzBootstrapName).dll'))</_InfoJson>
+			<_UmmStageVersionDir>$(UmmStageModDir)/Runtime/versions/$(QuartzDisplayVersion)</_UmmStageVersionDir>
+			<_UmmModVersionDir>$(UmmModDir)/Runtime/versions/$(QuartzDisplayVersion)</_UmmModVersionDir>
 		</PropertyGroup>
 
 		<ItemGroup>
@@ -351,8 +394,11 @@
 
 		<!-- Stage: $(PackageStageRoot)/Quartz/ (mod folder at zip root). -->
 		<RemoveDir Directories="$(PackageStageRoot)" />
-		<MakeDir Directories="$(DistDir);$(UmmStageModDir);$(UmmStageDataDir)" />
-		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(UmmStageModDir)" />
+		<MakeDir Directories="$(DistDir);$(UmmStageModDir);$(UmmStageDataDir);$(_UmmStageVersionDir)" />
+		<Copy SourceFiles="$(QuartzBootstrapDll)" DestinationFolder="$(UmmStageModDir)" />
+		<Copy SourceFiles="$(TargetPath);$(QuartzEngineDll)" DestinationFolder="$(_UmmStageVersionDir)" />
+		<WriteLinesToFile File="$(_UmmStageVersionDir)/runtime.json" Lines="$(QuartzRuntimeMarkerJson)" Overwrite="true" />
+		<WriteLinesToFile File="$(UmmStageModDir)/Runtime/state.json" Lines="$(QuartzStateJson)" Overwrite="true" />
 		<WriteLinesToFile File="$(UmmStageModDir)/Info.json" Lines="$(_InfoJson)" Overwrite="true" />
 		<Copy SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(UmmStageDataDir)/%(RecursiveDir)%(Filename)%(Extension)')" />
 
@@ -373,8 +419,13 @@
 
 		<!-- Local install for testing: UMMMods/Quartz (or Mods/Quartz). Skipped when
 		     MelonLoader is present (the ML build already covers this game). -->
-		<MakeDir Directories="$(UmmModDir);$(UmmModDataDir)" Condition="'$(UmmAutoInstall)' == 'true'" />
-		<Copy Condition="'$(UmmAutoInstall)' == 'true'" SourceFiles="$(TargetPath)" DestinationFolder="$(UmmModDir)" SkipUnchangedFiles="true" />
+		<MakeDir Directories="$(UmmModDir);$(UmmModDataDir);$(_UmmModVersionDir)" Condition="'$(UmmAutoInstall)' == 'true'" />
+		<Copy Condition="'$(UmmAutoInstall)' == 'true'" SourceFiles="$(QuartzBootstrapDll)" DestinationFolder="$(UmmModDir)" SkipUnchangedFiles="true" />
+		<Copy Condition="'$(UmmAutoInstall)' == 'true'" SourceFiles="$(TargetPath);$(QuartzEngineDll)" DestinationFolder="$(_UmmModVersionDir)" SkipUnchangedFiles="true" />
+		<WriteLinesToFile Condition="'$(UmmAutoInstall)' == 'true'" File="$(_UmmModVersionDir)/runtime.json" Lines="$(QuartzRuntimeMarkerJson)" Overwrite="true" />
+		<WriteLinesToFile Condition="'$(UmmAutoInstall)' == 'true'" File="$(UmmModDir)/Runtime/state.json" Lines="$(QuartzStateJson)" Overwrite="true" />
+		<!-- The pre-bootstrap layout had the payload at the mod folder root. -->
+		<Delete Condition="'$(UmmAutoInstall)' == 'true'" Files="$(UmmModDir)/$(TargetFileName)" TreatErrorsAsWarnings="true" />
 		<WriteLinesToFile File="$(UmmModDir)/Info.json" Lines="$(_InfoJson)" Overwrite="true" Condition="'$(UmmAutoInstall)' == 'true'" />
 		<Copy Condition="'$(UmmAutoInstall)' == 'true'" SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(UmmModDataDir)/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
 		<Message Importance="high" Text="UMM installed: $(UmmModDir)" Condition="'$(UmmAutoInstall)' == 'true'" />

@@ -1,6 +1,7 @@
 #if QUARTZ_UMM
 using Quartz.Core;
 using Quartz.Compat.Interface;
+using Quartz.Update;
 using UnityModManagerNet;
 namespace Quartz;
 public sealed class LoaderUmm : IQuartzHost, IQuartzLogger {
@@ -48,6 +49,7 @@ public sealed class LoaderUmm : IQuartzHost, IQuartzLogger {
         try {
             MainCore.Initialize(this);
             state = LoaderState.Active;
+            UpdateLaunchPrefs.Bind(Path.Combine(modPath, "Runtime"));
             if(pendingToggle is bool enabled) {
                 pendingToggle = null;
                 try { MainCore.SetModEnabled(enabled); }

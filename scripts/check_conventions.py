@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SOURCE_DIRS = ("Quartz", "modules", "Quartz.Tests", "sdk")
+SOURCE_DIRS = ("Quartz", "Quartz.Bootstrap", "Quartz.UpdateEngine", "modules", "Quartz.Tests", "sdk")
 SKIP_PARTS = {"obj", "bin"}
 MAX_LINES = 500
 

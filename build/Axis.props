@@ -1,0 +1,50 @@
+<!--
+  Axis.props — the loader/flavour axis, shared by Quartz.csproj,
+  Quartz.Bootstrap and Quartz.UpdateEngine.
+
+  One place derives every name that must agree across the three projects:
+  the payload assembly, the bootstrap/engine assembly names, the release
+  asset, and where the runtime store lives inside each install zip. The
+  packaging targets and both generated-consts targets read these, so a
+  rename here propagates everywhere or nowhere.
+-->
+<Project>
+
+	<PropertyGroup>
+		<LoaderTarget Condition="'$(LoaderTarget)' == ''">ML</LoaderTarget>
+		<Flavor Condition="'$(Flavor)' == ''">Full</Flavor>
+
+		<QuartzIsUmm>false</QuartzIsUmm>
+		<QuartzIsUmm Condition="'$(LoaderTarget)' == 'UMM'">true</QuartzIsUmm>
+
+		<!-- Mod identity (data root, UMM Info.json Id, MelonInfo name). -->
+		<QuartzModName Condition="'$(Flavor)' == 'KeyViewer'">QuartzKeyViewer</QuartzModName>
+		<QuartzModName Condition="'$(QuartzModName)' == ''">Quartz</QuartzModName>
+
+		<!-- Payload assembly name — must match Quartz.csproj's AssemblyName for
+		     the same LoaderTarget/Flavor pair. -->
+		<QuartzPayloadName>$(QuartzModName)</QuartzPayloadName>
+		<QuartzPayloadName Condition="'$(QuartzIsUmm)' == 'true'">$(QuartzModName)Umm</QuartzPayloadName>
+
+		<!-- obj/bin subfolder per axis so the four builds never clobber each other. -->
+		<QuartzAxis Condition="'$(Flavor)' != 'KeyViewer' And '$(QuartzIsUmm)' != 'true'">ml</QuartzAxis>
+		<QuartzAxis Condition="'$(Flavor)' != 'KeyViewer' And '$(QuartzIsUmm)' == 'true'">umm</QuartzAxis>
+		<QuartzAxis Condition="'$(Flavor)' == 'KeyViewer' And '$(QuartzIsUmm)' != 'true'">kv</QuartzAxis>
+		<QuartzAxis Condition="'$(Flavor)' == 'KeyViewer' And '$(QuartzIsUmm)' == 'true'">kv-umm</QuartzAxis>
+
+		<QuartzBootstrapName>$(QuartzPayloadName).Bootstrap</QuartzBootstrapName>
+		<QuartzEngineName>$(QuartzPayloadName).UpdateEngine</QuartzEngineName>
+
+		<!-- Release asset the engine downloads: the same install zip a human
+		     downloads, so one artifact serves fresh installs and auto-updates. -->
+		<QuartzUpdateAsset>$(QuartzPayloadName).zip</QuartzUpdateAsset>
+
+		<!-- Where, inside that zip, the data root and the runtime store live.
+		     ML zips extract over the game root; UMM zips over the mods dir. -->
+		<QuartzZipDataRel Condition="'$(QuartzIsUmm)' != 'true'">UserData/$(QuartzModName)</QuartzZipDataRel>
+		<QuartzZipDataRel Condition="'$(QuartzIsUmm)' == 'true'">$(QuartzModName)/UserData</QuartzZipDataRel>
+		<QuartzZipRuntimeRel Condition="'$(QuartzIsUmm)' != 'true'">UserData/$(QuartzModName)/Runtime</QuartzZipRuntimeRel>
+		<QuartzZipRuntimeRel Condition="'$(QuartzIsUmm)' == 'true'">$(QuartzModName)/Runtime</QuartzZipRuntimeRel>
+	</PropertyGroup>
+
+</Project>

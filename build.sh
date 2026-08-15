@@ -119,6 +119,6 @@ dotnet build modules/AllModules.proj -c "$CONFIG" -p:DeployToGame=true
 tools/bundle-modules.sh
 
 echo ">> done."
-[[ "$TARGET" == "ML"  || "$TARGET" == "both" ]] && echo ">> MelonLoader:     Mods/Quartz.dll + UserData/Quartz/* — dist/Quartz.zip"
-[[ "$TARGET" == "UMM" || "$TARGET" == "both" ]] && echo ">> UnityModManager: UMMMods/Quartz (or Mods/Quartz) + Quartz/UserData/* — dist/QuartzUmm.zip"
+[[ "$TARGET" == "ML"  || "$TARGET" == "both" ]] && echo ">> MelonLoader:     Mods/Quartz.Bootstrap.dll + UserData/Quartz/Runtime/* — dist/Quartz.zip"
+[[ "$TARGET" == "UMM" || "$TARGET" == "both" ]] && echo ">> UnityModManager: UMMMods/Quartz (or Mods/Quartz) + Quartz/Runtime/* — dist/QuartzUmm.zip"
 echo ">> Modules:          <data root>/Module/*.qmod — dist/modules/"

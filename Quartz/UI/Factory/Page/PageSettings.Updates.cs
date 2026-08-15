@@ -47,6 +47,7 @@ internal static partial class PageSettings {
             ch => {
                 MainCore.Conf.UpdateChannel = (int)ch;
                 MainCore.ConfMgr.RequestSave();
+                Update.UpdateLaunchPrefs.Write();
             },
             "update_channel"
         );

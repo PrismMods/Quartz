@@ -4,5 +4,5 @@
   "Author": "koren",
   "Version": "__VERSION__",
   "AssemblyName": "__ASSEMBLY__",
-  "EntryMethod": "Quartz.LoaderUmm.Load"
+  "EntryMethod": "Quartz.Bootstrap.LoaderUmm.Load"
 }

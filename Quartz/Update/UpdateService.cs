@@ -323,6 +323,7 @@ public static class UpdateService {
         if(info == null) return;
         MainCore.Conf.SkippedVersion = info.Tag;
         MainCore.ConfMgr.RequestSave();
+        UpdateLaunchPrefs.Write();
         lastSkipped = info;
         Available = null;
         Set(UpdateStatus.Skipped);
@@ -330,6 +331,7 @@ public static class UpdateService {
     public static void UndoSkip() {
         MainCore.Conf.SkippedVersion = "";
         MainCore.ConfMgr.RequestSave();
+        UpdateLaunchPrefs.Write();
         if(lastSkipped != null) {
             Available = lastSkipped;
             lastSkipped = null;

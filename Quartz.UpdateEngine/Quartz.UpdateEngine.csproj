@@ -1,0 +1,73 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="$(MSBuildProjectDirectory)/../build/Version.targets" />
+	<Import Project="$(MSBuildProjectDirectory)/../build/Axis.props" />
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<PlatformTarget>AnyCPU</PlatformTarget>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>warnings</Nullable>
+		<RootNamespace>Quartz.UpdateEngine</RootNamespace>
+		<!-- Distinct name per axis (Quartz.UpdateEngine / QuartzUmm.UpdateEngine /
+		     ...) for the same reason the payload splits: under a MelonLoader->UMM
+		     bridge both bootstraps run, and a shared identity would hand the second
+		     one the first one's baked constants (wrong asset name, wrong paths). -->
+		<AssemblyName>$(QuartzEngineName)</AssemblyName>
+		<LangVersion>latest</LangVersion>
+		<IsPackable>false</IsPackable>
+		<AssemblyVersion>$(QuartzAssemblyVersion)</AssemblyVersion>
+		<FileVersion>$(QuartzAssemblyVersion)</FileVersion>
+		<InformationalVersion>$(QuartzDisplayVersion)</InformationalVersion>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<WarningsNotAsErrors>NU1701;NU1702;NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
+		<EnableNETAnalyzers>true</EnableNETAnalyzers>
+		<AnalysisLevel>latest</AnalysisLevel>
+		<IntermediateOutputPath>obj/$(QuartzAxis)/$(Configuration)/</IntermediateOutputPath>
+		<OutputPath>bin/$(QuartzAxis)/$(Configuration)/</OutputPath>
+		<ManagedDir>$(GamePath)/$(GameData)/Managed</ManagedDir>
+		<LibDir Condition="'$(LibDir)' == ''">$(MSBuildProjectDirectory)/../lib</LibDir>
+	</PropertyGroup>
+
+	<Import Project="$(MSBuildProjectDirectory)/../build/Stubs.props" />
+
+	<ItemDefinitionGroup>
+		<Reference>
+			<Private>false</Private>
+			<ExternallyResolved>true</ExternallyResolved>
+		</Reference>
+	</ItemDefinitionGroup>
+
+	<!-- The game's Newtonsoft, same as the payload; everything else the engine
+	     needs (HttpClient, ZipArchive, SHA256) comes from netstandard. -->
+	<ItemGroup>
+		<Reference Include="Newtonsoft.Json"><HintPath>$(ManagedDir)/Newtonsoft.Json.dll</HintPath></Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="../Quartz/Core/SemVer.cs" Link="Source/SemVer.cs" />
+	</ItemGroup>
+
+	<Target Name="AddLibSearchPath" BeforeTargets="ResolveAssemblyReferences">
+		<PropertyGroup>
+			<AssemblySearchPaths>$(AssemblySearchPaths);$(LibDir)</AssemblySearchPaths>
+		</PropertyGroup>
+	</Target>
+
+	<!-- Baked constants: the engine must know its own version and which release
+	     asset feeds this install without any runtime configuration to corrupt. -->
+	<Target Name="GenerateEngineInfo" BeforeTargets="CoreCompile">
+		<PropertyGroup>
+			<_QuartzRepoOwner>$([System.Text.RegularExpressions.Regex]::Match($(_QuartzInfoText), '\bRepoOwner\s*=\s*"([^"]+)"').Groups[1].Value)</_QuartzRepoOwner>
+			<_QuartzRepoName>$([System.Text.RegularExpressions.Regex]::Match($(_QuartzInfoText), '\bRepoName\s*=\s*"([^"]+)"').Groups[1].Value)</_QuartzRepoName>
+			<_EngineInfoFile>$(IntermediateOutputPath)EngineInfo.g.cs</_EngineInfoFile>
+			<_EngineInfoBody>namespace Quartz.UpdateEngine { internal static class EngineInfo { public const string Version = "$(QuartzDisplayVersion)"%3B public const string Channel = "$(QuartzChannel)"%3B public const string RepoOwner = "$(_QuartzRepoOwner)"%3B public const string RepoName = "$(_QuartzRepoName)"%3B public const string AssetName = "$(QuartzUpdateAsset)"%3B public const string PayloadFileName = "$(QuartzPayloadName).dll"%3B public const string EngineFileName = "$(QuartzEngineName).dll"%3B public const string ZipDataRel = "$(QuartzZipDataRel)"%3B public const string ZipRuntimeRel = "$(QuartzZipRuntimeRel)"%3B } }</_EngineInfoBody>
+		</PropertyGroup>
+		<MakeDir Directories="$(IntermediateOutputPath)" />
+		<WriteLinesToFile File="$(_EngineInfoFile)" Lines="$(_EngineInfoBody)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+		<ItemGroup>
+			<Compile Include="$(_EngineInfoFile)" />
+		</ItemGroup>
+	</Target>
+
+</Project>

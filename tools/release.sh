@@ -214,17 +214,19 @@ dotnet build Quartz/Quartz.csproj -c Release -p:Flavor=KeyViewer
 echo "Building ${tag} (standalone Key Viewer, UnityModManager) ..."
 dotnet build Quartz/Quartz.csproj -c Release -p:Flavor=KeyViewer -p:LoaderTarget=UMM
 
-# Quartz.zip is the full MelonLoader install (DLL + lang + fonts), built by the
-# csproj PostBuild target. Ship the bare DLL alongside it too, so anyone still
-# running an old updater (which only looks for a "Quartz.dll" asset) can update.
-# QuartzUmm.zip is the self-contained UnityModManager mod folder — the UMM build's
-# updater downloads THIS asset (UpdateAssetName), so it must ship every release.
-quartz_dll="Quartz/bin/Release/netstandard2.1/Quartz.dll"
+# Quartz.zip is the full MelonLoader install (bootstrap + versioned runtime +
+# lang/fonts), built by the csproj PostBuild target. It doubles as the
+# auto-update package: the launch-time bootstrap's update engine downloads this
+# same asset and extracts the versioned runtime out of it. The bare Quartz.dll
+# asset is gone — the payload is no longer a MelonMod, so dropping it into
+# Mods/ would silently load nothing.
+# QuartzUmm.zip is the self-contained UnityModManager mod folder — the UMM
+# build's updaters (in-game and launch-time) download THIS asset, so it must
+# ship every release.
 quartz_zip="dist/Quartz.zip"
 quartz_umm_zip="dist/QuartzUmm.zip"
 keyviewer_zip="dist/QuartzKeyViewer.zip"
 keyviewer_umm_zip="dist/QuartzKeyViewerUmm.zip"
-[ -f "$quartz_dll" ] || { echo "build output missing — aborting" >&2; exit 1; }
 [ -f "$quartz_zip" ] || { echo "dist/Quartz.zip missing — aborting" >&2; exit 1; }
 [ -f "$quartz_umm_zip" ] || { echo "dist/QuartzUmm.zip missing — aborting" >&2; exit 1; }
 [ -f "$keyviewer_zip" ] || { echo "dist/QuartzKeyViewer.zip missing — aborting" >&2; exit 1; }
@@ -299,10 +301,10 @@ echo "Publishing ${title} ..."
 if gh release view "$tag" >/dev/null 2>&1; then
   # Re-publish: refresh title + notes, then replace the assets.
   gh release edit "$tag" --title "$title" --notes-file "$notes_tmp"
-  gh release upload "$tag" "$quartz_zip" "$quartz_dll" "$quartz_umm_zip" "$keyviewer_zip" "$keyviewer_umm_zip" "$sdk_dll" "$catalog" "${module_assets[@]}" --clobber
+  gh release upload "$tag" "$quartz_zip" "$quartz_umm_zip" "$keyviewer_zip" "$keyviewer_umm_zip" "$sdk_dll" "$catalog" "${module_assets[@]}" --clobber
 else
   # shellcheck disable=SC2086
-  gh release create "$tag" "$quartz_zip" "$quartz_dll" "$quartz_umm_zip" "$keyviewer_zip" "$keyviewer_umm_zip" "$sdk_dll" "$catalog" "${module_assets[@]}" --title "$title" --notes-file "$notes_tmp" $flags
+  gh release create "$tag" "$quartz_zip" "$quartz_umm_zip" "$keyviewer_zip" "$keyviewer_umm_zip" "$sdk_dll" "$catalog" "${module_assets[@]}" --title "$title" --notes-file "$notes_tmp" $flags
 fi
 
 # --- Roll this channel's "latest" pointer --------------------------------
@@ -350,10 +352,10 @@ roll_pointer() {
 
   if gh release view "$roll_tag" >/dev/null 2>&1; then
     gh release edit "$roll_tag" --title "$roll_title" --notes-file "$roll_notes" \
-      && gh release upload "$roll_tag" "$quartz_zip" "$quartz_dll" "$quartz_umm_zip" "$keyviewer_zip" "$keyviewer_umm_zip" "$sdk_dll" "$catalog" "${module_bundle[@]}" --clobber
+      && gh release upload "$roll_tag" "$quartz_zip" "$quartz_umm_zip" "$keyviewer_zip" "$keyviewer_umm_zip" "$sdk_dll" "$catalog" "${module_bundle[@]}" --clobber
   else
     # shellcheck disable=SC2086
-    gh release create "$roll_tag" "$quartz_zip" "$quartz_dll" "$quartz_umm_zip" "$keyviewer_zip" "$keyviewer_umm_zip" "$sdk_dll" "$catalog" "${module_bundle[@]}" \
+    gh release create "$roll_tag" "$quartz_zip" "$quartz_umm_zip" "$keyviewer_zip" "$keyviewer_umm_zip" "$sdk_dll" "$catalog" "${module_bundle[@]}" \
       --title "$roll_title" --notes-file "$roll_notes" $roll_flags
   fi
   local rc=$?
