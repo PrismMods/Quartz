@@ -67,6 +67,15 @@
 		<Compile Include="../Quartz/Compat/Game/Refl.cs" Link="Source/Refl.cs" />
 		<Compile Include="../Quartz/IO/AtomicFile.cs" Link="Source/AtomicFile.cs" />
 		<Compile Include="../Quartz/Update/UpdateInstallTransaction.cs" Link="Source/UpdateInstallTransaction.cs" />
+		<!-- The launch bootstrap's runtime store and the update engine's package
+		     installer. Their MSBuild-generated consts are stood in for by
+		     Support/BootstrapFixtures.cs. -->
+		<Compile Include="../Quartz.Bootstrap/RuntimeState.cs" Link="Source/RuntimeState.cs" />
+		<Compile Include="../Quartz.Bootstrap/RuntimeCandidate.cs" Link="Source/RuntimeCandidate.cs" />
+		<Compile Include="../Quartz.Bootstrap/RuntimeStore.cs" Link="Source/RuntimeStore.cs" />
+		<Compile Include="../Quartz.Bootstrap/DataSync.cs" Link="Source/DataSync.cs" />
+		<Compile Include="../Quartz.Bootstrap/LegacyCleanup.cs" Link="Source/LegacyCleanup.cs" />
+		<Compile Include="../Quartz.UpdateEngine/PackageInstaller.cs" Link="Source/PackageInstaller.cs" />
 		<Compile Include="../Quartz/IO/ProfileNames.cs" Link="Source/ProfileNames.cs" />
 		<Compile Include="../Quartz/IO/ProfileBundle.cs" Link="Source/ProfileBundle.cs" />
 		<Compile Include="../Quartz/IO/FaqDocument.cs" Link="Source/FaqDocument.cs" />
