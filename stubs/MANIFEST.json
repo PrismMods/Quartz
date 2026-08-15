@@ -36,11 +36,15 @@
         "members": [
           "HarmonyLib.PatchClassProcessor HarmonyLib.Harmony::CreateClassProcessor(System.Type)",
           "HarmonyLib.PatchProcessor HarmonyLib.Harmony::CreateProcessor(System.Reflection.MethodBase)",
+          "HarmonyLib.Patches HarmonyLib.Harmony::GetPatchInfo(System.Reflection.MethodBase)",
+          "System.Collections.Generic.IEnumerable\u00601\u003CSystem.Reflection.MethodBase\u003E HarmonyLib.Harmony::GetPatchedMethods()",
+          "System.Reflection.MethodInfo HarmonyLib.Harmony::Patch(System.Reflection.MethodBase,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod)",
           "System.String HarmonyLib.Harmony::Id()",
           "System.String HarmonyLib.Harmony::get_Id()",
           "System.Void HarmonyLib.Harmony::.ctor(System.String)",
           "System.Void HarmonyLib.Harmony::PatchAll(System.Reflection.Assembly)",
-          "System.Void HarmonyLib.Harmony::Unpatch(System.Reflection.MethodBase,HarmonyLib.HarmonyPatchType,System.String)"
+          "System.Void HarmonyLib.Harmony::Unpatch(System.Reflection.MethodBase,HarmonyLib.HarmonyPatchType,System.String)",
+          "System.Void HarmonyLib.Harmony::Unpatch(System.Reflection.MethodBase,System.Reflection.MethodInfo)"
         ]
       },
       {
@@ -50,6 +54,9 @@
       {
         "type": "HarmonyLib.HarmonyMethod",
         "members": [
+          "System.Int32 HarmonyLib.HarmonyMethod::priority",
+          "System.String[] HarmonyLib.HarmonyMethod::after",
+          "System.String[] HarmonyLib.HarmonyMethod::before",
           "System.Void HarmonyLib.HarmonyMethod::.ctor(System.Reflection.MethodInfo)"
         ]
       },
@@ -88,6 +95,17 @@
         ]
       },
       {
+        "type": "HarmonyLib.Patch",
+        "members": [
+          "System.Int32 HarmonyLib.Patch::priority",
+          "System.Reflection.MethodInfo HarmonyLib.Patch::PatchMethod()",
+          "System.Reflection.MethodInfo HarmonyLib.Patch::get_PatchMethod()",
+          "System.String HarmonyLib.Patch::owner",
+          "System.String[] HarmonyLib.Patch::after",
+          "System.String[] HarmonyLib.Patch::before"
+        ]
+      },
+      {
         "type": "HarmonyLib.PatchClassProcessor",
         "members": [
           "System.Collections.Generic.List\u00601\u003CSystem.Reflection.MethodInfo\u003E HarmonyLib.PatchClassProcessor::Patch()"
@@ -98,6 +116,17 @@
         "members": [
           "HarmonyLib.PatchProcessor HarmonyLib.PatchProcessor::AddPrefix(HarmonyLib.HarmonyMethod)",
           "System.Reflection.MethodInfo HarmonyLib.PatchProcessor::Patch()"
+        ]
+      },
+      {
+        "type": "HarmonyLib.Patches",
+        "members": [
+          "System.Collections.ObjectModel.ReadOnlyCollection\u00601\u003CHarmonyLib.Patch\u003E HarmonyLib.Patches::Finalizers",
+          "System.Collections.ObjectModel.ReadOnlyCollection\u00601\u003CHarmonyLib.Patch\u003E HarmonyLib.Patches::Postfixes",
+          "System.Collections.ObjectModel.ReadOnlyCollection\u00601\u003CHarmonyLib.Patch\u003E HarmonyLib.Patches::Prefixes",
+          "System.Collections.ObjectModel.ReadOnlyCollection\u00601\u003CHarmonyLib.Patch\u003E HarmonyLib.Patches::Transpilers",
+          "System.Collections.ObjectModel.ReadOnlyCollection\u00601\u003CSystem.String\u003E HarmonyLib.Patches::Owners()",
+          "System.Collections.ObjectModel.ReadOnlyCollection\u00601\u003CSystem.String\u003E HarmonyLib.Patches::get_Owners()"
         ]
       },
       {

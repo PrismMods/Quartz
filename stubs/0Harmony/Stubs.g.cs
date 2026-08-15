@@ -36,7 +36,11 @@ namespace HarmonyLib {
         public Harmony(string id) => throw null;
         public global::HarmonyLib.PatchClassProcessor CreateClassProcessor(global::System.Type type) => throw null;
         public global::HarmonyLib.PatchProcessor CreateProcessor(global::System.Reflection.MethodBase original) => throw null;
+        public static global::HarmonyLib.Patches GetPatchInfo(global::System.Reflection.MethodBase method) => throw null;
+        public global::System.Collections.Generic.IEnumerable<global::System.Reflection.MethodBase> GetPatchedMethods() => throw null;
+        public global::System.Reflection.MethodInfo Patch(global::System.Reflection.MethodBase original, global::HarmonyLib.HarmonyMethod prefix, global::HarmonyLib.HarmonyMethod postfix, global::HarmonyLib.HarmonyMethod transpiler, global::HarmonyLib.HarmonyMethod finalizer) => throw null;
         public void PatchAll(global::System.Reflection.Assembly assembly) => throw null;
+        public void Unpatch(global::System.Reflection.MethodBase original, global::System.Reflection.MethodInfo patch) => throw null;
         public void Unpatch(global::System.Reflection.MethodBase original, global::HarmonyLib.HarmonyPatchType type, string harmonyID = default) => throw null;
         protected Harmony() { }
         void global::System.IDisposable.Dispose() => throw null;
@@ -45,6 +49,9 @@ namespace HarmonyLib {
         protected HarmonyAttribute() { }
     }
     public unsafe partial class HarmonyMethod {
+        public string[] after;
+        public string[] before;
+        public int priority;
         public HarmonyMethod(global::System.Reflection.MethodInfo method) => throw null;
         protected HarmonyMethod() { }
     }
@@ -71,6 +78,14 @@ namespace HarmonyLib {
         StaticConstructor = 4,
         Enumerator = 5,
     }
+    public unsafe partial class Patch {
+        public readonly string[] after;
+        public readonly string[] before;
+        public readonly string owner;
+        public readonly int priority;
+        public global::System.Reflection.MethodInfo PatchMethod { get => throw null; set { } }
+        protected Patch() { }
+    }
     public unsafe partial class PatchClassProcessor {
         public global::System.Collections.Generic.List<global::System.Reflection.MethodInfo> Patch() => throw null;
         protected PatchClassProcessor() { }
@@ -79,6 +94,14 @@ namespace HarmonyLib {
         public global::HarmonyLib.PatchProcessor AddPrefix(global::HarmonyLib.HarmonyMethod prefix) => throw null;
         public global::System.Reflection.MethodInfo Patch() => throw null;
         protected PatchProcessor() { }
+    }
+    public unsafe partial class Patches {
+        public readonly global::System.Collections.ObjectModel.ReadOnlyCollection<global::HarmonyLib.Patch> Finalizers;
+        public readonly global::System.Collections.ObjectModel.ReadOnlyCollection<global::HarmonyLib.Patch> Postfixes;
+        public readonly global::System.Collections.ObjectModel.ReadOnlyCollection<global::HarmonyLib.Patch> Prefixes;
+        public readonly global::System.Collections.ObjectModel.ReadOnlyCollection<global::HarmonyLib.Patch> Transpilers;
+        public global::System.Collections.ObjectModel.ReadOnlyCollection<string> Owners { get => throw null; }
+        protected Patches() { }
     }
     public unsafe partial class Traverse {
         public static global::HarmonyLib.Traverse Create(object root) => throw null;

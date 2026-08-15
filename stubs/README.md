@@ -16,7 +16,7 @@ resources, and no types the mod never touches.
 
 | Assembly | Types | Members |
 |---|---:|---:|
-| `0Harmony` | 12 | 52 |
+| `0Harmony` | 14 | 71 |
 | `Assembly-CSharp` | 144 | 1169 |
 | `Assembly-CSharp-firstpass` | 3 | 14 |
 | `DOTween` | 15 | 61 |
@@ -38,7 +38,7 @@ resources, and no types the mod never touches.
 | `UnityEngine.UIModule` | 7 | 35 |
 | `UnityModManager` | 4 | 12 |
 
-**478 types, 3542 members.**
+**480 types, 3561 members.**
 
 ## How it is used
 
