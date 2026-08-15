@@ -141,6 +141,7 @@ public field/property becomes a control by type:
 | `enum`, `string` + `[Choices("A", "B")]` | dropdown |
 | `int` / `float` / `double` + `[Slider(min, max, step)]` | slider |
 | `int` / `float` / `double` | text input (parsed) |
+| `int?` / `float?` / `double?` | text input — empty field = `null` |
 | `string` | text input |
 | `UnityEngine.Color` | color picker |
 | `Dictionary<string, string>`, `List<KeyValuePair<string, string>>` | key/value row editor |

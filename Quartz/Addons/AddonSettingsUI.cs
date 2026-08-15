@@ -51,6 +51,8 @@ internal static class AddonSettingsUI {
         }
         object defVal = Get(member, defaults);
         object val = Get(member, data);
+        Type nullableOf = Nullable.GetUnderlyingType(type);
+        Type numType = nullableOf ?? type;
         RectTransform tipTarget = null;
         if(type == typeof(bool)) {
             UIToggle toggle = GenerateUI.Toggle(
@@ -85,19 +87,22 @@ internal static class AddonSettingsUI {
                 label, id
             );
             tipTarget = ui.Rect;
-        } else if(IsNumeric(type)) {
+        } else if(IsNumeric(numType)) {
             UIInput input = null;
             input = GenerateUI.Input(
                 GenerateUI.Row(content),
-                Convert.ToString(defVal, CultureInfo.InvariantCulture),
-                Convert.ToString(val, CultureInfo.InvariantCulture),
+                NumText(defVal),
+                NumText(val),
                 null, label, null, id
             );
             input.OnComplete = text => {
-                if(double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out double parsed)) {
-                    Commit(Convert.ChangeType(parsed, type));
+                if(nullableOf != null && string.IsNullOrWhiteSpace(text)) {
+                    Commit(null);
+                    input.Set("", invoke: false);
+                } else if(double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out double parsed)) {
+                    Commit(Convert.ChangeType(parsed, numType));
                 } else {
-                    input.Set(Convert.ToString(Get(member, data), CultureInfo.InvariantCulture), invoke: false);
+                    input.Set(NumText(Get(member, data)), invoke: false);
                 }
             };
             tipTarget = input.Rect;
@@ -148,6 +153,7 @@ internal static class AddonSettingsUI {
         GenerateUI.LocalizeById(text, id, label);
     }
     private static bool IsNumeric(Type type) => type == typeof(int) || type == typeof(float) || type == typeof(double);
+    private static string NumText(object v) => v == null ? "" : Convert.ToString(v, CultureInfo.InvariantCulture);
     private static string SplitPascal(string name) {
         StringBuilder sb = new(name.Length + 8);
         for(int i = 0; i < name.Length; i++) {
