@@ -1,0 +1,29 @@
+modules/KeyViewer/Js/KvJsRuntime.PluginRuntime.cs
+  s_e9a36f061a487f::t_989c71966db659 85-86
+  s_e9a36f061a487f::t_a0b75fcf6c9b75 174-183
+  s_e9a36f061a487f::t_bf3e7673a0f471 126-129
+modules/KeyViewer/Js/KvJsRuntime.HostBridge.cs
+  s_e9a36f061a487f::t_e0894e93a1be33 116-117
+modules/KeyViewer/Js/KvJsRenderer.cs
+  s_e9a36f061a487f::t_10df76d1b3a614 206
+  s_e9a36f061a487f::t_7c0144e88aa471 117-123,125,135-140
+  s_e9a36f061a487f::t_eda1ad238b1521 317-319
+  s_e9a36f061a487f::t_ff3c13feeaa51e 307-312
+  s_e9a36f061a487f::t_b914f1cb34de05 151
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "1e95298bdd0311e0a200d422d9e3daabd42cc75b",
+  "prompts": {},
+  "sessions": {
+    "s_e9a36f061a487f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a85d324b-8e36-488c-bcfb-5b3de418be8c",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
