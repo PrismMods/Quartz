@@ -27,7 +27,6 @@ internal static partial class PageSettings {
         updatesAnchor = updatesLabelRow;
         ReleaseChannel[] channels = [
             ReleaseChannel.Stable,
-            ReleaseChannel.ReleaseCandidate,
             ReleaseChannel.Beta,
             ReleaseChannel.Alpha,
         ];
@@ -39,7 +38,6 @@ internal static partial class PageSettings {
             channels,
             ch => ch switch {
                 ReleaseChannel.Stable => MainCore.Tr.Get("UPDATE_CHANNEL_STABLE", "Stable"),
-                ReleaseChannel.ReleaseCandidate => MainCore.Tr.Get("UPDATE_CHANNEL_RC", "Release Candidate"),
                 ReleaseChannel.Beta => MainCore.Tr.Get("UPDATE_CHANNEL_BETA", "Beta"),
                 ReleaseChannel.Alpha => MainCore.Tr.Get("UPDATE_CHANNEL_ALPHA", "Alpha"),
                 _ => ch.ToString(),

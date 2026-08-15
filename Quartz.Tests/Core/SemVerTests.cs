@@ -15,9 +15,7 @@ static class SemVerTests {
         Assert(stable.ToString() == "2.0.0", "stable omits channel + build");
         Assert(SemVer.TryParse("2.0.0-alpha.17", out SemVer alpha), "alpha parse");
         Assert(alpha.ToString() == "2.0.0-alpha-17", "prerelease includes channel + build");
-        Assert(SemVer.ParseChannel("rc") == ReleaseChannel.ReleaseCandidate, "rc alias");
-        Assert(SemVer.ParseChannel("release-candidate") == ReleaseChannel.ReleaseCandidate, "release-candidate alias");
-        Assert(SemVer.ParseChannel("releasecandidate") == ReleaseChannel.ReleaseCandidate, "run-together alias");
+        Assert(SemVer.ParseChannel("rc") == ReleaseChannel.Stable, "the removed rc channel falls through to stable");
         Assert(SemVer.ParseChannel("dev") == ReleaseChannel.Dev, "dev alias");
         Assert(SemVer.ParseChannel("") == ReleaseChannel.Stable, "empty defaults to stable");
         Assert(SemVer.ParseChannel("  BETA  ") == ReleaseChannel.Beta, "trim + case-insensitive");
@@ -32,7 +30,6 @@ static class SemVerTests {
         SemVer alpha98 = new(2, 0, 0, ReleaseChannel.Alpha, 98);
         SemVer alpha99 = new(2, 0, 0, ReleaseChannel.Alpha, 99);
         SemVer beta1 = new(2, 0, 0, ReleaseChannel.Beta, 1);
-        SemVer rc1 = new(2, 0, 0, ReleaseChannel.ReleaseCandidate, 1);
         SemVer stable = new(2, 0, 0, ReleaseChannel.Stable, 0);
         SemVer nextAlpha = new(2, 0, 1, ReleaseChannel.Alpha, 1);
         Assert(SemVer.CompareForChannel(beta1, alpha98, ReleaseChannel.Alpha) < 0,
@@ -49,7 +46,7 @@ static class SemVerTests {
             "beta channel still takes the final release");
         Assert(SemVer.CompareForChannel(nextAlpha, stable, ReleaseChannel.Alpha) > 0,
             "a higher core version always wins");
-        Assert(SemVer.CompareForChannel(rc1, beta1, ReleaseChannel.Stable) > 0,
+        Assert(SemVer.CompareForChannel(beta1, alpha98, ReleaseChannel.Stable) > 0,
             "unpreferred prereleases keep their normal order");
         Assert(SemVer.CompareForChannel(alpha98, alpha98, ReleaseChannel.Alpha) == 0,
             "the installed build is never an upgrade over itself");

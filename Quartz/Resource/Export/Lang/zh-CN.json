@@ -494,7 +494,6 @@
     "UPDATE_AVAILABLE": "发现新版本：",
     "UPDATE_CHANNEL_ALPHA": "测试版Alpha",
     "UPDATE_CHANNEL_BETA": "公开测试Beta",
-    "UPDATE_CHANNEL_RC": "候选发布RC",
     "UPDATE_CHANNEL_STABLE": "稳定正式版Stable",
     "UPDATE_CHECK": "检查更新",
     "UPDATE_CHECKING": "正在检测更新…",

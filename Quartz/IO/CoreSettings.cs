@@ -42,7 +42,11 @@ public sealed class CoreSettings : ISettingsFile {
     public int ToggleKey = (int)KeyCode.K;
     public int UpdateChannel = (int)ReleaseChannel.Alpha;
     public string SkippedVersion = "";
-    public ReleaseChannel GetUpdateChannel() => (ReleaseChannel)UpdateChannel;
+    // Clamp, don't cast blindly: 2 was ReleaseCandidate and 3 was Stable before
+    // RC was removed and Stable took its slot. A stored 3 cast raw would sit
+    // above every real channel and AcceptsChannel would then reject everything.
+    public ReleaseChannel GetUpdateChannel() =>
+        UpdateChannel >= (int)ReleaseChannel.Stable ? ReleaseChannel.Stable : (ReleaseChannel)UpdateChannel;
     public bool AcceptsChannel(ReleaseChannel remote) => remote >= GetUpdateChannel();
     public float AccentR = 1.0f;
     public float AccentG = 0.5995077f;

@@ -1,12 +1,14 @@
 #nullable enable
 using System;
 namespace Quartz.Core;
+// The channel is persisted as an int in Settings.json. Before ReleaseCandidate
+// was removed, 2 was RC and 3 was Stable — CoreSettings.GetUpdateChannel clamps
+// those stored values onto Stable.
 public enum ReleaseChannel {
     Dev = -1,
     Alpha = 0,
     Beta = 1,
-    ReleaseCandidate = 2,
-    Stable = 3,
+    Stable = 2,
 }
 public readonly struct SemVer : IComparable<SemVer> {
     public readonly int Major;
@@ -27,14 +29,12 @@ public readonly struct SemVer : IComparable<SemVer> {
             "dev" => ReleaseChannel.Dev,
             "alpha" => ReleaseChannel.Alpha,
             "beta" => ReleaseChannel.Beta,
-            "rc" or "releasecandidate" or "release-candidate" => ReleaseChannel.ReleaseCandidate,
             _ => ReleaseChannel.Stable,
         };
     public static string ChannelTag(ReleaseChannel channel) => channel switch {
         ReleaseChannel.Dev => "dev",
         ReleaseChannel.Alpha => "alpha",
         ReleaseChannel.Beta => "beta",
-        ReleaseChannel.ReleaseCandidate => "rc",
         _ => "",
     };
     public static bool TryParse(string text, out SemVer version) {
