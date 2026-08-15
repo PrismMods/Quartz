@@ -1,0 +1,63 @@
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_41e99980668f6e::t_452e00cb8ce1d4 18
+Quartz/Resource/Export/Lang/zh-CN.json
+  s_41e99980668f6e::t_452e00cb8ce1d4 18
+Quartz/Addons/QuartzAddon.cs
+  s_41e99980668f6e::t_47f8d5f0d31565 10
+Quartz/Addons/AddonService.cs
+  s_41e99980668f6e::t_f399fcc723d0f8 144-147
+  s_41e99980668f6e::t_4cda009e911f24 450-451
+  s_41e99980668f6e::t_5b49850adb8f9e 34
+  s_41e99980668f6e::t_0733dddd7efa0c 287-288
+  s_41e99980668f6e::t_26f1c7db1ba901 44-45
+sdk/README.md
+  s_c5b33cabad44e4::t_a9a552234998ef 155-164
+  s_c5b33cabad44e4::t_9e8c3fe66d3b83 115-116
+  s_41e99980668f6e::t_d817131a19b374 108-111
+  s_08b76d40c11158::t_a7737f0f18a704 118-121
+  s_c5b33cabad44e4::t_eac1da8a4648ee 165
+Quartz/UI/Nav/NavRegistry.cs
+  s_c5b33cabad44e4::t_01bb05dd79bccf 30-32
+Quartz/UI/Factory/Page/PageAddons.cs
+  s_41e99980668f6e::t_cdd3a5051b2bb5 109-117
+Quartz/Addons/AddonContext.cs
+  s_08b76d40c11158::t_03c8cbc3e3139e 45,47-78
+  s_c5b33cabad44e4::t_6169fb2ef81f9f 230-231
+  s_c5b33cabad44e4::t_10e79ce5415b75 174-209,211-212
+Quartz/UI/Nav/NavCategory.cs
+  s_c5b33cabad44e4::t_057481b8ceb138 10
+Quartz/Resource/Export/Lang/en-US.json
+  s_41e99980668f6e::t_452e00cb8ce1d4 18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "e7076b99b43ed530114f7783997cc3a74a54b40b",
+  "prompts": {},
+  "sessions": {
+    "s_08b76d40c11158": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9882790c-d344-46d4-9f74-80548eaae2f6",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_41e99980668f6e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ff339ae5-cebe-48fd-a1c4-05fea85784f1",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_c5b33cabad44e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d41a492e-5f94-4813-a79f-74c0fc0864e9",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
