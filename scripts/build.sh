@@ -118,6 +118,19 @@ dotnet build modules/AllModules.proj -c "$CONFIG" -p:DeployToGame=true
 # already-extracted feature.
 tools/bundle-modules.sh
 
+# A game install carrying a stale Module.bundled/ (from an older zip install)
+# out-versions dev builds — dev-0 sorts below any alpha — so ModuleBundle's
+# first-launch refresh would clobber the freshly deployed dev modules right
+# back to the bundled release. Keep the install's bundled copy current too.
+if [[ -n "$GAMEDIR" ]]; then
+    for bundled in "$GAMEDIR/UserData/Quartz/Module.bundled" "$GAMEDIR/Mods/Quartz/UserData/Module.bundled"; do
+        if [[ -d "$bundled" ]]; then
+            cp dist/modules/*.qmod dist/modules/*.qmod.json "$bundled/"
+            echo ">> refreshed game bundled modules: $bundled"
+        fi
+    done
+fi
+
 echo ">> done."
 [[ "$TARGET" == "ML"  || "$TARGET" == "both" ]] && echo ">> MelonLoader:     Mods/Quartz.Bootstrap.dll + UserData/Quartz/Runtime/* — dist/Quartz.zip"
 [[ "$TARGET" == "UMM" || "$TARGET" == "both" ]] && echo ">> UnityModManager: UMMMods/Quartz (or Mods/Quartz) + Quartz/Runtime/* — dist/QuartzUmm.zip"
