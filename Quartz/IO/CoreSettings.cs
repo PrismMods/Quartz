@@ -42,6 +42,7 @@ public sealed class CoreSettings : ISettingsFile {
     public int ToggleKey = (int)KeyCode.K;
     public int UpdateChannel = (int)ReleaseChannel.Alpha;
     public string SkippedVersion = "";
+    public bool AprilFoolsForced = false;
     // Clamp, don't cast blindly: 2 was ReleaseCandidate and 3 was Stable before
     // RC was removed and Stable took its slot. A stored 3 cast raw would sit
     // above every real channel and AcceptsChannel would then reject everything.
@@ -104,6 +105,7 @@ public sealed class CoreSettings : ISettingsFile {
             [nameof(ToggleKey)] = ToggleKey,
             [nameof(UpdateChannel)] = UpdateChannel,
             [nameof(SkippedVersion)] = SkippedVersion,
+            [nameof(AprilFoolsForced)] = AprilFoolsForced,
             [nameof(CollapsibleStates)] = collapsibleStates,
             [nameof(ToggleKeybinds)] = toggleKeybinds,
             [nameof(AccentR)] = AccentR,
@@ -150,6 +152,7 @@ public sealed class CoreSettings : ISettingsFile {
         ToggleKey = IOUtils.Read(token, nameof(ToggleKey), ToggleKey);
         UpdateChannel = IOUtils.Read(token, nameof(UpdateChannel), UpdateChannel);
         SkippedVersion = IOUtils.Read(token, nameof(SkippedVersion), SkippedVersion);
+        AprilFoolsForced = IOUtils.Read(token, nameof(AprilFoolsForced), AprilFoolsForced);
         CollapsibleStates.Clear();
         if(token[nameof(CollapsibleStates)] is JObject collapsibleStates) {
             foreach(var prop in collapsibleStates.Properties()) {

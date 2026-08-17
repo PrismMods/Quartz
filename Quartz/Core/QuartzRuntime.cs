@@ -185,6 +185,7 @@ public sealed class QuartzRuntime {
         RootObject.AddComponent<MainThread>();
         SaveGate.DeferWrites = static () => Game.Stats.GameStats.InGame && !UI.UICore.IsOpen;
         Config.Load();
+        AprilFools.SetDevForced(Config.Data.AprilFoolsForced);
         ProfileManager.Initialize();
         Logger.Msg($"[Startup] paths + config took {sw.ElapsedMilliseconds} ms");
         sw.Restart();

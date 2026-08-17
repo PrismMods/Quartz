@@ -50,6 +50,8 @@ internal static class PageDeveloper {
             AprilFools.DevForced,
             static v => {
                 AprilFools.SetDevForced(v);
+                MainCore.Conf.AprilFoolsForced = v;
+                MainCore.ConfMgr.RequestSave();
                 MainThread.Enqueue(UICore.Rebuild);
             },
             "Force April Fools",

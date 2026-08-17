@@ -23,6 +23,7 @@ public sealed class LocalizationService(
     }
     private async Task LoadThenUpdate() {
         try {
+            LoadAprilOverrides();
             await Translator.Load(langPath);
             TryAutoLanguage();
             if(await LangUpdateService.FetchAsync(langPath) > 0) {
@@ -56,6 +57,31 @@ public sealed class LocalizationService(
         logger.Msg($"[Localization] first launch: no translation for game language {detected}, keeping '{configFile.Data.Language}'");
         configFile.Data.LanguageAutoDetected = true;
         configFile.RequestSave();
+    }
+    private void LoadAprilOverrides() {
+        try {
+            string dir = Path.Combine(langPath, "AprilFools");
+            if(!Directory.Exists(dir)) return;
+            Dictionary<string, Dictionary<string, string>> result = new(StringComparer.Ordinal);
+            foreach(string file in Directory.GetFiles(dir, "*.json")) {
+                Newtonsoft.Json.Linq.JObject root = Newtonsoft.Json.Linq.JObject.Parse(File.ReadAllText(file));
+                foreach(Newtonsoft.Json.Linq.JProperty language in root.Properties()) {
+                    if(language.Value is not Newtonsoft.Json.Linq.JObject block) continue;
+                    if(!result.TryGetValue(language.Name, out Dictionary<string, string> merged))
+                        result[language.Name] = merged = new(StringComparer.Ordinal);
+                    foreach(KeyValuePair<string, Newtonsoft.Json.Linq.JToken> kv in block) {
+                        if(kv.Key.StartsWith("0", StringComparison.Ordinal)) continue;
+                        if(kv.Value is Newtonsoft.Json.Linq.JArray) continue;
+                        merged[kv.Key] = kv.Value?.ToString() ?? "";
+                    }
+                }
+            }
+            Translator.SetAprilOverrides(result);
+            if(result.Count > 0) logger.Msg($"[Localization] April Fools overlay ready for {result.Count} language(s)");
+        } catch(System.Exception e) {
+            Diag.Ignore(e);
+            logger.Wrn($"[Localization] April Fools overlay failed to load: {e.Message}");
+        }
     }
     public void Dispose() { }
 }

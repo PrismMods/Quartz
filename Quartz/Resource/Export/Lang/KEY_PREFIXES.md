@@ -16,6 +16,7 @@ Prefix -> feature (source of truth: the C# owning the setting / building the UI 
 | `KCB_`    | Keyboard Chatter Blocker              | `Features/ChatterBlocker`, built in `PageGameplay.cs` |
 | `KL_`     | Key Limiter                           | `Features/KeyLimiter`, built in `PageGameplay.cs` |
 | `PCOL_`   | Planet Colors                         | `Features/PlanetColors`, built in `PageVisuals.cs` |
+| `QUIZ_`   | April Fools pop quiz                  | `Features/AprilFools/QuizOverlay.cs` |
 | `TW_`     | Visual Tweaks                         | `Features/Tweaks`, built in `PageVisuals.cs` |
 | `UIH_`    | UI Hiding                             | `Features/UiHider`, built in `PageVisuals.cs` |
 

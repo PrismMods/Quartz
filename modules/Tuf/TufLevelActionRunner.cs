@@ -50,12 +50,15 @@ internal sealed class TufLevelActionRunner {
     }
     private void LaunchMainLevel(TufLevel level, string code) {
         MainCore.Log.Msg($"[TUF] opening base-game level {code} for #{level.Id}");
-        if(TufMainLevel.Launch(code)) {
-            UICore.Close(true);
-            return;
-        }
-        level.Error = MainCore.Tr.Get("TUF_MAIN_LAUNCH_FAILED", "Could not open the base-game level.");
-        notify();
+        Quartz.Features.AprilFools.QuizGate.GateMain(code, level.Difficulty, () => {
+            if(disposed) return;
+            if(TufMainLevel.Launch(code)) {
+                UICore.Close(true);
+                return;
+            }
+            level.Error = MainCore.Tr.Get("TUF_MAIN_LAUNCH_FAILED", "Could not open the base-game level.");
+            notify();
+        });
     }
     public void LaunchChart(TufLevel level, string chart) {
         if(level == null || IsBusy || level.State != TufItemState.ChooseChart) return;
@@ -110,15 +113,18 @@ internal sealed class TufLevelActionRunner {
     private void Launch(TufLevel level, string chart) {
         if(disposed) return;
         Update(level, TufItemState.Loading, 1f, "");
-        launcher.Launch(chart, (success, error) => MainThread.Enqueue(() => {
+        Quartz.Features.AprilFools.QuizGate.GateChart(chart, level.Difficulty, () => {
             if(disposed) return;
-            bool aborted = !success && string.IsNullOrEmpty(error);
-            if(!success) {
-                if(!aborted) MainCore.Log.Wrn("[TUF] automatic play failed: " + error);
-                UICore.Open(true);
-            }
-            FinishAction(level, success || aborted ? TufItemState.Load : TufItemState.Retry, error);
-        }));
+            launcher.Launch(chart, (success, error) => MainThread.Enqueue(() => {
+                if(disposed) return;
+                bool aborted = !success && string.IsNullOrEmpty(error);
+                if(!success) {
+                    if(!aborted) MainCore.Log.Wrn("[TUF] automatic play failed: " + error);
+                    UICore.Open(true);
+                }
+                FinishAction(level, success || aborted ? TufItemState.Load : TufItemState.Retry, error);
+            }));
+        });
     }
     private void FinishAction(TufLevel level, TufItemState state, string error) {
         activeLevelId = 0;

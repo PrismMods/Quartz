@@ -211,7 +211,22 @@ public class Translator {
         return (translations.TryGetValue(language, out var langDict) && langDict.ContainsKey(key))
             || (translationsArr.TryGetValue(language, out var langArr) && langArr.ContainsKey(key));
     }
+    private volatile Dictionary<string, Dictionary<string, string>> aprilOverrides = [];
+    public void SetAprilOverrides(Dictionary<string, Dictionary<string, string>> overrides) =>
+        aprilOverrides = overrides ?? [];
+    private string AprilGet(string key) {
+        if(string.IsNullOrEmpty(key) || !Quartz.Core.AprilFools.Active) return null;
+        var overrides = aprilOverrides;
+        if(overrides.Count == 0) return null;
+        string lang = IsDefault ? "en-US" : Language;
+        if(overrides.TryGetValue(lang, out var block) && block.TryGetValue(key, out string val)) return val;
+        if(lang != "en-US" && overrides.TryGetValue("en-US", out var english) && english.TryGetValue(key, out val))
+            return val;
+        return null;
+    }
     public string Get(string key, string defaultValue) {
+        string april = AprilGet(key);
+        if(april != null) return Quartz.Core.AprilFools.Rebrand(april);
         if(IsDefault) return Quartz.Core.AprilFools.Rebrand(defaultValue);
         if(translations.TryGetValue(Language, out var langDict) && langDict.TryGetValue(key, out var val))
             return Quartz.Core.AprilFools.Rebrand(val);
