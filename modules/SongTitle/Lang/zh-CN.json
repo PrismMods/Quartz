@@ -3,6 +3,8 @@
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "SECTION_SONG_TITLE": "谱面标题显示",
     "SONGTITLE_FORMAT": "文字格式——可用变量{artist}曲师、{title}曲名",
+    "SONGTITLE_STRIP": "清除富文本",
+    "DESC_SONGTITLE_STRIP": "移除标题中的富文本标签（大小、颜色等）和换行符。",
     "SONGTITLE_FONTSIZE": "字体大小",
     "SONGTITLE_MASTER": "整体缩放尺寸",
     "SONGTITLE_COLOR": "文字颜色",

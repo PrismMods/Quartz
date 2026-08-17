@@ -45,6 +45,7 @@
     "FXRM_MODE_ENHANCED": "增强模式",
     "FXRM_S_FILTER": "关闭画面滤镜",
     "DESC_FXRM_S_FILTER": "运行时关闭灰度、街机等滤镜特效，不修改谱面原始数据。",
+    "SECTION_EXCLUDED_FILTERS": "排除滤镜",
     "FXRM_S_ADVFILTER": "关闭高级滤镜",
     "DESC_FXRM_S_ADVFILTER": "运行时关闭高级滤镜特效而不修改谱面。",
     "FXRM_S_BLOOM": "关闭泛光",
