@@ -328,6 +328,12 @@
     },
     {
       "type": "scnEditor",
+      "member": "OpenLevelCo",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "scnEditor",
       "member": "OttoBlink",
       "resolved": true,
       "assembly": "Assembly-CSharp"
@@ -467,6 +473,12 @@
     {
       "type": "scrConductor",
       "member": "get_calibration_i",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "scrController",
+      "member": "EnterLevel",
       "resolved": true,
       "assembly": "Assembly-CSharp"
     },

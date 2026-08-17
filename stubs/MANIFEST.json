@@ -1571,6 +1571,7 @@
           "System.Void scnEditor::ApplyEventsToFloors()",
           "System.Void scnEditor::FlipFloor(scrFloor,System.Boolean,System.Boolean)",
           "System.Void scnEditor::FlipSelection(System.Boolean)",
+          "System.Void scnEditor::OpenLevel()",
           "System.Void scnEditor::OpenLevel(System.String)",
           "System.Void scnEditor::OttoBlink()",
           "System.Void scnEditor::Play()",

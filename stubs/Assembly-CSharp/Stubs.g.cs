@@ -810,6 +810,7 @@ public unsafe partial class scnEditor : global::ADOBase {
     public void ApplyEventsToFloors() => throw null;
     public void FlipFloor(global::scrFloor floor, bool horizontal = default, bool remakePath = default) => throw null;
     public void FlipSelection(bool horizontal = default) => throw null;
+    public void OpenLevel() => throw null;
     public void OpenLevel(string filePath) => throw null;
     public void OttoBlink() => throw null;
     public void Play() => throw null;
