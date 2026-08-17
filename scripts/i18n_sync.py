@@ -31,6 +31,16 @@ the English string in would mark it "translated" and hide the work forever.
 Like validate_i18n.py this is the trusted copy, run from the Quartz checkout by a
 job holding a cross-repo token. It only ever reads the i18n checkout as JSON data
 and never executes anything from it.
+
+Lang/AprilFools is a SEPARATE NAMESPACE, not another root. It reuses the exact key
+names of the core file with different values, so unioning it in the way modules are
+unioned would overwrite every real string with a joke one. Both workflows therefore
+run this script a second time over the directory pair
+Lang/AprilFools <-> i18n Lang/AprilFools. Nothing here special-cases it: roots()
+walks up four levels looking for modules/*/Lang, finds nothing from inside
+Export/Lang/AprilFools, and so the run covers that one directory with the ownership
+rules unchanged. If a second overlay namespace is ever added, give it its own pair
+too — never add it to roots().
 """
 import sys, os, json, glob, shutil
 

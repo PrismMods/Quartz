@@ -76,12 +76,25 @@ jobs:
             # that module's keys, so core's reference would flag all of them as dead.
             python3 quartz/scripts/validate_i18n.py "$d" "$d/en-US.json"
           done
+          # The seasonal overlay is its own namespace, measured against its own en-US.
+          april=quartz/Quartz/Resource/Export/Lang/AprilFools
+          [ -d "$april" ] && python3 quartz/scripts/validate_i18n.py "$april" "$april/en-US.json"
       - name: Merge our languages into i18n
         # Reads the i18n checkout purely as JSON data and never executes anything
         # from it, so translator-controlled content cannot reach I18N_PAT.
         run: |
           mkdir -p i18n/Lang
           python3 quartz/scripts/i18n_sync.py push quartz/Quartz/Resource/Export/Lang i18n/Lang
+          # Lang/AprilFools is a SEPARATE namespace, not another root of the main one:
+          # it reuses the very same key names with different values, so unioning it in
+          # would overwrite every real string. Same script, its own directory pair —
+          # i18n_sync.py's module glob finds nothing from there, so it syncs the one
+          # directory and the ownership rules (en-US + ko-KR authored here) still hold.
+          april=quartz/Quartz/Resource/Export/Lang/AprilFools
+          if [ -d "$april" ]; then
+            mkdir -p i18n/Lang/AprilFools
+            python3 quartz/scripts/i18n_sync.py push "$april" i18n/Lang/AprilFools
+          fi
       - name: Commit + push to quartz-i18n
         working-directory: i18n
         run: |

@@ -46,6 +46,12 @@ jobs:
           # module key reads as a dead key.
           python3 quartz/scripts/i18n_sync.py merged-ref quartz/Quartz/Resource/Export/Lang /tmp/en-US-merged.json
           python3 quartz/scripts/validate_i18n.py i18n/Lang /tmp/en-US-merged.json
+          # The seasonal overlay mirrors core's key set only, so it is measured
+          # against its own en-US rather than the union.
+          april=quartz/Quartz/Resource/Export/Lang/AprilFools
+          if [ -d "$april" ] && [ -d i18n/Lang/AprilFools ]; then
+            python3 quartz/scripts/validate_i18n.py i18n/Lang/AprilFools "$april/en-US.json"
+          fi
       - name: Merge translations in (never delete a key)
         # Was a wholesale `cp`, which let a stale i18n erase live strings: its ko-KR
         # lagged this repo by 31 keys, so it proposed deleting 31 Korean strings
@@ -53,7 +59,13 @@ jobs:
         # adds or revalues, so a key we have can never be dropped by a sender that
         # simply has not caught up yet. It also skips every language we author
         # (OWNED_HERE), so those only ever flow outward via i18n-push.
-        run: python3 quartz/scripts/i18n_sync.py pull i18n/Lang quartz/Quartz/Resource/Export/Lang
+        run: |
+          python3 quartz/scripts/i18n_sync.py pull i18n/Lang quartz/Quartz/Resource/Export/Lang
+          # Its own namespace, not another root — see the matching note in i18n-push.
+          april=quartz/Quartz/Resource/Export/Lang/AprilFools
+          if [ -d "$april" ] && [ -d i18n/Lang/AprilFools ]; then
+            python3 quartz/scripts/i18n_sync.py pull i18n/Lang/AprilFools "$april"
+          fi
       - name: Commit translations to main if changed
         working-directory: quartz
         run: |
@@ -68,7 +80,7 @@ jobs:
             # Every authoring root, not just core: a module's en-US/ko-KR is owned
             # here too, so a pull must never rewrite one.
             git checkout HEAD -- "Quartz/Resource/Export/Lang/$code.json"
-            for d in modules/*/Lang; do
+            for d in modules/*/Lang Quartz/Resource/Export/Lang/AprilFools; do
               [ -f "$d/$code.json" ] && git checkout HEAD -- "$d/$code.json"
             done
           done
