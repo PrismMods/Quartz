@@ -1,0 +1,33 @@
+stubs/MANIFEST.json
+  s_4bcef5f0a0fcd1::t_5ec1887d4e8085 1574
+stubs/README.md
+  s_4bcef5f0a0fcd1::t_5ec1887d4e8085 20,41
+stubs/Assembly-CSharp/Stubs.g.cs
+  s_4bcef5f0a0fcd1::t_5ec1887d4e8085 813
+stubs/PATCH-TARGETS.json
+  s_4bcef5f0a0fcd1::t_5ec1887d4e8085 332-334
+  s_4bcef5f0a0fcd1::t_a4d8af46180666 481-484
+  s_4bcef5f0a0fcd1::t_327849536ba952 331
+  s_4bcef5f0a0fcd1::t_dfd1ab5f8c01f4 329-330,479-480
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "d05cb3899dea24d319fa9184edbf62c4be5dd571",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_4bcef5f0a0fcd1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4360cd50-9fb4-47b1-8c1c-c066edbcbc95",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
