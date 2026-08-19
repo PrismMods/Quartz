@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "discord", "entry": "Quartz.Features.Discord.DiscordModule",
+  "name": "Discord", "nameKey": "SECTION_DISCORD", "group": "others", "order": 10,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": [], "settingsFiles": [], "langPrefixes": ["DISCORD_"]
+}

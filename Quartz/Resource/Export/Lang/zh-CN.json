@@ -123,6 +123,7 @@
     "DEV_CLEAR_SKIP": "清除已屏蔽更新版本",
     "DEV_REFRESH": "刷新状态信息",
     "DEV_SIM_UPDATE": "模拟有新版本推送",
+    "DISCORD": "Discord",
     "EDITOR": "编辑器",
     "EDITOR_FLIPROTATE_SHORTCUT_FLIP_H": "Ctrl + L — 水平翻转选区",
     "EDITOR_FLIPROTATE_SHORTCUT_FLIP_V": "Ctrl + Shift + L — 垂直翻转选区",

@@ -125,6 +125,7 @@
     "DEV_CLEAR_SKIP": "건너뛴 버전 지우기",
     "DEV_REFRESH": "상태 새로고침",
     "DEV_SIM_UPDATE": "업데이트 있음 시뮬레이션",
+    "DISCORD": "디스코드",
     "EDITOR": "에디터",
     "EDITOR_FLIPROTATE_SHORTCUT_FLIP_H": "Ctrl + L — 선택 영역 수평 반전",
     "EDITOR_FLIPROTATE_SHORTCUT_FLIP_V": "Ctrl + Shift + L — 선택 영역 수직 반전",

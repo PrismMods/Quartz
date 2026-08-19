@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<ModuleId>discord</ModuleId>
+		<AssemblyName>Quartz.Module.Discord</AssemblyName>
+	</PropertyGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Lang\*.json" />
+	</ItemGroup>
+
+</Project>
