@@ -383,6 +383,7 @@
     "LANGUAGE_RELOAD": "重载界面",
     "MIDDLE_CLICK_DEFAULT": "中键点击恢复默认",
     "MIDDLE_CLICK_TO_SET_AS_DEFAULT": "鼠标中键恢复默认值",
+    "MINECRAFT": "我的世界",
     "MODULES": "模组",
     "MODULES_ABI_BLOCKED": "为不同版本的Quartz构建——请更新Quartz后再安装。",
     "MODULES_ALL": "全部模块",

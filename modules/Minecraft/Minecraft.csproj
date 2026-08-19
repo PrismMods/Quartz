@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<ModuleId>minecraft</ModuleId>
+		<AssemblyName>Quartz.Module.Minecraft</AssemblyName>
+	</PropertyGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Lang\*.json" />
+	</ItemGroup>
+</Project>

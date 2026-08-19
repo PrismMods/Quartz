@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "minecraft", "entry": "Quartz.Features.Minecraft.MinecraftModule",
+  "name": "Minecraft", "nameKey": "SECTION_MINECRAFT", "group": "others", "order": 20,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": [], "settingsFiles": [], "langPrefixes": ["MINECRAFT_"]
+}

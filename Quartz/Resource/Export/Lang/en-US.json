@@ -385,6 +385,7 @@
     "LANGUAGE_RELOAD": "Reload",
     "MIDDLE_CLICK_DEFAULT": "Middle-click to set as default",
     "MIDDLE_CLICK_TO_SET_AS_DEFAULT": "Middle-click to set as default",
+    "MINECRAFT": "Minecraft",
     "MODULES": "Modules",
     "MODULES_ABI_BLOCKED": "Built for a different Quartz — update Quartz to install this.",
     "MODULES_ALL": "All Modules",

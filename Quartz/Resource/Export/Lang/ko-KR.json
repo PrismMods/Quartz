@@ -385,6 +385,7 @@
     "LANGUAGE_RELOAD": "다시 불러오기",
     "MIDDLE_CLICK_DEFAULT": "가운데 버튼으로 기본값",
     "MIDDLE_CLICK_TO_SET_AS_DEFAULT": "가운데 버튼으로 기본값",
+    "MINECRAFT": "마인크래프트",
     "MODULES": "모듈",
     "MODULES_ABI_BLOCKED": "다른 Quartz 버전용입니다 — 설치하려면 Quartz를 업데이트하세요.",
     "MODULES_ALL": "전체 모듈",
