@@ -1,0 +1,27 @@
+Quartz.Tests/Program.cs
+  s_cc4a9f6fa99f56::t_5dcdee5c44c088 85
+Quartz/Resource/Export/Lang/en-US.json
+  s_cc4a9f6fa99f56::t_addc8898756bc8 421
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_cc4a9f6fa99f56::t_479ae1309a880b 421
+Quartz/Resource/Export/Lang/zh-CN.json
+  s_cc4a9f6fa99f56::t_2a7e5e9e7f494f 419
+Quartz/UI/Nav/CorePages.cs
+  s_cc4a9f6fa99f56::t_00c057676ccfb2 48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "6826c476a94ab5c9305a0b59e4a966972070f629",
+  "prompts": {},
+  "sessions": {
+    "s_cc4a9f6fa99f56": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84faa67f-7b89-4d75-a9ef-64cd518ddd04",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
