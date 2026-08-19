@@ -1,0 +1,70 @@
+modules/Tuf/TufRollbackDialog.cs
+  s_46a743a48b8a33::t_6e051f8159fd06 1-221
+modules/Tuf/TufRollbackPaths.cs
+  s_46a743a48b8a33::t_bf5484e2503dee 1-38
+modules/Tuf/TufService.Library.cs
+  s_46a743a48b8a33::t_a2b91ddb771a10 96-97,101-102,134
+  s_46a743a48b8a33::t_babd8f6ce0f69c 135
+modules/Tuf/TufBrowserView.Actions.cs
+  s_46a743a48b8a33::t_78b34e77b46877 60-92
+Quartz.Tests/Quartz.Tests.csproj
+  s_cc4a9f6fa99f56::t_5f736295389394 127-128
+Quartz.Tests/Features/Tuf/TufRollbackTests.cs
+  s_46a743a48b8a33::t_b724066eb29e64 1-62
+modules/Tuf/TufRollback.cs
+  s_46a743a48b8a33::t_976e83c3ab7f50 1-11,13-14,16-27,29-108,111,113-121,123-126,129-140,142-154,156-159,174-180,182-195
+  s_46a743a48b8a33::t_2ff5cf23c0e3db 28,109-110,112,122,127-128,155
+  s_46a743a48b8a33::t_66053ee33b9148 141,160-173
+  s_46a743a48b8a33::t_babd8f6ce0f69c 12,181
+  s_46a743a48b8a33::t_deda8f641d6480 15
+modules/Tuf/Lang/ko-KR.json
+  s_46a743a48b8a33::t_a23369776a271a 92-98
+  s_46a743a48b8a33::t_5e8718e982fbb0 82-91,104
+modules/Tuf/TufService.cs
+  s_46a743a48b8a33::t_4035a792bbccf2 80,111
+  s_46a743a48b8a33::t_923542e3ae47e2 77-79,120,130
+Quartz.Tests/Program.cs
+  s_cc4a9f6fa99f56::t_5f736295389394 163-169
+modules/Tuf/Lang/zh-CN.json
+  s_46a743a48b8a33::t_a23369776a271a 92-98
+  s_46a743a48b8a33::t_efba7a6986ff4a 82-91,104
+modules/Tuf/TufBrowserView.Cards.cs
+  s_46a743a48b8a33::t_78b34e77b46877 78,84-90,149-150,172-174,176,197-199,213
+  s_46a743a48b8a33::t_03ba5766777179 58,77,216,218-219,235-244,248-250,252,255-263,265-274
+modules/Tuf/TufService.Installed.cs
+  s_46a743a48b8a33::t_babd8f6ce0f69c 10-14,17,49
+  s_46a743a48b8a33::t_4035a792bbccf2 194-196
+  s_46a743a48b8a33::t_9833507a1cd365 52,137-138
+modules/Tuf/TufDownloadService.cs
+  s_46a743a48b8a33::t_2ff5cf23c0e3db 106-107,170
+  s_46a743a48b8a33::t_d1311f90da6d5b 71-72,75
+modules/Tuf/Lang/en-US.json
+  s_46a743a48b8a33::t_a23369776a271a 92-98
+  s_46a743a48b8a33::t_3f6b400988e61c 82-91,104
+modules/Tuf/TufService.Rollback.cs
+  s_46a743a48b8a33::t_2189319e66d16a 1-66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "e4d1c938cf50b53a132d3ec66f87b6363da8981d",
+  "prompts": {},
+  "sessions": {
+    "s_46a743a48b8a33": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b17b362f-2b2e-4c0b-88df-d374a8554210",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_cc4a9f6fa99f56": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84faa67f-7b89-4d75-a9ef-64cd518ddd04",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
