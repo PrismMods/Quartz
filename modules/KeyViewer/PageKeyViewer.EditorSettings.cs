@@ -1,7 +1,6 @@
 using Quartz.Core;
 using Quartz.Features.KeyViewer;
 using Quartz.Features.KeyViewer.Layout;
-using Quartz.Localization;
 using Quartz.Resource;
 using Quartz.UI.Editor;
 using Quartz.UI.Generator;
@@ -101,21 +100,6 @@ internal static partial class PageKeyViewer {
         Action refreshJs = AppendJsPlugins(body, conf, compact: true);
         Action refreshTuning = AppendDmTuning(body, conf, compact: true, includeOffsets: false);
         Action refreshGhostRainDots = AppendGhostRainDots(body, conf, def, compact: true);
-        // Also reachable from the overlay module's General page, but that page is not
-        // shipped by the standalone KeyViewer build — and without an entry point here
-        // there would be no way left to drag the viewer into place.
-        //
-        // Borrows OVERLAY_REORGANIZE rather than minting a KEYVIEWER_REORGANIZE: it is
-        // the same action, already translated, and shipped by the overlay module — a
-        // hard dep of this one. A new key would have read English in every language
-        // until quartz-i18n caught up, which is exactly what it did.
-        UIButton reorganize = DmButton(
-            body, true,
-            () => UICore.EnterReorganize(),
-            "Reorganize",
-            "keyviewer_reorganize"
-        );
-        reorganize.Label.GetComponent<TextLocalization>()?.Init("OVERLAY_REORGANIZE", "Reorganize");
         DmButton(
             body, true,
             () => KeyViewerOverlay.ResetPosition(),
