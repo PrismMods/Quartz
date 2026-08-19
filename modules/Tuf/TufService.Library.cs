@@ -93,11 +93,13 @@ public sealed partial class TufService : IRuntimeService {
         }
         MoveState = TufMoveState.Moving;
         Notify();
-        MoveLibrary(pending, new TufInstallRoot(destination, false), moveRequest.Token);
+        string movedFrom = Path.GetDirectoryName(pending[0].From) ?? "";
+        MoveLibrary(pending, new TufInstallRoot(destination, false), movedFrom, moveRequest.Token);
     }
     private static StringComparison PathComparison =>
         Path.DirectorySeparatorChar == '\\' ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-    private async void MoveLibrary(List<(int Id, string From)> pending, TufInstallRoot target, CancellationToken token) {
+    private async void MoveLibrary(List<(int Id, string From)> pending, TufInstallRoot target, string movedFrom,
+        CancellationToken token) {
         List<string> roots = TrustedRoots().ToList();
         int failures = 0;
         string firstError = "";
@@ -129,6 +131,8 @@ public sealed partial class TufService : IRuntimeService {
         }
         MainThread.Enqueue(() => {
             if(disposed) return;
+            if(movedFrom.Length > 0) TufRollback.MoveTree(movedFrom, target.Path);
+            RefreshSnapshotCounts();
             MoveState = failures > 0 ? TufMoveState.Failed : TufMoveState.Done;
             MoveError = failures > 0
                 ? string.Format(MainCore.Tr.Get("TUF_MOVE_FAILED_COUNT",

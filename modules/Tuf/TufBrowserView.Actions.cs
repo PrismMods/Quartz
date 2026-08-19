@@ -57,6 +57,39 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
             if(deleteChips.TryGetValue(level.Id, out Image image) && image != null)
                 image.color = DeleteColor(armedDeleteId == level.Id, !service.IsBusy);
     }
+    private void BuildRollback(RectTransform button, TufLevel level) {
+        Image image = button.gameObject.AddComponent<Image>();
+        image.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
+        image.type = Image.Type.Sliced;
+        bool enabled = !service.IsBusy;
+        image.color = Color.Lerp(UIColors.ObjectBG, UIColors.ObjectButton, enabled ? 0.5f : 0.15f);
+        RectTransform iconRect = Rect("Icon", button, new(0.5f, 0.5f), new(0.5f, 0.5f), new(-11f, -11f), new(11f, 11f));
+        Image icon = iconRect.gameObject.AddComponent<Image>();
+        icon.sprite = MainCore.Spr.Get(UISprite.ClockRewind128, 22f);
+        icon.color = new(1f, 1f, 1f, enabled ? 0.95f : 0.45f);
+        icon.raycastTarget = false;
+        if(!enabled) return;
+        GenerateUI.AddButton(button.gameObject, input => {
+            if(input != PointerEventData.InputButton.Left) return;
+            DisarmDelete();
+            OpenRollback(level);
+        });
+        button.AddToolTip("DESC_TUF_ROLLBACK",
+            "Go back to a version of this level you had before an update. Quartz keeps the last few copies "
+            + "in the rollback folder inside your levels folder.");
+    }
+    private void OpenRollback(TufLevel level) {
+        IReadOnlyList<TufSnapshot> snapshots = service.Snapshots(level.Id);
+        if(snapshots.Count == 0) {
+            service.RefreshSnapshotCounts();
+            Rebuild();
+            return;
+        }
+        string title = string.IsNullOrEmpty(level.Song)
+            ? Tr("TUF_UNKNOWN_LEVEL", "Level") + " #" + level.Id
+            : level.Song + "  ·  #" + level.Id;
+        TufRollbackDialog.Show(title, snapshots, stamp => service.RestoreSnapshot(level, stamp));
+    }
     private void AddAction(RectTransform card, TufLevel level) =>
         BuildAction(Rect("Action", card, new(1f, 0.5f), new(1f, 0.5f), new(-138f, -23f), new(-10f, 23f)), level);
     private void BuildAction(RectTransform action, TufLevel level) {

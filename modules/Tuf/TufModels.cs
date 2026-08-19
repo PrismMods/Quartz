@@ -4,6 +4,7 @@ namespace Quartz.Features.Tuf;
 public enum TufSort { Recent, Difficulty, Clears, Likes }
 public enum TufListState { Idle, Loading, Ready, Empty, Error }
 public enum TufItemState { Download, Downloading, Extracting, Loading, Load, Retry, Unavailable, ChooseChart }
+public enum TufUpdateState { Unknown, Checking, UpToDate, Available, Updating }
 public sealed class TufDifficultyFilter : IEquatable<TufDifficultyFilter> {
     public static readonly IReadOnlyList<string> RankedNames = BuildRankedNames();
     private static readonly Dictionary<string, int> RankIndex = BuildRankIndex();
@@ -99,7 +100,11 @@ public sealed class TufLevel {
     public string DifficultyColor { get; }
     public int Clears { get; }
     public int Likes { get; }
-    public Uri? DownloadUri { get; }
+    public Uri? DownloadUri { get; private set; }
+    public string FileId { get; set; } = "";
+    public long UpdatedAtUtc { get; set; }
+    public long SizeBytes { get; set; }
+    public TufUpdateState UpdateState { get; set; }
     public string VideoLink { get; set; } = "";
     public string Suffix { get; set; } = "";
     public string MainLevelCode { get; set; } = "";
@@ -124,6 +129,10 @@ public sealed class TufLevel {
         Likes = likes;
         DownloadUri = downloadUri;
         State = downloadUri == null ? TufItemState.Unavailable : TufItemState.Download;
+    }
+    internal void SetSource(Uri? downloadUri, string fileId) {
+        if(downloadUri != null) DownloadUri = downloadUri;
+        if(!string.IsNullOrEmpty(fileId)) FileId = fileId;
     }
 }
 public sealed class TufPage {

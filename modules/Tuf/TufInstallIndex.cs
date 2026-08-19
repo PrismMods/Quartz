@@ -15,6 +15,8 @@ public sealed class TufInstallEntry {
     public string Folder = "";
     public string DownloadUrl = "";
     public string VideoLink = "";
+    public string FileId = "";
+    public long SizeBytes;
     public long InstalledAtUtc;
     public bool NeedsInfo => string.IsNullOrEmpty(Song) || string.IsNullOrEmpty(Difficulty);
     public bool ApplyChart(TufChartInfo? info) {
@@ -71,6 +73,8 @@ public sealed class TufInstallEntry {
         [nameof(Folder)] = Folder,
         [nameof(DownloadUrl)] = DownloadUrl,
         [nameof(VideoLink)] = VideoLink,
+        [nameof(FileId)] = FileId,
+        [nameof(SizeBytes)] = SizeBytes,
         [nameof(InstalledAtUtc)] = InstalledAtUtc
     };
     public static TufInstallEntry? Deserialize(JToken token) {
@@ -91,6 +95,8 @@ public sealed class TufInstallEntry {
                 Folder = folder,
                 DownloadUrl = token[nameof(DownloadUrl)]?.Value<string>() ?? "",
                 VideoLink = TufInput.CapDisplay(token[nameof(VideoLink)]?.Value<string>(), "", 300),
+                FileId = TufInput.CapDisplay(token[nameof(FileId)]?.Value<string>(), "", 64),
+                SizeBytes = Math.Max(0, token[nameof(SizeBytes)]?.Value<long>() ?? 0),
                 InstalledAtUtc = token[nameof(InstalledAtUtc)]?.Value<long>() ?? 0
             };
         } catch(Exception e) { Diag.Ignore(e); return null; }
@@ -99,7 +105,9 @@ public sealed class TufInstallEntry {
         Uri? uri = Uri.TryCreate(DownloadUrl, UriKind.Absolute, out Uri? parsed)
             && TufNetworkPolicy.IsAllowedDownloadUri(parsed) ? parsed : null;
         return new TufLevel(Id, Song, Artist, Creator, Difficulty, DifficultyColor, Clears, Likes, uri) {
-            VideoLink = VideoLink
+            VideoLink = VideoLink,
+            FileId = FileId,
+            SizeBytes = SizeBytes
         };
     }
 }
@@ -109,11 +117,14 @@ public sealed class TufInstallIndex : ISettingsFile {
     public IReadOnlyList<TufInstallEntry> Entries => entries;
     public int Count => entries.Count;
     public TufInstallEntry? Find(int id) => byId.TryGetValue(id, out TufInstallEntry? entry) ? entry : null;
-    public void Record(TufLevel level, string folder) {
+    public void Record(TufLevel level, string folder, bool freshInstall = true) {
         if(level == null || level.Id <= 0 || string.IsNullOrWhiteSpace(folder)) return;
         TufInstallEntry? existing = Find(level.Id);
         long installedAt = existing?.InstalledAtUtc ?? 0;
         if(installedAt <= 0) installedAt = DateTime.UtcNow.Ticks;
+        string fileId = freshInstall ? TufUpdateCheck.RemoteFileId(level) : "";
+        if(fileId.Length == 0) fileId = existing?.FileId ?? "";
+        long size = freshInstall ? 0 : existing?.SizeBytes ?? 0;
         if(existing != null) entries.Remove(existing);
         TufInstallEntry recorded = new() {
             Id = level.Id,
@@ -127,6 +138,8 @@ public sealed class TufInstallIndex : ISettingsFile {
             Folder = Path.GetFullPath(folder),
             DownloadUrl = level.DownloadUri?.ToString() ?? "",
             VideoLink = level.VideoLink,
+            FileId = fileId,
+            SizeBytes = size,
             InstalledAtUtc = installedAt
         };
         entries.Insert(0, recorded);

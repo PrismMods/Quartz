@@ -68,10 +68,11 @@ public sealed class TufDownloadService : IDisposable {
                 .Where(c => TufArchive.IsChartUnderRoot(c, folder)).ToList();
         } catch(Exception e) { Diag.Ignore(e); return Array.Empty<string>(); }
     }
-    public async Task<string> DownloadAsync(TufLevel level, Action<TufItemState, float> progress, CancellationToken token) {
+    public async Task<string> DownloadAsync(TufLevel level, Action<TufItemState, float> progress, CancellationToken token,
+        bool force = false) {
         if(level == null || level.Id <= 0 || !TufNetworkPolicy.IsAllowedDownloadUri(level.DownloadUri))
             throw new InvalidDataException("Level has no safe download URL.");
-        if(TryGetCachedChart(level.Id, out string cached)) return cached;
+        if(!force && TryGetCachedChart(level.Id, out string cached)) return cached;
         TufInstallRoot target = ActiveRoot();
         string stage = Path.Combine(target.Path, StageFolder);
         string part = Path.Combine(stage, level.Id + ".part");
@@ -102,7 +103,8 @@ public sealed class TufDownloadService : IDisposable {
             string chart = TufArchive.SelectChart(extracting, archiveStem);
             if(chart == null) throw new InvalidDataException("Archive contains no playable .adofai chart.");
             string relativeChart = Path.GetRelativePath(extracting, chart);
-            if(Directory.Exists(final)) Directory.Delete(final, true);
+            if(Directory.Exists(final) && TufRollback.Archive(final, target.Path, level.Id) == 0)
+                Directory.Delete(final, true);
             Directory.Move(extracting, final);
             string installed = Path.GetFullPath(Path.Combine(final, relativeChart));
             if(!TufArchive.IsChartUnderRoot(installed, target.Path)) throw new InvalidDataException("Installed chart path is unsafe.");
@@ -165,7 +167,7 @@ public sealed class TufDownloadService : IDisposable {
         }
         return target;
     }
-    private static void CopyDirectory(string from, string to, CancellationToken token) {
+    internal static void CopyDirectory(string from, string to, CancellationToken token) {
         Directory.CreateDirectory(to);
         foreach(string file in Directory.EnumerateFiles(from)) {
             token.ThrowIfCancellationRequested();

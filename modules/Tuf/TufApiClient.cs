@@ -96,6 +96,8 @@ public sealed class TufApiClient : IDisposable {
         ) {
             VideoLink = TufInput.CapDisplay(token.Value<string>("videoLink"), "", 300),
             Suffix = TufInput.CapDisplay(token.Value<string>("suffix"), "", 40),
+            FileId = TufInput.CapDisplay(token.Value<string>("fileId"), "", 64),
+            UpdatedAtUtc = TufUpdateCheck.ParseStamp(token.Value<string>("updatedAt")),
         };
     }
     private static async Task<byte[]> ReadBoundedAsync(Stream stream, int max, CancellationToken token) {

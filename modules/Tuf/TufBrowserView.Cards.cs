@@ -55,7 +55,7 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
             }
             else if(service.Levels.Count > 0)
                 AddStatus(service.ShowInstalled
-                    ? string.Format(Tr("TUF_INSTALLED_COUNT", "{0} level(s) in your library"), service.Levels.Count)
+                    ? InstalledFooter()
                     : Tr("TUF_END", "End of results"), false, null, 38f);
         }
         Canvas.ForceUpdateCanvases();
@@ -74,11 +74,19 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
             .Append(service.GridView ? 'G' : 'L').Append(gridColumns).Append('|')
             .Append(service.InfoRevision).Append('|');
         foreach(TufLevel level in service.Levels)
-            sb.Append(level.Id).Append(':').Append((int)level.State)
+            sb.Append(level.Id).Append(':').Append((int)level.State).Append((int)level.UpdateState)
+                .Append(service.SnapshotCount(level.Id))
                 .Append(level.InstallFolder == null ? '-' : '+')
                 .Append(string.IsNullOrEmpty(level.Error) ? '-' : '!')
                 .Append('#').Append(level.Charts?.Count ?? 0).Append(',');
         return sb.ToString();
+    }
+    private string InstalledFooter() {
+        string text = string.Format(Tr("TUF_INSTALLED_COUNT", "{0} level(s) in your library"), service.Levels.Count);
+        if(service.LibraryBytes > 0) text += "  ·  " + TufDiskSpace.Describe(service.LibraryBytes);
+        if(service.UpdatesAvailable > 0)
+            text += "  ·  " + string.Format(Tr("TUF_UPDATES_READY", "{0} update(s) available"), service.UpdatesAvailable);
+        return text;
     }
     private string EmptyMessage() {
         if(!service.ShowInstalled) return Tr("TUF_EMPTY", "No levels matched your search.");
@@ -138,6 +146,8 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
         x += MetaGap;
         TMP_Text diff = MetaLabel(card, "Difficulty", level.Difficulty, ref x, 128f);
         diff.color = railImage.color;
+        bool installed = IsInstalled(level);
+        if(installed) AddStatusBadge(card, x + MetaGap, level);
         RectTransform songRect = Rect("Song", card, new(0f, 1f), new(1f, 1f), new(20f, -74f), new(-16f, -40f));
         string song = string.IsNullOrEmpty(level.Song) ? Tr("TUF_UNKNOWN_LEVEL", "Level") + " #" + level.Id : level.Song;
         TMP_Text songText = Text(songRect, song, 20f, TextAlignmentOptions.Left);
@@ -159,9 +169,11 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
             stats.overflowMode = TextOverflowModes.Ellipsis;
             TextCompat.NoWrap(stats);
         }
-        bool installed = IsInstalled(level);
-        BuildAction(Rect("Action", card, new(0f, 0f), new(1f, 0f), new(20f, 14f), new(installed ? -66f : -16f, 48f)), level);
+        bool rollback = installed && service.SnapshotCount(level.Id) > 0;
+        float actionRight = installed ? rollback ? -112f : -66f : -16f;
+        BuildAction(Rect("Action", card, new(0f, 0f), new(1f, 0f), new(20f, 14f), new(actionRight, 48f)), level);
         if(installed) BuildDelete(Rect("Delete", card, new(1f, 0f), new(1f, 0f), new(-58f, 14f), new(-16f, 48f)), level);
+        if(rollback) BuildRollback(Rect("Rollback", card, new(1f, 0f), new(1f, 0f), new(-104f, 14f), new(-62f, 48f)), level);
     }
     private void AddCard(TufLevel level) {
         RectTransform card = FixedRow("Level " + level.Id, 94f);
@@ -182,8 +194,9 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
         TMP_Text diff = MetaLabel(card, "Difficulty", level.Difficulty, ref x, 150f);
         diff.color = railImage.color;
         bool installed = IsInstalled(level);
-        if(installed) AddInstalledBadge(card, x + MetaGap);
-        float textRight = installed ? -204f : -150f;
+        if(installed) AddStatusBadge(card, x + MetaGap, level);
+        bool rollback = installed && service.SnapshotCount(level.Id) > 0;
+        float textRight = installed ? rollback ? -258f : -204f : -150f;
         RectTransform songRect = Rect("Song", card, new(0f, 1f), new(1f, 1f), new(22f, -66f), new(textRight, -34f));
         string song = string.IsNullOrEmpty(level.Song) ? Tr("TUF_UNKNOWN_LEVEL", "Level") + " #" + level.Id : level.Song;
         TMP_Text songText = Text(songRect, song, 23f, TextAlignmentOptions.Left);
@@ -197,11 +210,13 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
         TextCompat.NoWrap(meta);
         AddAction(card, level);
         if(installed) AddDelete(card, level);
+        if(rollback) BuildRollback(Rect("Rollback", card, new(1f, 0.5f), new(1f, 0.5f), new(-246f, -23f), new(-200f, 23f)), level);
     }
     private string CardMeta(TufLevel level) {
+        string size = level.SizeBytes > 0 ? "  ·  " + TufDiskSpace.Describe(level.SizeBytes) : "";
         if(string.IsNullOrEmpty(level.Artist) && string.IsNullOrEmpty(level.Creator))
-            return Tr("TUF_INSTALLED_UNKNOWN", "Downloaded before Quartz tracked level details.");
-        return $"{level.Artist}  ·  {level.Creator}  ·  ✓ {level.Clears:N0}  ♥ {level.Likes:N0}";
+            return Tr("TUF_INSTALLED_UNKNOWN", "Downloaded before Quartz tracked level details.") + size;
+        return $"{level.Artist}  ·  {level.Creator}  ·  ✓ {level.Clears:N0}  ♥ {level.Likes:N0}{size}";
     }
     private bool IsInstalled(TufLevel level) =>
         level.InstallFolder != null
@@ -217,17 +232,44 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
         x += width;
         return text;
     }
-    private void AddInstalledBadge(RectTransform card, float x) {
-        string value = Tr("TUF_INSTALLED", "Installed");
-        RectTransform badge = Rect("Installed Badge", card, new(0f, 1f), new(0f, 1f), new(x, -33f), new(x, -10f));
+    private void AddStatusBadge(RectTransform card, float x, TufLevel level) {
+        TufUpdateState state = level.UpdateState;
+        string value = state switch {
+            TufUpdateState.Checking => Tr("TUF_UPDATE_CHECKING", "Checking…"),
+            TufUpdateState.Available => Tr("TUF_UPDATE_AVAILABLE", "Update"),
+            TufUpdateState.UpToDate => Tr("TUF_UPDATE_CURRENT", "Up to date"),
+            TufUpdateState.Updating => Tr("TUF_UPDATE_RUNNING", "Updating…"),
+            _ => Tr("TUF_INSTALLED", "Installed")
+        };
+        RectTransform badge = Rect("Status Badge", card, new(0f, 1f), new(0f, 1f), new(x, -33f), new(x, -10f));
         Image image = badge.gameObject.AddComponent<Image>();
         image.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
         image.type = Image.Type.Sliced;
-        image.color = new(0.38f, 0.78f, 0.52f, 0.22f);
-        image.raycastTarget = false;
+        image.color = BadgeFill(state);
+        bool clickable = !service.IsBusy && state is not TufUpdateState.Checking and not TufUpdateState.Updating;
+        image.raycastTarget = clickable;
         TMP_Text label = Text(badge, value, 13f, TextAlignmentOptions.Center);
-        label.color = new(0.62f, 0.92f, 0.72f, 0.95f);
+        label.color = BadgeText(state);
         label.raycastTarget = false;
         badge.offsetMax = new(x + Mathf.Ceil(label.GetPreferredValues(value).x) + 22f, -10f);
+        if(!clickable) return;
+        GenerateUI.AddButton(badge.gameObject, input => {
+            if(input != PointerEventData.InputButton.Left) return;
+            if(level.UpdateState == TufUpdateState.Available) service.UpdateLevel(level);
+            else service.CheckUpdate(level);
+        });
+        badge.AddToolTip("DESC_TUF_UPDATE_BADGE",
+            "Click to ask TUF whether this level has been re-uploaded since you downloaded it. "
+            + "When an update is waiting, clicking downloads it over the copy you have.");
     }
+    private static Color BadgeFill(TufUpdateState state) => state switch {
+        TufUpdateState.Available => new(0.29f, 0.56f, 0.95f, 0.32f),
+        TufUpdateState.Checking or TufUpdateState.Updating => new(1f, 1f, 1f, 0.12f),
+        _ => new(0.38f, 0.78f, 0.52f, 0.22f)
+    };
+    private static Color BadgeText(TufUpdateState state) => state switch {
+        TufUpdateState.Available => new(0.72f, 0.86f, 1f, 0.98f),
+        TufUpdateState.Checking or TufUpdateState.Updating => new(1f, 1f, 1f, 0.6f),
+        _ => new(0.62f, 0.92f, 0.72f, 0.95f)
+    };
 }

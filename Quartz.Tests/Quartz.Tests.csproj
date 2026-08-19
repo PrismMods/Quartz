@@ -124,6 +124,8 @@
 		<Compile Include="../modules/Tuf/TufDiskSpace.cs" Link="Source/TufDiskSpace.cs" />
 		<Compile Include="../modules/Tuf/TufInstallPaths.cs" Link="Source/TufInstallPaths.cs" />
 		<Compile Include="../modules/Tuf/TufInstallIndex.cs" Link="Source/TufInstallIndex.cs" />
+		<Compile Include="../modules/Tuf/TufUpdateCheck.cs" Link="Source/TufUpdateCheck.cs" />
+		<Compile Include="../modules/Tuf/TufRollbackPaths.cs" Link="Source/TufRollbackPaths.cs" />
 		<Compile Include="../modules/Tuf/TufChartInfo.cs" Link="Source/TufChartInfo.cs" />
 		<Compile Include="../modules/Tuf/TufCredits.cs" Link="Source/TufCredits.cs" />
 		<Compile Include="../modules/Tuf/TufPackModels.cs" Link="Source/TufPackModels.cs" />

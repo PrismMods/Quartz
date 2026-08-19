@@ -9,6 +9,7 @@ namespace Quartz.UI.Factory.Page;
 internal sealed class TufSettingsView : MonoBehaviour {
     private TufService service;
     private TMP_Text folderValue;
+    private TMP_Text libraryValue;
     private TMP_Text status;
     private RectTransform linkedNoteRow;
     private string notice = "";
@@ -23,8 +24,9 @@ internal sealed class TufSettingsView : MonoBehaviour {
         service.Changed += Refresh;
         Refresh();
     }
-    public void SetLabels(TMP_Text folderValue, TMP_Text status, RectTransform linkedNoteRow) {
+    public void SetLabels(TMP_Text folderValue, TMP_Text libraryValue, TMP_Text status, RectTransform linkedNoteRow) {
         this.folderValue = folderValue;
+        this.libraryValue = libraryValue;
         this.status = status;
         this.linkedNoteRow = linkedNoteRow;
     }
@@ -43,6 +45,10 @@ internal sealed class TufSettingsView : MonoBehaviour {
             linkedNoteRow.gameObject.SetActive(service.LinkTufHelperLite
                 && !string.IsNullOrEmpty(service.CustomLevelsRoot));
         if(folderValue != null) folderValue.text = service.ActiveRootPath;
+        if(libraryValue != null)
+            libraryValue.text = string.Format(
+                MainCore.Tr.Get("TUF_LIBRARY_SUMMARY", "{0} level(s) · {1}"),
+                service.InstalledCount, TufDiskSpace.Describe(service.LibraryBytes));
         if(status == null) return;
         if(notice.Length > 0) {
             status.gameObject.SetActive(true);
@@ -116,6 +122,10 @@ internal static class TufSettingsUI {
         );
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(content.transform)),
             "TUF_LIBRARY", "Level Library");
+        service.EnsureLibraryMeasured();
+        RectTransform summaryRow = GenerateUI.Row(content.transform, 30f);
+        TMP_Text summaryText = GenerateUI.AddMutedText(summaryRow, 15f);
+        summaryText.text = "";
         RectTransform pathRow = GenerateUI.Row(content.transform, 34f);
         TMP_Text pathText = GenerateUI.AddMutedText(pathRow, 15f);
         pathText.text = service.ActiveRootPath;
@@ -174,7 +184,7 @@ internal static class TufSettingsUI {
         RectTransform statusRow = GenerateUI.Row(content.transform, 44f);
         TMP_Text statusText = GenerateUI.AddMutedText(statusRow, 15f);
         statusText.text = "";
-        view.SetLabels(pathText, statusText, linkedNoteRow);
+        view.SetLabels(pathText, summaryText, statusText, linkedNoteRow);
         view.Bind(service);
     }
     private static void PickFolder(TufService service, TufSettingsView view) {

@@ -9,6 +9,7 @@ internal sealed class TufLevelActionRunner {
     private readonly Action notify;
     private readonly Action<TufLevel> installed;
     private CancellationTokenSource actionRequest;
+    public Action<TufLevel, bool> Finished;
     private int activeLevelId;
     private bool disposed;
     public bool IsBusy => activeLevelId != 0;
@@ -42,11 +43,21 @@ internal sealed class TufLevelActionRunner {
             }
             return;
         }
+        StartDownload(level, false);
+    }
+    public void UpdateLevel(TufLevel level) {
+        if(level == null || IsBusy || level.DownloadUri == null
+            || level.State is TufItemState.Downloading or TufItemState.Extracting or TufItemState.Loading) return;
+        if(level.State == TufItemState.ChooseChart) ExitChoose(level, notify: false);
+        activeLevelId = level.Id;
+        StartDownload(level, true);
+    }
+    private void StartDownload(TufLevel level, bool force) {
         actionRequest?.Cancel();
         actionRequest?.Dispose();
         actionRequest = new CancellationTokenSource();
         Update(level, TufItemState.Downloading, 0f, "");
-        Download(level, actionRequest.Token);
+        Download(level, actionRequest.Token, force);
     }
     private void LaunchMainLevel(TufLevel level, string code) {
         MainCore.Log.Msg($"[TUF] opening base-game level {code} for #{level.Id}");
@@ -84,7 +95,7 @@ internal sealed class TufLevelActionRunner {
         if(level.State == TufItemState.ChooseChart) level.State = TufItemState.Load;
         if(notify) this.notify();
     }
-    private async void Download(TufLevel level, CancellationToken token) {
+    private async void Download(TufLevel level, CancellationToken token, bool force) {
         int lastPercent = -2;
         try {
             await downloads.DownloadAsync(level, (state, progress) => {
@@ -93,7 +104,7 @@ internal sealed class TufLevelActionRunner {
                     && percent / 5 == lastPercent / 5) return;
                 lastPercent = percent;
                 MainThread.Enqueue(() => Update(level, state, progress, ""));
-            }, token);
+            }, token, force);
             MainThread.Enqueue(() => {
                 if(disposed || token.IsCancellationRequested) return;
                 installed?.Invoke(level);
@@ -134,6 +145,7 @@ internal sealed class TufLevelActionRunner {
             level.Progress = 0f;
             level.Error = error ?? "";
         }
+        Finished?.Invoke(level, state != TufItemState.Retry);
         notify();
     }
     private void Update(TufLevel level, TufItemState state, float progress, string error) {

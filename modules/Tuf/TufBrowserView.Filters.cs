@@ -44,6 +44,13 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
         installedLabel.gameObject.AddComponent<TextLocalization>().Init("TUF_INSTALLED", "Installed");
         installedChip.rectTransform.AddToolTip("DESC_TUF_INSTALLED",
             "Show only the levels you have downloaded, newest first. Works offline.");
+        (updatesChip, updatesLabel) = Chip(sortRow, "", 112f, () => {
+            DisarmDelete();
+            service.CheckUpdates();
+        });
+        updatesChip.rectTransform.AddToolTip("DESC_TUF_CHECK_UPDATES",
+            "Ask TUF whether any level in your library has been re-uploaded since you downloaded it. "
+            + "One request per level, so a large library takes a moment.");
         gridChip = IconChip(sortRow, UISprite.Grid128, 48f, () => service.SetGridView(!service.GridView));
         gridChip.rectTransform.AddToolTip("DESC_TUF_GRID_VIEW",
             "Lay the level browser out as a grid of cards instead of one column of rows. The column count follows the window width.");
@@ -233,6 +240,15 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
             installedChip.color = service.ShowInstalled ? UIColors.ObjectActive : UIColors.ObjectBG;
         if(gridChip != null)
             gridChip.color = service.GridView ? UIColors.ObjectActive : UIColors.ObjectBG;
+        if(updatesChip != null && updatesLabel != null) {
+            updatesLabel.fontSize = 15f;
+            updatesLabel.text = service.CheckingUpdates
+                ? string.Format(Tr("TUF_CHECKING_UPDATES", "{0}/{1}"), service.UpdateCheckDone, service.UpdateCheckTotal)
+                : service.UpdatesAvailable > 0
+                    ? string.Format(Tr("TUF_UPDATES_COUNT", "Updates ({0})"), service.UpdatesAvailable)
+                    : Tr("TUF_CHECK_UPDATES", "Updates");
+            updatesChip.color = service.UpdatesAvailable > 0 ? UIColors.ObjectActive : UIColors.ObjectBG;
+        }
         directionChip.color = service.Ascending ? UIColors.ObjectActive : UIColors.ObjectBG;
         directionLabel.text = service.Ascending ? "↑" : "↓";
         difficultyRange?.SetRange(service.MinDifficultyIndex, service.MaxDifficultyIndex);

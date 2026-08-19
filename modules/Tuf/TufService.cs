@@ -74,7 +74,10 @@ public sealed partial class TufService : IRuntimeService {
         } else {
             launcher.Initialize(MainCore.Paths.TufLevelsPath, TrustedRoots);
         }
-        actions = new TufLevelActionRunner(levels, downloads, launcher, Notify, RecordInstalledLevel);
+        actions = new TufLevelActionRunner(levels, downloads, launcher, Notify, RecordInstalledLevel) {
+            Finished = OnActionFinished
+        };
+        RefreshSnapshotCounts();
     }
     public void EnsureLoaded() {
         if(State == TufListState.Idle) Refresh();
@@ -105,6 +108,7 @@ public sealed partial class TufService : IRuntimeService {
     }
     public void Dispose() {
         disposed = true;
+        TufRollbackDialog.Close();
         settings?.Save();
         index?.Save();
         if(settings != null) SettingsRegistry.Unregister(settings);
@@ -113,6 +117,7 @@ public sealed partial class TufService : IRuntimeService {
         listRequest?.Cancel();
         moveRequest?.Cancel();
         infoRequest?.Cancel();
+        updateRequest?.Cancel();
         actions?.Dispose();
         downloads?.Cancel();
         launcher?.Cancel();
@@ -122,6 +127,7 @@ public sealed partial class TufService : IRuntimeService {
         listRequest?.Dispose();
         moveRequest?.Dispose();
         infoRequest?.Dispose();
+        updateRequest?.Dispose();
         downloads?.Dispose();
         api?.Dispose();
         TufPreviewCache.Clear();

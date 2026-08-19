@@ -7,8 +7,14 @@ namespace Quartz.Features.Tuf;
 public sealed partial class TufService : IRuntimeService {
     internal void RecordInstalledLevel(TufLevel level) {
         if(disposed || index == null || level?.InstallFolder == null) return;
+        TufInstallEntry previous = index.Data.Find(level.Id);
+        string previousFileId = previous?.FileId ?? "";
+        string previousSong = previous?.Song ?? "";
+        long previousInstalledAt = previous?.InstalledAtUtc ?? 0;
+        bool replaced = previous != null;
         index.Data.Record(level, level.InstallFolder);
         index.RequestSave();
+        LabelNewSnapshot(level.Id, previousFileId, previousSong, previousInstalledAt, replaced);
         settings?.Data.RememberRoot(Path.GetDirectoryName(Path.GetFullPath(level.InstallFolder)));
         settings?.RequestSave();
     }
@@ -40,8 +46,10 @@ public sealed partial class TufService : IRuntimeService {
         if(index == null) return;
         bool pruned = index.Data.PruneMissing();
         AdoptOrphans();
+        RefreshSnapshotCounts();
         if(pruned) index.RequestSave();
         BackfillInstalledInfo();
+        ScanSizes();
         RebuildInstalledList();
     }
     private void BackfillInstalledInfo() {
@@ -126,6 +134,8 @@ public sealed partial class TufService : IRuntimeService {
             TufLevel level = entry.ToLevel();
             level.InstallFolder = entry.Folder;
             level.InstalledAtUtc = entry.InstalledAtUtc;
+            level.SizeBytes = entry.SizeBytes;
+            level.UpdateState = UpdateStateOf(entry.Id);
             level.State = TufItemState.Load;
             levels.Add(level);
         }
@@ -181,6 +191,9 @@ public sealed partial class TufService : IRuntimeService {
         }
         index.Data.Remove(level.Id);
         index.RequestSave();
+        TufRollback.Prune(RollbackRoot, level.Id, 0);
+        RefreshSnapshotCounts();
+        InfoRevision++;
         if(ShowInstalled) LoadInstalled();
         else {
             level.InstallFolder = null;

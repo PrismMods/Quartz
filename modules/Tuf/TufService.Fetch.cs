@@ -75,8 +75,10 @@ public sealed partial class TufService : IRuntimeService {
                 level.State = TufItemState.Load;
                 level.InstallFolder = entry.Folder;
                 level.InstalledAtUtc = entry.InstalledAtUtc;
+                level.SizeBytes = entry.SizeBytes;
+                NoteUpdateState(entry, level);
                 if(string.IsNullOrEmpty(entry.Song)) {
-                    index.Data.Record(level, entry.Folder);
+                    index.Data.Record(level, entry.Folder, false);
                     index.RequestSave();
                 }
                 return;

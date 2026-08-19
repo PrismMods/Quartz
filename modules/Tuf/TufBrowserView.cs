@@ -50,6 +50,8 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
     private Image installedChip;
     private TMP_Text installedLabel;
     private Image gridChip;
+    private Image updatesChip;
+    private TMP_Text updatesLabel;
     private int gridColumns = 2;
     private string listSignature;
     private bool built;
