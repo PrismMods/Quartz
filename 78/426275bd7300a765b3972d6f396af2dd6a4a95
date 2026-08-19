@@ -1,0 +1,25 @@
+Quartz/Resource/Export/Lang/en-US.json
+  s_cc4a9f6fa99f56::t_fce69a20201099 388
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_cc4a9f6fa99f56::t_3b4e77d174dfac 388
+Quartz/Resource/Export/Lang/zh-CN.json
+  s_cc4a9f6fa99f56::t_cc0e0baee689af 386
+Quartz/UI/Nav/CorePages.cs
+  s_cc4a9f6fa99f56::t_ee060b555b0cec 51-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "78426275bd7300a765b3972d6f396af2dd6a4a95",
+  "prompts": {},
+  "sessions": {
+    "s_cc4a9f6fa99f56": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84faa67f-7b89-4d75-a9ef-64cd518ddd04",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
