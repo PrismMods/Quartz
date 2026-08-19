@@ -37,6 +37,8 @@ public static partial class ModuleMigration {
         new Rule { Id = "nostalgia-tweaks", FileName = "Nostalgia.json" },
         new Rule { Id = "nostalgia-editor", FileName = "Nostalgia.json" },
         new Rule { Id = "tuf", FileName = "TUF/Settings.json" },
+        new Rule { Id = "discord", FileName = "Discord.json", Field = "Enabled", Default = false },
+        new Rule { Id = "minecraft", FileName = "Minecraft.json", Field = "Enabled", Default = false },
     ];
     public sealed class Split {
         public string From;
