@@ -130,6 +130,7 @@
 		<Compile Include="../modules/Tuf/TufCredits.cs" Link="Source/TufCredits.cs" />
 		<Compile Include="../modules/Tuf/TufPackModels.cs" Link="Source/TufPackModels.cs" />
 		<Compile Include="../modules/Tuf/TufPackApiClient.cs" Link="Source/TufPackApiClient.cs" />
+		<Compile Include="../Quartz/Features/PlayCount/LevelAngleSignature.cs" Link="Source/LevelAngleSignature.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

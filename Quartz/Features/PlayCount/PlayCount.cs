@@ -230,11 +230,18 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
     }
     private static void HashLevelFile(string path, string cacheKey, string pendingKey) {
         string hash = null;
+        string legacyHash = null;
         Exception error = null;
         try {
-            using FileStream stream = new(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            using SHA256 sha = SHA256.Create();
-            hash = Hex(sha.ComputeHash(stream));
+            byte[] bytes;
+            using(FileStream stream = new(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
+                using MemoryStream buffer = new();
+                stream.CopyTo(buffer);
+                bytes = buffer.ToArray();
+            }
+            legacyHash = Sha256(bytes);
+            string signature = LevelAngleSignature.Extract(DecodeText(bytes));
+            hash = signature != null ? "a:" + Sha256(signature) : legacyHash;
         } catch(Exception e) {
             error = e;
         }
@@ -247,8 +254,14 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
                 MainCore.Log.Wrn("PlayCount map hash failed: " + error?.Message);
                 return;
             }
+            MigratePendingMapKey("custom:" + legacyHash, "custom:" + hash);
             MigratePendingMapKey(pendingKey, "custom:" + hash);
         });
+    }
+    private static string DecodeText(byte[] bytes) {
+        using MemoryStream ms = new(bytes);
+        using StreamReader reader = new(ms, Encoding.UTF8, true);
+        return reader.ReadToEnd();
     }
     private static void MigratePendingMapKey(string pendingKey, string finalKey) {
         if(pendingKey == finalKey) return;

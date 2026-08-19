@@ -1,5 +1,9 @@
 List<(string Name, Action Run)> tests = [
     ("SemVer parses and orders channels", SemVerTests.TestSemVer),
+    ("Attempt map key survives decoration, camera, and settings edits", LevelAngleSignatureTests.TestVisualEditsKeepTheSameSignature),
+    ("Attempt map key changes when the chart angles change", LevelAngleSignatureTests.TestAngleEditsChangeTheSignature),
+    ("Attempt map key reads pathData on old-format levels", LevelAngleSignatureTests.TestOldFormatUsesPathData),
+    ("Attempt map key declines unparseable level files", LevelAngleSignatureTests.TestUnparseableInputFallsBackToNull),
     ("SemVer formats and parses channels", SemVerTests.TestSemVerFormatAndChannels),
     ("SemVer ranks updates inside the selected channel", SemVerTests.TestSemVerChannelPreference),
     ("AtomicFile replaces without temp debris", AtomicFileTests.TestAtomicFile),
