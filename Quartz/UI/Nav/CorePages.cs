@@ -45,6 +45,7 @@ internal static class CorePages {
         // Pages come from the nostalgia module; the category hides itself when it is not installed.
         Category("nostalgia", "Nostalgia", "NOSTALGIA", UISprite.ClockRewind128, 60, togglable: true);
         Category("tuf", "TUF", "TUF", UISprite.TufLogo, 70, togglable: true);
+        Category("others", "Others", "OTHERS", UISprite.Grid128, 75, togglable: true);
         Category("search", "Search", "SEARCH", UISprite.MagnifyingGlass128, 80, visible: static () => CoreNav);
         Category("profiles", "Profiles", "PROFILES", UISprite.Users128, 90, visible: static () => CoreNav);
         Category("import", "Import", "IMPORT", UISprite.Book128, 100, visible: static () => CoreNav);

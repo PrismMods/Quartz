@@ -7,7 +7,8 @@
     { "key": "visuals",  "title": "Visuals",  "titleKey": "VISUALS",   "order": 30 },
     { "key": "tools",    "title": "Tools",    "titleKey": "TOOLS",     "order": 40 },
     { "key": "legacy",   "title": "Legacy",   "titleKey": "NOSTALGIA", "order": 50 },
-    { "key": "editor",   "title": "Editor",   "titleKey": "EDITOR",    "order": 60 }
+    { "key": "editor",   "title": "Editor",   "titleKey": "EDITOR",    "order": 60 },
+    { "key": "others",   "title": "Others",   "titleKey": "OTHERS",    "order": 70 }
   ],
   "modules": []
 }

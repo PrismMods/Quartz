@@ -82,6 +82,7 @@ List<(string Name, Action Run)> tests = [
     ("Module catalog still honours per-module urls", ModuleCatalogTests.TestALooseUrlCatalogStillWorks),
     ("Module catalog refuses an unverifiable bundle", ModuleCatalogTests.TestAnUnusableBundleIsNotOffered),
     ("Module catalog never offers a downgrade as an update", ModuleCatalogTests.TestAnOlderCatalogIsNeverOfferedAsAnUpdate),
+    ("Every module group has a togglable category", ModuleGroupTests.TestEveryModuleGroupHasACategory),
     ("Module dependencies load before their dependents", ModuleOrderTests.TestDependenciesLoadBeforeDependents),
     ("Module load order is deterministic", ModuleOrderTests.TestOrderIsDeterministic),
     ("A missing module dependency cascade-skips its dependents", ModuleOrderTests.TestMissingDependencyCascades),
