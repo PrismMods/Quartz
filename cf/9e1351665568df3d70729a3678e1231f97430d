@@ -1,0 +1,45 @@
+Quartz/Resource/Export/Lang/en-US.json
+  s_966127582e874f::t_cc3361673db03c 20,109-110,112,114,129,149-150,170,238,420,422,424-425
+modules/KeyViewer/Lang/ko-KR.json
+  s_966127582e874f::t_4709f592e8ecb7 111-124
+modules/ProgressBar/Lang/en-US.json
+  s_966127582e874f::t_cc3361673db03c 32-33
+modules/Combo/Lang/ko-KR.json
+  s_966127582e874f::t_cc3361673db03c 34-35
+modules/Panels/Lang/ko-KR.json
+  s_966127582e874f::t_cc3361673db03c 76-77
+modules/SongTitle/Lang/en-US.json
+  s_966127582e874f::t_cc3361673db03c 17-18
+modules/KeyViewer/Lang/en-US.json
+  s_966127582e874f::t_4709f592e8ecb7 111-124
+modules/ProgressBar/Lang/ko-KR.json
+  s_966127582e874f::t_cc3361673db03c 32-33
+modules/Judgement/Lang/en-US.json
+  s_966127582e874f::t_cc3361673db03c 4-5
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_966127582e874f::t_cc3361673db03c 20,109-110,112,114,129,149-150,170,238,420,422,424-425
+modules/Judgement/Lang/ko-KR.json
+  s_966127582e874f::t_cc3361673db03c 4-5
+modules/Panels/Lang/en-US.json
+  s_966127582e874f::t_cc3361673db03c 76-77
+modules/Combo/Lang/en-US.json
+  s_966127582e874f::t_cc3361673db03c 34-35
+modules/SongTitle/Lang/ko-KR.json
+  s_966127582e874f::t_cc3361673db03c 17-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "cf9e1351665568df3d70729a3678e1231f97430d",
+  "prompts": {},
+  "sessions": {
+    "s_966127582e874f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c873bedc-4244-4895-ab05-02d409a3b5e7",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
