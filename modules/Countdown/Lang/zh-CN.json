@@ -11,7 +11,7 @@
     "COUNTDOWN_HAYWIRE_ABOUT": "保留游戏原本的倒计时，但将其放慢：把前奏轨道的速度乘以 2 的幂，直到倒计时节拍落入下方区间。音乐音高始终不变——音频定位会相应回拉，使第一次判定仍落在原来的节拍上。",
     "COUNTDOWN_MAXBPM": "倒计时速度上限",
     "COUNTDOWN_MINBPM": "倒计时速度下限",
-    "COUNTDOWN_MODE_HAYWIRE": "Haywire",
+    "COUNTDOWN_MODE_HAYWIRE": "异常失控",
     "COUNTDOWN_MODE_LABEL": "倒计时模式",
     "COUNTDOWN_MODE_METRONOME": "节拍器",
     "COUNTDOWN_NUMERATOR": "每小节拍数",
