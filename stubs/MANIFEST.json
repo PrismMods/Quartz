@@ -2753,6 +2753,7 @@
           "System.String TMPro.TMP_InputField::get_text()",
           "System.String TMPro.TMP_InputField::text()",
           "System.Void TMPro.TMP_InputField::ActivateInputField()",
+          "System.Void TMPro.TMP_InputField::ForceLabelUpdate()",
           "System.Void TMPro.TMP_InputField::SetTextWithoutNotify(System.String)",
           "System.Void TMPro.TMP_InputField::set_caretBlinkRate(System.Single)",
           "System.Void TMPro.TMP_InputField::set_caretColor(UnityEngine.Color)",
@@ -3225,8 +3226,15 @@
           "System.Single UnityEngine.AudioClip::get_length()",
           "System.Single UnityEngine.AudioClip::length()",
           "UnityEngine.AudioClip UnityEngine.AudioClip::Create(System.String,System.Int32,System.Int32,System.Int32,System.Boolean)",
+          "UnityEngine.AudioClip UnityEngine.AudioClip::Create(System.String,System.Int32,System.Int32,System.Int32,System.Boolean,UnityEngine.AudioClip/PCMReaderCallback)",
           "UnityEngine.AudioDataLoadState UnityEngine.AudioClip::get_loadState()",
           "UnityEngine.AudioDataLoadState UnityEngine.AudioClip::loadState()"
+        ]
+      },
+      {
+        "type": "UnityEngine.AudioClip/PCMReaderCallback",
+        "members": [
+          "System.Void UnityEngine.AudioClip/PCMReaderCallback::.ctor(System.Object,System.IntPtr)"
         ]
       },
       {
@@ -3259,6 +3267,8 @@
       {
         "type": "UnityEngine.AudioSource",
         "members": [
+          "System.Boolean UnityEngine.AudioSource::bypassEffects()",
+          "System.Boolean UnityEngine.AudioSource::bypassListenerEffects()",
           "System.Boolean UnityEngine.AudioSource::get_isPlaying()",
           "System.Boolean UnityEngine.AudioSource::get_mute()",
           "System.Boolean UnityEngine.AudioSource::ignoreListenerPause()",
@@ -3282,6 +3292,8 @@
           "System.Void UnityEngine.AudioSource::SetScheduledEndTime(System.Double)",
           "System.Void UnityEngine.AudioSource::Stop()",
           "System.Void UnityEngine.AudioSource::UnPause()",
+          "System.Void UnityEngine.AudioSource::set_bypassEffects(System.Boolean)",
+          "System.Void UnityEngine.AudioSource::set_bypassListenerEffects(System.Boolean)",
           "System.Void UnityEngine.AudioSource::set_clip(UnityEngine.AudioClip)",
           "System.Void UnityEngine.AudioSource::set_ignoreListenerPause(System.Boolean)",
           "System.Void UnityEngine.AudioSource::set_loop(System.Boolean)",
@@ -3298,6 +3310,17 @@
           "UnityEngine.Audio.AudioMixerGroup UnityEngine.AudioSource::outputAudioMixerGroup()",
           "UnityEngine.AudioClip UnityEngine.AudioSource::clip()",
           "UnityEngine.AudioClip UnityEngine.AudioSource::get_clip()"
+        ]
+      },
+      {
+        "type": "UnityEngine.Microphone",
+        "members": [
+          "System.Int32 UnityEngine.Microphone::GetPosition(System.String)",
+          "System.String[] UnityEngine.Microphone::devices()",
+          "System.String[] UnityEngine.Microphone::get_devices()",
+          "System.Void UnityEngine.Microphone::End(System.String)",
+          "System.Void UnityEngine.Microphone::GetDeviceCaps(System.String,System.Int32\u0026,System.Int32\u0026)",
+          "UnityEngine.AudioClip UnityEngine.Microphone::Start(System.String,System.Boolean,System.Int32,System.Int32)"
         ]
       }
     ]
@@ -3612,6 +3635,21 @@
         "type": "UnityEngine.Graphics",
         "members": [
           "System.Void UnityEngine.Graphics::Blit(UnityEngine.Texture,UnityEngine.RenderTexture)"
+        ]
+      },
+      {
+        "type": "UnityEngine.HideFlags",
+        "members": [
+          "System.Int32 UnityEngine.HideFlags::value__",
+          "UnityEngine.HideFlags UnityEngine.HideFlags::DontSave",
+          "UnityEngine.HideFlags UnityEngine.HideFlags::DontSaveInBuild",
+          "UnityEngine.HideFlags UnityEngine.HideFlags::DontSaveInEditor",
+          "UnityEngine.HideFlags UnityEngine.HideFlags::DontUnloadUnusedAsset",
+          "UnityEngine.HideFlags UnityEngine.HideFlags::HideAndDontSave",
+          "UnityEngine.HideFlags UnityEngine.HideFlags::HideInHierarchy",
+          "UnityEngine.HideFlags UnityEngine.HideFlags::HideInInspector",
+          "UnityEngine.HideFlags UnityEngine.HideFlags::None",
+          "UnityEngine.HideFlags UnityEngine.HideFlags::NotEditable"
         ]
       },
       {
@@ -4062,10 +4100,12 @@
           "System.Void UnityEngine.Object::Destroy(UnityEngine.Object)",
           "System.Void UnityEngine.Object::DestroyImmediate(UnityEngine.Object)",
           "System.Void UnityEngine.Object::DontDestroyOnLoad(UnityEngine.Object)",
+          "System.Void UnityEngine.Object::set_hideFlags(UnityEngine.HideFlags)",
           "System.Void UnityEngine.Object::set_name(System.String)",
           "T UnityEngine.Object::FindAnyObjectByType()",
           "T UnityEngine.Object::Instantiate(T,UnityEngine.Transform)",
-          "T[] UnityEngine.Object::FindObjectsByType(UnityEngine.FindObjectsSortMode)"
+          "T[] UnityEngine.Object::FindObjectsByType(UnityEngine.FindObjectsSortMode)",
+          "UnityEngine.HideFlags UnityEngine.Object::hideFlags()"
         ]
       },
       {

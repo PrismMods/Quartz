@@ -2,6 +2,7 @@ namespace Quartz.Features.Discord;
 public static class DiscordPermissions {
     public const ulong Administrator = 1UL << 3;
     public const ulong ViewChannel = 1UL << 10;
+    public const ulong SendMessages = 1UL << 11;
     public static bool CanView(
         string guildId, string ownerId, IReadOnlyList<DiscordRole> roles,
         string userId, IReadOnlyList<string> memberRoles, IReadOnlyList<PermissionOverwrite> overwrites

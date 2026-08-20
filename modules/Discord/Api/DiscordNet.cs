@@ -12,12 +12,14 @@ public static class DiscordNet {
     public static string Https { get; private set; } = "not run";
     public static string Gateway { get; private set; } = "not run";
     public static string Crypto { get; private set; } = "not run";
+    public static string Native { get; private set; } = "not run";
     public static void SelfTest(Action onUpdate) {
         if(Running) return;
         Running = true;
         Https = "testing...";
         Gateway = "waiting";
         Crypto = "waiting";
+        Native = "waiting";
         Publish(onUpdate);
         Thread worker = new(() => {
             Https = TestHttps();
@@ -26,6 +28,8 @@ public static class DiscordNet {
             Gateway = TestGateway();
             Publish(onUpdate);
             Crypto = TestCrypto();
+            Publish(onUpdate);
+            Native = TestNative();
             Running = false;
             Publish(onUpdate);
         }) {
@@ -35,7 +39,7 @@ public static class DiscordNet {
         worker.Start();
     }
     private static void Publish(Action onUpdate) {
-        MainCore.Log.Msg($"[Discord] https={Https} gateway={Gateway} crypto={Crypto}");
+        MainCore.Log.Msg($"[Discord] https={Https} gateway={Gateway} crypto={Crypto} native={Native}");
         if(onUpdate != null) MainThread.Enqueue(onUpdate);
     }
     private static string TestHttps() {
@@ -96,6 +100,23 @@ public static class DiscordNet {
             return $"ok — RSA-{bits} OAEP-SHA256 and the token store both work ({spki.Length}-byte SPKI)";
         } catch(Exception e) {
             return "FAILED — " + Describe(e);
+        }
+    }
+    private static string TestNative() {
+        IntPtr handle = IntPtr.Zero;
+        try {
+            string rid = VoiceNatives.Rid();
+            string library = NativeLib.SystemLibrary();
+            handle = NativeLib.Load(library);
+            if(handle == IntPtr.Zero) return $"FAILED — could not dlopen {library}";
+            IntPtr symbol = NativeLib.Symbol(handle, NativeLib.SystemSymbol());
+            if(symbol == IntPtr.Zero)
+                return $"FAILED — opened {library} but could not resolve {NativeLib.SystemSymbol()}";
+            return $"ok — native loading works, platform {rid ?? "unsupported"}";
+        } catch(Exception e) {
+            return "FAILED — " + Describe(e);
+        } finally {
+            NativeLib.Free(handle);
         }
     }
     private static string Describe(Exception e) {

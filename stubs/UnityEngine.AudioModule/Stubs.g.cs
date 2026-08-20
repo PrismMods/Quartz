@@ -35,10 +35,12 @@ namespace UnityEngine {
         public global::UnityEngine.AudioDataLoadState loadState { get => throw null; }
         public int samples { get => throw null; }
         public static global::UnityEngine.AudioClip Create(string name, int lengthSamples, int channels, int frequency, bool stream) => throw null;
+        public static global::UnityEngine.AudioClip Create(string name, int lengthSamples, int channels, int frequency, bool stream, global::UnityEngine.AudioClip.PCMReaderCallback pcmreadercallback) => throw null;
         public bool GetData(float[] data, int offsetSamples) => throw null;
         public bool LoadAudioData() => throw null;
         public bool SetData(float[] data, int offsetSamples) => throw null;
         private AudioClip() { }
+        public unsafe delegate void PCMReaderCallback(float[] data);
     }
     public enum AudioDataLoadState : int {
         Unloaded = 0,
@@ -56,6 +58,8 @@ namespace UnityEngine {
         private AudioSettings() { }
     }
     public sealed unsafe partial class AudioSource : global::UnityEngine.AudioBehaviour {
+        public bool bypassEffects { get => throw null; set { } }
+        public bool bypassListenerEffects { get => throw null; set { } }
         public global::UnityEngine.AudioClip clip { get => throw null; set { } }
         public bool ignoreListenerPause { get => throw null; set { } }
         public bool isPlaying { get => throw null; }
@@ -76,6 +80,14 @@ namespace UnityEngine {
         public void Stop() => throw null;
         public void UnPause() => throw null;
         private AudioSource() { }
+    }
+    public sealed unsafe partial class Microphone {
+        public static string[] devices { get => throw null; }
+        public static void End(string deviceName) => throw null;
+        public static void GetDeviceCaps(string deviceName, out int minFreq, out int maxFreq) => throw null;
+        public static int GetPosition(string deviceName) => throw null;
+        public static global::UnityEngine.AudioClip Start(string deviceName, bool loop, int lengthSec, int frequency) => throw null;
+        private Microphone() { }
     }
 }
 namespace UnityEngine.Audio {

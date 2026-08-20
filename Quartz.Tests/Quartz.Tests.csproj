@@ -65,6 +65,9 @@
 		<Compile Include="../modules/Discord/Api/TokenBox.cs" Link="Source/DiscordTokenBox.cs" />
 		<Compile Include="../modules/Discord/Api/RsaOaep.cs" Link="Source/DiscordRsaOaep.cs" />
 		<Compile Include="../modules/Discord/Api/RsaKeys.cs" Link="Source/DiscordRsaKeys.cs" />
+		<Compile Include="../modules/Discord/Api/QrCode.cs" Link="Source/DiscordQrCode.cs" />
+		<Compile Include="../modules/Discord/Api/Json.cs" Link="Source/DiscordJson.cs" />
+		<Compile Include="../modules/Discord/Api/VoiceManifest.cs" Link="Source/DiscordVoiceManifest.cs" />
 
 		<!-- The late-binding layer. Refl.cs is deliberately free of game types so it
 		     can be linked here; the one member that needs the game's assembly

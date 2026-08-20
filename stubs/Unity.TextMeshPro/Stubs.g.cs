@@ -112,6 +112,7 @@ namespace TMPro {
         public global::TMPro.TMP_Text textComponent { get => throw null; set { } }
         public global::UnityEngine.RectTransform textViewport { get => throw null; set { } }
         public void ActivateInputField() => throw null;
+        public void ForceLabelUpdate() => throw null;
         public void SetTextWithoutNotify(string input) => throw null;
         protected TMP_InputField() { }
         void global::UnityEngine.EventSystems.IBeginDragHandler.OnBeginDrag(global::UnityEngine.EventSystems.PointerEventData eventData) => throw null;

@@ -191,6 +191,17 @@ namespace UnityEngine {
         public static void Blit(global::UnityEngine.Texture source, global::UnityEngine.RenderTexture dest) => throw null;
         protected Graphics() { }
     }
+    public enum HideFlags : int {
+        None = 0,
+        HideInHierarchy = 1,
+        HideInInspector = 2,
+        DontSaveInEditor = 4,
+        NotEditable = 8,
+        DontSaveInBuild = 16,
+        DontUnloadUnusedAsset = 32,
+        DontSave = 52,
+        HideAndDontSave = 61,
+    }
     public unsafe partial interface ISerializationCallbackReceiver {
     }
     public enum KeyCode : int {
@@ -598,6 +609,7 @@ namespace UnityEngine {
         public void StopCoroutine(global::UnityEngine.Coroutine routine) => throw null;
     }
     public unsafe partial class Object {
+        public global::UnityEngine.HideFlags hideFlags { get => throw null; set { } }
         public string name { get => throw null; set { } }
         public static void Destroy(global::UnityEngine.Object obj) => throw null;
         public static void DestroyImmediate(global::UnityEngine.Object obj) => throw null;

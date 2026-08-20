@@ -5,6 +5,10 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<EmbeddedResource Include="Lang\*.json" />
+		<EmbeddedResource Include="voice-natives.json" />
+	</ItemGroup>
+	<ItemGroup>
+		<Reference Include="System.IO.Compression.FileSystem"><HintPath>$(ManagedDir)/System.IO.Compression.FileSystem.dll</HintPath></Reference>
 	</ItemGroup>
 
 </Project>

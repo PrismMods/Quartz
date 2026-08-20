@@ -1,0 +1,149 @@
+{
+  "schema": 1,
+  "version": "opus-1.6.1.3+sodium-1.0.22+dave-1.1.1.7",
+  "platforms": {
+    "win-x64": {
+      "packages": [
+        {
+          "name": "opus",
+          "url": "https://api.nuget.org/v3-flatcontainer/libopus/1.6.1.3/libopus.1.6.1.3.nupkg",
+          "sha256": "84569f5a6c41e737cec90ea87c5f1a664b3d7ffc885f65cb96d25b60be09c6a7",
+          "entry": "shared/win-x64/native/libopus.dll",
+          "file": "libopus.dll"
+        },
+        {
+          "name": "sodium",
+          "url": "https://api.nuget.org/v3-flatcontainer/libsodium/1.0.22/libsodium.1.0.22.nupkg",
+          "sha256": "f66eac31ea413c1d5d068b46ade11d3295c86ec9d6cd29ff158ba58ef51db51a",
+          "entry": "runtimes/win-x64/native/libsodium.dll",
+          "file": "libsodium.dll"
+        },
+        {
+          "name": "dave",
+          "url": "https://api.nuget.org/v3-flatcontainer/libdave/1.1.1.7/libdave.1.1.1.7.nupkg",
+          "sha256": "4790264812b57b6bac40e87a13dd679741bec85cb0e6be3ac28616532817938a",
+          "entry": "shared/win-x64/native/libdave.dll",
+          "file": "libdave.dll"
+        }
+      ]
+    },
+    "win-arm64": {
+      "packages": [
+        {
+          "name": "opus",
+          "url": "https://api.nuget.org/v3-flatcontainer/libopus/1.6.1.3/libopus.1.6.1.3.nupkg",
+          "sha256": "84569f5a6c41e737cec90ea87c5f1a664b3d7ffc885f65cb96d25b60be09c6a7",
+          "entry": "shared/win-arm64/native/libopus.dll",
+          "file": "libopus.dll"
+        },
+        {
+          "name": "sodium",
+          "url": "https://api.nuget.org/v3-flatcontainer/libsodium/1.0.22/libsodium.1.0.22.nupkg",
+          "sha256": "f66eac31ea413c1d5d068b46ade11d3295c86ec9d6cd29ff158ba58ef51db51a",
+          "entry": "runtimes/win-arm64/native/libsodium.dll",
+          "file": "libsodium.dll"
+        }
+      ]
+    },
+    "osx-x64": {
+      "packages": [
+        {
+          "name": "opus",
+          "url": "https://api.nuget.org/v3-flatcontainer/libopus/1.6.1.3/libopus.1.6.1.3.nupkg",
+          "sha256": "84569f5a6c41e737cec90ea87c5f1a664b3d7ffc885f65cb96d25b60be09c6a7",
+          "entry": "shared/osx-x64/native/libopus.dylib",
+          "file": "libopus.dylib"
+        },
+        {
+          "name": "sodium",
+          "url": "https://api.nuget.org/v3-flatcontainer/libsodium/1.0.22/libsodium.1.0.22.nupkg",
+          "sha256": "f66eac31ea413c1d5d068b46ade11d3295c86ec9d6cd29ff158ba58ef51db51a",
+          "entry": "runtimes/osx-x64/native/libsodium.dylib",
+          "file": "libsodium.dylib"
+        },
+        {
+          "name": "dave",
+          "url": "https://api.nuget.org/v3-flatcontainer/libdave/1.1.1.7/libdave.1.1.1.7.nupkg",
+          "sha256": "4790264812b57b6bac40e87a13dd679741bec85cb0e6be3ac28616532817938a",
+          "entry": "shared/osx-x64/native/libdave.dylib",
+          "file": "libdave.dylib"
+        }
+      ]
+    },
+    "osx-arm64": {
+      "packages": [
+        {
+          "name": "opus",
+          "url": "https://api.nuget.org/v3-flatcontainer/libopus/1.6.1.3/libopus.1.6.1.3.nupkg",
+          "sha256": "84569f5a6c41e737cec90ea87c5f1a664b3d7ffc885f65cb96d25b60be09c6a7",
+          "entry": "shared/osx-arm64/native/libopus.dylib",
+          "file": "libopus.dylib"
+        },
+        {
+          "name": "sodium",
+          "url": "https://api.nuget.org/v3-flatcontainer/libsodium/1.0.22/libsodium.1.0.22.nupkg",
+          "sha256": "f66eac31ea413c1d5d068b46ade11d3295c86ec9d6cd29ff158ba58ef51db51a",
+          "entry": "runtimes/osx-arm64/native/libsodium.dylib",
+          "file": "libsodium.dylib"
+        },
+        {
+          "name": "dave",
+          "url": "https://api.nuget.org/v3-flatcontainer/libdave/1.1.1.7/libdave.1.1.1.7.nupkg",
+          "sha256": "4790264812b57b6bac40e87a13dd679741bec85cb0e6be3ac28616532817938a",
+          "entry": "shared/osx-arm64/native/libdave.dylib",
+          "file": "libdave.dylib"
+        }
+      ]
+    },
+    "linux-x64": {
+      "packages": [
+        {
+          "name": "opus",
+          "url": "https://api.nuget.org/v3-flatcontainer/libopus/1.6.1.3/libopus.1.6.1.3.nupkg",
+          "sha256": "84569f5a6c41e737cec90ea87c5f1a664b3d7ffc885f65cb96d25b60be09c6a7",
+          "entry": "shared/linux-x64/native/libopus.so",
+          "file": "libopus.so"
+        },
+        {
+          "name": "sodium",
+          "url": "https://api.nuget.org/v3-flatcontainer/libsodium/1.0.22/libsodium.1.0.22.nupkg",
+          "sha256": "f66eac31ea413c1d5d068b46ade11d3295c86ec9d6cd29ff158ba58ef51db51a",
+          "entry": "runtimes/linux-x64/native/libsodium.so",
+          "file": "libsodium.so"
+        },
+        {
+          "name": "dave",
+          "url": "https://api.nuget.org/v3-flatcontainer/libdave/1.1.1.7/libdave.1.1.1.7.nupkg",
+          "sha256": "4790264812b57b6bac40e87a13dd679741bec85cb0e6be3ac28616532817938a",
+          "entry": "shared/linux-x64/native/libdave.so",
+          "file": "libdave.so"
+        }
+      ]
+    },
+    "linux-arm64": {
+      "packages": [
+        {
+          "name": "opus",
+          "url": "https://api.nuget.org/v3-flatcontainer/libopus/1.6.1.3/libopus.1.6.1.3.nupkg",
+          "sha256": "84569f5a6c41e737cec90ea87c5f1a664b3d7ffc885f65cb96d25b60be09c6a7",
+          "entry": "shared/linux-arm64/native/libopus.so",
+          "file": "libopus.so"
+        },
+        {
+          "name": "sodium",
+          "url": "https://api.nuget.org/v3-flatcontainer/libsodium/1.0.22/libsodium.1.0.22.nupkg",
+          "sha256": "f66eac31ea413c1d5d068b46ade11d3295c86ec9d6cd29ff158ba58ef51db51a",
+          "entry": "runtimes/linux-arm64/native/libsodium.so",
+          "file": "libsodium.so"
+        },
+        {
+          "name": "dave",
+          "url": "https://api.nuget.org/v3-flatcontainer/libdave/1.1.1.7/libdave.1.1.1.7.nupkg",
+          "sha256": "4790264812b57b6bac40e87a13dd679741bec85cb0e6be3ac28616532817938a",
+          "entry": "shared/linux-arm64/native/libdave.so",
+          "file": "libdave.so"
+        }
+      ]
+    }
+  }
+}

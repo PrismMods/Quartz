@@ -3,6 +3,14 @@
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "SECTION_DISCORD": "Discord",
     "DISCORD_PREVIEW_NOTE": "Layout preview only — nothing here is connected to Discord yet.",
-    "DISCORD_SELFTEST": "Test Connection"
+    "DISCORD_SELFTEST": "Test Connection",
+    "DISCORD_QR": "Log In with QR",
+    "DISCORD_QR_CANCEL": "Cancel",
+    "DISCORD_LOGIN": "Log In",
+    "DISCORD_FORGET": "Forget Saved Token",
+    "DISCORD_VOICE": "Voice",
+    "DISCORD_VOICE_INSTALL": "Install Voice Runtime",
+    "DISCORD_VOICE_REMOVE": "Remove Voice Runtime",
+    "DISCORD_TOKEN": "Discord token"
   }
 }

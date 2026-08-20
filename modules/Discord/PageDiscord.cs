@@ -1,7 +1,9 @@
+using Quartz.Async;
 using Quartz.Core;
 using Quartz.Features.Discord;
 using Quartz.Resource;
 using Quartz.UI.Generator;
+using Quartz.UI.Objects.Impl;
 using Quartz.UI.Utility;
 using TMPro;
 using UnityEngine;
@@ -21,214 +23,466 @@ public static class PageDiscord {
     private static readonly Color TextMuted = new(0.580f, 0.608f, 0.643f);
     private static readonly Color Blurple = new(0.345f, 0.396f, 0.949f);
     private static readonly Color Green = new(0.137f, 0.647f, 0.353f);
-    private static readonly Color Gold = new(0.941f, 0.698f, 0.196f);
-    private static readonly Color Red = new(0.949f, 0.247f, 0.263f);
-    private static readonly Color Link = new(0f, 0.659f, 0.988f);
     private static readonly Color Shell = new(0.208f, 0.216f, 0.235f);
+    private static readonly Color TextLocked = new(0.400f, 0.420f, 0.451f);
+    private static readonly Color Gold = new(0.941f, 0.698f, 0.196f);
+    private static readonly Color SoftRed = new(0.949f, 0.247f, 0.263f);
+    private static readonly Color[] AvatarColors = [
+        new(0.345f, 0.396f, 0.949f), new(0.137f, 0.647f, 0.353f), new(0.941f, 0.698f, 0.196f),
+        new(0.831f, 0.361f, 0.361f), new(0.541f, 0.404f, 0.906f), new(0.196f, 0.663f, 0.784f),
+    ];
+    private static string pendingToken = "";
     public static void Create(RectTransform parent) {
         Transform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(content)), "SECTION_DISCORD", "Discord");
-        GenerateUI.AddLocalizedMutedText(
-            GenerateUI.Row(content, 34f),
-            "DISCORD_PREVIEW_NOTE",
-            "Layout preview only — nothing here is connected to Discord yet."
-        );
-        TextMeshProUGUI status = GenerateUI.AddMutedText(GenerateUI.Row(content, 72f), 15f, 0.6f);
-        void Refresh() {
-            if(status == null) return;
-            status.text = "HTTPS: " + DiscordNet.Https
-                + "\nGateway: " + DiscordNet.Gateway
-                + "\nCrypto: " + DiscordNet.Crypto;
-        }
-        GenerateUI.Button(
-            GenerateUI.Row(content),
-            () => DiscordNet.SelfTest(Refresh),
-            "Test Connection",
-            "discord_selftest"
-        );
-        Refresh();
+        TextMeshProUGUI status = GenerateUI.AddMutedText(GenerateUI.Row(content, 30f), 15f, 0.6f);
         RectTransform shell = GenerateUI.Row(content, 660f);
         shell.gameObject.AddComponent<ThemeExempt>();
         RectTransform client = Fill(shell, "Client", 4f, 0f, 4f, 0f);
         Paint(client, Shell, 2);
         client.gameObject.AddComponent<RectMask2D>();
+        void Refresh() {
+            if(client == null) {
+                DiscordSession.Changed -= Refresh;
+                VoiceSession.Changed -= Refresh;
+                return;
+            }
+            status.text = DiscordSession.LoggedIn
+                ? $"{DiscordSession.SelfName} · {DiscordSession.Status}"
+                : DiscordSession.Status;
+            GenerateUI.ClearChildren(client);
+            if(DiscordSession.LoggedIn) BuildClient(client);
+            else BuildLogin(client);
+        }
+        DiscordSession.Changed += Refresh;
+        VoiceSession.Changed += Refresh;
+        Diagnostics(content);
+        VoiceSection(content);
+        Refresh();
+        DiscordSession.Resume();
+    }
+    private static void BuildLogin(RectTransform client) {
+        Paint(client, ChatBg, 2);
+        bool qr = DiscordSession.QrActive;
+        RectTransform card = Box(client, "Login", 40f, 32f, 660f, qr ? 400f : 300f);
+        Paint(card, SidebarBg, 2);
+        Label(Box(card, "Title", 28f, 20f, 600f, 30f), "Log in to Discord", 22f, TextBright, FontStyles.Bold);
+        Label(
+            Box(card, "Body", 28f, 56f, 600f, 60f),
+            "Scan a QR code with the Discord mobile app, or paste a user token. A user token grants full "
+            + "account access, and third-party clients break Discord's terms of service.",
+            14f, TextMuted, FontStyles.Normal, TextAlignmentOptions.TopLeft);
+        if(qr) {
+            QrPanel(card);
+            return;
+        }
+        RectTransform field = Box(card, "Field", 28f, 126f, 600f, 50f);
+        UIInput input = GenerateUI.Input(
+            field, "", pendingToken, v => pendingToken = v, "Discord token", null, "discord_token", 0f);
+        input.InputField.contentType = TMP_InputField.ContentType.Password;
+        input.InputField.ForceLabelUpdate();
+        RectTransform login = Box(card, "Login", 28f, 190f, 290f, 50f);
+        GenerateUI.Button(login, () => DiscordSession.LogIn(pendingToken), "Log In", "discord_login", 0f);
+        RectTransform scan = Box(card, "Scan", 338f, 190f, 290f, 50f);
+        GenerateUI.Button(scan, DiscordSession.BeginQrLogin, "Log In with QR", "discord_qr", 0f).SetSecondary();
+        if(!DiscordSession.HasSavedToken) return;
+        RectTransform forget = Box(card, "Forget", 28f, 246f, 290f, 46f);
+        GenerateUI.Button(forget, DiscordSession.LogOut, "Forget Saved Token", "discord_forget", 0f).SetSecondary();
+    }
+    private static void QrPanel(RectTransform card) {
+        RectTransform frame = Box(card, "QrFrame", 28f, 122f, 216f, 216f);
+        Paint(frame, Color.white, 1);
+        Sprite sprite = QrSprite(DiscordSession.QrUrl);
+        if(sprite == null) {
+            Label(frame, "generating...", 14f, new Color(0.3f, 0.3f, 0.3f), FontStyles.Normal, TextAlignmentOptions.Center);
+        } else {
+            RectTransform code = Box(frame, "Code", 8f, 8f, 200f, 200f);
+            Image image = code.gameObject.AddComponent<Image>();
+            image.sprite = sprite;
+            image.raycastTarget = false;
+        }
+        Label(
+            Box(card, "QrHelp", 264f, 122f, 370f, 90f),
+            "On your phone: open Discord, go to Settings, then Scan QR Code, and point it at this code.",
+            14f, TextNormal, FontStyles.Normal, TextAlignmentOptions.TopLeft);
+        Label(
+            Box(card, "QrStatus", 264f, 216f, 370f, 50f),
+            DiscordSession.QrStatus, 14f, TextMuted, FontStyles.Normal, TextAlignmentOptions.TopLeft);
+        RectTransform cancel = Box(card, "QrCancel", 264f, 276f, 250f, 46f);
+        GenerateUI.Button(cancel, DiscordSession.CancelQrLogin, "Cancel", "discord_qr_cancel", 0f).SetSecondary();
+    }
+    private static string qrUrl;
+    private static Sprite qrSprite;
+    private static Texture2D qrTexture;
+    private static Sprite QrSprite(string url) {
+        if(string.IsNullOrEmpty(url)) return null;
+        if(url == qrUrl && qrSprite != null) return qrSprite;
+        try {
+            bool[,] matrix = QrCode.Encode(url);
+            int modules = matrix.GetLength(0);
+            const int quiet = 4;
+            const int scale = 5;
+            int dimension = (modules + quiet + quiet) * scale;
+            Color32 dark = new(0, 0, 0, 255);
+            Color32 light = new(255, 255, 255, 255);
+            Color32[] pixels = new Color32[dimension * dimension];
+            for(int i = 0; i < pixels.Length; i++) pixels[i] = light;
+            for(int my = 0; my < modules; my++)
+                for(int mx = 0; mx < modules; mx++) {
+                    if(!matrix[mx, my]) continue;
+                    for(int py = 0; py < scale; py++)
+                        for(int px = 0; px < scale; px++) {
+                            int x = ((mx + quiet) * scale) + px;
+                            int y = dimension - 1 - (((my + quiet) * scale) + py);
+                            pixels[(y * dimension) + x] = dark;
+                        }
+                }
+            Texture2D texture = new(dimension, dimension, TextureFormat.RGBA32, false) {
+                filterMode = FilterMode.Point,
+                wrapMode = TextureWrapMode.Clamp,
+            };
+            texture.SetPixels32(pixels);
+            texture.Apply(false);
+            if(qrTexture != null) UnityEngine.Object.Destroy(qrTexture);
+            qrTexture = texture;
+            qrUrl = url;
+            qrSprite = SpriteManager.Create(texture);
+            return qrSprite;
+        } catch(Exception e) {
+            MainCore.Log.Wrn($"[Discord] could not render the QR code: {e.Message}");
+            return null;
+        }
+    }
+    private static void BuildClient(RectTransform client) {
         Rail(LeftBand(client, "Rail", 0f, 72f));
         Sidebar(LeftBand(client, "Sidebar", 72f, 240f));
-        Chat(Fill(client, "Chat", 312f, 0f, 210f, 0f));
-        Members(RightBand(client, "Members", 0f, 210f));
+        Chat(Fill(client, "Chat", 312f, 0f, 0f, 0f));
     }
     private static void Rail(RectTransform rail) {
         Paint(rail, RailBg);
-        RectTransform home = Box(rail, "Home", 12f, 12f, 48f, 48f);
-        Paint(home, Blurple, 2);
-        Icon(Box(home, "Logo", 10f, 10f, 28f, 28f), UISprite.QuartzLogo, Color.white);
-        Paint(Box(rail, "Separator", 20f, 72f, 32f, 2f), Divider, 1);
-        Server(rail, 84f, "A", new Color(0.345f, 0.396f, 0.949f), true);
-        Server(rail, 140f, "Q", new Color(0.137f, 0.647f, 0.353f), false);
-        Server(rail, 196f, "M", new Color(0.831f, 0.361f, 0.361f), false);
-        RectTransform add = Box(rail, "AddServer", 12f, 252f, 48f, 48f);
-        Paint(add, ChatBg, 2);
-        Label(add, "+", 26f, Green, FontStyles.Normal, TextAlignmentOptions.Center);
+        RectTransform list = ScrollList(rail, 0f, 0f, new RectOffset(12, 12, 12, 12), 8f);
+        Guild(list, DiscordSession.DirectMessagesId, "@", Blurple);
+        Paint(Sized(list, "Separator", 2f), Divider, 1);
+        foreach(DiscordGuild guild in DiscordSession.Guilds)
+            Guild(list, guild.Id, Initials(guild.Name), ColorFor(guild.Id));
     }
-    private static void Server(RectTransform rail, float y, string initial, Color color, bool selected) {
-        RectTransform icon = Box(rail, "Server", 12f, y, 48f, 48f);
+    private static RectTransform ScrollList(
+        RectTransform parent, float top, float bottom, RectOffset padding, float spacing
+    ) {
+        RectTransform viewport = Fill(parent, "Viewport", 0f, top, 0f, bottom);
+        viewport.gameObject.AddComponent<RectMask2D>();
+        viewport.gameObject.AddComponent<EmptyGraphic>().raycastTarget = true;
+        RectTransform list = Node(viewport, "List");
+        list.anchorMin = new Vector2(0f, 1f);
+        list.anchorMax = new Vector2(1f, 1f);
+        list.pivot = new Vector2(0.5f, 1f);
+        list.offsetMin = Vector2.zero;
+        list.offsetMax = Vector2.zero;
+        VerticalLayoutGroup layout = list.gameObject.AddComponent<VerticalLayoutGroup>();
+        layout.spacing = spacing;
+        layout.padding = padding;
+        layout.childControlWidth = true;
+        layout.childControlHeight = true;
+        layout.childForceExpandWidth = true;
+        layout.childForceExpandHeight = false;
+        ContentSizeFitter fitter = list.gameObject.AddComponent<ContentSizeFitter>();
+        fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+        UIScrollController scroll = viewport.gameObject.AddComponent<UIScrollController>();
+        scroll.SetContent(list, viewport);
+        return list;
+    }
+    private static void Guild(RectTransform list, string id, string label, Color color) {
+        RectTransform slot = Sized(list, "Guild", 48f);
+        RectTransform icon = Box(slot, "Icon", 0f, 0f, 48f, 48f);
         Paint(icon, color, 2);
-        Label(icon, initial, 20f, Color.white, FontStyles.Bold, TextAlignmentOptions.Center);
-        if(!selected) return;
-        Paint(Box(rail, "Pill", 0f, y + 8f, 4f, 32f), Color.white, 1);
+        Label(icon, label, 17f, Color.white, FontStyles.Bold, TextAlignmentOptions.Center);
+        Clickable(icon, () => DiscordSession.OpenGuild(id));
+        if(DiscordSession.CurrentGuildId == id) Paint(Box(slot, "Pill", -12f, 8f, 4f, 32f), Color.white, 1);
     }
     private static void Sidebar(RectTransform sidebar) {
         Paint(sidebar, SidebarBg);
         RectTransform head = Strip(sidebar, "Head", 0f, 0f, 0f, 48f);
-        Label(Box(head, "Name", 16f, 0f, 176f, 48f), "Quartz Community", 16f, TextBright, FontStyles.Bold);
-        Icon(BoxRight(head, "Chevron", 14f, 19f, 12f, 12f), UISprite.ChevronDown128, TextMuted);
+        string title = DiscordSession.CurrentGuildId == DiscordSession.DirectMessagesId
+            ? "Direct Messages"
+            : NameOfGuild(DiscordSession.CurrentGuildId);
+        Label(Box(head, "Name", 16f, 0f, 208f, 48f), title, 16f, TextBright, FontStyles.Bold);
         Paint(Strip(sidebar, "HeadLine", 0f, 47f, 0f, 1f), HeadLine);
-        CategoryLabel(sidebar, 62f, "TEXT CHANNELS");
-        Channel(sidebar, 86f, "general", true);
-        Channel(sidebar, 120f, "adofai-chat", false);
-        Channel(sidebar, 154f, "mod-support", false);
-        Channel(sidebar, 188f, "screenshots", false);
-        CategoryLabel(sidebar, 230f, "VOICE CHANNELS");
-        RectTransform voice = Strip(sidebar, "Voice", 8f, 254f, 8f, 32f);
-        Icon(Box(voice, "VoiceIcon", 8f, 8f, 16f, 16f), UISprite.Users128, TextMuted);
-        Label(Fill(voice, "VoiceName", 32f, 0f, 8f, 0f), "Charting Lounge", 15f, TextMuted);
-        RectTransform inVoice = Box(sidebar, "InVoice", 40f, 290f, 190f, 26f);
-        Avatar(inVoice, 0f, 3f, 20f, Green, "O");
-        Label(Box(inVoice, "InVoiceName", 28f, 0f, 150f, 26f), "otto", 14f, TextMuted);
-        UserPanel(StripBottom(sidebar, "UserPanel", 0f, 0f, 0f, 52f));
+        RectTransform list = ScrollList(sidebar, 48f, 52f, new RectOffset(8, 8, 8, 8), 2f);
+        if(DiscordSession.Loading && DiscordSession.Channels.Count == 0) {
+            Label(Sized(list, "Loading", 32f), "loading...", 14f, TextMuted);
+            return;
+        }
+        string category = null;
+        foreach(DiscordChannel channel in DiscordSession.Channels) {
+            string name = DiscordSession.CategoryOf.TryGetValue(channel.Id, out string found) ? found : "";
+            if(name != category) {
+                category = name;
+                if(!string.IsNullOrEmpty(name))
+                    Label(Sized(list, "Category", 26f), name.ToUpperInvariant(), 12f, TextMuted, FontStyles.Bold);
+            }
+            Channel(list, channel);
+        }
+    }
+    private static RectTransform Sized(RectTransform parent, string name, float height) {
+        GameObject obj = new(name);
+        obj.transform.SetParent(parent, false);
+        RectTransform rect = obj.AddComponent<RectTransform>();
+        LayoutElement element = obj.AddComponent<LayoutElement>();
+        element.minHeight = height;
+        element.preferredHeight = height;
+        return rect;
+    }
+    private static void Channel(RectTransform list, DiscordChannel channel) {
+        bool locked = DiscordSession.IsLocked(channel.Id);
+        bool selected = !locked && channel.Id == DiscordSession.CurrentChannelId;
+        RectTransform row = Sized(list, "Channel", 32f);
+        Paint(row, selected ? ChannelActive : new Color(0f, 0f, 0f, 0f), 1);
+        Color fg = selected ? TextBright : locked ? TextLocked : TextMuted;
+        RectTransform mark = Box(row, "Mark", 8f, 0f, 18f, 32f);
+        if(locked) LockIcon(mark, fg);
+        else if(DiscordSession.IsVoice(channel.Type)) SpeakerIcon(mark, fg);
+        else Label(mark, channel.Type is 1 or 3 ? "@" : "#", 17f, fg, FontStyles.Normal, TextAlignmentOptions.Center);
+        Label(Fill(row, "Name", 30f, 0f, 8f, 0f), channel.Name, 15f, fg);
+        if(locked) return;
+        Clickable(row, () => DiscordSession.OpenChannel(channel.Id));
+    }
+    private static void SpeakerIcon(RectTransform mark, Color color) {
+        Paint(Box(mark, "Body", 2f, 12f, 7f, 8f), color, 1);
+        RectTransform arc = Box(mark, "Arc", 7f, 9f, 14f, 14f);
+        Image ring = Paint(arc, color, 0);
+        ring.sprite = MainCore.Spr.Get(UISliceSprite.CircleOutline256P1024);
+        ring.type = Image.Type.Sliced;
+        Paint(Box(mark, "ArcCut", 0f, 9f, 9f, 14f), SidebarBg);
+        Paint(Box(mark, "Cone", 5f, 10f, 5f, 12f), color, 1);
+    }
+    private static void LockIcon(RectTransform mark, Color color) {
+        RectTransform shackle = Box(mark, "Shackle", 5f, 9f, 8f, 8f);
+        Image ring = Paint(shackle, color, 0);
+        ring.sprite = MainCore.Spr.Get(UISliceSprite.CircleOutline256P1024);
+        ring.type = Image.Type.Sliced;
+        Paint(Box(mark, "Cut", 5f, 14f, 8f, 4f), SidebarBg);
+        Paint(Box(mark, "Body", 3f, 15f, 12f, 9f), color, 1);
     }
     private static void UserPanel(RectTransform panel) {
         Paint(panel, PanelBg);
-        RectTransform avatar = Avatar(panel, 8f, 10f, 32f, Gold, "K");
+        RectTransform avatar = Avatar(panel, 8f, 10f, 32f, ColorFor(DiscordSession.SelfId), Initials(DiscordSession.SelfName));
         Status(avatar, Green, PanelBg);
-        Label(Box(panel, "Name", 48f, 8f, 92f, 18f), "koren", 14f, TextBright, FontStyles.Bold);
-        Label(Box(panel, "Tag", 48f, 26f, 92f, 16f), "Online", 12f, TextMuted);
-        Icon(BoxRight(panel, "Mic", 68f, 16f, 20f, 20f), UISprite.Note128, TextMuted);
-        Icon(BoxRight(panel, "Headset", 42f, 16f, 20f, 20f), UISprite.Monitor128, TextMuted);
-        Icon(BoxRight(panel, "Settings", 16f, 16f, 20f, 20f), UISprite.Gear128, TextMuted);
-    }
-    private static void CategoryLabel(RectTransform parent, float y, string text) =>
-        Label(Strip(parent, "Category", 16f, y, 8f, 18f), text, 12f, TextMuted, FontStyles.Bold);
-    private static void Channel(RectTransform parent, float y, string name, bool selected) {
-        RectTransform row = Strip(parent, "Channel", 8f, y, 8f, 32f);
-        if(selected) Paint(row, ChannelActive, 1);
-        Color fg = selected ? TextBright : TextMuted;
-        Label(Box(row, "Hash", 8f, 0f, 18f, 32f), "#", 18f, fg, FontStyles.Normal, TextAlignmentOptions.Center);
-        Label(Fill(row, "Name", 30f, 0f, 8f, 0f), name, 15f, fg);
+        Label(Box(panel, "Name", 48f, 8f, 110f, 18f), DiscordSession.SelfName ?? "", 14f, TextBright, FontStyles.Bold);
+        Label(Box(panel, "Tag", 48f, 26f, 110f, 16f), "Online", 12f, TextMuted);
+        RectTransform logout = BoxRight(panel, "LogOut", 8f, 10f, 74f, 32f);
+        Paint(logout, ChannelActive, 1);
+        Label(logout, "Log Out", 12f, TextMuted, FontStyles.Bold, TextAlignmentOptions.Center);
+        Clickable(logout, DiscordSession.LogOut);
     }
     private static void Chat(RectTransform chat) {
         Paint(chat, ChatBg);
         RectTransform head = Strip(chat, "ChatHead", 0f, 0f, 0f, 48f);
-        Label(Box(head, "Hash", 16f, 0f, 20f, 48f), "#", 20f, TextMuted, FontStyles.Normal, TextAlignmentOptions.Center);
-        Label(Box(head, "Title", 40f, 0f, 140f, 48f), "general", 16f, TextBright, FontStyles.Bold);
-        Paint(Box(head, "Split", 190f, 16f, 1f, 16f), Divider);
-        Label(Box(head, "Topic", 204f, 0f, 320f, 48f), "modding, charts and general chaos", 13f, TextMuted);
-        Icon(BoxRight(head, "Members", 16f, 14f, 20f, 20f), UISprite.Users128, TextMuted);
-        Icon(BoxRight(head, "Search", 48f, 14f, 20f, 20f), UISprite.MagnifyingGlass128, TextMuted);
-        Icon(BoxRight(head, "Help", 80f, 14f, 20f, 20f), UISprite.QuestionMarkCircle128, TextMuted);
+        bool any = DiscordSession.CurrentChannelId != null;
+        Label(Box(head, "Mark", 16f, 0f, 20f, 48f), any ? "#" : "", 20f, TextMuted, FontStyles.Normal, TextAlignmentOptions.Center);
+        Label(Box(head, "Title", 40f, 0f, 300f, 48f), any ? DiscordSession.CurrentChannelName : "no channel", 16f, TextBright, FontStyles.Bold);
+        Label(BoxRight(head, "Count", 16f, 0f, 200f, 48f), $"{DiscordSession.Messages.Count} loaded", 12f, TextMuted, FontStyles.Normal, TextAlignmentOptions.Right);
         Paint(Strip(chat, "ChatHeadLine", 0f, 47f, 0f, 1f), HeadLine);
-        RectTransform messages = Fill(chat, "Messages", 0f, 48f, 0f, 72f);
-        messages.gameObject.AddComponent<RectMask2D>();
-        Messages(messages);
+        bool voice = DiscordSession.IsVoice(DiscordSession.CurrentChannelType);
+        if(voice) VoiceBar(Strip(chat, "VoiceBar", 0f, 48f, 0f, 56f));
+        Messages(Fill(chat, "Messages", 0f, voice ? 104f : 48f, 0f, 72f));
         Composer(StripBottom(chat, "Composer", 16f, 16f, 16f, 44f));
-        Label(StripBottom(chat, "Typing", 20f, 2f, 16f, 12f), "otto is typing...", 11f, TextMuted);
+    }
+    private static void VoiceBar(RectTransform bar) {
+        Paint(bar, PanelBg);
+        bool here = VoiceSession.Connected && VoiceSession.ChannelId == DiscordSession.CurrentChannelId;
+        bool busy = VoiceSession.Current is VoiceSession.State.Requesting or VoiceSession.State.Signalling;
+        Color accent = here ? Green : busy ? Gold : TextMuted;
+        Paint(Box(bar, "Dot", 16f, 24f, 8f, 8f), accent, 3);
+        Label(
+            Box(bar, "Status", 32f, 4f, 520f, 24f),
+            VoiceSession.Status.Length == 0 ? "not connected" : VoiceSession.Status,
+            13f, here ? TextNormal : TextMuted, FontStyles.Normal, TextAlignmentOptions.Left);
+        Label(
+            Box(bar, "Dave", 32f, 28f, 400f, 22f),
+            "E2EE: " + VoiceSession.DaveStatus
+                + $"  ·  sent {VoiceAudio.FramesSent} / recv {VoiceAudio.FramesReceived}"
+                + $" / dropped {VoiceAudio.FramesDropped}  ·  mic {VoiceAudio.MicLevel:F3} (peak {VoiceAudio.MicPeak:F3})",
+            12f, TextMuted, FontStyles.Normal, TextAlignmentOptions.Left);
+        if(here) {
+            RectTransform mute = BoxRight(bar, "Mute", 134f, 12f, 96f, 32f);
+            Paint(mute, VoiceAudio.Muted ? SoftRed : ChannelActive, 1);
+            Label(
+                mute, VoiceAudio.Muted ? "Unmute" : "Mute", 13f,
+                VoiceAudio.Muted ? Color.white : TextNormal, FontStyles.Bold, TextAlignmentOptions.Center);
+            Clickable(mute, () => {
+                VoiceAudio.Muted = !VoiceAudio.Muted;
+                VoiceSession.Refresh();
+            });
+        }
+        RectTransform button = BoxRight(bar, "Toggle", 16f, 12f, 110f, 32f);
+        bool leave = here || busy;
+        Paint(button, leave ? SoftRed : Green, 1);
+        Label(button, leave ? "Disconnect" : "Join Voice", 13f, Color.white, FontStyles.Bold, TextAlignmentOptions.Center);
+        string guildId = DiscordSession.CurrentGuildId;
+        string channelId = DiscordSession.CurrentChannelId;
+        Clickable(button, () => {
+            if(leave) VoiceSession.Leave();
+            else VoiceSession.Join(guildId, channelId);
+        });
     }
     private static void Messages(RectTransform area) {
-        Paint(Strip(area, "DayLine", 16f, 19f, 16f, 1f), Divider);
-        RectTransform day = BoxCenter(area, "Day", 10f, 76f, 18f);
-        Paint(day, ChatBg);
-        Label(day, "TODAY", 11f, TextMuted, FontStyles.Bold, TextAlignmentOptions.Center);
-        Avatar(area, 16f, 40f, 40f, Gold, "K");
-        RectTransform headA = AutoRow(area, 72f, 40f, 24f, 8f);
-        Label(headA, "koren", 16f, Gold, FontStyles.Bold);
-        Chip(headA, "MOD", Blurple, 34f, 15f);
-        Label(headA, "Today at 4:20 PM", 11f, TextMuted);
-        Label(Strip(area, "BodyA", 72f, 66f, 16f, 22f), "pushed the Others tab — Discord and Minecraft modules are in", 15f, TextNormal);
-        Label(Strip(area, "BodyA2", 72f, 92f, 16f, 22f), "the minecraft one is a placeholder for now", 15f, TextNormal);
-        Paint(Box(area, "ReplySpineV", 46f, 128f, 2f, 12f), Divider);
-        Paint(Box(area, "ReplySpineH", 46f, 128f, 26f, 2f), Divider);
-        RectTransform reply = AutoRow(area, 76f, 118f, 20f, 6f);
-        MiniAvatar(reply, 16f, Gold, "K");
-        Label(reply, "koren", 12f, TextMuted, FontStyles.Bold);
-        Label(reply, "pushed the Others tab — Discord and Minecraft modules are in", 12f, TextMuted);
-        Avatar(area, 16f, 142f, 40f, Green, "O");
-        RectTransform headB = AutoRow(area, 72f, 142f, 24f, 8f);
-        Label(headB, "otto", 16f, Green, FontStyles.Bold);
-        Label(headB, "Today at 4:21 PM", 11f, TextMuted);
-        Label(Strip(area, "BodyB", 72f, 168f, 16f, 22f), "the embed preview looks great", 15f, TextNormal);
-        Avatar(area, 16f, 200f, 40f, Blurple, "Q");
-        RectTransform headC = AutoRow(area, 72f, 200f, 24f, 8f);
-        Label(headC, "Quartz", 16f, Blurple, FontStyles.Bold);
-        Chip(headC, "BOT", Blurple, 32f, 15f);
-        Label(headC, "Today at 4:22 PM", 11f, TextMuted);
-        Label(Strip(area, "BodyC", 72f, 226f, 16f, 22f), "a new release just went out", 15f, TextNormal);
-        Embed(Box(area, "Embed", 72f, 252f, 460f, 232f));
-        RectTransform reactions = AutoRow(area, 72f, 490f, 26f, 6f);
-        Reaction(reactions, Green, "12");
-        Reaction(reactions, Gold, "7");
-        Reaction(reactions, Red, "3");
+        RectTransform list = ScrollList(area, 0f, 0f, new RectOffset(0, 0, 8, 8), 10f);
+        if(DiscordSession.Messages.Count == 0) {
+            Label(
+                Sized(list, "Empty", 30f),
+                DiscordSession.Loading ? "loading messages..." : "no messages here yet",
+                14f, TextMuted);
+            return;
+        }
+        foreach(DiscordMessage message in DiscordSession.Messages) Message(list, message);
+        UIScrollController scroll = list.parent.GetComponent<UIScrollController>();
+        if(scroll == null) return;
+        LayoutRebuilder.ForceRebuildLayoutImmediate(list);
+        scroll.ScrollTo(float.MaxValue);
     }
-    private static void Embed(RectTransform embed) {
-        Paint(embed, SidebarBg, 1);
-        Paint(Box(embed, "Accent", 0f, 0f, 4f, 232f), Blurple, 1);
-        RectTransform author = AutoRow(embed, 16f, 12f, 20f, 8f);
-        MiniAvatar(author, 20f, Blurple, "Q");
-        Label(author, "Quartz", 13f, TextBright, FontStyles.Bold);
-        Label(Box(embed, "Title", 16f, 38f, 300f, 24f), "Quartz v2.0.0-alpha-119", 16f, Link, FontStyles.Bold);
-        TextMeshProUGUI desc = Label(
-            Box(embed, "Desc", 16f, 64f, 300f, 42f),
-            "Adds the Others tab with the Discord and Minecraft modules, plus a handful of Key Viewer fixes.",
-            13f, TextNormal, FontStyles.Normal, TextAlignmentOptions.TopLeft
-        );
-        desc.overflowMode = TextOverflowModes.Truncate;
-        Field(embed, 16f, 112f, "Downloads", "1,204");
-        Field(embed, 176f, 112f, "Stars", "128");
-        RectTransform thumb = BoxRight(embed, "Thumb", 12f, 12f, 80f, 80f);
-        Paint(thumb, RailBg, 1);
-        Icon(Box(thumb, "ThumbArt", 20f, 20f, 40f, 40f), UISprite.QuartzLogo, new Color(1f, 1f, 1f, 0.85f));
-        RectTransform image = Box(embed, "Image", 16f, 156f, 428f, 46f);
-        Paint(image, RailBg, 1);
-        Icon(Box(image, "ImageArt", 12f, 11f, 24f, 24f), UISprite.Image128, new Color(1f, 1f, 1f, 0.35f));
-        Label(Box(image, "ImageName", 46f, 0f, 300f, 46f), "release-notes.png", 12f, TextMuted);
-        RectTransform footer = AutoRow(embed, 16f, 206f, 16f, 6f);
-        MiniAvatar(footer, 16f, Divider, "G");
-        Label(footer, "GitHub  -  Today at 4:22 PM", 11f, TextMuted);
+    private static void Message(RectTransform list, DiscordMessage message) {
+        GameObject obj = new("Message");
+        obj.transform.SetParent(list, false);
+        RectTransform row = obj.AddComponent<RectTransform>();
+        VerticalLayoutGroup layout = obj.AddComponent<VerticalLayoutGroup>();
+        layout.padding = new RectOffset(72, 16, 0, 0);
+        layout.spacing = 2f;
+        layout.childControlWidth = true;
+        layout.childControlHeight = true;
+        layout.childForceExpandWidth = true;
+        layout.childForceExpandHeight = false;
+        RectTransform avatar = Avatar(row, 16f, 0f, 40f, ColorFor(message.AuthorId), Initials(message.AuthorName));
+        LayoutElement floating = avatar.gameObject.AddComponent<LayoutElement>();
+        floating.ignoreLayout = true;
+        string stamp = message.Timestamp.ToLocalTime().ToString("HH:mm");
+        TextMeshProUGUI header = Label(row, "", 15f, TextBright, FontStyles.Bold);
+        header.richText = true;
+        header.text = Escape(message.AuthorName)
+            + "  <size=11><color=#949BA4>" + stamp + "</color></size>";
+        header.overflowMode = TextOverflowModes.Ellipsis;
+        string body = message.Content;
+        if(string.IsNullOrEmpty(body) && message.Attachments.Count > 0) body = "[attachment]";
+        if(string.IsNullOrEmpty(body) && message.Embeds.Count > 0) body = "[embed]";
+        if(string.IsNullOrEmpty(body)) return;
+        TextMeshProUGUI text = Label(row, body, 15f, TextNormal, FontStyles.Normal, TextAlignmentOptions.TopLeft);
+        text.richText = false;
+        text.overflowMode = TextOverflowModes.Overflow;
     }
-    private static void Field(RectTransform embed, float x, float y, string title, string value) {
-        Label(Box(embed, "FieldTitle", x, y, 140f, 16f), title, 12f, TextBright, FontStyles.Bold);
-        Label(Box(embed, "FieldValue", x, y + 18f, 140f, 18f), value, 13f, TextNormal);
-    }
-    private static void Reaction(RectTransform row, Color color, string count) {
-        RectTransform pill = Chip(row, "", ChannelActive, 56f, 24f);
-        Paint(Box(pill, "Emoji", 8f, 6f, 12f, 12f), color, 3);
-        Label(Box(pill, "Count", 26f, 0f, 24f, 24f), count, 12f, TextNormal, FontStyles.Bold);
-    }
+    private static string Escape(string value) =>
+        string.IsNullOrEmpty(value) ? "" : value.Replace("<", "<noparse><</noparse>");
     private static void Composer(RectTransform composer) {
         Paint(composer, ComposerBg, 2);
-        RectTransform plus = Box(composer, "Plus", 12f, 10f, 24f, 24f);
-        Paint(plus, TextMuted, 3);
-        Label(plus, "+", 18f, ComposerBg, FontStyles.Bold, TextAlignmentOptions.Center);
-        Label(Box(composer, "Placeholder", 48f, 0f, 320f, 44f), "Message #general", 15f, TextMuted);
-        Icon(BoxRight(composer, "Gift", 16f, 12f, 20f, 20f), UISprite.Star128, TextMuted);
-        Icon(BoxRight(composer, "Attach", 48f, 12f, 20f, 20f), UISprite.Image128, TextMuted);
+        if(DiscordSession.CurrentChannelId == null) {
+            Label(Box(composer, "Hint", 16f, 0f, 400f, 44f), "pick a channel", 15f, TextMuted);
+            return;
+        }
+        if(!DiscordSession.CanSendHere) {
+            Paint(composer, PanelBg, 2);
+            Label(
+                Box(composer, "ReadOnly", 16f, 0f, 620f, 44f),
+                "You do not have permission to send messages in this channel.",
+                14f, TextLocked);
+            return;
+        }
+        RectTransform field = Fill(composer, "Field", 8f, 4f, 108f, 4f);
+        UIInput input = GenerateUI.Input(
+            field, "", "", null, "Message #" + DiscordSession.CurrentChannelName, null, "discord_message", 0f);
+        input.OnComplete = value => {
+            if(string.IsNullOrWhiteSpace(value)) return;
+            DiscordSession.Send(value);
+            input.Set("", false);
+        };
+        RectTransform send = BoxRight(composer, "Send", 8f, 6f, 92f, 32f);
+        Paint(send, Blurple, 1);
+        Label(send, "Send", 13f, Color.white, FontStyles.Bold, TextAlignmentOptions.Center);
+        Clickable(send, () => {
+            DiscordSession.Send(input.Value);
+            input.Set("", false);
+        });
     }
-    private static void Members(RectTransform members) {
-        Paint(members, SidebarBg);
-        CategoryLabel(members, 16f, "ONLINE - 3");
-        Member(members, 40f, "koren", Gold, "K", Green, 1f);
-        Member(members, 82f, "otto", Green, "O", Gold, 1f);
-        Member(members, 124f, "quartz", Blurple, "Q", Green, 1f);
-        CategoryLabel(members, 178f, "OFFLINE - 2");
-        Member(members, 202f, "chartmaker", TextMuted, "C", Divider, 0.4f);
-        Member(members, 244f, "beatbot", TextMuted, "B", Divider, 0.4f);
+    private static void Diagnostics(Transform content) {
+        TextMeshProUGUI probe = GenerateUI.AddMutedText(GenerateUI.Row(content, 72f), 14f, 0.5f);
+        void Update() {
+            if(probe == null) return;
+            probe.text = "HTTPS: " + DiscordNet.Https
+                + "\nGateway: " + DiscordNet.Gateway
+                + "\nCrypto: " + DiscordNet.Crypto;
+        }
+        GenerateUI.Button(
+            GenerateUI.Row(content), () => DiscordNet.SelfTest(Update), "Test Connection", "discord_selftest");
+        Update();
     }
-    private static void Member(RectTransform parent, float y, string name, Color color, string initial, Color status, float alpha) {
-        RectTransform row = Strip(parent, "Member", 8f, y, 8f, 40f);
-        RectTransform avatar = Avatar(row, 8f, 4f, 32f, Fade(color, alpha), initial);
-        Status(avatar, Fade(status, alpha), SidebarBg);
-        Label(Box(row, "Name", 50f, 0f, 130f, 40f), name, 15f, Fade(color, alpha), FontStyles.Bold);
+    private static string voiceStatus = "";
+    private static bool voiceInstalling;
+    private static void VoiceSection(Transform content) {
+        GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(content)), "DISCORD_VOICE", "Voice");
+        TextMeshProUGUI state = GenerateUI.AddMutedText(GenerateUI.Row(content, 62f), 14f, 0.5f);
+        void Update() {
+            if(state == null) return;
+            string rid = VoiceNatives.Rid();
+            if(rid == null) {
+                state.text = "No voice runtime is published for this platform.";
+                return;
+            }
+            state.text = "Platform: " + rid
+                + "\nRuntime: " + (VoiceNatives.InstalledVersion ?? "not installed")
+                + (voiceStatus.Length == 0 ? "" : "\n" + voiceStatus);
+        }
+        GenerateUI.Button(
+            GenerateUI.Row(content), () => InstallVoice(Update), "Install Voice Runtime", "discord_voice_install");
+        GenerateUI.Button(
+            GenerateUI.Row(content),
+            () => {
+                VoiceNatives.Uninstall();
+                voiceStatus = "removed";
+                Update();
+            },
+            "Remove Voice Runtime",
+            "discord_voice_remove"
+        ).SetSecondary();
+        Update();
     }
-    private static Color Fade(Color color, float alpha) => new(color.r, color.g, color.b, alpha);
+    private static void InstallVoice(Action update) {
+        if(voiceInstalling) return;
+        voiceInstalling = true;
+        voiceStatus = "starting...";
+        update();
+        Task.Run(async () => {
+            bool installed = await VoiceNatives.InstallAsync(
+                (stage, fraction) => {
+                    voiceStatus = stage + " " + (int)(fraction * 100f) + "%";
+                    MainThread.Enqueue(update);
+                },
+                CancellationToken.None);
+            voiceStatus = installed ? "installed" : "install failed — see the log";
+            voiceInstalling = false;
+            MainThread.Enqueue(update);
+        });
+    }
+    private static string NameOfGuild(string id) {
+        foreach(DiscordGuild guild in DiscordSession.Guilds)
+            if(guild.Id == id) return guild.Name;
+        return "Discord";
+    }
+    private static string Initials(string name) {
+        if(string.IsNullOrEmpty(name)) return "?";
+        string trimmed = name.Trim();
+        return trimmed.Length == 0 ? "?" : trimmed[..1].ToUpperInvariant();
+    }
+    private static Color ColorFor(string id) {
+        if(string.IsNullOrEmpty(id)) return Blurple;
+        int hash = 0;
+        foreach(char c in id) hash = ((hash * 31) + c) & 0x7FFFFFF;
+        return AvatarColors[hash % AvatarColors.Length];
+    }
+    private static void Clickable(RectTransform rect, Action onClick) {
+        Button button = rect.gameObject.GetComponent<Button>();
+        if(button == null) button = rect.gameObject.AddComponent<Button>();
+        Image image = rect.gameObject.GetComponent<Image>();
+        if(image != null) image.raycastTarget = true;
+        button.transition = Selectable.Transition.None;
+        button.onClick.AddListener(() => onClick());
+    }
     private static RectTransform Node(Transform parent, string name) {
         GameObject obj = new(name);
         obj.transform.SetParent(parent, false);
@@ -254,15 +508,6 @@ public static class PageDiscord {
         rect.sizeDelta = new Vector2(width, 0f);
         return rect;
     }
-    private static RectTransform RightBand(Transform parent, string name, float right, float width) {
-        RectTransform rect = Node(parent, name);
-        rect.anchorMin = new Vector2(1f, 0f);
-        rect.anchorMax = new Vector2(1f, 1f);
-        rect.pivot = new Vector2(1f, 0.5f);
-        rect.anchoredPosition = new Vector2(-right, 0f);
-        rect.sizeDelta = new Vector2(width, 0f);
-        return rect;
-    }
     private static RectTransform Box(Transform parent, string name, float x, float y, float width, float height) {
         RectTransform rect = Node(parent, name);
         rect.anchorMin = new Vector2(0f, 1f);
@@ -278,15 +523,6 @@ public static class PageDiscord {
         rect.anchorMax = new Vector2(1f, 1f);
         rect.pivot = new Vector2(1f, 1f);
         rect.anchoredPosition = new Vector2(-right, -y);
-        rect.sizeDelta = new Vector2(width, height);
-        return rect;
-    }
-    private static RectTransform BoxCenter(Transform parent, string name, float y, float width, float height) {
-        RectTransform rect = Node(parent, name);
-        rect.anchorMin = new Vector2(0.5f, 1f);
-        rect.anchorMax = new Vector2(0.5f, 1f);
-        rect.pivot = new Vector2(0.5f, 1f);
-        rect.anchoredPosition = new Vector2(0f, -y);
         rect.sizeDelta = new Vector2(width, height);
         return rect;
     }
@@ -321,28 +557,6 @@ public static class PageDiscord {
         fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
         return rect;
     }
-    private static RectTransform Chip(Transform row, string text, Color background, float width, float height) {
-        GameObject obj = new("Chip");
-        obj.transform.SetParent(row, false);
-        RectTransform rect = obj.AddComponent<RectTransform>();
-        LayoutElement element = obj.AddComponent<LayoutElement>();
-        element.preferredWidth = width;
-        element.minWidth = width;
-        element.preferredHeight = height;
-        element.minHeight = height;
-        Paint(rect, background, 1);
-        if(!string.IsNullOrEmpty(text))
-            Label(rect, text, 10f, Color.white, FontStyles.Bold, TextAlignmentOptions.Center);
-        return rect;
-    }
-    private static RectTransform MiniAvatar(Transform row, float size, Color color, string initial) {
-        RectTransform rect = Chip(row, "", color, size, size);
-        Image image = rect.GetComponent<Image>();
-        image.sprite = MainCore.Spr.Get(UISprite.Circle256);
-        image.type = Image.Type.Simple;
-        Label(rect, initial, size * 0.5f, Color.white, FontStyles.Bold, TextAlignmentOptions.Center);
-        return rect;
-    }
     private static RectTransform Avatar(Transform parent, float x, float y, float size, Color color, string initial) {
         RectTransform rect = Box(parent, "Avatar", x, y, size, size);
         Paint(rect, color, 3);
@@ -367,7 +581,10 @@ public static class PageDiscord {
         Paint(inner, color, 3);
     }
     private static Image Paint(RectTransform rect, Color color, int radius = 0) {
-        Image image = rect.gameObject.AddComponent<Image>();
+        Image image = rect.gameObject.GetComponent<Image>();
+        if(image == null) image = rect.gameObject.AddComponent<Image>();
+        image.sprite = null;
+        image.type = Image.Type.Simple;
         image.color = color;
         image.raycastTarget = false;
         if(radius == 1) {
@@ -379,14 +596,6 @@ public static class PageDiscord {
         } else if(radius == 3) {
             image.sprite = MainCore.Spr.Get(UISprite.Circle256);
         }
-        return image;
-    }
-    private static Image Icon(RectTransform rect, UISprite sprite, Color color) {
-        Image image = rect.gameObject.AddComponent<Image>();
-        image.sprite = MainCore.Spr.Get(sprite);
-        image.color = color;
-        image.raycastTarget = false;
-        image.preserveAspect = true;
         return image;
     }
     private static TextMeshProUGUI Label(
@@ -401,6 +610,7 @@ public static class PageDiscord {
         text.alignment = align;
         text.characterSpacing = 0f;
         text.raycastTarget = false;
+        text.richText = false;
         text.overflowMode = TextOverflowModes.Ellipsis;
         return text;
     }

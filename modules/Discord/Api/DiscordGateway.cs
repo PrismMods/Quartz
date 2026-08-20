@@ -15,6 +15,7 @@ public sealed class DiscordGateway : IDisposable {
     private CancellationTokenSource outerCts;
     private CancellationTokenSource connCts;
     private int? seq;
+    private int attempts;
     private bool disposed;
     public event Action<DiscordMessage> MessageCreated;
     public event Action<DiscordMessage> MessageUpdated;
@@ -23,6 +24,9 @@ public sealed class DiscordGateway : IDisposable {
     public event Action<IReadOnlyDictionary<string, string>> ChannelGuildMap;
     public event Action<string, string> MessageAck;
     public event Action<ReactionUpdate> ReactionChanged;
+    public event Action<string, string> VoiceState;
+    public event Action<string, string, string> VoiceServer;
+    public string SelfId { get; private set; }
     public event Action<string> Status;
     public event Action<string> Error;
     public DiscordGateway(string token) => this.token = token;
@@ -39,11 +43,13 @@ public sealed class DiscordGateway : IDisposable {
                 socket = new ClientWebSocket();
                 Raise(Status, "connecting to the gateway...");
                 await socket.ConnectAsync(new Uri(GatewayUrl), ct);
+                MainCore.Log.Msg($"[Discord] main gateway connected (attempt {++attempts})");
                 Raise(Status, "gateway connected");
                 await ReceiveLoopAsync(ct);
             } catch(OperationCanceledException e) {
                 Diag.Ignore(e);
             } catch(Exception e) {
+                MainCore.Log.Wrn("[Discord] main gateway threw: " + e.Message);
                 Raise(Error, e.Message);
             } finally {
                 try {
@@ -55,6 +61,9 @@ public sealed class DiscordGateway : IDisposable {
                 socket = null;
             }
             if(outer.IsCancellationRequested) break;
+            MainCore.Log.Wrn(
+                $"[Discord] main gateway DROPPED — reconnecting in {ReconnectSeconds}s; "
+                + "any voice session is now stale (4006)");
             Raise(Status, $"gateway dropped — reconnecting in {ReconnectSeconds}s");
             try {
                 await Task.Delay(TimeSpan.FromSeconds(ReconnectSeconds), outer);
@@ -104,6 +113,7 @@ public sealed class DiscordGateway : IDisposable {
                 break;
             case 7:
             case 9:
+                MainCore.Log.Wrn($"[Discord] main gateway op {op} — server asked us to reset the connection");
                 Raise(Status, $"gateway op {op} — resetting the connection");
                 try {
                     connCts?.Cancel();
@@ -142,6 +152,33 @@ public sealed class DiscordGateway : IDisposable {
             case "MESSAGE_REACTION_REMOVE":
                 EmitReaction(d, false);
                 break;
+            case "VOICE_STATE_UPDATE":
+                if(Str(d, "user_id") == SelfId) {
+                    string tail = Str(d, "session_id") ?? "";
+                    if(tail.Length > 6) tail = tail[^6..];
+                    MainCore.Log.Msg(
+                        $"[Discord] VOICE_STATE_UPDATE self guild={Str(d, "guild_id")} "
+                        + $"chan={Str(d, "channel_id") ?? "(none)"} sess=…{tail}");
+                }
+                if(Str(d, "user_id") == SelfId && VoiceState != null) {
+                    string voiceChannel = Str(d, "channel_id");
+                    string voiceSession = Str(d, "session_id");
+                    Action<string, string> voiceHandler = VoiceState;
+                    MainThread.Enqueue(() => voiceHandler(voiceChannel, voiceSession));
+                }
+                break;
+            case "VOICE_SERVER_UPDATE":
+                MainCore.Log.Msg(
+                    $"[Discord] VOICE_SERVER_UPDATE guild={Str(d, "guild_id")} "
+                    + $"endpoint={Str(d, "endpoint")} hasToken={Str(d, "token") != null}");
+                if(VoiceServer != null) {
+                    string voiceGuild = Str(d, "guild_id");
+                    string voiceToken = Str(d, "token");
+                    string voiceEndpoint = Str(d, "endpoint");
+                    Action<string, string, string> serverHandler = VoiceServer;
+                    MainThread.Enqueue(() => serverHandler(voiceGuild, voiceToken, voiceEndpoint));
+                }
+                break;
         }
     }
     private void RaiseMessage(Action<DiscordMessage> handler, JToken d) {
@@ -153,7 +190,10 @@ public sealed class DiscordGateway : IDisposable {
         JObject self = Obj(d, "user");
         if(self != null) {
             string id = Str(self, "id");
-            if(id != null) userNames[id] = DisplayName(self);
+            if(id != null) {
+                userNames[id] = DisplayName(self);
+                SelfId = id;
+            }
         }
         JArray users = Arr(d, "users");
         if(users == null) return;
@@ -256,6 +296,13 @@ public sealed class DiscordGateway : IDisposable {
         }
     }
     private Task SendHeartbeatAsync(CancellationToken ct) => SendJsonAsync(new { op = 1, d = seq }, ct);
+    public Task SendVoiceStateAsync(string guildId, string channelId, bool selfMute, bool selfDeaf) =>
+        SendJsonAsync(
+            new {
+                op = 4,
+                d = new { guild_id = guildId, channel_id = channelId, self_mute = selfMute, self_deaf = selfDeaf },
+            },
+            connCts?.Token ?? CancellationToken.None);
     private async Task SendJsonAsync(object payload, CancellationToken ct) {
         if(socket == null || socket.State != WebSocketState.Open) return;
         byte[] bytes = Encoding.UTF8.GetBytes(Serialize(payload));
