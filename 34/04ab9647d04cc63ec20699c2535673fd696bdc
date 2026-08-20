@@ -1,0 +1,19 @@
+build.json
+  s_da2a9891f50bc4::t_0fcf1cb1d9fd85 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "3404ab9647d04cc63ec20699c2535673fd696bdc",
+  "prompts": {},
+  "sessions": {
+    "s_da2a9891f50bc4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a93ed8e4a37d51d65",
+        "model": "unknown"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
