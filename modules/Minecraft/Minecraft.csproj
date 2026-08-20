@@ -6,4 +6,21 @@
 	<ItemGroup>
 		<EmbeddedResource Include="Lang\*.json" />
 	</ItemGroup>
+	<ItemGroup>
+		<!-- Out-of-process CEF engine IPC. Compile-time refs point at the vendored
+		     DLLs; at runtime the module byte-loads them from embedded resources via
+		     McAssemblies, because a byte-loaded module has no probing path and a
+		     loose DLL beside the .qmod would never resolve. Deliberately NOT the
+		     upstream Unity Runtime package: that pulls UniTask and Unity.Collections
+		     NativeArray, whose API differs between ADOFAI 2.9.8 and 3.2.0. -->
+		<Reference Include="VoltRpc">
+			<HintPath>libs/VoltRpc.dll</HintPath>
+		</Reference>
+		<Reference Include="VoltstroStudios.UnityWebBrowser.Shared">
+			<HintPath>libs/VoltstroStudios.UnityWebBrowser.Shared.dll</HintPath>
+		</Reference>
+		<EmbeddedResource Include="libs\VoltRpc.dll" LogicalName="Quartz.Minecraft.Cef.VoltRpc.dll" />
+		<EmbeddedResource Include="libs\VoltstroStudios.UnityWebBrowser.Shared.dll" LogicalName="Quartz.Minecraft.Cef.VoltstroStudios.UnityWebBrowser.Shared.dll" />
+		<EmbeddedResource Include="libs\THIRD-PARTY-NOTICES.md" LogicalName="Quartz.Minecraft.Cef.THIRD-PARTY-NOTICES.md" />
+	</ItemGroup>
 </Project>

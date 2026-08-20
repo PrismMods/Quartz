@@ -2,6 +2,9 @@
   "en-US": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "SECTION_MINECRAFT": "Minecraft",
-    "MINECRAFT_EMPTY": "Nothing here yet — this tab is a placeholder."
+    "MINECRAFT_UNSUPPORTED": "No browser engine build exists for this platform and architecture.",
+    "MINECRAFT_INSTALL_INFO": "Playing Minecraft Classic in-game needs a browser engine (Chromium). It downloads once, is about 133 MB, and is stored beside your Quartz settings.",
+    "MINECRAFT_INSTALL_BUTTON": "Download browser engine",
+    "MINECRAFT_DISCLAIMER": "Minecraft Classic is played at classic.minecraft.net, a service of Mojang Synergies AB. Minecraft is a trademark of Mojang Synergies AB. Quartz is not affiliated with, endorsed by, or sponsored by Mojang or Microsoft, and redistributes no game code or assets."
   }
 }

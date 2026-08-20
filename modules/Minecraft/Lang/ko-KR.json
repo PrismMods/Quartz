@@ -2,6 +2,9 @@
   "ko-KR": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "SECTION_MINECRAFT": "마인크래프트",
-    "MINECRAFT_EMPTY": "아직 아무것도 없습니다 — 자리만 잡아 둔 탭입니다."
+    "MINECRAFT_UNSUPPORTED": "이 플랫폼과 아키텍처용 브라우저 엔진 빌드가 없습니다.",
+    "MINECRAFT_INSTALL_INFO": "게임 안에서 마인크래프트 클래식을 하려면 브라우저 엔진(Chromium)이 필요합니다. 한 번만 내려받으며, 약 133MB이고 Quartz 설정 폴더 옆에 저장됩니다.",
+    "MINECRAFT_INSTALL_BUTTON": "브라우저 엔진 다운로드",
+    "MINECRAFT_DISCLAIMER": "마인크래프트 클래식은 Mojang Synergies AB의 서비스인 classic.minecraft.net에서 실행됩니다. Minecraft는 Mojang Synergies AB의 상표입니다. Quartz는 Mojang 또는 Microsoft와 제휴하거나 승인·후원받지 않았으며, 게임 코드나 에셋을 재배포하지 않습니다."
   }
 }

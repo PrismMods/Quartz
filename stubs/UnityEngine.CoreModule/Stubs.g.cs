@@ -862,6 +862,7 @@ namespace UnityEngine {
         public void Apply(bool updateMipmaps, bool makeNoLongerReadable) => throw null;
         public void Compress(bool highQuality) => throw null;
         public global::UnityEngine.Color32[] GetPixels32() => throw null;
+        public void LoadRawTextureData(byte[] data) => throw null;
         public global::UnityEngine.Rect[] PackTextures(global::UnityEngine.Texture2D[] textures, int padding, int maximumAtlasSize, bool makeNoLongerReadable) => throw null;
         public void SetPixel(int x, int y, global::UnityEngine.Color color) => throw null;
         public void SetPixels(global::UnityEngine.Color[] colors) => throw null;
@@ -1009,6 +1010,14 @@ namespace UnityEngine {
         public override bool Equals(object obj) => throw null;
         public override int GetHashCode() => throw null;
         bool global::System.IEquatable<global::UnityEngine.Vector2>.Equals(global::UnityEngine.Vector2 other) => throw null;
+    }
+    public unsafe partial struct Vector2Int : global::System.IEquatable<global::UnityEngine.Vector2Int> {
+        private int m_X;
+        private int m_Y;
+        public int x { get => throw null; set { } }
+        public int y { get => throw null; set { } }
+        public Vector2Int(int x, int y) => throw null;
+        bool global::System.IEquatable<global::UnityEngine.Vector2Int>.Equals(global::UnityEngine.Vector2Int other) => throw null;
     }
     public unsafe partial struct Vector3 : global::System.IEquatable<global::UnityEngine.Vector3> {
         public const float kEpsilon = 12f;

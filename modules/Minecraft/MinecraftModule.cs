@@ -6,6 +6,7 @@ public sealed class MinecraftModule : QuartzModule {
     public override void OnLoad() {
         foreach(string lang in new[] { "en-US", "ko-KR", "zh-CN" })
             Context.RegisterTranslations(typeof(MinecraftModule), $"Quartz.Features.Minecraft.Lang.{lang}.json");
+        McAssemblies.EnsureLoaded();
         Context.AddPage(new NavPage {
             Key = "minecraft.main",
             CategoryKey = "minecraft",

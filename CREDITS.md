@@ -19,3 +19,11 @@
   their permission. Thank you for building it and for letting Quartz carry it. Modified
   by the Quartz project; see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for
   what changed.
+
+## Minecraft Classic
+
+The Minecraft module does not ship or reimplement Minecraft. It opens
+[classic.minecraft.net](https://classic.minecraft.net/), a service of Mojang
+Synergies AB, inside an embedded browser view, and redistributes no game code or
+assets. Minecraft is a trademark of Mojang Synergies AB. Quartz is not
+affiliated with, endorsed by, or sponsored by Mojang or Microsoft.

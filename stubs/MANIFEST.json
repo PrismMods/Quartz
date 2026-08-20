@@ -4505,6 +4505,7 @@
           "System.Void UnityEngine.Texture2D::Apply(System.Boolean)",
           "System.Void UnityEngine.Texture2D::Apply(System.Boolean,System.Boolean)",
           "System.Void UnityEngine.Texture2D::Compress(System.Boolean)",
+          "System.Void UnityEngine.Texture2D::LoadRawTextureData(System.Byte[])",
           "System.Void UnityEngine.Texture2D::SetPixel(System.Int32,System.Int32,UnityEngine.Color)",
           "System.Void UnityEngine.Texture2D::SetPixels(UnityEngine.Color[])",
           "System.Void UnityEngine.Texture2D::SetPixels32(UnityEngine.Color32[])",
@@ -4698,6 +4699,18 @@
         ]
       },
       {
+        "type": "UnityEngine.Vector2Int",
+        "members": [
+          "System.Int32 UnityEngine.Vector2Int::get_x()",
+          "System.Int32 UnityEngine.Vector2Int::get_y()",
+          "System.Int32 UnityEngine.Vector2Int::m_X",
+          "System.Int32 UnityEngine.Vector2Int::m_Y",
+          "System.Int32 UnityEngine.Vector2Int::x()",
+          "System.Int32 UnityEngine.Vector2Int::y()",
+          "System.Void UnityEngine.Vector2Int::.ctor(System.Int32,System.Int32)"
+        ]
+      },
+      {
         "type": "UnityEngine.Vector3",
         "members": [
           "System.Boolean UnityEngine.Vector3::op_Equality(UnityEngine.Vector3,UnityEngine.Vector3)",
@@ -4771,6 +4784,9 @@
           "System.Boolean UnityEngine.Input::GetMouseButtonUp(System.Int32)",
           "System.Boolean UnityEngine.Input::anyKeyDown()",
           "System.Boolean UnityEngine.Input::get_anyKeyDown()",
+          "System.Single UnityEngine.Input::GetAxisRaw(System.String)",
+          "System.String UnityEngine.Input::get_inputString()",
+          "System.String UnityEngine.Input::inputString()",
           "UnityEngine.Vector2 UnityEngine.Input::get_mouseScrollDelta()",
           "UnityEngine.Vector2 UnityEngine.Input::mouseScrollDelta()",
           "UnityEngine.Vector3 UnityEngine.Input::get_mousePosition()",
@@ -5108,11 +5124,15 @@
       },
       {
         "type": "UnityEngine.EventSystems.IPointerEnterHandler",
-        "members": []
+        "members": [
+          "System.Void UnityEngine.EventSystems.IPointerEnterHandler::OnPointerEnter(UnityEngine.EventSystems.PointerEventData)"
+        ]
       },
       {
         "type": "UnityEngine.EventSystems.IPointerExitHandler",
-        "members": []
+        "members": [
+          "System.Void UnityEngine.EventSystems.IPointerExitHandler::OnPointerExit(UnityEngine.EventSystems.PointerEventData)"
+        ]
       },
       {
         "type": "UnityEngine.EventSystems.IPointerUpHandler",

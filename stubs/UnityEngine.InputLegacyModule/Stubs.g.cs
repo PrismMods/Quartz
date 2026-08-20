@@ -14,8 +14,10 @@
 namespace UnityEngine {
     public unsafe partial class Input {
         public static bool anyKeyDown { get => throw null; }
+        public static string inputString { get => throw null; }
         public static global::UnityEngine.Vector3 mousePosition { get => throw null; }
         public static global::UnityEngine.Vector2 mouseScrollDelta { get => throw null; }
+        public static float GetAxisRaw(string axisName) => throw null;
         public static bool GetKey(global::UnityEngine.KeyCode key) => throw null;
         public static bool GetKeyDown(global::UnityEngine.KeyCode key) => throw null;
         public static bool GetKeyUp(global::UnityEngine.KeyCode key) => throw null;
