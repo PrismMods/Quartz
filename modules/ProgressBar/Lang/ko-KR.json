@@ -29,6 +29,7 @@
     "PROGRESSBAR_LINEEDGE_TOP": "위쪽",
     "PROGRESSBAR_LINEEDGE_BOTTOM": "아래쪽",
     "SECTION_PROGRESS_BAR": "진행도 바",
-    "PROGRESSBAR_ENABLE": "진행도 바 활성화"
+    "PROGRESSBAR_ENABLE": "진행도 바 활성화",
+    "PROGRESSBAR_RESETPOS": "위치 초기화"
   }
 }

@@ -29,6 +29,7 @@
     "PROGRESSBAR_LINEEDGE_TOP": "Top",
     "PROGRESSBAR_LINEEDGE_BOTTOM": "Bottom",
     "SECTION_PROGRESS_BAR": "Progress Bar",
-    "PROGRESSBAR_ENABLE": "Enable Progress Bar"
+    "PROGRESSBAR_ENABLE": "Enable Progress Bar",
+    "PROGRESSBAR_RESETPOS": "Reset Position"
   }
 }

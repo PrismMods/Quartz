@@ -31,6 +31,7 @@
     "COMBO_SOLIDCOLOR": "Solid Color",
     "COMBO_XPERFECT": "XPerfect Combo (X Only)",
     "SECTION_COMBO": "Combo",
-    "COMBO_ENABLE": "Enable Combo"
+    "COMBO_ENABLE": "Enable Combo",
+    "COMBO_RESETPOS": "Reset Position"
   }
 }

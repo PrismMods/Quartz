@@ -73,6 +73,7 @@
     "PANEL_TEXTCOLOR": "Text Color",
     "PANEL_TEXTSHADOW": "Text Shadow",
     "PANEL_TEXT_PLACEHOLDER": "Custom text…",
-    "SECTION_PANELS": "Panels"
+    "SECTION_PANELS": "Panels",
+    "PANEL_TOO_MANY": "{0} panels — that's a lot; performance may suffer."
   }
 }

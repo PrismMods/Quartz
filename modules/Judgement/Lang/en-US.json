@@ -1,6 +1,7 @@
 {
   "en-US": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
-    "SECTION_JUDGEMENT": "Judgement"
+    "SECTION_JUDGEMENT": "Judgement",
+    "JUDGEMENT_RESETPOS": "Reset Position"
   }
 }

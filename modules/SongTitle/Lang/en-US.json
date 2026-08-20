@@ -14,6 +14,7 @@
     "SONGTITLE_SHADOW_SOFT": "Shadow Softness",
     "SONGTITLE_SHADOW_COLOR": "Shadow Color",
     "SONGTITLE_PLACEHOLDER_ARTIST": "Artist",
-    "SONGTITLE_PLACEHOLDER_TITLE": "Title"
+    "SONGTITLE_PLACEHOLDER_TITLE": "Title",
+    "SONGTITLE_RESETPOS": "Reset Position"
   }
 }

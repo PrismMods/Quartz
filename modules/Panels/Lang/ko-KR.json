@@ -73,6 +73,7 @@
     "PANEL_TEXTCOLOR": "글자 색상",
     "PANEL_TEXTSHADOW": "글자 그림자",
     "PANEL_TEXT_PLACEHOLDER": "사용자 지정 텍스트…",
-    "SECTION_PANELS": "패널"
+    "SECTION_PANELS": "패널",
+    "PANEL_TOO_MANY": "패널 {0}개 — 너무 많으면 성능이 떨어질 수 있습니다."
   }
 }
