@@ -1,0 +1,21 @@
+modules/Discord/PageDiscord.cs
+  s_e88ee5f673db96::t_47a767bdf43167 12
+modules/Discord/PageDiscord.Login.cs
+  s_e88ee5f673db96::t_326c515b9a0d19 1-165
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "541cf38a4f74fbb83ee9f1028a2d66411ea3160c",
+  "prompts": {},
+  "sessions": {
+    "s_e88ee5f673db96": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "daba5f3a-3416-485b-8236-24e21d478c52",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
