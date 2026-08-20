@@ -2,6 +2,10 @@
   "zh-CN": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "SECTION_MINECRAFT": "我的世界",
+    "MINECRAFT_UNSUPPORTED": "目前没有针对该平台和架构的浏览器引擎构建。",
+    "MINECRAFT_INSTALL_INFO": "在游戏中玩Minecraft Classic需要浏览器引擎（Chromium）。它只需下载一次，大约133MB，存储在你的Quartz设置里。",
+    "MINECRAFT_INSTALL_BUTTON": "下载浏览器引擎",
+    "MINECRAFT_DISCLAIMER": "Minecraft 经典版在 Mojang Synergies AB 旗下的 classic.minecraft.net 平台进行。Minecraft 是 Mojang Synergies AB 的商标。Quartz 与 Mojang 或 Microsoft 没有关联、认可或赞助，也不分发任何游戏代码或资源。",
     "MINECRAFT_EMPTY": "这里还没有内容 — 该标签页仅作占位。"
   }
 }

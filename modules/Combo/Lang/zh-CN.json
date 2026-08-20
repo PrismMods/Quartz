@@ -31,6 +31,7 @@
     "COMBO_SOLIDCOLOR": "纯色填充",
     "COMBO_XPERFECT": "极限完美连击（仅X完美）",
     "SECTION_COMBO": "连击显示",
-    "COMBO_ENABLE": "启用连击显示"
+    "COMBO_ENABLE": "启用连击显示",
+    "COMBO_RESETPOS": "重置位置"
   }
 }

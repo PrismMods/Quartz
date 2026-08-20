@@ -29,6 +29,7 @@
     "PROGRESSBAR_LINEEDGE_TOP": "顶部",
     "PROGRESSBAR_LINEEDGE_BOTTOM": "底部",
     "SECTION_PROGRESS_BAR": "关卡进度条",
-    "PROGRESSBAR_ENABLE": "启用关卡进度条"
+    "PROGRESSBAR_ENABLE": "启用关卡进度条",
+    "PROGRESSBAR_RESETPOS": "重置位置"
   }
 }
