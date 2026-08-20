@@ -1,0 +1,107 @@
+modules/Minecraft/MinecraftModule.cs
+  s_5d2f73b01b2b1b::t_fd074304910f13 9
+modules/Minecraft/McBrowserView.cs
+  s_ec091734e2996a::t_b592db559048ee 54,62,98-105
+  s_5d2f73b01b2b1b::t_ff0dbce0198266 37-44,87,89-97
+  s_5d2f73b01b2b1b::t_f3b7891ba2b49a 79-85
+  s_5d2f73b01b2b1b::t_f29c39707eb23e 16,68,117,128,130-133,179-183,190,205
+  s_5d2f73b01b2b1b::t_4a7b0ce9d5f19a 70-76
+  s_5d2f73b01b2b1b::t_d192942cca7a4d 1-5,7-15,24-36,45-53,55-61,63,67,69,77-78,86,88,106-113,115-116,118-120,127,129,134-135,153,191-204,206-208
+  s_5d2f73b01b2b1b::t_c00cbaf931ec8d 121-126
+  s_5d2f73b01b2b1b::t_1fdc22544d4584 6,17-23,64-66,114,136-152,154-178,184-189
+stubs/README.md
+  s_5d2f73b01b2b1b::t_a5e3e716be810e 27,36
+  s_5d2f73b01b2b1b::t_207eb7c5bdb160 29-30,32,41
+modules/Minecraft/McInstallPanel.cs
+  s_5d2f73b01b2b1b::t_adaef2f95804b2 1-38
+modules/Minecraft/Lang/en-US.json
+  s_5d2f73b01b2b1b::t_1ed5f056ac69db 5-8
+modules/Minecraft/McEngine.cs
+  s_5d2f73b01b2b1b::t_513f50837f8929 79-84,86,92,94-95,145-147,170-171
+  s_5d2f73b01b2b1b::t_9295b33a43e303 11
+  s_5d2f73b01b2b1b::t_09d19e0e279689 22
+  s_5d2f73b01b2b1b::t_bc27cbe0aa015b 104-143
+  s_5d2f73b01b2b1b::t_7165cf31f6d0b1 7
+  s_5d2f73b01b2b1b::t_9c8ebd8c8b1fdf 188
+  s_5d2f73b01b2b1b::t_623660d986d702 24,26-27,32,35-39,42,52-64,67-75,78,85,87-91,97-101,213,215,217-218,226
+  s_ec091734e2996a::t_b592db559048ee 28,33,43-44,193-210,264
+  s_5d2f73b01b2b1b::t_006f25ba174390 216,219
+  s_5d2f73b01b2b1b::t_7d122434c3da7f 1-6,8-10,12-14,18-21,23,25,29-31,34,40-41,45-51,65-66,76,96,102-103,144,148-169,172-185,187,189-192,211-212,214,220-225,227-263,265
+  s_5d2f73b01b2b1b::t_50d82c8643ea63 15-17,77,93
+  s_5d2f73b01b2b1b::t_ac120555ae6a05 186
+modules/Minecraft/Minecraft.csproj
+  s_5d2f73b01b2b1b::t_1ed5f056ac69db 9-25
+modules/Minecraft/McAssemblies.cs
+  s_5d2f73b01b2b1b::t_fd074304910f13 1-54
+modules/Minecraft/libs/THIRD-PARTY-NOTICES.md
+  s_5d2f73b01b2b1b::t_fd074304910f13 1-20
+modules/Minecraft/PageMinecraft.cs
+  s_5d2f73b01b2b1b::t_c00cbaf931ec8d 47-50,61
+  s_5d2f73b01b2b1b::t_adaef2f95804b2 1-3,5,7,13-24,26-36,38-46,51-60,62-68
+modules/Minecraft/McInstaller.cs
+  s_5d2f73b01b2b1b::t_9417ffccf1c73e 1-49,51-91
+  s_5d2f73b01b2b1b::t_c00cbaf931ec8d 50
+modules/Minecraft/Lang/ko-KR.json
+  s_5d2f73b01b2b1b::t_1ed5f056ac69db 5-8
+THIRD-PARTY-NOTICES.md
+  s_5d2f73b01b2b1b::t_ec98b1745d1f7d 39-68
+modules/Minecraft/McPointerLock.cs
+  s_5d2f73b01b2b1b::t_9c8ebd8c8b1fdf 1-33
+modules/Minecraft/McContracts.cs
+  s_5d2f73b01b2b1b::t_006f25ba174390 38-47
+  s_5d2f73b01b2b1b::t_09d19e0e279689 1-37,48-75
+stubs/UnityEngine.InputLegacyModule/Stubs.g.cs
+  s_5d2f73b01b2b1b::t_207eb7c5bdb160 17,20
+stubs/UnityEngine.UI/Stubs.g.cs
+  s_5d2f73b01b2b1b::t_a5e3e716be810e 33,41-42,100,103,458,468-469
+modules/Minecraft/McPaths.cs
+  s_5d2f73b01b2b1b::t_c00cbaf931ec8d 38-43,46-49,60,64,68-72
+  s_5d2f73b01b2b1b::t_513f50837f8929 15-17
+  s_5d2f73b01b2b1b::t_670845cba510c6 1-14,18-37,44-45,50-59,61-63,65-67,73-74
+modules/Minecraft/McKeyboard.cs
+  s_5d2f73b01b2b1b::t_3212ab3af148f7 1-65
+CREDITS.md
+  s_5d2f73b01b2b1b::t_ec98b1745d1f7d 22-29
+stubs/MANIFEST.json
+  s_5d2f73b01b2b1b::t_8f0611a888db6b 4702-4712
+  s_5d2f73b01b2b1b::t_207eb7c5bdb160 4787-4789
+  s_5d2f73b01b2b1b::t_a5e3e716be810e 4508,5127-5129,5133-5135
+  s_5d2f73b01b2b1b::t_cf97eec0d6cbc9 4701
+stubs/UnityEngine.CoreModule/Stubs.g.cs
+  s_5d2f73b01b2b1b::t_a5e3e716be810e 865
+  s_5d2f73b01b2b1b::t_8f0611a888db6b 1014-1020
+  s_5d2f73b01b2b1b::t_c5980812db5d4d 1021
+modules/Minecraft/McContractsPopups.cs
+  s_5d2f73b01b2b1b::t_9295b33a43e303 1-11
+modules/Minecraft/McPixels.cs
+  s_5d2f73b01b2b1b::t_16e16692e98410 1-25,30-31,33-37
+  s_5d2f73b01b2b1b::t_513f50837f8929 26-29,32
+modules/Minecraft/McTar.cs
+  s_5d2f73b01b2b1b::t_3725a3ae0e94dd 1-111
+modules/Minecraft/McReadWriters.cs
+  s_5d2f73b01b2b1b::t_ac120555ae6a05 1-54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "868cd0a61350b3b0a1726aad09c112f6e49dd217",
+  "prompts": {},
+  "sessions": {
+    "s_5d2f73b01b2b1b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a123c91b-7c65-4091-9dae-cd6408ebf133",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_ec091734e2996a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a1a5b486-b9e6-4b56-84d7-460e75f04d60",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
