@@ -73,6 +73,7 @@
     "PANEL_TEXTCOLOR": "文字颜色",
     "PANEL_TEXTSHADOW": "文字阴影",
     "PANEL_TEXT_PLACEHOLDER": "自定义文字内容…",
-    "SECTION_PANELS": "自定义统计面板"
+    "SECTION_PANELS": "自定义统计面板",
+    "PANEL_TOO_MANY": "{0}个面板——数量过多，可能影响性能。"
   }
 }
