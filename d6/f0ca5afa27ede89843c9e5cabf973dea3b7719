@@ -1,0 +1,23 @@
+modules/Discord/Api/VoiceAudio.cs
+  s_ec091734e2996a::t_6c266aa21d2ca5 30-35,119-123,150-158,224-225,237,248-249
+modules/Discord/Api/VoiceGateway.cs
+  s_ec091734e2996a::t_3f4c891a8e071b 63-68
+modules/Discord/Api/VoiceSession.cs
+  s_ec091734e2996a::t_a2b0d762acfec2 43,45,47,54-66,169
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "d6f0ca5afa27ede89843c9e5cabf973dea3b7719",
+  "prompts": {},
+  "sessions": {
+    "s_ec091734e2996a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a1a5b486-b9e6-4b56-84d7-460e75f04d60",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}

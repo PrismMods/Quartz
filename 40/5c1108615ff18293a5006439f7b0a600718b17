@@ -1,0 +1,16 @@
+Quartz/GTweens/Source/Delegates/ValidationDelegates.cs
+  h_6eeb8441a8a159 2
+Quartz/GTweens/Source/Easings/Easing.cs
+  h_6eeb8441a8a159 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "405c1108615ff18293a5006439f7b0a600718b17",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}

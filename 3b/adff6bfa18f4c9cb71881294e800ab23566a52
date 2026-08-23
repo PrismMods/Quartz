@@ -1,0 +1,56 @@
+modules/Tuf/Lang/zh-CN.json
+  s_eb1cc316a0f131::t_d91a99a267f996 91
+  s_eb1cc316a0f131::t_324b311e532f74 92
+modules/Tuf/TufLevelActionRunner.cs
+  s_896a7adc0bda13::t_01c290d130c6a7 198,202-208
+  s_896a7adc0bda13::t_769cba1f375809 11,14-15,17-19,28-39,41,43-46,64,67-68,70-85,89-97,103,120,154,158,163,169,180,184-186,188,190,194-197,216-218
+  s_896a7adc0bda13::t_473583f0261046 86-88
+modules/Tuf/TufPacksView.Rebuild.cs
+  s_896a7adc0bda13::t_0abaa60b993fdf 153
+modules/Tuf/TufService.cs
+  s_896a7adc0bda13::t_6a685525705267 20-22
+modules/Tuf/TufService.Installed.cs
+  s_896a7adc0bda13::t_6a685525705267 140
+modules/Tuf/TufBrowserView.Actions.cs
+  s_896a7adc0bda13::t_0abaa60b993fdf 102,110,127
+modules/Tuf/TufBrowserView.Cards.cs
+  s_896a7adc0bda13::t_0abaa60b993fdf 71-72,251
+modules/Tuf/TufModels.cs
+  s_896a7adc0bda13::t_769cba1f375809 6
+modules/Tuf/TufService.Fetch.cs
+  s_896a7adc0bda13::t_6a685525705267 61
+modules/Tuf/TufPackService.cs
+  s_896a7adc0bda13::t_0abaa60b993fdf 25-27
+modules/Tuf/Lang/ko-KR.json
+  s_eb1cc316a0f131::t_5bfc7c0eed9895 91
+  s_eb1cc316a0f131::t_8ba6eb30ff77d4 92
+modules/Tuf/TufPacksView.Rows.cs
+  s_896a7adc0bda13::t_0abaa60b993fdf 162,186
+modules/Tuf/Lang/en-US.json
+  s_eb1cc316a0f131::t_5bf5ac4133f3b6 91
+  s_eb1cc316a0f131::t_714c7dcf37b22c 92
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "3badff6bfa18f4c9cb71881294e800ab23566a52",
+  "prompts": {},
+  "sessions": {
+    "s_896a7adc0bda13": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "975904c3-454d-4115-8c39-a9f40b94a15f",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_eb1cc316a0f131": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f07a9a99-06a1-48d3-874a-4b9c49c77779",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}

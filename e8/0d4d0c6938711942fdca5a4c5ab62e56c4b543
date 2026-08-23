@@ -1,0 +1,43 @@
+modules/Discord/PageDiscord.cs
+  s_eb1cc316a0f131::t_b9207b8d603b48 47-48,60-61,76-78,105,107,177-179,248-256,262,273-287,291-294,296,428-431,433-446
+modules/Discord/Api/DiscordSession.cs
+  s_eb1cc316a0f131::t_ba48604c1a69e9 20,119,123,309,311,339
+modules/Discord/Api/AvatarCache.cs
+  s_ec091734e2996a::t_ef2f52e466775e 1-82
+modules/Discord/Api/DiscordModels.cs
+  s_ec091734e2996a::t_d054f87633f3f3 2,52
+modules/Discord/Api/DiscordRest.cs
+  s_ec091734e2996a::t_71156c2e77dfee 19,21,28,176
+modules/Discord/Api/EmojiAtlas.cs
+  s_ec091734e2996a::t_80dcd6cc5444bf 1-199
+modules/Discord/Api/Markdown.cs
+  s_ec091734e2996a::t_e996cb10f77603 1-78
+modules/Discord/Api/Markup.cs
+  s_ec091734e2996a::t_92684fac1551b5 1-87
+modules/Discord/Api/UserCache.cs
+  s_ec091734e2996a::t_1ac75dd0ecb4a2 10-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "e80d4d0c6938711942fdca5a4c5ab62e56c4b543",
+  "prompts": {},
+  "sessions": {
+    "s_eb1cc316a0f131": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f07a9a99-06a1-48d3-874a-4b9c49c77779",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_ec091734e2996a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a1a5b486-b9e6-4b56-84d7-460e75f04d60",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+modules/Discord/Api/DiscordSession.cs
+  s_eb1cc316a0f131::t_6aae7a7322313e 144,161-187
+  s_eb1cc316a0f131::t_3780077ef7dbb3 188
+modules/Discord/Api/DiscordGateway.cs
+  s_ec091734e2996a::t_c44a8e74b1db80 26,150-158
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "bff48f24c5ab3b287f5c1edcedfad3ba0396d8df",
+  "prompts": {},
+  "sessions": {
+    "s_eb1cc316a0f131": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f07a9a99-06a1-48d3-874a-4b9c49c77779",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_ec091734e2996a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a1a5b486-b9e6-4b56-84d7-460e75f04d60",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}

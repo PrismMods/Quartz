@@ -1,0 +1,19 @@
+modules/Discord/PageDiscord.cs
+  s_eb1cc316a0f131::t_6aae7a7322313e 34-42,63,82,91,113-120,137,277-281
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "7df9efc13c0f63e238c9e264fb83d2d89c36fc1f",
+  "prompts": {},
+  "sessions": {
+    "s_eb1cc316a0f131": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f07a9a99-06a1-48d3-874a-4b9c49c77779",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}

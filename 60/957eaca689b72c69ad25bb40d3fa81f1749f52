@@ -1,0 +1,23 @@
+Quartz.Tests/Features/DiscordMarkdownTests.cs
+  s_ec091734e2996a::t_3e7a182c74500a 1-84
+Quartz.Tests/Program.cs
+  s_ec091734e2996a::t_5cbf17c544941e 120-131
+Quartz.Tests/Quartz.Tests.csproj
+  s_ec091734e2996a::t_f939bc9005b69e 69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "60957eaca689b72c69ad25bb40d3fa81f1749f52",
+  "prompts": {},
+  "sessions": {
+    "s_ec091734e2996a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a1a5b486-b9e6-4b56-84d7-460e75f04d60",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
