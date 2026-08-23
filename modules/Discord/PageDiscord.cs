@@ -31,6 +31,15 @@ public static partial class PageDiscord {
         new(0.345f, 0.396f, 0.949f), new(0.137f, 0.647f, 0.353f), new(0.941f, 0.698f, 0.196f),
         new(0.831f, 0.361f, 0.361f), new(0.541f, 0.404f, 0.906f), new(0.196f, 0.663f, 0.784f),
     ];
+    private static readonly Dictionary<string, float> scrollOffsets = [];
+    private static readonly Dictionary<string, (UIScrollController Scroll, RectTransform Content)> liveScrolls = [];
+    private static void RememberScrolls() {
+        foreach(KeyValuePair<string, (UIScrollController Scroll, RectTransform Content)> pair in liveScrolls) {
+            if(pair.Value.Scroll == null || pair.Value.Content == null) continue;
+            scrollOffsets[pair.Key] = pair.Value.Content.anchoredPosition.y;
+        }
+        liveScrolls.Clear();
+    }
     public static void Create(RectTransform parent) {
         Transform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(content)), "SECTION_DISCORD", "Discord");
@@ -51,6 +60,7 @@ public static partial class PageDiscord {
             status.text = DiscordSession.LoggedIn
                 ? $"{DiscordSession.SelfName} · {DiscordSession.Status}"
                 : DiscordSession.Status;
+            RememberScrolls();
             GenerateUI.ClearChildren(client);
             if(DiscordSession.LoggedIn) BuildClient(client);
             else BuildLogin(client);
@@ -69,7 +79,7 @@ public static partial class PageDiscord {
     }
     private static void Rail(RectTransform rail) {
         Paint(rail, RailBg);
-        RectTransform list = ScrollList(rail, 0f, 0f, new RectOffset(12, 12, 12, 12), 8f);
+        RectTransform list = ScrollList(rail, 0f, 0f, new RectOffset(12, 12, 12, 12), 8f, "rail");
         Guild(list, DiscordSession.DirectMessagesId, "@", Blurple);
         Paint(Sized(list, "Separator", 2f), Divider, 1);
         foreach(DiscordGuild guild in DiscordSession.Guilds)
@@ -78,7 +88,7 @@ public static partial class PageDiscord {
                 AvatarCache.GuildUrl(guild.Id, guild.Icon));
     }
     private static RectTransform ScrollList(
-        RectTransform parent, float top, float bottom, RectOffset padding, float spacing
+        RectTransform parent, float top, float bottom, RectOffset padding, float spacing, string key = null
     ) {
         RectTransform viewport = Fill(parent, "Viewport", 0f, top, 0f, bottom);
         viewport.gameObject.AddComponent<RectMask2D>();
@@ -100,6 +110,14 @@ public static partial class PageDiscord {
         fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
         UIScrollController scroll = viewport.gameObject.AddComponent<UIScrollController>();
         scroll.SetContent(list, viewport);
+        if(key == null) return list;
+        liveScrolls[key] = (scroll, list);
+        if(scrollOffsets.TryGetValue(key, out float saved) && saved > 0f)
+            MainThread.Enqueue(() => {
+                if(scroll == null || list == null) return;
+                LayoutRebuilder.ForceRebuildLayoutImmediate(list);
+                scroll.ScrollTo(saved);
+            });
         return list;
     }
     private static void Guild(RectTransform list, string id, string label, Color color, string iconUrl = null) {
@@ -116,7 +134,7 @@ public static partial class PageDiscord {
             : NameOfGuild(DiscordSession.CurrentGuildId);
         Label(Box(head, "Name", 16f, 0f, 208f, 48f), title, 16f, TextBright, FontStyles.Bold);
         Paint(Strip(sidebar, "HeadLine", 0f, 47f, 0f, 1f), HeadLine);
-        RectTransform list = ScrollList(sidebar, 48f, 52f, new RectOffset(8, 8, 8, 8), 2f);
+        RectTransform list = ScrollList(sidebar, 48f, 52f, new RectOffset(8, 8, 8, 8), 2f, "sidebar:" + DiscordSession.CurrentGuildId);
         if(DiscordSession.Loading && DiscordSession.Channels.Count == 0) {
             Label(Sized(list, "Loading", 32f), "loading...", 14f, TextMuted);
             return;
@@ -256,6 +274,11 @@ public static partial class PageDiscord {
         }
         UIScrollController scroll = list.parent.GetComponent<UIScrollController>();
         if(scroll == null) return;
+        Bottom(scroll, list);
+        MainThread.Enqueue(() => Bottom(scroll, list));
+    }
+    private static void Bottom(UIScrollController scroll, RectTransform list) {
+        if(scroll == null || list == null) return;
         LayoutRebuilder.ForceRebuildLayoutImmediate(list);
         scroll.ScrollTo(float.MaxValue);
     }
