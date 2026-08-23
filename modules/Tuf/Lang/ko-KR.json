@@ -88,6 +88,8 @@
     "DESC_TUF_CHECK_UPDATES": "라이브러리의 레벨이 내려받은 뒤 다시 올라왔는지 TUF에 물어봅니다. 레벨마다 요청을 한 번씩 보내므로 라이브러리가 크면 시간이 걸립니다.",
     "TUF_CHECKING_UPDATES": "{0}/{1}",
     "TUF_UPDATES_COUNT": "업데이트 ({0})",
+    "TUF_QUEUED": "대기 중 #{0}",
+    "DESC_TUF_QUEUED": "현재 다운로드가 끝나기를 기다리는 중입니다. 누르면 대기열에서 제거합니다.",
     "TUF_UPDATES_READY": "업데이트 {0}개",
     "DESC_TUF_ROLLBACK": "업데이트 전에 쓰던 버전으로 되돌립니다. Quartz는 레벨 폴더 안 rollback 폴더에 최근 사본 몇 개를 보관합니다.",
     "TUF_ROLLBACK_TITLE": "이전 버전으로 되돌리기",

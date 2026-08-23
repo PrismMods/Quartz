@@ -22,6 +22,9 @@ public sealed class TufPackService : IRuntimeService {
     public bool LoadingMore { get; private set; }
     public TufPack SelectedPack { get; private set; }
     public bool IsBusy => actions?.IsBusy ?? false;
+    public bool IsLaunching => actions?.IsLaunching ?? false;
+    public int QueueCount => actions?.QueueCount ?? 0;
+    public int QueuePosition(int id) => actions?.QueuePosition(id) ?? 0;
     public event Action Changed = delegate { };
     private readonly List<TufPack> packs = [];
     private readonly List<TufPackItem> packItems = [];

@@ -3,7 +3,7 @@ using System.Text;
 namespace Quartz.Features.Tuf;
 public enum TufSort { Recent, Difficulty, Clears, Likes }
 public enum TufListState { Idle, Loading, Ready, Empty, Error }
-public enum TufItemState { Download, Downloading, Extracting, Loading, Load, Retry, Unavailable, ChooseChart }
+public enum TufItemState { Download, Downloading, Extracting, Loading, Load, Retry, Unavailable, ChooseChart, Queued }
 public enum TufUpdateState { Unknown, Checking, UpToDate, Available, Updating }
 public sealed class TufDifficultyFilter : IEquatable<TufDifficultyFilter> {
     public static readonly IReadOnlyList<string> RankedNames = BuildRankedNames();

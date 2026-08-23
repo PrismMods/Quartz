@@ -150,7 +150,7 @@ internal sealed partial class TufPacksView : MonoBehaviour {
         sb.Append(ShowPreviews ? 'P' : 'p').Append(service.OfflineError ? 'O' : 'o');
         if(service.SelectedPack != null) {
             sb.Append("D:").Append(service.SelectedPack.Id).Append('|')
-                .Append((int)service.DetailState).Append('|').Append(service.IsBusy ? '1' : '0').Append('|')
+                .Append((int)service.DetailState).Append('|').Append(service.IsBusy ? '1' : '0').Append(service.IsLaunching ? '1' : '0').Append(service.QueueCount).Append('|')
                 .Append((int)service.LevelSort).Append(service.LevelAscending ? '1' : '0').Append('|');
             foreach(long key in expandedFolders) sb.Append(key).Append('^');
             sb.Append('|');

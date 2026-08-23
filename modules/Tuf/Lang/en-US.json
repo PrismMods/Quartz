@@ -88,6 +88,8 @@
     "DESC_TUF_CHECK_UPDATES": "Ask TUF whether any level in your library has been re-uploaded since you downloaded it. One request per level, so a large library takes a moment.",
     "TUF_CHECKING_UPDATES": "{0}/{1}",
     "TUF_UPDATES_COUNT": "Updates ({0})",
+    "TUF_QUEUED": "Queued #{0}",
+    "DESC_TUF_QUEUED": "Waiting for the current download to finish. Click to remove it from the queue.",
     "TUF_UPDATES_READY": "{0} update(s) available",
     "DESC_TUF_ROLLBACK": "Go back to a version of this level you had before an update. Quartz keeps the last few copies in the rollback folder inside your levels folder.",
     "TUF_ROLLBACK_TITLE": "Roll back to an earlier version",

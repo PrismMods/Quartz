@@ -68,6 +68,8 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
             .Append(service.HasMore ? '1' : '0')
             .Append(service.LoadingMore ? '1' : '0')
             .Append(service.IsBusy ? '1' : '0')
+            .Append(service.IsLaunching ? '1' : '0')
+            .Append(service.QueueCount).Append('|')
             .Append(service.ShowInstalled ? '1' : '0')
             .Append(service.OfflineError ? '1' : '0')
             .Append(service.ShowPreviews ? '1' : '0').Append('|')
@@ -246,7 +248,7 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
         image.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
         image.type = Image.Type.Sliced;
         image.color = BadgeFill(state);
-        bool clickable = !service.IsBusy && state is not TufUpdateState.Checking and not TufUpdateState.Updating;
+        bool clickable = !service.IsLaunching && state is not TufUpdateState.Checking and not TufUpdateState.Updating;
         image.raycastTarget = clickable;
         TMP_Text label = Text(badge, value, 13f, TextAlignmentOptions.Center);
         label.color = BadgeText(state);

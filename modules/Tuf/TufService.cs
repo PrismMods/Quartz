@@ -17,6 +17,9 @@ public sealed partial class TufService : IRuntimeService {
     public bool HasMore { get; private set; }
     public bool LoadingMore { get; private set; }
     public bool IsBusy => actions?.IsBusy ?? false;
+    public bool IsLaunching => actions?.IsLaunching ?? false;
+    public int QueueCount => actions?.QueueCount ?? 0;
+    public int QueuePosition(int id) => actions?.QueuePosition(id) ?? 0;
     public bool ShowInstalled { get; private set; }
     public int InstalledCount => index?.Data.Count ?? 0;
     public int InfoRevision { get; private set; }

@@ -137,6 +137,7 @@ public sealed partial class TufService : IRuntimeService {
             level.SizeBytes = entry.SizeBytes;
             level.UpdateState = UpdateStateOf(entry.Id);
             level.State = TufItemState.Load;
+            actions?.SyncState(level);
             levels.Add(level);
         }
         SortInstalled();

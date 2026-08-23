@@ -58,6 +58,7 @@ public sealed partial class TufService : IRuntimeService {
         foreach(TufLevel level in page.Results) {
             if(existing.Add(level.Id)) {
                 MarkIfInstalled(level);
+                actions?.SyncState(level);
                 levels.Add(level);
             }
         }

@@ -8,11 +8,15 @@ internal sealed class TufLevelActionRunner {
     private readonly TufLevelLauncher launcher;
     private readonly Action notify;
     private readonly Action<TufLevel> installed;
+    private readonly List<(TufLevel Level, bool Force, TufItemState Prior)> pending = [];
     private CancellationTokenSource actionRequest;
     public Action<TufLevel, bool> Finished;
-    private int activeLevelId;
+    private TufLevel downloading;
+    private int launchingId;
     private bool disposed;
-    public bool IsBusy => activeLevelId != 0;
+    public bool IsBusy => downloading != null || launchingId != 0;
+    public bool IsLaunching => launchingId != 0;
+    public int QueueCount => pending.Count;
     public TufLevelActionRunner(IReadOnlyList<TufLevel> owner, TufDownloadService downloads,
         TufLevelLauncher launcher, Action notify, Action<TufLevel> installed = null) {
         this.owner = owner;
@@ -21,14 +25,29 @@ internal sealed class TufLevelActionRunner {
         this.notify = notify;
         this.installed = installed;
     }
+    public int QueuePosition(int id) {
+        for(int i = 0; i < pending.Count; i++) if(pending[i].Level.Id == id) return i + 1;
+        return 0;
+    }
+    public void SyncState(TufLevel level) {
+        if(level == null) return;
+        if(downloading != null && downloading.Id == level.Id) {
+            level.State = downloading.State;
+            level.Progress = downloading.Progress;
+            level.Error = downloading.Error;
+        } else if(QueuePosition(level.Id) > 0) level.State = TufItemState.Queued;
+    }
     public void Act(TufLevel level) {
-        if(level == null || IsBusy
+        if(level == null || IsLaunching
             || level.State is TufItemState.Downloading or TufItemState.Extracting or TufItemState.Loading) return;
+        if(level.State == TufItemState.Queued) {
+            Dequeue(level);
+            return;
+        }
         if(level.State == TufItemState.ChooseChart) {
             ExitChoose(level);
             return;
         }
-        activeLevelId = level.Id;
         if(downloads.TryGetCachedChart(level.Id, level.InstallFolder, out string cached)) {
             IReadOnlyList<string> charts = downloads.ListCachedCharts(level.Id, level.InstallFolder);
             if(charts.Count > 1) EnterChoose(level, charts);
@@ -36,26 +55,52 @@ internal sealed class TufLevelActionRunner {
             return;
         }
         if(level.DownloadUri == null) {
-            activeLevelId = 0;
             switch(TufMainLevel.Resolve(level, out string codeOrUrl)) {
                 case TufMainLevel.TufMainAction.Play: LaunchMainLevel(level, codeOrUrl); break;
                 case TufMainLevel.TufMainAction.BuyDlc: TufMainLevel.OpenStore(codeOrUrl); break;
             }
             return;
         }
-        StartDownload(level, false);
+        Request(level, false);
     }
     public void UpdateLevel(TufLevel level) {
-        if(level == null || IsBusy || level.DownloadUri == null
-            || level.State is TufItemState.Downloading or TufItemState.Extracting or TufItemState.Loading) return;
+        if(level == null || IsLaunching || level.DownloadUri == null
+            || level.State is TufItemState.Downloading or TufItemState.Extracting or TufItemState.Loading or TufItemState.Queued) return;
         if(level.State == TufItemState.ChooseChart) ExitChoose(level, notify: false);
-        activeLevelId = level.Id;
-        StartDownload(level, true);
+        Request(level, true);
+    }
+    private void Request(TufLevel level, bool force) {
+        if(downloading != null) {
+            if(downloading.Id == level.Id || QueuePosition(level.Id) > 0) return;
+            pending.Add((level, force, level.State));
+            Update(level, TufItemState.Queued, 0f, "");
+            return;
+        }
+        StartDownload(level, force);
+    }
+    private void Dequeue(TufLevel level) {
+        int at = pending.FindIndex(p => p.Level.Id == level.Id);
+        if(at < 0) return;
+        TufItemState prior = pending[at].Prior;
+        pending.RemoveAt(at);
+        Apply(level, prior == TufItemState.Queued ? TufItemState.Download : prior, 0f, "");
+        Finished?.Invoke(level, false);
+        notify();
+    }
+    private void StartNext() {
+        if(disposed || downloading != null || pending.Count == 0) return;
+        (TufLevel stored, bool force, _) = pending[0];
+        pending.RemoveAt(0);
+        TufLevel current = stored;
+        foreach(TufLevel other in owner) if(other.Id == stored.Id) { current = other; break; }
+        current.InstallFolder ??= stored.InstallFolder;
+        StartDownload(current, force);
     }
     private void StartDownload(TufLevel level, bool force) {
         actionRequest?.Cancel();
         actionRequest?.Dispose();
         actionRequest = new CancellationTokenSource();
+        downloading = level;
         Update(level, TufItemState.Downloading, 0f, "");
         Download(level, actionRequest.Token, force);
     }
@@ -72,14 +117,12 @@ internal sealed class TufLevelActionRunner {
         });
     }
     public void LaunchChart(TufLevel level, string chart) {
-        if(level == null || IsBusy || level.State != TufItemState.ChooseChart) return;
+        if(level == null || IsLaunching || level.State != TufItemState.ChooseChart) return;
         if(level.Charts == null || !level.Charts.Contains(chart, StringComparer.Ordinal)) return;
-        activeLevelId = level.Id;
         ExitChoose(level, notify: false);
         Launch(level, chart);
     }
     private void EnterChoose(TufLevel level, IReadOnlyList<string> charts) {
-        activeLevelId = 0;
         foreach(TufLevel other in owner)
             if(!ReferenceEquals(other, level) && other.State == TufItemState.ChooseChart) ExitChoose(other, notify: false);
         level.State = TufItemState.ChooseChart;
@@ -108,21 +151,22 @@ internal sealed class TufLevelActionRunner {
             MainThread.Enqueue(() => {
                 if(disposed || token.IsCancellationRequested) return;
                 installed?.Invoke(level);
-                FinishAction(level, TufItemState.Load, "");
+                FinishAction(level, TufItemState.Load, "", true);
             });
         } catch(OperationCanceledException e) {
             Diag.Ignore(e);
-            MainThread.Enqueue(() => FinishAction(level, TufItemState.Download, ""));
+            MainThread.Enqueue(() => FinishAction(level, TufItemState.Download, "", true));
         }
         catch(Exception e) {
             MainThread.Enqueue(() => {
                 MainCore.Log.Wrn($"[TUF] level {level.Id} could not be downloaded or extracted: {e}");
-                FinishAction(level, TufItemState.Retry, e.Message);
+                FinishAction(level, TufItemState.Retry, e.Message, true);
             });
         }
     }
     private void Launch(TufLevel level, string chart) {
         if(disposed) return;
+        launchingId = level.Id;
         Update(level, TufItemState.Loading, 1f, "");
         Quartz.Features.AprilFools.QuizGate.GateChart(chart, level.Difficulty, () => {
             if(disposed) return;
@@ -133,27 +177,35 @@ internal sealed class TufLevelActionRunner {
                     if(!aborted) MainCore.Log.Wrn("[TUF] automatic play failed: " + error);
                     UICore.Open(true);
                 }
-                FinishAction(level, success || aborted ? TufItemState.Load : TufItemState.Retry, error);
+                FinishAction(level, success || aborted ? TufItemState.Load : TufItemState.Retry, error, false);
             }));
         });
     }
-    private void FinishAction(TufLevel level, TufItemState state, string error) {
-        activeLevelId = 0;
+    private void FinishAction(TufLevel level, TufItemState state, string error, bool download) {
+        if(download) downloading = null;
+        else launchingId = 0;
         if(disposed) return;
-        if(owner.Contains(level)) {
-            level.State = state;
-            level.Progress = 0f;
-            level.Error = error ?? "";
-        }
+        Apply(level, state, 0f, error);
         Finished?.Invoke(level, state != TufItemState.Retry);
+        if(download) StartNext();
         notify();
     }
     private void Update(TufLevel level, TufItemState state, float progress, string error) {
-        if(disposed || !owner.Contains(level)) return;
+        if(disposed) return;
+        Apply(level, state, progress, error);
+        notify();
+    }
+    private void Apply(TufLevel level, TufItemState state, float progress, string error) {
         level.State = state;
         level.Progress = progress;
         level.Error = error ?? "";
-        notify();
+        foreach(TufLevel other in owner) {
+            if(ReferenceEquals(other, level) || other.Id != level.Id) continue;
+            other.State = state;
+            other.Progress = progress;
+            other.Error = level.Error;
+            other.InstallFolder ??= level.InstallFolder;
+        }
     }
     public void Cancel() => actionRequest?.Cancel();
     public void Dispose() {
@@ -161,6 +213,8 @@ internal sealed class TufLevelActionRunner {
         actionRequest?.Cancel();
         actionRequest?.Dispose();
         actionRequest = null;
-        activeLevelId = 0;
+        pending.Clear();
+        downloading = null;
+        launchingId = 0;
     }
 }

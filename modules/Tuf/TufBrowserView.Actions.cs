@@ -99,7 +99,7 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
         bool actionable = level.State is not TufItemState.Unavailable and not TufItemState.Downloading
                 and not TufItemState.Extracting and not TufItemState.Loading
             || (level.State == TufItemState.Unavailable && TufMainLevel.Resolve(level, out _) != TufMainLevel.TufMainAction.None);
-        bool enabled = actionable && !service.IsBusy;
+        bool enabled = actionable && !service.IsLaunching;
         image.color = enabled ? UIColors.ObjectButton : Color.Lerp(UIColors.ObjectBG, UIColors.PanelBG, 0.25f);
         TMP_Text label = Text(action, ActionLabel(level), 15f, TextAlignmentOptions.Center);
         label.color = new(1f, 1f, 1f, enabled ? 1f : 0.5f);
@@ -107,6 +107,7 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
         if(enabled) GenerateUI.AddButton(action.gameObject, button => {
             if(button == PointerEventData.InputButton.Left) service.Act(level);
         });
+        if(level.State == TufItemState.Queued) action.AddToolTip("DESC_TUF_QUEUED", "Waiting for the current download to finish. Click to remove it from the queue.");
         if(!string.IsNullOrWhiteSpace(level.Error)) action.AddToolTip(level.Error.Length > 900 ? level.Error[..900] + "…" : level.Error);
     }
     private string ActionLabel(TufLevel level) => level.State switch {
@@ -123,6 +124,7 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
             _ => Tr("TUF_UNAVAILABLE", "Unavailable"),
         },
         TufItemState.ChooseChart => Tr("TUF_CANCEL", "Cancel"),
+        TufItemState.Queued => string.Format(Tr("TUF_QUEUED", "Queued #{0}"), service.QueuePosition(level.Id)),
         _ => Tr("TUF_DOWNLOAD", "Download")
     };
     private void AddChartChooser(TufLevel level) {
