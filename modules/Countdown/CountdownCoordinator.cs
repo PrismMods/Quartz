@@ -21,6 +21,12 @@ internal sealed class CountdownCoordinator {
     internal void OnStartRewind(scrController controller, int requestedFloor) {
         RestoreAndReset("restart");
         if(!metronome.IsEnabledForSession) return;
+        string fallbackReason =
+            CountdownWorld.GetNativeCountdownFallbackReason() ?? CountdownHitSounds.GetCompatibilityFailureReason();
+        if(fallbackReason != null) {
+            CountdownWorld.Log($"using the game's countdown because {fallbackReason}");
+            return;
+        }
         int startFloor = CountdownWorld.ResolveStartFloor(requestedFloor);
         if(CountdownWorld.CanArm(controller, startFloor)) session = new CountdownSession(controller);
     }
