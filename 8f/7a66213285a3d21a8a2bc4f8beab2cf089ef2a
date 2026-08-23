@@ -1,0 +1,49 @@
+modules/Accuracy/AccuracySettings.cs
+  s_d2ea0f5d9a347d::t_4522d9acf19379 1-28
+modules/Accuracy/AccuracyOverlay.cs
+  s_d2ea0f5d9a347d::t_62493822524ef0 1-21
+modules/Accuracy/AccuracyExport.cs
+  s_d2ea0f5d9a347d::t_d7c26d916eb83e 1-35
+modules/Accuracy/module.json
+  s_d2ea0f5d9a347d::t_df38364cccd2e1 1-6
+modules/Accuracy/DeathMarker.cs
+  s_d2ea0f5d9a347d::t_ac30a0f0e2bfca 1-49
+modules/Accuracy/Lang/en-US.json
+  s_d2ea0f5d9a347d::t_1e261c81e18001 1-14
+modules/Accuracy/Accuracy.csproj
+  s_d2ea0f5d9a347d::t_05b36461cee7ce 1-12
+modules/Accuracy/AccuracyRecorder.cs
+  s_d2ea0f5d9a347d::t_243bed1f7327c1 1-24
+modules/Accuracy/AccuracyPatches.cs
+  s_d2ea0f5d9a347d::t_0a9e772e43b106 1-167
+modules/Accuracy/Score/NeaScore.cs
+  s_d2ea0f5d9a347d::t_380ee0406ec18b 1-66
+modules/Accuracy/Lang/ko-KR.json
+  s_d2ea0f5d9a347d::t_d6e4d0076a45ec 1-14
+modules/Accuracy/Score/JeaScore.cs
+  s_d2ea0f5d9a347d::t_f81663c8d7bf35 1-110
+modules/Accuracy/AccuracyRecord.cs
+  s_d2ea0f5d9a347d::t_b2e4c6693dbee5 1-11
+modules/Accuracy/AccuracyModule.cs
+  s_d2ea0f5d9a347d::t_e6d0ae34c02ac3 1-18
+modules/Accuracy/Lang/zh-CN.json
+  s_d2ea0f5d9a347d::t_10487be3f5c37e 1-14
+modules/Accuracy/PageAccuracy.cs
+  s_d2ea0f5d9a347d::t_e2da567ae3a9b2 1-84
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "8f7a66213285a3d21a8a2bc4f8beab2cf089ef2a",
+  "prompts": {},
+  "sessions": {
+    "s_d2ea0f5d9a347d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1558511f-a014-43b4-8c89-6238f0965548",
+        "model": "unknown"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
