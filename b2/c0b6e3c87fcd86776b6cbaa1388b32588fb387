@@ -1,0 +1,29 @@
+modules/Countdown/CountdownVisuals.cs
+  s_dbd24b0a01e75c::t_347a003e1d6272 28-29
+modules/Countdown/CountdownWorld.cs
+  s_dbd24b0a01e75c::t_347a003e1d6272 3,16-47
+modules/Countdown/CountdownSession.cs
+  s_dbd24b0a01e75c::t_0f82f6fa379483 14-19,25,59-62,64-65,67,75,85-91,95-98,100,108-109
+modules/Countdown/CountdownHitSounds.cs
+  s_dbd24b0a01e75c::t_d002bd8d8b84e8 8,10-96,98-107,109-187,210-223
+modules/Countdown/CountdownTypes.cs
+  s_dbd24b0a01e75c::t_f99dae31645b9e 12
+modules/Countdown/CountdownCoordinator.cs
+  s_dbd24b0a01e75c::t_d5076f0cdef4ab 4-6,8,16-17,20,49,68,75,108-111,121,136-165,186,191-195,198-199
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "b2c0b6e3c87fcd86776b6cbaa1388b32588fb387",
+  "prompts": {},
+  "sessions": {
+    "s_dbd24b0a01e75c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dc1119c8-f722-4b0f-a458-3f1aaf3c4f66",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
