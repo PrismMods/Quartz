@@ -1,0 +1,40 @@
+modules/Tuf/TufBrowserView.Filters.cs
+  s_896a7adc0bda13::t_0abaa60b993fdf 49-50,54-55,250
+modules/Tuf/TufService.cs
+  s_eb1cc316a0f131::t_2871387ab5fe11 87
+modules/Tuf/Lang/zh-CN.json
+  s_eb1cc316a0f131::t_2871387ab5fe11 88,91
+modules/Tuf/Lang/ko-KR.json
+  s_eb1cc316a0f131::t_2871387ab5fe11 88,91
+modules/Tuf/Lang/en-US.json
+  s_eb1cc316a0f131::t_2871387ab5fe11 88,91
+modules/Tuf/TufService.Updates.cs
+  s_896a7adc0bda13::t_473583f0261046 167
+  s_896a7adc0bda13::t_6a685525705267 12-14,24,27-31,37-40,105-109,140,142-143,148-162,164-165
+modules/Tuf/TufSettings.cs
+  s_896a7adc0bda13::t_6a685525705267 20,52-53,76
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "7992db02eca13d2f7b7beac2cca33fcc5478b537",
+  "prompts": {},
+  "sessions": {
+    "s_896a7adc0bda13": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "975904c3-454d-4115-8c39-a9f40b94a15f",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_eb1cc316a0f131": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f07a9a99-06a1-48d3-874a-4b9c49c77779",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
