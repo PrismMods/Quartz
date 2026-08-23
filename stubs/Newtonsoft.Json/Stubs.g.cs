@@ -170,6 +170,7 @@ namespace Newtonsoft.Json.Linq {
         public static implicit operator global::Newtonsoft.Json.Linq.JToken(string value) => throw null;
         public static implicit operator global::Newtonsoft.Json.Linq.JToken(float value) => throw null;
         public static implicit operator global::Newtonsoft.Json.Linq.JToken(int value) => throw null;
+        public static implicit operator global::Newtonsoft.Json.Linq.JToken(double value) => throw null;
         public static implicit operator global::Newtonsoft.Json.Linq.JToken(long value) => throw null;
         protected JToken() { }
         global::System.Collections.Generic.IEnumerator<global::Newtonsoft.Json.Linq.JToken> global::System.Collections.Generic.IEnumerable<global::Newtonsoft.Json.Linq.JToken>.GetEnumerator() => throw null;

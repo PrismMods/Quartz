@@ -263,6 +263,7 @@ public unsafe partial class GCS {
     public const int multipressOverload = 45;
     public static float nextSpeedRun;
     public static bool playDeathSound;
+    public static int practiceLength;
     public static bool practiceMode;
     public static string sceneToLoad;
     public const float semitone = 46f;
@@ -997,6 +998,7 @@ public unsafe partial class scrFloor : global::ADOBase {
     public bool disableGlow;
     public global::scrLetterPress editorNumText;
     public double entryTime;
+    public double entryTimePitchAdj;
     public double entryangle;
     public double exitangle;
     public float extraBeats;
@@ -1090,6 +1092,7 @@ public unsafe partial class scrMistakesManager : global::ADOClass {
 public unsafe partial class scrPlanet : global::ADOBase {
     public double angle;
     public const float basePlanetScale = 78f;
+    public double cachedAngle;
     public float cosmeticAngle;
     public float cosmeticRadius;
     public global::scrFloor currfloor;
@@ -1098,6 +1101,7 @@ public unsafe partial class scrPlanet : global::ADOBase {
     public global::PlanetRenderer planetRenderer;
     public global::PlanetarySystem planetarySystem;
     public global::scrPlayer player;
+    public global::scrConductor conductor { get => throw null; }
     public double snappedLastAngle { get => throw null; }
     public double targetExitAngle { get => throw null; }
     public global::scrPlanet SwitchChosen() => throw null;

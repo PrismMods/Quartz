@@ -547,7 +547,13 @@ namespace UnityEngine {
     }
     public sealed unsafe partial class LineRenderer : global::UnityEngine.Renderer {
         public global::UnityEngine.Color endColor { get => throw null; set { } }
+        public float endWidth { get => throw null; set { } }
+        public bool loop { get => throw null; set { } }
+        public int positionCount { get => throw null; set { } }
         public global::UnityEngine.Color startColor { get => throw null; set { } }
+        public float startWidth { get => throw null; set { } }
+        public bool useWorldSpace { get => throw null; set { } }
+        public void SetPosition(int index, global::UnityEngine.Vector3 position) => throw null;
         private LineRenderer() { }
     }
     public unsafe partial class Material : global::UnityEngine.Object {
