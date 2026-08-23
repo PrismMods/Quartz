@@ -1,0 +1,21 @@
+Quartz/Modules/ModuleMigration.cs
+  s_eb1cc316a0f131::t_1561bdd17a2ab5 42
+modules/Accuracy/module.json
+  s_eb1cc316a0f131::t_b8652c93a7a6f2 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "9746e6c2177c0827109cce0f1ccb2a3bf8bd621c",
+  "prompts": {},
+  "sessions": {
+    "s_eb1cc316a0f131": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f07a9a99-06a1-48d3-874a-4b9c49c77779",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
