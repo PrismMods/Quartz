@@ -1,7 +1,11 @@
 using System;
 namespace Quartz.Features.Countdown;
 internal sealed class CountdownCoordinator {
+    private const int MinimumWarmupFrames = 2;
+    private const int MaximumWarmupFrames = 5;
+    private const double WarmupFrameDurationTolerance = 0.25;
     private readonly CountdownAudio audio = new();
+    private readonly CountdownHitSounds hitSounds = new();
     private readonly CountdownMetronome metronome = new();
     private readonly CountdownVisuals visuals = new();
     private readonly CountdownPreparer preparer;
@@ -9,10 +13,11 @@ internal sealed class CountdownCoordinator {
     private CountdownSession session;
     private bool restartingWithNativeCountdown;
     internal CountdownCoordinator() {
-        preparer = new CountdownPreparer(audio, metronome, visuals);
-        restorer = new CountdownRestorer(audio, visuals);
+        preparer = new CountdownPreparer(audio, hitSounds, visuals);
+        restorer = new CountdownRestorer(audio, hitSounds, visuals);
     }
     internal bool IsFrozen => session?.Phase == FrozenStartPhase.Frozen;
+    private bool IsWarming => session?.Phase == FrozenStartPhase.Warming;
     internal void OnStartRewind(scrController controller, int requestedFloor) {
         RestoreAndReset("restart");
         if(!metronome.IsEnabledForSession) return;
@@ -41,6 +46,7 @@ internal sealed class CountdownCoordinator {
         }
     }
     internal bool PreparePlayerUpdate(scrPlayer player, ref ulong? targetTick) {
+        if(IsWarming) return false;
         if(!IsFrozen) return true;
         if(CountdownWorld.IsAutoplayOn) {
             RestoreAndReset("autoplay enabled");
@@ -59,13 +65,14 @@ internal sealed class CountdownCoordinator {
         session.PendingInputTick = targetTick;
         targetTick = null;
         session.PendingInputPlayer = player;
+        restorer.ReleaseAudioForInput(session);
         CountdownWorld.Log(CountdownWorld.DescribeInput(player));
         return true;
     }
     internal void OnManualHitStarting(scrPlayer player, bool isAuto) {
         if(!IsFrozen || isAuto || player == null) return;
         visuals.RestorePlayer(player);
-        if(session.PendingInputPlayer == player) restorer.ReleaseAudioForInput(session);
+        if(session.PendingInputPlayer == player) restorer.RebaseTimelineForInput(session);
     }
     internal void CompletePlayerUpdate(scrPlayer player) {
         if(!IsFrozen || player == null || session.PendingInputPlayer != player) return;
@@ -98,6 +105,10 @@ internal sealed class CountdownCoordinator {
         if(CountdownWorld.IsAsyncInputActive) CountdownWorld.UpdateInput(session.Controller);
     }
     internal void PumpFrozenVisuals() {
+        if(IsWarming) {
+            PumpWarmup();
+            return;
+        }
         if(!IsFrozen) return;
         metronome.UpdateDisplay();
         if(metronome.ConsumeDisableRequest()) {
@@ -107,7 +118,7 @@ internal sealed class CountdownCoordinator {
         visuals.UpdatePreLandingMotion();
     }
     internal void OnPauseRequested(scrController controller) {
-        if(IsFrozen && controller == session.Controller && CountdownWorld.IsPauseRequest(controller))
+        if((IsFrozen || IsWarming) && controller == session.Controller && CountdownWorld.IsPauseRequest(controller))
             RestoreAndReset("pause requested");
     }
     internal void OnEditorPlayModeExited() {
@@ -121,6 +132,36 @@ internal sealed class CountdownCoordinator {
     internal void Shutdown() {
         RestoreAndReset("module shutdown");
         metronome.ResetSessionState();
+    }
+    private void PumpWarmup() {
+        if(!CountdownWorld.IsRuntimeValid(session.Controller)) {
+            RestoreAndReset("run became invalid during visual warmup");
+            return;
+        }
+        if(CountdownWorld.CurrentFrame <= session.WarmupStartedFrame) return;
+        (int tweens, double frameDuration) = visuals.CaptureWarmupSample();
+        bool tweenCountStable = session.WarmupTweenCount < 0 || tweens == session.WarmupTweenCount;
+        bool frameDurationStable = DurationsAreStable(session.WarmupFrameDurationSeconds, frameDuration);
+        session.WarmupStableFrames = tweenCountStable && frameDurationStable ? session.WarmupStableFrames + 1 : 1;
+        session.WarmupTweenCount = tweens;
+        session.WarmupFrameDurationSeconds = frameDuration;
+        session.WarmupRenderedFrames++;
+        session.WarmupStartedFrame = CountdownWorld.CurrentFrame;
+        bool stable = session.WarmupRenderedFrames >= MinimumWarmupFrames
+            && session.WarmupStableFrames >= MinimumWarmupFrames;
+        if(!stable && session.WarmupRenderedFrames < MaximumWarmupFrames) return;
+        session.FrozenFrame = CountdownWorld.CurrentFrame;
+        session.Phase = FrozenStartPhase.Frozen;
+        visuals.StartPreLandingMotion(metronome.Start());
+        CountdownWorld.Log(
+            $"completed frozen visual warmup: frames={session.WarmupRenderedFrames}, "
+                + $"stableFrames={session.WarmupStableFrames}, tweens={session.WarmupTweenCount}");
+    }
+    private static bool DurationsAreStable(double previous, double current) {
+        if(previous <= 0.0 || current <= 0.0) return previous <= 0.0 && current <= 0.0;
+        double larger = Math.Max(previous, current);
+        double smaller = Math.Min(previous, current);
+        return (larger - smaller) / smaller <= WarmupFrameDurationTolerance;
     }
     private void RestartWithNativeCountdown() {
         CountdownWorld.Log("metronome turned off; restarting the playtest with the game's countdown");
@@ -142,14 +183,20 @@ internal sealed class CountdownCoordinator {
         session.Phase = FrozenStartPhase.Releasing;
         restorer.Restore(session, restartAudio: true);
         CountdownAudio.RebaseAsyncInputClock();
+        hitSounds.Reset(keepInstalledSchedule: true);
         ResetSession();
     }
     private void RestoreAndReset(string reason) {
         metronome.Stop(reason);
-        if(session?.Phase is FrozenStartPhase.Frozen or FrozenStartPhase.Preparing or FrozenStartPhase.Releasing) {
+        if(session?.Phase
+            is FrozenStartPhase.Warming
+                or FrozenStartPhase.Frozen
+                or FrozenStartPhase.Preparing
+                or FrozenStartPhase.Releasing) {
             restorer.Restore(
                 session,
-                restartAudio: session.Phase is FrozenStartPhase.Frozen or FrozenStartPhase.Preparing
+                restartAudio: session.Phase
+                    is FrozenStartPhase.Warming or FrozenStartPhase.Frozen or FrozenStartPhase.Preparing
             );
             CountdownWorld.Log($"cleared frozen start state: {reason}");
         }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Quartz.Core;
 using UnityEngine;
 namespace Quartz.Features.Countdown;
@@ -11,6 +12,38 @@ internal static class CountdownWorld {
         requestedFloor >= 0 ? requestedFloor : GCS.checkpointNum;
     internal static bool IsAutoplayOn {
         get { try { return RDC.auto; } catch(Exception e) { Diag.Ignore(e); return false; } }
+    }
+    internal static string GetNativeCountdownFallbackReason() {
+        if(IsAutoplayOn) return "autoplay is active";
+        if(IsTufReplayPlaybackActive()) return "TUFReplay playback is active";
+        return null;
+    }
+    private static PropertyInfo tufReplayPlayback;
+    private static bool tufReplayResolved;
+    private static bool IsTufReplayPlaybackActive() {
+        if(!tufReplayResolved) {
+            tufReplayResolved = true;
+            foreach(Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()) {
+                if(assembly.GetName().Name != "TUFReplay") continue;
+                try {
+                    PropertyInfo property = assembly
+                        .GetType("TUFReplay.ReplayRuntime", throwOnError: false)
+                        ?.GetProperty("IsPlaybackActive", BindingFlags.Public | BindingFlags.Static);
+                    if(property?.PropertyType == typeof(bool) && property.GetMethod != null)
+                        tufReplayPlayback = property;
+                } catch(Exception e) {
+                    Diag.Ignore(e);
+                }
+                break;
+            }
+        }
+        if(tufReplayPlayback == null) return false;
+        try {
+            return tufReplayPlayback.GetValue(null) is true;
+        } catch(Exception e) {
+            Diag.Ignore(e);
+            return false;
+        }
     }
     internal static bool CanArm(scrController controller, int startFloor) =>
         ADOBase.isLevelEditor && startFloor > 0 && controller != null && controller == ADOBase.controller

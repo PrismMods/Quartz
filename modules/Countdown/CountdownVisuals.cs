@@ -25,6 +25,8 @@ internal sealed class CountdownVisuals {
             if(tween != null && tween.active) tween.Pause();
         }
     }
+    internal (int Tweens, double FrameDuration) CaptureWarmupSample() =>
+        (frozenVfx?.pausedTweens?.Count ?? 0, Math.Max(0.0, Time.unscaledDeltaTime));
     internal void StartPreLandingMotion(MetronomePlayback? playback) {
         RestoreOrbitAngles();
         if(!CountdownFeature.Conf.AnimatePlanets) return;
