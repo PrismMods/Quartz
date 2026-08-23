@@ -16,16 +16,16 @@ public sealed class DiscordRest : IDisposable {
         http.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", token);
         http.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", UserAgent);
     }
-    public async Task<(string Id, string Name)> GetSelfAsync(CancellationToken ct = default) {
+    public async Task<(string Id, string Name, string Avatar)> GetSelfAsync(CancellationToken ct = default) {
         JToken root = await GetJsonAsync("users/@me", ct);
-        return (Str(root, "id"), DisplayName(root));
+        return (Str(root, "id"), DisplayName(root), Str(root, "avatar"));
     }
     public async Task<List<DiscordGuild>> GetGuildsAsync(CancellationToken ct = default) {
         JToken root = await GetJsonAsync("users/@me/guilds", ct);
         List<DiscordGuild> list = [];
         if(root is JArray guilds)
             foreach(JToken guild in guilds)
-                list.Add(new DiscordGuild(Str(guild, "id"), Str(guild, "name") ?? "?"));
+                list.Add(new DiscordGuild(Str(guild, "id"), Str(guild, "name") ?? "?", Str(guild, "icon")));
         list.Sort(static (a, b) => string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase));
         return list;
     }
@@ -173,6 +173,7 @@ public sealed class DiscordRest : IDisposable {
             Str(m, "channel_id") ?? "",
             author != null ? DisplayName(author) : "",
             author != null ? Str(author, "id") ?? "" : "",
+            author == null ? null : Str(author, "avatar"),
             Str(m, "content") ?? "",
             stamp,
             ParseAttachments(m),

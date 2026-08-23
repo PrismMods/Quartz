@@ -7,5 +7,11 @@ public static class UserCache {
         names[id] = name;
     }
     public static string Resolve(string id) => names.TryGetValue(id, out string name) ? name : null;
+    public static string FindId(string name) {
+        if(string.IsNullOrEmpty(name)) return null;
+        foreach(KeyValuePair<string, string> pair in names)
+            if(string.Equals(pair.Value, name, StringComparison.OrdinalIgnoreCase)) return pair.Key;
+        return null;
+    }
     public static void Clear() => names.Clear();
 }

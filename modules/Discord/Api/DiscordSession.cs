@@ -17,6 +17,7 @@ public static class DiscordSession {
     public static DiscordGateway Gateway { get; private set; }
     public static string SelfId { get; private set; }
     public static string SelfName { get; private set; }
+    public static string SelfAvatar { get; private set; }
     public static string Status { get; private set; } = "";
     public static bool Loading { get; private set; }
     public static bool SigningIn { get; private set; }
@@ -115,10 +116,11 @@ public static class DiscordSession {
         Set("signing in...");
         Run(async () => {
             DiscordRest rest = new(token);
-            (string id, string name) = await rest.GetSelfAsync();
+            (string id, string name, string avatar) = await rest.GetSelfAsync();
             Rest = rest;
             SelfId = id;
             SelfName = name;
+            SelfAvatar = avatar;
             if(save) {
                 try {
                     TokenStore.Save(token);
@@ -304,8 +306,9 @@ public static class DiscordSession {
     public static void Send(string text) {
         if(Rest == null || CurrentChannelId == null || string.IsNullOrWhiteSpace(text)) return;
         string channelId = CurrentChannelId;
+        string outgoing = Markup.ResolveMentions(text);
         Run(async () => {
-            await Rest.SendMessageAsync(channelId, text);
+            await Rest.SendMessageAsync(channelId, outgoing);
             Set("sent");
         }, null);
     }
@@ -333,6 +336,7 @@ public static class DiscordSession {
         guildCache.Clear();
         messageCache.Clear();
         UserCache.Clear();
+        AvatarCache.Clear();
         TokenStore.Clear();
         Set("signed out");
     }

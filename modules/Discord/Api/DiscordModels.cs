@@ -1,5 +1,5 @@
 namespace Quartz.Features.Discord;
-public readonly record struct DiscordGuild(string Id, string Name);
+public readonly record struct DiscordGuild(string Id, string Name, string Icon);
 public readonly record struct DiscordRole(string Id, string Name, ulong Permissions);
 public readonly record struct PermissionOverwrite(string Id, int Type, ulong Allow, ulong Deny);
 public readonly record struct GuildPerms(string GuildId, string OwnerId, IReadOnlyList<DiscordRole> Roles);
@@ -49,6 +49,7 @@ public readonly record struct DiscordMessage(
     string ChannelId,
     string AuthorName,
     string AuthorId,
+    string AuthorAvatar,
     string Content,
     DateTimeOffset Timestamp,
     IReadOnlyList<Attachment> Attachments,

@@ -44,6 +44,8 @@ public static partial class PageDiscord {
             if(client == null) {
                 DiscordSession.Changed -= Refresh;
                 VoiceSession.Changed -= Refresh;
+                AvatarCache.Changed -= Refresh;
+                EmojiAtlas.Changed -= Refresh;
                 return;
             }
             status.text = DiscordSession.LoggedIn
@@ -55,6 +57,8 @@ public static partial class PageDiscord {
         }
         DiscordSession.Changed += Refresh;
         VoiceSession.Changed += Refresh;
+        AvatarCache.Changed += Refresh;
+        EmojiAtlas.Changed += Refresh;
         Refresh();
         DiscordSession.Resume();
     }
@@ -69,7 +73,9 @@ public static partial class PageDiscord {
         Guild(list, DiscordSession.DirectMessagesId, "@", Blurple);
         Paint(Sized(list, "Separator", 2f), Divider, 1);
         foreach(DiscordGuild guild in DiscordSession.Guilds)
-            Guild(list, guild.Id, Initials(guild.Name), ColorFor(guild.Id));
+            Guild(
+                list, guild.Id, Initials(guild.Name), ColorFor(guild.Id),
+                AvatarCache.GuildUrl(guild.Id, guild.Icon));
     }
     private static RectTransform ScrollList(
         RectTransform parent, float top, float bottom, RectOffset padding, float spacing
@@ -96,11 +102,9 @@ public static partial class PageDiscord {
         scroll.SetContent(list, viewport);
         return list;
     }
-    private static void Guild(RectTransform list, string id, string label, Color color) {
+    private static void Guild(RectTransform list, string id, string label, Color color, string iconUrl = null) {
         RectTransform slot = Sized(list, "Guild", 48f);
-        RectTransform icon = Box(slot, "Icon", 0f, 0f, 48f, 48f);
-        Paint(icon, color, 2);
-        Label(icon, label, 17f, Color.white, FontStyles.Bold, TextAlignmentOptions.Center);
+        RectTransform icon = Avatar(slot, 0f, 0f, 48f, color, label, iconUrl, 2);
         Clickable(icon, () => DiscordSession.OpenGuild(id));
         if(DiscordSession.CurrentGuildId == id) Paint(Box(slot, "Pill", -12f, 8f, 4f, 32f), Color.white, 1);
     }
@@ -170,7 +174,9 @@ public static partial class PageDiscord {
     }
     private static void UserPanel(RectTransform panel) {
         Paint(panel, PanelBg);
-        RectTransform avatar = Avatar(panel, 8f, 10f, 32f, ColorFor(DiscordSession.SelfId), Initials(DiscordSession.SelfName));
+        RectTransform avatar = Avatar(
+            panel, 8f, 10f, 32f, ColorFor(DiscordSession.SelfId), Initials(DiscordSession.SelfName),
+            AvatarCache.UserUrl(DiscordSession.SelfId, DiscordSession.SelfAvatar));
         Status(avatar, Green, PanelBg);
         Label(Box(panel, "Name", 48f, 8f, 110f, 18f), DiscordSession.SelfName ?? "", 14f, TextBright, FontStyles.Bold);
         Label(Box(panel, "Tag", 48f, 26f, 110f, 16f), "Online", 12f, TextMuted);
@@ -239,13 +245,21 @@ public static partial class PageDiscord {
                 14f, TextMuted);
             return;
         }
-        foreach(DiscordMessage message in DiscordSession.Messages) Message(list, message);
+        DiscordMessage? previous = null;
+        foreach(DiscordMessage message in DiscordSession.Messages) {
+            bool grouped = previous.HasValue
+                && previous.Value.AuthorId == message.AuthorId
+                && message.ReplyMessageId == null
+                && (message.Timestamp - previous.Value.Timestamp).TotalMinutes < 7d;
+            Message(list, message, grouped);
+            previous = message;
+        }
         UIScrollController scroll = list.parent.GetComponent<UIScrollController>();
         if(scroll == null) return;
         LayoutRebuilder.ForceRebuildLayoutImmediate(list);
         scroll.ScrollTo(float.MaxValue);
     }
-    private static void Message(RectTransform list, DiscordMessage message) {
+    private static void Message(RectTransform list, DiscordMessage message, bool grouped) {
         GameObject obj = new("Message");
         obj.transform.SetParent(list, false);
         RectTransform row = obj.AddComponent<RectTransform>();
@@ -256,22 +270,30 @@ public static partial class PageDiscord {
         layout.childControlHeight = true;
         layout.childForceExpandWidth = true;
         layout.childForceExpandHeight = false;
-        RectTransform avatar = Avatar(row, 16f, 0f, 40f, ColorFor(message.AuthorId), Initials(message.AuthorName));
-        LayoutElement floating = avatar.gameObject.AddComponent<LayoutElement>();
-        floating.ignoreLayout = true;
-        string stamp = message.Timestamp.ToLocalTime().ToString("HH:mm");
-        TextMeshProUGUI header = Label(row, "", 15f, TextBright, FontStyles.Bold);
-        header.richText = true;
-        header.text = Escape(message.AuthorName)
-            + "  <size=11><color=#949BA4>" + stamp + "</color></size>";
-        header.overflowMode = TextOverflowModes.Ellipsis;
-        string body = message.Content;
+        if(!grouped) {
+            RectTransform avatar = Avatar(
+                row, 16f, 0f, 40f, ColorFor(message.AuthorId), Initials(message.AuthorName),
+                AvatarCache.UserUrl(message.AuthorId, message.AuthorAvatar));
+            LayoutElement floating = avatar.gameObject.AddComponent<LayoutElement>();
+            floating.ignoreLayout = true;
+            string stamp = message.Timestamp.ToLocalTime().ToString("HH:mm");
+            TextMeshProUGUI header = Label(row, "", 15f, TextBright, FontStyles.Bold);
+            header.richText = true;
+            header.text = EmojiAtlas.Inline(Escape(message.AuthorName))
+                + "  <size=11><color=#949BA4>" + stamp + "</color></size>";
+            if(EmojiAtlas.Asset != null) header.spriteAsset = EmojiAtlas.Asset;
+            header.overflowMode = TextOverflowModes.Ellipsis;
+        }
+        string body = Markup.Render(message.Content, message.MentionedUsers);
         if(string.IsNullOrEmpty(body) && message.Attachments.Count > 0) body = "[attachment]";
         if(string.IsNullOrEmpty(body) && message.Embeds.Count > 0) body = "[embed]";
         if(string.IsNullOrEmpty(body)) return;
-        TextMeshProUGUI text = Label(row, body, 15f, TextNormal, FontStyles.Normal, TextAlignmentOptions.TopLeft);
-        text.richText = false;
+        TextMeshProUGUI text = Label(
+            row, EmojiAtlas.Inline(Markdown.ToRichText(body)), 15f, TextNormal,
+            FontStyles.Normal, TextAlignmentOptions.TopLeft);
+        text.richText = true;
         text.overflowMode = TextOverflowModes.Overflow;
+        if(EmojiAtlas.Asset != null) text.spriteAsset = EmojiAtlas.Asset;
     }
     private static string Escape(string value) =>
         string.IsNullOrEmpty(value) ? "" : value.Replace("<", "<noparse><</noparse>");
@@ -403,10 +425,25 @@ public static partial class PageDiscord {
         fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
         return rect;
     }
-    private static RectTransform Avatar(Transform parent, float x, float y, float size, Color color, string initial) {
+    private static RectTransform Avatar(
+        Transform parent, float x, float y, float size, Color color, string initial,
+        string url = null, int radius = 3
+    ) {
         RectTransform rect = Box(parent, "Avatar", x, y, size, size);
-        Paint(rect, color, 3);
-        Label(rect, initial, size * 0.44f, Color.white, FontStyles.Bold, TextAlignmentOptions.Center);
+        Sprite sprite = AvatarCache.Get(url);
+        if(sprite == null) {
+            Paint(rect, color, radius);
+            Label(rect, initial, size * 0.44f, Color.white, FontStyles.Bold, TextAlignmentOptions.Center);
+            return rect;
+        }
+        Paint(rect, Color.white, radius);
+        Mask mask = rect.gameObject.AddComponent<Mask>();
+        mask.showMaskGraphic = false;
+        RectTransform inner = Node(rect, "Image");
+        Image image = inner.gameObject.AddComponent<Image>();
+        image.sprite = sprite;
+        image.preserveAspect = true;
+        image.raycastTarget = false;
         return rect;
     }
     private static void Status(RectTransform avatar, Color color, Color ring) {
