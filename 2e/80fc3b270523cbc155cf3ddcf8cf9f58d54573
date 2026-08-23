@@ -1,0 +1,63 @@
+modules/Tuf/TufService.Installed.cs
+  s_896a7adc0bda13::t_6a685525705267 140
+modules/Tuf/TufPacksView.Rebuild.cs
+  s_896a7adc0bda13::t_0abaa60b993fdf 153
+modules/Tuf/TufBrowserView.Cards.cs
+  s_896a7adc0bda13::t_0abaa60b993fdf 71-72,251
+modules/Tuf/TufService.Updates.cs
+  s_896a7adc0bda13::t_473583f0261046 167
+  s_896a7adc0bda13::t_6a685525705267 12-14,24,27-31,37-40,105-109,140,142-143,148-162,164-165
+modules/Tuf/TufPacksView.Rows.cs
+  s_896a7adc0bda13::t_0abaa60b993fdf 162,186
+modules/Tuf/TufPackService.cs
+  s_896a7adc0bda13::t_0abaa60b993fdf 25-27
+modules/Tuf/Lang/en-US.json
+  s_896a7adc0bda13::t_2299b2c4ab61fb 91
+  s_eb1cc316a0f131::t_5bf5ac4133f3b6 92
+modules/Tuf/TufService.Fetch.cs
+  s_896a7adc0bda13::t_6a685525705267 61
+modules/Tuf/TufBrowserView.Actions.cs
+  s_896a7adc0bda13::t_0abaa60b993fdf 102,110,127
+modules/Tuf/TufBrowserView.Filters.cs
+  s_896a7adc0bda13::t_0abaa60b993fdf 49-50,54-55,250
+modules/Tuf/TufSettings.cs
+  s_896a7adc0bda13::t_6a685525705267 20,52-53,76
+modules/Tuf/TufService.cs
+  s_896a7adc0bda13::t_6a685525705267 20-22
+modules/Tuf/TufLevelActionRunner.cs
+  s_896a7adc0bda13::t_473583f0261046 86-88
+  s_896a7adc0bda13::t_01c290d130c6a7 198,202-208
+  s_896a7adc0bda13::t_769cba1f375809 11,14-15,17-19,28-39,41,43-46,64,67-68,70-85,89-97,103,120,154,158,163,169,180,184-186,188,190,194-197,216-218
+modules/Tuf/Lang/zh-CN.json
+  s_896a7adc0bda13::t_2299b2c4ab61fb 91
+  s_eb1cc316a0f131::t_d91a99a267f996 92
+modules/Tuf/TufModels.cs
+  s_896a7adc0bda13::t_769cba1f375809 6
+modules/Tuf/Lang/ko-KR.json
+  s_896a7adc0bda13::t_2299b2c4ab61fb 91
+  s_eb1cc316a0f131::t_5bfc7c0eed9895 92
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "2e80fc3b270523cbc155cf3ddcf8cf9f58d54573",
+  "prompts": {},
+  "sessions": {
+    "s_896a7adc0bda13": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "975904c3-454d-4115-8c39-a9f40b94a15f",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_eb1cc316a0f131": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f07a9a99-06a1-48d3-874a-4b9c49c77779",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
