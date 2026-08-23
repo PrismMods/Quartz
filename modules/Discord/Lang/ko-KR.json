@@ -3,14 +3,10 @@
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "SECTION_DISCORD": "디스코드",
     "DISCORD_PREVIEW_NOTE": "레이아웃 미리보기입니다 — 아직 디스코드와 연결되어 있지 않습니다.",
-    "DISCORD_SELFTEST": "연결 테스트",
     "DISCORD_QR": "QR로 로그인",
     "DISCORD_QR_CANCEL": "취소",
     "DISCORD_LOGIN": "로그인",
     "DISCORD_FORGET": "저장된 토큰 삭제",
-    "DISCORD_VOICE": "음성",
-    "DISCORD_VOICE_INSTALL": "음성 런타임 설치",
-    "DISCORD_VOICE_REMOVE": "음성 런타임 삭제",
     "DISCORD_TOKEN": "디스코드 토큰"
   }
 }

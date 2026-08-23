@@ -55,8 +55,6 @@ public static partial class PageDiscord {
         }
         DiscordSession.Changed += Refresh;
         VoiceSession.Changed += Refresh;
-        Diagnostics(content);
-        VoiceSection(content);
         Refresh();
         DiscordSession.Resume();
     }

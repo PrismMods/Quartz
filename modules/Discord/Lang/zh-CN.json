@@ -3,14 +3,10 @@
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "SECTION_DISCORD": "Discord",
     "DISCORD_PREVIEW_NOTE": "仅为界面预览 — 目前尚未与 Discord 连接。",
-    "DISCORD_SELFTEST": "测试连接",
     "DISCORD_QR": "用二维码登录",
     "DISCORD_QR_CANCEL": "取消",
     "DISCORD_LOGIN": "登录",
     "DISCORD_FORGET": "清除已保存的密钥",
-    "DISCORD_VOICE": "语音",
-    "DISCORD_VOICE_INSTALL": "安装语音运行库",
-    "DISCORD_VOICE_REMOVE": "卸载语音运行库",
     "DISCORD_TOKEN": "Discord令牌"
   }
 }
