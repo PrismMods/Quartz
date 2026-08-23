@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using System.Threading;
 using HarmonyLib;
 using Quartz.Compat.Game;
 using Quartz.Core;

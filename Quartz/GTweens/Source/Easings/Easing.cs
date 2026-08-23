@@ -1,5 +1,5 @@
 #nullable enable
-﻿namespace GTweens.Easings;
+namespace GTweens.Easings;
 public enum Easing {
     Linear,
     InSine,
