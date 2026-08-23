@@ -1,0 +1,14 @@
+{
+  "ko-KR": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "SECTION_ACCURACY": "정확도 과다",
+    "ACCURACY_ENABLE": "정확도 과다",
+    "ACCURACY_JEA_ENABLE": "JEA 정확도",
+    "ACCURACY_NEA_ENABLE": "NEA 정확도",
+    "ACCURACY_HITTEXT": "히트 텍스트에 점수 표시",
+    "ACCURACY_DEATHMARKERS": "사망 마커 표시",
+    "ACCURACY_DEATHMARKERS_CLEAR": "사망 마커 지우기",
+    "ACCURACY_EXPORT": "마지막 플레이 내보내기 (JSON)",
+    "HEADING_LAST_RUN": "마지막 플레이"
+  }
+}

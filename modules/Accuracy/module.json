@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "accuracy", "entry": "Quartz.Features.Accuracy.AccuracyModule",
+  "name": "Too Much Accuracy", "nameKey": "SECTION_ACCURACY", "group": "overlay", "order": 90,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": ["overlay"], "settingsFiles": [], "langPrefixes": []
+}

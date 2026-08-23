@@ -1,0 +1,14 @@
+{
+  "zh-CN": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "SECTION_ACCURACY": "过多精准度",
+    "ACCURACY_ENABLE": "过多精准度",
+    "ACCURACY_JEA_ENABLE": "JEA 精准度",
+    "ACCURACY_NEA_ENABLE": "NEA 精准度",
+    "ACCURACY_HITTEXT": "在判定文字中显示分数",
+    "ACCURACY_DEATHMARKERS": "显示死亡标记",
+    "ACCURACY_DEATHMARKERS_CLEAR": "清除死亡标记",
+    "ACCURACY_EXPORT": "导出本次游玩记录 (JSON)",
+    "HEADING_LAST_RUN": "本次游玩"
+  }
+}

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<ModuleId>accuracy</ModuleId>
+		<AssemblyName>Quartz.Module.Accuracy</AssemblyName>
+	</PropertyGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Lang\*.json" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="../Overlay/Overlay.csproj" Private="false" />
+	</ItemGroup>
+</Project>

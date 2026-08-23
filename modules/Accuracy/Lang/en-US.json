@@ -1,0 +1,14 @@
+{
+  "en-US": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "SECTION_ACCURACY": "Too Much Accuracy",
+    "ACCURACY_ENABLE": "Too Much Accuracy",
+    "ACCURACY_JEA_ENABLE": "JEA Accuracy",
+    "ACCURACY_NEA_ENABLE": "NEA Accuracy",
+    "ACCURACY_HITTEXT": "Show Score In Hit Text",
+    "ACCURACY_DEATHMARKERS": "Show Death Markers",
+    "ACCURACY_DEATHMARKERS_CLEAR": "Clear Death Markers",
+    "ACCURACY_EXPORT": "Export Last Run (JSON)",
+    "HEADING_LAST_RUN": "Last Run"
+  }
+}
