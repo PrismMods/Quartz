@@ -9,8 +9,9 @@ public sealed partial class TufService : IRuntimeService {
     private readonly HashSet<int> sizeProbed = [];
     private CancellationTokenSource updateRequest;
     private bool sizeScanRunning;
-    private int updatingId;
-    private string updatingFolder = "";
+    private readonly Dictionary<int, string> updating = [];
+    private bool fullCheck;
+    public static readonly TimeSpan AutoCheckInterval = TimeSpan.FromDays(1);
     public int UpdatesAvailable { get; private set; }
     public int UpdateCheckDone { get; private set; }
     public int UpdateCheckTotal { get; private set; }
@@ -20,14 +21,23 @@ public sealed partial class TufService : IRuntimeService {
         updateStates.TryGetValue(id, out TufUpdateState state) ? state : TufUpdateState.Unknown;
     public void CheckUpdates() {
         if(index == null) return;
+        fullCheck = true;
         StartUpdateCheck(index.Data.Entries.Select(e => e.Id).ToList());
+    }
+    internal void AutoCheckUpdates() {
+        if(disposed || index == null || settings == null || index.Data.Count == 0 || CheckingUpdates) return;
+        if(DateTime.UtcNow.Ticks - settings.Data.LastUpdateCheckUtc < AutoCheckInterval.Ticks) return;
+        CheckUpdates();
     }
     public void CheckUpdate(TufLevel level) {
         if(level == null || index?.Data.Find(level.Id) == null) return;
         StartUpdateCheck([level.Id]);
     }
     private void StartUpdateCheck(List<int> ids) {
-        if(disposed || index == null || CheckingUpdates || ids.Count == 0) return;
+        if(disposed || index == null || CheckingUpdates || ids.Count == 0) {
+            fullCheck = false;
+            return;
+        }
         updateRequest?.Cancel();
         updateRequest?.Dispose();
         updateRequest = new CancellationTokenSource();
@@ -92,6 +102,11 @@ public sealed partial class TufService : IRuntimeService {
     }
     private void FinishUpdateCheck(CancellationToken token) {
         if(disposed || token.IsCancellationRequested) return;
+        if(fullCheck && settings != null) {
+            settings.Data.LastUpdateCheckUtc = DateTime.UtcNow.Ticks;
+            settings.RequestSave();
+        }
+        fullCheck = false;
         UpdateCheckTotal = 0;
         UpdateCheckDone = 0;
         ApplyUpdateStates();
@@ -122,23 +137,34 @@ public sealed partial class TufService : IRuntimeService {
         UpdatesAvailable = CountAvailable();
     }
     public void UpdateLevel(TufLevel level) {
-        if(disposed || level == null || index == null || IsBusy || actions == null) return;
+        if(disposed || level == null || index == null || IsLaunching || actions == null) return;
         TufInstallEntry entry = index.Data.Find(level.Id);
-        if(entry == null || level.DownloadUri == null) return;
-        updatingId = level.Id;
-        updatingFolder = entry.Folder;
+        if(entry == null || level.DownloadUri == null || updating.ContainsKey(level.Id)) return;
+        updating[level.Id] = entry.Folder;
         updateStates[level.Id] = TufUpdateState.Updating;
         level.UpdateState = TufUpdateState.Updating;
         actions.UpdateLevel(level);
     }
+    public void UpdateAll() {
+        if(disposed || index == null || actions == null) return;
+        foreach(TufInstallEntry entry in index.Data.Entries.ToList()) {
+            if(UpdateStateOf(entry.Id) != TufUpdateState.Available) continue;
+            TufLevel level = levels.FirstOrDefault(l => l.Id == entry.Id);
+            if(level == null) {
+                level = entry.ToLevel();
+                level.InstallFolder = entry.Folder;
+                level.InstalledAtUtc = entry.InstalledAtUtc;
+                level.State = TufItemState.Load;
+            }
+            UpdateLevel(level);
+        }
+        Notify();
+    }
     private void OnActionFinished(TufLevel level, bool success) {
-        if(disposed || level == null || level.Id != updatingId) return;
-        int id = updatingId;
-        string previous = updatingFolder;
-        updatingId = 0;
-        updatingFolder = "";
+        if(disposed || level == null || !updating.Remove(level.Id, out string previous)) return;
+        int id = level.Id;
         if(!success) {
-            updateStates[id] = TufUpdateState.Unknown;
+            updateStates[id] = level.State == TufItemState.Retry ? TufUpdateState.Unknown : TufUpdateState.Available;
             ApplyUpdateStates();
             return;
         }

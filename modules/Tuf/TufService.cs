@@ -84,6 +84,7 @@ public sealed partial class TufService : IRuntimeService {
     }
     public void EnsureLoaded() {
         if(State == TufListState.Idle) Refresh();
+        AutoCheckUpdates();
     }
     public void Refresh() {
         CancelDebounce();

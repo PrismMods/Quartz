@@ -17,6 +17,7 @@ public sealed class TufSettings : ISettingsFile {
     public bool GridView;
     public string CustomLevelsRoot = "";
     public List<string> KnownRoots = [];
+    public long LastUpdateCheckUtc;
     public TufSort GetSort() => Enum.IsDefined(typeof(TufSort), Sort)
         ? (TufSort)Sort
         : TufSort.Recent;
@@ -48,7 +49,8 @@ public sealed class TufSettings : ISettingsFile {
         [nameof(ShowPreviews)] = ShowPreviews,
         [nameof(GridView)] = GridView,
         [nameof(CustomLevelsRoot)] = CustomLevelsRoot,
-        [nameof(KnownRoots)] = new JArray(KnownRoots)
+        [nameof(KnownRoots)] = new JArray(KnownRoots),
+        [nameof(LastUpdateCheckUtc)] = LastUpdateCheckUtc
     };
     public void RememberRoot(string? root) {
         if(string.IsNullOrWhiteSpace(root)) return;
@@ -71,6 +73,7 @@ public sealed class TufSettings : ISettingsFile {
         ShowPreviews = Read(token, nameof(ShowPreviews), ShowPreviews);
         GridView = Read(token, nameof(GridView), GridView);
         CustomLevelsRoot = Read(token, nameof(CustomLevelsRoot), CustomLevelsRoot) ?? "";
+        LastUpdateCheckUtc = Read(token, nameof(LastUpdateCheckUtc), LastUpdateCheckUtc);
         KnownRoots.Clear();
         if(token[nameof(KnownRoots)] is JArray roots) {
             foreach(JToken root in roots)

@@ -46,11 +46,13 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
             "Show only the levels you have downloaded, newest first. Works offline.");
         (updatesChip, updatesLabel) = Chip(sortRow, "", 112f, () => {
             DisarmDelete();
-            service.CheckUpdates();
+            if(service.UpdatesAvailable > 0) service.UpdateAll();
+            else service.CheckUpdates();
         });
         updatesChip.rectTransform.AddToolTip("DESC_TUF_CHECK_UPDATES",
             "Ask TUF whether any level in your library has been re-uploaded since you downloaded it. "
-            + "One request per level, so a large library takes a moment.");
+            + "One request per level, so a large library takes a moment. Quartz checks on its own once a day; "
+            + "when updates are waiting, clicking queues all of them.");
         gridChip = IconChip(sortRow, UISprite.Grid128, 48f, () => service.SetGridView(!service.GridView));
         gridChip.rectTransform.AddToolTip("DESC_TUF_GRID_VIEW",
             "Lay the level browser out as a grid of cards instead of one column of rows. The column count follows the window width.");
@@ -245,7 +247,7 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
             updatesLabel.text = service.CheckingUpdates
                 ? string.Format(Tr("TUF_CHECKING_UPDATES", "{0}/{1}"), service.UpdateCheckDone, service.UpdateCheckTotal)
                 : service.UpdatesAvailable > 0
-                    ? string.Format(Tr("TUF_UPDATES_COUNT", "Updates ({0})"), service.UpdatesAvailable)
+                    ? string.Format(Tr("TUF_UPDATE_ALL", "Update all ({0})"), service.UpdatesAvailable)
                     : Tr("TUF_CHECK_UPDATES", "Updates");
             updatesChip.color = service.UpdatesAvailable > 0 ? UIColors.ObjectActive : UIColors.ObjectBG;
         }
