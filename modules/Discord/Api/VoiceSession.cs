@@ -40,14 +40,29 @@ public static class VoiceSession {
         pendingGuild = guildId;
         pendingChannel = channelId;
         ChannelId = channelId;
-        Set(State.Requesting, "asking Discord to move you...");
+        Set(State.Requesting, "preparing voice...");
         Task.Run(async () => {
+            if(!await EnsureRuntimeAsync()) return;
             try {
+                Set(State.Requesting, "asking Discord to move you...");
                 await gateway.SendVoiceStateAsync(guildId, channelId, false, false);
             } catch(Exception e) {
                 Set(State.Failed, "join failed: " + e.Message);
             }
         });
+    }
+    private static async Task<bool> EnsureRuntimeAsync() {
+        if(VoiceNatives.IsInstalled) return true;
+        if(VoiceNatives.Rid() == null) {
+            Set(State.Failed, "voice is not available on this platform");
+            return false;
+        }
+        Set(State.Requesting, "downloading the voice runtime (one time)...");
+        bool installed = await VoiceNatives.InstallAsync(
+            (stage, fraction) => Set(State.Requesting, $"{stage} {(int)(fraction * 100f)}%"),
+            CancellationToken.None);
+        if(!installed) Set(State.Failed, "the voice runtime could not be installed — see the log");
+        return installed;
     }
     public static void Leave() {
         DiscordGateway gateway = DiscordSession.Gateway;
@@ -151,6 +166,7 @@ public static class VoiceSession {
                 VoiceAudio.Begin(udp, created);
                 alive = System.Diagnostics.Stopwatch.StartNew();
                 Send(created.SendSpeakingAsync(true, created.Ssrc));
+                Send(created.SendSinkWantsAsync());
             }
             Set(
                 State.Connected,

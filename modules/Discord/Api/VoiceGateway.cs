@@ -60,6 +60,12 @@ public sealed class VoiceGateway : IDisposable {
             ct);
         _ = Task.Run(() => ReceiveLoopAsync(ct), ct);
     }
+    public Task SendSinkWantsAsync() {
+        MainCore.Log.Msg($"[Discord] vgw sink-wants (audio_ssrc={Ssrc})");
+        return SendJsonAsync(
+            new { op = 12, d = new { audio_ssrc = Ssrc, video_ssrc = 0, rtx_ssrc = 0 } },
+            cts?.Token ?? CancellationToken.None);
+    }
     public Task SendSelectProtocolAsync(string ip, int port, string mode) => SendJsonAsync(
         new { op = 1, d = new { protocol = "udp", data = new { address = ip, port, mode } } },
         cts?.Token ?? CancellationToken.None);

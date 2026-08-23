@@ -27,6 +27,12 @@ public sealed class VoiceAudio : MonoBehaviour {
     public static int FramesDropped { get; private set; }
     public static float MicLevel { get; private set; }
     public static float MicPeak { get; private set; }
+    private static long silenceFrames;
+    private static long voiceFrames;
+    private static long decodedSamples;
+    private static long pcmReads;
+    private static long pcmUnderruns;
+    private static float reportAt;
     public static bool Capturing { get; private set; }
     public static string Status { get; private set; } = "idle";
     public static void Begin(VoiceUdp udp, VoiceGateway voiceGateway) {
@@ -110,6 +116,11 @@ public sealed class VoiceAudio : MonoBehaviour {
         FramesDropped = 0;
         MicPeak = 0f;
         MicLevel = 0f;
+        silenceFrames = 0;
+        voiceFrames = 0;
+        decodedSamples = 0;
+        pcmReads = 0;
+        pcmUnderruns = 0;
         Capturing = true;
             Status = $"capturing from {device} ({minFrequency}-{maxFrequency}Hz)";
             MainCore.Log.Msg($"[Discord] voice capture started on '{device}'");
@@ -136,6 +147,15 @@ public sealed class VoiceAudio : MonoBehaviour {
         speaking = false;
     }
     private void Update() {
+        if(Time.realtimeSinceStartup >= reportAt) {
+            reportAt = Time.realtimeSinceStartup + 5f;
+            int queued;
+            lock(jitterLock) queued = jitter.Count;
+            MainCore.Log.Msg(
+                $"[Discord] voice audio: in voice={voiceFrames} silence={silenceFrames} "
+                + $"samples={decodedSamples} jitter={queued} pcmReads={pcmReads} underruns={pcmUnderruns} "
+                + $"| out sent={FramesSent} peak={MicPeak:F3}");
+        }
         if(!Capturing || microphone == null || transport == null || !transport.Ready) return;
         int position;
         try {
@@ -201,6 +221,8 @@ public sealed class VoiceAudio : MonoBehaviour {
                 }
             }
             FramesReceived++;
+            if(opus.Length <= 3) silenceFrames++;
+            else voiceFrames++;
             if(!decoders.TryGetValue(ssrc, out IntPtr decoder)) {
                 decoder = OpusNative.CreateDecoder(out string error);
                 if(decoder == IntPtr.Zero) {
@@ -212,6 +234,7 @@ public sealed class VoiceAudio : MonoBehaviour {
             short[] pcm = new short[OpusNative.FrameSamples];
             int samples = OpusNative.Decode(decoder, opus, opus.Length, pcm, OpusNative.FrameSamples);
             if(samples <= 0) return;
+            decodedSamples += samples;
             lock(jitterLock) {
                 if(jitter.Count > JitterCap) jitter.Clear();
                 for(int i = 0; i < samples; i++) jitter.Enqueue(pcm[i] / (float)short.MaxValue);
@@ -222,6 +245,8 @@ public sealed class VoiceAudio : MonoBehaviour {
     }
     private static void OnPcmRead(float[] data) {
         lock(jitterLock) {
+            pcmReads++;
+            if(jitter.Count == 0) pcmUnderruns++;
             for(int i = 0; i < data.Length; i++) data[i] = jitter.Count > 0 ? jitter.Dequeue() : 0f;
         }
     }
