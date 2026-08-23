@@ -1,0 +1,40 @@
+stubs/MANIFEST.json
+  s_dbd24b0a01e75c::t_472439006932cb 787,1820,1932,1942-1943,2420,4017-4022,4024-4026,4028-4029,4265
+stubs/README.md
+  s_dbd24b0a01e75c::t_472439006932cb 20,24,30,41
+stubs/Assembly-CSharp/Stubs.g.cs
+  s_dbd24b0a01e75c::t_472439006932cb 266,1001,1095,1104
+stubs/Newtonsoft.Json/Stubs.g.cs
+  s_d2ea0f5d9a347d::t_3f4fe234cabb4a 173
+stubs/UnityEngine.CoreModule/Stubs.g.cs
+  s_d2ea0f5d9a347d::t_b681973d93278e 550-552,554-556
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "308628559b7bc01b5ee023400970c8e9306df3d1",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_d2ea0f5d9a347d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1558511f-a014-43b4-8c89-6238f0965548",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_dbd24b0a01e75c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dc1119c8-f722-4b0f-a458-3f1aaf3c4f66",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
