@@ -23,6 +23,7 @@ public sealed class DiscordGateway : IDisposable {
     public event Action<IReadOnlyList<ReadStateEntry>> ReadState;
     public event Action<IReadOnlyDictionary<string, string>> ChannelGuildMap;
     public event Action<string, string> MessageAck;
+    public event Action<string> ChannelsChanged;
     public event Action<ReactionUpdate> ReactionChanged;
     public event Action<string, string> VoiceState;
     public event Action<string, string, string> VoiceServer;
@@ -146,6 +147,15 @@ public sealed class DiscordGateway : IDisposable {
                     MainThread.Enqueue(() => handler(ackChannel, ackMessage));
                 }
                 break;
+            case "CHANNEL_CREATE":
+            case "CHANNEL_UPDATE":
+            case "CHANNEL_DELETE": {
+                string guildId = Str(d, "guild_id") ?? DiscordSession.DirectMessagesId;
+                MainCore.Log.Msg($"[Discord] {Str(payload, "t")} in guild {guildId}");
+                Action<string> channelHandler = ChannelsChanged;
+                if(channelHandler != null) MainThread.Enqueue(() => channelHandler(guildId));
+                break;
+            }
             case "MESSAGE_REACTION_ADD":
                 EmitReaction(d, true);
                 break;

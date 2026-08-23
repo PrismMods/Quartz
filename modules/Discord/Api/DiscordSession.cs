@@ -141,6 +141,7 @@ public static class DiscordSession {
         Gateway = new DiscordGateway(token);
         Gateway.MessageCreated += OnMessageCreated;
         Gateway.MessageUpdated += OnMessageUpdated;
+        Gateway.ChannelsChanged += OnChannelsChanged;
         Gateway.Status += text => Set(text);
         Gateway.Error += text => Set("gateway: " + text);
         Gateway.Start();
@@ -156,6 +157,34 @@ public static class DiscordSession {
         if(message.ChannelId != CurrentChannelId) return;
         Replace(Messages, message);
         Notify();
+    }
+    private static void OnChannelsChanged(string guildId) {
+        if(guildId == null) return;
+        guildCache.Remove(guildId);
+        if(guildId != CurrentGuildId) return;
+        string reopen = CurrentChannelId;
+        Run(async () => {
+            GuildView reloaded = guildId == DirectMessagesId
+                ? await DirectMessagesAsync()
+                : await GuildChannelsAsync(guildId);
+            if(CurrentGuildId != guildId) return;
+            guildCache[guildId] = reloaded;
+            view = reloaded;
+            Channels.Clear();
+            Channels.AddRange(reloaded.Channels);
+            Set(Summary(reloaded));
+            bool stillThere = false;
+            foreach(DiscordChannel channel in reloaded.Channels)
+                if(channel.Id == reopen) {
+                    stillThere = true;
+                    break;
+                }
+            if(stillThere) return;
+            CurrentChannelId = null;
+            Messages.Clear();
+            string first = FirstOpenable(reloaded);
+            if(first != null) MainThread.Enqueue(() => OpenChannel(first));
+        }, null);
     }
     private static void Replace(List<DiscordMessage> list, DiscordMessage message) {
         for(int i = 0; i < list.Count; i++)
