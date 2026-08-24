@@ -2,7 +2,7 @@
   "zh-CN": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "0NATIVELANG": "中文",
-    "0TRANSLATORS": "yunfan_adofai,CM_Limit",
+    "0TRANSLATORS": "yunfan_adofai,CMLimit",
     "ACCENT_COLOR": "主题强调色",
     "ADDONS": "扩展插件",
     "ADDONS_ADD": "添加插件",
@@ -393,7 +393,7 @@
     "LANGUAGE_RELOAD": "重载界面",
     "MIDDLE_CLICK_DEFAULT": "中键点击恢复默认",
     "MIDDLE_CLICK_TO_SET_AS_DEFAULT": "鼠标中键恢复默认值",
-    "MINECRAFT": "我的世界",
+    "MINECRAFT": "Minecraft",
     "MODULES": "模组",
     "MODULES_ABI_BLOCKED": "为不同版本的Quartz构建——请更新Quartz后再安装。",
     "MODULES_ALL": "全部模块",
