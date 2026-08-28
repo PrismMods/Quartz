@@ -49,7 +49,7 @@ internal static class CountdownHaywire {
         int cp = checkpoint >= 0
             ? checkpoint
             : PendingCheckpoint >= 0 ? PendingCheckpoint : GCS.checkpointNum;
-        if(!CountdownFeature.HaywireActive || cp == 0) return;
+        if(!CountdownFeature.Active || cp == 0) return;
         scrConductor conductor = scrConductor.instance;
         scrLevelMaker maker = scrLevelMaker.instance;
         List<scrFloor> floors = maker?.listFloors;

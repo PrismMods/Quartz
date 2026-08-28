@@ -1,34 +1,10 @@
 {
   "zh-CN": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
-    "COUNTDOWN_ABOUT": "星球会停在下一个手动轨道的完美判定时刻，同时循环播放节拍器；按下第一个输入后，谱面即从该时刻继续。仅在关卡编辑器试玩中生效。",
-    "COUNTDOWN_ANIMATE_PLANETS": "冻结期间保持星球动画",
-    "COUNTDOWN_BPM": "节拍器速度",
-    "COUNTDOWN_CREDIT": "由 IMPL（KGH1113）制作的 Enhanced Countdown，经作者授权移植。",
-    "COUNTDOWN_CUSTOM_BPM": "固定节拍器速度",
-    "COUNTDOWN_DENOMINATOR": "拍号分母",
     "COUNTDOWN_ENABLE": "启用倒计时",
-    "COUNTDOWN_HAYWIRE_ABOUT": "保留游戏原本的倒计时，但将其放慢：把前奏轨道的速度乘以 2 的幂，直到倒计时节拍落入下方区间。音乐音高始终不变——音频定位会相应回拉，使第一次判定仍落在原来的节拍上。",
     "COUNTDOWN_MAXBPM": "倒计时速度上限",
     "COUNTDOWN_MINBPM": "倒计时速度下限",
-    "COUNTDOWN_MODE_HAYWIRE": "Haywire",
-    "COUNTDOWN_MODE_LABEL": "倒计时模式",
-    "COUNTDOWN_MODE_METRONOME": "节拍器",
-    "COUNTDOWN_NUMERATOR": "每小节拍数",
-    "COUNTDOWN_PANEL_BPM": "BPM",
-    "COUNTDOWN_PANEL_METER": "拍号",
-    "COUNTDOWN_PANEL_OFF": "使用游戏原倒计时",
-    "COUNTDOWN_PANEL_TITLE": "节拍器",
-    "COUNTDOWN_SHOW_ICON": "显示节拍器图标",
-    "COUNTDOWN_SHOW_PANEL": "显示节拍器面板",
-    "COUNTDOWN_VOLUME": "节拍器音量",
-    "DESC_COUNTDOWN_ANIMATE_PLANETS": "让星球按倒计时节奏循环演示驶向下一轨道的过程，冻结期间也能看清落点；关闭后星球完全静止。",
-    "DESC_COUNTDOWN_CUSTOM_BPM": "关闭时，按关卡自身的倒计时速度加倍或减半，直到落在 200~500 BPM 区间；开启时始终使用下方设定的速度。",
     "DESC_COUNTDOWN_ENABLE": "替换从检查点或关卡编辑器中间轨道开始时出现的倒计时；关闭后使用游戏原本的倒计时。",
-    "DESC_COUNTDOWN_SHOW_ICON": "在屏幕中央显示节拍器图标，每次敲击时左右摆动。",
-    "DESC_COUNTDOWN_SHOW_PANEL": "冻结开始期间在屏幕下方显示小面板，无需退出试玩即可调整节拍器的速度与拍号；在此处的改动会写回这些设置。",
-    "SECTION_COUNTDOWN": "倒计时",
-    "SECTION_HAYWIRE": "Haywire",
-    "SECTION_METRONOME": "节拍器"
+    "SECTION_COUNTDOWN": "倒计时"
   }
 }

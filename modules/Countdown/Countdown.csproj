@@ -4,7 +4,6 @@
 		<AssemblyName>Quartz.Module.Countdown</AssemblyName>
 	</PropertyGroup>
 	<ItemGroup>
-		<EmbeddedResource Include="Resource\**\*" />
 		<EmbeddedResource Include="Lang\*.json" />
 	</ItemGroup>
 </Project>

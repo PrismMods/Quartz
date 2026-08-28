@@ -1,34 +1,10 @@
 {
   "en-US": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
-    "COUNTDOWN_ABOUT": "Freezes the planets on the next manual tile's Pure Perfect timing while a metronome loops, and resumes the run from that exact timestamp on your first input. Level-editor play-tests only.",
-    "COUNTDOWN_ANIMATE_PLANETS": "Animate the planets while frozen",
-    "COUNTDOWN_BPM": "Metronome Tempo",
-    "COUNTDOWN_CREDIT": "Enhanced Countdown by IMPL (KGH1113), ported with their permission.",
-    "COUNTDOWN_CUSTOM_BPM": "Use a fixed metronome tempo",
-    "COUNTDOWN_DENOMINATOR": "Note Value",
     "COUNTDOWN_ENABLE": "Enable Countdown",
-    "COUNTDOWN_HAYWIRE_ABOUT": "Keeps the game's own countdown but slows it down, by multiplying the lead-in tiles' speed by a power of two until the countdown ticks land in the range below. The music is never re-pitched — the audio seek is pulled back so the first hit still falls on its real beat.",
     "COUNTDOWN_MAXBPM": "Maximum Countdown Tempo",
     "COUNTDOWN_MINBPM": "Minimum Countdown Tempo",
-    "COUNTDOWN_MODE_HAYWIRE": "Haywire",
-    "COUNTDOWN_MODE_LABEL": "Countdown Mode",
-    "COUNTDOWN_MODE_METRONOME": "Metronome",
-    "COUNTDOWN_NUMERATOR": "Beats per Bar",
-    "COUNTDOWN_PANEL_BPM": "BPM",
-    "COUNTDOWN_PANEL_METER": "Meter",
-    "COUNTDOWN_PANEL_OFF": "Use game countdown",
-    "COUNTDOWN_PANEL_TITLE": "Metronome",
-    "COUNTDOWN_SHOW_ICON": "Show the metronome icon",
-    "COUNTDOWN_SHOW_PANEL": "Show the metronome panel",
-    "COUNTDOWN_VOLUME": "Metronome Volume",
-    "DESC_COUNTDOWN_ANIMATE_PLANETS": "Loops the planet's approach to the next tile in time with the countdown, so the landing point stays readable while frozen. Turn it off to leave the planets perfectly still.",
-    "DESC_COUNTDOWN_CUSTOM_BPM": "Off, the metronome follows the level's own countdown tempo, doubled or halved until it lands between 200 and 500 BPM. On, it always clicks at the tempo below.",
     "DESC_COUNTDOWN_ENABLE": "Replaces the countdown you get when a run starts from a checkpoint or from a middle tile in the level editor. Off, the game's own countdown is used.",
-    "DESC_COUNTDOWN_SHOW_ICON": "Shows a metronome icon in the middle of the screen that swings with every click.",
-    "DESC_COUNTDOWN_SHOW_PANEL": "Shows a small panel at the bottom of the screen while the start is frozen, for changing the metronome tempo and meter without leaving the play-test. Changes there are saved back to these settings.",
-    "SECTION_COUNTDOWN": "Countdown",
-    "SECTION_HAYWIRE": "Haywire",
-    "SECTION_METRONOME": "Metronome"
+    "SECTION_COUNTDOWN": "Countdown"
   }
 }
