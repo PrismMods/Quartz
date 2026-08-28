@@ -1,0 +1,19 @@
+Quartz/Modules/ModuleMigration.cs
+  s_25445f963d616c::t_5ea55f95f01611 46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "56c0ae0aa575893912e8a0c797d29e9bf244e5f8",
+  "prompts": {},
+  "sessions": {
+    "s_25445f963d616c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "43e881dd-d3ad-4980-afe4-d1fbf6c77e74",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
