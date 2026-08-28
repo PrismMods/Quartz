@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "tilearc", "entry": "Quartz.Features.TileArc.TileArcModule",
+  "name": "Tile Arc", "nameKey": "SECTION_TILE_ARC", "group": "visuals", "order": 25,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": [], "settingsFiles": ["TileArc.json"], "langPrefixes": ["TILEARC_"]
+}

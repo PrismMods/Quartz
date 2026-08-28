@@ -1,0 +1,10 @@
+{
+  "ko-KR": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "DESC_TILEARC_ENABLE": "기본적으로 둥글게 처리되는 90°~105° 구간뿐 아니라 모든 회전의 바깥쪽 모서리를 둥글게 만듭니다. 이미 화면에 있는 타일에도 즉시 적용됩니다.",
+    "DESC_TILEARC_INTENSITY": "둥근 모서리가 타일 너비의 몇 퍼센트까지 미치는지 정합니다. 100%는 완전한 반원 모서리, 0%는 날카로운 모서리입니다.",
+    "SECTION_TILE_ARC": "타일 곡선",
+    "TILEARC_ENABLE": "타일 곡선 사용",
+    "TILEARC_INTENSITY": "곡선 강도"
+  }
+}

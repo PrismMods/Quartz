@@ -1,0 +1,10 @@
+{
+  "zh-CN": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "DESC_TILEARC_ENABLE": "将每个转角的外侧边角都变为圆角，而不仅限于原版处理的 90°–105° 区间。对屏幕上已有的方块立即生效。",
+    "DESC_TILEARC_INTENSITY": "圆角延伸的范围，以方块宽度的百分比表示。100% 为完整的半圆角，0% 则保持尖角。",
+    "SECTION_TILE_ARC": "方块圆角",
+    "TILEARC_ENABLE": "启用方块圆角",
+    "TILEARC_INTENSITY": "圆角强度"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "en-US": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "DESC_TILEARC_ENABLE": "Rounds the outer corner of every turn, not just the 90°–105° band the game rounds by default. Applies to tiles already on screen straight away.",
+    "DESC_TILEARC_INTENSITY": "How far the rounded corner reaches, as a percentage of the tile's width. 100% is a full half-circle corner; 0% leaves the turn sharp.",
+    "SECTION_TILE_ARC": "Tile Arc",
+    "TILEARC_ENABLE": "Enable Tile Arc",
+    "TILEARC_INTENSITY": "Arc Intensity"
+  }
+}
