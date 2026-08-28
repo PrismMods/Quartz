@@ -1,0 +1,75 @@
+Quartz/Modules/ModuleMigration.cs
+  s_c86710675ed3db::t_bdf8d47662471b 30-31,52-53
+modules/MainMenu/Lang/en-US.json
+  s_c86710675ed3db::t_da31f2039b0fc1 1-12
+modules/MainMenu/Lang/ko-KR.json
+  s_c86710675ed3db::t_dbb167c9c509b6 1-12
+modules/MainMenu/Lang/zh-CN.json
+  s_c86710675ed3db::t_8abfd7a81671dc 1-12
+modules/MainMenu/LegacyTweaks.cs
+  s_c86710675ed3db::t_e2cf1e10cb090d 1-42
+modules/MainMenu/MainMenu.csproj
+  s_c86710675ed3db::t_d088625fe8f50e 1-9
+modules/MainMenu/MainMenuModule.cs
+  s_c86710675ed3db::t_35464bca751025 1-21
+modules/MainMenu/MenuTweaks.cs
+  s_c86710675ed3db::t_b1f16fab87c838 1-70
+modules/MainMenu/MenuTweaksPatches.cs
+  s_c86710675ed3db::t_445fc0ca79c1e3 1-30
+modules/MainMenu/MenuTweaksSettings.cs
+  s_c86710675ed3db::t_2cb74f38a1f1f1 1-23
+modules/MainMenu/PageMainMenu.cs
+  s_c86710675ed3db::t_3663b7a36f4aaf 1-48
+modules/MainMenu/module.json
+  s_c86710675ed3db::t_e4e320afcccb36 1-6
+modules/Tweaks/Lang/en-US.json
+  s_c86710675ed3db::t_8c59509451641f 6,8
+modules/Tweaks/Lang/ko-KR.json
+  s_c86710675ed3db::t_10039338e6c1b1 6,8
+modules/Tweaks/Lang/zh-CN.json
+  s_c86710675ed3db::t_1ec51d86a75749 6,8
+modules/Tweaks/PageTweaks.cs
+  s_c86710675ed3db::t_dbea59dc73e2ce 19
+modules/Tweaks/module.json
+  s_c86710675ed3db::t_364d1ecddee9d2 5
+modules/VisualTweaks/Lang/en-US.json
+  s_c86710675ed3db::t_982e28f67fd3ca 1-14
+modules/VisualTweaks/Lang/ko-KR.json
+  s_c86710675ed3db::t_96b2a95137d528 1-14
+modules/VisualTweaks/Lang/zh-CN.json
+  s_c86710675ed3db::t_6c0ef0775ba33c 1-14
+modules/VisualTweaks/LegacyTweaks.cs
+  s_c86710675ed3db::t_216cd926e381fe 1-29
+modules/VisualTweaks/PageVisualTweaks.cs
+  s_c86710675ed3db::t_2a407a569fe50a 1,9-11,17,20,26,35,44
+modules/VisualTweaks/VisualTweaks.cs
+  s_c86710675ed3db::t_4383f4e0701024 1-341
+modules/VisualTweaks/VisualTweaks.csproj
+  s_c86710675ed3db::t_30f1f70f5676b9 1-9
+modules/VisualTweaks/VisualTweaksImport.cs
+  s_c86710675ed3db::t_2908f3bee1c959 1-35
+modules/VisualTweaks/VisualTweaksModule.cs
+  s_c86710675ed3db::t_20f9a14a559e36 1-25
+modules/VisualTweaks/VisualTweaksPatches.cs
+  s_c86710675ed3db::t_f4f1290e959d53 1-141
+modules/VisualTweaks/VisualTweaksSettings.cs
+  s_c86710675ed3db::t_6ff118e2cc1a05 1-23
+modules/VisualTweaks/module.json
+  s_c86710675ed3db::t_e4f1c534c5da58 1-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "ce552ecfe37e24b9b2bfb598169bf37831b5f07c",
+  "prompts": {},
+  "sessions": {
+    "s_c86710675ed3db": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a7afa5a8-e392-4dcb-b0f5-f903e39d0262",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
