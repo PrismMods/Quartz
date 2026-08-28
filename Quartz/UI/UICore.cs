@@ -130,6 +130,8 @@ public static partial class UICore {
         if(wasOpen) Close(true);
         Vector2 position = LastPanelPosition;
         Vector2 size = LastPanelSize;
+        int scrolledState = CurrentMenuState;
+        float scrollOffset = ScrollOf(scrolledState)?.Offset ?? 0f;
         Dispose();
         Initialize();
         LastPanelPosition = reloadPanelSize ? Vector2.zero : position;
@@ -140,6 +142,22 @@ public static partial class UICore {
             Panel.anchoredPosition = LastPanelPosition;
             Panel.sizeDelta = LastPanelSize;
         }
+        RestoreScroll(scrolledState, scrollOffset);
+    }
+    private static UIScrollController ScrollOf(int state) =>
+        Pages.TryGetValue(state, out RectTransform page) && page != null
+            ? page.GetComponentInChildren<UIScrollController>(true)
+            : null;
+    // Rebuild() is Dispose() + Initialize(), so every page comes back as a brand new
+    // object tree parked at the top. Restoring one pump later lets the fresh content
+    // lay out first; JumpTo() straight away would clamp against a zero-height content
+    // and land on 0 anyway.
+    private static void RestoreScroll(int state, float offset) {
+        if(offset <= 0f) return;
+        MainThread.Enqueue(() => {
+            if(CurrentMenuState != state) return;
+            ScrollOf(state)?.JumpTo(offset);
+        });
     }
     public static void Dispose() {
         MainCore.Tr.OnLoadEnd -= _onPageSettings;

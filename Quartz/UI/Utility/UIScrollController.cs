@@ -3,6 +3,7 @@ using GTweens.Extensions;
 using GTweens.Tweens;
 using Quartz.Core;
 using UnityEngine;
+using UnityEngine.UI;
 namespace Quartz.UI.Utility;
 public class UIScrollController : MonoBehaviour {
     public RectTransform content;
@@ -85,6 +86,17 @@ public class UIScrollController : MonoBehaviour {
         )
         .SetEasing(scrollEase);
         MainCore.TC.Play(scrollTween);
+    }
+    public float Offset => targetY;
+    public void JumpTo(float y) {
+        if(content == null || viewport == null) return;
+        LayoutRebuilder.ForceRebuildLayoutImmediate(content);
+        float maxOffset = Mathf.Max(0f, content.rect.height - viewport.rect.height);
+        targetY = Mathf.Clamp(y, 0f, maxOffset);
+        tweenedTo = targetY;
+        scrollTween?.Kill();
+        scrollTween = null;
+        content.anchoredPosition = new Vector2(content.anchoredPosition.x, targetY);
     }
     public void ScrollTo(float y) {
         if(content == null || viewport == null) return;
