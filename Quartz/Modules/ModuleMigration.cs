@@ -43,6 +43,7 @@ public static partial class ModuleMigration {
         new Rule { Id = "discord", FileName = "Discord.json", Field = "Enabled", Default = false },
         new Rule { Id = "minecraft", FileName = "Minecraft.json", Field = "Enabled", Default = false },
         new Rule { Id = "accuracy", FileName = "Accuracy.json", Field = "Enabled", Default = false },
+        new Rule { Id = "tilearc", FileName = "TileArc.json", Field = "Enabled", Default = false },
     ];
     public sealed class Split {
         public string From;
