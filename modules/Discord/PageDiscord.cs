@@ -55,6 +55,7 @@ public static partial class PageDiscord {
                 VoiceSession.Changed -= Refresh;
                 AvatarCache.Changed -= Refresh;
                 EmojiAtlas.Changed -= Refresh;
+                ImageCache.Changed -= Refresh;
                 return;
             }
             status.text = DiscordSession.LoggedIn
@@ -69,6 +70,7 @@ public static partial class PageDiscord {
         VoiceSession.Changed += Refresh;
         AvatarCache.Changed += Refresh;
         EmojiAtlas.Changed += Refresh;
+        ImageCache.Changed += Refresh;
         Refresh();
         DiscordSession.Resume();
     }
@@ -308,15 +310,73 @@ public static partial class PageDiscord {
             header.overflowMode = TextOverflowModes.Ellipsis;
         }
         string body = Markup.Render(message.Content, message.MentionedUsers);
-        if(string.IsNullOrEmpty(body) && message.Attachments.Count > 0) body = "[attachment]";
-        if(string.IsNullOrEmpty(body) && message.Embeds.Count > 0) body = "[embed]";
-        if(string.IsNullOrEmpty(body)) return;
-        TextMeshProUGUI text = Label(
-            row, EmojiAtlas.Inline(Markdown.ToRichText(body)), 15f, TextNormal,
-            FontStyles.Normal, TextAlignmentOptions.TopLeft);
-        text.richText = true;
-        text.overflowMode = TextOverflowModes.Overflow;
-        if(EmojiAtlas.Asset != null) text.spriteAsset = EmojiAtlas.Asset;
+        if(!string.IsNullOrEmpty(body)) {
+            TextMeshProUGUI text = Label(
+                row, EmojiAtlas.Inline(Markdown.ToRichText(body)), 15f, TextNormal,
+                FontStyles.Normal, TextAlignmentOptions.TopLeft);
+            text.richText = true;
+            text.overflowMode = TextOverflowModes.Overflow;
+            if(EmojiAtlas.Asset != null) text.spriteAsset = EmojiAtlas.Asset;
+        }
+        Media(row, message);
+    }
+    private static void Media(RectTransform row, DiscordMessage message) {
+        HashSet<string> seen = new(StringComparer.OrdinalIgnoreCase);
+        int shown = 0;
+        foreach(Attachment attachment in message.Attachments) {
+            if(!attachment.IsImage) {
+                Label(
+                    Sized(row, "File", 22f),
+                    "file: " + attachment.Filename, 13f, new Color(0f, 0.659f, 0.988f));
+                continue;
+            }
+            if(shown >= 4 || !seen.Add(attachment.Url)) continue;
+            shown++;
+            ImageBlock(row, attachment.Url, attachment.Width, attachment.Height);
+        }
+        foreach(MediaRef media in message.Media) {
+            if(shown >= 4 || !seen.Add(media.Url)) continue;
+            shown++;
+            ImageBlock(row, media.Url, media.Width, media.Height);
+        }
+        foreach(DiscordEmbed embed in message.Embeds) {
+            if(embed.Title != null)
+                Label(Sized(row, "EmbedTitle", 22f), embed.Title, 14f, new Color(0f, 0.659f, 0.988f), FontStyles.Bold);
+            if(embed.Description != null) {
+                TextMeshProUGUI description = Label(
+                    row, embed.Description, 13f, TextMuted, FontStyles.Normal, TextAlignmentOptions.TopLeft);
+                description.overflowMode = TextOverflowModes.Overflow;
+            }
+            if(embed.ImageUrl == null || shown >= 4 || !seen.Add(embed.ImageUrl)) continue;
+            shown++;
+            ImageBlock(row, embed.ImageUrl, null, null);
+        }
+    }
+    private static void ImageBlock(RectTransform row, string url, int? sourceWidth, int? sourceHeight) {
+        const float maxWidth = 400f;
+        const float maxHeight = 280f;
+        Sprite sprite = ImageCache.Get(url);
+        float width = sprite != null ? sprite.texture.width : sourceWidth ?? 320;
+        float height = sprite != null ? sprite.texture.height : sourceHeight ?? 180;
+        if(width <= 0f || height <= 0f) {
+            width = 320f;
+            height = 180f;
+        }
+        float scale = Mathf.Min(1f, Mathf.Min(maxWidth / width, maxHeight / height));
+        width *= scale;
+        height *= scale;
+        RectTransform slot = Sized(row, "Media", height + 6f);
+        RectTransform cell = Box(slot, "Image", 0f, 3f, width, height);
+        if(sprite == null) {
+            Paint(cell, PanelBg, 1);
+            Label(
+                cell, ImageCache.Failed(url) ? "image unavailable" : "loading image...",
+                12f, TextMuted, FontStyles.Normal, TextAlignmentOptions.Center);
+            return;
+        }
+        Image image = Paint(cell, Color.white, 0);
+        image.sprite = sprite;
+        image.preserveAspect = true;
     }
     private static string Escape(string value) =>
         string.IsNullOrEmpty(value) ? "" : value.Replace("<", "<noparse><</noparse>");

@@ -366,6 +366,7 @@ public static class DiscordSession {
         messageCache.Clear();
         UserCache.Clear();
         AvatarCache.Clear();
+        ImageCache.Clear();
         TokenStore.Clear();
         Set("signed out");
     }
