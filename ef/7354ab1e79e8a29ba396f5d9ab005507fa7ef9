@@ -1,0 +1,39 @@
+modules/Accuracy/AccuracyExport.cs
+  s_d2ea0f5d9a347d::t_fc2b66f0fec4ee 15-17,21-24
+modules/Accuracy/AccuracyOverlay.cs
+  s_d2ea0f5d9a347d::t_1a5a0ea69a9ac0 13-14,17-18
+modules/Accuracy/AccuracyPatches.cs
+  s_d2ea0f5d9a347d::t_89f7abb2aa7fe7 11,31,47,49-50,57,60,63,66-67,70,77,88,108,118-120,122-123,125
+modules/Accuracy/AccuracyRecord.cs
+  s_d2ea0f5d9a347d::t_a5c5634ff5878c 7-9
+modules/Accuracy/AccuracyRecorder.cs
+  s_d2ea0f5d9a347d::t_df0c209bf428b6 9,15-17
+modules/Accuracy/AccuracySettings.cs
+  s_d2ea0f5d9a347d::t_da9cafd20e257e 7-14,19-26,32-39
+modules/Accuracy/Lang/en-US.json
+  s_d2ea0f5d9a347d::t_3be5d06d6415a5 6-17,21-22
+modules/Accuracy/Lang/ko-KR.json
+  s_d2ea0f5d9a347d::t_4a9bf42364dedd 6-17,21-22
+modules/Accuracy/Lang/zh-CN.json
+  s_d2ea0f5d9a347d::t_8f9796276a48cf 6-17,21-22
+modules/Accuracy/PageAccuracy.cs
+  s_d2ea0f5d9a347d::t_1e192ef0b5e81c 20-47,68-71,92-93
+modules/Accuracy/Score/TmaScore.cs
+  s_d2ea0f5d9a347d::t_e9c86691eedb6c 4,27-35,37-39,45-52,55-57,61,66-68,70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "ef7354ab1e79e8a29ba396f5d9ab005507fa7ef9",
+  "prompts": {},
+  "sessions": {
+    "s_d2ea0f5d9a347d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1558511f-a014-43b4-8c89-6238f0965548",
+        "model": "unknown"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
