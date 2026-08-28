@@ -97,54 +97,83 @@ of the generic per-type icon.
   `GameApi.EventGet<T>` rather than a direct `LevelEvent` indexer cast.
 - Exceptions are routed to `Diag.Ignore` per the repo's swallow convention.
 
-## enhanced-countdown
+## Iridium
 
-- **Author:** IMPL (GitHub: KGH1113)
-- **Source:** https://github.com/KGH1113/enhanced-countdown
-- **Licence:** none declared — the upstream repository ships no `LICENSE` file.
-  Quartz ports it with the author's explicit permission, granted directly to the
-  Quartz project rather than through a public licence.
-- **Lives in Quartz as:** the *Metronome* mode of the Countdown module, in the
-  Gameplay group (`modules/Countdown/`). It is one of two countdown modes and is
-  not the default; the default *Haywire* mode is Quartz's own work.
+- **Author:** Xbodwf
+- **Source:** https://github.com/adofaiex/Iridium
+- **Licence:** GNU Lesser General Public License v3 (relicensed to GPLv3 here,
+  as LGPLv3 §2 permits)
+- **Lives in Quartz as:** the *Tile Arc* module, in the Visuals group
+  (`modules/TileArc/`), and three optimizations on the Optimizer page
+  (`modules/Optimizer/IridiumPatches.cs`)
 
-Replaces the countdown and lead-in for level-editor play-tests started from a
-middle tile: the run state is loaded, automatic tiles are stepped through, and
-the planets are frozen at the next manual tile's Pure Perfect timestamp while a
-metronome loops. The first input stops the metronome and resumes the run from
-that exact timestamp.
+Rounds the outer corner of every tile turn. Vanilla `FloorMesh` only draws the
+big rounded corner inside a narrow angle band and renders every other turn as a
+sharp point; the port widens both the radius calculation and the arc gate so
+obtuse turns get the same rounded corner.
 
-> **Permission:** granted by IMPL (KGH1113) for Quartz to port and ship this
-> work. The grant is to Quartz specifically — the upstream repository is still
-> unlicensed, so it confers nothing on anyone else. Thanks to IMPL for writing
-> the mod and for allowing Quartz to carry it.
+**Modified by the Quartz project on 2026-08-24:**
 
-**Modified by the Quartz project on 2026-08-02:**
+- Rewritten as a Quartz module feature — Iridium's `IriPatch` attribute, its
+  `PatchPaths` tree, `PatchManager`, `SubSettings`/`UISettings` config layer and
+  its `.iml` UI markup are gone; registration, patching, unpatching and settings
+  are the module context's job.
+- Made runtime-toggleable. Upstream applies or skips the whole transpiler at
+  patch time based on `enableCircleArc`. Here the `GetPositions` gate constant is
+  not overwritten with PI outright — the transpiler leaves the vanilla constant
+  on the stack and inserts a call to `TileArc.ArcGate`, which returns PI only
+  while the feature is on, so the switch works without re-patching.
+- The radius override (`FloorMesh.SmallestAngleBetweenTwoAngles`) returns the
+  vanilla result unchanged when the feature is off, for the same reason.
+- Toggling clears `FloorMesh.cache` so tiles meshed afterwards pick up the new
+  shape; the UI states that tiles already on screen need a level reload.
+- Failure to find either IL anchor logs through `MainCore.Log` and returns the
+  original instruction stream instead of Iridium's `Main.Logger`.
+- Replaced upstream's fixed corner-radius formula with an *Arc Intensity*
+  slider. Upstream hard-codes the substituted angle as `minDiff * 5deg`, which
+  lands wherever the game's own angle-to-radius curve happens to put it. Quartz
+  inverts that curve instead, so the slider is the corner radius as a fraction
+  of the tile's width and the number on screen is the thing being set.
+- Toggling or moving the slider re-meshes every `FloorMesh` already in the
+  scene, so the change is visible immediately instead of only on tiles built
+  afterwards. Mesh colliders are deliberately left alone: they drive editor
+  picking rather than gameplay, and refreshing them per tile costs far more
+  than the shape delta is worth.
+- Given its own localized settings page (en-US, ko-KR, zh-CN) and its own
+  `TileArc.json`, off by default.
 
-- Rewritten as a Quartz module — the standalone UMM entry point, bootstrap
-  launcher, versioned runtime store, and self-update engine
-  (`EnhancedCountdown.Bootstrap`, `EnhancedCountdown.UpdateEngine`) are gone;
-  loading, patching, unpatching, and updates are Quartz's job.
-- The hexagonal port/adapter layer (`Application/Ports/*`, `ModCompositionRoot`,
-  `IModLogger`) is collapsed: each port had exactly one implementation, so the
-  concrete classes are called directly and logging goes through `MainCore.Log`
-  and `Diag`.
-- The in-game metronome control panel is rebuilt in code against Quartz's UI
-  stack instead of loading a per-platform Unity `AssetBundle`. Upstream ships
-  `win`/`mac`/`linux` prefab bundles beside the DLL; a Quartz module packages as
-  a single `.qmod`, and a bundle built for one Unity version will not load on
-  both game branches Quartz supports. The time-signature dropdowns became
-  steppers as part of that rebuild.
-- Metronome tempo, meter, volume, and the icon/panel/planet-animation toggles
-  are persisted in `Countdown.json` with a localized settings page (en-US,
-  ko-KR, zh-CN), instead of living only for the duration of an editor session.
-  Turning the metronome off in the in-game panel stays session-scoped and
-  restarts the play-test with the game's own countdown, leaving the persisted
-  `Enabled` setting untouched.
-- The `AsyncInputManager` clock fields used to re-base input timing after the
-  freeze are read and written through cached reflection, so a game build that
-  renames or drops them degrades to a no-op instead of breaking the patched
-  methods at JIT time.
-- Exception handling follows the repo's swallow convention: every catch either
-  logs through `Diag.Warn` or is an explicit `Diag.Ignore`, and the upstream
-  per-step verbose logging is reduced to the state transitions.
+The Optimizer page carries three more patches derived from Iridium's
+`v3/Patches/SceneOptimizationPatches.cs` and
+`v3/Patches/ParticleOptimizationPatches.cs`, each behind its own switch:
+*Skip Redundant Screen Rescales*, *Skip Idle Particle Updates*, and
+*Pause Off-Screen Particles*.
+
+**Modified by the Quartz project on 2026-08-24:**
+
+- The screen-rescale patch does not reimplement `scnGame.Update`. Upstream
+  replaces the method body and rewrites the scaling itself, which drops the
+  `flashEndscreen` quad this game build also scales. Quartz's prefix only
+  decides whether the vanilla body runs: it returns false when the camera's
+  orthographic size and aspect both match the previous frame, and otherwise
+  lets the game do its own work unchanged.
+- The frame-3 level-load branch of `scnGame.Update` is detected and always
+  allowed through, and the cached camera state is invalidated on every scene
+  load and whenever the Optimizer settings are applied.
+- The idle-particle patch is rewritten against this game build. Upstream keys
+  off `GetVisible()` and its own pooling; here `SetVisible` deactivates the
+  GameObject, so the visibility check is dead and only the per-frame
+  `shape.scale` / `main.simulationSpeed` writes are worth skipping.
+- Added a `ResetParticle` postfix that re-arms the skip. `ResetParticle` writes
+  `shape.scale` directly without updating the field `Update` copies from, so
+  vanilla relies on the next `Update` to overwrite it; without the re-arm, a
+  skipped frame would leave the wrong shape scale in place. Upstream has no
+  equivalent.
+- Particle updates are never skipped in the level editor, where the vanilla
+  body also drives the gizmo.
+- Off-screen particle culling applies and reverts live across every
+  `scrParticleDecoration` in the scene rather than only on the next event
+  reload, and reverts to Unity's `Automatic` rather than being one-way.
+- Iridium's DOTween, multithreading, track-event, player-input and
+  `RDInput.GetStateKeys` optimizations are deliberately not ported: each either
+  reimplements a method Quartz already patches elsewhere or returns a shared
+  buffer across Quartz's own input modules.

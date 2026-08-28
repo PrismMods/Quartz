@@ -43,7 +43,7 @@
     "CREDITS_DONORS_BODY": "Refreshin",
     "CREDITS_LICENSE": "基于GPLv3协议开源",
     "CREDITS_PORTS": "移植与引用作品",
-    "CREDITS_PORTS_BODY": "Overlayer — 界面基础（modlist.org）\nDM Note (lee-sihun) — 按键查看器编辑器图标\nDecoPreview (rdzip) — 装饰预览，GPLv3\nBackToThePast (tjwogud) — 怀旧模式\nFlipAndRotateTiles (tjwogud) — 翻转与旋转轨道\nAdofaiTweaks — 编辑器轨道角度读数\nHzHitSoundRenderer — 渲染所有命中音效\nJipperKeyViewer — 108键布局预设",
+    "CREDITS_PORTS_BODY": "Overlayer — 界面基础（modlist.org）\nDM Note (lee-sihun) — 按键查看器编辑器图标\nDecoPreview (rdzip) — 装饰预览，GPLv3\nBackToThePast (tjwogud) — 怀旧模式\nFlipAndRotateTiles (tjwogud) — 翻转与旋转轨道\nAdofaiTweaks — 编辑器轨道角度读数\nHzHitSoundRenderer — 渲染所有命中音效\nJipperKeyViewer — 108键布局预设\nIridium (Xbodwf) — 方块圆角、优化项，LGPLv3",
     "CREDITS_SUBTITLE": "作者：koren、sbrothers7 及其他贡献者",
     "CREDITS_TEAM": "开发团队",
     "CREDITS_TEAM_BODY": "koren — 主要开发者\nsbrothers7 — 开发者",

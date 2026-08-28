@@ -14,11 +14,10 @@
 - **Decoration Preview** — ported from [DecoPreview](https://github.com/rdzip/DecoPreview)
   by **rdzip**, licensed under the GNU GPL v3. Modified by the Quartz project;
   see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for what changed.
-- **Countdown → Metronome mode** — created by **IMPL** (**KGH1113**) as
-  [enhanced-countdown](https://github.com/KGH1113/enhanced-countdown), ported with
-  their permission. Thank you for building it and for letting Quartz carry it. Modified
-  by the Quartz project; see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for
-  what changed.
+- **Tile Arc, and three Optimizer patches** — ported from
+  [Iridium](https://github.com/adofaiex/Iridium) by **Xbodwf**, licensed under the
+  GNU LGPL v3. Modified by the Quartz project; see
+  [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for what changed.
 
 ## Minecraft Classic
 
