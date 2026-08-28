@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "mainmenu", "entry": "Quartz.Features.MainMenu.MainMenuModule",
+  "name": "Main Menu", "nameKey": "SECTION_MAIN_MENU", "group": "tweaks", "order": 15,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": [], "settingsFiles": ["MainMenu.json"], "langPrefixes": ["TW_MENU"]
+}

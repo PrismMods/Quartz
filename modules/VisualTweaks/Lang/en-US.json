@@ -1,0 +1,14 @@
+{
+  "en-US": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "DESC_TW_BCP": "Removes the planets' core and spark particles.",
+    "DESC_TW_CP": "Strips checkpoint icons and behavior from the level — dying always restarts the run. Turning this off needs a level reload to bring icons back.",
+    "DESC_TW_GLOW": "Suppresses the glow flash tiles get when the planet lands on them.",
+    "DESC_TW_PGLOW": "Hides the glow sprite drawn around the planets.",
+    "SECTION_VISUAL_TWEAKS": "Visual Tweaks",
+    "TW_BCP": "Remove Ball Core Particles",
+    "TW_CP": "Remove All Checkpoints",
+    "TW_GLOW": "Disable Tile Hit Glow",
+    "TW_PGLOW": "Remove Planet Glow"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "visualtweaks", "entry": "Quartz.Features.VisualTweaks.VisualTweaksModule",
+  "name": "Visual Tweaks", "nameKey": "SECTION_VISUAL_TWEAKS", "group": "visuals", "order": 30,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": [], "settingsFiles": ["VisualTweaks.json"], "langPrefixes": ["TW_CP", "TW_BCP", "TW_GLOW", "TW_PGLOW"]
+}

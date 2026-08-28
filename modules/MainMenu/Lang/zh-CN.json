@@ -1,0 +1,12 @@
+{
+  "zh-CN": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "DESC_TW_MENUBPM": "将主菜单兔子动画速度改为下方自定义BPM，而非默认1倍/2倍；重新打开菜单生效。",
+    "DESC_TW_MENUMUSIC": "静音标题与选岛界面背景音乐，即时生效，谱面音乐不受影响。",
+    "SECTION_MAIN_MENU": "主菜单调整",
+    "TW_MENUBPM": "自定义菜单兔子速度",
+    "TW_MENUHIGHBPM": "高速BPM",
+    "TW_MENUMUSIC": "静音主菜单背景音乐",
+    "TW_MENUSLOWBPM": "低速BPM"
+  }
+}

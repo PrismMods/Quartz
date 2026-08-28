@@ -1,0 +1,12 @@
+{
+  "ko-KR": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "DESC_TW_MENUBPM": "메뉴 토끼의 두 속도를 기본 1x / 2x 대신 아래 BPM으로 설정합니다. 메뉴를 다시 열면 적용됩니다.",
+    "DESC_TW_MENUMUSIC": "타이틀과 섬 선택 화면의 테마 음악을 음소거합니다. 즉시 적용되며 플레이 음악은 유지됩니다.",
+    "SECTION_MAIN_MENU": "메인 메뉴",
+    "TW_MENUBPM": "사용자 지정 메뉴 BPM",
+    "TW_MENUHIGHBPM": "높은 BPM",
+    "TW_MENUMUSIC": "메뉴 음악 끄기",
+    "TW_MENUSLOWBPM": "느린 BPM"
+  }
+}

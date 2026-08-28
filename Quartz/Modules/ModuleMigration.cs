@@ -27,6 +27,8 @@ public static partial class ModuleMigration {
         new Rule { Id = "autodeafen", FileName = "AutoDeafen.json", Field = "Enabled", Default = false },
         new Rule { Id = "countdown", FileName = "Countdown.json", Field = "Enabled", Default = true },
         new Rule { Id = "tweaks", FileName = "Tweaks.json" },
+        new Rule { Id = "mainmenu", FileName = "Tweaks.json" },
+        new Rule { Id = "visualtweaks", FileName = "Tweaks.json" },
         new Rule { Id = "restriction", FileName = "Restriction.json" },
         new Rule { Id = "calibration", FileName = "Calibration.json" },
         new Rule { Id = "optimizer", FileName = "Optimizer.json" },
@@ -47,6 +49,8 @@ public static partial class ModuleMigration {
     }
     public static readonly Split[] Splits = [
         new Split { From = "judgement", To = "hidejudgements" },
+        new Split { From = "tweaks", To = "mainmenu" },
+        new Split { From = "tweaks", To = "visualtweaks" },
     ];
     public static bool NeedsSourceRefresh(string installed, string bundled) {
         if(string.IsNullOrEmpty(installed) || string.IsNullOrEmpty(bundled)) return false;

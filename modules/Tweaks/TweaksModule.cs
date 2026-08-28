@@ -16,28 +16,7 @@ public sealed class TweaksModule : QuartzModule {
             Build = PageTweaks.GeneralPage,
             OwnScroll = true,
         });
-        Context.AddPage(new NavPage {
-            Key = "tweaks.mainmenu",
-            CategoryKey = "tweaks",
-            Order = 30,
-            Title = "Main Menu",
-            LocaleKey = "SECTION_MAIN_MENU",
-            Build = PageTweaks.MainMenuPage,
-            OwnScroll = true,
-        });
-        Context.AddPage(new NavPage {
-            Key = "visuals.visualtweaks",
-            CategoryKey = "visuals",
-            Order = 30,
-            Title = "Visual Tweaks",
-            LocaleKey = "SECTION_VISUAL_TWEAKS",
-            Build = PageVisualTweaks.Create,
-            OwnScroll = true,
-        });
         Context.RegisterImportHandler(new TweaksImport());
         Context.PatchAll(typeof(TweaksModule));
-        Context.OnModEnable("Tweaks", Tweaks.RefreshAll);
-        Context.OnModDisable("Tweaks", Tweaks.RestoreAll);
     }
-    public override void OnUnload() => Tweaks.RestoreAll();
 }

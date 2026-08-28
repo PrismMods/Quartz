@@ -2,5 +2,5 @@
   "schema": 1, "id": "tweaks", "entry": "Quartz.Features.Tweaks.TweaksModule",
   "name": "Tweaks", "nameKey": "TWEAKS", "group": "tweaks", "order": 10,
   "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
-  "deps": [], "settingsFiles": ["Tweaks.json"], "langPrefixes": ["TW_", "TWEAKS_"]
+  "deps": [], "settingsFiles": ["Tweaks.json"], "langPrefixes": ["TW_NOPAUSE", "TW_SCROLL", "TWEAKS_"]
 }

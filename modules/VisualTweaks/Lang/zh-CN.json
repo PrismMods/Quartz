@@ -1,0 +1,14 @@
+{
+  "zh-CN": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "DESC_TW_BCP": "移除星球核心与火花粒子特效。",
+    "DESC_TW_CP": "移除谱面全部存档点图标与功能；关闭该设置后需重载谱面才能恢复存档点。",
+    "DESC_TW_GLOW": "关闭轨道被星球触碰时的闪光特效。",
+    "DESC_TW_PGLOW": "隐藏星球外圈发光贴图。",
+    "SECTION_VISUAL_TWEAKS": "视觉微调",
+    "TW_BCP": "移除星球核心粒子",
+    "TW_CP": "删除全部存档点",
+    "TW_GLOW": "关闭轨道触碰闪光",
+    "TW_PGLOW": "移除星球外圈发光"
+  }
+}

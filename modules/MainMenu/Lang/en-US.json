@@ -1,0 +1,12 @@
+{
+  "en-US": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "DESC_TW_MENUBPM": "Sets the menu rabbit's two speeds to the BPMs below instead of the default 1x / 2x. Re-open the menu to apply.",
+    "DESC_TW_MENUMUSIC": "Mutes the theme song on the title and island-select screens. Takes effect immediately; gameplay music is untouched.",
+    "SECTION_MAIN_MENU": "Main Menu",
+    "TW_MENUBPM": "Custom Menu BPM",
+    "TW_MENUHIGHBPM": "High BPM",
+    "TW_MENUMUSIC": "Disable Menu Music",
+    "TW_MENUSLOWBPM": "Slow BPM"
+  }
+}

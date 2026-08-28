@@ -1,0 +1,141 @@
+using HarmonyLib;
+using UnityEngine;
+using Quartz.Core;
+namespace Quartz.Features.VisualTweaks;
+public static partial class VisualTweaks {
+    [HarmonyPatch(typeof(scrController), "StartLoadingScene")]
+    private static class ClearCachesOnSceneChangePatch {
+        private static void Postfix() => ClearSceneCaches();
+    }
+    [HarmonyPatch(typeof(ffxCheckpoint), "get_runOnHit")]
+    private static class CheckpointRunOnHitPatch {
+        private static bool Prefix(ref bool __result) {
+            if(!ShouldRemoveCheckpoints) return true;
+            __result = false;
+            return false;
+        }
+    }
+    [HarmonyPatch(typeof(ffxCheckpoint), "Awake")]
+    private static class CheckpointAwakePatch {
+        private static void Postfix(ffxCheckpoint __instance) => CheckpointSpawned(__instance);
+    }
+    [HarmonyPatch(typeof(ffxCheckpoint), "Decode")]
+    private static class CheckpointDecodePatch {
+        private static void Postfix(ffxCheckpoint __instance) => CheckpointSpawned(__instance);
+    }
+    private static void CheckpointSpawned(ffxCheckpoint checkpoint) {
+        InvalidateCheckpointCache();
+        if(ShouldRemoveCheckpoints) RemoveCheckpointVisual(checkpoint);
+    }
+    [HarmonyPatch(typeof(ffxCheckpoint), "StartEffect")]
+    private static class CheckpointStartEffectPatch {
+        private static bool Prefix(ffxCheckpoint __instance) {
+            if(!ShouldRemoveCheckpoints) return true;
+            RemoveCheckpointVisual(__instance);
+            return false;
+        }
+    }
+    [HarmonyPatch(typeof(scrMistakesManager), "MarkCheckpoint")]
+    private static class MistakesMarkCheckpointPatch {
+        private static bool Prefix() => !ShouldRemoveCheckpoints;
+    }
+    [HarmonyPatch(typeof(scrFloor), "Start")]
+    private static class FloorStartPatch {
+        private static void Postfix(scrFloor __instance) {
+            if(ShouldDisableTileHitGlow) SuppressFloorHitGlow(__instance);
+        }
+    }
+    [HarmonyPatch(typeof(scrFloor), "LightUp")]
+    private static class FloorLightUpPatch {
+        private static void Prefix(scrFloor __instance) {
+            if(!ShouldDisableTileHitGlow || __instance == null) return;
+            lightUpDepth++;
+            try {
+                int id = __instance.GetInstanceID();
+                lightUpDisableGlowStates.TryAdd(id, __instance.disableGlow);
+                __instance.disableGlow = true;
+            } catch(Exception e) { Diag.Ignore(e); }
+        }
+        private static void Postfix(scrFloor __instance) {
+            if(__instance == null) return;
+            if(lightUpDepth > 0) lightUpDepth--;
+            bool disable = ShouldDisableTileHitGlow;
+            bool hasSavedState = lightUpDisableGlowStates.Count != 0;
+            if(!disable && !hasSavedState) return;
+            int id;
+            try { id = __instance.GetInstanceID(); }
+            catch(Exception e) { Diag.Ignore(e); return; }
+            if(hasSavedState) {
+                try {
+                    if(lightUpDisableGlowStates.TryGetValue(id, out bool wasDisabled)) {
+                        __instance.disableGlow = wasDisabled;
+                        lightUpDisableGlowStates.Remove(id);
+                    }
+                } catch(Exception e) { Diag.Ignore(e); }
+            }
+            if(!disable) return;
+            suppressNextRandomColorFloorIds.Add(id);
+            SuppressFloorHitGlow(__instance);
+        }
+    }
+    [HarmonyPatch(typeof(scrFloor), "SetToRandomColor")]
+    private static class FloorSetToRandomColorPatch {
+        private static bool Prefix(scrFloor __instance) {
+            if(!ShouldDisableTileHitGlow || __instance == null) return true;
+            int id;
+            try { id = __instance.GetInstanceID(); }
+            catch(Exception e) { Diag.Ignore(e); return true; }
+            if(lightUpDepth <= 0 && !suppressNextRandomColorFloorIds.Remove(id)) return true;
+            SuppressFloorHitGlow(__instance);
+            return false;
+        }
+    }
+    [HarmonyPatch(typeof(PlanetRenderer), "Awake")]
+    private static class PlanetRendererAwakePatch {
+        private static void Postfix(PlanetRenderer __instance) {
+            InvalidateRendererCache();
+            ApplyBallCoreParticlesTweak(__instance);
+        }
+    }
+    [HarmonyPatch(typeof(PlanetRenderer), "Revive")]
+    private static class PlanetRendererRevivePatch {
+        private static void Postfix(PlanetRenderer __instance) {
+            InvalidateRendererCache();
+            ApplyBallCoreParticlesTweak(__instance);
+        }
+    }
+    [HarmonyPatch(typeof(PlanetRenderer), "PlayParticles")]
+    private static class PlanetRendererPlayParticlesPatch {
+        private static void Postfix(PlanetRenderer __instance) => ApplyBallCoreParticlesTweak(__instance);
+    }
+    [HarmonyPatch(typeof(PlanetRenderer), "LateUpdate")]
+    private static class PlanetRendererLateUpdatePatch {
+        private static void Postfix(PlanetRenderer __instance) {
+            if(ShouldRemoveBallCoreParticles) ApplyBallCoreParticlesTweak(__instance);
+        }
+    }
+    [HarmonyPatch(typeof(PlanetRenderer), "SetCoreColor")]
+    private static class PlanetRendererSetCoreColorPatch {
+        private static bool Prefix(PlanetRenderer __instance) {
+            if(!ShouldRemoveBallCoreParticles) return true;
+            ApplyBallCoreParticlesTweak(__instance);
+            return false;
+        }
+    }
+    [HarmonyPatch(typeof(PlanetRenderer), "SetParticleSystemColor")]
+    private static class PlanetRendererSetParticleSystemColorPatch {
+        private static bool Prefix(PlanetRenderer __instance, ParticleSystem particleSystem) {
+            if(!ShouldRemoveBallCoreParticles || !IsRemovedPlanetParticle(__instance, particleSystem)) return true;
+            ApplyPlanetParticleTweak(particleSystem, false);
+            return false;
+        }
+    }
+    [HarmonyPatch(typeof(scrPlanet), "Start")]
+    private static class PlanetStartPatch {
+        private static void Postfix(scrPlanet __instance) {
+            InvalidateRendererCache();
+            try { ApplyBallCoreParticlesTweak(__instance.planetRenderer); } catch(Exception e) { Diag.Ignore(e); }
+            try { ApplyPlanetGlowTweak(__instance.planetRenderer); } catch(Exception e) { Diag.Ignore(e); }
+        }
+    }
+}
