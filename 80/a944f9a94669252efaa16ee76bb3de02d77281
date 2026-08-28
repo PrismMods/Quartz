@@ -1,0 +1,21 @@
+Quartz/UI/UICore.cs
+  s_bfe789d4502017::t_e268c21900b0fa 133-134,145-160
+Quartz/UI/Utility/UIScrollController.cs
+  s_bfe789d4502017::t_dea072243485cf 6,90-100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "80a944f9a94669252efaa16ee76bb3de02d77281",
+  "prompts": {},
+  "sessions": {
+    "s_bfe789d4502017": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5a9ba5ae-09b3-4149-b6d1-962376525aa8",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
