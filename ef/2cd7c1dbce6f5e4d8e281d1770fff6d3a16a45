@@ -1,0 +1,33 @@
+modules/Optimizer/PageOptimizer.cs
+  s_c86710675ed3db::t_32b4da9fb03084 86-112
+modules/Optimizer/IridiumPatches.cs
+  s_c86710675ed3db::t_29d12a3d81970d 1-36,60-127
+  s_c86710675ed3db::t_f14243a1695fc8 37-59
+modules/Optimizer/Optimizer.cs
+  s_c86710675ed3db::t_f14243a1695fc8 63-64
+  s_c86710675ed3db::t_21b85486029cb6 89-106,114
+modules/Optimizer/Lang/zh-CN.json
+  s_c86710675ed3db::t_6e5cd7f1d2c735 4,6-9,11,13,15-23,26-30
+modules/Optimizer/Lang/en-US.json
+  s_c86710675ed3db::t_6e5cd7f1d2c735 4,6-9,11,13,15-23,26-30
+modules/Optimizer/Lang/ko-KR.json
+  s_c86710675ed3db::t_6e5cd7f1d2c735 4,6-9,11,13,15-23,26-30
+modules/Optimizer/OptimizerSettings.cs
+  s_c86710675ed3db::t_21b85486029cb6 17-19,32-34,48-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "ef2cd7c1dbce6f5e4d8e281d1770fff6d3a16a45",
+  "prompts": {},
+  "sessions": {
+    "s_c86710675ed3db": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a7afa5a8-e392-4dcb-b0f5-f903e39d0262",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
