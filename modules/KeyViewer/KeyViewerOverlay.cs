@@ -34,13 +34,21 @@ public static partial class KeyViewerOverlay {
     private static GameObject canvasObj;
     private static GraphicRaycaster raycaster;
     private static RectTransform root;
+    private static RectTransform footRoot;
     private static GameObject dragObj;
     private static RectTransform dragRect;
     private static RectTransform rainLayerRef;
+    private static GameObject footDragObj;
+    private static RectTransform footDragRect;
+    private static RectTransform footRainLayerRef;
     private static readonly List<Box> boxes = [];
     private static readonly List<Box> counterBounces = [];
     private static bool built;
+    private static bool footBuilt;
     private static RainManager rainManager;
+    private static RainManager footRainManager;
+    private static RectTransform buildRoot;
+    private static RainManager buildRain;
     private static float dmCanvasHeight = 250f;
     private static float dmCanvasWidth = 800f;
     private static float dmTrackHeight = 200f;
@@ -77,6 +85,7 @@ public static partial class KeyViewerOverlay {
     private static bool inputWasActive;
     private static bool inputPrimed;
     private sealed class Box {
+        public RainManager Rain;
         public KeyCode Key;
         public KeyCode GhostKey = KeyCode.None;
         public bool IsFoot = false;

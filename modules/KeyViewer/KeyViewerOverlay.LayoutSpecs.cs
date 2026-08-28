@@ -2,14 +2,15 @@ using Quartz.Core;
 using Quartz.Features.KeyViewer.Layout;
 namespace Quartz.Features.KeyViewer;
 public static partial class KeyViewerOverlay {
-    private static List<DmNoteSpec> ParseLayoutSpecs(KvDocument doc) {
+    private static List<DmNoteSpec> ParseLayoutSpecs(KvDocument doc, string tab) {
         List<DmNoteSpec> result = [];
         dmCanvasHeight = 250f;
         dmCanvasWidth = 800f;
-        ApplyDmRuntimeSettings();
-        if(doc == null) return result;
+        if(doc == null || tab == null || !doc.HasTab(tab)) {
+            ApplyCssToSpecs(result);
+            return result;
+        }
         try {
-            string tab = doc.SelectedTab;
             float minX = float.PositiveInfinity;
             float minY = float.PositiveInfinity;
             float maxX = float.NegativeInfinity;
@@ -52,6 +53,15 @@ public static partial class KeyViewerOverlay {
         }
         ApplyCssToSpecs(result);
         return result;
+    }
+    internal static List<string> RenderTabs(KvDocument doc) {
+        List<string> tabs = [];
+        if(doc == null) return tabs;
+        string hand = doc.SelectedTab;
+        tabs.Add(hand);
+        string foot = doc.SelectedFootTab;
+        if(foot != null && !string.Equals(foot, hand, StringComparison.Ordinal)) tabs.Add(foot);
+        return tabs;
     }
     private static void AdoptLayoutElement(DmNoteSpec spec, KvElement el) {
         spec.Source = el;

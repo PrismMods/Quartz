@@ -39,6 +39,10 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
             [nameof(DmOffsetX)] = DmOffsetX,
             [nameof(DmOffsetY)] = DmOffsetY,
             [nameof(DmScale)] = DmScale,
+            [nameof(DmFootOffsetX)] = DmFootOffsetX,
+            [nameof(DmFootOffsetY)] = DmFootOffsetY,
+            [nameof(DmFootScale)] = DmFootScale,
+            [nameof(DmFootPlaced)] = DmFootPlaced,
             [nameof(DmNoteEffect)] = DmNoteEffect,
             [nameof(DmNoteSpeed)] = DmNoteSpeed,
             [nameof(DmTrackHeight)] = DmTrackHeight,
@@ -161,6 +165,10 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
         DmOffsetX = IOUtils.Read(token, nameof(DmOffsetX), DmOffsetX);
         DmOffsetY = IOUtils.Read(token, nameof(DmOffsetY), DmOffsetY);
         DmScale = Mathf.Clamp(IOUtils.Read(token, nameof(DmScale), DmScale), 0.2f, 4f);
+        DmFootOffsetX = IOUtils.Read(token, nameof(DmFootOffsetX), DmFootOffsetX);
+        DmFootOffsetY = IOUtils.Read(token, nameof(DmFootOffsetY), DmFootOffsetY);
+        DmFootScale = Mathf.Clamp(IOUtils.Read(token, nameof(DmFootScale), DmFootScale), 0.2f, 4f);
+        DmFootPlaced = IOUtils.Read(token, nameof(DmFootPlaced), DmFootPlaced);
         DmNoteEffect = IOUtils.Read(token, nameof(DmNoteEffect), DmNoteEffect);
         DmNoteSpeed = Mathf.Clamp(IOUtils.Read(token, nameof(DmNoteSpeed), DmNoteSpeed), 1f, 5000f);
         DmTrackHeight = Mathf.Clamp(IOUtils.Read(token, nameof(DmTrackHeight), DmTrackHeight), 0f, 5000f);

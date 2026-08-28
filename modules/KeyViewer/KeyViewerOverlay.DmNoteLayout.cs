@@ -10,10 +10,11 @@ public static partial class KeyViewerOverlay {
             return;
         }
         (Image fill, Image border) = NewBoxVisual(
-            "DmNote_" + index, root, spec.X, spec.Y, spec.W, spec.H,
+            "DmNote_" + index, buildRoot, spec.X, spec.Y, spec.W, spec.H,
             spec.BorderRadius, spec.BoxBorderWidth
         );
         Box box = new() {
+            Rain = buildRain,
             Key = spec.KeyCode,
             Name = spec.CountKey,
             Fill = fill,
@@ -50,7 +51,7 @@ public static partial class KeyViewerOverlay {
             }
         }
         if(spec.CounterEnabled && !spec.InlineStatCounter) {
-            Transform counterParent = spec.CounterOutside ? root : fill.transform;
+            Transform counterParent = spec.CounterOutside ? buildRoot : fill.transform;
             box.Value = NewText(counterParent, "Counter", "0", spec.CounterFontSize);
             box.Value.enableAutoSizing = true;
             box.Value.fontSizeMin = 0f;

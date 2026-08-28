@@ -15,22 +15,34 @@ internal static class KvExportShaping {
     private static readonly string[] TabScopedTables = [
         "keys", "keyPositions", "statPositions", "graphPositions", "knobPositions", "quartzRenderAnchors",
     ];
-    internal static void KeepOnlyTab(JObject root, string tab) {
+    internal static void KeepOnlyTab(JObject root, string tab, string footTab = null) {
         if(root == null || string.IsNullOrEmpty(tab)) return;
+        if(string.Equals(footTab, tab, StringComparison.Ordinal)) footTab = null;
         foreach(string table in TabScopedTables) {
             if(root[table] is not JObject byTab) continue;
             JObject kept = [];
-            if(byTab[tab] is { } value) kept[tab] = value;
+            if(Merged(byTab[tab], footTab == null ? null : byTab[footTab]) is { } value) kept[tab] = value;
             root[table] = kept;
         }
         if(root["customTabs"] is JArray custom) {
             JArray kept = [];
             foreach(JToken entry in custom)
-                if(entry is JObject o && o["id"]?.ToString() == tab) kept.Add(o);
+                if(entry is JObject o && o["id"]?.ToString() == tab) {
+                    o.Remove(KvDocument.FootTabKey);
+                    kept.Add(o);
+                }
             if(kept.Count > 0) root["customTabs"] = kept;
             else root.Remove("customTabs");
         }
         root["selectedKeyType"] = tab;
+        root.Remove(KvDocument.SelectedFootKey);
+    }
+    private static JToken Merged(JToken hand, JToken foot) {
+        if(foot is not JArray footArr || footArr.Count == 0) return hand;
+        if(hand is not JArray handArr) return footArr.DeepClone();
+        JArray all = (JArray)handArr.DeepClone();
+        foreach(JToken item in footArr) all.Add(item.DeepClone());
+        return all;
     }
     internal const string GapStats = "stats-avgmax";
     internal const string GapGhostKeys = "ghost-keys";

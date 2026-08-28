@@ -18,13 +18,15 @@ internal sealed class KvTabStrip {
     private readonly RectTransform track;
     private readonly LayoutElement viewportLe;
     private readonly ScrollRect scroll;
+    internal RectTransform Pill { get; private set; }
     private KvTabStrip(RectTransform track, LayoutElement viewportLe, ScrollRect scroll) {
         this.track = track;
         this.viewportLe = viewportLe;
         this.scroll = scroll;
     }
-    internal static KvTabStrip Create(RectTransform bar) {
+    internal static KvTabStrip Create(RectTransform bar, string captionKey = null, string captionText = null) {
         RectTransform pill = KvToolbar.Pill(bar);
+        if(captionText != null) Caption(pill, captionKey, captionText);
         GameObject viewObj = new("TabViewport");
         viewObj.transform.SetParent(pill, false);
         RectTransform viewport = viewObj.AddComponent<RectTransform>();
@@ -59,10 +61,31 @@ internal sealed class KvTabStrip {
         scroll.scrollSensitivity = 0f;
         scroll.inertia = false;
         viewObj.AddComponent<KvToolbar.StripWheel>().Init(viewport, track);
-        return new KvTabStrip(track, viewportLe, scroll);
+        return new KvTabStrip(track, viewportLe, scroll) { Pill = pill };
+    }
+    private static void Caption(RectTransform pill, string key, string text) {
+        GameObject obj = new("Caption");
+        obj.transform.SetParent(pill, false);
+        RectTransform rect = obj.AddComponent<RectTransform>();
+        TextMeshProUGUI label = GenerateUI.AddText(rect, true);
+        label.fontSize = LabelSize;
+        label.text = key == null ? text : MainCore.Tr.Get(key, text);
+        label.color = KvPalette.TabIdleText;
+        label.alignment = TextAlignmentOptions.Center;
+        TextCompat.NoWrap(label);
+        label.raycastTarget = false;
+        LayoutElement le = obj.AddComponent<LayoutElement>();
+        le.minHeight = ButtonHeight;
+        le.preferredHeight = ButtonHeight;
+        le.flexibleWidth = 0f;
+        float width = label.GetPreferredValues(label.text).x + LabelPadX * 2f;
+        le.preferredWidth = width;
+        le.minWidth = width;
+        KvTabRemeasure.Attach(rect, [(le, label, LabelPadX * 2f)]);
     }
     internal void Rebuild(
-        IReadOnlyList<string> tabs, string selected, Func<string, string> name, Action<string> onPick
+        IReadOnlyList<string> tabs, Func<string, bool> active, string editing,
+        Func<string, string> name, Action<string> onPick
     ) {
         if(track == null) return;
         GenerateUI.ClearChildren(track);
@@ -70,14 +93,15 @@ internal sealed class KvTabStrip {
         float width = 0f;
         for(int i = 0; i < tabs.Count; i++) {
             if(i > 0) width += KvPalette.PillPad;
-            width += Button(tabs[i], name(tabs[i]), tabs[i] == selected, onPick, measured);
+            string tab = tabs[i];
+            width += Button(tab, name(tab), active?.Invoke(tab) ?? false, tab == editing, onPick, measured);
         }
         viewportLe.preferredWidth = Mathf.Min(width, MaxWidth);
         viewportLe.minWidth = Mathf.Min(width, MinWidth);
         KvTabRemeasure.Attach(track, measured, viewportLe, KvPalette.PillPad, MinWidth, MaxWidth);
     }
     private float Button(
-        string tab, string text, bool selected, Action<string> onPick,
+        string tab, string text, bool active, bool editing, Action<string> onPick,
         List<(LayoutElement, TextMeshProUGUI, float)> measured
     ) {
         GameObject obj = new("Tab");
@@ -93,7 +117,7 @@ internal sealed class KvTabStrip {
         TextMeshProUGUI label = GenerateUI.AddText(rect, true);
         label.fontSize = LabelSize;
         label.text = text;
-        label.color = KvPalette.TextDim;
+        label.color = editing ? KvPalette.TextWhite : active ? KvPalette.TextDim : KvPalette.TabIdleText;
         label.alignment = TextAlignmentOptions.Center;
         TextCompat.NoWrap(label);
         label.overflowMode = TextOverflowModes.Ellipsis;
@@ -103,13 +127,13 @@ internal sealed class KvTabStrip {
         le.minWidth = width;
         measured.Add((le, label, LabelPadX * 2f));
         UIButton button = new("kv_tab", rect, label, bg, null) {
-            RestColor = selected ? static () => KvPalette.ButtonActive : static () => KvPalette.ButtonPrimary,
-            HoverColor = selected ? static () => KvPalette.ButtonActive : static () => KvPalette.ButtonHover,
+            RestColor = active ? static () => KvPalette.ButtonActive : static () => KvPalette.ButtonPrimary,
+            HoverColor = active ? static () => KvPalette.ButtonActive : static () => KvPalette.ButtonHover,
         };
         button.UpdateVisual(true);
         GenerateUI.AddButton(obj, btn => {
             if(btn != InputButton.Left) return;
-            if(selected) return;
+            if(editing) return;
             onPick?.Invoke(tab);
         }, false);
         EventTrigger trigger = obj.GetComponent<EventTrigger>() ?? obj.AddComponent<EventTrigger>();

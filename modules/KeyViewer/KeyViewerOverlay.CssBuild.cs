@@ -119,7 +119,7 @@ public static partial class KeyViewerOverlay {
     private static RectTransform EnsureGlowLayer() {
         if(cssGlowLayer != null) return cssGlowLayer;
         GameObject obj = new("CssGlowLayer");
-        obj.transform.SetParent(root, false);
+        obj.transform.SetParent(buildRoot, false);
         RectTransform rt = obj.AddComponent<RectTransform>();
         rt.anchorMin = Vector2.zero;
         rt.anchorMax = Vector2.one;

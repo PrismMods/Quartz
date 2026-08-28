@@ -42,6 +42,7 @@ internal static class KvMigration {
         string tab = doc.SelectedTab;
         GenerateTab(doc, tab, conf.Style, conf);
         SetFootRow(doc, tab, conf.FootKeyCount(), conf);
+        doc.SplitFootTabs();
         return doc;
     }
     internal static void GenerateStockTab(KvDocument doc, string tab, int style) {
@@ -55,8 +56,13 @@ internal static class KvMigration {
         }
         GenerateTab(doc, tab, style, KvPresets.Stock);
     }
-    internal static void SetStockFootRow(KvDocument doc, string tab, int footCount) =>
-        SetFootRow(doc, tab, footCount, KvPresets.Stock);
+    internal static void GenerateStockFootTab(KvDocument doc, string footTab, string anchorTab, int footCount) {
+        if(doc == null) return;
+        int count = Mathf.Clamp(footCount, 0, KvPresets.MaxFootCount);
+        int footStyle = Mathf.Clamp(count / 2, 0, KeyViewerSettings.MaxFootStyle);
+        KvPresets.GenerateFootTab(doc, footTab, anchorTab, count, KvPresets.Stock,
+            (el, slot) => BakeFootKey(KvPresets.Stock, el, footStyle, slot));
+    }
     private static void GenerateTab(KvDocument doc, string tab, int style, KeyViewerSettings source) {
         if(doc == null || source == null) return;
         style = Mathf.Clamp(style, 0, KeyViewerSettings.MaxStyle);

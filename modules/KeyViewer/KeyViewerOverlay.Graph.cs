@@ -7,7 +7,7 @@ public static partial class KeyViewerOverlay {
     private const float GraphAnimMs = 150f;
     private static void AddDmNoteGraph(int index, DmNoteSpec spec) {
         (Image fill, Image border) = NewBoxVisual(
-            "DmNoteGraph_" + index, root, spec.X, spec.Y, spec.W, spec.H,
+            "DmNoteGraph_" + index, buildRoot, spec.X, spec.Y, spec.W, spec.H,
             spec.GraphBorderRadius, spec.GraphBorderWidth);
         fill.color = spec.GraphBg;
         border.color = spec.GraphBorderWidth <= 0.01f

@@ -103,13 +103,20 @@ public static partial class KeyViewerOverlay {
             KvInputQueue.Pump(now, independent);
             if(raycaster != null && raycaster.enabled != isReorganizing) raycaster.enabled = isReorganizing;
             if(root.gameObject.activeSelf != show) root.gameObject.SetActive(show);
-            if(dragObj != null && dragObj.activeSelf != isReorganizing) {
-                if(isReorganizing) {
+            bool showFoot = show && footBuilt;
+            if(footRoot != null && footRoot.gameObject.activeSelf != showFoot)
+                footRoot.gameObject.SetActive(showFoot);
+            bool showDrag = isReorganizing;
+            if(dragObj != null && dragObj.activeSelf != showDrag) {
+                if(showDrag) {
                     Canvas.ForceUpdateCanvases();
                     RefreshDragBounds();
                 }
-                dragObj.SetActive(isReorganizing);
+                dragObj.SetActive(showDrag);
             }
+            bool showFootDrag = isReorganizing && footBuilt;
+            if(footDragObj != null && footDragObj.activeSelf != showFootDrag)
+                footDragObj.SetActive(showFootDrag);
             UpdateTabubVisibility(show, isReorganizing);
             if(!show || !focused) {
                 MarkInputInactive(now, clearTransientStats: !show);
@@ -120,6 +127,11 @@ public static partial class KeyViewerOverlay {
                 Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
                 Conf.DmOffsetX = stored.x;
                 Conf.DmOffsetY = stored.y;
+                if(footRoot != null) {
+                    Vector2 storedFoot = OverlayCalibration.Unscale(footRoot.anchoredPosition);
+                    Conf.DmFootOffsetX = storedFoot.x;
+                    Conf.DmFootOffsetY = storedFoot.y;
+                }
             }
             EnsureInputPrimed(now);
             UpdateDmNote(now);

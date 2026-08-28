@@ -8,44 +8,60 @@ using TMPro;
 using Quartz.Compat.Game;
 namespace Quartz.Features.KeyViewer;
 public static partial class KeyViewerOverlay {
-    private static void AddReorganizeHandle(RectTransform rainLayer) {
-        rainLayerRef = rainLayer;
+    private static void AddReorganizeHandles() {
         dragObj = BuildReorganizeHandle(root, "Drag", "KEYVIEWER_TITLE", "Key Viewer");
         dragRect = (RectTransform)dragObj.transform;
         if(dragObj.GetComponent<ReorganizeHandle>() is { } handle) handle.Bounds = dragRect;
+        if(footRoot != null) {
+            footDragObj = BuildReorganizeHandle(
+                footRoot, "FootDrag", "KEYVIEWER_FOOT_TITLE", "Key Viewer (Foot)"
+            );
+            footDragRect = (RectTransform)footDragObj.transform;
+            if(footDragObj.GetComponent<ReorganizeHandle>() is { } footHandle) footHandle.Bounds = footDragRect;
+        }
         RefreshDragBounds();
     }
     internal static void RefreshDragBounds() {
-        if(root == null || dragRect == null) return;
-        if(!TryContentBounds(out Vector2 min, out Vector2 max)) return;
-        Rect rootRect = root.rect;
-        dragRect.offsetMin = min - rootRect.min;
-        dragRect.offsetMax = max - rootRect.max;
+        FitDragRect(root, dragRect, rainLayerRef);
+        FitDragRect(footRoot, footDragRect, footRainLayerRef);
     }
-    private static bool TryContentBounds(out Vector2 min, out Vector2 max) {
+    private static void FitDragRect(RectTransform groupRoot, RectTransform handle, RectTransform rainLayer) {
+        if(groupRoot == null || handle == null) return;
+        if(!TryContentBounds(groupRoot, handle, rainLayer, out Vector2 min, out Vector2 max)) return;
+        Rect rootRect = groupRoot.rect;
+        handle.offsetMin = min - rootRect.min;
+        handle.offsetMax = max - rootRect.max;
+    }
+    private static bool TryContentBounds(
+        RectTransform groupRoot, RectTransform handle, RectTransform rainLayer,
+        out Vector2 min, out Vector2 max
+    ) {
         min = new Vector2(float.PositiveInfinity, float.PositiveInfinity);
         max = new Vector2(float.NegativeInfinity, float.NegativeInfinity);
         bool any = false;
-        ExtendContentBounds(root, ref min, ref max, ref any);
+        ExtendContentBounds(groupRoot, groupRoot, handle, rainLayer, ref min, ref max, ref any);
         return any && max.x > min.x && max.y > min.y;
     }
     private static readonly Vector3[] boundsCorners = new Vector3[4];
-    private static void ExtendContentBounds(Transform parent, ref Vector2 min, ref Vector2 max, ref bool any) {
+    private static void ExtendContentBounds(
+        Transform parent, RectTransform groupRoot, RectTransform handle, RectTransform rainLayer,
+        ref Vector2 min, ref Vector2 max, ref bool any
+    ) {
         for(int i = 0; i < parent.childCount; i++) {
             Transform child = parent.GetChild(i);
             if(!child.gameObject.activeSelf) continue;
-            if(rainLayerRef != null && child == rainLayerRef.transform) continue;
-            if(dragRect != null && child == dragRect.transform) continue;
+            if(rainLayer != null && child == rainLayer.transform) continue;
+            if(handle != null && child == handle.transform) continue;
             if(child is RectTransform rt && IsRenderedGraphic(rt)) {
                 rt.GetWorldCorners(boundsCorners);
                 for(int c = 0; c < 4; c++) {
-                    Vector2 local = root.InverseTransformPoint(boundsCorners[c]);
+                    Vector2 local = groupRoot.InverseTransformPoint(boundsCorners[c]);
                     min = Vector2.Min(min, local);
                     max = Vector2.Max(max, local);
                 }
                 any = true;
             }
-            ExtendContentBounds(child, ref min, ref max, ref any);
+            ExtendContentBounds(child, groupRoot, handle, rainLayer, ref min, ref max, ref any);
         }
     }
     private static bool IsRenderedGraphic(RectTransform rt) {

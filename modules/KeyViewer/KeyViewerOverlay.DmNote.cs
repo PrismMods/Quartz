@@ -7,17 +7,49 @@ public static partial class KeyViewerOverlay {
     private static void BuildDmNote() {
         built = true;
         lastSyncedFont = null;
+        ApplyDmRuntimeSettings();
+        Layout.KvDocument doc = Layout.KvStore.Current;
+        string handTab = doc?.SelectedTab;
+        string footTab = doc?.SelectedFootTab;
+        if(footTab != null && string.Equals(footTab, handTab, StringComparison.Ordinal)) footTab = null;
+        rainLayerRef = BuildDmGroup(root, rainManager, doc, handTab);
+        int handBoxes = boxes.Count;
+        footRainLayerRef = BuildDmGroup(footRoot, footRainManager, doc, footTab);
+        footBuilt = boxes.Count > handBoxes;
+        SeedFootPanelPlacement(dmCanvasHeight);
+        totalCount = 0;
+        foreach(Box box in boxes)
+            if(!box.IsStat && box.CountInTotal) totalCount += box.Count;
+        RebuildKeyMap();
+        PaintInitialCounts();
+        AddReorganizeHandles();
+        Apply();
+    }
+    private static void SeedFootPanelPlacement(float footCanvasHeight) {
+        if(!footBuilt || Conf == null || Conf.DmFootPlaced) return;
+        Conf.DmFootOffsetX = Conf.DmOffsetX;
+        Conf.DmFootOffsetY = Conf.DmOffsetY - footCanvasHeight * Mathf.Clamp(Conf.DmFootScale, 0.2f, 4f);
+        Conf.DmFootPlaced = true;
+        Save();
+    }
+    private static RectTransform BuildDmGroup(
+        RectTransform groupRoot, RainManager rain, Layout.KvDocument doc, string tab
+    ) {
+        if(groupRoot == null) return null;
         GameObject rainObj = new("RainLayer");
-        rainObj.transform.SetParent(root, false);
+        rainObj.transform.SetParent(groupRoot, false);
         RectTransform rainLayer = rainObj.AddComponent<RectTransform>();
         rainLayer.anchorMin = Vector2.zero;
         rainLayer.anchorMax = Vector2.one;
         rainLayer.offsetMin = Vector2.zero;
         rainLayer.offsetMax = Vector2.zero;
         rainObj.AddComponent<Canvas>().overrideSorting = false;
-        rainManager?.SetLayer(rainLayer);
-        List<DmNoteSpec> specs = ParseLayoutSpecs(Layout.KvStore.Current);
-        root.sizeDelta = new Vector2(dmCanvasWidth, dmCanvasHeight);
+        rain?.SetLayer(rainLayer);
+        buildRoot = groupRoot;
+        buildRain = rain;
+        cssGlowLayer = null;
+        List<DmNoteSpec> specs = ParseLayoutSpecs(doc, tab);
+        groupRoot.sizeDelta = new Vector2(dmCanvasWidth, dmCanvasHeight);
         int[] order = new int[specs.Count];
         for(int i = 0; i < order.Length; i++) order[i] = i;
         System.Array.Sort(order, (a, b) => {
@@ -25,13 +57,10 @@ public static partial class KeyViewerOverlay {
             return byZ != 0 ? byZ : a.CompareTo(b);
         });
         foreach(int i in order) AddDmNoteBox(i, specs[i]);
-        totalCount = 0;
-        foreach(Box box in boxes)
-            if(!box.IsStat && box.CountInTotal) totalCount += box.Count;
-        RebuildKeyMap();
-        PaintInitialCounts();
-        AddReorganizeHandle(rainLayer);
-        Apply();
+        buildRoot = null;
+        buildRain = null;
+        cssGlowLayer = null;
+        return rainLayer;
     }
     private static void PaintInitialCounts() {
         foreach(Box box in boxes) {
@@ -68,7 +97,7 @@ public static partial class KeyViewerOverlay {
     }
     private static void BeginDmNoteRain(Box box, float now) {
         DmNoteSpec spec = box.Dm;
-        if(!Conf.DmNoteEffect || spec == null || !spec.NoteEnabled || rainManager == null) return;
+        if(!Conf.DmNoteEffect || spec == null || !spec.NoteEnabled || box.Rain == null) return;
         float delay = dmDelayedNoteEnabled ? dmShortNoteThresholdMs / 1000f : 0f;
         if(delay > 0.0001f) {
             box.DelayedNotePending = true;
@@ -96,7 +125,7 @@ public static partial class KeyViewerOverlay {
         if(!box.DelayedNotePending || now < box.DelayedStartTime) return;
         DmNoteSpec spec = box.Dm;
         box.DelayedNotePending = false;
-        if(!Conf.DmNoteEffect || spec == null || !spec.NoteEnabled || rainManager == null) return;
+        if(!Conf.DmNoteEffect || spec == null || !spec.NoteEnabled || box.Rain == null) return;
         box.LastRain = SpawnDmRain(box, box.DelayedStartTime, false);
         if(box.DelayedReleasedBeforeStart) {
             EndDmNoteRain(box, box.DelayedReleaseTime >= 0f ? box.DelayedReleaseTime : now);

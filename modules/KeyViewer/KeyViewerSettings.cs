@@ -37,6 +37,10 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
     public float DmOffsetX = 0f;
     public float DmOffsetY = 240f;
     public float DmScale = 1f;
+    public float DmFootOffsetX = 0f;
+    public float DmFootOffsetY = 120f;
+    public float DmFootScale = 1f;
+    public bool DmFootPlaced = false;
     public bool DmNoteEffect = true;
     public float DmNoteSpeed = 1000f;
     public float DmTrackHeight = 200f;

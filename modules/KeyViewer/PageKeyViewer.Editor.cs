@@ -23,10 +23,13 @@ internal static partial class PageKeyViewer {
         );
         TextMeshProUGUI status = GenerateUI.AddMutedText(GenerateUI.Row(editor, ThinRowHeight), 17f, 0.45f);
         RectTransform toolbar = KvToolbar.Bar(editor);
-        Action refreshTabs = AppendTabStrip(toolbar, canvas, status, RefreshStatus);
+        Action refreshSettings = null;
+        Action refreshTabs = AppendTabStrip(
+            toolbar, canvas, status, RefreshStatus, () => refreshSettings?.Invoke()
+        );
         inspector.BuildToolbar(toolbar);
         EditorPanel panel = InspectorPanel(split.PaneHost);
-        Action refreshSettings = AppendEditorSettings(panel.Settings, conf, refreshTabs);
+        refreshSettings = AppendEditorSettings(panel.Settings, conf, canvas, refreshTabs);
         void RefreshStatus() {
             KvDocument doc = canvas.Document;
             status.text = string.Format(

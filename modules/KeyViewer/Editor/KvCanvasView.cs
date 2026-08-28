@@ -51,12 +51,12 @@ internal sealed partial class KvCanvas {
         v.Outline.enabled = false;
         return v;
     }
-    private void Paint(Visual v) {
+    private void Paint(Visual v, float scale = 1f) {
         KvElement el = v.El;
         v.Rect.anchoredPosition = new Vector2(el.X, -el.Y);
         v.Rect.sizeDelta = new Vector2(el.W, el.H);
         ApplyShape(v, el);
-        float dim = el.Hidden ? DimAlpha : 1f;
+        float dim = (el.Hidden ? DimAlpha : 1f) * scale;
         v.Fill.color = Fade(KeyViewerOverlay.HexToColor(RawStr(el, "backgroundColor", DefaultBg), 0.9f), dim);
         v.Border.color = Fade(KeyViewerOverlay.HexToColor(RawStr(el, "borderColor", DefaultBorder), 0.9f), dim);
         PaintImage(v, el, dim);
@@ -72,7 +72,7 @@ internal sealed partial class KvCanvas {
                 : KeyViewerOverlay.DmCounterAlignment(spec, false);
         }
         PaintCounter(v, el, spec, dim);
-        if(v.Outline != null) v.Outline.enabled = selection.Contains(el);
+        if(v.Outline != null) v.Outline.enabled = scale >= 1f && selection.Contains(el);
     }
     private void PaintImage(Visual v, KvElement el, float dim) {
         string inactive = RawStr(el, "inactiveImage", "").Trim();

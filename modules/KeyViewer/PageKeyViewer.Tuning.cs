@@ -166,6 +166,15 @@ internal static partial class PageKeyViewer {
         UISlider offsetY = includeOffsets ? DmSlider(body, compact, "Offset Y", "keyviewer_dm_offsety",
             def.DmOffsetY, -2000f, 2000f, conf.DmOffsetY, "0 px", 1f,
             v => { conf.DmOffsetY = v; Apply(); }, Save) : null;
+        UISlider footScale = DmSlider(body, compact, "Foot Scale", "keyviewer_dm_foot_scale",
+            def.DmFootScale, 0.2f, 4f, conf.DmFootScale, "0.00 x", 0.01f,
+            v => { conf.DmFootScale = v; Apply(); }, Save);
+        UISlider footOffsetX = includeOffsets ? DmSlider(body, compact, "Foot Offset X", "keyviewer_dm_foot_offsetx",
+            def.DmFootOffsetX, -2000f, 2000f, conf.DmFootOffsetX, "0 px", 1f,
+            v => { conf.DmFootOffsetX = v; Apply(); }, Save) : null;
+        UISlider footOffsetY = includeOffsets ? DmSlider(body, compact, "Foot Offset Y", "keyviewer_dm_foot_offsety",
+            def.DmFootOffsetY, -2000f, 2000f, conf.DmFootOffsetY, "0 px", 1f,
+            v => { conf.DmFootOffsetY = v; Apply(); }, Save) : null;
         UISlider speed = DmSlider(body, compact, "Note Speed", "keyviewer_dm_speed",
             def.DmNoteSpeed, 10f, 1000f, conf.DmNoteSpeed, "0 px/s", 1f,
             v => { conf.DmNoteSpeed = v; Apply(); }, Save);
@@ -207,6 +216,9 @@ internal static partial class PageKeyViewer {
             scale.SetOnlyValue(conf.DmScale, true);
             offsetX?.SetOnlyValue(conf.DmOffsetX, true);
             offsetY?.SetOnlyValue(conf.DmOffsetY, true);
+            footScale.SetOnlyValue(conf.DmFootScale, true);
+            footOffsetX?.SetOnlyValue(conf.DmFootOffsetX, true);
+            footOffsetY?.SetOnlyValue(conf.DmFootOffsetY, true);
             speed.SetOnlyValue(conf.DmNoteSpeed, true);
             track.SetOnlyValue(conf.DmTrackHeight, true);
             fade.SetOnlyValue(conf.DmFadePx, true);

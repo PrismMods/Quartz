@@ -35,7 +35,14 @@ public static partial class KeyViewerOverlay {
         root.anchorMin = new Vector2(0.5f, 0f);
         root.anchorMax = new Vector2(0.5f, 0f);
         root.pivot = new Vector2(0.5f, 0f);
+        GameObject footObj = new("KeyViewerFootGrid");
+        footObj.transform.SetParent(canvasObj.transform, false);
+        footRoot = footObj.AddComponent<RectTransform>();
+        footRoot.anchorMin = new Vector2(0.5f, 0f);
+        footRoot.anchorMax = new Vector2(0.5f, 0f);
+        footRoot.pivot = new Vector2(0.5f, 0f);
         rainManager = canvasObj.AddComponent<RainManager>();
+        footRainManager = canvasObj.AddComponent<RainManager>();
         canvasObj.AddComponent<Updater>();
         BuildTabub();
         Rebuild();
@@ -44,7 +51,9 @@ public static partial class KeyViewerOverlay {
         if(root == null) return;
         CaptureCounts();
         rainManager?.Clear();
+        footRainManager?.Clear();
         Quartz.UI.Generator.GenerateUI.ClearChildren(root);
+        if(footRoot != null) Quartz.UI.Generator.GenerateUI.ClearChildren(footRoot);
         boxes.Clear();
         counterBounces.Clear();
         cssFx.Clear();
@@ -52,6 +61,10 @@ public static partial class KeyViewerOverlay {
         dragObj = null;
         dragRect = null;
         rainLayerRef = null;
+        footDragObj = null;
+        footDragRect = null;
+        footRainLayerRef = null;
+        footBuilt = false;
         kpsMax = 0;
         kpsSum = 0;
         kpsSamples = 0;
@@ -116,7 +129,8 @@ public static partial class KeyViewerOverlay {
     private static void AddLayoutKeys(Action<KeyCode> add) {
         Layout.KvDocument doc = Layout.KvStore.Current;
         if(doc == null) return;
-        foreach(Layout.KvElement el in doc.BoundKeyElements(doc.SelectedTab)) add(el.KeyCodeValue);
+        foreach(string tab in RenderTabs(doc))
+            foreach(Layout.KvElement el in doc.BoundKeyElements(tab)) add(el.KeyCodeValue);
     }
     public static void Apply() {
         if(root == null) return;
@@ -128,9 +142,19 @@ public static partial class KeyViewerOverlay {
         root.anchoredPosition = OverlayCalibration.Scale(new Vector2(Conf.DmOffsetX, Conf.DmOffsetY));
         float dmScale = Mathf.Clamp(Conf.DmScale, 0.2f, 4f);
         root.localScale = new Vector3(dmScale, dmScale, 1f);
+        if(footRoot != null) {
+            footRoot.anchoredPosition = OverlayCalibration.Scale(
+                new Vector2(Conf.DmFootOffsetX, Conf.DmFootOffsetY)
+            );
+            float footScale = Mathf.Clamp(Conf.DmFootScale, 0.2f, 4f);
+            footRoot.localScale = new Vector3(footScale, footScale, 1f);
+        }
         ApplyBorderScale(dmScale);
         ApplyTabub();
-        if(!Conf.DmNoteEffect) rainManager?.Clear();
+        if(!Conf.DmNoteEffect) {
+            rainManager?.Clear();
+            footRainManager?.Clear();
+        }
     }
     private const float MinBorderScreenUnits = 1.4f;
     internal static float ScaledBorderStroke(float radiusUnits, float strokeUnits, float scale) {
@@ -254,10 +278,16 @@ public static partial class KeyViewerOverlay {
         canvasObj = null;
         raycaster = null;
         root = null;
+        footRoot = null;
         dragObj = null;
         dragRect = null;
         rainLayerRef = null;
+        footDragObj = null;
+        footDragRect = null;
+        footRainLayerRef = null;
         rainManager = null;
+        footRainManager = null;
+        footBuilt = false;
         boxes.Clear();
         pressLog.Clear();
         kpsMax = 0;

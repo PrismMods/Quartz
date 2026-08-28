@@ -23,6 +23,9 @@ internal static partial class KvStore {
         nameof(KeyViewerSettings.DmOffsetX),
         nameof(KeyViewerSettings.DmOffsetY),
         nameof(KeyViewerSettings.DmScale),
+        nameof(KeyViewerSettings.DmFootOffsetX),
+        nameof(KeyViewerSettings.DmFootOffsetY),
+        nameof(KeyViewerSettings.DmFootScale),
         nameof(KeyViewerSettings.DmNoteEffect),
         nameof(KeyViewerSettings.DmNoteSpeed),
         nameof(KeyViewerSettings.DmTrackHeight),
@@ -46,7 +49,7 @@ internal static partial class KvStore {
     }
     private static JObject ExportRoot() {
         JObject root = JObject.Parse(Current.ToJson(true));
-        KvExportShaping.KeepOnlyTab(root, Current.SelectedTab);
+        KvExportShaping.KeepOnlyTab(root, Current.SelectedTab, Current.SelectedFootTab);
         return root;
     }
     internal static List<string> DmNoteGaps() {

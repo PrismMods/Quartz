@@ -146,7 +146,7 @@ public static partial class KeyViewerOverlay {
         if(spec == null || down == box.GhostPressed) return;
         box.GhostPressed = down;
         if(down) {
-            if(Conf.DmNoteEffect && spec.NoteEnabled && rainManager != null)
+            if(Conf.DmNoteEffect && spec.NoteEnabled && box.Rain != null)
                 box.LastGhostRain = SpawnDmRain(box, time, true);
             return;
         }

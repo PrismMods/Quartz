@@ -4,7 +4,9 @@ public static partial class KeyViewerOverlay {
     private static RawRain SpawnDmRain(Box box, float now, bool ghost) {
         DmNoteSpec spec = box.Dm;
         if(spec == null || tabubActive) return null;
-        RawRain raw = rainManager.Rent();
+        RainManager manager = box.Rain;
+        if(manager == null) return null;
+        RawRain raw = manager.Rent();
         raw.Group = 1;
         raw.Order = spec.ZIndex;
         raw.StartTime = now;
@@ -35,7 +37,7 @@ public static partial class KeyViewerOverlay {
             raw.DotLength = Conf.GhostRainDotLength;
             raw.GapLength = Conf.GhostRainGapLength;
         }
-        rainManager.Enqueue(raw);
+        manager.Enqueue(raw);
         return raw;
     }
 }

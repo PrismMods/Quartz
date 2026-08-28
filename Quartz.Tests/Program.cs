@@ -70,6 +70,7 @@ List<(string Name, Action Run)> tests = [
     ("KeyViewer export embeds local image files and prunes orphans", KvDocumentTests.TestExportEmbedsLocalImages),
     ("KeyViewer DM Note gap scan ignores a switched-off note shadow", KvDocumentTests.TestDmNoteGapsIgnoreDisabledNoteShadow),
     ("KeyViewer foot keys carry an explicit marker that round-trips", KvDocumentTests.TestFootMarkerIsExplicitAndRoundTrips),
+    ("KeyViewer foot keys live on their own tab and export merged", KvDocumentTests.TestFootTabsSplitActivateAndExportMerged),
     ("KeyViewer per-key KPS is absent by default and round-trips", KvDocumentTests.TestPerKeyKpsIsOptOutAndRoundTrips),
     ("KeyViewer tabs are created, named uniquely, and removed", KvDocumentTests.TestTabsCreateNameAndRemove),
     ("KeyViewer tab rename is unique, reversible, and round-trips", KvDocumentTests.TestRenameTabIsUniqueAndReversible),

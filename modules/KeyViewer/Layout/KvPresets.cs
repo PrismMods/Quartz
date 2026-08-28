@@ -77,14 +77,23 @@ internal static partial class KvPresets {
         }
         doc.ReindexZOrder(tab);
     }
+    internal static void GenerateFootTab(KvDocument doc, string footTab, string anchorTab, int footCount,
+        KeyViewerSettings conf = null, Action<KvElement, int> onElement = null) {
+        if(doc == null) return;
+        doc.EnsureTab(footTab);
+        doc.Clear(footTab);
+        AppendFootRow(doc, footTab, footCount, ContentSize(doc, anchorTab), conf, onElement);
+    }
     internal static void AppendFootRow(KvDocument doc, string tab, int footCount,
+        KeyViewerSettings conf = null, Action<KvElement, int> onElement = null) =>
+        AppendFootRow(doc, tab, footCount, ContentSize(doc, tab), conf, onElement);
+    private static void AppendFootRow(KvDocument doc, string tab, int footCount, Vector2 content,
         KeyViewerSettings conf = null, Action<KvElement, int> onElement = null) {
         if(doc == null || footCount <= 0) return;
         conf ??= Stock;
         doc.EnsureTab(tab);
         List<KeyViewerOverlay.KeySlot> slots = [];
         Vector2 footSize = KeyViewerOverlay.BuildFootLayout(footCount, slots);
-        Vector2 content = ContentSize(doc, tab);
         float shiftX = (content.x - footSize.x) * 0.5f;
         float shiftY = content.y + FootGapAbove;
         float z = doc.AllElements(tab).Count;
@@ -99,13 +108,6 @@ internal static partial class KvPresets {
         doc.ReindexZOrder(tab);
     }
     internal static int MaxFootCount => KeyViewerSettings.MaxFootStyle * 2;
-    internal static int FootCount(KvDocument doc, string tab) {
-        if(doc == null) return 0;
-        int count = 0;
-        foreach(KvElement el in doc.Elements(tab, KvElementKind.Key))
-            if(el.Foot) count++;
-        return count;
-    }
     internal static bool RemoveFootRow(KvDocument doc, string tab) {
         if(doc == null) return false;
         List<KvElement> foot = [];

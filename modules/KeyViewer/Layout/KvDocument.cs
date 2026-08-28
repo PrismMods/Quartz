@@ -6,6 +6,8 @@ namespace Quartz.Features.KeyViewer.Layout;
 internal sealed partial class KvDocument {
     internal const string DmLocalImagePrefix = "dmnote-local-image://";
     private const string DefaultTabId = "custom-quartz";
+    internal const string FootTabKey = "quartzFoot";
+    internal const string SelectedFootKey = "quartzSelectedFootTab";
     private const string DefaultTabName = "Quartz";
     private static readonly string[] BuiltinTabs = ["4key", "5key", "6key", "8key"];
     private static readonly (string table, KvElementKind kind)[] Tables = [
@@ -26,12 +28,41 @@ internal sealed partial class KvDocument {
     internal string SelectedTab {
         get {
             string sel = Root["selectedKeyType"]?.ToString();
-            if(!string.IsNullOrWhiteSpace(sel) && tabs.ContainsKey(sel)) return sel;
-            foreach(string tab in tabs.Keys) return tab;
+            if(!string.IsNullOrWhiteSpace(sel) && tabs.ContainsKey(sel) && !IsFootTab(sel)) return sel;
+            foreach(string tab in tabs.Keys) if(!IsFootTab(tab)) return tab;
             return DefaultTabId;
         }
         set {
-            if(!string.IsNullOrWhiteSpace(value)) Root["selectedKeyType"] = value;
+            if(!string.IsNullOrWhiteSpace(value) && !IsFootTab(value)) Root["selectedKeyType"] = value;
+        }
+    }
+    internal string SelectedFootTab {
+        get {
+            string sel = Root[SelectedFootKey]?.ToString();
+            return !string.IsNullOrWhiteSpace(sel) && tabs.ContainsKey(sel) && IsFootTab(sel) ? sel : null;
+        }
+        set {
+            if(string.IsNullOrWhiteSpace(value)) Root.Remove(SelectedFootKey);
+            else Root[SelectedFootKey] = value;
+        }
+    }
+    internal bool IsFootTab(string tab) {
+        JToken flag = CustomTabEntry(tab)?[FootTabKey];
+        if(flag == null) return false;
+        try { return flag.ToObject<bool>(); }
+        catch(Exception e) { Diag.Ignore(e); return false; }
+    }
+    internal void SetFootTab(string tab, bool foot) {
+        JObject entry = CustomTabEntry(tab);
+        if(entry == null) return;
+        if(foot) entry[FootTabKey] = true;
+        else entry.Remove(FootTabKey);
+    }
+    internal int HandTabCount {
+        get {
+            int count = 0;
+            foreach(string tab in tabs.Keys) if(!IsFootTab(tab)) count++;
+            return count;
         }
     }
     internal IEnumerable<string> Tabs => tabs.Keys;
@@ -86,10 +117,13 @@ internal sealed partial class KvDocument {
         return unique;
     }
     internal bool RemoveTab(string tab) {
-        if(string.IsNullOrWhiteSpace(tab) || !tabs.ContainsKey(tab) || tabs.Count <= 1) return false;
+        if(string.IsNullOrWhiteSpace(tab) || !tabs.ContainsKey(tab)) return false;
+        bool foot = IsFootTab(tab);
+        if(!foot && HandTabCount <= 1) return false;
         List<string> order = [.. tabs.Keys];
         int index = order.IndexOf(tab);
-        bool wasSelected = SelectedTab == tab;
+        bool wasSelected = !foot && SelectedTab == tab;
+        bool wasFootSelected = foot && SelectedFootTab == tab;
         tabs.Remove(tab);
         foreach((string table, _) in Tables) (Root[table] as JObject)?.Remove(tab);
         (Root["keys"] as JObject)?.Remove(tab);
@@ -98,7 +132,13 @@ internal sealed partial class KvDocument {
             for(int i = custom.Count - 1; i >= 0; i--)
                 if(custom[i] is JObject o && o["id"]?.ToString() == tab) custom.RemoveAt(i);
         order.RemoveAt(index);
-        if(wasSelected && order.Count > 0) SelectedTab = order[Math.Max(0, index - 1)];
+        if(wasSelected)
+            for(int i = Math.Min(index, order.Count - 1); i >= 0; i--)
+                if(!IsFootTab(order[i])) { SelectedTab = order[i]; break; }
+        if(wasFootSelected) {
+            SelectedFootTab = null;
+            foreach(string other in order) if(IsFootTab(other)) { SelectedFootTab = other; break; }
+        }
         return true;
     }
     internal bool TryGetRenderAnchor(string tab, out float x, out float y) {
@@ -162,6 +202,7 @@ internal sealed partial class KvDocument {
                 }
             firstAdded ??= newId;
         }
+        SplitFootTabs();
         warnings = rejectedImages.AsReadOnly();
         return firstAdded;
     }
@@ -183,6 +224,7 @@ internal sealed partial class KvDocument {
         KvDocument doc = new(root);
         doc.Load();
         if(doc.tabs.Count == 0) doc.EnsureTab(DefaultTabId, DefaultTabName);
+        doc.SplitFootTabs();
         return doc;
     }
     private void Load() {
@@ -243,6 +285,28 @@ internal sealed partial class KvDocument {
         element != null && Bucket(tab, element.Kind).Remove(element);
     internal void Clear(string tab) {
         foreach((_, KvElementKind kind) in Tables) Bucket(tab, kind).Clear();
+    }
+    internal void SplitFootTabs() {
+        List<string> source = [];
+        foreach(string tab in tabs.Keys) if(!IsFootTab(tab)) source.Add(tab);
+        foreach(string tab in source) {
+            List<KvElement> foot = [];
+            foreach(KvElement el in Bucket(tab, KvElementKind.Key)) if(el.Foot) foot.Add(el);
+            if(foot.Count == 0) continue;
+            string id = NewTabId();
+            EnsureTab(id, UniqueTabName(TabName(tab) + " Foot"));
+            SetFootTab(id, true);
+            List<KvElement> keys = Bucket(tab, KvElementKind.Key);
+            List<KvElement> moved = Bucket(id, KvElementKind.Key);
+            foreach(KvElement el in foot) {
+                keys.Remove(el);
+                moved.Add(el);
+            }
+            ReindexZOrder(tab);
+            ReindexZOrder(id);
+            if(SelectedFootTab == null || string.Equals(tab, SelectedTab, StringComparison.Ordinal))
+                SelectedFootTab = id;
+        }
     }
     internal void ReindexZOrder(string tab) {
         List<KvElement> all = AllElements(tab);

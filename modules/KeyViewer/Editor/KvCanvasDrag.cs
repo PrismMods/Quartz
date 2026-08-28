@@ -26,6 +26,7 @@ internal sealed partial class KvCanvas {
         if(dragPrimary != null) dragPrimaryOrigin = new Vector2(dragPrimary.X, dragPrimary.Y);
         foreach(Visual v in visuals)
             if(!selection.Contains(v.El)) dragOthers.Add(RectOf(v.El));
+        foreach(Visual v in ghosts) dragOthers.Add(RectOf(v.El));
         axisLatched = false;
     }
     private void UpdateDrag(Vector2 layout) {

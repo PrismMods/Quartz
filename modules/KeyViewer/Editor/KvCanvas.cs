@@ -22,6 +22,7 @@ internal sealed partial class KvCanvas {
         internal float BorderWidth = float.NaN;
     }
     private const float DimAlpha = 0.35f;
+    private const float GhostAlpha = 0.18f;
     private RectTransform root;
     private RectTransform viewport;
     private RectTransform content;
@@ -32,6 +33,7 @@ internal sealed partial class KvCanvas {
     private string tab = "";
     private float zoom = 1f;
     private readonly List<Visual> visuals = [];
+    private readonly List<Visual> ghosts = [];
     private readonly List<KvElement> selection = [];
     private readonly List<KvElement> selectionScratch = [];
     private readonly KvHistory history = new();
@@ -114,15 +116,35 @@ internal sealed partial class KvCanvas {
         needsCentre = true;
         SelectionChanged?.Invoke();
     }
-    internal void Rebuild() {
-        foreach(Visual v in visuals) {
+    internal string CompanionTab() {
+        if(doc == null || string.IsNullOrEmpty(tab)) return null;
+        string other = doc.IsFootTab(tab) ? doc.SelectedTab : doc.SelectedFootTab;
+        if(other == null || string.Equals(other, tab, StringComparison.Ordinal) || !doc.HasTab(other)) return null;
+        return other;
+    }
+    private static void DestroyVisuals(List<Visual> list) {
+        foreach(Visual v in list) {
             if(v.Counter != null) Object.Destroy(v.Counter.gameObject);
             if(v.Rect != null) Object.Destroy(v.Rect.gameObject);
         }
-        visuals.Clear();
+        list.Clear();
+    }
+    internal void Rebuild() {
+        DestroyVisuals(ghosts);
+        DestroyVisuals(visuals);
         if(doc == null || string.IsNullOrEmpty(tab)) {
             SyncOverlay();
             return;
+        }
+        string companion = CompanionTab();
+        if(companion != null) {
+            foreach(KvElement el in doc.AllElements(companion)) {
+                try {
+                    ghosts.Add(BuildVisual(el));
+                } catch(Exception e) {
+                    MainCore.Log.Wrn($"[KvCanvas] ghost visual failed: {e.Message}");
+                }
+            }
         }
         List<KvElement> all = doc.AllElements(tab);
         for(int i = selection.Count - 1; i >= 0; i--)
@@ -137,6 +159,14 @@ internal sealed partial class KvCanvas {
         Refresh();
     }
     internal void Refresh() {
+        foreach(Visual v in ghosts) {
+            if(v.Rect == null) continue;
+            try {
+                Paint(v, GhostAlpha);
+            } catch(Exception e) {
+                MainCore.Log.Wrn($"[KvCanvas] ghost paint failed: {e.Message}");
+            }
+        }
         foreach(Visual v in visuals) {
             if(v.Rect == null) continue;
             try {
@@ -233,6 +263,7 @@ internal sealed partial class KvCanvas {
         if(driver != null) driver.Owner = null;
         if(root != null) Object.Destroy(root.gameObject);
         root = null;
+        ghosts.Clear();
         visuals.Clear();
         selection.Clear();
     }

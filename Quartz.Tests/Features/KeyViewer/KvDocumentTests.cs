@@ -272,10 +272,33 @@ static partial class KvDocumentTests {
         Assert(keys[1].Raw["quartzFoot"]!.ToObject<bool>(), "the marker is written where DM Note ignores it");
         KvDocument reparsed = KvDocument.Parse(doc.ToJson());
         List<KvElement> back = reparsed.Elements("4key", KvElementKind.Key);
-        Assert(!back[0].Foot && back[1].Foot, "the marker survives a DM Note round trip");
+        foreach(KvElement el in back) Assert(!el.Foot, "the hand tab keeps no foot keys after a load");
         Assert(!back[0].CountInTotal, "quartzCountInTotal and quartzFoot are independent");
-        back[1].Foot = false;
-        Assert(back[1].Raw["quartzFoot"] == null, "clearing the marker removes the key");
+        string footTab = reparsed.SelectedFootTab;
+        Assert(footTab != null && reparsed.IsFootTab(footTab), "foot keys land on their own foot tab");
+        List<KvElement> feet = reparsed.Elements(footTab, KvElementKind.Key);
+        Assert(feet.Count == 1 && feet[0].Foot, "the marker survives a DM Note round trip");
+        feet[0].Foot = false;
+        Assert(feet[0].Raw["quartzFoot"] == null, "clearing the marker removes the key");
+    }
+    public static void TestFootTabsSplitActivateAndExportMerged() {
+        KvDocument doc = KvDocument.Parse(Preset);
+        doc.Elements("4key", KvElementKind.Key)[2].Foot = true;
+        KvDocument loaded = KvDocument.Parse(doc.ToJson());
+        string foot = loaded.SelectedFootTab;
+        Assert(foot != null && loaded.IsFootTab(foot), "a preset's foot row becomes its own tab");
+        Assert(loaded.SelectedTab == "4key", "the hand tab stays selected");
+        Assert(loaded.Elements("4key", KvElementKind.Key).Count == 2, "the hand tab loses the foot key");
+        Assert(loaded.Elements(foot, KvElementKind.Key).Count == 1, "the foot tab gains it");
+        JObject exported = JObject.Parse(loaded.ToJson());
+        KvExportShaping.KeepOnlyTab(exported, loaded.SelectedTab, foot);
+        Assert(((JArray)exported["keyPositions"]!["4key"]!).Count == 3, "export merges the foot tab back in");
+        Assert(((JArray)exported["keys"]!["4key"]!).Count == 3, "names stay parallel through the merge");
+        Assert(exported["quartzSelectedFootTab"] == null, "an export carries one tab and no foot pointer");
+        Assert(KvDocument.Parse(exported.ToString()).SelectedFootTab != null, "a re-imported export splits again");
+        Assert(!loaded.RemoveTab("4key"), "the last hand tab cannot be deleted");
+        Assert(loaded.RemoveTab(foot), "a foot tab can be");
+        Assert(loaded.SelectedFootTab == null, "removing the active foot tab deactivates it");
     }
     public static void TestPerKeyKpsIsOptOutAndRoundTrips() {
         KvDocument doc = KvDocument.Parse(Preset);
