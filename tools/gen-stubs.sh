@@ -72,9 +72,16 @@ for dll in modules/*/bin/Release/Quartz.Module.*.dll; do
 done
 echo ">> reading $(( ${#INPUTS[@]} / 2 )) assemblies"
 
-LIBS=(--lib lib)
-[[ -d "$GP/MelonLoader/net35" ]] && LIBS+=(--lib "$GP/MelonLoader/net35")
+# Search order mirrors the HintPath order in Quartz/Quartz.csproj, because the
+# resolver takes the FIRST directory holding a matching assembly name and both
+# loaders ship a 0Harmony at a different version. UMM's 2.4.2 has to win: the mod
+# compiles against it, and MelonLoader's 2.10.2 also keeps an obsolete 5-argument
+# Harmony.Patch overload whose parameters are NOT optional, so a stub derived from
+# 2.10.2 drops the defaults that the named-argument call sites need.
+LIBS=()
 [[ -d "$MANAGED/UnityModManager" ]] && LIBS+=(--lib "$MANAGED/UnityModManager")
+[[ -d "$GP/MelonLoader/net35" ]] && LIBS+=(--lib "$GP/MelonLoader/net35")
+LIBS+=(--lib lib)
 
 # --source feeds the nameof/Harmony-string scan: those names are compile-time only
 # and leave no trace in the IL, so they cannot be recovered from --input alone.

@@ -16,29 +16,29 @@ resources, and no types the mod never touches.
 
 | Assembly | Types | Members |
 |---|---:|---:|
-| `0Harmony` | 14 | 71 |
-| `Assembly-CSharp` | 144 | 1175 |
+| `0Harmony` | 15 | 104 |
+| `Assembly-CSharp` | 143 | 1138 |
 | `Assembly-CSharp-firstpass` | 3 | 14 |
-| `DOTween` | 15 | 61 |
+| `DOTween` | 15 | 57 |
 | `MelonLoader` | 8 | 23 |
 | `Newtonsoft.Json` | 18 | 114 |
 | `RDTools` | 2 | 0 |
 | `SkyHook.Unity` | 4 | 130 |
-| `Unity.TextMeshPro` | 34 | 318 |
+| `Unity.TextMeshPro` | 34 | 317 |
 | `UnityEngine` | 0 | 0 |
-| `UnityEngine.AudioModule` | 21 | 99 |
-| `UnityEngine.CoreModule` | 80 | 1048 |
-| `UnityEngine.ImageConversionModule` | 1 | 2 |
+| `UnityEngine.AudioModule` | 20 | 85 |
+| `UnityEngine.CoreModule` | 79 | 1039 |
+| `UnityEngine.ImageConversionModule` | 1 | 1 |
 | `UnityEngine.InputLegacyModule` | 1 | 15 |
-| `UnityEngine.ParticleSystemModule` | 8 | 46 |
+| `UnityEngine.ParticleSystemModule` | 9 | 53 |
 | `UnityEngine.TextCoreFontEngineModule` | 3 | 21 |
 | `UnityEngine.TextRenderingModule` | 7 | 31 |
-| `UnityEngine.UI` | 97 | 396 |
+| `UnityEngine.UI` | 96 | 377 |
 | `UnityEngine.UIElementsModule` | 13 | 7 |
 | `UnityEngine.UIModule` | 7 | 35 |
 | `UnityModManager` | 4 | 12 |
 
-**484 types, 3618 members.**
+**482 types, 3573 members.**
 
 ## How it is used
 

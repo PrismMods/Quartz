@@ -31,19 +31,21 @@ namespace HarmonyLib {
         public CodeInstruction(global::System.Reflection.Emit.OpCode opcode, object operand = default) => throw null;
         protected CodeInstruction() { }
     }
-    public unsafe partial class Harmony : global::System.IDisposable {
+    public static unsafe partial class CodeInstructionExtensions {
+        public static global::HarmonyLib.CodeInstruction MoveLabelsFrom(this global::HarmonyLib.CodeInstruction code, global::HarmonyLib.CodeInstruction other) => throw null;
+    }
+    public unsafe partial class Harmony {
         public string Id { get => throw null; }
         public Harmony(string id) => throw null;
         public global::HarmonyLib.PatchClassProcessor CreateClassProcessor(global::System.Type type) => throw null;
         public global::HarmonyLib.PatchProcessor CreateProcessor(global::System.Reflection.MethodBase original) => throw null;
         public static global::HarmonyLib.Patches GetPatchInfo(global::System.Reflection.MethodBase method) => throw null;
         public global::System.Collections.Generic.IEnumerable<global::System.Reflection.MethodBase> GetPatchedMethods() => throw null;
-        public global::System.Reflection.MethodInfo Patch(global::System.Reflection.MethodBase original, global::HarmonyLib.HarmonyMethod prefix, global::HarmonyLib.HarmonyMethod postfix, global::HarmonyLib.HarmonyMethod transpiler, global::HarmonyLib.HarmonyMethod finalizer) => throw null;
+        public global::System.Reflection.MethodInfo Patch(global::System.Reflection.MethodBase original, global::HarmonyLib.HarmonyMethod prefix = default, global::HarmonyLib.HarmonyMethod postfix = default, global::HarmonyLib.HarmonyMethod transpiler = default, global::HarmonyLib.HarmonyMethod finalizer = default) => throw null;
         public void PatchAll(global::System.Reflection.Assembly assembly) => throw null;
         public void Unpatch(global::System.Reflection.MethodBase original, global::System.Reflection.MethodInfo patch) => throw null;
         public void Unpatch(global::System.Reflection.MethodBase original, global::HarmonyLib.HarmonyPatchType type, string harmonyID = default) => throw null;
         protected Harmony() { }
-        void global::System.IDisposable.Dispose() => throw null;
     }
     public unsafe partial class HarmonyAttribute : global::System.Attribute {
         protected HarmonyAttribute() { }
@@ -68,7 +70,8 @@ namespace HarmonyLib {
         Transpiler = 3,
         Finalizer = 4,
         ReversePatch = 5,
-        ILManipulator = 6,
+        InnerPrefix = 6,
+        InnerPostfix = 7,
     }
     public enum MethodType : int {
         Normal = 0,
@@ -77,6 +80,37 @@ namespace HarmonyLib {
         Constructor = 3,
         StaticConstructor = 4,
         Enumerator = 5,
+        Async = 6,
+        Finalizer = 7,
+        EventAdd = 8,
+        EventRemove = 9,
+        OperatorImplicit = 10,
+        OperatorExplicit = 11,
+        OperatorUnaryPlus = 12,
+        OperatorUnaryNegation = 13,
+        OperatorLogicalNot = 14,
+        OperatorOnesComplement = 15,
+        OperatorIncrement = 16,
+        OperatorDecrement = 17,
+        OperatorTrue = 18,
+        OperatorFalse = 19,
+        OperatorAddition = 20,
+        OperatorSubtraction = 21,
+        OperatorMultiply = 22,
+        OperatorDivision = 23,
+        OperatorModulus = 24,
+        OperatorBitwiseAnd = 25,
+        OperatorBitwiseOr = 26,
+        OperatorExclusiveOr = 27,
+        OperatorLeftShift = 28,
+        OperatorRightShift = 29,
+        OperatorEquality = 30,
+        OperatorInequality = 31,
+        OperatorGreaterThan = 32,
+        OperatorLessThan = 33,
+        OperatorGreaterThanOrEqual = 34,
+        OperatorLessThanOrEqual = 35,
+        OperatorComma = 36,
     }
     public unsafe partial class Patch {
         public readonly string[] after;

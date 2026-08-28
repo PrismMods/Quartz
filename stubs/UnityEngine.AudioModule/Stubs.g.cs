@@ -48,10 +48,6 @@ namespace UnityEngine {
         Loaded = 2,
         Failed = 3,
     }
-    public sealed unsafe partial class AudioListener : global::UnityEngine.AudioBehaviour {
-        public static bool pause { get => throw null; set { } }
-        private AudioListener() { }
-    }
     public sealed unsafe partial class AudioSettings {
         public static double dspTime { get => throw null; }
         public static int outputSampleRate { get => throw null; set { } }
@@ -61,8 +57,6 @@ namespace UnityEngine {
         public bool bypassEffects { get => throw null; set { } }
         public bool bypassListenerEffects { get => throw null; set { } }
         public global::UnityEngine.AudioClip clip { get => throw null; set { } }
-        public bool ignoreListenerPause { get => throw null; set { } }
-        public bool isPlaying { get => throw null; }
         public bool loop { get => throw null; set { } }
         public bool mute { get => throw null; set { } }
         public global::UnityEngine.Audio.AudioMixerGroup outputAudioMixerGroup { get => throw null; set { } }
@@ -73,12 +67,9 @@ namespace UnityEngine {
         public float time { get => throw null; set { } }
         public int timeSamples { get => throw null; set { } }
         public float volume { get => throw null; set { } }
-        public void Pause() => throw null;
         public void Play() => throw null;
         public void PlayScheduled(double time) => throw null;
-        public void SetScheduledEndTime(double time) => throw null;
         public void Stop() => throw null;
-        public void UnPause() => throw null;
         private AudioSource() { }
     }
     public sealed unsafe partial class Microphone {

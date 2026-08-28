@@ -15,6 +15,18 @@
       "assembly": "Assembly-CSharp"
     },
     {
+      "type": "FloorMesh",
+      "member": "GetPositions",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "FloorMesh",
+      "member": "SmallestAngleBetweenTwoAngles",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
       "type": "ADOFAI.LevelData",
       "member": "Decode",
       "resolved": true,
@@ -423,6 +435,12 @@
       "assembly": "Assembly-CSharp"
     },
     {
+      "type": "scnGame",
+      "member": "Update",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
       "type": "scnLevelSelect",
       "member": "Start",
       "resolved": true,
@@ -497,12 +515,6 @@
     {
       "type": "scrController",
       "member": "OnLandOnPortal",
-      "resolved": true,
-      "assembly": "Assembly-CSharp"
-    },
-    {
-      "type": "scrController",
-      "member": "OnMusicScheduled",
       "resolved": true,
       "assembly": "Assembly-CSharp"
     },
@@ -639,6 +651,18 @@
       "assembly": "Assembly-CSharp"
     },
     {
+      "type": "scrParticleDecoration",
+      "member": "ResetParticle",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "scrParticleDecoration",
+      "member": "Update",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
       "type": "scrPlanet",
       "member": "MoveToNextFloor",
       "resolved": true,
@@ -657,12 +681,6 @@
       "assembly": "Assembly-CSharp"
     },
     {
-      "type": "scrPlayer",
-      "member": "Hit",
-      "resolved": true,
-      "assembly": "Assembly-CSharp"
-    },
-    {
       "type": "scrShowIfDebug",
       "member": "Update",
       "resolved": true,
@@ -677,12 +695,6 @@
     {
       "type": "scrUIController",
       "member": "ShowDifficultyContainer",
-      "resolved": true,
-      "assembly": "Assembly-CSharp"
-    },
-    {
-      "type": "scrVfxPlus",
-      "member": "ScrubToTime",
       "resolved": true,
       "assembly": "Assembly-CSharp"
     },

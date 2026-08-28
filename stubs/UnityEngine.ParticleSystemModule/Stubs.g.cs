@@ -20,6 +20,7 @@ namespace UnityEngine {
         private ParticleSystem() { }
         public unsafe partial struct MainModule {
             private global::UnityEngine.ParticleSystem m_ParticleSystem;
+            public global::UnityEngine.ParticleSystemCullingMode cullingMode { get => throw null; set { } }
             public int maxParticles { get => throw null; set { } }
             public global::UnityEngine.ParticleSystem.MinMaxGradient startColor { get => throw null; set { } }
         }
@@ -45,6 +46,12 @@ namespace UnityEngine {
             private global::UnityEngine.ParticleSystemGradientMode m_Mode;
             public MinMaxGradient(global::UnityEngine.Color color) => throw null;
         }
+    }
+    public enum ParticleSystemCullingMode : int {
+        Automatic = 0,
+        PauseAndCatchup = 1,
+        Pause = 2,
+        AlwaysSimulate = 3,
     }
     public enum ParticleSystemCurveMode : int {
         Constant = 0,

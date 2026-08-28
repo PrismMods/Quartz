@@ -23,7 +23,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="../Assembly-CSharp-firstpass/Assembly-CSharp-firstpass.csproj" />
-		<ProjectReference Include="../DOTween/DOTween.csproj" />
 		<ProjectReference Include="../RDTools/RDTools.csproj" />
 		<ProjectReference Include="../SkyHook.Unity/SkyHook.Unity.csproj" />
 		<ProjectReference Include="../Unity.TextMeshPro/Unity.TextMeshPro.csproj" />
