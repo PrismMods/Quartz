@@ -1,0 +1,38 @@
+CREDITS.md
+  s_c86710675ed3db::t_73db3649bf6104 17-20
+THIRD-PARTY-NOTICES.md
+  s_c86710675ed3db::t_73db3649bf6104 100-138,142-179
+  s_c86710675ed3db::t_402806d3503315 139-141
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_756728804d933d::t_5a4973f87c19ef 48
+Quartz/Resource/Export/Lang/zh-CN.json
+  s_c86710675ed3db::t_73db3649bf6104 46
+Quartz/Resource/Export/Lang/en-US.json
+  s_756728804d933d::t_5a4973f87c19ef 48
+Quartz/UI/Factory/Page/PageCredits.cs
+  s_c86710675ed3db::t_73db3649bf6104 31,40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "61bd8a5e41e08c72f5271b02abaa296e50429496",
+  "prompts": {},
+  "sessions": {
+    "s_756728804d933d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cfa67c0d-2f43-4337-b29a-46fba4e18443",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_c86710675ed3db": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a7afa5a8-e392-4dcb-b0f5-f903e39d0262",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
