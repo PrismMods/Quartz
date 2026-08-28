@@ -60,6 +60,8 @@ public static class Optimizer {
         TMPTextShadow.UnderlayOffsetScale = Conf.ShadowUnderlayOffsetScale;
         TMPTextShadow.UseMaterialUnderlay = on && Conf.LightTextShadows;
         if(!(on && Conf.RenderAllHitSounds)) HitSoundRenderer.StopAll("disabled");
+        IridiumPatches.InvalidateScreenScale();
+        IridiumPatches.ApplyParticleCulling();
     }
     public static void Restore() {
         if(gcDeferred) ResumeGC();
@@ -84,6 +86,24 @@ public static class Optimizer {
             return MainCore.IsModEnabled && Conf != null && Conf.SkipNoOpScreenFilters;
         }
     }
+    internal static bool CacheScreenScaleActive {
+        get {
+            EnsureConf();
+            return MainCore.IsModEnabled && Conf != null && Conf.CacheScreenScale;
+        }
+    }
+    internal static bool SkipIdleParticlesActive {
+        get {
+            EnsureConf();
+            return MainCore.IsModEnabled && Conf != null && Conf.SkipIdleParticles;
+        }
+    }
+    internal static bool PauseOffscreenParticlesActive {
+        get {
+            EnsureConf();
+            return MainCore.IsModEnabled && Conf != null && Conf.PauseOffscreenParticles;
+        }
+    }
     private static void SetPriority(ProcessPriorityClass priority) {
         try {
             Process proc = Process.GetCurrentProcess();
@@ -91,6 +111,7 @@ public static class Optimizer {
         } catch(Exception e) { Diag.Ignore(e); }
     }
     private static void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
+        IridiumPatches.InvalidateScreenScale();
         if(!Active) return;
         if(Conf.LeakGuard) LeakGuardPatches.SweepStaticCaches();
         if(Conf.CollectOnLevelLoad) GC.Collect();

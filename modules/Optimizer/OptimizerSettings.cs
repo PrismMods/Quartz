@@ -14,6 +14,9 @@ public sealed class OptimizerSettings : ISettingsFile {
     public bool LightTextShadows = true;
     public float ShadowUnderlayOffsetScale = 6f;
     public bool RenderAllHitSounds = false;
+    public bool CacheScreenScale = true;
+    public bool SkipIdleParticles = true;
+    public bool PauseOffscreenParticles = false;
     public JToken Serialize() => new JObject {
         [nameof(SmoothGC)] = SmoothGC,
         [nameof(LeakGuard)] = LeakGuard,
@@ -26,6 +29,9 @@ public sealed class OptimizerSettings : ISettingsFile {
         [nameof(LightTextShadows)] = LightTextShadows,
         [nameof(ShadowUnderlayOffsetScale)] = ShadowUnderlayOffsetScale,
         [nameof(RenderAllHitSounds)] = RenderAllHitSounds,
+        [nameof(CacheScreenScale)] = CacheScreenScale,
+        [nameof(SkipIdleParticles)] = SkipIdleParticles,
+        [nameof(PauseOffscreenParticles)] = PauseOffscreenParticles,
     };
     public void Deserialize(JToken token) {
         SmoothGC = IOUtils.Read(token, nameof(SmoothGC), SmoothGC);
@@ -39,5 +45,8 @@ public sealed class OptimizerSettings : ISettingsFile {
         LightTextShadows = IOUtils.Read(token, nameof(LightTextShadows), LightTextShadows);
         ShadowUnderlayOffsetScale = IOUtils.Read(token, nameof(ShadowUnderlayOffsetScale), ShadowUnderlayOffsetScale);
         RenderAllHitSounds = IOUtils.Read(token, nameof(RenderAllHitSounds), RenderAllHitSounds);
+        CacheScreenScale = IOUtils.Read(token, nameof(CacheScreenScale), CacheScreenScale);
+        SkipIdleParticles = IOUtils.Read(token, nameof(SkipIdleParticles), SkipIdleParticles);
+        PauseOffscreenParticles = IOUtils.Read(token, nameof(PauseOffscreenParticles), PauseOffscreenParticles);
     }
 }

@@ -85,6 +85,33 @@ public static class PageOptimizer {
         );
         GenerateUI.ToggleTip(
             optimizerSec.Body,
+            optDef.CacheScreenScale,
+            opt.CacheScreenScale,
+            v => { opt.CacheScreenScale = v; Optimizer.Apply(); Optimizer.Save(); },
+            "Skip Redundant Screen Rescales",
+            "opt_cachescreenscale",
+            "The game rescales its four full-screen flash quads every single frame from the camera's size and aspect, even when neither has changed. This skips that frame's work whenever both are identical to the last one, and lets the game run normally the moment either moves."
+        );
+        GenerateUI.ToggleTip(
+            optimizerSec.Body,
+            optDef.SkipIdleParticles,
+            opt.SkipIdleParticles,
+            v => { opt.SkipIdleParticles = v; Optimizer.Apply(); Optimizer.Save(); },
+            "Skip Idle Particle Updates",
+            "opt_skipidleparticles",
+            "Each particle decoration writes its shape scale and simulation speed into Unity every frame, whether or not they changed. This skips those writes while the values and the song pitch are unchanged. Paused during editing and re-armed whenever a particle event reloads, so nothing goes stale."
+        );
+        GenerateUI.ToggleTip(
+            optimizerSec.Body,
+            optDef.PauseOffscreenParticles,
+            opt.PauseOffscreenParticles,
+            v => { opt.PauseOffscreenParticles = v; Optimizer.Apply(); Optimizer.Save(); },
+            "Pause Off-Screen Particles",
+            "opt_pauseoffscreenparticles",
+            "Forces particle decorations to stop simulating on the CPU while they are off camera, instead of the game's default of deciding per system. Saves real CPU on particle-heavy levels, but a system that scrolls back into view resumes where it paused rather than catching up, so its timing can differ. Off by default."
+        );
+        GenerateUI.ToggleTip(
+            optimizerSec.Body,
             optDef.RenderAllHitSounds,
             opt.RenderAllHitSounds,
             v => { opt.RenderAllHitSounds = v; Optimizer.Apply(); Optimizer.Save(); },
