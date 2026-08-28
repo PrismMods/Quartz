@@ -171,8 +171,7 @@ internal static class HitSoundRenderer {
             StopAll("recapture");
             mixerGroup = conductor.hitSoundGroup;
             BuildSegments(events);
-            list.Clear();
-            NextHitSoundField.SetValue(conductor, 0);
+            NextHitSoundField.SetValue(conductor, list.Count);
         } catch(Exception e) {
             MainCore.Log.Wrn("[Optimizer] Render All Hit Sounds capture failed: " + e.Message);
             StopAll("capture error");
