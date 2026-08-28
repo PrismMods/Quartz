@@ -1,0 +1,19 @@
+modules/Optimizer/HitSoundRenderer.cs
+  s_58278a9b441be0::t_4d4d33cf3e7c24 174
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "4b5bbe829b62413e3b22727d0f17765eed3807a0",
+  "prompts": {},
+  "sessions": {
+    "s_58278a9b441be0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ac535edd-e567-4981-aa81-2e619d81e016",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}

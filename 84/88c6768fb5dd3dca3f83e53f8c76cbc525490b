@@ -1,0 +1,45 @@
+Quartz/Modules/ModuleMigration.cs
+  s_c86710675ed3db::t_8090bb0ff2c358 33,55
+modules/DeathLimit/DeathLimit.cs
+  s_c86710675ed3db::t_4313215a95e032 1-59
+modules/DeathLimit/DeathLimit.csproj
+  s_c86710675ed3db::t_c8f12e18bd847c 1-9
+modules/DeathLimit/DeathLimitImport.cs
+  s_c86710675ed3db::t_ab10840f415670 1-33
+modules/DeathLimit/DeathLimitModule.cs
+  s_c86710675ed3db::t_27d0eee38769c2 1-22
+modules/DeathLimit/DeathLimitSettings.cs
+  s_c86710675ed3db::t_4bf643d48cad02 1-34
+modules/DeathLimit/Lang/en-US.json
+  s_c86710675ed3db::t_a2969b76b6a384 1-14
+modules/DeathLimit/Lang/ko-KR.json
+  s_c86710675ed3db::t_9538998ff6c5e1 1-14
+modules/DeathLimit/Lang/zh-CN.json
+  s_c86710675ed3db::t_5dab94f2a2e5d0 1-14
+modules/DeathLimit/LegacyRestriction.cs
+  s_c86710675ed3db::t_296508f9fd654c 1-41
+modules/DeathLimit/PageDeathLimit.cs
+  s_c86710675ed3db::t_d8f08a7ede2017 1-83
+modules/DeathLimit/module.json
+  s_c86710675ed3db::t_e0329821eaf733 1-6
+modules/Restriction/Restriction.cs
+  s_c86710675ed3db::t_4650099d09ccb8 15,100-101
+modules/Restriction/module.json
+  s_c86710675ed3db::t_0eb3f8f1107414 3,5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "8488c6768fb5dd3dca3f83e53f8c76cbc525490b",
+  "prompts": {},
+  "sessions": {
+    "s_c86710675ed3db": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a7afa5a8-e392-4dcb-b0f5-f903e39d0262",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
