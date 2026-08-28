@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<ModuleId>deathlimit</ModuleId>
+		<AssemblyName>Quartz.Module.DeathLimit</AssemblyName>
+	</PropertyGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Lang\*.json" />
+	</ItemGroup>
+</Project>

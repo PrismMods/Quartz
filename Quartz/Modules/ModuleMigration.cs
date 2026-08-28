@@ -30,6 +30,7 @@ public static partial class ModuleMigration {
         new Rule { Id = "mainmenu", FileName = "Tweaks.json" },
         new Rule { Id = "visualtweaks", FileName = "Tweaks.json" },
         new Rule { Id = "restriction", FileName = "Restriction.json" },
+        new Rule { Id = "deathlimit", FileName = "Restriction.json" },
         new Rule { Id = "calibration", FileName = "Calibration.json" },
         new Rule { Id = "optimizer", FileName = "Optimizer.json" },
         new Rule { Id = "editor", FileName = "Editor.json" },
@@ -51,6 +52,7 @@ public static partial class ModuleMigration {
         new Split { From = "judgement", To = "hidejudgements" },
         new Split { From = "tweaks", To = "mainmenu" },
         new Split { From = "tweaks", To = "visualtweaks" },
+        new Split { From = "restriction", To = "deathlimit" },
     ];
     public static bool NeedsSourceRefresh(string installed, string bundled) {
         if(string.IsNullOrEmpty(installed) || string.IsNullOrEmpty(bundled)) return false;

@@ -1,0 +1,14 @@
+{
+  "zh-CN": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "DESC_DL_MESSAGE": "达到死亡限制结算失败时显示的提示文字。",
+    "DL_DEATHS_MAX": "最大失败次数",
+    "DL_DEATHS_ON": "开启失败次数限制（失误+过载判定）",
+    "DL_MESSAGE": "达到限制提示文字",
+    "DL_MISSES_MAX": "最大失误数",
+    "DL_MISSES_ON": "开启失误次数限制",
+    "DL_OVERLOADS_MAX": "最大过载次数",
+    "DL_OVERLOADS_ON": "开启过载次数限制",
+    "SECTION_DEATH_LIMIT": "失败次数限制"
+  }
+}

@@ -1,17 +1,9 @@
 {
   "en-US": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
-    "DESC_DL_MESSAGE": "Shown on the fail screen when a limit kills the run.",
     "DESC_JR_MESSAGE": "Shown on the fail screen when the restriction kills the run.",
     "DESC_JR_SECTIONS_ADD": "Adds another percentage range of the level. Up to 16.",
     "DESC_JR_SECTIONS_ON": "Only enforce the restriction while the run is inside one of the ranges below. Off: the whole level is restricted.",
-    "DL_DEATHS_MAX": "Max Deaths",
-    "DL_DEATHS_ON": "Limit Deaths (Miss + Overload)",
-    "DL_MESSAGE": "Limit reached message",
-    "DL_MISSES_MAX": "Max Misses",
-    "DL_MISSES_ON": "Limit Misses",
-    "DL_OVERLOADS_MAX": "Max Overloads",
-    "DL_OVERLOADS_ON": "Limit Overloads",
     "JRSEC_END": "End (%)",
     "JRSEC_REMOVE": "Remove",
     "JRSEC_START": "Start (%)",
@@ -39,7 +31,6 @@
     "JR_SECTIONS": "Sections",
     "JR_SECTIONS_ADD": "Add Section",
     "JR_SECTIONS_ON": "Restrict Only In Sections",
-    "SECTION_DEATH_LIMIT": "Death Limit",
     "SECTION_JUDGEMENT_RESTRICTION": "Judgement Restriction"
   }
 }

@@ -1,17 +1,9 @@
 {
   "ko-KR": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
-    "DESC_DL_MESSAGE": "플레이 제한 때문에 죽었을 시패했을 때 실패 화면에 표시됩니다.",
     "DESC_JR_MESSAGE": "판정제한으로 죽었을 때 화면에 표시됩니다.",
     "DESC_JR_SECTIONS_ADD": "레벨의 퍼센트 구간을 하나 더 추가합니다. 최대 16개.",
     "DESC_JR_SECTIONS_ON": "아래 구간 안에 있을 때만 판정 제한을 적용합니다. 끄면 레벨 전체에 적용됩니다.",
-    "DL_DEATHS_MAX": "최대 죽음 수",
-    "DL_DEATHS_ON": "죽음 제한 (Miss + Overload)",
-    "DL_MESSAGE": "제한 도달 메시지",
-    "DL_MISSES_MAX": "최대 미스",
-    "DL_MISSES_ON": "미스 제한",
-    "DL_OVERLOADS_MAX": "최대 과부하",
-    "DL_OVERLOADS_ON": "과부하 제한",
     "JRSEC_END": "끝 (%)",
     "JRSEC_REMOVE": "삭제",
     "JRSEC_START": "시작 (%)",
@@ -39,7 +31,6 @@
     "JR_SECTIONS": "구간",
     "JR_SECTIONS_ADD": "구간 추가",
     "JR_SECTIONS_ON": "특정 구간에서만 제한",
-    "SECTION_DEATH_LIMIT": "죽음 개수 제한",
     "SECTION_JUDGEMENT_RESTRICTION": "판정 제한"
   }
 }

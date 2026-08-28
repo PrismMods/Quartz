@@ -1,0 +1,14 @@
+{
+  "ko-KR": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "DESC_DL_MESSAGE": "플레이 제한 때문에 죽었을 시패했을 때 실패 화면에 표시됩니다.",
+    "DL_DEATHS_MAX": "최대 죽음 수",
+    "DL_DEATHS_ON": "죽음 제한 (Miss + Overload)",
+    "DL_MESSAGE": "제한 도달 메시지",
+    "DL_MISSES_MAX": "최대 미스",
+    "DL_MISSES_ON": "미스 제한",
+    "DL_OVERLOADS_MAX": "최대 과부하",
+    "DL_OVERLOADS_ON": "과부하 제한",
+    "SECTION_DEATH_LIMIT": "죽음 개수 제한"
+  }
+}

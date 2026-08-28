@@ -11,14 +11,8 @@ public static class Restriction {
     public static RestrictionSettings Conf => ConfMgr?.Data;
     public static void EnsureConf() => ConfMgr ??= SettingsFile<RestrictionSettings>.Loaded("Restriction.json");
     public static void Save() => ConfMgr?.RequestSave();
-    private static int missCount;
-    private static int overloadCount;
     private static bool failTriggered;
-    private static void ResetCounters() {
-        missCount = 0;
-        overloadCount = 0;
-        failTriggered = false;
-    }
+    private static void ResetCounters() => failTriggered = false;
     private static void TriggerFail(string reason) {
         try {
             scrController c = scrController.instance;
@@ -103,26 +97,9 @@ public static class Restriction {
     private static void AfterAddHit(HitMargin hit) {
         EnsureConf();
         if(!MainCore.IsModEnabled || hit == HitMargin.Auto) return;
-        bool jrOn = Conf.JRestrictEnabled;
-        bool dlOn = Conf.DeathLimitEnabled;
-        if(!jrOn && !dlOn) return;
-        if(hit == HitMargin.FailMiss) {
-            missCount++;
-        } else if(hit == HitMargin.FailOverload) {
-            overloadCount++;
-        }
-        if(jrOn && InRestrictedSection() && ShouldFailFor(hit)) {
+        if(!Conf.JRestrictEnabled) return;
+        if(InRestrictedSection() && ShouldFailFor(hit))
             TriggerFail(FormatJrMessage(Conf.JRestrictMessage, hit));
-            return;
-        }
-        if(dlOn) {
-            int deaths = missCount + overloadCount;
-            if((Conf.MaxDeathsOn && deaths > Conf.MaxDeaths)
-                || (Conf.MaxMissesOn && missCount > Conf.MaxMisses)
-                || (Conf.MaxOverloadsOn && overloadCount > Conf.MaxOverloads)) {
-                TriggerFail(Conf.DeathLimitMessage);
-            }
-        }
     }
     [HarmonyPatch]
     private static class AddHitPatch {

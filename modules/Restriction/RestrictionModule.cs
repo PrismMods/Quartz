@@ -16,15 +16,6 @@ public sealed class RestrictionModule : QuartzModule {
             Build = PageRestriction.JudgementPage,
             OwnScroll = true,
         });
-        Context.AddPage(new NavPage {
-            Key = "gameplay.death",
-            CategoryKey = "gameplay",
-            Order = 40,
-            Title = "Death Limit",
-            LocaleKey = "SECTION_DEATH_LIMIT",
-            Build = PageRestriction.DeathLimitPage,
-            OwnScroll = true,
-        });
         Context.RegisterImportHandler(new RestrictionImport());
         Context.PatchAll(typeof(RestrictionModule));
     }

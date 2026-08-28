@@ -1,0 +1,6 @@
+{
+  "schema": 1, "id": "deathlimit", "entry": "Quartz.Features.DeathLimit.DeathLimitModule",
+  "name": "Death Limit", "nameKey": "SECTION_DEATH_LIMIT", "group": "gameplay", "order": 40,
+  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
+  "deps": [], "settingsFiles": ["DeathLimit.json"], "langPrefixes": ["DL_"]
+}

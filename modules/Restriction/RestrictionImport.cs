@@ -35,13 +35,6 @@ public sealed class RestrictionImport : IImportHandler {
             count++;
         }
         Number("JRestrictAllowedMask", v => c.JRestrictAllowedMask = v);
-        Flag("DeathLimitOn", v => c.DeathLimitEnabled = v);
-        Flag("DeathLimitMaxDeathsOn", v => c.MaxDeathsOn = v);
-        Number("DeathLimitMaxDeaths", v => c.MaxDeaths = v);
-        Flag("DeathLimitMaxMissesOn", v => c.MaxMissesOn = v);
-        Number("DeathLimitMaxMisses", v => c.MaxMisses = v);
-        Flag("DeathLimitMaxOverloadsOn", v => c.MaxOverloadsOn = v);
-        Number("DeathLimitMaxOverloads", v => c.MaxOverloads = v);
         return count;
     }
     public void Refresh() {

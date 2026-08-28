@@ -1,0 +1,14 @@
+{
+  "en-US": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "DESC_DL_MESSAGE": "Shown on the fail screen when a limit kills the run.",
+    "DL_DEATHS_MAX": "Max Deaths",
+    "DL_DEATHS_ON": "Limit Deaths (Miss + Overload)",
+    "DL_MESSAGE": "Limit reached message",
+    "DL_MISSES_MAX": "Max Misses",
+    "DL_MISSES_ON": "Limit Misses",
+    "DL_OVERLOADS_MAX": "Max Overloads",
+    "DL_OVERLOADS_ON": "Limit Overloads",
+    "SECTION_DEATH_LIMIT": "Death Limit"
+  }
+}

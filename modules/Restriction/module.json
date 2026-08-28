@@ -1,6 +1,6 @@
 {
   "schema": 1, "id": "restriction", "entry": "Quartz.Features.Restriction.RestrictionModule",
-  "name": "Restrictions", "nameKey": "SECTION_JUDGEMENT_RESTRICTION", "group": "gameplay", "order": 30,
+  "name": "Judgement Restriction", "nameKey": "SECTION_JUDGEMENT_RESTRICTION", "group": "gameplay", "order": 30,
   "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
-  "deps": [], "settingsFiles": ["Restriction.json"], "langPrefixes": ["JR_", "DL_"]
+  "deps": [], "settingsFiles": ["Restriction.json"], "langPrefixes": ["JR_", "JRSEC_"]
 }
