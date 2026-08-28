@@ -3,12 +3,22 @@
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "SECTION_ACCURACY": "정확도 과다",
     "ACCURACY_ENABLE": "정확도 과다",
-    "ACCURACY_JEA_ENABLE": "JEA 정확도",
-    "ACCURACY_NEA_ENABLE": "NEA 정확도",
+    "HEADING_CURVE": "점수 곡선",
+    "ACCURACY_WINDOW": "퍼펙트 구간",
+    "ACCURACY_MAXDEV": "최대 오차",
+    "ACCURACY_CURVE": "곡선 지수",
+    "HEADING_COMBO": "콤보",
+    "ACCURACY_COMBOTHRESHOLD": "콤보 기준 점수",
+    "ACCURACY_EMPTYTOLERANCE": "헛치기 허용 횟수",
+    "HEADING_PENALTIES": "감점",
+    "ACCURACY_EMPTYPENALTY": "헛치기 감점",
+    "ACCURACY_MISSPENALTY": "미스 감점",
+    "ACCURACY_OVERLOADPENALTY": "오버로드 감점",
+    "HEADING_DISPLAY": "표시",
     "ACCURACY_HITTEXT": "히트 텍스트에 점수 표시",
     "ACCURACY_DEATHMARKERS": "사망 마커 표시",
     "ACCURACY_DEATHMARKERS_CLEAR": "사망 마커 지우기",
-    "ACCURACY_EXPORT": "마지막 플레이 내보내기 (JSON)",
-    "HEADING_LAST_RUN": "마지막 플레이"
+    "HEADING_LAST_RUN": "마지막 플레이",
+    "ACCURACY_EXPORT": "마지막 플레이 내보내기 (JSON)"
   }
 }

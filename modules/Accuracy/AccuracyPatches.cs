@@ -7,11 +7,8 @@ using Quartz.Game.Stats;
 using UnityEngine;
 namespace Quartz.Features.Accuracy;
 internal static class AccuracyPatches {
-    private static double pendingDeviationDeg;
     private static double pendingDeviationMs;
-    private static double pendingEffectiveRate;
-    private static double pendingJeaScore;
-    private static long pendingNeaScore;
+    private static double pendingScore;
     private static bool pendingValid;
     private static readonly Type TrackerType = Refl.Type("scrMarginTracker") ?? Refl.Type("scrMistakesManager");
     private static MethodBase RevertTarget => Refl.Method(TrackerType, "RevertToLastCheckpoint", 0);
@@ -30,11 +27,8 @@ internal static class AccuracyPatches {
                 double rad = __instance.cachedAngle - __instance.targetExitAngle;
                 if(!__instance.planetarySystem.isCW) rad = -rad;
                 double effectiveRate = __instance.conductor.bpm * __instance.planetarySystem.speed * GameStats.Pitch;
-                pendingDeviationDeg = Math.Abs(rad) * 180.0 / Math.PI;
                 pendingDeviationMs = effectiveRate == 0 ? 0 : 60000.0 / Math.PI * rad / effectiveRate;
-                pendingEffectiveRate = effectiveRate;
-                pendingJeaScore = JeaScore.ScoreForNormalizedDeg(JeaScore.NormalizedDeg(pendingDeviationDeg, effectiveRate));
-                pendingNeaScore = NeaScore.TileScoreFromMs(Math.Abs(pendingDeviationMs));
+                pendingScore = TmaScore.ScoreForDeviation(Math.Abs(pendingDeviationMs));
                 pendingValid = true;
             } catch(Exception e) {
                 Diag.Ignore(e);
@@ -48,52 +42,39 @@ internal static class AccuracyPatches {
         private static void Postfix(object __instance, HitMargin hit) {
             if(!MainCore.IsModEnabled || !AccuracyOverlay.Conf.Enabled) return;
             bool midspin = IsMidspin();
-            double devDeg = pendingValid ? pendingDeviationDeg : 0;
             double signedDevMs = pendingValid ? pendingDeviationMs : 0;
-            double devMs = Math.Abs(signedDevMs);
-            double effectiveRate = pendingValid ? pendingEffectiveRate : 0;
             pendingValid = false;
-            double jeaScore;
-            long neaScore;
+            double score;
             if(midspin) {
-                JeaScore.AddNoop();
-                NeaScore.AddNoop();
-                jeaScore = 0;
-                neaScore = 0;
+                TmaScore.AddNoop();
+                score = 0;
             } else {
                 switch(hit) {
                     case HitMargin.Multipress:
                     case HitMargin.OverPress:
                     case HitMargin.TooEarly:
                     case HitMargin.TooLate:
-                        jeaScore = JeaScore.AddEmptyPress();
-                        neaScore = NeaScore.AddEmptyPress();
+                        score = TmaScore.AddEmptyPress();
                         break;
                     case HitMargin.FailMiss:
-                        jeaScore = JeaScore.AddFail();
-                        neaScore = NeaScore.AddFailMiss();
+                        score = TmaScore.AddMiss();
                         break;
                     case HitMargin.FailOverload:
-                        jeaScore = JeaScore.AddFail();
-                        neaScore = NeaScore.AddFailOverload();
+                        score = TmaScore.AddOverload();
                         break;
                     case HitMargin.Auto:
-                        JeaScore.AddNoop();
-                        NeaScore.AddNoop();
-                        jeaScore = 0;
-                        neaScore = 0;
+                        TmaScore.AddNoop();
+                        score = 0;
                         break;
                     default:
-                        jeaScore = JeaScore.AddTile(devDeg, effectiveRate);
-                        neaScore = NeaScore.AddTile(NeaScore.TileScoreFromMs(devMs));
+                        score = TmaScore.AddTile(Math.Abs(signedDevMs));
                         break;
                 }
             }
             int tile = scrController.instance != null ? scrController.instance.currentSeqID + 1 : 0;
             double timestamp = scrConductor.instance != null ? scrConductor.instance.songposition_minusi : 0;
             AccuracyRecorder.Capture(
-                tile, timestamp, signedDevMs, hit,
-                jeaScore, JeaScore.CachedAccuracy, neaScore, NeaScore.CachedAccuracy
+                tile, timestamp, signedDevMs, hit, score, TmaScore.CachedAccuracy, TmaScore.Combo
             );
         }
     }
@@ -104,8 +85,7 @@ internal static class AccuracyPatches {
             if(!MainCore.IsModEnabled) return;
             int count = GameApi.HitMarginTotal(__instance);
             if(count < 0) return;
-            JeaScore.RevertTo(count);
-            NeaScore.RevertTo(count);
+            TmaScore.RevertTo(count);
             AccuracyRecorder.RevertTo(count);
         }
     }
@@ -125,8 +105,7 @@ internal static class AccuracyPatches {
     }
     private static void ResetAll() {
         if(!MainCore.IsModEnabled) return;
-        JeaScore.Reset();
-        NeaScore.Reset();
+        TmaScore.Reset();
         AccuracyRecorder.Clear();
         pendingValid = false;
     }
@@ -136,16 +115,14 @@ internal static class AccuracyPatches {
             if(!MainCore.IsModEnabled || !AccuracyOverlay.Conf.Enabled || !AccuracyOverlay.Conf.ShowHitText) return;
             TMPro.TMP_Text label = GameApi.HitTextLabel(__instance);
             if(label == null) return;
-            (long jeaDisplay, long neaDisplay) = __instance.hitMargin switch {
-                HitMargin.FailMiss or HitMargin.FailOverload => (-100L, -100L),
+            long display = __instance.hitMargin switch {
+                HitMargin.FailMiss => (long)AccuracyOverlay.Conf.MissPenalty,
+                HitMargin.FailOverload => (long)AccuracyOverlay.Conf.OverloadPenalty,
                 HitMargin.Multipress or HitMargin.OverPress or HitMargin.TooEarly or HitMargin.TooLate
-                    => (-100L, -50L),
-                _ => ((long)Math.Floor(pendingJeaScore), pendingNeaScore),
+                    => (long)AccuracyOverlay.Conf.EmptyPressPenalty,
+                _ => (long)Math.Floor(pendingScore),
             };
-            string suffix = "";
-            if(AccuracyOverlay.Conf.JeaEnabled) suffix += $" J{jeaDisplay}";
-            if(AccuracyOverlay.Conf.NeaEnabled) suffix += $" N{neaDisplay}";
-            if(suffix.Length > 0) label.text += suffix;
+            label.text += $" {display}";
         }
     }
     [HarmonyPatch(typeof(scrController), nameof(scrController.FailAction))]

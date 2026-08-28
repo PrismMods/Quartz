@@ -6,16 +6,15 @@ public static class AccuracyRecorder {
     public static void Clear() => records.Clear();
     public static void Capture(
         int tile, double timestamp, double deviationMs, HitMargin margin,
-        double jeaScore, long jeaAccuracy, long neaScore, long neaAccuracy
+        double score, long accuracy, int combo
     ) => records.Add(new AccuracyRecord {
         Tile = tile,
         Timestamp = timestamp,
         DeviationMs = deviationMs,
         Margin = margin,
-        JeaScore = jeaScore,
-        JeaAccuracy = jeaAccuracy,
-        NeaScore = neaScore,
-        NeaAccuracy = neaAccuracy,
+        Score = score,
+        Accuracy = accuracy,
+        Combo = combo,
     });
     public static void RevertTo(int hitCount) {
         if(hitCount < 0) hitCount = 0;

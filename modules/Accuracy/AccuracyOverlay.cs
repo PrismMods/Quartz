@@ -10,12 +10,12 @@ internal static class AccuracyOverlay {
     private static string FormatAcc(long acc) => (acc / 10000m).ToString("0.0000", CultureInfo.InvariantCulture) + "%";
     public static void RegisterStats() {
         StatRegistry.Register(new StatSource {
-            Id = "accuracy_jea", Category = "Accuracy", Label = "JEA Accuracy",
-            Value = () => Conf.Enabled && Conf.JeaEnabled ? FormatAcc(JeaScore.CachedAccuracy) : null,
+            Id = "accuracy_tma", Category = "Accuracy", Label = "TMA Accuracy",
+            Value = () => Conf.Enabled ? FormatAcc(TmaScore.CachedAccuracy) : null,
         });
         StatRegistry.Register(new StatSource {
-            Id = "accuracy_nea", Category = "Accuracy", Label = "NEA Accuracy",
-            Value = () => Conf.Enabled && Conf.NeaEnabled ? FormatAcc(NeaScore.CachedAccuracy) : null,
+            Id = "accuracy_tma_combo", Category = "Accuracy", Label = "TMA Combo",
+            Value = () => Conf.Enabled ? TmaScore.Combo.ToString(CultureInfo.InvariantCulture) : null,
         });
     }
 }

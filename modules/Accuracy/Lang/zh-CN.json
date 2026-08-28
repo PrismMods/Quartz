@@ -3,12 +3,22 @@
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "SECTION_ACCURACY": "过多精准度",
     "ACCURACY_ENABLE": "过多精准度",
-    "ACCURACY_JEA_ENABLE": "JEA 精准度",
-    "ACCURACY_NEA_ENABLE": "NEA 精准度",
+    "HEADING_CURVE": "评分曲线",
+    "ACCURACY_WINDOW": "完美区间",
+    "ACCURACY_MAXDEV": "最大偏差",
+    "ACCURACY_CURVE": "曲线指数",
+    "HEADING_COMBO": "连击",
+    "ACCURACY_COMBOTHRESHOLD": "连击分数阈值",
+    "ACCURACY_EMPTYTOLERANCE": "空敲容错次数",
+    "HEADING_PENALTIES": "扣分",
+    "ACCURACY_EMPTYPENALTY": "空敲扣分",
+    "ACCURACY_MISSPENALTY": "失误扣分",
+    "ACCURACY_OVERLOADPENALTY": "超载扣分",
+    "HEADING_DISPLAY": "显示",
     "ACCURACY_HITTEXT": "在判定文字中显示分数",
     "ACCURACY_DEATHMARKERS": "显示死亡标记",
     "ACCURACY_DEATHMARKERS_CLEAR": "清除死亡标记",
-    "ACCURACY_EXPORT": "导出本次游玩记录 (JSON)",
-    "HEADING_LAST_RUN": "本次游玩"
+    "HEADING_LAST_RUN": "本次游玩",
+    "ACCURACY_EXPORT": "导出本次游玩记录 (JSON)"
   }
 }

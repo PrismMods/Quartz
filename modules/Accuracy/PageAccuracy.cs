@@ -17,18 +17,34 @@ internal static class PageAccuracy {
             conf.Enabled,
             "Too Much Accuracy", "accuracy_enable", def.Enabled
         );
-        GenerateUI.ToggleTip(
-            sec.Body, def.JeaEnabled, conf.JeaEnabled,
-            v => { conf.JeaEnabled = v; Save(); },
-            "JEA Accuracy", "accuracy_jea_enable",
-            "Angular banded scoring (Just Enough Accuracy), normalized to a reference BPM."
-        );
-        GenerateUI.ToggleTip(
-            sec.Body, def.NeaEnabled, conf.NeaEnabled,
-            v => { conf.NeaEnabled = v; Save(); },
-            "NEA Accuracy", "accuracy_nea_enable",
-            "Millisecond-deviation scoring (Not Enough Accuracy)."
-        );
+        GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(sec.Body)), "HEADING_CURVE", "Scoring Curve");
+        GenerateUI.SnapSlider(sec.Body, "Perfect Window", "accuracy_window",
+            (float)def.WindowMs, 0f, 30f, (float)conf.WindowMs, "0.0 ms", 0.1f,
+            v => conf.WindowMs = v, null, Save);
+        GenerateUI.SnapSlider(sec.Body, "Max Deviation", "accuracy_maxdev",
+            (float)def.MaxDeviationMs, 10f, 200f, (float)conf.MaxDeviationMs, "0 ms", 1f,
+            v => conf.MaxDeviationMs = v, null, Save);
+        GenerateUI.SnapSlider(sec.Body, "Curve Exponent", "accuracy_curve",
+            (float)def.CurveExponent, 0.5f, 4f, (float)conf.CurveExponent, "0.00", 0.05f,
+            v => conf.CurveExponent = v, null, Save);
+        GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(sec.Body)), "HEADING_COMBO", "Combo");
+        GenerateUI.SnapSlider(sec.Body, "Combo Threshold", "accuracy_combothreshold",
+            def.ComboThreshold, 0f, 100f, conf.ComboThreshold, "0", 1f,
+            v => conf.ComboThreshold = Mathf.RoundToInt(v), null, Save);
+        GenerateUI.SnapSlider(sec.Body, "Empty Press Tolerance", "accuracy_emptytolerance",
+            def.EmptyPressTolerance, 0f, 30f, conf.EmptyPressTolerance, "0", 1f,
+            v => conf.EmptyPressTolerance = Mathf.RoundToInt(v), null, Save);
+        GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(sec.Body)), "HEADING_PENALTIES", "Penalties");
+        GenerateUI.SnapSlider(sec.Body, "Empty Press Penalty", "accuracy_emptypenalty",
+            (float)def.EmptyPressPenalty, -100f, 0f, (float)conf.EmptyPressPenalty, "0", 1f,
+            v => conf.EmptyPressPenalty = v, null, Save);
+        GenerateUI.SnapSlider(sec.Body, "Miss Penalty", "accuracy_misspenalty",
+            (float)def.MissPenalty, -200f, 0f, (float)conf.MissPenalty, "0", 1f,
+            v => conf.MissPenalty = v, null, Save);
+        GenerateUI.SnapSlider(sec.Body, "Overload Penalty", "accuracy_overloadpenalty",
+            (float)def.OverloadPenalty, -200f, 0f, (float)conf.OverloadPenalty, "0", 1f,
+            v => conf.OverloadPenalty = v, null, Save);
+        GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(sec.Body)), "HEADING_DISPLAY", "Display");
         GenerateUI.Toggle(
             GenerateUI.Row(sec.Body), def.ShowHitText, conf.ShowHitText,
             v => { conf.ShowHitText = v; Save(); },
@@ -49,11 +65,10 @@ internal static class PageAccuracy {
         TextMeshProUGUI summary = GenerateUI.AddText(GenerateUI.Row(sec.Body, 60f), true);
         summary.text = string.Format(
             CultureInfo.InvariantCulture,
-            "JEA {0:0.0000}% ({1} tiles)  |  NEA {2:0.0000}% ({3} tiles)",
-            Quartz.Features.Accuracy.JeaScore.CachedAccuracy / 10000.0,
-            Quartz.Features.Accuracy.JeaScore.Tiles,
-            Quartz.Features.Accuracy.NeaScore.CachedAccuracy / 10000.0,
-            Quartz.Features.Accuracy.NeaScore.Tiles
+            "TMA {0:0.0000}%  ({1} tiles, max combo {2})",
+            Quartz.Features.Accuracy.TmaScore.CachedAccuracy / 10000.0,
+            Quartz.Features.Accuracy.TmaScore.Tiles,
+            Quartz.Features.Accuracy.TmaScore.MaxCombo
         );
         TextMeshProUGUI exportStatus = GenerateUI.AddMutedText(GenerateUI.Row(sec.Body, 34f));
         GenerateUI.Button(
@@ -74,8 +89,8 @@ internal static class PageAccuracy {
             row.fontSize = 17f;
             row.text = string.Format(
                 CultureInfo.InvariantCulture,
-                "#{0}  {1}  {2:+0.0;-0.0}ms  J{3:0}  N{4}",
-                record.Tile, record.Margin, record.DeviationMs, record.JeaScore, record.NeaScore
+                "#{0}  {1}  {2:+0.0;-0.0}ms  score {3:0}  combo {4}",
+                record.Tile, record.Margin, record.DeviationMs, record.Score, record.Combo
             );
         }
     }

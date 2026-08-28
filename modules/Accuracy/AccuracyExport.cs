@@ -12,19 +12,16 @@ internal static class AccuracyExport {
                 ["timestamp"] = record.Timestamp,
                 ["deviationMs"] = record.DeviationMs,
                 ["margin"] = record.Margin.ToString(),
-                ["jeaScore"] = record.JeaScore,
-                ["jeaAccuracy"] = record.JeaAccuracy / 10000.0,
-                ["neaScore"] = record.NeaScore,
-                ["neaAccuracy"] = record.NeaAccuracy / 10000.0,
+                ["score"] = record.Score,
+                ["accuracy"] = record.Accuracy / 10000.0,
+                ["combo"] = record.Combo,
             });
         }
         JObject root = new() {
-            ["jeaAccuracy"] = JeaScore.CachedAccuracy / 10000.0,
-            ["jeaTiles"] = JeaScore.Tiles,
-            ["jeaMaxCombo"] = JeaScore.MaxCombo,
-            ["neaAccuracy"] = NeaScore.CachedAccuracy / 10000.0,
-            ["neaTiles"] = NeaScore.Tiles,
-            ["tiles"] = tiles,
+            ["accuracy"] = TmaScore.CachedAccuracy / 10000.0,
+            ["tiles"] = TmaScore.Tiles,
+            ["maxCombo"] = TmaScore.MaxCombo,
+            ["records"] = tiles,
         };
         string dir = Path.Combine(MainCore.Paths.RootPath, "AccuracyExports");
         Directory.CreateDirectory(dir);

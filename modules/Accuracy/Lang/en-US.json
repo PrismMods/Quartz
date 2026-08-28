@@ -3,12 +3,22 @@
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "SECTION_ACCURACY": "Too Much Accuracy",
     "ACCURACY_ENABLE": "Too Much Accuracy",
-    "ACCURACY_JEA_ENABLE": "JEA Accuracy",
-    "ACCURACY_NEA_ENABLE": "NEA Accuracy",
+    "HEADING_CURVE": "Scoring Curve",
+    "ACCURACY_WINDOW": "Perfect Window",
+    "ACCURACY_MAXDEV": "Max Deviation",
+    "ACCURACY_CURVE": "Curve Exponent",
+    "HEADING_COMBO": "Combo",
+    "ACCURACY_COMBOTHRESHOLD": "Combo Threshold",
+    "ACCURACY_EMPTYTOLERANCE": "Empty Press Tolerance",
+    "HEADING_PENALTIES": "Penalties",
+    "ACCURACY_EMPTYPENALTY": "Empty Press Penalty",
+    "ACCURACY_MISSPENALTY": "Miss Penalty",
+    "ACCURACY_OVERLOADPENALTY": "Overload Penalty",
+    "HEADING_DISPLAY": "Display",
     "ACCURACY_HITTEXT": "Show Score In Hit Text",
     "ACCURACY_DEATHMARKERS": "Show Death Markers",
     "ACCURACY_DEATHMARKERS_CLEAR": "Clear Death Markers",
-    "ACCURACY_EXPORT": "Export Last Run (JSON)",
-    "HEADING_LAST_RUN": "Last Run"
+    "HEADING_LAST_RUN": "Last Run",
+    "ACCURACY_EXPORT": "Export Last Run (JSON)"
   }
 }

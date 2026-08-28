@@ -4,8 +4,7 @@ public sealed class AccuracyRecord {
     public double Timestamp;
     public double DeviationMs;
     public HitMargin Margin;
-    public double JeaScore;
-    public long JeaAccuracy;
-    public long NeaScore;
-    public long NeaAccuracy;
+    public double Score;
+    public long Accuracy;
+    public int Combo;
 }
