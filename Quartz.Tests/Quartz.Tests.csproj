@@ -107,6 +107,7 @@
 		<Compile Include="../modules/KeyViewer/Js/KvJsVNode.cs" Link="Source/KvJsVNode.cs" />
 		<Compile Include="../modules/KeyViewer/Layout/KvElement.cs" Link="Source/KvElement.cs" />
 		<Compile Include="../modules/KeyViewer/Layout/KvDocument.cs" Link="Source/KvDocument.cs" />
+		<Compile Include="../modules/KeyViewer/Layout/KvDocument.Images.cs" Link="Source/KvDocument.Images.cs" />
 		<Compile Include="../modules/KeyViewer/Layout/KvExportShaping.cs" Link="Source/KvExportShaping.cs" />
 		<Compile Include="../modules/KeyViewer/Layout/KvExportEmbedding.cs" Link="Source/KvExportEmbedding.cs" />
 		<Compile Include="../modules/KeyViewer/Layout/KvSnap.cs" Link="Source/KvSnap.cs" />
