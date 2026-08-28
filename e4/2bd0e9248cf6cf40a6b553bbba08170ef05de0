@@ -1,0 +1,23 @@
+modules/Discord/Api/ImageCache.cs
+  s_ec091734e2996a::t_6bf963397b560c 1-95
+modules/Discord/PageDiscord.cs
+  s_ec091734e2996a::t_333d12f3132ec9 58,73,313-379
+modules/Discord/Api/DiscordSession.cs
+  s_ec091734e2996a::t_333d12f3132ec9 369
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "e42bd0e9248cf6cf40a6b553bbba08170ef05de0",
+  "prompts": {},
+  "sessions": {
+    "s_ec091734e2996a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a1a5b486-b9e6-4b56-84d7-460e75f04d60",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
