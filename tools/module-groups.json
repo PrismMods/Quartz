@@ -5,6 +5,5 @@
   { "key": "tweaks",    "title": "Tweaks",    "titleKey": "TWEAKS",    "order": 40 },
   { "key": "editor",    "title": "Editor",    "titleKey": "EDITOR",    "order": 50 },
   { "key": "nostalgia", "title": "Nostalgia", "titleKey": "NOSTALGIA", "order": 60 },
-  { "key": "tuf",       "title": "TUF",       "titleKey": "TUF",       "order": 70 },
   { "key": "others",    "title": "Others",    "titleKey": "OTHERS",    "order": 75 }
 ]

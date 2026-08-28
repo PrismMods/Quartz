@@ -44,11 +44,12 @@ internal static class CorePages {
         Category("editor", "Editor", "EDITOR", UISprite.Wrench128, 50, togglable: true);
         // Pages come from the nostalgia module; the category hides itself when it is not installed.
         Category("nostalgia", "Nostalgia", "NOSTALGIA", UISprite.ClockRewind128, 60, togglable: true);
-        Category("tuf", "TUF", "TUF", UISprite.TufLogo, 70, togglable: true);
         Category("others", "Others", "OTHERS", UISprite.Grid128, 75, togglable: true);
-        Category("discord", "Discord", "DISCORD", UISprite.Text128, 76,
+        Category("tuf", "TUF", "TUF", UISprite.TufLogo, 76,
             visible: static () => CoreNav && Quartz.Modules.ModuleCategories.IsEnabled("others"));
-        Category("minecraft", "Minecraft", "MINECRAFT", UISprite.Grid128, 77,
+        Category("discord", "Discord", "DISCORD", UISprite.Text128, 77,
+            visible: static () => CoreNav && Quartz.Modules.ModuleCategories.IsEnabled("others"));
+        Category("minecraft", "Minecraft", "MINECRAFT", UISprite.Grid128, 78,
             visible: static () => CoreNav && Quartz.Modules.ModuleCategories.IsEnabled("others"));
         Category("search", "Search", "SEARCH", UISprite.MagnifyingGlass128, 80, visible: static () => CoreNav);
         Category("profiles", "Profiles", "PROFILES", UISprite.Users128, 90, visible: static () => CoreNav);
