@@ -1,6 +1,7 @@
 using Newtonsoft.Json.Linq;
 using Quartz.Core;
 using Quartz.Localization;
+using Quartz.Modules;
 using Quartz.Resource;
 namespace Quartz.IO;
 public static partial class ProfileManager {
@@ -172,6 +173,17 @@ public static partial class ProfileManager {
         }
     }
     private static string ConfigFileName => Path.GetFileName(MainCore.Paths.ConfigPath);
+    // A bundle carries a module's settings file whether or not that module is installed
+    // here, so an imported profile would otherwise come up missing the very features it
+    // was built around. The migration table already knows which file means which module.
+    private static void InstallModulesFor(JObject files) {
+        try {
+            ModuleMigration.Plan plan = ModuleMigration.Decide(fileName => files[fileName] as JObject);
+            ImportAutoInstall.Ensure(plan.Install);
+        } catch(Exception e) {
+            MainCore.Log.Wrn($"[{nameof(ProfileManager)}] could not install the imported profile's modules: {e.Message}");
+        }
+    }
     public static string Import(string srcPath, bool asPreset = false) {
         try {
             JToken bundle = JToken.Parse(File.ReadAllText(srcPath));
@@ -186,6 +198,7 @@ public static partial class ProfileManager {
                 DirOf(name),
                 ProfileBundle.ReadFiles(files, excluded, asPreset, ConfigFileName, presetImposed)
             );
+            InstallModulesFor(files);
             return name;
         } catch(Exception e) {
             MainCore.Log.Err($"[{nameof(ProfileManager)}] Import '{srcPath}' failed: {e}");

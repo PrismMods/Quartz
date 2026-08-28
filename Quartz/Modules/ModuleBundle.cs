@@ -100,15 +100,20 @@ public static class ModuleBundle {
         if(done.Count == 0) return;
         MainCore.Log.Msg($"[Modules] refreshed from the bundle: {string.Join(", ", done)}");
     }
-    public static void Install(string id) {
+    public static void Install(string id) => Install([id]);
+    public static void Install(IReadOnlyList<string> ids) {
+        if(ids == null) return;
         List<string> installed = [];
-        foreach(string needed in WithDeps(id)) {
-            if(ModuleService.Find(needed) is { Loaded: true }) continue;
-            if(!Copy(needed)) continue;
-            ModuleState.Entry entry = ModuleService.State.For(needed);
-            entry.Enabled = true;
-            entry.Source = "bundled";
-            installed.Add(needed);
+        foreach(string id in ids) {
+            foreach(string needed in WithDeps(id)) {
+                if(installed.Contains(needed)) continue;
+                if(ModuleService.Find(needed) is { Loaded: true }) continue;
+                if(!Copy(needed)) continue;
+                ModuleState.Entry entry = ModuleService.State.For(needed);
+                entry.Enabled = true;
+                entry.Source = "bundled";
+                installed.Add(needed);
+            }
         }
         if(installed.Count == 0) return;
         ModuleService.State.Save();

@@ -222,6 +222,7 @@
     "IMPORT_FAIL": "가져오기 실패: {0}",
     "IMPORT_HEADER": "다른 모드에서 가져오기",
     "IMPORT_HINT": "다른 ADOFAI 모드의 설정을 가져옵니다. Quartz가 Unity Mod Manager로 로드된 지원 모드를 읽어 옮길 수 있는 설정을 복사합니다. 나머지 설정은 그대로 유지됩니다.",
+    "IMPORT_INSTALLING": "이 설정에 필요한 기능을 설치하는 중…",
     "IMPORT_KV_MODE": "키뷰어 가져오기",
     "IMPORT_MODE_KEEP_OLD": "기존 유지",
     "IMPORT_MODE_REPLACE_ALL": "전체 교체",

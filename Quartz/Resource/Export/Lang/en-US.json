@@ -222,6 +222,7 @@
     "IMPORT_FAIL": "Import failed: {0}",
     "IMPORT_HEADER": "Import from other mods",
     "IMPORT_HINT": "Pull your settings in from another ADOFAI mod. Quartz reads each supported mod loaded through Unity Mod Manager and copies over what it has a home for. Your other settings are left untouched.",
+    "IMPORT_INSTALLING": "Installing the features these settings need…",
     "IMPORT_KV_MODE": "KeyViewer import",
     "IMPORT_MODE_KEEP_OLD": "Keep old",
     "IMPORT_MODE_REPLACE_ALL": "Replace all",

@@ -322,7 +322,7 @@ internal static class PageModules {
         if(catalogIds.Count + bundledIds.Count > 0) {
             UIButton install = GenerateUI.Button(row, () => {
                 if(ModuleInstallService.Busy) return;
-                foreach(string moduleId in bundledIds) ModuleBundle.Install(moduleId);
+                ModuleBundle.Install(bundledIds);
                 ModuleInstallService.InstallAll(catalogIds);
             }, "Install All", "modules_install_tab");
             GenerateUI.FixWidth(install, 170f);

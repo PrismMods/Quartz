@@ -220,6 +220,7 @@
     "IMPORT_FAIL": "导入失败：{0}",
     "IMPORT_HEADER": "从其他模组导入",
     "IMPORT_HINT": "读取其他ADOFAI模组配置迁移至Quartz；模组需通过Unity Mod Manager加载，仅迁移支持的对应设置，原模组配置不会被修改。",
+    "IMPORT_INSTALLING": "正在安装这些设置所需的功能…",
     "IMPORT_KV_MODE": "按键显示器导入模式",
     "IMPORT_MODE_KEEP_OLD": "保留现有设置",
     "IMPORT_MODE_REPLACE_ALL": "全部覆盖",

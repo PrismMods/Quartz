@@ -191,6 +191,15 @@ public static class SettingsImporter {
             or SettingsImportSource.KorenResourcePackV1;
     public static SettingsImportKeyViewerPart GetSupportedKeyViewerParts(SettingsImportSource source) =>
         HasKeyViewerPayload(source) ? SettingsImportKeyViewerPart.All : SettingsImportKeyViewerPart.None;
+    public static string KindOf(SettingsImportSource source) => source switch {
+        SettingsImportSource.KeyboardChatterBlocker => Quartz.Interop.ImportSourceKind.KeyboardChatterBlocker,
+        SettingsImportSource.JipperKeyViewer => Quartz.Interop.ImportSourceKind.JipperKeyViewer,
+        SettingsImportSource.JipperResourcePack => Quartz.Interop.ImportSourceKind.JipperResourcePack,
+        SettingsImportSource.AdofaiTweaks => Quartz.Interop.ImportSourceKind.AdofaiTweaks,
+        SettingsImportSource.EnhancedEffectRemover => Quartz.Interop.ImportSourceKind.EnhancedEffectRemover,
+        SettingsImportSource.KorenResourcePackV1 => Quartz.Interop.ImportSourceKind.KorenResourcePackV1,
+        _ => null,
+    };
     public static SettingsImportResult Import(SettingsImportOption option) =>
         Import(option, SettingsImportReplaceMode.ReplaceAll, SettingsImportKeyViewerPart.All);
     public static SettingsImportResult ImportToProfile(

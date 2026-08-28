@@ -166,6 +166,14 @@ internal static class PageImport {
         _ => GenerateUI.Tr("IMPORT_MODE_KEEP_OLD", "Keep old"),
     };
     private static void RunImport(SettingsImportOption option, bool separateProfile) {
+        if(option != null && Quartz.Modules.ImportAutoInstall.EnsureForKind(SettingsImporter.KindOf(option.Source))) {
+            statusText.text = GenerateUI.Tr("IMPORT_INSTALLING", "Installing the features these settings need…");
+            Quartz.Async.MainThread.Enqueue(() => RunImportNow(option, separateProfile));
+            return;
+        }
+        RunImportNow(option, separateProfile);
+    }
+    private static void RunImportNow(SettingsImportOption option, bool separateProfile) {
         SettingsImportReplaceMode mode = modes.TryGetValue(option.OptionId, out var m) ? m : SettingsImportReplaceMode.ReplaceAll;
         SettingsImportKeyViewerPart p = parts.TryGetValue(option.OptionId, out var pp) ? pp : SettingsImportKeyViewerPart.All;
         SettingsImportResult result = separateProfile
