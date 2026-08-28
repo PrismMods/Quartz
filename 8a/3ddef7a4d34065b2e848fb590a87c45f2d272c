@@ -1,0 +1,116 @@
+modules/KeyViewer/KeyViewerOverlay.Lifecycle.cs
+  s_77b91be417df49::t_90dbac4b37bb37 38-43,45,54,56,64-67,132-133,145-151,154-157,281,285-287,289-290
+modules/KeyViewer/KeyViewerOverlay.DmNoteLayout.cs
+  s_77b91be417df49::t_de42427d6b6712 13,17,54
+modules/KeyViewer/KeyViewerOverlay.Boxes.cs
+  s_77b91be417df49::t_1a7ca63b4c21d1 11,25-33,35-38,42,46-49,53-54,58,64
+  s_77b91be417df49::t_d50ad953f27165 15-21
+modules/KeyViewer/KeyViewerOverlay.LayoutSpecs.cs
+  s_77b91be417df49::t_b741ff0557b228 5,9-12,57-64
+  s_77b91be417df49::t_a9822819924f69 65
+modules/KeyViewer/KeyViewerOverlay.cs
+  s_77b91be417df49::t_65162643463000 37,41-43,49,88
+  s_77b91be417df49::t_de42427d6b6712 47,50-51
+Quartz/Resource/Export/Lang/en-US.json
+  s_77b91be417df49::t_0ea26951404038 84-86
+  s_c86710675ed3db::t_73db3649bf6104 83
+  s_77b91be417df49::t_19ca08d96ba0d7 80-82
+  s_756728804d933d::t_c4d82cf98fcdb0 87,90
+modules/KeyViewer/Layout/KvStore.Transfer.cs
+  s_77b91be417df49::t_ab62d45673247c 26-28,52
+modules/KeyViewer/KeyViewerSettings.Serialization.cs
+  s_77b91be417df49::t_ab62d45673247c 42-45,168-170
+  s_77b91be417df49::t_d8c38567cb9829 171
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_77b91be417df49::t_0ea26951404038 84-86
+  s_c86710675ed3db::t_73db3649bf6104 83
+  s_77b91be417df49::t_19ca08d96ba0d7 81-82
+  s_756728804d933d::t_43f1573a4918f2 87
+Quartz/Resource/Export/Lang/zh-CN.json
+  s_77b91be417df49::t_0ea26951404038 82-84
+  s_77b91be417df49::t_19ca08d96ba0d7 79-80
+  s_c86710675ed3db::t_73db3649bf6104 81
+  s_c86710675ed3db::t_eac804c30d0fd1 85
+modules/KeyViewer/KeyViewerOverlay.Rain.cs
+  s_77b91be417df49::t_f9450e4ea297cf 7-9,40
+modules/KeyViewer/PageKeyViewer.EditorTabs.cs
+  s_77b91be417df49::t_8e5bc4d2054a85 14,16-18,20-22,27-34,39-40,46-54,57,66,72,77-98,103,118,120
+modules/KeyViewer/KeyViewerOverlay.Input.cs
+  s_77b91be417df49::t_f9450e4ea297cf 149
+modules/KeyViewer/KeyViewerOverlay.DmNote.cs
+  s_77b91be417df49::t_742a49dc586a5d 19,28-31
+  s_77b91be417df49::t_f9450e4ea297cf 100,128
+  s_77b91be417df49::t_de42427d6b6712 16,18
+  s_77b91be417df49::t_3a73ac04db55ee 10-15,17,20-27,34-38,40,47-52,60-63
+  s_77b91be417df49::t_45c41ad8f48a55 32-33
+modules/KeyViewer/Editor/KvTabStrip.cs
+  s_77b91be417df49::t_76c6a9064c6532 81,84
+  s_77b91be417df49::t_47cecec3a7cf8d 27,29,66-80,82-83,87-88,96-97,104,120,130-131,136
+  s_77b91be417df49::t_7f97425220f6ef 21,64
+  s_77b91be417df49::t_95beefc2a806ba 65
+modules/KeyViewer/KeyViewerSettings.cs
+  s_77b91be417df49::t_ab62d45673247c 40-42
+  s_77b91be417df49::t_3d7920017f960f 43
+modules/KeyViewer/PageKeyViewer.Tuning.cs
+  s_77b91be417df49::t_12b892935739b9 169-177,219-221
+Quartz.Tests/Features/KeyViewer/KvDocumentTests.cs
+  s_77b91be417df49::t_4e80c6a6f1ed12 275,277-301
+Quartz.Tests/Program.cs
+  s_77b91be417df49::t_2c8581caa9121b 73
+modules/KeyViewer/Editor/KvCanvas.cs
+  s_77b91be417df49::t_40f2c656b696b9 25,36,119-126,130-134,139-148,162-169,266
+modules/KeyViewer/Editor/KvCanvasDrag.cs
+  s_77b91be417df49::t_6f39e2f029ac6e 29
+modules/KeyViewer/Editor/KvCanvasView.cs
+  s_77b91be417df49::t_1bb6b1beefbdf9 54,59,75
+modules/KeyViewer/KeyViewerOverlay.CssBuild.cs
+  s_77b91be417df49::t_a5b1504c0db256 122
+modules/KeyViewer/KeyViewerOverlay.Graph.cs
+  s_77b91be417df49::t_e1a79d5db57381 10
+modules/KeyViewer/KeyViewerOverlay.Update.cs
+  s_77b91be417df49::t_3a1a769c423286 106-111,115,117-119,130-134
+modules/KeyViewer/Layout/KvDocument.cs
+  s_77b91be417df49::t_fb355332cc90ec 9-10,31-32,36-65,120-122,125-126,135-141,205,227,289-310
+modules/KeyViewer/Layout/KvExportShaping.cs
+  s_77b91be417df49::t_c9e62e8c104a70 18,20,24,30-33,38-45
+modules/KeyViewer/Layout/KvMigration.cs
+  s_77b91be417df49::t_5703f32a051c80 45,59-65
+modules/KeyViewer/Layout/KvPresets.cs
+  s_77b91be417df49::t_ca7ced0d01e970 80-86,88-90
+modules/KeyViewer/PageKeyViewer.Editor.cs
+  s_77b91be417df49::t_5d4da59ed1ad34 26-29,32
+modules/KeyViewer/PageKeyViewer.EditorSettings.cs
+  s_77b91be417df49::t_af4e8783cd0a11 12-14,18,24-25,121
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "8a3ddef7a4d34065b2e848fb590a87c45f2d272c",
+  "prompts": {},
+  "sessions": {
+    "s_756728804d933d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cfa67c0d-2f43-4337-b29a-46fba4e18443",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_77b91be417df49": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "02a31ce0-28ca-422b-b342-fe0bf2c33275",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_c86710675ed3db": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a7afa5a8-e392-4dcb-b0f5-f903e39d0262",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
