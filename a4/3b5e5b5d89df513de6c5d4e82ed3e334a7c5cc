@@ -1,0 +1,36 @@
+modules/Countdown/CountdownFeature.cs
+  s_756728804d933d::t_81a66bc1b81b2e 11
+  s_756728804d933d::t_18ae4931dccf79 12-13
+modules/Countdown/Lang/ko-KR.json
+  s_756728804d933d::t_20de5d579fb38d 8
+modules/Countdown/CountdownModule.cs
+  s_756728804d933d::t_8e02da83d84426 23
+modules/Countdown/Lang/zh-CN.json
+  s_756728804d933d::t_f90b03a5561465 8
+modules/Countdown/CountdownPatches.cs
+  s_756728804d933d::t_d760ff18434068 8,18-19
+  s_756728804d933d::t_9f5ab7d7230119 12,35,43
+modules/Countdown/Lang/en-US.json
+  s_756728804d933d::t_ea0fe89700973a 8
+modules/Countdown/PageCountdown.cs
+  s_756728804d933d::t_9f5ab7d7230119 20
+  s_756728804d933d::t_ba7428e0d03d44 26,32,46,55
+modules/Countdown/CountdownHaywire.cs
+  s_756728804d933d::t_9f5ab7d7230119 52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "a43b5e5b5d89df513de6c5d4e82ed3e334a7c5cc",
+  "prompts": {},
+  "sessions": {
+    "s_756728804d933d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cfa67c0d-2f43-4337-b29a-46fba4e18443",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
