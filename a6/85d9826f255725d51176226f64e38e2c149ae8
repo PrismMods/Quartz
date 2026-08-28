@@ -1,0 +1,51 @@
+Quartz/Features/Interop/SettingsImporter.cs
+  s_bfe789d4502017::t_91119e9121fbfe 194-202
+Quartz/IO/ProfileManager.cs
+  s_bfe789d4502017::t_8b1e7c7ebaeef3 4,176-186,201
+Quartz/Modules/ImportAutoInstall.cs
+  s_bfe789d4502017::t_68d15441abce09 1-36
+Quartz/Modules/ModuleBundle.cs
+  s_bfe789d4502017::t_4bbff2825c94d0 103-105,107-116
+Quartz/Resource/Export/Lang/en-US.json
+  s_756728804d933d::t_f01240b2adc30d 225
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_756728804d933d::t_6ac6ad56eb7692 225
+Quartz/Resource/Export/Lang/zh-CN.json
+  s_c86710675ed3db::t_06d06735674907 223
+Quartz/UI/Factory/Page/PageImport.cs
+  s_bfe789d4502017::t_5211c8c1bd02c3 169-176
+Quartz/UI/Factory/Page/PageModules.cs
+  s_bfe789d4502017::t_63709353eb5166 325
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "a685d9826f255725d51176226f64e38e2c149ae8",
+  "prompts": {},
+  "sessions": {
+    "s_756728804d933d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cfa67c0d-2f43-4337-b29a-46fba4e18443",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_bfe789d4502017": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5a9ba5ae-09b3-4149-b6d1-962376525aa8",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_c86710675ed3db": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a7afa5a8-e392-4dcb-b0f5-f903e39d0262",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
