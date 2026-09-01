@@ -52,7 +52,7 @@ public static partial class KeyViewerOverlay {
     private static float dmCanvasHeight = 250f;
     private static float dmCanvasWidth = 800f;
     private static float dmTrackHeight = 200f;
-    private static float dmNoteSpeed = 1000f;
+    private static float dmNoteSpeed = 450f;
     private static bool dmNoteReverse;
     private static float dmFadePx = 60f;
     private static bool dmDelayedNoteEnabled;
