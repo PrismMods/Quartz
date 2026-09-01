@@ -12,7 +12,13 @@ internal static class CalibrationPopup {
             if(state == States.Fail2 && Calibration.Conf.ShowPopupOnDeath && !Calibration.InCalibrationScreen
                 && ADOBase.controller is { paused: false } && ADOBase.conductor is { isGameWorld: true }) {
                 float current = Calibration.GetOffsetMs();
-                CalibrationPopupUI.Show(current, current + CalibrationTiming.Average());
+                float suggested = current + CalibrationTiming.Average();
+                if(!CalibrationTiming.HasSamples
+                    || Calibration.FormatMs(current) == Calibration.FormatMs(suggested)) {
+                    CalibrationPopupUI.Hide();
+                    return;
+                }
+                CalibrationPopupUI.Show(current, suggested);
             } else {
                 CalibrationPopupUI.Hide();
             }
