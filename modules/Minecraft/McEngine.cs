@@ -169,26 +169,57 @@ public sealed class McEngine : IDisposable {
     }
     public int FrameLength => pixels?.Length ?? 0;
     public bool TryApplyFrame(Action<byte[]> upload) => pixels?.TryApply(upload) ?? false;
-    public void LoadUrl(string url) => Invoke(() => engine?.LoadUrl(url));
+    public void LoadUrl(string url) {
+        if(!running) return;
+        try { engine?.LoadUrl(url); } catch(Exception e) { Diag.Ignore(e); }
+    }
     public void Resize(int width, int height) {
         if(width <= 0 || height <= 0) return;
         Width = width;
         Height = height;
-        Invoke(() => engine?.Resize(new Resolution((uint)width, (uint)height)));
-    }
-    public void SendMouseMove(int x, int y) => Invoke(() => engine?.SendMouseMoveEvent(new MouseMoveEvent { MouseX = x, MouseY = y }));
-    public void SendMouseClick(int x, int y, int count, MouseClickType type, MouseEventType eventType)
-        => Invoke(() => engine?.SendMouseClickEvent(new MouseClickEvent {
-            MouseX = x, MouseY = y, MouseClickCount = count, MouseClickType = type, MouseEventType = eventType
-        }));
-    public void SendMouseScroll(int x, int y, int delta) => Invoke(() => engine?.SendMouseScrollEvent(new MouseScrollEvent { MouseX = x, MouseY = y, MouseScroll = delta }));
-    public void SendKeyboard(WindowsKey[] down, WindowsKey[] up, string chars)
-        => Invoke(() => engine?.SendKeyboardEvent(new KeyboardEvent { KeysDown = down, KeysUp = up, Chars = chars.ToCharArray() }));
-    public void AudioMute(bool mute) => Invoke(() => engine?.AudioMute(mute));
-    public void ExecuteJs(string js) => Invoke(() => engine?.ExecuteJs(js));
-    private void Invoke(Action action) {
         if(!running) return;
-        try { action(); } catch(Exception e) { Diag.Ignore(e); }
+        try { engine?.Resize(new Resolution((uint)width, (uint)height)); }
+        catch(Exception e) { Diag.Ignore(e); }
+    }
+    public void SendMouseMove(int x, int y) {
+        if(!running) return;
+        try { engine?.SendMouseMoveEvent(new MouseMoveEvent { MouseX = x, MouseY = y }); }
+        catch(Exception e) { Diag.Ignore(e); }
+    }
+    public void SendMouseClick(int x, int y, int count, MouseClickType type, MouseEventType eventType) {
+        if(!running) return;
+        try {
+            engine?.SendMouseClickEvent(new MouseClickEvent {
+                MouseX = x,
+                MouseY = y,
+                MouseClickCount = count,
+                MouseClickType = type,
+                MouseEventType = eventType
+            });
+        } catch(Exception e) { Diag.Ignore(e); }
+    }
+    public void SendMouseScroll(int x, int y, int delta) {
+        if(!running) return;
+        try { engine?.SendMouseScrollEvent(new MouseScrollEvent { MouseX = x, MouseY = y, MouseScroll = delta }); }
+        catch(Exception e) { Diag.Ignore(e); }
+    }
+    public void SendKeyboard(WindowsKey[] down, WindowsKey[] up, string chars) {
+        if(!running) return;
+        try {
+            engine?.SendKeyboardEvent(new KeyboardEvent {
+                KeysDown = down,
+                KeysUp = up,
+                Chars = chars.ToCharArray()
+            });
+        } catch(Exception e) { Diag.Ignore(e); }
+    }
+    public void AudioMute(bool mute) {
+        if(!running) return;
+        try { engine?.AudioMute(mute); } catch(Exception e) { Diag.Ignore(e); }
+    }
+    public void ExecuteJs(string js) {
+        if(!running) return;
+        try { engine?.ExecuteJs(js); } catch(Exception e) { Diag.Ignore(e); }
     }
     // Teardown costs about two seconds — joining the worker, the Shutdown round trip
     // and reaping CEF's process tree. OnDisable runs on Unity's main thread, so doing

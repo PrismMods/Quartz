@@ -36,14 +36,22 @@ internal sealed class McEngineProxy(Client client) : IEngineControls {
     private const string Prefix = "VoltstroStudios.UnityWebBrowser.Shared.Core.IEngineControls.";
     private readonly Client client = client;
     private readonly object gate = new();
+    private readonly object[] oneParameter = new object[1];
     // VoltRpc writes a request and reads its response over ONE socket, so it is not
     // thread safe. Quartz calls in from two threads — the pixel pump polling
     // GetPixels and Unity's main thread forwarding input — and interleaving them
     // desynchronises the stream, which surfaces as bogus "method does not exist" and
     // decode errors on whichever call reads someone else's reply. Every call funnels
     // through here, so the lock cannot be forgotten at a call site.
-    private object[] Call(string method, params object[] parameters) {
-        lock(gate) return client.InvokeMethod(Prefix + method, parameters) ?? [];
+    private object[] Call(string method) {
+        lock(gate) return client.InvokeMethod(Prefix + method, Array.Empty<object>()) ?? [];
+    }
+    private object[] Call<T>(string method, T parameter) {
+        lock(gate) {
+            oneParameter[0] = parameter!;
+            try { return client.InvokeMethod(Prefix + method, oneParameter) ?? []; }
+            finally { oneParameter[0] = null!; }
+        }
     }
     public PixelsEvent GetPixels() {
         object[] result = Call(nameof(GetPixels));

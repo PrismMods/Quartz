@@ -23,11 +23,13 @@ public sealed class McBrowserView : MonoBehaviour, IPointerEnterHandler, IPointe
     public float LookSensitivity { get; set; } = 12f;
     private int lastWidth;
     private int lastHeight;
+    private Action<byte[]>? uploadFrame;
     public string DataRoot { get; set; } = string.Empty;
     public int FrameRate { get; set; } = 60;
     private void Awake() {
         surface = GetComponent<RawImage>();
         rect = GetComponent<RectTransform>();
+        uploadFrame = UploadFrame;
     }
     // Pages are built once then toggled with SetActive, and closing the menu
     // deactivates the whole Quartz canvas, so OnDisable is the single signal for
@@ -125,13 +127,15 @@ public sealed class McBrowserView : MonoBehaviour, IPointerEnterHandler, IPointe
                 surface.uvRect = new Rect(0f, 1f, 1f, -1f);
             }
         }
-        Texture2D target = texture;
         try {
-            engine.TryApplyFrame(data => {
-                target.LoadRawTextureData(data);
-                target.Apply(false);
-            });
+            engine.TryApplyFrame(uploadFrame!);
         } catch(Exception e) { Diag.Ignore(e); }
+    }
+    private void UploadFrame(byte[] data) {
+        Texture2D? target = texture;
+        if(target == null) return;
+        target.LoadRawTextureData(data);
+        target.Apply(false);
     }
     // The page installs its own handlers as it boots, and Quartz has no LoadFinish
     // callback (the client-callback service is internal to UnityWebBrowser), so nudge
