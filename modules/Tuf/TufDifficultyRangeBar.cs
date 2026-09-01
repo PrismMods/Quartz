@@ -252,14 +252,16 @@ internal sealed class TufDifficultyRangeBar : MonoBehaviour, IPointerDownHandler
             wrapMode = TextureWrapMode.Clamp,
             filterMode = FilterMode.Bilinear
         };
+        Color32[] pixels = new Color32[width];
         float span = 1f / (stops.Length - 1);
         for(int x = 0; x < width; x++) {
             float t = (float)x / (width - 1);
             int index = Mathf.Min(Mathf.FloorToInt(t / span), stops.Length - 2);
             float local = (t - index * span) / span;
-            texture.SetPixel(x, 0, Color.Lerp(stops[index], stops[index + 1], local));
+            pixels[x] = Color.Lerp(stops[index], stops[index + 1], local);
         }
-        texture.Apply();
+        texture.SetPixels32(pixels);
+        texture.Apply(false, true);
         return texture;
     }
     private static RectTransform AddHandle(RectTransform parent, string name, Color color) {

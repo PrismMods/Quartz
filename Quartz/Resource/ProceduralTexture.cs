@@ -17,22 +17,24 @@ public static class ProceduralTexture {
             float outer = Mathf.Clamp01(radius - d + 0.5f);
             float inner = Mathf.Clamp01(radius - stroke - d + 0.5f);
             return outer - inner;
-        }, mip: false);
+        });
     }
     private static float CircleCoverage(float dx, float dy, float radius) {
         float d = Mathf.Sqrt((dx * dx) + (dy * dy));
         return Mathf.Clamp01(radius - d + 0.5f);
     }
-    private static Texture2D Generate(int size, CoverageFn coverage, bool mip = true) {
-        Texture2D tex = new(size, size, TextureFormat.RGBA32, mip, true);
+    private static Texture2D Generate(int size, CoverageFn coverage) {
+        Texture2D tex = new(size, size, TextureFormat.RGBA32, false, true);
+        Color32[] pixels = new Color32[size * size];
         for(int y = 0; y < size; y++) {
             for(int x = 0; x < size; x++) {
-                float a = Mathf.Clamp01(coverage(x, y));
-                tex.SetPixel(x, y, new Color(1f, 1f, 1f, a));
+                byte alpha = (byte)Mathf.RoundToInt(Mathf.Clamp01(coverage(x, y)) * byte.MaxValue);
+                pixels[(y * size) + x] = new Color32(byte.MaxValue, byte.MaxValue, byte.MaxValue, alpha);
             }
         }
-        tex.Apply(mip, true);
-        tex.filterMode = mip ? FilterMode.Trilinear : FilterMode.Bilinear;
+        tex.SetPixels32(pixels);
+        tex.Apply(false, true);
+        tex.filterMode = FilterMode.Bilinear;
         tex.wrapMode = TextureWrapMode.Clamp;
         return tex;
     }

@@ -131,19 +131,22 @@ public static class NativeCursor {
         float cos = Mathf.Cos(rad);
         float sin = Mathf.Sin(rad);
         Texture2D tex = new(size, size, TextureFormat.RGBA32, false);
-        Color clear = new(0f, 0f, 0f, 0f);
+        Color32[] pixels = new Color32[size * size];
+        Color32 black = new(0, 0, 0, byte.MaxValue);
+        Color32 white = new(byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue);
         for(int y = 0; y < size; y++) {
             for(int x = 0; x < size; x++) {
                 float px = x - c;
                 float py = y - c;
                 float u = (px * cos) + (py * sin);
                 float v = (-px * sin) + (py * cos);
-                Color col = clear;
-                if(IsArrow(u, v, 14f, 6f, 5f, 2.6f)) col = Color.black;
-                if(IsArrow(u, v, 13f, 5f, 4f, 1.5f)) col = Color.white;
-                tex.SetPixel(x, y, col);
+                Color32 col = default;
+                if(IsArrow(u, v, 14f, 6f, 5f, 2.6f)) col = black;
+                if(IsArrow(u, v, 13f, 5f, 4f, 1.5f)) col = white;
+                pixels[(y * size) + x] = col;
             }
         }
+        tex.SetPixels32(pixels);
         tex.Apply(false);
         tex.filterMode = FilterMode.Bilinear;
         texCache[angleDeg] = tex;
