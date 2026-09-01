@@ -102,10 +102,7 @@ internal static class HitSoundRenderer {
     private static GameObject poolRoot;
     private static readonly List<Voice> voices = new();
     internal static bool Active {
-        get {
-            Optimizer.EnsureConf();
-            return MainCore.IsModEnabled && Optimizer.Conf != null && Optimizer.Conf.RenderAllHitSounds;
-        }
+        get => Optimizer.RenderAllHitSoundsActive;
     }
     private static bool ReflectionReady =>
         HitSoundsDataField != null && NextHitSoundField != null &&

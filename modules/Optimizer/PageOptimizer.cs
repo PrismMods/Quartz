@@ -69,7 +69,7 @@ public static class PageOptimizer {
             optimizerSec.Body,
             optDef.FastBloom,
             opt.FastBloom,
-            v => { opt.FastBloom = v; Optimizer.Save(); },
+            v => { opt.FastBloom = v; Optimizer.Apply(); Optimizer.Save(); },
             "Fast Bloom",
             "opt_fastbloom",
             "Forces ADOFAI's bloom post-process to use its cheaper low-quality render path while bloom is active. This targets real GPU work and can improve FPS on bloom-heavy levels, with softer/less precise bloom."
@@ -78,7 +78,7 @@ public static class PageOptimizer {
             optimizerSec.Body,
             optDef.SkipNoOpScreenFilters,
             opt.SkipNoOpScreenFilters,
-            v => { opt.SkipNoOpScreenFilters = v; Optimizer.Save(); },
+            v => { opt.SkipNoOpScreenFilters = v; Optimizer.Apply(); Optimizer.Save(); },
             "Skip No-Op Screen Filters",
             "opt_skipnoopfilters",
             "Skips ADOFAI full-screen screen-tile/screen-scroll shader passes when their current values are visually identity, replacing the shader pass with a plain copy. This removes real render work without wrapping an existing game setting."

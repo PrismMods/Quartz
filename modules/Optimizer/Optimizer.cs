@@ -19,14 +19,18 @@ public static class Optimizer {
     private static bool gcDeferred;
     private static bool usingNoGcRegion;
     private static bool loggedGcStrategy;
+    private static bool optimizerActive;
+    private static bool smoothGcActive;
+    private static bool leakGuardActive;
+    private static bool collectOnLevelLoadActive;
+    private static bool fastBloomActive;
+    private static bool skipNoOpScreenFiltersActive;
+    private static bool cacheScreenScaleActive;
+    private static bool skipIdleParticlesActive;
+    private static bool pauseOffscreenParticlesActive;
+    private static bool renderAllHitSoundsActive;
     public static void EnsureConf() => ConfMgr ??= SettingsFile<OptimizerSettings>.Loaded("Optimizer.json");
     public static void Save() => ConfMgr?.RequestSave();
-    private static bool Active {
-        get {
-            EnsureConf();
-            return MainCore.IsModEnabled;
-        }
-    }
     public static void Initialize() {
         EnsureConf();
         CaptureDefaults();
@@ -50,59 +54,44 @@ public static class Optimizer {
         EnsureConf();
         CaptureDefaults();
         bool on = MainCore.IsModEnabled;
+        CacheRuntimeFlags(on);
         Application.runInBackground = on && Conf.RunInBackground
             ? true
             : defaultRunInBackground;
         SetPriority(on && Conf.BoostProcessPriority
             ? ProcessPriorityClass.AboveNormal
             : defaultPriority);
-        if(gcDeferred && !(on && Conf.SmoothGC && GameStats.InGame)) ResumeGC();
+        if(gcDeferred && !(smoothGcActive && GameStats.InGame)) ResumeGC();
         TMPTextShadow.UnderlayOffsetScale = Conf.ShadowUnderlayOffsetScale;
         TMPTextShadow.UseMaterialUnderlay = on && Conf.LightTextShadows;
-        if(!(on && Conf.RenderAllHitSounds)) HitSoundRenderer.StopAll("disabled");
+        if(!renderAllHitSoundsActive) HitSoundRenderer.StopAll("disabled");
         IridiumPatches.InvalidateScreenScale();
         IridiumPatches.ApplyParticleCulling();
     }
     public static void Restore() {
+        CacheRuntimeFlags(false);
         if(gcDeferred) ResumeGC();
         Application.runInBackground = defaultRunInBackground;
         SetPriority(defaultPriority);
     }
-    internal static bool LeakGuardActive {
-        get {
-            EnsureConf();
-            return MainCore.IsModEnabled && Conf != null && Conf.LeakGuard;
-        }
-    }
-    internal static bool FastBloomActive {
-        get {
-            EnsureConf();
-            return MainCore.IsModEnabled && Conf != null && Conf.FastBloom;
-        }
-    }
-    internal static bool SkipNoOpScreenFiltersActive {
-        get {
-            EnsureConf();
-            return MainCore.IsModEnabled && Conf != null && Conf.SkipNoOpScreenFilters;
-        }
-    }
-    internal static bool CacheScreenScaleActive {
-        get {
-            EnsureConf();
-            return MainCore.IsModEnabled && Conf != null && Conf.CacheScreenScale;
-        }
-    }
-    internal static bool SkipIdleParticlesActive {
-        get {
-            EnsureConf();
-            return MainCore.IsModEnabled && Conf != null && Conf.SkipIdleParticles;
-        }
-    }
-    internal static bool PauseOffscreenParticlesActive {
-        get {
-            EnsureConf();
-            return MainCore.IsModEnabled && Conf != null && Conf.PauseOffscreenParticles;
-        }
+    internal static bool LeakGuardActive => leakGuardActive;
+    internal static bool FastBloomActive => fastBloomActive;
+    internal static bool SkipNoOpScreenFiltersActive => skipNoOpScreenFiltersActive;
+    internal static bool CacheScreenScaleActive => cacheScreenScaleActive;
+    internal static bool SkipIdleParticlesActive => skipIdleParticlesActive;
+    internal static bool PauseOffscreenParticlesActive => pauseOffscreenParticlesActive;
+    internal static bool RenderAllHitSoundsActive => renderAllHitSoundsActive;
+    private static void CacheRuntimeFlags(bool on) {
+        optimizerActive = on;
+        smoothGcActive = on && Conf != null && Conf.SmoothGC;
+        leakGuardActive = on && Conf != null && Conf.LeakGuard;
+        collectOnLevelLoadActive = on && Conf != null && Conf.CollectOnLevelLoad;
+        fastBloomActive = on && Conf != null && Conf.FastBloom;
+        skipNoOpScreenFiltersActive = on && Conf != null && Conf.SkipNoOpScreenFilters;
+        cacheScreenScaleActive = on && Conf != null && Conf.CacheScreenScale;
+        skipIdleParticlesActive = on && Conf != null && Conf.SkipIdleParticles;
+        pauseOffscreenParticlesActive = on && Conf != null && Conf.PauseOffscreenParticles;
+        renderAllHitSoundsActive = on && Conf != null && Conf.RenderAllHitSounds;
     }
     private static void SetPriority(ProcessPriorityClass priority) {
         try {
@@ -112,13 +101,13 @@ public static class Optimizer {
     }
     private static void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
         IridiumPatches.InvalidateScreenScale();
-        if(!Active) return;
-        if(Conf.LeakGuard) LeakGuardPatches.SweepStaticCaches();
-        if(Conf.CollectOnLevelLoad) GC.Collect();
+        if(!optimizerActive) return;
+        if(leakGuardActive) LeakGuardPatches.SweepStaticCaches();
+        if(collectOnLevelLoadActive) GC.Collect();
     }
     public static void Unhook() => SceneManager.sceneLoaded -= OnSceneLoaded;
     private static void Tick() {
-        bool wantDefer = Active && Conf.SmoothGC && GameStats.InGame;
+        bool wantDefer = smoothGcActive && GameStats.InGame;
         if(wantDefer != gcDeferred) {
             if(wantDefer) DeferGC(); else ResumeGC();
         }
