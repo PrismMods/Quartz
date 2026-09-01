@@ -1,0 +1,19 @@
+Quartz/Game/Stats/ProgressTracker.cs
+  s_72d21ee04bbb64::t_7d830cfbc462d8 25-31,33,46,48-49,70,72
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "c7028f6630fc3f4ba4489a07b7e4554a5df176e7",
+  "prompts": {},
+  "sessions": {
+    "s_72d21ee04bbb64": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f1d249b7-dfa5-404e-9755-972cca397c64",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
