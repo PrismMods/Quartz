@@ -1,0 +1,19 @@
+modules/Calibration/CalibrationPopup.cs
+  s_72d21ee04bbb64::t_c30ba7b1e4a8a3 15-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "a1f2d1e22a4171b1721636f61867a5979199eecc",
+  "prompts": {},
+  "sessions": {
+    "s_72d21ee04bbb64": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f1d249b7-dfa5-404e-9755-972cca397c64",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
