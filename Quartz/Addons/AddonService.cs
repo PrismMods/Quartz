@@ -36,6 +36,7 @@ public static class AddonService {
         public QuartzAddon Instance;
         internal AddonContext Context;
         internal bool Active;
+        internal bool Ticks;
         internal object Api;
         internal bool ApiRequested;
         public bool Loaded => Instance != null && Error == null;
@@ -90,7 +91,7 @@ public static class AddonService {
     private static void Tick() {
         for(int i = 0; i < handles.Count; i++) {
             Handle handle = handles[i];
-            if(!handle.Active) continue;
+            if(!handle.Active || !handle.Ticks) continue;
             try {
                 handle.Instance.OnTick();
             } catch(Exception e) {
@@ -138,6 +139,7 @@ public static class AddonService {
         handle.Context?.Cleanup();
         handle.Instance = null;
         handle.Context = null;
+        handle.Ticks = false;
         handle.Api = null;
         handle.ApiRequested = false;
     }
@@ -452,12 +454,14 @@ public static class AddonService {
             handle.Context = new AddonContext(id);
             instance.Context = handle.Context;
             handle.Instance = instance;
+            handle.Ticks = instance.GetType().GetMethod(nameof(QuartzAddon.OnTick))?.DeclaringType != typeof(QuartzAddon);
         } catch(Exception e) {
             handle.Error = $"couldn't create addon instance: {e}";
             MainCore.Log.Err($"[Addon:{handle.Id}] {handle.Error}");
             handle.Context?.Cleanup();
             handle.Context = null;
             handle.Instance = null;
+            handle.Ticks = false;
         }
     }
     private static string SanitizeId(string id) {

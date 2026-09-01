@@ -19,6 +19,7 @@ public static class ModuleService {
         internal ModuleContext Context;
         internal Assembly Image;
         internal bool Active;
+        internal bool Ticks;
         public bool Loaded => Instance != null && Error == null;
     }
     private static readonly List<Handle> handles = [];
@@ -63,7 +64,7 @@ public static class ModuleService {
     private static void Tick() {
         for(int i = 0; i < handles.Count; i++) {
             Handle handle = handles[i];
-            if(!handle.Active) continue;
+            if(!handle.Active || !handle.Ticks) continue;
             try {
                 handle.Instance.OnTick();
             } catch(Exception e) {
@@ -342,6 +343,7 @@ public static class ModuleService {
             handle.Context = new ModuleContext(manifest);
             instance.Context = handle.Context;
             handle.Instance = instance;
+            handle.Ticks = instance.GetType().GetMethod(nameof(QuartzModule.OnTick))?.DeclaringType != typeof(QuartzModule);
             instance.OnLoad();
             MainCore.Log.Msg($"[Modules] loaded '{handle.Name}' v{handle.Version}");
         } catch(Exception e) {
@@ -350,6 +352,7 @@ public static class ModuleService {
             handle.Context?.Cleanup();
             handle.Context = null;
             handle.Instance = null;
+            handle.Ticks = false;
         }
     }
     private static bool AttributeMatches(Assembly assembly, ModuleManifest manifest, out string error) {
@@ -425,6 +428,7 @@ public static class ModuleService {
         handle.Image = null;
         handle.Instance = null;
         handle.Context = null;
+        handle.Ticks = false;
     }
     private static void UnloadAll() {
         for(int i = handles.Count - 1; i >= 0; i--) Teardown(handles[i]);
