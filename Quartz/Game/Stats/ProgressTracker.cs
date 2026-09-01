@@ -22,17 +22,20 @@ public static class ProgressTracker {
         FrozenMapTimeSeconds = 0f;
         FrozenMusicTimeSeconds = 0f;
     }
+    public static int ResolveStartSeqID(int seqID) {
+        if(seqID > 0) return seqID;
+        try {
+            return Mathf.Max(0, GCS.checkpointNum);
+        } catch(Exception e) { Diag.Ignore(e); }
+        return 0;
+    }
     public static bool IsFirstTileRunStart(int seqID = 0) {
-        if(seqID > 0) return false;
+        if(ResolveStartSeqID(seqID) > 0) return false;
         try {
             if(scnGame.instance != null && scnGame.instance.checkpointsUsed > 0) return false;
         } catch(Exception e) { Diag.Ignore(e); }
         try {
             if(scrController.checkpointsUsed > 0) return false;
-        } catch(Exception e) { Diag.Ignore(e); }
-        try {
-            scrController c = scrController.instance;
-            if(c != null && c.currentSeqID > 0) return false;
         } catch(Exception e) { Diag.Ignore(e); }
         return true;
     }
@@ -40,10 +43,10 @@ public static class ProgressTracker {
         RunCleared = false;
         ThawRunTime();
         try {
-            scrController c = scrController.instance;
+            int startSeqID = ResolveStartSeqID(seqID);
             RunStartedFromFirstTile = IsFirstTileRunStart(seqID);
-            RunStartProgress = RunStartedFromFirstTile ? 0f : StartProgress(c, seqID);
-            RunStartMapTimeRatio = RunStartedFromFirstTile ? 0f : StartMapTimeRatio(seqID);
+            RunStartProgress = RunStartedFromFirstTile ? 0f : StartProgress(startSeqID);
+            RunStartMapTimeRatio = RunStartedFromFirstTile ? 0f : StartMapTimeRatio(startSeqID);
         } catch(Exception e) {
             Diag.Ignore(e);
             RunStartedFromFirstTile = true;
@@ -64,16 +67,14 @@ public static class ProgressTracker {
                 return Mathf.Clamp01(t / total);
             }
         } catch(Exception e) { Diag.Ignore(e); }
-        return GameStats.MapTimeRatio;
+        return 0f;
     }
-    private static float StartProgress(scrController c, int seqID) {
+    private static float StartProgress(int seqID) {
         try {
             scrLevelMaker lm = scrLevelMaker.instance;
             int count = lm != null && lm.listFloors != null ? lm.listFloors.Count : 0;
             if(seqID > 0 && count > 0) return Mathf.Clamp01((seqID + 1f) / count);
         } catch(Exception e) { Diag.Ignore(e); }
-        float progress = c != null ? c.percentComplete : 0f;
-        if(progress > 0f) return Mathf.Clamp01(progress);
         return 0f;
     }
     [HarmonyPatch(typeof(scnGame), "Play")]
