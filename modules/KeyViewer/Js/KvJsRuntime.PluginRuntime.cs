@@ -133,11 +133,17 @@ internal static partial class KvJsRuntime {
                     InvokeScoped(timer.DefinitionId, timer.Callback);
                 }
             }
-            if(time >= nextStats && subscriptions.Values.Any(static sub => sub.EventName == "stats")) {
+            if(time >= nextStats && HasStatsSubscription()) {
                 nextStats = time + 0.05f;
                 JsValue payload = StatsValue();
                 Emit("stats", payload);
             }
+        }
+
+        private bool HasStatsSubscription() {
+            foreach(Subscription sub in subscriptions.Values)
+                if(sub.EventName == "stats") return true;
+            return false;
         }
 
         internal void EmitKey(string label, string state, string mode, string device) {
