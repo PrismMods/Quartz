@@ -1,0 +1,39 @@
+Quartz/UI/Utility/NativeCursor.cs
+  s_98efdd6f29abd9::t_90f047ff2de78f 144
+  s_98efdd6f29abd9::t_283151a62f4051 134-136,143,145-146,149
+Quartz/Resource/ProceduralTexture.cs
+  s_98efdd6f29abd9::t_283151a62f4051 28,31-32,35
+  s_4fa2a58a88fcc8::t_f7b45ff25c7249 20,26-27,36-37
+modules/Tuf/TufDifficultyRangeBar.cs
+  s_98efdd6f29abd9::t_bbdf8d9ae4f6b9 255,263-264
+  s_98efdd6f29abd9::t_283151a62f4051 261
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "28a68b6476610090565f4f9437805a1aa2824e27",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_4fa2a58a88fcc8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23046570-a16a-4731-812c-5348d6b28ed6",
+        "model": "claude-fable-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_98efdd6f29abd9": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a059e8-13c9-7f73-8122-effe049870b5",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
