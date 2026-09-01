@@ -1,0 +1,19 @@
+stubs/README.md
+  s_113fcbd331b1fb::t_b64c47166c7089 30,41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "0b8119bd0a4072fbf69a8921f028d16a4b3b454c",
+  "prompts": {},
+  "sessions": {
+    "s_113fcbd331b1fb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "86f4bee4-0609-45ab-af3f-9509a547af71",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
