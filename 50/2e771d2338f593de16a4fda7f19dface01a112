@@ -1,0 +1,29 @@
+modules/Minecraft/McContracts.cs
+  s_98efdd6f29abd9::t_486edc7980b55e 39,46-54
+modules/Minecraft/McEngine.cs
+  s_98efdd6f29abd9::t_92f097b44801af 172-175,180-218,220,222
+modules/Minecraft/McBrowserView.cs
+  s_98efdd6f29abd9::t_283151a62f4051 26,32,131,134-138
+  s_98efdd6f29abd9::t_f862a783f3a772 139
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "502e771d2338f593de16a4fda7f19dface01a112",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_98efdd6f29abd9": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a059e8-13c9-7f73-8122-effe049870b5",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
