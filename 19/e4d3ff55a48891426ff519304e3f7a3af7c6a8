@@ -1,0 +1,14 @@
+modules/KeyViewer/KeyViewerOverlay.cs
+  h_6eeb8441a8a159 55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "19e4d3ff55a48891426ff519304e3f7a3af7c6a8",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
