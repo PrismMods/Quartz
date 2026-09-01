@@ -859,14 +859,12 @@ namespace UnityEngine {
     public sealed unsafe partial class Texture2D : global::UnityEngine.Texture {
         public Texture2D(int width, int height, global::UnityEngine.TextureFormat textureFormat, bool mipChain) => throw null;
         public Texture2D(int width, int height, global::UnityEngine.TextureFormat textureFormat, bool mipChain, bool linear) => throw null;
-        public void Apply() => throw null;
         public void Apply(bool updateMipmaps) => throw null;
         public void Apply(bool updateMipmaps, bool makeNoLongerReadable) => throw null;
         public void Compress(bool highQuality) => throw null;
         public global::UnityEngine.Color32[] GetPixels32() => throw null;
         public void LoadRawTextureData(byte[] data) => throw null;
         public global::UnityEngine.Rect[] PackTextures(global::UnityEngine.Texture2D[] textures, int padding, int maximumAtlasSize, bool makeNoLongerReadable) => throw null;
-        public void SetPixel(int x, int y, global::UnityEngine.Color color) => throw null;
         public void SetPixels(global::UnityEngine.Color[] colors) => throw null;
         public void SetPixels32(global::UnityEngine.Color32[] colors) => throw null;
         private Texture2D() { }

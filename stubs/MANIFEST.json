@@ -4449,12 +4449,10 @@
         "members": [
           "System.Void UnityEngine.Texture2D::.ctor(System.Int32,System.Int32,UnityEngine.TextureFormat,System.Boolean)",
           "System.Void UnityEngine.Texture2D::.ctor(System.Int32,System.Int32,UnityEngine.TextureFormat,System.Boolean,System.Boolean)",
-          "System.Void UnityEngine.Texture2D::Apply()",
           "System.Void UnityEngine.Texture2D::Apply(System.Boolean)",
           "System.Void UnityEngine.Texture2D::Apply(System.Boolean,System.Boolean)",
           "System.Void UnityEngine.Texture2D::Compress(System.Boolean)",
           "System.Void UnityEngine.Texture2D::LoadRawTextureData(System.Byte[])",
-          "System.Void UnityEngine.Texture2D::SetPixel(System.Int32,System.Int32,UnityEngine.Color)",
           "System.Void UnityEngine.Texture2D::SetPixels(UnityEngine.Color[])",
           "System.Void UnityEngine.Texture2D::SetPixels32(UnityEngine.Color32[])",
           "UnityEngine.Color32[] UnityEngine.Texture2D::GetPixels32()",
