@@ -1,0 +1,28 @@
+modules/Optimizer/HitSoundRenderer.cs
+  s_98efdd6f29abd9::t_84526732a589ff 105
+modules/Optimizer/PageOptimizer.cs
+  s_98efdd6f29abd9::t_84526732a589ff 72,81
+modules/Optimizer/Optimizer.cs
+  s_98efdd6f29abd9::t_84526732a589ff 22-31,57,64,67,72,77-94,104-106,110
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "3271215b00dc24af8a8463b175b461fe60c74402",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_98efdd6f29abd9": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a059e8-13c9-7f73-8122-effe049870b5",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
