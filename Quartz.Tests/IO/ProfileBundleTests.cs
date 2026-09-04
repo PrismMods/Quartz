@@ -36,6 +36,13 @@ static class ProfileBundleTests {
         Dictionary<string, byte[]> normal = ProfileBundle.ReadFiles(Bundle(), Excluded, false, Config, Imposed);
         Assert(Parse(normal[Config])["Language"]?.Value<string>() == "ko-KR", "the Import button restores the exported Language");
     }
+    public static void TestNewProfileCarriesOnlyImposedFields() {
+        JObject config = (JObject)Bundle()[Config]!;
+        JObject kept = ProfileBundle.KeepOnly(config, Imposed);
+        Assert(kept["Language"]?.Value<string>() == "ko-KR", "a new profile carries the imposed Language over");
+        Assert(kept["UIScale"] == null && kept["FontName"] == null, "a new profile drops every other setting");
+        Assert(!ProfileBundle.KeepOnly([], Imposed).HasValues, "an empty config carries nothing over");
+    }
     public static void TestPresetLeavesOtherFilesByteIdentical() {
         JObject files = Bundle();
         Dictionary<string, byte[]> preset = ProfileBundle.ReadFiles(files, Excluded, true, Config, Imposed);

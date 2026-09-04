@@ -44,6 +44,7 @@ List<(string Name, Action Run)> tests = [
     ("Preset import drops the fields a preset may not impose", ProfileBundleTests.TestPresetStripsImposedFields),
     ("Preset import passes every other file through untouched", ProfileBundleTests.TestPresetLeavesOtherFilesByteIdentical),
     ("Importing an exported profile keeps its Language", ProfileBundleTests.TestImportButtonKeepsLanguage),
+    ("A new profile keeps only the imposed fields", ProfileBundleTests.TestNewProfileCarriesOnlyImposedFields),
     ("Localization keys stay in parity", LocalizationParityTests.TestLocalizationParity),
     ("FAQ ships a usable default in every language it claims", FaqDocumentTests.TestShippedDefaultIsUsable),
     ("FAQ text falls back exact language then en-US then anything", FaqDocumentTests.TestLanguagePicksExactThenEnglishThenAnything),
