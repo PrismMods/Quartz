@@ -1,0 +1,54 @@
+Quartz/IO/ProfileBundle.cs
+  s_9e1e203e67c495::t_5024961e22f56e 21-27
+Quartz/UI/Factory/Page/PageProfiles.cs
+  s_9e1e203e67c495::t_613822085ade5f 151-155,161
+  s_ebe775fc7a79d6::t_fb29e849069d1a 156-160
+Quartz/Resource/Export/Lang/AprilFools/ko-KR.json
+  s_ebe775fc7a79d6::t_fb29e849069d1a 444
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_ebe775fc7a79d6::t_fb29e849069d1a 468
+Quartz/Resource/Export/Lang/AprilFools/zh-CN.json
+  s_ebe775fc7a79d6::t_fb29e849069d1a 444
+Quartz/Resource/Export/Lang/AprilFools/en-US.json
+  s_ebe775fc7a79d6::t_fb29e849069d1a 444
+Quartz/IO/ProfileManager.cs
+  s_9e1e203e67c495::t_5024961e22f56e 1,82-85,91-103
+  s_a6f0178732304c::t_3c875e08df6294 26-30
+  s_ebe775fc7a79d6::t_fb29e849069d1a 81
+Quartz/Resource/Export/Lang/en-US.json
+  s_ebe775fc7a79d6::t_fb29e849069d1a 468
+Quartz/Resource/Export/Lang/zh-CN.json
+  s_ebe775fc7a79d6::t_fb29e849069d1a 466
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "3f699ba1bcb45332bdb6b169d39e145166a50636",
+  "prompts": {},
+  "sessions": {
+    "s_9e1e203e67c495": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f3ffcb0c-3ac2-49cd-a374-a27d7ffc80f5",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_a6f0178732304c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2c01447-2d4c-4dc0-a30f-d6101b62da31",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_ebe775fc7a79d6": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a06702-fe49-7e23-8e73-0f6f798df39d",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
