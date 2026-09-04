@@ -136,7 +136,7 @@ public static class AutoDeafen {
         suppressUntilRestart = true;
         Undeafen();
     }
-    private static void OnRunHide() => Undeafen();
+    private static void OnRunHide() => OnRunEnded();
     private static void Undeafen() {
         if(!desiredDeaf) return;
         desiredDeaf = false;
@@ -151,6 +151,7 @@ public static class AutoDeafen {
         configToken = null;
         suppressUntilRestart = false;
         runStartCaptured = false;
+        startedFromFirstTile = false;
     }
     public static void OpenAuthorizeUrl() {
         EnsureConf();
@@ -263,7 +264,13 @@ public static class AutoDeafen {
     private static class RunEndPatch {
         private static void Postfix(Enum newState) {
             if(!MainCore.IsModEnabled || newState is not States state) return;
-            if(state == States.Fail2 || state == States.Won) OnRunEnded();
+            if(state == States.Fail || state == States.Fail2 || state == States.Won) OnRunEnded();
+        }
+    }
+    [HarmonyPatch(typeof(scrPlayer), nameof(scrPlayer.Die))]
+    private static class PlayerDeathPatch {
+        private static void Postfix() {
+            if(MainCore.IsModEnabled) OnRunEnded();
         }
     }
     [HarmonyPatch(typeof(scrController), "StartLoadingScene")]
