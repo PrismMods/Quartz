@@ -295,38 +295,32 @@ public static class DaveNative {
     public static void DecryptorPassthrough(IntPtr decryptor, bool enabled) =>
         decryptorPassthrough?.Invoke(decryptor, (byte)(enabled ? 1 : 0));
     public static bool EncryptorHasRatchet(IntPtr encryptor) => (encryptorHasRatchet?.Invoke(encryptor) ?? 0) != 0;
-    public static int Encrypt(IntPtr encryptor, uint ssrc, byte[] frame, int length, byte[] output) {
-        IntPtr input = Marshal.AllocHGlobal(Math.Max(1, length));
-        IntPtr result = Marshal.AllocHGlobal(output.Length);
-        try {
-            Marshal.Copy(frame, 0, input, length);
+    public static unsafe int Encrypt(IntPtr encryptor, uint ssrc, byte[] frame, int length, byte[] output) {
+        if(encryptor == IntPtr.Zero || length < 0 || length > (frame?.Length ?? 0)
+            || output == null || output.Length == 0) return -1;
+        fixed(byte* input = frame)
+        fixed(byte* result = output) {
             EncryptResult code = encrypt(
-                encryptor, MediaType.Audio, ssrc, input, (UIntPtr)length,
-                result, (UIntPtr)output.Length, out UIntPtr written);
+                encryptor, MediaType.Audio, ssrc,
+                length == 0 ? IntPtr.Zero : (IntPtr)input, (UIntPtr)length,
+                (IntPtr)result, (UIntPtr)output.Length, out UIntPtr written);
             if(code != EncryptResult.Success) return -(int)code;
-            int size = (int)written.ToUInt64();
-            if(size > 0) Marshal.Copy(result, output, 0, size);
-            return size;
-        } finally {
-            Marshal.FreeHGlobal(input);
-            Marshal.FreeHGlobal(result);
+            ulong size = written.ToUInt64();
+            return size <= (ulong)output.Length ? (int)size : -1;
         }
     }
-    public static int Decrypt(IntPtr decryptor, byte[] frame, int length, byte[] output) {
-        IntPtr input = Marshal.AllocHGlobal(Math.Max(1, length));
-        IntPtr result = Marshal.AllocHGlobal(output.Length);
-        try {
-            Marshal.Copy(frame, 0, input, length);
+    public static unsafe int Decrypt(IntPtr decryptor, byte[] frame, int length, byte[] output) {
+        if(decryptor == IntPtr.Zero || length < 0 || length > (frame?.Length ?? 0)
+            || output == null || output.Length == 0) return -1;
+        fixed(byte* input = frame)
+        fixed(byte* result = output) {
             DecryptResult code = decrypt(
-                decryptor, MediaType.Audio, input, (UIntPtr)length,
-                result, (UIntPtr)output.Length, out UIntPtr written);
+                decryptor, MediaType.Audio,
+                length == 0 ? IntPtr.Zero : (IntPtr)input, (UIntPtr)length,
+                (IntPtr)result, (UIntPtr)output.Length, out UIntPtr written);
             if(code != DecryptResult.Success) return -(int)code;
-            int size = (int)written.ToUInt64();
-            if(size > 0) Marshal.Copy(result, output, 0, size);
-            return size;
-        } finally {
-            Marshal.FreeHGlobal(input);
-            Marshal.FreeHGlobal(result);
+            ulong size = written.ToUInt64();
+            return size <= (ulong)output.Length ? (int)size : -1;
         }
     }
     public static IntPtr DecryptorCreate() => decryptorCreate?.Invoke() ?? IntPtr.Zero;

@@ -46,59 +46,86 @@ public static class SodiumNative {
         return true;
     }
     public static byte[] Encrypt(byte[] plain, int plainLength, byte[] additional, byte[] nonce, byte[] key) {
+        if(plainLength < 0 || plainLength > (plain?.Length ?? 0)) return null;
         byte[] cipher = new byte[plainLength + TagBytes];
-        IntPtr cipherBuffer = Marshal.AllocHGlobal(cipher.Length);
-        IntPtr plainBuffer = Marshal.AllocHGlobal(Math.Max(1, plainLength));
-        IntPtr adBuffer = Marshal.AllocHGlobal(Math.Max(1, additional.Length));
-        IntPtr nonceBuffer = Marshal.AllocHGlobal(nonce.Length);
-        IntPtr keyBuffer = Marshal.AllocHGlobal(key.Length);
-        try {
-            Marshal.Copy(plain, 0, plainBuffer, plainLength);
-            Marshal.Copy(additional, 0, adBuffer, additional.Length);
-            Marshal.Copy(nonce, 0, nonceBuffer, nonce.Length);
-            Marshal.Copy(key, 0, keyBuffer, key.Length);
-            int result = encrypt(
-                cipherBuffer, out ulong written, plainBuffer, (ulong)plainLength,
-                adBuffer, (ulong)additional.Length, IntPtr.Zero, nonceBuffer, keyBuffer);
-            if(result != 0) return null;
-            int length = (int)written;
-            byte[] output = new byte[length];
-            Marshal.Copy(cipherBuffer, output, 0, length);
-            return output;
-        } finally {
-            Marshal.FreeHGlobal(cipherBuffer);
-            Marshal.FreeHGlobal(plainBuffer);
-            Marshal.FreeHGlobal(adBuffer);
-            Marshal.FreeHGlobal(nonceBuffer);
-            Marshal.FreeHGlobal(keyBuffer);
-        }
+        int written = EncryptInto(
+            plain, 0, plainLength,
+            additional, 0, additional?.Length ?? 0,
+            nonce, key,
+            cipher, 0
+        );
+        if(written < 0) return null;
+        if(written != cipher.Length) Array.Resize(ref cipher, written);
+        return cipher;
     }
     public static byte[] Decrypt(byte[] cipher, int cipherLength, byte[] additional, byte[] nonce, byte[] key) {
-        if(cipherLength < TagBytes) return null;
-        IntPtr plainBuffer = Marshal.AllocHGlobal(cipherLength);
-        IntPtr cipherBuffer = Marshal.AllocHGlobal(cipherLength);
-        IntPtr adBuffer = Marshal.AllocHGlobal(Math.Max(1, additional.Length));
-        IntPtr nonceBuffer = Marshal.AllocHGlobal(nonce.Length);
-        IntPtr keyBuffer = Marshal.AllocHGlobal(key.Length);
-        try {
-            Marshal.Copy(cipher, 0, cipherBuffer, cipherLength);
-            Marshal.Copy(additional, 0, adBuffer, additional.Length);
-            Marshal.Copy(nonce, 0, nonceBuffer, nonce.Length);
-            Marshal.Copy(key, 0, keyBuffer, key.Length);
-            int result = decrypt(
-                plainBuffer, out ulong written, IntPtr.Zero, cipherBuffer, (ulong)cipherLength,
-                adBuffer, (ulong)additional.Length, nonceBuffer, keyBuffer);
-            if(result != 0) return null;
-            int length = (int)written;
-            byte[] output = new byte[length];
-            Marshal.Copy(plainBuffer, output, 0, length);
-            return output;
-        } finally {
-            Marshal.FreeHGlobal(plainBuffer);
-            Marshal.FreeHGlobal(cipherBuffer);
-            Marshal.FreeHGlobal(adBuffer);
-            Marshal.FreeHGlobal(nonceBuffer);
-            Marshal.FreeHGlobal(keyBuffer);
+        if(cipherLength < TagBytes || cipherLength > (cipher?.Length ?? 0)) return null;
+        byte[] plain = new byte[cipherLength - TagBytes];
+        int written = DecryptInto(
+            cipher, 0, cipherLength,
+            additional, 0, additional?.Length ?? 0,
+            nonce, key,
+            plain, 0
+        );
+        if(written < 0) return null;
+        if(written != plain.Length) Array.Resize(ref plain, written);
+        return plain;
+    }
+    internal static unsafe int EncryptInto(
+        byte[] plain, int plainOffset, int plainLength,
+        byte[] additional, int additionalOffset, int additionalLength,
+        byte[] nonce, byte[] key,
+        byte[] output, int outputOffset
+    ) {
+        if(!SliceFits(plain, plainOffset, plainLength)
+            || !SliceFits(additional, additionalOffset, additionalLength)
+            || nonce == null || nonce.Length != NonceBytes
+            || key == null || key.Length != KeyBytes
+            || !SliceFits(output, outputOffset, plainLength + TagBytes)) return -1;
+        fixed(byte* plainStart = plain)
+        fixed(byte* additionalStart = additional)
+        fixed(byte* nonceStart = nonce)
+        fixed(byte* keyStart = key)
+        fixed(byte* outputStart = output) {
+            byte* message = plainLength == 0 ? null : plainStart + plainOffset;
+            byte* ad = additionalLength == 0 ? null : additionalStart + additionalOffset;
+            int result = encrypt(
+                (IntPtr)(outputStart + outputOffset), out ulong written,
+                (IntPtr)message, (ulong)plainLength,
+                (IntPtr)ad, (ulong)additionalLength,
+                IntPtr.Zero, (IntPtr)nonceStart, (IntPtr)keyStart
+            );
+            return result == 0 && written <= int.MaxValue ? (int)written : -1;
         }
     }
+    internal static unsafe int DecryptInto(
+        byte[] cipher, int cipherOffset, int cipherLength,
+        byte[] additional, int additionalOffset, int additionalLength,
+        byte[] nonce, byte[] key,
+        byte[] output, int outputOffset
+    ) {
+        if(cipherLength < TagBytes
+            || !SliceFits(cipher, cipherOffset, cipherLength)
+            || !SliceFits(additional, additionalOffset, additionalLength)
+            || nonce == null || nonce.Length != NonceBytes
+            || key == null || key.Length != KeyBytes
+            || !SliceFits(output, outputOffset, cipherLength - TagBytes)) return -1;
+        fixed(byte* cipherStart = cipher)
+        fixed(byte* additionalStart = additional)
+        fixed(byte* nonceStart = nonce)
+        fixed(byte* keyStart = key)
+        fixed(byte* outputStart = output) {
+            byte* ad = additionalLength == 0 ? null : additionalStart + additionalOffset;
+            int result = decrypt(
+                (IntPtr)(outputStart + outputOffset), out ulong written,
+                IntPtr.Zero,
+                (IntPtr)(cipherStart + cipherOffset), (ulong)cipherLength,
+                (IntPtr)ad, (ulong)additionalLength,
+                (IntPtr)nonceStart, (IntPtr)keyStart
+            );
+            return result == 0 && written <= int.MaxValue ? (int)written : -1;
+        }
+    }
+    private static bool SliceFits(byte[] buffer, int offset, int length) =>
+        buffer != null && offset >= 0 && length >= 0 && offset <= buffer.Length - length;
 }

@@ -8,6 +8,10 @@ public sealed class VoiceUdp : IDisposable {
     private const int HeaderSize = 12;
     private const int NonceSuffix = 4;
     private readonly UdpClient udp = new();
+    private readonly byte[] sendNonce = new byte[SodiumNative.NonceBytes];
+    private readonly byte[] receiveNonce = new byte[SodiumNative.NonceBytes];
+    private byte[] sendPacket = new byte[4096];
+    private byte[] receivePlain = new byte[4096];
     private IPEndPoint server;
     private readonly uint ssrc;
     private byte[] key = [];
@@ -17,7 +21,7 @@ public sealed class VoiceUdp : IDisposable {
     private long sentPackets;
     private CancellationTokenSource receiveCts;
     private bool disposed;
-    public event Action<uint, byte[]> AudioReceived;
+    public event Action<uint, byte[], int> AudioReceived;
     public event Action<string> Error;
     public bool Ready => key.Length == SodiumNative.KeyBytes;
     public VoiceUdp(int ssrc) => this.ssrc = (uint)ssrc;
@@ -97,15 +101,17 @@ public sealed class VoiceUdp : IDisposable {
             int extensionBody = extension == 1
                 ? ((packet[aadLength - 2] << 8) | packet[aadLength - 1]) * 4
                 : 0;
-            byte[] nonce = new byte[SodiumNative.NonceBytes];
-            Buffer.BlockCopy(packet, packet.Length - NonceSuffix, nonce, 0, NonceSuffix);
-            byte[] aad = new byte[aadLength];
-            Buffer.BlockCopy(packet, 0, aad, 0, aadLength);
+            Buffer.BlockCopy(packet, packet.Length - NonceSuffix, receiveNonce, 0, NonceSuffix);
             int cipherLength = packet.Length - aadLength - NonceSuffix;
-            byte[] cipher = new byte[cipherLength];
-            Buffer.BlockCopy(packet, aadLength, cipher, 0, cipherLength);
-            byte[] plain = SodiumNative.Decrypt(cipher, cipherLength, aad, nonce, key);
-            if(plain == null) {
+            int maxPlainLength = cipherLength - SodiumNative.TagBytes;
+            EnsureCapacity(ref receivePlain, maxPlainLength);
+            int plainLength = SodiumNative.DecryptInto(
+                packet, aadLength, cipherLength,
+                packet, 0, aadLength,
+                receiveNonce, key,
+                receivePlain, 0
+            );
+            if(plainLength < 0) {
                 failed++;
                 if(failed <= 5)
                     MainCore.Log.Msg(
@@ -113,50 +119,52 @@ public sealed class VoiceUdp : IDisposable {
                         + $"b0=0x{packet[0]:x2} aad={aadLength} pt={payloadType} ssrc={sourceSsrc}");
                 continue;
             }
-            if(extensionBody >= plain.Length) continue;
-            byte[] frame = plain;
+            if(extensionBody >= plainLength) continue;
+            int frameLength = plainLength - extensionBody;
             if(extensionBody > 0) {
-                frame = new byte[plain.Length - extensionBody];
-                Buffer.BlockCopy(plain, extensionBody, frame, 0, frame.Length);
+                Buffer.BlockCopy(receivePlain, extensionBody, receivePlain, 0, frameLength);
             }
             delivered++;
             if(delivered <= 3 || delivered % 250 == 0)
                 MainCore.Log.Msg(
                     $"[Discord] voice rx ok total={total} delivered={delivered} failed={failed} "
-                    + $"ssrc={sourceSsrc} aad={aadLength} extBody={extensionBody} frame={frame.Length}B");
-            AudioReceived?.Invoke(sourceSsrc, frame);
+                    + $"ssrc={sourceSsrc} aad={aadLength} extBody={extensionBody} frame={frameLength}B");
+            AudioReceived?.Invoke(sourceSsrc, receivePlain, frameLength);
         }
     }
     public void SendAudio(byte[] opus, int length) {
         int opusLength = length;
         if(!Ready || opus == null || length <= 0) return;
-        byte[] header = new byte[HeaderSize];
-        header[0] = 0x80;
-        header[1] = 0x78;
-        header[2] = (byte)(sequence >> 8);
-        header[3] = (byte)sequence;
-        WriteUInt32(header, 4, timestamp);
-        WriteUInt32(header, 8, ssrc);
+        int capacity = HeaderSize + length + SodiumNative.TagBytes + NonceSuffix;
+        EnsureCapacity(ref sendPacket, capacity);
+        sendPacket[0] = 0x80;
+        sendPacket[1] = 0x78;
+        sendPacket[2] = (byte)(sequence >> 8);
+        sendPacket[3] = (byte)sequence;
+        WriteUInt32(sendPacket, 4, timestamp);
+        WriteUInt32(sendPacket, 8, ssrc);
         sequence++;
         timestamp += OpusNative.FrameSamples;
         uint counter = ++nonceCounter;
-        byte[] nonce = new byte[SodiumNative.NonceBytes];
-        WriteUInt32(nonce, 0, counter);
-        byte[] cipher = SodiumNative.Encrypt(opus, length, header, nonce, key);
-        if(cipher == null) {
+        WriteUInt32(sendNonce, 0, counter);
+        int cipherLength = SodiumNative.EncryptInto(
+            opus, 0, length,
+            sendPacket, 0, HeaderSize,
+            sendNonce, key,
+            sendPacket, HeaderSize
+        );
+        if(cipherLength < 0) {
             Error?.Invoke("encrypt returned nothing");
             return;
         }
-        byte[] packet = new byte[HeaderSize + cipher.Length + NonceSuffix];
-        Buffer.BlockCopy(header, 0, packet, 0, HeaderSize);
-        Buffer.BlockCopy(cipher, 0, packet, HeaderSize, cipher.Length);
-        WriteUInt32(packet, HeaderSize + cipher.Length, counter);
+        int packetLength = HeaderSize + cipherLength + NonceSuffix;
+        WriteUInt32(sendPacket, HeaderSize + cipherLength, counter);
         try {
-            udp.Send(packet, packet.Length);
+            udp.Send(sendPacket, packetLength);
             sentPackets++;
             if(sentPackets <= 3)
                 MainCore.Log.Msg(
-                    $"[Discord] voice tx #{sentPackets}: {packet.Length}B "
+                    $"[Discord] voice tx #{sentPackets}: {packetLength}B "
                     + $"(payload {opusLength}B, seq {sequence}, ssrc {ssrc})");
         } catch(Exception e) {
             Error?.Invoke("send: " + e.Message);
@@ -171,6 +179,10 @@ public sealed class VoiceUdp : IDisposable {
     private static uint ReadUInt32(byte[] buffer, int offset) =>
         ((uint)buffer[offset] << 24) | ((uint)buffer[offset + 1] << 16)
         | ((uint)buffer[offset + 2] << 8) | buffer[offset + 3];
+    private static void EnsureCapacity(ref byte[] buffer, int capacity) {
+        if(buffer.Length >= capacity) return;
+        Array.Resize(ref buffer, capacity);
+    }
     public void Dispose() {
         if(disposed) return;
         disposed = true;

@@ -9,6 +9,8 @@ public sealed class DaveSession : IDisposable {
     private readonly List<string> roster = [];
     private readonly string selfUserId;
     private readonly uint selfSsrc;
+    private byte[] encryptBuffer = new byte[4096];
+    private byte[] decryptBuffer = new byte[4096];
     private IntPtr session;
     private IntPtr encryptor;
     private bool disposed;
@@ -121,47 +123,48 @@ public sealed class DaveSession : IDisposable {
         ssrcToUser[ssrc] = userId;
         MainCore.Log.Msg($"[Discord] dave map ssrc {ssrc} → user {userId}");
     }
-    public byte[] EncryptOpus(byte[] opus, int length) {
-        if(disposed || encryptor == IntPtr.Zero) return Trim(opus, length);
+    public byte[] EncryptOpus(byte[] opus, int length, out int outputLength) {
+        outputLength = length;
+        if(disposed || encryptor == IntPtr.Zero) return opus;
         int capacity = Math.Max(length, DaveNative.EncryptorMaxSize(encryptor, DaveNative.MediaType.Audio, length));
-        byte[] output = new byte[capacity];
-        int written = DaveNative.Encrypt(encryptor, selfSsrc, opus, length, output);
-        if(written <= 0) return Trim(opus, length);
-        return Trim(output, written);
+        EnsureCapacity(ref encryptBuffer, capacity);
+        int written = DaveNative.Encrypt(encryptor, selfSsrc, opus, length, encryptBuffer);
+        if(written <= 0) return opus;
+        outputLength = written;
+        return encryptBuffer;
     }
-    public byte[] DecryptOpus(uint ssrc, byte[] frame) {
-        if(disposed) return frame;
+    public byte[] DecryptOpus(uint ssrc, byte[] frame, int frameLength, out int outputLength) {
+        outputLength = 0;
+        if(disposed) {
+            outputLength = frameLength;
+            return frame;
+        }
         if(ssrcToUser.TryGetValue(ssrc, out string mapped)
             && decryptors.TryGetValue(mapped, out IntPtr known)) {
-            byte[] direct = TryDecrypt(known, frame);
-            if(direct != null) LogDecrypt(ssrc);
-            return direct;
+            if(!TryDecrypt(known, frame, frameLength, out outputLength)) return null;
+            LogDecrypt(ssrc);
+            return decryptBuffer;
         }
-        HashSet<string> assigned = new(ssrcToUser.Values);
         foreach(KeyValuePair<string, IntPtr> pair in decryptors) {
-            if(assigned.Contains(pair.Key)) continue;
-            byte[] trial = TryDecrypt(pair.Value, frame);
-            if(trial == null) continue;
+            if(ssrcToUser.ContainsValue(pair.Key)) continue;
+            if(!TryDecrypt(pair.Value, frame, frameLength, out outputLength)) continue;
             ssrcToUser[ssrc] = pair.Key;
             MainCore.Log.Msg($"[Discord] dave decrypt: mapped ssrc {ssrc} → {pair.Key} by trial");
             LogDecrypt(ssrc);
-            return trial;
+            return decryptBuffer;
         }
         return null;
     }
-    private static byte[] TryDecrypt(IntPtr decryptor, byte[] frame) {
+    private bool TryDecrypt(IntPtr decryptor, byte[] frame, int frameLength, out int written) {
         int capacity = Math.Max(
-            frame.Length, DaveNative.DecryptorMaxSize(decryptor, DaveNative.MediaType.Audio, frame.Length));
-        byte[] output = new byte[capacity];
-        int written = DaveNative.Decrypt(decryptor, frame, frame.Length, output);
-        return written <= 0 ? null : Trim(output, written);
+            frameLength, DaveNative.DecryptorMaxSize(decryptor, DaveNative.MediaType.Audio, frameLength));
+        EnsureCapacity(ref decryptBuffer, capacity);
+        written = DaveNative.Decrypt(decryptor, frame, frameLength, decryptBuffer);
+        return written > 0;
     }
-    private static byte[] Trim(byte[] buffer, int length) {
-        if(buffer == null) return null;
-        if(buffer.Length == length) return buffer;
-        byte[] result = new byte[length];
-        Buffer.BlockCopy(buffer, 0, result, 0, length);
-        return result;
+    private static void EnsureCapacity(ref byte[] buffer, int capacity) {
+        if(buffer.Length >= capacity) return;
+        Array.Resize(ref buffer, capacity);
     }
     private void LogDecrypt(uint ssrc) {
         decryptOk++;

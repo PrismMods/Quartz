@@ -76,30 +76,33 @@ public static class OpusNative {
     public static void DestroyDecoder(IntPtr decoder) {
         if(decoder != IntPtr.Zero) decoderDestroy?.Invoke(decoder);
     }
-    public static int Encode(IntPtr encoder, short[] pcm, int frameSamples, byte[] output) {
-        IntPtr pcmBuffer = Marshal.AllocHGlobal(frameSamples * 2);
-        IntPtr outBuffer = Marshal.AllocHGlobal(output.Length);
-        try {
-            Marshal.Copy(pcm, 0, pcmBuffer, frameSamples);
-            int written = encode(encoder, pcmBuffer, frameSamples, outBuffer, output.Length);
-            if(written > 0) Marshal.Copy(outBuffer, output, 0, written);
-            return written;
-        } finally {
-            Marshal.FreeHGlobal(pcmBuffer);
-            Marshal.FreeHGlobal(outBuffer);
+    public static unsafe int Encode(IntPtr encoder, short[] pcm, int frameSamples, byte[] output) {
+        if(encoder == IntPtr.Zero || pcm == null || output == null
+            || frameSamples <= 0 || frameSamples > pcm.Length || output.Length == 0) return -1;
+        fixed(short* pcmBuffer = pcm)
+        fixed(byte* outBuffer = output) {
+            return encode(
+                encoder,
+                (IntPtr)pcmBuffer,
+                frameSamples,
+                (IntPtr)outBuffer,
+                output.Length
+            );
         }
     }
-    public static int Decode(IntPtr decoder, byte[] payload, int length, short[] pcm, int frameSamples) {
-        IntPtr input = payload == null ? IntPtr.Zero : Marshal.AllocHGlobal(Math.Max(1, length));
-        IntPtr output = Marshal.AllocHGlobal(frameSamples * 2);
-        try {
-            if(payload != null) Marshal.Copy(payload, 0, input, length);
-            int samples = decode(decoder, input, payload == null ? 0 : length, output, frameSamples, 0);
-            if(samples > 0) Marshal.Copy(output, pcm, 0, samples);
-            return samples;
-        } finally {
-            if(input != IntPtr.Zero) Marshal.FreeHGlobal(input);
-            Marshal.FreeHGlobal(output);
+    public static unsafe int Decode(IntPtr decoder, byte[] payload, int length, short[] pcm, int frameSamples) {
+        if(decoder == IntPtr.Zero || pcm == null || frameSamples <= 0 || frameSamples > pcm.Length
+            || length < 0 || (length > 0 && (payload == null || length > payload.Length))) return -1;
+        fixed(byte* input = payload)
+        fixed(short* output = pcm) {
+            return decode(
+                decoder,
+                length == 0 ? IntPtr.Zero : (IntPtr)input,
+                length,
+                (IntPtr)output,
+                frameSamples,
+                0
+            );
         }
     }
 }

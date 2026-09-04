@@ -7,7 +7,11 @@ public sealed class VoiceAudio : MonoBehaviour {
     private static VoiceAudio instance;
     private static readonly Queue<float> jitter = new();
     private static readonly object jitterLock = new();
-    private readonly Dictionary<uint, IntPtr> decoders = [];
+    private sealed class DecoderState {
+        internal IntPtr Handle;
+        internal readonly short[] Pcm = new short[OpusNative.FrameSamples];
+    }
+    private readonly Dictionary<uint, DecoderState> decoders = [];
     private VoiceUdp transport;
     private VoiceGateway gateway;
     private AudioSource output;
@@ -15,9 +19,9 @@ public sealed class VoiceAudio : MonoBehaviour {
     private string device;
     private IntPtr encoder;
     private int readPosition;
-    private readonly List<short> pending = [];
     private float[] scratch;
     private short[] frame;
+    private int frameFill;
     private byte[] encoded;
     private bool speaking;
     public static bool Muted { get; set; }
@@ -70,7 +74,8 @@ public sealed class VoiceAudio : MonoBehaviour {
         gateway = null;
         StopCapture();
         lock(jitterLock) jitter.Clear();
-        foreach(KeyValuePair<uint, IntPtr> pair in decoders) OpusNative.DestroyDecoder(pair.Value);
+        foreach(KeyValuePair<uint, DecoderState> pair in decoders)
+            OpusNative.DestroyDecoder(pair.Value.Handle);
         decoders.Clear();
         if(output != null) output.Stop();
     }
@@ -106,22 +111,22 @@ public sealed class VoiceAudio : MonoBehaviour {
                 Status = error;
                 return;
             }
-            scratch = new float[OpusNative.SampleRate];
+            scratch = new float[OpusNative.FrameSamples];
             frame = new short[OpusNative.FrameSamples];
             encoded = new byte[4000];
             readPosition = 0;
-            pending.Clear();
+            frameFill = 0;
             FramesSent = 0;
-        FramesReceived = 0;
-        FramesDropped = 0;
-        MicPeak = 0f;
-        MicLevel = 0f;
-        silenceFrames = 0;
-        voiceFrames = 0;
-        decodedSamples = 0;
-        pcmReads = 0;
-        pcmUnderruns = 0;
-        Capturing = true;
+            FramesReceived = 0;
+            FramesDropped = 0;
+            MicPeak = 0f;
+            MicLevel = 0f;
+            silenceFrames = 0;
+            voiceFrames = 0;
+            decodedSamples = 0;
+            pcmReads = 0;
+            pcmUnderruns = 0;
+            Capturing = true;
             Status = $"capturing from {device} ({minFrequency}-{maxFrequency}Hz)";
             MainCore.Log.Msg($"[Discord] voice capture started on '{device}'");
         } catch(Exception e) {
@@ -145,6 +150,7 @@ public sealed class VoiceAudio : MonoBehaviour {
             encoder = IntPtr.Zero;
         }
         speaking = false;
+        frameFill = 0;
     }
     private void Update() {
         if(Time.realtimeSinceStartup >= reportAt) {
@@ -167,38 +173,44 @@ public sealed class VoiceAudio : MonoBehaviour {
         int available = position - readPosition;
         if(available < 0) available += microphone.samples;
         if(available <= 0) return;
-        if(available > scratch.Length) available = scratch.Length;
-        if(!microphone.GetData(scratch, readPosition)) return;
-        readPosition = (readPosition + available) % microphone.samples;
         if(Muted) {
             if(speaking) SetSpeaking(false);
-            pending.Clear();
+            frameFill = 0;
+            readPosition = position;
+            MicLevel = 0f;
             return;
         }
         float peak = 0f;
-        for(int i = 0; i < available; i++) {
-            float sample = Mathf.Clamp(scratch[i], -1f, 1f);
-            float magnitude = sample < 0f ? -sample : sample;
-            if(magnitude > peak) peak = magnitude;
-            pending.Add((short)(sample * short.MaxValue));
+        while(available > 0) {
+            int chunk = Math.Min(available, scratch.Length);
+            if(!microphone.GetData(scratch, readPosition)) return;
+            readPosition = (readPosition + chunk) % microphone.samples;
+            available -= chunk;
+            for(int i = 0; i < chunk; i++) {
+                float sample = Mathf.Clamp(scratch[i], -1f, 1f);
+                float magnitude = sample < 0f ? -sample : sample;
+                if(magnitude > peak) peak = magnitude;
+                frame[frameFill++] = (short)(sample * short.MaxValue);
+                if(frameFill != frame.Length) continue;
+                SendFrame();
+                frameFill = 0;
+            }
         }
         MicLevel = peak;
         if(peak > MicPeak) MicPeak = peak;
-        while(pending.Count >= OpusNative.FrameSamples) {
-            pending.CopyTo(0, frame, 0, OpusNative.FrameSamples);
-            pending.RemoveRange(0, OpusNative.FrameSamples);
-            int written = OpusNative.Encode(encoder, frame, OpusNative.FrameSamples, encoded);
-            if(written <= 0) continue;
-            if(!speaking) SetSpeaking(true);
-            DaveSession dave = Dave;
-            if(dave != null) {
-                byte[] wrapped = dave.EncryptOpus(encoded, written);
-                transport.SendAudio(wrapped, wrapped.Length);
-            } else {
-                transport.SendAudio(encoded, written);
-            }
-            FramesSent++;
+    }
+    private void SendFrame() {
+        int written = OpusNative.Encode(encoder, frame, frame.Length, encoded);
+        if(written <= 0) return;
+        if(!speaking) SetSpeaking(true);
+        DaveSession dave = Dave;
+        if(dave != null) {
+            byte[] wrapped = dave.EncryptOpus(encoded, written, out int wrappedLength);
+            transport.SendAudio(wrapped, wrappedLength);
+        } else {
+            transport.SendAudio(encoded, written);
         }
+        FramesSent++;
     }
     private void SetSpeaking(bool value) {
         speaking = value;
@@ -209,30 +221,33 @@ public sealed class VoiceAudio : MonoBehaviour {
             Diag.Ignore(e);
         }
     }
-    private void OnAudioReceived(uint ssrc, byte[] payload) {
+    private void OnAudioReceived(uint ssrc, byte[] payload, int payloadLength) {
         try {
             byte[] opus = payload;
+            int opusLength = payloadLength;
             DaveSession dave = Dave;
             if(dave != null && dave.KeysReady) {
-                opus = dave.DecryptOpus(ssrc, payload);
+                opus = dave.DecryptOpus(ssrc, payload, payloadLength, out opusLength);
                 if(opus == null) {
                     FramesDropped++;
                     return;
                 }
             }
             FramesReceived++;
-            if(opus.Length <= 3) silenceFrames++;
+            if(opusLength <= 3) silenceFrames++;
             else voiceFrames++;
-            if(!decoders.TryGetValue(ssrc, out IntPtr decoder)) {
-                decoder = OpusNative.CreateDecoder(out string error);
-                if(decoder == IntPtr.Zero) {
+            if(!decoders.TryGetValue(ssrc, out DecoderState decoder)) {
+                IntPtr handle = OpusNative.CreateDecoder(out string error);
+                if(handle == IntPtr.Zero) {
                     MainCore.Log.Wrn("[Discord] " + error);
                     return;
                 }
+                decoder = new DecoderState { Handle = handle };
                 decoders[ssrc] = decoder;
             }
-            short[] pcm = new short[OpusNative.FrameSamples];
-            int samples = OpusNative.Decode(decoder, opus, opus.Length, pcm, OpusNative.FrameSamples);
+            short[] pcm = decoder.Pcm;
+            int samples = OpusNative.Decode(
+                decoder.Handle, opus, opusLength, pcm, OpusNative.FrameSamples);
             if(samples <= 0) return;
             decodedSamples += samples;
             lock(jitterLock) {
