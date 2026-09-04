@@ -1,0 +1,31 @@
+modules/Discord/Api/DaveNative.cs
+  s_ebe775fc7a79d6::t_f25567369df271 298-302,304-306,308-309,312-316,318-320,322-323
+modules/Discord/Api/VoiceAudio.cs
+  s_ebe775fc7a79d6::t_f25567369df271 120-129,208-209,224,227,230,237,250
+  s_ebe775fc7a79d6::t_405d4988531336 10-14,24,77-78,114,118,153,178-180,184-197,201-207,210-211,213,239-241,245,248-249
+modules/Discord/Api/OpusNative.cs
+  s_ebe775fc7a79d6::t_405d4988531336 79-90,93-105
+modules/Discord/Api/VoiceUdp.cs
+  s_ebe775fc7a79d6::t_f25567369df271 13-14,24,106-107,112,123,125,131-132,138-145,152,154,161,163,182-185
+  s_ebe775fc7a79d6::t_405d4988531336 11-12,104,108-111,113-114,122,149-151,153,155-156,160,167
+modules/Discord/Api/SodiumNative.cs
+  s_ebe775fc7a79d6::t_405d4988531336 49,51-91,93-98,101-118,120-126,129-130
+modules/Discord/Api/DaveSession.cs
+  s_ebe775fc7a79d6::t_f25567369df271 12-13,126-128,130-141,144-146,149-150,154,158,160-167
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "7e1290ccad9e7475205c16f17e132f83fa29008e",
+  "prompts": {},
+  "sessions": {
+    "s_ebe775fc7a79d6": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a06702-fe49-7e23-8e73-0f6f798df39d",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
