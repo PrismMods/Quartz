@@ -189,6 +189,43 @@ internal sealed class RainGraphic : MaskableGraphic {
                 AddQuad(vh, x0, yMax - bw, x1, yMax, topBottomEdge, top);
             }
         }
+        if(r <= 0.5f || !vertical || !horizontal) return;
+        float rIn = Mathf.Max(0f, r - bw);
+        AddArcBand(vh, raw, dNear, dFar, xMin + r, yMin + r, r, rIn, Mathf.PI, Mathf.PI * 1.5f, yMin, height);
+        AddArcBand(vh, raw, dNear, dFar, xMax - r, yMin + r, r, rIn, Mathf.PI * 1.5f, Mathf.PI * 2f, yMin, height);
+        AddArcBand(vh, raw, dNear, dFar, xMax - r, yMax - r, r, rIn, 0f, Mathf.PI * 0.5f, yMin, height);
+        AddArcBand(vh, raw, dNear, dFar, xMin + r, yMax - r, r, rIn, Mathf.PI * 0.5f, Mathf.PI, yMin, height);
+    }
+    private static void AddArcBand(VertexHelper vh, RawRain raw, float dNear, float dFar,
+        float cx, float cy, float rOuter, float rInner, float a0, float a1, float yMin, float height) {
+        int steps = Mathf.Clamp(Mathf.CeilToInt(rOuter * 0.5f), 3, 12);
+        float pc = Mathf.Cos(a0), ps = Mathf.Sin(a0);
+        for(int i = 1; i <= steps; i++) {
+            float a = Mathf.Lerp(a0, a1, i / (float)steps);
+            float c = Mathf.Cos(a), s = Mathf.Sin(a);
+            Color cA = BorderColor(raw, dNear, dFar, cy + ps * rOuter, yMin, height);
+            Color cB = BorderColor(raw, dNear, dFar, cy + s * rOuter, yMin, height);
+            AddPoly4(vh,
+                cx + pc * rInner, cy + ps * rInner,
+                cx + pc * rOuter, cy + ps * rOuter,
+                cx + c * rOuter, cy + s * rOuter,
+                cx + c * rInner, cy + s * rInner,
+                cA, cA, cB, cB);
+            pc = c;
+            ps = s;
+        }
+    }
+    private static void AddPoly4(VertexHelper vh, float x0, float y0, float x1, float y1,
+        float x2, float y2, float x3, float y3, Color c0, Color c1, Color c2, Color c3) {
+        int idx = vh.currentVertCount;
+        UIVertex v = UIVertex.simpleVert;
+        v.uv0 = SolidUV;
+        v.position = new Vector3(x0, y0, 0f); v.color = c0; vh.AddVert(v);
+        v.position = new Vector3(x1, y1, 0f); v.color = c1; vh.AddVert(v);
+        v.position = new Vector3(x2, y2, 0f); v.color = c2; vh.AddVert(v);
+        v.position = new Vector3(x3, y3, 0f); v.color = c3; vh.AddVert(v);
+        vh.AddTriangle(idx, idx + 1, idx + 2);
+        vh.AddTriangle(idx + 2, idx + 3, idx);
     }
     private static Color BodyColor(RawRain raw, float dNear, float dFar, float y, float yMin,
         float height, Color tint, bool tinted) {
