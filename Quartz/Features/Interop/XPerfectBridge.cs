@@ -17,6 +17,21 @@ public static class XPerfectBridge {
     private static MemberInfo plusCountMember;
     private static MemberInfo minusCountMember;
     private static PropertyInfo enabledProp;
+    private static Func<int> xCountFast;
+    private static Func<int> plusCountFast;
+    private static Func<int> minusCountFast;
+    private static Func<bool> enabledFast;
+    private static Func<T> BindStatic<T>(MemberInfo member) {
+        try {
+            if(member is PropertyInfo p && p.PropertyType == typeof(T))
+                return (Func<T>)Delegate.CreateDelegate(typeof(Func<T>), p.GetGetMethod(true));
+            if(member is FieldInfo f && f.FieldType == typeof(T)) {
+                HarmonyLib.AccessTools.FieldRef<T> field = HarmonyLib.AccessTools.StaticFieldRefAccess<T>(f);
+                return field == null ? null : () => field();
+            }
+        } catch(Exception e) { Diag.Ignore(e); }
+        return null;
+    }
     public static bool Installed {
         get {
             EnsureResolved();
@@ -31,7 +46,8 @@ public static class XPerfectBridge {
             if(activeFrame == UnityEngine.Time.frameCount) return activeCache;
             bool result;
             try {
-                result = enabledProp == null || (enabledProp.GetValue(null, null) is bool b && b);
+                result = enabledFast != null ? enabledFast()
+                    : enabledProp == null || (enabledProp.GetValue(null, null) is bool b && b);
             } catch(Exception e) {
                 Diag.Ignore(e);
                 result = false;
@@ -62,9 +78,9 @@ public static class XPerfectBridge {
     }
     private static void RefreshCounts() {
         if(countsFrame == UnityEngine.Time.frameCount) return;
-        xCountCache = ReadIntMember(xCountMember);
-        plusCountCache = ReadIntMember(plusCountMember);
-        minusCountCache = ReadIntMember(minusCountMember);
+        xCountCache = xCountFast != null ? xCountFast() : ReadIntMember(xCountMember);
+        plusCountCache = plusCountFast != null ? plusCountFast() : ReadIntMember(plusCountMember);
+        minusCountCache = minusCountFast != null ? minusCountFast() : ReadIntMember(minusCountMember);
         countsFrame = UnityEngine.Time.frameCount;
     }
     private static Judge ReadJudge(MemberInfo member, Judge fallback) {
@@ -136,6 +152,10 @@ public static class XPerfectBridge {
             minusCountMember = GetStaticReadable(accuracyStateType, "MinusPerfectCount");
             Type mainType = xpAsm.GetType("XPerfect.Main");
             if(mainType != null) enabledProp = mainType.GetProperty("Enabled", BindingFlags.Public | BindingFlags.Static);
+            xCountFast = BindStatic<int>(xCountMember);
+            plusCountFast = BindStatic<int>(plusCountMember);
+            minusCountFast = BindStatic<int>(minusCountMember);
+            enabledFast = BindStatic<bool>(enabledProp);
             installed = lastJudgeMember != null;
             if(installed) Unhook();
         } catch(Exception e) { Diag.Ignore(e); }
