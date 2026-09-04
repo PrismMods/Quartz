@@ -1,0 +1,21 @@
+Quartz.Tests/Program.cs
+  s_9e1e203e67c495::t_2a8bf8d720372e 47
+Quartz.Tests/IO/ProfileBundleTests.cs
+  s_9e1e203e67c495::t_2a8bf8d720372e 39-45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "df38e1f0f23d16892ef5a5e16e5d23d60816ae70",
+  "prompts": {},
+  "sessions": {
+    "s_9e1e203e67c495": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f3ffcb0c-3ac2-49cd-a374-a27d7ffc80f5",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
