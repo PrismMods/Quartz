@@ -43,9 +43,11 @@ internal sealed class KvTabRemeasure : MonoBehaviour {
             viewport.preferredWidth = Mathf.Min(strip, maxWidth);
             viewport.minWidth = Mathf.Min(strip, minWidth);
         }
-        if(track != null) LayoutRebuilder.MarkLayoutForRebuild(track);
         if(Mathf.Abs(total - lastTotal) < 0.5f) stableFrames++;
-        else stableFrames = 0;
+        else {
+            stableFrames = 0;
+            if(track != null) LayoutRebuilder.MarkLayoutForRebuild(track);
+        }
         lastTotal = total;
         if(++frames >= MaxFrames || stableFrames >= StableThreshold) Destroy(this);
     }
