@@ -1,0 +1,26 @@
+Quartz/Compat/Game/Refl.Game.cs
+  s_6aff90065a7193::t_7cc5592fb4d86b 2,6-19
+Quartz/Compat/Game/Refl.cs
+  s_6aff90065a7193::t_1ab4414000e524 10
+Quartz/Compat/Game/GameApi.cs
+  s_6aff90065a7193::t_d7452f217a5cbb 17-20
+  s_6aff90065a7193::t_f71f554ddd92a4 333-338
+  s_6aff90065a7193::t_7459940af1b98f 77-80
+  s_6aff90065a7193::t_4d5833b52c730b 34-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "7f3cebb53e7d193f66dc19dab3d638700fcab01f",
+  "prompts": {},
+  "sessions": {
+    "s_6aff90065a7193": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "144e1813-c0eb-4331-a969-de8215d315a9",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
