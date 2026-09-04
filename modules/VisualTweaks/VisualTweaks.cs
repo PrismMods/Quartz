@@ -160,7 +160,7 @@ public static partial class VisualTweaks {
         int id = renderer.GetInstanceID();
         if(planetParticleCache.TryGetValue(id, out (ParticleSystem, ParticleSystem) cached)) return cached;
         (ParticleSystem, ParticleSystem) resolved = (GetCoreParticles(renderer), GetSparks(renderer));
-        if(resolved is { Item1: not null, Item2: not null }) planetParticleCache[id] = resolved;
+        planetParticleCache[id] = resolved;
         return resolved;
     }
     private static ParticleSystem GetCoreParticles(PlanetRenderer renderer)
