@@ -1,0 +1,19 @@
+modules/VisualTweaks/VisualTweaks.cs
+  s_6aff90065a7193::t_9257e034f33903 163
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "3c39a9803cf28e511a5a69238d42d31224af1952",
+  "prompts": {},
+  "sessions": {
+    "s_6aff90065a7193": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "144e1813-c0eb-4331-a969-de8215d315a9",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
