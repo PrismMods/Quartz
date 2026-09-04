@@ -26,7 +26,7 @@ public sealed class McInstallPanel : MonoBehaviour {
         });
     }
     private void Update() {
-        if(Label != null) Label.text = status;
+        if(Label != null && Label.text != status) Label.text = status;
         if(!finished) return;
         finished = false;
         if(status == "installed") OnInstalled?.Invoke();
