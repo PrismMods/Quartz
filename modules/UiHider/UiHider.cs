@@ -34,6 +34,8 @@ public static partial class UiHider {
         ShowOrHideElements();
     }
     private static bool lastActive = true;
+    private static float nextReconcileAt;
+    private const float ReconcileInterval = 0.05f;
     private static void TickInternal() {
         if(!MainCore.IsModEnabled) {
             if(lastActive) {
@@ -47,6 +49,9 @@ public static partial class UiHider {
         if(!active && !lastActive) {
             return;
         }
+        float now = Time.unscaledTime;
+        if(active == lastActive && now < nextReconcileAt) return;
+        nextReconcileAt = now + ReconcileInterval;
         ShowOrHideElements();
         lastActive = active;
     }
@@ -61,7 +66,9 @@ public static partial class UiHider {
         bool hideBeta = profile != null && (hideEverything || profile.HideBeta);
         bool hideTitle = profile != null && (hideEverything || profile.HideTitle);
         bool hideMeter = profile != null && (hideEverything || profile.HideHitErrorMeter);
-        try { RDC.noHud = hideEverything; } catch(Exception e) { Diag.Ignore(e); }
+        try {
+            if(RDC.noHud != hideEverything) RDC.noHud = hideEverything;
+        } catch(Exception e) { Diag.Ignore(e); }
         ReconcileHitErrorMeter(hideMeter);
         if(HasSteamBranchName()) SetBetaObjectsActiveIfMatches(hideBeta);
         scrUIController uiController = scrUIController.instance;
