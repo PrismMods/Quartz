@@ -1,0 +1,19 @@
+modules/KeyViewer/RainRenderer.cs
+  s_b8769482646177::t_194e38e7e39458 192-228
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "fb86eefb57c3eb0c3f59983b31ee8e10222c57a0",
+  "prompts": {},
+  "sessions": {
+    "s_b8769482646177": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f8d35093-1d90-454b-862b-a006de2bd99e",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
