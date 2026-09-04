@@ -1,0 +1,21 @@
+modules/KeyViewer/Editor/KvFillHeight.cs
+  s_6aff90065a7193::t_022e86fb3aa808 13,16-18
+modules/KeyViewer/Editor/KvTabRemeasure.cs
+  s_6aff90065a7193::t_64b8844da0c60c 47-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "dbfd2ac5afd26caa347963a62ccdee4d03b3b782",
+  "prompts": {},
+  "sessions": {
+    "s_6aff90065a7193": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "144e1813-c0eb-4331-a969-de8215d315a9",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
