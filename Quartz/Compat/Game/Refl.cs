@@ -7,7 +7,7 @@ namespace Quartz.Compat.Game;
 public static partial class Refl {
     internal const BindingFlags Any = BindingFlags.Public | BindingFlags.NonPublic
         | BindingFlags.Instance | BindingFlags.Static | BindingFlags.FlattenHierarchy;
-    internal sealed class Member {
+    internal sealed partial class Member {
         private readonly PropertyInfo prop;
         private readonly FieldInfo fieldInfo;
         internal Member(Type owner, params string[] names) {

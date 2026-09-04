@@ -14,6 +14,10 @@ public static class GameApi {
     private static readonly Refl.Member CtrlMistakes = new(typeof(scrController), "mistakesManager");
     private static readonly Refl.Member CtrlPlanetary = new(typeof(scrController), "planetarySystem");
     private static readonly Refl.Member CtrlPlayerOne = new(typeof(scrController), "playerOne");
+    private static readonly Func<scrController, scrMistakesManager> CtrlMistakesFast =
+        CtrlMistakes.BindAnyGetter<scrController, scrMistakesManager>();
+    private static readonly Func<scrController, PlanetarySystem> CtrlPlanetaryFast =
+        CtrlPlanetary.BindAnyGetter<scrController, PlanetarySystem>();
     private static readonly Refl.Member AccPercent = new(MistakesManagerType, "percentAcc");
     private static readonly Refl.Member XAccPercent = new(MistakesManagerType, "percentXAcc");
     private static readonly Refl.Member PlayerCountMember = new(PlayerManagerType, "playerCount");
@@ -27,7 +31,8 @@ public static class GameApi {
     public static scrMistakesManager MistakesManager {
         get {
             scrController ctrl = scrController.instance;
-            return ctrl == null ? null : CtrlMistakes.Get(ctrl) as scrMistakesManager;
+            if(ctrl == null) return null;
+            return CtrlMistakesFast != null ? CtrlMistakesFast(ctrl) : CtrlMistakes.Get(ctrl) as scrMistakesManager;
         }
     }
     private static readonly Func<scrMistakesManager, float> AccPercentFast =
@@ -69,8 +74,10 @@ public static class GameApi {
         tracker != null && TrackerMargins.Get(tracker) is System.Collections.ICollection c ? c.Count : -1;
     public static int DeadTiles(object tracker) =>
         tracker == null ? 0 : TrackerDeadTiles.Get(tracker, 0);
-    public static PlanetarySystem Planetary(scrController ctrl) =>
-        ctrl == null ? null : CtrlPlanetary.Get(ctrl) as PlanetarySystem;
+    public static PlanetarySystem Planetary(scrController ctrl) {
+        if(ctrl == null) return null;
+        return CtrlPlanetaryFast != null ? CtrlPlanetaryFast(ctrl) : CtrlPlanetary.Get(ctrl) as PlanetarySystem;
+    }
     public static object PlayerOne() {
         scrController ctrl = scrController.instance;
         return ctrl == null ? null : CtrlPlayerOne.Get(ctrl);
@@ -323,8 +330,12 @@ public static class GameApi {
     public static Material FontMaterial(TMPro.TMP_Asset asset) =>
         asset == null ? null : FontAssetMaterialMember.Get(asset) as Material;
     private static readonly Refl.Member PlanetRingMember = new(typeof(PlanetRenderer), "ring");
-    public static Renderer PlanetRing(PlanetRenderer renderer) =>
-        renderer == null ? null : PlanetRingMember.Get(renderer) as Renderer;
+    private static readonly Func<PlanetRenderer, Renderer> PlanetRingFast =
+        PlanetRingMember.BindAnyGetter<PlanetRenderer, Renderer>();
+    public static Renderer PlanetRing(PlanetRenderer renderer) {
+        if(renderer == null) return null;
+        return PlanetRingFast != null ? PlanetRingFast(renderer) : PlanetRingMember.Get(renderer) as Renderer;
+    }
     public static bool TryGetRingColor(PlanetRenderer renderer, out Color color) {
         switch(PlanetRing(renderer)) {
             case LineRenderer line:
