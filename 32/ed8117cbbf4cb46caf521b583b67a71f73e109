@@ -1,0 +1,19 @@
+modules/Minecraft/McInstallPanel.cs
+  s_ebe775fc7a79d6::t_fa3df7e2586a40 29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "32ed8117cbbf4cb46caf521b583b67a71f73e109",
+  "prompts": {},
+  "sessions": {
+    "s_ebe775fc7a79d6": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a06702-fe49-7e23-8e73-0f6f798df39d",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
