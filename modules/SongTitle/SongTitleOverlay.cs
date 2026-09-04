@@ -85,6 +85,12 @@ public static class SongTitleOverlay {
         TextCompat.NoWrap(text);
         text.text = "";
         dragObj = ReorganizeHandle.CreateDragSurface(root, () => MainCore.Tr.Get("SONG_TITLE", "Song Title"), Save);
+        ReorganizeHandle.SetSizeSource(
+            dragObj,
+            () => Conf.MasterSize,
+            v => { Conf.MasterSize = v; Apply(); },
+            0.25f, 3f
+        );
         updater = canvasObj.AddComponent<Updater>();
         gateWant = true;
         gateRunning = true;

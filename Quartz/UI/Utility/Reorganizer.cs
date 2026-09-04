@@ -14,6 +14,12 @@ public sealed class ReorganizeHandle : MonoBehaviour {
     internal RectTransform MeasureRect => Bounds != null ? Bounds : Target;
     public Func<string> GetName;
     public Action OnMoved;
+    public Func<float> GetSize;
+    public Action<float> SetSize;
+    public float MinSize = 0.1f;
+    public float MaxSize = 4f;
+    public string SizeFormat = "0.00 x";
+    internal bool CanResize => GetSize != null && SetSize != null;
     private Vector2 grabOffset;
     private bool armed;
     private bool moved;
@@ -66,6 +72,70 @@ public sealed class ReorganizeHandle : MonoBehaviour {
         drag.SetActive(false);
         return drag;
     }
+    public static void SetSizeSource(
+        GameObject drag, Func<float> get, Action<float> set,
+        float min, float max, string format = "0.00 x"
+    ) {
+        if(drag == null || drag.GetComponent<ReorganizeHandle>() is not { } handle) return;
+        handle.GetSize = get;
+        handle.SetSize = set;
+        handle.MinSize = min;
+        handle.MaxSize = max;
+        handle.SizeFormat = format;
+    }
+}
+public sealed class ReorganizeSizeGrip : MonoBehaviour {
+    public ReorganizeHandle Owner;
+    private const float MinGrabRadius = 8f;
+    private Vector2 anchor;
+    private float startDistance;
+    private float startSize;
+    private bool dragging;
+    private void Awake() {
+        EventTrigger trigger = gameObject.AddComponent<EventTrigger>();
+        UnityUtils.AddEvent(EventTriggerType.PointerDown, OnPointerDown, trigger);
+        UnityUtils.AddEvent(EventTriggerType.Drag, OnDragInternal, trigger);
+        UnityUtils.AddEvent(EventTriggerType.PointerUp, OnPointerUp, trigger);
+    }
+    private void OnPointerDown(PointerEventData e) {
+        dragging = false;
+        if(e.button != PointerEventData.InputButton.Left) return;
+        if(Owner == null || Owner.Target == null || !Owner.CanResize) return;
+        anchor = Owner.Target.position;
+        startDistance = Vector2.Distance(e.position, anchor);
+        if(startDistance < MinGrabRadius) return;
+        startSize = Owner.GetSize();
+        dragging = true;
+    }
+    private void OnDragInternal(PointerEventData e) {
+        if(!dragging || Owner == null || !Owner.CanResize) return;
+        float ratio = Vector2.Distance(e.position, anchor) / startDistance;
+        Owner.SetSize(Mathf.Clamp(startSize * ratio, Owner.MinSize, Owner.MaxSize));
+        Reorganizer.SyncSelectedSliders();
+    }
+    private void OnPointerUp(PointerEventData e) {
+        if(!dragging) return;
+        dragging = false;
+        if(Owner != null) Owner.OnMoved?.Invoke();
+    }
+}
+public sealed class ReorganizeGripScaler : MonoBehaviour {
+    public Transform[] Grips;
+    private Transform referenceTransform;
+    private void Awake() {
+        Canvas canvas = GetComponentInParent<Canvas>();
+        referenceTransform = canvas != null ? canvas.rootCanvas.transform : null;
+    }
+    private void LateUpdate() {
+        if(Grips == null) return;
+        float own = transform.lossyScale.x;
+        if(own <= 0.0001f) return;
+        float reference = referenceTransform != null ? referenceTransform.lossyScale.x : 1f;
+        Vector3 scale = Vector3.one * (reference / own);
+        foreach(Transform grip in Grips) {
+            if(grip != null && grip.localScale != scale) grip.localScale = scale;
+        }
+    }
 }
 public static class Reorganizer {
     private const float VirtualW = 1920f;
@@ -78,6 +148,8 @@ public static class Reorganizer {
     private static TextMeshProUGUI nameLabel;
     private static UISlider xSlider;
     private static UISlider ySlider;
+    private static UISlider sizeSlider;
+    private static RectTransform sizeRow;
     private static GameObject outlineObj;
     internal static void Register(ReorganizeHandle handle) {
         if(!handles.Contains(handle)) handles.Add(handle);
@@ -98,6 +170,7 @@ public static class Reorganizer {
         BuildOutline(handle.MeasureRect);
         EnsurePanel();
         nameLabel.text = handle.GetName?.Invoke() ?? handle.Target.name;
+        ApplySizeSlider(handle);
         SyncSelectedSliders();
         panelObj.SetActive(true);
     }
@@ -115,6 +188,8 @@ public static class Reorganizer {
         nameLabel = null;
         xSlider = null;
         ySlider = null;
+        sizeSlider = null;
+        sizeRow = null;
     }
     private static void BuildOutline(RectTransform target) {
         outlineObj = new GameObject("ReorganizeOutline");
@@ -130,6 +205,32 @@ public static class Reorganizer {
         img.type = Image.Type.Sliced;
         img.color = UIColors.ObjectActive;
         img.raycastTarget = false;
+        BuildGrips();
+    }
+    private static readonly Vector2[] GripAnchors = [
+        new(0f, 0f), new(0f, 1f), new(1f, 0f), new(1f, 1f),
+    ];
+    private const float GripSize = 22f;
+    private static void BuildGrips() {
+        if(Selected == null || !Selected.CanResize) return;
+        Transform[] grips = new Transform[GripAnchors.Length];
+        for(int i = 0; i < GripAnchors.Length; i++) {
+            GameObject grip = new("ReorganizeGrip" + i);
+            grip.transform.SetParent(outlineObj.transform, false);
+            RectTransform rect = grip.AddComponent<RectTransform>();
+            rect.anchorMin = rect.anchorMax = GripAnchors[i];
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = Vector2.zero;
+            rect.sizeDelta = new Vector2(GripSize, GripSize);
+            Image image = grip.AddComponent<Image>();
+            image.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P1024);
+            image.type = Image.Type.Sliced;
+            image.color = UIColors.ObjectActive;
+            image.raycastTarget = true;
+            grip.AddComponent<ReorganizeSizeGrip>().Owner = Selected;
+            grips[i] = grip.transform;
+        }
+        outlineObj.AddComponent<ReorganizeGripScaler>().Grips = grips;
     }
     private static void ClearOutline() {
         if(outlineObj != null) Object.Destroy(outlineObj);
@@ -172,6 +273,19 @@ public static class Reorganizer {
         nameLabel.raycastTarget = false;
         xSlider = MakeAxisSlider("X Position", "reorganize_x", VirtualW, v => MoveSelected(v, null));
         ySlider = MakeAxisSlider("Y Position", "reorganize_y", VirtualH, v => MoveSelected(null, v));
+        sizeRow = GenerateUI.Row(panelObj.transform);
+        sizeSlider = GenerateUI.Slider(
+            sizeRow, 1f, 0.1f, 4f, 1f,
+            null, null, null,
+            "Size", "reorganize_size"
+        );
+        sizeSlider.Rect.offsetMin = Vector2.zero;
+        sizeSlider.Rect.offsetMax = Vector2.zero;
+        sizeSlider.OnChanged = SizeSelected;
+        sizeSlider.OnComplete = v => {
+            SizeSelected(v);
+            Selected?.OnMoved?.Invoke();
+        };
         panelObj.SetActive(false);
     }
     private static UISlider MakeAxisSlider(string text, string id, float max, Action<float> apply) {
@@ -191,11 +305,28 @@ public static class Reorganizer {
         };
         return slider;
     }
+    private static void ApplySizeSlider(ReorganizeHandle handle) {
+        if(sizeSlider == null || sizeRow == null) return;
+        if(handle == null || !handle.CanResize) {
+            sizeRow.gameObject.SetActive(false);
+            return;
+        }
+        sizeRow.gameObject.SetActive(true);
+        sizeSlider.Min = handle.MinSize;
+        sizeSlider.Max = handle.MaxSize;
+        sizeSlider.Format = handle.SizeFormat;
+        sizeSlider.SetDefaultValue(handle.GetSize(), true);
+    }
+    private static void SizeSelected(float value) {
+        if(Selected == null || !Selected.CanResize) return;
+        Selected.SetSize(Mathf.Clamp(value, Selected.MinSize, Selected.MaxSize));
+    }
     internal static void SyncSelectedSliders() {
         if(Selected?.Target == null || xSlider == null) return;
         Vector2 center = ScreenToVirtual(ScreenCenter(Selected.MeasureRect));
         xSlider.SetOnlyValue(center.x, true);
         ySlider.SetOnlyValue(center.y, true);
+        if(sizeSlider != null && Selected.CanResize) sizeSlider.SetOnlyValue(Selected.GetSize(), true);
     }
     private static void MoveSelected(float? virtualX, float? virtualY) {
         if(Selected?.Target == null) return;

@@ -12,12 +12,24 @@ public static partial class KeyViewerOverlay {
         dragObj = BuildReorganizeHandle(root, "Drag", "KEYVIEWER_TITLE", "Key Viewer");
         dragRect = (RectTransform)dragObj.transform;
         if(dragObj.GetComponent<ReorganizeHandle>() is { } handle) handle.Bounds = dragRect;
+        ReorganizeHandle.SetSizeSource(
+            dragObj,
+            () => Conf.DmScale,
+            v => { Conf.DmScale = v; Apply(); },
+            0.2f, 4f
+        );
         if(footRoot != null) {
             footDragObj = BuildReorganizeHandle(
                 footRoot, "FootDrag", "KEYVIEWER_FOOT_TITLE", "Key Viewer (Foot)"
             );
             footDragRect = (RectTransform)footDragObj.transform;
             if(footDragObj.GetComponent<ReorganizeHandle>() is { } footHandle) footHandle.Bounds = footDragRect;
+            ReorganizeHandle.SetSizeSource(
+                footDragObj,
+                () => Conf.DmFootScale,
+                v => { Conf.DmFootScale = v; Apply(); },
+                0.2f, 4f
+            );
         }
         RefreshDragBounds();
     }

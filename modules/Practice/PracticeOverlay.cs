@@ -59,6 +59,12 @@ public static class PracticeOverlay {
         text.text = "";
         dragObj = ReorganizeHandle.CreateDragSurface(root,
             () => MainCore.Tr.Get("SECTION_PRACTICE_DIFFICULTY", "Practice Difficulty"), PracticeDifficulty.Save);
+        ReorganizeHandle.SetSizeSource(
+            dragObj,
+            () => Conf.FontSize,
+            v => { Conf.FontSize = Mathf.Round(v); Apply(); },
+            8f, 120f, "0 px"
+        );
         updater = canvasObj.AddComponent<Updater>();
         gateWant = true;
         gateRunning = true;

@@ -58,6 +58,12 @@ public static class ComboOverlay {
         valueText = CreateLabel(root, "Value", TextAlignmentOptions.Center);
         captionText = CreateLabel(root, "Caption", TextAlignmentOptions.Center);
         dragObj = ReorganizeHandle.CreateDragSurface(root, () => MainCore.Tr.Get("COMBO", "Combo"), Save);
+        ReorganizeHandle.SetSizeSource(
+            dragObj,
+            () => Conf.MasterSize,
+            v => { Conf.MasterSize = v; Apply(); },
+            0.25f, 3f
+        );
         updater = canvasObj.AddComponent<Updater>();
         gateWant = true;
         gateRunning = true;

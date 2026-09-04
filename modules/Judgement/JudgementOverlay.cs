@@ -73,6 +73,12 @@ public static class JudgementOverlay {
         if(compact) BuildCompactRow(rowObj);
         else BuildMultiLabelRow(rowObj);
         dragObj = ReorganizeHandle.CreateDragSurface(root, () => MainCore.Tr.Get("JUDGEMENT", "Judgement"), Save, ignoreLayout: true);
+        ReorganizeHandle.SetSizeSource(
+            dragObj,
+            () => Conf.Size,
+            v => { Conf.Size = v; Apply(); },
+            0.3f, 3f
+        );
         updater = canvasObj.AddComponent<Updater>();
         gateWant = true;
         gateRunning = true;

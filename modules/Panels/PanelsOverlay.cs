@@ -294,6 +294,12 @@ public static partial class PanelsOverlay {
         bg.color = config.GetBackgroundColor();
         bg.raycastTarget = false;
         GameObject drag = ReorganizeHandle.CreateDragSurface(rect, () => config.Name, Save);
+        ReorganizeHandle.SetSizeSource(
+            drag,
+            () => config.FontSize,
+            v => { config.FontSize = Mathf.Round(v); Apply(); },
+            12f, 48f, "0 px"
+        );
         GameObject textObj = new("Text");
         textObj.transform.SetParent(rect, false);
         RectTransform textRect = textObj.AddComponent<RectTransform>();
