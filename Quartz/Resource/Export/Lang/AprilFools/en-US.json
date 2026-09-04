@@ -441,6 +441,7 @@
     "PROFILE_RECALIBRATE": "Recalibrate Display",
     "PROFILE_RECALIBRATED": "Recalibrated overlays to this display.",
     "PROFILE_SELECT": "Select",
+    "PROFILE_STATUS_CREATE_FAILED": "Couldn't create the profile.",
     "PROFILE_STATUS_EXPORTED": "Exported '{0}'.",
     "PROFILE_STATUS_EXPORT_FAILED": "Export failed.",
     "PROFILE_STATUS_IMPORTED": "Imported as '{0}'.",

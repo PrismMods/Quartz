@@ -441,6 +441,7 @@
     "PROFILE_RECALIBRATE": "重新校准显示器坐标",
     "PROFILE_RECALIBRATED": "已根据当前显示器重新校准悬浮界面坐标。",
     "PROFILE_SELECT": "选择",
+    "PROFILE_STATUS_CREATE_FAILED": "配置方案创建失败。",
     "PROFILE_STATUS_EXPORTED": "成功导出「{0}」。",
     "PROFILE_STATUS_EXPORT_FAILED": "导出失败。",
     "PROFILE_STATUS_IMPORTED": "已导入为方案「{0}」。",

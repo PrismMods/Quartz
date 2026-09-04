@@ -18,6 +18,13 @@ public static class ProfileBundle {
         }
         return imported;
     }
+    public static JObject KeepOnly(JObject settings, string[] fields) {
+        JObject kept = [];
+        foreach(string field in fields) {
+            if(settings[field] is { } value) kept[field] = value.DeepClone();
+        }
+        return kept;
+    }
     public static JToken StripPresetImposed(string fileName, JToken contents, string configFileName, string[] presetImposed) {
         if(!fileName.Equals(configFileName, StringComparison.OrdinalIgnoreCase)
             || contents is not JObject settings) return contents;

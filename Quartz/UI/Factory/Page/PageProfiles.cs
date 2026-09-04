@@ -148,12 +148,17 @@ internal static class PageProfiles {
             statusText.text = GenerateUI.Tr("PROFILE_STATUS_NAME_TAKEN", "That name is already used.");
             return;
         }
-        if(ProfileManager.Create(name)) {
-            pendingName = "";
-            nameInput.Set("", false);
-            statusText.text = "";
-            RebuildList();
-        }
+        pendingName = "";
+        nameInput.Set("", false);
+        statusText.text = "";
+        MainThread.Enqueue(() => {
+            if(ProfileManager.Create(name)) UICore.Rebuild(true);
+            else {
+                if(statusText != null)
+                    statusText.text = GenerateUI.Tr("PROFILE_STATUS_CREATE_FAILED", "Couldn't create the profile.");
+                RebuildList();
+            }
+        });
     }
     private static void ImportProfile() {
         string path;

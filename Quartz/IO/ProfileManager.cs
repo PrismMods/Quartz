@@ -1,3 +1,4 @@
+using System.Text;
 using Newtonsoft.Json.Linq;
 using Quartz.Core;
 using Quartz.Localization;
@@ -22,7 +23,11 @@ public static partial class ProfileManager {
         "CalibrationTimings.json",
         "FAQ.json",
     };
-    private static readonly string[] presetImposed = [nameof(CoreSettings.Language)];
+    private static readonly string[] presetImposed = [
+        nameof(CoreSettings.Language),
+        nameof(CoreSettings.ToggleModifier),
+        nameof(CoreSettings.ToggleKey),
+    ];
     public static string Active { get; private set; } = DEFAULT_NAME;
     public static string ProfilesPath => Path.Combine(MainCore.Paths.RootPath, "Profiles");
     private static string PointerPath => Path.Combine(MainCore.Paths.RootPath, "Profiles.json");
@@ -73,15 +78,28 @@ public static partial class ProfileManager {
         name = Sanitize(name);
         if(name == null || Exists(name)) return false;
         try {
-            if(!CaptureActive()) return false;
-            CaptureTo(name);
-            Active = name;
-            SavePointer();
-            return true;
+            if(!SettingsRegistry.SaveAll()) return false;
+            WriteProfileDirectory(DirOf(name), DefaultProfileFiles());
+            if(Apply(name)) return true;
+            Delete(name);
+            return false;
         } catch(Exception e) {
             MainCore.Log.Err($"[{nameof(ProfileManager)}] Create '{name}' failed: {e}");
             return false;
         }
+    }
+    private static Dictionary<string, byte[]> DefaultProfileFiles() {
+        Dictionary<string, byte[]> files = new(StringComparer.OrdinalIgnoreCase);
+        JObject carried = ProfileBundle.KeepOnly(ReadLiveConfig(), presetImposed);
+        if(carried.HasValues) files[ConfigFileName] = Encoding.UTF8.GetBytes(carried.ToString());
+        return files;
+    }
+    private static JObject ReadLiveConfig() {
+        try {
+            string path = Path.Combine(MainCore.Paths.RootPath, ConfigFileName);
+            if(File.Exists(path)) return JToken.Parse(File.ReadAllText(path)) as JObject ?? [];
+        } catch(Exception e) { Diag.Ignore(e); }
+        return [];
     }
     public static string CreateUnique(string name) {
         name = ProfileNames.Unique(name, Exists);
