@@ -1,0 +1,32 @@
+stubs/Newtonsoft.Json/Stubs.g.cs
+  s_6aff90065a7193::t_68ba176d126a43 152
+stubs/README.md
+  s_6aff90065a7193::t_68ba176d126a43 19-20,24,30,38,41
+stubs/UnityEngine.CoreModule/Stubs.g.cs
+  s_6aff90065a7193::t_68ba176d126a43 993
+stubs/UnityEngine.UIModule/Stubs.g.cs
+  s_6aff90065a7193::t_68ba176d126a43 19
+stubs/0Harmony/Stubs.g.cs
+  s_6aff90065a7193::t_68ba176d126a43 18,26,29
+stubs/MANIFEST.json
+  s_6aff90065a7193::t_68ba176d126a43 8-9,22-27,1115,2394-2395,4624,5871-5872
+stubs/PATCH-TARGETS.json
+  s_6aff90065a7193::t_68ba176d126a43 684-688
+  s_6aff90065a7193::t_cc89cb971a12da 683
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "e32e8e4589c307877429a5e9f60348c36e2c1d09",
+  "prompts": {},
+  "sessions": {
+    "s_6aff90065a7193": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "144e1813-c0eb-4331-a969-de8215d315a9",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
