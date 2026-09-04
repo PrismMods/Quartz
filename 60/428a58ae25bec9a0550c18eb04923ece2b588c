@@ -1,0 +1,19 @@
+build.json
+  s_6aff90065a7193::t_b96069a53faa14 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "60428a58ae25bec9a0550c18eb04923ece2b588c",
+  "prompts": {},
+  "sessions": {
+    "s_6aff90065a7193": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "144e1813-c0eb-4331-a969-de8215d315a9",
+        "model": "unknown"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
