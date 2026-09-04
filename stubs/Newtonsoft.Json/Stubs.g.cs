@@ -149,6 +149,7 @@ namespace Newtonsoft.Json.Linq {
         protected JProperty() { }
     }
     public abstract unsafe partial class JToken : global::System.Collections.Generic.IEnumerable<global::Newtonsoft.Json.Linq.JToken> {
+        public virtual bool HasValues { get => throw null; }
         public virtual global::Newtonsoft.Json.Linq.JToken this[object key] { get => throw null; set { } }
         public global::Newtonsoft.Json.Linq.JContainer Parent { get => throw null; }
         public virtual global::Newtonsoft.Json.Linq.JTokenType Type { get => throw null; }

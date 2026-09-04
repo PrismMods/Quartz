@@ -16,6 +16,7 @@ namespace UnityEngine {
         public bool overrideSorting { get => throw null; set { } }
         public bool pixelPerfect { get => throw null; set { } }
         public global::UnityEngine.RenderMode renderMode { get => throw null; set { } }
+        public global::UnityEngine.Canvas rootCanvas { get => throw null; }
         public int sortingOrder { get => throw null; set { } }
         public global::UnityEngine.Camera worldCamera { get => throw null; set { } }
         public static event global::UnityEngine.Canvas.WillRenderCanvases willRenderCanvases { add { } remove { } }

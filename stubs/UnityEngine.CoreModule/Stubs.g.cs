@@ -990,6 +990,7 @@ namespace UnityEngine {
         public float sqrMagnitude { get => throw null; }
         public static global::UnityEngine.Vector2 zero { get => throw null; }
         public Vector2(float x, float y) => throw null;
+        public static float Distance(global::UnityEngine.Vector2 a, global::UnityEngine.Vector2 b) => throw null;
         public static float Dot(global::UnityEngine.Vector2 lhs, global::UnityEngine.Vector2 rhs) => throw null;
         public static global::UnityEngine.Vector2 LerpUnclamped(global::UnityEngine.Vector2 a, global::UnityEngine.Vector2 b, float t) => throw null;
         public static global::UnityEngine.Vector2 Max(global::UnityEngine.Vector2 lhs, global::UnityEngine.Vector2 rhs) => throw null;

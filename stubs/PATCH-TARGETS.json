@@ -681,6 +681,12 @@
       "assembly": "Assembly-CSharp"
     },
     {
+      "type": "scrPlayer",
+      "member": "Die",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
       "type": "scrShowIfDebug",
       "member": "Update",
       "resolved": true,

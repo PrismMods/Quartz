@@ -15,6 +15,7 @@ namespace HarmonyLib {
     public static unsafe partial class AccessTools {
         public static global::System.Reflection.FieldInfo Field(global::System.Type type, string name) => throw null;
         public static global::HarmonyLib.AccessTools.FieldRef<T, F> FieldRefAccess<T, F>(string fieldName) => throw null;
+        public static global::HarmonyLib.AccessTools.FieldRef<T, F> FieldRefAccess<T, F>(global::System.Reflection.FieldInfo fieldInfo) => throw null;
         public static global::System.Collections.Generic.List<global::System.Reflection.MethodInfo> GetDeclaredMethods(global::System.Type type) => throw null;
         public static global::System.Collections.Generic.List<string> GetMethodNames(global::System.Type type) => throw null;
         public static global::System.Type[] GetTypesFromAssembly(global::System.Reflection.Assembly assembly) => throw null;
@@ -22,8 +23,10 @@ namespace HarmonyLib {
         public static global::System.Reflection.MethodInfo Method(global::System.Type type, string name, global::System.Type[] parameters = default, global::System.Type[] generics = default) => throw null;
         public static global::System.Reflection.PropertyInfo Property(global::System.Type type, string name) => throw null;
         public static global::System.Reflection.MethodInfo PropertyGetter(global::System.Type type, string name) => throw null;
+        public static global::HarmonyLib.AccessTools.FieldRef<F> StaticFieldRefAccess<F>(global::System.Reflection.FieldInfo fieldInfo) => throw null;
         public static global::System.Type TypeByName(string name) => throw null;
         public unsafe delegate ref F FieldRef<T, F>(T instance = default);
+        public unsafe delegate ref F FieldRef<F>();
     }
     public unsafe partial class CodeInstruction {
         public global::System.Reflection.Emit.OpCode opcode;

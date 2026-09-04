@@ -5,6 +5,8 @@
       {
         "type": "HarmonyLib.AccessTools",
         "members": [
+          "HarmonyLib.AccessTools/FieldRef\u00601\u003CF\u003E HarmonyLib.AccessTools::StaticFieldRefAccess(System.Reflection.FieldInfo)",
+          "HarmonyLib.AccessTools/FieldRef\u00602\u003CT,F\u003E HarmonyLib.AccessTools::FieldRefAccess(System.Reflection.FieldInfo)",
           "HarmonyLib.AccessTools/FieldRef\u00602\u003CT,F\u003E HarmonyLib.AccessTools::FieldRefAccess(System.String)",
           "System.Collections.Generic.List\u00601\u003CSystem.Reflection.MethodInfo\u003E HarmonyLib.AccessTools::GetDeclaredMethods(System.Type)",
           "System.Collections.Generic.List\u00601\u003CSystem.String\u003E HarmonyLib.AccessTools::GetMethodNames(System.Type)",
@@ -15,6 +17,12 @@
           "System.Type HarmonyLib.AccessTools::Inner(System.Type,System.String)",
           "System.Type HarmonyLib.AccessTools::TypeByName(System.String)",
           "System.Type[] HarmonyLib.AccessTools::GetTypesFromAssembly(System.Reflection.Assembly)"
+        ]
+      },
+      {
+        "type": "HarmonyLib.AccessTools/FieldRef\u00601",
+        "members": [
+          "F\u0026 HarmonyLib.AccessTools/FieldRef\u00601::Invoke()"
         ]
       },
       {
@@ -1104,6 +1112,7 @@
         "members": [
           "System.Boolean RDC::auto()",
           "System.Boolean RDC::get_auto()",
+          "System.Boolean RDC::get_noHud()",
           "System.Boolean RDC::get_runningOnSteamDeck()",
           "System.Boolean RDC::get_useOldAuto()",
           "System.Boolean RDC::noHud()",
@@ -2382,6 +2391,8 @@
           "Newtonsoft.Json.Linq.JToken Newtonsoft.Json.Linq.JToken::op_Implicit(System.String)",
           "Newtonsoft.Json.Linq.JTokenType Newtonsoft.Json.Linq.JToken::Type()",
           "Newtonsoft.Json.Linq.JTokenType Newtonsoft.Json.Linq.JToken::get_Type()",
+          "System.Boolean Newtonsoft.Json.Linq.JToken::HasValues()",
+          "System.Boolean Newtonsoft.Json.Linq.JToken::get_HasValues()",
           "System.Boolean Newtonsoft.Json.Linq.JToken::op_Explicit(Newtonsoft.Json.Linq.JToken)",
           "System.Int32 Newtonsoft.Json.Linq.JToken::op_Explicit(Newtonsoft.Json.Linq.JToken)",
           "System.Int64 Newtonsoft.Json.Linq.JToken::op_Explicit(Newtonsoft.Json.Linq.JToken)",
@@ -4610,6 +4621,7 @@
         "members": [
           "System.Boolean UnityEngine.Vector2::op_Equality(UnityEngine.Vector2,UnityEngine.Vector2)",
           "System.Boolean UnityEngine.Vector2::op_Inequality(UnityEngine.Vector2,UnityEngine.Vector2)",
+          "System.Single UnityEngine.Vector2::Distance(UnityEngine.Vector2,UnityEngine.Vector2)",
           "System.Single UnityEngine.Vector2::Dot(UnityEngine.Vector2,UnityEngine.Vector2)",
           "System.Single UnityEngine.Vector2::get_magnitude()",
           "System.Single UnityEngine.Vector2::get_sqrMagnitude()",
@@ -5856,6 +5868,8 @@
           "System.Void UnityEngine.Canvas::set_sortingOrder(System.Int32)",
           "UnityEngine.Camera UnityEngine.Canvas::get_worldCamera()",
           "UnityEngine.Camera UnityEngine.Canvas::worldCamera()",
+          "UnityEngine.Canvas UnityEngine.Canvas::get_rootCanvas()",
+          "UnityEngine.Canvas UnityEngine.Canvas::rootCanvas()",
           "UnityEngine.Canvas/WillRenderCanvases UnityEngine.Canvas::willRenderCanvases",
           "UnityEngine.Material UnityEngine.Canvas::GetDefaultCanvasMaterial()",
           "UnityEngine.RenderMode UnityEngine.Canvas::renderMode()"
