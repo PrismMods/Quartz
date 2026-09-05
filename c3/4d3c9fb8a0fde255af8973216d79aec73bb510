@@ -1,0 +1,32 @@
+modules/KeyViewer/Js/KvJsRuntime.PluginRuntime.cs
+  s_6aff90065a7193::t_28d03c495a9890 198-212,225,230-238,240-244
+  s_6aff90065a7193::t_0adbcf2c5335d6 136,143,145,149-150,152-159,168,170-171
+modules/KeyViewer/Js/KvJsRuntime.cs
+  s_6aff90065a7193::t_c8821f33640db2 200,202,205
+  s_6aff90065a7193::t_58253e2f00a403 162-163,166-170
+modules/KeyViewer/Js/KvJsRuntime.Definition.cs
+  s_6aff90065a7193::t_f598f49c234c71 69-70,77-82,87-91,94,100-104,108
+modules/KeyViewer/KeyViewerOverlay.Js.cs
+  s_6aff90065a7193::t_3b45f1bfe750a0 13-19
+modules/KeyViewer/Layout/KvKeyNames.cs
+  s_6aff90065a7193::t_cddaec531409f6 68,71-76
+modules/KeyViewer/Js/KvJsVNode.cs
+  s_6aff90065a7193::t_a6a53532b7902e 11-13,20-21,26,28-30
+  s_6aff90065a7193::t_a1b73962d15301 14-19,22-25,27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "c34d3c9fb8a0fde255af8973216d79aec73bb510",
+  "prompts": {},
+  "sessions": {
+    "s_6aff90065a7193": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "144e1813-c0eb-4331-a969-de8215d315a9",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
