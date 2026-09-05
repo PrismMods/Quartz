@@ -66,28 +66,46 @@ internal static partial class KvJsRuntime {
                 DestroyVisual();
             }
 
-            internal Vector2 Render(RectTransform parent, float x, float y) {
-                DestroyVisual();
+            internal Vector2 Render(RectTransform parent, float x, float y, out bool changed) {
+                changed = true;
                 try {
                     JsValue helpers = owner.engine.Invoke(owner.engine.GetValue("__kvHelpers"), [Id]);
                     owner.engine.Constraints.Reset();
                     JsValue rendered = owner.engine.Invoke(template, [State, Settings, helpers]);
                     object value = rendered.ToObject();
                     KvJsVNode vnode = value as KvJsVNode ?? KvJsVNode.NewText(value?.ToString() ?? "");
+                    if(visual != null && ReferenceEquals(parent, lastParent) && x == lastX && y == lastY
+                        && KvJsVNode.Same(vnode, lastVNode)) {
+                        changed = false;
+                        return lastSize;
+                    }
+                    DestroyVisual();
                     KvJsRenderer.Result result = KvJsRenderer.Render(
                         parent, vnode, Name, x, y,
                         Mathf.Max(20f, estimatedWidth), Mathf.Max(20f, estimatedHeight));
                     visual = result.Root;
+                    lastVNode = vnode;
+                    lastParent = parent;
+                    lastX = x;
+                    lastY = y;
+                    lastSize = result.Size;
                     return result.Size;
                 } catch(Exception e) {
+                    DestroyVisual();
                     Report(owner.record.Name, e);
                     return Vector2.zero;
                 }
             }
 
+            private KvJsVNode lastVNode;
+            private RectTransform lastParent;
+            private float lastX, lastY;
+            private Vector2 lastSize;
+
             internal void DestroyVisual() {
                 if(visual != null) Object.Destroy(visual);
                 visual = null;
+                lastVNode = null;
             }
 
             internal void MergeState(ObjectInstance updates) {

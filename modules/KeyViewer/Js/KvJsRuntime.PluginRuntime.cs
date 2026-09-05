@@ -133,25 +133,30 @@ internal static partial class KvJsRuntime {
                     InvokeScoped(timer.DefinitionId, timer.Callback);
                 }
             }
-            if(time >= nextStats && HasStatsSubscription()) {
+            if(time >= nextStats && HasSubscription("stats")) {
                 nextStats = time + 0.05f;
                 JsValue payload = StatsValue();
                 Emit("stats", payload);
             }
         }
 
-        private bool HasStatsSubscription() {
+        private bool HasSubscription(string eventName) {
             foreach(Subscription sub in subscriptions.Values)
-                if(sub.EventName == "stats") return true;
+                if(sub.EventName == eventName) return true;
             return false;
         }
 
+        internal bool WantsKeyEvents => HasSubscription("key") || HasSubscription("rawKey");
+
         internal void EmitKey(string label, string state, string mode, string device) {
-            ObjectInstance key = NewObject();
-            Put(key, "key", label);
-            Put(key, "state", state);
-            Put(key, "mode", mode);
-            Emit("key", key);
+            if(HasSubscription("key")) {
+                ObjectInstance key = NewObject();
+                Put(key, "key", label);
+                Put(key, "state", state);
+                Put(key, "mode", mode);
+                Emit("key", key);
+            }
+            if(!HasSubscription("rawKey")) return;
             ObjectInstance raw = NewObject();
             Put(raw, "device", device);
             Put(raw, "label", label);
@@ -160,9 +165,10 @@ internal static partial class KvJsRuntime {
             Emit("rawKey", raw);
         }
 
-        internal float RenderPanels(RectTransform parent, float x, float y) {
+        internal float RenderPanels(RectTransform parent, float x, float y, ref bool changed) {
             foreach(Definition definition in definitions) {
-                Vector2 size = definition.Render(parent, x, y);
+                Vector2 size = definition.Render(parent, x, y, out bool rendered);
+                changed |= rendered;
                 y += Mathf.Max(20f, size.y) + 12f;
             }
             return y;
@@ -189,7 +195,21 @@ internal static partial class KvJsRuntime {
             }
         }
 
-        private void InvokeScoped(string definitionId, JsValue callback, params object[] args) {
+        private static readonly object[] NoArgs = [];
+        private readonly object[] oneArg = new object[1];
+
+        private void InvokeScoped(string definitionId, JsValue callback) => InvokeScoped(definitionId, callback, NoArgs);
+
+        private void InvokeScoped(string definitionId, JsValue callback, JsValue payload) {
+            oneArg[0] = payload;
+            try {
+                InvokeScoped(definitionId, callback, oneArg);
+            } finally {
+                oneArg[0] = null;
+            }
+        }
+
+        private void InvokeScoped(string definitionId, JsValue callback, object[] args) {
             string previous = activeDefinition;
             activeDefinition = definitionId;
             try {
@@ -202,14 +222,26 @@ internal static partial class KvJsRuntime {
             }
         }
 
-        private ObjectInstance NewObject() => engine.Evaluate("({})").AsObject();
+        private ObjectInstance NewObject() => new JsObject(engine);
         private static void Put(ObjectInstance target, string name, JsValue value) => target.Set(name, value);
         private JsValue ParseJson(string raw) => string.IsNullOrEmpty(raw)
             ? JsValue.Null
             : engine.Invoke(engine.GetValue("__kvParse"), [raw]);
-        private JsValue StatsValue() => ParseJson(KeyViewerOverlay.JsStatsJson());
+        private JsValue StatsValue() {
+            KeyViewerOverlay.JsStats(out int kps, out float kpsAvg, out int kpsMax, out int total);
+            ObjectInstance stats = NewObject();
+            Put(stats, "kps", kps);
+            Put(stats, "kpsAvg", (double)kpsAvg);
+            Put(stats, "kpsMax", kpsMax);
+            Put(stats, "total", total);
+            return stats;
+        }
 
-        private Definition GetDefinition(string id) => definitions.FirstOrDefault(def => def.Id == id);
+        private Definition GetDefinition(string id) {
+            for(int i = 0; i < definitions.Count; i++)
+                if(definitions[i].Id == id) return definitions[i];
+            return null;
+        }
 
         private void RemoveScopedResources(string definitionId, bool mountedOnly = false) {
             int[] subIds = subscriptions.Values

@@ -10,6 +10,13 @@ public static partial class KeyViewerOverlay {
         total = totalCount,
     });
 
+    internal static void JsStats(out int kps, out float kpsAvg, out int max, out int total) {
+        kps = pressLog.Count;
+        kpsAvg = kpsSamples > 0 ? kpsSum / (float)kpsSamples : 0f;
+        max = kpsMax;
+        total = totalCount;
+    }
+
     internal static void ResetJsStats() {
         pressLog.Clear();
         kpsMax = 0;

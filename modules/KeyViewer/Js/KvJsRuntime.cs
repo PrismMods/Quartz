@@ -159,12 +159,18 @@ internal static partial class KvJsRuntime {
 
     private static void DrainKeyEvents() {
         int generation = Volatile.Read(ref activeKeyEventGeneration);
+        string mode = null;
+        bool wanted = false;
         while(keyEvents.TryDequeue(out KvJsKeyEventQueue.Event ev)) {
             if(generation == 0 || ev.Generation != generation) continue;
+            if(mode == null) {
+                mode = KvStore.Current?.SelectedTab ?? "";
+                foreach(PluginRuntime plugin in plugins) wanted |= plugin.WantsKeyEvents;
+            }
+            if(!wanted) continue;
             KeyCode key = (KeyCode)ev.Key;
             string label = KvKeyNames.ToGlobalKeyOrRaw(key);
             string state = ev.Down ? "DOWN" : "UP";
-            string mode = KvStore.Current?.SelectedTab ?? "";
             string device = key >= KeyCode.Mouse0 && key <= KeyCode.Mouse6 ? "mouse"
                 : key >= KeyCode.JoystickButton0 ? "gamepad" : "keyboard";
             foreach(PluginRuntime plugin in plugins) plugin.EmitKey(label, state, mode, device);
@@ -191,11 +197,12 @@ internal static partial class KvJsRuntime {
         try {
             float x = attached.rect.width + 20f;
             float y = 0f;
+            bool changed = false;
             foreach(PluginRuntime plugin in plugins) {
-                y = plugin.RenderPanels(attached, x, y);
+                y = plugin.RenderPanels(attached, x, y, ref changed);
                 plugin.Dirty = false;
             }
-            KeyViewerOverlay.RefreshDragBounds();
+            if(changed) KeyViewerOverlay.RefreshDragBounds();
         } finally {
             rendering = false;
         }

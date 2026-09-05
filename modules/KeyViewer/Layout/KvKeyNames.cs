@@ -65,8 +65,14 @@ internal static class KvKeyNames {
             _ => "",
         };
     }
+    private static readonly Dictionary<KeyCode, string> rawNames = [];
     internal static string ToGlobalKeyOrRaw(KeyCode key) {
         string name = ToGlobalKey(key);
-        return name.Length > 0 ? name : key.ToString();
+        if(name.Length > 0) return name;
+        if(!rawNames.TryGetValue(key, out string raw)) {
+            raw = key.ToString();
+            rawNames[key] = raw;
+        }
+        return raw;
     }
 }
