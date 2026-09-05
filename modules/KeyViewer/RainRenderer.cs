@@ -191,28 +191,53 @@ internal sealed class RainGraphic : MaskableGraphic {
         }
         if(r <= 0.5f || !vertical || !horizontal) return;
         float rIn = Mathf.Max(0f, r - bw);
-        AddArcBand(vh, raw, dNear, dFar, xMin + r, yMin + r, r, rIn, Mathf.PI, Mathf.PI * 1.5f, yMin, height);
-        AddArcBand(vh, raw, dNear, dFar, xMax - r, yMin + r, r, rIn, Mathf.PI * 1.5f, Mathf.PI * 2f, yMin, height);
-        AddArcBand(vh, raw, dNear, dFar, xMax - r, yMax - r, r, rIn, 0f, Mathf.PI * 0.5f, yMin, height);
-        AddArcBand(vh, raw, dNear, dFar, xMin + r, yMax - r, r, rIn, Mathf.PI * 0.5f, Mathf.PI, yMin, height);
+        AddArcBand(vh, raw, dNear, dFar, xMin + r, yMin + r, r, rIn, 2, yMin, height);
+        AddArcBand(vh, raw, dNear, dFar, xMax - r, yMin + r, r, rIn, 3, yMin, height);
+        AddArcBand(vh, raw, dNear, dFar, xMax - r, yMax - r, r, rIn, 0, yMin, height);
+        AddArcBand(vh, raw, dNear, dFar, xMin + r, yMax - r, r, rIn, 1, yMin, height);
+    }
+    private const int MaxArcSteps = 12;
+    private static readonly float[][] ArcCos = BuildArcTable(true);
+    private static readonly float[][] ArcSin = BuildArcTable(false);
+    private static float[][] BuildArcTable(bool cosine) {
+        float[][] table = new float[MaxArcSteps + 1][];
+        for(int steps = 3; steps <= MaxArcSteps; steps++) {
+            float[] row = new float[steps + 1];
+            for(int i = 0; i <= steps; i++) {
+                float a = Mathf.PI * 0.5f * i / steps;
+                row[i] = cosine ? Mathf.Cos(a) : Mathf.Sin(a);
+            }
+            table[steps] = row;
+        }
+        return table;
+    }
+    private static void Rotate(int quadrant, float c, float s, out float x, out float y) {
+        switch(quadrant) {
+            case 1: x = -s; y = c; break;
+            case 2: x = -c; y = -s; break;
+            case 3: x = s; y = -c; break;
+            default: x = c; y = s; break;
+        }
     }
     private static void AddArcBand(VertexHelper vh, RawRain raw, float dNear, float dFar,
-        float cx, float cy, float rOuter, float rInner, float a0, float a1, float yMin, float height) {
-        int steps = Mathf.Clamp(Mathf.CeilToInt(rOuter * 0.5f), 3, 12);
-        float pc = Mathf.Cos(a0), ps = Mathf.Sin(a0);
+        float cx, float cy, float rOuter, float rInner, int quadrant, float yMin, float height) {
+        int steps = Mathf.Clamp(Mathf.CeilToInt(rOuter * 0.5f), 3, MaxArcSteps);
+        float[] cosRow = ArcCos[steps];
+        float[] sinRow = ArcSin[steps];
+        Rotate(quadrant, cosRow[0], sinRow[0], out float pc, out float ps);
+        Color prev = BorderColor(raw, dNear, dFar, cy + ps * rOuter, yMin, height);
         for(int i = 1; i <= steps; i++) {
-            float a = Mathf.Lerp(a0, a1, i / (float)steps);
-            float c = Mathf.Cos(a), s = Mathf.Sin(a);
-            Color cA = BorderColor(raw, dNear, dFar, cy + ps * rOuter, yMin, height);
-            Color cB = BorderColor(raw, dNear, dFar, cy + s * rOuter, yMin, height);
+            Rotate(quadrant, cosRow[i], sinRow[i], out float c, out float s);
+            Color next = BorderColor(raw, dNear, dFar, cy + s * rOuter, yMin, height);
             AddPoly4(vh,
                 cx + pc * rInner, cy + ps * rInner,
                 cx + pc * rOuter, cy + ps * rOuter,
                 cx + c * rOuter, cy + s * rOuter,
                 cx + c * rInner, cy + s * rInner,
-                cA, cA, cB, cB);
+                prev, prev, next, next);
             pc = c;
             ps = s;
+            prev = next;
         }
     }
     private static void AddPoly4(VertexHelper vh, float x0, float y0, float x1, float y1,
@@ -449,7 +474,7 @@ internal sealed class RainManager : MonoBehaviour {
             }
             if(write < active.Count) active.RemoveRange(write, active.Count - write);
         }
-        if(dirty) graphic.SetFrame(now);
+        if(dirty && pending.Count == 0) graphic.SetFrame(now);
         if(IsIdle()) enabled = false;
     }
 }
