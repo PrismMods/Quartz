@@ -48,6 +48,7 @@ public static partial class KeyViewerOverlay {
         tabubRoot.localScale = new Vector3(scale, scale, 1f);
         tabubAlpha = -1f;
         tabubTimesValid = false;
+        tabubTimesTried = false;
     }
     private static Texture2D ResolveTabubTexture() {
         string path = Conf.TabubImagePath ?? "";
@@ -127,12 +128,14 @@ public static partial class KeyViewerOverlay {
         if(!tabubEnabled || !GameStats.InGame || GameStats.RunCleared) return false;
         return GameStats.Progress * 100f >= tabubPercent;
     }
+    private static bool tabubTimesTried;
     private static void EnsureTabubTimes() {
         int floors = GameStats.MapFloorCount;
         float total = GameStats.MapTotalTimeSeconds;
-        if(tabubTimesValid && floors == tabubTimesFloors
+        if(tabubTimesTried && floors == tabubTimesFloors
             && Mathf.Approximately(tabubTimesPercent, tabubPercent)
             && Mathf.Approximately(tabubFadeOutAt, total)) return;
+        tabubTimesTried = true;
         tabubTimesFloors = floors;
         tabubTimesPercent = tabubPercent;
         tabubFadeInAt = GameStats.MapTimeAtProgress(tabubPercent / 100f);
@@ -193,6 +196,7 @@ public static partial class KeyViewerOverlay {
         tabubDragObj = null;
         tabubAlpha = -1f;
         tabubTimesValid = false;
+        tabubTimesTried = false;
         tabubTimesFloors = -1;
         tabubTimesPercent = -1f;
     }
