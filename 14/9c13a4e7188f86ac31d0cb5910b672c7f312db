@@ -1,0 +1,80 @@
+Quartz/Compat/Game/GameApi.cs
+  s_50c9bce2b662ea::t_268f898efea716 67-69
+Quartz/Game/Stats/XAccuracyCalc.cs
+  s_50c9bce2b662ea::t_268f898efea716 48,61-62,66-69
+modules/DeathLimit/DeathLimit.cs
+  s_50c9bce2b662ea::t_268f898efea716 34-37
+stubs/README.md
+  s_50c9bce2b662ea::t_268f898efea716 19-20,27,30,41
+stubs/Assembly-CSharp/Stubs.g.cs
+  s_50c9bce2b662ea::t_268f898efea716 230-231,234-238,245,249,253-254,262-266,271,293-305,351,385,503,695-696,793,877-880,892,932,965,984,1019,1036,1047,1088,1098,1108,1143-1144,1240,1267
+Quartz/Features/PlayCount/PlayCount.cs
+  s_50c9bce2b662ea::t_268f898efea716 351
+modules/Calibration/CalibrationTiming.cs
+  s_50c9bce2b662ea::t_268f898efea716 38-51,54-75,80
+modules/NostalgiaVisuals/NostalgiaVisualsPatches.cs
+  s_50c9bce2b662ea::t_268f898efea716 89-93,111-115
+modules/Restriction/PageRestriction.cs
+  s_50c9bce2b662ea::t_268f898efea716 1,63-74
+stubs/UnityEngine.CoreModule/Stubs.g.cs
+  s_50c9bce2b662ea::t_268f898efea716 561,568
+stubs/0Harmony/Stubs.g.cs
+  s_50c9bce2b662ea::t_268f898efea716 76-77,87-116
+modules/Restriction/Restriction.cs
+  s_50c9bce2b662ea::t_268f898efea716 24-35,64-65,68,70,72,82,100
+Quartz/Compat/Game/HitKinds.cs
+  s_e238f5d5b2892d::t_0eb371612c2349 1-17,20-51,53-67
+  s_e238f5d5b2892d::t_5f26005da7bc49 18-19,52
+Quartz/Features/Interop/XPerfectBridge.cs
+  s_50c9bce2b662ea::t_268f898efea716 2,36-56,59,72-73,87-94,113-120,126-127
+Quartz.Tests/Quartz.Tests.csproj
+  s_50c9bce2b662ea::t_268f898efea716 79
+modules/HideJudgements/PageHideJudgements.cs
+  s_50c9bce2b662ea::t_268f898efea716 1,18-30,64
+stubs/MANIFEST.json
+  s_50c9bce2b662ea::t_268f898efea716 91-92,106-108,111-137,826-827,850,903,905,908-909,914,1462,1464-1465,1866,1897,1981,2679,2681-2684,2978,2987,3000-3001,3129-3138,4039,4047,4050
+stubs/Unity.TextMeshPro/Stubs.g.cs
+  s_50c9bce2b662ea::t_268f898efea716 33,35,37-38,227,239,333-337
+  s_50c9bce2b662ea::t_5bf329c66621fb 338
+Quartz.Tests/Compat/HitKindsTests.cs
+  s_e238f5d5b2892d::t_fbe6ee6f6cd9dd 1-14,17-28
+  s_e238f5d5b2892d::t_5f26005da7bc49 15-16
+modules/KeyLimiter/ChartKeyLimiterState.cs
+  s_50c9bce2b662ea::t_268f898efea716 1,58
+modules/KeyLimiter/ChartKeyLimiterPatches.cs
+  s_50c9bce2b662ea::t_268f898efea716 97-98
+modules/HideJudgements/JudgementPopupHider.cs
+  s_50c9bce2b662ea::t_268f898efea716 27-28,30,41
+modules/Combo/Combo.cs
+  s_50c9bce2b662ea::t_268f898efea716 69,71-74,78
+modules/Accuracy/AccuracyPatches.cs
+  s_50c9bce2b662ea::t_268f898efea716 52-56,59,62,65,118-121
+modules/Judgement/Judgement.cs
+  s_50c9bce2b662ea::t_268f898efea716 23-31,34,42
+Quartz.Tests/Program.cs
+  s_50c9bce2b662ea::t_268f898efea716 43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "149c13a4e7188f86ac31d0cb5910b672c7f312db",
+  "prompts": {},
+  "sessions": {
+    "s_50c9bce2b662ea": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "98981910-8cad-44bd-974d-e600c0110104",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_e238f5d5b2892d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c413644b-e463-4123-8c4d-384da671ad8c",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
