@@ -40,6 +40,7 @@ List<(string Name, Action Run)> tests = [
     ("Refl runtime-type member lookups are cached", ReflTests.TestTryReadCachesHitsAndMisses),
     ("Refl pads omitted optional arguments with their defaults", ReflTests.TestInvokePadsMissingOptionalArguments),
     ("Refl invocation is inert on null and throwing targets", ReflTests.TestInvokeIsInertOnNullAndThrowingTargets),
+    ("HitKinds maps the r150 judgement layout onto the stable one", HitKindsTests.TestR150LayoutMapsByName),
     ("Imported mod profile names are sanitized and uniquified", ProfileNamesTests.TestImportedModProfileNames),
     ("Preset import drops the fields a preset may not impose", ProfileBundleTests.TestPresetStripsImposedFields),
     ("Preset import passes every other file through untouched", ProfileBundleTests.TestPresetLeavesOtherFilesByteIdentical),

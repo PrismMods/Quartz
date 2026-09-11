@@ -86,11 +86,11 @@ public static class NostalgiaVisualsPatches {
         private static MethodBase TargetMethod() => GameApi.LegacyShowHitTextTarget;
         private static void Prefix(HitMargin hitMargin, ref Vector3 position) {
             if(!ShouldLateJudgement || legacyHitPlanet == null) return;
-            switch(hitMargin) {
-                case HitMargin.TooEarly:
-                case HitMargin.TooLate:
-                case HitMargin.FailMiss:
-                case HitMargin.FailOverload:
+            switch(HitKinds.Of(hitMargin)) {
+                case HitKind.TooEarly:
+                case HitKind.TooLate:
+                case HitKind.FailMiss:
+                case HitKind.FailOverload:
                     return;
             }
             try {
@@ -108,11 +108,11 @@ public static class NostalgiaVisualsPatches {
         private static bool Prepare() => TargetMethod() != null;
         private static void Postfix(object __instance, HitMargin hitMargin, scrPlanet planet) {
             if(!ShouldLateJudgement) return;
-            switch(hitMargin) {
-                case HitMargin.TooEarly:
-                case HitMargin.TooLate:
-                case HitMargin.FailMiss:
-                case HitMargin.FailOverload:
+            switch(HitKinds.Of(hitMargin)) {
+                case HitKind.TooEarly:
+                case HitKind.TooLate:
+                case HitKind.FailMiss:
+                case HitKind.FailOverload:
                     return;
             }
             try {

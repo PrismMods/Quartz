@@ -24,9 +24,10 @@ public static class JudgementPopupHider {
     }
     private static bool ShouldHide(scrHitTextMesh hitText) {
         if(!Enabled || hitText == null) return false;
-        if(hitText.hitMargin == HitMargin.Perfect) {
+        HitKind kind = HitKinds.Of(hitText.hitMargin);
+        if(kind == HitKind.Perfect) {
             if(XPerfectBridge.Active) {
-                int xbit = XPerfectBridge.LastJudgeForText() switch {
+                int xbit = XPerfectBridge.JudgeForText(hitText.hitMargin) switch {
                     XPerfectBridge.Judge.X => XPerfectPerfectBit,
                     XPerfectBridge.Judge.Plus => PlusPerfectBit,
                     XPerfectBridge.Judge.Minus => MinusPerfectBit,
@@ -37,7 +38,7 @@ public static class JudgementPopupHider {
                 return true;
             }
         }
-        int bit = (int)hitText.hitMargin;
+        int bit = (int)kind;
         return bit >= 0 && bit < JudgementCount && (Conf.HiddenMask & (1 << bit)) != 0;
     }
     [HarmonyPatch(typeof(scrHitTextMesh), "Show")]

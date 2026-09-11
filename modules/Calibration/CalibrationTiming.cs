@@ -35,32 +35,49 @@ internal static class CalibrationTiming {
             if(Calibration.Enabled) ResetLastTooJudge();
         }
     }
-    [HarmonyPatch(typeof(scrMisc), "GetHitMargin",
-        new[] { typeof(float), typeof(float), typeof(bool), typeof(float), typeof(float), typeof(double) })]
-    private static class GetHitMarginPatch {
-        private static void Postfix(float hitangle, float refangle, bool isCW, float bpmTimesSpeed, float conductorPitch, HitMargin __result) {
-            if(!Calibration.Enabled || RDC.auto || __result == HitMargin.Auto) return;
-            float angle = (hitangle - refangle) * (isCW ? 1f : -1f) * 57.29578f;
-            float timing = angle / 180f / bpmTimesSpeed / conductorPitch * 60000f;
-            switch(__result) {
-                case HitMargin.TooEarly:
-                    lastTooEarly = timing;
-                    break;
-                case HitMargin.TooLate:
-                    lastTooLate = timing;
-                    break;
-                default:
-                    timings.Add(timing);
-                    ResetLastTooJudge();
-                    break;
-            }
+    private static void Record(float timing, HitMargin result) {
+        HitKind kind = HitKinds.Of(result);
+        if(!Calibration.Enabled || RDC.auto || kind == HitKind.Auto) return;
+        switch(kind) {
+            case HitKind.TooEarly:
+                lastTooEarly = timing;
+                break;
+            case HitKind.TooLate:
+                lastTooLate = timing;
+                break;
+            default:
+                timings.Add(timing);
+                ResetLastTooJudge();
+                break;
         }
+    }
+    private static float AngleTiming(float hitAngle, float refAngle, bool clockwise, float bpmTimesSpeed, float conductorPitch) =>
+        (hitAngle - refAngle) * (clockwise ? 1f : -1f) * 57.29578f / 180f / bpmTimesSpeed / conductorPitch * 60000f;
+    [HarmonyPatch]
+    private static class LegacyGetHitMarginPatch {
+        private static MethodBase TargetMethod() => Refl.Method(typeof(scrMisc), "GetHitMargin", 6);
+        private static bool Prepare() => TargetMethod() != null;
+        private static void Postfix(float hitangle, float refangle, bool isCW, float bpmTimesSpeed, float conductorPitch, HitMargin __result) =>
+            Record(AngleTiming(hitangle, refangle, isCW, bpmTimesSpeed, conductorPitch), __result);
+    }
+    [HarmonyPatch]
+    private static class GetHitMarginInDegPatch {
+        private static MethodBase TargetMethod() => Refl.Method(typeof(scrMisc), "GetHitMarginInDeg", 7);
+        private static bool Prepare() => TargetMethod() != null;
+        private static void Postfix(float hitAngle, float refAngle, bool clockwise, float floorBpm, float conductorPitch, HitMargin __result) =>
+            Record(AngleTiming(hitAngle, refAngle, clockwise, floorBpm, conductorPitch), __result);
+    }
+    [HarmonyPatch]
+    private static class GetHitMarginInSecPatch {
+        private static MethodBase TargetMethod() => Refl.Method(typeof(scrMisc), "GetHitMarginInSec", 5);
+        private static bool Prepare() => TargetMethod() != null;
+        private static void Postfix(double timeDiff, HitMargin __result) => Record((float)(timeDiff * 1000.0), __result);
     }
     [HarmonyPatch]
     private static class AddHitPatch {
         private static MethodBase TargetMethod() => GameApi.AddHitTarget;
         private static void Postfix(HitMargin hit) {
-            if(!Calibration.Enabled || hit != HitMargin.FailMiss) return;
+            if(!Calibration.Enabled || HitKinds.Of(hit) != HitKind.FailMiss) return;
             if(float.IsNaN(lastTooEarly) || float.IsNaN(lastTooLate)) return;
             timings.Add(lastTooLate);
             timings.Add(lastTooEarly);

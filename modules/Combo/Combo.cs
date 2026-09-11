@@ -66,15 +66,16 @@ internal static class Combo {
             if(!MainCore.IsModEnabled) return;
             ComboSettings conf = ComboOverlay.Conf;
             if(conf == null) return;
+            HitKind kind = HitKinds.Of(hit);
             bool xpComboMode = conf.XPerfectComboEnabled && XPerfectBridge.Active;
-            bool incPerfect = xpComboMode && hit == HitMargin.Perfect
-                ? XPerfectBridge.LastJudge() == XPerfectBridge.Judge.X
-                : hit == HitMargin.Perfect;
-            bool incAuto = conf.CountAuto && hit == HitMargin.Auto;
+            bool incPerfect = xpComboMode && kind == HitKind.Perfect
+                ? XPerfectBridge.JudgeFor(hit) == XPerfectBridge.Judge.X
+                : kind == HitKind.Perfect;
+            bool incAuto = conf.CountAuto && kind == HitKind.Auto;
             if(incPerfect || incAuto) {
                 Count++;
                 PulseStartTime = conf.NoPopAnim ? -1f : Time.realtimeSinceStartup;
-            } else if(conf.CountAuto || hit != HitMargin.Auto) {
+            } else if(conf.CountAuto || kind != HitKind.Auto) {
                 Count = 0;
                 PulseStartTime = -1f;
             }

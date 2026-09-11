@@ -633,12 +633,6 @@
       "assembly": "Assembly-CSharp"
     },
     {
-      "type": "scrMisc",
-      "member": "GetHitMargin",
-      "resolved": true,
-      "assembly": "Assembly-CSharp"
-    },
-    {
       "type": "scrMistakesManager",
       "member": "MarkCheckpoint",
       "resolved": true,

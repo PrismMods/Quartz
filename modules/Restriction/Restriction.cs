@@ -21,18 +21,18 @@ public static class Restriction {
         } catch(Exception e) { Diag.Ignore(e); }
     }
     public static string JudgementName(HitMargin hit) {
-        string key = hit switch {
-            HitMargin.TooEarly => "JR_ALLOW_TOOEARLY",
-            HitMargin.VeryEarly => "JR_ALLOW_VERYEARLY",
-            HitMargin.EarlyPerfect => "JR_ALLOW_EARLYPERFECT",
-            HitMargin.Perfect => "JR_ALLOW_PERFECT",
-            HitMargin.LatePerfect => "JR_ALLOW_LATEPERFECT",
-            HitMargin.VeryLate => "JR_ALLOW_VERYLATE",
-            HitMargin.TooLate => "JR_ALLOW_TOOLATE",
-            HitMargin.Multipress => "JR_ALLOW_MULTIPRESS",
-            HitMargin.FailMiss => "JR_ALLOW_MISS",
-            HitMargin.FailOverload => "JR_ALLOW_OVERLOAD_FAIL",
-            HitMargin.OverPress => "JR_ALLOW_OVERLOAD_FAIL",
+        string key = HitKinds.Of(hit) switch {
+            HitKind.TooEarly => "JR_ALLOW_TOOEARLY",
+            HitKind.VeryEarly => "JR_ALLOW_VERYEARLY",
+            HitKind.EarlyPerfect => "JR_ALLOW_EARLYPERFECT",
+            HitKind.Perfect => "JR_ALLOW_PERFECT",
+            HitKind.LatePerfect => "JR_ALLOW_LATEPERFECT",
+            HitKind.VeryLate => "JR_ALLOW_VERYLATE",
+            HitKind.TooLate => "JR_ALLOW_TOOLATE",
+            HitKind.Multipress => "JR_ALLOW_MULTIPRESS",
+            HitKind.FailMiss => "JR_ALLOW_MISS",
+            HitKind.FailOverload => "JR_ALLOW_OVERLOAD_FAIL",
+            HitKind.OverPress => "JR_ALLOW_OVERLOAD_FAIL",
             _ => null,
         };
         string fallback = hit.ToString();
@@ -61,14 +61,15 @@ public static class Restriction {
         return false;
     }
     private static bool ShouldFailFor(HitMargin margin) {
-        int marginInt = (int)margin;
+        HitKind kind = HitKinds.Of(margin);
+        int marginInt = (int)kind;
         switch(Conf.JRestrictMode) {
             case 1:
-                return marginInt != (int)HitMargin.Perfect;
+                return kind != HitKind.Perfect;
             case 2: {
-                if(marginInt != (int)HitMargin.Perfect) return true;
+                if(kind != HitKind.Perfect) return true;
                 if(!XPerfectBridge.Active) return false;
-                XPerfectBridge.Judge xj = XPerfectBridge.LastJudge();
+                XPerfectBridge.Judge xj = XPerfectBridge.JudgeFor(margin);
                 return xj != XPerfectBridge.Judge.None && xj != XPerfectBridge.Judge.X;
             }
             case 3: {
@@ -78,7 +79,7 @@ public static class Restriction {
                 return (mask & bit) == 0;
             }
             case 4:
-                return margin == HitMargin.TooEarly;
+                return kind == HitKind.TooEarly;
             case 0:
             default: {
                 try {
@@ -96,7 +97,7 @@ public static class Restriction {
     }
     private static void AfterAddHit(HitMargin hit) {
         EnsureConf();
-        if(!MainCore.IsModEnabled || hit == HitMargin.Auto) return;
+        if(!MainCore.IsModEnabled || HitKinds.Of(hit) == HitKind.Auto) return;
         if(!Conf.JRestrictEnabled) return;
         if(InRestrictedSection() && ShouldFailFor(hit))
             TriggerFail(FormatJrMessage(Conf.JRestrictMessage, hit));

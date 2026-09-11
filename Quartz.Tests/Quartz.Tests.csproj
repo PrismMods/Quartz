@@ -76,6 +76,7 @@
 		     and stays out of this project. -->
 		<Compile Include="../Quartz/Core/Diag.cs" Link="Source/Diag.cs" />
 		<Compile Include="../Quartz/Compat/Game/Refl.cs" Link="Source/Refl.cs" />
+		<Compile Include="../Quartz/Compat/Game/HitKinds.cs" Link="Source/HitKinds.cs" />
 		<Compile Include="../Quartz/IO/AtomicFile.cs" Link="Source/AtomicFile.cs" />
 		<Compile Include="../Quartz/Update/UpdateInstallTransaction.cs" Link="Source/UpdateInstallTransaction.cs" />
 		<!-- The launch bootstrap's runtime store and the update engine's package

@@ -91,15 +91,11 @@ public static partial class ChartKeyLimiter {
     private static class SwitchChosenPatch {
         private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions) {
             List<CodeInstruction> code = [.. instructions];
-            MethodInfo getHitMargin = AccessTools.Method(typeof(scrMisc), nameof(scrMisc.GetHitMargin));
             MethodInfo validate = AccessTools.Method(typeof(SwitchChosenPatch), nameof(Validate));
-            if(getHitMargin == null || validate == null) {
-                MainCore.Log.Err("[KeyLimiter] scrMisc.GetHitMargin is gone, chart key limits will not fire");
-                return code;
-            }
             for(int i = 0; i < code.Count; i++) {
                 if(code[i].opcode != OpCodes.Call) continue;
-                if(!ReferenceEquals(code[i].operand, getHitMargin)) continue;
+                if(code[i].operand is not MethodInfo called || called.ReturnType != typeof(HitMargin)
+                    || !called.Name.Contains("GetHitMargin")) continue;
                 code.Insert(i + 1, new CodeInstruction(OpCodes.Call, validate));
                 code.Insert(i + 1, new CodeInstruction(OpCodes.Ldarg_0));
                 return code;

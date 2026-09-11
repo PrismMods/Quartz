@@ -45,11 +45,7 @@ namespace Quartz.Game.Stats
             int remaining = cachedHittableTotal - consumedHittable;
             return remaining < 0 ? 0 : remaining;
         }
-        private static int Hits(int[] counts, HitMargin m)
-        {
-            int i = (int)m;
-            return (counts != null && i >= 0 && i < counts.Length) ? counts[i] : 0;
-        }
+        private static int Hits(int[] counts, HitKind k) => HitKinds.Count(counts, k);
         internal static float MaxRatio() => MaxRatio(0);
         internal static float MaxRatio(int playerID)
         {
@@ -62,13 +58,15 @@ namespace Quartz.Game.Stats
                 int judged = GameApi.HitMarginTotal(t);
                 if (judged < 0) return 1f;
                 double checkpointFactor = Math.Pow(CheckpointPenalty, scrController.checkpointsUsed);
+                if (judged > 0 && GameApi.NativeMaxXAcc(t) is float native)
+                    return Mathf.Clamp01((float)(checkpointFactor * native));
                 int deadTiles = GameApi.DeadTiles(t);
                 int[] counts = GameApi.HitMarginCounts(t);
                 double weightedSum =
-                      1.0  * (Hits(counts, HitMargin.Perfect) + Hits(counts, HitMargin.Auto))
-                    + 0.75 * (Hits(counts, HitMargin.EarlyPerfect) + Hits(counts, HitMargin.LatePerfect))
-                    + 0.4  * (Hits(counts, HitMargin.VeryEarly) + Hits(counts, HitMargin.VeryLate))
-                    + 0.2  * (Hits(counts, HitMargin.TooEarly) + Hits(counts, HitMargin.TooLate))
+                      1.0  * (Hits(counts, HitKind.Perfect) + Hits(counts, HitKind.Auto))
+                    + 0.75 * (Hits(counts, HitKind.EarlyPerfect) + Hits(counts, HitKind.LatePerfect))
+                    + 0.4  * (Hits(counts, HitKind.VeryEarly) + Hits(counts, HitKind.VeryLate))
+                    + 0.2  * (Hits(counts, HitKind.TooEarly) + Hits(counts, HitKind.TooLate))
                     + 0.2  * deadTiles;
                 double denom = judged + deadTiles;
                 int remaining = RemainingHittable();

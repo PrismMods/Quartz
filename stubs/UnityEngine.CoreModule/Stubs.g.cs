@@ -558,12 +558,14 @@ namespace UnityEngine {
         public global::UnityEngine.Texture mainTexture { get => throw null; set { } }
         public global::UnityEngine.Shader shader { get => throw null; set { } }
         public Material(global::UnityEngine.Shader shader) => throw null;
+        public Material(global::UnityEngine.Material source) => throw null;
         public void DisableKeyword(string keyword) => throw null;
         public void EnableKeyword(string keyword) => throw null;
         public void SetColor(string name, global::UnityEngine.Color value) => throw null;
         public void SetColor(int nameID, global::UnityEngine.Color value) => throw null;
         public void SetFloat(string name, float value) => throw null;
         public void SetFloat(int nameID, float value) => throw null;
+        public void SetTexture(int nameID, global::UnityEngine.Texture value) => throw null;
         protected Material() { }
     }
     public unsafe partial struct Mathf {

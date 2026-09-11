@@ -1,4 +1,5 @@
 using System.Reflection;
+using Quartz.Compat.Game;
 using Quartz.Core;
 namespace Quartz.Features.Interop;
 public static class XPerfectBridge {
@@ -32,8 +33,30 @@ public static class XPerfectBridge {
         } catch(Exception e) { Diag.Ignore(e); }
         return null;
     }
+    private static readonly int NativeX = GameIndex("XPerfect");
+    private static readonly int NativePlus = GameIndex("PerfectPlus");
+    private static readonly int NativeMinus = GameIndex("PerfectMinus");
+    private static readonly Refl.Member PerfectTextPreset = new(typeof(Persistence), "hitMarginPerfectText");
+    private static int GameIndex(string name) {
+        try {
+            return Enum.IsDefined(typeof(HitMargin), name) ? Convert.ToInt32(Enum.Parse(typeof(HitMargin), name)) : -1;
+        } catch(Exception e) {
+            Diag.Ignore(e);
+            return -1;
+        }
+    }
+    public static bool Native => NativeX >= 0;
+    private static readonly Refl.Member HitMarginColours = new(typeof(RDC), "hitMarginColoursBySettings");
+    private static Refl.Member xPerfectColourMember;
+    public static UnityEngine.Color NativeXColor() {
+        object scheme = HitMarginColours.Get(null);
+        if(scheme == null) return UnityEngine.Color.white;
+        xPerfectColourMember ??= new Refl.Member(scheme.GetType(), "colourXPerfect");
+        return xPerfectColourMember.Get(scheme) is UnityEngine.Color c ? c : UnityEngine.Color.white;
+    }
     public static bool Installed {
         get {
+            if(Native) return true;
             EnsureResolved();
             return installed;
         }
@@ -46,7 +69,8 @@ public static class XPerfectBridge {
             if(activeFrame == UnityEngine.Time.frameCount) return activeCache;
             bool result;
             try {
-                result = enabledFast != null ? enabledFast()
+                result = Native ? Convert.ToInt32(PerfectTextPreset.Get(null) ?? 0) != 0
+                    : enabledFast != null ? enabledFast()
                     : enabledProp == null || (enabledProp.GetValue(null, null) is bool b && b);
             } catch(Exception e) {
                 Diag.Ignore(e);
@@ -60,6 +84,14 @@ public static class XPerfectBridge {
     public static Judge LastJudge() => ReadJudge(lastJudgeMember, Judge.None);
     public static Judge LastJudgeForText() =>
         lastJudgeForTextMember == null ? LastJudge() : ReadJudge(lastJudgeForTextMember, LastJudge());
+    public static Judge JudgeFor(HitMargin hit) => Native ? NativeJudge(hit) : LastJudge();
+    public static Judge JudgeForText(HitMargin hit) => Native ? NativeJudge(hit) : LastJudgeForText();
+    private static Judge NativeJudge(HitMargin hit) {
+        int i = (int)hit;
+        return i == NativeX ? Judge.X : i == NativePlus ? Judge.Plus : i == NativeMinus ? Judge.Minus : Judge.None;
+    }
+    public static int EarlyCount() => Native ? MinusCount() : PlusCount();
+    public static int LateCount() => Native ? PlusCount() : MinusCount();
     private static int countsFrame = -1;
     private static int xCountCache;
     private static int plusCountCache;
@@ -78,11 +110,21 @@ public static class XPerfectBridge {
     }
     private static void RefreshCounts() {
         if(countsFrame == UnityEngine.Time.frameCount) return;
+        if(Native) {
+            int[] counts = GameApi.HitMarginCounts(GameApi.Tracker(0));
+            xCountCache = NativeCount(counts, NativeX);
+            plusCountCache = NativeCount(counts, NativePlus);
+            minusCountCache = NativeCount(counts, NativeMinus);
+            countsFrame = UnityEngine.Time.frameCount;
+            return;
+        }
         xCountCache = xCountFast != null ? xCountFast() : ReadIntMember(xCountMember);
         plusCountCache = plusCountFast != null ? plusCountFast() : ReadIntMember(plusCountMember);
         minusCountCache = minusCountFast != null ? minusCountFast() : ReadIntMember(minusCountMember);
         countsFrame = UnityEngine.Time.frameCount;
     }
+    private static int NativeCount(int[] counts, int index) =>
+        counts != null && index >= 0 && index < counts.Length ? counts[index] : 0;
     private static Judge ReadJudge(MemberInfo member, Judge fallback) {
         if(!Installed || member == null) return fallback;
         try {

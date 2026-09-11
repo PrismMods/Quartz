@@ -49,20 +49,20 @@ internal static class AccuracyPatches {
                 TmaScore.AddNoop();
                 score = 0;
             } else {
-                switch(hit) {
-                    case HitMargin.Multipress:
-                    case HitMargin.OverPress:
-                    case HitMargin.TooEarly:
-                    case HitMargin.TooLate:
+                switch(HitKinds.Of(hit)) {
+                    case HitKind.Multipress:
+                    case HitKind.OverPress:
+                    case HitKind.TooEarly:
+                    case HitKind.TooLate:
                         score = TmaScore.AddEmptyPress();
                         break;
-                    case HitMargin.FailMiss:
+                    case HitKind.FailMiss:
                         score = TmaScore.AddMiss();
                         break;
-                    case HitMargin.FailOverload:
+                    case HitKind.FailOverload:
                         score = TmaScore.AddOverload();
                         break;
-                    case HitMargin.Auto:
+                    case HitKind.Auto:
                         TmaScore.AddNoop();
                         score = 0;
                         break;
@@ -115,10 +115,10 @@ internal static class AccuracyPatches {
             if(!MainCore.IsModEnabled || !AccuracyOverlay.Conf.Enabled || !AccuracyOverlay.Conf.ShowHitText) return;
             TMPro.TMP_Text label = GameApi.HitTextLabel(__instance);
             if(label == null) return;
-            long display = __instance.hitMargin switch {
-                HitMargin.FailMiss => (long)AccuracyOverlay.Conf.MissPenalty,
-                HitMargin.FailOverload => (long)AccuracyOverlay.Conf.OverloadPenalty,
-                HitMargin.Multipress or HitMargin.OverPress or HitMargin.TooEarly or HitMargin.TooLate
+            long display = HitKinds.Of(__instance.hitMargin) switch {
+                HitKind.FailMiss => (long)AccuracyOverlay.Conf.MissPenalty,
+                HitKind.FailOverload => (long)AccuracyOverlay.Conf.OverloadPenalty,
+                HitKind.Multipress or HitKind.OverPress or HitKind.TooEarly or HitKind.TooLate
                     => (long)AccuracyOverlay.Conf.EmptyPressPenalty,
                 _ => (long)Math.Floor(pendingScore),
             };

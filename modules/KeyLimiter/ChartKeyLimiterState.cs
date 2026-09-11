@@ -1,3 +1,4 @@
+using Quartz.Compat.Game;
 using Quartz.Core;
 using Quartz.Utility;
 using UnityEngine;
@@ -54,7 +55,7 @@ public sealed class ChartKeyLimiterState {
         if(exceedMethod is KeyExceedMethod.RunEvent
             or KeyExceedMethod.IgnoreAndRunEvent
             or KeyExceedMethod.KillAndRunEvent) RunTaggedEvents();
-        if(exceedMethod != KeyExceedMethod.RunEvent) margin = HitMargin.OverPress;
+        if(exceedMethod != KeyExceedMethod.RunEvent) margin = HitKinds.ToGame(HitKind.OverPress);
         return exceedMethod is KeyExceedMethod.Kill or KeyExceedMethod.KillAndRunEvent;
     }
     private void RunTaggedEvents() {

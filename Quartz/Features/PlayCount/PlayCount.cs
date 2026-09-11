@@ -348,7 +348,7 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
         private static MethodBase TargetMethod() => GameApi.AddHitTarget;
         private static void Postfix(HitMargin hit) {
             if(!MainCore.IsModEnabled || runHadFail) return;
-            if(hit == HitMargin.FailMiss || hit == HitMargin.FailOverload) {
+            if(HitKinds.Of(hit) is HitKind.FailMiss or HitKind.FailOverload) {
                 ObserveProgress(CurrentProgress());
                 runHadFail = true;
             }

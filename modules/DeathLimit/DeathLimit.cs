@@ -31,9 +31,10 @@ public static class DeathLimit {
     }
     private static void AfterAddHit(HitMargin hit) {
         EnsureConf();
-        if(!MainCore.IsModEnabled || hit == HitMargin.Auto) return;
-        if(hit == HitMargin.FailMiss) missCount++;
-        else if(hit == HitMargin.FailOverload) overloadCount++;
+        HitKind kind = HitKinds.Of(hit);
+        if(!MainCore.IsModEnabled || kind == HitKind.Auto) return;
+        if(kind == HitKind.FailMiss) missCount++;
+        else if(kind == HitKind.FailOverload) overloadCount++;
         DeathLimitSettings conf = Conf;
         if(conf == null || !conf.DeathLimitEnabled) return;
         int deaths = missCount + overloadCount;

@@ -20,18 +20,18 @@ internal static class Judgement {
     private static readonly int[] counts = new int[16];
     internal static void Reset() => System.Array.Clear(counts, 0, counts.Length);
     internal static int SlotCount(int slot) => slot switch {
-        0 => Count(HitMargin.FailOverload),
-        1 => Count(HitMargin.TooEarly),
-        2 => Count(HitMargin.VeryEarly),
-        3 => Count(HitMargin.EarlyPerfect),
-        4 => Count(HitMargin.Perfect) + Count(HitMargin.Auto),
-        5 => Count(HitMargin.LatePerfect),
-        6 => Count(HitMargin.VeryLate),
-        7 => Count(HitMargin.TooLate),
-        8 => Count(HitMargin.FailMiss),
+        0 => Count(HitKind.FailOverload),
+        1 => Count(HitKind.TooEarly),
+        2 => Count(HitKind.VeryEarly),
+        3 => Count(HitKind.EarlyPerfect),
+        4 => Count(HitKind.Perfect) + Count(HitKind.Auto),
+        5 => Count(HitKind.LatePerfect),
+        6 => Count(HitKind.VeryLate),
+        7 => Count(HitKind.TooLate),
+        8 => Count(HitKind.FailMiss),
         _ => 0,
     };
-    private static int Count(HitMargin hit) {
+    private static int Count(HitKind hit) {
         int idx = (int)hit;
         return idx >= 0 && idx < counts.Length ? counts[idx] : 0;
     }
@@ -39,7 +39,7 @@ internal static class Judgement {
     private static class AddHitPatch {
         private static MethodBase TargetMethod() => GameApi.AddHitTarget;
         private static void Postfix(HitMargin hit) {
-            int idx = (int)hit;
+            int idx = (int)HitKinds.Of(hit);
             if(MainCore.IsModEnabled && idx >= 0 && idx < counts.Length) counts[idx]++;
         }
     }

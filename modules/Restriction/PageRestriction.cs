@@ -1,3 +1,4 @@
+using Quartz.Compat.Game;
 using Quartz.Core;
 using Quartz.Features.Interop;
 using Quartz.Features.Restriction;
@@ -59,18 +60,18 @@ public static class PageRestriction {
             conf.JRestrictAccuracy = v;
             Restriction.Save();
         };
-        (HitMargin Margin, string Label, string Id)[] entries = [
-            (HitMargin.TooEarly, "Too Early", "jr_allow_tooearly"),
-            (HitMargin.VeryEarly, "Very Early", "jr_allow_veryearly"),
-            (HitMargin.EarlyPerfect, "Early Perfect", "jr_allow_earlyperfect"),
-            (HitMargin.Perfect, "Perfect", "jr_allow_perfect"),
-            (HitMargin.LatePerfect, "Late Perfect", "jr_allow_lateperfect"),
-            (HitMargin.VeryLate, "Very Late", "jr_allow_verylate"),
-            (HitMargin.TooLate, "Too Late", "jr_allow_toolate"),
-            (HitMargin.Multipress, "Multipress", "jr_allow_multipress"),
-            (HitMargin.FailMiss, "Miss", "jr_allow_miss"),
-            (HitMargin.FailOverload, "Overload (No Fail)", "jr_allow_overload_nofail"),
-            (HitMargin.OverPress, "Overload (Fail)", "jr_allow_overload_fail"),
+        (HitKind Margin, string Label, string Id)[] entries = [
+            (HitKind.TooEarly, "Too Early", "jr_allow_tooearly"),
+            (HitKind.VeryEarly, "Very Early", "jr_allow_veryearly"),
+            (HitKind.EarlyPerfect, "Early Perfect", "jr_allow_earlyperfect"),
+            (HitKind.Perfect, "Perfect", "jr_allow_perfect"),
+            (HitKind.LatePerfect, "Late Perfect", "jr_allow_lateperfect"),
+            (HitKind.VeryLate, "Very Late", "jr_allow_verylate"),
+            (HitKind.TooLate, "Too Late", "jr_allow_toolate"),
+            (HitKind.Multipress, "Multipress", "jr_allow_multipress"),
+            (HitKind.FailMiss, "Miss", "jr_allow_miss"),
+            (HitKind.FailOverload, "Overload (No Fail)", "jr_allow_overload_nofail"),
+            (HitKind.OverPress, "Overload (Fail)", "jr_allow_overload_fail"),
         ];
         maskRows = new RectTransform[entries.Length];
         for(int i = 0; i < entries.Length; i++) {

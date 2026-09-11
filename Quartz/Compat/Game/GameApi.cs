@@ -64,6 +64,9 @@ public static class GameApi {
     private static readonly Refl.Member TrackerCounts = new(TrackerType, "hitMarginsCount");
     private static readonly Refl.Member TrackerMargins = new(TrackerType, "hitMargins");
     private static readonly Refl.Member TrackerDeadTiles = new(TrackerType, "deadTiles");
+    private static readonly Refl.Member TrackerMaxXAcc = new(TrackerType, "maxPossibleXAcc");
+    public static float? NativeMaxXAcc(object tracker) =>
+        tracker != null && TrackerMaxXAcc.Exists ? TrackerMaxXAcc.Get(tracker, 1f) : null;
     public static int GetDeaths(object tracker) =>
         tracker == null ? 0 : Refl.Invoke(TrackerGetDeaths, tracker) as int? ?? 0;
     public static int GetHits(object tracker, HitMargin hit) =>

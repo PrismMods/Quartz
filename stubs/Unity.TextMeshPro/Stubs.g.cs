@@ -30,8 +30,12 @@ namespace TMPro {
         public global::TMPro.TMP_Offset padding;
     }
     public static unsafe partial class ShaderUtilities {
+        public static int ID_FaceColor;
         public static int ID_OutlineColor;
+        public static int ID_OutlineTex;
         public static int ID_OutlineWidth;
+        public static string Keyword_Outline;
+        public static void UpdateShaderRatios(global::UnityEngine.Material mat) => throw null;
     }
     public abstract unsafe partial class TMP_Asset : global::UnityEngine.ScriptableObject {
         public global::UnityEngine.Material material { get => throw null; set { } }
@@ -220,6 +224,7 @@ namespace TMPro {
         public float fontSizeMax { get => throw null; set { } }
         public float fontSizeMin { get => throw null; set { } }
         public global::TMPro.FontStyles fontStyle { get => throw null; set { } }
+        public global::TMPro.TextureMappingOptions horizontalMapping { get => throw null; set { } }
         public float lineSpacing { get => throw null; set { } }
         public virtual global::UnityEngine.Vector4 margin { get => throw null; set { } }
         public global::TMPro.TextOverflowModes overflowMode { get => throw null; set { } }
@@ -231,6 +236,7 @@ namespace TMPro {
         public global::TMPro.TMP_TextInfo textInfo { get => throw null; }
         public global::UnityEngine.Transform transform { get => throw null; }
         public global::TMPro.VerticalAlignmentOptions verticalAlignment { get => throw null; set { } }
+        public global::TMPro.TextureMappingOptions verticalMapping { get => throw null; set { } }
         public float wordSpacing { get => throw null; set { } }
         public virtual void ForceMeshUpdate(bool ignoreActiveState = default, bool forceTextReparsing = default) => throw null;
         public global::UnityEngine.Vector2 GetPreferredValues() => throw null;
@@ -323,6 +329,12 @@ namespace TMPro {
         ScrollRect = 4,
         Page = 5,
         Linked = 6,
+    }
+    public enum TextureMappingOptions : int {
+        Character = 0,
+        Line = 1,
+        Paragraph = 2,
+        MatchAspect = 3,
     }
     public enum VerticalAlignmentOptions : int {
         Top = 256,

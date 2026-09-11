@@ -88,6 +88,8 @@
         "members": [
           "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::All",
           "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::Finalizer",
+          "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::InnerPostfix",
+          "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::InnerPrefix",
           "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::Postfix",
           "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::Prefix",
           "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::ReversePatch",
@@ -101,8 +103,38 @@
           "HarmonyLib.MethodType HarmonyLib.MethodType::Async",
           "HarmonyLib.MethodType HarmonyLib.MethodType::Constructor",
           "HarmonyLib.MethodType HarmonyLib.MethodType::Enumerator",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::EventAdd",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::EventRemove",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::Finalizer",
           "HarmonyLib.MethodType HarmonyLib.MethodType::Getter",
           "HarmonyLib.MethodType HarmonyLib.MethodType::Normal",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorAddition",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorBitwiseAnd",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorBitwiseOr",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorComma",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorDecrement",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorDivision",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorEquality",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorExclusiveOr",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorExplicit",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorFalse",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorGreaterThan",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorGreaterThanOrEqual",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorImplicit",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorIncrement",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorInequality",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorLeftShift",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorLessThan",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorLessThanOrEqual",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorLogicalNot",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorModulus",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorMultiply",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorOnesComplement",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorRightShift",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorSubtraction",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorTrue",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorUnaryNegation",
+          "HarmonyLib.MethodType HarmonyLib.MethodType::OperatorUnaryPlus",
           "HarmonyLib.MethodType HarmonyLib.MethodType::Setter",
           "HarmonyLib.MethodType HarmonyLib.MethodType::StaticConstructor",
           "System.Int32 HarmonyLib.MethodType::value__"
@@ -791,6 +823,8 @@
           "System.Collections.Generic.Dictionary\u00602\u003CADOFAI.LevelEventType,UnityEngine.Sprite\u003E GCS::levelEventIcons",
           "System.Collections.Generic.Dictionary\u00602\u003CSystem.String,ADOFAI.LevelEventInfo\u003E GCS::levelEventsInfo",
           "System.Collections.Generic.Dictionary\u00602\u003CSystem.String,ADOFAI.LevelEventInfo\u003E GCS::settingsInfo",
+          "System.Double GCS::HITMARGIN_XPERFECT_ANGLE_ADJUST",
+          "System.Double GCS::HITMARGIN_XPERFECT_MAX_ANGLE_ADJUST_TIME",
           "System.Int32 GCS::LargeFloorSize",
           "System.Int32 GCS::MAXIMUM_ALLOWED_KEYS",
           "System.Int32 GCS::MAXIMUM_UNLOCKED_ALLOWED_KEYS",
@@ -813,6 +847,7 @@
           "System.Single GCS::HITMARGIN_PURE_MINIMUM_SECONDS_MOBILE",
           "System.Single GCS::LenientOptionMinimumBPM_Custom",
           "System.Single GCS::StrictOptionMinimumBPM_Custom",
+          "System.Single GCS::XPERFECT_SECONDS",
           "System.Single GCS::frameTimeSensitivity",
           "System.Single GCS::framesPerTileLimit",
           "System.Single GCS::minSpeedrunSpeed",
@@ -865,14 +900,18 @@
           "HitMargin HitMargin::EarlyPerfect",
           "HitMargin HitMargin::FailMiss",
           "HitMargin HitMargin::FailOverload",
+          "HitMargin HitMargin::FailedFloor",
           "HitMargin HitMargin::LatePerfect",
+          "HitMargin HitMargin::Midspin",
           "HitMargin HitMargin::Multipress",
           "HitMargin HitMargin::OverPress",
-          "HitMargin HitMargin::Perfect",
+          "HitMargin HitMargin::PerfectMinus",
+          "HitMargin HitMargin::PerfectPlus",
           "HitMargin HitMargin::TooEarly",
           "HitMargin HitMargin::TooLate",
           "HitMargin HitMargin::VeryEarly",
           "HitMargin HitMargin::VeryLate",
+          "HitMargin HitMargin::XPerfect",
           "System.Int32 HitMargin::value__"
         ]
       },
@@ -1420,8 +1459,10 @@
         "type": "WipeDirection",
         "members": [
           "System.Int32 WipeDirection::value__",
+          "WipeDirection WipeDirection::StartsFromBottom",
           "WipeDirection WipeDirection::StartsFromLeft",
-          "WipeDirection WipeDirection::StartsFromRight"
+          "WipeDirection WipeDirection::StartsFromRight",
+          "WipeDirection WipeDirection::StartsFromTop"
         ]
       },
       {
@@ -1822,7 +1863,7 @@
           "System.Single scrFloor::speed",
           "System.String scrFloor::checkpointIconFilename",
           "System.String scrFloor::gizmoIconFilename",
-          "System.Void scrFloor::LightUp(HitMargin)",
+          "System.Void scrFloor::LightUp()",
           "System.Void scrFloor::SetIconAngle(System.Single)",
           "System.Void scrFloor::SetIconFlipped(System.Boolean)",
           "System.Void scrFloor::SetIconOutlineSprite(UnityEngine.Sprite)",
@@ -1853,7 +1894,7 @@
         "members": [
           "HitMargin scrHitTextMesh::hitMargin",
           "System.Boolean scrHitTextMesh::dead",
-          "System.Void scrHitTextMesh::Show(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,System.Single,System.Single,System.Single)"
+          "System.Void scrHitTextMesh::Show(UnityEngine.Vector3,UnityEngine.Vector3,System.Single,System.Single,System.Single,System.Single,System.String)"
         ]
       },
       {
@@ -1899,7 +1940,6 @@
       {
         "type": "scrMisc",
         "members": [
-          "HitMargin scrMisc::GetHitMargin(System.Single,System.Single,System.Boolean,System.Single,System.Single,System.Double)",
           "System.Double scrMisc::GetAngleMoved(System.Double,System.Double,System.Boolean)",
           "System.Double scrMisc::mod(System.Double,System.Double)"
         ]
@@ -1938,7 +1978,7 @@
           "scrConductor scrPlanet::conductor()",
           "scrConductor scrPlanet::get_conductor()",
           "scrFloor scrPlanet::currfloor",
-          "scrPlanet scrPlanet::SwitchChosen()",
+          "scrPlanet scrPlanet::SwitchChosen(System.Nullable\u00601\u003CSystem.Int64\u003E)",
           "scrPlanet scrPlanet::other",
           "scrPlayer scrPlanet::player"
         ]
@@ -2636,8 +2676,12 @@
       {
         "type": "TMPro.ShaderUtilities",
         "members": [
+          "System.Int32 TMPro.ShaderUtilities::ID_FaceColor",
           "System.Int32 TMPro.ShaderUtilities::ID_OutlineColor",
-          "System.Int32 TMPro.ShaderUtilities::ID_OutlineWidth"
+          "System.Int32 TMPro.ShaderUtilities::ID_OutlineTex",
+          "System.Int32 TMPro.ShaderUtilities::ID_OutlineWidth",
+          "System.String TMPro.ShaderUtilities::Keyword_Outline",
+          "System.Void TMPro.ShaderUtilities::UpdateShaderRatios(UnityEngine.Material)"
         ]
       },
       {
@@ -2931,6 +2975,7 @@
           "System.Void TMPro.TMP_Text::set_fontSizeMax(System.Single)",
           "System.Void TMPro.TMP_Text::set_fontSizeMin(System.Single)",
           "System.Void TMPro.TMP_Text::set_fontStyle(TMPro.FontStyles)",
+          "System.Void TMPro.TMP_Text::set_horizontalMapping(TMPro.TextureMappingOptions)",
           "System.Void TMPro.TMP_Text::set_lineSpacing(System.Single)",
           "System.Void TMPro.TMP_Text::set_margin(UnityEngine.Vector4)",
           "System.Void TMPro.TMP_Text::set_overflowMode(TMPro.TextOverflowModes)",
@@ -2939,6 +2984,7 @@
           "System.Void TMPro.TMP_Text::set_spriteAsset(TMPro.TMP_SpriteAsset)",
           "System.Void TMPro.TMP_Text::set_text(System.String)",
           "System.Void TMPro.TMP_Text::set_verticalAlignment(TMPro.VerticalAlignmentOptions)",
+          "System.Void TMPro.TMP_Text::set_verticalMapping(TMPro.TextureMappingOptions)",
           "System.Void TMPro.TMP_Text::set_wordSpacing(System.Single)",
           "TMPro.FontStyles TMPro.TMP_Text::fontStyle()",
           "TMPro.FontStyles TMPro.TMP_Text::get_fontStyle()",
@@ -2951,6 +2997,8 @@
           "TMPro.TextAlignmentOptions TMPro.TMP_Text::get_alignment()",
           "TMPro.TextOverflowModes TMPro.TMP_Text::get_overflowMode()",
           "TMPro.TextOverflowModes TMPro.TMP_Text::overflowMode()",
+          "TMPro.TextureMappingOptions TMPro.TMP_Text::horizontalMapping()",
+          "TMPro.TextureMappingOptions TMPro.TMP_Text::verticalMapping()",
           "TMPro.VerticalAlignmentOptions TMPro.TMP_Text::verticalAlignment()",
           "UnityEngine.Material TMPro.TMP_Text::fontMaterial()",
           "UnityEngine.Material TMPro.TMP_Text::fontSharedMaterial()",
@@ -3076,6 +3124,16 @@
           "TMPro.TextOverflowModes TMPro.TextOverflowModes::Page",
           "TMPro.TextOverflowModes TMPro.TextOverflowModes::ScrollRect",
           "TMPro.TextOverflowModes TMPro.TextOverflowModes::Truncate"
+        ]
+      },
+      {
+        "type": "TMPro.TextureMappingOptions",
+        "members": [
+          "System.Int32 TMPro.TextureMappingOptions::value__",
+          "TMPro.TextureMappingOptions TMPro.TextureMappingOptions::Character",
+          "TMPro.TextureMappingOptions TMPro.TextureMappingOptions::Line",
+          "TMPro.TextureMappingOptions TMPro.TextureMappingOptions::MatchAspect",
+          "TMPro.TextureMappingOptions TMPro.TextureMappingOptions::Paragraph"
         ]
       },
       {
@@ -3978,6 +4036,7 @@
       {
         "type": "UnityEngine.Material",
         "members": [
+          "System.Void UnityEngine.Material::.ctor(UnityEngine.Material)",
           "System.Void UnityEngine.Material::.ctor(UnityEngine.Shader)",
           "System.Void UnityEngine.Material::DisableKeyword(System.String)",
           "System.Void UnityEngine.Material::EnableKeyword(System.String)",
@@ -3985,8 +4044,10 @@
           "System.Void UnityEngine.Material::SetColor(System.String,UnityEngine.Color)",
           "System.Void UnityEngine.Material::SetFloat(System.Int32,System.Single)",
           "System.Void UnityEngine.Material::SetFloat(System.String,System.Single)",
+          "System.Void UnityEngine.Material::SetTexture(System.Int32,UnityEngine.Texture)",
           "System.Void UnityEngine.Material::set_color(UnityEngine.Color)",
           "System.Void UnityEngine.Material::set_mainTexture(UnityEngine.Texture)",
+          "System.Void UnityEngine.Material::set_shader(UnityEngine.Shader)",
           "UnityEngine.Color UnityEngine.Material::color()",
           "UnityEngine.Shader UnityEngine.Material::get_shader()",
           "UnityEngine.Shader UnityEngine.Material::shader()",

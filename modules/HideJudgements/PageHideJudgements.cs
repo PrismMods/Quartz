@@ -1,3 +1,4 @@
+using Quartz.Compat.Game;
 using Quartz.Core;
 using Quartz.Features.Interop;
 using Quartz.Features.HideJudgements;
@@ -14,19 +15,19 @@ public static class PageHideJudgements {
         JudgementPopupHider.EnsureConf();
         JudgementPopupHiderSettings conf = JudgementPopupHider.Conf;
         JudgementPopupHiderSettings def = new();
-        (HitMargin Margin, string Label, string Id)[] entries = [
-            (HitMargin.TooEarly, "Too Early", "jpop_tooearly"),
-            (HitMargin.VeryEarly, "Very Early", "jpop_veryearly"),
-            (HitMargin.EarlyPerfect, "Early Perfect", "jpop_earlyperfect"),
-            (HitMargin.Perfect, "Perfect", "jpop_perfect"),
-            (HitMargin.LatePerfect, "Late Perfect", "jpop_lateperfect"),
-            (HitMargin.VeryLate, "Very Late", "jpop_verylate"),
-            (HitMargin.TooLate, "Too Late", "jpop_toolate"),
-            (HitMargin.Multipress, "Multipress", "jpop_multipress"),
-            (HitMargin.FailMiss, "Miss", "jpop_miss"),
-            (HitMargin.FailOverload, "Overload (No Fail)", "jpop_overload_nofail"),
-            (HitMargin.Auto, "Auto", "jpop_auto"),
-            (HitMargin.OverPress, "Overload (Fail)", "jpop_overload_fail"),
+        (HitKind Margin, string Label, string Id)[] entries = [
+            (HitKind.TooEarly, "Too Early", "jpop_tooearly"),
+            (HitKind.VeryEarly, "Very Early", "jpop_veryearly"),
+            (HitKind.EarlyPerfect, "Early Perfect", "jpop_earlyperfect"),
+            (HitKind.Perfect, "Perfect", "jpop_perfect"),
+            (HitKind.LatePerfect, "Late Perfect", "jpop_lateperfect"),
+            (HitKind.VeryLate, "Very Late", "jpop_verylate"),
+            (HitKind.TooLate, "Too Late", "jpop_toolate"),
+            (HitKind.Multipress, "Multipress", "jpop_multipress"),
+            (HitKind.FailMiss, "Miss", "jpop_miss"),
+            (HitKind.FailOverload, "Overload (No Fail)", "jpop_overload_nofail"),
+            (HitKind.Auto, "Auto", "jpop_auto"),
+            (HitKind.OverPress, "Overload (Fail)", "jpop_overload_fail"),
         ];
         List<RectTransform> maskRows = [];
         void RefreshMaskRows() {
@@ -60,7 +61,7 @@ public static class PageHideJudgements {
         }
         bool xperfect = XPerfectBridge.Installed;
         foreach(var entry in entries) {
-            if(entry.Margin == HitMargin.Perfect && xperfect) {
+            if(entry.Margin == HitKind.Perfect && xperfect) {
                 AddMaskToggle(1 << JudgementPopupHider.XPerfectPerfectBit, "X Perfect", "jpop_xperfect");
                 AddMaskToggle(1 << JudgementPopupHider.PlusPerfectBit, "+ Perfect", "jpop_plusperfect");
                 AddMaskToggle(1 << JudgementPopupHider.MinusPerfectBit, "- Perfect", "jpop_minusperfect");
