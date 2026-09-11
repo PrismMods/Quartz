@@ -1,0 +1,31 @@
+modules/KeyViewer/Layout/KvStore.Transfer.cs
+  s_9339e76d4444dd::t_b09f6b5d131e68 29,89-90
+modules/KeyViewer/KeyViewerOverlay.cs
+  s_9339e76d4444dd::t_b09f6b5d131e68 48
+modules/KeyViewer/KeyViewerSettings.Serialization.cs
+  s_9339e76d4444dd::t_2f95127d03fe99 46,173-178
+modules/KeyViewer/KeyViewerOverlay.DmNote.cs
+  s_9339e76d4444dd::t_b09f6b5d131e68 17,20,29-30,32-35
+modules/KeyViewer/KeyViewerOverlay.Update.cs
+  s_9339e76d4444dd::t_b09f6b5d131e68 131-132,134-135,137
+modules/KeyViewer/KeyViewerSettings.cs
+  s_9339e76d4444dd::t_2f95127d03fe99 44
+modules/KeyViewer/KeyViewerOverlay.Lifecycle.cs
+  s_9339e76d4444dd::t_b09f6b5d131e68 147,152,183,185
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0a66fe8238bae7c6420af0024c0de13e215ff2f9",
+  "prompts": {},
+  "sessions": {
+    "s_9339e76d4444dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "20fbb04c-523c-490e-885e-3d2c8b088a6a",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
