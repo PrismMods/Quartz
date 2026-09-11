@@ -105,12 +105,18 @@ public static class ChatterBlocker {
     private static int injectedComputeFrame = -1;
     private static int injectedBatch = -1;
     private static int injectedCount;
+    private static readonly KeyCode[] hookFallbackKeys = [
+        KeyCode.LeftShift, KeyCode.RightShift,
+        KeyCode.LeftControl, KeyCode.RightControl,
+        KeyCode.LeftAlt, KeyCode.RightAlt,
+    ];
     public static void NotePlayerBatch(bool entered) {
         inPlayerBatch = entered;
         if(entered) injectionBatch++;
     }
     private static int CountKeysMissedByGame(scrController controller, long now, long threshold, bool chatterActive) {
-        if(!KeyLimiter.KeyLimiter.IsActive() || !KeyLimiter.KeyLimiter.InPlayerControl()) {
+        bool limiterActive = KeyLimiter.KeyLimiter.IsActive();
+        if((!limiterActive && !chatterActive) || !KeyLimiter.KeyLimiter.InPlayerControl()) {
             injectedKeyHeldPrev.Clear();
             injectedComputeFrame = -1;
             return 0;
@@ -120,41 +126,59 @@ public static class ChatterBlocker {
         if(injectedComputeFrame != frame) {
             injectedComputeFrame = frame;
             injectedBatch = injectionBatch;
-            injectedCount = ComputeInjectedKeys(controller, now, threshold, chatterActive);
+            injectedCount = ComputeInjectedKeys(controller, now, threshold, chatterActive, limiterActive);
         }
         return injectionBatch == injectedBatch ? injectedCount : 0;
     }
-    private static int ComputeInjectedKeys(scrController controller, long now, long threshold, bool chatterActive) {
-        int[] allowed = KeyLimiter.KeyLimiter.Conf?.AllowedKeys;
-        if(allowed == null || allowed.Length == 0) {
-            injectedKeyHeldPrev.Clear();
-            return 0;
-        }
+    private static int ComputeInjectedKeys(scrController controller, long now, long threshold, bool chatterActive,
+        bool limiterActive) {
         bool asyncActive = AsyncKeyboardActive();
         int injected = 0;
-        for(int i = 0; i < allowed.Length; i++) {
-            KeyCode key = KeyCodes.Normalize((KeyCode)allowed[i]);
-            if(key == KeyCode.None || KeyLimiter.KeyLimiter.IsMouseKey(key)) continue;
-            if(reportedKeysThisFrame.Contains(key)) {
-                injectedKeyHeldPrev.Add(key);
-                continue;
+        if(limiterActive) {
+            int[] allowed = KeyLimiter.KeyLimiter.Conf?.AllowedKeys;
+            if(allowed == null || allowed.Length == 0) {
+                injectedKeyHeldPrev.Clear();
+                return 0;
             }
-            if(asyncActive && KeyLimiter.KeyLimiter.HookEverSaw(key)) {
-                injectedKeyHeldPrev.Remove(key);
-                continue;
+            for(int i = 0; i < allowed.Length; i++) {
+                KeyCode key = KeyCodes.Normalize((KeyCode)allowed[i]);
+                injected += TryInjectMissedKey(controller, key, now, threshold, chatterActive, asyncActive);
             }
-            bool held;
-            try { held = UnityEngine.Input.GetKey(key); }
-            catch(Exception e) { Diag.Ignore(e); continue; }
-            if(!held) held = KeyLimiter.KeyLimiter.HookKeyHeld(key);
-            if(held && !injectedKeyHeldPrev.Contains(key)) {
-                RecordKeyStats(controller, key);
-                if(AcceptNormalKey(key, now, threshold, chatterActive)) injected++;
-            }
-            if(held) injectedKeyHeldPrev.Add(key);
-            else injectedKeyHeldPrev.Remove(key);
+            return injected;
+        }
+        for(int i = 0; i < hookFallbackKeys.Length; i++) {
+            KeyCode key = hookFallbackKeys[i];
+            if(!Quartz.Game.HookInput.IsHookTrackedKey(key)) continue;
+            injected += TryInjectMissedKey(controller, key, now, threshold, chatterActive, asyncActive);
         }
         return injected;
+    }
+    private static int TryInjectMissedKey(scrController controller, KeyCode key, long now, long threshold,
+        bool chatterActive, bool asyncActive) {
+        if(key == KeyCode.None || KeyLimiter.KeyLimiter.IsMouseKey(key)) return 0;
+        if(reportedKeysThisFrame.Contains(key)) {
+            injectedKeyHeldPrev.Add(key);
+            return 0;
+        }
+        if(asyncActive && KeyLimiter.KeyLimiter.HookEverSaw(key)
+            && !Quartz.Game.HookInput.IsHookTrackedKey(key)) {
+            injectedKeyHeldPrev.Remove(key);
+            return 0;
+        }
+        bool held;
+        try { held = UnityEngine.Input.GetKey(key); }
+        catch(Exception e) { Diag.Ignore(e); return 0; }
+        if(!held) held = KeyLimiter.KeyLimiter.HookKeyHeld(key);
+        if(held && !injectedKeyHeldPrev.Contains(key)) {
+            RecordKeyStats(controller, key);
+            if(AcceptNormalKey(key, now, threshold, chatterActive)) {
+                injectedKeyHeldPrev.Add(key);
+                return 1;
+            }
+        }
+        if(held) injectedKeyHeldPrev.Add(key);
+        else injectedKeyHeldPrev.Remove(key);
+        return 0;
     }
     private static readonly List<KeyCode> injectedReleaseScratch = [];
     public static void SampleInjectedKeyReleases() {
