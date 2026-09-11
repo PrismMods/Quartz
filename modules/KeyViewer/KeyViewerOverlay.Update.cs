@@ -128,10 +128,13 @@ public static partial class KeyViewerOverlay {
                 Conf.DmOffsetX = stored.x;
                 Conf.DmOffsetY = stored.y;
                 if(footRoot != null) {
+                    Vector2 handDelta = root.anchoredPosition - handAnchoredPrev;
+                    if(handDelta != Vector2.zero) footRoot.anchoredPosition += handDelta;
                     Vector2 storedFoot = OverlayCalibration.Unscale(footRoot.anchoredPosition);
-                    Conf.DmFootOffsetX = storedFoot.x;
-                    Conf.DmFootOffsetY = storedFoot.y;
+                    Conf.DmFootOffsetX = storedFoot.x - stored.x;
+                    Conf.DmFootOffsetY = storedFoot.y - stored.y;
                 }
+                handAnchoredPrev = root.anchoredPosition;
             }
             EnsureInputPrimed(now);
             UpdateDmNote(now);

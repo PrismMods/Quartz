@@ -26,6 +26,7 @@ internal static partial class KvStore {
         nameof(KeyViewerSettings.DmFootOffsetX),
         nameof(KeyViewerSettings.DmFootOffsetY),
         nameof(KeyViewerSettings.DmFootScale),
+        nameof(KeyViewerSettings.DmFootRelative),
         nameof(KeyViewerSettings.DmNoteEffect),
         nameof(KeyViewerSettings.DmNoteSpeed),
         nameof(KeyViewerSettings.DmTrackHeight),
@@ -85,6 +86,8 @@ internal static partial class KvStore {
                 applied++;
             }
             if(applied == 0) return 0;
+            if(imported[nameof(KeyViewerSettings.DmFootRelative)] == null)
+                live[nameof(KeyViewerSettings.DmFootRelative)] = false;
             conf.Deserialize(live);
             KeyViewerOverlay.Save();
             return applied;

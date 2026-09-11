@@ -144,11 +144,12 @@ public static partial class KeyViewerOverlay {
         root.localScale = new Vector3(dmScale, dmScale, 1f);
         if(footRoot != null) {
             footRoot.anchoredPosition = OverlayCalibration.Scale(
-                new Vector2(Conf.DmFootOffsetX, Conf.DmFootOffsetY)
+                new Vector2(Conf.DmOffsetX + Conf.DmFootOffsetX, Conf.DmOffsetY + Conf.DmFootOffsetY)
             );
             float footScale = Mathf.Clamp(Conf.DmFootScale, 0.2f, 4f);
             footRoot.localScale = new Vector3(footScale, footScale, 1f);
         }
+        handAnchoredPrev = root.anchoredPosition;
         ApplyBorderScale(dmScale);
         ApplyTabub();
         if(!Conf.DmNoteEffect) {
@@ -179,8 +180,9 @@ public static partial class KeyViewerOverlay {
         KeyViewerSettings def = new();
         Conf.DmOffsetX = def.DmOffsetX;
         Conf.DmOffsetY = def.DmOffsetY;
-        Apply();
+        Conf.DmFootPlaced = false;
         Save();
+        Rebuild();
     }
     public static bool ImportDmNoteCss(out string error) =>
         ImportDmNoteFile(out error, "CSS", "css", "Select DM Note custom CSS", "CSS",

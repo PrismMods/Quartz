@@ -14,9 +14,10 @@ public static partial class KeyViewerOverlay {
         if(footTab != null && string.Equals(footTab, handTab, StringComparison.Ordinal)) footTab = null;
         rainLayerRef = BuildDmGroup(root, rainManager, doc, handTab);
         int handBoxes = boxes.Count;
+        float handCanvasWidth = dmCanvasWidth;
         footRainLayerRef = BuildDmGroup(footRoot, footRainManager, doc, footTab);
         footBuilt = boxes.Count > handBoxes;
-        SeedFootPanelPlacement(dmCanvasHeight);
+        SeedFootPanelPlacement(handCanvasWidth, dmCanvasWidth);
         totalCount = 0;
         foreach(Box box in boxes)
             if(!box.IsStat && box.CountInTotal) totalCount += box.Count;
@@ -25,10 +26,13 @@ public static partial class KeyViewerOverlay {
         AddReorganizeHandles();
         Apply();
     }
-    private static void SeedFootPanelPlacement(float footCanvasHeight) {
+    private const float FootPanelGap = 20f;
+    private static void SeedFootPanelPlacement(float handCanvasWidth, float footCanvasWidth) {
         if(!footBuilt || Conf == null || Conf.DmFootPlaced) return;
-        Conf.DmFootOffsetX = Conf.DmOffsetX;
-        Conf.DmFootOffsetY = Conf.DmOffsetY - footCanvasHeight * Mathf.Clamp(Conf.DmFootScale, 0.2f, 4f);
+        float handScale = Mathf.Clamp(Conf.DmScale, 0.2f, 4f);
+        float footScale = Mathf.Clamp(Conf.DmFootScale, 0.2f, 4f);
+        Conf.DmFootOffsetX = (handCanvasWidth * handScale + footCanvasWidth * footScale) * 0.5f + FootPanelGap;
+        Conf.DmFootOffsetY = 0f;
         Conf.DmFootPlaced = true;
         Save();
     }

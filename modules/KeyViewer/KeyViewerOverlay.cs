@@ -45,6 +45,7 @@ public static partial class KeyViewerOverlay {
     private static readonly List<Box> counterBounces = [];
     private static bool built;
     private static bool footBuilt;
+    private static Vector2 handAnchoredPrev;
     private static RainManager rainManager;
     private static RainManager footRainManager;
     private static RectTransform buildRoot;
