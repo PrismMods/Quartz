@@ -86,10 +86,11 @@ public sealed class QuartzRuntime {
         string modParent = Path.GetDirectoryName(NormalizeDir(modRoot));
         if(!string.IsNullOrEmpty(modParent)) yield return Path.Combine(modParent, "Koren");
     }
-    private static readonly string[] ModRootKeepSuffixes = { ".dll", ".dll.old", ".old", ".pdb", ".xml", ".krnew" };
+    private static readonly string[] ModRootKeepSuffixes = { ".dll", ".dll.old", ".old", ".pdb", ".xml", ".krnew", ".cache" };
     private static bool IsModDistributionEntry(string name) {
         if(name.Length == 0 || name[0] == '.') return true;
         if(string.Equals(name, "UserData", StringComparison.OrdinalIgnoreCase) ||
+           string.Equals(name, "Runtime", StringComparison.OrdinalIgnoreCase) ||
            string.Equals(name, "Info.json", StringComparison.OrdinalIgnoreCase)) return true;
         foreach(string suffix in ModRootKeepSuffixes)
             if(name.EndsWith(suffix, StringComparison.OrdinalIgnoreCase)) return true;
