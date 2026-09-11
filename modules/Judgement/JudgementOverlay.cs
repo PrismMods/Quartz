@@ -44,11 +44,23 @@ public static class JudgementOverlay {
     private const int PerfectSlot = 4;
     private static TextMeshProUGUI xPlusLabel;
     private static TextMeshProUGUI xMinusLabel;
+    private static TextMeshProUGUI xBorder;
+    private static string xHex;
+    private static readonly StringBuilder borderBuilder = new(160);
     private static readonly Color XPerfectColor = new(0.30f, 0.80f, 1f, 1f);
     private static readonly Color PlusMinusPerfectColor = new(0.38f, 1f, 0.31f, 1f);
     private static readonly string[] SlotHex =
         System.Array.ConvertAll(Judgement.SlotColors, ColorUtility.ToHtmlStringRGB);
-    private static readonly string XPerfectHex = ColorUtility.ToHtmlStringRGB(XPerfectColor);
+    private static Color XColor() => XPerfectBridge.Native ? XPerfectBridge.NativeXColor() : XPerfectColor;
+    private static void SyncBorder(TextMeshProUGUI target, bool show, string text) {
+        if(!show) {
+            if(xBorder != null && xBorder.gameObject.activeSelf) xBorder.gameObject.SetActive(false);
+            return;
+        }
+        xBorder ??= XPerfectBorder.Create(target);
+        if(!xBorder.gameObject.activeSelf) xBorder.gameObject.SetActive(true);
+        XPerfectBorder.Sync(target, xBorder, text);
+    }
     private static readonly string PlusMinusHex = ColorUtility.ToHtmlStringRGB(PlusMinusPerfectColor);
     private static readonly StringBuilder rowBuilder = new(160);
     public static void EnsureConf() => ConfMgr ??= SettingsFile<JudgementSettings>.Loaded("Judgement.json");
@@ -195,6 +207,7 @@ public static class JudgementOverlay {
         System.Array.Clear(labels, 0, labels.Length);
         xPlusLabel = null;
         xMinusLabel = null;
+        xBorder = null;
         dragObj = null;
         updater = null;
     }
@@ -244,13 +257,14 @@ public static class JudgementOverlay {
                 }
             }
             UpdateXPerfectLabels(xpMode, xpModeChanged, font, fontSize, ref changed);
-            if(xpModeChanged) labels[PerfectSlot].color = xpMode ? XPerfectColor : Judgement.SlotColors[PerfectSlot];
+            if(xpModeChanged) labels[PerfectSlot].color = xpMode ? XColor() : Judgement.SlotColors[PerfectSlot];
             cacheValid = true;
             lastFontSize = fontSize;
             lastFont = font;
             lastXpMode = xpMode;
             if(changed) {
                 LayoutRebuilder.ForceRebuildLayoutImmediate(root);
+                SyncBorder(labels[PerfectSlot], xpMode && XPerfectBridge.Native, cached[PerfectSlot].ToString(CultureInfo.InvariantCulture));
                 for(int i = 0; i < labels.Length; i++) ApplyTextStyle(labels[i], fontSize);
                 if(xpMode) {
                     ApplyTextStyle(xPlusLabel, fontSize);
@@ -274,12 +288,12 @@ public static class JudgementOverlay {
                 }
             }
             if(xpMode) {
-                int plus = XPerfectBridge.PlusCount();
+                int plus = XPerfectBridge.EarlyCount();
                 if(!cacheValid || plus != cachedPlus || xpModeChanged) {
                     cachedPlus = plus;
                     changed = true;
                 }
-                int minus = XPerfectBridge.MinusCount();
+                int minus = XPerfectBridge.LateCount();
                 if(!cacheValid || minus != cachedMinus || xpModeChanged) {
                     cachedMinus = minus;
                     changed = true;
@@ -291,31 +305,41 @@ public static class JudgementOverlay {
             lastXpMode = xpMode;
             lastRowSpacing = rowSpacing;
             if(!changed) return;
+            if(xpModeChanged || xHex == null) xHex = ColorUtility.ToHtmlStringRGB(XColor());
+            bool border = xpMode && XPerfectBridge.Native;
             StringBuilder sb = rowBuilder;
             sb.Clear();
+            StringBuilder bb = borderBuilder;
+            bb.Clear();
             if(lastGap == null || rowSpacing != lastGapSpacing) {
                 lastGap = rowSpacing.ToString("0.##", CultureInfo.InvariantCulture);
                 lastGapSpacing = rowSpacing;
             }
             string gap = lastGap;
             for(int i = 0; i < Judgement.Slots; i++) {
-                if(i > 0) sb.Append("<space=").Append(gap).Append("px>");
+                if(i > 0) AppendGap(sb, bb, gap);
                 if(i == PerfectSlot && xpMode) {
-                    AppendCount(sb, PlusMinusHex, cachedPlus);
-                    sb.Append("<space=").Append(gap).Append("px>");
-                    AppendCount(sb, XPerfectHex, cached[i]);
-                    sb.Append("<space=").Append(gap).Append("px>");
-                    AppendCount(sb, PlusMinusHex, cachedMinus);
+                    AppendCount(sb, bb, PlusMinusHex, cachedPlus, false);
+                    AppendGap(sb, bb, gap);
+                    AppendCount(sb, bb, xHex, cached[i], true);
+                    AppendGap(sb, bb, gap);
+                    AppendCount(sb, bb, PlusMinusHex, cachedMinus, false);
                 } else {
-                    AppendCount(sb, SlotHex[i], cached[i]);
+                    AppendCount(sb, bb, SlotHex[i], cached[i], false);
                 }
             }
             rowLabel.text = sb.ToString();
             LayoutRebuilder.ForceRebuildLayoutImmediate(root);
+            SyncBorder(rowLabel, border, border ? bb.ToString() : null);
             ApplyTextStyle(rowLabel, fontSize);
         }
-        private static void AppendCount(StringBuilder sb, string hex, int count) {
+        private static void AppendGap(StringBuilder sb, StringBuilder bb, string gap) {
+            sb.Append("<space=").Append(gap).Append("px>");
+            bb.Append("<space=").Append(gap).Append("px>");
+        }
+        private static void AppendCount(StringBuilder sb, StringBuilder bb, string hex, int count, bool border) {
             sb.Append("<color=#").Append(hex).Append('>').Append(count).Append("</color>");
+            bb.Append(border ? "<alpha=#FF>" : "<alpha=#00>").Append(count);
         }
         private void UpdateXPerfectLabels(
             bool xpMode, bool xpModeChanged, TMP_FontAsset font, float fontSize, ref bool changed
@@ -331,13 +355,13 @@ public static class JudgementOverlay {
             if(xMinusLabel.font != font) xMinusLabel.font = font;
             if(xPlusLabel.fontSize != fontSize) xPlusLabel.fontSize = fontSize;
             if(xMinusLabel.fontSize != fontSize) xMinusLabel.fontSize = fontSize;
-            int plus = XPerfectBridge.PlusCount();
+            int plus = XPerfectBridge.EarlyCount();
             if(!cacheValid || plus != cachedPlus || xpModeChanged) {
                 cachedPlus = plus;
                 UnityUtils.SetCount(xPlusLabel, plus);
                 changed = true;
             }
-            int minus = XPerfectBridge.MinusCount();
+            int minus = XPerfectBridge.LateCount();
             if(!cacheValid || minus != cachedMinus || xpModeChanged) {
                 cachedMinus = minus;
                 UnityUtils.SetCount(xMinusLabel, minus);

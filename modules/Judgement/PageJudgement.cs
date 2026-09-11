@@ -34,7 +34,7 @@ internal static class PageJudgement {
                 v => { conf.ShowXPerfect = v; Apply(); Save(); },
                 "Show XPerfect",
                 "judgement_xperfect",
-                "Split the Perfect count into +Perfect / X / -Perfect when the XPerfect mod is active."
+                "Split the Perfect count into early / X / late when X-Perfect judgements are shown (the game's Perfect text setting, or the XPerfect mod)."
             );
         }
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(sec.Body)), "HEADING_LAYOUT", "Layout");

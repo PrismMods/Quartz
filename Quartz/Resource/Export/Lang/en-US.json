@@ -70,7 +70,7 @@
     "DESC_IMPORT_DO": "Copy this mod's settings into Quartz. Settings it doesn't cover are left as they are.",
     "DESC_IMPORT_PROFILE": "Copy this mod's settings into a new Quartz profile, leaving the current profile selected.",
     "DESC_IMPORT_RESCAN": "Re-scan for supported mods loaded through Unity Mod Manager.",
-    "DESC_JUDGEMENT_XPERFECT": "Split the Perfect count into +Perfect / X / -Perfect when the XPerfect mod is active.",
+    "DESC_JUDGEMENT_XPERFECT": "Split the Perfect count into early / X / late when X-Perfect judgements are shown (the game's Perfect text setting, or the XPerfect mod).",
     "DESC_KEYVIEWER_COUNTFORMAT": "Show counters with a thousands separator (1,234).",
     "DESC_KEYVIEWER_DM_CSS_IMPORT": "Select a DM Note custom CSS file. Layers over the preset; restyles keys and counters.",
     "DESC_KEYVIEWER_DM_IMPORT": "Select a DM Note preset JSON file.",
