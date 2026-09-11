@@ -1,0 +1,32 @@
+Quartz/Resource/Export/Lang/en-US.json
+  s_e238f5d5b2892d::t_e3878c0a21a0ee 73
+modules/Judgement/PageJudgement.cs
+  s_e238f5d5b2892d::t_e3878c0a21a0ee 37
+modules/Judgement/JudgementOverlay.cs
+  s_e238f5d5b2892d::t_1d7594b642618c 291,296,358,364
+  s_e238f5d5b2892d::t_e691024a0ed712 320,322-326,328,333,336-340,342
+  s_e238f5d5b2892d::t_9788d9a6ff6a0a 62
+  s_e238f5d5b2892d::t_4fb04f09e18f86 47-49,54-61,63,210,260,267,308-309,312-313
+modules/Judgement/XPerfectBorder.cs
+  s_e238f5d5b2892d::t_420f6fcd068aae 1,44-45,47
+  s_e238f5d5b2892d::t_aac260c0981d68 2-7,19-26,30-33,35-43,48-50,83-84
+  s_e238f5d5b2892d::t_5514333b717d1a 8-18,27-29,34,51-52,54-56,58-82
+  s_e238f5d5b2892d::t_0402fbba09ec7f 57
+  s_e238f5d5b2892d::t_9788d9a6ff6a0a 46,53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "19534f1a78212f09acd75a6994408c146245a1bf",
+  "prompts": {},
+  "sessions": {
+    "s_e238f5d5b2892d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c413644b-e463-4123-8c4d-384da671ad8c",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
