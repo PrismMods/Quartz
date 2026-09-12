@@ -16,12 +16,12 @@ internal static partial class PageKeyViewer {
         KvTabStrip handStrip = KvTabStrip.Create(
             bar, "KEYVIEWER_EDITOR_HAND_TABS", "Hand"
         );
-        RectTransform actions = KvToolbar.Pill(bar);
         KvTabStrip footStrip = KvTabStrip.Create(
             bar, "KEYVIEWER_EDITOR_FOOT_TABS", "Foot"
         );
         RectTransform host = KvToolbar.RegionOf(bar);
         UIButton delete = null;
+        UIButton footDelete = null;
         void Refresh() {
             KvDocument doc = KvStore.Current;
             List<string> hands = [];
@@ -31,7 +31,8 @@ internal static partial class PageKeyViewer {
             string foot = doc.SelectedFootTab;
             handStrip.Rebuild(hands, tab => tab == hand, canvas.Tab, doc.TabName, Select);
             footStrip.Rebuild(feet, tab => tab == foot, canvas.Tab, doc.TabName, Select);
-            delete?.SetBlocked(!doc.IsFootTab(canvas.Tab) && doc.HandTabCount <= 1, true);
+            delete?.SetBlocked(doc.HandTabCount <= 1, true);
+            footDelete?.SetBlocked(FootTarget() == null, true);
         }
         void Select(string tab) {
             KvDocument doc = KvStore.Current;
@@ -44,6 +45,10 @@ internal static partial class PageKeyViewer {
             Refresh();
             refreshStatus();
             refreshSettings();
+        }
+        string FootTarget() {
+            KvDocument doc = KvStore.Current;
+            return doc.IsFootTab(canvas.Tab) ? canvas.Tab : doc.SelectedFootTab;
         }
         bool AtTabLimit() {
             if(KvStore.Current.CustomTabCount < KvDocument.MaxCustomTabs) return false;
@@ -61,65 +66,76 @@ internal static partial class PageKeyViewer {
             KvMigration.GenerateStockTab(doc, tab, style);
             Select(tab);
         }
-        void Delete() {
+        void Delete(string tab) {
             KvDocument doc = KvStore.Current;
-            if(!doc.RemoveTab(canvas.Tab)) return;
-            canvas.Bind(doc, doc.SelectedTab);
+            bool editing = tab == canvas.Tab;
+            if(!doc.RemoveTab(tab)) return;
+            canvas.Bind(doc, editing ? doc.SelectedTab : canvas.Tab);
             KvStore.RequestSave();
             KeyViewerOverlay.RequestLayoutRebuild();
             Refresh();
             refreshStatus();
             refreshSettings();
         }
-        void SetFoot(int footCount) {
+        void AddFoot(int footCount) {
             KvDocument doc = canvas.Document;
-            if(doc == null) return;
-            if(footCount <= 0) {
-                if(doc.SelectedFootTab == null) return;
-                doc.SelectedFootTab = null;
-                canvas.Rebuild();
-                canvas.Mutated();
-                Refresh();
-                return;
-            }
-            if(doc.IsFootTab(canvas.Tab)) {
-                canvas.PushHistory();
-                KvMigration.GenerateStockFootTab(doc, canvas.Tab, doc.SelectedTab, footCount);
-                canvas.Rebuild();
-                canvas.Mutated();
-                Refresh();
-                return;
-            }
-            if(AtTabLimit()) return;
+            if(doc == null || AtTabLimit()) return;
             string tab = doc.NewTabId();
             doc.EnsureTab(tab, doc.UniqueTabName(MainCore.Tr.Get("KEYVIEWER_EDITOR_FOOT_TAB", "Foot")));
             doc.SetFootTab(tab, true);
             KvMigration.GenerateStockFootTab(doc, tab, doc.SelectedTab, footCount);
             Select(tab);
         }
+        void HideFoot() {
+            KvDocument doc = canvas.Document;
+            if(doc == null || doc.SelectedFootTab == null) return;
+            doc.SelectedFootTab = null;
+            canvas.Rebuild();
+            canvas.Mutated();
+            Refresh();
+            refreshStatus();
+            refreshSettings();
+        }
         UIButton add = KvToolbar.Icon(
-            actions, UISprite.Plus128, "keyviewer_editor_tab_add", null,
+            handStrip.Pill, UISprite.Plus128, "keyviewer_editor_tab_add", null,
             "DESC_KEYVIEWER_EDITOR_TAB_ADD",
             "Add a hand-key tab holding one of the Simple mode key layouts, ready to edit."
         );
         add.OnClick = () => KvPopup.Show(host, add.Rect, PresetItems(), index => Create(KvPresets.Styles[index]));
         delete = KvToolbar.Icon(
-            actions, UISprite.Minus128, "keyviewer_editor_tab_delete", null,
+            handStrip.Pill, UISprite.Minus128, "keyviewer_editor_tab_delete", null,
             "DESC_KEYVIEWER_EDITOR_TAB_DELETE",
-            "Remove the tab you are editing, and every element on it."
+            "Remove the hand tab you are editing, and every element on it."
         );
         delete.OnClick = () => KvPopup.Show(
             host, delete.Rect,
             [("KEYVIEWER_EDITOR_TAB_DELETE_CONFIRM", "Delete this tab")],
-            _ => Delete()
+            _ => Delete(KvStore.Current.SelectedTab)
         );
         Danger(delete);
-        UIButton foot = KvToolbar.Icon(
-            footStrip.Pill, UISprite.Move128, "keyviewer_editor_foot", null,
+        UIButton footAdd = KvToolbar.Icon(
+            footStrip.Pill, UISprite.Plus128, "keyviewer_editor_foot", null,
             "DESC_KEYVIEWER_EDITOR_FOOT",
-            "Add a foot-key tab, drawn alongside the hand tab you have open. Pick a count to build or resize one, or None to leave the foot keys off."
+            "Add another foot-key tab, drawn alongside the hand tab you have open. Pick how many foot keys it starts with."
         );
-        foot.OnClick = () => KvPopup.Show(host, foot.Rect, FootItems(), index => SetFoot(index * 2));
+        footAdd.OnClick = () => KvPopup.Show(host, footAdd.Rect, FootItems(), index => AddFoot((index + 1) * 2));
+        footDelete = KvToolbar.Icon(
+            footStrip.Pill, UISprite.Minus128, "keyviewer_editor_foot_delete", null,
+            "DESC_KEYVIEWER_EDITOR_FOOT_DELETE",
+            "Hide the foot keys, or delete the foot tab you have open."
+        );
+        footDelete.OnClick = () => KvPopup.Show(
+            host, footDelete.Rect,
+            [
+                ("KEYVIEWER_EDITOR_FOOT_HIDE", "Hide foot keys"),
+                ("KEYVIEWER_EDITOR_FOOT_DELETE_CONFIRM", "Delete this foot tab"),
+            ],
+            index => {
+                if(index == 0) HideFoot();
+                else Delete(FootTarget());
+            }
+        );
+        Danger(footDelete);
         Refresh();
         return Refresh;
     }
@@ -130,7 +146,7 @@ internal static partial class PageKeyViewer {
     }
     private static List<(string Key, string Text)> FootItems() {
         List<(string, string)> items = [];
-        for(int s = 0; s <= KeyViewerSettings.MaxFootStyle; s++) items.Add((null, FootStyleName(s)));
+        for(int s = 1; s <= KeyViewerSettings.MaxFootStyle; s++) items.Add((null, FootStyleName(s)));
         return items;
     }
     private static void Danger(UIButton button) {
