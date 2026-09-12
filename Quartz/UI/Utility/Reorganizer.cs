@@ -173,6 +173,7 @@ public static class Reorganizer {
         ApplySizeSlider(handle);
         SyncSelectedSliders();
         panelObj.SetActive(true);
+        DragHandler.ClampToParent((RectTransform)panelObj.transform);
     }
     public static void Deselect() {
         ClearOutline();
@@ -254,7 +255,7 @@ public static class Reorganizer {
         rect.anchorMin = new Vector2(0f, 0f);
         rect.anchorMax = new Vector2(0f, 0f);
         rect.pivot = new Vector2(0f, 0f);
-        rect.anchoredPosition = new Vector2(18f, 18f);
+        rect.anchoredPosition = new Vector2(MainCore.Conf.ReorganizePanelX, MainCore.Conf.ReorganizePanelY);
         rect.sizeDelta = new Vector2(640f, 0f);
         Image bg = panelObj.AddComponent<Image>();
         bg.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P1024);
@@ -266,6 +267,7 @@ public static class Reorganizer {
         group.blocksRaycasts = true;
         VerticalLayoutGroup layout = GenerateUI.FitVertical(panelObj, 8f);
         layout.padding = new RectOffset(14, 14, 12, 12);
+        BuildPanelDragSurface();
         RectTransform nameRow = GenerateUI.Row(panelObj.transform, 34f);
         nameLabel = GenerateUI.AddText(nameRow, true);
         nameLabel.fontSize = 22f;
@@ -287,6 +289,26 @@ public static class Reorganizer {
             Selected?.OnMoved?.Invoke();
         };
         panelObj.SetActive(false);
+    }
+    private static void BuildPanelDragSurface() {
+        GameObject drag = new("Drag");
+        drag.transform.SetParent(panelObj.transform, false);
+        RectTransform dragRect = drag.AddComponent<RectTransform>();
+        dragRect.anchorMin = Vector2.zero;
+        dragRect.anchorMax = Vector2.one;
+        dragRect.offsetMin = Vector2.zero;
+        dragRect.offsetMax = Vector2.zero;
+        drag.AddComponent<LayoutElement>().ignoreLayout = true;
+        drag.AddComponent<EmptyGraphic>().raycastTarget = true;
+        drag.AddComponent<DragHandler>().OnDropped = SavePanelPosition;
+        drag.transform.SetAsFirstSibling();
+    }
+    private static void SavePanelPosition() {
+        if(panelObj == null) return;
+        Vector2 pos = ((RectTransform)panelObj.transform).anchoredPosition;
+        MainCore.Conf.ReorganizePanelX = pos.x;
+        MainCore.Conf.ReorganizePanelY = pos.y;
+        MainCore.ConfMgr.RequestSave();
     }
     private static UISlider MakeAxisSlider(string text, string id, float max, Action<float> apply) {
         UISlider slider = GenerateUI.Slider(

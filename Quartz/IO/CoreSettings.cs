@@ -36,6 +36,8 @@ public sealed class CoreSettings : ISettingsFile {
     public float KvInspectorWidth = 0f;
     public float ExitReorganizeOffsetX = -40f;
     public float ExitReorganizeOffsetY = 40f;
+    public float ReorganizePanelX = 18f;
+    public float ReorganizePanelY = 18f;
     public Dictionary<string, bool> CollapsibleStates = [];
     public Dictionary<string, (int Modifier, int Key)> ToggleKeybinds = [];
     public int ToggleModifier = (int)Keybind.KeyModifier.Alt;
@@ -101,6 +103,8 @@ public sealed class CoreSettings : ISettingsFile {
             [nameof(KvInspectorWidth)] = KvInspectorWidth,
             [nameof(ExitReorganizeOffsetX)] = ExitReorganizeOffsetX,
             [nameof(ExitReorganizeOffsetY)] = ExitReorganizeOffsetY,
+            [nameof(ReorganizePanelX)] = ReorganizePanelX,
+            [nameof(ReorganizePanelY)] = ReorganizePanelY,
             [nameof(ToggleModifier)] = ToggleModifier,
             [nameof(ToggleKey)] = ToggleKey,
             [nameof(UpdateChannel)] = UpdateChannel,
@@ -148,6 +152,8 @@ public sealed class CoreSettings : ISettingsFile {
         KvInspectorWidth = IOUtils.Read(token, nameof(KvInspectorWidth), KvInspectorWidth);
         ExitReorganizeOffsetX = IOUtils.Read(token, nameof(ExitReorganizeOffsetX), ExitReorganizeOffsetX);
         ExitReorganizeOffsetY = IOUtils.Read(token, nameof(ExitReorganizeOffsetY), ExitReorganizeOffsetY);
+        ReorganizePanelX = IOUtils.Read(token, nameof(ReorganizePanelX), ReorganizePanelX);
+        ReorganizePanelY = IOUtils.Read(token, nameof(ReorganizePanelY), ReorganizePanelY);
         ToggleModifier = IOUtils.Read(token, nameof(ToggleModifier), ToggleModifier);
         ToggleKey = IOUtils.Read(token, nameof(ToggleKey), ToggleKey);
         UpdateChannel = IOUtils.Read(token, nameof(UpdateChannel), UpdateChannel);

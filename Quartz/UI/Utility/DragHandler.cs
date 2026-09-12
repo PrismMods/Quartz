@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 namespace Quartz.UI.Utility;
 public class DragHandler : MonoBehaviour {
+    public Action OnDropped;
     private RectTransform rect;
     private Vector2 offset;
     private static readonly Vector3[] selfCorners = new Vector3[4];
@@ -14,6 +15,7 @@ public class DragHandler : MonoBehaviour {
         var trigger = gameObject.AddComponent<EventTrigger>();
         UnityUtils.AddEvent(EventTriggerType.PointerDown, _ => OnPointerDownInternal(), trigger);
         UnityUtils.AddEvent(EventTriggerType.Drag, _ => OnDragInternal(), trigger);
+        UnityUtils.AddEvent(EventTriggerType.PointerUp, _ => OnDropped?.Invoke(), trigger);
     }
     private void OnPointerDownInternal() {
         if(rect == null) rect = transform.parent?.GetComponent<RectTransform>();
