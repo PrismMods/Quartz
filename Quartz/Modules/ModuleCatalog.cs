@@ -53,7 +53,7 @@ public sealed class ModuleCatalog {
         if(string.IsNullOrWhiteSpace(current)) return true;
         return SemVer.TryParse(candidate, out SemVer remote)
             && SemVer.TryParse(current, out SemVer local)
-            && remote.CompareTo(local) > 0;
+            && SemVer.CompareForChannel(remote, local, remote.Channel) > 0;
     }
     public static bool IsSha256(string value) {
         if(value == null || value.Length != 64) return false;

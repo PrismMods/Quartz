@@ -74,4 +74,12 @@ static class ModuleCatalogTests {
         Assert(ModuleCatalog.IsNewer("2.0.0-alpha-103", null),
             "an entry still upgrades a module whose installed version is unknown");
     }
+    public static void TestTheRunningChannelOutranksAnotherChannelsBuild() {
+        Assert(ModuleCatalog.IsNewer("2.0.0-alpha-126", "2.0.0-beta-2"),
+            "an alpha core replaces a module left behind by a beta install");
+        Assert(ModuleCatalog.IsNewer("2.0.0-beta-2", "2.0.0-alpha-126"),
+            "a beta core likewise reclaims a module left behind by an alpha install");
+        Assert(!ModuleCatalog.IsNewer("2.0.0-alpha-126", "2.0.0"),
+            "crossing channels still never replaces the stable build");
+    }
 }

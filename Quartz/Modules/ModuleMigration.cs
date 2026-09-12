@@ -57,7 +57,9 @@ public static partial class ModuleMigration {
     ];
     public static bool NeedsSourceRefresh(string installed, string bundled) {
         if(string.IsNullOrEmpty(installed) || string.IsNullOrEmpty(bundled)) return false;
-        return SemVer.Compare(installed, bundled) < 0;
+        return SemVer.TryParse(installed, out SemVer local)
+            && SemVer.TryParse(bundled, out SemVer shipped)
+            && SemVer.CompareForChannel(shipped, local, shipped.Channel) > 0;
     }
     public sealed class Refresh {
         public string Id;
