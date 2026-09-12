@@ -18,6 +18,10 @@ internal sealed class KvTabStrip {
     private readonly RectTransform track;
     private readonly LayoutElement viewportLe;
     private readonly ScrollRect scroll;
+    private readonly List<string> order = [];
+    private Action<string, int> reorder;
+    private string dragging;
+    private int dragFrom = -1;
     internal RectTransform Pill { get; private set; }
     private KvTabStrip(RectTransform track, LayoutElement viewportLe, ScrollRect scroll) {
         this.track = track;
@@ -85,9 +89,13 @@ internal sealed class KvTabStrip {
     }
     internal void Rebuild(
         IReadOnlyList<string> tabs, Func<string, bool> active, string editing,
-        Func<string, string> name, Action<string> onPick
+        Func<string, string> name, Action<string> onPick, Action<string, int> onReorder
     ) {
         if(track == null) return;
+        reorder = onReorder;
+        dragging = null;
+        order.Clear();
+        order.AddRange(tabs);
         GenerateUI.ClearChildren(track);
         List<(LayoutElement, TextMeshProUGUI, float)> measured = [];
         float width = 0f;
@@ -132,14 +140,60 @@ internal sealed class KvTabStrip {
         };
         button.UpdateVisual(true);
         GenerateUI.AddButton(obj, btn => {
-            if(btn != InputButton.Left) return;
+            if(btn != InputButton.Left || dragging != null) return;
             if(editing) return;
             onPick?.Invoke(tab);
         }, false);
         EventTrigger trigger = obj.GetComponent<EventTrigger>() ?? obj.AddComponent<EventTrigger>();
         UnityUtils.AddEvent(EventTriggerType.PointerEnter, _ => button.OnHoverEnter(), trigger);
         UnityUtils.AddEvent(EventTriggerType.PointerExit, _ => button.OnHoverExit(), trigger);
-        KvToolbar.ForwardDrag(trigger, scroll);
+        UnityUtils.AddEvent(EventTriggerType.InitializePotentialDrag, scroll.OnInitializePotentialDrag, trigger);
+        UnityUtils.AddEvent(EventTriggerType.BeginDrag, e => BeginDrag(tab, e), trigger);
+        UnityUtils.AddEvent(EventTriggerType.Drag, Drag, trigger);
+        UnityUtils.AddEvent(EventTriggerType.EndDrag, EndDrag, trigger);
         return width;
+    }
+    private void BeginDrag(string tab, PointerEventData e) {
+        dragFrom = order.IndexOf(tab);
+        if(e.button != InputButton.Left || order.Count < 2 || dragFrom < 0) {
+            scroll.OnBeginDrag(e);
+            return;
+        }
+        dragging = tab;
+    }
+    private void Drag(PointerEventData e) {
+        if(dragging == null) {
+            scroll.OnDrag(e);
+            return;
+        }
+        int from = order.IndexOf(dragging);
+        int to = SlotAt(e);
+        if(from < 0 || to < 0 || to == from) return;
+        order.RemoveAt(from);
+        order.Insert(to, dragging);
+        track.GetChild(from).SetSiblingIndex(to);
+    }
+    private int SlotAt(PointerEventData e) {
+        if(!RectTransformUtility.ScreenPointToLocalPointInRectangle(track, e.position, null, out Vector2 local))
+            return -1;
+        float cursor = 0f;
+        for(int i = 0; i < track.childCount; i++) {
+            float w = ((RectTransform)track.GetChild(i)).rect.width;
+            if(local.x < cursor + w * 0.5f) return i;
+            cursor += w + KvPalette.PillPad;
+        }
+        return track.childCount - 1;
+    }
+    private void EndDrag(PointerEventData e) {
+        string tab = dragging;
+        int from = dragFrom;
+        dragging = null;
+        dragFrom = -1;
+        if(tab == null) {
+            scroll.OnEndDrag(e);
+            return;
+        }
+        int to = order.IndexOf(tab);
+        if(to >= 0 && to != from) reorder?.Invoke(tab, to);
     }
 }

@@ -95,6 +95,29 @@ static partial class KvDocumentTests {
             Assert(entry["id"]!.ToString() != b, "customTabs loses the removed tab");
         Assert(after["selectedKeyType"]!.ToString() == a, "the surviving selection is written out");
     }
+    public static void TestTabsReorderWithinTheirGroup() {
+        KvDocument doc = KvDocument.Empty();
+        string a = doc.SelectedTab;
+        string b = doc.NewTabId();
+        doc.EnsureTab(b, "B");
+        string foot = doc.NewTabId();
+        doc.EnsureTab(foot, "Foot");
+        doc.SetFootTab(foot, true);
+        Assert(!doc.MoveTabTo("nope", 0), "an unknown tab is refused");
+        Assert(!doc.MoveTabTo(a, 0), "dropping a tab back where it started is refused");
+        Assert(!doc.MoveTabTo(foot, 1), "a lone foot tab has no second slot in its own group");
+        Assert(!doc.MoveTabTo(b, 2), "a slot past the end of the group is refused");
+        Assert(doc.MoveTabTo(b, 0), "a hand tab drops into the first slot");
+        List<string> order = [.. doc.Tabs];
+        Assert(order.IndexOf(b) < order.IndexOf(a), "the dropped tab now sits before its neighbour");
+        Assert(order.Contains(foot), "the foot tab is still listed");
+        List<string> reloaded = [.. KvDocument.Parse(doc.ToJson()).Tabs];
+        Assert(reloaded.IndexOf(b) < reloaded.IndexOf(a), "the order survives a serialize/parse round-trip");
+        doc.SelectedTab = a;
+        Assert(doc.RemoveTab(a), "a reordered tab is still removable");
+        List<string> after = [.. doc.Tabs];
+        Assert(!after.Contains(a) && after.Contains(b), "the saved order drops ids that are gone");
+    }
     public static void TestRemoveTabLeavesUnmodelledTablesAlone() {
         KvDocument doc = KvDocument.Parse(Preset);
         doc.EnsureTab("custom-other", "Other");

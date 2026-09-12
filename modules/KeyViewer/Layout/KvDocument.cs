@@ -65,7 +65,41 @@ internal sealed partial class KvDocument {
             return count;
         }
     }
-    internal IEnumerable<string> Tabs => tabs.Keys;
+    internal IEnumerable<string> Tabs {
+        get {
+            List<string> listed = [];
+            if(Root["customTabs"] is JArray custom)
+                foreach(JToken entry in custom)
+                    if(entry is JObject o && o["id"]?.ToString() is string id
+                        && tabs.ContainsKey(id) && !listed.Contains(id)) listed.Add(id);
+            List<string> order = [];
+            foreach(string tab in tabs.Keys) if(!listed.Contains(tab)) order.Add(tab);
+            order.AddRange(listed);
+            if(Root[TabOrderKey] is not JArray saved) return order;
+            List<string> ranked = [];
+            foreach(JToken entry in saved)
+                if(entry?.ToString() is string id && tabs.ContainsKey(id) && !ranked.Contains(id)) ranked.Add(id);
+            foreach(string tab in order) if(!ranked.Contains(tab)) ranked.Add(tab);
+            return ranked;
+        }
+    }
+    private const string TabOrderKey = "quartzTabOrder";
+    internal bool MoveTabTo(string tab, int index) {
+        if(!HasTab(tab)) return false;
+        bool foot = IsFootTab(tab);
+        List<string> all = [.. Tabs];
+        List<string> group = [];
+        foreach(string id in all) if(IsFootTab(id) == foot) group.Add(id);
+        int from = group.IndexOf(tab);
+        if(from < 0 || index < 0 || index >= group.Count || index == from) return false;
+        group.RemoveAt(from);
+        group.Insert(index, tab);
+        JArray order = [];
+        int next = 0;
+        foreach(string id in all) order.Add(IsFootTab(id) == foot ? group[next++] : id);
+        Root[TabOrderKey] = order;
+        return true;
+    }
     internal bool HasTab(string tab) => tab != null && tabs.ContainsKey(tab);
     internal const int MaxCustomTabs = 30;
     internal int CustomTabCount => (Root["customTabs"] as JArray)?.Count ?? 0;
@@ -120,7 +154,7 @@ internal sealed partial class KvDocument {
         if(string.IsNullOrWhiteSpace(tab) || !tabs.ContainsKey(tab)) return false;
         bool foot = IsFootTab(tab);
         if(!foot && HandTabCount <= 1) return false;
-        List<string> order = [.. tabs.Keys];
+        List<string> order = [.. Tabs];
         int index = order.IndexOf(tab);
         bool wasSelected = !foot && SelectedTab == tab;
         bool wasFootSelected = foot && SelectedFootTab == tab;

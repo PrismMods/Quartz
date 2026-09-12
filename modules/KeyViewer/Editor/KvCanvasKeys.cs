@@ -205,6 +205,7 @@ internal sealed partial class KvCanvas {
             return;
         }
         doc = restored;
+        if(!doc.HasTab(tab)) tab = doc.SelectedTab;
         selection.Clear();
         Rebuild();
         DocumentReplaced?.Invoke(restored);

@@ -75,6 +75,7 @@ List<(string Name, Action Run)> tests = [
     ("KeyViewer foot keys live on their own tab and export merged", KvDocumentTests.TestFootTabsSplitActivateAndExportMerged),
     ("KeyViewer per-key KPS is absent by default and round-trips", KvDocumentTests.TestPerKeyKpsIsOptOutAndRoundTrips),
     ("KeyViewer tabs are created, named uniquely, and removed", KvDocumentTests.TestTabsCreateNameAndRemove),
+    ("KeyViewer tabs reorder inside their own strip", KvDocumentTests.TestTabsReorderWithinTheirGroup),
     ("KeyViewer tab rename is unique, reversible, and round-trips", KvDocumentTests.TestRenameTabIsUniqueAndReversible),
     ("KeyViewer import surfaces a preset's embedded custom CSS", KvDocumentTests.TestEmbeddedCssIsExtractedForImport),
     ("KeyViewer import merges tabs, keeping the existing ones", KvDocumentTests.TestMergeKeepsExistingTabsAndAddsImported),

@@ -29,8 +29,8 @@ internal static partial class PageKeyViewer {
             foreach(string tab in doc.Tabs) (doc.IsFootTab(tab) ? feet : hands).Add(tab);
             string hand = doc.SelectedTab;
             string foot = doc.SelectedFootTab;
-            handStrip.Rebuild(hands, tab => tab == hand, canvas.Tab, doc.TabName, Select);
-            footStrip.Rebuild(feet, tab => tab == foot, canvas.Tab, doc.TabName, Select);
+            handStrip.Rebuild(hands, tab => tab == hand, canvas.Tab, doc.TabName, Select, Reorder);
+            footStrip.Rebuild(feet, tab => tab == foot, canvas.Tab, doc.TabName, Select, Reorder);
             delete?.SetBlocked(doc.HandTabCount <= 1, true);
             footDelete?.SetBlocked(FootTarget() == null, true);
         }
@@ -61,17 +61,28 @@ internal static partial class PageKeyViewer {
         void Create(int style) {
             if(AtTabLimit()) return;
             KvDocument doc = KvStore.Current;
+            canvas.PushHistory();
             string tab = doc.NewTabId();
             doc.EnsureTab(tab, doc.UniqueTabName(StyleName(style)));
             KvMigration.GenerateStockTab(doc, tab, style);
             Select(tab);
         }
+        void Reorder(string tab, int index) {
+            KvDocument doc = KvStore.Current;
+            if(tab == null || !doc.HasTab(tab)) return;
+            canvas.PushHistory();
+            if(!doc.MoveTabTo(tab, index)) return;
+            canvas.Mutated();
+            Refresh();
+        }
         void Delete(string tab) {
             KvDocument doc = KvStore.Current;
+            if(!doc.HasTab(tab)) return;
             bool editing = tab == canvas.Tab;
+            canvas.PushHistory();
             if(!doc.RemoveTab(tab)) return;
             canvas.Bind(doc, editing ? doc.SelectedTab : canvas.Tab);
-            KvStore.RequestSave();
+            canvas.Mutated();
             KeyViewerOverlay.RequestLayoutRebuild();
             Refresh();
             refreshStatus();
@@ -80,6 +91,7 @@ internal static partial class PageKeyViewer {
         void AddFoot(int footCount) {
             KvDocument doc = canvas.Document;
             if(doc == null || AtTabLimit()) return;
+            canvas.PushHistory();
             string tab = doc.NewTabId();
             doc.EnsureTab(tab, doc.UniqueTabName(MainCore.Tr.Get("KEYVIEWER_EDITOR_FOOT_TAB", "Foot")));
             doc.SetFootTab(tab, true);
@@ -89,6 +101,7 @@ internal static partial class PageKeyViewer {
         void HideFoot() {
             KvDocument doc = canvas.Document;
             if(doc == null || doc.SelectedFootTab == null) return;
+            canvas.PushHistory();
             doc.SelectedFootTab = null;
             canvas.Rebuild();
             canvas.Mutated();

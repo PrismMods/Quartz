@@ -105,10 +105,10 @@ internal sealed partial class KvCanvas {
         rt.sizeDelta = Vector2.zero;
     }
     internal void Bind(KvDocument document, string tabId) {
+        if(!ReferenceEquals(doc, document)) history.Clear();
         doc = document;
         tab = tabId ?? "";
         selection.Clear();
-        history.Clear();
         zoom = 1f;
         content.localScale = Vector3.one;
         content.anchoredPosition = Vector2.zero;

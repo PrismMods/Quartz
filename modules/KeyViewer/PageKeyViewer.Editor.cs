@@ -55,7 +55,9 @@ internal static partial class PageKeyViewer {
         canvas.DocumentReplaced += replaced => {
             KvStore.Replace(replaced);
             KeyViewerOverlay.RequestLayoutRebuild();
+            refreshTabs();
             RefreshStatus();
+            refreshSettings?.Invoke();
         };
         AppendFileStrip(toolbar, status, Rebind, RefreshStatus);
         inspector.BindSettings(panel.Settings, refreshSettings);
