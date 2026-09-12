@@ -1,0 +1,19 @@
+build.json
+  s_ba3e7a9b5771b9::t_6a90bb4ef0e2e1 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "13d6cca368d12afc5bf0f294488fe2cae9b967e9",
+  "prompts": {},
+  "sessions": {
+    "s_ba3e7a9b5771b9": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a094b3-ec45-7873-84ea-69918b34dc72",
+        "model": "gpt-5.6-terra"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
