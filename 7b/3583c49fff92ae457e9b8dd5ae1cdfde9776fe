@@ -1,0 +1,36 @@
+modules/Overlay/PageOverlayGeneral.cs
+  s_97fd48843c9cfd::t_d5d45cabf4a0a6 8,32,55-127
+modules/Overlay/Lang/ko-KR.json
+  s_97fd48843c9cfd::t_fdf59aafdc02ed 10-22
+modules/Overlay/OverlaySettings.cs
+  s_97fd48843c9cfd::t_0f13be92af2f99 1,5,9-13,16-20,24-34
+modules/Overlay/OverlayMotion.cs
+  s_97fd48843c9cfd::t_70481e93ff94e9 2,8,49,53,64-68,79-86,112,114-117,120-128,208-209,231-238,342-345,380-391
+  s_97fd48843c9cfd::t_ac087fb04a51ba 7,39,41,55,172,179,281-285,293,298-299
+  s_97fd48843c9cfd::t_fe5b811b927337 296,358
+  s_97fd48843c9cfd::t_091234a9d1a73f 1,3-6,9-37,42-47,50-51,54,56-63,69-70,73-78,87,103,129-171,173-178,180-207,240-253,256-280,301-318,346,349-353,362-379,392-394
+  s_97fd48843c9cfd::t_af17297c726da5 40,48,72,119,210-230,239,255,288-291,294,319-335,337-338,347,355-357,359-361
+  s_97fd48843c9cfd::t_dabe99e607e4a7 292,295,336,339-341,348,354
+  s_97fd48843c9cfd::t_5a3ed8d6903ec8 38,52,71,88-102,104-111,113,118,254,286-287,297,300
+modules/Overlay/Lang/en-US.json
+  s_97fd48843c9cfd::t_fdf59aafdc02ed 10-22
+modules/Overlay/OverlayModule.cs
+  s_97fd48843c9cfd::t_0f13be92af2f99 25,27
+  s_97fd48843c9cfd::t_70481e93ff94e9 24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "7b3583c49fff92ae457e9b8dd5ae1cdfde9776fe",
+  "prompts": {},
+  "sessions": {
+    "s_97fd48843c9cfd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "035260cc-8213-4b2d-a664-809df6d26059",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
