@@ -1,0 +1,21 @@
+Quartz/IO/CoreSettings.cs
+  s_c9635c19796e9a::t_c2712fde835788 37-38,102-103,149-150
+Quartz/UI/UICore.Reorganize.cs
+  s_c9635c19796e9a::t_719c4b5f0aceaa 29-31,33,84-86,96-98,110-111
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "f5f360eb4674238b5a3c63cbb67baf028b06e7b6",
+  "prompts": {},
+  "sessions": {
+    "s_c9635c19796e9a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4da9ccc4-3e87-479b-b759-80be1f76f877",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
