@@ -26,11 +26,11 @@ public static partial class UICore {
         exitReorganizeObj = new GameObject("ExitReorganizeButton");
         exitReorganizeObj.transform.SetParent(canvasObj.transform, false);
         var rect = exitReorganizeObj.AddComponent<RectTransform>();
-        rect.anchorMin = new Vector2(0.5f, 1f);
-        rect.anchorMax = new Vector2(0.5f, 1f);
-        rect.pivot = new Vector2(0.5f, 1f);
+        rect.anchorMin = new Vector2(1f, 0f);
+        rect.anchorMax = new Vector2(1f, 0f);
+        rect.pivot = new Vector2(1f, 0f);
         rect.sizeDelta = new Vector2(240f, 60f);
-        rect.anchoredPosition = new Vector2(MainCore.Conf.ExitReorganizeX, MainCore.Conf.ExitReorganizeY);
+        rect.anchoredPosition = new Vector2(MainCore.Conf.ExitReorganizeOffsetX, MainCore.Conf.ExitReorganizeOffsetY);
         exitReorganizeCanvasGroup = exitReorganizeObj.AddComponent<CanvasGroup>();
         var img = exitReorganizeObj.AddComponent<Image>();
         img.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P1024);
@@ -81,9 +81,9 @@ public static partial class UICore {
         Vector2 canvasSize = canvasRect.rect.size;
         if(canvasSize.x <= 0f || canvasSize.y <= 0f) return pos;
         Vector2 size = ((RectTransform)exitReorganizeObj.transform).sizeDelta;
-        float maxX = Mathf.Max(0f, (canvasSize.x - size.x) * 0.5f);
-        float minY = Mathf.Min(0f, size.y - canvasSize.y);
-        return new Vector2(Mathf.Clamp(pos.x, -maxX, maxX), Mathf.Clamp(pos.y, minY, 0f));
+        float minX = Mathf.Min(0f, size.x - canvasSize.x);
+        float maxY = Mathf.Max(0f, canvasSize.y - size.y);
+        return new Vector2(Mathf.Clamp(pos.x, minX, 0f), Mathf.Clamp(pos.y, 0f, maxY));
     }
     private static void ApplyExitReorganizePosition() {
         if(exitReorganizeObj == null) return;
@@ -93,9 +93,9 @@ public static partial class UICore {
     public static void ResetExitReorganizePosition() {
         if(exitReorganizeObj == null) return;
         CoreSettings def = new();
-        Vector2 target = ClampExitReorganizePosition(new Vector2(def.ExitReorganizeX, def.ExitReorganizeY));
-        MainCore.Conf.ExitReorganizeX = target.x;
-        MainCore.Conf.ExitReorganizeY = target.y;
+        Vector2 target = ClampExitReorganizePosition(new Vector2(def.ExitReorganizeOffsetX, def.ExitReorganizeOffsetY));
+        MainCore.Conf.ExitReorganizeOffsetX = target.x;
+        MainCore.Conf.ExitReorganizeOffsetY = target.y;
         MainCore.ConfMgr.RequestSave();
         RectTransform rect = (RectTransform)exitReorganizeObj.transform;
         exitReorganizeResetSeq?.Kill();
@@ -107,8 +107,8 @@ public static partial class UICore {
         RectTransform rect = (RectTransform)exitReorganizeObj.transform;
         Vector2 pos = ClampExitReorganizePosition(rect.anchoredPosition);
         rect.anchoredPosition = pos;
-        MainCore.Conf.ExitReorganizeX = pos.x;
-        MainCore.Conf.ExitReorganizeY = pos.y;
+        MainCore.Conf.ExitReorganizeOffsetX = pos.x;
+        MainCore.Conf.ExitReorganizeOffsetY = pos.y;
         MainCore.ConfMgr.RequestSave();
     }
     public static event Action<bool> OnReorganizeChanged;
