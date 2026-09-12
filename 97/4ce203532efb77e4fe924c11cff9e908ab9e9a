@@ -1,0 +1,27 @@
+stubs/Assembly-CSharp/Stubs.g.cs
+  s_97fd48843c9cfd::t_99790a43b7e2ee 233-237,244,248,252-253,261-265,270,350,384,502,792,876-879,891,931,964,983,1046,1087,1107,1142-1143,1239,1266
+stubs/UnityEngine.CoreModule/Stubs.g.cs
+  s_97fd48843c9cfd::t_99790a43b7e2ee 37-38
+stubs/UnityEngine.UIModule/Stubs.g.cs
+  s_97fd48843c9cfd::t_99790a43b7e2ee 43
+stubs/README.md
+  s_97fd48843c9cfd::t_99790a43b7e2ee 20,30,38,41
+stubs/MANIFEST.json
+  s_97fd48843c9cfd::t_99790a43b7e2ee 3378-3379,3383-3384,5979
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "974ce203532efb77e4fe924c11cff9e908ab9e9a",
+  "prompts": {},
+  "sessions": {
+    "s_97fd48843c9cfd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "035260cc-8213-4b2d-a664-809df6d26059",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
