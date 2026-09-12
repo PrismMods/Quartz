@@ -228,30 +228,29 @@ public unsafe partial class GCS {
     public const float HITMARGIN_PURE_MINIMUM_SECONDS = 17f;
     public const float HITMARGIN_PURE_MINIMUM_SECONDS_MOBILE = 18f;
     public const double HITMARGIN_XPERFECT_ANGLE_ADJUST = 19d;
-    public const double HITMARGIN_XPERFECT_MAX_ANGLE_ADJUST_TIME = 20d;
     public const string JPEGFileExtension = "JPEGFileExtension";
     public const string JPGFileExtension = "JPGFileExtension";
-    public const int LargeFloorSize = 23;
-    public const float LenientOptionMinimumBPM_Custom = 24f;
-    public const int MAXIMUM_ALLOWED_KEYS = 25;
-    public const int MAXIMUM_UNLOCKED_ALLOWED_KEYS = 26;
-    public const int MINIMUM_USED_KEYS_RESULT = 27;
+    public const int LargeFloorSize = 22;
+    public const float LenientOptionMinimumBPM_Custom = 23f;
+    public const int MAXIMUM_ALLOWED_KEYS = 24;
+    public const int MAXIMUM_UNLOCKED_ALLOWED_KEYS = 25;
+    public const int MINIMUM_USED_KEYS_RESULT = 26;
     public const string MOVFileExtension = "MOVFileExtension";
     public const string MP3FileExtension = "MP3FileExtension";
     public const string MP4FileExtension = "MP4FileExtension";
     public const string OggVorbisFileExtension = "OggVorbisFileExtension";
     public const string PNGFileExtension = "PNGFileExtension";
     public const bool RandomValuesEnabled = false;
-    public const float StrictOptionMinimumBPM_Custom = 34f;
+    public const float StrictOptionMinimumBPM_Custom = 33f;
     public const string WEBMFileExtension = "WEBMFileExtension";
     public const string WMVFileExtension = "WMVFileExtension";
     public const string WavFileExtension = "WavFileExtension";
-    public const float XPERFECT_SECONDS = 38f;
+    public const float XPERFECT_SECONDS = 37f;
     public static int customLevelIndex;
     public static string[] customLevelPaths;
     public static global::Difficulty difficulty;
-    public const float frameTimeSensitivity = 39f;
-    public const float framesPerTileLimit = 40f;
+    public const float frameTimeSensitivity = 38f;
+    public const float framesPerTileLimit = 39f;
     public static string internalLevelName;
     public const string jsonExtension = "jsonExtension";
     public static global::System.Collections.Generic.Dictionary<global::ADOFAI.LevelEventType, global::UnityEngine.Sprite> levelEventIcons;
@@ -259,16 +258,16 @@ public unsafe partial class GCS {
     public static global::System.Collections.Generic.Dictionary<string, global::ADOFAI.LevelEventInfo> levelEventsInfo;
     public const string levelExtension = "levelExtension";
     public const string levelZipExtension = "levelZipExtension";
-    public const float minSpeedrunSpeed = 44f;
-    public const float msPerTileConsecLimit = 45f;
-    public const float msPerTileLimit = 46f;
-    public const float multiplierIncrement = 47f;
-    public const int multipressOverload = 48;
+    public const float minSpeedrunSpeed = 43f;
+    public const float msPerTileConsecLimit = 44f;
+    public const float msPerTileLimit = 45f;
+    public const float multiplierIncrement = 46f;
+    public const int multipressOverload = 47;
     public static float nextSpeedRun;
     public static bool playDeathSound;
     public static bool practiceMode;
     public static string sceneToLoad;
-    public const float semitone = 49f;
+    public const float semitone = 48f;
     public static global::System.Collections.Generic.Dictionary<string, global::ADOFAI.LevelEventInfo> settingsInfo;
     public static bool speedTrialMode;
     public static string steamBranchName;
@@ -348,7 +347,7 @@ public enum ObjectDecorationType : int {
     PlayerBubble = 2,
 }
 public unsafe partial class PauseMenu : global::ADOBase {
-    public const float pauseButtonWidth = 52f;
+    public const float pauseButtonWidth = 51f;
     public void PlayMenuSfx(global::SfxSound sound, float volume = default) => throw null;
     protected PauseMenu() { }
     public enum ButtonType : int {
@@ -382,7 +381,7 @@ public unsafe partial class PauseSettingButton : global::GeneralPauseButton {
     protected PauseSettingButton() { }
 }
 public unsafe partial class Persistence : global::RDTools.RDClassDll {
-    public const float inputOffsetNotSet = 53f;
+    public const float inputOffsetNotSet = 52f;
     public static global::ErrorMeterSize hitErrorMeterSize { get => throw null; set { } }
     public static global::HoldBehavior holdBehavior { get => throw null; set { } }
     public static bool GetHideCursorWhilePlaying() => throw null;
@@ -500,7 +499,7 @@ public abstract unsafe partial class RDInputType {
 public static unsafe partial class RDString {
     public const string BoothButtonKeySuffix = "BoothButtonKeySuffix";
     public const string DivekickKeySuffix = "DivekickKeySuffix";
-    public const global::UnityEngine.SystemLanguage FallbackLanguage = (global::UnityEngine.SystemLanguage)(56);
+    public const global::UnityEngine.SystemLanguage FallbackLanguage = (global::UnityEngine.SystemLanguage)(55);
     public const string GamepadKeySuffix = "GamepadKeySuffix";
     public const string MobileKeySuffix = "MobileKeySuffix";
     public const string NintendoSwitchFaceRightCharacter = "NintendoSwitchFaceRightCharacter";
@@ -790,7 +789,7 @@ public unsafe partial class scnCLS : global::ADOBase {
     }
 }
 public unsafe partial class scnEditor : global::ADOBase {
-    public const int MaxUndoSteps = 66;
+    public const int MaxUndoSteps = 65;
     public bool autoFailed;
     public global::UnityEngine.UI.Image autoImage;
     public global::UnityEngine.Sprite[] autoSprites;
@@ -874,10 +873,10 @@ public unsafe partial class scnGame : global::ADOBase {
     protected scnGame() { }
 }
 public unsafe partial class scnLevelSelect : global::LevelSelectBase {
-    public const int CrownEntrance = 68;
-    public const int CrownExit = 69;
-    public const int MuseDashEntrance = 70;
-    public const int MuseDashExit = 71;
+    public const int CrownEntrance = 67;
+    public const int CrownExit = 68;
+    public const int MuseDashEntrance = 69;
+    public const int MuseDashExit = 70;
     protected scnLevelSelect() { }
 }
 public unsafe partial class scnSplash : global::ADOBase {
@@ -889,7 +888,7 @@ public unsafe partial class scrButtonURL : global::ADOBase {
 }
 public unsafe partial class scrCamera : global::ADOBase {
     public global::UnityEngine.Camera Bgcamstatic;
-    public const float DefaultCameraOrthoSize = 72f;
+    public const float DefaultCameraOrthoSize = 71f;
     public global::UnityEngine.Renderer flashPlusRendererBg;
     public global::UnityEngine.Renderer flashPlusRendererFg;
     public static global::scrCamera instance { get => throw null; set { } }
@@ -929,7 +928,7 @@ public unsafe partial class scrConductor : global::ADOBase {
 }
 public unsafe partial class scrController : global::MonsterLove.StateMachine.StateBehaviour {
     public const bool HallOfMirrorsUsesRenderTextures = false;
-    public const float boothModeDebounceCooldownTime = 74f;
+    public const float boothModeDebounceCooldownTime = 73f;
     public static int checkpointsUsed;
     public int currentSeqID;
     public global::System.Collections.Generic.List<global::PlanetRenderer> dummyPlanets;
@@ -962,7 +961,7 @@ public unsafe partial class scrCountdown : global::ADOBase {
     protected scrCountdown() { }
 }
 public abstract unsafe partial class scrDecoration : global::ADOBase {
-    public const int HitboxLayer = 75;
+    public const int HitboxLayer = 74;
     public bool forceHide;
     public global::DecPlacementType placementType;
     public virtual bool GetVisible() => throw null;
@@ -981,7 +980,7 @@ public unsafe partial class scrFlash : global::UnityEngine.MonoBehaviour {
     protected scrFlash() { }
 }
 public unsafe partial class scrFloor : global::ADOBase {
-    public const int SortingOrderOffset = 76;
+    public const int SortingOrderOffset = 75;
     public double angleLength;
     public bool auto;
     public global::UnityEngine.SpriteRenderer bottomGlow;
@@ -1044,7 +1043,7 @@ public unsafe partial class scrLetterPress : global::UnityEngine.MonoBehaviour {
     protected scrLetterPress() { }
 }
 public unsafe partial class scrLevelMaker : global::ADOBase {
-    public const double FloorAngleEpsilon = 79d;
+    public const double FloorAngleEpsilon = 78d;
     public const string FloorContainerName = "FloorContainerName";
     public float[] floorAngles;
     public bool isOldLevel;
@@ -1085,7 +1084,7 @@ public unsafe partial class scrParticleDecoration : global::scrDecoration {
     protected scrParticleDecoration() { }
 }
 public unsafe partial class scrPlanet : global::ADOBase {
-    public const float basePlanetScale = 81f;
+    public const float basePlanetScale = 80f;
     public double cachedAngle;
     public global::scrFloor currfloor;
     public global::scrPlanet other;
@@ -1105,7 +1104,7 @@ public unsafe partial class scrPlayer : global::ADOBase {
     protected scrPlayer() { }
 }
 public unsafe partial class scrPlayerManager : global::ADOBase {
-    public const int MaxPlayers = 82;
+    public const int MaxPlayers = 81;
     public global::System.Collections.Generic.IEnumerator<global::scrPlayer> GetEnumerator() => throw null;
     protected scrPlayerManager() { }
 }
@@ -1140,8 +1139,8 @@ public unsafe partial class scrVisualDecoration : global::scrDecoration {
 }
 namespace ADOFAI {
     public static unsafe partial class EditorConstants {
-        public const int ConditionalArraySize = 83;
-        public const int adofaiFileVersion = 84;
+        public const int ConditionalArraySize = 82;
+        public const int adofaiFileVersion = 83;
         public const string key_actions = "key_actions";
         public const string key_active = "key_active";
         public const string key_angleData = "key_angleData";
@@ -1237,7 +1236,7 @@ namespace ADOFAI {
         public int cacheEventIndex;
         public global::System.Collections.Generic.List<global::ADOFAI.PropertiesPanel> panelsList;
         public global::ADOFAI.LevelEventType selectedEventType;
-        public const float tabHeight = 174f;
+        public const float tabHeight = 173f;
         public global::UnityEngine.RectTransform tabs;
         public void HideAllInspectorTabs() => throw null;
         public void Init(global::System.Collections.Generic.Dictionary<string, global::ADOFAI.LevelEventInfo> levelEventsInfo, bool floorPanel) => throw null;
@@ -1264,7 +1263,7 @@ namespace ADOFAI {
         protected LevelData() { }
     }
     public unsafe partial class LevelEvent {
-        public const int NoFloor = 175;
+        public const int NoFloor = 174;
         public bool active;
         public global::ADOFAI.LevelEventType eventType;
         public int floor;

@@ -824,7 +824,6 @@
           "System.Collections.Generic.Dictionary\u00602\u003CSystem.String,ADOFAI.LevelEventInfo\u003E GCS::levelEventsInfo",
           "System.Collections.Generic.Dictionary\u00602\u003CSystem.String,ADOFAI.LevelEventInfo\u003E GCS::settingsInfo",
           "System.Double GCS::HITMARGIN_XPERFECT_ANGLE_ADJUST",
-          "System.Double GCS::HITMARGIN_XPERFECT_MAX_ANGLE_ADJUST_TIME",
           "System.Int32 GCS::LargeFloorSize",
           "System.Int32 GCS::MAXIMUM_ALLOWED_KEYS",
           "System.Int32 GCS::MAXIMUM_UNLOCKED_ALLOWED_KEYS",
@@ -3376,9 +3375,13 @@
       {
         "type": "UnityEngine.Bounds",
         "members": [
+          "UnityEngine.Vector3 UnityEngine.Bounds::get_max()",
+          "UnityEngine.Vector3 UnityEngine.Bounds::get_min()",
           "UnityEngine.Vector3 UnityEngine.Bounds::get_size()",
           "UnityEngine.Vector3 UnityEngine.Bounds::m_Center",
           "UnityEngine.Vector3 UnityEngine.Bounds::m_Extents",
+          "UnityEngine.Vector3 UnityEngine.Bounds::max()",
+          "UnityEngine.Vector3 UnityEngine.Bounds::min()",
           "UnityEngine.Vector3 UnityEngine.Bounds::size()"
         ]
       },
@@ -5973,6 +5976,7 @@
         "members": [
           "System.Boolean UnityEngine.RectTransformUtility::RectangleContainsScreenPoint(UnityEngine.RectTransform,UnityEngine.Vector2,UnityEngine.Camera)",
           "System.Boolean UnityEngine.RectTransformUtility::ScreenPointToLocalPointInRectangle(UnityEngine.RectTransform,UnityEngine.Vector2,UnityEngine.Camera,UnityEngine.Vector2\u0026)",
+          "UnityEngine.Bounds UnityEngine.RectTransformUtility::CalculateRelativeRectTransformBounds(UnityEngine.Transform,UnityEngine.Transform)",
           "UnityEngine.Vector2 UnityEngine.RectTransformUtility::WorldToScreenPoint(UnityEngine.Camera,UnityEngine.Vector3)"
         ]
       },

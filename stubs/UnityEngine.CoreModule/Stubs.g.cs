@@ -34,6 +34,8 @@ namespace UnityEngine {
     public unsafe partial struct Bounds : global::System.IEquatable<global::UnityEngine.Bounds> {
         private global::UnityEngine.Vector3 m_Center;
         private global::UnityEngine.Vector3 m_Extents;
+        public global::UnityEngine.Vector3 max { get => throw null; set { } }
+        public global::UnityEngine.Vector3 min { get => throw null; set { } }
         public global::UnityEngine.Vector3 size { get => throw null; set { } }
         bool global::System.IEquatable<global::UnityEngine.Bounds>.Equals(global::UnityEngine.Bounds other) => throw null;
     }

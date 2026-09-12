@@ -40,6 +40,7 @@ namespace UnityEngine {
     public unsafe partial interface ICanvasRaycastFilter {
     }
     public sealed unsafe partial class RectTransformUtility {
+        public static global::UnityEngine.Bounds CalculateRelativeRectTransformBounds(global::UnityEngine.Transform root, global::UnityEngine.Transform child) => throw null;
         public static bool RectangleContainsScreenPoint(global::UnityEngine.RectTransform rect, global::UnityEngine.Vector2 screenPoint, global::UnityEngine.Camera cam) => throw null;
         public static bool ScreenPointToLocalPointInRectangle(global::UnityEngine.RectTransform rect, global::UnityEngine.Vector2 screenPoint, global::UnityEngine.Camera cam, out global::UnityEngine.Vector2 localPoint) => throw null;
         public static global::UnityEngine.Vector2 WorldToScreenPoint(global::UnityEngine.Camera cam, global::UnityEngine.Vector3 worldPoint) => throw null;
