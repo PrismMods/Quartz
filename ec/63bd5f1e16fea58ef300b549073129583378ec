@@ -1,0 +1,34 @@
+modules/KeyViewer/Lang/ko-KR.json
+  s_ba90aaff064966::t_0188b6d6d2ef40 199-200
+modules/KeyViewer/Lang/zh-CN.json
+  s_ba90aaff064966::t_0188b6d6d2ef40 199-200
+modules/KeyViewer/Editor/KvInspector.Toolbar.cs
+  s_ba90aaff064966::t_7cb762b05975a4 1,54,57-60,66,89
+  s_ba90aaff064966::t_749979e6233d45 55-56,61-65
+modules/KeyViewer/Editor/KvCanvasDrag.cs
+  s_ba90aaff064966::t_bc7f5fdb40d8ca 51
+modules/KeyViewer/Lang/en-US.json
+  s_ba90aaff064966::t_0188b6d6d2ef40 199-200
+Quartz/IO/CoreSettings.cs
+  s_ba90aaff064966::t_b99da39bb42550 37,105,155
+modules/KeyViewer/Editor/KvCanvasHandles.cs
+  s_ba90aaff064966::t_749979e6233d45 22,102-103
+modules/KeyViewer/Editor/KvCanvasInput.cs
+  s_ba90aaff064966::t_bc7f5fdb40d8ca 46-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "ec63bd5f1e16fea58ef300b549073129583378ec",
+  "prompts": {},
+  "sessions": {
+    "s_ba90aaff064966": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "824f81a7-430d-410d-86db-6e73a3f8f1e4",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
