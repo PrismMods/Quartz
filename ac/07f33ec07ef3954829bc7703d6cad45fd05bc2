@@ -1,0 +1,23 @@
+modules/KeyViewer/PageKeyViewer.EditorTabs.cs
+  s_efa184a18a85a0::t_569d1ef26b6bfe 24,34-35,49-52,69,71-73,80,82,89-98,100,106,108,113,116-117,119-136,138,149
+Quartz/Resource/Export/Lang/en-US.json
+  s_efa184a18a85a0::t_117a22e9221927 80-83,94
+Quartz/Resource/Export/Lang/ko-KR.json
+  s_efa184a18a85a0::t_117a22e9221927 80-83,94
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "ac07f33ec07ef3954829bc7703d6cad45fd05bc2",
+  "prompts": {},
+  "sessions": {
+    "s_efa184a18a85a0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6fe2d474-d7b9-47b0-9bd4-fbd89786c1db",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
