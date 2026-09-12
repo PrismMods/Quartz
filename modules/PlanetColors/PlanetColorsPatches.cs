@@ -37,10 +37,8 @@ public static partial class PlanetColors {
     private static class PlanetStartPatch {
         private static void Postfix(scrPlanet __instance) {
             InvalidatePlanetCache();
-            if(ShouldChange) {
-                ApplyPlanetColor(__instance);
-                try { ApplyPlanetRing(__instance.planetRenderer); } catch(Exception e) { Diag.Ignore(e); }
-            }
+            if(ShouldChange) ApplyPlanetColor(__instance);
+            try { ApplyPlanetRing(__instance.planetRenderer); } catch(Exception e) { Diag.Ignore(e); }
         }
     }
     [HarmonyPatch(typeof(PlanetRenderer), "Awake")]
@@ -66,8 +64,8 @@ public static partial class PlanetColors {
     [HarmonyPatch(typeof(PlanetRenderer), "LateUpdate")]
     private static class PlanetRendererLateUpdatePatch {
         private static void Postfix(PlanetRenderer __instance) {
-            if(!ShouldChange) return;
             ApplyPlanetRing(__instance);
+            if(!ShouldChange) return;
             ReconcileOverlayVisibility(__instance);
         }
     }

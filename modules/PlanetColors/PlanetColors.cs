@@ -16,6 +16,12 @@ public static partial class PlanetColors {
             return MainCore.IsModEnabled && Conf.Enabled;
         }
     }
+    private static bool ShouldRecolorRing {
+        get {
+            EnsureConf();
+            return MainCore.IsModEnabled && Conf.EnableRingRecolor;
+        }
+    }
     private static bool applying;
     private static readonly Dictionary<int, int> rendererSlots = [];
     private static readonly Dictionary<string, MethodInfo> colorMethodCache = [];
@@ -125,6 +131,7 @@ public static partial class PlanetColors {
     public static void Refresh() {
         if(!ShouldChange) {
             DisableAllOverlays();
+            if(!ShouldRecolorRing) Restore();
             return;
         }
         scrPlanet[] planets = GetPlanets();
@@ -276,10 +283,12 @@ public static partial class PlanetColors {
         }
     }
     private static void ApplyPlanetRing(PlanetRenderer renderer) {
-        if(!ShouldChange || renderer == null) return;
+        if(renderer == null) return;
+        bool recolor = ShouldRecolorRing;
+        if(!recolor && !ShouldChange) return;
         if(IsOnlyRing(renderer)) return;
         try {
-            if(Conf.EnableRingRecolor) {
+            if(recolor) {
                 GameApi.SetRingColor(
                     renderer,
                     Conf.SeparateRingColor ? Conf.GetRingColor(GetPlanetSlot(renderer)) : Conf.GetRingColor()
