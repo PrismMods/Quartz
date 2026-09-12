@@ -3,7 +3,7 @@ using System.Reflection;
 using Quartz.Core;
 namespace Quartz.Compat.Game;
 public static class GameVersion {
-    public const int LastLegacyRelease = 136;
+    private static bool? legacy;
     private static bool resolved;
     private static int release;
     public static int Release {
@@ -12,7 +12,7 @@ public static class GameVersion {
             return release;
         }
     }
-    public static bool IsLegacy => Release != 0 && Release <= LastLegacyRelease;
+    public static bool IsLegacy => legacy ??= Refl.Type("scrMarginTracker") == null;
     public static string DisplayRelease => Release == 0 ? "r?" : "r" + Release;
     private static void Resolve() {
         resolved = true;
