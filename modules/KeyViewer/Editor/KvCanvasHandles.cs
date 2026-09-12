@@ -19,6 +19,7 @@ internal sealed partial class KvCanvas {
     private Vector2 resizeStartLayout;
     private readonly List<float> siblingW = [];
     private readonly List<float> siblingH = [];
+    private static readonly List<float> noSiblings = [];
     private void BuildHandles() {
         GameObject rootObj = new("Handles");
         rootObj.transform.SetParent(overlay, false);
@@ -98,8 +99,8 @@ internal sealed partial class KvCanvas {
         w = Mathf.Max(KvElement.MinSize, w);
         h = Mathf.Max(KvElement.MinSize, h);
         if(!AltHeld()) {
-            if(dx != 0) w = KvSnap.SnapSize(w, siblingW);
-            if(dy != 0) h = KvSnap.SnapSize(h, siblingH);
+            if(dx != 0) w = KvSnap.SnapSize(w, SnapOn ? siblingW : noSiblings, SnapStep);
+            if(dy != 0) h = KvSnap.SnapSize(h, SnapOn ? siblingH : noSiblings, SnapStep);
         }
         if(ShiftHeld() && resizeOrig.W > 0f && resizeOrig.H > 0f) {
             float aspect = resizeOrig.W / resizeOrig.H;

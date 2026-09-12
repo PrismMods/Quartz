@@ -43,6 +43,8 @@ internal sealed partial class KvCanvas {
     private static bool CtrlOrCmdHeld() =>
         Keybind.ModifierHeld(Keybind.KeyModifier.Cmd)
         || ModifierOrHook(Keybind.KeyModifier.Ctrl, KeyCode.LeftControl, KeyCode.RightControl);
+    internal static bool SnapOn => MainCore.Conf?.KvSnapToGrid ?? true;
+    internal static float SnapStep => SnapOn ? KvSnap.GridSnap : 1f;
     private bool needsCentre;
     internal void Tick() {
         if(root == null) return;

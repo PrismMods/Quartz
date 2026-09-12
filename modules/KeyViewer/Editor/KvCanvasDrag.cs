@@ -48,7 +48,7 @@ internal sealed partial class KvCanvas {
             KvRect desired = new(
                 dragPrimaryOrigin.x + raw.x, dragPrimaryOrigin.y + raw.y, dragPrimary.W, dragPrimary.H
             );
-            KvSnapResult snapped = KvSnap.SnapMove(desired, dragOthers, zoom);
+            KvSnapResult snapped = KvSnap.SnapMove(desired, dragOthers, zoom, SnapOn, SnapStep);
             applied = new Vector2(snapped.X - dragPrimaryOrigin.x, snapped.Y - dragPrimaryOrigin.y);
             ShowGuides(snapped.Guides);
         }

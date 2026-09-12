@@ -1,3 +1,4 @@
+using Quartz.Core;
 using Quartz.Features.KeyViewer.Layout;
 using Quartz.Resource;
 using Quartz.UI.Generator;
@@ -50,6 +51,19 @@ internal sealed partial class KvInspector {
             "DESC_KVI_Z_BACK", "Draw the selected elements one step behind the ones they overlap.",
             ChevronScale
         ));
+        RectTransform precision = KvToolbar.Pill(bar);
+        UIButton snap = KvToolbar.Icon(
+            precision, UISprite.Grid128, "kvi_snap", null,
+            "DESC_KVI_SNAP",
+            "Snap dragging and resizing to the grid and to nearby edges. Turn it off to move and size elements one pixel at a time. The arrow keys always nudge by one pixel, and holding Alt while dragging ignores snapping either way."
+        );
+        snap.RestColor = static () => MainCore.Conf.KvSnapToGrid ? KvPalette.ButtonActive : KvPalette.ButtonPrimary;
+        snap.OnClick = () => {
+            MainCore.Conf.KvSnapToGrid = !MainCore.Conf.KvSnapToGrid;
+            MainCore.ConfMgr.RequestSave();
+            snap.UpdateVisual(true);
+        };
+        snap.UpdateVisual(true);
         RectTransform view = KvToolbar.Pill(bar);
         undoButton = KvToolbar.Icon(
             view, UISprite.TurnArrow128, "kvi_undo", canvas.Undo,
@@ -72,7 +86,7 @@ internal sealed partial class KvInspector {
             "DESC_KVI_ZOOM_RESET", "Back to actual size, at the top-left of the layout. The 0 key does the same."
         );
         KvToolbar.Icon(
-            view, UISprite.Grid128, "kvi_zoom_fit", canvas.FitToContent,
+            view, UISprite.Move128, "kvi_zoom_fit", canvas.FitToContent,
             "DESC_KVI_ZOOM_FIT", "Frame every element on this tab. Use this if you have panned the layout out of sight."
         );
         RectTransform destructive = KvToolbar.Pill(bar);
