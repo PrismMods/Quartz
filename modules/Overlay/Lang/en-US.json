@@ -7,6 +7,18 @@
     "OVERLAY_FPS_SMOOTH": "FPS Update Interval",
     "DESC_OVERLAY_FPS_SMOOTH": "How long the FPS counter holds each value before updating. 0 = every frame; higher makes the number tick more slowly and steadily.",
     "OVERLAY_REORGANIZE": "Reorganize",
-    "MODULE_OVERLAY_CORE": "Overlay Core"
+    "MODULE_OVERLAY_CORE": "Overlay Core",
+    "SECTION_POP_IN_ANIMATION": "Pop-In Animation",
+    "DESC_OVERLAY_POP": "Slide every overlay in from the edge of the screen when a run starts, and back out when you die or clear.",
+    "OVERLAY_POP_EDGE_LABEL": "Direction",
+    "OVERLAY_POP_EDGE_NEAREST": "Nearest Edge",
+    "OVERLAY_POP_EDGE_LEFT": "Left",
+    "OVERLAY_POP_EDGE_RIGHT": "Right",
+    "OVERLAY_POP_EDGE_TOP": "Top",
+    "OVERLAY_POP_EDGE_BOTTOM": "Bottom",
+    "OVERLAY_POP_EASE_LABEL": "Easing",
+    "OVERLAY_POP_SECONDS": "Duration",
+    "OVERLAY_POP_EXIT": "Slide Out on Death or Clear",
+    "DESC_OVERLAY_POP_EXIT": "Slide the overlays back off screen when the run ends. Turn this off to leave them on screen."
   }
 }

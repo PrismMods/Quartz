@@ -21,5 +21,8 @@ public sealed class OverlayModule : QuartzModule {
             Visible = static () => !Quartz.Core.Info.KeyViewerOnly,
         });
         Context.PatchAll(typeof(OverlayModule));
+        Context.OnModEnable("OverlayMotion", OverlayMotion.Attach);
+        Context.OnModDisable("OverlayMotion", OverlayMotion.Detach);
     }
+    public override void OnUnload() => OverlayMotion.Detach();
 }
