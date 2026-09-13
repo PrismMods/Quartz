@@ -1,0 +1,30 @@
+modules/KeyViewer/KeyViewerOverlay.Css.cs
+  h_6eeb8441a8a159 61-101,147-157
+modules/KeyViewer/KeyViewerOverlay.CssBuild.cs
+  h_6eeb8441a8a159 32,35,64,74-112,173-175
+modules/KeyViewer/KeyViewerOverlay.CssStyle.cs
+  h_6eeb8441a8a159 16-19,34-41,59-66
+modules/KeyViewer/KeyViewerOverlay.CssTick.cs
+  h_6eeb8441a8a159 70-77,174
+modules/KeyViewer/KeyViewerOverlay.DmNoteParsing.cs
+  h_6eeb8441a8a159 6,86-118,179-180,185-186,189-190,199,203-206,248-249,272-273
+modules/KeyViewer/KeyViewerOverlay.Rain.cs
+  h_6eeb8441a8a159 23,27
+modules/KeyViewer/KeyViewerOverlay.cs
+  h_6eeb8441a8a159 102-103,106,182,186,220,261,274
+modules/KeyViewer/Layout/DmGradientSpec.cs
+  h_6eeb8441a8a159 1-52
+modules/KeyViewer/RainRenderer.cs
+  h_6eeb8441a8a159 19,23,48,52,119,131-135,148-163,173,274,276-279,283-303,344,381-382,385-406,408-409
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "3bdbdee89f7b1d669f4fb717c81ddc4ba2d2ce17",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
