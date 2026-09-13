@@ -2,7 +2,15 @@ using Newtonsoft.Json.Linq;
 
 namespace Quartz.Features.KeyViewer.Layout;
 
-internal readonly record struct DmGradientStop(string Color, float Position);
+internal readonly struct DmGradientStop {
+    internal string Color { get; }
+    internal float Position { get; }
+
+    internal DmGradientStop(string color, float position) {
+        Color = color;
+        Position = position;
+    }
+}
 
 /// <summary>
 /// Parsed DM Note v2 gradient sibling. Kept free of Unity types so preset

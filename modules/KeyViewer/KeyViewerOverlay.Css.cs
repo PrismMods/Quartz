@@ -59,8 +59,8 @@ public static partial class KeyViewerOverlay {
         return Color.Lerp(stops[idx], stops[next], scaled - Mathf.Floor(scaled));
     }
     private static Color SampleGradient(CssAnimGradient gradient, float p) {
-        Color[] stops = gradient?.Stops;
-        if(stops == null || stops.Length == 0) return Color.white;
+        if(gradient?.Stops == null || gradient.Stops.Length == 0) return Color.white;
+        Color[] stops = gradient.Stops;
         if(stops.Length == 1) return stops[0];
         bool repeat = gradient.Period > 0.01f;
         p = repeat ? p - Mathf.Floor(p) : Mathf.Clamp01(p);
