@@ -1,0 +1,25 @@
+modules/KeyLimiter/ChatterBlocker.cs
+  s_9ea5e5f6097f93::t_7a51b9f1e5d439 31-39,42,94,96,98,103-109,115,119,121,126-130,134,136-140,144-149,151,161-162,175-181
+  s_9ea5e5f6097f93::t_cf26ed9db70782 58,72,150,152
+  s_9ea5e5f6097f93::t_c4e8db30603064 29-30,40-41,92-93
+Quartz/Resource/Export/Presets/Refreshin.qprofile
+  s_9ea5e5f6097f93::t_7a51b9f1e5d439 906-907,7851
+Quartz/Resource/Export/FAQ.json
+  s_9ea5e5f6097f93::t_7a51b9f1e5d439 328-330,776
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b0130d7f6bbce1663309f6399cea889bd881d7f5",
+  "prompts": {},
+  "sessions": {
+    "s_9ea5e5f6097f93": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a09857-1c24-78c3-b83d-7861de72c6f7",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
