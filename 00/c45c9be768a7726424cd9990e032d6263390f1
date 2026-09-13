@@ -1,0 +1,21 @@
+modules/KeyViewer/Layout/DmGradientSpec.cs
+  s_a534d3a2de3293::t_84ca7494b8bf00 5-13
+modules/KeyViewer/KeyViewerOverlay.Css.cs
+  s_a534d3a2de3293::t_379f812c318327 62-63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "00c45c9be768a7726424cd9990e032d6263390f1",
+  "prompts": {},
+  "sessions": {
+    "s_a534d3a2de3293": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a09862-e6a7-7260-8751-321ed81071a1",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
