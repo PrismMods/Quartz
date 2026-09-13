@@ -325,9 +325,9 @@
         "zh-CN": "什么是按键抖动屏蔽？"
       },
       "answer": {
-        "en-US": "Blocks keyboard chatter. If a key re-fires within a set millisecond threshold — a switch 'chattering' — the repeat is dropped. Repeats within ~5ms are let through, since those are the engine double-reporting rather than real chatter.",
-        "ko-KR": "키보드 채터링을 막습니다. 설정한 밀리초 안에 키가 다시 눌리면(스위치 '채터링') 그 반복 입력을 버립니다. 약 5ms 이내의 반복은 실제 채터링이 아니라 엔진의 중복 보고이므로 통과시킵니다.",
-        "zh-CN": "屏蔽键盘抖动。如果按键在设定的毫秒阈值内重新触发（开关「抖动」），重复的输入将被丢弃。约5ms内的重复会被放行，因为那是引擎的重复报告而非真正的抖动。"
+        "en-US": "Blocks keyboard chatter. Duplicate reports of one physical press are collapsed, and any key that re-fires within the configured millisecond threshold is dropped.",
+        "ko-KR": "키보드 채터링을 막습니다. 하나의 물리적 키 입력이 중복 보고되면 하나로 처리하고, 설정한 밀리초 임계값 이내에 같은 키가 다시 눌리면 그 입력을 버립니다.",
+        "zh-CN": "屏蔽键盘抖动。同一次物理按键的重复报告会合并为一次；同一按键在设定的毫秒阈值内再次触发时，该输入会被丢弃。"
       }
     },
     {

@@ -903,8 +903,8 @@
             "ko-KR": "채터링 차단이 뭔가요?"
           },
           "answer": {
-            "en-US": "Blocks keyboard chatter. If a key re-fires within a set millisecond threshold — a switch 'chattering' — the repeat is dropped. Repeats within ~5ms are let through, since those are the engine double-reporting rather than real chatter.",
-            "ko-KR": "키보드 채터링을 막습니다. 설정한 밀리초 안에 키가 다시 눌리면(스위치 '채터링') 그 반복 입력을 버립니다. 약 5ms 이내의 반복은 실제 채터링이 아니라 엔진의 중복 보고이므로 통과시킵니다."
+            "en-US": "Blocks keyboard chatter. Duplicate reports of one physical press are collapsed, and any key that re-fires within the configured millisecond threshold is dropped.",
+            "ko-KR": "키보드 채터링을 막습니다. 하나의 물리적 키 입력이 중복 보고되면 하나로 처리하고, 설정한 밀리초 임계값 이내에 같은 키가 다시 눌리면 그 입력을 버립니다."
           }
         },
         {
