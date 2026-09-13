@@ -58,6 +58,47 @@ public static partial class KeyViewerOverlay {
         int next = (idx + 1) % n;
         return Color.Lerp(stops[idx], stops[next], scaled - Mathf.Floor(scaled));
     }
+    private static Color SampleGradient(CssAnimGradient gradient, float p) {
+        Color[] stops = gradient?.Stops;
+        if(stops == null || stops.Length == 0) return Color.white;
+        if(stops.Length == 1) return stops[0];
+        bool repeat = gradient.Period > 0.01f;
+        p = repeat ? p - Mathf.Floor(p) : Mathf.Clamp01(p);
+        float[] positions = gradient.Positions;
+        if(positions == null || positions.Length != stops.Length) {
+            float scaled = p * (stops.Length - 1);
+            int index = Mathf.Min(Mathf.FloorToInt(scaled), stops.Length - 2);
+            return Color.Lerp(stops[index], stops[index + 1], scaled - index);
+        }
+        if(p <= positions[0]) return stops[0];
+        for(int i = 0; i < stops.Length - 1; i++) {
+            if(p > positions[i + 1]) continue;
+            float span = positions[i + 1] - positions[i];
+            float t = span <= 0.00001f ? 1f : (p - positions[i]) / span;
+            return Color.Lerp(stops[i], stops[i + 1], Mathf.Clamp01(t));
+        }
+        return stops[^1];
+    }
+    internal static Color SampleDmGradient(CssAnimGradient gradient, float p) =>
+        SampleGradient(gradient, p);
+    private static Texture2D GradientTexture(CssAnimGradient gradient, float blur) {
+        string key = GradKey(gradient, blur);
+        if(gradTex.TryGetValue(key, out Texture2D cached) && cached != null) return cached;
+        const int w = 256, h = 8;
+        Color[] row = new Color[w];
+        for(int x = 0; x < w; x++) row[x] = SampleGradient(gradient, (float)x / (w - 1));
+        if(blur > 0.5f) row = BoxBlur(row, Mathf.Clamp(Mathf.RoundToInt(blur * 2f), 1, 32));
+        Color[] px = new Color[w * h];
+        for(int y = 0; y < h; y++) Array.Copy(row, 0, px, y * w, w);
+        Texture2D tex = new(w, h, TextureFormat.RGBA32, false) {
+            wrapMode = gradient.Period > 0.01f ? TextureWrapMode.Repeat : TextureWrapMode.Clamp,
+            filterMode = FilterMode.Bilinear,
+        };
+        tex.SetPixels(px);
+        tex.Apply(false, false);
+        gradTex[key] = tex;
+        return tex;
+    }
     private static Texture2D GradientTexture(Color[] stops, float blur) {
         string key = GradKey(stops, blur);
         if(gradTex.TryGetValue(key, out Texture2D cached) && cached != null) return cached;
@@ -101,6 +142,17 @@ public static partial class KeyViewerOverlay {
         var sb = new StringBuilder(stops.Length * 8 + 4);
         foreach(Color c in stops) sb.Append(ColorUtility.ToHtmlStringRGBA(c));
         sb.Append('|').Append(Mathf.RoundToInt(blur));
+        return sb.ToString();
+    }
+    private static string GradKey(CssAnimGradient gradient, float blur) {
+        var sb = new StringBuilder(gradient.Stops.Length * 16 + 16);
+        for(int i = 0; i < gradient.Stops.Length; i++) {
+            sb.Append(ColorUtility.ToHtmlStringRGBA(gradient.Stops[i]));
+            if(gradient.Positions is { Length: > 0 } positions && i < positions.Length)
+                sb.Append('@').Append(Mathf.RoundToInt(positions[i] * 10000f));
+        }
+        sb.Append('|').Append(Mathf.RoundToInt(blur));
+        sb.Append('|').Append(gradient.Period > 0.01f ? 'R' : 'C');
         return sb.ToString();
     }
     private static Sprite GlowSprite() {

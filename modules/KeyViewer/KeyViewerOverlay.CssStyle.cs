@@ -13,6 +13,10 @@ public static partial class KeyViewerOverlay {
     private readonly struct InlineStyleSnapshot {
         private readonly Color bg, activeBg, outline, activeOutline, text, activeText;
         private readonly Color counterText, activeCounterText, counterStroke, activeCounterStroke;
+        private readonly CssAnimGradient fillGradient, activeFillGradient;
+        private readonly CssAnimGradient borderGradient, activeBorderGradient;
+        private readonly CssAnimGradient labelGradient, activeLabelGradient;
+        private readonly CssAnimGradient counterGradient, activeCounterGradient;
         private readonly float borderRadius, boxBorderWidth;
         private readonly int fontSize, counterFontSize;
         private readonly Vector2 activeScale;
@@ -27,6 +31,14 @@ public static partial class KeyViewerOverlay {
             activeCounterText = s.ActiveCounterText;
             counterStroke = s.CounterStroke;
             activeCounterStroke = s.ActiveCounterStroke;
+            fillGradient = s.FillGradient;
+            activeFillGradient = s.ActiveFillGradient;
+            borderGradient = s.BorderGradient;
+            activeBorderGradient = s.ActiveBorderGradient;
+            labelGradient = s.LabelGradient;
+            activeLabelGradient = s.ActiveLabelGradient;
+            counterGradient = s.CounterGradient;
+            activeCounterGradient = s.ActiveCounterGradient;
             borderRadius = s.BorderRadius;
             boxBorderWidth = s.BoxBorderWidth;
             fontSize = s.FontSize;
@@ -44,6 +56,14 @@ public static partial class KeyViewerOverlay {
             s.ActiveCounterText = activeCounterText;
             s.CounterStroke = counterStroke;
             s.ActiveCounterStroke = activeCounterStroke;
+            s.FillGradient = fillGradient;
+            s.ActiveFillGradient = activeFillGradient;
+            s.BorderGradient = borderGradient;
+            s.ActiveBorderGradient = activeBorderGradient;
+            s.LabelGradient = labelGradient;
+            s.ActiveLabelGradient = activeLabelGradient;
+            s.CounterGradient = counterGradient;
+            s.ActiveCounterGradient = activeCounterGradient;
             s.BorderRadius = borderRadius;
             s.BoxBorderWidth = boxBorderWidth;
             s.FontSize = fontSize;

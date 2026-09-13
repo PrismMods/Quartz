@@ -29,9 +29,10 @@ public static partial class KeyViewerOverlay {
         BuildKeyImage(box, spec);
         BuildBoxGlow(box, spec);
         BuildFillGradient(box, spec);
+        BuildBorderGradient(box, spec);
         box.BeforeLayer = BuildPseudo(box, spec, spec.IdleBefore ?? spec.ActiveBefore, true);
         box.AfterLayer = BuildPseudo(box, spec, spec.IdleAfter ?? spec.ActiveAfter, false);
-        bool animated = IsAnimated(spec)
+        bool animated = HasTextGradient(spec) || IsAnimated(spec)
             || spec.TransitionSec > 0.01f
             || LayerAnimated(spec.IdleBefore) || LayerAnimated(spec.ActiveBefore)
             || LayerAnimated(spec.IdleAfter) || LayerAnimated(spec.ActiveAfter);
@@ -60,20 +61,55 @@ public static partial class KeyViewerOverlay {
         CssAnimGradient g = spec.FillGradient ?? spec.ActiveFillGradient;
         if(g == null || box.Fill == null) return;
         Mask mask = box.Fill.GetComponent<Mask>() ?? box.Fill.gameObject.AddComponent<Mask>();
-        mask.showMaskGraphic = true;
+        box.FillGradMask = mask;
         GameObject obj = new("CssFillGrad");
         obj.transform.SetParent(box.Fill.transform, false);
         RectTransform rt = obj.AddComponent<RectTransform>();
         rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
         rt.anchoredPosition = Vector2.zero;
-        float diag = Mathf.Sqrt(spec.W * spec.W + spec.H * spec.H);
-        rt.sizeDelta = new Vector2(diag, diag);
-        rt.localRotation = Quaternion.Euler(0f, 0f, g.AngleDeg - 90f);
         RawImage ri = obj.AddComponent<RawImage>();
-        ri.texture = GradientTexture(g.Stops, 0f);
         ri.raycastTarget = false;
         rt.SetAsFirstSibling();
         box.FillGrad = ri;
+        ApplySurfaceGradient(ri, g, spec.W, spec.H);
+    }
+    private static void BuildBorderGradient(Box box, DmNoteSpec spec) {
+        CssAnimGradient g = spec.BorderGradient ?? spec.ActiveBorderGradient;
+        if(g == null || box.Fill == null || spec.BoxBorderWidth <= 0.01f) return;
+        GameObject maskObj = new("DmBorderGradientMask");
+        maskObj.transform.SetParent(box.Fill.transform, false);
+        RectTransform maskRt = maskObj.AddComponent<RectTransform>();
+        maskRt.anchorMin = Vector2.zero;
+        maskRt.anchorMax = Vector2.one;
+        maskRt.offsetMin = Vector2.zero;
+        maskRt.offsetMax = Vector2.zero;
+        Image maskImage = maskObj.AddComponent<Image>();
+        maskImage.sprite = MainCore.Spr.GetRing(
+            Mathf.Max(0.5f, spec.BorderRadius), Mathf.Max(0.1f, spec.BoxBorderWidth));
+        maskImage.type = Image.Type.Sliced;
+        maskImage.raycastTarget = false;
+        Mask mask = maskObj.AddComponent<Mask>();
+        mask.showMaskGraphic = false;
+        GameObject gradObj = new("DmBorderGradient");
+        gradObj.transform.SetParent(maskObj.transform, false);
+        gradObj.AddComponent<RectTransform>();
+        RawImage ri = gradObj.AddComponent<RawImage>();
+        ri.raycastTarget = false;
+        box.BorderGradMask = maskObj;
+        box.BorderGrad = ri;
+        ApplySurfaceGradient(ri, g, spec.W, spec.H);
+    }
+    private static void ApplySurfaceGradient(RawImage image, CssAnimGradient gradient, float width, float height) {
+        if(image == null || gradient == null) return;
+        RectTransform rt = image.rectTransform;
+        rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
+        rt.anchoredPosition = Vector2.zero;
+        float diag = Mathf.Sqrt(width * width + height * height);
+        rt.sizeDelta = new Vector2(diag, diag);
+        rt.localRotation = Quaternion.Euler(0f, 0f, gradient.AngleDeg - 90f);
+        image.texture = GradientTexture(gradient, 0f);
+        image.color = Color.white;
+        image.uvRect = new Rect(0f, 0f, 1f, 1f);
     }
     private static RawImage BuildPseudo(Box box, DmNoteSpec spec, CssLayerRt layer, bool isBefore) {
         if(layer == null) return null;
@@ -134,4 +170,7 @@ public static partial class KeyViewerOverlay {
         || Animated(spec.CounterGradient) || Animated(spec.ActiveCounterGradient)
         || Animated(spec.FillGradient) || Animated(spec.ActiveFillGradient);
     private static bool Animated(CssAnimGradient g) => g != null && g.Period > 0.01f && g.Stops.Length > 1;
+    private static bool HasTextGradient(DmNoteSpec spec) =>
+        spec.LabelGradient != null || spec.ActiveLabelGradient != null
+        || spec.CounterGradient != null || spec.ActiveCounterGradient != null;
 }

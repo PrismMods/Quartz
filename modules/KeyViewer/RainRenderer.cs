@@ -16,9 +16,11 @@ internal sealed class RawRain {
     public Color Color;
     public Color ColorTop;
     public Color ColorBottom;
+    public KeyViewerOverlay.CssAnimGradient BodyGradient;
     public float GlowSize;
     public Color GlowTop;
     public Color GlowBottom;
+    public KeyViewerOverlay.CssAnimGradient GlowGradient;
     public Color ShadowColor;
     public float ShadowX, ShadowY;
     public Color BorderColor;
@@ -43,9 +45,11 @@ internal sealed class RawRain {
         Color = default;
         ColorTop = default;
         ColorBottom = default;
+        BodyGradient = null;
         GlowSize = 0f;
         GlowTop = default;
         GlowBottom = default;
+        GlowGradient = null;
         ShadowColor = default;
         ShadowX = 0f;
         ShadowY = 0f;
@@ -112,7 +116,7 @@ internal sealed class RainGraphic : MaskableGraphic {
         if(raw.GlowSize <= 0.5f) return;
         Color cMin = ColorForY(raw, dNear, dFar, yMin, yMin, height);
         Color cMax = ColorForY(raw, dNear, dFar, yMax, yMin, height);
-        AddGlow(vh, raw, xMin, yMin, xMax, yMax, cMin, cMax);
+        AddGlow(vh, raw, dNear, dFar, xMin, yMin, xMax, yMax, cMin, cMax);
     }
     private static void EmitBody(VertexHelper vh, RawRain raw, float dNear, float dFar,
         float xMin, float xMax, float yMin, float yMax, float yOrigin, float height,
@@ -124,10 +128,11 @@ internal sealed class RainGraphic : MaskableGraphic {
         }
         float yBot = yMin + r;
         float yTop = yMax - r;
-        Color c0 = BodyColor(raw, dNear, dFar, yMin, yOrigin, height, tint, tinted);
-        Color c1 = BodyColor(raw, dNear, dFar, yBot, yOrigin, height, tint, tinted);
-        Color c2 = BodyColor(raw, dNear, dFar, yTop, yOrigin, height, tint, tinted);
-        Color c3 = BodyColor(raw, dNear, dFar, yMax, yOrigin, height, tint, tinted);
+        float centerX = (xMin + xMax) * 0.5f;
+        Color c0 = BodyColor(raw, dNear, dFar, centerX, yMin, yOrigin, height, tint, tinted);
+        Color c1 = BodyColor(raw, dNear, dFar, centerX, yBot, yOrigin, height, tint, tinted);
+        Color c2 = BodyColor(raw, dNear, dFar, centerX, yTop, yOrigin, height, tint, tinted);
+        Color c3 = BodyColor(raw, dNear, dFar, centerX, yMax, yOrigin, height, tint, tinted);
         AddQuadUV(vh, xMin, yMin, xMin + r, yBot, c0, c1, 0f, 0f, 0.5f, 0.5f);
         if(xMax - xMin > 2f * r) AddQuad(vh, xMin + r, yMin, xMax - r, yBot, c0, c1);
         AddQuadUV(vh, xMax - r, yMin, xMax, yBot, c0, c1, 0.5f, 0f, 1f, 0.5f);
@@ -140,8 +145,22 @@ internal sealed class RainGraphic : MaskableGraphic {
     private static void EmitSpan(VertexHelper vh, RawRain raw, float dNear, float dFar,
         float xMin, float xMax, float yMin, float yMax, float yOrigin, float height,
         Color tint, bool tinted) {
-        Color cMin = BodyColor(raw, dNear, dFar, yMin, yOrigin, height, tint, tinted);
-        Color cMax = BodyColor(raw, dNear, dFar, yMax, yOrigin, height, tint, tinted);
+        Color cMin = BodyColor(raw, dNear, dFar, (xMin + xMax) * 0.5f, yMin, yOrigin, height, tint, tinted);
+        Color cMax = BodyColor(raw, dNear, dFar, (xMin + xMax) * 0.5f, yMax, yOrigin, height, tint, tinted);
+        if(raw.BodyGradient != null && !tinted) {
+            int slices = Mathf.Clamp(raw.BodyGradient.Stops.Length * 2, 4, 16);
+            float previousY = yMin;
+            for(int i = 1; i <= slices; i++) {
+                float nextY = Mathf.Lerp(yMin, yMax, (float)i / slices);
+                Color bl = BodyColor(raw, dNear, dFar, xMin, previousY, yOrigin, height, tint, false);
+                Color br = BodyColor(raw, dNear, dFar, xMax, previousY, yOrigin, height, tint, false);
+                Color tr = BodyColor(raw, dNear, dFar, xMax, nextY, yOrigin, height, tint, false);
+                Color tl = BodyColor(raw, dNear, dFar, xMin, nextY, yOrigin, height, tint, false);
+                AddQuad4(vh, xMin, previousY, xMax, nextY, bl, br, tr, tl);
+                previousY = nextY;
+            }
+            return;
+        }
         if(raw.FadePx > 0.5f && raw.TrackHeight > 0.5f) {
             float fadeStartD = raw.TrackHeight - raw.FadePx;
             float span = dFar - dNear;
@@ -151,7 +170,7 @@ internal sealed class RainGraphic : MaskableGraphic {
                     : (fadeStartD - dNear) / span;
                 float yMid = yOrigin + (tB * height);
                 if(yMid > yMin + 0.01f && yMid < yMax - 0.01f) {
-                    Color cMid = BodyColor(raw, dNear, dFar, yMid, yOrigin, height, tint, tinted);
+                    Color cMid = BodyColor(raw, dNear, dFar, (xMin + xMax) * 0.5f, yMid, yOrigin, height, tint, tinted);
                     AddQuad(vh, xMin, yMin, xMax, yMid, cMin, cMid);
                     AddQuad(vh, xMin, yMid, xMax, yMax, cMid, cMax);
                     return;
@@ -252,11 +271,35 @@ internal sealed class RainGraphic : MaskableGraphic {
         vh.AddTriangle(idx, idx + 1, idx + 2);
         vh.AddTriangle(idx + 2, idx + 3, idx);
     }
-    private static Color BodyColor(RawRain raw, float dNear, float dFar, float y, float yMin,
+    private static Color BodyColor(RawRain raw, float dNear, float dFar, float x, float y, float yMin,
         float height, Color tint, bool tinted) {
-        Color c = ColorForY(raw, dNear, dFar, y, yMin, height);
+        float d = DistanceForY(raw, dNear, dFar, y, yMin, height);
+        Color c = raw.BodyGradient == null
+            ? ColorAtD(raw, d, FadeAtD(raw, d))
+            : GradientAt(raw, raw.BodyGradient, x, d, FadeAtD(raw, d));
         if(!tinted) return c;
         return new Color(tint.r, tint.g, tint.b, tint.a * c.a);
+    }
+    private static float DistanceForY(RawRain raw, float dNear, float dFar, float y, float yMin, float height) {
+        float t = height <= 0.0001f ? 0f : (y - yMin) / height;
+        return raw.Reverse ? Mathf.Lerp(dFar, dNear, t) : Mathf.Lerp(dNear, dFar, t);
+    }
+    private static float FadeAtD(RawRain raw, float d) =>
+        raw.FadePx > 0.5f && raw.TrackHeight > 0.5f
+            ? AlphaAtD(d, raw.TrackHeight - raw.FadePx, raw.TrackHeight, raw.FadePx)
+            : 1f;
+    private static Color GradientAt(RawRain raw, KeyViewerOverlay.CssAnimGradient gradient,
+        float worldX, float d, float alpha) {
+        float localX = worldX - raw.AnchorX;
+        float angle = gradient.AngleDeg * Mathf.Deg2Rad;
+        float sin = Mathf.Sin(angle);
+        float cos = Mathf.Cos(angle);
+        float py = (0.5f - d / Mathf.Max(raw.TrackHeight, 0.0001f)) * raw.TrackHeight;
+        float line = Mathf.Max(Mathf.Abs(raw.Width * sin) + Mathf.Abs(raw.TrackHeight * cos), 0.0001f);
+        float t = Mathf.Clamp01(0.5f + (localX * sin - py * cos) / line);
+        Color color = KeyViewerOverlay.SampleDmGradient(gradient, t);
+        color.a *= alpha;
+        return color;
     }
     private static Color BorderColor(RawRain raw, float dNear, float dFar, float y, float yMin, float height) {
         float t = height <= 0.0001f ? 0f : (y - yMin) / height;
@@ -298,7 +341,7 @@ internal sealed class RainGraphic : MaskableGraphic {
                     Tint(raw.ShadowColor, cA.a), Tint(raw.ShadowColor, cB.a));
             }
             AddQuad(vh, xMin, ySegMin, xMax, ySegMax, cA, cB);
-            AddGlow(vh, raw, xMin, ySegMin, xMax, ySegMax, cA, cB);
+            AddGlow(vh, raw, segStart, segEnd, xMin, ySegMin, xMax, ySegMax, cA, cB);
         }
     }
     private static void AddQuad(VertexHelper vh, float xMin, float yMin, float xMax, float yMax, Color bottom, Color top) {
@@ -335,23 +378,35 @@ internal sealed class RainGraphic : MaskableGraphic {
         vh.AddTriangle(idx, idx + 1, idx + 2);
         vh.AddTriangle(idx + 2, idx + 3, idx);
     }
-    private static void AddGlow(VertexHelper vh, RawRain raw, float xMin, float yMin, float xMax, float yMax, Color cMin, Color cMax) {
+    private static void AddGlow(VertexHelper vh, RawRain raw, float dNear, float dFar,
+        float xMin, float yMin, float xMax, float yMax, Color cMin, Color cMax) {
         float g = raw.GlowSize;
         if(g <= 0.5f) return;
-        Color glowBottom = new(raw.GlowBottom.r, raw.GlowBottom.g, raw.GlowBottom.b, raw.GlowBottom.a * cMin.a);
-        Color glowTop = new(raw.GlowTop.r, raw.GlowTop.g, raw.GlowTop.b, raw.GlowTop.a * cMax.a);
-        if(glowBottom.a <= 0.002f && glowTop.a <= 0.002f) return;
-        Color zeroBottom = new(glowBottom.r, glowBottom.g, glowBottom.b, 0f);
-        Color zeroTop = new(glowTop.r, glowTop.g, glowTop.b, 0f);
-        AddQuad4(vh, xMin - g, yMin, xMin, yMax, zeroBottom, glowBottom, glowTop, zeroTop);
-        AddQuad4(vh, xMax, yMin, xMax + g, yMax, glowBottom, zeroBottom, zeroTop, glowTop);
-        AddQuad4(vh, xMin, yMax, xMax, yMax + g, glowTop, glowTop, zeroTop, zeroTop);
-        AddQuad4(vh, xMin, yMin - g, xMax, yMin, zeroBottom, zeroBottom, glowBottom, glowBottom);
-        AddQuad4(vh, xMin - g, yMin - g, xMin, yMin, zeroBottom, zeroBottom, glowBottom, zeroBottom);
-        AddQuad4(vh, xMax, yMin - g, xMax + g, yMin, zeroBottom, zeroBottom, zeroBottom, glowBottom);
-        AddQuad4(vh, xMin - g, yMax, xMin, yMax + g, zeroTop, glowTop, zeroTop, zeroTop);
-        AddQuad4(vh, xMax, yMax, xMax + g, yMax + g, glowTop, zeroTop, zeroTop, zeroTop);
+        Color glowBL = GlowColor(raw, xMin, dNear, cMin.a);
+        Color glowBR = GlowColor(raw, xMax, dNear, cMin.a);
+        Color glowTR = GlowColor(raw, xMax, dFar, cMax.a);
+        Color glowTL = GlowColor(raw, xMin, dFar, cMax.a);
+        if(glowBL.a <= 0.002f && glowBR.a <= 0.002f && glowTR.a <= 0.002f && glowTL.a <= 0.002f) return;
+        Color zeroBL = WithAlpha(glowBL, 0f), zeroBR = WithAlpha(glowBR, 0f);
+        Color zeroTR = WithAlpha(glowTR, 0f), zeroTL = WithAlpha(glowTL, 0f);
+        AddQuad4(vh, xMin - g, yMin, xMin, yMax, zeroBL, glowBL, glowTL, zeroTL);
+        AddQuad4(vh, xMax, yMin, xMax + g, yMax, glowBR, zeroBR, zeroTR, glowTR);
+        AddQuad4(vh, xMin, yMax, xMax, yMax + g, glowTL, glowTR, zeroTR, zeroTL);
+        AddQuad4(vh, xMin, yMin - g, xMax, yMin, zeroBL, zeroBR, glowBR, glowBL);
+        AddQuad4(vh, xMin - g, yMin - g, xMin, yMin, zeroBL, zeroBL, glowBL, zeroBL);
+        AddQuad4(vh, xMax, yMin - g, xMax + g, yMin, zeroBR, zeroBR, zeroBR, glowBR);
+        AddQuad4(vh, xMin - g, yMax, xMin, yMax + g, zeroTL, glowTL, zeroTL, zeroTL);
+        AddQuad4(vh, xMax, yMax, xMax + g, yMax + g, glowTR, zeroTR, zeroTR, zeroTR);
     }
+    private static Color GlowColor(RawRain raw, float x, float d, float bodyAlpha) {
+        if(raw.GlowGradient != null) return GradientAt(raw, raw.GlowGradient, x, d, FadeAtD(raw, d));
+        float t = raw.TrackHeight <= 0.0001f ? 0f : Mathf.Clamp01(d / raw.TrackHeight);
+        Color color = Color.Lerp(raw.GlowBottom, raw.GlowTop, t);
+        color.a *= bodyAlpha;
+        return color;
+    }
+    private static Color WithAlpha(Color color, float alpha) =>
+        new(color.r, color.g, color.b, alpha);
     private static Color ColorForY(RawRain raw, float dNear, float dFar, float y, float yMin, float height) {
         float t = height <= 0.0001f ? 0f : (y - yMin) / height;
         float d = raw.Reverse

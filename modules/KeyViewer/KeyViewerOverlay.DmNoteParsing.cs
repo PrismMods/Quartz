@@ -3,6 +3,7 @@ using Quartz.Core;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using Quartz.Utility;
+using Quartz.Features.KeyViewer.Layout;
 namespace Quartz.Features.KeyViewer;
 public static partial class KeyViewerOverlay {
     private static void FinishDmSpecs(
@@ -82,6 +83,39 @@ public static partial class KeyViewerOverlay {
         top = HexToColor(solid, opacityTop);
         bottom = HexToColor(solid, opacityBottom);
     }
+    private static CssAnimGradient ParseDmGradient(JToken token, float opacityMultiplier = 1f) {
+        if(!DmGradientSpec.TryParse(token, out DmGradientSpec parsed)) return null;
+        Color[] colors = new Color[parsed.Stops.Length];
+        float[] positions = new float[parsed.Stops.Length];
+        float alpha = Mathf.Clamp01(opacityMultiplier);
+        for(int i = 0; i < parsed.Stops.Length; i++) {
+            DmGradientStop stop = parsed.Stops[i];
+            Color color = HexToColor(stop.Color, 1f);
+            color.a *= alpha;
+            colors[i] = color;
+            positions[i] = stop.Position;
+        }
+        return new CssAnimGradient {
+            Stops = colors,
+            Positions = positions,
+            AngleDeg = parsed.Angle,
+        };
+    }
+    private static CssAnimGradient TintGradient(CssAnimGradient source, float alpha) {
+        if(source == null) return null;
+        Color[] colors = new Color[source.Stops.Length];
+        for(int i = 0; i < colors.Length; i++) {
+            Color color = source.Stops[i];
+            color.a *= alpha;
+            colors[i] = color;
+        }
+        return new CssAnimGradient {
+            Stops = colors,
+            Positions = source.Positions,
+            AngleDeg = source.AngleDeg,
+            Period = source.Period,
+        };
+    }
     private static DmNoteSpec ParseGraphSpec(JObject p) {
         DmNoteSpec spec = new() {
             IsGraph = true,
@@ -142,12 +176,18 @@ public static partial class KeyViewerOverlay {
         spec.ImageFitDefault = JStr(p, "imageFit", "");
         spec.Bg = HexToColor(bgHex, 0.9f);
         spec.ActiveBg = HexToColor(activeBgHex, 0.9f);
+        spec.FillGradient = ParseDmGradient(p["backgroundGradient"]);
+        spec.ActiveFillGradient = ParseDmGradient(p["activeBackgroundGradient"]);
         if(JBool(p, "idleTransparent", false)) spec.Bg.a = 0f;
         if(JBool(p, "activeTransparent", false)) spec.ActiveBg.a = 0f;
         spec.Outline = HexToColor(borderHex, 0.9f);
         spec.ActiveOutline = HexToColor(activeBorderHex, spec.Outline.a);
+        spec.BorderGradient = ParseDmGradient(p["borderGradient"]);
+        spec.ActiveBorderGradient = ParseDmGradient(p["activeBorderGradient"]);
         spec.Text = HexToColor(fontHex, 1f);
         spec.ActiveText = HexToColor(activeFontHex, 1f);
+        spec.LabelGradient = ParseDmGradient(p["fontGradient"]);
+        spec.ActiveLabelGradient = ParseDmGradient(p["activeFontGradient"]);
         spec.BorderRadius = Mathf.Clamp(JFloat(p, "borderRadius", 10f), 0f, 100f);
         spec.BoxBorderWidth = Mathf.Clamp(JFloat(p, "borderWidth", 3f), 0f, 20f);
         if(spec.BoxBorderWidth <= 0.01f) {
@@ -156,9 +196,14 @@ public static partial class KeyViewerOverlay {
         }
         ResolveDmNoteColors(p, false, out spec.RainTop, out spec.RainBottom);
         spec.Rain = spec.RainBottom;
+        spec.RainGradient = ParseDmGradient(p["noteGradient"], JFloat(p, "noteOpacity", 100f) / 100f);
         spec.RainGlowOn = JBool(p, "noteGlowEnabled", false);
         spec.RainGlowSize = Mathf.Clamp(JFloat(p, "noteGlowSize", 20f), 0f, 50f);
         ResolveDmNoteColors(p, true, out spec.RainGlowTop, out spec.RainGlowBottom);
+        spec.RainGlowGradient = ParseDmGradient(
+            p["noteGlowGradient"], JFloat(p, "noteGlowOpacity", 100f) / 100f);
+        if(spec.RainGlowGradient == null && spec.RainGradient != null && p["noteGlowColor"] == null)
+            spec.RainGlowGradient = TintGradient(spec.RainGradient, 1f);
         spec.RainShadowOn = JBool(p, "quartzNoteShadow", false);
         spec.RainShadowColor = HexToColor(JStr(p, "quartzNoteShadowColor", "rgba(0, 0, 0, 0.5)"), 0.5f);
         spec.RainShadowX = Mathf.Clamp(JFloat(p, "quartzNoteShadowX", 3f), -64f, 64f);
@@ -200,6 +245,8 @@ public static partial class KeyViewerOverlay {
             spec.GhostRainBottom = new Color(spec.RainBottom.r, spec.RainBottom.g, spec.RainBottom.b, spec.RainBottom.a * 0.45f);
             spec.GhostRainGlowTop = new Color(spec.RainGlowTop.r, spec.RainGlowTop.g, spec.RainGlowTop.b, spec.RainGlowTop.a * 0.45f);
             spec.GhostRainGlowBottom = new Color(spec.RainGlowBottom.r, spec.RainGlowBottom.g, spec.RainGlowBottom.b, spec.RainGlowBottom.a * 0.45f);
+            spec.GhostRainGradient = TintGradient(spec.RainGradient, 0.45f);
+            spec.GhostRainGlowGradient = TintGradient(spec.RainGlowGradient, 0.45f);
         } else {
             Color ghostColor = HexToColor(ghostNoteHex, JFloat(p, "ghostNoteOpacity", 45f) / 100f);
             spec.GhostRainTop = ghostColor;
@@ -222,6 +269,8 @@ public static partial class KeyViewerOverlay {
         string counterActive = counterFill != null ? JStr(counterFill, "active", activeFontHex) : activeFontHex;
         spec.CounterText = HexToColor(counterIdle, 1f);
         spec.ActiveCounterText = HexToColor(counterActive, 1f);
+        spec.CounterGradient = ParseDmGradient(counter?["fillIdleGradient"]);
+        spec.ActiveCounterGradient = ParseDmGradient(counter?["fillActiveGradient"]);
         spec.CounterStroke = HexToColor(counterStroke != null ? JStr(counterStroke, "idle", "transparent") : "transparent", 0f);
         spec.ActiveCounterStroke = HexToColor(counterStroke != null ? JStr(counterStroke, "active", "transparent") : "transparent", 0f);
         spec.NoteEnabled = JBool(p, "noteEffectEnabled", true);

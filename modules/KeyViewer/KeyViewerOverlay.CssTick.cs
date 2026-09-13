@@ -67,6 +67,14 @@ public static partial class KeyViewerOverlay {
         if(box.FillGrad != null) {
             CssAnimGradient fg = pressed ? spec.ActiveFillGradient : spec.FillGradient;
             box.FillGrad.enabled = fg != null;
+            if(box.FillGradMask != null) box.FillGradMask.showMaskGraphic = fg == null;
+            if(fg != null) ApplySurfaceGradient(box.FillGrad, fg, spec.W, spec.H);
+        }
+        if(box.BorderGradMask != null) {
+            CssAnimGradient border = pressed ? spec.ActiveBorderGradient : spec.BorderGradient;
+            box.BorderGradMask.SetActive(border != null);
+            if(box.Border != null) box.Border.enabled = border == null;
+            if(border != null) ApplySurfaceGradient(box.BorderGrad, border, spec.W, spec.H);
         }
         if(spec.TransitionSec > 0.01f) box.TransStart = KvClock.Now;
     }
@@ -163,7 +171,7 @@ public static partial class KeyViewerOverlay {
             ref TMP_CharacterInfo ch = ref info.characterInfo[i];
             if(!ch.isVisible) continue;
             float u = count > 1 ? (float)i / (count - 1) : 0f;
-            Color32 col = SampleGradient(g.Stops, u + scroll);
+            Color32 col = SampleGradient(g, u + scroll);
             int mat = ch.materialReferenceIndex;
             if(cols == null || mat != lastMat) {
                 cols = info.meshInfo[mat].colors32;

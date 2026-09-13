@@ -99,8 +99,11 @@ public static partial class KeyViewerOverlay {
         public bool IsTotal;
         public string Name;
         public Image Border;
+        public GameObject BorderGradMask;
+        public RawImage BorderGrad;
         public float AppliedBorderStroke = -1f;
         public Image Fill;
+        public Mask FillGradMask;
         public Image Glow;
         public RawImage FillGrad;
         public RawImage BeforeLayer;
@@ -176,9 +179,11 @@ public static partial class KeyViewerOverlay {
         public Color CounterText, ActiveCounterText, Rain, GhostRain;
         public Color CounterStroke, ActiveCounterStroke;
         public Color RainTop, RainBottom, GhostRainTop, GhostRainBottom;
+        public CssAnimGradient RainGradient, GhostRainGradient;
         public bool RainGlowOn;
         public float RainGlowSize;
         public Color RainGlowTop, RainGlowBottom, GhostRainGlowTop, GhostRainGlowBottom;
+        public CssAnimGradient RainGlowGradient, GhostRainGlowGradient;
         public bool RainShadowOn;
         public Color RainShadowColor;
         public float RainShadowX, RainShadowY;
@@ -212,6 +217,7 @@ public static partial class KeyViewerOverlay {
         public CssAnimGradient LabelGradient, ActiveLabelGradient;
         public CssAnimGradient CounterGradient, ActiveCounterGradient;
         public CssAnimGradient FillGradient, ActiveFillGradient;
+        public CssAnimGradient BorderGradient, ActiveBorderGradient;
         public Vector2 IdleOffset, ActiveOffset;
         public Vector2 IdleScale = Vector2.one, ActiveScale = Vector2.one;
         public float IdleRot, ActiveRot;
@@ -252,6 +258,7 @@ public static partial class KeyViewerOverlay {
             || IdleFilter != Color.white || ActiveFilter != Color.white
             || IdleBackdrop > 0f || ActiveBackdrop > 0f
             || FillGradient != null || ActiveFillGradient != null
+            || BorderGradient != null || ActiveBorderGradient != null
             || HasImage || HasPseudo;
     }
     internal readonly struct CssGlow {
@@ -264,6 +271,7 @@ public static partial class KeyViewerOverlay {
     }
     internal sealed class CssAnimGradient {
         public Color[] Stops;
+        public float[] Positions;
         public float Period;
         public float AngleDeg;
     }

@@ -20,9 +20,11 @@ public static partial class KeyViewerOverlay {
         raw.Color = ghost ? spec.GhostRain : spec.Rain;
         raw.ColorTop = ghost ? spec.GhostRainTop : spec.RainTop;
         raw.ColorBottom = ghost ? spec.GhostRainBottom : spec.RainBottom;
+        raw.BodyGradient = ghost ? spec.GhostRainGradient : spec.RainGradient;
         raw.GlowSize = spec.RainGlowOn ? spec.RainGlowSize : 0f;
         raw.GlowTop = ghost ? spec.GhostRainGlowTop : spec.RainGlowTop;
         raw.GlowBottom = ghost ? spec.GhostRainGlowBottom : spec.RainGlowBottom;
+        raw.GlowGradient = ghost ? spec.GhostRainGlowGradient : spec.RainGlowGradient;
         if(spec.RainShadowOn) {
             raw.ShadowColor = spec.RainShadowColor;
             raw.ShadowX = spec.RainShadowX;
