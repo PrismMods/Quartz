@@ -27,6 +27,12 @@ public static class ChatterBlocker {
     private static readonly Dictionary<ushort, long> lastAsyncKeyPress = [];
     private static readonly HashSet<KeyCode> reportedKeysThisFrame = [];
     private static readonly HashSet<KeyCode> injectedKeyHeldPrev = [];
+    // Presses we counted ourselves because the game had not reported them yet. The
+    // hook bit is set on the hook thread before the game queues the same async event,
+    // so the game can still report that press a frame or two later; it must not count
+    // a second time.
+    private static readonly Dictionary<KeyCode, long> injectedAwaitingGame = [];
+    private const long InjectedReportGraceMs = 100L;
     private static readonly bool DebugLog = false;
     private static bool AcceptNormalKey(KeyCode key, long now, long thresholdMs, bool active) {
         if(!active) return true;
@@ -84,6 +90,7 @@ public static class ChatterBlocker {
                 KeyCode normalized = KeyCodes.Normalize(key);
                 reportedKeysThisFrame.Add(normalized);
                 if(Quartz.Game.InjectedKeys.Is(normalized)) continue;
+                if(ConsumeLateReportOfInjected(normalized, now)) continue;
                 if(KeyLimiter.KeyLimiter.ShouldBlockKey(key)) continue;
                 RecordKeyStats(controller, key);
                 if(AcceptNormalKey(key, now, threshold, chatterActive)) count++;
@@ -92,6 +99,7 @@ public static class ChatterBlocker {
                     KeyLimiter.KeyLimiter.HookKeyToPhysicalUnityKey(asyncKey.key, asyncKey.label));
                 if(physical != KeyCode.None) reportedKeysThisFrame.Add(physical);
                 if(Quartz.Game.InjectedKeys.Is(physical)) continue;
+                if(ConsumeLateReportOfInjected(physical, now)) continue;
                 if(KeyLimiter.KeyLimiter.ShouldBlockAsyncKeyFromHook(asyncKey.key, asyncKey.label)) continue;
                 RecordKeyStats(controller, asyncKey);
                 if(AcceptAsyncKey(asyncKey.key, now, threshold, chatterActive)) count++;
@@ -99,6 +107,11 @@ public static class ChatterBlocker {
         }
         count += CountKeysMissedByGame(controller, now, threshold, chatterActive);
         return count;
+    }
+    private static bool ConsumeLateReportOfInjected(KeyCode key, long now) {
+        if(key == KeyCode.None || !injectedAwaitingGame.TryGetValue(key, out long injectedAt)) return false;
+        injectedAwaitingGame.Remove(key);
+        return now - injectedAt <= InjectedReportGraceMs;
     }
     private static int injectionBatch;
     private static bool inPlayerBatch;
@@ -118,6 +131,7 @@ public static class ChatterBlocker {
         bool limiterActive = KeyLimiter.KeyLimiter.IsActive();
         if((!limiterActive && !chatterActive) || !KeyLimiter.KeyLimiter.InPlayerControl()) {
             injectedKeyHeldPrev.Clear();
+            injectedAwaitingGame.Clear();
             injectedComputeFrame = -1;
             return 0;
         }
@@ -173,6 +187,7 @@ public static class ChatterBlocker {
             RecordKeyStats(controller, key);
             if(AcceptNormalKey(key, now, threshold, chatterActive)) {
                 injectedKeyHeldPrev.Add(key);
+                injectedAwaitingGame[key] = now;
                 return 1;
             }
         }
