@@ -1,0 +1,26 @@
+Quartz.Tests/Features/KeyViewer/KvDocumentTests.Tabs.cs
+  h_6eeb8441a8a159 103-110,117-122,124-133,137-138
+Quartz.Tests/Features/KeyViewer/KvTabDragTests.cs
+  h_6eeb8441a8a159 1-27
+Quartz.Tests/Program.cs
+  h_6eeb8441a8a159 79
+Quartz.Tests/Quartz.Tests.csproj
+  h_6eeb8441a8a159 116
+modules/KeyViewer/Editor/KvTabDragState.cs
+  h_6eeb8441a8a159 1-46
+modules/KeyViewer/Editor/KvTabStrip.cs
+  h_6eeb8441a8a159 22,95,142,147,157,163,167-168,172,187
+modules/KeyViewer/Layout/KvDocument.cs
+  h_6eeb8441a8a159 32,169
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "68cc4300f1a6c58b9136cb8cc04cc9f95c36f6b9",
+  "prompts": {},
+  "humans": {
+    "h_6eeb8441a8a159": {
+      "author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
