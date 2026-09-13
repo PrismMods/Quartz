@@ -55,6 +55,6 @@ internal sealed class DmGradientSpec {
     private static float Number(JToken token, float fallback) {
         if(token == null || token.Type == JTokenType.Null) return fallback;
         try { return token.ToObject<float>(); }
-        catch(Exception) { return fallback; }
+        catch(Exception e) { Quartz.Core.Diag.Ignore(e); return fallback; }
     }
 }
