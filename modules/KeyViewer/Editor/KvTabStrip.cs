@@ -19,9 +19,8 @@ internal sealed class KvTabStrip {
     private readonly LayoutElement viewportLe;
     private readonly ScrollRect scroll;
     private readonly List<string> order = [];
+    private readonly KvTabDragState drag = new();
     private Action<string, int> reorder;
-    private string dragging;
-    private int dragFrom = -1;
     internal RectTransform Pill { get; private set; }
     private KvTabStrip(RectTransform track, LayoutElement viewportLe, ScrollRect scroll) {
         this.track = track;
@@ -93,7 +92,7 @@ internal sealed class KvTabStrip {
     ) {
         if(track == null) return;
         reorder = onReorder;
-        dragging = null;
+        drag.Reset();
         order.Clear();
         order.AddRange(tabs);
         GenerateUI.ClearChildren(track);
@@ -140,11 +139,12 @@ internal sealed class KvTabStrip {
         };
         button.UpdateVisual(true);
         GenerateUI.AddButton(obj, btn => {
-            if(btn != InputButton.Left || dragging != null) return;
+            if(!drag.TryPick(btn == InputButton.Left)) return;
             if(editing) return;
             onPick?.Invoke(tab);
         }, false);
         EventTrigger trigger = obj.GetComponent<EventTrigger>() ?? obj.AddComponent<EventTrigger>();
+        UnityUtils.AddEvent(EventTriggerType.PointerDown, e => drag.PointerDown(e.button == InputButton.Left), trigger);
         UnityUtils.AddEvent(EventTriggerType.PointerEnter, _ => button.OnHoverEnter(), trigger);
         UnityUtils.AddEvent(EventTriggerType.PointerExit, _ => button.OnHoverExit(), trigger);
         UnityUtils.AddEvent(EventTriggerType.InitializePotentialDrag, scroll.OnInitializePotentialDrag, trigger);
@@ -154,23 +154,22 @@ internal sealed class KvTabStrip {
         return width;
     }
     private void BeginDrag(string tab, PointerEventData e) {
-        dragFrom = order.IndexOf(tab);
-        if(e.button != InputButton.Left || order.Count < 2 || dragFrom < 0) {
+        if(!drag.Begin(tab, order.IndexOf(tab), order.Count, e.button == InputButton.Left)) {
             scroll.OnBeginDrag(e);
             return;
         }
-        dragging = tab;
     }
     private void Drag(PointerEventData e) {
-        if(dragging == null) {
+        if(!drag.Reordering) {
             scroll.OnDrag(e);
             return;
         }
-        int from = order.IndexOf(dragging);
+        string tab = drag.Tab;
+        int from = order.IndexOf(tab);
         int to = SlotAt(e);
         if(from < 0 || to < 0 || to == from) return;
         order.RemoveAt(from);
-        order.Insert(to, dragging);
+        order.Insert(to, tab);
         track.GetChild(from).SetSiblingIndex(to);
     }
     private int SlotAt(PointerEventData e) {
@@ -185,11 +184,7 @@ internal sealed class KvTabStrip {
         return track.childCount - 1;
     }
     private void EndDrag(PointerEventData e) {
-        string tab = dragging;
-        int from = dragFrom;
-        dragging = null;
-        dragFrom = -1;
-        if(tab == null) {
+        if(!drag.End(out string tab, out int from)) {
             scroll.OnEndDrag(e);
             return;
         }

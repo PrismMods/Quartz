@@ -113,6 +113,7 @@
 		<Compile Include="../modules/KeyViewer/Layout/KvExportEmbedding.cs" Link="Source/KvExportEmbedding.cs" />
 		<Compile Include="../modules/KeyViewer/Layout/KvSnap.cs" Link="Source/KvSnap.cs" />
 		<Compile Include="../modules/KeyViewer/Layout/KvHistory.cs" Link="Source/KvHistory.cs" />
+		<Compile Include="../modules/KeyViewer/Editor/KvTabDragState.cs" Link="Source/KvTabDragState.cs" />
 		<Compile Include="../modules/Tuf/TufModels.cs" Link="Source/TufModels.cs" />
 		<Compile Include="../modules/Tuf/TufSettings.cs" Link="Source/TufSettings.cs" />
 		<Compile Include="../Quartz/IO/Interface/ISettingsFile.cs" Link="Source/ISettingsFile.cs" />

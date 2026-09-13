@@ -29,7 +29,7 @@ internal sealed partial class KvDocument {
         get {
             string sel = Root["selectedKeyType"]?.ToString();
             if(!string.IsNullOrWhiteSpace(sel) && tabs.ContainsKey(sel) && !IsFootTab(sel)) return sel;
-            foreach(string tab in tabs.Keys) if(!IsFootTab(tab)) return tab;
+            foreach(string tab in Tabs) if(!IsFootTab(tab)) return tab;
             return DefaultTabId;
         }
         set {
@@ -166,6 +166,7 @@ internal sealed partial class KvDocument {
             for(int i = custom.Count - 1; i >= 0; i--)
                 if(custom[i] is JObject o && o["id"]?.ToString() == tab) custom.RemoveAt(i);
         order.RemoveAt(index);
+        if(Root[TabOrderKey] is JArray) Root[TabOrderKey] = new JArray(order);
         if(wasSelected)
             for(int i = Math.Min(index, order.Count - 1); i >= 0; i--)
                 if(!IsFootTab(order[i])) { SelectedTab = order[i]; break; }

@@ -100,23 +100,42 @@ static partial class KvDocumentTests {
         string a = doc.SelectedTab;
         string b = doc.NewTabId();
         doc.EnsureTab(b, "B");
-        string foot = doc.NewTabId();
-        doc.EnsureTab(foot, "Foot");
-        doc.SetFootTab(foot, true);
+        string footA = doc.NewTabId();
+        doc.EnsureTab(footA, "Foot A");
+        doc.SetFootTab(footA, true);
+        string footB = doc.NewTabId();
+        doc.EnsureTab(footB, "Foot B");
+        doc.SetFootTab(footB, true);
+        doc.SelectedTab = a;
+        doc.SelectedFootTab = footA;
         Assert(!doc.MoveTabTo("nope", 0), "an unknown tab is refused");
         Assert(!doc.MoveTabTo(a, 0), "dropping a tab back where it started is refused");
-        Assert(!doc.MoveTabTo(foot, 1), "a lone foot tab has no second slot in its own group");
         Assert(!doc.MoveTabTo(b, 2), "a slot past the end of the group is refused");
         Assert(doc.MoveTabTo(b, 0), "a hand tab drops into the first slot");
         List<string> order = [.. doc.Tabs];
         Assert(order.IndexOf(b) < order.IndexOf(a), "the dropped tab now sits before its neighbour");
-        Assert(order.Contains(foot), "the foot tab is still listed");
+        Assert(order.IndexOf(footA) < order.IndexOf(footB), "reordering hands leaves foot order alone");
+        Assert(doc.MoveTabTo(footB, 0), "a foot tab drops into the first foot slot");
+        order = [.. doc.Tabs];
+        Assert(order.IndexOf(footB) < order.IndexOf(footA), "the dropped foot now sits before its neighbour");
+        Assert(order.IndexOf(b) < order.IndexOf(a), "reordering feet leaves hand order alone");
+        Assert(doc.SelectedTab == a && doc.SelectedFootTab == footA, "reordering changes neither selection");
         List<string> reloaded = [.. KvDocument.Parse(doc.ToJson()).Tabs];
-        Assert(reloaded.IndexOf(b) < reloaded.IndexOf(a), "the order survives a serialize/parse round-trip");
-        doc.SelectedTab = a;
+        Assert(reloaded.SequenceEqual(order), "the complete mixed order survives a serialize/parse round-trip");
+
+        KvHistory history = new();
+        string before = doc.ToJson();
+        history.Push(before);
+        Assert(doc.MoveTabTo(a, 0), "a second hand reorder changes the document");
+        KvDocument undone = KvDocument.Parse(history.Undo(doc.ToJson()));
+        Assert(undone.Tabs.SequenceEqual(reloaded), "undo restores the persisted order snapshot");
+        Assert(undone.SelectedTab == a && undone.SelectedFootTab == footA, "undo restores both selections");
+
         Assert(doc.RemoveTab(a), "a reordered tab is still removable");
         List<string> after = [.. doc.Tabs];
         Assert(!after.Contains(a) && after.Contains(b), "the saved order drops ids that are gone");
+        JArray saved = (JArray)JObject.Parse(doc.ToJson())["quartzTabOrder"]!;
+        Assert(!saved.Values<string>().Contains(a), "removal prunes the persisted order too");
     }
     public static void TestRemoveTabLeavesUnmodelledTablesAlone() {
         KvDocument doc = KvDocument.Parse(Preset);
