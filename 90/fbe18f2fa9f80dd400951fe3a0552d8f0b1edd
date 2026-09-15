@@ -1,0 +1,19 @@
+modules/UiHider/UiHider.cs
+  s_627a52ba972fe3::t_9743b217795c62 218-219,225-226
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "90fbe18f2fa9f80dd400951fe3a0552d8f0b1edd",
+  "prompts": {},
+  "sessions": {
+    "s_627a52ba972fe3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8b026c0e-c10b-43da-9824-925b36cc2424",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
