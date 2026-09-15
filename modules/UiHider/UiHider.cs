@@ -215,12 +215,15 @@ public static partial class UiHider {
             if(errorMeter.activeSelf) errorMeter.SetActive(false);
             return;
         }
-        if(!errorMeter.activeSelf && !controller.paused && HitErrorMeterEnabledInGame()) errorMeter.SetActive(true);
+        if(!errorMeter.activeSelf && !controller.paused && HitErrorMeterEnabledInGame() && !GameHidesGameplayUi())
+            errorMeter.SetActive(true);
     }
     private static bool HitErrorMeterEnabledInGame() {
         try { return Persistence.hitErrorMeterSize != ErrorMeterSize.Off; }
         catch(Exception e) { Diag.Ignore(e); return true; }
     }
+    private static bool GameHidesGameplayUi()
+        => GetMemberValue(scnEditor.instance, "shouldHideGameplayUIForAutoplay") is true;
     private static bool HasSteamBranchName() {
         try { return !string.IsNullOrEmpty(GCS.steamBranchName); }
         catch(Exception e) { Diag.Ignore(e); return false; }
