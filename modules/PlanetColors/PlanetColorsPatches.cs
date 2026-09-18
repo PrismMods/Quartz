@@ -57,7 +57,7 @@ public static partial class PlanetColors {
     [HarmonyPatch(typeof(PlanetRenderer), "PlayParticles")]
     private static class PlanetRendererPlayParticlesPatch {
         private static void Postfix(PlanetRenderer __instance) {
-            if(!ShouldChange) return;
+            if(!ShouldRecolor) return;
             ApplyTailParticleColor(__instance, TailColor(GetPlanetSlot(__instance)));
         }
     }
@@ -75,7 +75,7 @@ public static partial class PlanetColors {
             => ExistingMethods(
                 typeof(PlanetRenderer), "SetRainbow", "LoadPlanetColor", "SetColor", "DisableCustomColor");
         private static bool Prefix(PlanetRenderer __instance) {
-            if(applying || !ShouldChange) return true;
+            if(applying || !ShouldRecolor) return true;
             ApplyPlanetRendererColor(__instance);
             ApplyLogoColor(scrLogoText.instance);
             return false;
@@ -86,43 +86,43 @@ public static partial class PlanetColors {
         private static IEnumerable<MethodBase> TargetMethods()
             => ExistingMethods(typeof(PlanetRenderer), "SetPlanetColor", "SetCoreColor", "SetTailColor", "SetFaceColor");
         private static void Prefix(PlanetRenderer __instance, MethodBase __originalMethod, ref Color __0) {
-            if(applying || !ShouldChange) return;
+            if(applying || !ShouldRecolor) return;
             int slot = GetPlanetSlot(__instance);
             __0 = __originalMethod != null && __originalMethod.Name == "SetTailColor"
                 ? TailColor(slot)
                 : BallColor(slot);
         }
         private static void Postfix(PlanetRenderer __instance, MethodBase __originalMethod) {
-            if(applying || !ShouldChange || __originalMethod == null || __originalMethod.Name != "SetTailColor") return;
+            if(applying || !ShouldRecolor || __originalMethod == null || __originalMethod.Name != "SetTailColor") return;
             ApplyTailParticleColor(__instance, TailColor(GetPlanetSlot(__instance)));
         }
     }
     [HarmonyPatch(typeof(scrLogoText), "Awake")]
     private static class LogoAwakePatch {
         private static void Postfix(scrLogoText __instance) {
-            if(ShouldChange) ApplyLogoColor(__instance);
+            if(ShouldRecolor) ApplyLogoColor(__instance);
         }
     }
     [HarmonyPatch(typeof(scrLogoText), "UpdateColors")]
     private static class LogoUpdateColorsPatch {
         private static bool Prefix(scrLogoText __instance) {
-            if(!ShouldChange) return true;
+            if(!ShouldRecolor) return true;
             ApplyLogoColor(__instance);
             return false;
         }
     }
     [HarmonyPatch(typeof(scrLogoText), "LateUpdate")]
     private static class LogoLateUpdatePatch {
-        private static bool Prefix() => !ShouldChange;
+        private static bool Prefix() => !ShouldRecolor;
     }
     [HarmonyPatch]
     private static class LevelSelectRainbowPatch {
         private static MethodBase TargetMethod() => GameApi.PlanetPaletteMethod("RainbowMode");
-        private static bool Prefix() => !ShouldChange;
+        private static bool Prefix() => !ShouldRecolor;
     }
     [HarmonyPatch]
     private static class LevelSelectEnbyPatch {
         private static MethodBase TargetMethod() => GameApi.PlanetPaletteMethod("EnbyMode");
-        private static bool Prefix() => !ShouldChange;
+        private static bool Prefix() => !ShouldRecolor;
     }
 }

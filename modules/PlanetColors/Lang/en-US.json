@@ -1,6 +1,7 @@
 {
   "en-US": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "DESC_PCOL_RECOLOR": "Off: planets keep their own look (gold, DLC, etc.) and only the overlay image and ring settings apply.",
     "DESC_PCOL_SEP_TAIL": "Off: tails use the ball color (with their own opacity). On: each planet's tail gets its own color.",
     "DESC_PCOL_RING": "Paint the planet ring a custom colour. When off, the ring is hidden while planet colours are active.",
     "DESC_PCOL_SEP_RING": "Off: every planet's ring uses one colour. On: each planet gets its own ring colour.",
@@ -13,6 +14,7 @@
     "PCOL_BALLOP2": "Planet 2 Ball Opacity",
     "PCOL_BALLOP3": "Planet 3 Ball Opacity",
     "PCOL_BALLOP4": "Planet 4 Ball Opacity",
+    "PCOL_RECOLOR": "Recolor Planets",
     "PCOL_SEP_TAIL": "Separate Tail Color",
     "PCOL_RINGON": "Recolor Ring",
     "PCOL_RINGCOL": "Ring Color",

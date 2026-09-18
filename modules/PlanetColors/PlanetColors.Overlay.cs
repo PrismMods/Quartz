@@ -37,7 +37,12 @@ public static partial class PlanetColors {
         SpriteRenderer overlay = entry.Overlay;
         if(overlay == null) return;
         try {
-            if(entry.Source == null) entry.Source = PlanetSpriteRenderer(renderer);
+            SpriteRenderer source = PlanetSpriteRenderer(renderer);
+            if(source != null && source != entry.Source) {
+                entry.Source = source;
+                overlay.sortingLayerID = source.sortingLayerID;
+                overlay.sortingOrder = source.sortingOrder + 10;
+            }
             bool visible = OverlayVisibleThisFrame && overlay.sprite != null && PlanetIsShowing(entry);
             if(overlay.gameObject.activeSelf != visible) overlay.gameObject.SetActive(visible);
             if(visible) SyncOverlayAlpha(overlay, entry);
@@ -143,7 +148,7 @@ public static partial class PlanetColors {
         int id = renderer.GetInstanceID();
         if(overlayMap.TryGetValue(id, out OverlayEntry cached)) {
             if(cached?.Overlay != null) {
-                if(cached.Source == null) cached.Source = PlanetSpriteRenderer(renderer);
+                cached.Source = PlanetSpriteRenderer(renderer) ?? cached.Source;
                 return cached;
             }
             overlayMap.Remove(id);

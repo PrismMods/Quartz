@@ -1,6 +1,7 @@
 {
   "zh-CN": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "DESC_PCOL_RECOLOR": "关闭：星球保留原本外观（黄金星球、DLC 星球等），仅应用覆盖图片与光环设置。",
     "DESC_PCOL_SEP_TAIL": "关闭：尾迹使用星球主色（独立透明度）；开启：每个星球尾迹使用专属配色。",
     "DESC_PCOL_RING": "自定义星球光环颜色；关闭星球配色时光环同步隐藏。",
     "DESC_PCOL_SEP_RING": "关闭：所有星球光环使用同一颜色；开启：每个星球使用独立光环颜色。",
@@ -13,6 +14,7 @@
     "PCOL_BALLOP2": "星球 2 透明度",
     "PCOL_BALLOP3": "星球 3 透明度",
     "PCOL_BALLOP4": "星球 4 透明度",
+    "PCOL_RECOLOR": "更改星球颜色",
     "PCOL_SEP_TAIL": "尾迹独立配色",
     "PCOL_RINGON": "自定义光环颜色",
     "PCOL_RINGCOL": "光环颜色",

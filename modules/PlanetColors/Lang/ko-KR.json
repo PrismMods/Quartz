@@ -1,6 +1,7 @@
 {
   "ko-KR": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "DESC_PCOL_RECOLOR": "끄면 행성이 원래 모습(황금 행성, DLC 행성 등)을 유지하고 오버레이 이미지와 링 설정만 적용됩니다.",
     "DESC_PCOL_SEP_TAIL": "끄면 꼬리가 공 색상을 사용합니다(투명도는 별도). 켜면 각 행성 꼬리에 별도 색상을 줍니다.",
     "DESC_PCOL_RING": "행성 링을 원하는 색상으로 칠합니다. 끄면 행성 색상이 적용되는 동안 링이 숨겨집니다.",
     "DESC_PCOL_SEP_RING": "끄면 모든 행성의 링이 한 가지 색상을 사용합니다. 켜면 행성마다 별도의 링 색상을 줍니다.",
@@ -13,6 +14,7 @@
     "PCOL_BALLOP2": "행성 2 공 투명도",
     "PCOL_BALLOP3": "행성 3 공 투명도",
     "PCOL_BALLOP4": "행성 4 공 투명도",
+    "PCOL_RECOLOR": "행성 색상 변경",
     "PCOL_SEP_TAIL": "꼬리 색상 분리",
     "PCOL_RINGON": "링 색상 변경",
     "PCOL_RINGCOL": "링 색상",

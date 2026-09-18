@@ -28,6 +28,20 @@ public static class PagePlanetColors {
             conf.Enabled,
             "Enable Planet Colors", "planetcolors_enable", def.Enabled
         );
+        GenerateUI.ToggleTip(
+            sec.Body,
+            def.RecolorPlanets,
+            conf.RecolorPlanets,
+            v => {
+                conf.RecolorPlanets = v;
+                PlanetColors.Restore();
+                PlanetColors.Refresh();
+                Save();
+            },
+            "Recolor Planets",
+            "pcol_recolor",
+            "Off: planets keep their own look (gold, DLC, etc.) and only the overlay image and ring settings apply."
+        );
         RectTransform[] tailColorRows = new RectTransform[PlanetColorsSettings.Slots];
         void RefreshTailRows() {
             foreach(RectTransform row in tailColorRows) row?.gameObject.SetActive(conf.SeparateTailColor);

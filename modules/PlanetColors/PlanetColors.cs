@@ -16,6 +16,7 @@ public static partial class PlanetColors {
             return MainCore.IsModEnabled && Conf.Enabled;
         }
     }
+    private static bool ShouldRecolor => ShouldChange && Conf.RecolorPlanets;
     private static bool ShouldRecolorRing {
         get {
             EnsureConf();
@@ -165,7 +166,7 @@ public static partial class PlanetColors {
         }
     }
     private static void ApplyLogoColor(scrLogoText logoText) {
-        if(logoText == null || !ShouldChange) return;
+        if(logoText == null || !ShouldRecolor) return;
         Color color = LogoColor;
         InvokeLogoColor(logoText, color, true);
         InvokeLogoColor(logoText, color, false);
@@ -206,9 +207,13 @@ public static partial class PlanetColors {
         => ApplyPlanetRendererColor(renderer, GetPlanetSlot(renderer));
     private static void ApplyPlanetRendererColor(PlanetRenderer renderer, int slot) {
         if(renderer == null || !ShouldChange || applying) return;
+        slot = Mathf.Clamp(slot, 0, PlanetColorsSettings.Slots - 1);
+        if(!Conf.RecolorPlanets) {
+            ApplyOverlayToPlanet(renderer, slot);
+            return;
+        }
         applying = true;
         try {
-            slot = Mathf.Clamp(slot, 0, PlanetColorsSettings.Slots - 1);
             Color ballColor = BallColor(slot);
             Color tailColor = TailColor(slot);
             try { renderer.DisableAllSpecialPlanets(); } catch(Exception e) { Diag.Ignore(e); }
@@ -285,7 +290,7 @@ public static partial class PlanetColors {
     private static void ApplyPlanetRing(PlanetRenderer renderer) {
         if(renderer == null) return;
         bool recolor = ShouldRecolorRing;
-        if(!recolor && !ShouldChange) return;
+        if(!recolor && !ShouldRecolor) return;
         if(IsOnlyRing(renderer)) return;
         try {
             if(recolor) {

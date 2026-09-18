@@ -7,6 +7,7 @@ namespace Quartz.Features.PlanetColors;
 public sealed class PlanetColorsSettings : ISettingsFile {
     public const int Slots = 3;
     public bool Enabled = true;
+    public bool RecolorPlanets = true;
     public bool SeparateTailColor = false;
     public float[] BallR = [1f, 1f, 1f];
     public float[] BallG = [0f, 0f, 0f];
@@ -103,6 +104,7 @@ public sealed class PlanetColorsSettings : ISettingsFile {
     }
     public JToken Serialize() => new JObject {
             [nameof(Enabled)] = Enabled,
+            [nameof(RecolorPlanets)] = RecolorPlanets,
             [nameof(SeparateTailColor)] = SeparateTailColor,
             [nameof(BallR)] = new JArray(BallR),
             [nameof(BallG)] = new JArray(BallG),
@@ -128,6 +130,7 @@ public sealed class PlanetColorsSettings : ISettingsFile {
     };
     public void Deserialize(JToken token) {
         Enabled = IOUtils.Read(token, nameof(Enabled), Enabled);
+        RecolorPlanets = IOUtils.Read(token, nameof(RecolorPlanets), RecolorPlanets);
         SeparateTailColor = IOUtils.Read(token, nameof(SeparateTailColor), SeparateTailColor);
         ReadFloats(token, nameof(BallR), BallR);
         ReadFloats(token, nameof(BallG), BallG);
