@@ -1,0 +1,23 @@
+stubs/MANIFEST.json
+  s_6e25864a17d827::t_e5abfc3e993090 3515
+stubs/README.md
+  s_6e25864a17d827::t_d5364601647ccf 30,41
+stubs/UnityEngine.CoreModule/Stubs.g.cs
+  s_6e25864a17d827::t_f33539e838b489 134
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "96295f337f00e80a793aaa1c5f506112af6b8016",
+  "prompts": {},
+  "sessions": {
+    "s_6e25864a17d827": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a0145778-65ce-47ed-8850-b4957c089f74",
+        "model": "unknown"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
