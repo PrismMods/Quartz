@@ -1,0 +1,22 @@
+modules/KeyLimiter/ChatterBlocker.cs
+  s_6e25864a17d827::t_95dc7583f54fab 229
+Quartz/Game/HookInput.cs
+  s_6e25864a17d827::t_40d832261e0057 225,227-230,234-259,261-265
+  s_6e25864a17d827::t_5fcd959db05a6c 266-269
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "bf3e7023a6eee39acd80ddf14db2357f0c895ee3",
+  "prompts": {},
+  "sessions": {
+    "s_6e25864a17d827": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a0145778-65ce-47ed-8850-b4957c089f74",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
