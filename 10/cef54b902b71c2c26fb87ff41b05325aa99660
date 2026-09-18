@@ -1,0 +1,32 @@
+Quartz/Game/HookInput.cs
+  s_808cdd06ee1753::t_afd0702f5731e6 130-138,141,151-179
+  s_6e25864a17d827::t_6a7b9a2fdbbb1c 129
+modules/KeyViewer/KeyViewerOverlay.cs
+  s_808cdd06ee1753::t_afd0702f5731e6 129
+modules/KeyViewer/KeyViewerOverlay.Input.cs
+  s_808cdd06ee1753::t_afd0702f5731e6 93,119-120,123-131,135-141,144-147
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "10cef54b902b71c2c26fb87ff41b05325aa99660",
+  "prompts": {},
+  "sessions": {
+    "s_6e25864a17d827": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a0145778-65ce-47ed-8850-b4957c089f74",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    },
+    "s_808cdd06ee1753": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f6c9cbe9-8b60-4e18-b6b2-6bfabb96f430",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
