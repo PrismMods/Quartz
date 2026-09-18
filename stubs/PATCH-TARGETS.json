@@ -153,12 +153,6 @@
       "assembly": "Assembly-CSharp"
     },
     {
-      "type": "RDString",
-      "member": "SetLocalizedFont",
-      "resolved": true,
-      "assembly": "Assembly-CSharp"
-    },
-    {
       "type": "ADOFAI.Editor.Actions.SaveLevelEditorAction",
       "member": "Execute",
       "resolved": true,

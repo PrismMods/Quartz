@@ -37,9 +37,6 @@ namespace UnityEngine {
         LowerCenter = 7,
         LowerRight = 8,
     }
-    public sealed unsafe partial class TextMesh : global::UnityEngine.Component {
-        private TextMesh() { }
-    }
     public unsafe partial struct UIVertex {
         public global::UnityEngine.Color32 color;
         public global::UnityEngine.Vector3 normal;

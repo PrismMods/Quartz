@@ -19,11 +19,9 @@ namespace UnityEngine {
         public global::UnityEngine.Canvas rootCanvas { get => throw null; }
         public int sortingOrder { get => throw null; set { } }
         public global::UnityEngine.Camera worldCamera { get => throw null; set { } }
-        public static event global::UnityEngine.Canvas.WillRenderCanvases willRenderCanvases { add { } remove { } }
         public static void ForceUpdateCanvases() => throw null;
         public static global::UnityEngine.Material GetDefaultCanvasMaterial() => throw null;
         private Canvas() { }
-        public unsafe delegate void WillRenderCanvases();
     }
     public sealed unsafe partial class CanvasGroup : global::UnityEngine.Behaviour {
         public float alpha { get => throw null; set { } }
@@ -33,8 +31,6 @@ namespace UnityEngine {
     }
     public sealed unsafe partial class CanvasRenderer : global::UnityEngine.Component {
         public bool cullTransparentMesh { get => throw null; set { } }
-        public float GetAlpha() => throw null;
-        public void SetAlpha(float alpha) => throw null;
         private CanvasRenderer() { }
     }
     public unsafe partial interface ICanvasRaycastFilter {

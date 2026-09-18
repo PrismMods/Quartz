@@ -510,8 +510,6 @@ public static unsafe partial class RDString {
     public static string GetEnumValue<T>(T value) => throw null;
     public static string GetWithCheck(string key, out bool exists, global::System.Collections.Generic.Dictionary<string, object> parameters = default) => throw null;
     public static void SetLocalizedFont(this global::UnityEngine.UI.Text text) => throw null;
-    public static void SetLocalizedFont(this global::TMPro.TMP_Text text) => throw null;
-    public static void SetLocalizedFont(this global::UnityEngine.TextMesh text) => throw null;
 }
 public static unsafe partial class RDUtils {
     public enum UnCamelCaseOptions : int {
@@ -956,9 +954,6 @@ public unsafe partial class scrController : global::MonsterLove.StateMachine.Sta
     public bool TogglePauseGame() => throw null;
     public global::System.Collections.IEnumerator WaitForStartCo(int seqID = default, bool remakeFloors = default) => throw null;
     protected scrController() { }
-}
-public unsafe partial class scrCountdown : global::ADOBase {
-    protected scrCountdown() { }
 }
 public abstract unsafe partial class scrDecoration : global::ADOBase {
     public const int HitboxLayer = 74;

@@ -1222,8 +1222,6 @@
           "System.String RDString::NintendoSwitchKeySuffix",
           "System.String RDString::StringsFilePrefix",
           "System.String RDString::StringsFolder",
-          "System.Void RDString::SetLocalizedFont(TMPro.TMP_Text)",
-          "System.Void RDString::SetLocalizedFont(UnityEngine.TextMesh)",
           "System.Void RDString::SetLocalizedFont(UnityEngine.UI.Text)",
           "UnityEngine.SystemLanguage RDString::FallbackLanguage",
           "UnityEngine.SystemLanguage RDString::language"
@@ -1803,10 +1801,6 @@
           "scrFloor scrController::firstFloor",
           "scrFloor scrController::get_currFloor()"
         ]
-      },
-      {
-        "type": "scrCountdown",
-        "members": []
       },
       {
         "type": "scrDecoration",
@@ -4996,10 +4990,6 @@
         ]
       },
       {
-        "type": "UnityEngine.TextMesh",
-        "members": []
-      },
-      {
         "type": "UnityEngine.UIVertex",
         "members": [
           "UnityEngine.Color32 UnityEngine.UIVertex::color",
@@ -5350,8 +5340,6 @@
           "System.Void UnityEngine.UI.Graphic::SetVerticesDirty()",
           "System.Void UnityEngine.UI.Graphic::set_color(UnityEngine.Color)",
           "System.Void UnityEngine.UI.Graphic::set_raycastTarget(System.Boolean)",
-          "UnityEngine.CanvasRenderer UnityEngine.UI.Graphic::canvasRenderer()",
-          "UnityEngine.CanvasRenderer UnityEngine.UI.Graphic::get_canvasRenderer()",
           "UnityEngine.Color UnityEngine.UI.Graphic::color()",
           "UnityEngine.Color UnityEngine.UI.Graphic::get_color()",
           "UnityEngine.RectTransform UnityEngine.UI.Graphic::get_rectTransform()",
@@ -5803,14 +5791,9 @@
       {
         "type": "UnityEngine.UI.Text",
         "members": [
-          "System.Boolean UnityEngine.UI.Text::get_resizeTextForBestFit()",
-          "System.Boolean UnityEngine.UI.Text::get_supportRichText()",
-          "System.Boolean UnityEngine.UI.Text::resizeTextForBestFit()",
           "System.Boolean UnityEngine.UI.Text::supportRichText()",
           "System.Int32 UnityEngine.UI.Text::fontSize()",
           "System.Int32 UnityEngine.UI.Text::get_fontSize()",
-          "System.Int32 UnityEngine.UI.Text::get_resizeTextMaxSize()",
-          "System.Int32 UnityEngine.UI.Text::resizeTextMaxSize()",
           "System.Single UnityEngine.UI.Text::lineSpacing()",
           "System.String UnityEngine.UI.Text::get_text()",
           "System.String UnityEngine.UI.Text::text()",
@@ -5823,11 +5806,8 @@
           "System.Void UnityEngine.UI.Text::set_text(System.String)",
           "System.Void UnityEngine.UI.Text::set_verticalOverflow(UnityEngine.VerticalWrapMode)",
           "UnityEngine.FontStyle UnityEngine.UI.Text::fontStyle()",
-          "UnityEngine.FontStyle UnityEngine.UI.Text::get_fontStyle()",
-          "UnityEngine.HorizontalWrapMode UnityEngine.UI.Text::get_horizontalOverflow()",
           "UnityEngine.HorizontalWrapMode UnityEngine.UI.Text::horizontalOverflow()",
           "UnityEngine.TextAnchor UnityEngine.UI.Text::alignment()",
-          "UnityEngine.TextAnchor UnityEngine.UI.Text::get_alignment()",
           "UnityEngine.VerticalWrapMode UnityEngine.UI.Text::verticalOverflow()"
         ]
       },
@@ -5924,8 +5904,6 @@
           "System.Boolean UnityEngine.Canvas::pixelPerfect()",
           "System.Int32 UnityEngine.Canvas::sortingOrder()",
           "System.Void UnityEngine.Canvas::ForceUpdateCanvases()",
-          "System.Void UnityEngine.Canvas::add_willRenderCanvases(UnityEngine.Canvas/WillRenderCanvases)",
-          "System.Void UnityEngine.Canvas::remove_willRenderCanvases(UnityEngine.Canvas/WillRenderCanvases)",
           "System.Void UnityEngine.Canvas::set_overrideSorting(System.Boolean)",
           "System.Void UnityEngine.Canvas::set_pixelPerfect(System.Boolean)",
           "System.Void UnityEngine.Canvas::set_renderMode(UnityEngine.RenderMode)",
@@ -5934,15 +5912,8 @@
           "UnityEngine.Camera UnityEngine.Canvas::worldCamera()",
           "UnityEngine.Canvas UnityEngine.Canvas::get_rootCanvas()",
           "UnityEngine.Canvas UnityEngine.Canvas::rootCanvas()",
-          "UnityEngine.Canvas/WillRenderCanvases UnityEngine.Canvas::willRenderCanvases",
           "UnityEngine.Material UnityEngine.Canvas::GetDefaultCanvasMaterial()",
           "UnityEngine.RenderMode UnityEngine.Canvas::renderMode()"
-        ]
-      },
-      {
-        "type": "UnityEngine.Canvas/WillRenderCanvases",
-        "members": [
-          "System.Void UnityEngine.Canvas/WillRenderCanvases::.ctor(System.Object,System.IntPtr)"
         ]
       },
       {
@@ -5962,8 +5933,6 @@
         "type": "UnityEngine.CanvasRenderer",
         "members": [
           "System.Boolean UnityEngine.CanvasRenderer::cullTransparentMesh()",
-          "System.Single UnityEngine.CanvasRenderer::GetAlpha()",
-          "System.Void UnityEngine.CanvasRenderer::SetAlpha(System.Single)",
           "System.Void UnityEngine.CanvasRenderer::set_cullTransparentMesh(System.Boolean)"
         ]
       },

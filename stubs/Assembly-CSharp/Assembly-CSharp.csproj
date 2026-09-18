@@ -29,7 +29,6 @@
 		<ProjectReference Include="../UnityEngine.AudioModule/UnityEngine.AudioModule.csproj" />
 		<ProjectReference Include="../UnityEngine.CoreModule/UnityEngine.CoreModule.csproj" />
 		<ProjectReference Include="../UnityEngine.ParticleSystemModule/UnityEngine.ParticleSystemModule.csproj" />
-		<ProjectReference Include="../UnityEngine.TextRenderingModule/UnityEngine.TextRenderingModule.csproj" />
 		<ProjectReference Include="../UnityEngine.UI/UnityEngine.UI.csproj" />
 		<ProjectReference Include="../UnityEngine.UIModule/UnityEngine.UIModule.csproj" />
 	</ItemGroup>

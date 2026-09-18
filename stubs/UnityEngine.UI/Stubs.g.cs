@@ -215,7 +215,6 @@ namespace UnityEngine.UI {
         }
     }
     public abstract unsafe partial class Graphic : global::UnityEngine.EventSystems.UIBehaviour {
-        public global::UnityEngine.CanvasRenderer canvasRenderer { get => throw null; }
         public virtual global::UnityEngine.Color color { get => throw null; set { } }
         public virtual global::UnityEngine.Texture mainTexture { get => throw null; }
         public virtual bool raycastTarget { get => throw null; set { } }
@@ -487,8 +486,6 @@ namespace UnityEngine.UI {
         public global::UnityEngine.FontStyle fontStyle { get => throw null; set { } }
         public global::UnityEngine.HorizontalWrapMode horizontalOverflow { get => throw null; set { } }
         public float lineSpacing { get => throw null; set { } }
-        public bool resizeTextForBestFit { get => throw null; set { } }
-        public int resizeTextMaxSize { get => throw null; set { } }
         public bool supportRichText { get => throw null; set { } }
         public virtual string text { get => throw null; set { } }
         public global::UnityEngine.VerticalWrapMode verticalOverflow { get => throw null; set { } }
