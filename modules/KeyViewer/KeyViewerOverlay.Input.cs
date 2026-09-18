@@ -90,6 +90,7 @@ public static partial class KeyViewerOverlay {
             KeyCode key = (KeyCode)ev.Key;
             for(int b = 0; b < list.Count; b++) {
                 Box box = list[b];
+                box.HookEdgeTime = ev.Time;
                 if(box.Key == key) {
                     MarkCovered(box, ghost: false);
                     ApplyPhysicalEdge(box, ev.Down, ev.Time, frameNow);
@@ -115,20 +116,35 @@ public static partial class KeyViewerOverlay {
     private static void PollUncoveredKeys(float now) {
         bool resync = resyncRequested;
         resyncRequested = false;
-        if(!resync && uncoveredBindings <= 0) return;
+        bool macBackfill = macRuntime && KvInputQueue.HookActive;
+        if(!resync && !macBackfill && uncoveredBindings <= 0) return;
         for(int i = 0; i < pollBoxes.Count; i++) {
             Box box = pollBoxes[i];
-            if((resync || !box.HookCovered) && box.Key != KeyCode.None) {
-                bool pressed = KeyHeld(box.Key);
-                if(pressed != box.RawPressed) ApplyPhysicalEdge(box, pressed, now, now);
+            bool settled = now - box.HookEdgeTime >= MacBackfillGraceSeconds;
+            if(box.Key != KeyCode.None) {
+                if(resync || !box.HookCovered) {
+                    bool pressed = KeyHeld(box.Key);
+                    if(pressed != box.RawPressed) ApplyPhysicalEdge(box, pressed, now, now);
+                } else if(macBackfill && settled && HookInput.TryMacKeyState(box.Key, out bool held)
+                    && held != box.RawPressed) {
+                    ApplyPhysicalEdge(box, held, now, now);
+                }
             }
             DmNoteSpec spec = box.Dm;
             if(spec == null || spec.GhostKeyCode == KeyCode.None) continue;
-            if(!resync && box.GhostHookCovered) continue;
-            bool ghost = KeyHeld(spec.GhostKeyCode);
-            if(ghost != box.GhostPressed) ApplyGhostEdge(box, ghost, now);
+            if(resync || !box.GhostHookCovered) {
+                bool ghost = KeyHeld(spec.GhostKeyCode);
+                if(ghost != box.GhostPressed) ApplyGhostEdge(box, ghost, now);
+            } else if(macBackfill && settled && HookInput.TryMacKeyState(spec.GhostKeyCode, out bool ghostHeld)
+                && ghostHeld != box.GhostPressed) {
+                ApplyGhostEdge(box, ghostHeld, now);
+            }
         }
     }
+    // SkyHook's macOS HID reader can stop at six held keys; the window server
+    // still sees the rest. A short grace after each hook edge keeps the two
+    // clocks from racing into a phantom press.
+    private const float MacBackfillGraceSeconds = 0.05f;
     private static void ApplyPhysicalEdge(Box box, bool down, float time, float frameNow) {
         if(down == box.RawPressed) return;
         box.RawPressed = down;

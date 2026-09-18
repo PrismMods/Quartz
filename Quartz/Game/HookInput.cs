@@ -127,11 +127,18 @@ public static class HookInput {
     /// </summary>
     public static bool TryMacPhysicalKeyHeld(KeyCode key, out bool held) {
         held = false;
+        return key is KeyCode.Tab or KeyCode.Backslash && TryMacKeyState(key, out held);
+    }
+    /// <summary>
+    /// macOS only: window-server key state for any keyboard key. SkyHook's macOS
+    /// backend reads raw HID values, so keyboards whose extra rollover the OS
+    /// understands but SkyHook's HID matching does not stop reporting after six
+    /// keys; this state has no such cap.
+    /// </summary>
+    public static bool TryMacKeyState(KeyCode key, out bool held) {
+        held = false;
         if(!MacRuntimeCached) return false;
-        ushort vk = key switch {
-            KeyCode.Tab => 0x30,
-            _ => ushort.MaxValue,
-        };
+        ushort vk = MacVirtualKey(key);
         if(vk == ushort.MaxValue) return false;
         try {
             held = CGEventSourceKeyState(KCGEventSourceStateHidSystemState, vk);
@@ -141,6 +148,35 @@ public static class HookInput {
             return false;
         }
     }
+    private static ushort MacVirtualKey(KeyCode key) => key switch {
+        KeyCode.A => 0x00, KeyCode.S => 0x01, KeyCode.D => 0x02, KeyCode.F => 0x03, KeyCode.H => 0x04,
+        KeyCode.G => 0x05, KeyCode.Z => 0x06, KeyCode.X => 0x07, KeyCode.C => 0x08, KeyCode.V => 0x09,
+        KeyCode.B => 0x0B, KeyCode.Q => 0x0C, KeyCode.W => 0x0D, KeyCode.E => 0x0E, KeyCode.R => 0x0F,
+        KeyCode.Y => 0x10, KeyCode.T => 0x11, KeyCode.Alpha1 => 0x12, KeyCode.Alpha2 => 0x13,
+        KeyCode.Alpha3 => 0x14, KeyCode.Alpha4 => 0x15, KeyCode.Alpha6 => 0x16, KeyCode.Alpha5 => 0x17,
+        KeyCode.Equals => 0x18, KeyCode.Alpha9 => 0x19, KeyCode.Alpha7 => 0x1A, KeyCode.Minus => 0x1B,
+        KeyCode.Alpha8 => 0x1C, KeyCode.Alpha0 => 0x1D, KeyCode.RightBracket => 0x1E, KeyCode.O => 0x1F,
+        KeyCode.U => 0x20, KeyCode.LeftBracket => 0x21, KeyCode.I => 0x22, KeyCode.P => 0x23,
+        KeyCode.Return => 0x24, KeyCode.L => 0x25, KeyCode.J => 0x26, KeyCode.Quote => 0x27, KeyCode.K => 0x28,
+        KeyCode.Semicolon => 0x29, KeyCode.Backslash => 0x2A, KeyCode.Comma => 0x2B, KeyCode.Slash => 0x2C,
+        KeyCode.N => 0x2D, KeyCode.M => 0x2E, KeyCode.Period => 0x2F, KeyCode.Tab => 0x30, KeyCode.Space => 0x31,
+        KeyCode.BackQuote => 0x32, KeyCode.Backspace => 0x33, KeyCode.Escape => 0x35,
+        KeyCode.RightCommand => 0x36, KeyCode.LeftCommand => 0x37, KeyCode.LeftShift => 0x38,
+        KeyCode.CapsLock => 0x39, KeyCode.LeftAlt => 0x3A, KeyCode.LeftControl => 0x3B,
+        KeyCode.RightShift => 0x3C, KeyCode.RightAlt => 0x3D, KeyCode.RightControl => 0x3E,
+        KeyCode.KeypadPeriod => 0x41, KeyCode.KeypadMultiply => 0x43, KeyCode.KeypadPlus => 0x45,
+        KeyCode.KeypadDivide => 0x4B, KeyCode.KeypadEnter => 0x4C, KeyCode.KeypadMinus => 0x4E,
+        KeyCode.KeypadEquals => 0x51, KeyCode.Keypad0 => 0x52, KeyCode.Keypad1 => 0x53, KeyCode.Keypad2 => 0x54,
+        KeyCode.Keypad3 => 0x55, KeyCode.Keypad4 => 0x56, KeyCode.Keypad5 => 0x57, KeyCode.Keypad6 => 0x58,
+        KeyCode.Keypad7 => 0x59, KeyCode.Keypad8 => 0x5B, KeyCode.Keypad9 => 0x5C,
+        KeyCode.F1 => 0x7A, KeyCode.F2 => 0x78, KeyCode.F3 => 0x63, KeyCode.F4 => 0x76, KeyCode.F5 => 0x60,
+        KeyCode.F6 => 0x61, KeyCode.F7 => 0x62, KeyCode.F8 => 0x64, KeyCode.F9 => 0x65, KeyCode.F10 => 0x6D,
+        KeyCode.F11 => 0x67, KeyCode.F12 => 0x6F, KeyCode.F13 => 0x69, KeyCode.F14 => 0x6B, KeyCode.F15 => 0x71,
+        KeyCode.Insert => 0x72, KeyCode.Home => 0x73, KeyCode.PageUp => 0x74, KeyCode.Delete => 0x75,
+        KeyCode.End => 0x77, KeyCode.PageDown => 0x79, KeyCode.LeftArrow => 0x7B, KeyCode.RightArrow => 0x7C,
+        KeyCode.DownArrow => 0x7D, KeyCode.UpArrow => 0x7E,
+        _ => ushort.MaxValue,
+    };
     private static readonly ConcurrentDictionary<KeyLabel, KeyCode> asyncLabelCache = new();
     private static KeyCode AsyncLabelToPhysicalUnityKey(KeyLabel label) {
         if(asyncLabelCache.TryGetValue(label, out KeyCode cached)) return cached;

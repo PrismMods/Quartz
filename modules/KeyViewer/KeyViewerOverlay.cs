@@ -126,6 +126,7 @@ public static partial class KeyViewerOverlay {
         public float LitUntil;
         public bool HookCovered;
         public bool GhostHookCovered;
+        public float HookEdgeTime = float.NegativeInfinity;
         public bool DisplayTargetPressed;
         public float DisplayTargetTime;
         public bool DelayedNotePending;
