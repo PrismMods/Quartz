@@ -70,6 +70,7 @@
     "PANEL_STAT_TIMINGSCALE": "判定偏移倍率",
     "PANEL_STAT_TOTALATTEMPTS": "总尝试次数",
     "PANEL_STAT_XACCURACY": "X精准度",
+    "PANEL_STAT_XSCORE": "X-分数",
     "PANEL_TEXTCOLOR": "文字颜色",
     "PANEL_TEXTSHADOW": "文字阴影",
     "PANEL_TEXT_PLACEHOLDER": "自定义文字内容…",

@@ -67,6 +67,12 @@ public static class GameApi {
     private static readonly Refl.Member TrackerMaxXAcc = new(TrackerType, "maxPossibleXAcc");
     public static float? NativeMaxXAcc(object tracker) =>
         tracker != null && TrackerMaxXAcc.Exists ? TrackerMaxXAcc.Get(tracker, 1f) : null;
+    private static readonly Refl.Member TrackerXScore = new(TrackerType, "xScore");
+    private static readonly Refl.Member TrackerMaxXScore = new(TrackerType, "maxXScore");
+    private static readonly Refl.Member ShowXScorePref = new(typeof(Persistence), "showXScore");
+    public static bool ShowXScore => ShowXScorePref.Exists && ShowXScorePref.Get(null, false);
+    public static int XScore(object tracker) => tracker == null ? 0 : TrackerXScore.Get(tracker, 0);
+    public static int MaxXScore(object tracker) => tracker == null ? 0 : TrackerMaxXScore.Get(tracker, 0);
     public static int GetDeaths(object tracker) =>
         tracker == null ? 0 : Refl.Invoke(TrackerGetDeaths, tracker) as int? ?? 0;
     public static int GetHits(object tracker, HitMargin hit) =>

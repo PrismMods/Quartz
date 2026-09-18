@@ -31,6 +31,7 @@ public static partial class PanelsOverlay {
         new() { Id = "accuracy", Category = "Accuracy", Label = "Accuracy", Value = p => Pct(GameStats.Accuracy, p) },
         new() { Id = "xaccuracy", Category = "Accuracy", Label = "X-Accuracy", Value = p => Pct(GameStats.XAccuracy, p) },
         new() { Id = "maxaccuracy", Category = "Accuracy", Label = "Max X-Acc", Value = p => Pct(GameStats.MaxXAccuracy, p) },
+        new() { Id = "xscore", Category = "Accuracy", Label = "X-Score", Value = _ => GameStats.XScoreText },
         new() { Id = "musictime", Category = "Time", Label = "Music Time", Value = _ => GameStats.MusicTimeText },
         new() { Id = "maptime", Category = "Time", Label = "Map Time", Value = _ => GameStats.MapTimeText },
         new() { Id = "checkpoints", Category = "Map Stats", Label = "Checkpoints", Value = _ =>

@@ -60,6 +60,12 @@ public static class GameStats {
         try { return XAccuracyCalc.MaxRatio(); }
         catch(Exception e) { Diag.Ignore(e); return 1f; }
     });
+    public static string XScoreText {
+        get {
+            try { return XAccuracyCalc.XScoreText(); }
+            catch(Exception e) { Diag.Ignore(e); return null; }
+        }
+    }
     public static int CheckpointCount => checkpointCache.Get(static () => {
         try { return scnGame.instance != null ? scnGame.instance.checkpointsUsed : 0; }
         catch(Exception e) { Diag.Ignore(e); return 0; }

@@ -70,6 +70,7 @@
     "PANEL_STAT_TIMINGSCALE": "판정 범위 배율",
     "PANEL_STAT_TOTALATTEMPTS": "총 시도",
     "PANEL_STAT_XACCURACY": "X-정확도",
+    "PANEL_STAT_XSCORE": "절대점수",
     "PANEL_TEXTCOLOR": "글자 색상",
     "PANEL_TEXTSHADOW": "글자 그림자",
     "PANEL_TEXT_PLACEHOLDER": "사용자 지정 텍스트…",

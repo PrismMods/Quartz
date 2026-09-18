@@ -46,6 +46,30 @@ namespace Quartz.Game.Stats
             return remaining < 0 ? 0 : remaining;
         }
         private static int Hits(int[] counts, HitKind k) => HitKinds.Count(counts, k);
+        private static readonly Refl.Member EditorStartFloor = new(typeof(scnEditor), "selectedFloorCached");
+        private static int EditorSkippedXScore()
+        {
+            if (!ADOBase.isLevelEditor || scnEditor.instance == null) return 0;
+            List<scrFloor> floors = scrLevelMaker.instance != null ? scrLevelMaker.instance.listFloors : null;
+            if (floors == null || floors.Count == 0) return 0;
+            int start = EditorStartFloor.Get(scnEditor.instance, 0);
+            if (start <= 0 || start >= floors.Count) return 0;
+            EnsurePrefix(floors);
+            scrFloor f0 = floors[0];
+            int before = prefixHittable[start] - (f0 != null && !f0.auto && !f0.midSpin ? 1 : 0);
+            scrFloor sf = floors[start];
+            int idx = sf != null && !sf.auto && !sf.midSpin ? before - 1 : before;
+            return idx <= 0 ? 0 : (idx + 1) * 2;
+        }
+        internal static string XScoreText()
+        {
+            if (!GameApi.ShowXScore) return null;
+            object t = MistakesAccess.Tracker(0);
+            if (t == null) return null;
+            int x = GameApi.XScore(t);
+            int lost = Math.Max(0, GameApi.MaxXScore(t) - x - 2 * RemainingHittable() - EditorSkippedXScore());
+            return x.ToString(System.Globalization.CultureInfo.InvariantCulture) + " (MAX-" + lost.ToString(System.Globalization.CultureInfo.InvariantCulture) + ")";
+        }
         internal static float MaxRatio() => MaxRatio(0);
         internal static float MaxRatio(int playerID)
         {
