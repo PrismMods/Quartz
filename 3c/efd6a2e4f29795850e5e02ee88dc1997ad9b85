@@ -1,0 +1,19 @@
+stubs/PATCH-TARGETS.json
+  s_6e25864a17d827::t_5c01052b352bb6 185-190
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "3cefd6a2e4f29795850e5e02ee88dc1997ad9b85",
+  "prompts": {},
+  "sessions": {
+    "s_6e25864a17d827": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a0145778-65ce-47ed-8850-b4957c089f74",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
