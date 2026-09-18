@@ -1,5 +1,4 @@
 using Quartz.Core;
-using Quartz.Features.InGameOverlay;
 using Quartz.Features.SongTitle;
 using Quartz.Resource;
 using Quartz.UI.Generator;
@@ -93,27 +92,6 @@ public static class PageSongTitle {
             "Reset Position",
             "songtitle_resetpos"
         ).SetSecondary();
-        GenerateUI.CollapsibleSection fontSec = null;
-        fontSec = GenerateUI.Collapsible(
-            content, "Native Title Font", startExpanded: false,
-            v => {
-                MainCore.Conf.FontSongTitle = v;
-                MainCore.ConfMgr.RequestSave();
-                InGameOverlayFont.Refresh();
-                SetHeaderEnabled(v, fontSec);
-            },
-            MainCore.Conf.FontSongTitle
-        );
-        SetHeaderEnabled(MainCore.Conf.FontSongTitle, fontSec);
-        fontSec.HeaderObj.transform.Find("Bar").AddToolTip(
-            "DESC_FONT_SONG_TITLE",
-            "Apply the selected font to the level title shown during play, not just this mod's UI."
-        );
-        GenerateUI.SnapSlider(fontSec.Body, "Font Size", "font_song_title_size",
-            1f, 0.25f, 3f, MainCore.Conf.FontSongTitleSize, "0.00 x", 0.01f,
-            v => MainCore.Conf.FontSongTitleSize = v,
-            () => InGameOverlayFont.RefreshSizeOnly(InGameOverlayFont.Category.SongTitle),
-            () => MainCore.ConfMgr.RequestSave());
     }
     public static void Create(RectTransform parent) =>
         AppendTo(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));

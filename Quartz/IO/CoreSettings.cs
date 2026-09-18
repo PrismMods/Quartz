@@ -14,11 +14,7 @@ public sealed class CoreSettings : ISettingsFile {
     public bool BlockInputsWhileMenuOpen = true;
     public float UIScale = 0.85f;
     public string FontName = "";
-    public bool FontSongTitle = false;
-    public bool FontCountdown = false;
     public bool FontJudgement = false;
-    public float FontSongTitleSize = 1f;
-    public float FontCountdownSize = 1f;
     public float FontJudgementSize = 1f;
     public string SettingsFontName = "";
     public float ScrollSpeed = 80f;
@@ -82,11 +78,7 @@ public sealed class CoreSettings : ISettingsFile {
             [nameof(BlockInputsWhileMenuOpen)] = BlockInputsWhileMenuOpen,
             [nameof(UIScale)] = UIScale,
             [nameof(FontName)] = FontName,
-            [nameof(FontSongTitle)] = FontSongTitle,
-            [nameof(FontCountdown)] = FontCountdown,
             [nameof(FontJudgement)] = FontJudgement,
-            [nameof(FontSongTitleSize)] = FontSongTitleSize,
-            [nameof(FontCountdownSize)] = FontCountdownSize,
             [nameof(FontJudgementSize)] = FontJudgementSize,
             [nameof(SettingsFontName)] = SettingsFontName,
             [nameof(ScrollSpeed)] = ScrollSpeed,
@@ -132,11 +124,7 @@ public sealed class CoreSettings : ISettingsFile {
         BlockInputsWhileMenuOpen = IOUtils.Read(token, nameof(BlockInputsWhileMenuOpen), BlockInputsWhileMenuOpen);
         UIScale = IOUtils.Read(token, nameof(UIScale), UIScale);
         FontName = IOUtils.Read(token, nameof(FontName), FontName);
-        FontSongTitle = IOUtils.Read(token, nameof(FontSongTitle), FontSongTitle);
-        FontCountdown = IOUtils.Read(token, nameof(FontCountdown), FontCountdown);
         FontJudgement = IOUtils.Read(token, nameof(FontJudgement), FontJudgement);
-        FontSongTitleSize = IOUtils.Read(token, nameof(FontSongTitleSize), FontSongTitleSize);
-        FontCountdownSize = IOUtils.Read(token, nameof(FontCountdownSize), FontCountdownSize);
         FontJudgementSize = IOUtils.Read(token, nameof(FontJudgementSize), FontJudgementSize);
         SettingsFontName = IOUtils.Read(token, nameof(SettingsFontName), SettingsFontName);
         ScrollSpeed = IOUtils.Read(token, nameof(ScrollSpeed), ScrollSpeed);

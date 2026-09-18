@@ -1,5 +1,4 @@
 using Quartz.Core;
-using Quartz.Features.InGameOverlay;
 using Quartz.Localization;
 using Quartz.UI.Generator;
 using TMPro;
@@ -30,27 +29,6 @@ internal static class PageOverlayGeneral {
             "Master switch for every overlay HUD — panels, progress bar, combo and judgement."
         );
         BuildPop(content);
-        GenerateUI.CollapsibleSection countdownSec = null;
-        countdownSec = GenerateUI.Collapsible(
-            content.transform, "Countdown Font", startExpanded: false,
-            v => {
-                MainCore.Conf.FontCountdown = v;
-                MainCore.ConfMgr.RequestSave();
-                InGameOverlayFont.Refresh();
-                SetHeaderEnabled(v, countdownSec);
-            },
-            MainCore.Conf.FontCountdown
-        );
-        SetHeaderEnabled(MainCore.Conf.FontCountdown, countdownSec);
-        countdownSec.HeaderObj.transform.Find("Bar").AddToolTip(
-            "DESC_FONT_COUNTDOWN",
-            "Apply the selected font to the pre-level countdown (\"3, 2, 1, Go!\")."
-        );
-        GenerateUI.SnapSlider(countdownSec.Body, "Font Size", "font_countdown_size",
-            1f, 0.25f, 3f, MainCore.Conf.FontCountdownSize, "0.00 x", 0.01f,
-            v => MainCore.Conf.FontCountdownSize = v,
-            () => InGameOverlayFont.RefreshSizeOnly(InGameOverlayFont.Category.Countdown),
-            () => MainCore.ConfMgr.RequestSave());
     }
     private static void BuildPop(RectTransform content) {
         OverlaySettings conf = OverlaySwitch.Conf;
