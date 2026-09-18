@@ -226,8 +226,7 @@ public static class ChatterBlocker {
             injectedKeyHeldPrev.Add(key);
             return 0;
         }
-        if(asyncActive && KeyLimiter.KeyLimiter.HookEverSaw(key)
-            && !Quartz.Game.HookInput.IsHookTrackedKey(key)) {
+        if(asyncActive && KeyLimiter.KeyLimiter.HookEverSaw(key)) {
             injectedKeyHeldPrev.Remove(key);
             return 0;
         }

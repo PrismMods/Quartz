@@ -222,15 +222,50 @@ public static class HookInput {
     /// </summary>
     [HarmonyPatch(typeof(SkyHookManager), "HookCallback")]
     private static class HookCallbackPatch {
-        private static void Prefix(SkyHookEvent __0) {
+        private static bool Prefix(ref SkyHookEvent __0) {
             try {
-                SkyHookEvent ev = __0;
-                if(IsMouseLabel(ev.Label)) return;
-                KeyCode key = HookKeyToPhysicalUnityKey(ev.Key, ev.Label);
-                bool down = ev.Type == SkyHook.EventType.KeyPressed;
+                if(IsMouseLabel(__0.Label)) return true;
+                bool down = __0.Type == SkyHook.EventType.KeyPressed;
+                if(MacRuntimeCached && down && !FixMacRightModifier(ref __0)) return false;
+                KeyCode key = HookKeyToPhysicalUnityKey(__0.Key, __0.Label);
                 NoteHookEvent(key, down);
                 HookKeys.RaiseKeyEvent(key, down);
             } catch(Exception e) { Diag.Ignore(e); }
+            return true;
         }
+    }
+    /// <summary>
+    /// macOS SkyHook reports a right-hand modifier press as its left twin (RAlt
+    /// down arrives as LAlt) while the release arrives correctly as the right key.
+    /// The left key then sticks held and the press counts twice. A left press whose
+    /// key the window server says is up, while the right twin is down, is the right
+    /// key: relabel it, or drop it when the right key is already held.
+    /// </summary>
+    private static bool FixMacRightModifier(ref SkyHookEvent ev) {
+        KeyLabel right;
+        ushort leftVk, rightVk;
+        switch(ev.Label) {
+            case KeyLabel.LAlt: right = KeyLabel.RAlt; leftVk = 0x3A; rightVk = 0x3D; break;
+            case KeyLabel.LShift: right = KeyLabel.RShift; leftVk = 0x38; rightVk = 0x3C; break;
+            case KeyLabel.LControl: right = KeyLabel.RControl; leftVk = 0x3B; rightVk = 0x3E; break;
+            default: return true;
+        }
+        bool leftHeld, rightHeld;
+        try {
+            leftHeld = CGEventSourceKeyState(KCGEventSourceStateHidSystemState, leftVk);
+            rightHeld = CGEventSourceKeyState(KCGEventSourceStateHidSystemState, rightVk);
+        } catch(Exception e) {
+            Diag.Ignore(e);
+            return true;
+        }
+        if(leftHeld || !rightHeld) return true;
+        if(HookKeyHeld(AsyncLabelToPhysicalUnityKey(right))) return false;
+        SetLabel(ref ev, right);
+        return true;
+    }
+    private static readonly int LabelOffset =
+        (int)System.Runtime.InteropServices.Marshal.OffsetOf(typeof(SkyHookEvent), nameof(SkyHookEvent.Label));
+    private static unsafe void SetLabel(ref SkyHookEvent ev, KeyLabel label) {
+        fixed(SkyHookEvent* p = &ev) *(KeyLabel*)((byte*)p + LabelOffset) = label;
     }
 }
