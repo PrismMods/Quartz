@@ -72,7 +72,7 @@ public static class HomeUI {
         number.color = UIColors.ObjectActiveBright;
         number.alignment = TextAlignmentOptions.Left;
         number.verticalAlignment = VerticalAlignmentOptions.Middle;
-        number.overflowMode = TextOverflowModes.Ellipsis;
+        number.overflowMode = TextOverflowModes.Overflow;
         TextMeshProUGUI caption = GenerateUI.AddMutedText(GenerateUI.Row(card, 24f), 15f, 0.5f, true);
         caption.text = label;
         caption.overflowMode = TextOverflowModes.Ellipsis;
