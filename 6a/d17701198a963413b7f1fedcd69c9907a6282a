@@ -1,0 +1,19 @@
+Quartz/UI/Home/HomeUI.cs
+  s_4da8ed35cb1ab9::t_965530c3e01c56 75
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "6ad17701198a963413b7f1fedcd69c9907a6282a",
+  "prompts": {},
+  "sessions": {
+    "s_4da8ed35cb1ab9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f6323db3-109f-4157-8edb-4ea14f57cb3e",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
