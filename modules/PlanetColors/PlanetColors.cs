@@ -95,6 +95,8 @@ public static partial class PlanetColors {
                 if(index >= 0) return Mathf.Clamp(index, 0, PlanetColorsSettings.Slots - 1);
             }
         } catch(Exception e) { Diag.Ignore(e); }
+        if(planet.planetIndex < 0 && TryGetMemberValue(planet, "isRed", out object isRed) && isRed is bool red)
+            return red ? 0 : 1;
         try { return Mathf.Clamp(planet.planetIndex, 0, PlanetColorsSettings.Slots - 1); }
         catch(Exception e) { Diag.Ignore(e); return 0; }
     }
@@ -118,7 +120,8 @@ public static partial class PlanetColors {
                 if(planet.planetRenderer == renderer) return planet;
             } catch(Exception e) { Diag.Ignore(e); }
         }
-        return null;
+        try { return renderer.GetComponentInParent<scrPlanet>(true); }
+        catch(Exception e) { Diag.Ignore(e); return null; }
     }
     private static void RememberRendererSlot(scrPlanet planet) {
         if(planet == null) return;
@@ -159,17 +162,14 @@ public static partial class PlanetColors {
     private static MethodInfo logoColorMethod;
     private static bool logoColorMethodResolved;
     private static readonly object[] logoColorInvokeArgs = new object[2];
-    private static Color LogoColor {
-        get {
-            Color ball = Conf.GetBallColor(0);
-            return new Color(ball.r, ball.g, ball.b, 1f);
-        }
+    private static Color LogoColor(int slot) {
+        Color ball = Conf.GetBallColor(slot);
+        return new Color(ball.r, ball.g, ball.b, 1f);
     }
     private static void ApplyLogoColor(scrLogoText logoText) {
         if(logoText == null || !ShouldRecolor) return;
-        Color color = LogoColor;
-        InvokeLogoColor(logoText, color, true);
-        InvokeLogoColor(logoText, color, false);
+        InvokeLogoColor(logoText, LogoColor(0), true);
+        InvokeLogoColor(logoText, LogoColor(1), false);
     }
     private static void InvokeLogoColor(scrLogoText logoText, Color color, bool isFire) {
         try {
