@@ -22,9 +22,9 @@ public static class TMPTextShadow {
         ShadowRoot root = GetOrCreateRoot(text);
         if(root == null) return;
         bool on = enabled && text.gameObject.activeSelf && color.a > 0.001f;
-        if(UseMaterialUnderlay && !isolateCanvas && softness <= 0.001f) {
+        if(UseMaterialUnderlay && !isolateCanvas) {
             root.Rect.gameObject.SetActive(false);
-            ApplyUnderlay(text, root, on, offsetX, offsetY, color);
+            ApplyUnderlay(text, root, on, offsetX, offsetY, softness, color);
             return;
         }
         DisableUnderlay(text, root);
@@ -232,6 +232,7 @@ public static class TMPTextShadow {
         bool on,
         float offsetX,
         float offsetY,
+        float softness,
         Color color
     ) {
         Material shared = text.fontSharedMaterial;
@@ -248,9 +249,11 @@ public static class TMPTextShadow {
         float fs = text.fontSize <= 0f ? 1f : text.fontSize;
         float ux = Mathf.Clamp(offsetX / fs * UnderlayOffsetScale, -1f, 1f);
         float uy = Mathf.Clamp(offsetY / fs * UnderlayOffsetScale, -1f, 1f);
+        float us = Mathf.Clamp01(Mathf.Max(0f, softness) / fs * UnderlayOffsetScale);
         bool sameMat = ReferenceEquals(shared, root.UnderlayAppliedMat);
         if(sameMat
            && ux == root.UnderlayAppliedX && uy == root.UnderlayAppliedY
+           && us == root.UnderlayAppliedSoftness
            && color == root.UnderlayAppliedColor) return;
         Material mat = ResolveMaterial(text, root);
         if(mat == null) return;
@@ -262,18 +265,21 @@ public static class TMPTextShadow {
         if(!sameMat || color != root.UnderlayAppliedColor) mat.SetColor("_UnderlayColor", color);
         mat.SetFloat("_UnderlayOffsetX", ux);
         mat.SetFloat("_UnderlayOffsetY", uy);
-        mat.SetFloat("_UnderlaySoftness", 0f);
+        mat.SetFloat("_UnderlaySoftness", us);
         mat.SetFloat("_UnderlayDilate", 0f);
         if(!sameMat
            || Mathf.Abs(ux - root.UnderlayPaddedX) > UnderlayPaddingEpsilon
-           || Mathf.Abs(uy - root.UnderlayPaddedY) > UnderlayPaddingEpsilon) {
+           || Mathf.Abs(uy - root.UnderlayPaddedY) > UnderlayPaddingEpsilon
+           || Mathf.Abs(us - root.UnderlayPaddedSoftness) > UnderlayPaddingEpsilon) {
             text.UpdateMeshPadding();
             root.UnderlayPaddedX = ux;
             root.UnderlayPaddedY = uy;
+            root.UnderlayPaddedSoftness = us;
         }
         root.UnderlayAppliedMat = text.fontSharedMaterial;
         root.UnderlayAppliedX = ux;
         root.UnderlayAppliedY = uy;
+        root.UnderlayAppliedSoftness = us;
         root.UnderlayAppliedColor = color;
         root.UnderlayDisabledMat = null;
     }
@@ -303,6 +309,8 @@ public static class TMPTextShadow {
         public float UnderlayAppliedY;
         public float UnderlayPaddedX;
         public float UnderlayPaddedY;
+        public float UnderlayAppliedSoftness;
+        public float UnderlayPaddedSoftness;
         public Color UnderlayAppliedColor;
         public CanvasGroup Group;
         public string LastSourceText;
