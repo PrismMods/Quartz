@@ -183,6 +183,12 @@
       "assembly": "Assembly-CSharp"
     },
     {
+      "type": "SkyHook.SkyHookEvent",
+      "member": "Label",
+      "resolved": true,
+      "assembly": "SkyHook.Unity"
+    },
+    {
       "type": "SkyHook.SkyHookManager",
       "member": "HookCallback",
       "resolved": true,
