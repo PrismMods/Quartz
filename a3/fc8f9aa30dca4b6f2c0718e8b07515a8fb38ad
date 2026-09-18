@@ -1,0 +1,19 @@
+modules/PlanetColors/PlanetColors.cs
+  s_73d65597764c9a::t_87d1eb9755771c 98-99,123-124,165-167,171-172
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a3fc8f9aa30dca4b6f2c0718e8b07515a8fb38ad",
+  "prompts": {},
+  "sessions": {
+    "s_73d65597764c9a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f6a58f52-f3c8-4df6-a9fd-0bb987e108ee",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
