@@ -3512,6 +3512,7 @@
           "T UnityEngine.Component::GetComponentInChildren()",
           "T UnityEngine.Component::GetComponentInChildren(System.Boolean)",
           "T UnityEngine.Component::GetComponentInParent()",
+          "T UnityEngine.Component::GetComponentInParent(System.Boolean)",
           "T[] UnityEngine.Component::GetComponents()",
           "T[] UnityEngine.Component::GetComponentsInChildren(System.Boolean)",
           "UnityEngine.Component UnityEngine.Component::GetComponent(System.String)",
