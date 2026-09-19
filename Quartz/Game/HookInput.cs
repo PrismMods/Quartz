@@ -120,7 +120,19 @@ public static class HookInput {
     [System.Runtime.InteropServices.DllImport(
         "/System/Library/Frameworks/ApplicationServices.framework/ApplicationServices")]
     private static extern bool CGEventSourceKeyState(int sourceStateID, ushort keyCode);
+    [System.Runtime.InteropServices.DllImport(
+        "/System/Library/Frameworks/ApplicationServices.framework/ApplicationServices")]
+    private static extern ulong CGEventSourceFlagsState(int sourceStateID);
     private const int KCGEventSourceStateHidSystemState = 1;
+    // CGEventSourceKeyState answers for the modifier, not the side: LeftAlt reads
+    // down while only RAlt is held. The device-dependent NX_DEVICE*KEYMASK bits in
+    // the flags state are per side.
+    private static ulong MacModifierMask(KeyCode key) => key switch {
+        KeyCode.LeftControl => 0x0001UL, KeyCode.LeftShift => 0x0002UL, KeyCode.RightShift => 0x0004UL,
+        KeyCode.LeftCommand => 0x0008UL, KeyCode.RightCommand => 0x0010UL, KeyCode.LeftAlt => 0x0020UL,
+        KeyCode.RightAlt => 0x0040UL, KeyCode.RightControl => 0x2000UL,
+        _ => 0UL,
+    };
     /// <summary>
     /// macOS only: reads the physical key state the window server sees, for keys
     /// Unity reports unreliably under a grabbed keyboard.
@@ -150,10 +162,13 @@ public static class HookInput {
     public static bool TryMacKeyState(KeyCode key, out bool held) {
         held = false;
         if(!MacRuntimeCached) return false;
+        ulong mask = MacModifierMask(key);
         ushort vk = MacVirtualKey(key);
-        if(vk == ushort.MaxValue) return false;
+        if(mask == 0UL && vk == ushort.MaxValue) return false;
         try {
-            held = CGEventSourceKeyState(KCGEventSourceStateHidSystemState, vk);
+            held = mask != 0UL
+                ? (CGEventSourceFlagsState(KCGEventSourceStateHidSystemState) & mask) != 0UL
+                : CGEventSourceKeyState(KCGEventSourceStateHidSystemState, vk);
             return true;
         } catch(Exception e) {
             Diag.Ignore(e);
@@ -291,21 +306,16 @@ public static class HookInput {
     /// </summary>
     private static bool FixMacRightModifier(ref SkyHookEvent ev) {
         KeyLabel right;
-        ushort leftVk, rightVk;
+        KeyCode leftKey, rightKey;
         switch(ev.Label) {
-            case KeyLabel.LAlt: right = KeyLabel.RAlt; leftVk = 0x3A; rightVk = 0x3D; break;
-            case KeyLabel.LShift: right = KeyLabel.RShift; leftVk = 0x38; rightVk = 0x3C; break;
-            case KeyLabel.LControl: right = KeyLabel.RControl; leftVk = 0x3B; rightVk = 0x3E; break;
+            case KeyLabel.LAlt: right = KeyLabel.RAlt; leftKey = KeyCode.LeftAlt; rightKey = KeyCode.RightAlt; break;
+            case KeyLabel.LShift:
+                right = KeyLabel.RShift; leftKey = KeyCode.LeftShift; rightKey = KeyCode.RightShift; break;
+            case KeyLabel.LControl:
+                right = KeyLabel.RControl; leftKey = KeyCode.LeftControl; rightKey = KeyCode.RightControl; break;
             default: return true;
         }
-        bool leftHeld, rightHeld;
-        try {
-            leftHeld = CGEventSourceKeyState(KCGEventSourceStateHidSystemState, leftVk);
-            rightHeld = CGEventSourceKeyState(KCGEventSourceStateHidSystemState, rightVk);
-        } catch(Exception e) {
-            Diag.Ignore(e);
-            return true;
-        }
+        if(!TryMacKeyState(leftKey, out bool leftHeld) || !TryMacKeyState(rightKey, out bool rightHeld)) return true;
         if(leftHeld || !rightHeld) return true;
         if(HookKeyHeld(AsyncLabelToPhysicalUnityKey(right))) return false;
         SetLabel(ref ev, right);
