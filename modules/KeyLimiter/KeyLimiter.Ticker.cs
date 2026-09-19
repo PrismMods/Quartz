@@ -23,7 +23,7 @@ public static partial class KeyLimiter {
             for(int i = 0; i < candidates.Length; i++) {
                 KeyCode key = candidates[i];
                 bool held;
-                try { held = UnityEngine.Input.GetKey(key); }
+                try { held = Quartz.Game.HookInput.PhysicalKeyHeld(key); }
                 catch(Exception e) { Diag.Ignore(e); continue; }
                 if(!held && IsHookTrackedKey(key)) held = HookKeyHeld(key);
                 if(held && !priming && !prevHeld.Contains(key)) {

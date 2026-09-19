@@ -127,7 +127,19 @@ public static class HookInput {
     /// </summary>
     public static bool TryMacPhysicalKeyHeld(KeyCode key, out bool held) {
         held = false;
-        return key is KeyCode.Tab or KeyCode.Backslash && TryMacKeyState(key, out held);
+        return key is KeyCode.Tab or KeyCode.Backslash
+            or KeyCode.LeftAlt or KeyCode.RightAlt or KeyCode.LeftShift or KeyCode.RightShift
+            or KeyCode.LeftControl or KeyCode.RightControl or KeyCode.LeftCommand or KeyCode.RightCommand
+            && TryMacKeyState(key, out held);
+    }
+    /// <summary>
+    /// Physical held state for gameplay polling. Unity's macOS input folds the
+    /// right-hand modifiers into their left twins (RAlt reads as LeftAlt), so on
+    /// macOS those keys come from the window server instead.
+    /// </summary>
+    public static bool PhysicalKeyHeld(KeyCode key) {
+        if(MacRuntimeCached && TryMacPhysicalKeyHeld(key, out bool held)) return held;
+        return Input.GetKey(key);
     }
     /// <summary>
     /// macOS only: window-server key state for any keyboard key. SkyHook's macOS

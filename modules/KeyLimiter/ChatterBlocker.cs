@@ -231,7 +231,7 @@ public static class ChatterBlocker {
             return 0;
         }
         bool held;
-        try { held = UnityEngine.Input.GetKey(key); }
+        try { held = Quartz.Game.HookInput.PhysicalKeyHeld(key); }
         catch(Exception e) { Diag.Ignore(e); return 0; }
         if(!held) held = KeyLimiter.KeyLimiter.HookKeyHeld(key);
         if(held && !injectedKeyHeldPrev.Contains(key)) {
@@ -254,7 +254,7 @@ public static class ChatterBlocker {
         for(int i = 0; i < injectedReleaseScratch.Count; i++) {
             KeyCode key = injectedReleaseScratch[i];
             bool held;
-            try { held = UnityEngine.Input.GetKey(key); }
+            try { held = Quartz.Game.HookInput.PhysicalKeyHeld(key); }
             catch(Exception e) { Diag.Ignore(e); held = false; }
             if(!held) held = KeyLimiter.KeyLimiter.HookKeyHeld(key);
             if(!held) injectedKeyHeldPrev.Remove(key);
