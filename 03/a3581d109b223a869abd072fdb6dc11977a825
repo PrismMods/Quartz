@@ -1,0 +1,19 @@
+stubs/README.md
+  s_4026be8f9ad245::t_cb7a2ed5121635 19,41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "03a3581d109b223a869abd072fdb6dc11977a825",
+  "prompts": {},
+  "sessions": {
+    "s_4026be8f9ad245": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "943b20dd-adf0-4573-99b8-d4728f382518",
+        "model": "claude-opus-5"
+      },
+      "human_author": "koren <131921956+kkorenn@users.noreply.github.com>"
+    }
+  }
+}
