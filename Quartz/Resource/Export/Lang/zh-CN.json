@@ -228,7 +228,7 @@
     "IMPORT_MODE_KEEP_OLD": "保留现有设置",
     "IMPORT_MODE_REPLACE_ALL": "全部覆盖",
     "IMPORT_MODE_REPLACE_CERTAIN": "仅替换选中项",
-    "IMPORT_NONE": "未检测到兼容模组，请通过Unity Mod Manager加载对应模组（Koren资源包v1、Jipper资源包、Jipper按键显示器、ADOFAI微调、按键误触屏蔽、增强特效清除器）后点击重新扫描。",
+    "IMPORT_NONE": "未检测到兼容模组，请通过Unity Mod Manager加载对应模组（KorenResourcePack (v1), JipperResourcePack, JipperKeyViewer, ADOFAI Tweaks, KeyboardChatterBlocker, Enhanced Effect Remover）后点击重新扫描。",
     "IMPORT_NOT_COMPATIBLE": "模组不兼容",
     "IMPORT_OK": "成功从{1}导入{0}项设置。",
     "IMPORT_OK_NONE": "{0}无可用配置可导入。",
