@@ -1,3 +1,4 @@
+using ADOFAI;
 using HarmonyLib;
 using UnityEngine;
 using Quartz.Core;
@@ -6,6 +7,22 @@ public static partial class VisualTweaks {
     [HarmonyPatch(typeof(scrController), "StartLoadingScene")]
     private static class ClearCachesOnSceneChangePatch {
         private static void Postfix() => ClearSceneCaches();
+    }
+    [HarmonyPatch(typeof(scnGame), "ApplyEventsToFloors",
+        new[] { typeof(List<scrFloor>), typeof(LevelData), typeof(scrLevelMaker), typeof(List<LevelEvent>) })]
+    private static class SpeedBpmApplyEventsPatch {
+        private static void Postfix(List<scrFloor> floors, LevelData levelData) {
+            if(!ShouldShowSpeedBpm && bpmLabels.Count == 0) return;
+            try { RebuildSpeedBpmLabels(floors, levelData != null ? levelData.bpm : 0f); }
+            catch(Exception e) { Diag.Ignore(e); }
+        }
+    }
+    [HarmonyPatch(typeof(scnGame), "RemakePath")]
+    private static class SpeedBpmRemakePathPatch {
+        private static void Postfix(bool applyEventsToFloors, bool remakeLevel) {
+            if(applyEventsToFloors && remakeLevel) return;
+            if(ShouldShowSpeedBpm || bpmLabels.Count != 0) RefreshSpeedBpmLabels();
+        }
     }
     [HarmonyPatch(typeof(ffxCheckpoint), "get_runOnHit")]
     private static class CheckpointRunOnHitPatch {

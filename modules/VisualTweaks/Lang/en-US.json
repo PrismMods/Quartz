@@ -5,10 +5,19 @@
     "DESC_TW_CP": "Strips checkpoint icons and behavior from the level — dying always restarts the run. Turning this off needs a level reload to bring icons back.",
     "DESC_TW_GLOW": "Suppresses the glow flash tiles get when the planet lands on them.",
     "DESC_TW_PGLOW": "Hides the glow sprite drawn around the planets.",
+    "DESC_TW_SBPM": "Labels every tile that changes speed with its new BPM and/or speed multiplier, placed above or below the tile so the tile icon stays visible.",
     "SECTION_VISUAL_TWEAKS": "Visual Tweaks",
     "TW_BCP": "Remove Ball Core Particles",
     "TW_CP": "Remove All Checkpoints",
     "TW_GLOW": "Disable Tile Hit Glow",
-    "TW_PGLOW": "Remove Planet Glow"
+    "TW_PGLOW": "Remove Planet Glow",
+    "TW_SBPM": "Show BPM On Speed Change Tiles",
+    "TW_SBPM_POS_ABOVE": "Above Tile",
+    "TW_SBPM_POS_BELOW": "Below Tile",
+    "TW_SBPM_POS_LABEL": "Speed Label Position",
+    "TW_SBPM_SHOW_BOTH": "BPM + Multiplier",
+    "TW_SBPM_SHOW_BPM": "BPM",
+    "TW_SBPM_SHOW_LABEL": "Speed Label Shows",
+    "TW_SBPM_SHOW_MULT": "Multiplier"
   }
 }

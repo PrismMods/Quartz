@@ -5,10 +5,19 @@
     "DESC_TW_CP": "移除谱面全部存档点图标与功能；关闭该设置后需重载谱面才能恢复存档点。",
     "DESC_TW_GLOW": "关闭轨道被星球触碰时的闪光特效。",
     "DESC_TW_PGLOW": "隐藏星球外圈发光贴图。",
+    "DESC_TW_SBPM": "在每个变速方块上标出新的 BPM 和/或速度倍率，显示在方块上方或下方，不遮挡方块图标。",
     "SECTION_VISUAL_TWEAKS": "视觉微调",
     "TW_BCP": "移除星球核心粒子",
     "TW_CP": "删除全部存档点",
     "TW_GLOW": "关闭轨道触碰闪光",
-    "TW_PGLOW": "移除星球外圈发光"
+    "TW_PGLOW": "移除星球外圈发光",
+    "TW_SBPM": "在变速方块上显示 BPM",
+    "TW_SBPM_POS_ABOVE": "方块上方",
+    "TW_SBPM_POS_BELOW": "方块下方",
+    "TW_SBPM_POS_LABEL": "速度标签位置",
+    "TW_SBPM_SHOW_BOTH": "BPM + 倍率",
+    "TW_SBPM_SHOW_BPM": "BPM",
+    "TW_SBPM_SHOW_LABEL": "速度标签内容",
+    "TW_SBPM_SHOW_MULT": "倍率"
   }
 }

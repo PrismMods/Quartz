@@ -46,6 +46,7 @@ public static partial class VisualTweaks {
         InvalidateCheckpointCache();
         InvalidateRendererCache();
         InvalidateFloorCache();
+        bpmLabels.Clear();
         suppressNextRandomColorFloorIds.Clear();
         planetParticleCache.Clear();
         particleActiveStates.Clear();
@@ -83,11 +84,13 @@ public static partial class VisualTweaks {
         RefreshBallCoreParticlesTweak();
         RefreshTileHitGlowTweak();
         RefreshPlanetGlowTweak();
+        RefreshSpeedBpmLabels();
     }
     public static void RestoreAll() {
         RefreshBallCoreParticlesTweak(true);
         RefreshPlanetGlowTweak(true);
         RefreshTileHitGlowTweak(true);
+        ClearSpeedBpmLabels();
     }
     public static void RefreshCheckpointTweak() {
         if(!ShouldRemoveCheckpoints) return;

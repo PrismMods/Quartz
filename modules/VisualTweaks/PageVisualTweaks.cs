@@ -1,3 +1,4 @@
+using Quartz.Core;
 using Quartz.Features.VisualTweaks;
 using Quartz.UI.Generator;
 using UnityEngine;
@@ -45,6 +46,43 @@ public static class PageVisualTweaks {
             "Remove Planet Glow",
             "tw_pglow",
             "Hides the glow sprite drawn around the planets."
+        );
+        GenerateUI.ToggleTip(
+            sec.Body,
+            def.ShowSpeedChangeBpm,
+            conf.ShowSpeedChangeBpm,
+            v => { conf.ShowSpeedChangeBpm = v; VisualTweaks.RefreshSpeedBpmLabels(); VisualTweaks.Save(); },
+            "Show BPM On Speed Change Tiles",
+            "tw_sbpm",
+            "Labels every tile that changes speed with its new BPM and/or speed multiplier, placed above or below the tile so the tile icon stays visible."
+        );
+        GenerateUI.DropDown(
+            GenerateUI.Row(sec.Body),
+            def.SpeedBpmDisplay,
+            conf.SpeedBpmDisplay,
+            new[] { VisualTweaks.SpeedBpmShowBpm, VisualTweaks.SpeedBpmShowMultiplier, VisualTweaks.SpeedBpmShowBoth },
+            m => m switch {
+                VisualTweaks.SpeedBpmShowMultiplier => MainCore.Tr.Get("TW_SBPM_SHOW_MULT", "Multiplier"),
+                VisualTweaks.SpeedBpmShowBoth => MainCore.Tr.Get("TW_SBPM_SHOW_BOTH", "BPM + Multiplier"),
+                _ => MainCore.Tr.Get("TW_SBPM_SHOW_BPM", "BPM"),
+            },
+            v => { conf.SpeedBpmDisplay = v; VisualTweaks.RefreshSpeedBpmLabels(); VisualTweaks.Save(); },
+            "tw_sbpm_show",
+            260f,
+            "Speed Label Shows"
+        );
+        GenerateUI.DropDown(
+            GenerateUI.Row(sec.Body),
+            def.SpeedBpmPosition,
+            conf.SpeedBpmPosition,
+            new[] { VisualTweaks.SpeedBpmAbove, VisualTweaks.SpeedBpmBelow },
+            p => p == VisualTweaks.SpeedBpmBelow
+                ? MainCore.Tr.Get("TW_SBPM_POS_BELOW", "Below Tile")
+                : MainCore.Tr.Get("TW_SBPM_POS_ABOVE", "Above Tile"),
+            v => { conf.SpeedBpmPosition = v; VisualTweaks.RefreshSpeedBpmLabels(); VisualTweaks.Save(); },
+            "tw_sbpm_pos",
+            260f,
+            "Speed Label Position"
         );
     }
 }
