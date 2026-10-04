@@ -1,8 +1,12 @@
 using Newtonsoft.Json;
 using Quartz.Core;
 using Quartz.IO;
+using UnityEngine;
 namespace Quartz.Addons;
 public sealed class AddonSettings<T> : ISettingsHandle where T : class, new() {
+    private static readonly JsonSerializerSettings SerializerSettings = new() {
+        Converters = { new UnityColorJsonConverter() },
+    };
     public T Data { get; } = new();
     public string Path { get; }
     public AddonSettings(string path) {
@@ -12,7 +16,7 @@ public sealed class AddonSettings<T> : ISettingsHandle where T : class, new() {
     public bool Load() {
         try {
             if(!File.Exists(Path)) return false;
-            JsonConvert.PopulateObject(File.ReadAllText(Path), Data);
+            JsonConvert.PopulateObject(File.ReadAllText(Path), Data, SerializerSettings);
             return true;
         } catch(Exception e) {
             MainCore.Log.Err($"[Addons] failed to load settings '{Path}': {e}");
@@ -21,7 +25,7 @@ public sealed class AddonSettings<T> : ISettingsHandle where T : class, new() {
     }
     public void LoadOrDefaults() {
         try {
-            JsonConvert.PopulateObject(JsonConvert.SerializeObject(new T()), Data);
+            JsonConvert.PopulateObject(JsonConvert.SerializeObject(new T(), SerializerSettings), Data, SerializerSettings);
         } catch(Exception e) {
             MainCore.Log.Err($"[Addons] failed to reset settings '{Path}': {e}");
         }
@@ -31,7 +35,7 @@ public sealed class AddonSettings<T> : ISettingsHandle where T : class, new() {
         try {
             string dir = System.IO.Path.GetDirectoryName(Path);
             if(!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
-            AtomicFile.WriteAllText(Path, JsonConvert.SerializeObject(Data, Formatting.Indented));
+            AtomicFile.WriteAllText(Path, JsonConvert.SerializeObject(Data, Formatting.Indented, SerializerSettings));
             return true;
         } catch(Exception e) {
             MainCore.Log.Err($"[Addons] failed to save settings '{Path}': {e}");

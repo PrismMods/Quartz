@@ -24,12 +24,17 @@ namespace Newtonsoft.Json {
     public unsafe partial interface IJsonLineInfo {
     }
     public static unsafe partial class JsonConvert {
-        public static void PopulateObject(string value, object target) => throw null;
+        public static void PopulateObject(string value, object target, global::Newtonsoft.Json.JsonSerializerSettings settings) => throw null;
         public static string SerializeObject(object value) => throw null;
+        public static string SerializeObject(object value, global::Newtonsoft.Json.JsonSerializerSettings settings) => throw null;
         public static string SerializeObject(object value, global::Newtonsoft.Json.Formatting formatting) => throw null;
+        public static string SerializeObject(object value, global::Newtonsoft.Json.Formatting formatting, global::Newtonsoft.Json.JsonSerializerSettings settings) => throw null;
     }
     public abstract unsafe partial class JsonConverter {
-        protected JsonConverter() { }
+        protected JsonConverter() => throw null;
+        public virtual bool CanConvert(global::System.Type objectType) => throw null;
+        public virtual object ReadJson(global::Newtonsoft.Json.JsonReader reader, global::System.Type objectType, object existingValue, global::Newtonsoft.Json.JsonSerializer serializer) => throw null;
+        public virtual void WriteJson(global::Newtonsoft.Json.JsonWriter writer, object value, global::Newtonsoft.Json.JsonSerializer serializer) => throw null;
     }
     public unsafe partial class JsonException : global::System.Exception {
         protected JsonException() { }
@@ -43,6 +48,13 @@ namespace Newtonsoft.Json {
         public void Skip() => throw null;
         protected JsonReader() { }
         void global::System.IDisposable.Dispose() => throw null;
+    }
+    public unsafe partial class JsonSerializer {
+        protected JsonSerializer() { }
+    }
+    public unsafe partial class JsonSerializerSettings {
+        public global::System.Collections.Generic.IList<global::Newtonsoft.Json.JsonConverter> Converters { get => throw null; set { } }
+        public JsonSerializerSettings() => throw null;
     }
     public unsafe partial class JsonTextReader : global::Newtonsoft.Json.JsonReader {
         public JsonTextReader(global::System.IO.TextReader reader) => throw null;
@@ -67,6 +79,14 @@ namespace Newtonsoft.Json {
         EndConstructor = 15,
         Date = 16,
         Bytes = 17,
+    }
+    public abstract unsafe partial class JsonWriter : global::System.IDisposable {
+        public virtual void WriteEndObject() => throw null;
+        public virtual void WritePropertyName(string name) => throw null;
+        public virtual void WriteStartObject() => throw null;
+        public virtual void WriteValue(float value) => throw null;
+        protected JsonWriter() { }
+        void global::System.IDisposable.Dispose() => throw null;
     }
 }
 namespace Newtonsoft.Json.Linq {

@@ -21,7 +21,7 @@ resources, and no types the mod never touches.
 | `Assembly-CSharp-firstpass` | 3 | 14 |
 | `DOTween` | 15 | 57 |
 | `MelonLoader` | 8 | 23 |
-| `Newtonsoft.Json` | 18 | 116 |
+| `Newtonsoft.Json` | 21 | 129 |
 | `RDTools` | 2 | 0 |
 | `SkyHook.Unity` | 4 | 130 |
 | `Unity.TextMeshPro` | 35 | 330 |
@@ -38,7 +38,7 @@ resources, and no types the mod never touches.
 | `UnityEngine.UIModule` | 6 | 32 |
 | `UnityModManager` | 4 | 12 |
 
-**481 types, 3559 members.**
+**484 types, 3572 members.**
 
 ## How it is used
 

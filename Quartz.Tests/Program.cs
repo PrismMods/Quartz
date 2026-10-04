@@ -1,4 +1,5 @@
 List<(string Name, Action Run)> tests = [
+    ("Addon Color settings serialize and round-trip without computed properties", UnityColorJsonConverterTests.TestColorRoundTrip),
     ("SemVer parses and orders channels", SemVerTests.TestSemVer),
     ("Attempt map key survives decoration, camera, and settings edits", LevelAngleSignatureTests.TestVisualEditsKeepTheSameSignature),
     ("Attempt map key changes when the chart angles change", LevelAngleSignatureTests.TestAngleEditsChangeTheSignature),

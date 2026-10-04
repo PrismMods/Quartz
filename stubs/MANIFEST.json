@@ -2262,12 +2262,19 @@
         "members": [
           "System.String Newtonsoft.Json.JsonConvert::SerializeObject(System.Object)",
           "System.String Newtonsoft.Json.JsonConvert::SerializeObject(System.Object,Newtonsoft.Json.Formatting)",
-          "System.Void Newtonsoft.Json.JsonConvert::PopulateObject(System.String,System.Object)"
+          "System.String Newtonsoft.Json.JsonConvert::SerializeObject(System.Object,Newtonsoft.Json.Formatting,Newtonsoft.Json.JsonSerializerSettings)",
+          "System.String Newtonsoft.Json.JsonConvert::SerializeObject(System.Object,Newtonsoft.Json.JsonSerializerSettings)",
+          "System.Void Newtonsoft.Json.JsonConvert::PopulateObject(System.String,System.Object,Newtonsoft.Json.JsonSerializerSettings)"
         ]
       },
       {
         "type": "Newtonsoft.Json.JsonConverter",
-        "members": []
+        "members": [
+          "System.Boolean Newtonsoft.Json.JsonConverter::CanConvert(System.Type)",
+          "System.Object Newtonsoft.Json.JsonConverter::ReadJson(Newtonsoft.Json.JsonReader,System.Type,System.Object,Newtonsoft.Json.JsonSerializer)",
+          "System.Void Newtonsoft.Json.JsonConverter::.ctor()",
+          "System.Void Newtonsoft.Json.JsonConverter::WriteJson(Newtonsoft.Json.JsonWriter,System.Object,Newtonsoft.Json.JsonSerializer)"
+        ]
       },
       {
         "type": "Newtonsoft.Json.JsonException",
@@ -2286,6 +2293,18 @@
           "System.Void Newtonsoft.Json.JsonReader::Skip()",
           "System.Void Newtonsoft.Json.JsonReader::set_DateParseHandling(Newtonsoft.Json.DateParseHandling)",
           "System.Void Newtonsoft.Json.JsonReader::set_MaxDepth(System.Nullable\u00601\u003CSystem.Int32\u003E)"
+        ]
+      },
+      {
+        "type": "Newtonsoft.Json.JsonSerializer",
+        "members": []
+      },
+      {
+        "type": "Newtonsoft.Json.JsonSerializerSettings",
+        "members": [
+          "System.Collections.Generic.IList\u00601\u003CNewtonsoft.Json.JsonConverter\u003E Newtonsoft.Json.JsonSerializerSettings::Converters()",
+          "System.Collections.Generic.IList\u00601\u003CNewtonsoft.Json.JsonConverter\u003E Newtonsoft.Json.JsonSerializerSettings::get_Converters()",
+          "System.Void Newtonsoft.Json.JsonSerializerSettings::.ctor()"
         ]
       },
       {
@@ -2316,6 +2335,15 @@
           "Newtonsoft.Json.JsonToken Newtonsoft.Json.JsonToken::String",
           "Newtonsoft.Json.JsonToken Newtonsoft.Json.JsonToken::Undefined",
           "System.Int32 Newtonsoft.Json.JsonToken::value__"
+        ]
+      },
+      {
+        "type": "Newtonsoft.Json.JsonWriter",
+        "members": [
+          "System.Void Newtonsoft.Json.JsonWriter::WriteEndObject()",
+          "System.Void Newtonsoft.Json.JsonWriter::WritePropertyName(System.String)",
+          "System.Void Newtonsoft.Json.JsonWriter::WriteStartObject()",
+          "System.Void Newtonsoft.Json.JsonWriter::WriteValue(System.Single)"
         ]
       },
       {
