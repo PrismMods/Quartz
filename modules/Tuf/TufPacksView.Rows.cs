@@ -139,6 +139,7 @@ internal sealed partial class TufPacksView : MonoBehaviour {
         RectTransform diffRect = Rect("Difficulty", card, new(0f, 1f), new(0f, 1f), new(104f, -35f), new(235f, -8f));
         TMP_Text diff = Text(diffRect, level.Difficulty, 16f, TextAlignmentOptions.Left);
         diff.color = railImage.color;
+        TufBrowserView.WhiteOutline(diff);
         RectTransform songRect = Rect("Song", card, new(0f, 1f), new(1f, 1f), new(22f, -66f), new(-150f, -34f));
         TMP_Text song = Text(songRect, level.Song, 23f, TextAlignmentOptions.Left);
         song.fontStyle = FontStyles.Bold;

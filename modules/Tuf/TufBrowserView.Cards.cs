@@ -148,6 +148,7 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
         x += MetaGap;
         TMP_Text diff = MetaLabel(card, "Difficulty", level.Difficulty, ref x, 128f);
         diff.color = railImage.color;
+        WhiteOutline(diff);
         bool installed = IsInstalled(level);
         if(installed) AddStatusBadge(card, x + MetaGap, level);
         RectTransform songRect = Rect("Song", card, new(0f, 1f), new(1f, 1f), new(20f, -74f), new(-16f, -40f));
@@ -195,6 +196,7 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
         x += MetaGap;
         TMP_Text diff = MetaLabel(card, "Difficulty", level.Difficulty, ref x, 150f);
         diff.color = railImage.color;
+        WhiteOutline(diff);
         bool installed = IsInstalled(level);
         if(installed) AddStatusBadge(card, x + MetaGap, level);
         bool rollback = installed && service.SnapshotCount(level.Id) > 0;

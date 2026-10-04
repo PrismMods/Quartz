@@ -125,6 +125,19 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
         SetFull(text.rectTransform, 0f, 0f);
         return text;
     }
+    private static readonly System.Collections.Generic.Dictionary<Material, Material> outlined = new();
+    internal static void WhiteOutline(TMP_Text text) {
+        Material source = text.fontSharedMaterial;
+        if(source == null) return;
+        if(!outlined.TryGetValue(source, out Material mat) || mat == null) {
+            mat = new(source) { name = source.name + " (Quartz Outline)" };
+            mat.EnableKeyword("OUTLINE_ON");
+            mat.SetFloat(Shader.PropertyToID("_OutlineWidth"), 0.18f);
+            mat.SetColor(Shader.PropertyToID("_OutlineColor"), Color.white);
+            outlined[source] = mat;
+        }
+        text.fontSharedMaterial = mat;
+    }
     private static RectTransform Rect(string name, Transform parent, Vector2 min, Vector2 max, Vector2 offsetMin, Vector2 offsetMax) {
         GameObject obj = new(name);
         obj.transform.SetParent(parent, false);
