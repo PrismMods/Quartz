@@ -37,6 +37,7 @@ public static class ProgressBarOverlay {
     internal const string BandId = "progressbar";
     internal static float BottomEdge() {
         EnsureConf();
+        if(Conf.Style != ProgressBarStyle.Line && !OverlayAnchors.IsTop(OverlayAnchors.Parse(Conf.Anchor))) return 0f;
         return Conf.TopOffset + Conf.Height;
     }
     internal static void Rescale(float fx, float fy) {
@@ -53,9 +54,6 @@ public static class ProgressBarOverlay {
         GameObject barObj = new("Bar");
         barObj.transform.SetParent(canvasObj.transform, false);
         bar = barObj.AddComponent<RectTransform>();
-        bar.anchorMin = new Vector2(0.5f, 1f);
-        bar.anchorMax = new Vector2(0.5f, 1f);
-        bar.pivot = new Vector2(0.5f, 1f);
         GameObject borderObj = new("Border");
         borderObj.transform.SetParent(bar, false);
         border = borderObj.AddComponent<RectTransform>();
@@ -115,9 +113,7 @@ public static class ProgressBarOverlay {
             bar.offsetMin = new Vector2(0f, bottom ? 0f : -thickness);
             bar.offsetMax = new Vector2(0f, bottom ? thickness : 0f);
         } else {
-            bar.anchorMin = new Vector2(0.5f, 1f);
-            bar.anchorMax = new Vector2(0.5f, 1f);
-            bar.pivot = new Vector2(0.5f, 1f);
+            OverlayAnchors.Pin(bar, OverlayAnchors.Parse(Conf.Anchor));
             bar.sizeDelta = new Vector2(Conf.Width, Conf.Height);
             bar.anchoredPosition = OverlayCalibration.Scale(new Vector2(Conf.OffsetX, -Conf.TopOffset));
         }
@@ -135,10 +131,15 @@ public static class ProgressBarOverlay {
     public static void Save() => ConfMgr?.RequestSave();
     public static void ResetPosition() {
         ProgressBarSettings def = new();
-        Conf.OffsetX = def.OffsetX;
-        Conf.TopOffset = def.TopOffset;
+        Vector2 d = OverlayAnchors.DefaultOffset(OverlayAnchors.Parse(Conf.Anchor), def.TopOffset);
+        Conf.OffsetX = d.x;
+        Conf.TopOffset = -d.y;
         Apply();
         Save();
+    }
+    public static void SetAnchor(OverlayAnchor anchor) {
+        Conf.Anchor = (int)anchor;
+        ResetPosition();
     }
     public static void Dispose() {
         if(canvasObj == null) return;

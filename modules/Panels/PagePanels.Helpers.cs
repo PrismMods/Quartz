@@ -43,18 +43,7 @@ internal static partial class PagePanels {
         obj.AddComponent<RectMask2D>();
         return body;
     }
-    private static string AnchorName(PanelAnchor anchor) => anchor switch {
-        PanelAnchor.TopLeft => GenerateUI.Tr("ANCHOR_TOP_LEFT", "Top Left"),
-        PanelAnchor.TopCenter => GenerateUI.Tr("ANCHOR_TOP_CENTER", "Top Center"),
-        PanelAnchor.TopRight => GenerateUI.Tr("ANCHOR_TOP_RIGHT", "Top Right"),
-        PanelAnchor.MiddleLeft => GenerateUI.Tr("ANCHOR_MIDDLE_LEFT", "Middle Left"),
-        PanelAnchor.MiddleCenter => GenerateUI.Tr("ANCHOR_MIDDLE_CENTER", "Middle Center"),
-        PanelAnchor.MiddleRight => GenerateUI.Tr("ANCHOR_MIDDLE_RIGHT", "Middle Right"),
-        PanelAnchor.BottomLeft => GenerateUI.Tr("ANCHOR_BOTTOM_LEFT", "Bottom Left"),
-        PanelAnchor.BottomCenter => GenerateUI.Tr("ANCHOR_BOTTOM_CENTER", "Bottom Center"),
-        PanelAnchor.BottomRight => GenerateUI.Tr("ANCHOR_BOTTOM_RIGHT", "Bottom Right"),
-        _ => anchor.ToString(),
-    };
+    private static string AnchorName(PanelAnchor anchor) => OverlayAnchors.Name((OverlayAnchor)anchor);
     private static string StatDefaultLabel(string id) {
         foreach(PanelsOverlay.StatDef stat in PanelsOverlay.AllStats)
             if(stat.Id == id) return stat.Label;

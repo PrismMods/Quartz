@@ -36,6 +36,7 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
             [nameof(Rain3R)] = Rain3R, [nameof(Rain3G)] = Rain3G, [nameof(Rain3B)] = Rain3B, [nameof(Rain3A)] = Rain3A,
             [nameof(DmPresetJson)] = DmPresetJson,
             [nameof(DmSelectedTab)] = DmSelectedTab,
+            [nameof(DmAnchor)] = DmAnchor,
             [nameof(DmOffsetX)] = DmOffsetX,
             [nameof(DmOffsetY)] = DmOffsetY,
             [nameof(DmScale)] = DmScale,
@@ -163,6 +164,7 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
             DmPresetJson = dmPreset;
         }
         DmSelectedTab = IOUtils.Read(token, nameof(DmSelectedTab), DmSelectedTab) ?? "4key";
+        DmAnchor = IOUtils.Read(token, nameof(DmAnchor), DmAnchor);
         DmOffsetX = IOUtils.Read(token, nameof(DmOffsetX), DmOffsetX);
         DmOffsetY = IOUtils.Read(token, nameof(DmOffsetY), DmOffsetY);
         DmScale = Mathf.Clamp(IOUtils.Read(token, nameof(DmScale), DmScale), 0.2f, 4f);

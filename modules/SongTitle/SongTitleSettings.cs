@@ -1,6 +1,7 @@
 using Newtonsoft.Json.Linq;
 using Quartz.IO;
 using Quartz.IO.Interface;
+using Quartz.Overlay;
 using UnityEngine;
 namespace Quartz.Features.SongTitle;
 public sealed class SongTitleSettings : ISettingsFile {
@@ -9,6 +10,7 @@ public sealed class SongTitleSettings : ISettingsFile {
     public bool StripFormatting = false;
     public float FontSize = 40f;
     public float MasterSize = 1f;
+    public int Anchor = (int)OverlayAnchor.TopCenter;
     public float OffsetX = 0f;
     public float OffsetY = -55f;
     public float ColorR = 1f, ColorG = 1f, ColorB = 1f, ColorA = 1f;
@@ -25,6 +27,7 @@ public sealed class SongTitleSettings : ISettingsFile {
         [nameof(StripFormatting)] = StripFormatting,
         [nameof(FontSize)] = FontSize,
         [nameof(MasterSize)] = MasterSize,
+        [nameof(Anchor)] = Anchor,
         [nameof(OffsetX)] = OffsetX,
         [nameof(OffsetY)] = OffsetY,
         [nameof(ColorR)] = ColorR,
@@ -46,6 +49,7 @@ public sealed class SongTitleSettings : ISettingsFile {
         StripFormatting = IOUtils.Read(token, nameof(StripFormatting), StripFormatting);
         FontSize = IOUtils.Read(token, nameof(FontSize), FontSize);
         MasterSize = IOUtils.Read(token, nameof(MasterSize), MasterSize);
+        Anchor = IOUtils.Read(token, nameof(Anchor), Anchor);
         OffsetX = IOUtils.Read(token, nameof(OffsetX), OffsetX);
         OffsetY = IOUtils.Read(token, nameof(OffsetY), OffsetY);
         IOUtils.ReadRgba(token, "Color", ref ColorR, ref ColorG, ref ColorB, ref ColorA);

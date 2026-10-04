@@ -1,6 +1,7 @@
 {
   "ko-KR": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "SONGTITLE_ANCHOR_LABEL": "기준점",
     "SECTION_SONG_TITLE": "노래 제목",
     "SONGTITLE_FORMAT": "형식 — {artist} 및 {title} 사용",
     "SONGTITLE_STRIP": "서식 태그 제거",

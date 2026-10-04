@@ -13,6 +13,7 @@ public sealed class ProgressBarSettings : ISettingsFile {
     public ProgressBarStyle Style = ProgressBarStyle.Modern;
     public float Width = 800f;
     public float Height = 8f;
+    public int Anchor = (int)OverlayAnchor.TopCenter;
     public float OffsetX = 0f;
     public float TopOffset = 10f;
     public float Rounding = 1f;
@@ -40,6 +41,7 @@ public sealed class ProgressBarSettings : ISettingsFile {
             [nameof(Style)] = Style.ToString(),
             [nameof(Width)] = Width,
             [nameof(Height)] = Height,
+            [nameof(Anchor)] = Anchor,
             [nameof(OffsetX)] = OffsetX,
             [nameof(TopOffset)] = TopOffset,
             [nameof(Rounding)] = Rounding,
@@ -68,6 +70,7 @@ public sealed class ProgressBarSettings : ISettingsFile {
             Style = style;
         Width = IOUtils.Read(token, nameof(Width), Width);
         Height = IOUtils.Read(token, nameof(Height), Height);
+        Anchor = IOUtils.Read(token, nameof(Anchor), Anchor);
         OffsetX = IOUtils.Read(token, nameof(OffsetX), OffsetX);
         TopOffset = IOUtils.Read(token, nameof(TopOffset), TopOffset);
         Rounding = IOUtils.Read(token, nameof(Rounding), Rounding);

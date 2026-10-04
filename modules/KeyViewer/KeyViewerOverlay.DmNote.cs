@@ -31,7 +31,12 @@ public static partial class KeyViewerOverlay {
         if(!footBuilt || Conf == null || Conf.DmFootPlaced) return;
         float handScale = Mathf.Clamp(Conf.DmScale, 0.2f, 4f);
         float footScale = Mathf.Clamp(Conf.DmFootScale, 0.2f, 4f);
-        Conf.DmFootOffsetX = (handCanvasWidth * handScale + footCanvasWidth * footScale) * 0.5f + FootPanelGap;
+        float px = Quartz.Overlay.OverlayAnchors.Vector(Anchor).x;
+        float handW = handCanvasWidth * handScale;
+        float footW = footCanvasWidth * footScale;
+        Conf.DmFootOffsetX = px >= 1f
+            ? -(handW + FootPanelGap)
+            : (1f - px) * handW + px * footW + FootPanelGap;
         Conf.DmFootOffsetY = 0f;
         Conf.DmFootPlaced = true;
         Save();

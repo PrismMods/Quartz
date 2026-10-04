@@ -3,6 +3,7 @@ using Quartz.Features.KeyViewer.Js;
 using Quartz.Features.KeyViewer.Layout;
 using Quartz.IO;
 using Quartz.IO.Interface;
+using Quartz.Overlay;
 using UnityEngine;
 namespace Quartz.Features.KeyViewer;
 public sealed partial class KeyViewerSettings : ISettingsFile {
@@ -34,6 +35,7 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
     public float Rain3R = 1f, Rain3G = 0f, Rain3B = 1f, Rain3A = 1f;
     public string DmPresetJson = "";
     public string DmSelectedTab = "4key";
+    public int DmAnchor = (int)OverlayAnchor.BottomCenter;
     public float DmOffsetX = 0f;
     public float DmOffsetY = 240f;
     public float DmScale = 1f;

@@ -69,18 +69,11 @@ public static class SongTitleOverlay {
         GameObject titleObj = new("SongTitle");
         titleObj.transform.SetParent(canvasObj.transform, false);
         root = titleObj.AddComponent<RectTransform>();
-        root.anchorMin = new Vector2(0.5f, 1f);
-        root.anchorMax = new Vector2(0.5f, 1f);
-        root.pivot = new Vector2(0.5f, 1f);
         GameObject labelObj = new("Label");
         labelObj.transform.SetParent(root, false);
-        RectTransform labelRect = labelObj.AddComponent<RectTransform>();
-        labelRect.anchorMin = new Vector2(0.5f, 1f);
-        labelRect.anchorMax = new Vector2(0.5f, 1f);
-        labelRect.pivot = new Vector2(0.5f, 1f);
+        labelObj.AddComponent<RectTransform>();
         text = labelObj.AddComponent<TextMeshProUGUI>();
         text.font = FontManager.Current;
-        text.alignment = TextAlignmentOptions.Top;
         text.raycastTarget = false;
         TextCompat.NoWrap(text);
         text.text = "";
@@ -98,9 +91,13 @@ public static class SongTitleOverlay {
     }
     public static void Apply() {
         if(root == null) return;
+        OverlayAnchor anchor = OverlayAnchors.Parse(Conf.Anchor);
+        OverlayAnchors.Pin(root, anchor);
         root.anchoredPosition = OverlayCalibration.Scale(new Vector2(Conf.OffsetX, Conf.OffsetY));
         root.localScale = Vector3.one * Mathf.Max(0.01f, Conf.MasterSize);
         if(text != null) {
+            OverlayAnchors.Pin(text.rectTransform, anchor);
+            text.alignment = OverlayAnchors.TextAlign(anchor);
             text.font = FontManager.Current;
             text.fontSize = Mathf.Clamp(Conf.FontSize, 4f, 400f);
             text.color = Conf.GetColor();
@@ -121,11 +118,19 @@ public static class SongTitleOverlay {
     }
     public static void Save() => ConfMgr?.RequestSave();
     public static void ResetPosition() {
-        SongTitleSettings def = new();
-        Conf.OffsetX = def.OffsetX;
-        Conf.OffsetY = def.OffsetY;
+        Vector2 d = DefaultOffset(OverlayAnchors.Parse(Conf.Anchor));
+        Conf.OffsetX = d.x;
+        Conf.OffsetY = d.y;
         Apply();
         Save();
+    }
+    public static void SetAnchor(OverlayAnchor anchor) {
+        Conf.Anchor = (int)anchor;
+        ResetPosition();
+    }
+    private static Vector2 DefaultOffset(OverlayAnchor anchor) {
+        SongTitleSettings def = new();
+        return (int)anchor == def.Anchor ? new Vector2(def.OffsetX, def.OffsetY) : OverlayAnchors.DefaultOffset(anchor);
     }
     public static void Dispose() {
         if(canvasObj == null) return;

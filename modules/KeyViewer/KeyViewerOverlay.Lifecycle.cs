@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using Quartz.Core;
 using Quartz.Game.Stats;
 using Quartz.IO;
+using Quartz.Overlay;
 using Quartz.Resource;
 using Quartz.UI;
 using Quartz.UI.Utility;
@@ -32,15 +33,9 @@ public static partial class KeyViewerOverlay {
         GameObject gridObj = new("KeyViewerGrid");
         gridObj.transform.SetParent(canvasObj.transform, false);
         root = gridObj.AddComponent<RectTransform>();
-        root.anchorMin = new Vector2(0.5f, 0f);
-        root.anchorMax = new Vector2(0.5f, 0f);
-        root.pivot = new Vector2(0.5f, 0f);
         GameObject footObj = new("KeyViewerFootGrid");
         footObj.transform.SetParent(canvasObj.transform, false);
         footRoot = footObj.AddComponent<RectTransform>();
-        footRoot.anchorMin = new Vector2(0.5f, 0f);
-        footRoot.anchorMax = new Vector2(0.5f, 0f);
-        footRoot.pivot = new Vector2(0.5f, 0f);
         rainManager = canvasObj.AddComponent<RainManager>();
         footRainManager = canvasObj.AddComponent<RainManager>();
         canvasObj.AddComponent<Updater>();
@@ -139,6 +134,8 @@ public static partial class KeyViewerOverlay {
             return;
         }
         ApplyDmRuntimeSettings();
+        OverlayAnchors.Pin(root, Anchor);
+        OverlayAnchors.Pin(footRoot, Anchor);
         root.anchoredPosition = OverlayCalibration.Scale(new Vector2(Conf.DmOffsetX, Conf.DmOffsetY));
         float dmScale = Mathf.Clamp(Conf.DmScale, 0.2f, 4f);
         root.localScale = new Vector3(dmScale, dmScale, 1f);
@@ -176,10 +173,18 @@ public static partial class KeyViewerOverlay {
             box.Border.sprite = MainCore.Spr.GetRing(Mathf.Max(0.5f, radius), Mathf.Max(0.1f, eff));
         }
     }
+    internal static OverlayAnchor Anchor => OverlayAnchors.Parse(Conf.DmAnchor);
+    public static void SetAnchor(OverlayAnchor anchor) {
+        Conf.DmAnchor = (int)anchor;
+        ResetPosition();
+    }
     public static void ResetPosition() {
         KeyViewerSettings def = new();
-        Conf.DmOffsetX = def.DmOffsetX;
-        Conf.DmOffsetY = def.DmOffsetY;
+        Vector2 d = Conf.DmAnchor == def.DmAnchor
+            ? new Vector2(def.DmOffsetX, def.DmOffsetY)
+            : OverlayAnchors.DefaultOffset(Anchor);
+        Conf.DmOffsetX = d.x;
+        Conf.DmOffsetY = d.y;
         Conf.DmFootPlaced = false;
         Save();
         Rebuild();

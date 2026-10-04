@@ -1,6 +1,7 @@
 using Newtonsoft.Json.Linq;
 using Quartz.IO;
 using Quartz.IO.Interface;
+using Quartz.Overlay;
 using UnityEngine;
 namespace Quartz.Features.Combo;
 public sealed class ComboSettings : ISettingsFile {
@@ -10,6 +11,7 @@ public sealed class ComboSettings : ISettingsFile {
     public float FontSize = 56f;
     public float MasterSize = 1f;
     public float CaptionScale = 0.35f;
+    public int Anchor = (int)OverlayAnchor.TopCenter;
     public float OffsetX = 0f;
     public float OffsetY = 58.8050537f;
     public bool ShowCaption = true;
@@ -61,6 +63,7 @@ public sealed class ComboSettings : ISettingsFile {
             [nameof(FontSize)] = FontSize,
             [nameof(MasterSize)] = MasterSize,
             [nameof(CaptionScale)] = CaptionScale,
+            [nameof(Anchor)] = Anchor,
             [nameof(OffsetX)] = OffsetX,
             [nameof(OffsetY)] = OffsetY,
             [nameof(ShowCaption)] = ShowCaption,
@@ -111,6 +114,7 @@ public sealed class ComboSettings : ISettingsFile {
         FontSize = IOUtils.Read(token, nameof(FontSize), FontSize);
         MasterSize = IOUtils.Read(token, nameof(MasterSize), MasterSize);
         CaptionScale = IOUtils.Read(token, nameof(CaptionScale), CaptionScale);
+        Anchor = IOUtils.Read(token, nameof(Anchor), Anchor);
         OffsetX = IOUtils.Read(token, nameof(OffsetX), OffsetX);
         OffsetY = IOUtils.Read(token, nameof(OffsetY), OffsetY);
         ShowCaption = IOUtils.Read(token, nameof(ShowCaption), ShowCaption);

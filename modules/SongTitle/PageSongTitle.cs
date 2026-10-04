@@ -1,5 +1,6 @@
 using Quartz.Core;
 using Quartz.Features.SongTitle;
+using Quartz.Overlay;
 using Quartz.Resource;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
@@ -45,6 +46,8 @@ public static class PageSongTitle {
             "songtitle_strip",
             "Remove rich text tags (size, color, ...) and line breaks from the title."
         );
+        OverlayAnchors.Dropdown(sec.Body, (OverlayAnchor)def.Anchor, OverlayAnchors.Parse(conf.Anchor),
+            SongTitleOverlay.SetAnchor, "songtitle_anchor");
         GenerateUI.SnapSlider(sec.Body, "Font Size", "songtitle_fontsize",
             def.FontSize, 12f, 120f, conf.FontSize, "0 px", 1f,
             v => conf.FontSize = v, Apply, Save);

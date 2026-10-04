@@ -1,12 +1,14 @@
 using Newtonsoft.Json.Linq;
 using Quartz.IO;
 using Quartz.IO.Interface;
+using Quartz.Overlay;
 using UnityEngine;
 namespace Quartz.Features.Judgement;
 public sealed class JudgementSettings : ISettingsFile {
     public bool Enabled = true;
     public bool CompactRow = true;
     public bool ShowXPerfect = true;
+    public int Anchor = (int)OverlayAnchor.BottomCenter;
     public float OffsetX = 0f;
     public float OffsetY = -5f;
     public float Size = 0.9f;
@@ -23,6 +25,7 @@ public sealed class JudgementSettings : ISettingsFile {
             [nameof(Enabled)] = Enabled,
             [nameof(CompactRow)] = CompactRow,
             [nameof(ShowXPerfect)] = ShowXPerfect,
+            [nameof(Anchor)] = Anchor,
             [nameof(OffsetX)] = OffsetX,
             [nameof(OffsetY)] = OffsetY,
             [nameof(Size)] = Size,
@@ -40,6 +43,7 @@ public sealed class JudgementSettings : ISettingsFile {
         Enabled = IOUtils.Read(token, nameof(Enabled), Enabled);
         CompactRow = IOUtils.Read(token, nameof(CompactRow), CompactRow);
         ShowXPerfect = IOUtils.Read(token, nameof(ShowXPerfect), ShowXPerfect);
+        Anchor = IOUtils.Read(token, nameof(Anchor), Anchor);
         OffsetX = IOUtils.Read(token, nameof(OffsetX), OffsetX);
         OffsetY = IOUtils.Read(token, nameof(OffsetY), OffsetY);
         Size = IOUtils.Read(token, nameof(Size), Size);

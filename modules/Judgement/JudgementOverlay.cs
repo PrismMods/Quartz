@@ -79,9 +79,6 @@ public static class JudgementOverlay {
         GameObject rowObj = new("JudgementRow");
         rowObj.transform.SetParent(canvasObj.transform, false);
         root = rowObj.AddComponent<RectTransform>();
-        root.anchorMin = new Vector2(0.5f, 0f);
-        root.anchorMax = new Vector2(0.5f, 0f);
-        root.pivot = new Vector2(0.5f, 0f);
         if(compact) BuildCompactRow(rowObj);
         else BuildMultiLabelRow(rowObj);
         dragObj = ReorganizeHandle.CreateDragSurface(root, () => MainCore.Tr.Get("JUDGEMENT", "Judgement"), Save, ignoreLayout: true);
@@ -149,6 +146,9 @@ public static class JudgementOverlay {
     }
     public static void Apply() {
         if(root == null) return;
+        OverlayAnchor anchor = OverlayAnchors.Parse(Conf.Anchor);
+        OverlayAnchors.Pin(root, anchor);
+        if(root.TryGetComponent(out HorizontalLayoutGroup layout)) layout.childAlignment = OverlayAnchors.LayoutAlign(anchor);
         root.anchoredPosition = OverlayCalibration.Scale(new Vector2(Conf.OffsetX, BottomMargin + Conf.OffsetY));
         float fontSize = FontSize();
         if(compact) {
@@ -190,10 +190,18 @@ public static class JudgementOverlay {
     public static void Save() => ConfMgr?.RequestSave();
     public static void ResetPosition() {
         JudgementSettings def = new();
-        Conf.OffsetX = def.OffsetX;
-        Conf.OffsetY = def.OffsetY;
+        OverlayAnchor anchor = OverlayAnchors.Parse(Conf.Anchor);
+        Vector2 d = (int)anchor == def.Anchor
+            ? new Vector2(def.OffsetX, def.OffsetY)
+            : OverlayAnchors.DefaultOffset(anchor) - new Vector2(0f, BottomMargin);
+        Conf.OffsetX = d.x;
+        Conf.OffsetY = d.y;
         Apply();
         Save();
+    }
+    public static void SetAnchor(OverlayAnchor anchor) {
+        Conf.Anchor = (int)anchor;
+        ResetPosition();
     }
     public static void Dispose() {
         if(canvasObj == null) return;

@@ -52,11 +52,8 @@ public static class ComboOverlay {
         GameObject rootObj = new("ComboRoot");
         rootObj.transform.SetParent(canvasObj.transform, false);
         root = rootObj.AddComponent<RectTransform>();
-        root.anchorMin = new Vector2(0.5f, 1f);
-        root.anchorMax = new Vector2(0.5f, 1f);
-        root.pivot = new Vector2(0.5f, 1f);
-        valueText = CreateLabel(root, "Value", TextAlignmentOptions.Center);
-        captionText = CreateLabel(root, "Caption", TextAlignmentOptions.Center);
+        valueText = CreateLabel(root, "Value");
+        captionText = CreateLabel(root, "Caption");
         dragObj = ReorganizeHandle.CreateDragSurface(root, () => MainCore.Tr.Get("COMBO", "Combo"), Save);
         ReorganizeHandle.SetSizeSource(
             dragObj,
@@ -69,16 +66,12 @@ public static class ComboOverlay {
         gateRunning = true;
         Apply();
     }
-    private static TextMeshProUGUI CreateLabel(Transform parent, string name, TextAlignmentOptions align) {
+    private static TextMeshProUGUI CreateLabel(Transform parent, string name) {
         GameObject obj = new(name);
         obj.transform.SetParent(parent, false);
-        RectTransform rect = obj.AddComponent<RectTransform>();
-        rect.anchorMin = new Vector2(0.5f, 1f);
-        rect.anchorMax = new Vector2(0.5f, 1f);
-        rect.pivot = new Vector2(0.5f, 1f);
+        obj.AddComponent<RectTransform>();
         TextMeshProUGUI text = obj.AddComponent<TextMeshProUGUI>();
         text.font = FontManager.Current;
-        text.alignment = align;
         text.color = Color.white;
         text.raycastTarget = false;
         text.text = "";
@@ -87,12 +80,35 @@ public static class ComboOverlay {
     public static void Apply() {
         if(root == null) return;
         ApplyFont();
+        ApplyAnchor();
         root.anchoredPosition = GetDefaultPosition();
         root.localScale = Vector3.one * Mathf.Max(0.01f, Conf.MasterSize);
         ApplyCaption();
         ApplyValueMaterial();
         ApplyCaptionMaterial();
     }
+    private static OverlayAnchor Anchor => OverlayAnchors.Parse(Conf.Anchor);
+    private static bool relayout = true;
+    private static void ApplyAnchor() {
+        OverlayAnchor anchor = Anchor;
+        Vector2 a = OverlayAnchors.Vector(anchor);
+        Vector2 labelAnchor = new(a.x, 1f);
+        foreach(TextMeshProUGUI label in new[] { valueText, captionText }) {
+            if(label == null) continue;
+            RectTransform rt = label.rectTransform;
+            rt.anchorMin = labelAnchor;
+            rt.anchorMax = labelAnchor;
+            rt.pivot = labelAnchor;
+            label.alignment = OverlayAnchors.HorizontalAlign(anchor);
+        }
+        root.anchorMin = a;
+        root.anchorMax = a;
+        root.pivot = a;
+        relayout = true;
+    }
+    private static float TopBand() => OverlayAnchors.IsTop(Anchor)
+        ? OverlayLayout.BottomEdge(ProgressBarBandId, NoProgressBarBand) + VerticalGap
+        : 0f;
     private static void ApplyFont() {
         TMP_FontAsset font = FontManager.Current;
         if(valueText != null) valueText.font = font;
@@ -108,17 +124,22 @@ public static class ComboOverlay {
     private const string ProgressBarBandId = "progressbar";
     private const float NoProgressBarBand = 0f;
     private static Vector2 GetDefaultPosition() {
-        float band = OverlayLayout.BottomEdge(ProgressBarBandId, NoProgressBarBand);
-        float y = -(band + VerticalGap + Conf.OffsetY);
+        float y = -(TopBand() + Conf.OffsetY);
         return OverlayCalibration.Scale(new Vector2(Conf.OffsetX, y));
     }
     public static void Save() => ConfMgr?.RequestSave();
     public static void ResetPosition() {
         ComboSettings def = new();
-        Conf.OffsetX = def.OffsetX;
-        Conf.OffsetY = def.OffsetY;
+        OverlayAnchor anchor = Anchor;
+        Vector2 d = OverlayAnchors.DefaultOffset(anchor);
+        Conf.OffsetX = (int)anchor == def.Anchor ? def.OffsetX : d.x;
+        Conf.OffsetY = OverlayAnchors.IsTop(anchor) ? def.OffsetY : -d.y;
         Apply();
         Save();
+    }
+    public static void SetAnchor(OverlayAnchor anchor) {
+        Conf.Anchor = (int)anchor;
+        ResetPosition();
     }
     public static void ApplyCountShadow() => ApplyValueMaterial();
     public static void ApplyCaptionShadow() => ApplyCaptionMaterial();
@@ -140,8 +161,7 @@ public static class ComboOverlay {
         updater = null;
     }
     private static float GetOffsetYFromPosition(float anchoredY) {
-        float band = OverlayLayout.BottomEdge(ProgressBarBandId, NoProgressBarBand);
-        return -(anchoredY + band + VerticalGap);
+        return -(anchoredY + TopBand());
     }
     private static void ApplyValueMaterial() {
         if(valueText == null) return;
@@ -281,9 +301,11 @@ public static class ComboOverlay {
             }
             float overhang = Mathf.Max(0f, -capTop);
             float blockH = Mathf.Max(1f, Mathf.Max(valueH, capBottom) + overhang);
-            if(blockH != lastBlockH || overhang != lastOverhang) {
+            if(relayout || blockH != lastBlockH || overhang != lastOverhang) {
+                relayout = false;
+                Vector2 a = OverlayAnchors.Vector(Anchor);
                 root.sizeDelta = new Vector2(768f, blockH);
-                root.pivot = new Vector2(0.5f, 1f - overhang / blockH);
+                root.pivot = new Vector2(a.x, a.y == 1f ? 1f - overhang / blockH : a.y);
                 valueText.rectTransform.anchoredPosition = new Vector2(0f, -overhang);
                 lastBlockH = blockH;
                 lastOverhang = overhang;

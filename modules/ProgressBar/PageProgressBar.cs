@@ -67,6 +67,8 @@ internal static class PageProgressBar {
         else AppendBoxSize(sec.Body, conf, def, Save);
         AppendColors(sec.Body, conf, def, Save);
         if(conf.Style != ProgressBarStyle.Line) {
+            OverlayAnchors.Dropdown(sec.Body, (OverlayAnchor)def.Anchor, OverlayAnchors.Parse(conf.Anchor),
+                ProgressBarOverlay.SetAnchor, "progressbar_anchor");
             GenerateUI.Button(
                 GenerateUI.Row(sec.Body),
                 () => ProgressBarOverlay.ResetPosition(),

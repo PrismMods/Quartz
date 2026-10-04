@@ -1,6 +1,7 @@
 {
   "zh-CN": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "PROGRESSBAR_ANCHOR_LABEL": "锚点位置",
     "DESC_PROGRESSBAR_PREFILLSTART": "从存档点/编辑器试玩开局时，进度条直接填充至对应位置，而非从零开始。",
     "DESC_PROGRESSBAR_USEMAPTIME": "进度条按谱面已播放时间推进而非按完成轨道数；填充进度每帧连续移动而非在每个轨道上步进。",
     "DESC_PROGRESSBAR_FILLGRADIENT": "关卡进度0%至100%填充色渐变切换，而非单一纯色。",

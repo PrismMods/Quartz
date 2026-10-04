@@ -56,25 +56,8 @@ public sealed class PanelConfig {
     public int Anchor = (int)PanelAnchor.TopLeft;
     public float PosX = 24f;
     public float PosY = -24f;
-    public static Vector2 DefaultOffset(PanelAnchor anchor) {
-        Vector2 a = AnchorVector(anchor);
-        return new Vector2(
-            a.x == 0f ? 24f : a.x == 1f ? -24f : 0f,
-            a.y == 0f ? 24f : a.y == 1f ? -24f : 0f
-        );
-    }
-    public static Vector2 AnchorVector(PanelAnchor anchor) => anchor switch {
-        PanelAnchor.TopLeft => new Vector2(0f, 1f),
-        PanelAnchor.TopCenter => new Vector2(0.5f, 1f),
-        PanelAnchor.TopRight => new Vector2(1f, 1f),
-        PanelAnchor.MiddleLeft => new Vector2(0f, 0.5f),
-        PanelAnchor.MiddleCenter => new Vector2(0.5f, 0.5f),
-        PanelAnchor.MiddleRight => new Vector2(1f, 0.5f),
-        PanelAnchor.BottomLeft => new Vector2(0f, 0f),
-        PanelAnchor.BottomCenter => new Vector2(0.5f, 0f),
-        PanelAnchor.BottomRight => new Vector2(1f, 0f),
-        _ => new Vector2(0f, 1f),
-    };
+    public static Vector2 DefaultOffset(PanelAnchor anchor) => OverlayAnchors.DefaultOffset((OverlayAnchor)anchor);
+    public static Vector2 AnchorVector(PanelAnchor anchor) => OverlayAnchors.Vector(OverlayAnchors.Parse((int)anchor));
     public List<StatEntry> Stats = [];
     public string Prefix = "";
     public int Decimals = 2;
