@@ -786,6 +786,7 @@ namespace UnityEngine {
     }
     public sealed unsafe partial class Shader : global::UnityEngine.Object {
         public static global::UnityEngine.Shader Find(string name) => throw null;
+        public static int PropertyToID(string name) => throw null;
         private Shader() { }
     }
     public sealed unsafe partial class Sprite : global::UnityEngine.Object {

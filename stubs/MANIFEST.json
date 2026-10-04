@@ -1657,6 +1657,7 @@
           "System.String scnGame::NoTag",
           "System.Void scnGame::ApplyEventsToFloors(System.Collections.Generic.List\u00601\u003CscrFloor\u003E)",
           "System.Void scnGame::ApplyEventsToFloors(System.Collections.Generic.List\u00601\u003CscrFloor\u003E,ADOFAI.LevelData,scrLevelMaker,System.Collections.Generic.List\u00601\u003CADOFAI.LevelEvent\u003E)",
+          "System.Void scnGame::RemakePath(System.Boolean,System.Boolean)",
           "System.Void scnGame::ResetScene(System.Boolean)",
           "ffxPlusBase scnGame::ApplyEvent(ADOFAI.LevelEvent,System.Single,System.Single,System.Collections.Generic.List\u00601\u003CscrFloor\u003E,System.Single,System.Nullable\u00601\u003CSystem.Int32\u003E)",
           "scnGame scnGame::instance"
@@ -4407,6 +4408,7 @@
       {
         "type": "UnityEngine.Shader",
         "members": [
+          "System.Int32 UnityEngine.Shader::PropertyToID(System.String)",
           "UnityEngine.Shader UnityEngine.Shader::Find(System.String)"
         ]
       },

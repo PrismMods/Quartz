@@ -867,6 +867,7 @@ public unsafe partial class scnGame : global::ADOBase {
     public void ApplyEventsToFloors(global::System.Collections.Generic.List<global::scrFloor> floors) => throw null;
     public static void ApplyEventsToFloors(global::System.Collections.Generic.List<global::scrFloor> floors, global::ADOFAI.LevelData levelData, global::scrLevelMaker lm, global::System.Collections.Generic.List<global::ADOFAI.LevelEvent> events) => throw null;
     public bool Play(int seqID = default, bool remakeFloors = default) => throw null;
+    public void RemakePath(bool applyEventsToFloors = default, bool remakeLevel = default) => throw null;
     public void ResetScene(bool isResetCustomLevel = default) => throw null;
     protected scnGame() { }
 }
