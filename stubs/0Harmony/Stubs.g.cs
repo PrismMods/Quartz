@@ -22,7 +22,6 @@ namespace HarmonyLib {
         public static global::System.Type Inner(global::System.Type type, string name) => throw null;
         public static global::System.Reflection.MethodInfo Method(global::System.Type type, string name, global::System.Type[] parameters = default, global::System.Type[] generics = default) => throw null;
         public static global::System.Reflection.PropertyInfo Property(global::System.Type type, string name) => throw null;
-        public static global::System.Reflection.MethodInfo PropertyGetter(global::System.Type type, string name) => throw null;
         public static global::HarmonyLib.AccessTools.FieldRef<F> StaticFieldRefAccess<F>(global::System.Reflection.FieldInfo fieldInfo) => throw null;
         public static global::System.Type TypeByName(string name) => throw null;
         public unsafe delegate ref F FieldRef<T, F>(T instance = default);
@@ -113,9 +112,7 @@ namespace HarmonyLib {
         public global::HarmonyLib.Traverse Field(string name) => throw null;
         public bool FieldExists() => throw null;
         public object GetValue() => throw null;
-        public T GetValue<T>() => throw null;
         public global::HarmonyLib.Traverse Method(string name, params object[] arguments) => throw null;
-        public global::HarmonyLib.Traverse Property(string name, object[] index = default) => throw null;
         public global::HarmonyLib.Traverse SetValue(object value) => throw null;
         protected Traverse() { }
     }

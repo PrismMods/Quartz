@@ -25,9 +25,3 @@ public enum DifficultyUIMode : int {
     ShowNormalAndStrict = 2,
     ShowAll = 3,
 }
-namespace DG.Tweening {
-    public static unsafe partial class DOTweenModuleUI {
-        public static global::DG.Tweening.Core.TweenerCore<float, float, global::DG.Tweening.Plugins.Options.FloatOptions> DOFade(this global::UnityEngine.CanvasGroup target, float endValue, float duration) => throw null;
-        public static global::DG.Tweening.Core.TweenerCore<global::UnityEngine.Vector2, global::UnityEngine.Vector2, global::DG.Tweening.Plugins.Options.VectorOptions> DOPivotY(this global::UnityEngine.RectTransform target, float endValue, float duration) => throw null;
-    }
-}

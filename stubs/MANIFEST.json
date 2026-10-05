@@ -12,7 +12,6 @@
           "System.Collections.Generic.List\u00601\u003CSystem.String\u003E HarmonyLib.AccessTools::GetMethodNames(System.Type)",
           "System.Reflection.FieldInfo HarmonyLib.AccessTools::Field(System.Type,System.String)",
           "System.Reflection.MethodInfo HarmonyLib.AccessTools::Method(System.Type,System.String,System.Type[],System.Type[])",
-          "System.Reflection.MethodInfo HarmonyLib.AccessTools::PropertyGetter(System.Type,System.String)",
           "System.Reflection.PropertyInfo HarmonyLib.AccessTools::Property(System.Type,System.String)",
           "System.Type HarmonyLib.AccessTools::Inner(System.Type,System.String)",
           "System.Type HarmonyLib.AccessTools::TypeByName(System.String)",
@@ -149,11 +148,9 @@
           "HarmonyLib.Traverse HarmonyLib.Traverse::Create(System.Object)",
           "HarmonyLib.Traverse HarmonyLib.Traverse::Field(System.String)",
           "HarmonyLib.Traverse HarmonyLib.Traverse::Method(System.String,System.Object[])",
-          "HarmonyLib.Traverse HarmonyLib.Traverse::Property(System.String,System.Object[])",
           "HarmonyLib.Traverse HarmonyLib.Traverse::SetValue(System.Object)",
           "System.Boolean HarmonyLib.Traverse::FieldExists()",
-          "System.Object HarmonyLib.Traverse::GetValue()",
-          "T HarmonyLib.Traverse::GetValue()"
+          "System.Object HarmonyLib.Traverse::GetValue()"
         ]
       }
     ]
@@ -171,13 +168,11 @@
           "System.Boolean ADOBase::get_isLevelSelect()",
           "System.Boolean ADOBase::get_isOfficialLevel()",
           "System.Boolean ADOBase::get_isSwitch()",
-          "System.Boolean ADOBase::get_practiceAvailable()",
           "System.Boolean ADOBase::isInternalLevel()",
           "System.Boolean ADOBase::isLevelEditor()",
           "System.Boolean ADOBase::isLevelSelect()",
           "System.Boolean ADOBase::isOfficialLevel()",
           "System.Boolean ADOBase::isSwitch()",
-          "System.Boolean ADOBase::practiceAvailable()",
           "System.String ADOBase::currentLevel()",
           "System.String ADOBase::get_currentLevel()",
           "System.String ADOBase::get_levelPath()",
@@ -186,8 +181,6 @@
           "scnEditor ADOBase::get_editor()",
           "scnGame ADOBase::customLevel()",
           "scnGame ADOBase::get_customLevel()",
-          "scnLevelSelect ADOBase::get_levelSelect()",
-          "scnLevelSelect ADOBase::levelSelect()",
           "scrConductor ADOBase::conductor()",
           "scrConductor ADOBase::get_conductor()",
           "scrController ADOBase::controller()",
@@ -667,12 +660,6 @@
         "members": []
       },
       {
-        "type": "ExtensionMethods",
-        "members": [
-          "UnityEngine.Color ExtensionMethods::WithAlpha(UnityEngine.Color,System.Single)"
-        ]
-      },
-      {
         "type": "Filter",
         "members": [
           "Filter Filter::Aberration",
@@ -768,23 +755,16 @@
           "UnityEngine.Color FloorRenderer::cachedColor",
           "UnityEngine.Color FloorRenderer::color()",
           "UnityEngine.Color FloorRenderer::deselectedColor",
-          "UnityEngine.Color FloorRenderer::get_color()",
           "UnityEngine.Renderer FloorRenderer::renderer"
         ]
-      },
-      {
-        "type": "FloorSpriteRenderer",
-        "members": []
       },
       {
         "type": "GCS",
         "members": [
           "Difficulty GCS::difficulty",
           "System.Boolean GCS::RandomValuesEnabled",
-          "System.Boolean GCS::playDeathSound",
           "System.Boolean GCS::practiceMode",
           "System.Boolean GCS::speedTrialMode",
-          "System.Boolean GCS::useNoFail",
           "System.Boolean GCS::usingCheckpoints",
           "System.Boolean GCS::webVersion",
           "System.Collections.Generic.Dictionary\u00602\u003CADOFAI.LevelEventType,System.String\u003E GCS::levelEventTypeString",
@@ -848,12 +828,6 @@
           "System.String GCS::worldEntrance",
           "System.String GCS::zipExtension",
           "System.String[] GCS::customLevelPaths"
-        ]
-      },
-      {
-        "type": "GOExtensions",
-        "members": [
-          "T GOExtensions::GetOrAddComponent(UnityEngine.GameObject)"
         ]
       },
       {
@@ -950,12 +924,6 @@
           "MonsterLove.StateMachine.StateTransition MonsterLove.StateMachine.StateTransition::Overwrite",
           "MonsterLove.StateMachine.StateTransition MonsterLove.StateMachine.StateTransition::Safe",
           "System.Int32 MonsterLove.StateMachine.StateTransition::value__"
-        ]
-      },
-      {
-        "type": "NewsSign",
-        "members": [
-          "scrButtonURL NewsSign::button"
         ]
       },
       {
@@ -1119,14 +1087,9 @@
           "System.Boolean RDC::auto()",
           "System.Boolean RDC::get_auto()",
           "System.Boolean RDC::get_noHud()",
-          "System.Boolean RDC::get_runningOnSteamDeck()",
-          "System.Boolean RDC::get_useOldAuto()",
           "System.Boolean RDC::noHud()",
-          "System.Boolean RDC::runningOnSteamDeck()",
-          "System.Boolean RDC::useOldAuto()",
           "System.Void RDC::set_auto(System.Boolean)",
-          "System.Void RDC::set_noHud(System.Boolean)",
-          "System.Void RDC::set_useOldAuto(System.Boolean)"
+          "System.Void RDC::set_noHud(System.Boolean)"
         ]
       },
       {
@@ -1140,12 +1103,6 @@
         "type": "RDEditorUtils",
         "members": [
           "System.Boolean RDEditorUtils::CheckModsDependency(System.Object[])"
-        ]
-      },
-      {
-        "type": "RDExtensions",
-        "members": [
-          "System.Void RDExtensions::SetAlpha(UnityEngine.SpriteRenderer,System.Single)"
         ]
       },
       {
@@ -1190,7 +1147,6 @@
           "System.String RDString::NintendoSwitchKeySuffix",
           "System.String RDString::StringsFilePrefix",
           "System.String RDString::StringsFolder",
-          "System.Void RDString::SetLocalizedFont(UnityEngine.UI.Text)",
           "UnityEngine.SystemLanguage RDString::FallbackLanguage",
           "UnityEngine.SystemLanguage RDString::language"
         ]
@@ -1531,38 +1487,6 @@
         ]
       },
       {
-        "type": "scnCLS",
-        "members": [
-          "System.Boolean scnCLS::showingInitialMenu",
-          "System.String scnCLS::BackupFilename",
-          "System.String scnCLS::FeaturedLevelsLocalPath",
-          "System.String scnCLS::MainFilename",
-          "System.Void scnCLS::DeleteLevel()",
-          "System.Void scnCLS::SearchLevels(System.String,System.Boolean)",
-          "scnCLS scnCLS::instance"
-        ]
-      },
-      {
-        "type": "scnCLS/Category",
-        "members": [
-          "System.Int32 scnCLS/Category::value__",
-          "scnCLS/Category scnCLS/Category::Featured",
-          "scnCLS/Category scnCLS/Category::Selection",
-          "scnCLS/Category scnCLS/Category::Tech",
-          "scnCLS/Category scnCLS/Category::Workshop"
-        ]
-      },
-      {
-        "type": "scnCLS/FeaturedLevelsSource",
-        "members": [
-          "System.Int32 scnCLS/FeaturedLevelsSource::value__",
-          "scnCLS/FeaturedLevelsSource scnCLS/FeaturedLevelsSource::DLC",
-          "scnCLS/FeaturedLevelsSource scnCLS/FeaturedLevelsSource::Local",
-          "scnCLS/FeaturedLevelsSource scnCLS/FeaturedLevelsSource::None",
-          "scnCLS/FeaturedLevelsSource scnCLS/FeaturedLevelsSource::Workshop"
-        ]
-      },
-      {
         "type": "scnEditor",
         "members": [
           "ADOFAI.InspectorPanel scnEditor::levelEventsPanel",
@@ -1573,8 +1497,6 @@
           "EventsArray\u00601\u003CADOFAI.LevelEvent\u003E scnEditor::events()",
           "EventsArray\u00601\u003CADOFAI.LevelEvent\u003E scnEditor::get_events()",
           "System.Boolean scnEditor::SelectionIsEmpty()",
-          "System.Boolean scnEditor::SelectionIsSingle()",
-          "System.Boolean scnEditor::autoFailed",
           "System.Boolean scnEditor::get_playMode()",
           "System.Boolean scnEditor::inStrictlyEditingMode",
           "System.Boolean scnEditor::initialized",
@@ -1586,7 +1508,6 @@
           "System.Collections.Generic.List\u00601\u003CscrFloor\u003E scnEditor::selectedFloors",
           "System.Int32 scnEditor::MaxUndoSteps",
           "System.String scnEditor::levelToOpenOnLoad",
-          "System.Void scnEditor::ApplyEventsToFloors()",
           "System.Void scnEditor::FlipFloor(scrFloor,System.Boolean,System.Boolean)",
           "System.Void scnEditor::FlipSelection(System.Boolean)",
           "System.Void scnEditor::OpenLevel()",
@@ -1600,11 +1521,9 @@
           "System.Void scnEditor::RotateSelection180()",
           "System.Void scnEditor::SaveLevel()",
           "System.Void scnEditor::SwitchToEditMode(System.Boolean)",
-          "System.Void scnEditor::ToggleNoFail()",
           "UnityEngine.GameObject scnEditor::notificationPopupContainer",
           "UnityEngine.Sprite[] scnEditor::autoSprites",
           "UnityEngine.UI.Button scnEditor::buttonAuto",
-          "UnityEngine.UI.Button scnEditor::buttonNoFail",
           "UnityEngine.UI.Button scnEditor::buttonSave",
           "UnityEngine.UI.Button scnEditor::popupUnsavedChangesSave",
           "UnityEngine.UI.Image scnEditor::autoImage",
@@ -1658,7 +1577,6 @@
           "System.Void scnGame::ApplyEventsToFloors(System.Collections.Generic.List\u00601\u003CscrFloor\u003E)",
           "System.Void scnGame::ApplyEventsToFloors(System.Collections.Generic.List\u00601\u003CscrFloor\u003E,ADOFAI.LevelData,scrLevelMaker,System.Collections.Generic.List\u00601\u003CADOFAI.LevelEvent\u003E)",
           "System.Void scnGame::RemakePath(System.Boolean,System.Boolean)",
-          "System.Void scnGame::ResetScene(System.Boolean)",
           "ffxPlusBase scnGame::ApplyEvent(ADOFAI.LevelEvent,System.Single,System.Single,System.Collections.Generic.List\u00601\u003CscrFloor\u003E,System.Single,System.Nullable\u00601\u003CSystem.Int32\u003E)",
           "scnGame scnGame::instance"
         ]
@@ -1670,16 +1588,6 @@
           "System.Int32 scnLevelSelect::CrownExit",
           "System.Int32 scnLevelSelect::MuseDashEntrance",
           "System.Int32 scnLevelSelect::MuseDashExit"
-        ]
-      },
-      {
-        "type": "scnSplash",
-        "members": []
-      },
-      {
-        "type": "scrButtonURL",
-        "members": [
-          "UnityEngine.UI.Button scrButtonURL::button"
         ]
       },
       {
@@ -1698,9 +1606,7 @@
         "type": "scrConductor",
         "members": [
           "CalibrationPreset scrConductor::currentPreset",
-          "System.Boolean scrConductor::fastTakeoff",
           "System.Boolean scrConductor::isGameWorld",
-          "System.Boolean scrConductor::playEndingCymbal",
           "System.Boolean scrConductor::separateCountdownTime",
           "System.Double scrConductor::addoffset",
           "System.Double scrConductor::crotchetAtStart",
@@ -1742,7 +1648,6 @@
           "System.Boolean scrController::TogglePauseGame()",
           "System.Boolean scrController::gameworld",
           "System.Boolean scrController::get_paused()",
-          "System.Boolean scrController::noFail",
           "System.Boolean scrController::paused()",
           "System.Collections.Generic.List\u00601\u003CPlanetRenderer\u003E scrController::dummyPlanets",
           "System.Collections.IEnumerator scrController::WaitForStartCo(System.Int32,System.Boolean)",
@@ -1758,11 +1663,8 @@
           "System.Void scrController::Restart(System.Boolean)",
           "System.Void scrController::RestartProgress()",
           "System.Void scrController::Scrub(System.Int32,System.Boolean)",
-          "System.Void scrController::SetPracticeMode(System.Boolean)",
           "System.Void scrController::StartLoadingScene(WipeDirection)",
           "System.Void scrController::Start_Rewind(System.Int32)",
-          "UnityEngine.UI.Text scrController::txtAllStrictClear",
-          "UnityEngine.UI.Text scrController::txtCongrats",
           "UnityEngine.UI.Text scrController::txtLevelName",
           "scrController scrController::get_instance()",
           "scrController scrController::instance()",
@@ -1792,28 +1694,16 @@
         ]
       },
       {
-        "type": "scrFlash",
-        "members": [
-          "System.Void scrFlash::FlashEx(UnityEngine.Color,UnityEngine.Color,System.Single)"
-        ]
-      },
-      {
         "type": "scrFloor",
         "members": [
           "FloorIcon scrFloor::floorIcon",
           "FloorRenderer scrFloor::floorRenderer",
           "System.Boolean scrFloor::auto",
           "System.Boolean scrFloor::disableGlow",
-          "System.Boolean scrFloor::isCCW",
-          "System.Boolean scrFloor::isportal",
           "System.Boolean scrFloor::midSpin",
-          "System.Boolean scrFloor::outline",
-          "System.Char scrFloor::stringDirection",
           "System.Collections.Generic.List\u00601\u003CffxPlusBase\u003E scrFloor::plusEffects",
           "System.Double scrFloor::angleLength",
           "System.Double scrFloor::entryTime",
-          "System.Double scrFloor::entryangle",
-          "System.Double scrFloor::exitangle",
           "System.Double scrFloor::marginScale",
           "System.Int32 scrFloor::SortingOrderOffset",
           "System.Int32 scrFloor::holdLength",
@@ -1821,15 +1711,10 @@
           "System.Int32 scrFloor::seqID",
           "System.Single scrFloor::extraBeats",
           "System.Single scrFloor::floatDirection",
-          "System.Single scrFloor::opacity",
           "System.Single scrFloor::speed",
           "System.String scrFloor::checkpointIconFilename",
           "System.String scrFloor::gizmoIconFilename",
           "System.Void scrFloor::LightUp()",
-          "System.Void scrFloor::SetIconAngle(System.Single)",
-          "System.Void scrFloor::SetIconFlipped(System.Boolean)",
-          "System.Void scrFloor::SetIconOutlineSprite(UnityEngine.Sprite)",
-          "System.Void scrFloor::SetIconSprite(UnityEngine.Sprite)",
           "System.Void scrFloor::SetToRandomColor()",
           "System.Void scrFloor::Start()",
           "System.Void scrFloor::UpdateIconSprite(System.Boolean)",
@@ -1881,14 +1766,7 @@
           "System.String scrLevelMaker::leveldata",
           "System.Void scrLevelMaker::CalculateFloorEntryTimes()",
           "scrLevelMaker scrLevelMaker::get_instance()",
-          "scrLevelMaker scrLevelMaker::instance()",
-          "scrLevelMaker2 scrLevelMaker::lm2"
-        ]
-      },
-      {
-        "type": "scrLevelMaker2",
-        "members": [
-          "System.Boolean scrLevelMaker2::BigTiles"
+          "scrLevelMaker scrLevelMaker::instance()"
         ]
       },
       {
@@ -1901,10 +1779,7 @@
       },
       {
         "type": "scrMisc",
-        "members": [
-          "System.Double scrMisc::GetAngleMoved(System.Double,System.Double,System.Boolean)",
-          "System.Double scrMisc::mod(System.Double,System.Double)"
-        ]
+        "members": []
       },
       {
         "type": "scrMistakesManager",
@@ -1939,9 +1814,7 @@
           "System.Single scrPlanet::basePlanetScale",
           "scrConductor scrPlanet::conductor()",
           "scrConductor scrPlanet::get_conductor()",
-          "scrFloor scrPlanet::currfloor",
           "scrPlanet scrPlanet::SwitchChosen(System.Nullable\u00601\u003CSystem.Int64\u003E)",
-          "scrPlanet scrPlanet::other",
           "scrPlayer scrPlanet::player"
         ]
       },
@@ -1959,10 +1832,6 @@
           "System.Collections.Generic.IEnumerator\u00601\u003CscrPlayer\u003E scrPlayerManager::GetEnumerator()",
           "System.Int32 scrPlayerManager::MaxPlayers"
         ]
-      },
-      {
-        "type": "scrSfx",
-        "members": []
       },
       {
         "type": "scrShowIfDebug",
@@ -2017,13 +1886,6 @@
         ]
       },
       {
-        "type": "DG.Tweening.DOTweenModuleUI",
-        "members": [
-          "DG.Tweening.Core.TweenerCore\u00603\u003CSystem.Single,System.Single,DG.Tweening.Plugins.Options.FloatOptions\u003E DG.Tweening.DOTweenModuleUI::DOFade(UnityEngine.CanvasGroup,System.Single,System.Single)",
-          "DG.Tweening.Core.TweenerCore\u00603\u003CUnityEngine.Vector2,UnityEngine.Vector2,DG.Tweening.Plugins.Options.VectorOptions\u003E DG.Tweening.DOTweenModuleUI::DOPivotY(UnityEngine.RectTransform,System.Single,System.Single)"
-        ]
-      },
-      {
         "type": "DifficultyUIMode",
         "members": [
           "DifficultyUIMode DifficultyUIMode::DontShow",
@@ -2039,131 +1901,10 @@
     "assembly": "DOTween",
     "types": [
       {
-        "type": "DG.Tweening.AxisConstraint",
-        "members": [
-          "DG.Tweening.AxisConstraint DG.Tweening.AxisConstraint::None",
-          "DG.Tweening.AxisConstraint DG.Tweening.AxisConstraint::W",
-          "DG.Tweening.AxisConstraint DG.Tweening.AxisConstraint::X",
-          "DG.Tweening.AxisConstraint DG.Tweening.AxisConstraint::Y",
-          "DG.Tweening.AxisConstraint DG.Tweening.AxisConstraint::Z",
-          "System.Int32 DG.Tweening.AxisConstraint::value__"
-        ]
-      },
-      {
-        "type": "DG.Tweening.Core.ABSSequentiable",
-        "members": []
-      },
-      {
-        "type": "DG.Tweening.Core.TweenerCore\u00603",
-        "members": []
-      },
-      {
         "type": "DG.Tweening.DOTween",
         "members": [
-          "DG.Tweening.Sequence DG.Tweening.DOTween::Sequence()",
           "System.Int32 DG.Tweening.DOTween::Kill(System.Object,System.Boolean)"
         ]
-      },
-      {
-        "type": "DG.Tweening.Ease",
-        "members": [
-          "DG.Tweening.Ease DG.Tweening.Ease::Flash",
-          "DG.Tweening.Ease DG.Tweening.Ease::INTERNAL_Custom",
-          "DG.Tweening.Ease DG.Tweening.Ease::INTERNAL_Zero",
-          "DG.Tweening.Ease DG.Tweening.Ease::InBack",
-          "DG.Tweening.Ease DG.Tweening.Ease::InBounce",
-          "DG.Tweening.Ease DG.Tweening.Ease::InCirc",
-          "DG.Tweening.Ease DG.Tweening.Ease::InCubic",
-          "DG.Tweening.Ease DG.Tweening.Ease::InElastic",
-          "DG.Tweening.Ease DG.Tweening.Ease::InExpo",
-          "DG.Tweening.Ease DG.Tweening.Ease::InFlash",
-          "DG.Tweening.Ease DG.Tweening.Ease::InOutBack",
-          "DG.Tweening.Ease DG.Tweening.Ease::InOutBounce",
-          "DG.Tweening.Ease DG.Tweening.Ease::InOutCirc",
-          "DG.Tweening.Ease DG.Tweening.Ease::InOutCubic",
-          "DG.Tweening.Ease DG.Tweening.Ease::InOutElastic",
-          "DG.Tweening.Ease DG.Tweening.Ease::InOutExpo",
-          "DG.Tweening.Ease DG.Tweening.Ease::InOutFlash",
-          "DG.Tweening.Ease DG.Tweening.Ease::InOutQuad",
-          "DG.Tweening.Ease DG.Tweening.Ease::InOutQuart",
-          "DG.Tweening.Ease DG.Tweening.Ease::InOutQuint",
-          "DG.Tweening.Ease DG.Tweening.Ease::InOutSine",
-          "DG.Tweening.Ease DG.Tweening.Ease::InQuad",
-          "DG.Tweening.Ease DG.Tweening.Ease::InQuart",
-          "DG.Tweening.Ease DG.Tweening.Ease::InQuint",
-          "DG.Tweening.Ease DG.Tweening.Ease::InSine",
-          "DG.Tweening.Ease DG.Tweening.Ease::Linear",
-          "DG.Tweening.Ease DG.Tweening.Ease::OutBack",
-          "DG.Tweening.Ease DG.Tweening.Ease::OutBounce",
-          "DG.Tweening.Ease DG.Tweening.Ease::OutCirc",
-          "DG.Tweening.Ease DG.Tweening.Ease::OutCubic",
-          "DG.Tweening.Ease DG.Tweening.Ease::OutElastic",
-          "DG.Tweening.Ease DG.Tweening.Ease::OutExpo",
-          "DG.Tweening.Ease DG.Tweening.Ease::OutFlash",
-          "DG.Tweening.Ease DG.Tweening.Ease::OutQuad",
-          "DG.Tweening.Ease DG.Tweening.Ease::OutQuart",
-          "DG.Tweening.Ease DG.Tweening.Ease::OutQuint",
-          "DG.Tweening.Ease DG.Tweening.Ease::OutSine",
-          "DG.Tweening.Ease DG.Tweening.Ease::Unset",
-          "System.Int32 DG.Tweening.Ease::value__"
-        ]
-      },
-      {
-        "type": "DG.Tweening.Plugins.Options.FloatOptions",
-        "members": [
-          "System.Boolean DG.Tweening.Plugins.Options.FloatOptions::snapping"
-        ]
-      },
-      {
-        "type": "DG.Tweening.Plugins.Options.IPlugOptions",
-        "members": [
-          "System.Void DG.Tweening.Plugins.Options.IPlugOptions::Reset()"
-        ]
-      },
-      {
-        "type": "DG.Tweening.Plugins.Options.VectorOptions",
-        "members": [
-          "DG.Tweening.AxisConstraint DG.Tweening.Plugins.Options.VectorOptions::axisConstraint",
-          "System.Boolean DG.Tweening.Plugins.Options.VectorOptions::snapping"
-        ]
-      },
-      {
-        "type": "DG.Tweening.Sequence",
-        "members": []
-      },
-      {
-        "type": "DG.Tweening.ShortcutExtensions",
-        "members": [
-          "System.Int32 DG.Tweening.ShortcutExtensions::DOKill(UnityEngine.Component,System.Boolean)"
-        ]
-      },
-      {
-        "type": "DG.Tweening.Tween",
-        "members": []
-      },
-      {
-        "type": "DG.Tweening.TweenCallback",
-        "members": [
-          "System.Void DG.Tweening.TweenCallback::.ctor(System.Object,System.IntPtr)"
-        ]
-      },
-      {
-        "type": "DG.Tweening.TweenExtensions",
-        "members": [
-          "System.Void DG.Tweening.TweenExtensions::Kill(DG.Tweening.Tween,System.Boolean)"
-        ]
-      },
-      {
-        "type": "DG.Tweening.TweenSettingsExtensions",
-        "members": [
-          "DG.Tweening.Sequence DG.Tweening.TweenSettingsExtensions::Insert(DG.Tweening.Sequence,System.Single,DG.Tweening.Tween)",
-          "T DG.Tweening.TweenSettingsExtensions::OnComplete(T,DG.Tweening.TweenCallback)",
-          "T DG.Tweening.TweenSettingsExtensions::SetEase(T,DG.Tweening.Ease)"
-        ]
-      },
-      {
-        "type": "DG.Tweening.Tweener",
-        "members": []
       }
     ]
   },
@@ -3464,10 +3205,8 @@
           "UnityEngine.Color UnityEngine.Color::HSVToRGB(System.Single,System.Single,System.Single)",
           "UnityEngine.Color UnityEngine.Color::Lerp(UnityEngine.Color,UnityEngine.Color,System.Single)",
           "UnityEngine.Color UnityEngine.Color::black()",
-          "UnityEngine.Color UnityEngine.Color::blue()",
           "UnityEngine.Color UnityEngine.Color::clear()",
           "UnityEngine.Color UnityEngine.Color::get_black()",
-          "UnityEngine.Color UnityEngine.Color::get_blue()",
           "UnityEngine.Color UnityEngine.Color::get_clear()",
           "UnityEngine.Color UnityEngine.Color::get_magenta()",
           "UnityEngine.Color UnityEngine.Color::get_red()",
@@ -3512,7 +3251,6 @@
           "T UnityEngine.Component::GetComponentInParent(System.Boolean)",
           "T[] UnityEngine.Component::GetComponents()",
           "T[] UnityEngine.Component::GetComponentsInChildren(System.Boolean)",
-          "UnityEngine.Component UnityEngine.Component::GetComponent(System.String)",
           "UnityEngine.GameObject UnityEngine.Component::gameObject()",
           "UnityEngine.GameObject UnityEngine.Component::get_gameObject()",
           "UnityEngine.Transform UnityEngine.Component::get_transform()",
@@ -3615,7 +3353,6 @@
           "System.Boolean UnityEngine.GameObject::activeSelf()",
           "System.Boolean UnityEngine.GameObject::get_activeInHierarchy()",
           "System.Boolean UnityEngine.GameObject::get_activeSelf()",
-          "System.Void UnityEngine.GameObject::.ctor()",
           "System.Void UnityEngine.GameObject::.ctor(System.String)",
           "System.Void UnityEngine.GameObject::.ctor(System.String,System.Type[])",
           "System.Void UnityEngine.GameObject::SetActive(System.Boolean)",
@@ -4256,12 +3993,9 @@
           "System.Int32 UnityEngine.Renderer::get_sortingOrder()",
           "System.Int32 UnityEngine.Renderer::sortingLayerID()",
           "System.Int32 UnityEngine.Renderer::sortingOrder()",
-          "System.String UnityEngine.Renderer::get_sortingLayerName()",
-          "System.String UnityEngine.Renderer::sortingLayerName()",
           "System.Void UnityEngine.Renderer::set_enabled(System.Boolean)",
           "System.Void UnityEngine.Renderer::set_material(UnityEngine.Material)",
           "System.Void UnityEngine.Renderer::set_sortingLayerID(System.Int32)",
-          "System.Void UnityEngine.Renderer::set_sortingLayerName(System.String)",
           "System.Void UnityEngine.Renderer::set_sortingOrder(System.Int32)",
           "UnityEngine.Material UnityEngine.Renderer::get_material()",
           "UnityEngine.Material UnityEngine.Renderer::get_sharedMaterial()",
@@ -4351,7 +4085,6 @@
         "members": [
           "System.String UnityEngine.SceneManagement.Scene::get_name()",
           "System.String UnityEngine.SceneManagement.Scene::name()",
-          "UnityEngine.GameObject[] UnityEngine.SceneManagement.Scene::GetRootGameObjects()",
           "UnityEngine.SceneManagement.SceneHandle UnityEngine.SceneManagement.Scene::m_Handle"
         ]
       },
@@ -4520,7 +4253,6 @@
           "System.Void UnityEngine.Texture2D::Apply(System.Boolean)",
           "System.Void UnityEngine.Texture2D::Apply(System.Boolean,System.Boolean)",
           "System.Void UnityEngine.Texture2D::Compress(System.Boolean)",
-          "System.Void UnityEngine.Texture2D::LoadRawTextureData(System.Byte[])",
           "System.Void UnityEngine.Texture2D::SetPixels(UnityEngine.Color[])",
           "System.Void UnityEngine.Texture2D::SetPixels32(UnityEngine.Color32[])",
           "UnityEngine.Color32[] UnityEngine.Texture2D::GetPixels32()",
@@ -4649,12 +4381,9 @@
           "System.Void UnityEngine.Transform::set_localPosition(UnityEngine.Vector3)",
           "System.Void UnityEngine.Transform::set_localRotation(UnityEngine.Quaternion)",
           "System.Void UnityEngine.Transform::set_localScale(UnityEngine.Vector3)",
-          "System.Void UnityEngine.Transform::set_parent(UnityEngine.Transform)",
           "System.Void UnityEngine.Transform::set_position(UnityEngine.Vector3)",
           "UnityEngine.Quaternion UnityEngine.Transform::get_localRotation()",
-          "UnityEngine.Quaternion UnityEngine.Transform::get_rotation()",
           "UnityEngine.Quaternion UnityEngine.Transform::localRotation()",
-          "UnityEngine.Quaternion UnityEngine.Transform::rotation()",
           "UnityEngine.Transform UnityEngine.Transform::Find(System.String)",
           "UnityEngine.Transform UnityEngine.Transform::GetChild(System.Int32)",
           "UnityEngine.Transform UnityEngine.Transform::get_parent()",
@@ -4707,18 +4436,6 @@
         ]
       },
       {
-        "type": "UnityEngine.Vector2Int",
-        "members": [
-          "System.Int32 UnityEngine.Vector2Int::get_x()",
-          "System.Int32 UnityEngine.Vector2Int::get_y()",
-          "System.Int32 UnityEngine.Vector2Int::m_X",
-          "System.Int32 UnityEngine.Vector2Int::m_Y",
-          "System.Int32 UnityEngine.Vector2Int::x()",
-          "System.Int32 UnityEngine.Vector2Int::y()",
-          "System.Void UnityEngine.Vector2Int::.ctor(System.Int32,System.Int32)"
-        ]
-      },
-      {
         "type": "UnityEngine.Vector3",
         "members": [
           "System.Boolean UnityEngine.Vector3::op_Equality(UnityEngine.Vector3,UnityEngine.Vector3)",
@@ -4755,12 +4472,6 @@
         ]
       },
       {
-        "type": "UnityEngine.WaitForEndOfFrame",
-        "members": [
-          "System.Void UnityEngine.WaitForEndOfFrame::.ctor()"
-        ]
-      },
-      {
         "type": "UnityEngine.YieldInstruction",
         "members": []
       }
@@ -4791,9 +4502,6 @@
           "System.Boolean UnityEngine.Input::GetMouseButtonUp(System.Int32)",
           "System.Boolean UnityEngine.Input::anyKeyDown()",
           "System.Boolean UnityEngine.Input::get_anyKeyDown()",
-          "System.Single UnityEngine.Input::GetAxisRaw(System.String)",
-          "System.String UnityEngine.Input::get_inputString()",
-          "System.String UnityEngine.Input::inputString()",
           "UnityEngine.Vector2 UnityEngine.Input::get_mouseScrollDelta()",
           "UnityEngine.Vector2 UnityEngine.Input::mouseScrollDelta()",
           "UnityEngine.Vector3 UnityEngine.Input::get_mousePosition()",
@@ -4956,24 +4664,6 @@
         ]
       },
       {
-        "type": "UnityEngine.FontStyle",
-        "members": [
-          "System.Int32 UnityEngine.FontStyle::value__",
-          "UnityEngine.FontStyle UnityEngine.FontStyle::Bold",
-          "UnityEngine.FontStyle UnityEngine.FontStyle::BoldAndItalic",
-          "UnityEngine.FontStyle UnityEngine.FontStyle::Italic",
-          "UnityEngine.FontStyle UnityEngine.FontStyle::Normal"
-        ]
-      },
-      {
-        "type": "UnityEngine.HorizontalWrapMode",
-        "members": [
-          "System.Int32 UnityEngine.HorizontalWrapMode::value__",
-          "UnityEngine.HorizontalWrapMode UnityEngine.HorizontalWrapMode::Overflow",
-          "UnityEngine.HorizontalWrapMode UnityEngine.HorizontalWrapMode::Wrap"
-        ]
-      },
-      {
         "type": "UnityEngine.TextAnchor",
         "members": [
           "System.Int32 UnityEngine.TextAnchor::value__",
@@ -5000,14 +4690,6 @@
           "UnityEngine.Vector4 UnityEngine.UIVertex::uv1",
           "UnityEngine.Vector4 UnityEngine.UIVertex::uv2",
           "UnityEngine.Vector4 UnityEngine.UIVertex::uv3"
-        ]
-      },
-      {
-        "type": "UnityEngine.VerticalWrapMode",
-        "members": [
-          "System.Int32 UnityEngine.VerticalWrapMode::value__",
-          "UnityEngine.VerticalWrapMode UnityEngine.VerticalWrapMode::Overflow",
-          "UnityEngine.VerticalWrapMode UnityEngine.VerticalWrapMode::Truncate"
         ]
       }
     ]
@@ -5138,15 +4820,11 @@
       },
       {
         "type": "UnityEngine.EventSystems.IPointerEnterHandler",
-        "members": [
-          "System.Void UnityEngine.EventSystems.IPointerEnterHandler::OnPointerEnter(UnityEngine.EventSystems.PointerEventData)"
-        ]
+        "members": []
       },
       {
         "type": "UnityEngine.EventSystems.IPointerExitHandler",
-        "members": [
-          "System.Void UnityEngine.EventSystems.IPointerExitHandler::OnPointerExit(UnityEngine.EventSystems.PointerEventData)"
-        ]
+        "members": []
       },
       {
         "type": "UnityEngine.EventSystems.IPointerUpHandler",
@@ -5521,21 +5199,7 @@
         "type": "UnityEngine.UI.InputField",
         "members": [
           "System.Boolean UnityEngine.UI.InputField::get_isFocused()",
-          "System.Boolean UnityEngine.UI.InputField::isFocused()",
-          "System.String UnityEngine.UI.InputField::get_text()",
-          "System.String UnityEngine.UI.InputField::text()",
-          "System.Void UnityEngine.UI.InputField::ActivateInputField()",
-          "System.Void UnityEngine.UI.InputField::set_caretColor(UnityEngine.Color)",
-          "System.Void UnityEngine.UI.InputField::set_placeholder(UnityEngine.UI.Graphic)",
-          "System.Void UnityEngine.UI.InputField::set_text(System.String)",
-          "System.Void UnityEngine.UI.InputField::set_textComponent(UnityEngine.UI.Text)",
-          "UnityEngine.Color UnityEngine.UI.InputField::caretColor()",
-          "UnityEngine.UI.Graphic UnityEngine.UI.InputField::placeholder()",
-          "UnityEngine.UI.InputField/EndEditEvent UnityEngine.UI.InputField::get_onEndEdit()",
-          "UnityEngine.UI.InputField/EndEditEvent UnityEngine.UI.InputField::onEndEdit()",
-          "UnityEngine.UI.InputField/OnChangeEvent UnityEngine.UI.InputField::get_onValueChanged()",
-          "UnityEngine.UI.InputField/OnChangeEvent UnityEngine.UI.InputField::onValueChanged()",
-          "UnityEngine.UI.Text UnityEngine.UI.InputField::textComponent()"
+          "System.Boolean UnityEngine.UI.InputField::isFocused()"
         ]
       },
       {
@@ -5575,10 +5239,6 @@
         ]
       },
       {
-        "type": "UnityEngine.UI.InputField/EndEditEvent",
-        "members": []
-      },
-      {
         "type": "UnityEngine.UI.InputField/InputType",
         "members": [
           "System.Int32 UnityEngine.UI.InputField/InputType::value__",
@@ -5595,10 +5255,6 @@
           "UnityEngine.UI.InputField/LineType UnityEngine.UI.InputField/LineType::MultiLineSubmit",
           "UnityEngine.UI.InputField/LineType UnityEngine.UI.InputField/LineType::SingleLine"
         ]
-      },
-      {
-        "type": "UnityEngine.UI.InputField/OnChangeEvent",
-        "members": []
       },
       {
         "type": "UnityEngine.UI.LayoutElement",
@@ -5662,10 +5318,6 @@
         ]
       },
       {
-        "type": "UnityEngine.UI.Outline",
-        "members": []
-      },
-      {
         "type": "UnityEngine.UI.RawImage",
         "members": [
           "System.Void UnityEngine.UI.RawImage::.ctor()",
@@ -5726,13 +5378,9 @@
         "members": [
           "System.Boolean UnityEngine.UI.Selectable::interactable()",
           "System.Void UnityEngine.UI.Selectable::Select()",
-          "System.Void UnityEngine.UI.Selectable::set_image(UnityEngine.UI.Image)",
           "System.Void UnityEngine.UI.Selectable::set_interactable(System.Boolean)",
           "System.Void UnityEngine.UI.Selectable::set_spriteState(UnityEngine.UI.SpriteState)",
-          "System.Void UnityEngine.UI.Selectable::set_targetGraphic(UnityEngine.UI.Graphic)",
           "System.Void UnityEngine.UI.Selectable::set_transition(UnityEngine.UI.Selectable/Transition)",
-          "UnityEngine.UI.Graphic UnityEngine.UI.Selectable::targetGraphic()",
-          "UnityEngine.UI.Image UnityEngine.UI.Selectable::image()",
           "UnityEngine.UI.Selectable/Transition UnityEngine.UI.Selectable::transition()",
           "UnityEngine.UI.SpriteState UnityEngine.UI.Selectable::get_spriteState()",
           "UnityEngine.UI.SpriteState UnityEngine.UI.Selectable::spriteState()"
@@ -5760,13 +5408,6 @@
         ]
       },
       {
-        "type": "UnityEngine.UI.Shadow",
-        "members": [
-          "System.Void UnityEngine.UI.Shadow::set_effectColor(UnityEngine.Color)",
-          "UnityEngine.Color UnityEngine.UI.Shadow::effectColor()"
-        ]
-      },
-      {
         "type": "UnityEngine.UI.SpriteState",
         "members": [
           "System.Void UnityEngine.UI.SpriteState::set_disabledSprite(UnityEngine.Sprite)",
@@ -5790,24 +5431,12 @@
       {
         "type": "UnityEngine.UI.Text",
         "members": [
-          "System.Boolean UnityEngine.UI.Text::supportRichText()",
           "System.Int32 UnityEngine.UI.Text::fontSize()",
           "System.Int32 UnityEngine.UI.Text::get_fontSize()",
-          "System.Single UnityEngine.UI.Text::lineSpacing()",
           "System.String UnityEngine.UI.Text::get_text()",
           "System.String UnityEngine.UI.Text::text()",
-          "System.Void UnityEngine.UI.Text::set_alignment(UnityEngine.TextAnchor)",
           "System.Void UnityEngine.UI.Text::set_fontSize(System.Int32)",
-          "System.Void UnityEngine.UI.Text::set_fontStyle(UnityEngine.FontStyle)",
-          "System.Void UnityEngine.UI.Text::set_horizontalOverflow(UnityEngine.HorizontalWrapMode)",
-          "System.Void UnityEngine.UI.Text::set_lineSpacing(System.Single)",
-          "System.Void UnityEngine.UI.Text::set_supportRichText(System.Boolean)",
-          "System.Void UnityEngine.UI.Text::set_text(System.String)",
-          "System.Void UnityEngine.UI.Text::set_verticalOverflow(UnityEngine.VerticalWrapMode)",
-          "UnityEngine.FontStyle UnityEngine.UI.Text::fontStyle()",
-          "UnityEngine.HorizontalWrapMode UnityEngine.UI.Text::horizontalOverflow()",
-          "UnityEngine.TextAnchor UnityEngine.UI.Text::alignment()",
-          "UnityEngine.VerticalWrapMode UnityEngine.UI.Text::verticalOverflow()"
+          "System.Void UnityEngine.UI.Text::set_text(System.String)"
         ]
       },
       {

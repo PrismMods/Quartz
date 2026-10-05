@@ -87,7 +87,6 @@ namespace UnityEngine {
         public float r;
         public float this[int index] { get => throw null; set { } }
         public static global::UnityEngine.Color black { get => throw null; }
-        public static global::UnityEngine.Color blue { get => throw null; }
         public static global::UnityEngine.Color clear { get => throw null; }
         public static global::UnityEngine.Color magenta { get => throw null; }
         public static global::UnityEngine.Color red { get => throw null; }
@@ -127,7 +126,6 @@ namespace UnityEngine {
         public global::UnityEngine.GameObject gameObject { get => throw null; }
         public global::UnityEngine.Transform transform { get => throw null; }
         public T GetComponent<T>() => throw null;
-        public global::UnityEngine.Component GetComponent(string type) => throw null;
         public T GetComponentInChildren<T>() => throw null;
         public T GetComponentInChildren<T>(bool includeInactive) => throw null;
         public T GetComponentInParent<T>() => throw null;
@@ -173,7 +171,6 @@ namespace UnityEngine {
         public bool activeInHierarchy { get => throw null; }
         public bool activeSelf { get => throw null; }
         public global::UnityEngine.Transform transform { get => throw null; }
-        public GameObject() => throw null;
         public GameObject(string name) => throw null;
         public GameObject(string name, params global::System.Type[] components) => throw null;
         public T AddComponent<T>() where T : global::UnityEngine.Component => throw null;
@@ -182,6 +179,7 @@ namespace UnityEngine {
         public T GetComponentInParent<T>() => throw null;
         public T[] GetComponentsInChildren<T>(bool includeInactive) => throw null;
         public void SetActive(bool value) => throw null;
+        private GameObject() { }
     }
     public unsafe partial class Gradient : global::System.IEquatable<global::UnityEngine.Gradient> {
         protected Gradient() { }
@@ -708,7 +706,6 @@ namespace UnityEngine {
         public global::UnityEngine.Material material { get => throw null; set { } }
         public global::UnityEngine.Material sharedMaterial { get => throw null; set { } }
         public int sortingLayerID { get => throw null; set { } }
-        public string sortingLayerName { get => throw null; set { } }
         public int sortingOrder { get => throw null; set { } }
         protected Renderer() { }
     }
@@ -869,7 +866,6 @@ namespace UnityEngine {
         public void Apply(bool updateMipmaps, bool makeNoLongerReadable) => throw null;
         public void Compress(bool highQuality) => throw null;
         public global::UnityEngine.Color32[] GetPixels32() => throw null;
-        public void LoadRawTextureData(byte[] data) => throw null;
         public global::UnityEngine.Rect[] PackTextures(global::UnityEngine.Texture2D[] textures, int padding, int maximumAtlasSize, bool makeNoLongerReadable) => throw null;
         public void SetPixels(global::UnityEngine.Color[] colors) => throw null;
         public void SetPixels32(global::UnityEngine.Color32[] colors) => throw null;
@@ -971,7 +967,6 @@ namespace UnityEngine {
         public global::UnityEngine.Vector3 lossyScale { get => throw null; }
         public global::UnityEngine.Transform parent { get => throw null; set { } }
         public global::UnityEngine.Vector3 position { get => throw null; set { } }
-        public global::UnityEngine.Quaternion rotation { get => throw null; set { } }
         public global::UnityEngine.Transform Find(string n) => throw null;
         public global::UnityEngine.Transform GetChild(int index) => throw null;
         public virtual global::System.Collections.IEnumerator GetEnumerator() => throw null;
@@ -1015,14 +1010,6 @@ namespace UnityEngine {
         public override int GetHashCode() => throw null;
         bool global::System.IEquatable<global::UnityEngine.Vector2>.Equals(global::UnityEngine.Vector2 other) => throw null;
     }
-    public unsafe partial struct Vector2Int : global::System.IEquatable<global::UnityEngine.Vector2Int> {
-        private int m_X;
-        private int m_Y;
-        public int x { get => throw null; set { } }
-        public int y { get => throw null; set { } }
-        public Vector2Int(int x, int y) => throw null;
-        bool global::System.IEquatable<global::UnityEngine.Vector2Int>.Equals(global::UnityEngine.Vector2Int other) => throw null;
-    }
     public unsafe partial struct Vector3 : global::System.IEquatable<global::UnityEngine.Vector3> {
         public const float kEpsilon = 12f;
         public const float kEpsilonNormalSqrt = 13f;
@@ -1057,9 +1044,6 @@ namespace UnityEngine {
         public override int GetHashCode() => throw null;
         bool global::System.IEquatable<global::UnityEngine.Vector4>.Equals(global::UnityEngine.Vector4 other) => throw null;
     }
-    public sealed unsafe partial class WaitForEndOfFrame : global::UnityEngine.YieldInstruction {
-        public WaitForEndOfFrame() => throw null;
-    }
     public unsafe partial class YieldInstruction {
         protected YieldInstruction() { }
     }
@@ -1092,7 +1076,6 @@ namespace UnityEngine.SceneManagement {
     public unsafe partial struct Scene {
         private global::UnityEngine.SceneManagement.SceneHandle m_Handle;
         public string name { get => throw null; set { } }
-        public global::UnityEngine.GameObject[] GetRootGameObjects() => throw null;
     }
     public unsafe partial struct SceneHandle : global::System.IEquatable<global::UnityEngine.SceneManagement.SceneHandle> {
         private global::UnityEngine.EntityId m_Value;

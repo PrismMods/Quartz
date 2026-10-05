@@ -16,16 +16,6 @@ namespace UnityEngine {
         public Font(string name) => throw null;
         private Font() { }
     }
-    public enum FontStyle : int {
-        Normal = 0,
-        Bold = 1,
-        Italic = 2,
-        BoldAndItalic = 3,
-    }
-    public enum HorizontalWrapMode : int {
-        Wrap = 0,
-        Overflow = 1,
-    }
     public enum TextAnchor : int {
         UpperLeft = 0,
         UpperCenter = 1,
@@ -47,9 +37,5 @@ namespace UnityEngine {
         public global::UnityEngine.Vector4 uv1;
         public global::UnityEngine.Vector4 uv2;
         public global::UnityEngine.Vector4 uv3;
-    }
-    public enum VerticalWrapMode : int {
-        Truncate = 0,
-        Overflow = 1,
     }
 }

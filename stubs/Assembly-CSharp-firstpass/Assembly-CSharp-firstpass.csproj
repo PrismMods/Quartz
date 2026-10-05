@@ -22,8 +22,5 @@
 		<Compile Include="Stubs.g.cs" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="../DOTween/DOTween.csproj" />
-		<ProjectReference Include="../UnityEngine.CoreModule/UnityEngine.CoreModule.csproj" />
-		<ProjectReference Include="../UnityEngine.UIModule/UnityEngine.UIModule.csproj" />
 	</ItemGroup>
 </Project>

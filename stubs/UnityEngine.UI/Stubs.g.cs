@@ -29,7 +29,7 @@ namespace UnityEngine.EventSystems {
         public global::UnityEngine.GameObject currentSelectedGameObject { get => throw null; }
         protected EventSystem() { }
     }
-    public unsafe partial class EventTrigger : global::UnityEngine.MonoBehaviour, global::UnityEngine.EventSystems.IPointerEnterHandler, global::UnityEngine.EventSystems.IPointerExitHandler, global::UnityEngine.EventSystems.IPointerDownHandler, global::UnityEngine.EventSystems.IPointerUpHandler, global::UnityEngine.EventSystems.IPointerClickHandler, global::UnityEngine.EventSystems.IBeginDragHandler, global::UnityEngine.EventSystems.IDragHandler, global::UnityEngine.EventSystems.IEndDragHandler {
+    public unsafe partial class EventTrigger : global::UnityEngine.MonoBehaviour, global::UnityEngine.EventSystems.IPointerDownHandler, global::UnityEngine.EventSystems.IPointerUpHandler, global::UnityEngine.EventSystems.IPointerClickHandler, global::UnityEngine.EventSystems.IBeginDragHandler, global::UnityEngine.EventSystems.IDragHandler, global::UnityEngine.EventSystems.IEndDragHandler {
         public global::System.Collections.Generic.List<global::UnityEngine.EventSystems.EventTrigger.Entry> triggers { get => throw null; set { } }
         protected EventTrigger() { }
         void global::UnityEngine.EventSystems.IBeginDragHandler.OnBeginDrag(global::UnityEngine.EventSystems.PointerEventData eventData) => throw null;
@@ -37,8 +37,6 @@ namespace UnityEngine.EventSystems {
         void global::UnityEngine.EventSystems.IEndDragHandler.OnEndDrag(global::UnityEngine.EventSystems.PointerEventData eventData) => throw null;
         void global::UnityEngine.EventSystems.IPointerClickHandler.OnPointerClick(global::UnityEngine.EventSystems.PointerEventData eventData) => throw null;
         void global::UnityEngine.EventSystems.IPointerDownHandler.OnPointerDown(global::UnityEngine.EventSystems.PointerEventData eventData) => throw null;
-        void global::UnityEngine.EventSystems.IPointerEnterHandler.OnPointerEnter(global::UnityEngine.EventSystems.PointerEventData eventData) => throw null;
-        void global::UnityEngine.EventSystems.IPointerExitHandler.OnPointerExit(global::UnityEngine.EventSystems.PointerEventData eventData) => throw null;
         void global::UnityEngine.EventSystems.IPointerUpHandler.OnPointerUp(global::UnityEngine.EventSystems.PointerEventData eventData) => throw null;
         public unsafe partial class TriggerEvent : global::UnityEngine.Events.UnityEvent<global::UnityEngine.EventSystems.BaseEventData> {
             protected TriggerEvent() { }
@@ -96,10 +94,8 @@ namespace UnityEngine.EventSystems {
         void OnPointerDown(global::UnityEngine.EventSystems.PointerEventData eventData);
     }
     public unsafe partial interface IPointerEnterHandler : global::UnityEngine.EventSystems.IEventSystemHandler {
-        void OnPointerEnter(global::UnityEngine.EventSystems.PointerEventData eventData);
     }
     public unsafe partial interface IPointerExitHandler : global::UnityEngine.EventSystems.IEventSystemHandler {
-        void OnPointerExit(global::UnityEngine.EventSystems.PointerEventData eventData);
     }
     public unsafe partial interface IPointerUpHandler : global::UnityEngine.EventSystems.IEventSystemHandler {
         void OnPointerUp(global::UnityEngine.EventSystems.PointerEventData eventData);
@@ -316,14 +312,7 @@ namespace UnityEngine.UI {
         }
     }
     public unsafe partial class InputField : global::UnityEngine.UI.Selectable, global::UnityEngine.EventSystems.IBeginDragHandler, global::UnityEngine.EventSystems.IDragHandler, global::UnityEngine.EventSystems.IEndDragHandler, global::UnityEngine.EventSystems.IPointerClickHandler {
-        public global::UnityEngine.Color caretColor { get => throw null; set { } }
         public bool isFocused { get => throw null; }
-        public global::UnityEngine.UI.InputField.EndEditEvent onEndEdit { get => throw null; set { } }
-        public global::UnityEngine.UI.InputField.OnChangeEvent onValueChanged { get => throw null; set { } }
-        public global::UnityEngine.UI.Graphic placeholder { get => throw null; set { } }
-        public string text { get => throw null; set { } }
-        public global::UnityEngine.UI.Text textComponent { get => throw null; set { } }
-        public void ActivateInputField() => throw null;
         protected InputField() { }
         void global::UnityEngine.EventSystems.IBeginDragHandler.OnBeginDrag(global::UnityEngine.EventSystems.PointerEventData eventData) => throw null;
         void global::UnityEngine.EventSystems.IDragHandler.OnDrag(global::UnityEngine.EventSystems.PointerEventData eventData) => throw null;
@@ -358,12 +347,6 @@ namespace UnityEngine.UI {
             SingleLine = 0,
             MultiLineSubmit = 1,
             MultiLineNewline = 2,
-        }
-        public unsafe partial class EndEditEvent : global::UnityEngine.Events.UnityEvent<string> {
-            protected EndEditEvent() { }
-        }
-        public unsafe partial class OnChangeEvent : global::UnityEngine.Events.UnityEvent<string> {
-            protected OnChangeEvent() { }
         }
         public enum EditState : int {
             Continue = 0,
@@ -401,9 +384,6 @@ namespace UnityEngine.UI {
     public abstract unsafe partial class MaskableGraphic : global::UnityEngine.UI.Graphic {
         protected MaskableGraphic() => throw null;
     }
-    public unsafe partial class Outline : global::UnityEngine.UI.Shadow {
-        protected Outline() { }
-    }
     public unsafe partial class RawImage : global::UnityEngine.UI.MaskableGraphic {
         public global::UnityEngine.Texture texture { get => throw null; set { } }
         public global::UnityEngine.Rect uvRect { get => throw null; set { } }
@@ -439,17 +419,13 @@ namespace UnityEngine.UI {
             AutoHideAndExpandViewport = 2,
         }
     }
-    public unsafe partial class Selectable : global::UnityEngine.EventSystems.UIBehaviour, global::UnityEngine.EventSystems.IPointerDownHandler, global::UnityEngine.EventSystems.IPointerUpHandler, global::UnityEngine.EventSystems.IPointerEnterHandler, global::UnityEngine.EventSystems.IPointerExitHandler {
-        public global::UnityEngine.UI.Image image { get => throw null; set { } }
+    public unsafe partial class Selectable : global::UnityEngine.EventSystems.UIBehaviour, global::UnityEngine.EventSystems.IPointerDownHandler, global::UnityEngine.EventSystems.IPointerUpHandler {
         public bool interactable { get => throw null; set { } }
         public global::UnityEngine.UI.SpriteState spriteState { get => throw null; set { } }
-        public global::UnityEngine.UI.Graphic targetGraphic { get => throw null; set { } }
         public global::UnityEngine.UI.Selectable.Transition transition { get => throw null; set { } }
         public virtual void Select() => throw null;
         protected Selectable() { }
         void global::UnityEngine.EventSystems.IPointerDownHandler.OnPointerDown(global::UnityEngine.EventSystems.PointerEventData eventData) => throw null;
-        void global::UnityEngine.EventSystems.IPointerEnterHandler.OnPointerEnter(global::UnityEngine.EventSystems.PointerEventData eventData) => throw null;
-        void global::UnityEngine.EventSystems.IPointerExitHandler.OnPointerExit(global::UnityEngine.EventSystems.PointerEventData eventData) => throw null;
         void global::UnityEngine.EventSystems.IPointerUpHandler.OnPointerUp(global::UnityEngine.EventSystems.PointerEventData eventData) => throw null;
         public enum Transition : int {
             None = 0,
@@ -465,10 +441,6 @@ namespace UnityEngine.UI {
             Disabled = 4,
         }
     }
-    public unsafe partial class Shadow : global::UnityEngine.UI.BaseMeshEffect {
-        public global::UnityEngine.Color effectColor { get => throw null; set { } }
-        protected Shadow() { }
-    }
     public unsafe partial struct SpriteState : global::System.IEquatable<global::UnityEngine.UI.SpriteState> {
         private global::UnityEngine.Sprite m_DisabledSprite;
         private global::UnityEngine.Sprite m_HighlightedSprite;
@@ -481,14 +453,8 @@ namespace UnityEngine.UI {
         bool global::System.IEquatable<global::UnityEngine.UI.SpriteState>.Equals(global::UnityEngine.UI.SpriteState other) => throw null;
     }
     public unsafe partial class Text : global::UnityEngine.UI.MaskableGraphic {
-        public global::UnityEngine.TextAnchor alignment { get => throw null; set { } }
         public int fontSize { get => throw null; set { } }
-        public global::UnityEngine.FontStyle fontStyle { get => throw null; set { } }
-        public global::UnityEngine.HorizontalWrapMode horizontalOverflow { get => throw null; set { } }
-        public float lineSpacing { get => throw null; set { } }
-        public bool supportRichText { get => throw null; set { } }
         public virtual string text { get => throw null; set { } }
-        public global::UnityEngine.VerticalWrapMode verticalOverflow { get => throw null; set { } }
         protected Text() { }
     }
     public unsafe partial class VertexHelper : global::System.IDisposable {
