@@ -154,9 +154,14 @@ public static partial class KeyViewerOverlay {
         }
         RecordDmPress(box, time);
         BeginDmNoteRain(box, time);
-        if(dmMinLitSeconds > 0f)
-            box.LitUntil = Mathf.Max(box.LitUntil, Mathf.Max(time, frameNow) + dmMinLitSeconds);
+        float minLit = macRuntime && box.Key == KeyCode.CapsLock
+            ? Mathf.Max(dmMinLitSeconds, MacCapsLockLitSeconds) : dmMinLitSeconds;
+        if(minLit > 0f)
+            box.LitUntil = Mathf.Max(box.LitUntil, Mathf.Max(time, frameNow) + minLit);
     }
+    // macOS delivers Caps Lock press and release together on each toggle, and the
+    // window server only knows the lock state, so the hold itself is invisible.
+    private const float MacCapsLockLitSeconds = 0.1f;
     private static void ApplyGhostEdge(Box box, bool down, float time) {
         DmNoteSpec spec = box.Dm;
         if(spec == null || down == box.GhostPressed) return;

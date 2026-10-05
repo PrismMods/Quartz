@@ -175,6 +175,8 @@ public static class HookInput {
             return false;
         }
     }
+    // No CapsLock: the window server reports its lock state, not the key, so a
+    // backfill would relight the box after release while caps lock stays on.
     private static ushort MacVirtualKey(KeyCode key) => key switch {
         KeyCode.A => 0x00, KeyCode.S => 0x01, KeyCode.D => 0x02, KeyCode.F => 0x03, KeyCode.H => 0x04,
         KeyCode.G => 0x05, KeyCode.Z => 0x06, KeyCode.X => 0x07, KeyCode.C => 0x08, KeyCode.V => 0x09,
@@ -189,7 +191,7 @@ public static class HookInput {
         KeyCode.N => 0x2D, KeyCode.M => 0x2E, KeyCode.Period => 0x2F, KeyCode.Tab => 0x30, KeyCode.Space => 0x31,
         KeyCode.BackQuote => 0x32, KeyCode.Backspace => 0x33, KeyCode.Escape => 0x35,
         KeyCode.RightCommand => 0x36, KeyCode.LeftCommand => 0x37, KeyCode.LeftShift => 0x38,
-        KeyCode.CapsLock => 0x39, KeyCode.LeftAlt => 0x3A, KeyCode.LeftControl => 0x3B,
+        KeyCode.LeftAlt => 0x3A, KeyCode.LeftControl => 0x3B,
         KeyCode.RightShift => 0x3C, KeyCode.RightAlt => 0x3D, KeyCode.RightControl => 0x3E,
         KeyCode.KeypadPeriod => 0x41, KeyCode.KeypadMultiply => 0x43, KeyCode.KeypadPlus => 0x45,
         KeyCode.KeypadDivide => 0x4B, KeyCode.KeypadEnter => 0x4C, KeyCode.KeypadMinus => 0x4E,

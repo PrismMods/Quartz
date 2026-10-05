@@ -7,6 +7,15 @@ public sealed class KeyCaptureRunner : MonoBehaviour {
     public Action<KeyCode> OnCaptured;
     public Action OnCancelled;
     private static readonly KeyCode[] allKeys = (KeyCode[])Enum.GetValues(typeof(KeyCode));
+    // Unity never reports Caps Lock on macOS; the hook does, as a press per toggle.
+    private static int hookCapsPresses;
+    static KeyCaptureRunner() {
+        if(!Quartz.Game.HookInput.IsMacOSRuntime) return;
+        Quartz.Game.HookKeys.KeyEvent += static (key, down) => {
+            if(down && key == KeyCode.CapsLock) System.Threading.Interlocked.Increment(ref hookCapsPresses);
+        };
+    }
+    private int prevHookCaps;
     private bool prevHookRAlt;
     private bool prevHookRCtrl;
     private bool wasListening;
@@ -37,12 +46,19 @@ public sealed class KeyCaptureRunner : MonoBehaviour {
         bool rCtrlEdge = !firstListeningFrame && hookRCtrl && !prevHookRCtrl;
         prevHookRAlt = hookRAlt;
         prevHookRCtrl = hookRCtrl;
+        int hookCaps = System.Threading.Volatile.Read(ref hookCapsPresses);
+        bool capsEdge = !firstListeningFrame && hookCaps != prevHookCaps;
+        prevHookCaps = hookCaps;
         if(Input.GetKeyDown(KeyCode.Escape) || (ShouldCancel?.Invoke() ?? false)) {
             CancelCapture();
             return;
         }
         if(rCtrlEdge) {
             CompleteCapture(KeyCode.RightControl);
+            return;
+        }
+        if(capsEdge) {
+            CompleteCapture(KeyCode.CapsLock);
             return;
         }
         if(rAltEdge) {
