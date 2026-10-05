@@ -152,7 +152,7 @@ Current feature areas include:
 - `ChatterBlocker` — input/chat blocking behavior.
 - `Combo`, `Judgement`, `ProgressBar`, `SongTitle`, `Panels` — gameplay HUD overlays.
 - `Editor` — editor-focused tweaks/readouts/BGA/difficulty behavior.
-- `EffectRemover`, `Nostalgia`, `PlanetColors`, `UiHider`, `Tweaks` — visual/gameplay presentation tweaks.
+- `EffectRemover`, `PlanetColors`, `UiHider`, `Tweaks` — visual/gameplay presentation tweaks.
 - `InGameOverlay` — applies the mod font to three specific pieces of the game's own native HUD text (song title, countdown, per-hit judgement); replaces an earlier scene-scanning `GameOverlayFont` that was removed for performance.
 - `KeyLimiter`, `Restriction` — input/gameplay restrictions.
 - `Calibration` — input-offset calibration flow: per-device float offsets, on-death calibration popup, and a detailed timing readout.
@@ -173,7 +173,7 @@ The in-game menu is built in code under `Quartz/UI`. It is a two-column sidebar 
 - `Quartz/UI/UICore.cs` creates the top-level canvas, panel, sidebar, first-run helper, reorganize mode, resize handle, tooltips, and global open/close behavior. It also defines `OriginalMenuState`, the ordered list of built-in pages.
 - `Quartz/UI/Factory/MenuFactory.cs` groups `OriginalMenuState` values into sidebar categories via `CategoryChildren`; each category's first value is its representative state. The enum is never persisted by name, so pages can be reordered/regrouped without corrupting saved settings.
 - `Quartz/UI/Factory/PageFactory.cs` wires each state to its page builder.
-- `Quartz/UI/Factory/Page/Page*.cs` are the settings pages. Several build more than one state via static methods (e.g. `PageGameplay`, `PageVisuals`, `PageTweaks`, `PageEditor`, `NostalgiaUI`), so one file can back a whole sidebar category.
+- `Quartz/UI/Factory/Page/Page*.cs` are the settings pages. Several build more than one state via static methods (e.g. `PageGameplay`, `PageVisuals`, `PageTweaks`, `PageEditor`), so one file can back a whole sidebar category.
 - `Quartz/UI/Panes/PaneHost.cs` — docked context/live-preview panes shown beside a page (currently wired for Key Viewer).
 - `Quartz/UI/Generator/GenerateUI*.cs` creates common rows/controls: toggles, buttons, sliders, inputs, dropdowns, color pickers, keybinds, collapsibles.
 - `Quartz/UI/Objects/Impl/*` are backing objects for those controls.

@@ -609,23 +609,6 @@
         "zh-CN": "视觉与美化"
       },
       "question": {
-        "en-US": "What is Nostalgia (Back To The Past)?",
-        "ko-KR": "추억(Back To The Past)이 뭔가요?",
-        "zh-CN": "什么是怀旧（回到过去）？"
-      },
-      "answer": {
-        "en-US": "A faithful port of tjwogud's BackToThePast mod. It reverts modern ADOFAI behavior, visuals, and sounds to older versions: legacy result/flash/twirl, hide difficulty/no-fail, old practice mode, SFX mutes, old editor buttons, old menu background, the alpha-warning skip, and the OldXO secret-level easter egg.",
-        "ko-KR": "tjwogud의 BackToThePast 모드를 충실히 이식한 기능입니다. 최신 얼불춤의 동작·비주얼·사운드를 옛 버전으로 되돌립니다: 옛 결과/플래시/회전, 난이도·노페일 숨기기, 옛 연습 모드, 효과음 음소거, 옛 에디터 버튼, 옛 메뉴 배경, 알파 경고 건너뛰기, OldXO 히든 레벨 이스터에그.",
-        "zh-CN": "tjwogud的BackToThePast模组的忠实移植版。将现代ADOFAI的行为、视觉和声音恢复到旧版本：旧结果/闪光/旋转、隐藏难度/no-fail、旧练习模式、静音效果音、旧编辑器按钮、旧菜单背景、跳过alpha警告，以及OldXO隐藏关卡彩蛋。"
-      }
-    },
-    {
-      "category": {
-        "en-US": "Visual and cosmetic",
-        "ko-KR": "비주얼과 꾸미기",
-        "zh-CN": "视觉与美化"
-      },
-      "question": {
         "en-US": "What does the Status / BPM feature track?",
         "ko-KR": "상태·BPM 기능은 뭘 보여주나요?",
         "zh-CN": "状态/BPM功能追踪什么？"

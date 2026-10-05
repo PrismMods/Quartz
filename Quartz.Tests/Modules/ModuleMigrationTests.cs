@@ -43,7 +43,7 @@ static class ModuleMigrationTests {
     }
     public static void TestFeaturesWithNoMasterToggleAlwaysComeAlong() {
         ModuleMigration.Plan plan = ModuleMigration.Decide(Files(("KeyViewer.json", "{}")));
-        foreach(string id in new[] { "tweaks", "restriction", "calibration", "optimizer", "editor", "nostalgia", "tuf" })
+        foreach(string id in new[] { "tweaks", "restriction", "calibration", "optimizer", "editor", "tuf" })
             Assert(plan.Install.Contains(id), $"'{id}' has no master toggle, so an upgrade keeps it");
     }
     public static void TestJudgementAndHideJudgementsCarryOverSeparately() {

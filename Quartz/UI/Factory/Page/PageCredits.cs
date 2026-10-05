@@ -32,7 +32,6 @@ internal static class PageCredits {
             "Overlayer — UI foundation (modlist.org)\n" +
             "DM Note (lee-sihun) — Key Viewer editor icons\n" +
             "DecoPreview (rdzip) — Decoration Preview, GPLv3\n" +
-            "BackToThePast (tjwogud) — Nostalgia\n" +
             "FlipAndRotateTiles (tjwogud) — Flip & Rotate Tiles\n" +
             "AdofaiTweaks — editor tile-angle readout\n" +
             "HzHitSoundRenderer — Render All Hit Sounds\n" +

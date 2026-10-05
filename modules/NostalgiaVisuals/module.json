@@ -1,6 +1,0 @@
-{
-  "schema": 1, "id": "nostalgia-visuals", "entry": "Quartz.Features.Nostalgia.NostalgiaVisualsModule",
-  "name": "Nostalgia Visuals", "nameKey": "NOSTALGIA_VISUALS", "group": "nostalgia", "order": 20,
-  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
-  "deps": ["nostalgia"], "settingsFiles": [], "langPrefixes": []
-}
