@@ -1,3 +1,4 @@
+using Quartz.Game;
 using Quartz.Modules;
 using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
@@ -15,6 +16,10 @@ public sealed class DiscordModule : QuartzModule {
             Build = PageDiscord.Create,
             OwnScroll = true,
         });
+        VoiceDeafen.Register("discord", VoiceSession.DeafenStatus, VoiceSession.SetDeaf);
     }
-    public override void OnUnload() { }
+    public override void OnUnload() {
+        VoiceSession.SetDeaf(false);
+        VoiceDeafen.Unregister("discord");
+    }
 }

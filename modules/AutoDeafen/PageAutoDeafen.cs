@@ -25,29 +25,29 @@ public static class PageAutoDeafen {
             conf.Enabled,
             "Enable Auto Deafen (Discord)", "autodeafen_enable", def.Enabled
         );
-        if(AutoDeafen.ShortcutSupported) {
-            GenerateUI.DropDown(
-                GenerateUI.Row(sec.Body),
-                AutoDeafenSettings.ModeShortcut,
-                conf.IsShortcut ? AutoDeafenSettings.ModeShortcut : AutoDeafenSettings.ModeBot,
-                new[] { AutoDeafenSettings.ModeShortcut, AutoDeafenSettings.ModeBot },
-                m => MainCore.Tr.Get(
-                    m == AutoDeafenSettings.ModeShortcut ? "AD_MODE_SHORTCUT" : "AD_MODE_BOT",
-                    m == AutoDeafenSettings.ModeShortcut ? "Shortcut" : "Bot"),
-                v => {
-                    conf.Mode = v;
-                    AutoDeafen.Save();
-                    UICore.Rebuild();
-                },
-                "ad_mode",
-                260f,
-                "Mode"
-            );
-        } else {
+        GenerateUI.DropDown(
+            GenerateUI.Row(sec.Body),
+            AutoDeafen.ShortcutSupported ? AutoDeafenSettings.ModeShortcut : AutoDeafenSettings.ModeBot,
+            AutoDeafen.EffectiveMode,
+            AutoDeafen.ShortcutSupported
+                ? new[] { AutoDeafenSettings.ModeShortcut, AutoDeafenSettings.ModeBot, AutoDeafenSettings.ModeDiscord }
+                : new[] { AutoDeafenSettings.ModeBot, AutoDeafenSettings.ModeDiscord },
+            m => m == AutoDeafenSettings.ModeShortcut ? MainCore.Tr.Get("AD_MODE_SHORTCUT", "Shortcut")
+                : m == AutoDeafenSettings.ModeDiscord ? MainCore.Tr.Get("AD_MODE_DISCORD", "Discord Login")
+                : MainCore.Tr.Get("AD_MODE_BOT", "Bot"),
+            v => {
+                conf.Mode = v;
+                AutoDeafen.Save();
+                UICore.Rebuild();
+            },
+            "ad_mode",
+            260f,
+            "Mode"
+        );
+        if(!AutoDeafen.ShortcutSupported)
             GenerateUI.AddLocalizedMutedText(
                 GenerateUI.Row(sec.Body, 30f), "AD_SHORTCUT_WINDOWS_ONLY",
                 "Shortcut mode is Windows-only — using Bot mode.");
-        }
         UISlider pct = GenerateUI.Slider(
             GenerateUI.Row(sec.Body),
             def.DeafenAtPercent, 0f, 100f, conf.DeafenAtPercent,
@@ -85,6 +85,10 @@ public static class PageAutoDeafen {
         );
         if(AutoDeafen.EffectiveMode == AutoDeafenSettings.ModeShortcut) {
             CreateAutoDeafenShortcut(sec.Body, conf);
+        } else if(AutoDeafen.EffectiveMode == AutoDeafenSettings.ModeDiscord) {
+            GenerateUI.AddLocalizedMutedText(
+                GenerateUI.Row(sec.Body, 30f), "AD_DISCORD_HINT",
+                "Uses your Discord module login. Join voice from the Discord page, not the Discord app.", 16f);
         } else {
             CreateAutoDeafenBot(sec.Body, conf, def);
         }

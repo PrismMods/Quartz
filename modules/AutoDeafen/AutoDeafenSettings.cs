@@ -11,8 +11,10 @@ public sealed class AutoDeafenSettings : ISettingsFile {
     public bool SkipWhenAuto = true;
     public const string ModeShortcut = "shortcut";
     public const string ModeBot = "bot";
+    public const string ModeDiscord = "discord";
     public string Mode = ModeShortcut;
     public bool IsShortcut => string.Equals(Mode, ModeShortcut, StringComparison.OrdinalIgnoreCase);
+    public bool IsDiscord => string.Equals(Mode, ModeDiscord, StringComparison.OrdinalIgnoreCase);
     public bool ShortcutCtrl = true;
     public bool ShortcutShift = true;
     public bool ShortcutAlt = false;

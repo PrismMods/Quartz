@@ -1,6 +1,7 @@
 using HarmonyLib;
 using Quartz.Async;
 using Quartz.Core;
+using Quartz.Game;
 using Quartz.Game.Stats;
 using Quartz.IO;
 using MonsterLove.StateMachine;
@@ -31,15 +32,16 @@ public static class AutoDeafen {
         Application.platform == RuntimePlatform.WindowsPlayer
         || Application.platform == RuntimePlatform.WindowsEditor;
     public static string EffectiveMode =>
-        ShortcutSupported && Conf != null && Conf.IsShortcut
-            ? AutoDeafenSettings.ModeShortcut
-            : AutoDeafenSettings.ModeBot;
+        Conf != null && Conf.IsDiscord ? AutoDeafenSettings.ModeDiscord
+        : ShortcutSupported && Conf != null && Conf.IsShortcut ? AutoDeafenSettings.ModeShortcut
+        : AutoDeafenSettings.ModeBot;
     public static string Status {
         get {
             if(EffectiveMode == AutoDeafenSettings.ModeShortcut) {
                 string shortcut = "shortcut " + ChordText();
                 return desiredDeaf ? shortcut + " / deaf" : shortcut;
             }
+            if(EffectiveMode == AutoDeafenSettings.ModeDiscord) return "discord: " + VoiceDeafen.Status;
             string rpcStatus = rpc != null ? rpc.Status : status;
             string oauthStatus = DiscordOAuthServer.Status;
             if(!string.IsNullOrEmpty(Trim(Conf?.DiscordAccessToken)) && !DiscordOAuthServer.Running) oauthStatus = "authorized";
@@ -65,7 +67,7 @@ public static class AutoDeafen {
             return;
         }
         Conf.DeafenAtPercent = Mathf.Clamp(Conf.DeafenAtPercent, 0f, 100f);
-        if(EffectiveMode == AutoDeafenSettings.ModeShortcut) {
+        if(EffectiveMode != AutoDeafenSettings.ModeBot) {
             if(rpc != null) StopRpc();
             if(DiscordOAuthServer.Running) DiscordOAuthServer.Stop();
         } else {
@@ -105,6 +107,8 @@ public static class AutoDeafen {
                 Conf.ShortcutCtrl, Conf.ShortcutShift, Conf.ShortcutAlt, Conf.ShortcutMeta,
                 (KeyCode)Conf.ShortcutKey
             );
+        } else if(EffectiveMode == AutoDeafenSettings.ModeDiscord) {
+            VoiceDeafen.SetDeaf(deaf);
         } else {
             rpc?.SetDeaf(deaf);
         }

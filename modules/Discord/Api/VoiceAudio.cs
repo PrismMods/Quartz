@@ -25,6 +25,7 @@ public sealed class VoiceAudio : MonoBehaviour {
     private byte[] encoded;
     private bool speaking;
     public static bool Muted { get; set; }
+    public static bool Deafened { get; set; }
     public static DaveSession Dave { get; set; }
     public static int FramesSent { get; private set; }
     public static int FramesReceived { get; private set; }
@@ -173,7 +174,7 @@ public sealed class VoiceAudio : MonoBehaviour {
         int available = position - readPosition;
         if(available < 0) available += microphone.samples;
         if(available <= 0) return;
-        if(Muted) {
+        if(Muted || Deafened) {
             if(speaking) SetSpeaking(false);
             frameFill = 0;
             readPosition = position;
@@ -262,7 +263,10 @@ public sealed class VoiceAudio : MonoBehaviour {
         lock(jitterLock) {
             pcmReads++;
             if(jitter.Count == 0) pcmUnderruns++;
-            for(int i = 0; i < data.Length; i++) data[i] = jitter.Count > 0 ? jitter.Dequeue() : 0f;
+            for(int i = 0; i < data.Length; i++) {
+                float sample = jitter.Count > 0 ? jitter.Dequeue() : 0f;
+                data[i] = Deafened ? 0f : sample;
+            }
         }
     }
     private void OnDestroy() => Detach();

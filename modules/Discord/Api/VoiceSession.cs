@@ -78,6 +78,23 @@ public static class VoiceSession {
             }
         });
     }
+    public static void SetDeaf(bool deaf) {
+        if(VoiceAudio.Deafened == deaf) return;
+        VoiceAudio.Deafened = deaf;
+        Notify();
+        DiscordGateway gateway = DiscordSession.Gateway;
+        string guildId = pendingGuild;
+        string channelId = pendingChannel;
+        if(gateway == null || guildId == null || channelId == null) return;
+        _ = gateway.SendVoiceStateAsync(guildId, channelId, VoiceAudio.Muted || deaf, deaf).ContinueWith(
+            t => MainCore.Log.Wrn("[Discord] deafen failed: " + t.Exception?.GetBaseException().Message),
+            TaskContinuationOptions.OnlyOnFaulted);
+    }
+    public static string DeafenStatus() =>
+        !DiscordSession.LoggedIn ? "not logged in"
+        : !Connected ? "logged in, not in voice"
+        : VoiceAudio.Deafened ? "in voice / deaf"
+        : "in voice";
     private static void Attach(DiscordGateway gateway) {
         if(attached == gateway) return;
         if(attached != null) {
@@ -281,6 +298,7 @@ public static class VoiceSession {
     }
     private static void Reset(bool clearChannel) {
         VoiceAudio.End();
+        VoiceAudio.Deafened = false;
         starting = false;
         sessionId = null;
         voiceToken = null;
