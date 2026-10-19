@@ -1085,6 +1085,7 @@
         "type": "RDC",
         "members": [
           "System.Boolean RDC::auto()",
+          "System.Boolean RDC::force4PlayerCoop",
           "System.Boolean RDC::get_auto()",
           "System.Boolean RDC::get_noHud()",
           "System.Boolean RDC::noHud()",
@@ -1123,8 +1124,6 @@
           "System.Boolean RDInput::get_holdingShift()",
           "System.Boolean RDInput::holdingControl()",
           "System.Boolean RDInput::holdingShift()",
-          "System.Collections.Generic.List\u00601\u003CAnyKeyCode\u003E RDInput::GetMainPressKeys()",
-          "System.Collections.Generic.List\u00601\u003CAnyKeyCode\u003E RDInput::GetStateKeys(ButtonState)",
           "System.Int32 RDInput::GetMain(ButtonState)",
           "UnityEngine.Vector2 RDInput::get_mouseScrollDelta()",
           "UnityEngine.Vector2 RDInput::mouseScrollDelta()"

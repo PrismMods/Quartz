@@ -112,12 +112,6 @@
     },
     {
       "type": "RDInput",
-      "member": "GetStateKeys",
-      "resolved": true,
-      "assembly": "Assembly-CSharp"
-    },
-    {
-      "type": "RDInput",
       "member": "IsDown",
       "resolved": true,
       "assembly": "Assembly-CSharp"
