@@ -437,6 +437,25 @@ public static class GameApi {
         object input = AsyncKeyboardMember.Get(null);
         return input != null && InputActiveMember.Get(input, false);
     }
+    private static readonly Func<List<AnyKeyCode>> MainPressKeysReturn =
+        BindMainPressKeys<Func<List<AnyKeyCode>>>(typeof(List<AnyKeyCode>), 0);
+    private static readonly Action<List<AnyKeyCode>> MainPressKeysFill =
+        BindMainPressKeys<Action<List<AnyKeyCode>>>(typeof(void), 1);
+    private static TDelegate BindMainPressKeys<TDelegate>(Type returnType, int argCount) where TDelegate : Delegate {
+        foreach(MethodInfo m in AccessTools.GetDeclaredMethods(typeof(RDInput)))
+            if(m.Name == "GetMainPressKeys" && m.ReturnType == returnType && m.GetParameters().Length == argCount)
+                return Refl.BindMethod<TDelegate>(m);
+        return null;
+    }
+    public static void MainPressKeys(List<AnyKeyCode> into) {
+        into.Clear();
+        if(MainPressKeysFill != null) {
+            MainPressKeysFill(into);
+            return;
+        }
+        List<AnyKeyCode> keys = MainPressKeysReturn?.Invoke();
+        if(keys != null) into.AddRange(keys);
+    }
     public static void LogDetectedVersion() =>
         MainCore.Log.Msg($"[Compat] ADOFAI {GameVersion.DisplayRelease}"
             + (GameVersion.IsLegacy ? " — legacy (pre-3.0) game API" : " — current game API"));

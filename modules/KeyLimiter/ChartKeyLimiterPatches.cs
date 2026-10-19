@@ -103,12 +103,14 @@ public static partial class ChartKeyLimiter {
             MainCore.Log.Err("[KeyLimiter] no GetHitMargin call in scrPlanet.SwitchChosen, chart key limits will not fire");
             return code;
         }
+        private static readonly System.Collections.Generic.List<AnyKeyCode> MainPressKeysBuffer = new();
         private static HitMargin Validate(HitMargin margin, scrPlanet planet) {
             try {
                 if(!ChartKeyLimiterState.Instance.Active) return margin;
                 if(planet == null || planet.player == null || RDC.auto) return margin;
                 int playerId = planet.player.playerID;
-                foreach(AnyKeyCode pressed in RDInput.GetMainPressKeys()) {
+                Quartz.Compat.Game.GameApi.MainPressKeys(MainPressKeysBuffer);
+                foreach(AnyKeyCode pressed in MainPressKeysBuffer) {
                     KeyCode key = Resolve(pressed);
                     if(key == KeyCode.None) continue;
                     if(ChartKeyLimiterState.Instance.IsKeyValid(playerId, key)) continue;

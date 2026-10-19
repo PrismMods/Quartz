@@ -9,6 +9,7 @@ using Quartz.Compat.Game;
 using Quartz.Utility;
 namespace Quartz.Features.ChatterBlocker;
 public static class ChatterBlocker {
+    private static readonly System.Collections.Generic.List<AnyKeyCode> MainPressKeysBuffer = new();
     public static SettingsFile<ChatterBlockerSettings> ConfMgr { get; private set; }
     public static ChatterBlockerSettings Conf => ConfMgr?.Data;
     public static void EnsureConf() => ConfMgr ??= SettingsFile<ChatterBlockerSettings>.Loaded("ChatterBlocker.json");
@@ -107,7 +108,8 @@ public static class ChatterBlocker {
             reportedKeysFrame = frame;
             reportedKeysThisFrame.Clear();
         }
-        foreach(AnyKeyCode mainPressKey in RDInput.GetMainPressKeys()) {
+        Quartz.Compat.Game.GameApi.MainPressKeys(MainPressKeysBuffer);
+        foreach(AnyKeyCode mainPressKey in MainPressKeysBuffer) {
             object value = mainPressKey.value;
             if(value is KeyCode key) {
                 KeyCode normalized = KeyCodes.Normalize(key);

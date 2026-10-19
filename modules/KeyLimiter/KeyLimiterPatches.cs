@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using HarmonyLib;
 namespace Quartz.Features.KeyLimiter;
 public static partial class KeyLimiter {
@@ -31,10 +34,24 @@ public static partial class KeyLimiter {
             if(IsMenuBlockActive()) __result = 0;
         }
     }
-    [HarmonyPatch(typeof(RDInput), nameof(RDInput.GetStateKeys))]
+    private static MethodBase FindGetStateKeys(bool returnsList) =>
+        AccessTools.GetDeclaredMethods(typeof(RDInput)).FirstOrDefault(m => m.Name == "GetStateKeys" && (returnsList
+            ? m.ReturnType == typeof(List<AnyKeyCode>)
+            : m.ReturnType == typeof(void) && m.GetParameters() is { Length: > 0 } p && p[0].ParameterType == typeof(List<AnyKeyCode>)));
+    [HarmonyPatch]
     private static class MenuBlockGetStateKeysPatch {
-        private static void Postfix(System.Collections.Generic.List<AnyKeyCode> __result) {
-            if(IsMenuBlockActive()) __result.Clear();
+        private static MethodBase TargetMethod() => FindGetStateKeys(true);
+        private static bool Prepare() => TargetMethod() != null;
+        private static void Postfix(List<AnyKeyCode> __result) {
+            if(IsMenuBlockActive()) __result?.Clear();
+        }
+    }
+    [HarmonyPatch]
+    private static class MenuBlockGetStateKeysIntoPatch {
+        private static MethodBase TargetMethod() => FindGetStateKeys(false);
+        private static bool Prepare() => TargetMethod() != null;
+        private static void Postfix(List<AnyKeyCode> __0) {
+            if(IsMenuBlockActive()) __0?.Clear();
         }
     }
 }
