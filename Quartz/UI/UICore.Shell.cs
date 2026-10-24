@@ -165,13 +165,7 @@ public static partial class UICore {
             };
             var fitter = content.AddComponent<ContentSizeFitter>();
             fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            ScrollRect railScroll = viewport.AddComponent<ScrollRect>();
-            railScroll.viewport = viewportRect;
-            railScroll.content = MenuContent;
-            railScroll.horizontal = false;
-            railScroll.movementType = ScrollRect.MovementType.Clamped;
-            railScroll.inertia = false;
-            railScroll.scrollSensitivity = 30f;
+            viewport.AddComponent<StripWheel>().Init(viewportRect, MenuContent, vertical: true);
             MenuFactory.CreateMenu(MenuContent);
             GameObject power = new("Power");
             power.transform.SetParent(Menu, false);
