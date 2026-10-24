@@ -85,10 +85,4 @@ public static class NativeLib {
             Diag.Ignore(e);
         }
     }
-    public static string SystemLibrary() {
-        if(IsWindows) return "kernel32.dll";
-        if(RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return "/usr/lib/libSystem.B.dylib";
-        return "libc.so.6";
-    }
-    public static string SystemSymbol() => IsWindows ? "GetTickCount" : "malloc";
 }

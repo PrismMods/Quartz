@@ -33,21 +33,24 @@ public static class TufArchive {
             string target;
             try { target = Path.GetFullPath(Path.Combine(root, relative)); }
             catch(Exception e) when(IsSkippableEntryError(e)) { skipped++; continue; }
-            if(!target.StartsWith(prefix, PathComparison)) throw new InvalidDataException("Archive path escapes level folder.");
+            if(!target.StartsWith(prefix, TufInstallPaths.PathComparison)) throw new InvalidDataException("Archive path escapes level folder.");
             if(original.EndsWith('/') || original.EndsWith('\\') || string.IsNullOrEmpty(entry.Name)) {
                 Directory.CreateDirectory(target);
                 continue;
             }
             long size = entry.Length;
             if(size < 0) throw new InvalidDataException("Archive declares a negative entry size.");
+            bool created = false;
             try {
                 Directory.CreateDirectory(Path.GetDirectoryName(target)!);
                 using Stream input = entry.Open();
                 using FileStream output = new(target, FileMode.CreateNew, FileAccess.Write, FileShare.None);
+                created = true;
                 CopyBounded(input, output, size);
             } catch(Exception e) when(IsSkippableEntryError(e)) {
                 skipped++;
-                TryDelete(target);
+                // a duplicate entry fails CreateNew; deleting then would remove the first copy
+                if(created) TryDelete(target);
             }
         }
         return skipped;
@@ -102,9 +105,9 @@ public static class TufArchive {
         string prefix = rootFull.EndsWith(Path.DirectorySeparatorChar.ToString())
             ? rootFull : rootFull + Path.DirectorySeparatorChar;
         string full = Path.GetFullPath(path);
-        if(!full.StartsWith(prefix, PathComparison) || !File.Exists(full)) return false;
+        if(!full.StartsWith(prefix, TufInstallPaths.PathComparison) || !File.Exists(full)) return false;
         string? current = full;
-        while(current != null && !string.Equals(current, rootFull, PathComparison)) {
+        while(current != null && !string.Equals(current, rootFull, TufInstallPaths.PathComparison)) {
             if((File.GetAttributes(current) & FileAttributes.ReparsePoint) != 0) return false;
             current = Path.GetDirectoryName(current);
         }
@@ -182,6 +185,4 @@ public static class TufArchive {
             }
         }
     }
-    private static StringComparison PathComparison =>
-        Path.DirectorySeparatorChar == '\\' ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 }

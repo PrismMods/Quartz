@@ -108,11 +108,18 @@ public static class ModuleBundle {
             foreach(string needed in WithDeps(id)) {
                 if(installed.Contains(needed)) continue;
                 if(ModuleService.Find(needed) is { Loaded: true }) continue;
+                string root = MainCore.Paths.ModulePath;
+                bool present = File.Exists(System.IO.Path.Combine(root, needed + ModuleService.ModuleExtension));
+                // never downgrade or re-enable a module the user already has, even a disabled one
+                if(present && !ModuleCatalog.IsNewer(VersionOf(needed),
+                    VersionAt(System.IO.Path.Combine(root, needed + ModuleService.ManifestExtension)))) continue;
                 if(!Copy(needed)) continue;
                 ModuleState.Entry entry = ModuleService.State.For(needed);
-                entry.Enabled = true;
-                entry.Source = "bundled";
-                installed.Add(needed);
+                if(!present) {
+                    entry.Enabled = true;
+                    entry.Source = "bundled";
+                }
+                if(entry.Enabled) installed.Add(needed);
             }
         }
         if(installed.Count == 0) return;

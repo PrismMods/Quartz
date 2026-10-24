@@ -14,17 +14,6 @@ public static class ImageCache {
     private static HttpClient http;
     private static bool refreshQueued;
     public static event Action Changed;
-    public static bool IsImageUrl(string url) {
-        if(string.IsNullOrEmpty(url)) return false;
-        int query = url.IndexOf('?');
-        string path = (query >= 0 ? url[..query] : url).ToLowerInvariant();
-        return path.EndsWith(".png", StringComparison.Ordinal)
-            || path.EndsWith(".jpg", StringComparison.Ordinal)
-            || path.EndsWith(".jpeg", StringComparison.Ordinal)
-            || path.EndsWith(".gif", StringComparison.Ordinal)
-            || path.EndsWith(".webp", StringComparison.Ordinal)
-            || path.EndsWith(".bmp", StringComparison.Ordinal);
-    }
     public static Sprite Get(string url) {
         if(string.IsNullOrEmpty(url)) return null;
         if(sprites.TryGetValue(url, out Sprite cached)) return cached;

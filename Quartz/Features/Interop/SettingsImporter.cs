@@ -200,8 +200,6 @@ public static class SettingsImporter {
         SettingsImportSource.KorenResourcePackV1 => Quartz.Interop.ImportSourceKind.KorenResourcePackV1,
         _ => null,
     };
-    public static SettingsImportResult Import(SettingsImportOption option) =>
-        Import(option, SettingsImportReplaceMode.ReplaceAll, SettingsImportKeyViewerPart.All);
     public static SettingsImportResult ImportToProfile(
         SettingsImportOption option,
         SettingsImportReplaceMode keyViewerMode,
@@ -295,9 +293,6 @@ public static class SettingsImporter {
     }
     private static void PostImportRefresh() {
         Quartz.Interop.ImportRegistry.RefreshAll();
-    }
-    private static void Try(Action action) {
-        try { action(); } catch(Exception e) { MainCore.Log.Wrn($"[SettingsImporter] refresh step failed: {e.Message}"); }
     }
     private static bool EntryMatches(object entry, string id, ImportSpec spec) {
         if(entry == null) return false;

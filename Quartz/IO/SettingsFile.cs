@@ -78,6 +78,15 @@ public sealed class SettingsFile<T> : ISettingsHandle where T : class, ISettings
             return true;
         } catch(Exception e) {
             MainCore.Log.Err($"[{nameof(SettingsFile<>)}] Failed to load settings '{Path}': {e}");
+            // keep the user's file before the next Save overwrites it with defaults
+            try {
+                if(File.Exists(Path)) {
+                    File.Copy(Path, Path + ".corrupt", true);
+                    MainCore.Log.Wrn($"[{nameof(SettingsFile<>)}] Saved the unreadable settings as '{Path}.corrupt'");
+                }
+            } catch(Exception copy) {
+                Diag.Ignore(copy);
+            }
             return false;
         }
     }

@@ -211,7 +211,7 @@ public static partial class ProfileManager {
             string name = Sanitize(bundle["Name"]?.Value<string>())
                 ?? Sanitize(Path.GetFileNameWithoutExtension(srcPath))
                 ?? "Imported";
-            name = Uniquify(name);
+            name = ProfileNames.Unique(name, Exists);
             WriteProfileDirectory(
                 DirOf(name),
                 ProfileBundle.ReadFiles(files, excluded, asPreset, ConfigFileName, presetImposed)

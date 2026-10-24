@@ -119,7 +119,7 @@ public sealed class TufPackService : IRuntimeService {
         try {
             TufPacksPage page = await api.FetchPacksAsync(query, sort, ascending, append ? nextOffset : 0, PageSize, token);
             MainThread.Enqueue(() => ApplyPacks(page, append, token, generation, query, sort, ascending));
-        } catch(OperationCanceledException e) { Diag.Ignore(e); }
+        } catch(OperationCanceledException e) when(token.IsCancellationRequested) { Diag.Ignore(e); }
         catch(Exception e) {
             bool offline = e is OperationCanceledException || TufNetworkPolicy.IsOfflineError(e);
             string message = e is OperationCanceledException
@@ -179,7 +179,7 @@ public sealed class TufPackService : IRuntimeService {
             difficulties ??= await api.FetchDifficultiesAsync(token);
             IReadOnlyList<TufPackItem> items = await api.FetchPackItemsAsync(pack.Id, difficulties, token);
             MainThread.Enqueue(() => ApplyPackLevels(pack, items, token, generation));
-        } catch(OperationCanceledException e) { Diag.Ignore(e); }
+        } catch(OperationCanceledException e) when(token.IsCancellationRequested) { Diag.Ignore(e); }
         catch(Exception e) {
             bool offline = e is OperationCanceledException || TufNetworkPolicy.IsOfflineError(e);
             string message = e is OperationCanceledException

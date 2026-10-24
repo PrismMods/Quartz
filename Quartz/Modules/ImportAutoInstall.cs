@@ -24,7 +24,7 @@ public static class ImportAutoInstall {
         List<string> missing = [];
         foreach(string id in ids) {
             if(string.IsNullOrEmpty(id) || missing.Contains(id)) continue;
-            if(ModuleService.Find(id) is { Loaded: true }) continue;
+            if(ModuleService.Find(id) is { Loaded: true } or { Enabled: false }) continue;
             if(!ModuleBundle.Has(id)) continue;
             missing.Add(id);
         }

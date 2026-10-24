@@ -141,7 +141,7 @@ public static class UpdateService {
                 }
             }
             string assetUrl = zipUrl ?? dllUrl;
-            if(assetUrl == null) continue;
+            if(assetUrl == null || (zipUrl != null ? zipSha256 : dllSha256) == null) continue;
             if(best == null || SemVer.CompareForChannel(v, best.Version, preferred) > 0) {
                 best = new UpdateInfo {
                     Tag = tag,
@@ -241,7 +241,21 @@ public static class UpdateService {
                 payloadRoot,
                 installRoot
             );
-            UpdateInstallTransaction.Commit(files, payloadRoot, installRoot);
+            List<StagedInstallFile> install = [];
+            StagedInstallFile? state = null;
+            string version = null;
+            foreach(StagedInstallFile file in files) {
+                if(IsNamed(file.Destination, "state.json", "Runtime") && File.Exists(file.Destination)) {
+                    state = file;
+                    continue;
+                }
+                if(IsNamed(file.Destination, "runtime.json", null)
+                    && IsNamed(Path.GetDirectoryName(file.Destination), null, "versions"))
+                    version = Path.GetFileName(Path.GetDirectoryName(file.Destination));
+                install.Add(file);
+            }
+            UpdateInstallTransaction.Commit(install, payloadRoot, installRoot);
+            if(state is StagedInstallFile shipped) StageRuntime(shipped, version);
         } else {
             string stagedQuartz = Path.Combine(staging, "Quartz.dll");
             await DownloadFile(info.AssetUrl, stagedQuartz, 0f, 1f);
@@ -253,11 +267,26 @@ public static class UpdateService {
         DeleteIfExists(Path.Combine(MainCore.Host.ModsPath, "Quartz.Loader.ML.dll"));
         DeleteIfExists(Path.Combine(MainCore.Host.UserLibsPath, "Quartz.dll"));
     }
-    private static void VerifyChecksum(string path, UpdateInfo info) {
-        if(string.IsNullOrEmpty(info.AssetSha256)) {
-            MainCore.Log.Wrn($"[Update] no checksum available for {info.Tag} — integrity not verified");
-            return;
+    private static bool IsNamed(string path, string name, string parent) =>
+        (name == null || string.Equals(Path.GetFileName(path), name, StringComparison.OrdinalIgnoreCase))
+        && (parent == null || string.Equals(
+            Path.GetFileName(Path.GetDirectoryName(path)), parent, StringComparison.OrdinalIgnoreCase));
+    // The zip's state.json says Current=new with no Previous, which skips the bootstrap's
+    // trial and drops the running version. Keep the live state and mark the new runtime Staged.
+    private static void StageRuntime(StagedInstallFile shipped, string version) {
+        try {
+            if(version == null) throw new InvalidDataException("the update has no runtime version marker");
+            JObject live = JObject.Parse(File.ReadAllText(shipped.Destination));
+            live["Staged"] = version;
+            Quartz.IO.AtomicFile.WriteAllText(shipped.Destination, live.ToString());
+        } catch(Exception e) {
+            MainCore.Log.Wrn($"[Update] couldn't stage the new runtime ({e.Message}); installing it directly");
+            File.Copy(shipped.Source, shipped.Destination, true);
         }
+    }
+    private static void VerifyChecksum(string path, UpdateInfo info) {
+        if(string.IsNullOrEmpty(info.AssetSha256))
+            throw new InvalidDataException($"no checksum available for {info.Tag}");
         string actual = HashFileSha256(path);
         if(!string.Equals(actual, info.AssetSha256, System.StringComparison.OrdinalIgnoreCase)) {
             throw new System.Exception(

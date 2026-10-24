@@ -59,7 +59,6 @@ public sealed class TufDownloadService : IDisposable {
         TufInstallRoot root = ActiveRoot();
         return Path.Combine(root.Path, TufInstallPaths.LevelFolderName(id, root.Linked));
     }
-    public IReadOnlyList<string> ListCachedCharts(int id) => ListCachedCharts(id, null);
     public IReadOnlyList<string> ListCachedCharts(int id, string folderOverride) {
         if(id <= 0) return Array.Empty<string>();
         try {
@@ -148,7 +147,7 @@ public sealed class TufDownloadService : IDisposable {
             throw new InvalidDataException($"Level {id} is not in a known library root.");
         string source = Path.GetFullPath(from);
         string target = Path.Combine(Path.GetFullPath(toRoot), TufInstallPaths.LevelFolderName(id, linked));
-        if(string.Equals(source, target, PathComparison)) return source;
+        if(string.Equals(source, target, TufInstallPaths.PathComparison)) return source;
         Directory.CreateDirectory(Path.GetFullPath(toRoot));
         if(Directory.Exists(target)) Directory.Delete(target, true);
         try {
@@ -242,6 +241,4 @@ public sealed class TufDownloadService : IDisposable {
             if(Directory.Exists(path) && !Directory.EnumerateFileSystemEntries(path).Any()) Directory.Delete(path);
         } catch(Exception e) { Diag.Ignore(e); }
     }
-    private static StringComparison PathComparison =>
-        Path.DirectorySeparatorChar == '\\' ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 }

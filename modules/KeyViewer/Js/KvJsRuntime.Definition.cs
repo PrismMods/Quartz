@@ -72,8 +72,9 @@ internal static partial class KvJsRuntime {
                     JsValue helpers = owner.engine.Invoke(owner.engine.GetValue("__kvHelpers"), [Id]);
                     owner.engine.Constraints.Reset();
                     JsValue rendered = owner.engine.Invoke(template, [State, Settings, helpers]);
-                    object value = rendered.ToObject();
-                    KvJsVNode vnode = value as KvJsVNode ?? KvJsVNode.NewText(value?.ToString() ?? "");
+                    // ToObject recurses through nested plain objects without a depth limit; only unwrap host vnodes.
+                    KvJsVNode vnode = (rendered as Jint.Runtime.Interop.ObjectWrapper)?.Target as KvJsVNode
+                        ?? KvJsVNode.NewText(rendered.IsObject() ? "" : rendered.ToObject()?.ToString() ?? "");
                     if(visual != null && ReferenceEquals(parent, lastParent) && x == lastX && y == lastY
                         && KvJsVNode.Same(vnode, lastVNode)) {
                         changed = false;

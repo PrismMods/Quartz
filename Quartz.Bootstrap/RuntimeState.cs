@@ -5,4 +5,6 @@ public sealed class RuntimeState {
     public string Previous;
     public string Trial;
     public string Failed;
+    // Set by the in-game updater: an unpacked runtime to launch as the next trial.
+    public string Staged;
 }

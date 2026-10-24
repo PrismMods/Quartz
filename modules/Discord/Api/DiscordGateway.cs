@@ -10,7 +10,6 @@ public sealed class DiscordGateway : IDisposable {
     private const int ReconnectSeconds = 5;
     private readonly string token;
     private readonly SemaphoreSlim sendLock = new(1, 1);
-    private readonly Dictionary<string, string> userNames = [];
     private ClientWebSocket socket;
     private CancellationTokenSource outerCts;
     private CancellationTokenSource connCts;
@@ -19,12 +18,7 @@ public sealed class DiscordGateway : IDisposable {
     private bool disposed;
     public event Action<DiscordMessage> MessageCreated;
     public event Action<DiscordMessage> MessageUpdated;
-    public event Action<string> Ready;
-    public event Action<IReadOnlyList<ReadStateEntry>> ReadState;
-    public event Action<IReadOnlyDictionary<string, string>> ChannelGuildMap;
-    public event Action<string, string> MessageAck;
     public event Action<string> ChannelsChanged;
-    public event Action<ReactionUpdate> ReactionChanged;
     public event Action<string, string> VoiceState;
     public event Action<string, string, string> VoiceServer;
     public string SelfId { get; private set; }
@@ -128,24 +122,13 @@ public sealed class DiscordGateway : IDisposable {
         JToken d = Prop(payload, "d");
         switch(Str(payload, "t")) {
             case "READY":
-                CacheUsers(d);
-                Raise(Ready, DisplayName(Prop(d, "user")));
-                ParseReadState(d);
-                ParseChannelGuildMap(d);
+                SelfId = Str(Obj(d, "user"), "id") ?? SelfId;
                 break;
             case "MESSAGE_CREATE":
                 RaiseMessage(MessageCreated, d);
                 break;
             case "MESSAGE_UPDATE":
                 RaiseMessage(MessageUpdated, d);
-                break;
-            case "MESSAGE_ACK":
-                string ackChannel = Str(d, "channel_id");
-                string ackMessage = Str(d, "message_id");
-                if(ackChannel != null && ackMessage != null && MessageAck != null) {
-                    Action<string, string> handler = MessageAck;
-                    MainThread.Enqueue(() => handler(ackChannel, ackMessage));
-                }
                 break;
             case "CHANNEL_CREATE":
             case "CHANNEL_UPDATE":
@@ -156,12 +139,6 @@ public sealed class DiscordGateway : IDisposable {
                 if(channelHandler != null) MainThread.Enqueue(() => channelHandler(guildId));
                 break;
             }
-            case "MESSAGE_REACTION_ADD":
-                EmitReaction(d, true);
-                break;
-            case "MESSAGE_REACTION_REMOVE":
-                EmitReaction(d, false);
-                break;
             case "VOICE_STATE_UPDATE":
                 if(Str(d, "user_id") == SelfId) {
                     string tail = Str(d, "session_id") ?? "";
@@ -196,74 +173,6 @@ public sealed class DiscordGateway : IDisposable {
         DiscordMessage message = DiscordRest.ParseMessage(d);
         MainThread.Enqueue(() => handler(message));
     }
-    private void CacheUsers(JToken d) {
-        JObject self = Obj(d, "user");
-        if(self != null) {
-            string id = Str(self, "id");
-            if(id != null) {
-                userNames[id] = DisplayName(self);
-                SelfId = id;
-            }
-        }
-        JArray users = Arr(d, "users");
-        if(users == null) return;
-        foreach(JToken user in users) {
-            string id = Str(user, "id");
-            if(id != null) userNames[id] = DisplayName(user);
-        }
-    }
-    public string NameOf(string userId) =>
-        userId != null && userNames.TryGetValue(userId, out string name) ? name : UserCache.Resolve(userId);
-    private void ParseReadState(JToken d) {
-        JToken raw = Prop(d, "read_state");
-        JArray entries = raw as JArray ?? Arr(raw, "entries");
-        if(entries == null) return;
-        List<ReadStateEntry> list = [];
-        foreach(JToken entry in entries) {
-            string id = Str(entry, "id");
-            if(id == null) continue;
-            list.Add(new ReadStateEntry(id, Str(entry, "last_message_id"), Int(entry, "mention_count") ?? 0));
-        }
-        if(list.Count == 0 || ReadState == null) return;
-        Action<IReadOnlyList<ReadStateEntry>> handler = ReadState;
-        MainThread.Enqueue(() => handler(list));
-    }
-    private void ParseChannelGuildMap(JToken d) {
-        JArray guilds = Arr(d, "guilds");
-        if(guilds == null) return;
-        Dictionary<string, string> map = [];
-        foreach(JToken guild in guilds) {
-            string guildId = Str(guild, "id");
-            if(guildId == null) continue;
-            JArray channels = Arr(guild, "channels");
-            if(channels == null) continue;
-            foreach(JToken channel in channels) {
-                string channelId = Str(channel, "id");
-                if(channelId != null) map[channelId] = guildId;
-            }
-        }
-        if(map.Count == 0 || ChannelGuildMap == null) return;
-        Action<IReadOnlyDictionary<string, string>> handler = ChannelGuildMap;
-        MainThread.Enqueue(() => handler(map));
-    }
-    private void EmitReaction(JToken d, bool added) {
-        string channelId = Str(d, "channel_id");
-        string messageId = Str(d, "message_id");
-        if(channelId == null || messageId == null || ReactionChanged == null) return;
-        JObject emoji = Obj(d, "emoji");
-        ReactionUpdate update = new(
-            channelId,
-            messageId,
-            Str(d, "user_id") ?? "",
-            emoji == null ? null : Str(emoji, "id"),
-            emoji == null ? "" : Str(emoji, "name") ?? "",
-            emoji != null && Flag(emoji, "animated"),
-            added);
-        Action<ReactionUpdate> handler = ReactionChanged;
-        MainThread.Enqueue(() => handler(update));
-    }
-    private static string DisplayName(JToken user) =>
-        user == null ? "?" : Str(user, "global_name") ?? Str(user, "username") ?? "?";
     private Task IdentifyAsync(CancellationToken ct) {
         object identify = new {
             op = 2,

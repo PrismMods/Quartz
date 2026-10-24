@@ -35,17 +35,24 @@ internal static class KvJsRenderer {
         if(parent == null || node == null) return new Result(null, Vector2.zero);
         float basisW = Mathf.Max(20f, estimatedWidth);
         float basisH = Mathf.Max(20f, estimatedHeight);
-        Box layout = Measure(node, basisW, basisH, DefaultFontSize);
+        Box layout = Measure(node, basisW, basisH, DefaultFontSize, 0);
         if(layout.Size.x < 1f || layout.Size.y < 1f) layout.Size = new Vector2(basisW, basisH);
         GameObject rootObj = new("JsPlugin_" + SafeName(name));
         rootObj.transform.SetParent(parent, false);
         RectTransform root = rootObj.AddComponent<RectTransform>();
         SetRect(root, x, y, layout.Size.x, layout.Size.y);
-        Draw(layout, root, 0f, 0f, Color.white, DefaultFontSize, isRoot: true);
+        try {
+            Draw(layout, root, 0f, 0f, Color.white, DefaultFontSize, isRoot: true);
+        } catch {
+            // The caller reports the error but never sees this root, so it would leak.
+            UnityEngine.Object.Destroy(rootObj);
+            throw;
+        }
         return new Result(rootObj, layout.Size);
     }
 
-    private static Box Measure(KvJsVNode node, float basisW, float basisH, float inheritedFont) {
+    private static Box Measure(KvJsVNode node, float basisW, float basisH, float inheritedFont, int depth) {
+        KvJsVNode.CheckDepth(depth);
         if(node.IsText) {
             float textWidth = Mathf.Max(0f, (node.Text?.Length ?? 0) * inheritedFont * 0.54f);
             return new Box {
@@ -78,7 +85,7 @@ internal static class KvJsRenderer {
         }
         if(node.Children != null) {
             foreach(KvJsVNode child in node.Children) {
-                Box measured = Measure(child, innerBasisW, innerBasisH, font);
+                Box measured = Measure(child, innerBasisW, innerBasisH, font, depth + 1);
                 if(!measured.Skip) box.Children.Add(measured);
             }
         }

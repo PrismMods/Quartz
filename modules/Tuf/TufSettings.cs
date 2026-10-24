@@ -56,10 +56,8 @@ public sealed class TufSettings : ISettingsFile {
         if(string.IsNullOrWhiteSpace(root)) return;
         string full;
         try { full = Path.GetFullPath(root); } catch(Exception e) { Diag.Ignore(e); return; }
-        if(!KnownRoots.Any(r => string.Equals(r, full, PathComparison))) KnownRoots.Add(full);
+        if(!KnownRoots.Any(r => string.Equals(r, full, TufInstallPaths.PathComparison))) KnownRoots.Add(full);
     }
-    private static StringComparison PathComparison =>
-        Path.DirectorySeparatorChar == '\\' ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
     public void Deserialize(JToken token) {
         Sort = Read(token, nameof(Sort), Sort);
         if(!Enum.IsDefined(typeof(TufSort), Sort)) Sort = (int)TufSort.Recent;

@@ -3,7 +3,7 @@ using Quartz.Core;
 namespace Quartz.Features.Tuf;
 public static class TufInstallPaths {
     private const string LinkedPrefix = "tuf-";
-    private static StringComparison PathComparison =>
+    internal static StringComparison PathComparison =>
         Path.DirectorySeparatorChar == '\\' ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
     public static bool IsLevelFolderName(string? name, out int id) {
         id = 0;

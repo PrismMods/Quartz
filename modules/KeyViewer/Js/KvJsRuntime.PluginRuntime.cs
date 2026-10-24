@@ -98,6 +98,8 @@ internal static partial class KvJsRuntime {
             engine = new Engine(options => options
                 .Strict()
                 .MaxStatements(250_000)
+                // Jint's default recursion depth is unlimited, so runaway JS recursion would overflow the game's stack.
+                .LimitRecursion(256)
                 .LimitMemory(24_000_000)
                 .TimeoutInterval(TimeSpan.FromMilliseconds(250)));
             host = new HostBridge(this);

@@ -89,7 +89,7 @@ internal static class KvExportEmbedding {
                     referenced.Add(existingId);
                     continue;
                 }
-                if(!TryLocalPath(value, out string path)) continue;
+                if(!KvImageSafety.TryLocalPath(value, out string path)) continue;
                 string id = Embed(path);
                 if(id == null) continue;
                 element[field] = KvDocument.DmLocalImagePrefix + id;
@@ -106,27 +106,6 @@ internal static class KvExportEmbedding {
         }
         if(embedded > 0) notes.Add("Embedded " + embedded + " local image reference(s) into the export.");
         return notes;
-    }
-    private static bool TryLocalPath(string value, out string path) {
-        path = null;
-        if(value.StartsWith("data:", StringComparison.OrdinalIgnoreCase)
-            || value.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
-            || value.StartsWith("https://", StringComparison.OrdinalIgnoreCase)) return false;
-        if(value.StartsWith("file://", StringComparison.OrdinalIgnoreCase)) {
-            try {
-                path = new Uri(value).LocalPath;
-                return true;
-            } catch(Exception e) {
-                Diag.Ignore(e);
-                return false;
-            }
-        }
-        if(value.Length > 1 && (value[0] == '/' || value.StartsWith("\\\\", StringComparison.Ordinal)
-            || (char.IsLetter(value[0]) && value[1] == ':'))) {
-            path = value;
-            return true;
-        }
-        return false;
     }
     private static IEnumerable<JObject> ElementObjects(JObject root) {
         foreach(string table in PositionTables) {

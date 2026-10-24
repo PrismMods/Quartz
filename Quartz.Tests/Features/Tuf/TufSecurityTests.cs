@@ -108,6 +108,24 @@ static class TufSecurityTests {
             try { Directory.Delete(temp, true); } catch(Exception e) { Diag.Ignore(e); }
         }
     }
+    public static void TestDuplicateEntryKeepsFirstCopy() {
+        string temp = Path.Combine(Path.GetTempPath(), "quartz-tuf-test-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(temp);
+        try {
+            string duplicate = Path.Combine(temp, "duplicate.zip");
+            MakeZip(duplicate, zip => {
+                Write(zip, "level.adofai", "first");
+                Write(zip, "level.adofai", "second");
+            });
+            string extracted = Path.Combine(temp, "duplicate");
+            int skipped = TufArchive.Extract(duplicate, extracted);
+            Assert(skipped == 1, "duplicate entry skipped");
+            string chart = Path.Combine(extracted, "level.adofai");
+            Assert(File.Exists(chart) && File.ReadAllText(chart) == "first", "first copy survives a duplicate entry");
+        } finally {
+            try { Directory.Delete(temp, true); } catch(Exception e) { Diag.Ignore(e); }
+        }
+    }
     private static void MakeZip(string path, Action<ZipArchive> write) {
         using FileStream stream = new(path, FileMode.CreateNew);
         using ZipArchive zip = new(stream, ZipArchiveMode.Create);

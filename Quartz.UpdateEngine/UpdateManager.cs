@@ -68,7 +68,6 @@ internal sealed class UpdateManager {
         Outcome = UpdateOutcomes.Candidate,
         Version = best.Version.ToString(),
         RuntimePath = runtimePath,
-        Message = best.Sha256 == null ? "the release asset had no digest — integrity was not verified" : null,
     };
     private sealed class ReleaseAsset {
         public SemVer Version;
@@ -92,12 +91,14 @@ internal sealed class UpdateManager {
             foreach(JToken asset in assets) {
                 if((string)asset["name"] != EngineInfo.AssetName) continue;
                 string assetUrl = (string)asset["browser_download_url"];
-                if(!IsTrustedReleaseUrl(assetUrl)) continue;
+                string sha256 = ParseSha256Digest((string)asset["digest"]);
+                // no digest, no install: the engine's update runs unattended at launch
+                if(!IsTrustedReleaseUrl(assetUrl) || sha256 == null) continue;
                 if(best == null || SemVer.CompareForChannel(version, best.Version, prefs.Channel) > 0) {
                     best = new ReleaseAsset {
                         Version = version,
                         Url = assetUrl,
-                        Sha256 = ParseSha256Digest((string)asset["digest"]),
+                        Sha256 = sha256,
                     };
                 }
             }
@@ -156,7 +157,7 @@ internal sealed class UpdateManager {
         }
     }
     private static void VerifyChecksum(string path, string expected) {
-        if(expected == null) return;
+        if(expected == null) throw new InvalidDataException("the release asset has no checksum");
         using SHA256 sha256 = SHA256.Create();
         using FileStream stream = File.OpenRead(path);
         string actual = BitConverter.ToString(sha256.ComputeHash(stream)).Replace("-", "").ToLowerInvariant();

@@ -69,19 +69,6 @@ public static partial class PageDiscord {
         rect.offsetMax = new Vector2(-right, y + height);
         return rect;
     }
-    private static RectTransform AutoRow(Transform parent, float x, float y, float height, float spacing) {
-        RectTransform rect = Box(parent, "AutoRow", x, y, 10f, height);
-        HorizontalLayoutGroup layout = rect.gameObject.AddComponent<HorizontalLayoutGroup>();
-        layout.spacing = spacing;
-        layout.childAlignment = TextAnchor.MiddleLeft;
-        layout.childControlWidth = true;
-        layout.childControlHeight = true;
-        layout.childForceExpandWidth = false;
-        layout.childForceExpandHeight = false;
-        ContentSizeFitter fitter = rect.gameObject.AddComponent<ContentSizeFitter>();
-        fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-        return rect;
-    }
     private static RectTransform Avatar(
         Transform parent, float x, float y, float size, Color color, string initial,
         string url = null, int radius = 3
@@ -102,23 +89,6 @@ public static partial class PageDiscord {
         image.preserveAspect = true;
         image.raycastTarget = false;
         return rect;
-    }
-    private static void Status(RectTransform avatar, Color color, Color ring) {
-        float size = Mathf.Round(avatar.sizeDelta.x * 0.4f);
-        RectTransform outer = Node(avatar, "Status");
-        outer.anchorMin = new Vector2(1f, 0f);
-        outer.anchorMax = new Vector2(1f, 0f);
-        outer.pivot = new Vector2(1f, 0f);
-        outer.anchoredPosition = new Vector2(2f, -2f);
-        outer.sizeDelta = new Vector2(size, size);
-        Paint(outer, ring, 3);
-        RectTransform inner = Node(outer, "Dot");
-        inner.anchorMin = new Vector2(0.5f, 0.5f);
-        inner.anchorMax = new Vector2(0.5f, 0.5f);
-        inner.pivot = new Vector2(0.5f, 0.5f);
-        inner.anchoredPosition = Vector2.zero;
-        inner.sizeDelta = new Vector2(size - 5f, size - 5f);
-        Paint(inner, color, 3);
     }
     private static Image Paint(RectTransform rect, Color color, int radius = 0) {
         Image image = rect.gameObject.GetComponent<Image>();

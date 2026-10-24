@@ -2,7 +2,6 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 namespace Quartz.Features.Discord;
-public readonly record struct MessageEmoji(string Name, string Id, bool Animated);
 public static class Markup {
     private static readonly Regex Token = new(
         @"(?<url>https?://[^\s<>]+)"
@@ -44,23 +43,6 @@ public static class Markup {
             Quartz.Core.Diag.Ignore(e);
             return raw;
         }
-    }
-    public static List<MessageEmoji> Emojis(string content) {
-        List<MessageEmoji> found = [];
-        if(string.IsNullOrEmpty(content)) return found;
-        foreach(Match match in Token.Matches(content)) {
-            if(!match.Groups["eid"].Success) continue;
-            found.Add(new MessageEmoji(
-                match.Groups["ename"].Value,
-                match.Groups["eid"].Value,
-                match.Groups["anim"].Success));
-        }
-        return found;
-    }
-    public static bool EmojiOnly(string content) {
-        if(string.IsNullOrEmpty(content)) return false;
-        string stripped = Token.Replace(content, match => match.Groups["eid"].Success ? "" : match.Value);
-        return stripped.Trim().Length == 0 && Emojis(content).Count > 0;
     }
     public static string ResolveMentions(string text) {
         if(string.IsNullOrEmpty(text) || !text.Contains('@')) return text;

@@ -192,19 +192,6 @@ public static partial class PageDiscord {
         Paint(Box(mark, "Cut", 5f, 14f, 8f, 4f), SidebarBg);
         Paint(Box(mark, "Body", 3f, 15f, 12f, 9f), color, 1);
     }
-    private static void UserPanel(RectTransform panel) {
-        Paint(panel, PanelBg);
-        RectTransform avatar = Avatar(
-            panel, 8f, 10f, 32f, ColorFor(DiscordSession.SelfId), Initials(DiscordSession.SelfName),
-            AvatarCache.UserUrl(DiscordSession.SelfId, DiscordSession.SelfAvatar));
-        Status(avatar, Green, PanelBg);
-        Label(Box(panel, "Name", 48f, 8f, 110f, 18f), DiscordSession.SelfName ?? "", 14f, TextBright, FontStyles.Bold);
-        Label(Box(panel, "Tag", 48f, 26f, 110f, 16f), "Online", 12f, TextMuted);
-        RectTransform logout = BoxRight(panel, "LogOut", 8f, 10f, 74f, 32f);
-        Paint(logout, ChannelActive, 1);
-        Label(logout, "Log Out", 12f, TextMuted, FontStyles.Bold, TextAlignmentOptions.Center);
-        Clickable(logout, DiscordSession.LogOut);
-    }
     private static void Chat(RectTransform chat) {
         Paint(chat, ChatBg);
         RectTransform head = Strip(chat, "ChatHead", 0f, 0f, 0f, 48f);

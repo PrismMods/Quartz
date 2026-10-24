@@ -14,9 +14,7 @@ public static class DaveNative {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate IntPtr SessionCreateFn(IntPtr context, IntPtr authSessionId, MlsFailure callback, IntPtr userData);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void SessionDestroyFn(IntPtr session);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void SessionInitFn(IntPtr session, ushort version, ulong groupId, IntPtr selfUserId);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void SessionResetFn(IntPtr session);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void SessionSetVersionFn(IntPtr session, ushort version);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate ushort SessionGetVersionFn(IntPtr session);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void SessionSetExternalSenderFn(IntPtr session, IntPtr bytes, UIntPtr length);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void SessionGetKeyPackageFn(IntPtr session, out IntPtr package, out UIntPtr length);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void SessionProcessProposalsFn(IntPtr session, IntPtr proposals, UIntPtr length, IntPtr[] recognized, UIntPtr recognizedLength, out IntPtr commitWelcome, out UIntPtr commitWelcomeLength);
@@ -31,7 +29,6 @@ public static class DaveNative {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void CryptorDestroyFn(IntPtr handle);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void EncryptorSetRatchetFn(IntPtr encryptor, IntPtr ratchet);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void PassthroughFn(IntPtr handle, byte enabled);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate byte HasRatchetFn(IntPtr encryptor);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate void EncryptorAssignCodecFn(IntPtr encryptor, uint ssrc, Codec codec);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate UIntPtr EncryptorMaxSizeFn(IntPtr encryptor, MediaType type, UIntPtr frameSize);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)] private delegate EncryptResult EncryptFn(IntPtr encryptor, MediaType type, uint ssrc, IntPtr frame, UIntPtr frameLength, IntPtr output, UIntPtr capacity, out UIntPtr written);
@@ -44,9 +41,7 @@ public static class DaveNative {
     private static SessionCreateFn sessionCreate;
     private static SessionDestroyFn sessionDestroy;
     private static SessionInitFn sessionInit;
-    private static SessionResetFn sessionReset;
     private static SessionSetVersionFn sessionSetVersion;
-    private static SessionGetVersionFn sessionGetVersion;
     private static SessionSetExternalSenderFn sessionSetExternalSender;
     private static SessionGetKeyPackageFn sessionGetKeyPackage;
     private static SessionProcessProposalsFn sessionProcessProposals;
@@ -65,7 +60,6 @@ public static class DaveNative {
     private static EncryptorSetRatchetFn encryptorSetRatchet;
     private static PassthroughFn encryptorPassthrough;
     private static PassthroughFn decryptorPassthrough;
-    private static HasRatchetFn encryptorHasRatchet;
     private static EncryptorAssignCodecFn encryptorAssignCodec;
     private static EncryptorMaxSizeFn encryptorMaxSize;
     private static EncryptFn encrypt;
@@ -95,9 +89,7 @@ public static class DaveNative {
         sessionCreate = NativeLib.Bind<SessionCreateFn>(library, "daveSessionCreate");
         sessionDestroy = NativeLib.Bind<SessionDestroyFn>(library, "daveSessionDestroy");
         sessionInit = NativeLib.Bind<SessionInitFn>(library, "daveSessionInit");
-        sessionReset = NativeLib.Bind<SessionResetFn>(library, "daveSessionReset");
         sessionSetVersion = NativeLib.Bind<SessionSetVersionFn>(library, "daveSessionSetProtocolVersion");
-        sessionGetVersion = NativeLib.Bind<SessionGetVersionFn>(library, "daveSessionGetProtocolVersion");
         sessionSetExternalSender = NativeLib.Bind<SessionSetExternalSenderFn>(library, "daveSessionSetExternalSender");
         sessionGetKeyPackage = NativeLib.Bind<SessionGetKeyPackageFn>(library, "daveSessionGetMarshalledKeyPackage");
         sessionProcessProposals = NativeLib.Bind<SessionProcessProposalsFn>(library, "daveSessionProcessProposals");
@@ -116,7 +108,6 @@ public static class DaveNative {
         encryptorSetRatchet = NativeLib.Bind<EncryptorSetRatchetFn>(library, "daveEncryptorSetKeyRatchet");
         encryptorPassthrough = NativeLib.Bind<PassthroughFn>(library, "daveEncryptorSetPassthroughMode");
         decryptorPassthrough = NativeLib.Bind<PassthroughFn>(library, "daveDecryptorTransitionToPassthroughMode");
-        encryptorHasRatchet = NativeLib.Bind<HasRatchetFn>(library, "daveEncryptorHasKeyRatchet");
         encryptorAssignCodec = NativeLib.Bind<EncryptorAssignCodecFn>(library, "daveEncryptorAssignSsrcToCodec");
         encryptorMaxSize = NativeLib.Bind<EncryptorMaxSizeFn>(library, "daveEncryptorGetMaxCiphertextByteSize");
         encrypt = NativeLib.Bind<EncryptFn>(library, "daveEncryptorEncrypt");
@@ -191,9 +182,7 @@ public static class DaveNative {
             if(id != IntPtr.Zero) Marshal.FreeHGlobal(id);
         }
     }
-    public static void SessionReset(IntPtr session) => sessionReset?.Invoke(session);
     public static void SessionSetVersion(IntPtr session, ushort version) => sessionSetVersion?.Invoke(session, version);
-    public static ushort SessionVersion(IntPtr session) => sessionGetVersion?.Invoke(session) ?? 0;
     public static void SessionSetExternalSender(IntPtr session, byte[] payload) {
         if(payload == null || payload.Length == 0) return;
         IntPtr buffer = Marshal.AllocHGlobal(payload.Length);
@@ -294,7 +283,6 @@ public static class DaveNative {
         encryptorPassthrough?.Invoke(encryptor, (byte)(enabled ? 1 : 0));
     public static void DecryptorPassthrough(IntPtr decryptor, bool enabled) =>
         decryptorPassthrough?.Invoke(decryptor, (byte)(enabled ? 1 : 0));
-    public static bool EncryptorHasRatchet(IntPtr encryptor) => (encryptorHasRatchet?.Invoke(encryptor) ?? 0) != 0;
     public static unsafe int Encrypt(IntPtr encryptor, uint ssrc, byte[] frame, int length, byte[] output) {
         if(encryptor == IntPtr.Zero || length < 0 || length > (frame?.Length ?? 0)
             || output == null || output.Length == 0) return -1;

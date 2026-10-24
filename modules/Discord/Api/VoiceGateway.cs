@@ -123,8 +123,6 @@ public sealed class VoiceGateway : IDisposable {
     }
     public Task SendDaveTransitionReadyAsync(int transitionId) => SendJsonAsync(
         new { op = 23, d = new { transition_id = transitionId } }, cts?.Token ?? CancellationToken.None);
-    public Task SendDaveInvalidCommitAsync(int transitionId) => SendJsonAsync(
-        new { op = 31, d = new { transition_id = transitionId } }, cts?.Token ?? CancellationToken.None);
     private async Task HandleAsync(JToken payload, CancellationToken ct) {
         int op = Int(payload, "op") ?? -1;
         int? sequence = Int(payload, "seq");

@@ -13,7 +13,7 @@ public static class TufDiskSpace {
                 string name;
                 try { name = drive.Name; } catch(Exception e) { Diag.Ignore(e); continue; }
                 if(string.IsNullOrEmpty(name) || name.Length <= bestLength) continue;
-                if(!full.StartsWith(name, PathComparison)) continue;
+                if(!full.StartsWith(name, TufInstallPaths.PathComparison)) continue;
                 best = drive;
                 bestLength = name.Length;
             }
@@ -51,6 +51,4 @@ public static class TufDiskSpace {
             : value.ToString(value >= 100d ? "0" : "0.0",
                 System.Globalization.CultureInfo.InvariantCulture) + " " + units[unit];
     }
-    private static StringComparison PathComparison =>
-        Path.DirectorySeparatorChar == '\\' ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 }

@@ -469,7 +469,8 @@ public static class AddonService {
         int n = 0;
         foreach(char c in id)
             if(char.IsLetterOrDigit(c) || c is '-' or '_' or '.' or ' ') buf[n++] = c;
-        return new string(buf[..n]).Trim();
+        // strip edge dots: "." or ".." would resolve to AddonsPath or its parent on Remove
+        return new string(buf[..n]).Trim().Trim('.').Trim();
     }
     private static bool Skip(string name) =>
         name.StartsWith('.') || name.StartsWith('_')

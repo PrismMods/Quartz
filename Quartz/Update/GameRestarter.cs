@@ -168,7 +168,8 @@ public static class GameRestarter {
             File.WriteAllText(script, IsWindows ? WindowsScript() : UnixScript());
             ProcessStartInfo info = new() {
                 FileName = IsWindows ? "cmd.exe" : "/bin/sh",
-                Arguments = (IsWindows ? "/c " : "") + "\"" + script + "\"",
+                // cmd /c strips one quote pair when the path has ( ) & etc. ("Program Files (x86)"), so wrap twice
+                Arguments = IsWindows ? "/c \"\"" + script + "\"\"" : "\"" + script + "\"",
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 WorkingDirectory = dir,

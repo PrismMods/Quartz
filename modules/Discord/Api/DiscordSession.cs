@@ -36,6 +36,8 @@ public static class DiscordSession {
     public static event Action Changed;
     public static bool HasSavedToken => TokenStore.HasSaved;
     private static RemoteAuth auth;
+    // bumped by LogOut so an in-flight Start drops its result
+    private static volatile int generation;
     public static string QrUrl { get; private set; }
     public static string QrStatus { get; private set; } = "";
     public static bool QrActive => auth != null;
@@ -114,27 +116,43 @@ public static class DiscordSession {
     private static void Start(string token, bool save) {
         SigningIn = true;
         Set("signing in...");
+        int started = generation;
         Run(async () => {
             DiscordRest rest = new(token);
             (string id, string name, string avatar) = await rest.GetSelfAsync();
-            Rest = rest;
-            SelfId = id;
-            SelfName = name;
-            SelfAvatar = avatar;
-            if(save) {
-                try {
-                    TokenStore.Save(token);
-                } catch(Exception e) {
-                    MainCore.Log.Wrn($"[Discord] could not save the token: {e.Message}");
+            bool current = false;
+            // checked on the main thread so a Log Out / Forget can't interleave with the apply
+            await OnMain(() => {
+                if(started != generation) return;
+                current = true;
+                Rest = rest;
+                SelfId = id;
+                SelfName = name;
+                SelfAvatar = avatar;
+                if(save) {
+                    try {
+                        TokenStore.Save(token);
+                    } catch(Exception e) {
+                        MainCore.Log.Wrn($"[Discord] could not save the token: {e.Message}");
+                    }
                 }
+            });
+            if(!current) {
+                rest.Dispose();
+                return;
             }
             List<DiscordGuild> guilds = await rest.GetGuildsAsync();
-            Guilds.Clear();
-            Guilds.AddRange(guilds);
-            StartGateway(token);
-            Set($"signed in as {name} — {guilds.Count} server(s)");
-            MainThread.Enqueue(() => OpenGuild(DirectMessagesId));
-        }, () => SigningIn = false);
+            await OnMain(() => {
+                if(started != generation) return;
+                Guilds.Clear();
+                Guilds.AddRange(guilds);
+                StartGateway(token);
+                Set($"signed in as {name} — {guilds.Count} server(s)");
+                OpenGuild(DirectMessagesId);
+            });
+        }, () => {
+            if(started == generation) SigningIn = false;
+        });
     }
     private static void StartGateway(string token) {
         Gateway?.Dispose();
@@ -167,23 +185,25 @@ public static class DiscordSession {
             GuildView reloaded = guildId == DirectMessagesId
                 ? await DirectMessagesAsync()
                 : await GuildChannelsAsync(guildId);
-            if(CurrentGuildId != guildId) return;
-            guildCache[guildId] = reloaded;
-            view = reloaded;
-            Channels.Clear();
-            Channels.AddRange(reloaded.Channels);
-            Set(Summary(reloaded));
-            bool stillThere = false;
-            foreach(DiscordChannel channel in reloaded.Channels)
-                if(channel.Id == reopen) {
-                    stillThere = true;
-                    break;
-                }
-            if(stillThere) return;
-            CurrentChannelId = null;
-            Messages.Clear();
-            string first = FirstOpenable(reloaded);
-            if(first != null) MainThread.Enqueue(() => OpenChannel(first));
+            await OnMain(() => {
+                if(CurrentGuildId != guildId) return;
+                guildCache[guildId] = reloaded;
+                view = reloaded;
+                Channels.Clear();
+                Channels.AddRange(reloaded.Channels);
+                Set(Summary(reloaded));
+                bool stillThere = false;
+                foreach(DiscordChannel channel in reloaded.Channels)
+                    if(channel.Id == reopen) {
+                        stillThere = true;
+                        break;
+                    }
+                if(stillThere) return;
+                CurrentChannelId = null;
+                Messages.Clear();
+                string first = FirstOpenable(reloaded);
+                if(first != null) OpenChannel(first);
+            });
         }, null);
     }
     private static void Replace(List<DiscordMessage> list, DiscordMessage message) {
@@ -217,15 +237,17 @@ public static class DiscordSession {
             GuildView loaded = guildId == DirectMessagesId
                 ? await DirectMessagesAsync()
                 : await GuildChannelsAsync(guildId);
-            if(ct.IsCancellationRequested || CurrentGuildId != guildId) return;
-            guildCache[guildId] = loaded;
-            view = loaded;
-            Channels.Clear();
-            Channels.AddRange(loaded.Channels);
-            Loading = false;
-            Set(Summary(loaded));
-            string first = FirstOpenable(loaded);
-            if(first != null) MainThread.Enqueue(() => OpenChannel(first));
+            await OnMain(() => {
+                if(ct.IsCancellationRequested || CurrentGuildId != guildId) return;
+                guildCache[guildId] = loaded;
+                view = loaded;
+                Channels.Clear();
+                Channels.AddRange(loaded.Channels);
+                Loading = false;
+                Set(Summary(loaded));
+                string first = FirstOpenable(loaded);
+                if(first != null) OpenChannel(first);
+            });
         }, () => Loading = false);
     }
     private static string Summary(GuildView loaded) {
@@ -313,13 +335,17 @@ public static class DiscordSession {
         Set("loading messages...");
         Run(async () => {
             List<DiscordMessage> history = await Rest.GetMessagesAsync(target.Id, 50);
-            if(ct.IsCancellationRequested || CurrentChannelId != target.Id) return;
-            messageCache[target.Id] = history;
-            Messages.Clear();
-            Messages.AddRange(history);
-            Loading = false;
-            Set($"#{target.Name} — {history.Count} message(s)");
-            if(history.Count > 0) await Rest.AckAsync(target.Id, history[^1].Id);
+            bool applied = false;
+            await OnMain(() => {
+                if(ct.IsCancellationRequested || CurrentChannelId != target.Id) return;
+                messageCache[target.Id] = history;
+                Messages.Clear();
+                Messages.AddRange(history);
+                Loading = false;
+                Set($"#{target.Name} — {history.Count} message(s)");
+                applied = true;
+            });
+            if(applied && history.Count > 0) await Rest.AckAsync(target.Id, history[^1].Id);
         }, () => Loading = false);
     }
     private static CancellationToken BeginNavigation() {
@@ -342,6 +368,7 @@ public static class DiscordSession {
         }, null);
     }
     public static void LogOut() {
+        generation++;
         try {
             navCts?.Cancel();
         } catch(Exception e) {
@@ -384,6 +411,19 @@ public static class DiscordSession {
                 Notify();
             }
         });
+    }
+    // Run bodies resume on the thread pool; the lists and caches are read by the UI on the main thread
+    private static Task OnMain(Action apply) {
+        TaskCompletionSource<bool> applied = new();
+        MainThread.Enqueue(() => {
+            try {
+                apply();
+                applied.SetResult(true);
+            } catch(Exception e) {
+                applied.SetException(e);
+            }
+        });
+        return applied.Task;
     }
     private static string Describe(Exception e) {
         Exception inner = e;

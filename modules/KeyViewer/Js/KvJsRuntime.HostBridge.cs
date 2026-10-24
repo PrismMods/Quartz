@@ -36,16 +36,19 @@ internal static partial class KvJsRuntime {
                 return KvJsTemplate.Get(chunks).Instantiate(args);
             }
 
-            private static object TemplateValue(JsValue value) {
+            private static object TemplateValue(JsValue value, int depth = 0) {
+                KvJsVNode.CheckDepth(depth);
                 if(Nullish(value)) return null;
                 if(value.IsArray()) {
                     JsArray array = value.AsArray();
                     object[] values = new object[array.Length];
-                    for(uint i = 0; i < values.Length; i++) values[i] = TemplateValue(array.Get(i));
+                    for(uint i = 0; i < values.Length; i++) values[i] = TemplateValue(array.Get(i), depth + 1);
                     return values;
                 }
+                if(value is Jint.Runtime.Interop.ObjectWrapper wrapper) return wrapper.Target;
+                // ToObject recurses through nested plain objects without a depth limit, so stringify them like JS would.
+                if(value.IsObject()) return Jint.Runtime.TypeConverter.ToString(value);
                 object converted = value.ToObject();
-                if(converted is KvJsVNode) return converted;
                 if(converted is bool flag && !flag) return null;
                 return converted;
             }

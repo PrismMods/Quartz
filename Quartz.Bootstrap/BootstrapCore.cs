@@ -39,14 +39,18 @@ public static class BootstrapCore {
             warn("[AutoUpdate] the update check failed (" + e.Message + ") — loading the current runtime");
             resolution = UpdateResolution.None();
         }
-        if(!resolution.HasCandidate) return LoadCurrent(current, dataRoot, warn, tryStart);
         RuntimeCandidate trial;
         try {
-            trial = store.ValidateCandidate(resolution.Version, resolution.RuntimePath);
+            trial = resolution.HasCandidate
+                ? store.ValidateCandidate(resolution.Version, resolution.RuntimePath)
+                : StagedTrial(store, state);
         } catch(Exception e) {
             warn("[AutoUpdate] the downloaded runtime is unusable (" + e.Message + ") — loading the current runtime");
+            state.Staged = null;
+            store.Save(state);
             return LoadCurrent(current, dataRoot, warn, tryStart);
         }
+        if(trial == null) return LoadCurrent(current, dataRoot, warn, tryStart);
         msg($"[AutoUpdate] updating {current.Version} -> {trial.Version}");
         state.Trial = trial.Version;
         store.Save(state);
@@ -62,12 +66,20 @@ public static class BootstrapCore {
         // process, so nothing else is loaded this launch; the old runtime is
         // intact and comes back on the next one.
         state.Trial = null;
+        state.Staged = null;
         state.Failed = trial.Version;
         store.Save(state);
         store.DeleteRuntime(trial.Version, state);
         warn($"[AutoUpdate] the updated runtime {trial.Version} failed to start: {startError}");
         warn($"[AutoUpdate] it is held back — restart to run {current.Version}");
         return new BootstrapResult { UpdateFailed = true };
+    }
+    private static RuntimeCandidate StagedTrial(RuntimeStore store, RuntimeState state) {
+        string staged = state.Staged;
+        if(string.IsNullOrWhiteSpace(staged)
+            || string.Equals(staged, state.Current, StringComparison.OrdinalIgnoreCase)
+            || string.Equals(staged, state.Failed, StringComparison.OrdinalIgnoreCase)) return null;
+        return store.GetCandidate(staged);
     }
     private static BootstrapResult LoadCurrent(
         RuntimeCandidate current,

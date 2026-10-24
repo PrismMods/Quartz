@@ -46,7 +46,7 @@ public sealed partial class TufService : IRuntimeService {
         string full;
         try { full = Path.GetFullPath(path); } catch(Exception e) { Diag.Ignore(e); reason = "invalid"; return false; }
         if(!TufInstallPaths.IsUsableLibraryRoot(full, out reason)) return false;
-        if(string.Equals(Path.GetFullPath(ResolveInstallRoot().Path), full, PathComparison)) return true;
+        if(string.Equals(Path.GetFullPath(ResolveInstallRoot().Path), full, TufInstallPaths.PathComparison)) return true;
         if(TufInstallPaths.IsSameOrNested(full, MainCore.Paths.TufLevelsPath)) {
             reason = "nested";
             return false;
@@ -80,7 +80,7 @@ public sealed partial class TufService : IRuntimeService {
         moveRequest = new CancellationTokenSource();
         string destination = Path.GetFullPath(toRoot);
         List<(int Id, string From)> pending = index.Data.Entries
-            .Where(e => !string.Equals(Path.GetDirectoryName(e.Folder), destination, PathComparison))
+            .Where(e => !string.Equals(Path.GetDirectoryName(e.Folder), destination, TufInstallPaths.PathComparison))
             .Select(e => (e.Id, e.Folder))
             .ToList();
         MoveDone = 0;
@@ -96,8 +96,6 @@ public sealed partial class TufService : IRuntimeService {
         string movedFrom = Path.GetDirectoryName(pending[0].From) ?? "";
         MoveLibrary(pending, new TufInstallRoot(destination, false), movedFrom, moveRequest.Token);
     }
-    private static StringComparison PathComparison =>
-        Path.DirectorySeparatorChar == '\\' ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
     private async void MoveLibrary(List<(int Id, string From)> pending, TufInstallRoot target, string movedFrom,
         CancellationToken token) {
         List<string> roots = TrustedRoots().ToList();

@@ -45,32 +45,6 @@ public static class SodiumNative {
         LoadError = "";
         return true;
     }
-    public static byte[] Encrypt(byte[] plain, int plainLength, byte[] additional, byte[] nonce, byte[] key) {
-        if(plainLength < 0 || plainLength > (plain?.Length ?? 0)) return null;
-        byte[] cipher = new byte[plainLength + TagBytes];
-        int written = EncryptInto(
-            plain, 0, plainLength,
-            additional, 0, additional?.Length ?? 0,
-            nonce, key,
-            cipher, 0
-        );
-        if(written < 0) return null;
-        if(written != cipher.Length) Array.Resize(ref cipher, written);
-        return cipher;
-    }
-    public static byte[] Decrypt(byte[] cipher, int cipherLength, byte[] additional, byte[] nonce, byte[] key) {
-        if(cipherLength < TagBytes || cipherLength > (cipher?.Length ?? 0)) return null;
-        byte[] plain = new byte[cipherLength - TagBytes];
-        int written = DecryptInto(
-            cipher, 0, cipherLength,
-            additional, 0, additional?.Length ?? 0,
-            nonce, key,
-            plain, 0
-        );
-        if(written < 0) return null;
-        if(written != plain.Length) Array.Resize(ref plain, written);
-        return plain;
-    }
     internal static unsafe int EncryptInto(
         byte[] plain, int plainOffset, int plainLength,
         byte[] additional, int additionalOffset, int additionalLength,

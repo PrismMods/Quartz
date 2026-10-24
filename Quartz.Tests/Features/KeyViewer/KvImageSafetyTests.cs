@@ -47,6 +47,18 @@ static class KvImageSafetyTests {
             "embedded image cache entries are scoped by both document and content");
     }
 
+    public static void TestLocalPathsStayLocal() {
+        Assert(KvImageSafety.TryLocalPath("C:\\img\\a.png", out _)
+            && KvImageSafety.TryLocalPath("/home/u/a.png", out _)
+            && KvImageSafety.TryLocalPath("file:///home/u/a.png", out string fromUri) && fromUri == "/home/u/a.png",
+            "drive, rooted and file:/// image paths are read locally");
+        Assert(!KvImageSafety.TryLocalPath("\\\\evil\\s\\a.png", out _)
+            && !KvImageSafety.TryLocalPath("//evil/s/a.png", out _)
+            && !KvImageSafety.TryLocalPath("file://evil/s/a.png", out _)
+            && !KvImageSafety.TryLocalPath("https://x/a.png", out _),
+            "UNC, file://host and web sources are never opened as local files");
+    }
+
     private static void WriteBigEndian(byte[] bytes, int offset, int value) {
         bytes[offset] = (byte)(value >> 24);
         bytes[offset + 1] = (byte)(value >> 16);

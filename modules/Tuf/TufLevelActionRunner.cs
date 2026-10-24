@@ -153,14 +153,18 @@ internal sealed class TufLevelActionRunner {
                 installed?.Invoke(level);
                 FinishAction(level, TufItemState.Load, "", true);
             });
-        } catch(OperationCanceledException e) {
+        } catch(OperationCanceledException e) when(token.IsCancellationRequested) {
             Diag.Ignore(e);
             MainThread.Enqueue(() => FinishAction(level, TufItemState.Download, "", true));
         }
         catch(Exception e) {
+            // a cancel the user did not ask for is the download's own time cap
+            string message = e is OperationCanceledException
+                ? MainCore.Tr.Get("TUF_TIMEOUT", "The request to TUF timed out.")
+                : e.Message;
             MainThread.Enqueue(() => {
                 MainCore.Log.Wrn($"[TUF] level {level.Id} could not be downloaded or extracted: {e}");
-                FinishAction(level, TufItemState.Retry, e.Message, true);
+                FinishAction(level, TufItemState.Retry, message, true);
             });
         }
     }

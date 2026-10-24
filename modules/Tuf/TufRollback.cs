@@ -147,7 +147,7 @@ public static partial class TufRollback {
         try {
             string from = Root(fromRoot);
             string to = Root(toRoot);
-            if(!Directory.Exists(from) || string.Equals(from, to, PathComparison)) return;
+            if(!Directory.Exists(from) || string.Equals(from, to, TufInstallPaths.PathComparison)) return;
             if(Directory.Exists(to)) {
                 MainCore.Log.Wrn($"[TUF] rollback copies stayed in '{from}': the new library already has some.");
                 return;

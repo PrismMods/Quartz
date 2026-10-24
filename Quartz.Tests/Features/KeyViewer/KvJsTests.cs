@@ -65,4 +65,44 @@ static class KvJsTests {
         Assert(root.Children[1] == badge, "nested template nodes stay as nodes");
         Assert(root.Children[2].Text == "!", "iterable template values are flattened");
     }
+
+    public static void TestPluginDepthLimits() {
+        KvJsVNode deepTags = KvJsTemplate.Get([string.Concat(Enumerable.Repeat("<b>", 300_000))]).Instantiate([]);
+        Assert(deepTags.Tag == "div" && deepTags.Children.Count == 0, "300k nested tags are rejected instead of overflowing the stack");
+
+        KvJsVNode nested = KvJsTemplate.Get([string.Concat(Enumerable.Repeat("<b>", 10)) + "x"]).Instantiate([]);
+        int depth = 0;
+        for(KvJsVNode node = nested; !node.IsText; node = node.Children[0]) depth++;
+        Assert(depth == 10, "nesting under the limit still parses");
+
+        object[] self = new object[1];
+        self[0] = self;
+        Assert(Throws(() => KvJsTemplate.Get(["<i>", "</i>"]).Instantiate([self])), "a self-referencing array in html`` throws a catchable error");
+
+        KvJsVNode a = KvJsVNode.NewElement("b"), b = KvJsVNode.NewElement("b");
+        a.Children.Add(a);
+        b.Children.Add(b);
+        Assert(Throws(() => KvJsVNode.Same(a, b)), "comparing cyclic vnodes throws a catchable error");
+        Assert(KvJsVNode.Same(Chain(KvJsVNode.MaxDepth), Chain(KvJsVNode.MaxDepth)), "vnode trees at the depth limit still compare");
+        Assert(Throws(() => KvJsVNode.Same(Chain(KvJsVNode.MaxDepth + 2), Chain(KvJsVNode.MaxDepth + 2))), "vnode trees past the depth limit throw");
+    }
+
+    private static KvJsVNode Chain(int levels) {
+        KvJsVNode node = KvJsVNode.NewText("x");
+        for(int i = 0; i < levels; i++) {
+            KvJsVNode parent = KvJsVNode.NewElement("b");
+            parent.Children.Add(node);
+            node = parent;
+        }
+        return node;
+    }
+
+    private static bool Throws(Action action) {
+        try {
+            action();
+            return false;
+        } catch(InvalidOperationException) {
+            return true;
+        }
+    }
 }

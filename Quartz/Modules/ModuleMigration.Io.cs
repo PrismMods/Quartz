@@ -3,7 +3,6 @@ using Quartz.Core;
 namespace Quartz.Modules;
 public static partial class ModuleMigration {
     public const string BundledFolderName = "Module.bundled";
-    public static string BundledPath => Path.Combine(MainCore.Paths.RootPath, BundledFolderName);
     public static void RunOnce(ModuleState state) {
         if(state == null || state.Migrated) return;
         state.Migrated = true;
@@ -18,7 +17,7 @@ public static partial class ModuleMigration {
         }
         List<string> installed = [];
         foreach(string id in plan.Install) {
-            if(!CopyBundled(id)) continue;
+            if(!ModuleBundle.Copy(id)) continue;
             ModuleState.Entry entry = state.For(id);
             entry.Enabled = true;
             entry.Source = "migrated";
@@ -62,22 +61,6 @@ public static partial class ModuleMigration {
         } catch(Exception e) {
             Diag.Ignore(e);
             return null;
-        }
-    }
-    private static bool CopyBundled(string id) {
-        string source = BundledPath;
-        string binary = Path.Combine(source, id + ModuleService.ModuleExtension);
-        string manifest = Path.Combine(source, id + ModuleService.ManifestExtension);
-        if(!File.Exists(binary) || !File.Exists(manifest)) return false;
-        try {
-            string root = MainCore.Paths.ModulePath;
-            Directory.CreateDirectory(root);
-            File.Copy(binary, Path.Combine(root, id + ModuleService.ModuleExtension), true);
-            File.Copy(manifest, Path.Combine(root, id + ModuleService.ManifestExtension), true);
-            return true;
-        } catch(Exception e) {
-            MainCore.Log.Err($"[Modules] couldn't carry over '{id}': {e.Message}");
-            return false;
         }
     }
 }

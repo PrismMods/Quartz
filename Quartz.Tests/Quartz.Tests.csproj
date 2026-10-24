@@ -52,7 +52,6 @@
 		<Compile Include="../Quartz/GTweens/Source/TweenBehaviours/WaitTimeTween.cs" Link="Source/WaitTimeTween.cs" />
 		<Compile Include="../Quartz/GTweens/Source/Tweeners/ITweener.cs" Link="Source/ITweener.cs" />
 		<Compile Include="../Quartz/GTweens/Source/Tweeners/Vector3RotationTweener.cs" Link="Source/Vector3RotationTweener.cs" />
-		<Compile Include="../Quartz/IO/Interface/ICopyable.cs" Link="Source/ICopyable.cs" />
 		<Compile Include="../Quartz/Interop/ImportKeys.cs" Link="Source/ImportKeys.cs" />
 		<Compile Include="../Quartz/Plugins/PluginIdentityResolver.cs" Link="Source/PluginIdentityResolver.cs" />
 		<Compile Include="../Quartz/Plugins/PluginImage.cs" Link="Source/PluginImage.cs" />

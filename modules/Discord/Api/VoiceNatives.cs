@@ -51,7 +51,6 @@ public static class VoiceNatives {
         }
         return null;
     }
-    public static bool DaveAvailable => Entry()?.Has("dave") ?? false;
     public static async Task<bool> InstallAsync(Action<string, float> progress, CancellationToken ct) {
         VoiceNativeEntry entry = Entry();
         if(entry == null) {
@@ -146,12 +145,5 @@ public static class VoiceNatives {
                 progress?.Invoke($"downloading {name}", start + (slice * 0.85f * written / declared));
         }
         return written > 0;
-    }
-    public static void Uninstall() {
-        try {
-            if(Directory.Exists(InstallRoot)) Directory.Delete(InstallRoot, true);
-        } catch(Exception e) {
-            MainCore.Log.Wrn("[Discord] could not remove the voice runtime: " + e.Message);
-        }
     }
 }

@@ -46,6 +46,26 @@ static class BootstrapRuntimeTests {
             Assert(warnings.Count > 0, "the demotion is reported");
         } finally { Directory.Delete(root, true); }
     }
+    public static void TestStagedRuntimeSurvivesUntilPromoted() {
+        string root = NewRoot();
+        try {
+            string versions = Path.Combine(root, "versions");
+            MakeRuntime(versions, "9.9.7");
+            MakeRuntime(versions, "9.9.8");
+            File.WriteAllText(Path.Combine(root, "state.json"),
+                "{\"SchemaVersion\": 1, \"Current\": \"9.9.7\", \"Staged\": \"9.9.8\"}");
+            RuntimeStore store = new(root, _ => { });
+            RuntimeState state = store.LoadAndRepair();
+            Assert(state.Current == "9.9.7" && state.Staged == "9.9.8", "a staged update stays pending, not current");
+            Assert(Directory.Exists(Path.Combine(versions, "9.9.8")), "cleanup keeps the staged runtime");
+            store.Promote(state, "9.9.8");
+            Assert(state.Previous == "9.9.7" && state.Staged == null, "promoting the staged trial keeps a rollback");
+            File.WriteAllText(Path.Combine(root, "state.json"),
+                "{\"SchemaVersion\": 1, \"Current\": \"9.9.7\", \"Trial\": \"9.9.8\", \"Staged\": \"9.9.8\"}");
+            state = new RuntimeStore(root, _ => { }).LoadAndRepair();
+            Assert(state.Failed == "9.9.8" && state.Staged == null, "a staged trial that died is held back, not retried");
+        } finally { Directory.Delete(root, true); }
+    }
     public static void TestPromoteKeepsPreviousDropsOlder() {
         string root = NewRoot();
         try {

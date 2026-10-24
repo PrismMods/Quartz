@@ -181,6 +181,14 @@ if [ -n "$dirty" ]; then
   printf '%s\n' "$dirty" >&2
   exit 1
 fi
+# gh creates a missing tag on the remote default branch, not on local HEAD, so the
+# assets must come from a commit that is already pushed; the tag is pinned to it below.
+git fetch --quiet origin
+release_commit=$(git rev-parse HEAD)
+if [ "$release_commit" != "$(git rev-parse -q --verify '@{u}' 2>/dev/null)" ]; then
+  echo "HEAD is not the pushed upstream commit — push (or pull) before releasing" >&2
+  exit 1
+fi
 
 # --- Commit the build-number bump (prerelease only) ----------------------
 if [ "$bumped" -eq 1 ]; then
@@ -201,6 +209,7 @@ tools/gen-stubs.sh --check || {
   exit 1
 }
 python3 scripts/check_conventions.py || exit 1
+scripts/test.sh || exit 1
 
 echo "Building ${tag} (MelonLoader) ..."
 dotnet build Quartz/Quartz.csproj -c Release
@@ -304,7 +313,7 @@ if gh release view "$tag" >/dev/null 2>&1; then
   gh release upload "$tag" "$quartz_zip" "$quartz_umm_zip" "$keyviewer_zip" "$keyviewer_umm_zip" "$sdk_dll" "$catalog" "${module_assets[@]}" --clobber
 else
   # shellcheck disable=SC2086
-  gh release create "$tag" "$quartz_zip" "$quartz_umm_zip" "$keyviewer_zip" "$keyviewer_umm_zip" "$sdk_dll" "$catalog" "${module_assets[@]}" --title "$title" --notes-file "$notes_tmp" $flags
+  gh release create "$tag" "$quartz_zip" "$quartz_umm_zip" "$keyviewer_zip" "$keyviewer_umm_zip" "$sdk_dll" "$catalog" "${module_assets[@]}" --title "$title" --notes-file "$notes_tmp" --target "$release_commit" $flags
 fi
 
 # --- Roll this channel's "latest" pointer --------------------------------

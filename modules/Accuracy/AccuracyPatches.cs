@@ -21,7 +21,7 @@ internal static class AccuracyPatches {
     [HarmonyPatch]
     private static class SwitchChosenPatch {
         private static MethodBase TargetMethod() => GameApi.SwitchChosenTarget;
-        private static void Postfix(scrPlanet __instance) {
+        private static void Prefix(scrPlanet __instance) {
             if(!MainCore.IsModEnabled) return;
             try {
                 double rad = __instance.cachedAngle - __instance.targetExitAngle;

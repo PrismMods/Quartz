@@ -56,7 +56,7 @@ public sealed partial class TufService : IRuntimeService {
             TufLevel remote = null;
             try {
                 remote = await api.FetchLevelAsync(id, token).ConfigureAwait(false);
-            } catch(OperationCanceledException e) {
+            } catch(OperationCanceledException e) when(token.IsCancellationRequested) {
                 Diag.Ignore(e);
                 break;
             } catch(Exception e) {
@@ -171,7 +171,7 @@ public sealed partial class TufService : IRuntimeService {
         updateStates[id] = TufUpdateState.UpToDate;
         string installed = level.InstallFolder ?? "";
         if(previous.Length > 0 && installed.Length > 0
-            && !string.Equals(Path.GetFullPath(previous), Path.GetFullPath(installed), PathComparison))
+            && !string.Equals(Path.GetFullPath(previous), Path.GetFullPath(installed), TufInstallPaths.PathComparison))
             downloads.DeleteLevel(id, previous, settings?.Data.KnownRoots);
         sizeProbed.Remove(id);
         TufInstallEntry entry = index?.Data.Find(id);

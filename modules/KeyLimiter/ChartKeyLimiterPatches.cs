@@ -104,7 +104,10 @@ public static partial class ChartKeyLimiter {
             return code;
         }
         private static readonly System.Collections.Generic.List<AnyKeyCode> MainPressKeysBuffer = new();
+        private static bool dying;
         private static HitMargin Validate(HitMargin margin, scrPlanet planet) {
+            // Die under NoFail/lives calls Hit -> SwitchChosen -> here again with the same keys held
+            if(dying) return margin;
             try {
                 if(!ChartKeyLimiterState.Instance.Active) return margin;
                 if(planet == null || planet.player == null || RDC.auto) return margin;
@@ -114,8 +117,14 @@ public static partial class ChartKeyLimiter {
                     KeyCode key = Resolve(pressed);
                     if(key == KeyCode.None) continue;
                     if(ChartKeyLimiterState.Instance.IsKeyValid(playerId, key)) continue;
-                    if(ChartKeyLimiterState.Instance.OnInvalidPress(ref margin))
+                    if(!ChartKeyLimiterState.Instance.OnInvalidPress(ref margin)) continue;
+                    dying = true;
+                    try {
                         planet.player.Die(false, true, ChartKeyLimiterState.Instance.Message, false);
+                    } finally {
+                        dying = false;
+                    }
+                    break;
                 }
             } catch(Exception e) {
                 Diag.Warn(e, "checking a hit against the chart key limiter");

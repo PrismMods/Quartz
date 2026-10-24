@@ -12,6 +12,8 @@ public sealed class VoiceAudio : MonoBehaviour {
         internal readonly short[] Pcm = new short[OpusNative.FrameSamples];
     }
     private readonly Dictionary<uint, DecoderState> decoders = [];
+    // OnAudioReceived runs on the UDP thread; Detach frees the decoders on the main thread
+    private readonly object decoderLock = new();
     private VoiceUdp transport;
     private VoiceGateway gateway;
     private AudioSource output;
@@ -75,9 +77,11 @@ public sealed class VoiceAudio : MonoBehaviour {
         gateway = null;
         StopCapture();
         lock(jitterLock) jitter.Clear();
-        foreach(KeyValuePair<uint, DecoderState> pair in decoders)
-            OpusNative.DestroyDecoder(pair.Value.Handle);
-        decoders.Clear();
+        lock(decoderLock) {
+            foreach(KeyValuePair<uint, DecoderState> pair in decoders)
+                OpusNative.DestroyDecoder(pair.Value.Handle);
+            decoders.Clear();
+        }
         if(output != null) output.Stop();
     }
     private void StartPlayback() {
@@ -223,40 +227,43 @@ public sealed class VoiceAudio : MonoBehaviour {
         }
     }
     private void OnAudioReceived(uint ssrc, byte[] payload, int payloadLength) {
-        try {
-            byte[] opus = payload;
-            int opusLength = payloadLength;
-            DaveSession dave = Dave;
-            if(dave != null && dave.KeysReady) {
-                opus = dave.DecryptOpus(ssrc, payload, payloadLength, out opusLength);
-                if(opus == null) {
-                    FramesDropped++;
-                    return;
+        lock(decoderLock) {
+            if(transport == null) return;
+            try {
+                byte[] opus = payload;
+                int opusLength = payloadLength;
+                DaveSession dave = Dave;
+                if(dave != null && dave.KeysReady) {
+                    opus = dave.DecryptOpus(ssrc, payload, payloadLength, out opusLength);
+                    if(opus == null) {
+                        FramesDropped++;
+                        return;
+                    }
                 }
-            }
-            FramesReceived++;
-            if(opusLength <= 3) silenceFrames++;
-            else voiceFrames++;
-            if(!decoders.TryGetValue(ssrc, out DecoderState decoder)) {
-                IntPtr handle = OpusNative.CreateDecoder(out string error);
-                if(handle == IntPtr.Zero) {
-                    MainCore.Log.Wrn("[Discord] " + error);
-                    return;
+                FramesReceived++;
+                if(opusLength <= 3) silenceFrames++;
+                else voiceFrames++;
+                if(!decoders.TryGetValue(ssrc, out DecoderState decoder)) {
+                    IntPtr handle = OpusNative.CreateDecoder(out string error);
+                    if(handle == IntPtr.Zero) {
+                        MainCore.Log.Wrn("[Discord] " + error);
+                        return;
+                    }
+                    decoder = new DecoderState { Handle = handle };
+                    decoders[ssrc] = decoder;
                 }
-                decoder = new DecoderState { Handle = handle };
-                decoders[ssrc] = decoder;
+                short[] pcm = decoder.Pcm;
+                int samples = OpusNative.Decode(
+                    decoder.Handle, opus, opusLength, pcm, OpusNative.FrameSamples);
+                if(samples <= 0) return;
+                decodedSamples += samples;
+                lock(jitterLock) {
+                    if(jitter.Count > JitterCap) jitter.Clear();
+                    for(int i = 0; i < samples; i++) jitter.Enqueue(pcm[i] / (float)short.MaxValue);
+                }
+            } catch(Exception e) {
+                Diag.Ignore(e);
             }
-            short[] pcm = decoder.Pcm;
-            int samples = OpusNative.Decode(
-                decoder.Handle, opus, opusLength, pcm, OpusNative.FrameSamples);
-            if(samples <= 0) return;
-            decodedSamples += samples;
-            lock(jitterLock) {
-                if(jitter.Count > JitterCap) jitter.Clear();
-                for(int i = 0; i < samples; i++) jitter.Enqueue(pcm[i] / (float)short.MaxValue);
-            }
-        } catch(Exception e) {
-            Diag.Ignore(e);
         }
     }
     private static void OnPcmRead(float[] data) {

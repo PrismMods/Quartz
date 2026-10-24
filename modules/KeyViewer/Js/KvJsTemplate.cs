@@ -29,7 +29,7 @@ internal sealed class KvJsTemplate {
         KvJsTemplate parsed;
         try {
             int pos = 0;
-            parsed = new KvJsTemplate(ParseNodes(source, ref pos, null));
+            parsed = new KvJsTemplate(ParseNodes(source, ref pos, null, 0));
         } catch(Exception e) {
             Diag.Warn(e, "KeyViewerJs/TemplateParse");
             parsed = new KvJsTemplate([]);
@@ -38,8 +38,8 @@ internal sealed class KvJsTemplate {
         Cache[source] = parsed;
         return parsed;
     }
-    public static void ClearCache() => Cache.Clear();
-    private static List<object> ParseNodes(string s, ref int pos, string closeTag) {
+    private static List<object> ParseNodes(string s, ref int pos, string closeTag, int depth) {
+        KvJsVNode.CheckDepth(depth);
         List<object> nodes = [];
         while(pos < s.Length) {
             if(s[pos] == '<') {
@@ -55,7 +55,7 @@ internal sealed class KvJsTemplate {
                     if(closeTag == null || name.Equals(closeTag, StringComparison.OrdinalIgnoreCase)) return nodes;
                     continue;
                 }
-                TplElement el = ParseElement(s, ref pos);
+                TplElement el = ParseElement(s, ref pos, depth);
                 if(el != null) nodes.Add(el);
                 continue;
             }
@@ -66,7 +66,7 @@ internal sealed class KvJsTemplate {
         }
         return nodes;
     }
-    private static TplElement ParseElement(string s, ref int pos) {
+    private static TplElement ParseElement(string s, ref int pos, int depth) {
         pos++;
         int nameStart = pos;
         while(pos < s.Length && !char.IsWhiteSpace(s[pos]) && s[pos] != '>' && s[pos] != '/') pos++;
@@ -114,7 +114,7 @@ internal sealed class KvJsTemplate {
             }
             if(attrName.Length > 0 && attrName.IndexOf(PhOpen) < 0) el.Attrs.Add((attrName, parts));
         }
-        if(!selfClosed && !VoidTags.Contains(el.Tag)) el.Children = ParseNodes(s, ref pos, el.Tag);
+        if(!selfClosed && !VoidTags.Contains(el.Tag)) el.Children = ParseNodes(s, ref pos, el.Tag, depth + 1);
         return el;
     }
     private static void AddTextParts(List<object> nodes, string text) {
@@ -171,7 +171,7 @@ internal sealed class KvJsTemplate {
                 parent.Children.Add(KvJsVNode.NewText(text));
                 break;
             case Placeholder ph:
-                AppendValue(parent, ph.Index < values.Length ? values[ph.Index] : null);
+                AppendValue(parent, ph.Index < values.Length ? values[ph.Index] : null, 0);
                 break;
             case TplElement el: {
                 KvJsVNode vnode = KvJsVNode.NewElement(el.Tag);
@@ -184,7 +184,8 @@ internal sealed class KvJsTemplate {
                 break;
         }
     }
-    private static void AppendValue(KvJsVNode parent, object value) {
+    private static void AppendValue(KvJsVNode parent, object value, int depth) {
+        KvJsVNode.CheckDepth(depth);
         switch(value) {
             case null:
                 break;
@@ -192,7 +193,7 @@ internal sealed class KvJsTemplate {
                 parent.Children.Add(vnode);
                 break;
             case System.Collections.IEnumerable list and not string:
-                foreach(object item in list) AppendValue(parent, item);
+                foreach(object item in list) AppendValue(parent, item, depth + 1);
                 break;
             default: {
                 string text = value.ToString();

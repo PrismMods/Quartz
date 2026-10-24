@@ -105,43 +105,6 @@ public sealed class DiscordRest : IDisposable {
         using HttpResponseMessage response = await http.SendAsync(request, ct);
         response.EnsureSuccessStatusCode();
     }
-    public async Task EditMessageAsync(
-        string channelId, string messageId, string content, CancellationToken ct = default
-    ) {
-        using HttpRequestMessage request = new(
-            new HttpMethod("PATCH"), $"channels/{channelId}/messages/{messageId}"
-        ) {
-            Content = Body(new { content }),
-        };
-        using HttpResponseMessage response = await http.SendAsync(request, ct);
-        response.EnsureSuccessStatusCode();
-    }
-    public async Task DeleteMessageAsync(string channelId, string messageId, CancellationToken ct = default) {
-        using HttpRequestMessage request = new(HttpMethod.Delete, $"channels/{channelId}/messages/{messageId}");
-        using HttpResponseMessage response = await http.SendAsync(request, ct);
-        response.EnsureSuccessStatusCode();
-    }
-    public async Task AddReactionAsync(
-        string channelId, string messageId, string emoji, CancellationToken ct = default
-    ) {
-        string escaped = Uri.EscapeDataString(emoji);
-        using HttpRequestMessage request = new(
-            HttpMethod.Put, $"channels/{channelId}/messages/{messageId}/reactions/{escaped}/@me"
-        ) {
-            Content = Body(new { }),
-        };
-        using HttpResponseMessage response = await http.SendAsync(request, ct);
-        response.EnsureSuccessStatusCode();
-    }
-    public async Task RemoveReactionAsync(
-        string channelId, string messageId, string emoji, CancellationToken ct = default
-    ) {
-        string escaped = Uri.EscapeDataString(emoji);
-        using HttpRequestMessage request = new(
-            HttpMethod.Delete, $"channels/{channelId}/messages/{messageId}/reactions/{escaped}/@me");
-        using HttpResponseMessage response = await http.SendAsync(request, ct);
-        response.EnsureSuccessStatusCode();
-    }
     public async Task AckAsync(string channelId, string messageId, CancellationToken ct = default) {
         using HttpRequestMessage request = new(
             HttpMethod.Post, $"channels/{channelId}/messages/{messageId}/ack"
@@ -245,7 +208,7 @@ public sealed class DiscordRest : IDisposable {
         if(content != null)
             foreach(Match match in UrlRegex.Matches(content)) {
                 string url = match.Value.TrimEnd('.', ',', ')', '>', '"', '\'', '!');
-                if(!IsImageUrl(url) || embedSources.Contains(url)) continue;
+                if(!Attachment.IsImageUrl(url) || embedSources.Contains(url)) continue;
                 if(seen.Add(url)) list.Add(new MediaRef(url, null, null));
             }
         return list;
@@ -311,16 +274,6 @@ public sealed class DiscordRest : IDisposable {
     private static string SubText(JToken token, string obj, string key) {
         JObject nested = Obj(token, obj);
         return nested == null ? null : Text(nested, key);
-    }
-    private static bool IsImageUrl(string url) {
-        int query = url.IndexOf('?');
-        string path = (query >= 0 ? url[..query] : url).ToLowerInvariant();
-        return path.EndsWith(".png", StringComparison.Ordinal)
-            || path.EndsWith(".jpg", StringComparison.Ordinal)
-            || path.EndsWith(".jpeg", StringComparison.Ordinal)
-            || path.EndsWith(".gif", StringComparison.Ordinal)
-            || path.EndsWith(".webp", StringComparison.Ordinal)
-            || path.EndsWith(".bmp", StringComparison.Ordinal);
     }
     private static List<PermissionOverwrite> ParseOverwrites(JToken channel) {
         List<PermissionOverwrite> list = [];

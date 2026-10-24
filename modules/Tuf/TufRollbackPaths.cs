@@ -30,9 +30,7 @@ public static partial class TufRollback {
             if(stampDir == null || !IsStampName(Path.GetFileName(stampDir), out _)) return false;
             string? rollbackDir = Path.GetDirectoryName(stampDir);
             return rollbackDir != null
-                && string.Equals(Path.GetFullPath(rollbackDir), Root(levelsRoot), PathComparison);
+                && string.Equals(Path.GetFullPath(rollbackDir), Root(levelsRoot), TufInstallPaths.PathComparison);
         } catch(Exception e) { Diag.Ignore(e); return false; }
     }
-    private static StringComparison PathComparison =>
-        Path.DirectorySeparatorChar == '\\' ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
 }

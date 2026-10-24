@@ -38,19 +38,13 @@ public static partial class KeyViewerOverlay {
                 StartImageDownload(key, path);
                 return null;
             }
-            string file = key.StartsWith("file://", StringComparison.OrdinalIgnoreCase)
-                ? new Uri(key).LocalPath
-                : key;
-            if(IsLikelyLocalPath(file) && File.Exists(file))
+            if(KvImageSafety.TryLocalPath(key, out string file) && File.Exists(file))
                 return Cache(cacheKey, LoadTex(ReadImageFile(file)));
         } catch(Exception ex) {
             MainCore.Log.Msg("[KeyViewer] CSS image load failed: " + ex.Message);
         }
         return null;
     }
-    private static bool IsLikelyLocalPath(string v) =>
-        v.Length > 1 && (v[0] == '/' || v.StartsWith("\\\\", StringComparison.Ordinal)
-            || (char.IsLetter(v[0]) && v[1] == ':'));
     private static Texture2D Cache(KvImageCacheKey key, Texture2D tex) {
         if(tex != null) cssImages[key] = tex;
         return tex;

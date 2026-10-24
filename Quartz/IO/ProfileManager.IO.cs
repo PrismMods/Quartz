@@ -4,13 +4,6 @@ using Quartz.Localization;
 using Quartz.Resource;
 namespace Quartz.IO;
 public static partial class ProfileManager {
-    private static string Uniquify(string name) {
-        if(!Exists(name)) return name;
-        for(int i = 2; ; i++) {
-            string candidate = $"{name} ({i})";
-            if(!Exists(candidate)) return candidate;
-        }
-    }
     public static string PresetsPath => Path.Combine(MainCore.Paths.RootPath, "Presets");
     public readonly struct PresetInfo {
         public readonly string Path;

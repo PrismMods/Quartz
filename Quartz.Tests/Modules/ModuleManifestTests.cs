@@ -60,13 +60,10 @@ static class ModuleManifestTests {
     public static void TestModuleStateRoundTrips() {
         ModuleState state = new();
         state.For("keyviewer").Enabled = true;
-        state.For("keyviewer").Version = "2.0.0";
         state.For("combo").Enabled = false;
-        state.PendingInstall.Add("tuf");
         ModuleState back = ModuleState.Parse(state.ToJson());
-        Assert(back.Modules["keyviewer"].Enabled && back.Modules["keyviewer"].Version == "2.0.0", "entries round-trip");
+        Assert(back.Modules["keyviewer"].Enabled, "entries round-trip");
         Assert(!back.Modules["combo"].Enabled, "a disabled module stays disabled");
-        Assert(back.PendingInstall.Count == 1 && back.PendingInstall[0] == "tuf", "pending installs round-trip");
         state.Categories["overlay"] = false;
         state.Migrated = true;
         ModuleState again = ModuleState.Parse(state.ToJson());
@@ -74,6 +71,7 @@ static class ModuleManifestTests {
         Assert(again.Migrated, "the migration marker round-trips");
         Assert(!again.Categories.ContainsKey("gameplay"), "tabs left alone are not written out, so they default to shown");
         Assert(ModuleState.Parse("{ broken").Modules.Count == 0, "a corrupt state file reads as empty, not a crash");
+        Assert(ModuleState.Parse("{ broken").Corrupt && !ModuleState.Parse("{}").Corrupt, "a corrupt state file is flagged so Load can back it up");
         Assert(!ModuleState.Parse("""{"modules":{"../evil":{"enabled":true}}}""").Modules.ContainsKey("../evil"),
             "an unsafe id in the state file is dropped");
     }

@@ -178,9 +178,9 @@ internal static class KvJsSvg {
     public static void Build(KvJsSvgGraphic graphic, KvJsVNode svg, float alpha) {
         Vector4 box = ParseViewBox(svg.Attr("viewBox"));
         Dictionary<string, (Color a, Color b)> gradients = new(StringComparer.Ordinal);
-        CollectGradients(svg, gradients);
+        CollectGradients(svg, gradients, 0);
         List<KvJsSvgGraphic.Shape> shapes = [];
-        CollectShapes(svg, gradients, shapes, alpha);
+        CollectShapes(svg, gradients, shapes, alpha, 0);
         graphic.SetShapes(shapes, box);
     }
     private static Vector4 ParseViewBox(string raw) {
@@ -189,7 +189,8 @@ internal static class KvJsSvg {
         if(parts.Length != 4) return new Vector4(0f, 0f, 100f, 100f);
         return new Vector4(F(parts[0]), F(parts[1]), Mathf.Max(1f, F(parts[2])), Mathf.Max(1f, F(parts[3])));
     }
-    private static void CollectGradients(KvJsVNode node, Dictionary<string, (Color a, Color b)> gradients) {
+    private static void CollectGradients(KvJsVNode node, Dictionary<string, (Color a, Color b)> gradients, int depth) {
+        KvJsVNode.CheckDepth(depth);
         if(node.Children == null) return;
         foreach(KvJsVNode child in node.Children) {
             if(child.IsText) continue;
@@ -205,7 +206,7 @@ internal static class KvJsSvg {
                 gradients[id] = (stops[0], stops[stops.Count - 1]);
                 continue;
             }
-            CollectGradients(child, gradients);
+            CollectGradients(child, gradients, depth + 1);
         }
     }
     private static Color StopColor(KvJsVNode stop) {
@@ -229,7 +230,8 @@ internal static class KvJsSvg {
         color.a *= opacity;
         return color;
     }
-    private static void CollectShapes(KvJsVNode node, Dictionary<string, (Color a, Color b)> gradients, List<KvJsSvgGraphic.Shape> shapes, float alpha) {
+    private static void CollectShapes(KvJsVNode node, Dictionary<string, (Color a, Color b)> gradients, List<KvJsSvgGraphic.Shape> shapes, float alpha, int depth) {
+        KvJsVNode.CheckDepth(depth);
         if(node.Children == null) return;
         foreach(KvJsVNode child in node.Children) {
             if(child.IsText) continue;
@@ -282,7 +284,7 @@ internal static class KvJsSvg {
                     break;
                 }
                 default:
-                    CollectShapes(child, gradients, shapes, alpha);
+                    CollectShapes(child, gradients, shapes, alpha, depth + 1);
                     break;
             }
         }

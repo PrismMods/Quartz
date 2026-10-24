@@ -19,7 +19,6 @@ public sealed class RuntimeStore {
         versionsRoot = Path.Combine(this.runtimeRoot, "versions");
         statePath = Path.Combine(this.runtimeRoot, "state.json");
     }
-    public string VersionsRoot => versionsRoot;
     public RuntimeState LoadAndRepair() {
         RuntimeState state = ReadState() ?? Reseed();
         if(!string.IsNullOrWhiteSpace(state.Trial)) {
@@ -29,6 +28,7 @@ public sealed class RuntimeStore {
             warn($"the previous update attempt ({state.Trial}) did not complete — holding it back");
             state.Failed = state.Trial;
             state.Trial = null;
+            state.Staged = null;
             Save(state);
         }
         if(!TryValidate(state.Current)) {
@@ -54,6 +54,7 @@ public sealed class RuntimeStore {
                 Previous = root.Value<string>("Previous"),
                 Trial = root.Value<string>("Trial"),
                 Failed = root.Value<string>("Failed"),
+                Staged = root.Value<string>("Staged"),
             };
             if(state.SchemaVersion != 1 || string.IsNullOrWhiteSpace(state.Current)) return null;
             return state;
@@ -122,6 +123,7 @@ public sealed class RuntimeStore {
         state.Current = version;
         state.Trial = null;
         state.Failed = null;
+        state.Staged = null;
         Save(state);
         CleanupVersions(state);
     }
@@ -149,6 +151,7 @@ public sealed class RuntimeStore {
             if(string.Equals(name, state.Current, StringComparison.OrdinalIgnoreCase)) continue;
             if(string.Equals(name, state.Previous, StringComparison.OrdinalIgnoreCase)) continue;
             if(string.Equals(name, state.Trial, StringComparison.OrdinalIgnoreCase)) continue;
+            if(string.Equals(name, state.Staged, StringComparison.OrdinalIgnoreCase)) continue;
             TryDeleteDirectory(directory);
         }
     }

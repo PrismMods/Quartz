@@ -14,6 +14,8 @@ public sealed class DaveSession : IDisposable {
     private IntPtr session;
     private IntPtr encryptor;
     private bool disposed;
+    // DecryptOpus runs on the UDP thread; MLS updates and Dispose run on main/pool threads
+    private readonly object gate = new();
     private long decryptOk;
     public ushort Version { get; private set; }
     public bool KeysReady { get; private set; }
@@ -41,40 +43,50 @@ public sealed class DaveSession : IDisposable {
             "[Discord] dave MLS failure ["
             + (Marshal.PtrToStringAnsi(source) ?? "?") + "]: " + (Marshal.PtrToStringAnsi(reason) ?? "?"));
     public void SetExternalSender(byte[] payload) {
-        if(disposed || !Ready || payload == null) return;
-        DaveNative.SessionSetExternalSender(session, payload);
-        MainCore.Log.Msg($"[Discord] dave external-sender set ({payload.Length}B)");
+        lock(gate) {
+            if(disposed || !Ready || payload == null) return;
+            DaveNative.SessionSetExternalSender(session, payload);
+            MainCore.Log.Msg($"[Discord] dave external-sender set ({payload.Length}B)");
+        }
     }
     public byte[] KeyPackage() {
-        if(disposed || !Ready) return null;
-        byte[] package = DaveNative.KeyPackage(session);
-        MainCore.Log.Msg($"[Discord] dave key-package ({package?.Length ?? 0}B)");
-        return package;
+        lock(gate) {
+            if(disposed || !Ready) return null;
+            byte[] package = DaveNative.KeyPackage(session);
+            MainCore.Log.Msg($"[Discord] dave key-package ({package?.Length ?? 0}B)");
+            return package;
+        }
     }
     public byte[] ProcessProposals(byte[] proposals, IReadOnlyList<string> recognized) {
-        if(disposed || !Ready || proposals == null) return null;
-        byte[] commitWelcome = DaveNative.ProcessProposals(session, proposals, recognized);
-        MainCore.Log.Msg(
-            $"[Discord] dave proposals→commitWelcome ({proposals.Length}B → {commitWelcome?.Length ?? 0}B)");
-        return commitWelcome == null || commitWelcome.Length == 0 ? null : commitWelcome;
+        lock(gate) {
+            if(disposed || !Ready || proposals == null) return null;
+            byte[] commitWelcome = DaveNative.ProcessProposals(session, proposals, recognized);
+            MainCore.Log.Msg(
+                $"[Discord] dave proposals→commitWelcome ({proposals.Length}B → {commitWelcome?.Length ?? 0}B)");
+            return commitWelcome == null || commitWelcome.Length == 0 ? null : commitWelcome;
+        }
     }
     public void ProcessCommit(byte[] commit) {
-        if(disposed || !Ready || commit == null) return;
-        if(!DaveNative.ProcessCommit(session, commit, out List<string> members)) {
-            MainCore.Log.Msg("[Discord] dave commit failed or was ignored");
-            return;
+        lock(gate) {
+            if(disposed || !Ready || commit == null) return;
+            if(!DaveNative.ProcessCommit(session, commit, out List<string> members)) {
+                MainCore.Log.Msg("[Discord] dave commit failed or was ignored");
+                return;
+            }
+            UpdateRoster(members);
+            RefreshRatchets();
         }
-        UpdateRoster(members);
-        RefreshRatchets();
     }
     public void ProcessWelcome(byte[] welcome, IReadOnlyList<string> recognized) {
-        if(disposed || !Ready || welcome == null) return;
-        if(!DaveNative.ProcessWelcome(session, welcome, recognized, out List<string> members)) {
-            MainCore.Log.Msg("[Discord] dave welcome produced no result");
-            return;
+        lock(gate) {
+            if(disposed || !Ready || welcome == null) return;
+            if(!DaveNative.ProcessWelcome(session, welcome, recognized, out List<string> members)) {
+                MainCore.Log.Msg("[Discord] dave welcome produced no result");
+                return;
+            }
+            UpdateRoster(members);
+            RefreshRatchets();
         }
-        UpdateRoster(members);
-        RefreshRatchets();
     }
     private void UpdateRoster(List<string> members) {
         if(members == null || members.Count == 0) return;
@@ -83,32 +95,36 @@ public sealed class DaveSession : IDisposable {
         MainCore.Log.Msg("[Discord] dave roster: " + string.Join(",", roster));
     }
     public void SetVersion(ushort version) {
-        if(disposed || !Ready) return;
-        Version = version;
-        DaveNative.SessionSetVersion(session, version);
+        lock(gate) {
+            if(disposed || !Ready) return;
+            Version = version;
+            DaveNative.SessionSetVersion(session, version);
+        }
     }
     public void RefreshRatchets() {
-        if(disposed || !Ready) return;
-        IntPtr self = GetOrRenewRatchet(selfUserId);
-        if(self != IntPtr.Zero && encryptor != IntPtr.Zero) {
-            DaveNative.EncryptorSetRatchet(encryptor, self);
-            DaveNative.EncryptorPassthrough(encryptor, false);
-            KeysReady = true;
-        }
-        foreach(string userId in roster) {
-            if(userId == selfUserId) continue;
-            IntPtr ratchet = GetOrRenewRatchet(userId);
-            if(ratchet == IntPtr.Zero) continue;
-            if(!decryptors.TryGetValue(userId, out IntPtr decryptor)) {
-                decryptor = DaveNative.DecryptorCreate();
-                if(decryptor == IntPtr.Zero) continue;
-                decryptors[userId] = decryptor;
+        lock(gate) {
+            if(disposed || !Ready) return;
+            IntPtr self = GetOrRenewRatchet(selfUserId);
+            if(self != IntPtr.Zero && encryptor != IntPtr.Zero) {
+                DaveNative.EncryptorSetRatchet(encryptor, self);
+                DaveNative.EncryptorPassthrough(encryptor, false);
+                KeysReady = true;
             }
-            DaveNative.DecryptorTransition(decryptor, ratchet);
-            DaveNative.DecryptorPassthrough(decryptor, false);
+            foreach(string userId in roster) {
+                if(userId == selfUserId) continue;
+                IntPtr ratchet = GetOrRenewRatchet(userId);
+                if(ratchet == IntPtr.Zero) continue;
+                if(!decryptors.TryGetValue(userId, out IntPtr decryptor)) {
+                    decryptor = DaveNative.DecryptorCreate();
+                    if(decryptor == IntPtr.Zero) continue;
+                    decryptors[userId] = decryptor;
+                }
+                DaveNative.DecryptorTransition(decryptor, ratchet);
+                DaveNative.DecryptorPassthrough(decryptor, false);
+            }
+            MainCore.Log.Msg(
+                $"[Discord] dave ratchets refreshed (self + {decryptors.Count} remotes, keysReady={KeysReady})");
         }
-        MainCore.Log.Msg(
-            $"[Discord] dave ratchets refreshed (self + {decryptors.Count} remotes, keysReady={KeysReady})");
     }
     private IntPtr GetOrRenewRatchet(string userId) {
         IntPtr ratchet = DaveNative.KeyRatchet(session, userId);
@@ -119,41 +135,47 @@ public sealed class DaveSession : IDisposable {
         return ratchet;
     }
     public void MapSsrc(uint ssrc, string userId) {
-        if(userId == null || ssrc == 0 || userId == selfUserId) return;
-        ssrcToUser[ssrc] = userId;
-        MainCore.Log.Msg($"[Discord] dave map ssrc {ssrc} → user {userId}");
+        lock(gate) {
+            if(userId == null || ssrc == 0 || userId == selfUserId) return;
+            ssrcToUser[ssrc] = userId;
+            MainCore.Log.Msg($"[Discord] dave map ssrc {ssrc} → user {userId}");
+        }
     }
     public byte[] EncryptOpus(byte[] opus, int length, out int outputLength) {
-        outputLength = length;
-        if(disposed || encryptor == IntPtr.Zero) return opus;
-        int capacity = Math.Max(length, DaveNative.EncryptorMaxSize(encryptor, DaveNative.MediaType.Audio, length));
-        EnsureCapacity(ref encryptBuffer, capacity);
-        int written = DaveNative.Encrypt(encryptor, selfSsrc, opus, length, encryptBuffer);
-        if(written <= 0) return opus;
-        outputLength = written;
-        return encryptBuffer;
+        lock(gate) {
+            outputLength = length;
+            if(disposed || encryptor == IntPtr.Zero) return opus;
+            int capacity = Math.Max(length, DaveNative.EncryptorMaxSize(encryptor, DaveNative.MediaType.Audio, length));
+            EnsureCapacity(ref encryptBuffer, capacity);
+            int written = DaveNative.Encrypt(encryptor, selfSsrc, opus, length, encryptBuffer);
+            if(written <= 0) return opus;
+            outputLength = written;
+            return encryptBuffer;
+        }
     }
     public byte[] DecryptOpus(uint ssrc, byte[] frame, int frameLength, out int outputLength) {
-        outputLength = 0;
-        if(disposed) {
-            outputLength = frameLength;
-            return frame;
+        lock(gate) {
+            outputLength = 0;
+            if(disposed) {
+                outputLength = frameLength;
+                return frame;
+            }
+            if(ssrcToUser.TryGetValue(ssrc, out string mapped)
+                && decryptors.TryGetValue(mapped, out IntPtr known)) {
+                if(!TryDecrypt(known, frame, frameLength, out outputLength)) return null;
+                LogDecrypt(ssrc);
+                return decryptBuffer;
+            }
+            foreach(KeyValuePair<string, IntPtr> pair in decryptors) {
+                if(ssrcToUser.ContainsValue(pair.Key)) continue;
+                if(!TryDecrypt(pair.Value, frame, frameLength, out outputLength)) continue;
+                ssrcToUser[ssrc] = pair.Key;
+                MainCore.Log.Msg($"[Discord] dave decrypt: mapped ssrc {ssrc} → {pair.Key} by trial");
+                LogDecrypt(ssrc);
+                return decryptBuffer;
+            }
+            return null;
         }
-        if(ssrcToUser.TryGetValue(ssrc, out string mapped)
-            && decryptors.TryGetValue(mapped, out IntPtr known)) {
-            if(!TryDecrypt(known, frame, frameLength, out outputLength)) return null;
-            LogDecrypt(ssrc);
-            return decryptBuffer;
-        }
-        foreach(KeyValuePair<string, IntPtr> pair in decryptors) {
-            if(ssrcToUser.ContainsValue(pair.Key)) continue;
-            if(!TryDecrypt(pair.Value, frame, frameLength, out outputLength)) continue;
-            ssrcToUser[ssrc] = pair.Key;
-            MainCore.Log.Msg($"[Discord] dave decrypt: mapped ssrc {ssrc} → {pair.Key} by trial");
-            LogDecrypt(ssrc);
-            return decryptBuffer;
-        }
-        return null;
     }
     private bool TryDecrypt(IntPtr decryptor, byte[] frame, int frameLength, out int written) {
         int capacity = Math.Max(
@@ -172,21 +194,23 @@ public sealed class DaveSession : IDisposable {
             MainCore.Log.Msg($"[Discord] dave decrypt ok #{decryptOk} ssrc={ssrc}");
     }
     public void Dispose() {
-        if(disposed) return;
-        disposed = true;
-        try {
-            foreach(KeyValuePair<string, IntPtr> pair in decryptors)
-                if(pair.Value != IntPtr.Zero) DaveNative.DecryptorDestroy(pair.Value);
-            foreach(KeyValuePair<string, IntPtr> pair in ratchets)
-                if(pair.Value != IntPtr.Zero) DaveNative.KeyRatchetDestroy(pair.Value);
-            decryptors.Clear();
-            ratchets.Clear();
-            if(encryptor != IntPtr.Zero) DaveNative.EncryptorDestroy(encryptor);
-            encryptor = IntPtr.Zero;
-            if(session != IntPtr.Zero) DaveNative.SessionDestroy(session);
-            session = IntPtr.Zero;
-        } catch(Exception e) {
-            Diag.Ignore(e);
+        lock(gate) {
+            if(disposed) return;
+            disposed = true;
+            try {
+                foreach(KeyValuePair<string, IntPtr> pair in decryptors)
+                    if(pair.Value != IntPtr.Zero) DaveNative.DecryptorDestroy(pair.Value);
+                foreach(KeyValuePair<string, IntPtr> pair in ratchets)
+                    if(pair.Value != IntPtr.Zero) DaveNative.KeyRatchetDestroy(pair.Value);
+                decryptors.Clear();
+                ratchets.Clear();
+                if(encryptor != IntPtr.Zero) DaveNative.EncryptorDestroy(encryptor);
+                encryptor = IntPtr.Zero;
+                if(session != IntPtr.Zero) DaveNative.SessionDestroy(session);
+                session = IntPtr.Zero;
+            } catch(Exception e) {
+                Diag.Ignore(e);
+            }
         }
     }
 }

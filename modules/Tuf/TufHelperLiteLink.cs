@@ -26,7 +26,6 @@ public static class TufHelperLiteLink {
             return null;
         }
     }
-    public static string FolderName(int id) => "tuf-" + id;
     private static string? ModDir() {
         if(resolved) return modDir;
         resolved = true;

@@ -13,6 +13,27 @@ internal static class KvImageSafety {
     internal const long MaxDecodedPixels = 64L * 1024L * 1024L;
     internal const int MaxBase64Characters = ((MaxEncodedBytes + 2) / 3) * 4;
 
+    // Only paths on this machine: a UNC or file://host source makes Windows send the user's NTLM hash over SMB.
+    internal static bool TryLocalPath(string value, out string path) {
+        path = null;
+        if(string.IsNullOrEmpty(value)
+            || value.StartsWith("data:", StringComparison.OrdinalIgnoreCase)
+            || value.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+            || value.StartsWith("https://", StringComparison.OrdinalIgnoreCase)) return false;
+        string candidate = value;
+        if(value.StartsWith("file://", StringComparison.OrdinalIgnoreCase)) {
+            if(!Uri.TryCreate(value, UriKind.Absolute, out Uri uri) || uri.IsUnc || uri.Host.Length > 0) return false;
+            candidate = uri.LocalPath;
+        }
+        if(candidate.Length < 2 || IsNetworkPath(candidate)) return false;
+        if(candidate[0] != '/' && !(char.IsLetter(candidate[0]) && candidate[1] == ':')) return false;
+        path = candidate;
+        return true;
+    }
+
+    private static bool IsNetworkPath(string path) =>
+        (path[0] == '\\' || path[0] == '/') && (path[1] == '\\' || path[1] == '/');
+
     internal static bool TryIdentify(byte[] bytes, out IImageInfo info) =>
         TryIdentify(bytes, out info, out _);
 
