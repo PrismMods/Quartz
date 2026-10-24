@@ -25,53 +25,35 @@ public static partial class UICore {
         GameObject subMenu = new("SubMenu");
         subMenu.transform.SetParent(parent, false);
         SubMenu = subMenu.AddComponent<RectTransform>();
-        SubMenu.anchorMin = new(0, 0);
-        SubMenu.anchorMax = new(0, 1);
-        SubMenu.pivot = new(0, 0.5f);
-        SubMenu.sizeDelta = new(0f, -TOP_BAR_HEIGHT);
-        SubMenu.anchoredPosition = new(MENU_WIDTH, -TOP_BAR_HEIGHT * 0.5f);
+        SubMenu.anchorMin = new(0, 1);
+        SubMenu.anchorMax = new(1, 1);
+        SubMenu.pivot = new(0.5f, 1f);
+        SubMenu.offsetMin = new(0f, -TOP_BAR_HEIGHT);
+        SubMenu.offsetMax = new(0f, -TOP_BAR_HEIGHT);
         var image = subMenu.AddComponent<Image>();
         image.color = UIColors.TopBar;
-        GameObject hairline = new("Hairline");
-        hairline.transform.SetParent(subMenu.transform, false);
-        RectTransform hairlineRect = hairline.AddComponent<RectTransform>();
-        hairlineRect.anchorMin = new(0, 0);
-        hairlineRect.anchorMax = new(0, 1);
-        hairlineRect.pivot = new(0, 0.5f);
-        hairlineRect.sizeDelta = new(1f, 0f);
-        Image hairlineImg = hairline.AddComponent<Image>();
-        hairlineImg.color = new Color(1f, 1f, 1f, 0.08f);
-        hairlineImg.raycastTarget = false;
-        void OutlineEdge(string name, Vector2 aMin, Vector2 aMax, Vector2 pivot, Vector2 size) {
-            GameObject edge = new(name);
-            edge.transform.SetParent(subMenu.transform, false);
-            RectTransform er = edge.AddComponent<RectTransform>();
-            er.anchorMin = aMin;
-            er.anchorMax = aMax;
-            er.pivot = pivot;
-            er.sizeDelta = size;
-            er.anchoredPosition = Vector2.zero;
-            Image ei = edge.AddComponent<Image>();
-            ei.color = Color.white;
-            ei.raycastTarget = false;
-            outlineStrips.Add((er, size.x == 0f));
-        }
         subMenu.AddComponent<RectMask2D>();
         subMenuCanvasGroup = subMenu.AddComponent<CanvasGroup>();
         subMenuCanvasGroup.alpha = 1f;
         GameObject content = new("Content");
         content.transform.SetParent(subMenu.transform, false);
         SubMenuContent = content.AddComponent<RectTransform>();
-        SubMenuContent.anchorMin = new(0, 1);
+        SubMenuContent.anchorMin = new(0, 0);
         SubMenuContent.anchorMax = new(0, 1);
-        SubMenuContent.pivot = new(0, 1);
+        SubMenuContent.pivot = new(0, 0.5f);
         SubMenuContent.anchoredPosition = Vector2.zero;
-        SubMenuContent.sizeDelta = new(SUBMENU_WIDTH, 0);
-        GenerateUI.FitVertical(content, 0f);
-        float outline = MainCore.Conf.OutlineWidth;
-        OutlineEdge("OutlineBottom", new(0, 0), new(1, 0), new(0.5f, 0f), new(0f, outline));
-        OutlineEdge("OutlineLeft", new(0, 0), new(0, 1), new(0f, 0.5f), new(outline, 0f));
-        OutlineEdge("OutlineRight", new(1, 0), new(1, 1), new(1f, 0.5f), new(outline, 0f));
+        SubMenuContent.sizeDelta = Vector2.zero;
+        var layout = content.AddComponent<HorizontalLayoutGroup>();
+        layout.childAlignment = TextAnchor.MiddleLeft;
+        layout.childControlWidth = true;
+        layout.childControlHeight = true;
+        layout.childForceExpandWidth = false;
+        layout.childForceExpandHeight = true;
+        layout.spacing = 4f;
+        layout.padding = new RectOffset(8, 8, 6, 6);
+        var fitter = content.AddComponent<ContentSizeFitter>();
+        fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+        subMenu.AddComponent<StripWheel>().Init(SubMenu, SubMenuContent);
     }
     private static void CreateBottomBand(Transform parent) {
         bandHeight = ClampBand(MainCore.Conf.ContextBandHeight > 0f ? MainCore.Conf.ContextBandHeight : DefaultBandHeight);
@@ -83,7 +65,7 @@ public static partial class UICore {
         BottomBand.pivot = new(0.5f, 0f);
         // SnapShellLayout corrects this on the first layout pass anyway; seeding it
         // right just avoids a one-frame band indent in the single-page shell.
-        BottomBand.offsetMin = new(ShellNavHidden ? 0f : MENU_WIDTH, 0f);
+        BottomBand.offsetMin = new(ShellNavHidden ? 0f : RAIL_WIDTH, 0f);
         BottomBand.offsetMax = new(0f, bandHeight);
         var image = band.AddComponent<Image>();
         image.color = UIColors.TopBar;
@@ -95,12 +77,11 @@ public static partial class UICore {
         bandHairlineRect.anchorMin = new(0, 1);
         bandHairlineRect.anchorMax = new(1, 1);
         bandHairlineRect.pivot = new(0.5f, 1f);
-        bandHairlineRect.sizeDelta = new(0f, MainCore.Conf.OutlineWidth);
+        bandHairlineRect.sizeDelta = new(0f, OUTLINE_WIDTH);
         bandHairlineRect.anchoredPosition = Vector2.zero;
         Image bandHairlineImg = bandHairline.AddComponent<Image>();
         bandHairlineImg.color = Color.white;
         bandHairlineImg.raycastTarget = false;
-        outlineStrips.Add((bandHairlineRect, true));
         GameObject content = new("Content");
         content.transform.SetParent(band.transform, false);
         BottomBandContent = content.AddComponent<RectTransform>();
@@ -213,6 +194,36 @@ public static partial class UICore {
     private static float ClampBand(float h) =>
         Mathf.Clamp(h, BandMinHeight, Mathf.Min(BandMaxHeight, Panel.sizeDelta.y - 2f - TOP_BAR_HEIGHT - MinPageHeight));
     private static GTween shellSeq;
+    private static float subTabShown;
+    private static float railShown;
+    private static GTween railSeq;
+    private const float RailHoverDelay = 0.1f;
+    private static void SetRailExpanded(bool expanded) {
+        if(Menu == null) return;
+        railSeq?.Kill();
+        // Expanding waits for a short dwell so passing over the rail doesn't pop it open.
+        railSeq = GTweenSequenceBuilder.New()
+            .AppendTime(expanded ? RailHoverDelay : 0f)
+            .Append(GTweenExtensions.Tween(
+                () => railShown,
+                ApplyRail,
+                expanded ? 1f : 0f,
+                expanded ? 0.22f : 0.18f
+            ).SetEasing(Easing.OutExpo))
+            .Build();
+        MainCore.TC.Play(railSeq);
+    }
+    private static void ApplyRail(float t) {
+        railShown = t;
+        Menu.sizeDelta = new Vector2(Mathf.Lerp(RAIL_WIDTH, MENU_WIDTH, t), Menu.sizeDelta.y);
+        MenuFactory.SetLabelAlpha(t);
+        if(menuVersionText != null) menuVersionText.alpha = 0.4f * t;
+    }
+    private static void ApplySubTabHeight(float h) {
+        subTabShown = h;
+        SubMenu.offsetMin = new Vector2(SubMenu.offsetMin.x, -TOP_BAR_HEIGHT - h);
+        Page.offsetMax = new Vector2(Page.offsetMax.x, -TOP_BAR_HEIGHT - h);
+    }
     private static void ApplyShellLayout(bool animate, float duration = 0f) {
         shellSeq?.Kill();
         if(!animate) {
@@ -220,23 +231,28 @@ public static partial class UICore {
             return;
         }
         Vector2 menuTarget = isMenuOpen ? MenuOpenPosition : MenuClosedPosition;
-        float subMenuX = isMenuOpen ? MENU_WIDTH : -SUBMENU_WIDTH;
-        float subMenuW = subMenuHasChildren ? SUBMENU_WIDTH : 0f;
-        float leftInset = isMenuOpen ? MENU_WIDTH + (subMenuHasChildren ? SUBMENU_WIDTH : 0f) : 0f;
+        bool subVisible = isMenuOpen && subMenuHasChildren;
+        float leftInset = isMenuOpen ? RAIL_WIDTH : 0f;
         float menuAlpha = isMenuOpen ? 1f : 0f;
-        float subMenuAlpha = isMenuOpen && subMenuHasChildren ? 1f : 0f;
+        float subMenuAlpha = subVisible ? 1f : 0f;
         menuCanvasGroup.interactable = isMenuOpen;
         menuCanvasGroup.blocksRaycasts = isMenuOpen;
-        subMenuCanvasGroup.interactable = isMenuOpen && subMenuHasChildren;
-        subMenuCanvasGroup.blocksRaycasts = isMenuOpen && subMenuHasChildren;
+        subMenuCanvasGroup.interactable = subVisible;
+        subMenuCanvasGroup.blocksRaycasts = subVisible;
         float pageBaseX = PrepareSlide(Page, leftInset, bandShown);
         float bandBaseX = PrepareSlide(BottomBand, leftInset, 0f);
+        float subMenuBaseX = PrepareSlide(SubMenu, leftInset, SubMenu.offsetMin.y);
         shellSeq = GTweenSequenceBuilder.New()
             .Join(Menu.GTAnchorPos(menuTarget, duration).SetEasing(Easing.OutExpo))
-            .Join(SubMenu.GTAnchorPosX(subMenuX, duration).SetEasing(Easing.OutExpo))
-            .Join(SubMenu.GTSizeDelta(new Vector2(subMenuW, SubMenu.sizeDelta.y), duration).SetEasing(Easing.OutExpo))
+            .Join(SubMenu.GTAnchorPosX(subMenuBaseX, duration).SetEasing(Easing.OutExpo))
             .Join(Page.GTAnchorPosX(pageBaseX, duration).SetEasing(Easing.OutExpo))
             .Join(BottomBand.GTAnchorPosX(bandBaseX, duration).SetEasing(Easing.OutExpo))
+            .Join(GTweenExtensions.Tween(
+                () => subTabShown,
+                ApplySubTabHeight,
+                subVisible ? SUBTAB_HEIGHT : 0f,
+                duration
+            ).SetEasing(Easing.OutExpo))
             .Join(menuCanvasGroup.GTFade(menuAlpha, Mathf.Min(duration, 0.3f)).SetEasing(Easing.OutSine))
             .Join(subMenuCanvasGroup.GTFade(subMenuAlpha, Mathf.Min(duration, 0.3f)).SetEasing(Easing.OutSine))
             .AppendCallback(SnapShellLayout)
@@ -253,22 +269,22 @@ public static partial class UICore {
     }
     private static void SnapShellLayout() {
         Vector2 menuTarget = isMenuOpen ? MenuOpenPosition : MenuClosedPosition;
-        float subMenuX = isMenuOpen ? MENU_WIDTH : -SUBMENU_WIDTH;
-        float subMenuW = subMenuHasChildren ? SUBMENU_WIDTH : 0f;
-        float leftInset = isMenuOpen ? MENU_WIDTH + (subMenuHasChildren ? SUBMENU_WIDTH : 0f) : 0f;
+        bool subVisible = isMenuOpen && subMenuHasChildren;
+        float leftInset = isMenuOpen ? RAIL_WIDTH : 0f;
         Menu.anchoredPosition = menuTarget;
-        SubMenu.anchoredPosition = new Vector2(subMenuX, SubMenu.anchoredPosition.y);
-        SubMenu.sizeDelta = new Vector2(subMenuW, SubMenu.sizeDelta.y);
+        SubMenu.offsetMin = new Vector2(leftInset, SubMenu.offsetMin.y);
+        SubMenu.offsetMax = new Vector2(0f, SubMenu.offsetMax.y);
         Page.offsetMin = new Vector2(leftInset, bandShown);
         Page.offsetMax = new Vector2(0f, Page.offsetMax.y);
+        ApplySubTabHeight(subVisible ? SUBTAB_HEIGHT : 0f);
         BottomBand.offsetMin = new Vector2(leftInset, 0f);
         BottomBand.offsetMax = new Vector2(0f, BottomBand.offsetMax.y);
         menuCanvasGroup.alpha = isMenuOpen ? 1f : 0f;
-        subMenuCanvasGroup.alpha = isMenuOpen && subMenuHasChildren ? 1f : 0f;
+        subMenuCanvasGroup.alpha = subVisible ? 1f : 0f;
         menuCanvasGroup.interactable = isMenuOpen;
         menuCanvasGroup.blocksRaycasts = isMenuOpen;
-        subMenuCanvasGroup.interactable = isMenuOpen && subMenuHasChildren;
-        subMenuCanvasGroup.blocksRaycasts = isMenuOpen && subMenuHasChildren;
+        subMenuCanvasGroup.interactable = subVisible;
+        subMenuCanvasGroup.blocksRaycasts = subVisible;
     }
     public static void SetSubMenuVisible(bool hasChildren, bool animate) {
         subMenuHasChildren = hasChildren;

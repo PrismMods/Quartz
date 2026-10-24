@@ -53,6 +53,12 @@ public enum Asset {
     QuestionMarkCircle128 = 44,
     Tabub = 45,
     QuizLogo = 46,
+    House128 = 47,
+    Box128 = 48,
+    Pencil128 = 49,
+    Globe128 = 50,
+    Message128 = 51,
+    Code128 = 52,
 }
 public sealed class ResourceManager(Assembly assembly, string resourcePath) : IDisposable {
     private readonly Dictionary<string, object> cache = [];
@@ -191,6 +197,12 @@ public sealed class ResourceManager(Assembly assembly, string resourcePath) : ID
         [Asset.Folder128] = "Image.Folder128.png",
         [Asset.QuestionMarkCircle128] = "Image.QuestionMarkCircle128.png",
         [Asset.Tabub] = "Image.Tabub.png",
-        [Asset.QuizLogo] = "Image.QuizLogo.png"
+        [Asset.QuizLogo] = "Image.QuizLogo.png",
+        [Asset.House128] = "Image.House128.png",
+        [Asset.Box128] = "Image.Box128.png",
+        [Asset.Pencil128] = "Image.Pencil128.png",
+        [Asset.Globe128] = "Image.Globe128.png",
+        [Asset.Message128] = "Image.Message128.png",
+        [Asset.Code128] = "Image.Code128.png"
     };
 }

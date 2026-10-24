@@ -166,34 +166,6 @@ internal static class KvToolbar {
         UnityUtils.AddEvent(EventTriggerType.Drag, e => scroll.OnDrag(e), trigger);
         UnityUtils.AddEvent(EventTriggerType.EndDrag, e => scroll.OnEndDrag(e), trigger);
     }
-    internal sealed class StripWheel : MonoBehaviour {
-        private RectTransform viewport, content;
-        private bool captured;
-        internal void Init(RectTransform viewport, RectTransform content) {
-            this.viewport = viewport;
-            this.content = content;
-        }
-        private void OnDestroy() => SetCaptured(false);
-        private void SetCaptured(bool value) {
-            if(value == captured) return;
-            captured = value;
-            if(value) UIScrollController.AddInputCapture(viewport);
-            else if(viewport != null) UIScrollController.RemoveInputCapture(viewport);
-        }
-        private void Update() {
-            if(viewport == null || content == null) return;
-            float overflow = content.rect.width - viewport.rect.width;
-            SetCaptured(overflow > 0.5f);
-            if(overflow <= 0f) return;
-            Vector2 wheel = UnityEngine.Input.mouseScrollDelta;
-            float delta = wheel.y + wheel.x;
-            if(Mathf.Abs(delta) <= 0.0001f) return;
-            if(!RectTransformUtility.RectangleContainsScreenPoint(viewport, UnityEngine.Input.mousePosition, null)) return;
-            Vector2 pos = content.anchoredPosition;
-            pos.x = Mathf.Clamp(pos.x + delta * MainCore.Conf.ScrollSpeed, -overflow, 0f);
-            content.anchoredPosition = pos;
-        }
-    }
     private static void Backdrop(RectTransform parent, Color color, float radius) {
         GameObject obj = new("Bg");
         obj.transform.SetParent(parent, false);

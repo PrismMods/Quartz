@@ -1,3 +1,4 @@
+using Quartz.Compat.Game;
 using Quartz.Core;
 using Quartz.Localization;
 using Quartz.Resource;
@@ -39,7 +40,7 @@ public static class MenuFactory {
         activeCategoryKey = null;
         CorePages.EnsureRegistered();
         PruneStaleLastChildren();
-        float iconUnits = 28f * MainCore.Conf.UIScale;
+        float iconUnits = 32f * MainCore.Conf.UIScale;
         MenuItem settings = null;
         foreach(NavCategory category in NavRegistry.Categories) {
             IReadOnlyList<NavPage> children = NavRegistry.PagesIn(category.Key);
@@ -49,7 +50,7 @@ public static class MenuFactory {
                 ? SpriteRegistry.Get(category.IconAsset)
                 : MainCore.Spr.Get(category.Icon, iconUnits * scale);
             MenuItem item = CreateItem(
-                parent, category.Title, category.LocaleKey, icon, category.Key, children[0].State, 28f * scale);
+                parent, category.Title, category.LocaleKey, icon, category.Key, children[0].State, 32f * scale);
             if(category.Key == "settings") settings = item;
         }
         updateBadge = null;
@@ -68,10 +69,11 @@ public static class MenuFactory {
         updateBadge = new GameObject("UpdateBadge");
         updateBadge.transform.SetParent(parent, false);
         RectTransform rect = updateBadge.AddComponent<RectTransform>();
-        rect.anchorMin = new(1f, 0.5f);
-        rect.anchorMax = new(1f, 0.5f);
+        rect.anchorMin = new(0f, 0.5f);
+        rect.anchorMax = new(0f, 0.5f);
         rect.pivot = new(0.5f, 0.5f);
-        rect.anchoredPosition = new(-22f, 0f);
+        // Top-right of the icon, so it stays visible on the collapsed rail.
+        rect.anchoredPosition = new(UICore.RailIconCenter + 12f, 12f);
         rect.sizeDelta = new(10f, 10f);
         Image img = updateBadge.AddComponent<Image>();
         img.sprite = MainCore.Spr.Get(UISprite.Circle256, 10f * MainCore.Conf.UIScale);
@@ -83,10 +85,13 @@ public static class MenuFactory {
         if(updateBadge == null) return;
         updateBadge.SetActive(UpdateService.Status == UpdateStatus.Available);
     }
+    public static void SetLabelAlpha(float alpha) {
+        foreach(MenuItem it in items) it.label.alpha = alpha;
+    }
     public static void RefreshTheme() {
         ApplyState(UICore.CurrentMenuState, true);
     }
-    public static MenuItem CreateItem(Transform parent, string name, string localeKey, Sprite icon, string categoryKey, int state, float iconSize = 28f) {
+    public static MenuItem CreateItem(Transform parent, string name, string localeKey, Sprite icon, string categoryKey, int state, float iconSize = 32f) {
         GameObject item = new(name);
         item.transform.SetParent(parent, false);
         RectTransform rect = item.AddComponent<RectTransform>();
@@ -94,15 +99,26 @@ public static class MenuFactory {
         rect.anchorMax = new(1, 1);
         rect.pivot = new(0.5f, 1);
         rect.sizeDelta = new(0, 54);
-        Image bg = item.AddComponent<Image>();
+        // Inset rounded tile; a child so the icon and label keep the item's coordinates.
+        GameObject bgObj = new("Bg");
+        bgObj.transform.SetParent(item.transform, false);
+        RectTransform bgRect = bgObj.AddComponent<RectTransform>();
+        bgRect.anchorMin = Vector2.zero;
+        bgRect.anchorMax = Vector2.one;
+        // 48x48 square on the collapsed rail; the right edge follows the rail as it widens.
+        bgRect.offsetMin = new(UICore.RailIconCenter - 24f, 3f);
+        bgRect.offsetMax = new(UICore.RailIconCenter + 24f - UICore.RAIL_WIDTH, -3f);
+        Image bg = bgObj.AddComponent<Image>();
+        bg.sprite = MainCore.Spr.GetFilled(10f);
+        bg.type = Image.Type.Sliced;
         bg.color = UIColors.MenuNormal;
         GameObject iconObj = new("Icon");
         iconObj.transform.SetParent(item.transform, false);
         RectTransform iconRect = iconObj.AddComponent<RectTransform>();
         iconRect.anchorMin = new(0, 0.5f);
         iconRect.anchorMax = new(0, 0.5f);
-        iconRect.pivot = new(0, 0.5f);
-        iconRect.anchoredPosition = new(24f - (iconSize - 28f) * 0.5f, 0);
+        iconRect.pivot = new(0.5f, 0.5f);
+        iconRect.anchoredPosition = new(UICore.RailIconCenter, 0);
         iconRect.sizeDelta = new(iconSize, iconSize);
         Image iconImg = iconObj.AddComponent<Image>();
         iconImg.sprite = icon;
@@ -122,6 +138,7 @@ public static class MenuFactory {
         label.alignment = TextAlignmentOptions.Left;
         label.verticalAlignment = VerticalAlignmentOptions.Middle;
         label.characterSpacing = -3f;
+        TextCompat.NoWrap(label);
         label.gameObject.AddComponent<TextLocalization>().Init(localeKey ?? name.ToUpperInvariant(), name);
         MenuItem menuItem = new() {
             obj = item,
@@ -136,43 +153,55 @@ public static class MenuFactory {
         return menuItem;
     }
     private static void CreateSubSeparator(Transform parent) {
-        RectTransform rect = GenerateUI.Row(parent, 11f);
-        rect.gameObject.name = "Separator";
+        GameObject obj = new("Separator");
+        obj.transform.SetParent(parent, false);
+        obj.AddComponent<RectTransform>();
+        LayoutElement le = obj.AddComponent<LayoutElement>();
+        le.minWidth = 11f;
+        le.preferredWidth = 11f;
         GameObject lineObj = new("Line");
-        lineObj.transform.SetParent(rect, false);
+        lineObj.transform.SetParent(obj.transform, false);
         RectTransform line = lineObj.AddComponent<RectTransform>();
-        line.anchorMin = new(0f, 0.5f);
-        line.anchorMax = new(1f, 0.5f);
-        line.offsetMin = new(24f, -0.5f);
-        line.offsetMax = new(-16f, 0.5f);
+        line.anchorMin = new(0.5f, 0f);
+        line.anchorMax = new(0.5f, 1f);
+        line.offsetMin = new(-0.5f, 4f);
+        line.offsetMax = new(0.5f, -4f);
         Image image = lineObj.AddComponent<Image>();
         image.color = UIColors.MenuHover;
         image.raycastTarget = false;
     }
     private static void CreateSubItem(Transform parent, string title, string key, int state) {
-        RectTransform rect = GenerateUI.Row(parent, 40f);
-        rect.gameObject.name = title;
-        Image bg = rect.gameObject.AddComponent<Image>();
+        GameObject obj = new(title);
+        obj.transform.SetParent(parent, false);
+        obj.AddComponent<RectTransform>();
+        Image bg = obj.AddComponent<Image>();
+        bg.sprite = MainCore.Spr.GetFilled(8f);
+        bg.type = Image.Type.Sliced;
         bg.color = UIColors.MenuNormal;
+        // Width follows the (localized) label, so tabs size to their text.
+        HorizontalLayoutGroup layout = obj.AddComponent<HorizontalLayoutGroup>();
+        layout.padding = new RectOffset(16, 16, 0, 0);
+        layout.childControlWidth = true;
+        layout.childControlHeight = true;
+        layout.childForceExpandWidth = false;
+        layout.childForceExpandHeight = true;
         GameObject textObj = new("Text");
-        textObj.transform.SetParent(rect, false);
-        RectTransform textRect = textObj.AddComponent<RectTransform>();
-        textRect.anchorMin = new(0, 0);
-        textRect.anchorMax = new(1, 1);
-        textRect.offsetMin = new(24, 0);
-        textRect.offsetMax = Vector2.zero;
+        textObj.transform.SetParent(obj.transform, false);
+        textObj.AddComponent<RectTransform>();
         TMP_Text label = textObj.AddComponent<TextMeshProUGUI>();
         label.text = title;
         label.font = FontManager.Current;
         label.fontSize = 16;
         label.color = Color.white;
-        label.alignment = TextAlignmentOptions.Left;
+        label.alignment = TextAlignmentOptions.Center;
         label.verticalAlignment = VerticalAlignmentOptions.Middle;
         label.characterSpacing = -3f;
+        label.raycastTarget = false;
+        TextCompat.NoWrap(label);
         label.gameObject.AddComponent<TextLocalization>().Init(key, title);
-        MenuItem menuItem = new() { obj = rect.gameObject, bg = bg, state = state, label = label, isCategory = false };
+        MenuItem menuItem = new() { obj = obj, bg = bg, state = state, label = label, isCategory = false };
         subItems.Add(menuItem);
-        WireItemInteractions(menuItem, rect.gameObject, bg);
+        WireItemInteractions(menuItem, obj, bg);
     }
     private static void RefreshSubMenu(string categoryKey, bool animate) {
         if(categoryKey == activeCategoryKey) return;
@@ -180,6 +209,7 @@ public static class MenuFactory {
         foreach(var it in subItems) it.hoverSeq?.Kill();
         subItems.Clear();
         GenerateUI.ClearChildren(UICore.SubMenuContent);
+        UICore.SubMenuContent.anchoredPosition = Vector2.zero;
         NavCategory category = NavRegistry.Category(categoryKey);
         bool has = NavRegistry.ShowsSubmenu(category);
         if(has) {

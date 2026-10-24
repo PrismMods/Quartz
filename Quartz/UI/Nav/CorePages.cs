@@ -28,24 +28,24 @@ internal static class CorePages {
     // states, search entries — stays identical between the two builds.
     private static bool CoreNav => !Info.KeyViewerOnly;
     private static void Categories() {
-        Category(HomeCategoryKey, "Home", "HOME", UISprite.QuartzLogo, 0,
+        Category(HomeCategoryKey, "Home", "HOME", UISprite.House128, 0,
             visible: static () => CoreNav);
         // The KeyViewer flavour ships a fixed module set, so the store — and the
         // addons page that lives in the same category — would only offer things it
         // is not meant to install. Registered but hidden: one predicate instead of
         // a conditional-compilation hole through the page registry.
-        Category(ModulesCategoryKey, "Modules", "MODULES", UISprite.Wrench128, 5, alwaysSubmenu: true,
+        Category(ModulesCategoryKey, "Modules", "MODULES", UISprite.Box128, 5, alwaysSubmenu: true,
             visible: static () => CoreNav);
         Category("overlay", "Overlay", "OVERLAY", UISprite.Monitor128, 10, togglable: true);
         Category("gameplay", "Gameplay", "GAMEPLAY", UISprite.Gamepad128, 20, togglable: true);
         Category("visuals", "Visuals", "VISUALS", UISprite.Image128, 30, togglable: true);
         Category("tweaks", "Tweaks", "TWEAKS", UISprite.AdjustmentsHorizontal128, 40, togglable: true);
         // Pages come from the editor module; the category hides itself when it is not installed.
-        Category("editor", "Editor", "EDITOR", UISprite.Wrench128, 50, togglable: true);
+        Category("editor", "Editor", "EDITOR", UISprite.Pencil128, 50, togglable: true);
         Category("others", "Others", "OTHERS", UISprite.Grid128, 75, togglable: true);
-        Category("tuf", "TUF", "TUF", UISprite.TufLogo, 76,
+        Category("tuf", "TUF", "TUF", UISprite.Globe128, 76,
             visible: static () => CoreNav && Quartz.Modules.ModuleCategories.IsEnabled("others"));
-        Category("discord", "Discord", "DISCORD", UISprite.Text128, 77,
+        Category("discord", "Discord", "DISCORD", UISprite.Message128, 77,
             visible: static () => CoreNav && Quartz.Modules.ModuleCategories.IsEnabled("others"));
         Category("search", "Search", "SEARCH", UISprite.MagnifyingGlass128, 80, visible: static () => CoreNav);
         Category("profiles", "Profiles", "PROFILES", UISprite.Users128, 90, visible: static () => CoreNav);
@@ -53,7 +53,7 @@ internal static class CorePages {
         Category("settings", "Settings", "SETTINGS", UISprite.Gear128, 120, visible: static () => CoreNav);
         Category("help", "Help", "HELP", UISprite.QuestionMarkCircle128, 130, alwaysSubmenu: true, visible: static () => CoreNav);
         Category("credits", "Credits", "CREDITS", UISprite.Star128, 140, visible: static () => CoreNav);
-        Category("developer", "Developer", "DEVELOPER", UISprite.Wrench128, 150, visible: static () => CoreNav && Info.IsDev);
+        Category("developer", "Developer", "DEVELOPER", UISprite.Code128, 150, visible: static () => CoreNav && Info.IsDev);
     }
     private static void Overlay() {
     }

@@ -263,25 +263,6 @@ internal static partial class PageSettings {
             "Transparency of the settings window."
         );
         var opacityTr = opacity.Label.gameObject.AddComponent<TextLocalization>().Init("WINDOW_OPACITY", "Window Opacity");
-        var outlineRow = GenerateUI.Row(content.transform);
-        UISlider outlineWidth = GenerateUI.Slider(
-            outlineRow,
-            6.25f,
-            0f,
-            15f,
-            MainCore.Conf.OutlineWidth,
-            v => Mathf.Round(v * 4f) / 4f,
-            v => { MainCore.Conf.OutlineWidth = v; UICore.SetOutlineWidth(v, false); },
-            v => { MainCore.Conf.OutlineWidth = v; UICore.SetOutlineWidth(v, true); MainCore.ConfMgr.RequestSave(); },
-            "Outline Width",
-            "outline_width"
-        );
-        outlineWidth.Format = "0.## px";
-        outlineWidth.Rect.AddToolTip(
-            "DESC_OUTLINE_WIDTH",
-            "Thickness of the settings window's white outlines — the border ring, the submenu column, the top rule and the bottom pane edge."
-        );
-        var outlineTr = outlineWidth.Label.gameObject.AddComponent<TextLocalization>().Init("OUTLINE_WIDTH", "Outline Width");
         var accentRow = GenerateUI.Row(content.transform);
         UIColorPicker accentPicker = GenerateUI.ColorPicker(
             accentRow,

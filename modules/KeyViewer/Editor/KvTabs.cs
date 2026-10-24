@@ -63,7 +63,7 @@ internal static class KvTabs {
         scroll.movementType = ScrollRect.MovementType.Clamped;
         scroll.scrollSensitivity = 0f;
         scroll.inertia = false;
-        viewObj.AddComponent<KvToolbar.StripWheel>().Init(viewport, tabs);
+        viewObj.AddComponent<StripWheel>().Init(viewport, tabs);
         List<(T Value, Image Bg, TextMeshProUGUI Label)> pills = [];
         List<(LayoutElement Le, TextMeshProUGUI Label, float Pad)> measured = [];
         RectTransform selectedPill = null;

@@ -63,7 +63,7 @@ internal sealed class KvTabStrip {
         scroll.movementType = ScrollRect.MovementType.Clamped;
         scroll.scrollSensitivity = 0f;
         scroll.inertia = false;
-        viewObj.AddComponent<KvToolbar.StripWheel>().Init(viewport, track);
+        viewObj.AddComponent<StripWheel>().Init(viewport, track);
         return new KvTabStrip(track, viewportLe, scroll) { Pill = pill };
     }
     private static void Caption(RectTransform pill, string key, string text) {

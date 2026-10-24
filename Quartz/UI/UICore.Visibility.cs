@@ -288,6 +288,7 @@ public static partial class UICore {
         ApplyShellLayout(true, 0.6f);
     }
     public static void CloseMenu() {
+        SetRailExpanded(false);
         menuCanvasGroup.interactable = false;
         menuCanvasGroup.blocksRaycasts = false;
         isMenuOpen = false;

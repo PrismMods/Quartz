@@ -24,7 +24,12 @@ public static partial class UICore {
     public static RectTransform Panel;
     public static Image CloseImage;
     public const float MENU_WIDTH = 210f;
-    public const float SUBMENU_WIDTH = 260f;
+    // Collapsed rail width; the rail widens to MENU_WIDTH over the page on hover.
+    public const float RAIL_WIDTH = 76f;
+    public const float SUBTAB_HEIGHT = 44f;
+    public const float OUTLINE_WIDTH = 3f;
+    // The border ring paints over the rail's left edge, so center on what stays visible.
+    internal static float RailIconCenter => (RAIL_WIDTH + OUTLINE_WIDTH) * 0.5f;
     private const float TOP_BAR_HEIGHT = 60f;
     public static RectTransform Menu;
     public static RectTransform MenuContent;
@@ -43,10 +48,10 @@ public static partial class UICore {
     private static float bandShown;
     private static CanvasGroup bandCanvasGroup;
     private static GTween bandSeq;
-    private static readonly List<(RectTransform rect, bool horizontal)> outlineStrips = [];
-    private static Image borderImage;
     private static CanvasGroup menuCanvasGroup;
     private static CanvasGroup subMenuCanvasGroup;
+    private static TMP_Text menuVersionText;
+    private static CanvasGroup pageCanvasGroup;
     private static CanvasGroup panelCanvasGroup;
     private static CanvasGroup exitReorganizeCanvasGroup;
     private static GTween reorganizeSeq;
@@ -63,8 +68,6 @@ public static partial class UICore {
         }
     } = 1f;
     private static void CreatePanel() {
-        outlineStrips.Clear();
-        borderImage = null;
         GameObject panel = new("Panel");
         panel.transform.SetParent(canvasObj.transform, false);
         {
@@ -100,7 +103,9 @@ public static partial class UICore {
             var mask = menuPanel.AddComponent<Mask>();
             mask.showMaskGraphic = false;
             Page = PageFactory.CreatePages(menuPanel);
+            pageCanvasGroup = Page.gameObject.AddComponent<CanvasGroup>();
             CreateBottomBand(menuPanel.transform);
+            ApplyPowerLock();
             CreateSubMenu(menuPanel.transform);
             GameObject menu = new("Menu");
             menu.transform.SetParent(menuPanel.transform, false);
@@ -108,7 +113,7 @@ public static partial class UICore {
             Menu.anchorMin = Vector2.zero;
             Menu.anchorMax = new(0, 1);
             Menu.pivot = new(0, 0.5f);
-            Menu.sizeDelta = new(MENU_WIDTH, -TOP_BAR_HEIGHT);
+            Menu.sizeDelta = new(RAIL_WIDTH, -TOP_BAR_HEIGHT);
             // Single-page shell (the standalone KeyViewer build) starts with the rail
             // already parked off-canvas, which also drops the page's left inset to 0
             // so the one page fills the panel.
@@ -120,6 +125,14 @@ public static partial class UICore {
             menuCanvasGroup.alpha = isMenuOpen ? 1f : 0f;
             menuCanvasGroup.interactable = isMenuOpen;
             menuCanvasGroup.blocksRaycasts = isMenuOpen;
+            menu.AddComponent<RectMask2D>();
+            EventTrigger railTrigger = menu.AddComponent<EventTrigger>();
+            var railEnter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+            railEnter.callback.AddListener(_ => SetRailExpanded(true));
+            var railExit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
+            railExit.callback.AddListener(_ => SetRailExpanded(false));
+            railTrigger.triggers.Add(railEnter);
+            railTrigger.triggers.Add(railExit);
             GameObject content = new("Content");
             content.transform.SetParent(Menu, false);
             MenuContent = content.AddComponent<RectTransform>();
@@ -158,18 +171,24 @@ public static partial class UICore {
                     : UIColors.SoftRed;
             var btn = power.AddComponent<Button>();
             btn.transition = Selectable.Transition.None;
-            GTween powerSeq = null;
+            bool powerPending = false;
             btn.onClick.AddListener(() => {
+                if(powerPending) return;
                 bool enable = MainCore.Conf.Active = !MainCore.Conf.Active;
-                MainCore.SetModEnabled(enable);
-                Color target = enable
+                powerBg.color = enable
                     ? new Color(0f, 0f, 0f, 0.1f)
                     : UIColors.SoftRed;
-                powerSeq?.Kill();
-                powerSeq = GTweenSequenceBuilder.New()
-                    .Append(powerBg.GTColor(target, 0.32f).SetEasing(Easing.OutExpo))
-                    .Build();
-                MainCore.TC.Play(powerSeq);
+                powerPending = true;
+                ApplyPowerLock();
+                // Toggling re-patches every module and stalls for ~1.5 s, so let the new color
+                // render first (the nested Enqueue lands a frame later) and drop clicks meanwhile.
+                MainThread.Enqueue(() => MainThread.Enqueue(() => {
+                    try {
+                        MainCore.SetModEnabled(enable);
+                    } finally {
+                        powerPending = false;
+                    }
+                }));
             });
             GameObject powerIcon = new("PowerIcon");
             powerIcon.transform.SetParent(powerRect, false);
@@ -177,6 +196,8 @@ public static partial class UICore {
             powerIconRect.anchorMin = new Vector2(0.5f, 0.5f);
             powerIconRect.anchorMax = new Vector2(0.5f, 0.5f);
             powerIconRect.pivot = new Vector2(0.5f, 0.5f);
+            // Centered at any rail width, shifted off the border ring like RailIconCenter.
+            powerIconRect.anchoredPosition = new Vector2(OUTLINE_WIDTH * 0.5f, 0f);
             powerIconRect.sizeDelta = new Vector2(26f, 26f);
             Image powerIconImage = powerIcon.AddComponent<Image>();
             powerIconImage.sprite = MainCore.Spr.Get(UISprite.Power128);
@@ -196,6 +217,11 @@ public static partial class UICore {
             versionText.color = new Color(1f, 1f, 1f, 0.4f);
             versionText.characterSpacing = -3f;
             versionText.alignment = TextAlignmentOptions.BottomLeft;
+            // Spans the power button's lower edge; must not eat its clicks.
+            versionText.raycastTarget = false;
+            menuVersionText = versionText;
+            railSeq?.Kill();
+            ApplyRail(0f);
         }
         GameObject topBar = new("TopBar");
         topBar.transform.SetParent(panel.transform, false);
@@ -290,20 +316,6 @@ public static partial class UICore {
             trigger.triggers.Add(exit);
         }
         {
-            GameObject topRule = new("SubMenuTopRule");
-            topRule.transform.SetParent(panel.transform, false);
-            RectTransform ruleRect = topRule.AddComponent<RectTransform>();
-            ruleRect.anchorMin = new(0, 1);
-            ruleRect.anchorMax = new(1, 1);
-            ruleRect.pivot = new(0.5f, 1);
-            ruleRect.anchoredPosition = new(0, -TOP_BAR_HEIGHT);
-            ruleRect.sizeDelta = new(0, MainCore.Conf.OutlineWidth);
-            Image ruleImg = topRule.AddComponent<Image>();
-            ruleImg.color = Color.white;
-            ruleImg.raycastTarget = false;
-            outlineStrips.Add((ruleRect, true));
-        }
-        {
             GameObject border = new("Border");
             border.transform.SetParent(panel.transform, false);
             RectTransform borderRect = border.AddComponent<RectTransform>();
@@ -312,23 +324,23 @@ public static partial class UICore {
             borderRect.offsetMin = Vector2.zero;
             borderRect.offsetMax = Vector2.zero;
             Image borderImg = border.AddComponent<Image>();
-            borderImg.sprite = MainCore.Spr.GetRing(12.5f, BorderStroke(MainCore.Conf.OutlineWidth));
+            borderImg.sprite = MainCore.Spr.GetRing(12.5f, OUTLINE_WIDTH);
             borderImg.type = Image.Type.Sliced;
             borderImg.color = Color.white;
             borderImg.raycastTarget = false;
-            borderImage = borderImg;
         }
     }
-    private static float BorderStroke(float outlineWidth) => Mathf.Clamp(outlineWidth, 1f, 12.5f);
-    public static void SetOutlineWidth(float width, bool regenBorder) {
-        for(int i = 0; i < outlineStrips.Count; i++) {
-            (RectTransform rect, bool horizontal) = outlineStrips[i];
-            if(rect == null) continue;
-            rect.sizeDelta = horizontal
-                ? new Vector2(rect.sizeDelta.x, width)
-                : new Vector2(width, rect.sizeDelta.y);
+    // Powered off, settings are view-only: pages and the context band take no pointer input.
+    private static void ApplyPowerLock() {
+        bool on = MainCore.Conf.Active;
+        if(pageCanvasGroup != null) {
+            pageCanvasGroup.interactable = on;
+            pageCanvasGroup.blocksRaycasts = on;
+            pageCanvasGroup.alpha = on ? 1f : 0.5f;
         }
-        if(regenBorder && borderImage != null)
-            borderImage.sprite = MainCore.Spr.GetRing(12.5f, BorderStroke(width));
+        if(bandCanvasGroup != null) {
+            bandCanvasGroup.interactable = on;
+            bandCanvasGroup.blocksRaycasts = on;
+        }
     }
 }
