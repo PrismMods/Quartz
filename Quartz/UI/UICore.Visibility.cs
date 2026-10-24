@@ -83,13 +83,14 @@ public static partial class UICore {
     private static bool canvasWasVisible;
     private static int lastScreenWidth;
     private static int lastScreenHeight;
+    // Same rule as dragging the top bar: the window may hang off any edge as long as
+    // the top bar stays on screen vertically and PANEL_KEEP_VISIBLE of it horizontally.
     public static Vector2 ClampPanelPosition(Vector2 position, Vector2 size) {
         Vector2 canvas = CanvasSize;
-        Vector2 limit = Vector2.Max((canvas - size) * 0.5f, Vector2.zero);
-        return new Vector2(
-            Mathf.Clamp(position.x, -limit.x, limit.x),
-            Mathf.Clamp(position.y, -limit.y, limit.y)
-        );
+        float limitX = Mathf.Max((canvas.x + size.x) * 0.5f - PANEL_KEEP_VISIBLE, 0f);
+        float maxY = (canvas.y - size.y) * 0.5f;
+        float minY = Mathf.Min(-(canvas.y + size.y) * 0.5f + TOP_BAR_HEIGHT, maxY);
+        return new Vector2(Mathf.Clamp(position.x, -limitX, limitX), Mathf.Clamp(position.y, minY, maxY));
     }
     private static void HandleResolutionChange() {
         if(Screen.width == lastScreenWidth && Screen.height == lastScreenHeight) return;

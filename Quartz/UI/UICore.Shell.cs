@@ -27,6 +27,8 @@ public static partial class UICore {
     // Collapsed rail width; the rail widens to MENU_WIDTH over the page on hover.
     public const float RAIL_WIDTH = 76f;
     private const float POWER_HEIGHT = 60f;
+    // How much of the window must stay on screen when it is dragged off an edge.
+    internal const float PANEL_KEEP_VISIBLE = 120f;
     public const float SUBTAB_HEIGHT = 44f;
     public const float OUTLINE_WIDTH = 3f;
     // The border ring paints over the rail's left edge, so center on what stays visible.
@@ -217,7 +219,7 @@ public static partial class UICore {
         }
         GameObject topBar = new("TopBar");
         topBar.transform.SetParent(panel.transform, false);
-        topBar.AddComponent<DragHandler>();
+        topBar.AddComponent<DragHandler>().KeepVisible = PANEL_KEEP_VISIBLE;
         var topImage = topBar.AddComponent<Image>();
         topImage.color = UIColors.TopBar;
         topImage.type = Image.Type.Sliced;

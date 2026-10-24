@@ -3,6 +3,9 @@ using UnityEngine.EventSystems;
 namespace Quartz.UI.Utility;
 public class DragHandler : MonoBehaviour {
     public Action OnDropped;
+    // >= 0: the window may leave the screen; only the handle has to stay grabbable,
+    // fully on screen vertically and with this many canvas units on screen horizontally.
+    public float KeepVisible = -1f;
     private RectTransform rect;
     private Vector2 offset;
     private static readonly Vector3[] selfCorners = new Vector3[4];
@@ -38,7 +41,25 @@ public class DragHandler : MonoBehaviour {
             out Vector2 localPoint
         );
         rect.anchoredPosition = localPoint + offset;
-        ClampToParent(rect);
+        if(KeepVisible >= 0f) KeepHandleOnScreen();
+        else ClampToParent(rect);
+    }
+    private void KeepHandleOnScreen() {
+        if(rect.parent is not RectTransform parent) return;
+        ((RectTransform)transform).GetWorldCorners(selfCorners);
+        parent.GetWorldCorners(parentCorners);
+        Vector3 scale = parent.lossyScale;
+        float keep = KeepVisible * scale.x;
+        float dx = 0f;
+        if(selfCorners[2].x < parentCorners[0].x + keep) dx = parentCorners[0].x + keep - selfCorners[2].x;
+        else if(selfCorners[0].x > parentCorners[2].x - keep) dx = parentCorners[2].x - keep - selfCorners[0].x;
+        float dy = 0f;
+        if(selfCorners[2].y > parentCorners[2].y) dy = parentCorners[2].y - selfCorners[2].y;
+        else if(selfCorners[0].y < parentCorners[0].y) dy = parentCorners[0].y - selfCorners[0].y;
+        Vector2 position = rect.anchoredPosition;
+        if(!Mathf.Approximately(scale.x, 0f)) position.x += dx / scale.x;
+        if(!Mathf.Approximately(scale.y, 0f)) position.y += dy / scale.y;
+        rect.anchoredPosition = position;
     }
     public static void ClampToParent(RectTransform rect) {
         if(rect == null || rect.parent is not RectTransform parent) return;
