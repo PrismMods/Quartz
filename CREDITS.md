@@ -9,6 +9,8 @@
 
 ## My Beautiful Developers
 - sbrothers7
+- kkitut
+- square3ang
 
 ## Ported Work
 - **Decoration Preview** — ported from [DecoPreview](https://github.com/rdzip/DecoPreview)

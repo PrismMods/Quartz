@@ -20,9 +20,11 @@ internal static class PageCredits {
         GenerateUI.Localize(subtitle, "CREDITS_SUBTITLE", "by koren, sbrothers7, and more.");
         GenerateUI.Row(content.transform, 20f);
         Header(content, "CREDITS_TEAM", "Team");
-        Block(content, 76f, 22f, "CREDITS_TEAM_BODY",
+        Block(content, 140f, 22f, "CREDITS_TEAM_BODY",
             "koren — lead developer\n" +
-            "sbrothers7 — developer");
+            "sbrothers7 — developer\n" +
+            "kkitut — developer\n" +
+            "square3ang — developer");
         Header(content, "CREDITS_TESTERS", "Mod Testers");
         Block(content, 108f, 22f, "CREDITS_TESTERS_BODY",
             "Refreshin\n" +
