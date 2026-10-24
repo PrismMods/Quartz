@@ -139,7 +139,7 @@ public static class HookInput {
     /// </summary>
     public static bool TryMacPhysicalKeyHeld(KeyCode key, out bool held) {
         held = false;
-        return key is KeyCode.Tab or KeyCode.Backslash
+        return key is KeyCode.Tab
             or KeyCode.LeftAlt or KeyCode.RightAlt or KeyCode.LeftShift or KeyCode.RightShift
             or KeyCode.LeftControl or KeyCode.RightControl or KeyCode.LeftCommand or KeyCode.RightCommand
             && TryMacKeyState(key, out held);
@@ -177,6 +177,8 @@ public static class HookInput {
     }
     // No CapsLock: the window server reports its lock state, not the key, so a
     // backfill would relight the box after release while caps lock stays on.
+    // No Backslash: Korean (and other non-US) layouts never report the key under
+    // kVK 0x2A, so the window server read it as always up and swallowed it.
     private static ushort MacVirtualKey(KeyCode key) => key switch {
         KeyCode.A => 0x00, KeyCode.S => 0x01, KeyCode.D => 0x02, KeyCode.F => 0x03, KeyCode.H => 0x04,
         KeyCode.G => 0x05, KeyCode.Z => 0x06, KeyCode.X => 0x07, KeyCode.C => 0x08, KeyCode.V => 0x09,
@@ -187,7 +189,7 @@ public static class HookInput {
         KeyCode.Alpha8 => 0x1C, KeyCode.Alpha0 => 0x1D, KeyCode.RightBracket => 0x1E, KeyCode.O => 0x1F,
         KeyCode.U => 0x20, KeyCode.LeftBracket => 0x21, KeyCode.I => 0x22, KeyCode.P => 0x23,
         KeyCode.Return => 0x24, KeyCode.L => 0x25, KeyCode.J => 0x26, KeyCode.Quote => 0x27, KeyCode.K => 0x28,
-        KeyCode.Semicolon => 0x29, KeyCode.Backslash => 0x2A, KeyCode.Comma => 0x2B, KeyCode.Slash => 0x2C,
+        KeyCode.Semicolon => 0x29, KeyCode.Comma => 0x2B, KeyCode.Slash => 0x2C,
         KeyCode.N => 0x2D, KeyCode.M => 0x2E, KeyCode.Period => 0x2F, KeyCode.Tab => 0x30, KeyCode.Space => 0x31,
         KeyCode.BackQuote => 0x32, KeyCode.Backspace => 0x33, KeyCode.Escape => 0x35,
         KeyCode.RightCommand => 0x36, KeyCode.LeftCommand => 0x37, KeyCode.LeftShift => 0x38,
@@ -284,6 +286,9 @@ public static class HookInput {
     /// The one subscription to the game's keyboard hook. Core-owned so the feed
     /// exists whenever Quartz does, not only when the key limiter is installed.
     /// Runs on the hook thread — keep it allocation-free and non-throwing.
+    /// SkyHook's macOS HID table labels the ISO/Korean backslash usages (0x32
+    /// Non-US #, 0x89 ₩/¥) IgnoredInternal, so async input dropped the key;
+    /// they are relabelled BackSlash before the game reads the event.
     /// </summary>
     [HarmonyPatch(typeof(SkyHookManager), "HookCallback")]
     private static class HookCallbackPatch {
@@ -291,6 +296,8 @@ public static class HookInput {
             try {
                 if(IsMouseLabel(__0.Label)) return true;
                 bool down = __0.Type == SkyHook.EventType.KeyPressed;
+                if(MacRuntimeCached && __0.Key is 0x32 or 0x89 && __0.Label != KeyLabel.BackSlash)
+                    SetLabel(ref __0, KeyLabel.BackSlash);
                 if(MacRuntimeCached && down && !FixMacRightModifier(ref __0)) return false;
                 KeyCode key = HookKeyToPhysicalUnityKey(__0.Key, __0.Label);
                 NoteHookEvent(key, down);
