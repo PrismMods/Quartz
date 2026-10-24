@@ -556,6 +556,15 @@
     "UPDATE_UNDO": "撤销",
     "UPDATE_UP_TO_DATE": "当前已是最新版本。",
     "VISUALS": "视觉效果",
-    "WINDOW_OPACITY": "设置窗口透明度"
+    "WINDOW_OPACITY": "设置窗口透明度",
+    "HOME_RESET": "重置",
+    "HOME_RESET_DESC": "重置会将所有设置恢复为默认值。清空还会清除按键布局、面板和按键列表。模块、插件和其他配置文件会保留。完成后请重启游戏。",
+    "HOME_RESET_ALL": "重置所有设置",
+    "HOME_RESET_CLEAN": "清空",
+    "HOME_RESET_CONFIRM": "再次点击以确认",
+    "HOME_RESET_FAILED": "失败 — 请查看日志",
+    "INACTIVE_TITLE": "Quartz 已停用",
+    "INACTIVE_HINT": "所有功能均已关闭。重新开启前无法更改设置。",
+    "INACTIVE_TURN_ON": "开启"
   }
 }

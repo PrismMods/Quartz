@@ -561,6 +561,15 @@
     "UPDATE_UNDO": "Undo",
     "UPDATE_UP_TO_DATE": "You're up to date.",
     "VISUALS": "Visuals",
-    "WINDOW_OPACITY": "Window Opacity"
+    "WINDOW_OPACITY": "Window Opacity",
+    "HOME_RESET": "Reset",
+    "HOME_RESET_DESC": "Reset puts every setting back to its default. Clean also empties key layouts, panels and key lists. Modules, addons and other profiles stay. Restart the game afterwards.",
+    "HOME_RESET_ALL": "Reset All Settings",
+    "HOME_RESET_CLEAN": "Clean",
+    "HOME_RESET_CONFIRM": "Click again to confirm",
+    "HOME_RESET_FAILED": "Failed — see the log",
+    "INACTIVE_TITLE": "Quartz is inactive",
+    "INACTIVE_HINT": "Every feature is off. Settings can't be changed until you turn it back on.",
+    "INACTIVE_TURN_ON": "Turn On"
   }
 }

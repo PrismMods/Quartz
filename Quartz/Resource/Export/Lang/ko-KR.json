@@ -561,6 +561,15 @@
     "UPDATE_UNDO": "되돌리기",
     "UPDATE_UP_TO_DATE": "최신 버전입니다.",
     "VISUALS": "비주얼",
-    "WINDOW_OPACITY": "창 투명도"
+    "WINDOW_OPACITY": "창 투명도",
+    "HOME_RESET": "초기화",
+    "HOME_RESET_DESC": "초기화는 모든 설정을 기본값으로 되돌립니다. 클린은 키 레이아웃, 패널, 키 목록까지 비웁니다. 모듈, 애드온, 다른 프로필은 그대로 남습니다. 끝나면 게임을 재시작하세요.",
+    "HOME_RESET_ALL": "모든 설정 초기화",
+    "HOME_RESET_CLEAN": "클린",
+    "HOME_RESET_CONFIRM": "한 번 더 눌러 확인",
+    "HOME_RESET_FAILED": "실패 — 로그를 확인하세요",
+    "INACTIVE_TITLE": "Quartz가 꺼져 있습니다",
+    "INACTIVE_HINT": "모든 기능이 꺼져 있습니다. 다시 켜기 전까지는 설정을 바꿀 수 없습니다.",
+    "INACTIVE_TURN_ON": "켜기"
   }
 }

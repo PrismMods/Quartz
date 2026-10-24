@@ -1,6 +1,8 @@
 using System.Globalization;
+using Quartz.Async;
 using Quartz.Compat.Game;
 using Quartz.Core;
+using Quartz.IO;
 using Quartz.Modules;
 using Quartz.UI.Generator;
 using Quartz.UI.Home;
@@ -28,6 +30,7 @@ internal static class PageHome {
         UpdateService.OnChanged += RefreshUpdateBanner;
         Setup(content);
         Cards(content);
+        ResetCard(content);
         TextMeshProUGUI hint = GenerateUI.AddMutedText(GenerateUI.Row(content.transform, 60f), 16f, 0.4f, true);
         TextCompat.Wrap(hint);
         hint.rectTransform.offsetMax = new Vector2(-250f, 0f);
@@ -92,6 +95,40 @@ internal static class PageHome {
             MainCore.Log.Err($"[Home] card '{card.Key}' failed to build: {e}");
             HomeUI.Line(body, MainCore.Tr.Get("HOME_CARD_FAILED", "This card failed to build — see the log."));
         }
+    }
+    private static void ResetCard(RectTransform content) {
+        RectTransform grid = HomeUI.Grid(content.transform);
+        Transform card = HomeUI.Card(grid, MainCore.Tr.Get("HOME_RESET", "Reset"));
+        HomeUI.Line(card, MainCore.Tr.Get(
+            "HOME_RESET_DESC",
+            "Reset puts every setting back to its default. Clean also empties key layouts, panels and key lists. Modules, addons and other profiles stay. Restart the game afterwards."
+        ));
+        RectTransform buttonRow = GenerateUI.Row(card, 56f);
+        GenerateUI.ButtonRow(buttonRow);
+        ConfirmButton(buttonRow, "Reset All Settings", "home_reset_all", false);
+        ConfirmButton(buttonRow, "Clean", "home_reset_clean", true);
+        HomeUI.Spacer(grid);
+    }
+    // First click arms the button; the second one runs it.
+    private static void ConfirmButton(RectTransform row, string text, string id, bool clean) {
+        bool armed = false;
+        UIButton button = null;
+        button = GenerateUI.Button(row, () => {
+            if(button == null) return;
+            if(!armed) {
+                armed = true;
+                button.Label.text = GenerateUI.Tr("HOME_RESET_CONFIRM", "Click again to confirm");
+                button.RestColor = static () => UIColors.SoftRed;
+                button.Background.color = UIColors.SoftRed;
+                return;
+            }
+            button.SetBlocked(true);
+            MainThread.Enqueue(() => {
+                if(ProfileManager.ResetLive(clean)) UICore.Rebuild(true);
+                else button.Label.text = GenerateUI.Tr("HOME_RESET_FAILED", "Failed — see the log");
+            });
+        }, text, id, 0f).SetSecondary();
+        GenerateUI.FixWidth(button, 230f);
     }
     private static void Go(string pageKey) {
         int state = NavRegistry.StateFor(pageKey);

@@ -51,7 +51,6 @@ public static partial class UICore {
     private static CanvasGroup menuCanvasGroup;
     private static CanvasGroup subMenuCanvasGroup;
     private static TMP_Text menuVersionText;
-    private static CanvasGroup pageCanvasGroup;
     private static CanvasGroup panelCanvasGroup;
     private static CanvasGroup exitReorganizeCanvasGroup;
     private static GTween reorganizeSeq;
@@ -104,6 +103,7 @@ public static partial class UICore {
             mask.showMaskGraphic = false;
             Page = PageFactory.CreatePages(menuPanel);
             pageCanvasGroup = Page.gameObject.AddComponent<CanvasGroup>();
+            CreateInactiveOverlay(Page);
             CreateBottomBand(menuPanel.transform);
             ApplyPowerLock();
             CreateSubMenu(menuPanel.transform);
@@ -165,31 +165,11 @@ public static partial class UICore {
             powerRect.offsetMax = Vector2.zero;
             powerRect.sizeDelta = new Vector2(0f, 60f);
             powerRect.pivot = new Vector2(0.5f, 0f);
-            var powerBg = power.AddComponent<Image>();
-            powerBg.color = MainCore.Conf.Active
-                    ? new(0, 0, 0, 0.1f)
-                    : UIColors.SoftRed;
+            powerBg = power.AddComponent<Image>();
+            powerBg.color = PowerColor(MainCore.Conf.Active);
             var btn = power.AddComponent<Button>();
             btn.transition = Selectable.Transition.None;
-            bool powerPending = false;
-            btn.onClick.AddListener(() => {
-                if(powerPending) return;
-                bool enable = MainCore.Conf.Active = !MainCore.Conf.Active;
-                powerBg.color = enable
-                    ? new Color(0f, 0f, 0f, 0.1f)
-                    : UIColors.SoftRed;
-                powerPending = true;
-                ApplyPowerLock();
-                // Toggling re-patches every module and stalls for ~1.5 s, so let the new color
-                // render first (the nested Enqueue lands a frame later) and drop clicks meanwhile.
-                MainThread.Enqueue(() => MainThread.Enqueue(() => {
-                    try {
-                        MainCore.SetModEnabled(enable);
-                    } finally {
-                        powerPending = false;
-                    }
-                }));
-            });
+            btn.onClick.AddListener(TogglePower);
             GameObject powerIcon = new("PowerIcon");
             powerIcon.transform.SetParent(powerRect, false);
             RectTransform powerIconRect = powerIcon.AddComponent<RectTransform>();
@@ -328,19 +308,6 @@ public static partial class UICore {
             borderImg.type = Image.Type.Sliced;
             borderImg.color = Color.white;
             borderImg.raycastTarget = false;
-        }
-    }
-    // Powered off, settings are view-only: pages and the context band take no pointer input.
-    private static void ApplyPowerLock() {
-        bool on = MainCore.Conf.Active;
-        if(pageCanvasGroup != null) {
-            pageCanvasGroup.interactable = on;
-            pageCanvasGroup.blocksRaycasts = on;
-            pageCanvasGroup.alpha = on ? 1f : 0.5f;
-        }
-        if(bandCanvasGroup != null) {
-            bandCanvasGroup.interactable = on;
-            bandCanvasGroup.blocksRaycasts = on;
         }
     }
 }

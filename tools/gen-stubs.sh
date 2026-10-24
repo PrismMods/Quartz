@@ -36,7 +36,7 @@ detect_gamepath() {
 
 resolve_managed() {
     local gp="$1"
-    for d in "ADanceOfFireAndIce.app/Contents/Resources/Data" "A Dance of Fire and Ice_Data"; do
+    for d in "ADanceOfFireAndIce.app/Contents/Resources/Data" "A Dance of Fire and Ice_Data" "ADanceOfFireAndIce_Data"; do
         [[ -d "$gp/$d/Managed" ]] && { echo "$gp/$d/Managed"; return; }
     done
     return 1
