@@ -21,7 +21,7 @@ public static class Info {
 #endif
     public static string DisplayName => AprilFools.Active ? AprilFools.BrandName : Name;
     public const string Author = "koren";
-    public const string Version = "2.2.0";
+    public const string Version = "3.0.0";
     public const string Channel = "alpha";
     public static readonly int Build = BuildInfo.Number;
     public static ReleaseChannel ChannelKind => SemVer.ParseChannel(Channel);
