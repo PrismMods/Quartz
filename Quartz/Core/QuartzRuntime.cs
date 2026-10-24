@@ -200,7 +200,7 @@ public sealed class QuartzRuntime {
         harmonyService = new HarmonyService();
         playCount = new PlayCount();
         services.Add(Localization);
-        services.Add(Quartz.Modules.ModuleService.Service);
+        services.Add(Quartz.Features.FeatureService.Service);
         services.Add(Quartz.Addons.AddonService.Service);
         services.Add(uiService);
         services.Add(tweenService);
@@ -210,7 +210,7 @@ public sealed class QuartzRuntime {
         ticks.Add(harmonyService);
         ticks.Add(uiService);
         ticks.Add(tweenService);
-        ticks.Add(Quartz.Modules.ModuleService.Ticker);
+        ticks.Add(Quartz.Features.FeatureService.Ticker);
         ticks.Add(Quartz.Addons.AddonService.Ticker);
         services.Initialize(Logger);
         Quartz.Features.Interop.XPerfectRecursionGuard.TryApply(harmonyService.Harmony);

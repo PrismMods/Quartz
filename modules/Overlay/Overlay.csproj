@@ -1,9 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<ModuleId>overlay</ModuleId>
-		<AssemblyName>Quartz.Module.Overlay</AssemblyName>
-	</PropertyGroup>
-	<ItemGroup>
-		<EmbeddedResource Include="Lang\*.json" />
-	</ItemGroup>
-</Project>

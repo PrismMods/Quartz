@@ -27,12 +27,8 @@
 		<QuartzDisplayVersion Condition="'$(QuartzDisplayVersion)' == ''">$(QuartzVersion)-$(QuartzChannel)-$(QuartzBuild)</QuartzDisplayVersion>
 
 		<!-- Assembly identity deliberately ignores the build counter: bumping it must
-		     not rebind every precompiled addon and module against a new identity. -->
+		     not rebind every precompiled addon against a new identity. -->
 		<QuartzAssemblyVersion Condition="'$(QuartzVersion)' != ''">$(QuartzVersion).0</QuartzAssemblyVersion>
-
-		<!-- Module ABI, read from the same Info.cs the runtime gate uses. -->
-		<QuartzModuleAbi>$([System.Text.RegularExpressions.Regex]::Match($(_QuartzInfoText), '\bModuleAbi\s*=\s*(\d+)').Groups[1].Value)</QuartzModuleAbi>
-		<QuartzModuleAbi Condition="'$(QuartzModuleAbi)' == ''">1</QuartzModuleAbi>
 	</PropertyGroup>
 
 </Project>

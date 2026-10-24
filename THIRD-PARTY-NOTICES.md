@@ -22,8 +22,8 @@ repository, so it is not yet a complete inventory.
 
 ## KeyViewer JavaScript engine
 
-The KeyViewer module embeds these unmodified runtime dependencies in its
-`.qmod`, so JavaScript plugins work without loose DLLs:
+The key viewer embeds these unmodified runtime dependencies in the Quartz
+DLL, so JavaScript plugins work without loose DLLs:
 
 - **Jint 4.16.0**, Copyright (c) 2013 Sebastien Ros, BSD 2-Clause.
   Source: https://github.com/sebastienros/jint/tree/v4.16.0
@@ -147,3 +147,9 @@ The Optimizer page carries three more patches derived from Iridium's
   `RDInput.GetStateKeys` optimizations are deliberately not ported: each either
   reimplements a method Quartz already patches elsewhere or returns a shared
   buffer across Quartz's own input modules.
+
+## Tabler Icons
+
+The TUF tab icon (`tools/icons/Planet128.svg`) is the `planet` icon from
+Tabler Icons, mirrored horizontally. Copyright (c) 2020-2024 Paweł Kuna, MIT
+License. Source: https://github.com/tabler/tabler-icons

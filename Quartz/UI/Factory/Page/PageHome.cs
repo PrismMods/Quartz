@@ -3,7 +3,7 @@ using Quartz.Async;
 using Quartz.Compat.Game;
 using Quartz.Core;
 using Quartz.IO;
-using Quartz.Modules;
+using Quartz.Features;
 using Quartz.UI.Generator;
 using Quartz.UI.Home;
 using Quartz.UI.Nav;
@@ -41,40 +41,17 @@ internal static class PageHome {
         );
     }
     private static void Setup(RectTransform content) {
-        int installed = ModuleService.Modules.Count;
-        int active = 0;
-        int updates = 0;
-        foreach(ModuleService.Handle handle in ModuleService.Modules) {
-            if(handle.Loaded && handle.Enabled) active++;
-            if(PageModules.UpdateFor(handle) != null) updates++;
-        }
+        int total = FeatureService.Features.Count;
+        int on = 0;
+        foreach(FeatureService.Handle handle in FeatureService.Features)
+            if(handle.Enabled) on++;
         RectTransform strip = HomeUI.Grid(content.transform);
-        HomeUI.Stat(strip, installed.ToString(CultureInfo.InvariantCulture),
-            MainCore.Tr.Get("HOME_STAT_MODULES", "Modules installed"),
-            static () => Go(CorePages.ModulesPageKey));
-        HomeUI.Stat(strip, active.ToString(CultureInfo.InvariantCulture),
-            MainCore.Tr.Get("HOME_STAT_ACTIVE", "Active"),
-            static () => Go(CorePages.ModulesPageKey));
+        HomeUI.Stat(strip, on.ToString(CultureInfo.InvariantCulture) + "/" + total.ToString(CultureInfo.InvariantCulture),
+            MainCore.Tr.Get("HOME_STAT_FEATURES", "Features on"),
+            static () => Go(CorePages.FeaturesPageKey));
         HomeUI.Stat(strip, Quartz.Addons.AddonService.Addons.Count.ToString(CultureInfo.InvariantCulture),
             MainCore.Tr.Get("HOME_STAT_ADDONS", "Addons"),
             static () => Go(CorePages.AddonsPageKey));
-        if(updates > 0) {
-            HomeUI.Stat(strip, updates.ToString(CultureInfo.InvariantCulture),
-                MainCore.Tr.Get("HOME_STAT_UPDATES", "Updates available"),
-                static () => Go(CorePages.ModulesPageKey));
-        }
-        if(installed > 0) return;
-        RectTransform emptyGrid = HomeUI.Grid(content.transform);
-        Transform empty = HomeUI.Card(emptyGrid, MainCore.Tr.Get("HOME_SETUP", "Your setup"));
-        HomeUI.Line(empty, MainCore.Tr.Get(
-            "HOME_SETUP_EMPTY",
-            "No modules yet — every feature lives in one. Open Modules to add some."
-        ));
-        RectTransform buttonRow = GenerateUI.Row(empty, 56f);
-        GenerateUI.ButtonRow(buttonRow);
-        UIButton open = GenerateUI.Button(buttonRow, static () => Go(CorePages.ModulesPageKey),
-            "Open Modules", "home_open_modules", 0f);
-        GenerateUI.FixWidth(open, 200f);
     }
     private static void Cards(RectTransform content) {
         IReadOnlyList<HomeCard> cards = HomeRegistry.Visible();
@@ -101,7 +78,7 @@ internal static class PageHome {
         Transform card = HomeUI.Card(grid, MainCore.Tr.Get("HOME_RESET", "Reset"));
         HomeUI.Line(card, MainCore.Tr.Get(
             "HOME_RESET_DESC",
-            "Reset puts every setting back to its default. Clean also empties key layouts, panels and key lists. Modules, addons and other profiles stay. Restart the game afterwards."
+            "Reset puts every setting back to its default. Clean also empties key layouts, panels and key lists. Feature switches, addons and other profiles stay. Restart the game afterwards."
         ));
         RectTransform buttonRow = GenerateUI.Row(card, 56f);
         GenerateUI.ButtonRow(buttonRow);

@@ -166,8 +166,8 @@ internal static class PageImport {
         _ => GenerateUI.Tr("IMPORT_MODE_KEEP_OLD", "Keep old"),
     };
     private static void RunImport(SettingsImportOption option, bool separateProfile) {
-        if(option != null && Quartz.Modules.ImportAutoInstall.EnsureForKind(SettingsImporter.KindOf(option.Source))) {
-            statusText.text = GenerateUI.Tr("IMPORT_INSTALLING", "Installing the features these settings need…");
+        if(option != null && Quartz.Features.FeatureImport.EnsureForKind(SettingsImporter.KindOf(option.Source))) {
+            statusText.text = GenerateUI.Tr("IMPORT_ENABLING", "Switching on the features these settings need…");
             Quartz.Async.MainThread.Enqueue(() => RunImportNow(option, separateProfile));
             return;
         }

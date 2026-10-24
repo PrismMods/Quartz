@@ -44,7 +44,7 @@ static class DiscordVoiceTests {
     }
     public static void TestTheShippedManifestCoversEveryPlatform() {
         string repo = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../"));
-        string json = File.ReadAllText(Path.Combine(repo, "modules", "Discord", "voice-natives.json"));
+        string json = File.ReadAllText(Path.Combine(repo, "Quartz", "Features", "Discord", "voice-natives.json"));
         (string Rid, string Extension, bool Dave)[] expected = [
             ("win-x64", "dll", true),
             ("win-arm64", "dll", false),

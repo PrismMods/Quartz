@@ -7,10 +7,10 @@ internal static class CorePages {
     internal const string HomeCategoryKey = "home";
     internal const string HomePageKey = "home.overview";
     internal const string SearchPageKey = "search.main";
-    internal const string ModulesCategoryKey = "modules";
-    internal const string AddonsCategoryKey = ModulesCategoryKey;
+    internal const string FeaturesCategoryKey = "features";
+    internal const string AddonsCategoryKey = FeaturesCategoryKey;
     internal const string AddonsPageKey = "addons.main";
-    internal const string ModulesPageKey = "modules.main";
+    internal const string FeaturesPageKey = "features.main";
     internal const string SettingsPageKey = "settings.main";
     private static bool registered;
     internal static void EnsureRegistered() {
@@ -30,23 +30,23 @@ internal static class CorePages {
     private static void Categories() {
         Category(HomeCategoryKey, "Home", "HOME", UISprite.House128, 0,
             visible: static () => CoreNav);
-        // The KeyViewer flavour ships a fixed module set, so the store — and the
-        // addons page that lives in the same category — would only offer things it
-        // is not meant to install. Registered but hidden: one predicate instead of
-        // a conditional-compilation hole through the page registry.
-        Category(ModulesCategoryKey, "Modules", "MODULES", UISprite.Box128, 5, alwaysSubmenu: true,
+        // The KeyViewer flavour runs a fixed feature set, so the feature switches — and
+        // the addons page that lives in the same category — would only offer things it
+        // is not meant to run. Registered but hidden: one predicate instead of a
+        // conditional-compilation hole through the page registry.
+        Category(FeaturesCategoryKey, "Features", "FEATURES", UISprite.Sparkles128, 5, alwaysSubmenu: true,
             visible: static () => CoreNav);
         Category("overlay", "Overlay", "OVERLAY", UISprite.Monitor128, 10, togglable: true);
         Category("gameplay", "Gameplay", "GAMEPLAY", UISprite.Gamepad128, 20, togglable: true);
         Category("visuals", "Visuals", "VISUALS", UISprite.Image128, 30, togglable: true);
         Category("tweaks", "Tweaks", "TWEAKS", UISprite.AdjustmentsHorizontal128, 40, togglable: true);
-        // Pages come from the editor module; the category hides itself when it is not installed.
+        // Pages come from the editor feature; the category hides itself while it is off.
         Category("editor", "Editor", "EDITOR", UISprite.Pencil128, 50, togglable: true);
         Category("others", "Others", "OTHERS", UISprite.Grid128, 75, togglable: true);
-        Category("tuf", "TUF", "TUF", UISprite.Globe128, 76,
-            visible: static () => CoreNav && Quartz.Modules.ModuleCategories.IsEnabled("others"));
+        Category("tuf", "TUF", "TUF", UISprite.Planet128, 76,
+            visible: static () => CoreNav && Quartz.Features.FeatureCategories.IsEnabled("others"));
         Category("discord", "Discord", "DISCORD", UISprite.Message128, 77,
-            visible: static () => CoreNav && Quartz.Modules.ModuleCategories.IsEnabled("others"));
+            visible: static () => CoreNav && Quartz.Features.FeatureCategories.IsEnabled("others"));
         Category("search", "Search", "SEARCH", UISprite.MagnifyingGlass128, 80, visible: static () => CoreNav);
         Category("profiles", "Profiles", "PROFILES", UISprite.Users128, 90, visible: static () => CoreNav);
         Category("import", "Import", "IMPORT", UISprite.Book128, 100, visible: static () => CoreNav);
@@ -66,16 +66,8 @@ internal static class CorePages {
         Page(SearchPageKey, "search", 10, "Search", "SEARCH", PageSearch.Create);
         Page("profiles.main", "profiles", 10, "Profiles", "PROFILES", PageProfiles.Create);
         Page("import.main", "import", 10, "Import", "IMPORT", PageImport.Create);
-        Page(ModulesPageKey, ModulesCategoryKey, 0, "All Modules", "MODULES_ALL", PageModules.Create,
+        Page(FeaturesPageKey, FeaturesCategoryKey, 0, "Features", "FEATURES", PageFeatures.Create,
             visible: static () => CoreNav);
-        foreach(NavCategory category in NavRegistry.AllCategories) {
-            if(!category.Togglable) continue;
-            string key = category.Key;
-            Page("modules." + key, ModulesCategoryKey, category.Order, category.Title, category.LocaleKey,
-                rect => PageModuleCategory.Create(rect, key),
-                () => GenerateUI.Tr("MODULES", "Modules") + " · " + GenerateUI.Tr(category.LocaleKey, category.Title),
-                () => CoreNav && Quartz.Modules.ModuleCategories.IsEnabled(key));
-        }
         Page(AddonsPageKey, AddonsCategoryKey, 90, "Addons", "ADDONS", PageAddons.Create, separatorBefore: true,
             visible: static () => CoreNav);
         Page(SettingsPageKey, "settings", 10, "Settings", "SETTINGS", PageSettings.Create);
@@ -99,8 +91,8 @@ internal static class CorePages {
         Togglable = togglable,
         Visible = togglable
             ? visible == null
-                ? () => Quartz.Modules.ModuleCategories.IsEnabled(key)
-                : () => visible() && Quartz.Modules.ModuleCategories.IsEnabled(key)
+                ? () => Quartz.Features.FeatureCategories.IsEnabled(key)
+                : () => visible() && Quartz.Features.FeatureCategories.IsEnabled(key)
             : visible,
     });
     private static void Page(

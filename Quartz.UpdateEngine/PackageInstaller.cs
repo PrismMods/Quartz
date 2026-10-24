@@ -7,8 +7,8 @@ namespace Quartz.UpdateEngine;
 // Turns a downloaded install zip into Runtime/versions/<version>/. The zip is
 // the ordinary release asset (Mods DLL + data files + runtime store), so this
 // routes entries rather than extracting wholesale: the versioned runtime subtree
-// lands as the new runtime, the maintainer-owned data files (Lang, bundled
-// modules) are staged into .data-sync/ for the bootstrap to copy over the data
+// lands as the new runtime, the maintainer-owned data files (Lang) are
+// staged into .data-sync/ for the bootstrap to copy over the data
 // root, and the rest (bootstrap DLL, state.json) is deliberately dropped — the
 // frozen bootstrap only updates through the in-game installer.
 internal static class PackageInstaller {

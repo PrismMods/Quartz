@@ -33,7 +33,7 @@ jobs:
   compile:
     name: Compile everything
     runs-on: ubuntu-latest
-    # The whole mod — core, both loader targets, and every module — compiled with
+    # The whole mod — core with every feature, both loader targets — compiled with
     # TreatWarningsAsErrors on a machine that has never seen the game.
     #
     # It links the game's managed assemblies, which normally only exist beside a
@@ -60,13 +60,6 @@ jobs:
       - name: Compile the mod (UnityModManager)
         run: >
           dotnet build Quartz/Quartz.csproj -c Release -p:LoaderTarget=UMM
-          -p:UseStubs=true -p:GamePath= -p:GameData=
-
-      # Must follow the core build: each module references sdk/QuartzAddon.dll, the
-      # reference assembly the core build emits.
-      - name: Compile every module
-        run: >
-          dotnet build modules/AllModules.proj -c Release
           -p:UseStubs=true -p:GamePath= -p:GameData=
 
       # Standalone uses different compile symbols, assembly names, resources,

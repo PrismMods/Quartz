@@ -12,8 +12,8 @@ public class Translator {
     private readonly string KTLKey;
     private readonly string ExpectedKTLValue;
     private volatile Dictionary<string, Dictionary<string, string>> translations = [];
-    // Modules hand their language blocks over at load time, but Load() rebuilds the
-    // dictionaries from disk and would drop every one of them — which is why a module
+    // Features hand their language blocks over at load time, but Load() rebuilds the
+    // dictionaries from disk and would drop every one of them — which is why a feature
     // page's name showed English while core categories were translated. Keep the
     // blocks and re-apply them after every load, newest per source wins.
     private readonly Dictionary<string, string> mergedSources = new(StringComparer.Ordinal);
@@ -265,7 +265,7 @@ public class Translator {
         if(translationsArr.TryGetValue(Language, out var lang) && lang.TryGetValue(key, out var values)) return values.Length;
         return 0;
     }
-    // Prefix-based: a module registers one block per language, each under its own
+    // Prefix-based: a feature registers one block per language, each under its own
     // source, so unloading has to drop them all.
     public void Forget(string sourcePrefix) {
         if(string.IsNullOrEmpty(sourcePrefix)) return;

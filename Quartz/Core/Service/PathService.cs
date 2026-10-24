@@ -6,7 +6,6 @@ public sealed class PathService(string rootPath) {
     public string ConfigPath => Path.Combine(RootPath, "Settings.json");
     public string LangPath => Path.Combine(RootPath, "Lang");
     public string TempPath => Path.Combine(RootPath, "Temp");
-    public string ModulePath => Path.Combine(RootPath, "Module");
     public string FontPath => Path.Combine(RootPath, "Fonts");
     public string CustomFontPath => Path.Combine(RootPath, "CustomFonts");
     public string AddonsPath => Path.Combine(RootPath, "Addons");
@@ -17,13 +16,12 @@ public sealed class PathService(string rootPath) {
         Directory.CreateDirectory(RootPath);
         Directory.CreateDirectory(LangPath);
         Directory.CreateDirectory(TempPath);
-        Directory.CreateDirectory(ModulePath);
         Directory.CreateDirectory(FontPath);
         Directory.CreateDirectory(CustomFontPath);
         Directory.CreateDirectory(AddonsPath);
         Directory.CreateDirectory(TufLevelsPath);
         try {
-            // Atomic state lives in root settings, profiles, module metadata,
+            // Atomic state lives in root settings, profiles,
             // preset/cache folders, and TUF's top level. Skip directories that
             // can contain large user libraries but never receive AtomicFile writes.
             AtomicFile.RecoverTree(

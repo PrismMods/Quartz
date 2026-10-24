@@ -1,6 +1,0 @@
-{
-  "schema": 1, "id": "practice", "entry": "Quartz.Features.Practice.PracticeModule",
-  "name": "Practice Difficulty", "nameKey": "SECTION_PRACTICE_DIFFICULTY", "group": "gameplay", "order": 60,
-  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
-  "deps": ["overlay"], "settingsFiles": ["Practice.json"], "langPrefixes": ["PRACTICE_"]
-}

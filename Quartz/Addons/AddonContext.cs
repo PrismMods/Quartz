@@ -47,7 +47,7 @@ public sealed class AddonContext {
         OrderOwnPatchesAfterQuartz();
     }
     private static bool IsQuartzOwner(string owner) =>
-        owner == Info.Name || owner.StartsWith("quartz.module.", StringComparison.Ordinal);
+        owner == Info.Name || owner.StartsWith("quartz.feature.", StringComparison.Ordinal);
     private void OrderOwnPatchesAfterQuartz() {
         foreach(System.Reflection.MethodBase original in Harmony.GetPatchedMethods().ToList()) {
             HarmonyLib.Patches info = HarmonyLib.Harmony.GetPatchInfo(original);

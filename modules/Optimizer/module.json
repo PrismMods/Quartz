@@ -1,6 +1,0 @@
-{
-  "schema": 1, "id": "optimizer", "entry": "Quartz.Features.Optimizer.OptimizerModule",
-  "name": "Optimizer", "nameKey": "SECTION_OPTIMIZER", "group": "tweaks", "order": 20,
-  "version": "__VERSION__", "coreAbi": __COREABI__, "minCoreVersion": "",
-  "deps": [], "settingsFiles": ["Optimizer.json"], "langPrefixes": ["OPTIMIZER_"]
-}

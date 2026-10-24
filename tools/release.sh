@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Build a Release and publish it to GitHub with the full Quartz packages, the
-# standalone Key Viewer packages, the compatibility DLL, and module assets.
+# standalone Key Viewer packages, and the addon SDK DLL.
 # Pre-release channels (alpha/beta/rc) are flagged as pre-releases.
 #
 # Release identity (Version + Channel) comes from Quartz/Core/Info.cs — set those
@@ -137,7 +137,7 @@ if [ -n "$prev_tag" ]; then footer="${footer}  ·  ${prev_tag}…${tag}"; fi
 
 # Lead with the two files a human is here for. GitHub lists assets alphabetically
 # with no hint which is the mod, so without this the answer to "what do I click"
-# is buried — that is the whole reason modules ship as one zip now.
+# is buried.
 dl="https://github.com/${owner}/${repo}/releases/download/${tag}"
 downloads=$(cat <<EOF
 ## Download
@@ -149,7 +149,7 @@ downloads=$(cat <<EOF
 | **[QuartzKeyViewer.zip]($dl/QuartzKeyViewer.zip)** | Standalone Key Viewer — MelonLoader |
 | **[QuartzKeyViewerUmm.zip]($dl/QuartzKeyViewerUmm.zip)** | Standalone Key Viewer — UnityModManager |
 
-Every feature is included; you pick what to turn on from **Modules** inside the game. Step-by-step instructions are in the [install guide](https://quartzz.xyz/docs/install/).
+Every feature is included; you pick what to turn on from **Features** inside the game. Step-by-step instructions are in the [install guide](https://quartzz.xyz/docs/install/).
 
 The other files below are for the mod itself — you don't need to download them.
 EOF
@@ -215,9 +215,6 @@ echo "Building ${tag} (MelonLoader) ..."
 dotnet build Quartz/Quartz.csproj -c Release
 echo "Building ${tag} (UnityModManager) ..."
 dotnet build Quartz/Quartz.csproj -c Release -p:LoaderTarget=UMM
-echo "Building ${tag} (modules) ..."
-rm -rf dist/modules
-dotnet build modules/AllModules.proj -c Release
 echo "Building ${tag} (standalone Key Viewer, MelonLoader) ..."
 dotnet build Quartz/Quartz.csproj -c Release -p:Flavor=KeyViewer
 echo "Building ${tag} (standalone Key Viewer, UnityModManager) ..."
@@ -251,56 +248,6 @@ keyviewer_umm_zip="dist/QuartzKeyViewerUmm.zip"
 sdk_dll="sdk/QuartzAddon.dll"
 [ -f "$sdk_dll" ] || { echo "sdk/QuartzAddon.dll missing — aborting" >&2; exit 1; }
 
-# Modules ship as ONE asset: QuartzModules.zip, every .qmod and .qmod.json in a
-# flat zip. Attaching them loose put 50+ files on the release page and buried the
-# two zips a human actually downloads; the whole set is smaller than one install
-# zip, so the installer fetches it once and extracts what it needs. The catalog
-# is generated from whatever dist/modules/ holds and then checked against it —
-# deliberately NOT a hand-maintained per-module asset list, which is the thing
-# the module system exists to delete.
-catalog="dist/modules.json"
-modules_zip="dist/QuartzModules.zip"
-on_disk=$(find dist/modules -name '*.qmod' 2>/dev/null | wc -l | tr -d ' ')
-[ "$on_disk" -gt 0 ] || { echo "dist/modules holds no modules — the module build failed; aborting" >&2; exit 1; }
-rm -f "$modules_zip"
-(cd dist/modules && zip -q -X "../$(basename "$modules_zip")" ./*.qmod ./*.qmod.json)
-[ -f "$modules_zip" ] || { echo "dist/QuartzModules.zip missing — aborting" >&2; exit 1; }
-tools/gen-catalog.sh "$tag" "$modules_zip" "$catalog"
-jq -e . "$catalog" >/dev/null || { echo "dist/modules.json is not valid JSON — aborting" >&2; exit 1; }
-in_catalog=$(jq '.modules | length' "$catalog")
-[ "$on_disk" = "$in_catalog" ] || {
-  echo "catalog lists ${in_catalog} module(s) but dist/modules has ${on_disk} — aborting" >&2; exit 1; }
-sha_of() { (shasum -a 256 "$1" 2>/dev/null || sha256sum "$1") | cut -d' ' -f1; }
-while read -r id want; do
-  [ "$(sha_of "dist/modules/${id}.qmod")" = "$want" ] \
-    || { echo "catalog sha256 for ${id} does not match the file — aborting" >&2; exit 1; }
-done < <(jq -r '.modules[] | "\(.id) \(.sha256)"' "$catalog")
-# The installer verifies this before it trusts a single byte out of the zip.
-[ "$(sha_of "$modules_zip")" = "$(jq -r '.bundle.sha256' "$catalog")" ] \
-  || { echo "catalog sha256 for the module bundle does not match the zip — aborting" >&2; exit 1; }
-# The installer looks each module up inside the zip by "<id>.qmod" / "<id>.qmod.json".
-# A catalog entry with no matching zip member is a module nobody can install.
-zip_members=$(unzip -Z1 "$modules_zip")
-while read -r id; do
-  for member in "${id}.qmod" "${id}.qmod.json"; do
-    grep -qxF "$member" <<<"$zip_members" \
-      || { echo "the module bundle has no '${member}' but the catalog lists it — aborting" >&2; exit 1; }
-  done
-done < <(jq -r '.modules[].id' "$catalog")
-module_assets=("$modules_zip")
-module_bundle=("$modules_zip")
-# Fold the verified modules into both install zips under the data root's
-# Module.bundled/. That is the offline source the first-launch migration
-# copies from, so an upgrading user keeps every feature they had enabled
-# without needing the network. Transitional — dropped in Phase 6.
-tools/bundle-modules.sh
-# Every module that ships must have a migration rule, or upgrading users
-# silently lose that feature on first launch.
-while read -r id; do
-  grep -q "Id = \"${id}\"" Quartz/Modules/ModuleMigration.cs \
-    || { echo "module '${id}' has no rule in ModuleMigration.Table — aborting" >&2; exit 1; }
-done < <(jq -r '.modules[].id' "$catalog")
-
 # gh wants the body from a file (preserves markdown + newlines).
 notes_tmp=$(mktemp)
 printf '%s\n' "$body" > "$notes_tmp"
@@ -310,10 +257,10 @@ echo "Publishing ${title} ..."
 if gh release view "$tag" >/dev/null 2>&1; then
   # Re-publish: refresh title + notes, then replace the assets.
   gh release edit "$tag" --title "$title" --notes-file "$notes_tmp"
-  gh release upload "$tag" "$quartz_zip" "$quartz_umm_zip" "$keyviewer_zip" "$keyviewer_umm_zip" "$sdk_dll" "$catalog" "${module_assets[@]}" --clobber
+  gh release upload "$tag" "$quartz_zip" "$quartz_umm_zip" "$keyviewer_zip" "$keyviewer_umm_zip" "$sdk_dll" --clobber
 else
   # shellcheck disable=SC2086
-  gh release create "$tag" "$quartz_zip" "$quartz_umm_zip" "$keyviewer_zip" "$keyviewer_umm_zip" "$sdk_dll" "$catalog" "${module_assets[@]}" --title "$title" --notes-file "$notes_tmp" --target "$release_commit" $flags
+  gh release create "$tag" "$quartz_zip" "$quartz_umm_zip" "$keyviewer_zip" "$keyviewer_umm_zip" "$sdk_dll" --title "$title" --notes-file "$notes_tmp" --target "$release_commit" $flags
 fi
 
 # --- Roll this channel's "latest" pointer --------------------------------
@@ -354,17 +301,16 @@ roll_pointer() {
     printf -- '- [QuartzUmm.zip](https://github.com/%s/%s/releases/download/%s/QuartzUmm.zip) — UnityModManager\n' "$owner" "$repo" "$roll_tag"
     printf -- '- [QuartzKeyViewer.zip](https://github.com/%s/%s/releases/download/%s/QuartzKeyViewer.zip) — standalone Key Viewer for MelonLoader\n' "$owner" "$repo" "$roll_tag"
     printf -- '- [QuartzKeyViewerUmm.zip](https://github.com/%s/%s/releases/download/%s/QuartzKeyViewerUmm.zip) — standalone Key Viewer for UnityModManager\n' "$owner" "$repo" "$roll_tag"
-    printf -- '- [modules.json](https://github.com/%s/%s/releases/download/%s/modules.json) — module catalog\n' "$owner" "$repo" "$roll_tag"
     printf -- '- [QuartzAddon.dll](https://github.com/%s/%s/releases/download/%s/QuartzAddon.dll) — addon SDK reference assembly\n\n' "$owner" "$repo" "$roll_tag"
     printf -- '---\n\n%s\n' "$body"
   } > "$roll_notes"
 
   if gh release view "$roll_tag" >/dev/null 2>&1; then
     gh release edit "$roll_tag" --title "$roll_title" --notes-file "$roll_notes" \
-      && gh release upload "$roll_tag" "$quartz_zip" "$quartz_umm_zip" "$keyviewer_zip" "$keyviewer_umm_zip" "$sdk_dll" "$catalog" "${module_bundle[@]}" --clobber
+      && gh release upload "$roll_tag" "$quartz_zip" "$quartz_umm_zip" "$keyviewer_zip" "$keyviewer_umm_zip" "$sdk_dll" --clobber
   else
     # shellcheck disable=SC2086
-    gh release create "$roll_tag" "$quartz_zip" "$quartz_umm_zip" "$keyviewer_zip" "$keyviewer_umm_zip" "$sdk_dll" "$catalog" "${module_bundle[@]}" \
+    gh release create "$roll_tag" "$quartz_zip" "$quartz_umm_zip" "$keyviewer_zip" "$keyviewer_umm_zip" "$sdk_dll" \
       --title "$roll_title" --notes-file "$roll_notes" $roll_flags
   fi
   local rc=$?

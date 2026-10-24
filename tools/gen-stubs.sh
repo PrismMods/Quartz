@@ -8,7 +8,7 @@
 #            CI is proving something about an API that no longer exists.
 #
 # Needs a real game install (located exactly like build.sh does) plus a local
-# build of the mod and every module, since the generator derives the stub set
+# build of the mod, since the generator derives the stub set
 # from the compiled IL's reference tables rather than from the sources.
 set -euo pipefail
 
@@ -49,10 +49,9 @@ MANAGED="$(resolve_managed "$GP")" || { echo "ERROR: Managed/ not found under $G
 # BOTH loader targets: LoaderUmm.cs only compiles under QUARTZ_UMM, so a stub set
 # derived from the MelonLoader build alone has no UnityModManager surface in it and
 # the UMM build then fails against the stubs.
-echo ">> building mod (ML + UMM) + modules (Release) to derive the stub set from..."
+echo ">> building mod (ML + UMM) (Release) to derive the stub set from..."
 dotnet build Quartz/Quartz.csproj -c Release -v quiet --nologo >/dev/null
 dotnet build Quartz/Quartz.csproj -c Release -p:LoaderTarget=UMM -v quiet --nologo >/dev/null
-dotnet build modules/AllModules.proj -c Release -v quiet --nologo >/dev/null
 
 INPUTS=(--input "Quartz/bin/Release/netstandard2.1/Quartz.dll")
 [[ -f Quartz/bin/umm/Release/netstandard2.1/QuartzUmm.dll ]] \
@@ -66,9 +65,6 @@ for dll in \
     "Quartz.UpdateEngine/bin/ml/Release/netstandard2.1/Quartz.UpdateEngine.dll" \
     "Quartz.UpdateEngine/bin/umm/Release/netstandard2.1/QuartzUmm.UpdateEngine.dll"; do
     [[ -f "$dll" ]] && INPUTS+=(--input "$dll")
-done
-for dll in modules/*/bin/Release/Quartz.Module.*.dll; do
-    INPUTS+=(--input "$dll")
 done
 echo ">> reading $(( ${#INPUTS[@]} / 2 )) assemblies"
 
@@ -88,7 +84,7 @@ LIBS+=(--lib lib)
 dotnet run --project tools/StubGen/StubGen.csproj -c Release -v quiet --nologo -- \
     --game "$MANAGED" \
     "${LIBS[@]}" \
-    --source Quartz --source Quartz.Bootstrap --source Quartz.UpdateEngine --source modules --source sdk \
+    --source Quartz --source Quartz.Bootstrap --source Quartz.UpdateEngine --source sdk \
     "${INPUTS[@]}" \
     --out stubs \
     ${MODE:+"$MODE"}

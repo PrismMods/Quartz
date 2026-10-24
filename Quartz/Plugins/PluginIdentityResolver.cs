@@ -25,20 +25,15 @@ public static class PluginIdentityResolver {
         Assembly mod = typeof(PluginIdentityResolver).Assembly;
         handler = (_, args) => {
             string name = new AssemblyName(args.Name).Name;
-            // Modules and addons are compiled once against sdk/QuartzAddon.dll, whose
-            // identity is "Quartz". Every shipped core — UMM build, KeyViewer flavour —
-            // answers to that name so the same .qmod loads under all of them.
+            // Addons are compiled once against sdk/QuartzAddon.dll, whose identity is
+            // "Quartz". Every shipped core — UMM build, KeyViewer flavour — answers to
+            // that name so the same .qaddon loads under all of them.
             if(name is "Quartz" or "QuartzUmm" or "QuartzKeyViewer" or "QuartzKeyViewerUmm") return mod;
             if(name == null) return null;
             if(current.TryGetValue(name, out Assembly live)) return live;
-            if(!name.StartsWith("Quartz.Module.", StringComparison.Ordinal)) return null;
-            Assembly[] loaded = AppDomain.CurrentDomain.GetAssemblies();
-            for(int i = loaded.Length - 1; i >= 0; i--) {
-                try {
-                    if(loaded[i].GetName().Name == name) return loaded[i];
-                } catch(Exception e) { Diag.Ignore(e); }
-            }
-            return null;
+            // The old per-feature module assemblies are part of the core now, with the
+            // same type names, so an addon built against one still binds.
+            return name.StartsWith("Quartz.Module.", StringComparison.Ordinal) ? mod : null;
         };
         AppDomain.CurrentDomain.AssemblyResolve += handler;
     }

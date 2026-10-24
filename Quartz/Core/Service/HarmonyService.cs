@@ -15,7 +15,8 @@ public sealed class HarmonyService : IRuntimeService, IRuntimeTick {
     }
     private void PatchAllResilient() {
         foreach(Type type in AccessTools.GetTypesFromAssembly(MainCore.Asm)) {
-            if(!IsPatchClass(type)) continue;
+            // Feature patches go on and off with their feature (FeatureContext.PatchAll).
+            if(Quartz.Features.FeatureService.OwnsPatchClass(type) || !IsPatchClass(type)) continue;
             try {
                 Harmony.CreateClassProcessor(type).Patch();
             } catch(Exception e) {

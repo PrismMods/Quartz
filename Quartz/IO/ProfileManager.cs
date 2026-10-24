@@ -2,7 +2,7 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using Quartz.Core;
 using Quartz.Localization;
-using Quartz.Modules;
+using Quartz.Features;
 using Quartz.Resource;
 namespace Quartz.IO;
 public static partial class ProfileManager {
@@ -22,6 +22,8 @@ public static partial class ProfileManager {
         "Profiles.json",
         "CalibrationTimings.json",
         "FAQ.json",
+        // Which features are on is install-wide, not per profile.
+        "Features.json",
     };
     private static readonly string[] presetImposed = [
         nameof(CoreSettings.Language),
@@ -191,15 +193,15 @@ public static partial class ProfileManager {
         }
     }
     private static string ConfigFileName => Path.GetFileName(MainCore.Paths.ConfigPath);
-    // A bundle carries a module's settings file whether or not that module is installed
+    // A bundle carries a feature's settings file whether or not that feature is on
     // here, so an imported profile would otherwise come up missing the very features it
-    // was built around. The migration table already knows which file means which module.
-    private static void InstallModulesFor(JObject files) {
+    // was built around. The defaults table already knows which file means which feature.
+    private static void EnableFeaturesFor(JObject files) {
         try {
-            ModuleMigration.Plan plan = ModuleMigration.Decide(fileName => files[fileName] as JObject);
-            ImportAutoInstall.Ensure(plan.Install);
+            FeatureDefaults.Plan plan = FeatureDefaults.Decide(fileName => files[fileName] as JObject);
+            FeatureImport.Ensure(plan.Enable);
         } catch(Exception e) {
-            MainCore.Log.Wrn($"[{nameof(ProfileManager)}] could not install the imported profile's modules: {e.Message}");
+            MainCore.Log.Wrn($"[{nameof(ProfileManager)}] could not enable the imported profile's features: {e.Message}");
         }
     }
     public static string Import(string srcPath, bool asPreset = false) {
@@ -216,7 +218,7 @@ public static partial class ProfileManager {
                 DirOf(name),
                 ProfileBundle.ReadFiles(files, excluded, asPreset, ConfigFileName, presetImposed)
             );
-            InstallModulesFor(files);
+            EnableFeaturesFor(files);
             return name;
         } catch(Exception e) {
             MainCore.Log.Err($"[{nameof(ProfileManager)}] Import '{srcPath}' failed: {e}");

@@ -13,7 +13,7 @@ public static partial class ProfileManager {
     /// Resets the active profile's live settings in place, like a profile switch.
     /// Reset: every setting back to its fresh-install default. Clean: the same, then
     /// settings that would seed content (key layouts, panels, key lists) start empty.
-    /// Installed modules, addons, other profiles and play counts are left alone.
+    /// Feature switches, addons, other profiles and play counts are left alone.
     /// </summary>
     public static bool ResetLive(bool clean) {
         string language = MainCore.Conf.Language;

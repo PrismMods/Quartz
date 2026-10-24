@@ -33,11 +33,11 @@ on:
   push:
     branches: [main]
     paths:
-      # Every module ships its own Lang/ directory, and i18n_sync.py unions them all
-      # into the single per-language file translators work on. A module-only string
+      # Every feature keeps its own Lang/ directory, and i18n_sync.py unions them all
+      # into the single per-language file translators work on. A feature-only string
       # change MUST reach i18n or the hourly pull proposes deleting it.
       - "Quartz/Resource/Export/Lang/**"
-      - "modules/*/Lang/**"
+      - "Quartz/Features/*/Lang/**"
   workflow_dispatch:
 
 jobs:
@@ -70,10 +70,10 @@ jobs:
         # otherwise ship it to every translator.
         run: |
           python3 quartz/scripts/validate_i18n.py quartz/Quartz/Resource/Export/Lang quartz/Quartz/Resource/Export/Lang/en-US.json
-          for d in quartz/modules/*/Lang; do
+          for d in quartz/Quartz/Features/*/Lang; do
             [ -d "$d" ] || continue
-            # Each module is measured against its OWN en-US: its Lang dir holds only
-            # that module's keys, so core's reference would flag all of them as dead.
+            # Each feature is measured against its OWN en-US: its Lang dir holds only
+            # that feature's keys, so core's reference would flag all of them as dead.
             python3 quartz/scripts/validate_i18n.py "$d" "$d/en-US.json"
           done
           # The seasonal overlay is its own namespace, measured against its own en-US.
@@ -88,7 +88,7 @@ jobs:
           # Lang/AprilFools is a SEPARATE namespace, not another root of the main one:
           # it reuses the very same key names with different values, so unioning it in
           # would overwrite every real string. Same script, its own directory pair —
-          # i18n_sync.py's module glob finds nothing from there, so it syncs the one
+          # i18n_sync.py's feature glob finds nothing from there, so it syncs the one
           # directory and the ownership rules (en-US + ko-KR authored here) still hold.
           april=quartz/Quartz/Resource/Export/Lang/AprilFools
           if [ -d "$april" ]; then

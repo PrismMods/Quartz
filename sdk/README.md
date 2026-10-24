@@ -155,7 +155,7 @@ supply other languages via `RegisterTranslations`.
 
 ## Top-level tabs
 
-`RegisterTab` puts your tab under **Modules** next to the Addons page. If your
+`RegisterTab` puts your tab under **Features** next to the Addons page. If your
 addon deserves its own entry in the sidebar, use
 `Context.RegisterTopLevelTab("My Addon", content => ...)` — it appears as its
 own top-level item, between the core categories. Optional third argument: raw

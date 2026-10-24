@@ -80,10 +80,8 @@ fi
 TARGET="${2:-both}"
 
 # The csproj skips the UMM local install when MelonLoader is present, so the two
-# loaders never double-load. That silently freezes the UMM core while modules keep
-# deploying to both roots, which shows up much later as a MissingMethodException
-# from a module calling core API the stale DLL lacks. If a live UMM install is
-# already there, it is the one being played -- keep it current.
+# loaders never double-load. That silently freezes a live UMM install at an old
+# build. If one is already there, it is the one being played -- keep it current.
 UMM_FORCE=()
 GAMEDIR="${GP:-}"
 if [[ -z "$GAMEDIR" && -f Directory.Build.props ]]; then
@@ -108,35 +106,6 @@ case "$TARGET" in
     *)    echo "ERROR: unknown target '$TARGET' (use ML | UMM | both)"; exit 1 ;;
 esac
 
-# Features now ship as modules beside the core DLL. Build and deploy them in the
-# same pass: a core that has shed a feature, running next to a game folder that
-# still lacks that feature's module, simply loses the feature — and a STALE core
-# beside fresh modules double-registers its pages. Keep the two in lockstep.
-# Only modules already installed in the game are overwritten (see QuartzModule.props);
-# a shed feature reaches the game through Module.bundled, refreshed below.
-echo ">> building modules ($CONFIG)..."
-dotnet build modules/AllModules.proj -c "$CONFIG" -p:DeployToGame=true
-
-# The zips the csproj just wrote predate the modules, so fold them in now. An
-# upgrading user's first launch copies out of Module.bundled/ rather than
-# downloading — without this the install zips would silently drop every
-# already-extracted feature.
-tools/bundle-modules.sh
-
-# A game install carrying a stale Module.bundled/ (from an older zip install)
-# out-versions dev builds — dev-0 sorts below any alpha — so ModuleBundle's
-# first-launch refresh would clobber the freshly deployed dev modules right
-# back to the bundled release. Keep the install's bundled copy current too.
-if [[ -n "$GAMEDIR" ]]; then
-    for bundled in "$GAMEDIR/UserData/Quartz/Module.bundled" "$GAMEDIR/Mods/Quartz/UserData/Module.bundled"; do
-        if [[ -d "$bundled" ]]; then
-            cp dist/modules/*.qmod dist/modules/*.qmod.json "$bundled/"
-            echo ">> refreshed game bundled modules: $bundled"
-        fi
-    done
-fi
-
 echo ">> done."
 [[ "$TARGET" == "ML"  || "$TARGET" == "both" ]] && echo ">> MelonLoader:     Mods/Quartz.Bootstrap.dll + UserData/Quartz/Runtime/* — dist/Quartz.zip"
 [[ "$TARGET" == "UMM" || "$TARGET" == "both" ]] && echo ">> UnityModManager: UMMMods/Quartz (or Mods/Quartz) + Quartz/Runtime/* — dist/QuartzUmm.zip"
-echo ">> Modules:          <data root>/Module/*.qmod — dist/modules/"

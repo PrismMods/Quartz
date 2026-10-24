@@ -59,11 +59,11 @@
 		<PackageStageDataDir>$(PackageStageRoot)/UserData/Quartz</PackageStageDataDir>
 		<DistZipPath>$(DistDir)/Quartz.zip</DistZipPath>
 		<!-- MelonLoader data root of the local test install; the KeyViewer flavour
-		     moves it, so the two builds never share Settings.json or Module/. -->
+		     moves it, so the two builds never share Settings.json. -->
 		<MlDataRoot>$(GamePath)/UserData/Quartz</MlDataRoot>
 
 		<!-- Flavour: Full (everything, the default) or KeyViewer (the same core
-		     shipping only the key-viewer module and its deps, as its own mod). -->
+		     running only the key viewer and the overlay core, as its own mod). -->
 		<Flavor Condition="'$(Flavor)' == ''">Full</Flavor>
 	</PropertyGroup>
 
@@ -122,10 +122,6 @@
 		<PackageStageDataDir>$(PackageStageRoot)/UserData/QuartzKeyViewer</PackageStageDataDir>
 		<DistZipPath>$(DistDir)/QuartzKeyViewer.zip</DistZipPath>
 		<MlDataRoot>$(GamePath)/UserData/QuartzKeyViewer</MlDataRoot>
-		<!-- The modules this flavour ships. overlay is keyviewer's only manifest
-		     dep. The key limiter is deliberately absent: KvKeyLimiterBridge makes
-		     it optional, so "Sync Keys to Key Limiter" just isn't offered here. -->
-		<KeyViewerModuleIds>keyviewer;overlay</KeyViewerModuleIds>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Flavor)' == 'KeyViewer' And '$(LoaderTarget)' == 'UMM'">
@@ -233,6 +229,7 @@
 		<Reference Include="UnityEngine.InputLegacyModule"><HintPath>$(ManagedDir)/UnityEngine.InputLegacyModule.dll</HintPath></Reference>
 		<Reference Include="UnityEngine.ParticleSystemModule"><HintPath>$(ManagedDir)/UnityEngine.ParticleSystemModule.dll</HintPath></Reference>
 		<Reference Include="UnityEngine.TextRenderingModule"><HintPath>$(ManagedDir)/UnityEngine.TextRenderingModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.TextCoreFontEngineModule" Condition="Exists('$(ManagedDir)/UnityEngine.TextCoreFontEngineModule.dll') Or Exists('$(LibDir)/UnityEngine.TextCoreFontEngineModule.dll')"><HintPath>$(ManagedDir)/UnityEngine.TextCoreFontEngineModule.dll</HintPath></Reference>
 		<Reference Include="UnityEngine.UI"><HintPath>$(ManagedDir)/UnityEngine.UI.dll</HintPath></Reference>
 		<Reference Include="UnityEngine.UIModule"><HintPath>$(ManagedDir)/UnityEngine.UIModule.dll</HintPath></Reference>
 	</ItemGroup>
@@ -277,14 +274,31 @@
 		<!-- The FAQ is maintainer-authored and read-only at runtime: embedded only,
 		     never copied to the data root, so there is no on-disk copy for a user to
 		     edit and for the next update to silently overwrite. -->
-		<!-- Offline fallback for the module browser: groups render on a fresh
-		     install that has never reached the network. -->
-		<EmbeddedResource Include="Modules\Catalog.Default.json">
-			<LogicalName>Quartz.Modules.Catalog.Default.json</LogicalName>
-		</EmbeddedResource>
 		<EmbeddedResource Include="Resource\Export\FAQ.json">
 			<LogicalName>Quartz.FAQ.Default.json</LogicalName>
 		</EmbeddedResource>
+	</ItemGroup>
+
+	<!-- Built-in features (Features/<Name>/). Default resource names already come
+	     out as Quartz.Features.<Name>.*, which is what each feature reads. -->
+	<ItemGroup>
+		<EmbeddedResource Include="Features\*\Lang\*.json" />
+		<EmbeddedResource Include="Features\KeyLimiter\Assets\*.png" />
+		<EmbeddedResource Include="Features\Discord\voice-natives.json" />
+		<Reference Include="System.IO.Compression.FileSystem"><HintPath>$(ManagedDir)/System.IO.Compression.FileSystem.dll</HintPath></Reference>
+		<!-- Key viewer JS runtime: compiled against the vendored DLLs, byte-loaded at
+		     runtime from these resources by KvJsAssemblies (the payload is byte-loaded
+		     too, so it has no probing path for a loose DLL). -->
+		<Reference Include="Jint"><HintPath>Features/KeyViewer/libs/Jint.dll</HintPath></Reference>
+		<Reference Include="Acornima"><HintPath>Features/KeyViewer/libs/Acornima.dll</HintPath></Reference>
+		<EmbeddedResource Include="Features\KeyViewer\libs\Jint.dll" LogicalName="Quartz.KeyViewer.Js.Jint.dll" />
+		<EmbeddedResource Include="Features\KeyViewer\libs\Acornima.dll" LogicalName="Quartz.KeyViewer.Js.Acornima.dll" />
+		<EmbeddedResource Include="Features\KeyViewer\libs\System.Runtime.CompilerServices.Unsafe.dll" LogicalName="Quartz.KeyViewer.Js.System.Runtime.CompilerServices.Unsafe.dll" />
+		<EmbeddedResource Include="Features\KeyViewer\libs\THIRD-PARTY-NOTICES.md" LogicalName="Quartz.KeyViewer.Js.THIRD-PARTY-NOTICES.md" />
+		<!-- DM Note preset compatibility for embedded WebP/GIF/BMP images. -->
+		<PackageReference Include="SixLabors.ImageSharp" Version="2.1.13" GeneratePathProperty="true" PrivateAssets="all" />
+		<EmbeddedResource Include="$(PkgSixLabors_ImageSharp)/lib/netstandard2.1/SixLabors.ImageSharp.dll"
+			LogicalName="Quartz.KeyViewer.Js.SixLabors.ImageSharp.dll" />
 	</ItemGroup>
 
 	<!-- Build number comes from build.json (repo root), keyed by the Version and
@@ -345,20 +359,6 @@
 		<WriteLinesToFile Condition="'$(TargetPath)' != ''" File="$(_StageVersionDir)/runtime.json" Lines="$(QuartzRuntimeMarkerJson)" Overwrite="true" />
 		<WriteLinesToFile Condition="'$(TargetPath)' != ''" File="$(PackageStageDataDir)/Runtime/state.json" Lines="$(QuartzStateJson)" Overwrite="true" />
 		<Copy Condition="'$(TargetPath)' != ''" SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(PackageStageDataDir)/%(RecursiveDir)%(Filename)%(Extension)')" />
-		<!-- Flavour modules ship pre-installed in Module/, not in Module.bundled/:
-		     the module browser is hidden here, so nothing would ever install them
-		     out of the bundle. A module in Module/ with no state entry defaults to
-		     enabled, so the key viewer is live on first launch. -->
-		<ItemGroup Condition="'$(Flavor)' == 'KeyViewer'">
-			<FlavorModuleId Include="$(KeyViewerModuleIds)" />
-			<!-- Binary + manifest: ModuleService needs both beside each other. -->
-			<FlavorModule Include="@(FlavorModuleId->'$(DistDir)/modules/%(Identity).qmod')" />
-			<FlavorModule Include="@(FlavorModuleId->'$(DistDir)/modules/%(Identity).qmod.json')" />
-		</ItemGroup>
-		<Error Condition="'$(Flavor)' == 'KeyViewer' And '@(FlavorModule)' == ''"
-		       Text="No modules in $(DistDir)/modules — build modules/KeyViewer/KeyViewer.csproj first (tools/build-keyviewer.sh does this)." />
-		<Copy Condition="'$(Flavor)' == 'KeyViewer' And '$(TargetPath)' != ''" SourceFiles="@(FlavorModule)" DestinationFolder="$(PackageStageDataDir)/Module" />
-		<Copy Condition="'$(Flavor)' == 'KeyViewer' And '$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" SourceFiles="@(FlavorModule)" DestinationFolder="$(MlDataRoot)/Module" SkipUnchangedFiles="true" />
 		<Delete Files="$(DistZipPath)" Condition="'$(TargetPath)' != ''" TreatErrorsAsWarnings="true" />
 		<ZipDirectory SourceDirectory="$(PackageStageRoot)" DestinationFile="$(DistZipPath)" Condition="'$(TargetPath)' != ''" />
 		<Message Importance="high" Text="Zip: $(DistZipPath)" Condition="'$(TargetPath)' != ''" />
@@ -402,17 +402,6 @@
 		<WriteLinesToFile File="$(UmmStageModDir)/Info.json" Lines="$(_InfoJson)" Overwrite="true" />
 		<Copy SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(UmmStageDataDir)/%(RecursiveDir)%(Filename)%(Extension)')" />
 
-		<!-- Same pre-installed Module/ as the ML flavour zip; see PostBuild. -->
-		<ItemGroup Condition="'$(Flavor)' == 'KeyViewer'">
-			<FlavorModuleId Include="$(KeyViewerModuleIds)" />
-			<FlavorModule Include="@(FlavorModuleId->'$(DistDir)/modules/%(Identity).qmod')" />
-			<FlavorModule Include="@(FlavorModuleId->'$(DistDir)/modules/%(Identity).qmod.json')" />
-		</ItemGroup>
-		<Error Condition="'$(Flavor)' == 'KeyViewer' And '@(FlavorModule)' == ''"
-		       Text="No modules in $(DistDir)/modules — build modules/KeyViewer/KeyViewer.csproj first (tools/build-keyviewer.sh does this)." />
-		<Copy Condition="'$(Flavor)' == 'KeyViewer'" SourceFiles="@(FlavorModule)" DestinationFolder="$(UmmStageDataDir)/Module" />
-		<Copy Condition="'$(Flavor)' == 'KeyViewer' And '$(UmmAutoInstall)' == 'true'" SourceFiles="@(FlavorModule)" DestinationFolder="$(UmmModDataDir)/Module" SkipUnchangedFiles="true" />
-
 		<Delete Files="$(DistZipPath)" TreatErrorsAsWarnings="true" />
 		<ZipDirectory SourceDirectory="$(PackageStageRoot)" DestinationFile="$(DistZipPath)" />
 		<Message Importance="high" Text="Zip: $(DistZipPath)" />
@@ -440,8 +429,8 @@
 	     ML build only — the UMM reference assembly would carry the wrong
 	     identity for a portable addon. -->
 	<!-- Flavour builds are excluded too: their reference assembly is named
-	     QuartzKeyViewer, and publishing it would silently break every module and
-	     addon that compiles against sdk/QuartzAddon.dll expecting "Quartz". -->
+	     QuartzKeyViewer, and publishing it would silently break every addon that
+	     compiles against sdk/QuartzAddon.dll expecting "Quartz". -->
 	<Target Name="PublishAddonSdk" AfterTargets="Build" Condition="'$(LoaderTarget)' != 'UMM' And '$(Flavor)' == 'Full' And Exists('$(TargetRefPath)')">
 		<MakeDir Directories="$(MSBuildProjectDirectory)/../sdk" />
 		<Copy SourceFiles="$(TargetRefPath)" DestinationFiles="$(MSBuildProjectDirectory)/../sdk/QuartzAddon.dll" SkipUnchangedFiles="true" />

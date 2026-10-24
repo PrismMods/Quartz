@@ -6,7 +6,7 @@ static class PathServiceTests {
         string root = Path.Combine(Path.GetTempPath(), "quartz-paths-" + Guid.NewGuid().ToString("N"));
         PathService paths = new(root);
         string[] all = [
-            paths.ConfigPath, paths.LangPath, paths.TempPath, paths.ModulePath, paths.FontPath,
+            paths.ConfigPath, paths.LangPath, paths.TempPath, paths.FontPath,
             paths.CustomFontPath, paths.AddonsPath, paths.TufPath, paths.TufLevelsPath, paths.UserResourcePath,
         ];
         string prefix = Path.GetFullPath(root) + Path.DirectorySeparatorChar;
@@ -24,7 +24,7 @@ static class PathServiceTests {
         try {
             paths.Initialize();
             foreach(string directory in new[] {
-                paths.RootPath, paths.LangPath, paths.TempPath, paths.ModulePath,
+                paths.RootPath, paths.LangPath, paths.TempPath,
                 paths.FontPath, paths.CustomFontPath, paths.AddonsPath, paths.TufLevelsPath,
             }) Assert(Directory.Exists(directory), $"{directory} created");
             Assert(!File.Exists(paths.ConfigPath), "Initialize never writes a settings file");

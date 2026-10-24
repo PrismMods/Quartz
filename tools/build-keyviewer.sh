@@ -2,9 +2,9 @@
 # Build the standalone Key Viewer mod.
 #
 # Same core as Quartz, built with -p:Flavor=KeyViewer: its own assembly name
-# (QuartzKeyViewer), its own data root (UserData/QuartzKeyViewer), the module
-# browser hidden, and only the key-viewer module set pre-installed under
-# Module/. It can sit beside a full Quartz install without sharing a file —
+# (QuartzKeyViewer), its own data root (UserData/QuartzKeyViewer), the feature
+# switches hidden, and only the key viewer (plus the overlay core it needs)
+# running. It can sit beside a full Quartz install without sharing a file —
 # and refuses to start if one is loaded, so there is never a double menu.
 #
 # Usage: tools/build-keyviewer.sh [Config] [ML|UMM|both]
@@ -25,18 +25,6 @@ INSTALL_ARGS=(-p:AutoInstall=false)
 if [[ "$AUTOINSTALL" == "1" ]]; then
     INSTALL_ARGS=(-p:AutoInstall=true)
 fi
-
-# Module projects compile against the generated sdk/QuartzAddon.dll, which is
-# deliberately not committed. Refresh it first so this script also works from a
-# clean checkout; never auto-install this full-core bootstrap build.
-echo ">> refreshing the Quartz module SDK ($CONFIG)..."
-dotnet build Quartz/Quartz.csproj -c "$CONFIG" -p:Flavor=Full -p:LoaderTarget=ML -p:AutoInstall=false
-
-# The key-viewer module project references KeyLimiter and Overlay, so this one
-# build produces all three .qmod files the flavour ships. The core's packaging
-# step reads them straight out of dist/modules.
-echo ">> building the key viewer module set ($CONFIG)..."
-dotnet build modules/KeyViewer/KeyViewer.csproj -c "$CONFIG"
 
 build_one() {
     echo ">> building QuartzKeyViewer ($CONFIG, LoaderTarget=$1)..."

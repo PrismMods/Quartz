@@ -1,8 +1,0 @@
-[
-  { "key": "overlay",   "title": "Overlay",   "titleKey": "OVERLAY",   "order": 10 },
-  { "key": "gameplay",  "title": "Gameplay",  "titleKey": "GAMEPLAY",  "order": 20 },
-  { "key": "visuals",   "title": "Visuals",   "titleKey": "VISUALS",   "order": 30 },
-  { "key": "tweaks",    "title": "Tweaks",    "titleKey": "TWEAKS",    "order": 40 },
-  { "key": "editor",    "title": "Editor",    "titleKey": "EDITOR",    "order": 50 },
-  { "key": "others",    "title": "Others",    "titleKey": "OTHERS",    "order": 75 }
-]

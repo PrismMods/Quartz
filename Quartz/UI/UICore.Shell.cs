@@ -26,6 +26,7 @@ public static partial class UICore {
     public const float MENU_WIDTH = 210f;
     // Collapsed rail width; the rail widens to MENU_WIDTH over the page on hover.
     public const float RAIL_WIDTH = 76f;
+    private const float POWER_HEIGHT = 60f;
     public const float SUBTAB_HEIGHT = 44f;
     public const float OUTLINE_WIDTH = 3f;
     // The border ring paints over the rail's left edge, so center on what stays visible.
@@ -133,8 +134,17 @@ public static partial class UICore {
             railExit.callback.AddListener(_ => SetRailExpanded(false));
             railTrigger.triggers.Add(railEnter);
             railTrigger.triggers.Add(railExit);
+            // The category list scrolls above the power button instead of running under it.
+            GameObject viewport = new("Viewport");
+            viewport.transform.SetParent(Menu, false);
+            RectTransform viewportRect = viewport.AddComponent<RectTransform>();
+            viewportRect.anchorMin = Vector2.zero;
+            viewportRect.anchorMax = Vector2.one;
+            viewportRect.offsetMin = new Vector2(0f, POWER_HEIGHT);
+            viewportRect.offsetMax = Vector2.zero;
+            viewport.AddComponent<RectMask2D>();
             GameObject content = new("Content");
-            content.transform.SetParent(Menu, false);
+            content.transform.SetParent(viewportRect, false);
             MenuContent = content.AddComponent<RectTransform>();
             MenuContent.anchorMin = new(0, 1);
             MenuContent.anchorMax = new(1, 1);
@@ -155,6 +165,13 @@ public static partial class UICore {
             };
             var fitter = content.AddComponent<ContentSizeFitter>();
             fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            ScrollRect railScroll = viewport.AddComponent<ScrollRect>();
+            railScroll.viewport = viewportRect;
+            railScroll.content = MenuContent;
+            railScroll.horizontal = false;
+            railScroll.movementType = ScrollRect.MovementType.Clamped;
+            railScroll.inertia = false;
+            railScroll.scrollSensitivity = 30f;
             MenuFactory.CreateMenu(MenuContent);
             GameObject power = new("Power");
             power.transform.SetParent(Menu, false);
@@ -163,7 +180,7 @@ public static partial class UICore {
             powerRect.anchorMax = new Vector2(1f, 0f);
             powerRect.offsetMin = Vector2.zero;
             powerRect.offsetMax = Vector2.zero;
-            powerRect.sizeDelta = new Vector2(0f, 60f);
+            powerRect.sizeDelta = new Vector2(0f, POWER_HEIGHT);
             powerRect.pivot = new Vector2(0.5f, 0f);
             powerBg = power.AddComponent<Image>();
             powerBg.color = PowerColor(MainCore.Conf.Active);

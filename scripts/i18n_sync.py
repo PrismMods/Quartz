@@ -33,11 +33,11 @@ job holding a cross-repo token. It only ever reads the i18n checkout as JSON dat
 and never executes anything from it.
 
 Lang/AprilFools is a SEPARATE NAMESPACE, not another root. It reuses the exact key
-names of the core file with different values, so unioning it in the way modules are
+names of the core file with different values, so unioning it in the way features are
 unioned would overwrite every real string with a joke one. Both workflows therefore
 run this script a second time over the directory pair
 Lang/AprilFools <-> i18n Lang/AprilFools. Nothing here special-cases it: roots()
-walks up four levels looking for modules/*/Lang, finds nothing from inside
+walks up four levels looking for Quartz/Features/*/Lang, finds nothing from inside
 Export/Lang/AprilFools, and so the run covers that one directory with the ownership
 rules unchanged. If a second overlay namespace is ever added, give it its own pair
 too — never add it to roots().
@@ -46,23 +46,23 @@ import sys, os, json, glob, shutil
 
 OWNED_HERE = {"en-US", "ko-KR"}
 
-# Every feature now ships as a module with its own Lang/ directory, so this repo has
-# many authoring roots (core + modules/*/Lang) while quartz-i18n stays ONE file per
+# Every built-in feature keeps its own Lang/ directory, so this repo has
+# many authoring roots (core + Quartz/Features/*/Lang) while quartz-i18n stays ONE file per
 # language. That asymmetry is deliberate: translators should not have to open 27
 # files, and at runtime every block merges into one dictionary anyway.
 #
 #   push  unions all roots into the single i18n file.
 #   pull  routes each translated key BACK to the root whose en-US declares it, so a
-#         module keeps its own translations and the core file does not swallow them.
+#         feature keeps its own translations and the core file does not swallow them.
 #         A key no root claims is dropped with a warning — it is dead, or it belongs
-#         to a module this checkout does not have.
+#         to a feature this checkout does not have.
 
 
 def roots(core_lang_dir):
-    """The core Lang dir first (it owns key order), then every module Lang dir."""
+    """The core Lang dir first (it owns key order), then every feature Lang dir."""
     found = [core_lang_dir]
     repo = os.path.abspath(os.path.join(core_lang_dir, "..", "..", "..", ".."))
-    for d in sorted(glob.glob(os.path.join(repo, "modules", "*", "Lang"))):
+    for d in sorted(glob.glob(os.path.join(repo, "Quartz", "Features", "*", "Lang"))):
         if os.path.isdir(d):
             found.append(d)
     return found
@@ -70,7 +70,7 @@ def roots(core_lang_dir):
 
 def owner_map(all_roots):
     """key -> root that declares it in en-US. First declaration wins; a duplicate key
-    across two modules would otherwise ping-pong between them on every pull."""
+    across two features would otherwise ping-pong between them on every pull."""
     owners = {}
     for root in all_roots:
         en = os.path.join(root, "en-US.json")
@@ -114,8 +114,8 @@ def main():
     # guard reads OWNED_HERE too, instead of a second hardcoded list that could
     # silently drift out of step with it.
     if len(sys.argv) == 4 and sys.argv[1] == "merged-ref":
-        # The i18n side holds ONE file per language covering core + every module, so
-        # validating it against core's en-US alone would report every module key as
+        # The i18n side holds ONE file per language covering core + every feature, so
+        # validating it against core's en-US alone would report every feature key as
         # dead. This writes the union en-US that the i18n side is measured against.
         all_roots = roots(sys.argv[2])
         merged = {}
@@ -144,7 +144,7 @@ def main():
         if os.path.exists(en):
             ref_keys.extend(k for k in load(en)[1] if k not in ref_keys)
     if len(all_roots) > 1:
-        print(f"lang roots: core + {len(all_roots) - 1} module(s)")
+        print(f"lang roots: core + {len(all_roots) - 1} feature(s)")
 
     if direction == "push":
         return push_all(all_roots, dst_dir, ref_keys)
@@ -216,7 +216,7 @@ def pull_all(src_dir, all_roots, ref_keys):
         lang, block = load(src)
         homeless = [k for k in block if k not in owners and k != "0KTL"]
         if homeless:
-            print(f"{base}: {len(homeless)} key(s) match no module here, left out: {homeless[:10]}")
+            print(f"{base}: {len(homeless)} key(s) match no feature here, left out: {homeless[:10]}")
         for root in all_roots:
             share = {k: v for k, v in block.items() if owners.get(k) == root}
             if not share and root != all_roots[0]:
