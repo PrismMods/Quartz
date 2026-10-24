@@ -59,6 +59,7 @@ public sealed partial class UIColorPicker : UIObject {
     private Color? pendingHexColor;
     private bool hsvMode;
     public bool HsvMode => hsvMode;
+    private float handleLayoutSize = -1f;
     private DragTarget dragTarget;
     private GTween popupTween, validationTween;
     private enum DragTarget { None, Hue, Triangle }
@@ -148,7 +149,14 @@ public sealed partial class UIColorPicker : UIObject {
     }
     public void ToggleExpanded() => SetExpanded(!Expanded);
     public override void Tick() {
-        if(!IsDisposed && Expanded) PositionPopup();
+        if(IsDisposed || !Expanded) return;
+        PositionPopup();
+        // A picker reopened right after a rebuild expands before layout; re-place once the wheel has its size.
+        float size = Mathf.Min(wheelRect.rect.width, wheelRect.rect.height);
+        if(!Mathf.Approximately(size, handleLayoutSize)) {
+            handleLayoutSize = size;
+            UpdateHandles();
+        }
     }
     public void SetExpanded(bool expanded, bool noAnimate = false) {
         if(IsDisposed) return;
