@@ -21,6 +21,7 @@ public sealed partial class UIColorPicker : UIObject {
     public TextMeshProUGUI Label { get; }
     public Color Value { get; private set; }
     public bool Expanded { get; private set; }
+    public Action<bool> OnExpandedChanged { get; set; }
     private readonly RectTransform canvasRect;
     private readonly RectTransform popupRect;
     private readonly GameObject popup;
@@ -151,7 +152,9 @@ public sealed partial class UIColorPicker : UIObject {
     public void SetExpanded(bool expanded, bool noAnimate = false) {
         if(IsDisposed) return;
         popupTween?.Kill();
+        bool changed = Expanded != expanded;
         Expanded = expanded;
+        if(changed) OnExpandedChanged?.Invoke(expanded);
         if(expanded) {
             PositionPopup();
             popup.SetActive(true);
@@ -279,7 +282,7 @@ public sealed partial class UIColorPicker : UIObject {
             ];
         for(int i = 0; i < sliders.Length; i++) {
             sliders[i].Label.text = labels[i];
-            sliders[i].FillImage.color = colors[i];
+            sliders[i].SetAccent(colors[i]);
             sliders[i].SetDefaultValue(defaults[i], true);
         }
         UpdateSliderValues();
@@ -416,7 +419,7 @@ public sealed partial class UIColorPicker : UIObject {
             ? [hue, saturation, brightness, Value.a]
             : [Value.r, Value.g, Value.b, Value.a];
         for(int i = 0; i < sliders.Length; i++) sliders[i].Set(values[i], false);
-        if(hsvMode && sliders.Length > 0) sliders[0].FillImage.color = Color.HSVToRGB(hue, 1f, 1f);
+        if(hsvMode && sliders.Length > 0) sliders[0].SetAccent(Color.HSVToRGB(hue, 1f, 1f));
     }
     private void SetHexText() {
         suppressHex = true;

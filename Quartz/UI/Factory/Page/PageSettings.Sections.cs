@@ -264,12 +264,13 @@ internal static partial class PageSettings {
         );
         var opacityTr = opacity.Label.gameObject.AddComponent<TextLocalization>().Init("WINDOW_OPACITY", "Window Opacity");
         var accentRow = GenerateUI.Row(content.transform);
-        UIColorPicker accentPicker = GenerateUI.ColorPicker(
+        UIColorPicker accentPicker = null;
+        accentPicker = GenerateUI.ColorPicker(
             accentRow,
             new Color(1f, 0.6f, 0.6f, 1f),
             MainCore.Conf.GetAccentColor(),
             c => UICore.SetAccentColor(c, false),
-            c => UICore.SetAccentColor(c, true),
+            c => UICore.SetAccentColor(c, true, rebuild: accentPicker == null || !accentPicker.Expanded),
             "Accent Color",
             "accent_color",
             false
@@ -278,6 +279,9 @@ internal static partial class PageSettings {
             "DESC_ACCENT_COLOR",
             "Recolors the whole Quartz UI. Middle-click to reset."
         );
+        accentPicker.OnExpandedChanged = open => {
+            if(!open) UICore.FlushAccentRebuild();
+        };
         var accentTr = accentPicker.Label.gameObject.AddComponent<TextLocalization>().Init("ACCENT_COLOR", "Accent Color");
     }
 }

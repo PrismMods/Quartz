@@ -194,7 +194,9 @@ public static partial class GenerateUI {
             );
             sliders[i].Format = "F2";
             sliders[i].Rect.offsetMax = Vector2.zero;
-            sliders[i].FillImage.color = colors[i];
+            // Channel colours are fixed: keep them through expression commits and accent repaints.
+            sliders[i].SetAccent(colors[i]);
+            sliders[i].FillImage.gameObject.AddComponent<ThemeExempt>();
             sliders[i].Label.fontSize = 18f;
         }
         Image sharedOutline = AddOutlineHover(header.gameObject, header.gameObject.AddComponent<EventTrigger>());

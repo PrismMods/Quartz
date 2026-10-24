@@ -22,7 +22,7 @@ internal sealed class KvPopup : MonoBehaviour {
     private Action onClosed;
     internal static void Show(
         RectTransform host, RectTransform anchor, IReadOnlyList<(string Key, string Text)> items,
-        Action<int> onPick, Action onClosed = null
+        Action<int> onPick, Action onClosed = null, int danger = -1
     ) {
         bool sameAnchor = open != null && open.transform.parent == host && ReferenceEquals(open.Anchor, anchor);
         CloseAny();
@@ -48,7 +48,7 @@ internal sealed class KvPopup : MonoBehaviour {
         catcherRect.offsetMax = Vector2.zero;
         catcher.AddComponent<EmptyGraphic>().raycastTarget = true;
         GenerateUI.AddButton(catcher, _ => CloseAny(), false);
-        RectTransform tray = BuildTray(rect, items, onPick);
+        RectTransform tray = BuildTray(rect, items, onPick, danger);
         Place(tray, anchor, rect);
         AnimateIn(tray);
         open = popup;
@@ -66,7 +66,7 @@ internal sealed class KvPopup : MonoBehaviour {
         if(open == this) open = null;
     }
     private static RectTransform BuildTray(
-        RectTransform parent, IReadOnlyList<(string Key, string Text)> items, Action<int> onPick
+        RectTransform parent, IReadOnlyList<(string Key, string Text)> items, Action<int> onPick, int danger
     ) {
         GameObject obj = new("Tray");
         obj.transform.SetParent(parent, false);
@@ -91,18 +91,23 @@ internal sealed class KvPopup : MonoBehaviour {
             Item(rect, items[i].Key, items[i].Text, () => {
                 CloseAny();
                 onPick?.Invoke(index);
-            });
+            }, i == danger);
         }
         return rect;
     }
-    private static void Item(RectTransform tray, string key, string text, Action onClick) {
+    // on-danger: the dark label the design system puts on danger fills.
+    private static readonly Color OnDanger = new(0.122f, 0.051f, 0.024f, 1f);
+    private static void Item(RectTransform tray, string key, string text, Action onClick, bool danger) {
+        // A destructive pick is a solid danger fill, so it never passes for a plain menu row.
+        Color rest = danger ? UIColors.SoftRed : KvPalette.ButtonPrimary;
+        Color hover = danger ? Color.Lerp(UIColors.SoftRed, Color.white, 0.2f) : KvPalette.ButtonHover;
         GameObject obj = new("Item");
         obj.transform.SetParent(tray, false);
         RectTransform rect = obj.AddComponent<RectTransform>();
         Image bg = obj.AddComponent<Image>();
         bg.sprite = MainCore.Spr.GetFilled(KvPalette.Radius);
         bg.type = Image.Type.Sliced;
-        bg.color = KvPalette.ButtonPrimary;
+        bg.color = rest;
         LayoutElement le = obj.AddComponent<LayoutElement>();
         le.minHeight = ItemHeight;
         le.preferredHeight = ItemHeight;
@@ -110,7 +115,8 @@ internal sealed class KvPopup : MonoBehaviour {
         TextMeshProUGUI label = GenerateUI.AddText(rect, true);
         label.fontSize = LabelSize;
         label.text = text;
-        label.color = KvPalette.TextDim;
+        label.color = danger ? OnDanger : KvPalette.TextDim;
+        if(danger) label.fontStyle = FontStyles.Bold;
         label.alignment = TextAlignmentOptions.Center;
         TextCompat.NoWrap(label);
         label.raycastTarget = false;
@@ -119,8 +125,8 @@ internal sealed class KvPopup : MonoBehaviour {
             if(btn == InputButton.Left) onClick();
         }, false);
         EventTrigger trigger = obj.GetComponent<EventTrigger>() ?? obj.AddComponent<EventTrigger>();
-        UnityUtils.AddEvent(EventTriggerType.PointerEnter, _ => bg.color = KvPalette.ButtonHover, trigger);
-        UnityUtils.AddEvent(EventTriggerType.PointerExit, _ => bg.color = KvPalette.ButtonPrimary, trigger);
+        UnityUtils.AddEvent(EventTriggerType.PointerEnter, _ => bg.color = hover, trigger);
+        UnityUtils.AddEvent(EventTriggerType.PointerExit, _ => bg.color = rest, trigger);
     }
     private static void AnimateIn(RectTransform tray) {
         CanvasGroup cg = tray.GetComponent<CanvasGroup>() ?? tray.gameObject.AddComponent<CanvasGroup>();

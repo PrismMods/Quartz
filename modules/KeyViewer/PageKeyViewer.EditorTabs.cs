@@ -123,7 +123,8 @@ internal static partial class PageKeyViewer {
         delete.OnClick = () => KvPopup.Show(
             host, delete.Rect,
             [("KEYVIEWER_EDITOR_TAB_DELETE_CONFIRM", "Delete this tab")],
-            _ => Delete(KvStore.Current.SelectedTab)
+            _ => Delete(KvStore.Current.SelectedTab),
+            danger: 0
         );
         Danger(delete);
         UIButton footAdd = KvToolbar.Icon(
@@ -146,7 +147,8 @@ internal static partial class PageKeyViewer {
             index => {
                 if(index == 0) HideFoot();
                 else Delete(FootTarget());
-            }
+            },
+            danger: 1
         );
         Danger(footDelete);
         Refresh();

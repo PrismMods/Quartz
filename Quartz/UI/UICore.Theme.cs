@@ -21,15 +21,24 @@ using GTweenExtensions = GTweens.Extensions.GTweenExtensions;
 using TMPro;
 namespace Quartz.UI;
 public static partial class UICore {
-    public static void SetAccentColor(Color accent, bool save) {
+    private static bool accentRebuildPending;
+    // rebuild = false while the picker is open: a rebuild would destroy it mid-edit, so the
+    // full repaint waits for FlushAccentRebuild when it closes.
+    public static void SetAccentColor(Color accent, bool save, bool rebuild = true) {
         UIColors.Palette previous = UIColors.Current;
         MainCore.Conf.SetAccentColor(accent);
         UIColors.ApplyAccent(MainCore.Conf.GetAccentColor());
         RefreshTheme(previous);
         if(save) {
             MainCore.ConfMgr.Save();
-            MainThread.Enqueue(Rebuild);
+            accentRebuildPending = true;
+            if(rebuild) FlushAccentRebuild();
         }
+    }
+    public static void FlushAccentRebuild() {
+        if(!accentRebuildPending) return;
+        accentRebuildPending = false;
+        MainThread.Enqueue(Rebuild);
     }
     private static List<Image> themeImages;
     private static List<TMP_Text> themeTexts;
