@@ -20,6 +20,8 @@ using GTweenExtensions = GTweens.Extensions.GTweenExtensions;
 using TMPro;
 namespace Quartz.UI.Factory.Page;
 internal static partial class PageSettings {
+    private static bool reopenAccentPicker;
+    private static bool reopenAccentHsv;
     private static void CreateLanguageSection(RectTransform content, CoreSettings defSet) {
         var langLabelRow = GenerateUI.Row(content.transform);
         var langText = GenerateUI.AddTextH1(langLabelRow);
@@ -270,7 +272,12 @@ internal static partial class PageSettings {
             new Color(1f, 0.6f, 0.6f, 1f),
             MainCore.Conf.GetAccentColor(),
             c => UICore.SetAccentColor(c, false),
-            c => UICore.SetAccentColor(c, true, rebuild: accentPicker == null || !accentPicker.Expanded),
+            c => {
+                // The save rebuilds the UI, which would close the picker mid-edit: reopen it after.
+                reopenAccentPicker = accentPicker != null && accentPicker.Expanded;
+                reopenAccentHsv = accentPicker != null && accentPicker.HsvMode;
+                UICore.SetAccentColor(c, true);
+            },
             "Accent Color",
             "accent_color",
             false
@@ -279,9 +286,11 @@ internal static partial class PageSettings {
             "DESC_ACCENT_COLOR",
             "Recolors the whole Quartz UI. Middle-click to reset."
         );
-        accentPicker.OnExpandedChanged = open => {
-            if(!open) UICore.FlushAccentRebuild();
-        };
+        if(reopenAccentPicker) {
+            reopenAccentPicker = false;
+            accentPicker.SetMode(reopenAccentHsv);
+            accentPicker.SetExpanded(true, true);
+        }
         var accentTr = accentPicker.Label.gameObject.AddComponent<TextLocalization>().Init("ACCENT_COLOR", "Accent Color");
     }
 }

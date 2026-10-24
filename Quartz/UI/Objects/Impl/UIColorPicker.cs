@@ -58,6 +58,7 @@ public sealed partial class UIColorPicker : UIObject {
     private bool suppressHex;
     private Color? pendingHexColor;
     private bool hsvMode;
+    public bool HsvMode => hsvMode;
     private DragTarget dragTarget;
     private GTween popupTween, validationTween;
     private enum DragTarget { None, Hue, Triangle }
