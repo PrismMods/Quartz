@@ -1,15 +1,13 @@
 using Quartz.Core;
 using UnityEngine;
 namespace Quartz.UI.Utility;
-// Wheel scroll for an overflowing strip or column; polls input so child EventTriggers cannot swallow it.
+// Horizontal wheel scroll for overflowing strips; polls input so child EventTriggers cannot swallow it.
 public sealed class StripWheel : MonoBehaviour {
     private RectTransform viewport, content;
     private bool captured;
-    private bool vertical;
-    public void Init(RectTransform viewport, RectTransform content, bool vertical = false) {
+    public void Init(RectTransform viewport, RectTransform content) {
         this.viewport = viewport;
         this.content = content;
-        this.vertical = vertical;
     }
     private void OnDestroy() => SetCaptured(false);
     private void SetCaptured(bool value) {
@@ -20,22 +18,15 @@ public sealed class StripWheel : MonoBehaviour {
     }
     private void Update() {
         if(viewport == null || content == null) return;
-        float overflow = vertical
-            ? content.rect.height - viewport.rect.height
-            : content.rect.width - viewport.rect.width;
+        float overflow = content.rect.width - viewport.rect.width;
         SetCaptured(overflow > 0.5f);
-        if(overflow <= 0f) {
-            if(vertical && content.anchoredPosition.y != 0f) content.anchoredPosition = new Vector2(content.anchoredPosition.x, 0f);
-            return;
-        }
+        if(overflow <= 0f) return;
         Vector2 wheel = Input.mouseScrollDelta;
         float delta = wheel.y + wheel.x;
         if(Mathf.Abs(delta) <= 0.0001f) return;
         if(!RectTransformUtility.RectangleContainsScreenPoint(viewport, Input.mousePosition, null)) return;
         Vector2 pos = content.anchoredPosition;
-        // A top-anchored column moves up (positive y) as the wheel rolls down.
-        if(vertical) pos.y = Mathf.Clamp(pos.y - wheel.y * MainCore.Conf.ScrollSpeed, 0f, overflow);
-        else pos.x = Mathf.Clamp(pos.x + delta * MainCore.Conf.ScrollSpeed, -overflow, 0f);
+        pos.x = Mathf.Clamp(pos.x + delta * MainCore.Conf.ScrollSpeed, -overflow, 0f);
         content.anchoredPosition = pos;
     }
 }

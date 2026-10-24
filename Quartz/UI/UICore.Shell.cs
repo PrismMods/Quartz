@@ -165,7 +165,8 @@ public static partial class UICore {
             };
             var fitter = content.AddComponent<ContentSizeFitter>();
             fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            viewport.AddComponent<StripWheel>().Init(viewportRect, MenuContent, vertical: true);
+            // Same wheel and right-drag scrolling as every page.
+            viewport.AddComponent<UIScrollController>().SetContent(MenuContent, viewportRect);
             MenuFactory.CreateMenu(MenuContent);
             GameObject power = new("Power");
             power.transform.SetParent(Menu, false);
