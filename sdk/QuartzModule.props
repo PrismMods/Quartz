@@ -106,19 +106,26 @@
          The module folder is <data root>/Module, and the data root differs per
          loader: MelonLoader keeps it at <game>/UserData/Quartz, UnityModManager
          at <mods>/Quartz/UserData. Deploy to whichever install(s) exist —
-         targeting only one silently drops the files somewhere nothing reads. -->
-    <MakeDir Condition="'$(DeployToGame)' == 'true' And Exists('$(MlModuleDir)/..')"
-             Directories="$(MlModuleDir)" />
-    <Copy Condition="'$(DeployToGame)' == 'true' And Exists('$(MlModuleDir)')"
+         targeting only one silently drops the files somewhere nothing reads.
+
+         Only modules already installed there are overwritten: the core adopts any
+         unknown .qmod as a manual install and enables it, so deploying every module
+         would switch on ones the user never chose. Install a new module through the
+         in-game store, or copy it from dist/modules once; later builds keep it current. -->
+    <PropertyGroup>
+      <_MlModuleInstalled>$([System.IO.File]::Exists('$(MlModuleDir)/$(ModuleId)$(ModuleExtension)'))</_MlModuleInstalled>
+      <_UmmModuleInstalled>$([System.IO.File]::Exists('$(UmmModuleDir)/$(ModuleId)$(ModuleExtension)'))</_UmmModuleInstalled>
+    </PropertyGroup>
+    <Copy Condition="'$(DeployToGame)' == 'true' And '$(_MlModuleInstalled)' == 'True'"
           SourceFiles="@(_QuartzModuleArtifacts)" DestinationFolder="$(MlModuleDir)" />
-    <Message Condition="'$(DeployToGame)' == 'true' And Exists('$(MlModuleDir)')"
+    <Message Condition="'$(DeployToGame)' == 'true' And '$(_MlModuleInstalled)' == 'True'"
              Importance="high" Text="Deployed (MelonLoader): $(MlModuleDir)/$(ModuleId)$(ModuleExtension)" />
-    <MakeDir Condition="'$(DeployToGame)' == 'true' And Exists('$(UmmModuleDir)/..')"
-             Directories="$(UmmModuleDir)" />
-    <Copy Condition="'$(DeployToGame)' == 'true' And Exists('$(UmmModuleDir)')"
+    <Copy Condition="'$(DeployToGame)' == 'true' And '$(_UmmModuleInstalled)' == 'True'"
           SourceFiles="@(_QuartzModuleArtifacts)" DestinationFolder="$(UmmModuleDir)" />
-    <Message Condition="'$(DeployToGame)' == 'true' And Exists('$(UmmModuleDir)')"
+    <Message Condition="'$(DeployToGame)' == 'true' And '$(_UmmModuleInstalled)' == 'True'"
              Importance="high" Text="Deployed (UnityModManager): $(UmmModuleDir)/$(ModuleId)$(ModuleExtension)" />
+    <Message Condition="'$(DeployToGame)' == 'true' And '$(_MlModuleInstalled)' != 'True' And '$(_UmmModuleInstalled)' != 'True' And (Exists('$(MlModuleDir)') Or Exists('$(UmmModuleDir)'))"
+             Importance="high" Text="Skipped deploy: '$(ModuleId)' is not installed in the game" />
     <Warning Condition="'$(DeployToGame)' == 'true' And !Exists('$(MlModuleDir)') And !Exists('$(UmmModuleDir)')"
              Text="DeployToGame was set but no Quartz install was found (looked for '$(MlModuleDir)' and '$(UmmModuleDir)'). Run the mod once so it creates its data folder." />
   </Target>

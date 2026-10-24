@@ -46,6 +46,9 @@ resolve_gamedata() {
     if [[ -d "$gp/A Dance of Fire and Ice_Data/Managed" ]]; then
         echo "A Dance of Fire and Ice_Data"; return
     fi
+    if [[ -d "$gp/ADanceOfFireAndIce_Data/Managed" ]]; then  # Linux native
+        echo "ADanceOfFireAndIce_Data"; return
+    fi
     return 1
 }
 
@@ -109,6 +112,8 @@ esac
 # same pass: a core that has shed a feature, running next to a game folder that
 # still lacks that feature's module, simply loses the feature — and a STALE core
 # beside fresh modules double-registers its pages. Keep the two in lockstep.
+# Only modules already installed in the game are overwritten (see QuartzModule.props);
+# a shed feature reaches the game through Module.bundled, refreshed below.
 echo ">> building modules ($CONFIG)..."
 dotnet build modules/AllModules.proj -c "$CONFIG" -p:DeployToGame=true
 

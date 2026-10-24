@@ -12,7 +12,7 @@
 
             Linux (Steam):
               GamePath = ~/.local/share/Steam/steamapps/common/A Dance of Fire and Ice
-              GameData = A Dance of Fire and Ice_Data
+              GameData = ADanceOfFireAndIce_Data  (native build; A Dance of Fire and Ice_Data under Proton)
         -->
         <GamePath>/path/to/A Dance of Fire and Ice</GamePath>
         <GameData>A Dance of Fire and Ice_Data</GameData>
