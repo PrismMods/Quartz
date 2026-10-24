@@ -39,6 +39,7 @@ public static partial class PanelsOverlay {
         private bool lastShow;
         private bool lastReorganizing;
         private void Update() {
+            updaterRan = true;
             bool isReorganizing = UICore.IsReorganizing;
             bool show = ShouldShow();
             if(raycaster != null && raycaster.enabled != isReorganizing) raycaster.enabled = isReorganizing;

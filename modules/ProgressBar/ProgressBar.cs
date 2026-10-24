@@ -23,12 +23,14 @@ public static class ProgressBarOverlay {
     private static Updater updater;
     private static bool ShouldShow() => OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame;
     private static bool gateWant;
+    // Roots are built visible; keep the updater alive until it has run once and hidden them.
+    private static bool updaterRan;
     private static bool gateRunning = true;
     internal static void Gate() {
         if(updater == null) return;
         bool want = ShouldShow() || UICore.IsReorganizing;
         bool run = want || gateWant;
-        gateWant = want;
+        gateWant = want || !updaterRan;
         if(gateRunning == run) return;
         gateRunning = run;
         updater.enabled = run;
@@ -98,6 +100,7 @@ public static class ProgressBarOverlay {
         drag.SetActive(false);
         updater = canvasObj.AddComponent<Updater>();
         gateWant = true;
+        updaterRan = false;
         gateRunning = true;
         Apply();
     }
@@ -192,6 +195,7 @@ public static class ProgressBarOverlay {
         private float lastFillW = float.NaN;
         private float lastGradientNow = float.NaN;
         private void Update() {
+            updaterRan = true;
             if(bar == null) return;
             bool show = ShouldShow();
             if(bar.gameObject.activeSelf != show) bar.gameObject.SetActive(show);

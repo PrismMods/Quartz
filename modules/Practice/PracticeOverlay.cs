@@ -23,6 +23,8 @@ public static class PracticeOverlay {
         (OverlaySwitch.Enabled && Conf.Enabled && Conf.ShowIndicator
             && (!Conf.IndicatorOnlyInGame || GameStats.InGame)) || UICore.IsReorganizing;
     private static bool gateWant;
+    // Roots are built visible; keep the updater alive until it has run once and hidden them.
+    private static bool updaterRan;
     private static bool gateRunning = true;
     internal static void Gate() {
         if(updater == null) return;
@@ -30,7 +32,7 @@ public static class PracticeOverlay {
         PracticeDifficulty.FlushPendingDifficulty();
         bool want = ShouldShow() || UICore.IsReorganizing;
         bool run = want || gateWant;
-        gateWant = want;
+        gateWant = want || !updaterRan;
         if(gateRunning == run) return;
         gateRunning = run;
         updater.enabled = run;
@@ -67,6 +69,7 @@ public static class PracticeOverlay {
         );
         updater = canvasObj.AddComponent<Updater>();
         gateWant = true;
+        updaterRan = false;
         gateRunning = true;
         Apply();
     }
@@ -124,6 +127,7 @@ public static class PracticeOverlay {
         }
         private void OnTranslationsLoaded(TranslationFailState state) => bodyValid = false;
         private void Update() {
+            updaterRan = true;
             if(root == null || text == null) return;
             bool isReorganizing = UICore.IsReorganizing;
             bool show = ShouldShow();
