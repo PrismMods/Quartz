@@ -62,7 +62,7 @@ public static partial class UICore {
         textRect.offsetMax = Vector2.zero;
         var label = textObj.AddComponent<TextMeshProUGUI>();
         label.text = "Exit Reorganize";
-        label.font = FontManager.Current;
+        label.font = FontManager.MenuFontAsset;
         label.fontSize = 24f;
         label.color = Color.white;
         label.alignment = TextAlignmentOptions.Center;

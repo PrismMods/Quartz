@@ -120,7 +120,7 @@ public static class QuizOverlay {
             rect.offsetMin = new(-2f, -2f);
             rect.offsetMax = new(2f, 2f);
             Image img = border.AddComponent<Image>();
-            img.sprite = MainCore.Spr.GetRing(14.5f, 3f);
+            img.sprite = MainCore.Spr.GetRing(14f, 3f);
             img.type = Image.Type.Sliced;
             img.color = UIColors.ObjectActive;
             img.raycastTarget = false;

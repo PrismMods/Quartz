@@ -62,11 +62,11 @@ public static partial class GenerateUI {
         rect.anchorMin = new Vector2(0f, 1f);
         rect.anchorMax = new Vector2(0f, 1f);
         rect.pivot = new Vector2(0f, 1f);
-        rect.anchoredPosition = new Vector2(6f, -6f);
-        rect.sizeDelta = new Vector2(8f, 8f);
+        rect.anchoredPosition = new Vector2(3f, -3f);
+        rect.sizeDelta = new Vector2(6f, 6f);
         Image img = obj.AddComponent<Image>();
         img.sprite = MainCore.Spr.Get(UISprite.Circle256);
-        Color c = UIColors.ObjectActive;
+        Color c = UIColors.ObjectInactive;
         c.a = 0f;
         img.color = c;
         return obj;

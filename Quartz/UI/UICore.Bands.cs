@@ -80,7 +80,7 @@ public static partial class UICore {
         bandHairlineRect.sizeDelta = new(0f, OUTLINE_WIDTH);
         bandHairlineRect.anchoredPosition = Vector2.zero;
         Image bandHairlineImg = bandHairline.AddComponent<Image>();
-        bandHairlineImg.color = Color.white;
+        bandHairlineImg.color = UIColors.Border;
         bandHairlineImg.raycastTarget = false;
         GameObject content = new("Content");
         content.transform.SetParent(band.transform, false);

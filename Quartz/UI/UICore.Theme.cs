@@ -32,6 +32,7 @@ public static partial class UICore {
         }
     }
     private static List<Image> themeImages;
+    private static List<TMP_Text> themeTexts;
     private static void RefreshTheme(UIColors.Palette previous) {
         if(canvasObj != null) {
             if(themeImages == null) {
@@ -49,8 +50,23 @@ public static partial class UICore {
                 if(img == null) continue;
                 img.color = RemapThemeColor(img.color, previous);
             }
+            // Accent-coloured text follows a live accent change too, not only on rebuild.
+            if(themeTexts == null) {
+                themeTexts = [];
+                TMP_Text[] texts = canvasObj.GetComponentsInChildren<TMP_Text>(true);
+                for(int i = 0; i < texts.Length; i++) {
+                    if(texts[i] == null || IsThemeExempt(texts[i].transform)) continue;
+                    themeTexts.Add(texts[i]);
+                }
+            }
+            for(int i = 0; i < themeTexts.Count; i++) {
+                TMP_Text text = themeTexts[i];
+                if(text == null) continue;
+                text.color = RemapThemeColor(text.color, previous);
+            }
         }
         MenuFactory.RefreshTheme();
+        QuartzLogo.Refresh();
     }
     private static bool IsThemeExempt(Transform t) {
         for(; t != null; t = t.parent)
@@ -60,6 +76,7 @@ public static partial class UICore {
     private static Color RemapThemeColor(Color color, UIColors.Palette previous) {
         Color next;
         if(TryRemapRgb(color, previous.ObjectActive, UIColors.ObjectActive, out next)) return next;
+        if(TryRemapRgb(color, previous.TextSecondary, UIColors.TextSecondary, out next)) return next;
         if(TryRemapRgb(color, previous.ObjectActiveBright, UIColors.ObjectActiveBright, out next)) return next;
         if(TryRemapRgb(color, previous.ObjectActiveLightBright, UIColors.ObjectActiveLightBright, out next)) return next;
         if(TryRemapRgb(color, previous.ObjectButton, UIColors.ObjectButton, out next)) return next;

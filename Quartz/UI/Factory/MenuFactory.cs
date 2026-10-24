@@ -109,7 +109,7 @@ public static class MenuFactory {
         bgRect.offsetMin = new(UICore.RailIconCenter - 24f, 3f);
         bgRect.offsetMax = new(UICore.RailIconCenter + 24f - UICore.RAIL_WIDTH, -3f);
         Image bg = bgObj.AddComponent<Image>();
-        bg.sprite = MainCore.Spr.GetFilled(10f);
+        bg.sprite = MainCore.Spr.GetFilled(8f);
         bg.type = Image.Type.Sliced;
         bg.color = UIColors.MenuNormal;
         GameObject iconObj = new("Icon");
@@ -132,7 +132,7 @@ public static class MenuFactory {
         textRect.offsetMax = Vector2.zero;
         TMP_Text label = textObj.AddComponent<TextMeshProUGUI>();
         label.text = name;
-        label.font = FontManager.Current;
+        label.font = FontManager.MenuFontAsset;
         label.fontSize = 18;
         label.color = Color.white;
         label.alignment = TextAlignmentOptions.Left;
@@ -190,7 +190,7 @@ public static class MenuFactory {
         textObj.AddComponent<RectTransform>();
         TMP_Text label = textObj.AddComponent<TextMeshProUGUI>();
         label.text = title;
-        label.font = FontManager.Current;
+        label.font = FontManager.MenuFontAsset;
         label.fontSize = 16;
         label.color = Color.white;
         label.alignment = TextAlignmentOptions.Center;
@@ -230,21 +230,8 @@ public static class MenuFactory {
     }
     private static void WireItemInteractions(MenuItem menuItem, GameObject item, Image bg) {
         var trigger = item.AddComponent<EventTrigger>();
-        void Add(EventTriggerType type, Action cb) {
-            var e = new EventTrigger.Entry { eventID = type };
-            e.callback.AddListener(_ => cb());
-            trigger.triggers.Add(e);
-        }
-        void HoverFade(EventTriggerType type, Func<Color> color, float duration) => Add(type, () => {
-            if(IsSelected(menuItem, UICore.CurrentMenuState)) return;
-            menuItem.hoverSeq?.Kill();
-            menuItem.hoverSeq = GTweenSequenceBuilder.New()
-                .Append(bg.GTColor(color(), duration).SetEasing(Easing.OutSine))
-                .Build();
-            MainCore.TC.Play(menuItem.hoverSeq);
-        });
-        HoverFade(EventTriggerType.PointerEnter, static () => UIColors.MenuHover, 0.2f);
-        HoverFade(EventTriggerType.PointerExit, static () => UIColors.MenuNormal, 0.25f);
+        // Nav links hover with the accent ring, not a fill.
+        GenerateUI.AddOutlineHover(bg.gameObject, trigger);
         UnityUtils.AddClickEvent(trigger, _ => {
             if(IsSelected(menuItem, UICore.CurrentMenuState)) return;
             SetState(menuItem.isCategory ? LastChildState(menuItem) : menuItem.state);
@@ -264,22 +251,29 @@ public static class MenuFactory {
         if(cat != null) lastChildForCategory[cat] = NavRegistry.KeyFor(to);
         RefreshSubMenu(cat, animate: true);
         PageSwicher.SwitchPage(from, to);
-        ApplyState(to);
+        ApplyState(to, from: from);
         OnStateChanged?.Invoke(to);
     }
     private static bool IsSelected(MenuItem it, int currentState) =>
         it.isCategory ? CategoryFor(currentState) == it.categoryKey : it.state == currentState;
-    private static void ApplyState(int id, bool noAnimate = false) {
-        ApplyStateList(items, id, noAnimate);
-        ApplyStateList(subItems, id, noAnimate);
+    private static void ApplyState(int id, bool noAnimate = false, int from = -1) {
+        ApplyStateList(items, id, noAnimate, from);
+        ApplyStateList(subItems, id, noAnimate, from);
     }
-    private static void ApplyStateList(List<MenuItem> list, int id, bool noAnimate) {
+    private static void ApplyStateList(List<MenuItem> list, int id, bool noAnimate, int from) {
         for(int i = 0; i < list.Count; i++) {
             var it = list[i];
             it.hoverSeq?.Kill();
             bool selected = IsSelected(it, id);
+            if(it.label != null) {
+                // Keep alpha: the collapsed rail hides its labels through it.
+                Color c = selected ? Color.white : UIColors.TextSecondary;
+                c.a = it.label.color.a;
+                it.label.color = c;
+            }
             if(selected) {
-                if(noAnimate) {
+                // Only a newly selected item flashes; the rail tile stays put across sub tab switches.
+                if(noAnimate || (from >= 0 && IsSelected(it, from))) {
                     it.bg.color = UIColors.MenuSelected;
                 } else {
                     it.bg.color = UIColors.MenuHighlight;

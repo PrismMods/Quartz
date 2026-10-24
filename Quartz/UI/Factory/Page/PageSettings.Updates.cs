@@ -101,7 +101,7 @@ internal static partial class PageSettings {
             pctRect.anchoredPosition = new(-238f, 0f);
             pctRect.sizeDelta = new(90f, 0f);
             updateProgressLabel = pctObj.AddComponent<TextMeshProUGUI>();
-            updateProgressLabel.font = FontManager.Current;
+            updateProgressLabel.font = FontManager.MenuFontAsset;
             updateProgressLabel.fontSize = 18f;
             updateProgressLabel.color = Color.white;
             updateProgressLabel.alignment = TextAlignmentOptions.Left;

@@ -2,6 +2,7 @@ using Quartz.Compat.Game;
 using Quartz.Core;
 using Quartz.Resource;
 using Quartz.UI.Generator;
+using Quartz.UI.Utility;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -10,9 +11,9 @@ internal static class PageCredits {
     public static void Create(RectTransform parent) {
         RectTransform content = PageFactory.CreateScrollablePage(parent);
         RectTransform logoRow = GenerateUI.Row(content.transform, 280f);
-        var logoImg = CenteredRect(logoRow, "Logo", 260, 260).gameObject.AddComponent<Image>();
-        logoImg.sprite = MainCore.Spr.Get(UISprite.QuartzLogo);
-        logoImg.preserveAspect = true;
+        RectTransform logo = CenteredRect(logoRow, "Logo", 260, 260);
+        logo.gameObject.AddComponent<ThemeExempt>();
+        QuartzLogo.Create(logo);
         TextMeshProUGUI title = Line(content, 60f, 38f);
         title.text = Info.DisplayName;
         TextMeshProUGUI subtitle = Line(content, 40f, 20f, 0.45f);
@@ -59,7 +60,7 @@ internal static class PageCredits {
     }
     private static TextMeshProUGUI Line(RectTransform content, float height, float size, float alpha = 1f) {
         var tmp = GenerateUI.Row(content.transform, height).gameObject.AddComponent<TextMeshProUGUI>();
-        tmp.font = FontManager.Current;
+        tmp.font = FontManager.MenuFontAsset;
         tmp.fontSize = size;
         tmp.color = new Color(1f, 1f, 1f, alpha);
         tmp.alignment = TextAlignmentOptions.Center;

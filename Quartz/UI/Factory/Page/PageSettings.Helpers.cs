@@ -22,20 +22,22 @@ namespace Quartz.UI.Factory.Page;
 internal static partial class PageSettings {
     private static string CurrentSettingsFontValue() {
         string name = MainCore.Conf.SettingsFontName;
-        return string.IsNullOrEmpty(name) ? FontManager.SameAsOverlay : name;
+        return string.IsNullOrEmpty(name) ? FontManager.UiDefault : name;
     }
     private static void OnSettingsFontSelected(string name) {
-        MainCore.Conf.SettingsFontName = name == FontManager.SameAsOverlay ? "" : name;
+        MainCore.Conf.SettingsFontName = name == FontManager.UiDefault ? "" : name;
         MainCore.ConfMgr.RequestSave();
         FontManager.ApplyMenuFont();
     }
     private static IReadOnlyList<string> BuildSettingsFontValues() {
-        var list = new List<string> { FontManager.SameAsOverlay };
+        var list = new List<string> { FontManager.UiDefault, FontManager.SameAsOverlay };
         list.AddRange(FontManager.GetAvailableFonts());
         return list;
     }
     private static string DisplaySettingsFont(string name) =>
-        name == FontManager.SameAsOverlay
+        name == FontManager.UiDefault
+            ? GenerateUI.Tr("FONT_UI_DEFAULT", "Default (SUIT)")
+            : name == FontManager.SameAsOverlay
             ? GenerateUI.Tr("FONT_SAME_AS_OVERLAY", "Same as overlay font")
             : name == FontManager.DefaultName
                 ? GenerateUI.Tr("FONT_DEFAULT", "Default (Cookie Run Bold)")

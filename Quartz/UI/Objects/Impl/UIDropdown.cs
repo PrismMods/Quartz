@@ -169,7 +169,7 @@ public class UIDropDown<T> : UIObject {
             UnityUtils.AddEvent(EventTriggerType.PointerEnter, e => {
                 hoverSeq?.Kill();
                 hoverSeq = GTweenSequenceBuilder.New()
-                    .Append(rowImage.GTColor(UIColors.ObjectActive, 0.12f).SetEasing(Easing.OutSine))
+                    .Append(rowImage.GTColor(UIColors.ObjectButton, 0.12f).SetEasing(Easing.OutSine))
                     .Build();
                 MainCore.TC.Play(hoverSeq);
             }, trigger);

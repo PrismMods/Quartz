@@ -50,6 +50,10 @@ public enum UISprite {
     Globe128 = 43,
     Message128 = 44,
     Code128 = 45,
+    QuartzLogoFace = 46,
+    QuartzLogoShade = 47,
+    QuartzLogoTint = 48,
+    QuartzLogoShard = 49,
 }
 public enum UISliceSprite {
     Circle256P1024 = 0,
@@ -182,18 +186,20 @@ public sealed class SpriteManager(ResourceManager resource) : IDisposable {
         tex.wrapMode = TextureWrapMode.Clamp;
         return tex;
     }
-    private const float CORNER_UNITS_P1024 = 12.5f;
-    private const float CORNER_UNITS_P2048 = 6.25f;
+    private const float CORNER_UNITS_P1024 = 12f; // radius-lg
+    private const float CORNER_UNITS_P2048 = 8f; // radius-sm
     public Sprite Get(UISliceSprite sprite) {
         if(cache.TryGetValue(sprite, out Sprite cached)) return cached;
         int r1 = CornerPixels(CORNER_UNITS_P1024);
         int r2 = CornerPixels(CORNER_UNITS_P2048);
+        // Hover/focus rings are a 2-unit stroke whatever the corner.
+        int ring = CornerPixels(2f);
         Sprite created = sprite switch {
             UISliceSprite.Circle256P1024 => SlicedShape(ProceduralTexture.Circle(r1), r1, CORNER_UNITS_P1024),
             UISliceSprite.Circle256P2048 => SlicedShape(ProceduralTexture.Circle(r2), r2, CORNER_UNITS_P2048),
             UISliceSprite.CircleHalf256P1024 => SlicedShape(ProceduralTexture.CircleHalfTop(r1), r1, CORNER_UNITS_P1024),
-            UISliceSprite.CircleOutline256P1024 => SlicedShape(ProceduralTexture.CircleOutline(r1, Mathf.Max(1, r1 / 2)), r1, CORNER_UNITS_P1024),
-            UISliceSprite.CircleOutline256P2048 => SlicedShape(ProceduralTexture.CircleOutline(r2, Mathf.Max(1, r2 / 2)), r2, CORNER_UNITS_P2048),
+            UISliceSprite.CircleOutline256P1024 => SlicedShape(ProceduralTexture.CircleOutline(r1, Mathf.Min(r1, ring)), r1, CORNER_UNITS_P1024),
+            UISliceSprite.CircleOutline256P2048 => SlicedShape(ProceduralTexture.CircleOutline(r2, Mathf.Min(r2, ring)), r2, CORNER_UNITS_P2048),
             _ => null,
         };
         if(created != null) cache[sprite] = created;
@@ -285,6 +291,10 @@ public sealed class SpriteManager(ResourceManager resource) : IDisposable {
         [UISprite.Pencil128] = Asset.Pencil128,
         [UISprite.Globe128] = Asset.Globe128,
         [UISprite.Message128] = Asset.Message128,
-        [UISprite.Code128] = Asset.Code128
+        [UISprite.Code128] = Asset.Code128,
+        [UISprite.QuartzLogoFace] = Asset.QuartzLogoFace,
+        [UISprite.QuartzLogoShade] = Asset.QuartzLogoShade,
+        [UISprite.QuartzLogoTint] = Asset.QuartzLogoTint,
+        [UISprite.QuartzLogoShard] = Asset.QuartzLogoShard
     };
 }

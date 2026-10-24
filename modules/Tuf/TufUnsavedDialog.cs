@@ -85,9 +85,9 @@ internal static class TufUnsavedDialog {
         borderRect.offsetMin = new Vector2(-2f, -2f);
         borderRect.offsetMax = new Vector2(2f, 2f);
         Image borderImage = border.AddComponent<Image>();
-        borderImage.sprite = MainCore.Spr.GetRing(14.5f, 3f);
+        borderImage.sprite = MainCore.Spr.GetRing(14f, 3f);
         borderImage.type = Image.Type.Sliced;
-        borderImage.color = UIColors.ObjectButton;
+        borderImage.color = UIColors.Border;
         borderImage.raycastTarget = false;
         return rect;
     }

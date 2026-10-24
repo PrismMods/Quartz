@@ -28,7 +28,7 @@ public class UISlider : UIObject {
     public Func<float, float> Filter;
     public float MinFill;
     private Color? accentOverride;
-    public Color AccentColor => accentOverride ?? UIColors.ObjectActive;
+    public Color AccentColor => accentOverride ?? UIColors.ObjectButton;
     public RectTransform FillRect { get; }
     public Image FillImage { get; }
     public TextMeshProUGUI Label { get; }
@@ -63,7 +63,7 @@ public class UISlider : UIObject {
     ) : base(id, rect) {
         FillRect = fillRect;
         FillImage = fillImage;
-        FillImage.color = UIColors.ObjectActive;
+        FillImage.color = UIColors.ObjectButton;
         Label = label;
         ValueText = valueText;
         ChangedImage = changedImage;

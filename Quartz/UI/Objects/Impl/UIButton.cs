@@ -5,14 +5,17 @@ using Quartz.Tween;
 using GTweens.Easings;
 using Quartz.Core;
 using TMPro;
+using Quartz.UI.Generator;
+using UnityEngine.EventSystems;
 namespace Quartz.UI.Objects.Impl;
 public class UIButton : UIObject {
     public Action OnClick { get; set; }
     public TextMeshProUGUI Label { get; }
     public Image Background { get; }
     public Func<Color> RestColor { get; set; } = static () => UIColors.ObjectButton;
-    public Func<Color> HoverColor { get; set; } = static () => UIColors.ObjectActiveLightBright;
+    public Func<Color> HoverColor { get; set; } = static () => Color.Lerp(UIColors.ObjectButton, Color.white, 0.06f);
     private GTween hoverTween;
+    private bool hasRing;
     public UIButton(
         string id,
         RectTransform rect,
@@ -27,21 +30,31 @@ public class UIButton : UIObject {
     }
     public UIButton SetSecondary() {
         RestColor = static () => UIColors.ObjectBG;
-        HoverColor = static () => UIColors.ObjectButton;
+        HoverColor = static () => UIColors.ObjectBG;
+        AddRing();
         UpdateVisual(true);
         return this;
     }
     public UIButton SetNeutral() {
         RestColor = static () => Color.Lerp(UIColors.ObjectBG, UIColors.ObjectButton, 0.55f);
-        HoverColor = static () => UIColors.ObjectButton;
+        HoverColor = static () => Color.Lerp(UIColors.ObjectBG, UIColors.ObjectButton, 0.55f);
+        AddRing();
         UpdateVisual(true);
         return this;
     }
     public UIButton SetDanger() {
-        RestColor = static () => Color.Lerp(UIColors.SoftRed, UIColors.PanelBG, 0.28f);
+        RestColor = static () => Color.Lerp(UIColors.SoftRed, UIColors.PanelBG, 0.12f);
         HoverColor = static () => UIColors.SoftRed;
         UpdateVisual(true);
         return this;
+    }
+    // Secondary buttons hover with the accent ring instead of a fill change.
+    private void AddRing() {
+        if(hasRing) return;
+        EventTrigger trigger = Rect.GetComponent<EventTrigger>();
+        if(trigger == null) return;
+        hasRing = true;
+        GenerateUI.AddOutlineHover(Rect.gameObject, trigger);
     }
     public void OnHoverEnter() {
         if(IsDisposed) return;

@@ -174,7 +174,7 @@ public static partial class GenerateUI {
         labelRect.offsetMin = new Vector2(16f, 0f);
         labelRect.offsetMax = new Vector2(onToggle != null ? -88f : -44f, 0f);
         TextMeshProUGUI label = labelObj.AddComponent<TextMeshProUGUI>();
-        label.font = FontManager.Current;
+        label.font = FontManager.MenuFontAsset;
         label.fontSize = 24f;
         label.color = Color.white;
         label.alignment = TextAlignmentOptions.Left;

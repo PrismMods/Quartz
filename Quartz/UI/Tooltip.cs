@@ -34,7 +34,7 @@ public class Tooltip {
         bgRect.offsetMin = Vector2.zero;
         bgRect.offsetMax = Vector2.zero;
         Image img = bg.AddComponent<Image>();
-        img.color = new(0f, 0f, 0f, 0.6f);
+        img.color = new(0f, 0f, 0f, 0.85f);
         img.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
         img.type = Image.Type.Sliced;
         GameObject t = new("Text");
@@ -45,7 +45,7 @@ public class Tooltip {
         tr.offsetMin = new(16f, 16f);
         tr.offsetMax = new(-16f, -16f);
         text = t.AddComponent<TextMeshProUGUI>();
-        text.font = FontManager.Current;
+        text.font = FontManager.MenuFontAsset;
         text.fontSize = 20f;
         text.color = Color.white;
         text.alignment = TextAlignmentOptions.Left;

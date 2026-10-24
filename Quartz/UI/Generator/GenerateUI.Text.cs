@@ -103,7 +103,7 @@ public static partial class GenerateUI {
         rect.offsetMin = new(noPad ? 0f : 16f, 0f);
         rect.offsetMax = Vector2.zero;
         TextMeshProUGUI tmp = obj.AddComponent<TextMeshProUGUI>();
-        tmp.font = FontManager.Current;
+        tmp.font = FontManager.MenuFontAsset;
         tmp.fontSize = size;
         tmp.color = Color.white;
         tmp.alignment = TextAlignmentOptions.Left;

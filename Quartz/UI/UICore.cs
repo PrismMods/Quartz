@@ -87,6 +87,7 @@ public static partial class UICore {
         _onRefresh = state => {
             if(state == TranslationFailState.Success) {
                 themeImages = null;
+                themeTexts = null;
                 TextLocalization.RefreshAll();
                 RequestPagesRebuild();
             }
@@ -183,6 +184,7 @@ public static partial class UICore {
         exitReorganizeResetSeq?.Kill();
         exitReorganizeResetSeq = null;
         themeImages = null;
+        themeTexts = null;
         UIObject.DisposeAll();
         ToggleBinds.ClearLive();
         Reorganizer.Dispose();

@@ -201,7 +201,7 @@ public static partial class UICore {
     private static int refreshedAtlasCount = -1;
     private static void RefreshAllText() {
         if(canvasObj == null) return;
-        TMP_FontAsset font = FontManager.Current;
+        TMP_FontAsset font = FontManager.MenuFontAsset;
         int fontId = font != null ? font.GetInstanceID() : 0;
         int characterCount = font?.characterTable?.Count ?? 0;
         int atlasCount = font?.atlasTextures?.Length ?? 0;

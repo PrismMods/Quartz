@@ -95,17 +95,17 @@ internal static partial class PageSettings {
         var settingsFontRow = GenerateUI.Row(content.transform);
         settingsFontDropdown = GenerateUI.DropDown(
             settingsFontRow,
-            FontManager.SameAsOverlay,
+            FontManager.UiDefault,
             CurrentSettingsFontValue(),
             BuildSettingsFontValues(),
             DisplaySettingsFont,
             OnSettingsFontSelected,
             "settings_font_dropdown"
         );
-        settingsFontDropdown.ItemFont = FontManager.GetFont;
+        settingsFontDropdown.ItemFont = name => name == FontManager.UiDefault ? FontManager.UiFont : FontManager.GetFont(name);
         settingsFontDropdown.Rect.AddToolTip(
             "DESC_SETTINGS_FONT",
-            "Font for this mod's own settings window. \"Same as overlay font\" follows the Font picker above."
+            "Font for this mod's own settings window. Default is SUIT; \"Same as overlay font\" follows the Font picker above."
         );
     }
 }

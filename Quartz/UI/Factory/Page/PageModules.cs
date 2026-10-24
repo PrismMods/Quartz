@@ -293,7 +293,7 @@ internal static class PageModules {
         rect.anchoredPosition = new Vector2(-92f, 0f);
         rect.sizeDelta = new Vector2(70f, 0f);
         TextMeshProUGUI count = countObj.AddComponent<TextMeshProUGUI>();
-        count.font = FontManager.Current;
+        count.font = FontManager.MenuFontAsset;
         count.fontSize = 16f;
         count.color = new Color(1f, 1f, 1f, 0.45f);
         count.alignment = TextAlignmentOptions.Right;

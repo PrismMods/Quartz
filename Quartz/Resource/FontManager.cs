@@ -9,13 +9,16 @@ public static partial class FontManager {
     private const string DefaultFontFile = "Cookie Run Bold";
     public const string AddSentinel = "quartz-add-custom-font";
     public const string SameAsOverlay = "quartz-overlay-font-same";
+    // Stored as "": the settings window uses SUIT unless the user picks something else.
+    public const string UiDefault = "quartz-ui-default";
     public static TMP_FontAsset Current { get; private set; }
     public static string CurrentName { get; private set; } = DefaultName;
     public static Transform MenuRoot { get; set; }
     public static TMP_FontAsset MenuFontAsset {
         get {
             string name = MainCore.Conf?.SettingsFontName;
-            return string.IsNullOrEmpty(name) || name == SameAsOverlay ? Current : GetFont(name);
+            if(string.IsNullOrEmpty(name)) return UiFont;
+            return name == SameAsOverlay ? Current : GetFont(name);
         }
     }
     public static event Action OnFontChanged;
@@ -41,6 +44,15 @@ public static partial class FontManager {
         CurrentName = DefaultName;
     }
     private static TMP_FontAsset DefaultFont => defaultFont ??= BuildDefaultFont();
+    private static TMP_FontAsset uiFont;
+    public static TMP_FontAsset UiFont {
+        get {
+            if(uiFont != null) return uiFont;
+            uiFont = MainCore.Res.Get<TMP_FontAsset>(Asset.SUIT_Medium);
+            AttachCjk(uiFont);
+            return uiFont;
+        }
+    }
     private static FieldInfo tmpSettingsInstanceField;
     private static TMP_Settings tmpSettingsFallback;
     private static bool EnsureTmpSettings() {

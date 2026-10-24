@@ -192,7 +192,7 @@ public static partial class UICore {
             versionRect.pivot = Vector2.zero;
             var versionText = version.AddComponent<TextMeshProUGUI>();
             versionText.text = $"v{Info.DisplayVersion}";
-            versionText.font = FontManager.Current;
+            versionText.font = FontManager.MenuFontAsset;
             versionText.fontSize = 12f;
             versionText.color = new Color(1f, 1f, 1f, 0.4f);
             versionText.characterSpacing = -3f;
@@ -221,9 +221,8 @@ public static partial class UICore {
         {
             GameObject logo = new("Logo");
             logo.transform.SetParent(topBar.transform, false);
-            var logoImage = logo.AddComponent<Image>();
-            logoImage.sprite = MainCore.Spr.Get(UISprite.QuartzLogo);
-            logoImage.preserveAspect = true;
+            // Clear hit area for the click; the tinted layers draw on top.
+            logo.AddComponent<Image>().color = Color.clear;
             logo.AddComponent<ThemeExempt>();
             var logoRect = logo.GetComponent<RectTransform>();
             logoRect.anchorMin = new(0, 0.5f);
@@ -231,6 +230,7 @@ public static partial class UICore {
             logoRect.pivot = new(0, 0.5f);
             logoRect.anchoredPosition = new(14, 0);
             logoRect.sizeDelta = new(46f, 46f);
+            QuartzLogo.Create(logoRect);
             var btn = logo.AddComponent<NonRaycastButton>();
             // No rail to summon in the single-page shell, so the logo is just a logo.
             if(!ShellNavHidden) btn.onClick += ToggleMenu;
@@ -304,9 +304,9 @@ public static partial class UICore {
             borderRect.offsetMin = Vector2.zero;
             borderRect.offsetMax = Vector2.zero;
             Image borderImg = border.AddComponent<Image>();
-            borderImg.sprite = MainCore.Spr.GetRing(12.5f, OUTLINE_WIDTH);
+            borderImg.sprite = MainCore.Spr.GetRing(12f, OUTLINE_WIDTH);
             borderImg.type = Image.Type.Sliced;
-            borderImg.color = Color.white;
+            borderImg.color = UIColors.Border;
             borderImg.raycastTarget = false;
         }
     }

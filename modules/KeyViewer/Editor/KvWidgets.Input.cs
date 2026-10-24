@@ -63,7 +63,7 @@ internal static partial class KvWidgets {
     }
     private static TextMeshProUGUI FieldText(Transform parent, string value, Color color) {
         TextMeshProUGUI text = GenerateUI.AddText(parent, true);
-        text.font = FontManager.Current;
+        text.font = FontManager.MenuFontAsset;
         text.fontSize = LabelSize;
         text.text = value ?? string.Empty;
         text.color = color;

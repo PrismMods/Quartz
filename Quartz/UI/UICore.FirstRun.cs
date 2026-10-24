@@ -81,7 +81,7 @@ public static partial class UICore {
                 tmp.color = Color.white;
                 tmp.alignment = TextAlignmentOptions.Bottom;
                 tmp.text = "";
-                tmp.font = FontManager.Current;
+                tmp.font = FontManager.MenuFontAsset;
                 frhTextRect.anchorMin = new Vector2(0.5f, 0.5f);
                 frhTextRect.anchorMax = new Vector2(0.5f, 0.5f);
                 frhTextRect.anchoredPosition = new Vector2(0f, 6f);

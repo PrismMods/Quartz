@@ -135,7 +135,7 @@ public static partial class GenerateUI {
         void Refresh() {
             foreach((T optValue, Image bg, TextMeshProUGUI label) in options) {
                 bool selected = EqualityComparer<T>.Default.Equals(optValue, current);
-                bg.color = selected ? UIColors.ObjectActive : UIColors.ObjectBG;
+                bg.color = selected ? UIColors.ObjectButton : UIColors.ObjectBG;
                 label.color = selected ? Color.white : new Color(1f, 1f, 1f, 0.6f);
             }
         }

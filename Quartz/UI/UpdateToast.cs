@@ -89,9 +89,9 @@ public static class UpdateToast {
             rect.offsetMin = new(-2f, -2f);
             rect.offsetMax = new(2f, 2f);
             Image borderImg = border.AddComponent<Image>();
-            borderImg.sprite = MainCore.Spr.GetRing(14.5f, 3f);
+            borderImg.sprite = MainCore.Spr.GetRing(14f, 3f);
             borderImg.type = Image.Type.Sliced;
-            borderImg.color = Color.white;
+            borderImg.color = UIColors.Border;
             borderImg.raycastTarget = false;
         }
         var trigger = toastObj.AddComponent<EventTrigger>();
@@ -139,7 +139,7 @@ public static class UpdateToast {
             rect.offsetMin = new(58f, -34f);
             rect.offsetMax = new(-38f, -10f);
             titleText = title.AddComponent<TextMeshProUGUI>();
-            titleText.font = FontManager.Current;
+            titleText.font = FontManager.MenuFontAsset;
             titleText.fontSize = 16f;
             titleText.color = Color.white;
             titleText.alignment = TextAlignmentOptions.Left;
@@ -159,7 +159,7 @@ public static class UpdateToast {
             rect.offsetMin = new(58f, -54f);
             rect.offsetMax = new(-38f, -34f);
             hintText = hint.AddComponent<TextMeshProUGUI>();
-            hintText.font = FontManager.Current;
+            hintText.font = FontManager.MenuFontAsset;
             hintText.fontSize = 13f;
             hintText.color = new Color(1f, 1f, 1f, 0.6f);
             hintText.alignment = TextAlignmentOptions.Left;
@@ -214,7 +214,7 @@ public static class UpdateToast {
         labelRect.offsetMin = new(6f, 0f);
         labelRect.offsetMax = new(-6f, 0f);
         restartLabel = label.AddComponent<TextMeshProUGUI>();
-        restartLabel.font = FontManager.Current;
+        restartLabel.font = FontManager.MenuFontAsset;
         restartLabel.fontSize = 15f;
         restartLabel.color = Color.white;
         restartLabel.alignment = TextAlignmentOptions.Center;

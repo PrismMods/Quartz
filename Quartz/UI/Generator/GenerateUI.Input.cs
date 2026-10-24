@@ -54,7 +54,7 @@ public static partial class GenerateUI {
         inputObj.AddComponent<RectMask2D>();
         TMP_InputField inputField = inputObj.AddComponent<TMP_InputField>();
         var text = AddText(inputObj.transform);
-        text.font = FontManager.Current;
+        text.font = FontManager.MenuFontAsset;
         text.text = value ?? string.Empty;
         text.alignment = TextAlignmentOptions.Left;
         TextCompat.NoWrap(text);
@@ -64,7 +64,7 @@ public static partial class GenerateUI {
         textRect.offsetMin = Vector2.zero;
         textRect.offsetMax = Vector2.zero;
         var placeholderText = AddText(inputObj.transform);
-        placeholderText.font = FontManager.Current;
+        placeholderText.font = FontManager.MenuFontAsset;
         placeholderText.text = placeholder;
         placeholderText.alignment = TextAlignmentOptions.Left;
         TextCompat.NoWrap(placeholderText);

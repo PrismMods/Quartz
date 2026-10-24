@@ -64,7 +64,7 @@ internal static class PageHelp {
         obj.transform.SetParent(parent, false);
         obj.AddComponent<RectTransform>();
         TextMeshProUGUI text = obj.AddComponent<TextMeshProUGUI>();
-        text.font = FontManager.Current;
+        text.font = FontManager.MenuFontAsset;
         text.fontSize = 19f;
         text.color = new Color(1f, 1f, 1f, 0.75f);
         text.alignment = TextAlignmentOptions.TopLeft;
