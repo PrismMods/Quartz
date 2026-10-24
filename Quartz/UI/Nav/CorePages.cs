@@ -28,7 +28,7 @@ internal static class CorePages {
     // states, search entries — stays identical between the two builds.
     private static bool CoreNav => !Info.KeyViewerOnly;
     private static void Categories() {
-        Category(HomeCategoryKey, "Home", "HOME", UISprite.QuartzLogo, 0, iconScale: 1.45f,
+        Category(HomeCategoryKey, "Home", "HOME", UISprite.QuartzLogo, 0,
             visible: static () => CoreNav);
         // The KeyViewer flavour ships a fixed module set, so the store — and the
         // addons page that lives in the same category — would only offer things it
