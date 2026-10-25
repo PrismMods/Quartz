@@ -1,8 +1,8 @@
 {
   "en-US": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
-    "DESC_KL_CAPTURE": "Press any key to add/remove it from the allowed list. Escape cancels.",
-    "DESC_KL_PROFILE_NAME": "Rename the current profile, e.g. \"12 Keys\".",
+    "DESC_KL_CAPTURE": "Press a key to add or remove it. Press Escape to cancel.",
+    "DESC_KL_PROFILE_NAME": "Name this profile, like \"12 Keys\".",
     "KCB_MS": "Threshold (ms)",
     "KL_ALLOWED_KEYS": "Allowed Keys",
     "KL_ADD_PROFILE": "Add Profile",
@@ -12,15 +12,15 @@
     "KL_PROFILE_LABEL": "Profile",
     "KL_PROFILE_NAME": "Profile Name",
     "KL_REMOVE_PROFILE": "Remove Profile",
-    "KL_SYNC_LOCKED": "Keys are managed by the Key Viewer (Sync Keys to Key Limiter is on).",
+    "KL_SYNC_LOCKED": "Key Viewer manages these keys (Sync Keys to Key Limiter is on).",
     "SECTION_KEY_LIMITER": "Key Limiter",
     "SECTION_KEYBOARD_CHATTER_BLOCKER": "Keyboard Chatter Blocker",
     "KL_HOME_KEYS": "{0}: {1} keys · {2}",
     "KL_HOME_ON": "limiting",
     "KL_HOME_OFF": "off",
     "KL_CHART_SECTION": "Chart Key Limiter",
-    "KL_CHART_NOTE": "Adds a Key Limiter event to the level editor. A chart can cap how many distinct keys you may use from one tile onward and pick what an extra press does: ignore it, kill the run, or fire tagged events. Reopen the level after changing this.",
-    "DESC_CHARTKEYLIMITER_ENABLE": "Lets levels carry a Key Limiter event and enforces it while you play.",
-    "CHARTKEYLIMITER_ENABLE": "Enable Chart Key Limiter"
+    "KL_CHART_NOTE": "Adds a Key Limiter event to the level editor. From a chosen tile, a chart can cap how many different keys you use and decide what an extra press does: ignore it, end the run, or fire tagged events. Reopen the level after changing this.",
+    "DESC_CHARTKEYLIMITER_ENABLE": "Lets levels use a Key Limiter event and applies it while you play.",
+    "CHARTKEYLIMITER_ENABLE": "Chart Key Limiter"
   }
 }

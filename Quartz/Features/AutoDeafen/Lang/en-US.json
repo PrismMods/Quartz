@@ -9,11 +9,11 @@
     "AD_KB_META": "Keybind Win",
     "AD_KB_SHIFT": "Keybind Shift",
     "AD_PCT": "Deafen At %",
-    "AD_SKIP_AUTO": "Don't Deafen While Auto Is On",
+    "AD_SKIP_AUTO": "Don't Deafen During Auto",
     "AD_START": "Only When Starting From 0%",
     "AD_TUTORIAL": "Watch Tutorial",
     "AD_UNLINK": "Unlink",
     "SECTION_AUTO_DEAFEN_DISCORD": "Auto Deafen (Discord)",
-    "AUTODEAFEN_ENABLE": "Enable Auto Deafen (Discord)"
+    "AUTODEAFEN_ENABLE": "Auto Deafen (Discord)"
   }
 }

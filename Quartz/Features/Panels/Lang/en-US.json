@@ -2,16 +2,16 @@
   "en-US": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "DESC_PANEL_ADDSTAT": "Pick a stat to add to this panel.",
-    "DESC_PANEL_BGCOLOR": "Fill color of the panel background. The A (alpha) slider sets its opacity. Needs Background Panel on.",
-    "DESC_PANEL_IMAGE_CHOOSE": "Pick a PNG or JPG. A bare file name is looked up in the PanelImages folder, so a config stays portable when the image lives there.",
+    "DESC_PANEL_BGCOLOR": "Panel background color. The A (alpha) slider sets opacity. Turn on Background Panel to see it.",
+    "DESC_PANEL_IMAGE_CHOOSE": "Pick a PNG or JPG. A file name alone is looked up in PanelImages, so images kept there move with your config.",
     "DESC_PANEL_IMAGE_SIZE": "Image height as a multiple of this panel's font size.",
-    "DESC_PANEL_LAYER": "Drag to reorder. Panels higher in the list draw on top where they overlap.",
+    "DESC_PANEL_LAYER": "Drag to reorder. Panels higher in the list show on top when they overlap.",
     "DESC_PANEL_LOCALIZESTATS": "Off: this panel's stat labels stay English (X-Acc, Max X-Acc…). On: they follow the UI language.",
-    "DESC_PANEL_NAME": "Shown on the panel while reorganizing, and as this section's title.",
+    "DESC_PANEL_NAME": "Shown on the panel while you rearrange, and as this section's title.",
     "DESC_PANEL_PREFIX": "Extra line shown at the top of the panel.",
     "DESC_PANEL_STATCOLOR_MAXBPM": "BPM that maps to the 100% end of the gradient.",
-    "DESC_PANEL_STATCOLOR_ON": "Tints this stat's value by blending the colors below across the stat's own 0–100% range.",
-    "DESC_PANEL_STATCOLOR_PERFECT": "Overrides the gradient with this color while the stat sits at exactly 100% — v1's gold accuracy.",
+    "DESC_PANEL_STATCOLOR_ON": "Colors this stat's value by blending the colors below over its 0–100% range.",
+    "DESC_PANEL_STATCOLOR_PERFECT": "Uses this color instead of the gradient when the stat is exactly 100%, like v1's gold accuracy.",
     "PANELS_CREATE": "Create Panel",
     "PANEL_ADDSTAT": "+ Add Stat",
     "PANEL_ALL_STATS_ADDED": "All stats are already on this panel.",
@@ -75,6 +75,6 @@
     "PANEL_TEXTSHADOW": "Text Shadow",
     "PANEL_TEXT_PLACEHOLDER": "Custom text…",
     "SECTION_PANELS": "Panels",
-    "PANEL_TOO_MANY": "{0} panels — that's a lot; performance may suffer."
+    "PANEL_TOO_MANY": "{0} panels is a lot. The game may slow down."
   }
 }

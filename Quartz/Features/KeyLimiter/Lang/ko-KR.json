@@ -1,26 +1,26 @@
 {
   "ko-KR": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
-    "DESC_KL_CAPTURE": "아무 키나 눌러 허용 목록에 추가/제거합니다. Esc로 취소합니다.",
-    "DESC_KL_PROFILE_NAME": "현재 프로필 이름을 변경합니다. 예: \"12키\".",
+    "DESC_KL_CAPTURE": "키를 누르면 허용 목록에 넣거나 빼요. Esc를 누르면 취소돼요.",
+    "DESC_KL_PROFILE_NAME": "지금 프로필 이름을 바꿔요. 예: \"12키\".",
     "KCB_MS": "기준값 (ms)",
     "KL_ALLOWED_KEYS": "허용 키",
     "KL_ADD_PROFILE": "프로필 추가",
     "KL_CAPTURE": "키 추가 / 제거",
     "KL_CLEAR": "모두 지우기",
-    "KL_NO_ALLOWED_KEYS": "허용된 키가 없습니다.",
+    "KL_NO_ALLOWED_KEYS": "허용된 키가 없어요.",
     "KL_PROFILE_LABEL": "프로필",
     "KL_PROFILE_NAME": "프로필 이름",
     "KL_REMOVE_PROFILE": "프로필 제거",
-    "KL_SYNC_LOCKED": "키 뷰어가 키를 관리합니다 (키 제한과 동기화 켜짐).",
+    "KL_SYNC_LOCKED": "키뷰어에서 키를 관리해요 (키 제한과 동기화 켜짐).",
     "SECTION_KEY_LIMITER": "키 제한",
     "SECTION_KEYBOARD_CHATTER_BLOCKER": "키보드 채터링 차단",
     "KL_HOME_KEYS": "{0}: 키 {1}개 · {2}",
     "KL_HOME_ON": "제한 중",
     "KL_HOME_OFF": "꺼짐",
     "KL_CHART_SECTION": "채보 키 제한",
-    "KL_CHART_NOTE": "레벨 에디터에 키 제한 이벤트를 추가합니다. 채보가 특정 타일부터 사용할 수 있는 키의 개수를 제한하고, 초과 입력 시 동작(무시, 게임 오버, 태그된 이벤트 실행)을 지정할 수 있습니다. 변경 후에는 레벨을 다시 열어야 적용됩니다.",
-    "DESC_CHARTKEYLIMITER_ENABLE": "레벨에 키 제한 이벤트를 넣을 수 있게 하고, 플레이 중 이를 적용합니다.",
-    "CHARTKEYLIMITER_ENABLE": "채보 키 제한 사용"
+    "KL_CHART_NOTE": "레벨 에디터에 키 제한 이벤트를 추가해요. 채보에서 특정 타일부터 쓸 수 있는 키 개수를 제한하고, 더 누르면 어떻게 할지(무시, 게임 오버, 태그된 이벤트 실행) 고를 수 있어요. 바꾼 뒤에는 레벨을 다시 열어 주세요.",
+    "DESC_CHARTKEYLIMITER_ENABLE": "레벨에 키 제한 이벤트를 넣을 수 있고, 플레이할 때 적용돼요.",
+    "CHARTKEYLIMITER_ENABLE": "채보 키 제한"
   }
 }

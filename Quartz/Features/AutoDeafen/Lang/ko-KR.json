@@ -8,12 +8,12 @@
     "AD_KB_CTRL": "단축키 Ctrl",
     "AD_KB_META": "단축키 Win",
     "AD_KB_SHIFT": "단축키 Shift",
-    "AD_PCT": "헤드셋 음소거 임계값(%)",
+    "AD_PCT": "헤드셋 음소거 시점(%)",
     "AD_SKIP_AUTO": "자동플레이 중에는 헤드셋 음소거 안 함",
     "AD_START": "0% 시작일 때만",
     "AD_TUTORIAL": "튜토리얼 보기",
     "AD_UNLINK": "연결 해제",
     "SECTION_AUTO_DEAFEN_DISCORD": "자동 디스코드 헤드셋 음소거",
-    "AUTODEAFEN_ENABLE": "자동 디스코드 헤드셋 음소거 활성화"
+    "AUTODEAFEN_ENABLE": "자동 디스코드 헤드셋 음소거"
   }
 }

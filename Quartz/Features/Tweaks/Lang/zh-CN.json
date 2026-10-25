@@ -1,10 +1,10 @@
 {
   "zh-CN": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
-    "DESC_TW_NOPAUSE": "旧版自动播放逻辑",
-    "DESC_TW_SCROLL": "游玩时屏蔽鼠标滚轮，避免误触改变游戏参数。",
+    "DESC_TW_NOPAUSE": "自动播放时不自动暂停",
+    "DESC_TW_SCROLL": "游玩时屏蔽鼠标滚轮，避免误触影响游戏。",
     "TWEAKS_GENERAL": "通用微调",
-    "TW_NOPAUSE": "旧版自动播放",
+    "TW_NOPAUSE": "关闭自动暂停",
     "TW_SCROLL": "游戏时屏蔽鼠标滚轮"
   }
 }

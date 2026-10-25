@@ -4,7 +4,7 @@
     "COUNTDOWN_ENABLE": "카운트다운 사용",
     "COUNTDOWN_MAXBPM": "카운트다운 템포 최댓값",
     "COUNTDOWN_MINBPM": "카운트다운 템포 최솟값",
-    "DESC_COUNTDOWN_ENABLE": "체크포인트나 레벨 에디터의 중간 타일에서 시작할 때 나오는 카운트다운을 대체합니다. 끄면 게임의 기본 카운트다운을 사용합니다.",
+    "DESC_COUNTDOWN_ENABLE": "체크포인트나 레벨 에디터 중간 타일에서 시작할 때 나오는 카운트다운을 바꿔요. 끄면 게임 기본 카운트다운이 나와요.",
     "SECTION_COUNTDOWN": "카운트다운"
   }
 }

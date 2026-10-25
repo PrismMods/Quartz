@@ -4,7 +4,7 @@
     "COUNTDOWN_ENABLE": "启用倒计时",
     "COUNTDOWN_MAXBPM": "倒计时速度上限",
     "COUNTDOWN_MINBPM": "倒计时速度下限",
-    "DESC_COUNTDOWN_ENABLE": "替换从检查点或关卡编辑器中间轨道开始时出现的倒计时；关闭后使用游戏原本的倒计时。",
+    "DESC_COUNTDOWN_ENABLE": "替换从存档点或编辑器中间轨道开始时的倒计时。关闭后使用游戏自带的倒计时。",
     "SECTION_COUNTDOWN": "倒计时"
   }
 }

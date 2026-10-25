@@ -3,7 +3,7 @@
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "SONGTITLE_ANCHOR_LABEL": "Anchor",
     "SECTION_SONG_TITLE": "Song Title",
-    "SONGTITLE_FORMAT": "Format — use {artist} and {title}",
+    "SONGTITLE_FORMAT": "Format: use {artist} and {title}",
     "SONGTITLE_STRIP": "Strip Rich Text",
     "DESC_SONGTITLE_STRIP": "Remove rich text tags (size, color, ...) and line breaks from the title.",
     "SONGTITLE_FONTSIZE": "Font Size",

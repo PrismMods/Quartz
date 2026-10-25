@@ -1,8 +1,8 @@
 {
   "en-US": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
-    "DESC_TW_NOPAUSE": "While auto-play is on, the game pauses itself (e.g. when the window loses focus). This blocks those automatic pauses — pausing manually still works.",
-    "DESC_TW_SCROLL": "Ignores mouse wheel input while a level is being played, so accidental scrolling can't affect the game mid-run.",
+    "DESC_TW_NOPAUSE": "With auto-play on, the game pauses by itself (e.g. when the window loses focus). This stops those auto pauses. You can still pause manually.",
+    "DESC_TW_SCROLL": "Ignores the mouse wheel while you play, so a stray scroll can't change anything mid-run.",
     "TWEAKS_GENERAL": "General",
     "TW_NOPAUSE": "Disable Auto Pause",
     "TW_SCROLL": "Block Scroll While Playing"

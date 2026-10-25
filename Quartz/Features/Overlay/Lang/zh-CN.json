@@ -1,12 +1,24 @@
 {
   "zh-CN": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
-    "DESC_OVERLAY_ENABLED": "总开关，控制全部悬浮界面：统计面板、进度条、连击、判定文字。",
-    "OVERLAY_GENERAL": "通用设置",
-    "OVERLAY_ENABLED": "启用全部悬浮界面",
+    "DESC_OVERLAY_ENABLED": "一键开关全部覆盖层：统计面板、进度条、连击、判定。",
+    "OVERLAY_GENERAL": "通用",
+    "OVERLAY_ENABLED": "覆盖层",
     "OVERLAY_FPS_SMOOTH": "FPS刷新间隔",
-    "DESC_OVERLAY_FPS_SMOOTH": "FPS计数器每次数值保持时间；0=每帧更新，数值越大刷新越慢越平稳。",
-    "OVERLAY_REORGANIZE": "布局调整模式",
-    "MODULE_OVERLAY_CORE": "覆盖层核心"
+    "DESC_OVERLAY_FPS_SMOOTH": "FPS计数器每个数值停留多久。0表示每帧更新，数值越大变化越慢越稳。",
+    "OVERLAY_REORGANIZE": "调整布局",
+    "MODULE_OVERLAY_CORE": "覆盖层核心",
+    "SECTION_POP_IN_ANIMATION": "弹入动画",
+    "DESC_OVERLAY_POP": "开始游玩时，所有覆盖层从屏幕边缘滑入，失败或通关时再滑出。",
+    "OVERLAY_POP_EDGE_LABEL": "方向",
+    "OVERLAY_POP_EDGE_NEAREST": "最近的边缘",
+    "OVERLAY_POP_EDGE_LEFT": "左",
+    "OVERLAY_POP_EDGE_RIGHT": "右",
+    "OVERLAY_POP_EDGE_TOP": "上",
+    "OVERLAY_POP_EDGE_BOTTOM": "下",
+    "OVERLAY_POP_EASE_LABEL": "缓动",
+    "OVERLAY_POP_SECONDS": "时长",
+    "OVERLAY_POP_EXIT": "失败或通关时滑出",
+    "DESC_OVERLAY_POP_EXIT": "游玩结束时覆盖层滑出屏幕。关掉后会留在屏幕上。"
   }
 }

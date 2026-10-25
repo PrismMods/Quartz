@@ -1,15 +1,15 @@
 {
   "en-US": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
-    "DESC_OVERLAY_ENABLED": "Master switch for every overlay HUD — panels, progress bar, combo and judgement.",
+    "DESC_OVERLAY_ENABLED": "Turns every overlay on or off: panels, progress bar, combo and judgement.",
     "OVERLAY_GENERAL": "General",
-    "OVERLAY_ENABLED": "Enable Overlays",
+    "OVERLAY_ENABLED": "Overlays",
     "OVERLAY_FPS_SMOOTH": "FPS Update Interval",
-    "DESC_OVERLAY_FPS_SMOOTH": "How long the FPS counter holds each value before updating. 0 = every frame; higher makes the number tick more slowly and steadily.",
+    "DESC_OVERLAY_FPS_SMOOTH": "How long the FPS counter holds each value. 0 updates every frame. Higher values make the number change slower and steadier.",
     "OVERLAY_REORGANIZE": "Reorganize",
     "MODULE_OVERLAY_CORE": "Overlay Core",
     "SECTION_POP_IN_ANIMATION": "Pop-In Animation",
-    "DESC_OVERLAY_POP": "Slide every overlay in from the edge of the screen when a run starts, and back out when you die or clear.",
+    "DESC_OVERLAY_POP": "Overlays slide in from the screen edge when a run starts, and back out when you die or clear.",
     "OVERLAY_POP_EDGE_LABEL": "Direction",
     "OVERLAY_POP_EDGE_NEAREST": "Nearest Edge",
     "OVERLAY_POP_EDGE_LEFT": "Left",
@@ -19,6 +19,6 @@
     "OVERLAY_POP_EASE_LABEL": "Easing",
     "OVERLAY_POP_SECONDS": "Duration",
     "OVERLAY_POP_EXIT": "Slide Out on Death or Clear",
-    "DESC_OVERLAY_POP_EXIT": "Slide the overlays back off screen when the run ends. Turn this off to leave them on screen."
+    "DESC_OVERLAY_POP_EXIT": "Overlays slide off screen when the run ends. Turn this off to keep them on screen."
   }
 }

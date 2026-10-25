@@ -2,7 +2,7 @@
   "en-US": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "COMBO_ANCHOR_LABEL": "Anchor",
-    "COMBO_AUTO": "Combo Counts Auto Hits",
+    "COMBO_AUTO": "Count Auto Hits",
     "COMBO_CAPTION": "Show Caption",
     "COMBO_CAPTION_SHADOW_COLOR": "Caption Shadow Color",
     "COMBO_CAPTION_SHADOW_ENABLED": "Caption Shadow",
@@ -32,7 +32,7 @@
     "COMBO_SOLIDCOLOR": "Solid Color",
     "COMBO_XPERFECT": "XPerfect Combo (X Only)",
     "SECTION_COMBO": "Combo",
-    "COMBO_ENABLE": "Enable Combo",
+    "COMBO_ENABLE": "Combo",
     "COMBO_RESETPOS": "Reset Position"
   }
 }

@@ -1,9 +1,9 @@
 {
   "en-US": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
-    "DESC_OTTO_HIGHBPM_ON": "On: Otto uses the color below while the level's top BPM is 300+ (where vanilla turns him red). Off: the normal color is always used.",
-    "DESC_OTTO_IMAGE": "Pick any PNG or JPG to stand in for Otto. Without one, the cat that ships with the mod is used.",
-    "DESC_OTTO_TINT_IMAGE": "On: your own image is painted with the colors below, like the built-in one. Off: it keeps its own colors and only dims while auto is off.",
+    "DESC_OTTO_HIGHBPM_ON": "On: Otto uses the color below when the level's top BPM is 300+ (where vanilla turns him red). Off: he always uses the normal color.",
+    "DESC_OTTO_IMAGE": "Pick a PNG or JPG to use as Otto. Leave it empty to use the cat that comes with the mod.",
+    "DESC_OTTO_TINT_IMAGE": "On: your image gets the colors below, like the built-in one. Off: it keeps its own colors and only dims while auto is off.",
     "OTTO_COLOR": "Otto Color",
     "OTTO_IMAGE": "Custom Otto Image",
     "OTTO_IMAGE_CLEAR": "Use Built-in Image",
@@ -14,6 +14,6 @@
     "OTTO_OFFSET_X": "Offset X",
     "OTTO_OFFSET_Y": "Offset Y",
     "SECTION_OTTO_ICON": "Otto Icon",
-    "OTTOICON_ENABLE": "Enable Otto Icon"
+    "OTTOICON_ENABLE": "Otto Icon"
   }
 }

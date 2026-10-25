@@ -1,7 +1,7 @@
 {
   "en-US": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
-    "DESC_UIH_RECMODE": "Which profile is live right now: off = Playing, on = Recording.",
+    "DESC_UIH_RECMODE": "The profile in use right now. Off is Playing, on is Recording.",
     "SECTION_UI_HIDING": "UI Hiding",
     "UIH_PLAY_ALL": "Hide Everything (No HUD)",
     "UIH_PLAY_BETA": "Hide Beta Build Text",
