@@ -36,13 +36,18 @@ public static partial class EffectRemover {
     ];
     private static LevelEventType Event(int value) => (LevelEventType)value;
     public static void RefreshEditorSaveButtons() => SetEditorSaveButtons(scnEditor.instance, EditorSaveEnabled);
-    public static void RestoreEditorSaveButtons() => SetEditorSaveButtons(scnEditor.instance, true);
+    public static void RestoreEditorSaveButtons() => SetEditorSaveButtons(scnEditor.instance, !StrippedSaveBlocked);
+    // The open level was decoded with effects stripped; saving it would write them out of the file.
+    // Cleared by StrippedLevelSaveGuard on the next decode, so it outlives this feature's own patches.
+    internal static bool LevelStripped;
+    internal static bool StrippedSaveBlocked => LevelStripped && !(Conf?.EnableSave ?? false);
     private static void SetEditorSaveButtons(scnEditor editor, bool enabled) {
         if(editor == null || SceneManager.GetActiveScene().name != "scnEditor") return;
         if(editor.popupUnsavedChangesSave != null) editor.popupUnsavedChangesSave.interactable = enabled;
         if(editor.buttonSave != null) editor.buttonSave.interactable = enabled;
     }
     internal static void Remove(LevelData levelData) {
+        LevelStripped = true;
         if(!Enabled || levelData == null) return;
         EffectRemoverSettings conf = Conf;
         List<LevelEventType> events = [];
