@@ -325,6 +325,16 @@ public static partial class FontManager {
     }
     private static TMP_FontAsset GetCjkFallback() {
         if(cjkFallback != null) return cjkFallback;
+        // Bundled Noto Sans SC first: SUIT has no Hanzi and the game's own CJK fonts miss glyphs.
+        try {
+            cjkFallback = MainCore.Res.Get<TMP_FontAsset>(Asset.NotoSansSC_Medium);
+            if(cjkFallback != null) {
+                cjkFallback.isMultiAtlasTexturesEnabled = true;
+                return cjkFallback;
+            }
+        } catch(Exception e) {
+            MainCore.Log.Wrn($"[FontManager] bundled CJK font failed, probing the game's: {e.Message}");
+        }
         try {
             TMP_FontAsset[] all = Resources.FindObjectsOfTypeAll<TMP_FontAsset>();
             for(int pass = 0; pass < 2 && cjkFallback == null; pass++) {

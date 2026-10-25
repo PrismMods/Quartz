@@ -63,6 +63,7 @@ public enum Asset {
     QuartzLogoShade = 54,
     QuartzLogoTint = 55,
     QuartzLogoShard = 56,
+    NotoSansSC_Medium = 57,
 }
 public sealed class ResourceManager(Assembly assembly, string resourcePath) : IDisposable {
     private readonly Dictionary<string, object> cache = [];
@@ -157,6 +158,7 @@ public sealed class ResourceManager(Assembly assembly, string resourcePath) : ID
     private readonly Dictionary<Asset, string> assetMap = new() {
         [Asset.SUIT_Regular] = "Font.SUIT-Regular.otf",
         [Asset.SUIT_Medium] = "Font.SUIT-Medium.otf",
+        [Asset.NotoSansSC_Medium] = "Font.NotoSansSC-Medium.otf",
         [Asset.QuartzLogo] = "Image.QuartzLogo.png",
         [Asset.OV5LogoOutline256] = "Image.OV5LogoOutline256.png",
         [Asset.Circle256] = "Image.Circle256.png",

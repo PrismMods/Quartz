@@ -153,3 +153,11 @@ The Optimizer page carries three more patches derived from Iridium's
 The TUF tab icon (`tools/icons/Planet128.svg`) is the `planet` icon from
 Tabler Icons, mirrored horizontally. Copyright (c) 2020-2024 Paweł Kuna, MIT
 License. Source: https://github.com/tabler/tabler-icons
+
+## Noto Sans CJK
+
+The Chinese fallback font (`Quartz/Resource/Embedded/Font/NotoSansSC-Medium.otf`)
+is Noto Sans CJK SC Medium, subset to the GB2312 character set plus the
+characters Quartz's Chinese translations use. Copyright 2014-2021 Adobe
+(http://www.adobe.com/), SIL Open Font License 1.1.
+Source: https://github.com/notofonts/noto-cjk
