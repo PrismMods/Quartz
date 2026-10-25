@@ -37,6 +37,7 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
             [nameof(DmPresetJson)] = DmPresetJson,
             [nameof(DmSelectedTab)] = DmSelectedTab,
             [nameof(DmAnchor)] = DmAnchor,
+            [nameof(DmAnchorClosest)] = DmAnchorClosest,
             [nameof(DmOffsetX)] = DmOffsetX,
             [nameof(DmOffsetY)] = DmOffsetY,
             [nameof(DmScale)] = DmScale,
@@ -168,6 +169,7 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
         }
         DmSelectedTab = IOUtils.Read(token, nameof(DmSelectedTab), DmSelectedTab) ?? "4key";
         DmAnchor = IOUtils.Read(token, nameof(DmAnchor), DmAnchor);
+        DmAnchorClosest = IOUtils.Read(token, nameof(DmAnchorClosest), DmAnchorClosest);
         DmOffsetX = IOUtils.Read(token, nameof(DmOffsetX), DmOffsetX);
         DmOffsetY = IOUtils.Read(token, nameof(DmOffsetY), DmOffsetY);
         DmScale = Mathf.Clamp(IOUtils.Read(token, nameof(DmScale), DmScale), 0.2f, 4f);

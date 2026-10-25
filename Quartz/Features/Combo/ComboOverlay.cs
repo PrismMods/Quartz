@@ -66,6 +66,13 @@ public static class ComboOverlay {
         valueText = CreateLabel(root, "Value");
         captionText = CreateLabel(root, "Caption");
         dragObj = ReorganizeHandle.CreateDragSurface(root, () => MainCore.Tr.Get("COMBO", "Combo"), Save);
+        ReorganizeHandle.SetAnchorSource(dragObj, () => Conf.AnchorClosest, a => {
+            OverlayAnchors.Rebase(root, () => { Conf.Anchor = (int)a; Apply(); });
+            Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
+            Conf.OffsetX = stored.x;
+            Conf.OffsetY = GetOffsetYFromPosition(stored.y);
+            Save();
+        });
         ReorganizeHandle.SetSizeSource(
             dragObj,
             () => Conf.MasterSize,

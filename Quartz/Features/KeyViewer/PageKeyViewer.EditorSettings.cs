@@ -102,8 +102,15 @@ internal static partial class PageKeyViewer {
         Action refreshJs = AppendJsPlugins(body, conf, compact: true);
         Action refreshTuning = AppendDmTuning(body, conf, compact: true, includeOffsets: false);
         Action refreshGhostRainDots = AppendGhostRainDots(body, conf, def, compact: true);
-        KvWidgets.DropDown(GenerateUI.Row(body), (Quartz.Overlay.OverlayAnchor)def.DmAnchor, KeyViewerOverlay.Anchor,
-            Quartz.Overlay.OverlayAnchors.All, Quartz.Overlay.OverlayAnchors.Name, KeyViewerOverlay.SetAnchor,
+        KvWidgets.DropDown(GenerateUI.Row(body), Quartz.Overlay.OverlayAnchors.Closest, conf.DmAnchorClosest ? Quartz.Overlay.OverlayAnchors.Closest : conf.DmAnchor,
+            Quartz.Overlay.OverlayAnchors.WithClosest, Quartz.Overlay.OverlayAnchors.ClosestName, v => {
+                conf.DmAnchorClosest = v == Quartz.Overlay.OverlayAnchors.Closest;
+                if(conf.DmAnchorClosest) {
+                    KeyViewerOverlay.Save();
+                    Quartz.UI.Utility.Reorganizer.SnapAllAnchors();
+                }
+                else KeyViewerOverlay.SetAnchor((Quartz.Overlay.OverlayAnchor)v);
+            },
             "Anchor", "keyviewer_anchor");
         DmButton(
             body, true,

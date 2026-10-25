@@ -302,6 +302,16 @@ public static partial class PanelsOverlay {
         bg.color = config.GetBackgroundColor();
         bg.raycastTarget = false;
         GameObject drag = ReorganizeHandle.CreateDragSurface(rect, () => config.Name, Save);
+        ReorganizeHandle.SetAnchorSource(drag, () => config.AnchorClosest, a => {
+            OverlayAnchors.Rebase(rect, () => {
+                config.Anchor = (int)a;
+                OverlayAnchors.Pin(rect, a);
+            });
+            Vector2 stored = OverlayCalibration.Unscale(rect.anchoredPosition);
+            config.PosX = stored.x;
+            config.PosY = stored.y;
+            Save();
+        });
         ReorganizeHandle.SetSizeSource(
             drag,
             () => config.FontSize,

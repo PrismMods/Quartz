@@ -54,6 +54,7 @@ public enum PanelAnchor {
 public sealed class PanelConfig {
     public string Name = "Panel";
     public int Anchor = (int)PanelAnchor.TopLeft;
+    public bool AnchorClosest = true;
     public float PosX = 24f;
     public float PosY = -24f;
     public float Rotation = 0f;
@@ -96,6 +97,7 @@ public sealed class PanelConfig {
         return new JObject {
             [nameof(Name)] = Name,
             [nameof(Anchor)] = Anchor,
+            [nameof(AnchorClosest)] = AnchorClosest,
             [nameof(PosX)] = PosX,
             [nameof(PosY)] = PosY,
             [nameof(Rotation)] = Rotation,
@@ -130,6 +132,7 @@ public sealed class PanelConfig {
         if(token == null) return p;
         p.Name = IOUtils.Read(token, nameof(Name), p.Name);
         p.Anchor = IOUtils.Read(token, nameof(Anchor), p.Anchor);
+        p.AnchorClosest = IOUtils.Read(token, nameof(AnchorClosest), p.AnchorClosest);
         p.PosX = IOUtils.Read(token, nameof(PosX), p.PosX);
         p.PosY = IOUtils.Read(token, nameof(PosY), p.PosY);
         p.Rotation = Mathf.DeltaAngle(0f, IOUtils.Read(token, nameof(Rotation), p.Rotation));

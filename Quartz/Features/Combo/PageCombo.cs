@@ -37,8 +37,8 @@ internal static class PageCombo {
                 "Count only dead-center X perfects toward the combo when the XPerfect mod is active. The caption becomes \"XCombo\"."
             );
         }
-        OverlayAnchors.Dropdown(sec.Body, (OverlayAnchor)def.Anchor, OverlayAnchors.Parse(conf.Anchor),
-            ComboOverlay.SetAnchor, "combo_anchor");
+        OverlayAnchors.Dropdown(sec.Body, OverlayAnchors.Parse(conf.Anchor), conf.AnchorClosest,
+            ComboOverlay.SetAnchor, v => { conf.AnchorClosest = v; ComboOverlay.Save(); }, "combo_anchor");
         OverlayFontPicker.Dropdown(sec.Body, ComboOverlay.FontKey, "combo_font");
         GenerateUI.SnapSlider(sec.Body, "Font Size", "combo_fontsize",
             def.FontSize, 24f, 120f, conf.FontSize, "0 px", 1f,

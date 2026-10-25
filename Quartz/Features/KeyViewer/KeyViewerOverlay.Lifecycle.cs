@@ -176,6 +176,26 @@ public static partial class KeyViewerOverlay {
         }
     }
     internal static OverlayAnchor Anchor => OverlayAnchors.Parse(Conf.DmAnchor);
+    // Re-anchors hand and foot together without moving either on screen.
+    private static void RebaseAnchor(OverlayAnchor anchor) {
+        Vector3 footBefore = footRoot != null ? footRoot.TransformPoint(footRoot.rect.center) : Vector3.zero;
+        OverlayAnchors.Rebase(root, () => {
+            Conf.DmAnchor = (int)anchor;
+            OverlayAnchors.Pin(root, anchor);
+            OverlayAnchors.Pin(footRoot, anchor);
+        });
+        Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
+        Conf.DmOffsetX = stored.x;
+        Conf.DmOffsetY = stored.y;
+        if(footRoot != null) {
+            footRoot.position += footBefore - footRoot.TransformPoint(footRoot.rect.center);
+            Vector2 storedFoot = OverlayCalibration.Unscale(footRoot.anchoredPosition);
+            Conf.DmFootOffsetX = storedFoot.x - stored.x;
+            Conf.DmFootOffsetY = storedFoot.y - stored.y;
+        }
+        handAnchoredPrev = root.anchoredPosition;
+        Save();
+    }
     public static void SetAnchor(OverlayAnchor anchor) {
         Conf.DmAnchor = (int)anchor;
         ResetPosition();

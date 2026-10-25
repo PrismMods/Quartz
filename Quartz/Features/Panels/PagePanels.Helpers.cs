@@ -42,7 +42,6 @@ internal static partial class PagePanels {
         obj.AddComponent<RectMask2D>();
         return body;
     }
-    private static string AnchorName(PanelAnchor anchor) => OverlayAnchors.Name((OverlayAnchor)anchor);
     private static string StatDefaultLabel(string id) {
         foreach(PanelsOverlay.StatDef stat in PanelsOverlay.AllStats)
             if(stat.Id == id) return stat.Label;

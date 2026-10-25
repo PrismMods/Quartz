@@ -36,6 +36,26 @@ public static class OverlayAnchors {
         rect.anchorMax = a;
         rect.pivot = a;
     }
+    // Moves rect onto another anchor without moving it on screen; apply re-pins it (and stores the new anchor).
+    public static void Rebase(RectTransform rect, System.Action apply) {
+        if(rect == null) return;
+        Vector3 before = rect.TransformPoint(rect.rect.center);
+        apply();
+        rect.position += before - rect.TransformPoint(rect.rect.center);
+    }
+    // Closest is shown first in anchor dropdowns as -1; the rest are the anchors' own values.
+    public const int Closest = -1;
+    public static readonly int[] WithClosest = [Closest, 0, 1, 2, 3, 4, 5, 6, 7, 8];
+    public static string ClosestName(int v) => v == Closest
+        ? GenerateUI.Tr("ANCHOR_CLOSEST", "Closest")
+        : Name((OverlayAnchor)v);
+    public static void Dropdown(Transform parent, OverlayAnchor current, bool closest,
+        System.Action<OverlayAnchor> onChange, System.Action<bool> onClosest, string id) =>
+        GenerateUI.DropDown(GenerateUI.Row(parent), Closest, closest ? Closest : (int)current, WithClosest, ClosestName, v => {
+            onClosest(v == Closest);
+            if(v != Closest) onChange((OverlayAnchor)v);
+            else Quartz.UI.Utility.Reorganizer.SnapAllAnchors();
+        }, id, 260f, "Anchor");
     public static TextAlignmentOptions TextAlign(OverlayAnchor anchor) => anchor switch {
         OverlayAnchor.TopLeft => TextAlignmentOptions.TopLeft,
         OverlayAnchor.TopCenter => TextAlignmentOptions.Top,

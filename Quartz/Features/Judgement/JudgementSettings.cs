@@ -9,6 +9,7 @@ public sealed class JudgementSettings : ISettingsFile {
     public bool CompactRow = true;
     public bool ShowXPerfect = true;
     public int Anchor = (int)OverlayAnchor.BottomCenter;
+    public bool AnchorClosest = true;
     public float OffsetX = 0f;
     public float Rotation = 0f;
     public float OffsetY = -5f;
@@ -27,6 +28,7 @@ public sealed class JudgementSettings : ISettingsFile {
             [nameof(CompactRow)] = CompactRow,
             [nameof(ShowXPerfect)] = ShowXPerfect,
             [nameof(Anchor)] = Anchor,
+            [nameof(AnchorClosest)] = AnchorClosest,
             [nameof(OffsetX)] = OffsetX,
             [nameof(Rotation)] = Rotation,
             [nameof(OffsetY)] = OffsetY,
@@ -46,6 +48,7 @@ public sealed class JudgementSettings : ISettingsFile {
         CompactRow = IOUtils.Read(token, nameof(CompactRow), CompactRow);
         ShowXPerfect = IOUtils.Read(token, nameof(ShowXPerfect), ShowXPerfect);
         Anchor = IOUtils.Read(token, nameof(Anchor), Anchor);
+        AnchorClosest = IOUtils.Read(token, nameof(AnchorClosest), AnchorClosest);
         OffsetX = IOUtils.Read(token, nameof(OffsetX), OffsetX);
         Rotation = Mathf.DeltaAngle(0f, IOUtils.Read(token, nameof(Rotation), Rotation));
         OffsetY = IOUtils.Read(token, nameof(OffsetY), OffsetY);

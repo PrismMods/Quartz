@@ -76,6 +76,10 @@ public sealed partial class ReorganizeHandle : MonoBehaviour {
         pos.y = next.y;
         active.Target.position = pos;
         Reorganizer.SnapDuringDrag(active);
+        // A new anchor moves the pivot; keep the grab point under the cursor.
+        Vector3 pivotBefore = active.Target.position;
+        Reorganizer.SnapAnchor(active);
+        grabOffset += (Vector2)(active.Target.position - pivotBefore);
         Reorganizer.SyncSelectedSliders();
         moved = true;
     }
@@ -215,6 +219,7 @@ public static partial class Reorganizer {
         handle.SetFrameSelected(true);
         BuildOutline(handle.MeasureRect);
         EnsurePanel();
+        BuildAnchorLine(handle);
         nameLabel.text = handle.GetName?.Invoke() ?? handle.Target.name;
         ApplySizeSlider(handle);
         ApplyRotationSlider(handle);
@@ -285,6 +290,7 @@ public static partial class Reorganizer {
         outlineObj.AddComponent<ReorganizeGripScaler>().Grips = grips;
     }
     private static void ClearOutline() {
+        ClearAnchorLine();
         if(outlineObj != null) Object.Destroy(outlineObj);
         outlineObj = null;
     }

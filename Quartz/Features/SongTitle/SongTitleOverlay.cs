@@ -83,6 +83,13 @@ public static class SongTitleOverlay {
         TextCompat.NoWrap(text);
         text.text = "";
         dragObj = ReorganizeHandle.CreateDragSurface(root, () => MainCore.Tr.Get("SONG_TITLE", "Song Title"), Save);
+        ReorganizeHandle.SetAnchorSource(dragObj, () => Conf.AnchorClosest, a => {
+            OverlayAnchors.Rebase(root, () => { Conf.Anchor = (int)a; Apply(); });
+            Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
+            Conf.OffsetX = stored.x;
+            Conf.OffsetY = stored.y;
+            Save();
+        });
         ReorganizeHandle.SetSizeSource(
             dragObj,
             () => Conf.MasterSize,

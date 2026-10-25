@@ -660,6 +660,8 @@ namespace UnityEngine {
         public float yMax { get => throw null; set { } }
         public float yMin { get => throw null; set { } }
         public Rect(float x, float y, float width, float height) => throw null;
+        public static global::UnityEngine.Vector2 NormalizedToPoint(global::UnityEngine.Rect rectangle, global::UnityEngine.Vector2 normalizedRectCoordinates) => throw null;
+        public static global::UnityEngine.Vector2 PointToNormalized(global::UnityEngine.Rect rectangle, global::UnityEngine.Vector2 point) => throw null;
         bool global::System.IEquatable<global::UnityEngine.Rect>.Equals(global::UnityEngine.Rect other) => throw null;
     }
     public unsafe partial class RectOffset {
@@ -1021,6 +1023,7 @@ namespace UnityEngine {
         public static bool operator ==(global::UnityEngine.Vector3 lhs, global::UnityEngine.Vector3 rhs) => throw null;
         public static bool operator !=(global::UnityEngine.Vector3 lhs, global::UnityEngine.Vector3 rhs) => throw null;
         public static global::UnityEngine.Vector3 operator *(global::UnityEngine.Vector3 a, float d) => throw null;
+        public static global::UnityEngine.Vector3 operator -(global::UnityEngine.Vector3 a, global::UnityEngine.Vector3 b) => throw null;
         public override bool Equals(object obj) => throw null;
         public override int GetHashCode() => throw null;
         bool global::System.IEquatable<global::UnityEngine.Vector3>.Equals(global::UnityEngine.Vector3 other) => throw null;

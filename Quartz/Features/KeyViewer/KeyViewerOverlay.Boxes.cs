@@ -9,6 +9,7 @@ namespace Quartz.Features.KeyViewer;
 public static partial class KeyViewerOverlay {
     private static void AddReorganizeHandles() {
         dragObj = BuildReorganizeHandle(root, "Drag", "KEYVIEWER_TITLE", "Key Viewer");
+        ReorganizeHandle.SetAnchorSource(dragObj, () => Conf.DmAnchorClosest, RebaseAnchor);
         dragRect = (RectTransform)dragObj.transform;
         if(dragObj.GetComponent<ReorganizeHandle>() is { } handle) handle.Bounds = dragRect;
         ReorganizeHandle.SetSizeSource(

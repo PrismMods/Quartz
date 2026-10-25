@@ -1,4 +1,5 @@
 using Quartz.Core;
+using Quartz.Overlay;
 using Quartz.Resource;
 using Quartz.Tween;
 using Quartz.UI.Generator;
@@ -200,18 +201,9 @@ internal static partial class PagePanels {
         rows = MakeListContainer("StatRows", sec.Body, 6f);
         RebuildRows();
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(sec.Body)), "HEADING_APPEARANCE", "Appearance");
-        PanelAnchor[] anchors = (PanelAnchor[])Enum.GetValues(typeof(PanelAnchor));
-        GenerateUI.DropDown(
-            GenerateUI.Row(sec.Body),
-            PanelAnchor.TopLeft,
-            (PanelAnchor)panel.Anchor,
-            anchors,
-            AnchorName,
-            v => PanelsOverlay.SetAnchor(panel, v),
-            idp + "_anchor",
-            260f,
-            "Anchor"
-        );
+        OverlayAnchors.Dropdown(sec.Body, OverlayAnchors.Parse(panel.Anchor), panel.AnchorClosest,
+            v => PanelsOverlay.SetAnchor(panel, (PanelAnchor)v), v => { panel.AnchorClosest = v; PanelsOverlay.Save(); },
+            idp + "_anchor");
         UIInput prefix = GenerateUI.Input(
             GenerateUI.Row(sec.Body),
             def.Prefix,

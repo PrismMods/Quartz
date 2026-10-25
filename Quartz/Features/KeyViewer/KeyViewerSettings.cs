@@ -36,6 +36,7 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
     public string DmPresetJson = "";
     public string DmSelectedTab = "4key";
     public int DmAnchor = (int)OverlayAnchor.BottomCenter;
+    public bool DmAnchorClosest = true;
     public float DmOffsetX = 0f;
     public float DmOffsetY = 240f;
     public float DmScale = 1f;

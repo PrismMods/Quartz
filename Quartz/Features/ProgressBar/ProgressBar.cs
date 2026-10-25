@@ -91,6 +91,13 @@ public static class ProgressBarOverlay {
         fill = fillObj.AddComponent<Image>();
         fill.raycastTarget = false;
         dragObj = ReorganizeHandle.CreateDragSurface(bar, () => MainCore.Tr.Get("SECTION_PROGRESS_BAR", "Progress Bar"), Save);
+        ReorganizeHandle.SetAnchorSource(dragObj, () => Conf.AnchorClosest, a => {
+            OverlayAnchors.Rebase(bar, () => { Conf.Anchor = (int)a; Apply(); });
+            Vector2 stored = OverlayCalibration.Unscale(bar.anchoredPosition);
+            Conf.OffsetX = stored.x;
+            Conf.TopOffset = -stored.y;
+            Save();
+        });
         ReorganizeHandle.SetRotationSource(dragObj, () => Conf.Rotation, v => { Conf.Rotation = v; Apply(); });
         updater = canvasObj.AddComponent<Updater>();
         gateWant = true;

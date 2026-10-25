@@ -29,6 +29,7 @@
     "ANCHOR_BOTTOM_CENTER": "가운데 아래",
     "ANCHOR_BOTTOM_LEFT": "왼쪽 아래",
     "ANCHOR_BOTTOM_RIGHT": "오른쪽 아래",
+    "ANCHOR_CLOSEST": "가장 가까운 곳",
     "ANCHOR_MIDDLE_CENTER": "정가운데",
     "ANCHOR_MIDDLE_LEFT": "왼쪽 가운데",
     "ANCHOR_MIDDLE_RIGHT": "오른쪽 가운데",

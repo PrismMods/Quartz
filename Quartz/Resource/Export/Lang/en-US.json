@@ -29,6 +29,7 @@
     "ANCHOR_BOTTOM_CENTER": "Bottom Center",
     "ANCHOR_BOTTOM_LEFT": "Bottom Left",
     "ANCHOR_BOTTOM_RIGHT": "Bottom Right",
+    "ANCHOR_CLOSEST": "Closest",
     "ANCHOR_MIDDLE_CENTER": "Middle Center",
     "ANCHOR_MIDDLE_LEFT": "Middle Left",
     "ANCHOR_MIDDLE_RIGHT": "Middle Right",

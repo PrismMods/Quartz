@@ -87,6 +87,13 @@ public static class JudgementOverlay {
         if(compact) BuildCompactRow(rowObj);
         else BuildMultiLabelRow(rowObj);
         dragObj = ReorganizeHandle.CreateDragSurface(root, () => MainCore.Tr.Get("JUDGEMENT", "Judgement"), Save, ignoreLayout: true);
+        ReorganizeHandle.SetAnchorSource(dragObj, () => Conf.AnchorClosest, a => {
+            OverlayAnchors.Rebase(root, () => { Conf.Anchor = (int)a; Apply(); });
+            Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
+            Conf.OffsetX = stored.x;
+            Conf.OffsetY = stored.y - BottomMargin;
+            Save();
+        });
         ReorganizeHandle.SetSizeSource(
             dragObj,
             () => Conf.Size,

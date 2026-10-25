@@ -34,8 +34,8 @@ public static class PageSongTitle {
             "songtitle_strip",
             "Remove rich text tags (size, color, ...) and line breaks from the title."
         );
-        OverlayAnchors.Dropdown(sec.Body, (OverlayAnchor)def.Anchor, OverlayAnchors.Parse(conf.Anchor),
-            SongTitleOverlay.SetAnchor, "songtitle_anchor");
+        OverlayAnchors.Dropdown(sec.Body, OverlayAnchors.Parse(conf.Anchor), conf.AnchorClosest,
+            SongTitleOverlay.SetAnchor, v => { conf.AnchorClosest = v; SongTitleOverlay.Save(); }, "songtitle_anchor");
         OverlayFontPicker.Dropdown(sec.Body, SongTitleOverlay.FontKey, "songtitle_font");
         GenerateUI.SnapSlider(sec.Body, "Font Size", "songtitle_fontsize",
             def.FontSize, 12f, 120f, conf.FontSize, "0 px", 1f,

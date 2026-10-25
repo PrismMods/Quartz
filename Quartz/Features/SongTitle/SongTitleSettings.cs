@@ -11,6 +11,7 @@ public sealed class SongTitleSettings : ISettingsFile {
     public float FontSize = 40f;
     public float MasterSize = 0.5697336f;
     public int Anchor = (int)OverlayAnchor.TopCenter;
+    public bool AnchorClosest = true;
     public float OffsetX = 0f;
     public float Rotation = 0f;
     public float OffsetY = -46.75464f;
@@ -29,6 +30,7 @@ public sealed class SongTitleSettings : ISettingsFile {
         [nameof(FontSize)] = FontSize,
         [nameof(MasterSize)] = MasterSize,
         [nameof(Anchor)] = Anchor,
+        [nameof(AnchorClosest)] = AnchorClosest,
         [nameof(OffsetX)] = OffsetX,
         [nameof(Rotation)] = Rotation,
         [nameof(OffsetY)] = OffsetY,
@@ -52,6 +54,7 @@ public sealed class SongTitleSettings : ISettingsFile {
         FontSize = IOUtils.Read(token, nameof(FontSize), FontSize);
         MasterSize = IOUtils.Read(token, nameof(MasterSize), MasterSize);
         Anchor = IOUtils.Read(token, nameof(Anchor), Anchor);
+        AnchorClosest = IOUtils.Read(token, nameof(AnchorClosest), AnchorClosest);
         OffsetX = IOUtils.Read(token, nameof(OffsetX), OffsetX);
         Rotation = Mathf.DeltaAngle(0f, IOUtils.Read(token, nameof(Rotation), Rotation));
         OffsetY = IOUtils.Read(token, nameof(OffsetY), OffsetY);
