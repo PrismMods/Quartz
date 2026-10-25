@@ -28,6 +28,23 @@ internal static partial class PageSettings {
         MainCore.Conf.SettingsFontName = name == FontManager.UiDefault ? "" : name;
         MainCore.ConfMgr.RequestSave();
         FontManager.ApplyMenuFont();
+        RefreshSettingsFontAdjust();
+    }
+    // "Same as overlay" already follows the sliders above, so it gets no pair of its own.
+    private static string SettingsAdjustTarget() {
+        string name = MainCore.Conf.SettingsFontName;
+        return string.IsNullOrEmpty(name) ? FontManager.UiDefault
+            : name == FontManager.SameAsOverlay ? null : name;
+    }
+    private static void RefreshSettingsFontAdjust() {
+        string target = SettingsAdjustTarget();
+        var (scale, lineSpacing) = FontManager.GetAdjust(target);
+        foreach(var (slider, value) in new[] { (settingsFontScaleSlider, scale), (settingsFontLineSpacingSlider, lineSpacing) }) {
+            if(slider == null) continue;
+            slider.Set(value, false);
+            slider.Rect.parent.gameObject.SetActive(target != null);
+        }
+        if(pageContent != null) LayoutRebuilder.ForceRebuildLayoutImmediate(pageContent);
     }
     private static IReadOnlyList<string> BuildSettingsFontValues() {
         var list = new List<string> { FontManager.UiDefault, FontManager.SameAsOverlay };
@@ -51,6 +68,7 @@ internal static partial class PageSettings {
             settingsFontDropdown.SetValues(BuildSettingsFontValues());
             settingsFontDropdown.Set(CurrentSettingsFontValue(), false);
         }
+        RefreshSettingsFontAdjust();
     }
     private static IReadOnlyList<string> BuildFontValues() {
         var list = new List<string>(FontManager.GetAvailableFonts()) { FontManager.AddSentinel };
@@ -125,6 +143,9 @@ internal static partial class PageSettings {
         }
     }
     private static void RefreshFontManageRow() {
+        var (scale, lineSpacing) = FontManager.GetAdjust(FontManager.CurrentName);
+        fontScaleSlider?.Set(scale, false);
+        fontLineSpacingSlider?.Set(lineSpacing, false);
         if(fontManageRow == null) return;
         bool custom = FontManager.IsCustomFont(FontManager.CurrentName);
         fontManageRow.SetActive(custom);

@@ -82,6 +82,7 @@ internal sealed partial class KvCanvas {
         GameObject contentObj = new("Content");
         contentObj.transform.SetParent(viewObj.transform, false);
         c.content = contentObj.AddComponent<RectTransform>();
+        contentObj.AddComponent<OverlayFontScope>();
         TopLeft(c.content);
         GameObject overlayObj = new("Overlay");
         overlayObj.transform.SetParent(viewObj.transform, false);

@@ -30,6 +30,10 @@ internal static partial class PageSettings {
     private static GameObject fontStatusRow;
     private static TextMeshProUGUI fontStatusText;
     private static UIDropDown<string> settingsFontDropdown;
+    private static UISlider fontScaleSlider;
+    private static UISlider fontLineSpacingSlider;
+    private static UISlider settingsFontScaleSlider;
+    private static UISlider settingsFontLineSpacingSlider;
     private static string pendingFontName = "";
     private static UIButton updateCheckButton;
     private static TextMeshProUGUI updateStatusText;

@@ -2,6 +2,8 @@ using Quartz.Core;
 using System.Reflection;
 using UnityEngine;
 using TMPro;
+using UnityEngine.TextCore;
+using UnityEngine.UI;
 using Quartz.Compat.Game;
 namespace Quartz.Resource;
 public static partial class FontManager {
@@ -21,6 +23,8 @@ public static partial class FontManager {
             return name == SameAsOverlay ? Current : GetFont(name);
         }
     }
+    public const float MinAdjust = 0.5f;
+    public const float MaxAdjust = 2f;
     public static event Action OnFontChanged;
     public static event Action OnFontCatalogChanged;
     private static TMP_FontAsset defaultFont;
@@ -32,6 +36,7 @@ public static partial class FontManager {
     private static readonly Dictionary<string, Font> sourceByName = [];
     private static readonly Dictionary<string, string> fontFiles = [];
     private static readonly HashSet<string> customNames = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly Dictionary<TMP_FontAsset, FaceInfo> baseFaces = [];
     private static string[] available;
     private static bool scanned;
     public static void Initialize() {
@@ -49,7 +54,8 @@ public static partial class FontManager {
         get {
             if(uiFont != null) return uiFont;
             uiFont = MainCore.Res.Get<TMP_FontAsset>(Asset.SUIT_Medium);
-            AttachCjk(uiFont);
+            AttachFallbacks(uiFont);
+            ApplyAdjust(uiFont, UiDefault);
             return uiFont;
         }
     }
@@ -96,7 +102,8 @@ public static partial class FontManager {
                 font = new Font(path);
                 TMP_FontAsset asset = TMP_FontAsset.CreateFontAsset(font);
                 asset.isMultiAtlasTexturesEnabled = true;
-                AttachCjk(asset);
+                AttachFallbacks(asset);
+                ApplyAdjust(asset, DefaultName);
                 defaultSourceFont = font;
                 return asset;
             } catch(Exception e) {
@@ -106,7 +113,7 @@ public static partial class FontManager {
         }
         defaultSourceFont = null;
         TMP_FontAsset suit = MainCore.Res.Get<TMP_FontAsset>(Asset.SUIT_Medium);
-        AttachCjk(suit);
+        AttachFallbacks(suit);
         return suit;
     }
     public static IReadOnlyList<string> GetAvailableFonts() {
@@ -156,6 +163,8 @@ public static partial class FontManager {
             asset = DefaultFont;
             name = DefaultName;
         }
+        // Re-apply: a profile load can swap Conf.FontAdjust under an already-built asset.
+        ApplyAdjust(asset, name);
         Current = asset;
         CurrentName = name;
         ApplyToAll();
@@ -216,8 +225,8 @@ public static partial class FontManager {
             return false;
         }
         Invalidate();
-        if(wasCurrent) SetFont(clean, true);
         RetargetFontOverrides(oldName, clean);
+        if(wasCurrent) SetFont(clean, true);
         OnFontCatalogChanged?.Invoke();
         return true;
     }
@@ -237,14 +246,18 @@ public static partial class FontManager {
             return false;
         }
         Invalidate();
-        if(wasCurrent) SetFont(DefaultName, true);
         RetargetFontOverrides(name, "");
+        if(wasCurrent) SetFont(DefaultName, true);
         OnFontCatalogChanged?.Invoke();
         return true;
     }
     private static void RetargetFontOverrides(string oldName, string replacement) {
         var conf = MainCore.Conf;
         if(conf == null) return;
+        if(conf.FontAdjust.Remove(oldName, out var adjust)) {
+            if(!string.IsNullOrEmpty(replacement)) conf.FontAdjust[replacement] = adjust;
+            MainCore.ConfMgr.RequestSave();
+        }
         if(string.Equals(conf.SettingsFontName, oldName, StringComparison.OrdinalIgnoreCase)) {
             conf.SettingsFontName = replacement;
             ApplyMenuFont();
@@ -269,6 +282,7 @@ public static partial class FontManager {
     }
     private static void EvictCache(string name) {
         if(cache.TryGetValue(name, out TMP_FontAsset asset)) {
+            baseFaces.Remove(asset);
             DestroyFontAsset(asset);
             cache.Remove(name);
         }
@@ -287,38 +301,79 @@ public static partial class FontManager {
         customNames.Clear();
     }
     public static TMP_FontAsset GetFont(string name) => Resolve(name) ?? DefaultFont;
+    public static (float Scale, float LineSpacing) GetAdjust(string name) =>
+        MainCore.Conf.FontAdjust.TryGetValue(name ?? "", out var a)
+            ? (Mathf.Clamp(a.Scale, MinAdjust, MaxAdjust), Mathf.Clamp(a.LineSpacing, MinAdjust, MaxAdjust))
+            : (1f, 1f);
+    public static void SetAdjust(string name, float scale, float lineSpacing) {
+        if(string.IsNullOrEmpty(name)) return;
+        if(scale == 1f && lineSpacing == 1f) MainCore.Conf.FontAdjust.Remove(name);
+        else MainCore.Conf.FontAdjust[name] = (scale, lineSpacing);
+        TMP_FontAsset asset = name == UiDefault ? uiFont
+            : name == DefaultName ? defaultFont
+            : cache.TryGetValue(name, out var c) ? c : null;
+        if(asset == null) return;
+        ApplyAdjust(asset, name);
+        RefreshTexts(asset);
+    }
+    // TMP doesn't re-mesh other texts when face metrics change, so redraw every text on this font, hidden pages included.
+    private static void RefreshTexts(TMP_FontAsset asset) {
+        if(MainCore.Root == null) return;
+        TMP_Text[] texts = MainCore.Root.GetComponentsInChildren<TMP_Text>(true);
+        for(int i = 0; i < texts.Length; i++) {
+            TMP_Text text = texts[i];
+            if(text == null || text.font != asset) continue;
+            text.ForceMeshUpdate(true, true);
+            LayoutRebuilder.MarkLayoutForRebuild(text.rectTransform);
+        }
+    }
+    // Scales the asset's face metrics so every text using the font follows, whatever fontSize each overlay sets.
+    private static void ApplyAdjust(TMP_FontAsset asset, string name) {
+        if(asset == null) return;
+        if(!baseFaces.TryGetValue(asset, out FaceInfo face)) baseFaces[asset] = face = asset.faceInfo;
+        var (scale, lineSpacing) = GetAdjust(name);
+        face.scale *= scale;
+        face.lineHeight *= lineSpacing;
+        asset.faceInfo = face;
+    }
     public static void ApplyToAll() {
         if(MainCore.Root == null || Current == null) return;
         TMP_FontAsset menuFont = MenuFontAsset ?? Current;
-        AttachCjk(Current);
-        if(menuFont != Current) AttachCjk(menuFont);
+        AttachFallbacks(Current);
+        if(menuFont != Current) AttachFallbacks(menuFont);
         Transform menuRoot = MenuRoot;
         TMP_Text[] texts = MainCore.Root.GetComponentsInChildren<TMP_Text>(true);
         for(int i = 0; i < texts.Length; i++) {
             TMP_Text text = texts[i];
             if(text == null || text.GetComponent<FontExempt>() != null) continue;
-            bool isMenu = menuRoot != null
-                && (text.transform == menuRoot || text.transform.IsChildOf(menuRoot));
-            text.font = isMenu ? menuFont : Current;
+            text.font = IsMenuText(text, menuRoot) ? menuFont : Current;
         }
     }
+    private static bool IsMenuText(TMP_Text text, Transform menuRoot) =>
+        menuRoot != null
+        && (text.transform == menuRoot || text.transform.IsChildOf(menuRoot))
+        && text.GetComponentInParent<OverlayFontScope>(true) == null;
     public static void ApplyMenuFont() {
         Transform menuRoot = MenuRoot;
         if(menuRoot == null) return;
         TMP_FontAsset menuFont = MenuFontAsset ?? Current;
         if(menuFont == null) return;
-        AttachCjk(menuFont);
+        AttachFallbacks(menuFont);
         TMP_Text[] texts = menuRoot.GetComponentsInChildren<TMP_Text>(true);
         for(int i = 0; i < texts.Length; i++) {
             TMP_Text text = texts[i];
             if(text == null || text.GetComponent<FontExempt>() != null) continue;
-            text.font = menuFont;
+            text.font = IsMenuText(text, menuRoot) ? menuFont : Current;
             text.ForceMeshUpdate(false, true);
         }
     }
-    private static void AttachCjk(TMP_FontAsset asset) {
+    // SUIT first so any picked font still gets SUIT's Hangul and Latin for glyphs it lacks, then the CJK font.
+    private static void AttachFallbacks(TMP_FontAsset asset) {
         if(asset == null) return;
-        TMP_FontAsset fb = GetCjkFallback();
+        AddFallback(asset, MainCore.Res.Get<TMP_FontAsset>(Asset.SUIT_Medium));
+        AddFallback(asset, GetCjkFallback());
+    }
+    private static void AddFallback(TMP_FontAsset asset, TMP_FontAsset fb) {
         if(fb == null || fb == asset) return;
         asset.fallbackFontAssetTable ??= [];
         if(!asset.fallbackFontAssetTable.Contains(fb)) asset.fallbackFontAssetTable.Add(fb);
@@ -366,7 +421,8 @@ public static partial class FontManager {
             font = new Font(path);
             TMP_FontAsset asset = TMP_FontAsset.CreateFontAsset(font);
             asset.isMultiAtlasTexturesEnabled = true;
-            AttachCjk(asset);
+            AttachFallbacks(asset);
+            ApplyAdjust(asset, name);
             cache[name] = asset;
             sourceFonts.Add(font);
             sourceByName[name] = font;
@@ -382,6 +438,7 @@ public static partial class FontManager {
     public static void Dispose() {
         foreach(TMP_FontAsset asset in cache.Values) DestroyFontAsset(asset);
         cache.Clear();
+        baseFaces.Clear();
         foreach(Font font in sourceFonts) if(font != null) UnityEngine.Object.Destroy(font);
         sourceFonts.Clear();
         sourceByName.Clear();

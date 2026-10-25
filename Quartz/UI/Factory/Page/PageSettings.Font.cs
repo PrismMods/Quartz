@@ -39,6 +39,7 @@ internal static partial class PageSettings {
             "font_dropdown"
         );
         fontDropdown.ItemFont = FontManager.GetFont;
+        (fontScaleSlider, fontLineSpacingSlider) = CreateAdjustSliders(fontGroup.transform, () => FontManager.CurrentName);
         var manageRow = GenerateUI.Row(fontGroup.transform);
         fontManageRow = manageRow.gameObject;
         fontRenameInput = GenerateUI.Input(
@@ -103,9 +104,31 @@ internal static partial class PageSettings {
             "settings_font_dropdown"
         );
         settingsFontDropdown.ItemFont = name => name == FontManager.UiDefault ? FontManager.UiFont : FontManager.GetFont(name);
+        (settingsFontScaleSlider, settingsFontLineSpacingSlider) = CreateAdjustSliders(content.transform, SettingsAdjustTarget);
+        RefreshSettingsFontAdjust();
         settingsFontDropdown.Rect.AddToolTip(
             "DESC_SETTINGS_FONT",
             "Font for this mod's own settings window. Default is SUIT; \"Same as overlay font\" follows the Font picker above."
         );
+    }
+    private static (UISlider Scale, UISlider LineSpacing) CreateAdjustSliders(Transform parent, Func<string> target) {
+        var (adjScale, adjLine) = FontManager.GetAdjust(target());
+        UISlider scale = GenerateUI.SnapSlider(parent, "Font Size", "font_scale",
+            1f, FontManager.MinAdjust, FontManager.MaxAdjust, adjScale, "0.00 x", 0.01f,
+            v => FontManager.SetAdjust(target(), v, FontManager.GetAdjust(target()).LineSpacing),
+            null, () => MainCore.ConfMgr.RequestSave());
+        scale.Rect.AddToolTip(
+            "DESC_FONT_SCALE",
+            "Size multiplier for the selected font. Use it when a custom font renders smaller than others. Saved per font."
+        );
+        UISlider lineSpacing = GenerateUI.SnapSlider(parent, "Line Spacing", "font_line_spacing",
+            1f, FontManager.MinAdjust, FontManager.MaxAdjust, adjLine, "0.00 x", 0.01f,
+            v => FontManager.SetAdjust(target(), FontManager.GetAdjust(target()).Scale, v),
+            null, () => MainCore.ConfMgr.RequestSave());
+        lineSpacing.Rect.AddToolTip(
+            "DESC_FONT_LINE_SPACING",
+            "Line height multiplier for the selected font. Saved per font."
+        );
+        return (scale, lineSpacing);
     }
 }

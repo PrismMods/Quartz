@@ -17,6 +17,7 @@ public sealed class CoreSettings : ISettingsFile {
     public bool FontJudgement = false;
     public float FontJudgementSize = 1f;
     public string SettingsFontName = "";
+    public Dictionary<string, (float Scale, float LineSpacing)> FontAdjust = [];
     public float ScrollSpeed = 80f;
     public float FpsRefreshInterval = 0f;
     public float PanelOpacity = 1.0f;
@@ -64,6 +65,9 @@ public sealed class CoreSettings : ISettingsFile {
         JObject toggleKeybinds = [];
         foreach(var kvp in ToggleKeybinds)
             toggleKeybinds[kvp.Key] = new JArray(kvp.Value.Modifier, kvp.Value.Key);
+        JObject fontAdjust = [];
+        foreach(var kvp in FontAdjust)
+            fontAdjust[kvp.Key] = new JArray(kvp.Value.Scale, kvp.Value.LineSpacing);
         return new JObject {
             [nameof(Active)] = Active,
             [nameof(Language)] = Language,
@@ -78,6 +82,7 @@ public sealed class CoreSettings : ISettingsFile {
             [nameof(FontJudgement)] = FontJudgement,
             [nameof(FontJudgementSize)] = FontJudgementSize,
             [nameof(SettingsFontName)] = SettingsFontName,
+            [nameof(FontAdjust)] = fontAdjust,
             [nameof(ScrollSpeed)] = ScrollSpeed,
             [nameof(FpsRefreshInterval)] = FpsRefreshInterval,
             [nameof(PanelOpacity)] = PanelOpacity,
@@ -159,6 +164,15 @@ public sealed class CoreSettings : ISettingsFile {
                     if(prop.Value is not JArray pair || pair.Count != 2) continue;
                     ToggleKeybinds[prop.Name] = (pair[0].Value<int>(), pair[1].Value<int>());
                 } catch(Exception e) { Diag.Warn(e, "Settings/ToggleKeybinds:" + prop.Name); }
+            }
+        }
+        FontAdjust.Clear();
+        if(token[nameof(FontAdjust)] is JObject fontAdjust) {
+            foreach(var prop in fontAdjust.Properties()) {
+                try {
+                    if(prop.Value is not JArray pair || pair.Count != 2) continue;
+                    FontAdjust[prop.Name] = (pair[0].Value<float>(), pair[1].Value<float>());
+                } catch(Exception e) { Diag.Warn(e, "Settings/FontAdjust:" + prop.Name); }
             }
         }
         AccentR = IOUtils.Read(token, nameof(AccentR), AccentR);
