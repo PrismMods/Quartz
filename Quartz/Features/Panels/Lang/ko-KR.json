@@ -1,9 +1,9 @@
 {
   "ko-KR": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
-    "DESC_PANEL_ADDSTAT": "이 패널에 넣을 스탯을 골라 주세요.",
+    "DESC_PANEL_ADDSTAT": "이 패널에 넣을 스탯을 골라요.",
     "DESC_PANEL_BGCOLOR": "패널 배경 색이에요. A(알파) 슬라이더로 불투명도를 바꿔요. 배경 패널을 켜야 보여요.",
-    "DESC_PANEL_IMAGE_CHOOSE": "PNG나 JPG 파일을 골라 주세요. 파일 이름만 쓰면 PanelImages 폴더에서 찾아요. 이미지를 거기 두면 설정을 그대로 옮길 수 있어요.",
+    "DESC_PANEL_IMAGE_CHOOSE": "PNG나 JPG 파일을 골라요. 파일 이름만 쓰면 PanelImages 폴더에서 찾아요. 이미지를 거기 두면 설정을 그대로 옮길 수 있어요.",
     "DESC_PANEL_IMAGE_SIZE": "이미지 높이를 이 패널 글꼴 크기의 몇 배로 할지 정해요.",
     "DESC_PANEL_LAYER": "끌어서 순서를 바꿔요. 겹칠 때는 목록 위쪽 패널이 앞에 보여요.",
     "DESC_PANEL_LOCALIZESTATS": "끄면 이 패널의 스탯 이름이 영어로 나와요(X-Acc, Max X-Acc…). 켜면 UI 언어를 따라가요.",
@@ -34,7 +34,7 @@
     "PANEL_LINESPACING": "줄 간격",
     "PANEL_LOCALIZESTATS": "스탯 이름 현지화",
     "PANEL_NAME": "패널 이름",
-    "PANEL_NO_PANELS": "패널이 없어요. 위에서 만들어 보세요.",
+    "PANEL_NO_PANELS": "패널이 없어요. 위에서 만들 수 있어요.",
     "PANEL_NO_STATS": "이 패널에 스탯이 없어요.",
     "PANEL_PREFIX": "접두 문구",
     "PANEL_RESETPOS": "위치 초기화",
