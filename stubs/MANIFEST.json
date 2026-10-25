@@ -2408,9 +2408,12 @@
       {
         "type": "TMPro.TMP_Asset",
         "members": [
+          "System.Void TMPro.TMP_Asset::set_faceInfo(UnityEngine.TextCore.FaceInfo)",
           "System.Void TMPro.TMP_Asset::set_material(UnityEngine.Material)",
           "UnityEngine.Material TMPro.TMP_Asset::get_material()",
-          "UnityEngine.Material TMPro.TMP_Asset::material()"
+          "UnityEngine.Material TMPro.TMP_Asset::material()",
+          "UnityEngine.TextCore.FaceInfo TMPro.TMP_Asset::faceInfo()",
+          "UnityEngine.TextCore.FaceInfo TMPro.TMP_Asset::get_faceInfo()"
         ]
       },
       {
@@ -2493,7 +2496,6 @@
           "System.String TMPro.TMP_InputField::get_text()",
           "System.String TMPro.TMP_InputField::text()",
           "System.Void TMPro.TMP_InputField::ActivateInputField()",
-          "System.Void TMPro.TMP_InputField::ForceLabelUpdate()",
           "System.Void TMPro.TMP_InputField::SetTextWithoutNotify(System.String)",
           "System.Void TMPro.TMP_InputField::set_caretBlinkRate(System.Single)",
           "System.Void TMPro.TMP_InputField::set_caretColor(UnityEngine.Color)",
@@ -2980,15 +2982,8 @@
           "System.Single UnityEngine.AudioClip::get_length()",
           "System.Single UnityEngine.AudioClip::length()",
           "UnityEngine.AudioClip UnityEngine.AudioClip::Create(System.String,System.Int32,System.Int32,System.Int32,System.Boolean)",
-          "UnityEngine.AudioClip UnityEngine.AudioClip::Create(System.String,System.Int32,System.Int32,System.Int32,System.Boolean,UnityEngine.AudioClip/PCMReaderCallback)",
           "UnityEngine.AudioDataLoadState UnityEngine.AudioClip::get_loadState()",
           "UnityEngine.AudioDataLoadState UnityEngine.AudioClip::loadState()"
-        ]
-      },
-      {
-        "type": "UnityEngine.AudioClip/PCMReaderCallback",
-        "members": [
-          "System.Void UnityEngine.AudioClip/PCMReaderCallback::.ctor(System.Object,System.IntPtr)"
         ]
       },
       {
@@ -3013,8 +3008,6 @@
       {
         "type": "UnityEngine.AudioSource",
         "members": [
-          "System.Boolean UnityEngine.AudioSource::bypassEffects()",
-          "System.Boolean UnityEngine.AudioSource::bypassListenerEffects()",
           "System.Boolean UnityEngine.AudioSource::get_mute()",
           "System.Boolean UnityEngine.AudioSource::loop()",
           "System.Boolean UnityEngine.AudioSource::mute()",
@@ -3024,14 +3017,10 @@
           "System.Single UnityEngine.AudioSource::get_pitch()",
           "System.Single UnityEngine.AudioSource::get_time()",
           "System.Single UnityEngine.AudioSource::pitch()",
-          "System.Single UnityEngine.AudioSource::spatialBlend()",
           "System.Single UnityEngine.AudioSource::time()",
           "System.Single UnityEngine.AudioSource::volume()",
-          "System.Void UnityEngine.AudioSource::Play()",
           "System.Void UnityEngine.AudioSource::PlayScheduled(System.Double)",
           "System.Void UnityEngine.AudioSource::Stop()",
-          "System.Void UnityEngine.AudioSource::set_bypassEffects(System.Boolean)",
-          "System.Void UnityEngine.AudioSource::set_bypassListenerEffects(System.Boolean)",
           "System.Void UnityEngine.AudioSource::set_clip(UnityEngine.AudioClip)",
           "System.Void UnityEngine.AudioSource::set_loop(System.Boolean)",
           "System.Void UnityEngine.AudioSource::set_mute(System.Boolean)",
@@ -3039,23 +3028,11 @@
           "System.Void UnityEngine.AudioSource::set_pitch(System.Single)",
           "System.Void UnityEngine.AudioSource::set_playOnAwake(System.Boolean)",
           "System.Void UnityEngine.AudioSource::set_priority(System.Int32)",
-          "System.Void UnityEngine.AudioSource::set_spatialBlend(System.Single)",
           "System.Void UnityEngine.AudioSource::set_timeSamples(System.Int32)",
           "System.Void UnityEngine.AudioSource::set_volume(System.Single)",
           "UnityEngine.Audio.AudioMixerGroup UnityEngine.AudioSource::outputAudioMixerGroup()",
           "UnityEngine.AudioClip UnityEngine.AudioSource::clip()",
           "UnityEngine.AudioClip UnityEngine.AudioSource::get_clip()"
-        ]
-      },
-      {
-        "type": "UnityEngine.Microphone",
-        "members": [
-          "System.Int32 UnityEngine.Microphone::GetPosition(System.String)",
-          "System.String[] UnityEngine.Microphone::devices()",
-          "System.String[] UnityEngine.Microphone::get_devices()",
-          "System.Void UnityEngine.Microphone::End(System.String)",
-          "System.Void UnityEngine.Microphone::GetDeviceCaps(System.String,System.Int32\u0026,System.Int32\u0026)",
-          "UnityEngine.AudioClip UnityEngine.Microphone::Start(System.String,System.Boolean,System.Int32,System.Int32)"
         ]
       }
     ]
@@ -4596,6 +4573,44 @@
     "assembly": "UnityEngine.TextCoreFontEngineModule",
     "types": [
       {
+        "type": "UnityEngine.TextCore.FaceInfo",
+        "members": [
+          "System.Int32 UnityEngine.TextCore.FaceInfo::m_FaceIndex",
+          "System.Int32 UnityEngine.TextCore.FaceInfo::m_UnitsPerEM",
+          "System.Single UnityEngine.TextCore.FaceInfo::ascentLine()",
+          "System.Single UnityEngine.TextCore.FaceInfo::capLine()",
+          "System.Single UnityEngine.TextCore.FaceInfo::get_ascentLine()",
+          "System.Single UnityEngine.TextCore.FaceInfo::get_capLine()",
+          "System.Single UnityEngine.TextCore.FaceInfo::get_lineHeight()",
+          "System.Single UnityEngine.TextCore.FaceInfo::get_pointSize()",
+          "System.Single UnityEngine.TextCore.FaceInfo::get_scale()",
+          "System.Single UnityEngine.TextCore.FaceInfo::lineHeight()",
+          "System.Single UnityEngine.TextCore.FaceInfo::m_AscentLine",
+          "System.Single UnityEngine.TextCore.FaceInfo::m_Baseline",
+          "System.Single UnityEngine.TextCore.FaceInfo::m_CapLine",
+          "System.Single UnityEngine.TextCore.FaceInfo::m_DescentLine",
+          "System.Single UnityEngine.TextCore.FaceInfo::m_LineHeight",
+          "System.Single UnityEngine.TextCore.FaceInfo::m_MeanLine",
+          "System.Single UnityEngine.TextCore.FaceInfo::m_PointSize",
+          "System.Single UnityEngine.TextCore.FaceInfo::m_Scale",
+          "System.Single UnityEngine.TextCore.FaceInfo::m_StrikethroughOffset",
+          "System.Single UnityEngine.TextCore.FaceInfo::m_StrikethroughThickness",
+          "System.Single UnityEngine.TextCore.FaceInfo::m_SubscriptOffset",
+          "System.Single UnityEngine.TextCore.FaceInfo::m_SubscriptSize",
+          "System.Single UnityEngine.TextCore.FaceInfo::m_SuperscriptOffset",
+          "System.Single UnityEngine.TextCore.FaceInfo::m_SuperscriptSize",
+          "System.Single UnityEngine.TextCore.FaceInfo::m_TabWidth",
+          "System.Single UnityEngine.TextCore.FaceInfo::m_UnderlineOffset",
+          "System.Single UnityEngine.TextCore.FaceInfo::m_UnderlineThickness",
+          "System.Single UnityEngine.TextCore.FaceInfo::pointSize()",
+          "System.Single UnityEngine.TextCore.FaceInfo::scale()",
+          "System.String UnityEngine.TextCore.FaceInfo::m_FamilyName",
+          "System.String UnityEngine.TextCore.FaceInfo::m_StyleName",
+          "System.Void UnityEngine.TextCore.FaceInfo::set_lineHeight(System.Single)",
+          "System.Void UnityEngine.TextCore.FaceInfo::set_scale(System.Single)"
+        ]
+      },
+      {
         "type": "UnityEngine.TextCore.Glyph",
         "members": [
           "System.Int32 UnityEngine.TextCore.Glyph::atlasIndex()",
@@ -4695,6 +4710,7 @@
       {
         "type": "UnityEngine.EventSystems.EventSystem",
         "members": [
+          "System.Void UnityEngine.EventSystems.EventSystem::RaycastAll(UnityEngine.EventSystems.PointerEventData,System.Collections.Generic.List\u00601\u003CUnityEngine.EventSystems.RaycastResult\u003E)",
           "UnityEngine.EventSystems.EventSystem UnityEngine.EventSystems.EventSystem::current()",
           "UnityEngine.EventSystems.EventSystem UnityEngine.EventSystems.EventSystem::get_current()",
           "UnityEngine.GameObject UnityEngine.EventSystems.EventSystem::currentSelectedGameObject()",
@@ -4832,6 +4848,8 @@
         "members": [
           "System.Boolean UnityEngine.EventSystems.PointerEventData::dragging()",
           "System.Boolean UnityEngine.EventSystems.PointerEventData::get_dragging()",
+          "System.Void UnityEngine.EventSystems.PointerEventData::.ctor(UnityEngine.EventSystems.EventSystem)",
+          "System.Void UnityEngine.EventSystems.PointerEventData::set_position(UnityEngine.Vector2)",
           "UnityEngine.Camera UnityEngine.EventSystems.PointerEventData::get_pressEventCamera()",
           "UnityEngine.Camera UnityEngine.EventSystems.PointerEventData::pressEventCamera()",
           "UnityEngine.EventSystems.PointerEventData/InputButton UnityEngine.EventSystems.PointerEventData::button()",

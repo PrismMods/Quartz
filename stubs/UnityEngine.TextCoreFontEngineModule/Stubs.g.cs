@@ -12,6 +12,34 @@
 #pragma warning disable CS0067, CS0169, CS0649, CS0108, CS0109, CS0114, CS0465, CS0824
 
 namespace UnityEngine.TextCore {
+    public unsafe partial struct FaceInfo {
+        private float m_AscentLine;
+        private float m_Baseline;
+        private float m_CapLine;
+        private float m_DescentLine;
+        private int m_FaceIndex;
+        private string m_FamilyName;
+        private float m_LineHeight;
+        private float m_MeanLine;
+        private float m_PointSize;
+        private float m_Scale;
+        private float m_StrikethroughOffset;
+        private float m_StrikethroughThickness;
+        private string m_StyleName;
+        private float m_SubscriptOffset;
+        private float m_SubscriptSize;
+        private float m_SuperscriptOffset;
+        private float m_SuperscriptSize;
+        private float m_TabWidth;
+        private float m_UnderlineOffset;
+        private float m_UnderlineThickness;
+        private int m_UnitsPerEM;
+        public float ascentLine { get => throw null; set { } }
+        public float capLine { get => throw null; set { } }
+        public float lineHeight { get => throw null; set { } }
+        public float pointSize { get => throw null; set { } }
+        public float scale { get => throw null; set { } }
+    }
     public unsafe partial class Glyph {
         public int atlasIndex { get => throw null; set { } }
         public global::UnityEngine.TextCore.GlyphRect glyphRect { get => throw null; set { } }

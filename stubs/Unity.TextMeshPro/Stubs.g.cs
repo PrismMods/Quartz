@@ -38,6 +38,7 @@ namespace TMPro {
         public static void UpdateShaderRatios(global::UnityEngine.Material mat) => throw null;
     }
     public abstract unsafe partial class TMP_Asset : global::UnityEngine.ScriptableObject {
+        public global::UnityEngine.TextCore.FaceInfo faceInfo { get => throw null; set { } }
         public global::UnityEngine.Material material { get => throw null; set { } }
         protected TMP_Asset() { }
     }
@@ -116,7 +117,6 @@ namespace TMPro {
         public global::TMPro.TMP_Text textComponent { get => throw null; set { } }
         public global::UnityEngine.RectTransform textViewport { get => throw null; set { } }
         public void ActivateInputField() => throw null;
-        public void ForceLabelUpdate() => throw null;
         public void SetTextWithoutNotify(string input) => throw null;
         protected TMP_InputField() { }
         void global::UnityEngine.EventSystems.IBeginDragHandler.OnBeginDrag(global::UnityEngine.EventSystems.PointerEventData eventData) => throw null;
