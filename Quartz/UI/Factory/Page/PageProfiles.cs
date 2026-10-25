@@ -230,11 +230,17 @@ internal static class PageProfiles {
         label.overflowMode = TextOverflowModes.Ellipsis;
         LayoutElement labelLe = label.gameObject.AddComponent<LayoutElement>();
         labelLe.flexibleWidth = 1f;
+        label.text = name;
         if(active) {
-            string accent = ColorUtility.ToHtmlStringRGB(UIColors.ObjectActiveBright);
-            label.text = $"{name}  <size=70%><color=#{accent}>●  {GenerateUI.Tr("PROFILE_ACTIVE", "Active")}</color></size>";
-        } else {
-            label.text = name;
+            // The active profile is marked by a tinted row, not a text badge.
+            Image highlight = row.gameObject.AddComponent<Image>();
+            highlight.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P1024);
+            highlight.type = Image.Type.Sliced;
+            highlight.raycastTarget = false;
+            Color tint = UIColors.ObjectActiveBright;
+            tint.a = 0.15f;
+            highlight.color = tint;
+            label.color = UIColors.ObjectActiveBright;
         }
         if(!active) {
             UIButton selectBtn = null;
