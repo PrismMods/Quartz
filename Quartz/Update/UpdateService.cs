@@ -271,8 +271,7 @@ public static class UpdateService {
         (name == null || string.Equals(Path.GetFileName(path), name, StringComparison.OrdinalIgnoreCase))
         && (parent == null || string.Equals(
             Path.GetFileName(Path.GetDirectoryName(path)), parent, StringComparison.OrdinalIgnoreCase));
-    // The zip's state.json says Current=new with no Previous, which skips the bootstrap's
-    // trial and drops the running version. Keep the live state and mark the new runtime Staged.
+    // The zip's state.json would skip the trial and drop the running version: keep live state, mark the new runtime Staged.
     private static void StageRuntime(StagedInstallFile shipped, string version) {
         try {
             if(version == null) throw new InvalidDataException("the update has no runtime version marker");

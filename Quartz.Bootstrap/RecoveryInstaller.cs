@@ -4,13 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 namespace Quartz.Bootstrap;
-// Last-resort repair for an install whose runtime store is gone or gutted —
-// third-party installers have been seen extracting the mod folder without its
-// Runtime/ subtree. The bootstrap knows exactly which release it shipped in,
-// so it re-downloads that release's own install zip from its deterministic
-// URL and restores just the versioned runtime out of it. Deliberately not the
-// update engine: no release scan, no channel logic, never a different version
-// than the one this DLL was packaged with.
+// Last-resort repair when Runtime/ is missing: re-download this bootstrap's own release zip and restore its runtime. Never a different version.
 public static class RecoveryInstaller {
     private const long MaximumPackageBytes = 256L * 1024 * 1024;
     private const long MaximumExtractedBytes = 512L * 1024 * 1024;

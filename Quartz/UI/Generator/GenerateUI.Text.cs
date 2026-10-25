@@ -111,7 +111,7 @@ public static partial class GenerateUI {
         tmp.characterSpacing = -3f;
         return tmp;
     }
-    // One-line label in a fixed slot: shrink to fit, then ellipsize, never wrap out of the row.
+    // One line in a fixed slot: shrink, then ellipsize, never wrap.
     public static TMP_Text FitLine(TMP_Text text, float minSize = 16f) {
         TextCompat.NoWrap(text);
         text.fontSizeMax = text.fontSize;
@@ -120,7 +120,7 @@ public static partial class GenerateUI {
         text.overflowMode = TextOverflowModes.Ellipsis;
         return text;
     }
-    // Wrapped text in a layout row: the row grows to fit every line instead of the text spilling out.
+    // Wrapped text: the row grows to fit.
     public static T WrapGrow<T>(T text, float padding = 6f) where T : TMP_Text {
         TextCompat.Wrap(text);
         text.enableAutoSizing = false;

@@ -1,20 +1,10 @@
 using System.IO;
 namespace Quartz.Bootstrap;
-// Removes the pre-bootstrap install layout, where the payload itself sat in the
-// loader's scan path. A release upgrade extracted by the old in-game updater
-// leaves that stale payload beside the new bootstrap, and the loader would
-// load both. A loaded DLL can't always be deleted, so locked files are retired
-// to .old and the .old is swept on the next launch.
+// Removes the pre-bootstrap layout (payload in Mods/) that the loader would load twice. Locked files are renamed .old and swept next launch.
 public static class LegacyCleanup {
-    // A property, not the const directly: comparing the baked ModName const
-    // inline makes the branch constant-false in the KeyViewer flavour and the
-    // warning gate turns the resulting CS0162 into an error.
+    // Property, not the const: an inline const compare is constant-false in the KeyViewer flavour (CS0162 as error).
     private static bool FullFlavor => BootstrapInfo.ModName == "Quartz";
-    // True when a pre-bootstrap mod DLL sat in Mods/ this launch. MelonLoader
-    // has already registered it, so the caller must NOT load the payload too:
-    // two same-identity Quartz assemblies in one process leave byte-loaded
-    // modules free to bind the dormant one. The old mod runs its final session
-    // and the retire below makes the next launch bootstrap-only.
+    // A pre-bootstrap DLL was in Mods/ and MelonLoader already loaded it: don't load the payload too.
     public static bool RetireMelonLeftovers(string modsDir, string userLibsDir, Action<string> warn) {
         bool legacyLoaded = Retire(Path.Combine(modsDir, BootstrapInfo.PayloadFileName), warn);
         if(FullFlavor) {

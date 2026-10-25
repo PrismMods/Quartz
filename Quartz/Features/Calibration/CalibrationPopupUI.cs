@@ -128,7 +128,7 @@ public static class CalibrationPopupUI {
             messageText.alignment = TextAlignmentOptions.Center;
             messageText.verticalAlignment = VerticalAlignmentOptions.Middle;
             TextCompat.Wrap(messageText);
-            // Fixed popup box, nothing to grow: shrink long offsets messages instead of cutting them.
+            // Fixed box: shrink long messages instead of cutting them.
             messageText.fontSizeMax = 22f;
             messageText.fontSizeMin = 16f;
             messageText.enableAutoSizing = true;

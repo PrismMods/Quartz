@@ -73,7 +73,6 @@ internal static partial class KvWidgets {
         });
         return toggle;
     }
-    // Full-width row like the other pane controls, reading "Label: value".
     internal static UIDropDown<T> DropDown<T>(
         Transform parent, T defaultValue, T value, IReadOnlyList<T> values, Func<T, string> display,
         Action<T> onChanged, string text, string id

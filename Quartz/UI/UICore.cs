@@ -113,9 +113,7 @@ public static partial class UICore {
         if(panelCanvasGroup != null && !IsReorganizing) panelCanvasGroup.alpha = MainCore.Conf.PanelOpacity;
         if(save) MainCore.ConfMgr.RequestSave();
     }
-    // Deferred one pump so the rebuild never tears down UI objects whose own
-    // OnLanguageChanged/OnLoadEnd handlers are still pending in the same event
-    // snapshot (a destroyed dropdown's refresh closure would throw on its dead TMP).
+    // Deferred one pump: handlers still pending in this event snapshot would touch destroyed UI.
     private static void RequestPagesRebuild() {
         if(rebuildQueued) return;
         rebuildQueued = true;
@@ -149,10 +147,7 @@ public static partial class UICore {
         Pages.TryGetValue(state, out RectTransform page) && page != null
             ? page.GetComponentInChildren<UIScrollController>(true)
             : null;
-    // Rebuild() is Dispose() + Initialize(), so every page comes back as a brand new
-    // object tree parked at the top. Restoring one pump later lets the fresh content
-    // lay out first; JumpTo() straight away would clamp against a zero-height content
-    // and land on 0 anyway.
+    // Restore one pump later: the rebuilt content has zero height until it lays out.
     private static void RestoreScroll(int state, float offset) {
         if(offset <= 0f) return;
         MainThread.Enqueue(() => {

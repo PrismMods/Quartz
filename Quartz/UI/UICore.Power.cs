@@ -18,8 +18,7 @@ public static partial class UICore {
         if(powerBg != null) powerBg.color = PowerColor(enable);
         powerPending = true;
         ApplyPowerLock();
-        // Toggling re-patches every feature and stalls for ~1.5 s, so let the new color
-        // render first (the nested Enqueue lands a frame later) and drop clicks meanwhile.
+        // Toggling re-patches every feature (~1.5 s): render the new color first and drop clicks meanwhile.
         MainThread.Enqueue(() => MainThread.Enqueue(() => {
             try {
                 MainCore.SetModEnabled(enable);

@@ -25,13 +25,7 @@ public static partial class UICore {
     private static TextMeshProUGUI firstRunHelperText;
     private static GTween firstRunHelperImageSequence;
     private static GTween secondRunHelperTextSequence;
-    // The helper canvas hangs off MainCore.Root, not the menu canvas, so it can show
-    // while the menu is closed — which also means UICore.Dispose()'s Destroy(canvasObj)
-    // never touches it. Rebuild() is Dispose() + Initialize(), and Initialize() asks
-    // for a helper whenever IsFirstRun is still set, so every rebuild before the user
-    // opened the menu used to orphan another canvas on screen with nothing left
-    // pointing at it. The generation counter ties each helper to the UI that built it:
-    // one alive at a time, and a delayed build from a torn-down generation is dropped.
+    // The helper hangs off MainCore.Root, so Dispose() doesn't destroy it and a Rebuild() could orphan one. The generation counter keeps one alive and drops stale delayed builds.
     private static int firstRunGeneration;
     private static void MakeFirstRunHelper() {
         if(firstRunCanvasObj != null) return;
@@ -41,9 +35,7 @@ public static partial class UICore {
             MainThread.Enqueue(() => {
                 if(generation != firstRunGeneration || firstRunCanvasObj != null) return;
                 if(!MainCore.Conf.IsFirstRun) return;
-                // Menu already open (ShowOnStartup) by the time the delay elapsed:
-                // prompting for the key that opens it is nonsense, and the user has
-                // plainly found it, so the tutorial is simply done.
+                // Menu already open: the user found the key, so the tutorial is done.
                 if(isOpen) {
                     MainCore.Conf.IsFirstRun = false;
                     MainCore.ConfMgr.Save();
@@ -111,13 +103,7 @@ public static partial class UICore {
             });
         });
     }
-    /// <summary>
-    /// Tears the helper down now, without animating. Called from
-    /// <see cref="Dispose"/> so a helper never outlives the UI generation that
-    /// built it — <c>Dispose</c> also runs <c>MainCore.TC.Clear()</c>, which kills
-    /// the farewell sequence in <see cref="EndFirstRunHelper"/> mid-flight and with
-    /// it the callback that was supposed to destroy this canvas.
-    /// </summary>
+    /// <summary>Destroys the helper now. Dispose() runs TC.Clear(), which kills the farewell tween that would have destroyed it.</summary>
     private static void DestroyFirstRunHelper() {
         firstRunGeneration++;
         firstRunHelperActivated = false;
@@ -135,8 +121,7 @@ public static partial class UICore {
         MainCore.ConfMgr.Save();
         firstRunHelperImageSequence?.Kill();
         secondRunHelperTextSequence?.Kill();
-        // A torn-down helper still owes the settings write above; the farewell has
-        // nothing left to play on.
+        // Torn down: save the setting, skip the farewell.
         if(firstRunHelperText == null || firstRunHelperImage == null) {
             DestroyFirstRunHelper();
             return;

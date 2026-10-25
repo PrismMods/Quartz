@@ -22,18 +22,12 @@ internal static class CorePages {
         Visuals();
         Standalone();
     }
-    // Everything the standalone KeyViewer build hides. It is meant to be exactly one
-    // page, so every core category except the one holding the key viewer is gated on
-    // this. Kept as a predicate rather than #if so the registry shape — page keys,
-    // states, search entries — stays identical between the two builds.
+    // Hidden in the KeyViewer flavour. A predicate, not #if, so both builds keep the same registry shape.
     private static bool CoreNav => !Info.KeyViewerOnly;
     private static void Categories() {
         Category(HomeCategoryKey, "Home", "HOME", UISprite.House128, 0,
             visible: static () => CoreNav);
-        // The KeyViewer flavour runs a fixed feature set, so the feature switches — and
-        // the addons page that lives in the same category — would only offer things it
-        // is not meant to run. Registered but hidden: one predicate instead of a
-        // conditional-compilation hole through the page registry.
+        // The KeyViewer flavour runs a fixed feature set, so feature switches and addons are hidden.
         Category(FeaturesCategoryKey, "Features", "FEATURES", UISprite.Sparkles128, 5, alwaysSubmenu: true,
             visible: static () => CoreNav);
         Category("overlay", "Overlay", "OVERLAY", UISprite.Monitor128, 10, togglable: true);

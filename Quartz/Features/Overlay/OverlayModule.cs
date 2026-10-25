@@ -14,9 +14,7 @@ public sealed class OverlayModule : QuartzFeature {
             LocaleKey = "OVERLAY_GENERAL",
             Build = PageOverlayGeneral.Create,
             OwnScroll = true,
-            // The standalone KeyViewer build is meant to be exactly one page, and
-            // this one carries settings for overlays it does not ship. Its Reorganize
-            // button also lives on the key viewer's own page, so nothing is lost.
+            // The KeyViewer flavour has one page; its Reorganize button is on the key viewer page.
             Visible = static () => !Quartz.Core.Info.KeyViewerOnly,
         });
         Context.PatchAll();

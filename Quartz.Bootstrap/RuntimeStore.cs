@@ -4,10 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Quartz.Core;
 namespace Quartz.Bootstrap;
-// Owns Runtime/state.json and Runtime/versions/. The store is deliberately
-// self-healing: a missing or corrupt state file is reseeded from whatever valid
-// runtimes are on disk, an interrupted trial is demoted to Failed, and only the
-// Current/Previous pair of versions survives cleanup.
+// Owns Runtime/state.json and versions/. Reseeds a bad state file, fails interrupted trials, keeps only Current and Previous.
 public sealed class RuntimeStore {
     private readonly string runtimeRoot;
     private readonly string versionsRoot;
@@ -22,9 +19,7 @@ public sealed class RuntimeStore {
     public RuntimeState LoadAndRepair() {
         RuntimeState state = ReadState() ?? Reseed();
         if(!string.IsNullOrWhiteSpace(state.Trial)) {
-            // A recorded trial means the last launch died before promoting it.
-            // Blame the trial runtime and hold it back until a newer release
-            // lands, so one bad update can't dead-loop every launch.
+            // A recorded trial means the last launch died: mark it Failed so a bad update can't loop.
             warn($"the previous update attempt ({state.Trial}) did not complete — holding it back");
             state.Failed = state.Trial;
             state.Trial = null;

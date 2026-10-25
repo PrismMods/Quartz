@@ -48,7 +48,6 @@ public class UIButton : UIObject {
         UpdateVisual(true);
         return this;
     }
-    // Secondary buttons hover with the accent ring instead of a fill change.
     private void AddRing() {
         if(hasRing) return;
         EventTrigger trigger = Rect.GetComponent<EventTrigger>();

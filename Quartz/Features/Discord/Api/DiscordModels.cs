@@ -26,7 +26,7 @@ public readonly record struct Attachment(string Url, string Filename, string Con
     public bool IsImage =>
         (ContentType?.StartsWith("image/", StringComparison.OrdinalIgnoreCase) ?? false)
         || IsImageUrl(Filename);
-    // the one image-extension check; a query string is ignored so CDN urls match too
+    // Ignores the query string so CDN urls match.
     internal static bool IsImageUrl(string url) {
         if(string.IsNullOrEmpty(url)) return false;
         int query = url.IndexOf('?');

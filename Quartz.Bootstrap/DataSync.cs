@@ -1,9 +1,6 @@
 using System.IO;
 namespace Quartz.Bootstrap;
-// A staged runtime carries the maintainer-owned data files (Lang)
-// under .data-sync/. They are copied over the data root before the
-// payload loads — the payload reads Lang during initialize — and the staging
-// folder is deleted after a successful pass so the copy runs once per update.
+// Copies .data-sync/ (Lang) over the data root before the payload loads, then deletes it.
 public static class DataSync {
     public const string DirName = ".data-sync";
     public static void Apply(string runtimePath, string dataRoot, Action<string> warn) {

@@ -46,8 +46,7 @@ public static partial class GenerateUI {
         rect.anchorMin = new(rect.anchorMin.x, 1f);
         rect.anchorMax = new(rect.anchorMax.x, 1f);
         rect.sizeDelta = new(rect.sizeDelta.x, rowHeight);
-        // A labelled dropdown is a full-width O5Kit row whose closed text reads "Label: value",
-        // as Overlayer does it. width only sizes an unlabelled box.
+        // Labelled: full-width row reading "Label: value". width only sizes the unlabelled box.
         bool labelled = leftLabel != null;
         if(width > 0f && !labelled) {
             rect.anchorMin = new(1f, 1f);

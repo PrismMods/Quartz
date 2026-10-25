@@ -18,8 +18,7 @@ public static class UIColors {
         public Color SoftRed;
         public Color TextSecondary;
     }
-    // Quartz design system (Modlist, red variation). Greys are tinted toward the accent;
-    // the defaults below are the system's values for its coral ol-accent #ff8a8f.
+    // Quartz design system (Modlist, red variation); greys tinted toward the accent.
     private static readonly Color BaseSoftRed = new(1f, 0.478f, 0.271f, 1f); // danger #ff7a45
     public static readonly Color Border = new(1f, 1f, 1f, 0.09f); // border-strong
     public static Color PanelBG { get; private set; } = new(0.094f, 0.067f, 0.071f, 1f); // bg #181112

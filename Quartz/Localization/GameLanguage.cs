@@ -7,10 +7,7 @@ namespace Quartz.Localization;
 public static class GameLanguage {
     private static readonly Refl.Member PersistenceLanguage = new(typeof(Persistence), "language");
     private static readonly Refl.Member RdStringLanguage = new(Refl.Type("RDString"), "language");
-    // Persistence.language is the in-game setting (falling back to the OS one), so it is
-    // the closest thing to what the player picked. RDString.language is that value clamped
-    // to the languages the game itself ships, and stays default(Afrikaans) until
-    // RDString.Setup() has run — ADOFAI has no Afrikaans, so that only means "not ready".
+    // Persistence.language is what the player picked. RDString.language stays Afrikaans (default) until RDString.Setup() runs.
     public static SystemLanguage Detect() {
         if(PersistenceLanguage.Get(null) is SystemLanguage saved && saved != SystemLanguage.Unknown) return saved;
         if(RdStringLanguage.Get(null) is SystemLanguage active && active != SystemLanguage.Afrikaans) return active;
@@ -68,8 +65,7 @@ public static class GameLanguage {
     };
     public static string[] CandidateCodes(SystemLanguage language) =>
         Candidates.TryGetValue(language, out string[] codes) ? codes : [];
-    // Exact tag first across every candidate, then the primary subtag, so a Brazilian
-    // client still lands on a pt-PT translation rather than falling back to English.
+    // Exact tag first, then primary subtag, so pt-BR still gets pt-PT.
     public static string Match(SystemLanguage language, IEnumerable<string> available) {
         if(available == null) return null;
         string[] codes = CandidateCodes(language);

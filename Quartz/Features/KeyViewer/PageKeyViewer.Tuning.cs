@@ -31,11 +31,7 @@ internal static partial class PageKeyViewer {
         s.OnComplete = v => { setter(v); save?.Invoke(); };
         return s;
     }
-    /// <summary>
-    /// The sync toggle, or null when the key-limiter feature isn't loaded —
-    /// the standalone KeyViewer build ships without it, and a toggle that
-    /// overwrites a feature the user doesn't have is worse than no toggle.
-    /// </summary>
+    // Null when the key limiter isn't loaded (KeyViewer flavour).
     private static UIToggle DmSyncLimiter(
         RectTransform body, KeyViewerSettings conf, KeyViewerSettings def, bool compact
     ) {

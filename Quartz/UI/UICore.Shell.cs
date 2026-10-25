@@ -116,9 +116,7 @@ public static partial class UICore {
             Menu.anchorMax = new(0, 1);
             Menu.pivot = new(0, 0.5f);
             Menu.sizeDelta = new(RAIL_WIDTH, -TOP_BAR_HEIGHT);
-            // Single-page shell (the standalone KeyViewer build) starts with the rail
-            // already parked off-canvas, which also drops the page's left inset to 0
-            // so the one page fills the panel.
+            // Single-page shell: the rail starts off-canvas and the page has no left inset.
             isMenuOpen = !ShellNavHidden;
             Menu.anchoredPosition = isMenuOpen ? MenuOpenPosition : MenuClosedPosition;
             var image = menu.AddComponent<Image>();
@@ -166,7 +164,6 @@ public static partial class UICore {
             };
             var fitter = content.AddComponent<ContentSizeFitter>();
             fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            // Same wheel and right-drag scrolling as every page.
             viewport.AddComponent<UIScrollController>().SetContent(MenuContent, viewportRect);
             MenuFactory.CreateMenu(MenuContent);
             GameObject power = new("Power");

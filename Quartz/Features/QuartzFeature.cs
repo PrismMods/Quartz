@@ -7,10 +7,7 @@ public abstract class QuartzFeature {
     public virtual void OnTick() { }
     public virtual void OnUnload() { }
 }
-/// <summary>
-/// Marks a built-in feature's entry class. FeatureService finds these by reflection,
-/// so adding a feature is one class with this attribute — no list to keep in sync.
-/// </summary>
+/// <summary>Marks a built-in feature's entry class; FeatureService finds it by reflection.</summary>
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public sealed class FeatureAttribute(string id, string group, int order, string name, string nameKey) : Attribute {
     public string Id { get; } = id;
@@ -19,7 +16,6 @@ public sealed class FeatureAttribute(string id, string group, int order, string 
     public string Name { get; } = name;
     public string NameKey { get; } = nameKey;
     public string[] Deps { get; set; } = [];
-    // Namespaces whose [HarmonyPatch] classes belong to this feature; null means the
-    // entry class's own namespace. The core Harmony pass skips every one of them.
+    // Namespaces whose [HarmonyPatch] classes this feature owns; null means the entry class's namespace.
     public string[] Patches { get; set; }
 }

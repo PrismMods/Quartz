@@ -34,7 +34,7 @@ public sealed class AddonSettings<T> : ISettingsHandle where T : class, new() {
         }
         Load();
     }
-    // PopulateObject appends into existing lists and dictionaries; clear the ones the JSON sets so it replaces them.
+    // PopulateObject appends into lists and dictionaries; clear the ones the JSON sets.
     // shortcut: top-level members only, nested objects still merge; recurse if addon settings grow nested collections.
     private void Populate(string json) {
         JObject incoming = JObject.Parse(json);

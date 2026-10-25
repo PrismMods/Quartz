@@ -6,11 +6,7 @@ using Quartz.Core;
 using Quartz.Compat.Interface;
 using Quartz.Update;
 namespace Quartz;
-// The MelonLoader entry, invoked reflectively by Quartz.Bootstrap (the thin
-// MelonMod that lives in Mods/ and picks which versioned runtime to load).
-// This assembly is no longer a MelonMod itself: the bootstrap forwards
-// OnUpdate/OnDeinitialize into Tick/Unload, and Load throwing is the signal
-// it uses to roll a bad update back.
+// Entry point called by Quartz.Bootstrap. Load throwing tells the bootstrap to roll the update back.
 public static class PayloadBridge {
     private enum LoaderState { New, Waiting, Initializing, Active, Failed, Stopped }
     private static readonly HostMl Host = new();
@@ -61,8 +57,7 @@ public static class PayloadBridge {
 }
 internal sealed class HostMl : IQuartzHost, IQuartzLogger {
     public IQuartzLogger QuartzLogger => this;
-    // Info.Name, not a literal: the KeyViewer flavour ships as its own mod and must
-    // not read or write the full build's UserData/Quartz folder.
+    // Info.Name: the KeyViewer flavour must not touch the full build's UserData/Quartz.
     public string QuartzFilePath => Path.Combine(MelonEnvironment.UserDataDirectory, Info.Name);
     public string ModsPath => MelonEnvironment.ModsDirectory;
     public string UserLibsPath => MelonEnvironment.UserLibsDirectory;

@@ -77,8 +77,7 @@ internal static class CssAssetDownloader {
         Task canceled = Task.Delay(Timeout.Infinite, token);
         if(await Task.WhenAny(operation, canceled).ConfigureAwait(false) == operation)
             return await operation.ConfigureAwait(false);
-        // DNS has no cancellable netstandard API. Observe its eventual failure after
-        // releasing the bounded slot so a stuck resolver cannot stall all downloads.
+        // DNS can't be cancelled on netstandard: release the slot first so a stuck resolver can't stall downloads.
         _ = operation.ContinueWith(task => { _ = task.Exception; }, CancellationToken.None,
             TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
             TaskScheduler.Default);

@@ -21,15 +21,12 @@ public sealed class PathService(string rootPath) {
         Directory.CreateDirectory(AddonsPath);
         Directory.CreateDirectory(TufLevelsPath);
         try {
-            // Atomic state lives in root settings, profiles,
-            // preset/cache folders, and TUF's top level. Skip directories that
-            // can contain large user libraries but never receive AtomicFile writes.
+            // Skip folders that hold large user libraries but never get AtomicFile writes.
             AtomicFile.RecoverTree(
                 RootPath, LangPath, TempPath, FontPath, CustomFontPath, AddonsPath, TufLevelsPath
             );
         } catch(Exception e) when(e is IOException or UnauthorizedAccessException) {
-            // A damaged recovery artifact must not prevent Quartz from starting;
-            // later writes retry recovery for their own destination before saving.
+            // A damaged recovery artifact must not block startup; later writes retry it.
             Diag.Warn(e, "Atomic recovery");
         }
     }

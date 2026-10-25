@@ -81,8 +81,7 @@ public static partial class UICore {
     private static bool canvasWasVisible;
     private static int lastScreenWidth;
     private static int lastScreenHeight;
-    // Same rule as dragging the top bar: the window may hang off any edge as long as
-    // the top bar stays on screen vertically and PANEL_KEEP_VISIBLE of it horizontally.
+    // Same rule as dragging the top bar: on screen vertically, PANEL_KEEP_VISIBLE of it horizontally.
     public static Vector2 ClampPanelPosition(Vector2 position, Vector2 size) {
         Vector2 canvas = CanvasSize;
         float limitX = Mathf.Max((canvas.x + size.x) * 0.5f - PANEL_KEEP_VISIBLE, 0f);
@@ -171,10 +170,7 @@ public static partial class UICore {
         Cursor.lockState = CursorLockMode.None;
         panelTweener.CompleteAndKill();
         resetSequence.CompleteAndKill();
-        // Before the noAnimate early-return, not after it: opening the menu is what
-        // completes the first-run tutorial, and ShowOnStartup plus Rebuild() both
-        // come through here with noAnimate set. Sitting below the return meant those
-        // paths left the "Press <key>" prompt on screen for good.
+        // Before the noAnimate return: opening the menu completes the tutorial, and ShowOnStartup and Rebuild() pass noAnimate.
         if(firstRunHelperActivated) {
             firstRunHelperActivated = false;
             EndFirstRunHelper();
@@ -270,11 +266,7 @@ public static partial class UICore {
         MainCore.TC.Play(resetSequence);
     }
     private static bool isMenuOpen = false;
-    /// <summary>
-    /// Single-page shell: no category rail, no submenu, and nothing that can summon
-    /// them. The standalone KeyViewer build has exactly one page, so the rail would
-    /// be a column holding one entry that never changes anything.
-    /// </summary>
+    /// <summary>Single-page shell for the KeyViewer flavour: no rail, no submenu.</summary>
     internal static bool ShellNavHidden => Info.KeyViewerOnly;
     private static Vector2 MenuOpenPosition => new(0f, -TOP_BAR_HEIGHT * 0.5f);
     private static Vector2 MenuClosedPosition => new(-MENU_WIDTH, -TOP_BAR_HEIGHT * 0.5f);

@@ -140,9 +140,7 @@ public static partial class KeyViewerOverlay {
             }
         }
     }
-    // SkyHook's macOS HID reader can stop at six held keys; the window server
-    // still sees the rest. A short grace after each hook edge keeps the two
-    // clocks from racing into a phantom press.
+    // SkyHook's macOS HID reader can stop at six held keys; a short grace after each hook edge avoids phantom presses from the window-server backfill.
     private const float MacBackfillGraceSeconds = 0.05f;
     private static void ApplyPhysicalEdge(Box box, bool down, float time, float frameNow) {
         if(down == box.RawPressed) return;
@@ -158,8 +156,7 @@ public static partial class KeyViewerOverlay {
         if(minLit > 0f)
             box.LitUntil = Mathf.Max(box.LitUntil, Mathf.Max(time, frameNow) + minLit);
     }
-    // macOS delivers Caps Lock press and release together on each toggle, and the
-    // window server only knows the lock state, so the hold itself is invisible.
+    // macOS sends Caps Lock press and release together per toggle; the hold itself is invisible.
     private const float MacCapsLockLitSeconds = 0.1f;
     private static void ApplyGhostEdge(Box box, bool down, float time) {
         DmNoteSpec spec = box.Dm;

@@ -3,10 +3,7 @@ using Newtonsoft.Json.Linq;
 using UnityEngine;
 namespace Quartz.Addons;
 
-/// <summary>
-/// Unity's computed Color properties (notably <c>linear</c>) recursively expose
-/// another Color to Json.NET. Persist only the four actual color channels.
-/// </summary>
+// Color.linear recurses under Json.NET; write only r, g, b, a.
 internal sealed class UnityColorJsonConverter : JsonConverter {
     public override bool CanConvert(Type objectType) =>
         objectType == typeof(Color) || Nullable.GetUnderlyingType(objectType) == typeof(Color);

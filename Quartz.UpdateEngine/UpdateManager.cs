@@ -8,10 +8,7 @@ using Newtonsoft.Json.Linq;
 using Quartz.Core;
 namespace Quartz.UpdateEngine;
 internal sealed class UpdateManager {
-    // The whole resolve — API call, download, extract — runs before the payload
-    // loads, so it must give up fast enough that a dead network never holds the
-    // game hostage. The API call gets the short budget; only once a newer
-    // release is confirmed real is the longer download budget worth spending.
+    // Runs before the payload loads: the API call gets a short budget, the download a longer one only once a release is confirmed.
     private static readonly TimeSpan ApiTimeout = TimeSpan.FromSeconds(10);
     private static readonly TimeSpan TotalTimeout = TimeSpan.FromSeconds(90);
     internal const long MaximumPackageBytes = 256L * 1024 * 1024;
@@ -134,9 +131,7 @@ internal sealed class UpdateManager {
     }
     private static async Task DownloadFileAsync(
         HttpClient client, string url, string destinationPath, CancellationToken cancellation) {
-        // The client's short Timeout only bounds time-to-headers here (the body
-        // streams under ResponseHeadersRead); the body is bounded by the caller's
-        // total-timeout token and the byte cap.
+        // Timeout only bounds time-to-headers; the body is bounded by the caller's token and the byte cap.
         using HttpResponseMessage response = await client
             .GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellation).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();

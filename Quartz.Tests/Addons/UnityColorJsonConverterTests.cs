@@ -28,8 +28,7 @@ static class UnityColorJsonConverterTests {
     }
 }
 
-// Minimal test stand-in for Unity's value type. `linear` models the recursively
-// exposed computed property that makes Json.NET's default reflection serialization fail.
+// Stand-in for UnityEngine.Color; `linear` reproduces the recursive property.
 namespace UnityEngine {
     public struct Color {
         public float r;

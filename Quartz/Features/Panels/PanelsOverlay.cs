@@ -171,7 +171,7 @@ public static partial class PanelsOverlay {
     private static bool ShouldShow() =>
         (OverlaySwitch.Enabled && GameStats.InGame) || UICore.IsReorganizing;
     private static bool gateWant;
-    // Roots are built visible; keep the updater alive until it has run once and hidden them.
+    // Roots start visible; keep the updater until it has hidden them once.
     private static bool updaterRan;
     private static bool gateRunning = true;
     internal static void Gate() {

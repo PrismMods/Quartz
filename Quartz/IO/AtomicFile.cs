@@ -139,8 +139,7 @@ public static class AtomicFile {
                 return;
             }
         }
-        // Destination creation is the commit point. A leftover backup means the
-        // process stopped before cleanup, so keep the committed destination.
+        // Creating the destination is the commit point; a leftover backup means cleanup never ran.
         if(!SafeRegularFileExists(fullPath, "atomic destination")) {
             if(SafeRegularFileExists(backupPath, "atomic backup")) File.Move(backupPath, fullPath);
             return;
@@ -148,8 +147,7 @@ public static class AtomicFile {
         if(!SafeRegularFileExists(backupPath, "atomic backup")) return;
         try { File.Delete(backupPath); }
         catch(Exception e) when(IsExpectedRecoveryFailure(e)) {
-            // The destination is already committed. Keeping its old backup is
-            // safe; a later startup/write will retry cleanup.
+            // Already committed; a later write retries backup cleanup.
             Diag.Warn(e, "Atomic recovery");
         }
     }

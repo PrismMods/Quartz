@@ -27,8 +27,7 @@ public static class ChatterBlocker {
     private static readonly Dictionary<KeyCode, long> lastKeyPress = [];
     private static readonly Dictionary<ushort, long> lastAsyncKeyPress = [];
     private static readonly HashSet<KeyCode> reportedKeysThisFrame = [];
-    // RDInput merges every active backend. Unity and the async hook can therefore
-    // describe the same physical edge in one list; gameplay must see it once.
+    // RDInput merges backends, so Unity and the async hook can report the same edge; gameplay must see it once.
     private static readonly HashSet<KeyCode> physicalKeysThisEvaluation = [];
     private static readonly HashSet<ushort> unknownAsyncKeysThisEvaluation = [];
     private static int reportedKeysFrame = -1;
@@ -38,14 +37,10 @@ public static class ChatterBlocker {
         public readonly InputSource Source = source;
     }
     private static readonly Dictionary<KeyCode, PhysicalReport> lastPhysicalReport = [];
-    // A backend can queue its copy one frame later. This is separate from the
-    // user-configured chatter threshold and remains active with only Key Limiter.
+    // A backend can queue its copy a frame late. Independent of the chatter threshold.
     private const long CrossSourceDuplicateGraceMs = 8L;
     private static readonly HashSet<KeyCode> injectedKeyHeldPrev = [];
-    // Presses we counted ourselves because the game had not reported them yet. The
-    // hook bit is set on the hook thread before the game queues the same async event,
-    // so the game can still report that press a frame or two later; it must not count
-    // a second time.
+    // Presses counted before the game reported them; the game's later report must not count again.
     private static readonly Dictionary<KeyCode, long> injectedAwaitingGame = [];
     private const long InjectedReportGraceMs = 100L;
     private static readonly bool DebugLog = false;
@@ -90,8 +85,7 @@ public static class ChatterBlocker {
         GameApi.ResetKeyLimiterOverCounter(controller);
     }
     private static int CountValidKeysPressed() {
-        // The game calls this once as a boolean probe and again to get the count.
-        // Replaying the filters makes their stateful answer differ on call two.
+        // The game calls this twice (probe, then count); replaying stateful filters would change the answer.
         if(inPlayerBatch && evaluatedBatch == injectionBatch) return evaluatedBatchCount;
         scrController controller = scrController.instance;
         if(controller == null) return CacheEvaluation(0);

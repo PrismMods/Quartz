@@ -5,11 +5,6 @@ using Quartz.Compat.Interface;
 using Quartz.Core;
 using Quartz.UI;
 namespace Quartz.Features;
-/// <summary>
-/// Runs the built-in features. Every feature is compiled into the core and marked with
-/// <see cref="FeatureAttribute"/>; the only choice left to the user is on or off.
-/// An off feature is not loaded at all: no pages, no patches, no ticks.
-/// </summary>
 public static class FeatureService {
     public sealed class Handle {
         public FeatureAttribute Info;
@@ -24,12 +19,11 @@ public static class FeatureService {
         internal bool Ticks;
         public bool Loaded => Instance != null && Error == null;
     }
-    // The standalone KeyViewer build carries the same code but runs only these.
+    // The KeyViewer flavour runs only these.
     private static readonly string[] KeyViewerIds = ["overlay", "keyviewer"];
     private static List<Handle> all;
     private static List<Handle> features;
     private static List<Handle> All => all ??= Scan();
-    /// <summary>Every feature this build runs, dependencies before dependents.</summary>
     public static IReadOnlyList<Handle> Features => features ??= All.FindAll(h => !Info.KeyViewerOnly || Array.IndexOf(KeyViewerIds, h.Id) >= 0);
     private static FeatureState state;
     public static FeatureState State => state ??= FeatureState.Load();
@@ -56,7 +50,7 @@ public static class FeatureService {
             int byOrder = a.Info.Order.CompareTo(b.Info.Order);
             return byOrder != 0 ? byOrder : string.CompareOrdinal(a.Id, b.Id);
         });
-        // Stable topological pass: a feature lands after every dependency.
+        // Stable topological order.
         List<Handle> ordered = [];
         HashSet<string> placed = new(StringComparer.Ordinal);
         while(ordered.Count < found.Count) {
@@ -82,7 +76,6 @@ public static class FeatureService {
             if(ns == owned || ns.StartsWith(owned + ".", StringComparison.Ordinal)) return true;
         return false;
     }
-    /// <summary>True for a patch class some feature owns; the core Harmony pass leaves those alone.</summary>
     internal static bool OwnsPatchClass(Type type) {
         foreach(Handle handle in All)
             if(InNamespaces(type, handle.Info.Patches)) return true;
@@ -130,10 +123,7 @@ public static class FeatureService {
         return null;
     }
     public static bool IsEnabled(string id) => Find(id) is { Enabled: true };
-    /// <summary>
-    /// Switches a feature on or off. On also switches on what it needs; off also
-    /// switches off what needs it, so the set that runs is always complete.
-    /// </summary>
+    // On also enables dependencies; off also disables dependents.
     public static void SetEnabled(string id, bool enabled) {
         Handle handle = Find(id);
         if(handle == null) return;
@@ -162,7 +152,6 @@ public static class FeatureService {
         foreach(Handle other in Features)
             if(Array.IndexOf(other.Info.Deps, handle.Id) >= 0) Collect(other, false, into);
     }
-    // Unload what should be off (dependents first), then load what should be on (dependencies first).
     private static void Sync() {
         for(int i = Features.Count - 1; i >= 0; i--) {
             Handle handle = Features[i];
@@ -209,10 +198,7 @@ public static class FeatureService {
                 try {
                     FeatureContext context = handle.Context;
                     context?.ApplyPatches();
-                    // Mark the handle active before entering feature code so a
-                    // partial OnEnable can be unwound through the normal disable
-                    // path. Otherwise its Harmony patches survive the exception
-                    // forever: Active stays false, so later passes skip cleanup.
+                    // Mark active before OnEnable so a throwing enable still unwinds its patches.
                     handle.Active = true;
                     handle.Instance.OnEnable();
                     context?.RunEnableSteps();

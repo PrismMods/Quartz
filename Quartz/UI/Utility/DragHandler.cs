@@ -3,8 +3,7 @@ using UnityEngine.EventSystems;
 namespace Quartz.UI.Utility;
 public class DragHandler : MonoBehaviour {
     public Action OnDropped;
-    // >= 0: the window may leave the screen; only the handle has to stay grabbable,
-    // fully on screen vertically and with this many canvas units on screen horizontally.
+    // >= 0: the window may leave the screen; the handle stays fully on screen vertically and this many units horizontally.
     public float KeepVisible = -1f;
     private RectTransform rect;
     private Vector2 offset;

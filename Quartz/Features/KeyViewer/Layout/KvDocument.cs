@@ -17,8 +17,7 @@ internal sealed partial class KvDocument {
         ("knobPositions", KvElementKind.Knob),
     ];
     private static readonly string[] EmbeddedImageFields = ["inactiveImage", "activeImage"];
-    // Bounds growth across repeated imports. Existing records are counted but
-    // never removed merely because an older document is already over budget.
+    // Caps growth across repeated imports; never drops existing records.
     internal const long MaxEmbeddedImageStorageBytes = 32L * 1024 * 1024;
     internal JObject Root { get; private set; }
     private readonly Dictionary<string, Dictionary<KvElementKind, List<KvElement>>> tabs = new(StringComparer.Ordinal);

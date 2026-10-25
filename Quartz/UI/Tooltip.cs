@@ -75,7 +75,6 @@ public class Tooltip {
         obj.SetActive(true);
         obj.transform.SetAsLastSibling();
         text.text = tip;
-        // Cap the width so long descriptions wrap instead of running off screen.
         Vector2 size = text.GetPreferredValues(tip, TooltipMaxWidth, 0f);
         size.x = Mathf.Min(size.x, TooltipMaxWidth);
         rect.sizeDelta = new(size.x + 32f, size.y + 32f);

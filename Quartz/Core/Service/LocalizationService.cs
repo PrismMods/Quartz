@@ -16,8 +16,7 @@ public sealed class LocalizationService(
         Translator.SetLog(logger.Msg);
         Translator.SetDispatcher(MainThread.Enqueue);
         Translator.Language = configFile.Data.Language;
-        // Read the game's language here: Initialize runs on the main thread, the load below
-        // does not, and Application.systemLanguage is main-thread only under Unity 6.
+        // Application.systemLanguage is main-thread only; the load below is not.
         if(!configFile.Data.LanguageAutoDetected) detected = GameLanguage.Detect();
         _ = LoadThenUpdate();
     }
@@ -49,8 +48,7 @@ public sealed class LocalizationService(
             TextLocalization.RefreshAll();
         });
     }
-    // Only give up once a load actually produced languages, so a failed first fetch leaves
-    // the detection pending for the next launch instead of silently locking in English.
+    // Give up only after a load produced languages, so a failed fetch retries next launch.
     private void FinishAutoLanguage() {
         if(configFile.Data.LanguageAutoDetected) return;
         if(!Translator.GetLanguages().Any(l => l != Translator.FALLBACK_LANGUAGE)) return;

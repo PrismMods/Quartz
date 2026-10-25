@@ -24,7 +24,7 @@ public static class ProgressBarOverlay {
     private static Updater updater;
     private static bool ShouldShow() => OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame;
     private static bool gateWant;
-    // Roots are built visible; keep the updater alive until it has run once and hidden them.
+    // Roots start visible; keep the updater until it has hidden them once.
     private static bool updaterRan;
     private static bool gateRunning = true;
     internal static void Gate() {

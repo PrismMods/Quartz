@@ -9,12 +9,7 @@ public static partial class ProfileManager {
         ["OverlayPanels.json"] = """{"Panels":[]}""",
         ["KeyLimiter.json"] = """{"Profiles":[{"Name":"Profile 1","Keys":[]}]}""",
     };
-    /// <summary>
-    /// Resets the active profile's live settings in place, like a profile switch.
-    /// Reset: every setting back to its fresh-install default. Clean: the same, then
-    /// settings that would seed content (key layouts, panels, key lists) start empty.
-    /// Feature switches, addons, other profiles and play counts are left alone.
-    /// </summary>
+    /// <summary>Resets live settings in place. Clean also empties content-seeding settings. Feature switches, addons, other profiles and play counts are untouched.</summary>
     public static bool ResetLive(bool clean) {
         string language = MainCore.Conf.Language;
         bool languageDetected = MainCore.Conf.LanguageAutoDetected;

@@ -6,20 +6,7 @@ using Quartz.Utility;
 using SkyHook;
 using UnityEngine;
 namespace Quartz.Game;
-/// <summary>
-/// The raw keyboard-hook feed: SkyHook events mapped to physical
-/// <see cref="KeyCode"/>s, the held/seen bit state behind them, and the platform
-/// probes that decide which keys Unity's own <c>Input</c> cannot see.
-/// </summary>
-/// <remarks>
-/// This used to live inside the key-limiter module, with the key viewer reaching
-/// across for it. That made the key viewer silently dependent on an unrelated
-/// feature: with the key limiter uninstalled nothing patched
-/// <see cref="SkyHookManager"/>, so no hook events were raised at all and every
-/// hook-only key (RightAlt, RightControl, the non-Windows modifiers, the Mac
-/// numpad) went dark. Core owns the feed now — <see cref="HookKeys"/> was already
-/// the seam for it — and both modules read from here.
-/// </remarks>
+/// <summary>Keyboard-hook feed: SkyHook events as KeyCodes, held/seen state, and platform probes.</summary>
 public static class HookInput {
     // 11 words * 64 bits covers the whole KeyCode keyboard range.
     private const int HookBitWords = 11;
@@ -124,19 +111,14 @@ public static class HookInput {
         "/System/Library/Frameworks/ApplicationServices.framework/ApplicationServices")]
     private static extern ulong CGEventSourceFlagsState(int sourceStateID);
     private const int KCGEventSourceStateHidSystemState = 1;
-    // CGEventSourceKeyState answers for the modifier, not the side: LeftAlt reads
-    // down while only RAlt is held. The device-dependent NX_DEVICE*KEYMASK bits in
-    // the flags state are per side.
+    // CGEventSourceKeyState is per modifier, not per side; the NX_DEVICE*KEYMASK flag bits are per side.
     private static ulong MacModifierMask(KeyCode key) => key switch {
         KeyCode.LeftControl => 0x0001UL, KeyCode.LeftShift => 0x0002UL, KeyCode.RightShift => 0x0004UL,
         KeyCode.LeftCommand => 0x0008UL, KeyCode.RightCommand => 0x0010UL, KeyCode.LeftAlt => 0x0020UL,
         KeyCode.RightAlt => 0x0040UL, KeyCode.RightControl => 0x2000UL,
         _ => 0UL,
     };
-    /// <summary>
-    /// macOS only: reads the physical key state the window server sees, for keys
-    /// Unity reports unreliably under a grabbed keyboard.
-    /// </summary>
+    /// <summary>macOS only: window-server key state, for keys Unity misreports under a grabbed keyboard.</summary>
     public static bool TryMacPhysicalKeyHeld(KeyCode key, out bool held) {
         held = false;
         return key is KeyCode.Tab
@@ -144,21 +126,12 @@ public static class HookInput {
             or KeyCode.LeftControl or KeyCode.RightControl or KeyCode.LeftCommand or KeyCode.RightCommand
             && TryMacKeyState(key, out held);
     }
-    /// <summary>
-    /// Physical held state for gameplay polling. Unity's macOS input folds the
-    /// right-hand modifiers into their left twins (RAlt reads as LeftAlt), so on
-    /// macOS those keys come from the window server instead.
-    /// </summary>
+    /// <summary>Held state for gameplay. On macOS right-hand modifiers come from the window server, since Unity folds them into the left keys.</summary>
     public static bool PhysicalKeyHeld(KeyCode key) {
         if(MacRuntimeCached && TryMacPhysicalKeyHeld(key, out bool held)) return held;
         return Input.GetKey(key);
     }
-    /// <summary>
-    /// macOS only: window-server key state for any keyboard key. SkyHook's macOS
-    /// backend reads raw HID values, so keyboards whose extra rollover the OS
-    /// understands but SkyHook's HID matching does not stop reporting after six
-    /// keys; this state has no such cap.
-    /// </summary>
+    /// <summary>macOS only: window-server state for any key, not capped at six keys like SkyHook's HID reader.</summary>
     public static bool TryMacKeyState(KeyCode key, out bool held) {
         held = false;
         if(!MacRuntimeCached) return false;
@@ -175,10 +148,7 @@ public static class HookInput {
             return false;
         }
     }
-    // No CapsLock: the window server reports its lock state, not the key, so a
-    // backfill would relight the box after release while caps lock stays on.
-    // No Backslash: Korean (and other non-US) layouts never report the key under
-    // kVK 0x2A, so the window server read it as always up and swallowed it.
+    // No CapsLock: the window server reports lock state, not the key. No Backslash: non-US layouts never report it under kVK 0x2A.
     private static ushort MacVirtualKey(KeyCode key) => key switch {
         KeyCode.A => 0x00, KeyCode.S => 0x01, KeyCode.D => 0x02, KeyCode.F => 0x03, KeyCode.H => 0x04,
         KeyCode.G => 0x05, KeyCode.Z => 0x06, KeyCode.X => 0x07, KeyCode.C => 0x08, KeyCode.V => 0x09,
@@ -282,14 +252,7 @@ public static class HookInput {
             _ => GameApi.HookKeyToUnityKey(label),
         };
     }
-    /// <summary>
-    /// The one subscription to the game's keyboard hook. Core-owned so the feed
-    /// exists whenever Quartz does, not only when the key limiter is installed.
-    /// Runs on the hook thread — keep it allocation-free and non-throwing.
-    /// SkyHook's macOS HID table labels the ISO/Korean backslash usages (0x32
-    /// Non-US #, 0x89 ₩/¥) IgnoredInternal, so async input dropped the key;
-    /// they are relabelled BackSlash before the game reads the event.
-    /// </summary>
+    /// <summary>The one game keyboard-hook subscription. Hook thread: no allocation, no throw. Relabels the macOS ISO/Korean backslash usages (0x32, 0x89), which SkyHook marks IgnoredInternal, as BackSlash.</summary>
     [HarmonyPatch(typeof(SkyHookManager), "HookCallback")]
     private static class HookCallbackPatch {
         private static bool Prefix(ref SkyHookEvent __0) {
@@ -306,13 +269,7 @@ public static class HookInput {
             return true;
         }
     }
-    /// <summary>
-    /// macOS SkyHook reports a right-hand modifier press as its left twin (RAlt
-    /// down arrives as LAlt) while the release arrives correctly as the right key.
-    /// The left key then sticks held and the press counts twice. A left press whose
-    /// key the window server says is up, while the right twin is down, is the right
-    /// key: relabel it, or drop it when the right key is already held.
-    /// </summary>
+    /// <summary>macOS SkyHook reports a right modifier press as its left twin, but the release correctly. A left press the window server says is up while the right twin is down is relabelled, or dropped if the right key is already held.</summary>
     private static bool FixMacRightModifier(ref SkyHookEvent ev) {
         KeyLabel right;
         KeyCode leftKey, rightKey;

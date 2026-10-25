@@ -99,7 +99,7 @@ internal sealed class KvPopup : MonoBehaviour {
     // on-danger: the dark label the design system puts on danger fills.
     private static readonly Color OnDanger = new(0.122f, 0.051f, 0.024f, 1f);
     private static void Item(RectTransform tray, string key, string text, Action onClick, bool danger) {
-        // A destructive pick is a solid danger fill, so it never passes for a plain menu row.
+        // Destructive items get a solid danger fill.
         Color rest = danger ? UIColors.SoftRed : KvPalette.ButtonPrimary;
         Color hover = danger ? Color.Lerp(UIColors.SoftRed, Color.white, 0.2f) : KvPalette.ButtonHover;
         GameObject obj = new("Item");
@@ -122,7 +122,7 @@ internal sealed class KvPopup : MonoBehaviour {
         TextCompat.NoWrap(label);
         label.raycastTarget = false;
         label.gameObject.AddComponent<TextLocalization>().Init(key, text);
-        // The tray sizes to its items, so the item has to ask for its translated label's width.
+        // The tray sizes to its items, so measure the translated label.
         le.preferredWidth = Mathf.Max(MinWidth, label.GetPreferredValues(label.text).x + 20f * KvPalette.Scale);
         GenerateUI.AddButton(obj, btn => {
             if(btn == InputButton.Left) onClick();

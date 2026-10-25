@@ -5,12 +5,7 @@ public sealed class BootstrapResult {
     public Assembly Assembly;
     public bool UpdateFailed;
 }
-// The launch sequence: repair the runtime store, ask the current runtime's
-// update engine for a newer version, and load whichever runtime wins. A fresh
-// download is loaded as a TRIAL — it only becomes Current after the payload's
-// entry point returns cleanly, and a trial that fails (or dies mid-launch) is
-// recorded as Failed and held back until a newer release supersedes it, so a
-// broken update costs one launch, not every launch.
+// Repair the store, ask the current engine for an update, load the winner. A new download runs as a trial and becomes Current only if Load returns; a failed trial is held back until a newer release.
 public static class BootstrapCore {
     public static BootstrapResult Run(
         string runtimeRoot,
@@ -23,9 +18,7 @@ public static class BootstrapCore {
         try {
             state = store.LoadAndRepair();
         } catch(Exception storeError) {
-            // Nothing usable on disk (an installer that dropped Runtime/, a
-            // hand-gutted folder). Restore this bootstrap's own release and
-            // try once more; a second failure is the real error.
+            // Nothing usable on disk: restore this bootstrap's own release and retry once.
             warn($"the runtime store is unusable ({storeError.Message})");
             if(!RecoveryInstaller.TryRestore(runtimeRoot, msg, warn)) throw;
             state = store.LoadAndRepair();
@@ -62,9 +55,7 @@ public static class BootstrapCore {
             msg($"[AutoUpdate] now running {trial.Version}");
             return new BootstrapResult { Loaded = trial, Assembly = assembly };
         }
-        // The failed payload may have half-initialized static state in this
-        // process, so nothing else is loaded this launch; the old runtime is
-        // intact and comes back on the next one.
+        // The failed payload may have left static state: load nothing else this launch.
         state.Trial = null;
         state.Staged = null;
         state.Failed = trial.Version;

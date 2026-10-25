@@ -1,18 +1,12 @@
 namespace Quartz.Core;
 public static class Info {
-    // The KeyViewer flavour (-p:Flavor=KeyViewer) is the same core shipping only the
-    // key viewer. Name is the mod's identity everywhere it matters — the data
-    // root under UserData/, the Harmony id, the MelonInfo name, the update asset —
-    // so a single const keeps the two builds from ever sharing a file or a patch id.
+    // The KeyViewer flavour has its own Name, so the builds never share a data root, Harmony id or update asset.
 #if QUARTZ_KEYVIEWER
     public const string Name = "QuartzKeyViewer";
 #else
     public const string Name = "Quartz";
 #endif
-    // A property, deliberately NOT a const: addons compile against
-    // sdk/QuartzAddon.dll, which is built from the Full flavour, and the compiler
-    // bakes a const's value into every call site. As a const this would read false
-    // inside every addon no matter which core was actually running.
+    // Not a const: addons would bake in the Full flavour's value.
     public static bool KeyViewerOnly =>
 #if QUARTZ_KEYVIEWER
         true;

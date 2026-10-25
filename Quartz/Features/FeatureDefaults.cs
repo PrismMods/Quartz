@@ -1,8 +1,7 @@
 using Newtonsoft.Json.Linq;
 using Quartz.Core;
 namespace Quartz.Features;
-// Which features start on: carried over from the settings a pre-module (1.x) install
-// left behind, or the fresh-install defaults when there are none.
+// Default on/off per feature: from 1.x settings files if present, else fresh-install defaults.
 public static class FeatureDefaults {
     public sealed class Rule {
         public string Id;

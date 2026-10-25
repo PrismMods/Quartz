@@ -16,10 +16,7 @@ public class LoaderMl : MelonMod {
         string runtimeRoot = Path.Combine(dataRoot, "Runtime");
         try {
             if(LegacyCleanup.RetireMelonLeftovers(MelonEnvironment.ModsDirectory, MelonEnvironment.UserLibsDirectory, Wrn)) {
-                // MelonLoader already registered the pre-bootstrap mod this
-                // launch. Loading the payload too would put two same-identity
-                // assemblies in the process, so the old build runs its final
-                // session and the retired DLL makes the next launch ours.
+                // The old build already loaded this launch; two same-identity assemblies would conflict.
                 Msg($"the previous {BootstrapInfo.ModName} install runs this session — the updated runtime takes over on the next launch");
                 return;
             }

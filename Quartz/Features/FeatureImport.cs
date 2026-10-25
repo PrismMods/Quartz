@@ -13,10 +13,7 @@ public static class FeatureImport {
             "tweaks", "visualtweaks", "uihider", "restriction", "deathlimit", "effectremover",
         ],
     };
-    // An IImportHandler only exists while its feature is loaded, so a settings import
-    // with the feature off silently drops everything it would have read. Switch the
-    // features that handle this source on first; the caller re-runs the import after
-    // the load pump so the handlers are registered by the time it delivers.
+    // Handlers exist only while their feature is loaded: switch those on first; the caller re-runs the import after the load pump.
     public static bool EnsureForKind(string kind) =>
         kind != null && ByKind.TryGetValue(kind, out string[] ids) && Ensure(ids);
     public static bool Ensure(IReadOnlyList<string> ids) {

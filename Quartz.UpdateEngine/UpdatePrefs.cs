@@ -2,9 +2,7 @@ using System.IO;
 using Newtonsoft.Json.Linq;
 using Quartz.Core;
 namespace Quartz.UpdateEngine;
-// Runtime/update.json — written by the payload after each successful launch
-// (channel + skipped release from the in-game settings), readable and editable
-// by hand. Enabled=false is the kill switch for launch-time update checks.
+// Runtime/update.json, written after each launch and hand-editable. Enabled=false disables launch-time checks.
 public sealed class UpdatePrefs {
     public bool Enabled = true;
     public ReleaseChannel Channel = SemVer.ParseChannel(EngineInfo.Channel);

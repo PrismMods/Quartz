@@ -38,7 +38,7 @@ public static partial class GenerateUI {
         RectTransform header = BackGround(rightInset);
         header.name = "Header";
         header.SetParent(root, false);
-        // O5Kit field: the swatch fills the left half with the label inside it, the hex value sits on the right.
+        // O5Kit field: swatch and label on the left half, hex on the right.
         GameObject previewObject = new("Preview");
         previewObject.transform.SetParent(header, false);
         RectTransform previewRect = previewObject.AddComponent<RectTransform>();

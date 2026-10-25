@@ -4,13 +4,7 @@ using System.Runtime.InteropServices;
 using Newtonsoft.Json.Linq;
 using Quartz.Core;
 namespace Quartz.UpdateEngine;
-// Turns a downloaded install zip into Runtime/versions/<version>/. The zip is
-// the ordinary release asset (Mods DLL + data files + runtime store), so this
-// routes entries rather than extracting wholesale: the versioned runtime subtree
-// lands as the new runtime, the maintainer-owned data files (Lang) are
-// staged into .data-sync/ for the bootstrap to copy over the data
-// root, and the rest (bootstrap DLL, state.json) is deliberately dropped — the
-// frozen bootstrap only updates through the in-game installer.
+// Routes an install zip into Runtime/versions/<version>/: runtime subtree as the runtime, Lang into .data-sync/, the rest dropped.
 internal static class PackageInstaller {
     private const long MaximumExtractedBytes = 512L * 1024 * 1024;
     public const string DataSyncDirName = ".data-sync";

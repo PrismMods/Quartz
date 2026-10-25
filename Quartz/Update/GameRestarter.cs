@@ -273,8 +273,7 @@ public static class GameRestarter {
         for(int i = 0; i < args.Length; i++) {
             quoted[i] = BatchQuote(args[i]);
             if(quoted[i] != null) continue;
-            // Dropping one positional argument can change the meaning of every
-            // argument after it. Forward either the exact list or none of it.
+            // Dropping one positional argument shifts the rest: forward all or none.
             MainCore.Log.Wrn("[Update] dropped forwarded arguments because one value is unsafe for cmd.exe");
             return "";
         }
@@ -287,12 +286,10 @@ public static class GameRestarter {
             if(unsafeChars.IndexOf(value[i]) < 0) continue;
             return null;
         }
-        // Always quote: an unquoted argument from the current process would be
-        // reparsed as cmd.exe syntax after environment-variable expansion.
+        // Always quote: cmd.exe reparses unquoted arguments after variable expansion.
         int trailingSlashes = 0;
         for(int i = value.Length - 1; i >= 0 && value[i] == '\\'; i--) trailingSlashes++;
-        // Windows argv parsing consumes a backslash before the closing quote;
-        // double the trailing run so the child receives it verbatim.
+        // Windows argv parsing eats a backslash before the closing quote; double the trailing run.
         return "\"" + value + new string('\\', trailingSlashes) + "\"";
     }
 }

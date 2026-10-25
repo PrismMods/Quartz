@@ -84,7 +84,7 @@ internal sealed partial class TufPacksView : MonoBehaviour {
     private static (Image, TMP_Text) Chip(Transform parent, string value, float width, Action action) {
         RectTransform rect = Rect("Chip " + value, parent, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
         LayoutElement size = rect.gameObject.AddComponent<LayoutElement>();
-        // Chips may squeeze to 70% when the row runs out of width; the label shrinks with them.
+        // Chips can squeeze to 70%; the label shrinks with them.
         size.preferredWidth = width;
         size.minWidth = width * 0.7f;
         Image image = rect.gameObject.AddComponent<Image>();

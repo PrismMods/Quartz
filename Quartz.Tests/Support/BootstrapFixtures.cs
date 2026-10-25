@@ -1,6 +1,4 @@
-// Test stand-ins for the MSBuild-generated consts (BootstrapInfo.g.cs /
-// EngineInfo.g.cs). The linked bootstrap and engine sources compile against
-// these; values mirror the Full+ML axis.
+// Stand-ins for the MSBuild-generated BootstrapInfo/EngineInfo consts (Full+ML values).
 namespace Quartz.Bootstrap {
     internal static class BootstrapInfo {
         public const string ModName = "Quartz";

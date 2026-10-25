@@ -8,7 +8,7 @@ internal sealed class KvGrid : MaskableGraphic {
     private Vector2 offset = new(float.NaN, float.NaN);
     private Vector3 drawnAt = new(float.NaN, float.NaN, float.NaN);
     private float drawnScale = -1f;
-    // Lines snap to screen pixels, so moving or rescaling the window has to redraw them too.
+    // Lines snap to screen pixels, so window moves and rescales redraw.
     private void LateUpdate() {
         Vector3 at = rectTransform.position;
         float scale = rectTransform.lossyScale.x;
@@ -19,7 +19,7 @@ internal sealed class KvGrid : MaskableGraphic {
     }
     internal void Sync(float zoom, Vector2 pan) {
         float scaled = KvSnap.GridSnap * Mathf.Max(zoom, 0.0001f);
-        // MinScreenPitch is in real pixels, so a scaled-down UI doesn't pack lines into a moire.
+        // Real pixels, so a scaled-down UI doesn't moire.
         float pixels = Mathf.Max(rectTransform.lossyScale.x, 0.0001f);
         while(scaled * pixels < MinScreenPitch) scaled *= 2f;
         Vector2 next = new(Mod(pan.x, scaled), Mod(-pan.y, scaled));
@@ -41,8 +41,7 @@ internal sealed class KvGrid : MaskableGraphic {
         Rect r = rectTransform.rect;
         if(r.width <= 1f || r.height <= 1f) return;
         Color32 tint = KvPalette.GridLine;
-        // Overlay canvas: world units are screen pixels. Lines are exactly one pixel wide and sit on
-        // pixel boundaries; a sub-pixel line (UI scale < 1) blinks in and out as the view pans.
+        // Overlay canvas units are screen pixels; sub-pixel lines blink while panning.
         Vector3 scale = rectTransform.lossyScale;
         float sx = scale.x > 0.0001f ? scale.x : 1f;
         float sy = scale.y > 0.0001f ? scale.y : 1f;

@@ -3,10 +3,7 @@ using Newtonsoft.Json.Linq;
 using Quartz.Core;
 using Quartz.IO;
 namespace Quartz.Update;
-// Mirrors the in-game update settings into Runtime/update.json, where the
-// launch-time bootstrap's update engine reads them before this assembly is
-// even loaded. Enabled is user-owned (hand-edited to opt out of launch
-// checks), so a rewrite preserves it.
+// Mirrors update settings to Runtime/update.json for the bootstrap's engine. Enabled is user-owned and preserved.
 public static class UpdateLaunchPrefs {
     public static string RuntimeRoot { get; private set; }
     public static void Bind(string runtimeRoot) {

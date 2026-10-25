@@ -1,10 +1,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 namespace Quartz.UpdateEngine;
-// The reflection contract with Quartz.Bootstrap. The bootstrap DLL is frozen at
-// install time while this engine ships inside every versioned runtime, so the
-// surface between them is one static method exchanging JSON strings — the only
-// shape that stays callable no matter how far the two drift apart.
+// Reflection contract with the frozen bootstrap: one static method taking and returning JSON strings.
 public static class EntryPoint {
     public static string Resolve(string requestJson) {
         try {

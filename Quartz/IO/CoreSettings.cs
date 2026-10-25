@@ -41,9 +41,7 @@ public sealed class CoreSettings : ISettingsFile {
     public int UpdateChannel = (int)ReleaseChannel.Alpha;
     public string SkippedVersion = "";
     public bool AprilFoolsForced = false;
-    // Clamp, don't cast blindly: 2 was ReleaseCandidate and 3 was Stable before
-    // RC was removed and Stable took its slot. A stored 3 cast raw would sit
-    // above every real channel and AcceptsChannel would then reject everything.
+    // Clamp: stored 2 (old RC) and 3 (old Stable) would otherwise sit above every channel.
     public ReleaseChannel GetUpdateChannel() =>
         UpdateChannel >= (int)ReleaseChannel.Stable ? ReleaseChannel.Stable : (ReleaseChannel)UpdateChannel;
     public bool AcceptsChannel(ReleaseChannel remote) => remote >= GetUpdateChannel();
@@ -112,8 +110,7 @@ public sealed class CoreSettings : ISettingsFile {
     public void Deserialize(JToken token) {
         Active = IOUtils.Read(token, nameof(Active), Active);
         Language = IOUtils.Read(token, nameof(Language), Language);
-        // A config written before auto-detect existed belongs to someone who already has a
-        // language — treat the missing key as "already done" so an upgrade never overrides it.
+        // Configs from before auto-detect already have a language; don't override it.
         LanguageAutoDetected = IOUtils.Read(token, nameof(LanguageAutoDetected), true);
         IsFirstRun = IOUtils.Read(token, nameof(IsFirstRun), IsFirstRun);
         ShowOnStartup = IOUtils.Read(token, nameof(ShowOnStartup), ShowOnStartup);

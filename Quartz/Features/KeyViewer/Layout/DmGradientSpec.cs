@@ -12,10 +12,7 @@ internal readonly struct DmGradientStop {
     }
 }
 
-/// <summary>
-/// Parsed DM Note v2 gradient sibling. Kept free of Unity types so preset
-/// validation and renderer conversion share one tolerant boundary.
-/// </summary>
+// DM Note v2 gradient, free of Unity types so validation and rendering share one parser.
 internal sealed class DmGradientSpec {
     internal const int MinStops = 2;
     internal const int MaxStops = 8;

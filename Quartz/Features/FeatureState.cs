@@ -3,7 +3,6 @@ using Newtonsoft.Json.Linq;
 using Quartz.Core;
 using Quartz.IO;
 namespace Quartz.Features;
-/// <summary>Which built-in features are switched on, plus the sidebar tab toggles. Features.json.</summary>
 public sealed class FeatureState {
     public readonly Dictionary<string, bool> Features = new(StringComparer.Ordinal);
     public readonly Dictionary<string, bool> Categories = new(StringComparer.Ordinal);
@@ -42,7 +41,7 @@ public sealed class FeatureState {
         }
         FeatureState state = FromLegacy() ?? FromSettings() ?? new FeatureState();
         state.Save();
-        // Only once the new file is safely down: the old binaries are what the migration reads.
+        // Only after the new file is written: the migration reads the old binaries.
         if(File.Exists(Path)) RemoveLegacyBinaries();
         return state;
     }
@@ -95,7 +94,7 @@ public sealed class FeatureState {
             return null;
         }
     }
-    // The .qmod binaries are dead weight now; installed.json stays as the record of the old choice.
+    // installed.json stays as the record of the old choice.
     private static void RemoveLegacyBinaries() {
         try {
             if(Directory.Exists(LegacyFolder)) {

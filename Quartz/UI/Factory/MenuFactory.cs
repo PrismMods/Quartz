@@ -178,7 +178,6 @@ public static class MenuFactory {
         bg.sprite = MainCore.Spr.GetFilled(8f);
         bg.type = Image.Type.Sliced;
         bg.color = UIColors.MenuNormal;
-        // Width follows the (localized) label, so tabs size to their text.
         HorizontalLayoutGroup layout = obj.AddComponent<HorizontalLayoutGroup>();
         layout.padding = new RectOffset(16, 16, 0, 0);
         layout.childControlWidth = true;
@@ -230,7 +229,6 @@ public static class MenuFactory {
     }
     private static void WireItemInteractions(MenuItem menuItem, GameObject item, Image bg) {
         var trigger = item.AddComponent<EventTrigger>();
-        // Nav links hover with the accent ring, not a fill.
         GenerateUI.AddOutlineHover(bg.gameObject, trigger);
         UnityUtils.AddClickEvent(trigger, _ => {
             if(IsSelected(menuItem, UICore.CurrentMenuState)) return;

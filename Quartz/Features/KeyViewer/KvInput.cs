@@ -23,9 +23,7 @@ internal static class KvClock {
             }
         }
     }
-    // An external driver (offline render capture) swaps the wall clock for its own virtual clock so
-    // rain lengths and animation speeds follow the capture timeline, not real time. Both switches
-    // rebase so Now never jumps backwards for timestamps already stored in boxes and rains.
+    // An external driver replaces the wall clock with its capture clock; switching rebases so Now never goes backwards.
     internal static void SetExternal(Func<double> clock) {
         if(clock == null) {
             ClearExternal();
@@ -80,15 +78,12 @@ public static class KvInputQueue {
     public static void SetWanted(bool value) => wanted = value;
     public static void SetFocused(bool value) => focused = value;
     public static void Push(KeyCode key, bool down) {
-        // Real hook events are ignored while an external driver replays a run; the machine's
-        // keyboard is not part of the capture.
         if(externalDriver) return;
         if(!wanted || key == KeyCode.None) return;
         if(down && !focused) return;
         Write(key, down);
     }
-    // Driver path: no wanted/focus gating — the driver decides what the viewer shows, and a
-    // background render has no window focus to speak of.
+    // Driver path: no focus gating; a background render has no focus.
     internal static void PushExternal(KeyCode key, bool down) {
         if(!externalDriver || key == KeyCode.None) return;
         Write(key, down);

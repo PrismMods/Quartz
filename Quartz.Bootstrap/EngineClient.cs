@@ -3,10 +3,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 namespace Quartz.Bootstrap;
-// Loads the CURRENT runtime's update engine and asks it whether a newer runtime
-// exists (downloading and staging it if so). The engine ships beside each
-// payload precisely so this frozen bootstrap never carries update logic that
-// could go stale.
+// Asks the current runtime's update engine for a newer runtime. The engine ships with each payload, so the frozen bootstrap holds no update logic.
 public static class EngineClient {
     private const string EntryType = "Quartz.UpdateEngine.EntryPoint";
     private const string EntryMethod = "Resolve";

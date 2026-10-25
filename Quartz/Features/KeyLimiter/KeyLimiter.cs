@@ -172,10 +172,7 @@ public static partial class KeyLimiter {
                 return false;
         }
     }
-    // The hook feed itself now lives in Quartz.Game.HookInput (core), so the key
-    // viewer no longer needs this module installed to see hook-only keys. These
-    // stay as forwarders: they are public API and this module's own code, the
-    // chatter blocker and third-party addons all still call them.
+    // Public forwarders to HookInput, still called by addons.
     public static bool IsHookTrackedKey(KeyCode key) => HookInput.IsHookTrackedKey(key);
     public static void NoteHookEvent(KeyCode key, bool pressed) => HookInput.NoteHookEvent(key, pressed);
     public static bool HookEverSaw(KeyCode key) => HookInput.HookEverSaw(key);

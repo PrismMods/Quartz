@@ -193,9 +193,7 @@ public static partial class ProfileManager {
         }
     }
     private static string ConfigFileName => Path.GetFileName(MainCore.Paths.ConfigPath);
-    // A bundle carries a feature's settings file whether or not that feature is on
-    // here, so an imported profile would otherwise come up missing the very features it
-    // was built around. The defaults table already knows which file means which feature.
+    // Turn on the features an imported bundle carries settings for.
     private static void EnableFeaturesFor(JObject files) {
         try {
             FeatureDefaults.Plan plan = FeatureDefaults.Decide(fileName => files[fileName] as JObject);
