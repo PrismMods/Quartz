@@ -70,6 +70,7 @@ internal static partial class PageKeyViewer {
             "Scales the picture. Drag it into place in Reorganize mode."
         );
         TextMeshProUGUI tabubStatus = GenerateUI.AddMutedText(GenerateUI.Row(body, 30f), 17f, 0.45f);
+        GenerateUI.FitLine(tabubStatus, 13f);
         void RefreshTabubStatus() => tabubStatus.text = !string.IsNullOrWhiteSpace(conf.TabubImagePath)
             ? Path.GetFileName(conf.TabubImagePath)
             : KeyViewerOverlay.HasTabubImage
@@ -102,8 +103,9 @@ internal static partial class PageKeyViewer {
         Action refreshJs = AppendJsPlugins(body, conf, compact: true);
         Action refreshTuning = AppendDmTuning(body, conf, compact: true, includeOffsets: false);
         Action refreshGhostRainDots = AppendGhostRainDots(body, conf, def, compact: true);
-        Quartz.Overlay.OverlayAnchors.Dropdown(body, (Quartz.Overlay.OverlayAnchor)def.DmAnchor, KeyViewerOverlay.Anchor,
-            KeyViewerOverlay.SetAnchor, "keyviewer_anchor");
+        KvWidgets.DropDown(GenerateUI.Row(body), (Quartz.Overlay.OverlayAnchor)def.DmAnchor, KeyViewerOverlay.Anchor,
+            Quartz.Overlay.OverlayAnchors.All, Quartz.Overlay.OverlayAnchors.Name, KeyViewerOverlay.SetAnchor,
+            "Anchor", "keyviewer_anchor");
         DmButton(
             body, true,
             () => KeyViewerOverlay.ResetPosition(),

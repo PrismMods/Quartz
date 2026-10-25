@@ -11,7 +11,7 @@ namespace Quartz.UI.Generator;
 public static partial class GenerateUI {
     private const float PickerWheelSize = 280f;
     private const float PickerVerticalWidth = 360f;
-    private const float PickerVerticalHeight = 624f;
+    private const float PickerVerticalHeight = 586f;
     private const float PickerHorizontalWidth = 640f;
     private const float PickerHorizontalHeight = 344f;
     public static UIColorPicker ColorPicker(
@@ -38,29 +38,29 @@ public static partial class GenerateUI {
         RectTransform header = BackGround(rightInset);
         header.name = "Header";
         header.SetParent(root, false);
-        TextMeshProUGUI label = AddText(header);
-        label.text = text;
-        LocalizeById(label, id, text);
+        // O5Kit field: the swatch fills the left half with the label inside it, the hex value sits on the right.
         GameObject previewObject = new("Preview");
         previewObject.transform.SetParent(header, false);
         RectTransform previewRect = previewObject.AddComponent<RectTransform>();
-        previewRect.anchorMin = new(1f, 0f);
-        previewRect.anchorMax = new(1f, 1f);
-        previewRect.pivot = new(1f, 0.5f);
-        previewRect.sizeDelta = new(150f, 0f);
-        previewRect.anchoredPosition = new(-6f, 0f);
-        previewRect.offsetMin = new(previewRect.offsetMin.x, 8f);
-        previewRect.offsetMax = new(previewRect.offsetMax.x, -8f);
+        previewRect.anchorMin = new(0f, 0f);
+        previewRect.anchorMax = new(0.5f, 1f);
+        previewRect.offsetMin = new(9f, 8f);
+        previewRect.offsetMax = new(-5f, -8f);
         Image preview = previewObject.AddComponent<Image>();
         preview.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
         preview.type = Image.Type.Sliced;
         TextMeshProUGUI previewLabel = AddText(previewRect, true);
         previewLabel.name = "ColorLabel";
-        previewLabel.text = string.Empty;
-        previewLabel.fontSize = 16f;
+        previewLabel.text = text;
+        previewLabel.fontSize = 18f;
         previewLabel.alignment = TextAlignmentOptions.Center;
         previewLabel.verticalAlignment = VerticalAlignmentOptions.Middle;
         previewLabel.raycastTarget = false;
+        previewLabel.rectTransform.offsetMin = new(8f, 0f);
+        previewLabel.rectTransform.offsetMax = new(-8f, 0f);
+        LocalizeById(previewLabel, id, text);
+        FitLine(previewLabel, 12f);
+        TextMeshProUGUI label = previewLabel;
         UIColorPicker picker = null;
         UIInput hexInput = Input(
             header,
@@ -81,9 +81,14 @@ public static partial class GenerateUI {
             hexViewport.offsetMin = new(6f, hexViewport.offsetMin.y);
             hexViewport.offsetMax = new(-6f, hexViewport.offsetMax.y);
         }
+        hexRect.anchorMin = new(0.62f, 0f);
+        hexRect.anchorMax = new(1f, 1f);
+        hexRect.offsetMin = new(0f, 4f);
+        hexRect.offsetMax = new(-10f, -4f);
+        hexRect.GetComponent<Image>().color = Color.clear;
         TMP_Text hexText = hexInput.InputField.textComponent;
-        hexText.fontSize = 17f;
-        hexText.alignment = TextAlignmentOptions.Center;
+        hexText.fontSize = 19f;
+        hexText.alignment = TextAlignmentOptions.Right;
         hexInput.InputField.onFocusSelectAll = false;
         hexInput.InputField.characterLimit = 9;
         Transform hexHover = hexRect.Find("Hover");
@@ -137,17 +142,6 @@ public static partial class GenerateUI {
             wheelParent = body;
             controlParent = body;
         }
-        RectTransform hexParent = horizontal ? controlParent : body;
-        hexRect.SetParent(hexParent, false);
-        hexRect.SetAsFirstSibling();
-        hexRect.anchorMin = Vector2.zero;
-        hexRect.anchorMax = Vector2.one;
-        hexRect.pivot = new(0.5f, 0.5f);
-        hexRect.offsetMin = Vector2.zero;
-        hexRect.offsetMax = Vector2.zero;
-        LayoutElement hexLayout = hexRect.gameObject.AddComponent<LayoutElement>();
-        hexLayout.preferredHeight = 40f;
-        hexLayout.minHeight = 40f;
         GameObject wheelObject = new("Wheel");
         wheelObject.transform.SetParent(wheelParent, false);
         RectTransform wheel = wheelObject.AddComponent<RectTransform>();
@@ -166,7 +160,7 @@ public static partial class GenerateUI {
         wheelImage.color = Color.white;
         RectTransform hueHandle = CreateHandle(wheel, "HueHandle", new(15f, 15f));
         RectTransform colorHandle = CreateHandle(wheel, "ColorHandle", new(13f, 13f));
-        RectTransform modeRow = Row(controlParent, 22f);
+        RectTransform modeRow = Row(controlParent, 30f);
         HorizontalLayoutGroup modeLayout = modeRow.gameObject.AddComponent<HorizontalLayoutGroup>();
         modeLayout.spacing = 4f;
         modeLayout.childControlWidth = true;
@@ -198,6 +192,7 @@ public static partial class GenerateUI {
             sliders[i].SetAccent(colors[i]);
             sliders[i].FillImage.gameObject.AddComponent<ThemeExempt>();
             sliders[i].Label.fontSize = 18f;
+            sliders[i].Label.fontSizeMax = 18f;
         }
         Image sharedOutline = AddOutlineHover(header.gameObject, header.gameObject.AddComponent<EventTrigger>());
         picker = new UIColorPicker(
@@ -217,7 +212,7 @@ public static partial class GenerateUI {
         toggleArea.transform.SetParent(header, false);
         RectTransform toggleRect = toggleArea.AddComponent<RectTransform>();
         toggleRect.anchorMin = Vector2.zero;
-        toggleRect.anchorMax = new(1f, 1f);
+        toggleRect.anchorMax = new(0.6f, 1f);
         toggleRect.offsetMin = Vector2.zero;
         toggleRect.offsetMax = Vector2.zero;
         Image toggleTarget = toggleArea.AddComponent<Image>();
@@ -247,7 +242,7 @@ public static partial class GenerateUI {
         background.type = Image.Type.Sliced;
         TextMeshProUGUI label = AddText(rect, true);
         label.text = text;
-        label.fontSize = 17f;
+        label.fontSize = 15f;
         label.alignment = TextAlignmentOptions.Center;
         label.raycastTarget = false;
         AddButton(buttonObject, button => {

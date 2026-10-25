@@ -27,7 +27,8 @@ public static partial class GenerateUI {
         Action<T> onChanged,
         string id,
         float width = 0f,
-        string leftLabel = null
+        string leftLabel = null,
+        float rightInset = 250f
     ) {
         const float rowHeight = 50f;
         const float listTopOffset = 62f;
@@ -39,32 +40,21 @@ public static partial class GenerateUI {
         rootRect.pivot = new(0.5f, 0.5f);
         rootRect.offsetMin = Vector2.zero;
         rootRect.offsetMax = Vector2.zero;
-        RectTransform rect = BackGround();
+        RectTransform rect = BackGround(rightInset);
         rect.SetParent(root.transform, false);
         rect.pivot = new(rect.pivot.x, 1f);
         rect.anchorMin = new(rect.anchorMin.x, 1f);
         rect.anchorMax = new(rect.anchorMax.x, 1f);
         rect.sizeDelta = new(rect.sizeDelta.x, rowHeight);
-        if(width > 0f) {
+        // A labelled dropdown is a full-width O5Kit row whose closed text reads "Label: value",
+        // as Overlayer does it. width only sizes an unlabelled box.
+        bool labelled = leftLabel != null;
+        if(width > 0f && !labelled) {
             rect.anchorMin = new(1f, 1f);
             rect.anchorMax = new(1f, 1f);
             rect.pivot = new(1f, 1f);
             rect.sizeDelta = new(width, rowHeight);
-            rect.anchoredPosition = new(-250f, 0f);
-            if(leftLabel != null) {
-                TextMeshProUGUI lead = AddText(root.transform);
-                lead.text = leftLabel;
-                lead.raycastTarget = false;
-                LocalizeById(lead, id, leftLabel, "LABEL");
-                RectTransform leadRect = lead.rectTransform;
-                leadRect.anchorMin = new(0f, 1f);
-                leadRect.anchorMax = new(1f, 1f);
-                leadRect.pivot = new(0.5f, 1f);
-                leadRect.offsetMin = new(16f, -rowHeight);
-                leadRect.offsetMax = new(-(250f + width + 16f), 0f);
-                TextCompat.NoWrap(lead);
-                lead.overflowMode = TextOverflowModes.Ellipsis;
-            }
+            rect.anchoredPosition = new(-rightInset, 0f);
         }
         TextMeshProUGUI tmp = AddText(rect);
         tmp.text = display(value);
@@ -90,13 +80,13 @@ public static partial class GenerateUI {
         listRect.anchorMax = new(1f, 1f);
         listRect.pivot = new(0.5f, 1f);
         listRect.offsetMin = new(0f, -listTopOffset);
-        listRect.offsetMax = new(-250f, -listTopOffset);
-        if(width > 0f) {
+        listRect.offsetMax = new(-rightInset, -listTopOffset);
+        if(width > 0f && !labelled) {
             listRect.anchorMin = new(1f, 1f);
             listRect.anchorMax = new(1f, 1f);
             listRect.pivot = new(1f, 1f);
             listRect.sizeDelta = new(width, listRect.sizeDelta.y);
-            listRect.anchoredPosition = new(-250f, -listTopOffset);
+            listRect.anchoredPosition = new(-rightInset, -listTopOffset);
         }
         Image listBg = list.AddComponent<Image>();
         listBg.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
@@ -129,6 +119,10 @@ public static partial class GenerateUI {
             value,
             onChanged
         );
+        if(labelled) {
+            string labelKey = LocaleKeyFromId(id, "LABEL");
+            dropdown.HeaderDisplay = v => $"{(labelKey != null ? Tr(labelKey, leftLabel) : leftLabel)}: {display(v)}";
+        }
         root.AddComponent<DropdownLanguageRefresh>().Init(dropdown.RefreshLanguage);
         GTween layoutSeq = null;
         RectTransform parentRect = parent as RectTransform ?? parent.GetComponent<RectTransform>();

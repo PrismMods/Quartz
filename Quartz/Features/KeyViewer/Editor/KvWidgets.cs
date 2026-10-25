@@ -72,6 +72,16 @@ internal static partial class KvWidgets {
         });
         return toggle;
     }
+    // Full-width row like the other pane controls, reading "Label: value".
+    internal static UIDropDown<T> DropDown<T>(
+        Transform parent, T defaultValue, T value, IReadOnlyList<T> values, Func<T, string> display,
+        Action<T> onChanged, string text, string id
+    ) {
+        UIDropDown<T> dropdown = GenerateUI.DropDown(parent, defaultValue, value, values, display, onChanged, id, 0f, text, 0f);
+        dropdown.Label.fontSize = LabelSize;
+        Fit(dropdown.Label, LabelSize, LabelSizeMin);
+        return dropdown;
+    }
     internal static UIButton Button(Transform parent, Action onClick, string text, string id) {
         RectTransform rect = GenerateUI.BackGround(0f);
         rect.SetParent(parent, false);

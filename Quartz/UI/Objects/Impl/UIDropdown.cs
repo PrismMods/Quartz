@@ -29,6 +29,16 @@ public class UIDropDown<T> : UIObject {
     public bool Expanded { get; private set; }
     public Action OnLayoutChanged;
     public Func<T, TMP_FontAsset> ItemFont;
+    // Closed-row text when it differs from the list items, e.g. "Anchor: Bottom Center".
+    private Func<T, string> headerDisplay;
+    public Func<T, string> HeaderDisplay {
+        get => headerDisplay;
+        set {
+            headerDisplay = value;
+            if(Label != null && !IsDisposed) Label.text = HeaderText(Value);
+        }
+    }
+    private string HeaderText(T value) => headerDisplay != null ? headerDisplay(value) : Display(value);
     private readonly List<(T item, TextMeshProUGUI text)> rowTexts = [];
     private GTween triangleSeq;
     private GTween changeSeq;
@@ -60,14 +70,14 @@ public class UIDropDown<T> : UIObject {
         DefaultValue = defaultValue;
         Value = value;
         OnChanged = onChanged;
-        Label.text = Display(Value);
+        Label.text = HeaderText(Value);
         RebuildList();
         UpdateVisual(true);
     }
     public void Set(T value, bool invoke = true) {
         if(IsDisposed) return;
         Value = value;
-        Label.text = Display(Value);
+        Label.text = HeaderText(Value);
         if(invoke) OnChanged?.Invoke(value);
         UpdateVisual();
         OnLayoutChanged?.Invoke();
@@ -81,7 +91,7 @@ public class UIDropDown<T> : UIObject {
     }
     public void Reset() => Set(DefaultValue);
     public void RefreshLanguage() {
-        if(Label != null) Label.text = Display(Value);
+        if(Label != null) Label.text = HeaderText(Value);
         RebuildList();
     }
     private GTween listSeq;
