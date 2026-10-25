@@ -40,6 +40,12 @@ public static class ComboOverlay {
     }
     private const float VerticalGap = 32f;
     private const float CaptionGap = 24f;
+    // Caption sits on the value's baseline and its own cap height, not on line boxes, so tight-metric fonts don't collide.
+    // These are Cookie Run's descent and ascent-to-cap gap (per em), which the default offsets were tuned on.
+    private const float RefDescent = 0.335f;
+    private const float RefCapGap = 0.319f;
+    private static float PerEm(TMP_FontAsset font, float line) =>
+        font == null || font.faceInfo.pointSize <= 0f ? 0f : line / font.faceInfo.pointSize * font.faceInfo.scale;
     public static void EnsureConf() => ConfMgr ??= SettingsFile<ComboSettings>.Loaded("Combo.json");
     internal static void Rescale(float fx, float fy) {
         EnsureConf();
@@ -301,7 +307,11 @@ public static class ComboOverlay {
             float capTop = 0f;
             float capBottom = 0f;
             if(captionShown && captionText != null) {
-                capTop = valueH + CaptionGap + Conf.CaptionOffsetY;
+                TMP_FontAsset vf = valueText.font, cf = captionText.font;
+                float valueBaseline = valueSize * PerEm(vf, vf != null ? vf.faceInfo.ascentLine : 0f);
+                float capGap = captionSize * PerEm(cf, cf != null ? cf.faceInfo.ascentLine - cf.faceInfo.capLine : 0f);
+                capTop = valueBaseline + valueSize * RefDescent + CaptionGap + Conf.CaptionOffsetY
+                    + captionSize * RefCapGap - capGap;
                 capBottom = capTop + captionText.rectTransform.sizeDelta.y;
             }
             float overhang = Mathf.Max(0f, -capTop);
