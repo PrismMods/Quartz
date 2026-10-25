@@ -1,0 +1,12 @@
+{
+  "en-US": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "SECTION_SPECIAL_DAYS": "Special Days",
+    "SPECIALDAY_HINT": "Turn the game's seasonal events on or off regardless of the date. Changes show after the next scene load.",
+    "SPECIALDAY_HALLOWEEN_LABEL": "Halloween",
+    "SPECIALDAY_APRILFOOLS_LABEL": "April Fools",
+    "SPECIALDAY_AUTO": "By date",
+    "SPECIALDAY_ON": "Always on",
+    "SPECIALDAY_OFF": "Always off"
+  }
+}

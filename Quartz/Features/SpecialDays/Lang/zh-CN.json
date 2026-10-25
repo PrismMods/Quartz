@@ -1,0 +1,12 @@
+{
+  "zh-CN": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "SECTION_SPECIAL_DAYS": "节日活动",
+    "SPECIALDAY_HINT": "无论日期如何，开启或关闭游戏的节日活动。下次加载场景时生效。",
+    "SPECIALDAY_HALLOWEEN_LABEL": "万圣节",
+    "SPECIALDAY_APRILFOOLS_LABEL": "愚人节",
+    "SPECIALDAY_AUTO": "按日期",
+    "SPECIALDAY_ON": "始终开启",
+    "SPECIALDAY_OFF": "始终关闭"
+  }
+}
