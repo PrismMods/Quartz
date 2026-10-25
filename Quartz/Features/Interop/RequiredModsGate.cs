@@ -7,6 +7,7 @@ public static class RequiredModsGate {
     [HarmonyPatch(typeof(RDEditorUtils), "CheckModsDependency")]
     private static class CheckModsDependencyPatch {
         private static bool Prefix(object[] mods, ref bool __result) {
+            if(!MainCore.IsModEnabled) return true;
             try {
                 __result = HasMissingMods(mods);
                 return false;

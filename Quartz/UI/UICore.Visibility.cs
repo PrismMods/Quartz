@@ -164,7 +164,7 @@ public static partial class UICore {
         }
         bool ctrl = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)
             || Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand);
-        if(!ctrl) return;
+        if(!ctrl || !MainCore.IsModEnabled) return;
         bool shift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
         if(Input.GetKeyDown(KeyCode.Z)) {
             if(shift) UndoTimeline.Redo();

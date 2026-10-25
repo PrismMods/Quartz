@@ -259,9 +259,10 @@ public static class HookInput {
             try {
                 if(IsMouseLabel(__0.Label)) return true;
                 bool down = __0.Type == SkyHook.EventType.KeyPressed;
-                if(MacRuntimeCached && __0.Key is 0x32 or 0x89 && __0.Label != KeyLabel.BackSlash)
+                bool mac = MacRuntimeCached && MainCore.IsModEnabled;
+                if(mac && __0.Key is 0x32 or 0x89 && __0.Label != KeyLabel.BackSlash)
                     SetLabel(ref __0, KeyLabel.BackSlash);
-                if(MacRuntimeCached && down && !FixMacRightModifier(ref __0)) return false;
+                if(mac && down && !FixMacRightModifier(ref __0)) return false;
                 KeyCode key = HookKeyToPhysicalUnityKey(__0.Key, __0.Label);
                 NoteHookEvent(key, down);
                 HookKeys.RaiseKeyEvent(key, down);

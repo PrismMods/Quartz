@@ -12,7 +12,6 @@ public sealed class CalibrationModule : QuartzFeature {
             if(entering) CalibrationPopupUI.BeginReorganize();
             else CalibrationPopupUI.EndReorganize();
         };
-        UICore.OnReorganizeChanged += reorganizeHandler;
         Context.AddPage(new NavPage {
             Key = "overlay.calibration",
             CategoryKey = "overlay",
@@ -23,8 +22,17 @@ public sealed class CalibrationModule : QuartzFeature {
             OwnScroll = true,
         });
         Context.PatchAll();
-        Context.OnModEnable("CalibrationPopup", CalibrationPopupUI.Initialize);
-        Context.OnModDisable("CalibrationPopup", CalibrationPopupUI.Dispose);
+        // Hooked only while Quartz is on, so reorganizing with Quartz off doesn't bring up the popup.
+        Context.OnModEnable("CalibrationPopup", () => {
+            CalibrationPopupUI.Initialize();
+            UICore.OnReorganizeChanged += reorganizeHandler;
+            if(UICore.IsReorganizing) CalibrationPopupUI.BeginReorganize();
+        });
+        Context.OnModDisable("CalibrationPopup", () => {
+            UICore.OnReorganizeChanged -= reorganizeHandler;
+            CalibrationPopupUI.EndReorganize();
+            CalibrationPopupUI.Dispose();
+        });
     }
     public override void OnTick() => CalibrationTimingLogger.Tick();
     public override void OnUnload() {

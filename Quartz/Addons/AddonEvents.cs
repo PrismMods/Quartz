@@ -10,7 +10,9 @@ public static class AddonEvents {
     public static event Action<HitMargin> Hit;
     public static event Action<Scene> SceneLoaded;
     public static event Action<bool> ModEnabledChanged;
-    internal static void RaiseSceneLoaded(Scene scene) => SafeRaise(SceneLoaded, scene);
+    internal static void RaiseSceneLoaded(Scene scene) {
+        if(MainCore.IsModEnabled) SafeRaise(SceneLoaded, scene);
+    }
     internal static void RaiseModEnabledChanged(bool enabled) => SafeRaise(ModEnabledChanged, enabled);
     internal static void Clear() {
         LevelStart = null;
