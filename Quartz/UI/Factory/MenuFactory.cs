@@ -15,6 +15,7 @@ using GTweens.Builders;
 using GTweens.Easings;
 using TMPro;
 using Quartz.UI.Nav;
+using Quartz.Features;
 namespace Quartz.UI.Factory;
 public static class MenuFactory {
     public static Action<int> OnStateChanged;
@@ -26,6 +27,7 @@ public static class MenuFactory {
         public TMP_Text label;
         public string categoryKey;
         public bool isCategory;
+        public Image underline;
     }
     private static readonly List<MenuItem> items = [];
     private static readonly List<MenuItem> subItems = [];
@@ -170,7 +172,8 @@ public static class MenuFactory {
         image.color = UIColors.MenuHover;
         image.raycastTarget = false;
     }
-    private static void CreateSubItem(Transform parent, string title, string key, int state) {
+    private static void CreateSubItem(Transform parent, NavPage page) {
+        string title = page.Title;
         GameObject obj = new(title);
         obj.transform.SetParent(parent, false);
         obj.AddComponent<RectTransform>();
@@ -184,21 +187,36 @@ public static class MenuFactory {
         layout.childControlHeight = true;
         layout.childForceExpandWidth = false;
         layout.childForceExpandHeight = true;
+        bool stub = FeaturePages.IsStub(page);
         GameObject textObj = new("Text");
         textObj.transform.SetParent(obj.transform, false);
         textObj.AddComponent<RectTransform>();
         TMP_Text label = textObj.AddComponent<TextMeshProUGUI>();
         label.text = title;
         label.font = FontManager.MenuFontAsset;
-        label.fontSize = 16;
+        label.fontSize = 17;
         label.color = Color.white;
         label.alignment = TextAlignmentOptions.Center;
         label.verticalAlignment = VerticalAlignmentOptions.Middle;
         label.characterSpacing = -3f;
         label.raycastTarget = false;
         TextCompat.NoWrap(label);
-        label.gameObject.AddComponent<TextLocalization>().Init(key, title);
-        MenuItem menuItem = new() { obj = obj, bg = bg, state = state, label = label, isCategory = false };
+        label.gameObject.AddComponent<TextLocalization>().Init(page.LocaleKey, title);
+        if(stub) label.alpha = 0.5f;
+        GameObject lineObj = new("Underline");
+        lineObj.transform.SetParent(obj.transform, false);
+        lineObj.AddComponent<LayoutElement>().ignoreLayout = true;
+        RectTransform lineRect = lineObj.GetComponent<RectTransform>();
+        lineRect.anchorMin = new(0f, 0f);
+        lineRect.anchorMax = new(1f, 0f);
+        lineRect.pivot = new(0.5f, 0f);
+        lineRect.offsetMin = new(10f, 0f);
+        lineRect.offsetMax = new(-10f, 3f);
+        Image underline = lineObj.AddComponent<Image>();
+        underline.color = UIColors.ObjectActive;
+        underline.raycastTarget = false;
+        underline.enabled = false;
+        MenuItem menuItem = new() { obj = obj, bg = bg, state = page.State, label = label, isCategory = false, underline = underline };
         subItems.Add(menuItem);
         WireItemInteractions(menuItem, obj, bg);
     }
@@ -215,7 +233,7 @@ public static class MenuFactory {
             bool first = true;
             foreach(NavPage child in NavRegistry.PagesIn(categoryKey)) {
                 if(child.SeparatorBefore && !first) CreateSubSeparator(UICore.SubMenuContent);
-                CreateSubItem(UICore.SubMenuContent, child.Title, child.LocaleKey, child.State);
+                CreateSubItem(UICore.SubMenuContent, child);
                 first = false;
             }
         }
@@ -263,6 +281,7 @@ public static class MenuFactory {
             var it = list[i];
             it.hoverSeq?.Kill();
             bool selected = IsSelected(it, id);
+            if(it.underline != null) it.underline.enabled = selected;
             if(it.label != null) {
                 // Keep alpha: the collapsed rail hides its labels through it.
                 Color c = selected ? Color.white : UIColors.TextSecondary;

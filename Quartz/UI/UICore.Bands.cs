@@ -34,6 +34,18 @@ public static partial class UICore {
         subMenu.AddComponent<RectMask2D>();
         subMenuCanvasGroup = subMenu.AddComponent<CanvasGroup>();
         subMenuCanvasGroup.alpha = 1f;
+        // Bottom rule so the tab strip reads as its own bar against the page.
+        GameObject rule = new("Rule");
+        rule.transform.SetParent(subMenu.transform, false);
+        RectTransform ruleRect = rule.AddComponent<RectTransform>();
+        ruleRect.anchorMin = new(0f, 0f);
+        ruleRect.anchorMax = new(1f, 0f);
+        ruleRect.pivot = new(0.5f, 0f);
+        ruleRect.offsetMin = Vector2.zero;
+        ruleRect.offsetMax = new(0f, 1f);
+        Image ruleImage = rule.AddComponent<Image>();
+        ruleImage.color = UIColors.Border;
+        ruleImage.raycastTarget = false;
         GameObject content = new("Content");
         content.transform.SetParent(subMenu.transform, false);
         SubMenuContent = content.AddComponent<RectTransform>();
