@@ -234,9 +234,7 @@ public sealed class ResizeFrame : MonoBehaviour {
             lastPanelSize = panelSize;
             hasApplied = true;
         }
-        bool show = Panel.gameObject.activeInHierarchy
-            && UICore.IsOpen
-            && !UICore.IsReorganizing;
+        bool show = Panel.gameObject.activeInHierarchy && UICore.PanelInteractive;
         if(Handles != null && Handles.activeSelf != show) Handles.SetActive(show);
     }
 }

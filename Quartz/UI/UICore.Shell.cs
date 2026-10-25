@@ -60,6 +60,8 @@ public static partial class UICore {
     private static GameObject reorganizeDim;
     private static CanvasGroup reorganizeDimGroup;
     private static bool panelOverHub;
+    // The settings panel is up and usable: opened normally, or over the reorganize hub.
+    internal static bool PanelInteractive => isOpen && (!IsReorganizing || panelOverHub);
     public static float PanelScale {
         get;
         set {
