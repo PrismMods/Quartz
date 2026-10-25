@@ -3,13 +3,13 @@ using Quartz.Interop;
 namespace Quartz.Features;
 public static class FeatureImport {
     private static readonly Dictionary<string, string[]> ByKind = new(StringComparer.Ordinal) {
-        [ImportSourceKind.KeyboardChatterBlocker] = ["keylimiter"],
+        [ImportSourceKind.KeyboardChatterBlocker] = ["keylimiter", "antichatter"],
         [ImportSourceKind.JipperKeyViewer] = ["keyviewer"],
         [ImportSourceKind.JipperResourcePack] = ["keyviewer", "combo", "judgement", "progressbar", "planetcolors", "ottoicon"],
         [ImportSourceKind.AdofaiTweaks] = ["keylimiter", "tweaks", "uihider", "restriction"],
         [ImportSourceKind.EnhancedEffectRemover] = ["effectremover", "visualtweaks"],
         [ImportSourceKind.KorenResourcePackV1] = [
-            "keyviewer", "keylimiter", "combo", "judgement", "progressbar", "planetcolors", "ottoicon",
+            "keyviewer", "keylimiter", "antichatter", "combo", "judgement", "progressbar", "planetcolors", "ottoicon",
             "tweaks", "visualtweaks", "uihider", "restriction", "deathlimit", "effectremover",
         ],
     };

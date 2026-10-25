@@ -6,7 +6,6 @@ public sealed class KeyLimiterModule : QuartzFeature {
         foreach(string lang in new[] { "en-US", "ko-KR", "zh-CN" })
             Context.RegisterTranslations(typeof(KeyLimiterModule), $"Quartz.Features.KeyLimiter.Lang.{lang}.json");
         KeyLimiter.EnsureConf();
-        ChatterBlocker.EnsureConf();
         FeatureMasters.Claim(KeyLimiter.ConfMgr, KeyLimiter.Conf.Enabled, static c => c.Enabled = true);
         ChartKeyLimiter.EnsureConf();
         EnumToStringPatch.Bind(Context.Harmony);
@@ -22,15 +21,6 @@ public sealed class KeyLimiterModule : QuartzFeature {
             Title = "Key Limiter",
             LocaleKey = "SECTION_KEY_LIMITER",
             Build = PageKeyLimiter.KeyLimiterPage,
-            OwnScroll = true,
-        });
-        Context.AddPage(new NavPage {
-            Key = "gameplay.chatter",
-            CategoryKey = "gameplay",
-            Order = 20,
-            Title = "Keyboard Chatter Blocker",
-            LocaleKey = "SECTION_KEYBOARD_CHATTER_BLOCKER",
-            Build = PageKeyLimiter.ChatterBlockerPage,
             OwnScroll = true,
         });
         Context.AddHomeCard(new Quartz.UI.Home.HomeCard {

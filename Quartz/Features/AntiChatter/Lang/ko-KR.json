@@ -1,0 +1,10 @@
+{
+  "ko-KR": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "SECTION_ANTICHATTER": "채터링 방지",
+    "ANTICHATTER_MS": "기준값 (ms)",
+    "ANTICHATTER_HOLD": "홀드 채터링 보호",
+    "ANTICHATTER_STATS": "차단: {0}회 · 마지막: {1} ({2} ms)",
+    "ANTICHATTER_RESET_STATS": "통계 초기화"
+  }
+}

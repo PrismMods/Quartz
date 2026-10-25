@@ -1,0 +1,10 @@
+{
+  "en-US": {
+    "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "SECTION_ANTICHATTER": "AntiChatter",
+    "ANTICHATTER_MS": "Threshold (ms)",
+    "ANTICHATTER_HOLD": "Hold Bounce Protection",
+    "ANTICHATTER_STATS": "Blocked: {0} · Last: {1} ({2} ms)",
+    "ANTICHATTER_RESET_STATS": "Reset Stats"
+  }
+}

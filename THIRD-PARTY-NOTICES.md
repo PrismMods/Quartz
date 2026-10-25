@@ -161,3 +161,47 @@ is Noto Sans CJK SC Medium, subset to the GB2312 character set plus the
 characters Quartz's Chinese translations use. Copyright 2014-2021 Adobe
 (http://www.adobe.com/), SIL Open Font License 1.1.
 Source: https://github.com/notofonts/noto-cjk
+
+## AntiChatter
+
+- **Author:** copecone
+- **Source:** https://git.yunizun.org/copecone/AntiChatter
+- **Licence:** MIT
+- **Lives in Quartz as:** the *AntiChatter* feature
+  (`Quartz/Features/AntiChatter/`), replacing Quartz's own
+  Keyboard Chatter Blocker
+
+Drops a key's repeat press inside a threshold (switch bounce) on both the
+async keyboard hook and Unity input, splits each frame's hook events into
+per-tick simulation steps, and bridges a hold that bounces open for a moment
+instead of ending it.
+
+**Modified by the Quartz project on 2026-10-25:**
+
+- Rewritten as a Quartz feature module: the MelonLoader entry point,
+  MelonPreferences config, IMGUI window, F8 toggle key and own localization are
+  gone; settings live in `AntiChatter.json` (migrated once from the old
+  `ChatterBlocker.json`), the page uses Quartz's UI and en-US/ko-KR keys.
+- Every filter is a pass-through while the feature, the setting or Quartz itself
+  is off, including the per-tick step splitting upstream always runs.
+- The blocked-press counter shows on the settings page, with a reset button.
+
+Copyright (c) 2026 copecone
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

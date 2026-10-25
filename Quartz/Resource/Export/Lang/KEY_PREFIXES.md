@@ -13,7 +13,7 @@ Prefix -> feature (source of truth: the C# owning the setting / building the UI 
 | `FXRM_`   | Effect Remover                        | `Features/EffectRemover`, built in `PageVisuals.cs` |
 | `JR_`     | Judgement Restriction                 | `Features/Restriction` (`RestrictionSettings.JRestrict*`), built in `PageGameplay.cs` |
 | `JPOP_`   | Hide Judgements (judgement popup mask)| `Features/Judgement/JudgementPopupHiderSettings`, built in `PageVisuals.cs` |
-| `KCB_`    | Keyboard Chatter Blocker              | `Features/ChatterBlocker`, built in `PageGameplay.cs` |
+| `ANTICHATTER_` | AntiChatter                        | `Features/AntiChatter`, built in `PageAntiChatter.cs` |
 | `KL_`     | Key Limiter                           | `Features/KeyLimiter`, built in `PageGameplay.cs` |
 | `PCOL_`   | Planet Colors                         | `Features/PlanetColors`, built in `PageVisuals.cs` |
 | `QUIZ_`   | April Fools pop quiz                  | `Features/AprilFools/QuizOverlay.cs` |
