@@ -18,4 +18,6 @@ public sealed class FeatureAttribute(string id, string group, int order, string 
     public string[] Deps { get; set; } = [];
     // Namespaces whose [HarmonyPatch] classes this feature owns; null means the entry class's namespace.
     public string[] Patches { get; set; }
+    // Sidebar category its pages live in, when that isn't Group; places the tab shown while it's off.
+    public string Tab { get; set; }
 }

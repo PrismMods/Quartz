@@ -517,6 +517,11 @@
     "INACTIVE_HINT": "Every feature is off. Turn Quartz back on to change settings.",
     "INACTIVE_TURN_ON": "Turn On",
     "DESC_KEYVIEWER_EDITOR_TAB_DUPLICATE": "Copies the hand tab you are editing, with every element on it, into a new tab.",
-    "DESC_KEYVIEWER_EDITOR_FOOT_DUPLICATE": "Copies the foot tab you have open, with every element on it, into a new foot tab."
+    "DESC_KEYVIEWER_EDITOR_FOOT_DUPLICATE": "Copies the foot tab you have open, with every element on it, into a new foot tab.",
+    "FEATURE_OFF_HINT": "This feature is off. Turn it on to see its settings.",
+    "FEATURE_OFF_NEEDS": "This feature needs {0}. Turning it on turns that on too.",
+    "FEATURE_TURN_ON": "Turn On",
+    "FEATURE_PAGE_ENABLE": "Use this feature",
+    "FEATURE_OPEN": "Open"
   }
 }

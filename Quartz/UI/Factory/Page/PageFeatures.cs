@@ -127,9 +127,13 @@ internal static class PageFeatures {
             v => FeatureService.SetEnabled(id, v),
             MainCore.Tr.Get(handle.Info.NameKey, handle.Name),
             "feature_" + id,
-            52f
+            150f
         );
         toggle.Label?.GetComponent<TextLocalization>()?.Init(handle.Info.NameKey, handle.Name);
+        GenerateUI.MiniButton(row, "Open", "FEATURE_OPEN", -16f, 120f, () => {
+            int state = FeaturePages.StateFor(id);
+            if(state >= 0) MenuFactory.SetState(state);
+        });
         string error = handle.Error;
         if(error == null) return [row.gameObject];
         RectTransform statusRow = GenerateUI.Row(parent, 96f);

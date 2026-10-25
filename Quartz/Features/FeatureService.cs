@@ -154,9 +154,10 @@ public static class FeatureService {
             State.Features[other] = enabled;
         }
         State.Save();
-        MainThread.Enqueue(static () => {
+        string follow = FeaturePages.FeatureOf(Quartz.UI.Nav.NavRegistry.ByState(UICore.CurrentMenuState));
+        MainThread.Enqueue(() => {
             Sync();
-            RebuildUI();
+            RebuildUI(follow);
         });
     }
     private static void Collect(Handle handle, bool enabled, HashSet<string> into) {
@@ -177,6 +178,7 @@ public static class FeatureService {
         foreach(Handle handle in Features)
             if(handle.Instance == null && handle.Error == null && ShouldRun(handle)) Instantiate(handle);
         ApplyActive();
+        FeaturePages.Sync();
     }
     private static bool ShouldRun(Handle handle) {
         if(!handle.Enabled) return false;
@@ -184,10 +186,13 @@ public static class FeatureService {
             if(Find(dep) is not { Loaded: true }) return false;
         return true;
     }
-    private static void RebuildUI() {
+    // A page that vanished because its feature flipped hands over to that feature's other tab (real or stub).
+    private static void RebuildUI(string follow) {
         if(UICore.Pages.Count == 0) return;
-        if(Quartz.UI.Nav.NavRegistry.ByState(UICore.CurrentMenuState) == null)
-            UICore.CurrentMenuState = Quartz.UI.Nav.NavRegistry.FirstVisibleState();
+        if(Quartz.UI.Nav.NavRegistry.ByState(UICore.CurrentMenuState) == null) {
+            int next = FeaturePages.StateFor(follow);
+            UICore.CurrentMenuState = next >= 0 ? next : Quartz.UI.Nav.NavRegistry.FirstVisibleState();
+        }
         UICore.Rebuild();
     }
     private static void Instantiate(Handle handle) {

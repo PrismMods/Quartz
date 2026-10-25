@@ -6,16 +6,25 @@ namespace Quartz.UI.Factory;
 public static class PageFactory {
     public static RectTransform PagesContaner;
     private static readonly Dictionary<int, (Quartz.UI.Nav.NavPage Def, RectTransform Target)> unbuilt = [];
+    // Set while a feature's page builds; its first scroll page gets the feature's on/off row on top.
+    private static string switchFor;
     public static void EnsureBuilt(int state) {
         if(!unbuilt.TryGetValue(state, out (Quartz.UI.Nav.NavPage Def, RectTransform Target) entry)) return;
         unbuilt.Remove(state);
+        if(!Quartz.Features.FeaturePages.IsStub(entry.Def)) switchFor = Quartz.Features.FeaturePages.FeatureOf(entry.Def);
         try {
+            if(!entry.Def.OwnScroll && switchFor != null) {
+                Quartz.Features.FeaturePages.AddSwitch(entry.Target, switchFor);
+                switchFor = null;
+            }
             entry.Def.Build(entry.Target);
         } catch(Exception e) {
             string owner = entry.Def.OwnerId == null ? "UI" : "Addon:" + entry.Def.OwnerId;
             Quartz.Core.MainCore.Log.Err($"[{owner}] page '{entry.Def.Key}' build threw: {e}");
             RectTransform fallback = entry.Def.OwnScroll ? CreateScrollablePage(entry.Target) : entry.Target;
             GenerateUI.AddMutedText(GenerateUI.Row(fallback, 40f)).text = $"'{entry.Def.Title}' failed to build — see log";
+        } finally {
+            switchFor = null;
         }
     }
     public static void EnsureAllBuilt() {
@@ -84,6 +93,11 @@ public static class PageFactory {
         GenerateUI.FitVertical(content);
         scrollController = pad.AddComponent<UIScrollController>();
         scrollController.SetContent(contentRect, viewportRect);
+        if(switchFor != null) {
+            string id = switchFor;
+            switchFor = null;
+            Quartz.Features.FeaturePages.AddSwitch(contentRect, id);
+        }
         return contentRect;
     }
     public static RectTransform CreatePageBase(int num) {

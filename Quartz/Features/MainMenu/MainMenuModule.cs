@@ -1,6 +1,6 @@
 using Quartz.UI.Nav;
 namespace Quartz.Features.MainMenu;
-[Feature("mainmenu", "tweaks", 15, "Main Menu", "SECTION_MAIN_MENU")]
+[Feature("mainmenu", "tweaks", 30, "Main Menu", "SECTION_MAIN_MENU")]
 public sealed class MainMenuModule : QuartzFeature {
     public override void OnLoad() {
         foreach(string lang in new[] { "en-US", "ko-KR", "zh-CN" })

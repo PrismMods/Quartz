@@ -1,7 +1,7 @@
 using Quartz.UI.Generator;
 using Quartz.UI.Nav;
 namespace Quartz.Features.Tuf;
-[Feature("tuf", "others", 30, "TUF", "TUF")]
+[Feature("tuf", "others", 30, "TUF", "TUF", Tab = "tuf")]
 public sealed class TufModule : QuartzFeature {
     public const string LevelsPageKey = "tuf.levels";
     private TufService tufService;
