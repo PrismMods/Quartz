@@ -18,7 +18,8 @@ using Quartz.UI;
 namespace Quartz.Features.Calibration;
 public static class CalibrationPopupUI {
     private const float WIDTH = 460f;
-    private const float HEIGHT = 210f;
+    private const float HEIGHT = 200f;
+    private const float TITLE_HEIGHT = 44f;
     private static Vector2 ShownPos {
         get {
             Calibration.EnsureConf();
@@ -35,6 +36,8 @@ public static class CalibrationPopupUI {
     private static Image borderImage;
     private static Image iconImage;
     private static Image yesImage;
+    private static Image noImage;
+    private static Image barImage;
     private static GTween moveSeq;
     private static bool visible;
     private static float pendingOffsetMs;
@@ -56,6 +59,8 @@ public static class CalibrationPopupUI {
         borderImage = null;
         iconImage = null;
         yesImage = null;
+        noImage = null;
+        barImage = null;
         dragObj = null;
         visible = false;
         reorganizing = false;
@@ -84,34 +89,44 @@ public static class CalibrationPopupUI {
         panelRect.anchoredPosition = HiddenPos;
         group = panelObj.AddComponent<CanvasGroup>();
         group.alpha = 0f;
+        // Same chrome as the settings window: rounded body, title bar, faint outline.
         bgImage = panelObj.AddComponent<Image>();
-        bgImage.sprite = MainCore.Spr.GetFilled(18.5f);
+        bgImage.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P1024);
         bgImage.type = Image.Type.Sliced;
         {
-            GameObject border = new("Border");
-            border.transform.SetParent(panelObj.transform, false);
-            RectTransform rect = border.AddComponent<RectTransform>();
-            rect.anchorMin = Vector2.zero;
-            rect.anchorMax = Vector2.one;
-            rect.offsetMin = new(-2f, -2f);
-            rect.offsetMax = new(2f, 2f);
-            borderImage = border.AddComponent<Image>();
-            borderImage.sprite = MainCore.Spr.GetRing(20.5f, 3f);
-            borderImage.type = Image.Type.Sliced;
-            borderImage.raycastTarget = false;
-        }
-        {
+            GameObject bar = new("TitleBar");
+            bar.transform.SetParent(panelObj.transform, false);
+            RectTransform rect = bar.AddComponent<RectTransform>();
+            rect.anchorMin = new(0f, 1f);
+            rect.anchorMax = new(1f, 1f);
+            rect.pivot = new(0.5f, 1f);
+            rect.offsetMin = new(0f, -TITLE_HEIGHT);
+            rect.offsetMax = Vector2.zero;
+            barImage = bar.AddComponent<Image>();
+            barImage.sprite = MainCore.Spr.Get(UISliceSprite.CircleHalf256P1024);
+            barImage.type = Image.Type.Sliced;
+            barImage.raycastTarget = false;
             GameObject icon = new("Icon");
-            icon.transform.SetParent(panelObj.transform, false);
+            icon.transform.SetParent(bar.transform, false);
             RectTransform iconRect = icon.AddComponent<RectTransform>();
-            iconRect.anchorMin = new(0.5f, 1f);
-            iconRect.anchorMax = new(0.5f, 1f);
-            iconRect.pivot = new(0.5f, 1f);
-            iconRect.anchoredPosition = new(0f, -22f);
-            iconRect.sizeDelta = new(34f, 34f);
+            iconRect.anchorMin = new(0f, 0.5f);
+            iconRect.anchorMax = new(0f, 0.5f);
+            iconRect.pivot = new(0f, 0.5f);
+            iconRect.anchoredPosition = new(18f, 0f);
+            iconRect.sizeDelta = new(24f, 24f);
             iconImage = icon.AddComponent<Image>();
-            iconImage.sprite = MainCore.Spr.Get(UISprite.AdjustmentsHorizontal128, 34f);
+            iconImage.sprite = MainCore.Spr.Get(UISprite.AdjustmentsHorizontal128, 24f);
             iconImage.raycastTarget = false;
+            GameObject title = new("Title");
+            title.transform.SetParent(bar.transform, false);
+            RectTransform titleRect = title.AddComponent<RectTransform>();
+            titleRect.anchorMin = Vector2.zero;
+            titleRect.anchorMax = Vector2.one;
+            titleRect.offsetMin = new(52f, 0f);
+            titleRect.offsetMax = new(-18f, 0f);
+            TextMeshProUGUI titleText = MenuText(title, 18f);
+            titleText.alignment = TextAlignmentOptions.Left;
+            GenerateUI.Localize(titleText, "SECTION_CALIBRATION", "Calibration");
         }
         {
             GameObject msg = new("Message");
@@ -119,24 +134,32 @@ public static class CalibrationPopupUI {
             RectTransform rect = msg.AddComponent<RectTransform>();
             rect.anchorMin = new(0f, 0f);
             rect.anchorMax = new(1f, 1f);
-            rect.offsetMin = new(28f, 78f);
-            rect.offsetMax = new(-28f, -60f);
-            messageText = msg.AddComponent<TextMeshProUGUI>();
-            messageText.font = FontManager.Current;
-            messageText.fontSize = 22f;
-            messageText.color = Color.white;
-            messageText.alignment = TextAlignmentOptions.Center;
-            messageText.verticalAlignment = VerticalAlignmentOptions.Middle;
+            rect.offsetMin = new(24f, 72f);
+            rect.offsetMax = new(-24f, -TITLE_HEIGHT - 8f);
+            messageText = MenuText(msg, 20f);
+            messageText.alignment = TextAlignmentOptions.Left;
             TextCompat.Wrap(messageText);
             // Fixed box: shrink long messages instead of cutting them.
-            messageText.fontSizeMax = 22f;
-            messageText.fontSizeMin = 16f;
+            messageText.fontSizeMax = 20f;
+            messageText.fontSizeMin = 15f;
             messageText.enableAutoSizing = true;
             messageText.overflowMode = TextOverflowModes.Ellipsis;
-            messageText.raycastTarget = false;
         }
-        yesImage = Button(panelObj.transform, -118f, UIColors.ObjectButton, "CALIBRATION_POPUP_YES", "Yes", OnYes);
-        Button(panelObj.transform, 118f, new Color(1f, 1f, 1f, 0.12f), "CALIBRATION_POPUP_NO", "No", Hide);
+        {
+            GameObject border = new("Border");
+            border.transform.SetParent(panelObj.transform, false);
+            RectTransform rect = border.AddComponent<RectTransform>();
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            borderImage = border.AddComponent<Image>();
+            borderImage.sprite = MainCore.Spr.GetRing(12f, UICore.OUTLINE_WIDTH);
+            borderImage.type = Image.Type.Sliced;
+            borderImage.raycastTarget = false;
+        }
+        noImage = Button(panelObj.transform, -154f, "CALIBRATION_POPUP_NO", "No", Hide);
+        yesImage = Button(panelObj.transform, -16f, "CALIBRATION_POPUP_YES", "Yes", OnYes);
         dragObj = ReorganizeHandle.CreateDragSurface(
             panelRect,
             () => MainCore.Tr.Get("SECTION_CALIBRATION", "Calibration"),
@@ -147,23 +170,35 @@ public static class CalibrationPopupUI {
     }
     private static void ApplyTheme() {
         if(bgImage != null) bgImage.color = UIColors.PanelBG;
-        if(borderImage != null) borderImage.color = UIColors.ObjectActive;
+        if(barImage != null) barImage.color = UIColors.TopBar;
+        if(borderImage != null) borderImage.color = UIColors.Border;
+        if(noImage != null) noImage.color = UIColors.ObjectBG;
         if(iconImage != null) iconImage.color = UIColors.ObjectActive;
         if(yesImage != null) yesImage.color = UIColors.ObjectButton;
     }
-    private static Image Button(Transform parent, float x, Color color, string localeKey, string defaultText, System.Action onClick) {
+    private static TextMeshProUGUI MenuText(GameObject obj, float size) {
+        TextMeshProUGUI text = obj.AddComponent<TextMeshProUGUI>();
+        text.font = FontManager.MenuFontAsset;
+        text.fontSize = size;
+        text.characterSpacing = -3f;
+        text.color = Color.white;
+        text.verticalAlignment = VerticalAlignmentOptions.Middle;
+        text.raycastTarget = false;
+        return text;
+    }
+    // Right-aligned pill, like the settings window's buttons; x is the right edge's offset.
+    private static Image Button(Transform parent, float x, string localeKey, string defaultText, System.Action onClick) {
         GameObject obj = new("Button_" + defaultText);
         obj.transform.SetParent(parent, false);
         RectTransform rect = obj.AddComponent<RectTransform>();
-        rect.anchorMin = new(0.5f, 0f);
-        rect.anchorMax = new(0.5f, 0f);
-        rect.pivot = new(0.5f, 0.5f);
-        rect.anchoredPosition = new(x, 40f);
-        rect.sizeDelta = new(180f, 52f);
+        rect.anchorMin = new(1f, 0f);
+        rect.anchorMax = new(1f, 0f);
+        rect.pivot = new(1f, 0.5f);
+        rect.anchoredPosition = new(x, 38f);
+        rect.sizeDelta = new(130f, 44f);
         Image img = obj.AddComponent<Image>();
         img.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
         img.type = Image.Type.Sliced;
-        img.color = color;
         GameObject labelObj = new("Label");
         labelObj.transform.SetParent(obj.transform, false);
         RectTransform labelRect = labelObj.AddComponent<RectTransform>();
@@ -171,13 +206,8 @@ public static class CalibrationPopupUI {
         labelRect.anchorMax = Vector2.one;
         labelRect.offsetMin = Vector2.zero;
         labelRect.offsetMax = Vector2.zero;
-        TextMeshProUGUI label = labelObj.AddComponent<TextMeshProUGUI>();
-        label.font = FontManager.Current;
-        label.fontSize = 22f;
-        label.color = Color.white;
+        TextMeshProUGUI label = MenuText(labelObj, 18f);
         label.alignment = TextAlignmentOptions.Center;
-        label.verticalAlignment = VerticalAlignmentOptions.Middle;
-        label.raycastTarget = false;
         GenerateUI.Localize(label, localeKey, defaultText);
         GenerateUI.AddButton(obj, btn => {
             if(btn == InputButton.Left) onClick();
