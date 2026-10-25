@@ -39,11 +39,11 @@ internal sealed partial class KvInspector {
         CounterSegments(root, batch, Placements, PlaceName, PlaceKey, "placement", "inside");
         CounterSegments(root, batch, CounterAligns, CounterAlignName, CounterAlignKey, "align", "top");
         CounterSegments(root, batch, AlignModes, ModeName, ModeKey, "alignMode", "center");
-        GenerateUI.AddLocalizedMutedText(
+        GenerateUI.WrapGrow(GenerateUI.AddLocalizedMutedText(
             GenerateUI.Row(root, 44f), "KVI_COUNTER_MODE_HINT",
             "Center draws the label and count as one line; Between pushes them to opposite edges.",
             15f, 0.45f
-        );
+        ));
         Num(root, tracked, "Counter Gap", "kvi_counter_gap", 6f, 0f, 100f, "0 px", 1f,
             batch, el => KvProps.Float(Read(el), "gap", 6f),
             (el, v) => KvProps.SetInt(Counter(el), "gap", v));

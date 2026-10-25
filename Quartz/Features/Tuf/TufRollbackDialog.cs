@@ -118,7 +118,7 @@ internal static class TufRollbackDialog {
         labelRect.offsetMin = new Vector2(18f, 0f);
         labelRect.offsetMax = new Vector2(-(ButtonWidth + 24f), 0f);
         TextMeshProUGUI label = labelObj.AddComponent<TextMeshProUGUI>();
-        label.font = FontManager.Current;
+        label.font = FontManager.MenuFontAsset;
         label.fontSize = 15f;
         label.color = new Color(1f, 1f, 1f, 0.85f);
         label.text = Describe(snapshot);
@@ -179,7 +179,7 @@ internal static class TufRollbackDialog {
         labelRect.offsetMin = new Vector2(8f, 0f);
         labelRect.offsetMax = new Vector2(-8f, 0f);
         TextMeshProUGUI label = labelObj.AddComponent<TextMeshProUGUI>();
-        label.font = FontManager.Current;
+        label.font = FontManager.MenuFontAsset;
         label.fontSize = 16f;
         label.color = Color.white;
         label.text = text;
@@ -208,7 +208,7 @@ internal static class TufRollbackDialog {
         rect.offsetMin = offsetMin;
         rect.offsetMax = offsetMax;
         TextMeshProUGUI label = obj.AddComponent<TextMeshProUGUI>();
-        label.font = FontManager.Current;
+        label.font = FontManager.MenuFontAsset;
         label.fontSize = size;
         label.color = color;
         label.text = text;

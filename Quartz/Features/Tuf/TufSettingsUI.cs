@@ -124,10 +124,10 @@ internal static class TufSettingsUI {
             "TUF_LIBRARY", "Level Library");
         service.EnsureLibraryMeasured();
         RectTransform summaryRow = GenerateUI.Row(content.transform, 30f);
-        TMP_Text summaryText = GenerateUI.AddMutedText(summaryRow, 15f);
+        TMP_Text summaryText = GenerateUI.FitLine(GenerateUI.AddMutedText(summaryRow, 15f), 12f);
         summaryText.text = "";
         RectTransform pathRow = GenerateUI.Row(content.transform, 34f);
-        TMP_Text pathText = GenerateUI.AddMutedText(pathRow, 15f);
+        TMP_Text pathText = GenerateUI.FitLine(GenerateUI.AddMutedText(pathRow, 15f), 12f);
         pathText.text = service.ActiveRootPath;
         UIButton openFolderBtn = GenerateUI.Button(
             GenerateUI.Row(content.transform),
@@ -182,7 +182,7 @@ internal static class TufSettingsUI {
             ).color = new Color(1f, 0.72f, 0.35f, 0.9f);
         }
         RectTransform statusRow = GenerateUI.Row(content.transform, 44f);
-        TMP_Text statusText = GenerateUI.AddMutedText(statusRow, 15f);
+        TMP_Text statusText = GenerateUI.WrapGrow(GenerateUI.AddMutedText(statusRow, 15f));
         statusText.text = "";
         view.SetLabels(pathText, summaryText, statusText, linkedNoteRow);
         view.Bind(service);

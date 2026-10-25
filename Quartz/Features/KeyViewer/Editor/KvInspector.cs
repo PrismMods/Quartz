@@ -133,17 +133,18 @@ internal sealed partial class KvInspector {
     private void Build(RectTransform root, List<UIObject> tracked) {
         IReadOnlyList<KvElement> sel = canvas.Selection;
         if(sel.Count == 0) {
-            GenerateUI.AddLocalizedMutedText(
+            GenerateUI.WrapGrow(GenerateUI.AddLocalizedMutedText(
                 GenerateUI.Row(root, 30f), "KVI_EMPTY",
                 "Select an element on the canvas to edit it. Drag a box around several to edit them together.",
                 17f, 0.45f
-            );
+            ));
             return;
         }
         KvElement[] batch = [.. sel];
         TextMeshProUGUI title = GenerateUI.AddText(GenerateUI.Row(root, 36f));
         title.fontSize = 24f;
         title.alignment = TextAlignmentOptions.MidlineLeft;
+        GenerateUI.FitLine(title);
         title.text = batch.Length == 1
             ? TitleFor(batch[0])
             : string.Format(MainCore.Tr.Get("KVI_MULTI_TITLE", "{0} elements selected"), batch.Length);

@@ -88,4 +88,11 @@ public static class HomeUI {
         label.text = text;
         return label;
     }
+    // Wrapped lines; the row grows to fit them.
+    public static TextMeshProUGUI Paragraph(Transform parent, string text, float height) {
+        TextMeshProUGUI label = GenerateUI.AddMutedText(GenerateUI.Row(parent, height), 15f, 0.5f, true);
+        label.text = text;
+        GenerateUI.WrapGrow(label);
+        return label;
+    }
 }

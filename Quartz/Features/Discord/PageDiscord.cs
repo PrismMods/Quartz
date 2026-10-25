@@ -44,6 +44,7 @@ public static partial class PageDiscord {
         Transform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(content)), "SECTION_DISCORD", "Discord");
         TextMeshProUGUI status = GenerateUI.AddMutedText(GenerateUI.Row(content, 30f), 15f, 0.6f);
+        GenerateUI.FitLine(status, 12f);
         RectTransform shell = GenerateUI.Row(content, 660f);
         shell.gameObject.AddComponent<ThemeExempt>();
         RectTransform client = Fill(shell, "Client", 4f, 0f, 4f, 0f);

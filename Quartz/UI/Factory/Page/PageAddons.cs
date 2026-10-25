@@ -16,6 +16,7 @@ internal static class PageAddons {
         headerText.gameObject.AddComponent<TextLocalization>().Init("ADDONS", "Addons");
         var hintRow = GenerateUI.Row(content.transform, 54f);
         var hintText = GenerateUI.AddMutedText(hintRow, 17f, 0.45f, true);
+        GenerateUI.WrapGrow(hintText);
         hintText.gameObject.AddComponent<TextLocalization>().Init(
             "ADDONS_HINT",
             "Build a .qaddon against the QuartzAddon SDK and drop it into UserData/Quartz/Addons (or use Add Addon). Quartz loads addons at launch; Reload re-reads the folder from disk."

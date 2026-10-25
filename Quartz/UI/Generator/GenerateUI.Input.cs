@@ -74,7 +74,8 @@ public static partial class GenerateUI {
         placeholderRect.anchorMin = Vector2.zero;
         placeholderRect.anchorMax = Vector2.one;
         placeholderRect.offsetMin = Vector2.zero;
-        placeholderRect.offsetMax = Vector2.zero;
+        placeholderRect.offsetMax = new(icon != null ? -30f : 0f, 0f);
+        placeholderText.overflowMode = TextOverflowModes.Ellipsis;
         inputField.textViewport = inputRect;
         inputField.textComponent = text;
         inputField.placeholder = placeholderText;

@@ -128,7 +128,11 @@ public static class CalibrationPopupUI {
             messageText.alignment = TextAlignmentOptions.Center;
             messageText.verticalAlignment = VerticalAlignmentOptions.Middle;
             TextCompat.Wrap(messageText);
-            messageText.overflowMode = TextOverflowModes.Truncate;
+            // Fixed popup box, nothing to grow: shrink long offsets messages instead of cutting them.
+            messageText.fontSizeMax = 22f;
+            messageText.fontSizeMin = 16f;
+            messageText.enableAutoSizing = true;
+            messageText.overflowMode = TextOverflowModes.Ellipsis;
             messageText.raycastTarget = false;
         }
         yesImage = Button(panelObj.transform, -118f, UIColors.ObjectButton, "CALIBRATION_POPUP_YES", "Yes", OnYes);

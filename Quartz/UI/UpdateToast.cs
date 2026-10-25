@@ -15,10 +15,10 @@ using TMPro;
 namespace Quartz.UI;
 public static class UpdateToast {
     private const float WIDTH = 360f;
-    private const float RESTART_WIDTH = 440f;
+    private const float RESTART_WIDTH = 540f;
     private const float HEIGHT = 64f;
     private const float AUTO_HIDE_SECONDS = 10f;
-    private const float RESTART_BUTTON_WIDTH = 120f;
+    private const float RESTART_BUTTON_WIDTH = 130f;
     private const string RestartTag = "restart";
     private static Vector2 ShownPos => new(-24f, -24f);
     private static float CurrentWidth => restartMode ? RESTART_WIDTH : WIDTH;
@@ -145,7 +145,7 @@ public static class UpdateToast {
             titleText.alignment = TextAlignmentOptions.Left;
             titleText.verticalAlignment = VerticalAlignmentOptions.Middle;
             titleText.characterSpacing = -3f;
-            titleText.overflowMode = TextOverflowModes.Ellipsis;
+            Generator.GenerateUI.FitLine(titleText, 13f);
             titleText.raycastTarget = false;
         }
         {
@@ -165,7 +165,7 @@ public static class UpdateToast {
             hintText.alignment = TextAlignmentOptions.Left;
             hintText.verticalAlignment = VerticalAlignmentOptions.Middle;
             hintText.characterSpacing = -3f;
-            hintText.overflowMode = TextOverflowModes.Ellipsis;
+            Generator.GenerateUI.FitLine(hintText, 10f);
             hintText.raycastTarget = false;
         }
         {
@@ -220,7 +220,7 @@ public static class UpdateToast {
         restartLabel.alignment = TextAlignmentOptions.Center;
         restartLabel.verticalAlignment = VerticalAlignmentOptions.Middle;
         restartLabel.characterSpacing = -3f;
-        restartLabel.overflowMode = TextOverflowModes.Ellipsis;
+        Generator.GenerateUI.FitLine(restartLabel, 11f);
         restartLabel.raycastTarget = false;
         var trigger = restartObj.AddComponent<EventTrigger>();
         Utility.UnityUtils.AddClickEvent(trigger, _ => OnRestartClicked());

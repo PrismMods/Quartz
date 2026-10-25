@@ -158,6 +158,8 @@ public static class PageAutoDeafen {
         rect.name = "DeafenKey";
         var label = GenerateUI.AddText(rect);
         GenerateUI.Localize(label, "AD_KEY", "Discord Key");
+        label.rectTransform.offsetMax = new(-252f, 0f);
+        GenerateUI.WrapGrow(label);
         GameObject box = new("DeafenKeyBox");
         box.transform.SetParent(rect, false);
         RectTransform boxRect = box.AddComponent<RectTransform>();

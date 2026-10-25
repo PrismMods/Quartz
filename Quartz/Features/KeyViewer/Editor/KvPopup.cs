@@ -121,6 +121,8 @@ internal sealed class KvPopup : MonoBehaviour {
         TextCompat.NoWrap(label);
         label.raycastTarget = false;
         label.gameObject.AddComponent<TextLocalization>().Init(key, text);
+        // The tray sizes to its items, so the item has to ask for its translated label's width.
+        le.preferredWidth = Mathf.Max(MinWidth, label.GetPreferredValues(label.text).x + 20f * KvPalette.Scale);
         GenerateUI.AddButton(obj, btn => {
             if(btn == InputButton.Left) onClick();
         }, false);

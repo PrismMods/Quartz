@@ -31,6 +31,7 @@ public static partial class GenerateUI {
         tmp.text = text;
         tmp.alignment = TextAlignmentOptions.Center;
         LocalizeById(tmp, id, text);
+        FitLine(tmp, 14f);
         Image bg = rect.GetComponent<Image>();
         bg.color = UIColors.ObjectButton;
         UIButton button = new(

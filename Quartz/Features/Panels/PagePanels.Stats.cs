@@ -84,6 +84,7 @@ internal static partial class PagePanels {
             RectTransform labelRect = label.rectTransform;
             labelRect.offsetMin = new Vector2(48f, 0f);
             labelRect.offsetMax = new Vector2(-300f, 0f);
+            GenerateUI.FitLine(label);
         }
         GameObject toggleObj = new("EnableDot");
         toggleObj.transform.SetParent(bg, false);

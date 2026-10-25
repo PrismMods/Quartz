@@ -16,12 +16,13 @@ internal static partial class PageKeyViewer {
         KvCanvas canvas = KvCanvas.Create(split.CanvasHost);
         KvInspector inspector = KvInspector.Attach(canvas);
         canvas.Bind(KvStore.Current, KvStore.Current.SelectedTab);
-        GenerateUI.AddLocalizedMutedText(
+        GenerateUI.WrapGrow(GenerateUI.AddLocalizedMutedText(
             GenerateUI.Row(editor, ThinRowHeight), "KVI_TOOLBAR_HINT",
             "Scroll to pan, or drag with the middle or right mouse button. Press + and - to zoom, 0 for actual size. Arrow keys nudge, Delete removes.",
             15f, 0.45f
-        );
+        ));
         TextMeshProUGUI status = GenerateUI.AddMutedText(GenerateUI.Row(editor, ThinRowHeight), 17f, 0.45f);
+        GenerateUI.WrapGrow(status);
         RectTransform toolbar = KvToolbar.Bar(editor);
         Action refreshSettings = null;
         Action refreshTabs = AppendTabStrip(

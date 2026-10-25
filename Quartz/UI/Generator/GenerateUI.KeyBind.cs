@@ -24,6 +24,8 @@ public static partial class GenerateUI {
         TextMeshProUGUI label = AddText(rect);
         label.text = text;
         LocalizeById(label, id, text);
+        label.rectTransform.offsetMax = new(-252f, 0f);
+        WrapGrow(label);
         GameObject box = new("KeybindBox");
         box.transform.SetParent(rect, false);
         RectTransform boxRect = box.AddComponent<RectTransform>();

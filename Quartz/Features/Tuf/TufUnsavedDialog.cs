@@ -104,7 +104,7 @@ internal static class TufUnsavedDialog {
         rect.offsetMin = offsetMin;
         rect.offsetMax = offsetMax;
         TextMeshProUGUI label = obj.AddComponent<TextMeshProUGUI>();
-        label.font = FontManager.Current;
+        label.font = FontManager.MenuFontAsset;
         label.fontSize = size;
         label.color = color;
         label.text = text;
@@ -152,7 +152,7 @@ internal static class TufUnsavedDialog {
         labelRect.offsetMin = new Vector2(8f, 0f);
         labelRect.offsetMax = new Vector2(-8f, 0f);
         TextMeshProUGUI label = labelObj.AddComponent<TextMeshProUGUI>();
-        label.font = FontManager.Current;
+        label.font = FontManager.MenuFontAsset;
         label.fontSize = 16f;
         label.color = Color.white;
         label.text = text;

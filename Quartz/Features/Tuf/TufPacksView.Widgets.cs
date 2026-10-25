@@ -66,6 +66,8 @@ internal sealed partial class TufPacksView : MonoBehaviour {
         bg.type = Image.Type.Sliced;
         bg.color = button ? UIColors.ObjectBG : Color.Lerp(UIColors.ObjectBG, UIColors.PanelBG, 0.35f);
         TMP_Text label = Text(row, message, 18f, TextAlignmentOptions.Center);
+        SetFull(label.rectTransform, 12f, 6f);
+        GenerateUI.WrapGrow(label);
         label.color = new(1f, 1f, 1f, button ? 0.9f : 0.48f);
         if(action != null) GenerateUI.AddButton(row.gameObject, input => {
             if(input == PointerEventData.InputButton.Left) action();
@@ -81,12 +83,16 @@ internal sealed partial class TufPacksView : MonoBehaviour {
     private static (Image, TMP_Text) Chip(Transform parent, string value, float width, Action action) {
         RectTransform rect = Rect("Chip " + value, parent, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
         LayoutElement size = rect.gameObject.AddComponent<LayoutElement>();
-        size.minWidth = size.preferredWidth = width;
+        // Chips may squeeze to 70% when the row runs out of width; the label shrinks with them.
+        size.preferredWidth = width;
+        size.minWidth = width * 0.7f;
         Image image = rect.gameObject.AddComponent<Image>();
         image.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
         image.type = Image.Type.Sliced;
         image.color = UIColors.ObjectBG;
         TMP_Text label = Text(rect, value, 17f, TextAlignmentOptions.Center);
+        SetFull(label.rectTransform, 6f, 0f);
+        GenerateUI.FitLine(label, 11f);
         GenerateUI.AddButton(rect.gameObject, button => {
             if(button == PointerEventData.InputButton.Left) action?.Invoke();
         });
@@ -104,7 +110,7 @@ internal sealed partial class TufPacksView : MonoBehaviour {
     private static TMP_Text Text(Transform parent, string value, float size, TextAlignmentOptions align) {
         TextMeshProUGUI text = GenerateUI.AddText(parent, true);
         text.text = value;
-        text.font = FontManager.Current;
+        text.font = FontManager.MenuFontAsset;
         text.fontSize = size;
         text.alignment = align;
         text.richText = false;

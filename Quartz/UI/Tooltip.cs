@@ -1,4 +1,5 @@
 using Quartz.Core;
+using Quartz.Compat.Game;
 using Quartz.Resource;
 using UnityEngine;
 using UnityEngine.UI;
@@ -50,6 +51,8 @@ public class Tooltip {
         text.color = Color.white;
         text.alignment = TextAlignmentOptions.Left;
         text.characterSpacing = -3f;
+        // Explicit: a fresh TMP text takes the game's TMP_Settings default, which may be no-wrap.
+        TextCompat.Wrap(text);
     }
     public static void Tick() {
         if(!MainCore.Conf.Tooltip || !visible || obj == null) return;
@@ -65,13 +68,16 @@ public class Tooltip {
         rect.position = Vector2.SmoothDamp(rect.position, target, ref velocity, 0.02f);
     }
     private static GTween seq;
+    private const float TooltipMaxWidth = 560f;
     public static void Show(string tip) {
         if(!MainCore.Conf.Tooltip || obj == null) return;
         seq?.Kill();
         obj.SetActive(true);
         obj.transform.SetAsLastSibling();
         text.text = tip;
-        Vector2 size = text.GetPreferredValues(tip);
+        // Cap the width so long descriptions wrap instead of running off screen.
+        Vector2 size = text.GetPreferredValues(tip, TooltipMaxWidth, 0f);
+        size.x = Mathf.Min(size.x, TooltipMaxWidth);
         rect.sizeDelta = new(size.x + 32f, size.y + 32f);
         rect.position = Input.mousePosition + new Vector3(20f, -20f, 0f);
         canvas.alpha = 0f;

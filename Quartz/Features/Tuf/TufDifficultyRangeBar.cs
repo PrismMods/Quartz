@@ -113,6 +113,7 @@ internal sealed class TufDifficultyRangeBar : MonoBehaviour, IPointerDownHandler
         label.rectTransform.anchorMax = Vector2.one;
         label.rectTransform.offsetMin = new(28f, 0f);
         label.rectTransform.offsetMax = new(-8f, 0f);
+        GenerateUI.FitLine(label, 10f);
         label.gameObject.AddComponent<TextLocalization>().Init(key, text);
         GenerateUI.AddButton(rect.gameObject, button => {
             if(button == PointerEventData.InputButton.Left) onToggle();
@@ -277,7 +278,7 @@ internal sealed class TufDifficultyRangeBar : MonoBehaviour, IPointerDownHandler
     private static TMP_Text AddText(Transform parent, string text, float size, TextAlignmentOptions alignment) {
         TextMeshProUGUI label = GenerateUI.AddText(parent, true);
         label.text = text;
-        label.font = FontManager.Current;
+        label.font = FontManager.MenuFontAsset;
         label.fontSize = size;
         label.alignment = alignment;
         label.richText = false;

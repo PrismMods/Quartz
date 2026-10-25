@@ -77,6 +77,7 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
         TMP_Text label = Text(button, "Special", 14f, TextAlignmentOptions.Left);
         label.rectTransform.offsetMin = new(38f, 0f);
         label.rectTransform.offsetMax = new(-12f, 0f);
+        GenerateUI.FitLine(label, 10f);
         label.color = new(1f, 1f, 1f, 0.7f);
         label.raycastTarget = false;
         label.gameObject.AddComponent<TextLocalization>().Init("TUF_SPECIAL", "Special");
@@ -243,7 +244,7 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
         if(gridChip != null)
             gridChip.color = service.GridView ? UIColors.ObjectActive : UIColors.ObjectBG;
         if(updatesChip != null && updatesLabel != null) {
-            updatesLabel.fontSize = 15f;
+            updatesLabel.fontSizeMax = 15f;
             updatesLabel.text = service.CheckingUpdates
                 ? string.Format(Tr("TUF_CHECKING_UPDATES", "{0}/{1}"), service.UpdateCheckDone, service.UpdateCheckTotal)
                 : service.UpdatesAvailable > 0

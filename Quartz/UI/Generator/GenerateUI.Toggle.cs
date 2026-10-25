@@ -32,6 +32,8 @@ public static partial class GenerateUI {
         TextMeshProUGUI tmp = AddText(rect);
         tmp.text = text;
         LocalizeById(tmp, id, text);
+        tmp.rectTransform.offsetMax = new(-46f, 0f);
+        WrapGrow(tmp);
         GameObject change = AddSmallChangedCircle(rect);
         Image changeImg = change.GetComponent<Image>();
         GameObject toggleCircle = new("ToggleCircle");

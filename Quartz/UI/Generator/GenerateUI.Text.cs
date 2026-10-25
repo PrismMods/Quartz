@@ -111,5 +111,21 @@ public static partial class GenerateUI {
         tmp.characterSpacing = -3f;
         return tmp;
     }
+    // One-line label in a fixed slot: shrink to fit, then ellipsize, never wrap out of the row.
+    public static TMP_Text FitLine(TMP_Text text, float minSize = 16f) {
+        TextCompat.NoWrap(text);
+        text.fontSizeMax = text.fontSize;
+        text.fontSizeMin = Mathf.Min(minSize, text.fontSize);
+        text.enableAutoSizing = true;
+        text.overflowMode = TextOverflowModes.Ellipsis;
+        return text;
+    }
+    // Wrapped text in a layout row: the row grows to fit every line instead of the text spilling out.
+    public static T WrapGrow<T>(T text, float padding = 6f) where T : TMP_Text {
+        TextCompat.Wrap(text);
+        text.enableAutoSizing = false;
+        GrowRow.Attach(text, padding);
+        return text;
+    }
     public static string Tr(string key, string def) => MainCore.Tr.Get(key, def);
 }

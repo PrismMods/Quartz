@@ -22,12 +22,12 @@ public static class PagePractice {
             conf.Enabled,
             "Enable Practice Difficulty", "practice_enable", def.Enabled
         );
-        GenerateUI.AddLocalizedMutedText(
+        GenerateUI.WrapGrow(GenerateUI.AddLocalizedMutedText(
             GenerateUI.Row(sec.Body, 46f),
             "PRACTICE_HINT",
             "Bind a key to a difficulty and a pitch. Both land between attempts, never mid-run: difficulty is held until the current attempt ends, and pitch is written into the level's own Pitch setting once, exactly as if you typed it in. The readout shows anything still queued with an arrow.",
             18f
-        );
+        ));
         GameObject list = new("PracticeBindings");
         list.transform.SetParent(sec.Body, false);
         list.AddComponent<RectTransform>();

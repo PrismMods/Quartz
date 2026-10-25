@@ -14,6 +14,7 @@ internal static partial class PageKeyViewer {
         KeyViewerSettings defaults = new();
         KvWidgets.Header(body, "KEYVIEWER_JS_TITLE", "JavaScript Plugins");
         TextMeshProUGUI status = GenerateUI.AddMutedText(GenerateUI.Row(body, 42f), 16f, 0.55f);
+        GenerateUI.WrapGrow(status);
         UIToggle enabled = DmToggle(
             body, compact,
             defaults.JsPluginsEnabled,

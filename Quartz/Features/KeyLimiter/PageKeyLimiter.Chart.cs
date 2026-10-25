@@ -25,12 +25,12 @@ public static partial class PageKeyLimiter {
             "Enable Chart Key Limiter",
             "chartkeylimiter_enable"
         );
-        GenerateUI.AddLocalizedMutedText(
+        GenerateUI.WrapGrow(GenerateUI.AddLocalizedMutedText(
             GenerateUI.Row(body, 76f),
             "KL_CHART_NOTE",
             "Adds a Key Limiter event to the level editor. A chart can cap how many distinct keys "
                 + "you may use from one tile onward and pick what an extra press does: ignore it, "
                 + "kill the run, or fire tagged events. Reopen the level after changing this."
-        );
+        ));
     }
 }

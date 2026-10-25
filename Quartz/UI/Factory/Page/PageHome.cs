@@ -76,15 +76,14 @@ internal static class PageHome {
     private static void ResetCard(RectTransform content) {
         RectTransform grid = HomeUI.Grid(content.transform);
         Transform card = HomeUI.Card(grid, MainCore.Tr.Get("HOME_RESET", "Reset"));
-        HomeUI.Line(card, MainCore.Tr.Get(
+        HomeUI.Paragraph(card, MainCore.Tr.Get(
             "HOME_RESET_DESC",
             "Reset puts every setting back to its default. Clean also empties key layouts, panels and key lists. Feature switches, addons and other profiles stay. Restart the game afterwards."
-        ));
+        ), 26f);
         RectTransform buttonRow = GenerateUI.Row(card, 56f);
         GenerateUI.ButtonRow(buttonRow);
         ConfirmButton(buttonRow, "Reset All Settings", "home_reset_all", false);
         ConfirmButton(buttonRow, "Clean", "home_reset_clean", true);
-        HomeUI.Spacer(grid);
     }
     // First click arms the button; the second one runs it.
     private static void ConfirmButton(RectTransform row, string text, string id, bool clean) {

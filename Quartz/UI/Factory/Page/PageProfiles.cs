@@ -24,6 +24,7 @@ internal static class PageProfiles {
         headerText.gameObject.AddComponent<TextLocalization>().Init("PROFILES", "Profiles");
         var hintRow = GenerateUI.Row(content.transform, 54f);
         var hintText = GenerateUI.AddMutedText(hintRow, 17f, 0.45f, true);
+        GenerateUI.WrapGrow(hintText);
         hintText.gameObject.AddComponent<TextLocalization>().Init(
             "PROFILE_HINT",
             "Every setting lives in the active profile. Export a profile before updating the mod manually, then import it back if your UserData gets replaced."

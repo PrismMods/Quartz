@@ -48,6 +48,8 @@ public static partial class GenerateUI {
         label.text = text;
         label.alignment = TextAlignmentOptions.Left;
         LocalizeById(label, id, text);
+        label.rectTransform.offsetMax = new(-150f, 0f);
+        FitLine(label);
         TextMeshProUGUI valueText = AddText(rect);
         valueText.alignment = TextAlignmentOptions.Right;
         var valueTextRect = valueText.gameObject.GetComponent<RectTransform>();

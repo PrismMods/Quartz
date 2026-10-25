@@ -182,6 +182,7 @@ public static partial class GenerateUI {
         label.text = title;
         label.characterSpacing = -3f;
         label.raycastTarget = false;
+        FitLine(label);
         if(!IsDynamicTitleList(parent)) Localize(label, LocaleKeyFromText("SECTION", title), title);
         GameObject bodyObj = new("Body");
         bodyObj.transform.SetParent(sectionRect, false);

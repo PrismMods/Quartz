@@ -28,6 +28,7 @@ internal static class PageImport {
         var hintText = GenerateUI.AddMutedText(hintRow, 17f, 0.45f, true);
         TextCompat.Wrap(hintText);
         hintText.rectTransform.offsetMax = new Vector2(-250f, 0f);
+        GenerateUI.WrapGrow(hintText);
         GenerateUI.Localize(
             hintText,
             "IMPORT_HINT",
@@ -70,6 +71,7 @@ internal static class PageImport {
             var emptyText = GenerateUI.AddMutedText(emptyRow, 18f, 0.6f, true);
             TextCompat.Wrap(emptyText);
             emptyText.rectTransform.offsetMax = new Vector2(-250f, 0f);
+            GenerateUI.WrapGrow(emptyText);
             GenerateUI.Localize(
                 emptyText,
                 "IMPORT_NONE",
