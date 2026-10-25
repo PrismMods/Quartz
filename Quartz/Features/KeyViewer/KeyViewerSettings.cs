@@ -39,9 +39,11 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
     public float DmOffsetX = 0f;
     public float DmOffsetY = 240f;
     public float DmScale = 1f;
+    public float DmRotation = 0f;
     public float DmFootOffsetX = 0f;
     public float DmFootOffsetY = 120f;
     public float DmFootScale = 1f;
+    public float DmFootRotation = 0f;
     public bool DmFootPlaced = false;
     public bool DmFootRelative = true;
     public bool DmNoteEffect = true;
@@ -65,6 +67,7 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
     public float TabubOffsetX = 0f;
     public float TabubOffsetY = 520f;
     public float TabubScale = 1f;
+    public float TabubRotation = 0f;
     public bool DmCssEnabled = false;
     public string DmCssText = "";
     public string DmCssPath = "";

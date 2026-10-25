@@ -245,6 +245,7 @@ public static partial class PanelsOverlay {
     }
     private static void ApplyPanel(LivePanel p) {
         if(p?.Config == null) return;
+        if(p.Rect != null) p.Rect.localEulerAngles = new Vector3(0f, 0f, p.Config.Rotation);
         if(p.Text != null) {
             p.Text.font = FontManager.Current;
             p.Text.fontSize = p.Config.FontSize;
@@ -305,6 +306,7 @@ public static partial class PanelsOverlay {
             v => { config.FontSize = Mathf.Round(v); Apply(); },
             12f, 48f, "0 px"
         );
+        ReorganizeHandle.SetRotationSource(drag, () => config.Rotation, v => { config.Rotation = v; Apply(); });
         GameObject textObj = new("Text");
         textObj.transform.SetParent(rect, false);
         RectTransform textRect = textObj.AddComponent<RectTransform>();

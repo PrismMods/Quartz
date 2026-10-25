@@ -40,9 +40,11 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
             [nameof(DmOffsetX)] = DmOffsetX,
             [nameof(DmOffsetY)] = DmOffsetY,
             [nameof(DmScale)] = DmScale,
+            [nameof(DmRotation)] = DmRotation,
             [nameof(DmFootOffsetX)] = DmFootOffsetX,
             [nameof(DmFootOffsetY)] = DmFootOffsetY,
             [nameof(DmFootScale)] = DmFootScale,
+            [nameof(DmFootRotation)] = DmFootRotation,
             [nameof(DmFootPlaced)] = DmFootPlaced,
             [nameof(DmFootRelative)] = DmFootRelative,
             [nameof(DmNoteEffect)] = DmNoteEffect,
@@ -66,6 +68,7 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
             [nameof(TabubOffsetX)] = TabubOffsetX,
             [nameof(TabubOffsetY)] = TabubOffsetY,
             [nameof(TabubScale)] = TabubScale,
+            [nameof(TabubRotation)] = TabubRotation,
             [nameof(DmCssEnabled)] = DmCssEnabled,
             [nameof(DmCssText)] = DmCssText,
             [nameof(DmCssPath)] = DmCssPath,
@@ -168,9 +171,11 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
         DmOffsetX = IOUtils.Read(token, nameof(DmOffsetX), DmOffsetX);
         DmOffsetY = IOUtils.Read(token, nameof(DmOffsetY), DmOffsetY);
         DmScale = Mathf.Clamp(IOUtils.Read(token, nameof(DmScale), DmScale), 0.2f, 4f);
+        DmRotation = Mathf.DeltaAngle(0f, IOUtils.Read(token, nameof(DmRotation), DmRotation));
         DmFootOffsetX = IOUtils.Read(token, nameof(DmFootOffsetX), DmFootOffsetX);
         DmFootOffsetY = IOUtils.Read(token, nameof(DmFootOffsetY), DmFootOffsetY);
         DmFootScale = Mathf.Clamp(IOUtils.Read(token, nameof(DmFootScale), DmFootScale), 0.2f, 4f);
+        DmFootRotation = Mathf.DeltaAngle(0f, IOUtils.Read(token, nameof(DmFootRotation), DmFootRotation));
         DmFootPlaced = IOUtils.Read(token, nameof(DmFootPlaced), DmFootPlaced);
         DmFootRelative = IOUtils.Read(token, nameof(DmFootRelative), false);
         if(!DmFootRelative) {
@@ -204,6 +209,7 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
         TabubOffsetX = IOUtils.Read(token, nameof(TabubOffsetX), TabubOffsetX);
         TabubOffsetY = IOUtils.Read(token, nameof(TabubOffsetY), TabubOffsetY);
         TabubScale = Mathf.Clamp(IOUtils.Read(token, nameof(TabubScale), TabubScale), 0.1f, 4f);
+        TabubRotation = Mathf.DeltaAngle(0f, IOUtils.Read(token, nameof(TabubRotation), TabubRotation));
         DmCssEnabled = IOUtils.Read(token, nameof(DmCssEnabled), DmCssEnabled);
         DmCssText = IOUtils.Read(token, nameof(DmCssText), DmCssText) ?? "";
         DmCssPath = IOUtils.Read(token, nameof(DmCssPath), DmCssPath) ?? "";

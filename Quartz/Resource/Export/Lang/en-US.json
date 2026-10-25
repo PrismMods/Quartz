@@ -445,6 +445,7 @@
     "REMOVE": "Remove",
     "REORGANIZE_X": "X Position",
     "REORGANIZE_Y": "Y Position",
+    "REORGANIZE_ROTATION": "Rotation",
     "SCROLL_SPEED": "Scroll Speed",
     "SEARCH": "Search",
     "SEARCH_HINT": "Type to search every tab: categories, toggles, buttons and more.",

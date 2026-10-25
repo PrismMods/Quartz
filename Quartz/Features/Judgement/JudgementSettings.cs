@@ -10,6 +10,7 @@ public sealed class JudgementSettings : ISettingsFile {
     public bool ShowXPerfect = true;
     public int Anchor = (int)OverlayAnchor.BottomCenter;
     public float OffsetX = 0f;
+    public float Rotation = 0f;
     public float OffsetY = -5f;
     public float Size = 0.9f;
     public float Spacing = 5f;
@@ -27,6 +28,7 @@ public sealed class JudgementSettings : ISettingsFile {
             [nameof(ShowXPerfect)] = ShowXPerfect,
             [nameof(Anchor)] = Anchor,
             [nameof(OffsetX)] = OffsetX,
+            [nameof(Rotation)] = Rotation,
             [nameof(OffsetY)] = OffsetY,
             [nameof(Size)] = Size,
             [nameof(Spacing)] = Spacing,
@@ -45,6 +47,7 @@ public sealed class JudgementSettings : ISettingsFile {
         ShowXPerfect = IOUtils.Read(token, nameof(ShowXPerfect), ShowXPerfect);
         Anchor = IOUtils.Read(token, nameof(Anchor), Anchor);
         OffsetX = IOUtils.Read(token, nameof(OffsetX), OffsetX);
+        Rotation = Mathf.DeltaAngle(0f, IOUtils.Read(token, nameof(Rotation), Rotation));
         OffsetY = IOUtils.Read(token, nameof(OffsetY), OffsetY);
         Size = IOUtils.Read(token, nameof(Size), Size);
         Spacing = IOUtils.Read(token, nameof(Spacing), Spacing);

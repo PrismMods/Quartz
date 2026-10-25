@@ -17,6 +17,7 @@ public static partial class KeyViewerOverlay {
             v => { Conf.DmScale = v; Apply(); },
             0.2f, 4f
         );
+        ReorganizeHandle.SetRotationSource(dragObj, () => Conf.DmRotation, v => { Conf.DmRotation = v; Apply(); });
         if(footRoot != null) {
             footDragObj = BuildReorganizeHandle(
                 footRoot, "FootDrag", "KEYVIEWER_FOOT_TITLE", "Key Viewer (Foot)"
@@ -29,6 +30,7 @@ public static partial class KeyViewerOverlay {
                 v => { Conf.DmFootScale = v; Apply(); },
                 0.2f, 4f
             );
+            ReorganizeHandle.SetRotationSource(footDragObj, () => Conf.DmFootRotation, v => { Conf.DmFootRotation = v; Apply(); });
         }
         RefreshDragBounds();
     }

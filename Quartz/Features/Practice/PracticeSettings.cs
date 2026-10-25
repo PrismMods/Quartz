@@ -40,6 +40,7 @@ public sealed class PracticeSettings : ISettingsFile {
     public float MasterSize = 1f;
     public float OffsetX = 0f;
     public float OffsetY = -110f;
+    public float Rotation = 0f;
     public float ColorR = 1f, ColorG = 1f, ColorB = 1f, ColorA = 0.85f;
     public readonly List<PracticeBinding> Bindings = [];
     public static int ClampPitch(int value) => Mathf.Clamp(value, MinPitch, MaxPitch);
@@ -53,6 +54,7 @@ public sealed class PracticeSettings : ISettingsFile {
         [nameof(FontSize)] = FontSize,
         [nameof(MasterSize)] = MasterSize,
         [nameof(OffsetX)] = OffsetX,
+        [nameof(Rotation)] = Rotation,
         [nameof(OffsetY)] = OffsetY,
         [nameof(ColorR)] = ColorR,
         [nameof(ColorG)] = ColorG,
@@ -68,6 +70,7 @@ public sealed class PracticeSettings : ISettingsFile {
         FontSize = IOUtils.Read(token, nameof(FontSize), FontSize);
         MasterSize = IOUtils.Read(token, nameof(MasterSize), MasterSize);
         OffsetX = IOUtils.Read(token, nameof(OffsetX), OffsetX);
+        Rotation = Mathf.DeltaAngle(0f, IOUtils.Read(token, nameof(Rotation), Rotation));
         OffsetY = IOUtils.Read(token, nameof(OffsetY), OffsetY);
         IOUtils.ReadRgba(token, "Color", ref ColorR, ref ColorG, ref ColorB, ref ColorA);
         Bindings.Clear();

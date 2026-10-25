@@ -521,6 +521,7 @@
     "FAQ_LOAD_ERROR": "无法读取内置问题。{0}",
     "FAQ_NONE": "没有可显示的问题。",
     "FONT_DEFAULT": "默认字体（Cookie Run粗体）",
-    "HELP": "帮助"
+    "HELP": "帮助",
+    "REORGANIZE_ROTATION": "旋转"
   }
 }

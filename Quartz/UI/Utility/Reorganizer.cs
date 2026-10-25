@@ -8,7 +8,7 @@ using UnityEngine.UI;
 using Object = UnityEngine.Object;
 using TMPro;
 namespace Quartz.UI.Utility;
-public sealed class ReorganizeHandle : MonoBehaviour {
+public sealed partial class ReorganizeHandle : MonoBehaviour {
     public RectTransform Target;
     public RectTransform Bounds;
     internal RectTransform MeasureRect => Bounds != null ? Bounds : Target;
@@ -20,40 +20,77 @@ public sealed class ReorganizeHandle : MonoBehaviour {
     public float MaxSize = 4f;
     public string SizeFormat = "0.00 x";
     internal bool CanResize => GetSize != null && SetSize != null;
+    public Func<float> GetRotation;
+    public Action<float> SetRotation;
+    internal bool CanRotate => GetRotation != null && SetRotation != null;
     private Vector2 grabOffset;
     private bool armed;
     private bool moved;
+    private bool cycleOnUp;
+    // The handle this press works on; can be one under the handle that received the event.
+    private ReorganizeHandle active;
+    private static readonly List<RaycastResult> stackHits = [];
+    private static readonly List<ReorganizeHandle> stack = [];
     private void Awake() {
         EventTrigger trigger = gameObject.AddComponent<EventTrigger>();
         UnityUtils.AddEvent(EventTriggerType.PointerDown, OnPointerDown, trigger);
         UnityUtils.AddEvent(EventTriggerType.Drag, OnDragInternal, trigger);
         UnityUtils.AddEvent(EventTriggerType.PointerUp, OnPointerUp, trigger);
     }
-    private void OnEnable() => Reorganizer.Register(this);
+    private void OnEnable() {
+        Reorganizer.Register(this);
+        RefreshFrame();
+    }
     private void OnDisable() => Reorganizer.Unregister(this);
+    // Every handle under the pointer, topmost first.
+    private static void CollectStack(PointerEventData e) {
+        stack.Clear();
+        stackHits.Clear();
+        EventSystem.current?.RaycastAll(e, stackHits);
+        foreach(RaycastResult hit in stackHits)
+            if(hit.gameObject != null && hit.gameObject.GetComponent<ReorganizeHandle>() is { Target: not null } h && !stack.Contains(h))
+                stack.Add(h);
+        stackHits.Clear();
+    }
+    // Overlapping overlays: the selected one keeps the press even when another sits on top of it, and a click
+    // without dragging moves the selection one layer down, so a covered overlay can always be reached.
     private void OnPointerDown(PointerEventData e) {
+        active = null;
         if(e.button != PointerEventData.InputButton.Left || Target == null) return;
-        armed = Reorganizer.Selected == this;
+        CollectStack(e);
+        if(!stack.Contains(this)) stack.Insert(0, this);
+        bool selectedHere = Reorganizer.Selected != null && stack.Contains(Reorganizer.Selected);
+        ReorganizeHandle target = (selectedHere ? Reorganizer.Selected : null) ?? this;
+        active = target;
+        armed = selectedHere;
+        cycleOnUp = selectedHere && stack.Count > 1;
         moved = false;
-        if(!armed) Reorganizer.Select(this);
-        grabOffset = (Vector2)Target.position - e.position;
+        if(!armed) Reorganizer.Select(target);
+        grabOffset = (Vector2)target.Target.position - e.position;
     }
     private void OnDragInternal(PointerEventData e) {
-        if(!armed || Target == null) return;
-        Vector3 pos = Target.position;
+        if(!armed || active == null || active.Target == null) return;
+        Vector3 pos = active.Target.position;
         Vector2 next = e.position + grabOffset;
         pos.x = next.x;
         pos.y = next.y;
-        Target.position = pos;
-        Reorganizer.SnapDuringDrag(this);
+        active.Target.position = pos;
+        Reorganizer.SnapDuringDrag(active);
         Reorganizer.SyncSelectedSliders();
         moved = true;
     }
     private void OnPointerUp(PointerEventData e) {
+        if(active == null) return;
         if(moved) {
             moved = false;
-            ReorganizeHistory.Moved(this);
+            ReorganizeHistory.Moved(active);
+        } else if(cycleOnUp) {
+            int i = stack.IndexOf(active);
+            ReorganizeHandle next = stack[(i + 1) % stack.Count];
+            if(next != null && next.isActiveAndEnabled) Reorganizer.Select(next);
         }
+        cycleOnUp = false;
+        active = null;
     }
     public static GameObject CreateDragSurface(RectTransform target, Func<string> getName, Action onMoved, bool ignoreLayout = false) {
         GameObject drag = new("Drag");
@@ -82,6 +119,12 @@ public sealed class ReorganizeHandle : MonoBehaviour {
         handle.MinSize = min;
         handle.MaxSize = max;
         handle.SizeFormat = format;
+    }
+    // Degrees, counter-clockwise; the overlay applies it to its own root so it persists with its settings.
+    public static void SetRotationSource(GameObject drag, Func<float> get, Action<float> set) {
+        if(drag == null || drag.GetComponent<ReorganizeHandle>() is not { } handle) return;
+        handle.GetRotation = get;
+        handle.SetRotation = set;
     }
 }
 public sealed class ReorganizeSizeGrip : MonoBehaviour {
@@ -137,7 +180,7 @@ public sealed class ReorganizeGripScaler : MonoBehaviour {
         }
     }
 }
-public static class Reorganizer {
+public static partial class Reorganizer {
     private const float VirtualW = 1920f;
     private const float VirtualH = 1080f;
     private const float SnapThreshold = 8f;
@@ -161,6 +204,7 @@ public static class Reorganizer {
     public static void Select(ReorganizeHandle handle) {
         if(Selected == handle) return;
         ClearOutline();
+        if(Selected != null) Selected.SetFrameSelected(false);
         Selected = handle;
         if(handle?.Target == null) {
             Selected = null;
@@ -168,16 +212,19 @@ public static class Reorganizer {
             return;
         }
         ReorganizeHistory.Baseline(handle);
+        handle.SetFrameSelected(true);
         BuildOutline(handle.MeasureRect);
         EnsurePanel();
         nameLabel.text = handle.GetName?.Invoke() ?? handle.Target.name;
         ApplySizeSlider(handle);
+        ApplyRotationSlider(handle);
         SyncSelectedSliders();
         panelObj.SetActive(true);
         DragHandler.ClampToParent((RectTransform)panelObj.transform);
     }
     public static void Deselect() {
         ClearOutline();
+        if(Selected != null) Selected.SetFrameSelected(false);
         Selected = null;
         if(panelObj != null) panelObj.SetActive(false);
     }
@@ -192,6 +239,8 @@ public static class Reorganizer {
         ySlider = null;
         sizeSlider = null;
         sizeRow = null;
+        rotationSlider = null;
+        rotationRow = null;
     }
     private static void BuildOutline(RectTransform target) {
         outlineObj = new GameObject("ReorganizeOutline");
@@ -208,6 +257,7 @@ public static class Reorganizer {
         img.color = UIColors.ObjectActive;
         img.raycastTarget = false;
         BuildGrips();
+        BuildRotateGrip();
     }
     private static readonly Vector2[] GripAnchors = [
         new(0f, 0f), new(0f, 1f), new(1f, 0f), new(1f, 1f),
@@ -289,6 +339,7 @@ public static class Reorganizer {
             SizeSelected(v);
             if(Selected != null) ReorganizeHistory.Moved(Selected);
         };
+        BuildRotationRow();
         panelObj.SetActive(false);
     }
     private static void BuildPanelDragSurface() {
@@ -350,6 +401,7 @@ public static class Reorganizer {
         xSlider.SetOnlyValue(center.x, true);
         ySlider.SetOnlyValue(center.y, true);
         if(sizeSlider != null && Selected.CanResize) sizeSlider.SetOnlyValue(Selected.GetSize(), true);
+        if(rotationSlider != null && Selected.CanRotate) rotationSlider.SetOnlyValue(Selected.GetRotation(), true);
     }
     private static void MoveSelected(float? virtualX, float? virtualY) {
         if(Selected?.Target == null) return;

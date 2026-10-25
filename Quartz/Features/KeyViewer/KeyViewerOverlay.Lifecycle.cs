@@ -138,12 +138,14 @@ public static partial class KeyViewerOverlay {
         root.anchoredPosition = OverlayCalibration.Scale(new Vector2(Conf.DmOffsetX, Conf.DmOffsetY));
         float dmScale = Mathf.Clamp(Conf.DmScale, 0.2f, 4f);
         root.localScale = new Vector3(dmScale, dmScale, 1f);
+        root.localEulerAngles = new Vector3(0f, 0f, Conf.DmRotation);
         if(footRoot != null) {
             footRoot.anchoredPosition = OverlayCalibration.Scale(
                 new Vector2(Conf.DmOffsetX + Conf.DmFootOffsetX, Conf.DmOffsetY + Conf.DmFootOffsetY)
             );
             float footScale = Mathf.Clamp(Conf.DmFootScale, 0.2f, 4f);
             footRoot.localScale = new Vector3(footScale, footScale, 1f);
+            footRoot.localEulerAngles = new Vector3(0f, 0f, Conf.DmFootRotation);
         }
         handAnchoredPrev = root.anchoredPosition;
         ApplyBorderScale(dmScale);

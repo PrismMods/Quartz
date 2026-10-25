@@ -34,6 +34,7 @@ public static partial class KeyViewerOverlay {
             v => { Conf.TabubScale = v; ApplyTabub(); },
             0.1f, 4f
         );
+        ReorganizeHandle.SetRotationSource(tabubDragObj, () => Conf.TabubRotation, v => { Conf.TabubRotation = v; ApplyTabub(); });
         obj.SetActive(false);
         ApplyTabub();
     }
@@ -46,6 +47,7 @@ public static partial class KeyViewerOverlay {
         tabubRoot.anchoredPosition = OverlayCalibration.Scale(new Vector2(Conf.TabubOffsetX, Conf.TabubOffsetY));
         float scale = Mathf.Clamp(Conf.TabubScale, 0.1f, 4f);
         tabubRoot.localScale = new Vector3(scale, scale, 1f);
+        tabubRoot.localEulerAngles = new Vector3(0f, 0f, Conf.TabubRotation);
         tabubAlpha = -1f;
         tabubTimesValid = false;
         tabubTimesTried = false;

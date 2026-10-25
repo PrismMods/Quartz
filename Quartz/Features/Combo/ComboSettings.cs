@@ -14,6 +14,7 @@ public sealed class ComboSettings : ISettingsFile {
     public int Anchor = (int)OverlayAnchor.TopCenter;
     public float OffsetX = 0f;
     public float OffsetY = 58.8050537f;
+    public float Rotation = 0f;
     public bool ShowCaption = true;
     public string CaptionText = "Combo";
     public float CaptionOffsetY = -40f;
@@ -65,6 +66,7 @@ public sealed class ComboSettings : ISettingsFile {
             [nameof(CaptionScale)] = CaptionScale,
             [nameof(Anchor)] = Anchor,
             [nameof(OffsetX)] = OffsetX,
+            [nameof(Rotation)] = Rotation,
             [nameof(OffsetY)] = OffsetY,
             [nameof(ShowCaption)] = ShowCaption,
             [nameof(CaptionText)] = CaptionText,
@@ -116,6 +118,7 @@ public sealed class ComboSettings : ISettingsFile {
         CaptionScale = IOUtils.Read(token, nameof(CaptionScale), CaptionScale);
         Anchor = IOUtils.Read(token, nameof(Anchor), Anchor);
         OffsetX = IOUtils.Read(token, nameof(OffsetX), OffsetX);
+        Rotation = Mathf.DeltaAngle(0f, IOUtils.Read(token, nameof(Rotation), Rotation));
         OffsetY = IOUtils.Read(token, nameof(OffsetY), OffsetY);
         ShowCaption = IOUtils.Read(token, nameof(ShowCaption), ShowCaption);
         CaptionText = IOUtils.Read(token, nameof(CaptionText), CaptionText);

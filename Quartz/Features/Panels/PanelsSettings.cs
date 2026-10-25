@@ -56,6 +56,7 @@ public sealed class PanelConfig {
     public int Anchor = (int)PanelAnchor.TopLeft;
     public float PosX = 24f;
     public float PosY = -24f;
+    public float Rotation = 0f;
     public static Vector2 DefaultOffset(PanelAnchor anchor) => OverlayAnchors.DefaultOffset((OverlayAnchor)anchor);
     public static Vector2 AnchorVector(PanelAnchor anchor) => OverlayAnchors.Vector(OverlayAnchors.Parse((int)anchor));
     public List<StatEntry> Stats = [];
@@ -97,6 +98,7 @@ public sealed class PanelConfig {
             [nameof(Anchor)] = Anchor,
             [nameof(PosX)] = PosX,
             [nameof(PosY)] = PosY,
+            [nameof(Rotation)] = Rotation,
             [nameof(Stats)] = stats,
             [nameof(Prefix)] = Prefix,
             [nameof(Decimals)] = Decimals,
@@ -130,6 +132,7 @@ public sealed class PanelConfig {
         p.Anchor = IOUtils.Read(token, nameof(Anchor), p.Anchor);
         p.PosX = IOUtils.Read(token, nameof(PosX), p.PosX);
         p.PosY = IOUtils.Read(token, nameof(PosY), p.PosY);
+        p.Rotation = Mathf.DeltaAngle(0f, IOUtils.Read(token, nameof(Rotation), p.Rotation));
         if(token[nameof(Stats)] is JArray arr) {
             p.Stats = [];
             foreach(JToken t in arr) {

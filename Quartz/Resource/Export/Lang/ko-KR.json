@@ -445,6 +445,7 @@
     "REMOVE": "제거",
     "REORGANIZE_X": "X 위치",
     "REORGANIZE_Y": "Y 위치",
+    "REORGANIZE_ROTATION": "회전",
     "SCROLL_SPEED": "스크롤 속도",
     "SEARCH": "검색",
     "SEARCH_HINT": "모든 탭의 카테고리, 토글, 버튼을 다 찾을 수 있어요.",

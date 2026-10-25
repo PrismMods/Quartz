@@ -67,6 +67,7 @@ public static class PracticeOverlay {
             v => { Conf.FontSize = Mathf.Round(v); Apply(); },
             8f, 120f, "0 px"
         );
+        ReorganizeHandle.SetRotationSource(dragObj, () => Conf.Rotation, v => { Conf.Rotation = v; Apply(); });
         updater = canvasObj.AddComponent<Updater>();
         gateWant = true;
         updaterRan = false;
@@ -77,6 +78,7 @@ public static class PracticeOverlay {
         if(root == null) return;
         root.anchoredPosition = OverlayCalibration.Scale(new Vector2(Conf.OffsetX, Conf.OffsetY));
         root.localScale = Vector3.one * Mathf.Max(0.01f, Conf.MasterSize);
+        root.localEulerAngles = new Vector3(0f, 0f, Conf.Rotation);
         if(text == null) return;
         text.font = FontManager.Current;
         text.fontSize = Mathf.Clamp(Conf.FontSize, 4f, 200f);

@@ -22,7 +22,9 @@ public static class ProgressBarOverlay {
     private static Image fill;
     private static GameObject dragObj;
     private static Updater updater;
-    private static bool ShouldShow() => OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame;
+    private static GraphicRaycaster raycaster;
+    private static bool ShouldShow() =>
+        (OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame) || UICore.IsReorganizing;
     private static bool gateWant;
     // Roots start visible; keep the updater until it has hidden them once.
     private static bool updaterRan;
@@ -53,7 +55,7 @@ public static class ProgressBarOverlay {
     public static void Initialize(GameObject root) {
         if(canvasObj != null) return;
         EnsureConf();
-        canvasObj = UnityUtils.CreateOverlayCanvas("QuartzProgressBarCanvas", root.transform, 32755, out _);
+        canvasObj = UnityUtils.CreateOverlayCanvas("QuartzProgressBarCanvas", root.transform, 32755, out raycaster);
         GameObject barObj = new("Bar");
         barObj.transform.SetParent(canvasObj.transform, false);
         bar = barObj.AddComponent<RectTransform>();
@@ -88,17 +90,8 @@ public static class ProgressBarOverlay {
         fillRect.offsetMax = Vector2.zero;
         fill = fillObj.AddComponent<Image>();
         fill.raycastTarget = false;
-        GameObject drag = new("Drag");
-        dragObj = drag;
-        drag.transform.SetParent(bar, false);
-        RectTransform dragRect = drag.AddComponent<RectTransform>();
-        dragRect.anchorMin = Vector2.zero;
-        dragRect.anchorMax = Vector2.one;
-        dragRect.offsetMin = Vector2.zero;
-        dragRect.offsetMax = Vector2.zero;
-        drag.AddComponent<EmptyGraphic>().raycastTarget = true;
-        drag.AddComponent<DragHandler>();
-        drag.SetActive(false);
+        dragObj = ReorganizeHandle.CreateDragSurface(bar, () => MainCore.Tr.Get("SECTION_PROGRESS_BAR", "Progress Bar"), Save);
+        ReorganizeHandle.SetRotationSource(dragObj, () => Conf.Rotation, v => { Conf.Rotation = v; Apply(); });
         updater = canvasObj.AddComponent<Updater>();
         gateWant = true;
         updaterRan = false;
@@ -121,6 +114,7 @@ public static class ProgressBarOverlay {
             bar.sizeDelta = new Vector2(Conf.Width, Conf.Height);
             bar.anchoredPosition = OverlayCalibration.Scale(new Vector2(Conf.OffsetX, -Conf.TopOffset));
         }
+        bar.localEulerAngles = new Vector3(0f, 0f, line ? 0f : Conf.Rotation);
         float rounding = line ? 0f : Conf.Rounding;
         if(back != null && !back.gameObject.activeSelf) back.gameObject.SetActive(true);
         if(fillContainer != null && !fillContainer.gameObject.activeSelf)
@@ -157,6 +151,7 @@ public static class ProgressBarOverlay {
         fillContainer = null;
         fill = null;
         dragObj = null;
+        raycaster = null;
         updater = null;
     }
     private static void ApplyRounding(Image img, float rounding) {
@@ -199,9 +194,18 @@ public static class ProgressBarOverlay {
             updaterRan = true;
             if(bar == null) return;
             bool show = ShouldShow();
+            bool isReorganizing = UICore.IsReorganizing;
+            // The line style spans the screen edge, so only the bar style can be moved.
+            bool movable = isReorganizing && Conf.Style != ProgressBarStyle.Line;
+            if(raycaster != null && raycaster.enabled != movable) raycaster.enabled = movable;
             if(bar.gameObject.activeSelf != show) bar.gameObject.SetActive(show);
-            if(dragObj != null && dragObj.activeSelf) dragObj.SetActive(false);
+            if(dragObj != null && dragObj.activeSelf != movable) dragObj.SetActive(movable);
             if(!show) return;
+            if(movable) {
+                Vector2 stored = OverlayCalibration.Unscale(bar.anchoredPosition);
+                Conf.OffsetX = stored.x;
+                Conf.TopOffset = -stored.y;
+            }
             GetProgressValues(out float start, out float now);
             float fillFrom = Conf.PrefillStart ? 0f : start;
             float totalW = bar.rect.width;

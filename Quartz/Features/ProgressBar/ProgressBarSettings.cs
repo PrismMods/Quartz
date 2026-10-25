@@ -15,6 +15,7 @@ public sealed class ProgressBarSettings : ISettingsFile {
     public float Height = 8f;
     public int Anchor = (int)OverlayAnchor.TopCenter;
     public float OffsetX = 0f;
+    public float Rotation = 0f;
     public float TopOffset = 10f;
     public float Rounding = 1f;
     public float OutlineThickness = 1.75f;
@@ -43,6 +44,7 @@ public sealed class ProgressBarSettings : ISettingsFile {
             [nameof(Height)] = Height,
             [nameof(Anchor)] = Anchor,
             [nameof(OffsetX)] = OffsetX,
+            [nameof(Rotation)] = Rotation,
             [nameof(TopOffset)] = TopOffset,
             [nameof(Rounding)] = Rounding,
             [nameof(OutlineThickness)] = OutlineThickness,
@@ -72,6 +74,7 @@ public sealed class ProgressBarSettings : ISettingsFile {
         Height = IOUtils.Read(token, nameof(Height), Height);
         Anchor = IOUtils.Read(token, nameof(Anchor), Anchor);
         OffsetX = IOUtils.Read(token, nameof(OffsetX), OffsetX);
+        Rotation = Mathf.DeltaAngle(0f, IOUtils.Read(token, nameof(Rotation), Rotation));
         TopOffset = IOUtils.Read(token, nameof(TopOffset), TopOffset);
         Rounding = IOUtils.Read(token, nameof(Rounding), Rounding);
         OutlineThickness = IOUtils.Read(token, nameof(OutlineThickness), OutlineThickness);

@@ -91,6 +91,7 @@ public static class JudgementOverlay {
             v => { Conf.Size = v; Apply(); },
             0.3f, 3f
         );
+        ReorganizeHandle.SetRotationSource(dragObj, () => Conf.Rotation, v => { Conf.Rotation = v; Apply(); });
         updater = canvasObj.AddComponent<Updater>();
         gateWant = true;
         updaterRan = false;
@@ -154,6 +155,7 @@ public static class JudgementOverlay {
         OverlayAnchors.Pin(root, anchor);
         if(root.TryGetComponent(out HorizontalLayoutGroup layout)) layout.childAlignment = OverlayAnchors.LayoutAlign(anchor);
         root.anchoredPosition = OverlayCalibration.Scale(new Vector2(Conf.OffsetX, BottomMargin + Conf.OffsetY));
+        root.localEulerAngles = new Vector3(0f, 0f, Conf.Rotation);
         float fontSize = FontSize();
         if(compact) {
             ApplyTextStyle(rowLabel, fontSize);

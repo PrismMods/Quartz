@@ -13,6 +13,7 @@ public sealed class SongTitleSettings : ISettingsFile {
     public int Anchor = (int)OverlayAnchor.TopCenter;
     public float OffsetX = 0f;
     public float OffsetY = -55f;
+    public float Rotation = 0f;
     public float ColorR = 1f, ColorG = 1f, ColorB = 1f, ColorA = 1f;
     public bool ShadowEnabled = true;
     public float ShadowX = 2f, ShadowY = -2f, ShadowSoftness = 0f;
@@ -29,6 +30,7 @@ public sealed class SongTitleSettings : ISettingsFile {
         [nameof(MasterSize)] = MasterSize,
         [nameof(Anchor)] = Anchor,
         [nameof(OffsetX)] = OffsetX,
+        [nameof(Rotation)] = Rotation,
         [nameof(OffsetY)] = OffsetY,
         [nameof(ColorR)] = ColorR,
         [nameof(ColorG)] = ColorG,
@@ -51,6 +53,7 @@ public sealed class SongTitleSettings : ISettingsFile {
         MasterSize = IOUtils.Read(token, nameof(MasterSize), MasterSize);
         Anchor = IOUtils.Read(token, nameof(Anchor), Anchor);
         OffsetX = IOUtils.Read(token, nameof(OffsetX), OffsetX);
+        Rotation = Mathf.DeltaAngle(0f, IOUtils.Read(token, nameof(Rotation), Rotation));
         OffsetY = IOUtils.Read(token, nameof(OffsetY), OffsetY);
         IOUtils.ReadRgba(token, "Color", ref ColorR, ref ColorG, ref ColorB, ref ColorA);
         ShadowEnabled = IOUtils.Read(token, nameof(ShadowEnabled), ShadowEnabled);
