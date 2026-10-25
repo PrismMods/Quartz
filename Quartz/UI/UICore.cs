@@ -65,8 +65,9 @@ public static partial class UICore {
         canvasObj = new GameObject("QuartzUICanvas");
         canvasObj.transform.SetParent(MainCore.Root.transform, false);
         canvasObj.SetActive(false);
-        FontManager.MenuRoot = canvasObj.transform;
         canvas = canvasObj.AddComponent<Canvas>();
+        // After the Canvas: adding it swaps the Transform for a RectTransform, which would leave a stale (Unity-null) root.
+        FontManager.MenuRoot = canvasObj.transform;
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 32767;
         canvasScaler = canvasObj.AddComponent<CanvasScaler>();
