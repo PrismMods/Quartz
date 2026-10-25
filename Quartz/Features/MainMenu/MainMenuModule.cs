@@ -16,5 +16,6 @@ public sealed class MainMenuModule : QuartzFeature {
             OwnScroll = true,
         });
         Context.PatchAll();
+        Context.OnModDisable("MenuTweaks", MenuTweaks.Restore);
     }
 }

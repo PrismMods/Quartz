@@ -27,14 +27,40 @@ public static partial class MenuTweaks {
         scrConductor cond = ADOBase.conductor;
         if(cond == null || cond.bpm <= 0f) return;
         menuFast = false;
+        bpmApplied = true;
         SetAllPlayerSpeed(Conf.MenuSlowBpm / cond.bpm);
         SetMenuSong2(false);
+    }
+    private static bool bpmApplied;
+    private static scrFloor lastSpeedFloor;
+    // Turning Quartz off drops the patches that keep these up, so put the menu back the way the game had it.
+    internal static void Restore() {
+        try {
+            scrConductor muted = lastMuteConductor;
+            if(muted != null && lastMuteTarget) {
+                if(muted.song != null) muted.song.mute = false;
+                if(muted.song2 != null) muted.song2.mute = false;
+            }
+            lastMuteTarget = false;
+            if(!bpmApplied) return;
+            bpmApplied = false;
+            menuFast = false;
+            if(!ADOBase.isLevelSelect) return;
+            SetAllPlayerSpeed(1.0);
+            SetMenuSong2(false);
+            if(lastSpeedFloor != null) {
+                lastSpeedFloor.floorIcon = FloorIcon.Rabbit;
+                lastSpeedFloor.UpdateIconSprite();
+            }
+        } catch(Exception e) { Diag.Ignore(e); }
     }
     internal static bool HandleMenuBpmToggle(scrFloor floor) {
         if(!ShouldCustomMenuBpm || floor == null) return false;
         scrConductor cond = ADOBase.conductor;
         if(cond == null || cond.bpm <= 0f) return false;
         menuFast = !menuFast;
+        bpmApplied = true;
+        lastSpeedFloor = floor;
         SetAllPlayerSpeed((menuFast ? Conf.MenuHighBpm : Conf.MenuSlowBpm) / cond.bpm);
         floor.floorIcon = menuFast ? FloorIcon.Snail : FloorIcon.Rabbit;
         floor.UpdateIconSprite();

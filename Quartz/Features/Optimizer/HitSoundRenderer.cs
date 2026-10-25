@@ -123,6 +123,27 @@ internal static class HitSoundRenderer {
         DestroyPool();
     }
     private static void OnSceneUnloaded(Scene scene) => StopAll("scene unloaded", destroyPool: true);
+    private static scrConductor capturedConductor;
+    // Capture told the game every hit sound was scheduled; point it back at the next unplayed one so it takes over.
+    internal static void HandBack() {
+        scrConductor conductor = capturedConductor;
+        capturedConductor = null;
+        StopAll("handed back");
+        if(conductor == null || !ReflectionReady) return;
+        try {
+            if(HitSoundsDataField.GetValue(conductor) is not System.Collections.IList list) return;
+            double now = AudioSettings.dspTime;
+            int next = list.Count;
+            for(int i = 0; i < list.Count; i++) {
+                if(list[i] == null || Convert.ToDouble(TimeField.GetValue(list[i])) <= now) continue;
+                next = i;
+                break;
+            }
+            NextHitSoundField.SetValue(conductor, next);
+        } catch(Exception e) {
+            MainCore.Log.Wrn("[Optimizer] couldn't hand hit sounds back to the game: " + e.Message);
+        }
+    }
     internal static void Capture(scrConductor conductor) {
         if(conductor == null || !ReflectionReady) return;
         try {
@@ -169,6 +190,7 @@ internal static class HitSoundRenderer {
             mixerGroup = conductor.hitSoundGroup;
             BuildSegments(events);
             NextHitSoundField.SetValue(conductor, list.Count);
+            capturedConductor = conductor;
         } catch(Exception e) {
             MainCore.Log.Wrn("[Optimizer] Render All Hit Sounds capture failed: " + e.Message);
             StopAll("capture error");

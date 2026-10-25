@@ -50,10 +50,10 @@ public static class Optimizer {
         }
         defaultsCaptured = true;
     }
-    public static void Apply() {
+    public static void Apply() => Apply(MainCore.IsModEnabled);
+    private static void Apply(bool on) {
         EnsureConf();
         CaptureDefaults();
-        bool on = MainCore.IsModEnabled;
         CacheRuntimeFlags(on);
         Application.runInBackground = on && Conf.RunInBackground
             ? true
@@ -68,11 +68,10 @@ public static class Optimizer {
         IridiumPatches.InvalidateScreenScale();
         IridiumPatches.ApplyParticleCulling();
     }
+    // Applying as off resets every flag, the text shadow material and particle culling.
     public static void Restore() {
-        CacheRuntimeFlags(false);
-        if(gcDeferred) ResumeGC();
-        Application.runInBackground = defaultRunInBackground;
-        SetPriority(defaultPriority);
+        Apply(false);
+        HitSoundRenderer.HandBack();
     }
     internal static bool LeakGuardActive => leakGuardActive;
     internal static bool FastBloomActive => fastBloomActive;
