@@ -44,7 +44,7 @@ public static partial class UICore {
     private const float BandMaxHeight = 500f;
     private const float DefaultBandHeight = 260f;
     private const float MinPageHeight = 200f;
-    private const string WordmarkFont = "Linotte Semi Bold";
+    private const string WordmarkFont = "Gmarket Sans Medium";
     private static bool subMenuHasChildren;
     private static float bandHeight;
     private static float bandShown;

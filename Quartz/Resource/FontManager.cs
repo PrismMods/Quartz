@@ -7,8 +7,9 @@ using UnityEngine.UI;
 using Quartz.Compat.Game;
 namespace Quartz.Resource;
 public static partial class FontManager {
+    // Stored identity, kept from when Cookie Run was the default; shown through FONT_DEFAULT_OF.
     public const string DefaultName = "Default (Cookie Run Bold)";
-    private const string DefaultFontFile = "Cookie Run Bold";
+    internal const string DefaultFontFile = "Maplestory Bold";
     public const string AddSentinel = "quartz-add-custom-font";
     public const string SameAsOverlay = "quartz-overlay-font-same";
     // Stored as "": the settings window uses SUIT unless the user picks something else.

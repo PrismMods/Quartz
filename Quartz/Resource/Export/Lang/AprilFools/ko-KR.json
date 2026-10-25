@@ -139,7 +139,7 @@
     "FONT": "폰트",
     "FONT_ADD": "＋  사용자 폰트 추가…",
     "FONT_ADDED": "'{0}' 추가됨.",
-    "FONT_DEFAULT": "기본 (Cookie Run Bold)",
+    "FONT_DEFAULT_OF": "기본 ({0})",
     "FONT_DELETE": "삭제",
     "FONT_DELETED": "'{0}' 삭제됨.",
     "FONT_DELETE_CONFIRM": "삭제할까요?",

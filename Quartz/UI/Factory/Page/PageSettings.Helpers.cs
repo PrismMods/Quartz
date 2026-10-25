@@ -57,7 +57,7 @@ internal static partial class PageSettings {
             : name == FontManager.SameAsOverlay
             ? GenerateUI.Tr("FONT_SAME_AS_OVERLAY", "Same as overlay font")
             : name == FontManager.DefaultName
-                ? GenerateUI.Tr("FONT_DEFAULT", "Default (Cookie Run Bold)")
+                ? string.Format(GenerateUI.Tr("FONT_DEFAULT_OF", "Default ({0})"), FontManager.DefaultFontFile)
                 : name;
     private static void RefreshFontDropdowns() {
         if(fontDropdown != null) {
@@ -78,7 +78,7 @@ internal static partial class PageSettings {
         name == FontManager.AddSentinel
             ? GenerateUI.Tr("FONT_ADD", "＋  Add custom font…")
             : name == FontManager.DefaultName
-                ? GenerateUI.Tr("FONT_DEFAULT", "Default (Cookie Run Bold)")
+                ? string.Format(GenerateUI.Tr("FONT_DEFAULT_OF", "Default ({0})"), FontManager.DefaultFontFile)
                 : name;
     private static void OnFontSelected(string name) {
         if(name == FontManager.AddSentinel) {
