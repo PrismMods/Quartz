@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 namespace Quartz.Core.Service;
+// Unused: languages ship with each build. Kept because it is public SDK surface.
+[Obsolete("Languages ship with each build; Quartz no longer fetches them.")]
 public static class LangUpdateService {
     private const int MaxFileBytes = 2 * 1024 * 1024;
     private const string EnglishFile = "en-US.json";

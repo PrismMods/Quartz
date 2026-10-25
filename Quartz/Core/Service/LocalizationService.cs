@@ -25,14 +25,10 @@ public sealed class LocalizationService(
             LoadAprilOverrides();
             await Translator.Load(langPath);
             TryAutoLanguage();
-            if(await LangUpdateService.FetchAsync(langPath) > 0) {
-                await Translator.Load(langPath);
-                TryAutoLanguage();
-            }
             FinishAutoLanguage();
         } catch(System.Exception e) {
             Diag.Ignore(e);
-            logger.Wrn($"[LangUpdate] startup refresh failed: {e.Message}");
+            logger.Wrn($"[Localization] startup load failed: {e.Message}");
         }
     }
     private void TryAutoLanguage() {

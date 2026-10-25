@@ -59,7 +59,6 @@ internal static partial class PageSettings {
             langBtn.SetBlocked(true);
             langBtn.Label.text = "...";
             _ = Task.Run(async () => {
-                await LangUpdateService.FetchAsync(MainCore.Paths.LangPath);
                 await MainCore.Tr.Load(MainCore.Paths.LangPath);
                 MainThread.Enqueue(() => {
                     languageDropdown.SetBlocked(false);
