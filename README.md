@@ -56,10 +56,11 @@
   </tbody>
 </table>
 
-## Screenshots!! (may not be fully up to date)
-![Main Menu](readme/mainmenu.png)
+## Screenshots!!
+![Reorganize Hub](readme/reorganize.png)
 ![Credits](readme/credits.png)
 ![In-Game](readme/ingame.png)
+![Settings](readme/settings.png)
 
 <a href="https://www.star-history.com/?repos=PrismMods%2FQuartz&type=date&legend=top-left">
  <picture>
