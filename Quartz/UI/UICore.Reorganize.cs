@@ -28,7 +28,7 @@ public static partial class UICore {
         rect.anchorMin = new Vector2(0.5f, 0.5f);
         rect.anchorMax = new Vector2(0.5f, 0.5f);
         rect.pivot = new Vector2(0.5f, 0.5f);
-        rect.sizeDelta = new Vector2(260f, 250f);
+        rect.sizeDelta = new Vector2(260f, 300f);
         reorganizeHubGroup = reorganizeHub.AddComponent<CanvasGroup>();
         GameObject logo = new("Logo");
         logo.transform.SetParent(rect, false);
