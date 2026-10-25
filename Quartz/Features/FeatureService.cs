@@ -89,10 +89,26 @@ public static class FeatureService {
         if(initialized) return;
         initialized = true;
         state = FeatureState.Load();
+        RegisterBuiltinTranslations();
         foreach(Handle handle in Features) handle.Enabled = state.IsEnabled(handle.Id);
         modChangedHandler = (_, isDispose) => ApplyActive(!isDispose);
         MainCore.OnModEnabledChanged += modChangedHandler;
         Sync();
+    }
+    // A disabled feature never runs OnLoad, so its name on the Features page would stay untranslated.
+    private static void RegisterBuiltinTranslations() {
+        foreach(string name in MainCore.Asm.GetManifestResourceNames()) {
+            if(!name.StartsWith("Quartz.Features.", StringComparison.Ordinal) || !name.Contains(".Lang.")
+                || !name.EndsWith(".json", StringComparison.Ordinal)) continue;
+            try {
+                using System.IO.Stream stream = MainCore.Asm.GetManifestResourceStream(name);
+                if(stream == null) continue;
+                using System.IO.StreamReader reader = new(stream);
+                MainCore.Tr.Merge(reader.ReadToEnd(), "builtin " + name);
+            } catch(Exception e) {
+                MainCore.Log.Wrn($"[Features] couldn't read translations '{name}': {e.Message}");
+            }
+        }
     }
     private static void Dispose() {
         if(!initialized) return;
