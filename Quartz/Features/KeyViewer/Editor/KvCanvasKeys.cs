@@ -177,7 +177,9 @@ internal sealed partial class KvCanvas {
         if(root == null || doc == null || !history.CanUndo) return false;
         string current = Snapshot();
         if(current == null) return false;
-        Restore(history.Undo(current));
+        string snapshot = history.Undo(current);
+        if(snapshot == null) return false;
+        Restore(snapshot);
         return true;
     }
     internal bool Redo() {
