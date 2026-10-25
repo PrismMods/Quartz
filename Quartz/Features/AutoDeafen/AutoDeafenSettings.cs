@@ -5,7 +5,7 @@ using Quartz.IO.Interface;
 using UnityEngine;
 namespace Quartz.Features.AutoDeafen;
 public sealed class AutoDeafenSettings : ISettingsFile {
-    public bool Enabled = false;
+    public bool Enabled = true;
     public float DeafenAtPercent = 5f;
     public bool OnlyFromStart = true;
     public bool SkipWhenAuto = true;

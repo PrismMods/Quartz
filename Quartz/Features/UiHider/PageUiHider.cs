@@ -12,17 +12,7 @@ public static class PageUiHider {
         UiHider.EnsureConf();
         UiHiderSettings conf = UiHider.Conf;
         UiHiderSettings def = new();
-        var sec = GenerateUI.FlatSection(
-            content, "UI Hiding",
-            v => {
-                conf.Enabled = v;
-                if(v) UiHider.ApplyNow();
-                else UiHider.Restore();
-                UiHider.Save();
-            },
-            conf.Enabled,
-            "Enable UI Hiding", "uihiding_enable", def.Enabled
-        );
+        var sec = GenerateUI.FlatSection(content, "UI Hiding");
         GenerateUI.ToggleTip(
             sec.Body,
             def.RecordingMode,

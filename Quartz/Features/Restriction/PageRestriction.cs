@@ -15,15 +15,7 @@ public static class PageRestriction {
         RestrictionSettings conf = Restriction.Conf;
         RestrictionSettings def = new();
         if(conf.JRestrictMode == 2 && !XPerfectBridge.Installed) conf.JRestrictMode = 1;
-        var sec = GenerateUI.FlatSection(
-            content, "Judgement Restriction",
-            v => {
-                conf.JRestrictEnabled = v;
-                Restriction.Save();
-            },
-            conf.JRestrictEnabled,
-            "Enable Judgement Restriction", "judgementrestriction_enable", def.JRestrictEnabled
-        );
+        var sec = GenerateUI.FlatSection(content, "Judgement Restriction");
         RectTransform accuracyRow = null;
         RectTransform[] maskRows = null;
         void RefreshConditionalRows() {

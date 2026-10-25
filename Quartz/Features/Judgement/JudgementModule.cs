@@ -6,6 +6,7 @@ public sealed class JudgementModule : QuartzFeature {
         foreach(string lang in new[] { "en-US", "ko-KR", "zh-CN" })
             Context.RegisterTranslations(typeof(JudgementModule), $"Quartz.Features.Judgement.Lang.{lang}.json");
         JudgementOverlay.EnsureConf();
+        FeatureMasters.Claim(JudgementOverlay.ConfMgr, JudgementOverlay.Conf.Enabled, static c => c.Enabled = true);
         Context.RegisterRescalable("judgement", JudgementOverlay.Rescale);
         Context.AddPage(new NavPage {
             Key = "overlay.judgement", CategoryKey = "overlay", Order = 50,

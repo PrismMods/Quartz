@@ -22,7 +22,7 @@ public sealed class JudgementSection {
 }
 public sealed class RestrictionSettings : ISettingsFile {
     public const int MaxSections = 16;
-    public bool JRestrictEnabled = false;
+    public bool JRestrictEnabled = true;
     public int JRestrictMode = 1;
     public float JRestrictAccuracy = 96.6741943f;
     public int JRestrictAllowedMask = 0;

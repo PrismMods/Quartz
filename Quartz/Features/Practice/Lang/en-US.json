@@ -2,7 +2,6 @@
   "en-US": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "SECTION_PRACTICE_DIFFICULTY": "Practice Difficulty",
-    "PRACTICE_ENABLE": "Enable Practice Difficulty",
     "PRACTICE_HINT": "Bind a key to a difficulty and a pitch. Changes apply between attempts, never mid-run. Difficulty waits until the current attempt ends. Pitch is written once into the level's Pitch setting, as if you typed it. Queued changes show an arrow in the readout.",
     "PRACTICE_NO_BINDINGS": "No keys bound yet.",
     "PRACTICE_ADD": "Add Key",

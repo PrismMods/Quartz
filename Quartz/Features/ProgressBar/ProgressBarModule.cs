@@ -6,6 +6,7 @@ public sealed class ProgressBarModule : QuartzFeature {
         foreach(string lang in new[] { "en-US", "ko-KR", "zh-CN" })
             Context.RegisterTranslations(typeof(ProgressBarModule), $"Quartz.Features.ProgressBar.Lang.{lang}.json");
         ProgressBarOverlay.EnsureConf();
+        FeatureMasters.Claim(ProgressBarOverlay.ConfMgr, ProgressBarOverlay.Conf.Enabled, static c => c.Enabled = true);
         Context.ReserveOverlayBand(ProgressBarOverlay.BandId, ProgressBarOverlay.BottomEdge);
         Context.RegisterRescalable("progressbar", ProgressBarOverlay.Rescale);
         Context.AddPage(new NavPage {

@@ -16,17 +16,7 @@ public static class PagePlanetColors {
         PlanetColorsSettings def = new();
         void Apply() => PlanetColors.Refresh();
         void Save() => PlanetColors.Save();
-        var sec = GenerateUI.FlatSection(
-            content, "Planet Colors",
-            v => {
-                conf.Enabled = v;
-                if(v) PlanetColors.Refresh();
-                else PlanetColors.Restore();
-                Save();
-            },
-            conf.Enabled,
-            "Enable Planet Colors", "planetcolors_enable", def.Enabled
-        );
+        var sec = GenerateUI.FlatSection(content, "Planet Colors");
         GenerateUI.ToggleTip(
             sec.Body,
             def.RecolorPlanets,

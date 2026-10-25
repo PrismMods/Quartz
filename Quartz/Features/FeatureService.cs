@@ -90,6 +90,7 @@ public static class FeatureService {
         initialized = true;
         state = FeatureState.Load();
         RegisterBuiltinTranslations();
+        if(FeatureMasters.Migrate(state, FeatureMasters.ReadFile)) state.Save();
         foreach(Handle handle in Features) handle.Enabled = state.IsEnabled(handle.Id);
         modChangedHandler = (_, isDispose) => ApplyActive(!isDispose);
         MainCore.OnModEnabledChanged += modChangedHandler;

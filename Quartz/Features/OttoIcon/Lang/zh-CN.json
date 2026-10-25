@@ -13,7 +13,6 @@
     "OTTO_HIGHBPM_ON": "高BPM单独配色",
     "OTTO_OFFSET_X": "横向偏移",
     "OTTO_OFFSET_Y": "纵向偏移",
-    "SECTION_OTTO_ICON": "自动播放图标",
-    "OTTOICON_ENABLE": "显示自动播放图标"
+    "SECTION_OTTO_ICON": "自动播放图标"
   }
 }

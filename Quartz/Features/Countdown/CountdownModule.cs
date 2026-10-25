@@ -6,6 +6,7 @@ public sealed class CountdownModule : QuartzFeature {
         foreach(string lang in new[] { "en-US", "ko-KR", "zh-CN" })
             Context.RegisterTranslations(typeof(CountdownModule), $"Quartz.Features.Countdown.Lang.{lang}.json");
         CountdownFeature.EnsureConf();
+        FeatureMasters.Claim(CountdownFeature.ConfMgr, CountdownFeature.Conf.Enabled, static c => c.Enabled = true);
         Context.AddPage(new NavPage {
             Key = "gameplay.countdown",
             CategoryKey = "gameplay",

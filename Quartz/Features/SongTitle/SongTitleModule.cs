@@ -6,6 +6,7 @@ public sealed class SongTitleModule : QuartzFeature {
         foreach(string lang in new[] { "en-US", "ko-KR", "zh-CN" })
             Context.RegisterTranslations(typeof(SongTitleModule), $"Quartz.Features.SongTitle.Lang.{lang}.json");
         SongTitleOverlay.EnsureConf();
+        FeatureMasters.Claim(SongTitleOverlay.ConfMgr, SongTitleOverlay.Conf.Enabled, static c => c.Enabled = true);
         Context.RegisterRescalable("songtitle", SongTitleOverlay.Rescale);
         Context.AddPage(new NavPage {
             Key = "overlay.songtitle",

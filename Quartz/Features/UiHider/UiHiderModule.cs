@@ -6,6 +6,7 @@ public sealed class UiHiderModule : QuartzFeature {
         foreach(string lang in new[] { "en-US", "ko-KR", "zh-CN" })
             Context.RegisterTranslations(typeof(UiHiderModule), $"Quartz.Features.UiHider.Lang.{lang}.json");
         UiHider.EnsureConf();
+        FeatureMasters.Claim(UiHider.ConfMgr, UiHider.Conf.Enabled, static c => c.Enabled = true);
         Context.AddPage(new NavPage {
             Key = "visuals.uihiding",
             CategoryKey = "visuals",

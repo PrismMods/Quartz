@@ -12,15 +12,7 @@ public static class PagePractice {
         PracticeSettings conf = PracticeDifficulty.Conf;
         PracticeSettings def = new();
         void Save() => PracticeDifficulty.Save();
-        var sec = GenerateUI.FlatSection(
-            content, "Practice Difficulty",
-            v => {
-                conf.Enabled = v;
-                Save();
-            },
-            conf.Enabled,
-            "Enable Practice Difficulty", "practice_enable", def.Enabled
-        );
+        var sec = GenerateUI.FlatSection(content, "Practice Difficulty");
         GenerateUI.WrapGrow(GenerateUI.AddLocalizedMutedText(
             GenerateUI.Row(sec.Body, 46f),
             "PRACTICE_HINT",

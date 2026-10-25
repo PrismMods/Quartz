@@ -9,6 +9,7 @@ public sealed class KeyViewerModule : QuartzFeature {
         foreach(string lang in new[] { "en-US", "ko-KR", "zh-CN" })
             Context.RegisterTranslations(typeof(KeyViewerModule), $"Quartz.Features.KeyViewer.Lang.{lang}.json");
         KeyViewerOverlay.EnsureConf();
+        FeatureMasters.Claim(KeyViewerOverlay.ConfMgr, KeyViewerOverlay.Conf.Enabled, static c => c.Enabled = true);
         if(KvJsAssemblies.EnsureLoaded()) KvJsRuntime.Reload(KeyViewerOverlay.Conf);
         Layout.KvStore.RegisterHandle();
         hookHandler = KvInputQueue.Push;

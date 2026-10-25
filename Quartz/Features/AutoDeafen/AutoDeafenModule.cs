@@ -6,6 +6,7 @@ public sealed class AutoDeafenModule : QuartzFeature {
         foreach(string lang in new[] { "en-US", "ko-KR", "zh-CN" })
             Context.RegisterTranslations(typeof(AutoDeafenModule), $"Quartz.Features.AutoDeafen.Lang.{lang}.json");
         AutoDeafen.EnsureConf();
+        FeatureMasters.Claim(AutoDeafen.ConfMgr, AutoDeafen.Conf.Enabled, static c => c.Enabled = true);
         Context.AddPage(new NavPage {
             Key = "gameplay.autodeafen",
             CategoryKey = "gameplay",

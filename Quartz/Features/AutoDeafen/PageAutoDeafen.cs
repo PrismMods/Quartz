@@ -17,15 +17,7 @@ public static class PageAutoDeafen {
         AutoDeafen.EnsureConf();
         AutoDeafenSettings conf = AutoDeafen.Conf;
         AutoDeafenSettings def = new();
-        var sec = GenerateUI.FlatSection(
-            content, "Auto Deafen (Discord)",
-            v => {
-                conf.Enabled = v;
-                AutoDeafen.Save();
-            },
-            conf.Enabled,
-            "Enable Auto Deafen (Discord)", "autodeafen_enable", def.Enabled
-        );
+        var sec = GenerateUI.FlatSection(content, "Auto Deafen (Discord)");
         GenerateUI.DropDown(
             GenerateUI.Row(sec.Body),
             AutoDeafen.ShortcutSupported ? AutoDeafenSettings.ModeShortcut : AutoDeafenSettings.ModeBot,

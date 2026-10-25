@@ -15,13 +15,6 @@ internal static class PageCountdown {
             "SECTION_COUNTDOWN",
             "Countdown"
         );
-        GenerateUI.ToggleTip(
-            content.transform, def.Enabled, conf.Enabled,
-            v => { conf.Enabled = v; CountdownFeature.EnabledChanged(); Save(); },
-            "Enable Countdown", "countdown_enable",
-            "Replaces the countdown you get when a run starts from a checkpoint or from a middle tile in the "
-                + "level editor. Off, the game's own countdown is used."
-        );
         UISlider min = GenerateUI.Slider(
             GenerateUI.Row(content.transform),
             def.MinBpm,

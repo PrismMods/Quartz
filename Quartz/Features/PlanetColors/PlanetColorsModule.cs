@@ -6,6 +6,7 @@ public sealed class PlanetColorsModule : QuartzFeature {
         foreach(string lang in new[] { "en-US", "ko-KR", "zh-CN" })
             Context.RegisterTranslations(typeof(PlanetColorsModule), $"Quartz.Features.PlanetColors.Lang.{lang}.json");
         PlanetColors.EnsureConf();
+        FeatureMasters.Claim(PlanetColors.ConfMgr, PlanetColors.Conf.Enabled, static c => c.Enabled = true);
         Context.AddPage(new NavPage {
             Key = "visuals.planetcolors",
             CategoryKey = "visuals",

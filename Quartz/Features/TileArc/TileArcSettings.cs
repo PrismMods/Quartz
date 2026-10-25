@@ -4,7 +4,7 @@ using Quartz.IO.Interface;
 using UnityEngine;
 namespace Quartz.Features.TileArc;
 public sealed class TileArcSettings : ISettingsFile {
-    public bool Enabled = false;
+    public bool Enabled = true;
     public float Intensity = 0.9f;
     public JToken Serialize() => new JObject {
         [nameof(Enabled)] = Enabled,

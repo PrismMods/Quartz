@@ -9,16 +9,7 @@ public static class PageTileArc {
         TileArc.EnsureConf();
         TileArcSettings conf = TileArc.Conf;
         TileArcSettings def = new();
-        var sec = GenerateUI.FlatSection(
-            content, "Tile Arc",
-            v => {
-                conf.Enabled = v;
-                TileArc.Refresh();
-                TileArc.Save();
-            },
-            conf.Enabled,
-            "Enable Tile Arc", "tilearc_enable", def.Enabled
-        );
+        var sec = GenerateUI.FlatSection(content, "Tile Arc");
         UISlider intensity = GenerateUI.Slider(
             GenerateUI.Row(sec.Body),
             def.Intensity * 100f, 0f, 100f, conf.Intensity * 100f,

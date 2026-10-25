@@ -11,17 +11,7 @@ public static class PageOttoIcon {
         OttoIcon.EnsureConf();
         OttoIconSettings conf = OttoIcon.Conf;
         OttoIconSettings def = new();
-        var sec = GenerateUI.FlatSection(
-            content, "Otto Icon",
-            v => {
-                conf.Enabled = v;
-                if(v) OttoIcon.Refresh();
-                else OttoIcon.Restore();
-                OttoIcon.Save();
-            },
-            conf.Enabled,
-            "Enable Otto Icon", "ottoicon_enable", def.Enabled
-        );
+        var sec = GenerateUI.FlatSection(content, "Otto Icon");
         TextMeshProUGUI imageStatus = GenerateUI.AddMutedText(GenerateUI.Row(sec.Body, 30f), 17f, 0.45f);
         void RefreshImageStatus() => imageStatus.text = OttoIcon.HasCustomImage
             ? Path.GetFileName(conf.ImagePath)

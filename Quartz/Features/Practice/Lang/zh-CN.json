@@ -2,7 +2,6 @@
   "zh-CN": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "SECTION_PRACTICE_DIFFICULTY": "练习难度",
-    "PRACTICE_ENABLE": "启用练习难度",
     "PRACTICE_HINT": "给按键绑定难度和变速倍率。改动只在两次尝试之间生效，不会中途改变。难度等当前尝试结束后切换，变速倍率会写入谱面的Pitch设置一次，和手动输入一样。还在排队的改动会显示箭头。",
     "PRACTICE_NO_BINDINGS": "暂无绑定按键。",
     "PRACTICE_ADD": "添加按键",

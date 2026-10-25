@@ -45,7 +45,6 @@
     "PCOL_TAILOP2": "星球 2 尾迹透明度",
     "PCOL_TAILOP3": "星球 3 尾迹透明度",
     "PCOL_TAILOP4": "星球 4 尾迹透明度",
-    "PLANETCOLORS_ENABLE": "启用星球配色",
     "SECTION_PLANET_COLORS": "星球配色"
   }
 }

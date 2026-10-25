@@ -12,15 +12,7 @@ public static class PageDeathLimit {
         DeathLimit.EnsureConf();
         DeathLimitSettings conf = DeathLimit.Conf;
         DeathLimitSettings def = new();
-        var sec = GenerateUI.FlatSection(
-            content, "Death Limit",
-            v => {
-                conf.DeathLimitEnabled = v;
-                DeathLimit.Save();
-            },
-            conf.DeathLimitEnabled,
-            "Enable Death Limit", "deathlimit_enable", def.DeathLimitEnabled
-        );
+        var sec = GenerateUI.FlatSection(content, "Death Limit");
         void LimitPair(string toggleLabel, string sliderLabel, string id,
             bool defOn, bool on, Action<bool> setOn,
             int defMax, int max, Action<int> setMax, float sliderMax) {

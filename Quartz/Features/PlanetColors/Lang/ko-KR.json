@@ -45,7 +45,6 @@
     "PCOL_TAILOP2": "행성 2 꼬리 투명도",
     "PCOL_TAILOP3": "행성 3 꼬리 투명도",
     "PCOL_TAILOP4": "행성 4 꼬리 투명도",
-    "PLANETCOLORS_ENABLE": "행성 색상 켜기",
     "SECTION_PLANET_COLORS": "행성 색상"
   }
 }

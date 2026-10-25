@@ -6,6 +6,7 @@ public sealed class TileArcModule : QuartzFeature {
         foreach(string lang in new[] { "en-US", "ko-KR", "zh-CN" })
             Context.RegisterTranslations(typeof(TileArcModule), $"Quartz.Features.TileArc.Lang.{lang}.json");
         TileArc.EnsureConf();
+        FeatureMasters.Claim(TileArc.ConfMgr, TileArc.Conf.Enabled, static c => c.Enabled = true);
         Context.AddPage(new NavPage {
             Key = "visuals.tilearc", CategoryKey = "visuals", Order = 25,
             Title = "Tile Arc", LocaleKey = "SECTION_TILE_ARC", Build = PageTileArc.Create,

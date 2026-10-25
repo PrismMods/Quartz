@@ -6,6 +6,7 @@ public sealed class DeathLimitModule : QuartzFeature {
         foreach(string lang in new[] { "en-US", "ko-KR", "zh-CN" })
             Context.RegisterTranslations(typeof(DeathLimitModule), $"Quartz.Features.DeathLimit.Lang.{lang}.json");
         DeathLimit.EnsureConf();
+        FeatureMasters.Claim(DeathLimit.ConfMgr, DeathLimit.Conf.DeathLimitEnabled, static c => c.DeathLimitEnabled = true);
         Context.AddPage(new NavPage {
             Key = "gameplay.death",
             CategoryKey = "gameplay",

@@ -1,10 +1,8 @@
 {
   "en-US": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
-    "COUNTDOWN_ENABLE": "Enable Countdown",
     "COUNTDOWN_MAXBPM": "Maximum Countdown Tempo",
     "COUNTDOWN_MINBPM": "Minimum Countdown Tempo",
-    "DESC_COUNTDOWN_ENABLE": "Replaces the countdown when you start from a checkpoint or a middle tile in the level editor. When off, the game's own countdown plays.",
     "SECTION_COUNTDOWN": "Countdown"
   }
 }

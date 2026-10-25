@@ -14,16 +14,7 @@ public static class PageEffectRemover {
         EffectRemoverSettings conf = EffectRemover.Conf;
         EffectRemoverSettings def = new();
         void Save() => EffectRemover.Save();
-        var sec = GenerateUI.FlatSection(
-            content.transform, "Effect Remover",
-            v => {
-                conf.On = v;
-                EffectRemover.RefreshEditorSaveButtons();
-                Save();
-            },
-            conf.On,
-            "Enable Effect Remover", "effectremover_enable", def.On
-        );
+        var sec = GenerateUI.FlatSection(content.transform, "Effect Remover");
         GenerateUI.DropDown(
             GenerateUI.Row(sec.Body),
             EffectRemoverSettings.ModeEnhanced,

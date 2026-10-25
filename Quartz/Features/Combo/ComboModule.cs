@@ -6,6 +6,7 @@ public sealed class ComboModule : QuartzFeature {
         foreach(string lang in new[] { "en-US", "ko-KR", "zh-CN" })
             Context.RegisterTranslations(typeof(ComboModule), $"Quartz.Features.Combo.Lang.{lang}.json");
         ComboOverlay.EnsureConf();
+        FeatureMasters.Claim(ComboOverlay.ConfMgr, ComboOverlay.Conf.Enabled, static c => c.Enabled = true);
         Context.RegisterRescalable("combo", ComboOverlay.Rescale);
         Context.AddPage(new NavPage {
             Key = "overlay.combo", CategoryKey = "overlay", Order = 40,

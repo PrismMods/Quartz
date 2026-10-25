@@ -7,6 +7,7 @@ public sealed class KeyLimiterModule : QuartzFeature {
             Context.RegisterTranslations(typeof(KeyLimiterModule), $"Quartz.Features.KeyLimiter.Lang.{lang}.json");
         KeyLimiter.EnsureConf();
         ChatterBlocker.EnsureConf();
+        FeatureMasters.Claim(KeyLimiter.ConfMgr, KeyLimiter.Conf.Enabled, static c => c.Enabled = true);
         ChartKeyLimiter.EnsureConf();
         EnumToStringPatch.Bind(Context.Harmony);
         Quartz.Resource.ResourceManager assets = Context.Resources(typeof(KeyLimiterModule), "Quartz.Features.KeyLimiter.Assets.");

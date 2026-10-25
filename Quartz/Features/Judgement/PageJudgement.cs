@@ -19,13 +19,7 @@ internal static class PageJudgement {
                 && labelTr.TryGetComponent(out TextMeshProUGUI label))
                 label.alpha = enabled ? 1f : 0.5f;
         }
-        GenerateUI.CollapsibleSection sec = null;
-        sec = GenerateUI.Collapsible(
-            content, "Judgement", startExpanded: false,
-            v => { conf.Enabled = v; Apply(); Save(); SetHeaderEnabled(v, sec); },
-            conf.Enabled
-        );
-        SetHeaderEnabled(conf.Enabled, sec);
+        GenerateUI.CollapsibleSection sec = GenerateUI.Collapsible(content, "Judgement", startExpanded: false);
         if(XPerfectBridge.Installed) {
             GenerateUI.ToggleTip(
                 sec.Body,

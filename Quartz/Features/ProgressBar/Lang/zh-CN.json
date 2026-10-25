@@ -30,7 +30,6 @@
     "PROGRESSBAR_LINEEDGE_TOP": "顶部",
     "PROGRESSBAR_LINEEDGE_BOTTOM": "底部",
     "SECTION_PROGRESS_BAR": "进度条",
-    "PROGRESSBAR_ENABLE": "启用进度条",
     "PROGRESSBAR_RESETPOS": "重置位置"
   }
 }

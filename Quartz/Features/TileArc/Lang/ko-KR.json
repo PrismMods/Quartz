@@ -1,10 +1,8 @@
 {
   "ko-KR": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
-    "DESC_TILEARC_ENABLE": "게임이 기본으로 둥글게 만드는 90°~105° 구간뿐 아니라 모든 회전의 바깥쪽 모서리를 둥글게 만들어요. 이미 화면에 있는 타일에도 바로 적용돼요.",
     "DESC_TILEARC_INTENSITY": "둥근 모서리가 타일 너비의 몇 %까지 닿을지 정해요. 100%는 완전한 반원, 0%는 날카로운 모서리예요.",
     "SECTION_TILE_ARC": "타일 곡선",
-    "TILEARC_ENABLE": "타일 곡선 사용",
     "TILEARC_INTENSITY": "곡선 강도"
   }
 }

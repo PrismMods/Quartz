@@ -49,7 +49,7 @@ public sealed class UiHiderProfile {
     }
 }
 public sealed class UiHiderSettings : ISettingsFile {
-    public bool Enabled = false;
+    public bool Enabled = true;
     public bool RecordingMode = false;
     public bool UseShortcut = true;
     public int ShortcutModifier = (int)Core.Keybind.KeyModifier.None;

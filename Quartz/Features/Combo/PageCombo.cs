@@ -16,12 +16,7 @@ internal static class PageCombo {
         void Apply() => ComboOverlay.Apply();
         void ApplyCaptionShadow() => ComboOverlay.ApplyCaptionShadow();
         void ApplyCountShadow() => ComboOverlay.ApplyCountShadow();
-        var sec = GenerateUI.FlatSection(
-            content, "Combo",
-            v => { conf.Enabled = v; Apply(); Save(); },
-            conf.Enabled,
-            "Enable Combo", "combo_enable", def.Enabled
-        );
+        var sec = GenerateUI.FlatSection(content, "Combo");
         GenerateUI.ToggleTip(
             sec.Body,
             def.CountAuto,

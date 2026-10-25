@@ -71,15 +71,7 @@ public static partial class PageKeyLimiter {
         KeyLimiter.EnsureConf();
         KeyLimiterSettings conf = KeyLimiter.Conf;
         KeyLimiterSettings def = new();
-        var sec = GenerateUI.FlatSection(
-            content, "Key Limiter",
-            v => {
-                conf.Enabled = v;
-                KeyLimiter.Save();
-            },
-            conf.Enabled,
-            "Enable Key Limiter", "keylimiter_enable", def.Enabled
-        );
+        var sec = GenerateUI.FlatSection(content, "Key Limiter");
         UIToggle syncToggle = GenerateUI.Toggle(
             GenerateUI.Row(sec.Body),
             Quartz.Game.KeyBindSync.Default,

@@ -32,16 +32,7 @@ public static class PageHideJudgements {
         void RefreshMaskRows() {
             foreach(RectTransform row in maskRows) row?.gameObject.SetActive(conf.Enabled);
         }
-        var sec = GenerateUI.FlatSection(
-            content, "Hide Judgements",
-            v => {
-                conf.Enabled = v;
-                RefreshMaskRows();
-                JudgementPopupHider.Save();
-            },
-            conf.Enabled,
-            "Enable Hide Judgements", "hidejudgements_enable", def.Enabled
-        );
+        var sec = GenerateUI.FlatSection(content, "Hide Judgements");
         void AddMaskToggle(int maskBit, string label, string id) {
             RectTransform row = GenerateUI.Row(sec.Body);
             maskRows.Add(row);

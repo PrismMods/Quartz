@@ -3,7 +3,7 @@ using Quartz.IO;
 using Quartz.IO.Interface;
 namespace Quartz.Features.DeathLimit;
 public sealed class DeathLimitSettings : ISettingsFile {
-    public bool DeathLimitEnabled = false;
+    public bool DeathLimitEnabled = true;
     public bool MaxDeathsOn = true;
     public int MaxDeaths = 10;
     public bool MaxMissesOn = false;

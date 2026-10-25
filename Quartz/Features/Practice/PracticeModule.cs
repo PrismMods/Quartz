@@ -6,6 +6,7 @@ public sealed class PracticeModule : QuartzFeature {
         foreach(string lang in new[] { "en-US", "ko-KR", "zh-CN" })
             Context.RegisterTranslations(typeof(PracticeModule), $"Quartz.Features.Practice.Lang.{lang}.json");
         PracticeDifficulty.EnsureConf();
+        FeatureMasters.Claim(PracticeDifficulty.ConfMgr, PracticeDifficulty.Conf.Enabled, static c => c.Enabled = true);
         Context.AddPage(new NavPage {
             Key = "gameplay.practice",
             CategoryKey = "gameplay",

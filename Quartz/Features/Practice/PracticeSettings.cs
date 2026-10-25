@@ -32,7 +32,7 @@ public sealed class PracticeBinding {
 public sealed class PracticeSettings : ISettingsFile {
     public const int MinPitch = 1;
     public const int MaxPitch = 1000;
-    public bool Enabled = false;
+    public bool Enabled = true;
     public bool ShowIndicator = true;
     public bool ShowSpeed = true;
     public bool IndicatorOnlyInGame = true;

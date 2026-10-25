@@ -14,18 +14,7 @@ public static class PageSongTitle {
         void Save() => SongTitleOverlay.Save();
         void Apply() => SongTitleOverlay.Apply();
         void ApplyShadow() => SongTitleOverlay.ApplyShadow();
-        void SetHeaderEnabled(bool enabled, GenerateUI.CollapsibleSection section) {
-            if(section.HeaderObj.transform.Find("Bar/Label") is Transform labelTr
-                && labelTr.TryGetComponent(out TextMeshProUGUI label))
-                label.alpha = enabled ? 1f : 0.5f;
-        }
-        GenerateUI.CollapsibleSection sec = null;
-        sec = GenerateUI.Collapsible(
-            content, "Song Title", startExpanded: false,
-            v => { conf.Enabled = v; Apply(); Save(); SetHeaderEnabled(v, sec); },
-            conf.Enabled
-        );
-        SetHeaderEnabled(conf.Enabled, sec);
+        GenerateUI.CollapsibleSection sec = GenerateUI.Collapsible(content, "Song Title", startExpanded: false);
         UIInput fmt = GenerateUI.Input(
             GenerateUI.Row(sec.Body),
             def.Format,

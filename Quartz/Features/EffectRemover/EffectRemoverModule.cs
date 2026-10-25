@@ -6,6 +6,7 @@ public sealed class EffectRemoverModule : QuartzFeature {
         foreach(string lang in new[] { "en-US", "ko-KR", "zh-CN" })
             Context.RegisterTranslations(typeof(EffectRemoverModule), $"Quartz.Features.EffectRemover.Lang.{lang}.json");
         EffectRemover.EnsureConf();
+        FeatureMasters.Claim(EffectRemover.ConfMgr, EffectRemover.Conf.On, static c => c.On = true);
         Context.AddPage(new NavPage {
             Key = "visuals.effectremover",
             CategoryKey = "visuals",

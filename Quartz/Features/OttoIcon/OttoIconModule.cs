@@ -6,6 +6,7 @@ public sealed class OttoIconModule : QuartzFeature {
         foreach(string lang in new[] { "en-US", "ko-KR", "zh-CN" })
             Context.RegisterTranslations(typeof(OttoIconModule), $"Quartz.Features.OttoIcon.Lang.{lang}.json");
         OttoIcon.EnsureConf();
+        FeatureMasters.Claim(OttoIcon.ConfMgr, OttoIcon.Conf.Enabled, static c => c.Enabled = true);
         Context.AddPage(new NavPage {
             Key = "visuals.ottoicon",
             CategoryKey = "visuals",

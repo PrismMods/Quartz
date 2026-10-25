@@ -12,12 +12,7 @@ internal static class PageProgressBar {
         ProgressBarSettings conf = ProgressBarOverlay.Conf;
         ProgressBarSettings def = new();
         void Save() => ProgressBarOverlay.Save();
-        GenerateUI.CollapsibleSection sec = GenerateUI.FlatSection(
-            content, "Progress Bar",
-            v => { conf.Enabled = v; ProgressBarOverlay.Apply(); Save(); },
-            conf.Enabled,
-            "Enable Progress Bar", "progressbar_enable", def.Enabled
-        );
+        GenerateUI.CollapsibleSection sec = GenerateUI.FlatSection(content, "Progress Bar");
         GenerateUI.Toggle(
             GenerateUI.Row(sec.Body),
             def.PrefillStart,

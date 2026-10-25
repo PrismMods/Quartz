@@ -1,10 +1,8 @@
 {
   "zh-CN": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
-    "DESC_TILEARC_ENABLE": "让每个转弯的外侧拐角都变圆，不只是游戏默认处理的 90°–105°。屏幕上已有的轨道也会立刻生效。",
     "DESC_TILEARC_INTENSITY": "圆角延伸多远，按轨道宽度的百分比算。100% 是完整半圆，0% 保持尖角。",
     "SECTION_TILE_ARC": "轨道圆角",
-    "TILEARC_ENABLE": "启用轨道圆角",
     "TILEARC_INTENSITY": "圆角强度"
   }
 }
