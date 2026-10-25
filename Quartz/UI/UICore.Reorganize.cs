@@ -117,6 +117,17 @@ public static partial class UICore {
             .Build();
         MainCore.TC.Play(reorganizeSeq);
     }
+    // A rebuild (a feature toggled from the panel) lands back in the hub as it was, without the fades.
+    private static void RestoreHub(bool overHub) {
+        EnterReorganize();
+        reorganizeSeq?.CompleteAndKill();
+        if(!overHub || Panel == null) return;
+        panelOverHub = true;
+        Panel.gameObject.SetActive(true);
+        panelCanvasGroup.interactable = true;
+        panelCanvasGroup.blocksRaycasts = true;
+        panelCanvasGroup.alpha = Mathf.Clamp01(MainCore.Conf.PanelOpacity);
+    }
     [Obsolete("The movable exit button was replaced by the centred hub; this does nothing.")]
     public static void ResetExitReorganizePosition() { }
     internal static void OpenToHub() {

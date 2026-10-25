@@ -127,6 +127,8 @@ public static partial class UICore {
     public static void Rebuild() => Rebuild(false);
     public static void Rebuild(bool reloadPanelSize) {
         bool wasOpen = isOpen;
+        bool wasHub = IsReorganizing;
+        bool wasOverHub = panelOverHub;
         if(wasOpen) Close(true);
         Vector2 position = LastPanelPosition;
         Vector2 size = LastPanelSize;
@@ -141,6 +143,7 @@ public static partial class UICore {
         if(isOpen) {
             Panel.anchoredPosition = LastPanelPosition;
             Panel.sizeDelta = LastPanelSize;
+            if(wasHub) RestoreHub(wasOverHub);
         }
         RestoreScroll(scrolledState, scrollOffset);
     }
