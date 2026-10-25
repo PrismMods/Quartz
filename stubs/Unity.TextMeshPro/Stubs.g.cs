@@ -12,6 +12,11 @@
 #pragma warning disable CS0067, CS0169, CS0649, CS0108, CS0109, CS0114, CS0465, CS0824
 
 namespace TMPro {
+    public enum AtlasPopulationMode : int {
+        Static = 0,
+        Dynamic = 1,
+        DynamicOS = 2,
+    }
     public enum FontStyles : int {
         Normal = 0,
         Bold = 1,
@@ -89,10 +94,12 @@ namespace TMPro {
         public float xAdvance;
     }
     public unsafe partial class TMP_FontAsset : global::TMPro.TMP_Asset {
+        public global::TMPro.AtlasPopulationMode atlasPopulationMode { get => throw null; set { } }
         public global::UnityEngine.Texture2D[] atlasTextures { get => throw null; set { } }
         public global::System.Collections.Generic.List<global::TMPro.TMP_Character> characterTable { get => throw null; }
         public global::System.Collections.Generic.List<global::TMPro.TMP_FontAsset> fallbackFontAssetTable { get => throw null; set { } }
         public bool isMultiAtlasTexturesEnabled { get => throw null; set { } }
+        public global::UnityEngine.Font sourceFontFile { get => throw null; }
         public static global::TMPro.TMP_FontAsset CreateFontAsset(global::UnityEngine.Font font) => throw null;
         public bool HasCharacter(char character, bool searchFallbacks = default, bool tryAddCharacter = default) => throw null;
         protected TMP_FontAsset() { }

@@ -163,6 +163,8 @@
         "members": [
           "RDConstants ADOBase::gc()",
           "RDConstants ADOBase::get_gc()",
+          "System.Boolean ADOBase::IsAprilFools()",
+          "System.Boolean ADOBase::IsHalloweenWeek()",
           "System.Boolean ADOBase::get_isInternalLevel()",
           "System.Boolean ADOBase::get_isLevelEditor()",
           "System.Boolean ADOBase::get_isLevelSelect()",
@@ -548,14 +550,24 @@
         "type": "AsyncInputManager",
         "members": [
           "System.Boolean AsyncInputManager::get_isActive()",
-          "System.Boolean AsyncInputManager::isActive()"
+          "System.Boolean AsyncInputManager::isActive()",
+          "System.Collections.Concurrent.ConcurrentQueue\u00601\u003CSkyHook.SkyHookEvent\u003E AsyncInputManager::keyQueue",
+          "System.Collections.Generic.HashSet\u00601\u003CAsyncKeyCode\u003E AsyncInputManager::frameDependentKeyDownMask",
+          "System.Collections.Generic.HashSet\u00601\u003CAsyncKeyCode\u003E AsyncInputManager::frameDependentKeyMask",
+          "System.Collections.Generic.HashSet\u00601\u003CAsyncKeyCode\u003E AsyncInputManager::frameDependentKeyUpMask",
+          "System.Collections.Generic.HashSet\u00601\u003CAsyncKeyCode\u003E AsyncInputManager::keyDownMask",
+          "System.Collections.Generic.HashSet\u00601\u003CAsyncKeyCode\u003E AsyncInputManager::keyMask",
+          "System.Collections.Generic.HashSet\u00601\u003CAsyncKeyCode\u003E AsyncInputManager::keyUpMask",
+          "System.Int64 AsyncInputManager::currFrameTick",
+          "System.Void AsyncInputManager::ClearKeys()"
         ]
       },
       {
         "type": "AsyncKeyCode",
         "members": [
           "SkyHook.KeyLabel AsyncKeyCode::label",
-          "System.UInt16 AsyncKeyCode::key"
+          "System.UInt16 AsyncKeyCode::key",
+          "System.Void AsyncKeyCode::.ctor(System.UInt16,SkyHook.KeyLabel)"
         ]
       },
       {
@@ -908,6 +920,8 @@
         "members": [
           "MonsterLove.StateMachine.StateEngine MonsterLove.StateMachine.StateBehaviour::get_stateMachine()",
           "MonsterLove.StateMachine.StateEngine MonsterLove.StateMachine.StateBehaviour::stateMachine()",
+          "States MonsterLove.StateMachine.StateBehaviour::get_state()",
+          "States MonsterLove.StateMachine.StateBehaviour::state()",
           "System.Void MonsterLove.StateMachine.StateBehaviour::ChangeState(System.Enum)",
           "System.Void MonsterLove.StateMachine.StateBehaviour::ChangeState(System.Enum,MonsterLove.StateMachine.StateTransition)"
         ]
@@ -1026,6 +1040,7 @@
         "members": [
           "System.Collections.Generic.List\u00601\u003CscrPlanet\u003E PlanetarySystem::allPlanets",
           "System.Collections.Generic.List\u00601\u003CscrPlanet\u003E PlanetarySystem::planetList",
+          "System.Double PlanetarySystem::speed",
           "scrPlanet PlanetarySystem::planetBlue",
           "scrPlanet PlanetarySystem::planetRed"
         ]
@@ -1094,6 +1109,7 @@
       {
         "type": "RDConstants",
         "members": [
+          "TMPro.TMP_FontAsset RDConstants::koreanFontTMPro",
           "UnityEngine.GameObject RDConstants::prefab_property",
           "UnityEngine.Texture2D RDConstants::tex_planetWhite"
         ]
@@ -1114,6 +1130,10 @@
       {
         "type": "RDInput",
         "members": [
+          "RDInputType_AsyncKeyboard RDInput::asyncKeyboard",
+          "RDInputType_AsyncKeyboard RDInput::asyncKeyboardLeft",
+          "RDInputType_AsyncKeyboard RDInput::asyncKeyboardRight",
+          "RDInputType_Keyboard RDInput::keyboardInput",
           "System.Boolean RDInput::GetState(InputAction,ButtonState)",
           "System.Boolean RDInput::IsDown(UnityEngine.KeyCode)",
           "System.Boolean RDInput::WentDown(UnityEngine.KeyCode)",
@@ -1129,6 +1149,17 @@
       },
       {
         "type": "RDInputType",
+        "members": [
+          "System.Boolean RDInputType::get_isActive()",
+          "System.Boolean RDInputType::isActive()"
+        ]
+      },
+      {
+        "type": "RDInputType_AsyncKeyboard",
+        "members": []
+      },
+      {
+        "type": "RDInputType_Keyboard",
         "members": []
       },
       {
@@ -1646,6 +1677,7 @@
           "System.Boolean scrController::gameworld",
           "System.Boolean scrController::get_paused()",
           "System.Boolean scrController::paused()",
+          "System.Boolean scrController::requireHolding",
           "System.Collections.Generic.List\u00601\u003CPlanetRenderer\u003E scrController::dummyPlanets",
           "System.Collections.IEnumerator scrController::WaitForStartCo(System.Int32,System.Boolean)",
           "System.Int32 scrController::checkpointsUsed",
@@ -1662,12 +1694,15 @@
           "System.Void scrController::Scrub(System.Int32,System.Boolean)",
           "System.Void scrController::StartLoadingScene(WipeDirection)",
           "System.Void scrController::Start_Rewind(System.Int32)",
+          "System.Void scrController::UpdateInput()",
           "UnityEngine.UI.Text scrController::txtLevelName",
           "scrController scrController::get_instance()",
           "scrController scrController::instance()",
           "scrFloor scrController::currFloor()",
           "scrFloor scrController::firstFloor",
-          "scrFloor scrController::get_currFloor()"
+          "scrFloor scrController::get_currFloor()",
+          "scrPlayer scrController::get_playerOne()",
+          "scrPlayer scrController::playerOne()"
         ]
       },
       {
@@ -1708,6 +1743,7 @@
           "System.Int32 scrFloor::seqID",
           "System.Single scrFloor::extraBeats",
           "System.Single scrFloor::floatDirection",
+          "System.Single scrFloor::holdCompletion",
           "System.Single scrFloor::speed",
           "System.String scrFloor::checkpointIconFilename",
           "System.String scrFloor::gizmoIconFilename",
@@ -1776,7 +1812,18 @@
       },
       {
         "type": "scrMisc",
-        "members": []
+        "members": [
+          "scrMisc/HitMarginGeneralWithXPerfectValuesStruct\u00601\u003CSystem.Double\u003E scrMisc::GetAdjustedAngleBoundaryInDeg(Difficulty,System.Double,System.Double,System.Double)"
+        ]
+      },
+      {
+        "type": "scrMisc/HitMarginGeneralWithXPerfectValuesStruct\u00601",
+        "members": [
+          "T scrMisc/HitMarginGeneralWithXPerfectValuesStruct\u00601::Counted",
+          "T scrMisc/HitMarginGeneralWithXPerfectValuesStruct\u00601::Perfect",
+          "T scrMisc/HitMarginGeneralWithXPerfectValuesStruct\u00601::Pure",
+          "T scrMisc/HitMarginGeneralWithXPerfectValuesStruct\u00601::XPerfect"
+        ]
       },
       {
         "type": "scrMistakesManager",
@@ -1813,16 +1860,25 @@
       {
         "type": "scrPlayer",
         "members": [
+          "PlanetarySystem scrPlayer::planetarySystem",
+          "System.Boolean scrPlayer::ValidInputWasReleased()",
+          "System.Boolean scrPlayer::alive",
+          "System.Collections.Generic.List\u00601\u003CAnyKeyCode\u003E scrPlayer::holdKeys",
           "System.Double scrPlayer::lastHit",
           "System.Int32 scrPlayer::playerID",
-          "System.Void scrPlayer::Die(System.Boolean,System.Boolean,System.String,System.Boolean)"
+          "System.Void scrPlayer::Die(System.Boolean,System.Boolean,System.String,System.Boolean)",
+          "System.Void scrPlayer::Simulated_PlayerControl_Update(System.Nullable\u00601\u003CSystem.Int64\u003E)",
+          "scrFloor scrPlayer::currFloor()",
+          "scrFloor scrPlayer::get_currFloor()"
         ]
       },
       {
         "type": "scrPlayerManager",
         "members": [
           "System.Collections.Generic.IEnumerator\u00601\u003CscrPlayer\u003E scrPlayerManager::GetEnumerator()",
-          "System.Int32 scrPlayerManager::MaxPlayers"
+          "System.Int32 scrPlayerManager::MaxPlayers",
+          "scrPlayer[] scrPlayerManager::get_players()",
+          "scrPlayer[] scrPlayerManager::players()"
         ]
       },
       {
@@ -2356,6 +2412,7 @@
         "members": [
           "SkyHook.EventType SkyHook.SkyHookEvent::Type",
           "SkyHook.KeyLabel SkyHook.SkyHookEvent::Label",
+          "System.Int64 SkyHook.SkyHookEvent::GetTimeInTicks()",
           "System.Int64 SkyHook.SkyHookEvent::TimeSec",
           "System.UInt16 SkyHook.SkyHookEvent::Key",
           "System.UInt32 SkyHook.SkyHookEvent::TimeSubsecNano"
@@ -2370,6 +2427,15 @@
   {
     "assembly": "Unity.TextMeshPro",
     "types": [
+      {
+        "type": "TMPro.AtlasPopulationMode",
+        "members": [
+          "System.Int32 TMPro.AtlasPopulationMode::value__",
+          "TMPro.AtlasPopulationMode TMPro.AtlasPopulationMode::Dynamic",
+          "TMPro.AtlasPopulationMode TMPro.AtlasPopulationMode::DynamicOS",
+          "TMPro.AtlasPopulationMode TMPro.AtlasPopulationMode::Static"
+        ]
+      },
       {
         "type": "TMPro.FontStyles",
         "members": [
@@ -2475,9 +2541,13 @@
           "System.Collections.Generic.List\u00601\u003CTMPro.TMP_Character\u003E TMPro.TMP_FontAsset::get_characterTable()",
           "System.Collections.Generic.List\u00601\u003CTMPro.TMP_FontAsset\u003E TMPro.TMP_FontAsset::fallbackFontAssetTable()",
           "System.Collections.Generic.List\u00601\u003CTMPro.TMP_FontAsset\u003E TMPro.TMP_FontAsset::get_fallbackFontAssetTable()",
+          "System.Void TMPro.TMP_FontAsset::set_atlasPopulationMode(TMPro.AtlasPopulationMode)",
           "System.Void TMPro.TMP_FontAsset::set_fallbackFontAssetTable(System.Collections.Generic.List\u00601\u003CTMPro.TMP_FontAsset\u003E)",
           "System.Void TMPro.TMP_FontAsset::set_isMultiAtlasTexturesEnabled(System.Boolean)",
+          "TMPro.AtlasPopulationMode TMPro.TMP_FontAsset::atlasPopulationMode()",
           "TMPro.TMP_FontAsset TMPro.TMP_FontAsset::CreateFontAsset(UnityEngine.Font)",
+          "UnityEngine.Font TMPro.TMP_FontAsset::get_sourceFontFile()",
+          "UnityEngine.Font TMPro.TMP_FontAsset::sourceFontFile()",
           "UnityEngine.Texture2D[] TMPro.TMP_FontAsset::atlasTextures()",
           "UnityEngine.Texture2D[] TMPro.TMP_FontAsset::get_atlasTextures()"
         ]
@@ -3811,6 +3881,7 @@
           "System.Void UnityEngine.Object::DontDestroyOnLoad(UnityEngine.Object)",
           "System.Void UnityEngine.Object::set_hideFlags(UnityEngine.HideFlags)",
           "System.Void UnityEngine.Object::set_name(System.String)",
+          "T UnityEngine.Object::Instantiate(T)",
           "T UnityEngine.Object::Instantiate(T,UnityEngine.Transform)",
           "T[] UnityEngine.Object::FindObjectsByType(UnityEngine.FindObjectsSortMode)",
           "UnityEngine.HideFlags UnityEngine.Object::hideFlags()"

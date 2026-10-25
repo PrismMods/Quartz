@@ -616,6 +616,7 @@ namespace UnityEngine {
         public static void DontDestroyOnLoad(global::UnityEngine.Object target) => throw null;
         public static T[] FindObjectsByType<T>(global::UnityEngine.FindObjectsSortMode sortMode) where T : global::UnityEngine.Object => throw null;
         public int GetInstanceID() => throw null;
+        public static T Instantiate<T>(T original) where T : global::UnityEngine.Object => throw null;
         public static T Instantiate<T>(T original, global::UnityEngine.Transform parent) where T : global::UnityEngine.Object => throw null;
         public static bool operator ==(global::UnityEngine.Object x, global::UnityEngine.Object y) => throw null;
         public static implicit operator bool(global::UnityEngine.Object exists) => throw null;

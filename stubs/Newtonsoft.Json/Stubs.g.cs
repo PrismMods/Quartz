@@ -181,9 +181,9 @@ namespace Newtonsoft.Json.Linq {
         public object ToObject(global::System.Type objectType) => throw null;
         public string ToString(global::Newtonsoft.Json.Formatting formatting, params global::Newtonsoft.Json.JsonConverter[] converters) => throw null;
         public virtual T Value<T>(object key) => throw null;
+        public static explicit operator string(global::Newtonsoft.Json.Linq.JToken value) => throw null;
         public static explicit operator float(global::Newtonsoft.Json.Linq.JToken value) => throw null;
         public static explicit operator bool(global::Newtonsoft.Json.Linq.JToken value) => throw null;
-        public static explicit operator string(global::Newtonsoft.Json.Linq.JToken value) => throw null;
         public static explicit operator int(global::Newtonsoft.Json.Linq.JToken value) => throw null;
         public static explicit operator global::System.Nullable<bool>(global::Newtonsoft.Json.Linq.JToken value) => throw null;
         public static implicit operator global::Newtonsoft.Json.Linq.JToken(bool value) => throw null;

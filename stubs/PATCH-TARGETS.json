@@ -3,8 +3,26 @@
   "unresolved": 0,
   "targets": [
     {
+      "type": "ADOBase",
+      "member": "IsAprilFools",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "ADOBase",
+      "member": "IsHalloweenWeek",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
       "type": "ADOStartup",
       "member": "SetupLevelEventsInfo",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "AsyncInputManager",
+      "member": "ClearKeys",
       "resolved": true,
       "assembly": "Assembly-CSharp"
     },
@@ -131,6 +149,12 @@
     {
       "type": "RDInput",
       "member": "get_mouseScrollDelta",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "RDInputType_Keyboard",
+      "member": "CheckKeyState",
       "resolved": true,
       "assembly": "Assembly-CSharp"
     },
@@ -508,6 +532,12 @@
     },
     {
       "type": "scrController",
+      "member": "UpdateInput",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "scrController",
       "member": "WaitForStartCo",
       "resolved": true,
       "assembly": "Assembly-CSharp"
@@ -611,6 +641,24 @@
     {
       "type": "scrPlayer",
       "member": "Die",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "scrPlayer",
+      "member": "Simulated_PlayerControl_Update",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "scrPlayer",
+      "member": "UpdateHoldBehavior",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "scrPlayer",
+      "member": "ValidInputWasReleased",
       "resolved": true,
       "assembly": "Assembly-CSharp"
     },
