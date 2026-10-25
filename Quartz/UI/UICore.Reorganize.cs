@@ -134,18 +134,6 @@ public static partial class UICore {
         }
     }
     // Pinned in the empty right inset of every Overlay page, so it stays put while the page scrolls.
-    internal static void AddReorganizeShortcut(RectTransform page) {
-        var button = GenerateUI.Button(page, () => {
-            if(IsReorganizing) HidePanelToHub();
-            else EnterReorganize();
-        }, "Reorganize", "overlay_reorganize");
-        RectTransform r = button.Rect;
-        r.anchorMin = new(1f, 1f);
-        r.anchorMax = new(1f, 1f);
-        r.pivot = new(1f, 1f);
-        r.sizeDelta = new(160f, 50f);
-        r.anchoredPosition = new(-18f, -18f);
-    }
     public static void EnterReorganize() {
         if(IsReorganizing) return;
         IsReorganizing = true;

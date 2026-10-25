@@ -11,7 +11,6 @@ public static class PageFactory {
         unbuilt.Remove(state);
         try {
             entry.Def.Build(entry.Target);
-            if(entry.Def.CategoryKey == "overlay") UICore.AddReorganizeShortcut(entry.Target);
         } catch(Exception e) {
             string owner = entry.Def.OwnerId == null ? "UI" : "Addon:" + entry.Def.OwnerId;
             Quartz.Core.MainCore.Log.Err($"[{owner}] page '{entry.Def.Key}' build threw: {e}");
