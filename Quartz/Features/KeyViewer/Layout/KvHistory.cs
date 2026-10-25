@@ -9,11 +9,14 @@ internal sealed class KvHistory(int maxDepth = KvHistory.DefaultDepth) {
     internal bool CanUndo => past.Count > 0;
     internal bool CanRedo => future.Count > 0;
     internal int UndoDepth => past.Count;
+    // Fires per recorded step (coalesced nudges count once), so the editor can mirror it onto a shared timeline.
+    internal Action Pushed { get; set; }
     internal void Push(string snapshot) {
         if(snapshot == null) return;
         past.Add(snapshot);
         if(past.Count > depth) past.RemoveAt(0);
         future.Clear();
+        Pushed?.Invoke();
     }
     internal void PushNudge(string snapshot, float now) {
         if(now - lastNudgeAt <= NudgeCoalesceSeconds) return;

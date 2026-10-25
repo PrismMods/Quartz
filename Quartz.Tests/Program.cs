@@ -160,6 +160,7 @@ List<(string Name, Action Run)> tests = [
     ("KeyViewer editor editing after undo discards redo", KvHistoryTests.TestEditAfterUndoDiscardsRedo),
     ("KeyViewer editor history drops the oldest entry on overflow", KvHistoryTests.TestDepthDropsOldestNotNewest),
     ("KeyViewer editor held nudges coalesce into one undo step", KvHistoryTests.TestHeldNudgeCoalescesToOneStep),
+    ("Undo timeline interleaves steps and skips dead ones", UndoTimelineTests.TestInterleavedStepsUndoInOrderAndSkipDead),
     ("TUF inputs and download URLs are validated", TufSecurityTests.TestInputAndNetworkPolicy),
     ("TUF archives reject unsafe entries and select charts", TufSecurityTests.TestArchiveSafetyAndSelection),
     ("TUF archives keep the first copy of a duplicate entry", TufSecurityTests.TestDuplicateEntryKeepsFirstCopy),

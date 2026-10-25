@@ -4,6 +4,7 @@ using Quartz.Resource;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects;
 using Quartz.UI.Objects.Impl;
+using Quartz.UI.Utility;
 using UnityEngine;
 namespace Quartz.Features.KeyViewer.Editor;
 internal sealed partial class KvInspector {
@@ -66,11 +67,11 @@ internal sealed partial class KvInspector {
         snap.UpdateVisual(true);
         RectTransform view = KvToolbar.Pill(bar);
         undoButton = KvToolbar.Icon(
-            view, UISprite.TurnArrow128, "kvi_undo", canvas.Undo,
+            view, UISprite.TurnArrow128, "kvi_undo", () => UndoTimeline.Undo(),
             "DESC_KVI_UNDO", "Step back through your edits."
         );
         redoButton = KvToolbar.Icon(
-            view, UISprite.TurnArrow128, "kvi_redo", canvas.Redo,
+            view, UISprite.TurnArrow128, "kvi_redo", () => UndoTimeline.Redo(),
             "DESC_KVI_REDO", "Step forward again through the edits you undid."
         );
         KvToolbar.Icon(

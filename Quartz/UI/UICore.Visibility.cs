@@ -122,6 +122,7 @@ public static partial class UICore {
             holdingToggle = false;
         }
         if(Input.GetKeyUp(key)) holdingToggle = false;
+        if(isOpen && !editing && !Keybind.Capturing) HandleShortcuts();
         ToggleBinds.HandleUpdate();
         if(!canvasObj.activeSelf) {
             if(canvasWasVisible) {
@@ -133,6 +134,42 @@ public static partial class UICore {
         canvasWasVisible = true;
         UIObject.TickAll();
         Tooltip.Tick();
+    }
+    private static int escConsumedFrame = -1;
+    // For widgets that use Esc themselves (KeyViewer editor selection, key capture): this frame's Esc is theirs.
+    internal static void ConsumeEscape() => escConsumedFrame = Time.frameCount;
+    private static readonly List<RaycastResult> clickHits = [];
+    // A click that lands on none of our UI (handles, hub, panel) means empty screen.
+    private static bool PointerOverQuartz() {
+        EventSystem es = EventSystem.current;
+        if(es == null) return false;
+        clickHits.Clear();
+        es.RaycastAll(new PointerEventData(es) { position = Input.mousePosition }, clickHits);
+        Transform root = MainCore.Root.transform;
+        foreach(RaycastResult hit in clickHits)
+            if(hit.gameObject != null && hit.gameObject.transform.IsChildOf(root)) return true;
+        return false;
+    }
+    private static void HandleShortcuts() {
+        if(IsReorganizing && Reorganizer.Selected != null && Input.GetMouseButtonDown(0) && !PointerOverQuartz()) Reorganizer.Deselect();
+        if(Input.GetKeyDown(KeyCode.Escape)) {
+            int frame = Time.frameCount;
+            // Next pump, so a widget's Update later this frame can still claim the key.
+            MainThread.Enqueue(() => {
+                if(escConsumedFrame == frame || !isOpen) return;
+                if(IsReorganizing && !panelOverHub && Reorganizer.Selected != null) Reorganizer.Deselect();
+                else if(IsReorganizing && !panelOverHub) Close();
+                else ClosePanel();
+            });
+        }
+        bool ctrl = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)
+            || Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand);
+        if(!ctrl) return;
+        bool shift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+        if(Input.GetKeyDown(KeyCode.Z)) {
+            if(shift) UndoTimeline.Redo();
+            else UndoTimeline.Undo();
+        } else if(Input.GetKeyDown(KeyCode.Y)) UndoTimeline.Redo();
     }
     private static Vector2 GetRandomOffscreenPosition() {
         float halfW = Screen.width * 0.5f;
@@ -216,6 +253,8 @@ public static partial class UICore {
     }
     public static void Close(bool noAnimate = false) {
         if(!isOpen) return;
+        // From the hub the panel is invisible; sliding it out would flash it back in.
+        if(IsReorganizing) noAnimate = true;
         ExitReorganize();
         isOpen = false;
         LastPanelPosition = Panel.anchoredPosition;
@@ -239,9 +278,14 @@ public static partial class UICore {
             .OnComplete(() => canvasObj.SetActive(false));
         MainCore.TC.Play(panelTweener);
     }
+    // The panel's X: settings opened from the hub closes back to the hub, not out of the UI.
+    private static void ClosePanel() {
+        if(IsReorganizing && panelOverHub) HidePanelToHub();
+        else Close();
+    }
     public static void Toggle(bool noAnimate = false) {
         if(isOpen) Close(noAnimate);
-        else Open(noAnimate);
+        else OpenToHub();
     }
     public static void ResetScalePosition(bool noAnimate = false) {
         Vector2 targetSize = DefaultPanelSize;

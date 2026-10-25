@@ -210,6 +210,7 @@ public static class PageAutoDeafen {
         private void Update() {
             if(!listening) return;
             if(Input.GetKeyDown(KeyCode.Escape)) {
+                UICore.ConsumeEscape();
                 Cancel();
                 return;
             }

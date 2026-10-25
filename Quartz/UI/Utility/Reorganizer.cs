@@ -52,7 +52,7 @@ public sealed class ReorganizeHandle : MonoBehaviour {
     private void OnPointerUp(PointerEventData e) {
         if(moved) {
             moved = false;
-            OnMoved?.Invoke();
+            ReorganizeHistory.Moved(this);
         }
     }
     public static GameObject CreateDragSurface(RectTransform target, Func<string> getName, Action onMoved, bool ignoreLayout = false) {
@@ -116,7 +116,7 @@ public sealed class ReorganizeSizeGrip : MonoBehaviour {
     private void OnPointerUp(PointerEventData e) {
         if(!dragging) return;
         dragging = false;
-        if(Owner != null) Owner.OnMoved?.Invoke();
+        if(Owner != null) ReorganizeHistory.Moved(Owner);
     }
 }
 public sealed class ReorganizeGripScaler : MonoBehaviour {
@@ -167,6 +167,7 @@ public static class Reorganizer {
             Deselect();
             return;
         }
+        ReorganizeHistory.Baseline(handle);
         BuildOutline(handle.MeasureRect);
         EnsurePanel();
         nameLabel.text = handle.GetName?.Invoke() ?? handle.Target.name;
@@ -286,7 +287,7 @@ public static class Reorganizer {
         sizeSlider.OnChanged = SizeSelected;
         sizeSlider.OnComplete = v => {
             SizeSelected(v);
-            Selected?.OnMoved?.Invoke();
+            if(Selected != null) ReorganizeHistory.Moved(Selected);
         };
         panelObj.SetActive(false);
     }
@@ -323,7 +324,7 @@ public static class Reorganizer {
         slider.OnChanged = v => apply(v);
         slider.OnComplete = v => {
             apply(v);
-            Selected?.OnMoved?.Invoke();
+            if(Selected != null) ReorganizeHistory.Moved(Selected);
         };
         return slider;
     }

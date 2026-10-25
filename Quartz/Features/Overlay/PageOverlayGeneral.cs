@@ -12,12 +12,6 @@ internal static class PageOverlayGeneral {
         var headerRow = GenerateUI.Row(content.transform);
         var headerText = GenerateUI.AddTextH1(headerRow);
         headerText.gameObject.AddComponent<TextLocalization>().Init("OVERLAY_GENERAL", "General");
-        GenerateUI.Button(
-            GenerateUI.Row(content.transform),
-            () => UICore.EnterReorganize(),
-            "Reorganize",
-            "overlay_reorganize"
-        );
         OverlaySwitch.EnsureConf();
         GenerateUI.ToggleTip(
             content.transform,

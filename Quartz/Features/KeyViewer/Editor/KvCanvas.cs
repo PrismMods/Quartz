@@ -49,6 +49,7 @@ internal sealed partial class KvCanvas {
     internal event Action<KvDocument> DocumentReplaced;
     internal static KvCanvas Create(Transform parent) {
         KvCanvas c = new();
+        c.history.Pushed = () => UndoTimeline.Push(c.Undo, c.Redo);
         GameObject rootObj = new("KvCanvas");
         rootObj.transform.SetParent(parent, false);
         c.root = rootObj.AddComponent<RectTransform>();

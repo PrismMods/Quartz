@@ -81,7 +81,7 @@ public static partial class UICore {
         ResizeHandle.CreateResizeHandles(Panel, canvasObj.GetComponent<RectTransform>());
         Tooltip.Initialize(canvasObj.transform);
         UpdateToast.Initialize();
-        CreateExitReorganizeButton();
+        CreateReorganizeHub();
         _onPageSettings = state => {
             if(state == TranslationFailState.Success) PageSettings.OnTranslatorLoadEnd();
         };
@@ -111,7 +111,7 @@ public static partial class UICore {
     }
     public static void SetPanelOpacity(float value, bool save) {
         MainCore.Conf.PanelOpacity = Mathf.Clamp01(value);
-        if(panelCanvasGroup != null && !IsReorganizing) panelCanvasGroup.alpha = MainCore.Conf.PanelOpacity;
+        if(panelCanvasGroup != null && (!IsReorganizing || panelOverHub)) panelCanvasGroup.alpha = MainCore.Conf.PanelOpacity;
         if(save) MainCore.ConfMgr.RequestSave();
     }
     // Deferred one pump: handlers still pending in this event snapshot would touch destroyed UI.
@@ -175,10 +175,6 @@ public static partial class UICore {
         shellSeq = null;
         reorganizeSeq?.Kill();
         reorganizeSeq = null;
-        exitReorganizeHoldSeq?.Kill();
-        exitReorganizeHoldSeq = null;
-        exitReorganizeResetSeq?.Kill();
-        exitReorganizeResetSeq = null;
         themeImages = null;
         themeTexts = null;
         UIObject.DisposeAll();
@@ -189,6 +185,9 @@ public static partial class UICore {
         MainCore.TC.Clear();
         // The helper lives outside canvasObj, so Destroy(canvasObj) below misses it.
         DestroyFirstRunHelper();
+        // Lives on its own canvas outside canvasObj too.
+        if(reorganizeDim != null) UnityEngine.Object.Destroy(reorganizeDim);
+        reorganizeDim = null;
         FontManager.MenuRoot = null;
         UnityEngine.Object.Destroy(canvasObj);
         canvasObj = null;

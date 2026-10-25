@@ -1,5 +1,6 @@
 using Quartz.Core;
 using Quartz.Features.KeyViewer.Layout;
+using Quartz.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -33,11 +34,6 @@ internal sealed partial class KvCanvas {
     private void HandleKeyboard() {
         if(doc == null || TextInputFocused() || (InputSuppressed?.Invoke() ?? false)) return;
         if(CtrlOrCmdHeld()) {
-            if(Input.GetKeyDown(KeyCode.Z)) {
-                if(ShiftHeld()) Redo();
-                else Undo();
-                return;
-            }
             if(Input.GetKeyDown(KeyCode.C)) {
                 Copy();
                 return;
@@ -47,7 +43,8 @@ internal sealed partial class KvCanvas {
                 return;
             }
         }
-        if(Input.GetKeyDown(KeyCode.Escape)) {
+        if(Input.GetKeyDown(KeyCode.Escape) && selection.Count > 0) {
+            UICore.ConsumeEscape();
             ClearSelection();
             return;
         }
@@ -175,17 +172,20 @@ internal sealed partial class KvCanvas {
         Rebuild();
         Mutated();
     }
-    internal void Undo() {
-        if(doc == null) return;
+    // Driven by UndoTimeline (Ctrl+Z lives in UICore); false tells it this step is stale.
+    internal bool Undo() {
+        if(root == null || doc == null || !history.CanUndo) return false;
         string current = Snapshot();
-        if(current == null) return;
+        if(current == null) return false;
         Restore(history.Undo(current));
+        return true;
     }
-    internal void Redo() {
-        if(doc == null) return;
+    internal bool Redo() {
+        if(root == null || doc == null || !history.CanRedo) return false;
         string current = Snapshot();
-        if(current == null) return;
+        if(current == null) return false;
         Restore(history.Redo(current));
+        return true;
     }
     private string Snapshot() {
         try {

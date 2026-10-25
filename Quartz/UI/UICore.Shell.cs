@@ -54,12 +54,12 @@ public static partial class UICore {
     private static CanvasGroup subMenuCanvasGroup;
     private static TMP_Text menuVersionText;
     private static CanvasGroup panelCanvasGroup;
-    private static CanvasGroup exitReorganizeCanvasGroup;
+    private static CanvasGroup reorganizeHubGroup;
     private static GTween reorganizeSeq;
-    private static GTween exitReorganizeHoldSeq;
-    private static GTween exitReorganizeResetSeq;
-    private static Color exitReorganizeIdleColor;
-    private static GameObject exitReorganizeObj;
+    private static GameObject reorganizeHub;
+    private static GameObject reorganizeDim;
+    private static CanvasGroup reorganizeDimGroup;
+    private static bool panelOverHub;
     public static float PanelScale {
         get;
         set {
@@ -293,7 +293,7 @@ public static partial class UICore {
             xRect.offsetMin = new(4, 4);
             xRect.offsetMax = new(-4, -4);
             EventTrigger trigger = close.AddComponent<EventTrigger>();
-            UnityUtils.AddClickEvent(trigger, _ => Close());
+            UnityUtils.AddClickEvent(trigger, _ => ClosePanel());
             var enter = new EventTrigger.Entry {
                 eventID = EventTriggerType.PointerEnter
             };

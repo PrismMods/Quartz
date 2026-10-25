@@ -20,94 +20,110 @@ using GTweenExtensions = GTweens.Extensions.GTweenExtensions;
 using TMPro;
 namespace Quartz.UI;
 public static partial class UICore {
-    private static void CreateExitReorganizeButton() {
-        exitReorganizeObj = new GameObject("ExitReorganizeButton");
-        exitReorganizeObj.transform.SetParent(canvasObj.transform, false);
-        var rect = exitReorganizeObj.AddComponent<RectTransform>();
-        rect.anchorMin = new Vector2(1f, 0f);
-        rect.anchorMax = new Vector2(1f, 0f);
-        rect.pivot = new Vector2(1f, 0f);
-        rect.sizeDelta = new Vector2(240f, 60f);
-        rect.anchoredPosition = new Vector2(MainCore.Conf.ExitReorganizeOffsetX, MainCore.Conf.ExitReorganizeOffsetY);
-        exitReorganizeCanvasGroup = exitReorganizeObj.AddComponent<CanvasGroup>();
-        var img = exitReorganizeObj.AddComponent<Image>();
-        img.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P1024);
-        img.type = Image.Type.Sliced;
-        exitReorganizeIdleColor = Color.Lerp(UIColors.MenuHighlight, UIColors.MenuSelected, 0.5f);
-        img.color = exitReorganizeIdleColor;
-        exitReorganizeObj.AddComponent<Button>();
-        HoldToMoveHandle hold = exitReorganizeObj.AddComponent<HoldToMoveHandle>();
-        hold.Target = rect;
-        hold.Clamp = ClampExitReorganizePosition;
-        hold.OnClick = () => ExitReorganize();
-        hold.OnMoved = SaveExitReorganizePosition;
-        hold.OnReset = () => {
-            if(MainCore.Conf.MiddleClickToDefault) ResetExitReorganizePosition();
-        };
-        hold.OnHoldChanged = holding => {
-            if(img == null) return;
-            exitReorganizeHoldSeq?.Kill();
-            exitReorganizeHoldSeq = img.GTColor(holding ? UIColors.ObjectActive : exitReorganizeIdleColor, 0.16f)
-                .SetEasing(Easing.OutSine);
-            MainCore.TC.Play(exitReorganizeHoldSeq);
-        };
-        GameObject textObj = new("Text");
-        textObj.transform.SetParent(rect, false);
-        var textRect = textObj.AddComponent<RectTransform>();
-        textRect.anchorMin = Vector2.zero;
-        textRect.anchorMax = Vector2.one;
-        textRect.offsetMin = Vector2.zero;
-        textRect.offsetMax = Vector2.zero;
-        var label = textObj.AddComponent<TextMeshProUGUI>();
-        label.text = "Exit Reorganize";
-        label.font = FontManager.MenuFontAsset;
-        label.fontSize = 24f;
-        label.color = Color.white;
-        label.alignment = TextAlignmentOptions.Center;
-        label.gameObject.AddComponent<TextLocalization>()
-            .Init("EXIT_REORGANIZE", "Exit Reorganize");
-        exitReorganizeObj.transform.AddToolTip(
-            "EXIT_REORGANIZE_TIP",
-            "Hold to move this button, middle click to reset it"
-        );
-        exitReorganizeObj.SetActive(false);
+    // Lunar-style hub: the hotkey lands here in reorganize mode, and "Settings" opens the full panel.
+    private static void CreateReorganizeHub() {
+        reorganizeHub = new GameObject("ReorganizeHub");
+        reorganizeHub.transform.SetParent(canvasObj.transform, false);
+        var rect = reorganizeHub.AddComponent<RectTransform>();
+        rect.anchorMin = new Vector2(0.5f, 0.5f);
+        rect.anchorMax = new Vector2(0.5f, 0.5f);
+        rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.sizeDelta = new Vector2(260f, 250f);
+        reorganizeHubGroup = reorganizeHub.AddComponent<CanvasGroup>();
+        GameObject logo = new("Logo");
+        logo.transform.SetParent(rect, false);
+        var logoRect = logo.AddComponent<RectTransform>();
+        logoRect.anchorMin = new Vector2(0.5f, 1f);
+        logoRect.anchorMax = new Vector2(0.5f, 1f);
+        logoRect.pivot = new Vector2(0.5f, 1f);
+        logoRect.sizeDelta = new Vector2(120f, 120f);
+        logo.AddComponent<ThemeExempt>();
+        QuartzLogo.Create(logoRect);
+        GameObject wordmark = new("Wordmark");
+        wordmark.transform.SetParent(rect, false);
+        var wordmarkText = wordmark.AddComponent<TextMeshProUGUI>();
+        wordmarkText.text = Info.DisplayName.ToUpperInvariant();
+        wordmarkText.font = FontManager.GetFont(WordmarkFont);
+        wordmarkText.fontSize = 28f;
+        wordmarkText.characterSpacing = 6f;
+        wordmarkText.color = new Color(1f, 1f, 1f, 0.92f);
+        wordmarkText.alignment = TextAlignmentOptions.Center;
+        wordmarkText.raycastTarget = false;
+        wordmark.AddComponent<FontExempt>();
+        var wordmarkRect = wordmark.GetComponent<RectTransform>();
+        wordmarkRect.anchorMin = new Vector2(0f, 1f);
+        wordmarkRect.anchorMax = new Vector2(1f, 1f);
+        wordmarkRect.pivot = new Vector2(0.5f, 1f);
+        wordmarkRect.sizeDelta = new Vector2(0f, 40f);
+        wordmarkRect.anchoredPosition = new Vector2(0f, -128f);
+        var settings = GenerateUI.Button(rect, ShowPanelOverHub, "Settings", "settings");
+        var br = settings.Rect;
+        br.anchorMin = new Vector2(0.5f, 0f);
+        br.anchorMax = new Vector2(0.5f, 0f);
+        br.pivot = new Vector2(0.5f, 0f);
+        br.sizeDelta = new Vector2(240f, 56f);
+        br.anchoredPosition = new Vector2(0f, 64f);
+        var close = GenerateUI.Button(rect, () => Close(), "Close", "close").SetSecondary();
+        var cr = close.Rect;
+        cr.anchorMin = new Vector2(0.5f, 0f);
+        cr.anchorMax = new Vector2(0.5f, 0f);
+        cr.pivot = new Vector2(0.5f, 0f);
+        cr.sizeDelta = new Vector2(240f, 56f);
+        cr.anchoredPosition = Vector2.zero;
+        // Behind the panel, so "Settings" opens the panel on top of the hub.
+        reorganizeHub.transform.SetAsFirstSibling();
+        reorganizeHub.SetActive(false);
+        // Own canvas just under the overlays (32754+): dims the game, not the HUD being arranged.
+        reorganizeDim = new GameObject("QuartzReorganizeDim");
+        reorganizeDim.transform.SetParent(MainCore.Root.transform, false);
+        var dimCanvas = reorganizeDim.AddComponent<Canvas>();
+        dimCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        dimCanvas.sortingOrder = 32700;
+        reorganizeDimGroup = reorganizeDim.AddComponent<CanvasGroup>();
+        reorganizeDimGroup.blocksRaycasts = false;
+        reorganizeDimGroup.interactable = false;
+        var dim = new GameObject("Dim").AddComponent<Image>();
+        dim.transform.SetParent(reorganizeDim.transform, false);
+        dim.color = new Color(0f, 0f, 0f, 0.45f);
+        dim.raycastTarget = false;
+        var dimRect = dim.rectTransform;
+        dimRect.anchorMin = Vector2.zero;
+        dimRect.anchorMax = Vector2.one;
+        dimRect.offsetMin = Vector2.zero;
+        dimRect.offsetMax = Vector2.zero;
+        reorganizeDim.SetActive(false);
     }
-    private static Vector2 ClampExitReorganizePosition(Vector2 pos) {
-        if(canvasObj == null || exitReorganizeObj == null) return pos;
-        RectTransform canvasRect = canvasObj.GetComponent<RectTransform>();
-        if(canvasRect == null) return pos;
-        Vector2 canvasSize = canvasRect.rect.size;
-        if(canvasSize.x <= 0f || canvasSize.y <= 0f) return pos;
-        Vector2 size = ((RectTransform)exitReorganizeObj.transform).sizeDelta;
-        float minX = Mathf.Min(0f, size.x - canvasSize.x);
-        float maxY = Mathf.Max(0f, canvasSize.y - size.y);
-        return new Vector2(Mathf.Clamp(pos.x, minX, 0f), Mathf.Clamp(pos.y, 0f, maxY));
+    private static void ShowPanelOverHub() {
+        if(!IsReorganizing || Panel == null) return;
+        panelOverHub = true;
+        Panel.gameObject.SetActive(true);
+        panelCanvasGroup.interactable = true;
+        panelCanvasGroup.blocksRaycasts = true;
+        reorganizeSeq?.Kill();
+        reorganizeSeq = panelCanvasGroup.GTFade(Mathf.Clamp01(MainCore.Conf.PanelOpacity), 0.2f).SetEasing(Easing.OutSine);
+        MainCore.TC.Play(reorganizeSeq);
     }
-    private static void ApplyExitReorganizePosition() {
-        if(exitReorganizeObj == null) return;
-        RectTransform rect = (RectTransform)exitReorganizeObj.transform;
-        rect.anchoredPosition = ClampExitReorganizePosition(rect.anchoredPosition);
+    private static void HidePanelToHub() {
+        if(!IsReorganizing || Panel == null) return;
+        panelOverHub = false;
+        panelCanvasGroup.interactable = false;
+        panelCanvasGroup.blocksRaycasts = false;
+        reorganizeSeq?.Kill();
+        reorganizeSeq = GTweenSequenceBuilder.New()
+            .Join(panelCanvasGroup.GTFade(0f, 0.2f).SetEasing(Easing.OutSine))
+            .AppendCallback(() => {
+                if(IsReorganizing && !panelOverHub && Panel != null) Panel.gameObject.SetActive(false);
+            })
+            .Build();
+        MainCore.TC.Play(reorganizeSeq);
     }
-    public static void ResetExitReorganizePosition() {
-        if(exitReorganizeObj == null) return;
-        CoreSettings def = new();
-        Vector2 target = ClampExitReorganizePosition(new Vector2(def.ExitReorganizeOffsetX, def.ExitReorganizeOffsetY));
-        MainCore.Conf.ExitReorganizeOffsetX = target.x;
-        MainCore.Conf.ExitReorganizeOffsetY = target.y;
-        MainCore.ConfMgr.RequestSave();
-        RectTransform rect = (RectTransform)exitReorganizeObj.transform;
-        exitReorganizeResetSeq?.Kill();
-        exitReorganizeResetSeq = rect.GTAnchorPos(target, 0.26f).SetEasing(Easing.OutExpo);
-        MainCore.TC.Play(exitReorganizeResetSeq);
-    }
-    private static void SaveExitReorganizePosition() {
-        if(exitReorganizeObj == null) return;
-        RectTransform rect = (RectTransform)exitReorganizeObj.transform;
-        Vector2 pos = ClampExitReorganizePosition(rect.anchoredPosition);
-        rect.anchoredPosition = pos;
-        MainCore.Conf.ExitReorganizeOffsetX = pos.x;
-        MainCore.Conf.ExitReorganizeOffsetY = pos.y;
-        MainCore.ConfMgr.RequestSave();
+    [Obsolete("The movable exit button was replaced by the centred hub; this does nothing.")]
+    public static void ResetExitReorganizePosition() { }
+    internal static void OpenToHub() {
+        Open(true);
+        // Hidden before the fade so the panel doesn't flash on its way out.
+        if(panelCanvasGroup != null) panelCanvasGroup.alpha = 0f;
+        EnterReorganize();
     }
     public static event Action<bool> OnReorganizeChanged;
     private static void RaiseReorganize(bool entering) {
@@ -117,21 +133,37 @@ public static partial class UICore {
             MainCore.Log.Err($"[UI] reorganize listener threw: {e.Message}");
         }
     }
+    // Pinned in the empty right inset of every Overlay page, so it stays put while the page scrolls.
+    internal static void AddReorganizeShortcut(RectTransform page) {
+        var button = GenerateUI.Button(page, () => {
+            if(IsReorganizing) HidePanelToHub();
+            else EnterReorganize();
+        }, "Reorganize", "overlay_reorganize");
+        RectTransform r = button.Rect;
+        r.anchorMin = new(1f, 1f);
+        r.anchorMax = new(1f, 1f);
+        r.pivot = new(1f, 1f);
+        r.sizeDelta = new(160f, 50f);
+        r.anchoredPosition = new(-18f, -18f);
+    }
     public static void EnterReorganize() {
         if(IsReorganizing) return;
         IsReorganizing = true;
+        panelOverHub = false;
         RaiseReorganize(true);
         if(panelCanvasGroup != null) {
             panelCanvasGroup.interactable = false;
             panelCanvasGroup.blocksRaycasts = false;
         }
-        if(exitReorganizeObj != null) exitReorganizeObj.SetActive(true);
-        ApplyExitReorganizePosition();
-        if(exitReorganizeCanvasGroup != null) exitReorganizeCanvasGroup.alpha = 0f;
+        if(reorganizeHub != null) reorganizeHub.SetActive(true);
+        if(reorganizeHubGroup != null) reorganizeHubGroup.alpha = 0f;
+        if(reorganizeDim != null) reorganizeDim.SetActive(true);
+        if(reorganizeDimGroup != null) reorganizeDimGroup.alpha = 0f;
         reorganizeSeq?.Kill();
         reorganizeSeq = GTweenSequenceBuilder.New()
             .Join(panelCanvasGroup.GTFade(0f, 0.2f).SetEasing(Easing.OutSine))
-            .Join(exitReorganizeCanvasGroup.GTFade(1f, 0.2f).SetEasing(Easing.OutSine))
+            .Join(reorganizeHubGroup.GTFade(1f, 0.2f).SetEasing(Easing.OutSine))
+            .Join(reorganizeDimGroup.GTFade(1f, 0.2f).SetEasing(Easing.OutSine))
             .AppendCallback(() => {
                 if(IsReorganizing && Panel != null) Panel.gameObject.SetActive(false);
             })
@@ -141,6 +173,7 @@ public static partial class UICore {
     public static void ExitReorganize() {
         if(!IsReorganizing) return;
         IsReorganizing = false;
+        panelOverHub = false;
         Reorganizer.Deselect();
         RaiseReorganize(false);
         if(Panel != null) Panel.gameObject.SetActive(true);
@@ -151,79 +184,14 @@ public static partial class UICore {
         reorganizeSeq?.Kill();
         reorganizeSeq = GTweenSequenceBuilder.New()
             .Join(panelCanvasGroup.GTFade(Mathf.Clamp01(MainCore.Conf.PanelOpacity), 0.2f).SetEasing(Easing.OutSine))
-            .Join(exitReorganizeCanvasGroup.GTFade(0f, 0.2f).SetEasing(Easing.OutSine))
+            .Join(reorganizeHubGroup.GTFade(0f, 0.2f).SetEasing(Easing.OutSine))
+            .Join(reorganizeDimGroup.GTFade(0f, 0.2f).SetEasing(Easing.OutSine))
             .AppendCallback(() => {
-                if(!IsReorganizing && exitReorganizeObj != null) exitReorganizeObj.SetActive(false);
+                if(IsReorganizing) return;
+                if(reorganizeHub != null) reorganizeHub.SetActive(false);
+                if(reorganizeDim != null) reorganizeDim.SetActive(false);
             })
             .Build();
         MainCore.TC.Play(reorganizeSeq);
-    }
-}
-internal sealed class HoldToMoveHandle : MonoBehaviour {
-    private const float HoldSeconds = 0.8f;
-    public RectTransform Target;
-    public Action OnClick;
-    public Action OnMoved;
-    public Action OnReset;
-    public Action<bool> OnHoldChanged;
-    public Func<Vector2, Vector2> Clamp;
-    private bool pressed;
-    private bool holding;
-    private bool moved;
-    private float downTime;
-    private Vector2 grabOffset;
-    private void Awake() {
-        EventTrigger trigger = gameObject.AddComponent<EventTrigger>();
-        UnityUtils.AddEvent(EventTriggerType.PointerDown, OnPointerDown, trigger);
-        UnityUtils.AddEvent(EventTriggerType.Drag, OnDrag, trigger);
-        UnityUtils.AddEvent(EventTriggerType.PointerUp, OnPointerUp, trigger);
-    }
-    private void OnDisable() {
-        if(holding) OnHoldChanged?.Invoke(false);
-        pressed = false;
-        holding = false;
-        moved = false;
-    }
-    private void Update() {
-        if(!pressed || holding) return;
-        if(Time.unscaledTime - downTime < HoldSeconds) return;
-        holding = true;
-        OnHoldChanged?.Invoke(true);
-    }
-    private void OnPointerDown(PointerEventData e) {
-        if(e.button != PointerEventData.InputButton.Left || Target == null) return;
-        pressed = true;
-        holding = false;
-        moved = false;
-        downTime = Time.unscaledTime;
-        grabOffset = (Vector2)Target.position - e.position;
-    }
-    private void OnDrag(PointerEventData e) {
-        if(!pressed || !holding || Target == null) return;
-        Vector2 next = e.position + grabOffset;
-        Vector3 pos = Target.position;
-        pos.x = next.x;
-        pos.y = next.y;
-        Target.position = pos;
-        if(Clamp != null) Target.anchoredPosition = Clamp(Target.anchoredPosition);
-        moved = true;
-    }
-    private void OnPointerUp(PointerEventData e) {
-        if(e.button == PointerEventData.InputButton.Middle) {
-            if(UnityUtils.ReleasedInside(e, transform)) OnReset?.Invoke();
-            return;
-        }
-        if(!pressed) return;
-        pressed = false;
-        bool wasHolding = holding;
-        bool wasMoved = moved;
-        holding = false;
-        moved = false;
-        if(wasHolding) OnHoldChanged?.Invoke(false);
-        if(wasMoved) {
-            OnMoved?.Invoke();
-            return;
-        }
-        if(!wasHolding && UnityUtils.ReleasedInside(e, transform)) OnClick?.Invoke();
     }
 }
