@@ -48,7 +48,7 @@ internal static class PageProfiles {
             br.anchorMin = new(1f, 1f);
             br.anchorMax = new(1f, 1f);
             br.sizeDelta = new(160f, 50f);
-            br.offsetMax = Vector2.zero;
+            br.anchoredPosition = Vector2.zero;
         }
         addBtn.Rect.AddToolTip(
             "DESC_PROFILE_ADD",

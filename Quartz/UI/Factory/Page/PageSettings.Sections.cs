@@ -75,7 +75,7 @@ internal static partial class PageSettings {
             br.anchorMin = new(1f, 1f);
             br.anchorMax = new(1f, 1f);
             br.sizeDelta = new(114f, 50f);
-            br.offsetMax = Vector2.zero;
+            br.anchoredPosition = Vector2.zero;
         }
         langBtn.Label.gameObject.AddComponent<TextLocalization>().Init("RELOAD", "Reload");
     }

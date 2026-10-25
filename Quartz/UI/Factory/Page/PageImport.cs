@@ -43,7 +43,7 @@ internal static class PageImport {
             br.anchorMin = new(1f, 1f);
             br.anchorMax = new(1f, 1f);
             br.sizeDelta = new(160f, 50f);
-            br.offsetMax = Vector2.zero;
+            br.anchoredPosition = Vector2.zero;
         }
         rescanBtn.Rect.AddToolTip("DESC_IMPORT_RESCAN", "Re-scan for supported mods loaded through Unity Mod Manager.");
         var statusRow = GenerateUI.Row(content.transform, 32f);
