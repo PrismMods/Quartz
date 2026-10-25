@@ -524,6 +524,13 @@
     "HELP": "帮助",
     "REORGANIZE_ROTATION": "旋转",
     "DESC_KEYVIEWER_EDITOR_TAB_DUPLICATE": "将正在编辑的手键标签页连同其中所有元素复制到新标签页。",
-    "DESC_KEYVIEWER_EDITOR_FOOT_DUPLICATE": "将当前打开的脚键标签页连同其中所有元素复制到新的脚键标签页。"
+    "DESC_KEYVIEWER_EDITOR_FOOT_DUPLICATE": "将当前打开的脚键标签页连同其中所有元素复制到新的脚键标签页。",
+    "FONT_DEFAULT_OF": "默认（{0}）",
+    "FONT_OVERLAY": "字体",
+    "FONT_OVERLAY_GLOBAL": "全局字体（{0}）",
+    "FONT_SCALE": "字体大小",
+    "FONT_LINE_SPACING": "行距",
+    "DESC_FONT_SCALE": "所选字体的大小倍率。自定义字体显示得比其他字体小时使用。每个字体单独保存。",
+    "DESC_FONT_LINE_SPACING": "所选字体的行高倍率。每个字体单独保存。"
   }
 }

@@ -28,6 +28,7 @@ public static partial class KeyViewerOverlay {
         scaler.referenceResolution = new Vector2(1920, 1080);
         scaler.matchWidthOrHeight = 0.5f;
         raycaster = canvasObj.AddComponent<GraphicRaycaster>();
+        canvasObj.AddComponent<OverlayFontScope>().Key = FontKey;
         raycaster.enabled = false;
         GameObject gridObj = new("KeyViewerGrid");
         gridObj.transform.SetParent(canvasObj.transform, false);

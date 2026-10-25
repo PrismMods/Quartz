@@ -1,4 +1,7 @@
 using UnityEngine;
 namespace Quartz.Resource;
-// Texts under this inside the settings window preview an overlay, so they take the overlay font, not the menu font.
-internal sealed class OverlayFontScope : MonoBehaviour { }
+// Marks an overlay's texts (or a settings-window preview of them) so they take that overlay's font, not the menu font.
+internal sealed class OverlayFontScope : MonoBehaviour {
+    // FontManager.For key; null follows the global font.
+    public string Key;
+}

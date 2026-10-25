@@ -18,6 +18,8 @@ public sealed class CoreSettings : ISettingsFile {
     public float FontJudgementSize = 1f;
     public string SettingsFontName = "";
     public Dictionary<string, (float Scale, float LineSpacing)> FontAdjust = [];
+    // Overlay key to font name; a missing key follows FontName.
+    public Dictionary<string, string> OverlayFonts = [];
     public float ScrollSpeed = 80f;
     public float FpsRefreshInterval = 0f;
     public float PanelOpacity = 1.0f;
@@ -68,6 +70,8 @@ public sealed class CoreSettings : ISettingsFile {
         JObject fontAdjust = [];
         foreach(var kvp in FontAdjust)
             fontAdjust[kvp.Key] = new JArray(kvp.Value.Scale, kvp.Value.LineSpacing);
+        JObject overlayFonts = [];
+        foreach(var kvp in OverlayFonts) overlayFonts[kvp.Key] = kvp.Value;
         return new JObject {
             [nameof(Active)] = Active,
             [nameof(Language)] = Language,
@@ -83,6 +87,7 @@ public sealed class CoreSettings : ISettingsFile {
             [nameof(FontJudgementSize)] = FontJudgementSize,
             [nameof(SettingsFontName)] = SettingsFontName,
             [nameof(FontAdjust)] = fontAdjust,
+            [nameof(OverlayFonts)] = overlayFonts,
             [nameof(ScrollSpeed)] = ScrollSpeed,
             [nameof(FpsRefreshInterval)] = FpsRefreshInterval,
             [nameof(PanelOpacity)] = PanelOpacity,
@@ -174,6 +179,11 @@ public sealed class CoreSettings : ISettingsFile {
                     FontAdjust[prop.Name] = (pair[0].Value<float>(), pair[1].Value<float>());
                 } catch(Exception e) { Diag.Warn(e, "Settings/FontAdjust:" + prop.Name); }
             }
+        }
+        OverlayFonts.Clear();
+        if(token[nameof(OverlayFonts)] is JObject overlayFonts) {
+            foreach(var prop in overlayFonts.Properties())
+                if(prop.Value.Type == JTokenType.String && !string.IsNullOrEmpty((string)prop.Value)) OverlayFonts[prop.Name] = (string)prop.Value;
         }
         AccentR = IOUtils.Read(token, nameof(AccentR), AccentR);
         AccentG = IOUtils.Read(token, nameof(AccentG), AccentG);

@@ -11,6 +11,7 @@ using Object = UnityEngine.Object;
 using TMPro;
 namespace Quartz.Features.KeyViewer;
 public static partial class KeyViewerOverlay {
+    public const string FontKey = "keyviewer";
     public static SettingsFile<KeyViewerSettings> ConfMgr { get; private set; }
     public static KeyViewerSettings Conf => ConfMgr?.Data;
     private const float KeyW = 50f;

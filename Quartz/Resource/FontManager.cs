@@ -120,7 +120,7 @@ public static partial class FontManager {
     public static IReadOnlyList<string> GetAvailableFonts() {
         if(available != null) return available;
         EnsureScanned();
-        var list = new List<string> { DefaultName };
+        var list = new List<string> { DefaultName, GameFontName };
         list.AddRange(fontFiles.Keys
             .Where(n => !string.Equals(n, DefaultFontFile, StringComparison.OrdinalIgnoreCase))
             .OrderBy(n => n, StringComparer.OrdinalIgnoreCase));
@@ -259,6 +259,11 @@ public static partial class FontManager {
             if(!string.IsNullOrEmpty(replacement)) conf.FontAdjust[replacement] = adjust;
             MainCore.ConfMgr.RequestSave();
         }
+        foreach(string key in conf.OverlayFonts.Where(p => p.Value == oldName).Select(p => p.Key).ToList()) {
+            if(string.IsNullOrEmpty(replacement)) conf.OverlayFonts.Remove(key);
+            else conf.OverlayFonts[key] = replacement;
+            MainCore.ConfMgr.RequestSave();
+        }
         if(string.Equals(conf.SettingsFontName, oldName, StringComparison.OrdinalIgnoreCase)) {
             conf.SettingsFontName = replacement;
             ApplyMenuFont();
@@ -312,6 +317,7 @@ public static partial class FontManager {
         else MainCore.Conf.FontAdjust[name] = (scale, lineSpacing);
         TMP_FontAsset asset = name == UiDefault ? uiFont
             : name == DefaultName ? defaultFont
+            : name == GameFontName ? gameFont
             : cache.TryGetValue(name, out var c) ? c : null;
         if(asset == null) return;
         ApplyAdjust(asset, name);
@@ -347,7 +353,7 @@ public static partial class FontManager {
         for(int i = 0; i < texts.Length; i++) {
             TMP_Text text = texts[i];
             if(text == null || text.GetComponent<FontExempt>() != null) continue;
-            text.font = IsMenuText(text, menuRoot) ? menuFont : Current;
+            text.font = IsMenuText(text, menuRoot) ? menuFont : FontFor(text);
         }
     }
     private static bool IsMenuText(TMP_Text text, Transform menuRoot) =>
@@ -364,7 +370,7 @@ public static partial class FontManager {
         for(int i = 0; i < texts.Length; i++) {
             TMP_Text text = texts[i];
             if(text == null || text.GetComponent<FontExempt>() != null) continue;
-            text.font = IsMenuText(text, menuRoot) ? menuFont : Current;
+            text.font = IsMenuText(text, menuRoot) ? menuFont : FontFor(text);
             text.ForceMeshUpdate(false, true);
         }
     }
@@ -413,6 +419,7 @@ public static partial class FontManager {
     }
     private static TMP_FontAsset Resolve(string name) {
         if(string.IsNullOrEmpty(name) || name == DefaultName || name == AddSentinel) return DefaultFont;
+        if(name == GameFontName) return GameFont();
         if(cache.TryGetValue(name, out TMP_FontAsset cached)) return cached;
         EnsureScanned();
         if(!fontFiles.TryGetValue(name, out string path)) return null;
@@ -439,6 +446,7 @@ public static partial class FontManager {
     public static void Dispose() {
         foreach(TMP_FontAsset asset in cache.Values) DestroyFontAsset(asset);
         cache.Clear();
+        DisposeGameFont();
         baseFaces.Clear();
         foreach(Font font in sourceFonts) if(font != null) UnityEngine.Object.Destroy(font);
         sourceFonts.Clear();

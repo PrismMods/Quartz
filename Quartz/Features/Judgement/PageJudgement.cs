@@ -34,6 +34,7 @@ internal static class PageJudgement {
         GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(sec.Body)), "HEADING_LAYOUT", "Layout");
         OverlayAnchors.Dropdown(sec.Body, (OverlayAnchor)def.Anchor, OverlayAnchors.Parse(conf.Anchor),
             JudgementOverlay.SetAnchor, "judgement_anchor");
+        OverlayFontPicker.Dropdown(sec.Body, JudgementOverlay.FontKey, "judgement_font");
         GenerateUI.SnapSlider(sec.Body, "Size", "judgement_size",
             def.Size, 0.3f, 3f, conf.Size, "0.00 x", 0.01f,
             v => conf.Size = v, Apply, Save);

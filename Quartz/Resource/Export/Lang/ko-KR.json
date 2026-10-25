@@ -151,6 +151,8 @@
     "FONT_ADD": "＋  내 폰트 추가…",
     "FONT_ADDED": "'{0}' 추가했어요.",
     "FONT_DEFAULT_OF": "기본 ({0})",
+    "FONT_OVERLAY": "폰트",
+    "FONT_OVERLAY_GLOBAL": "전역 폰트 ({0})",
     "FONT_DELETE": "삭제",
     "FONT_DELETED": "'{0}' 삭제했어요.",
     "FONT_DELETE_CONFIRM": "삭제할까요?",

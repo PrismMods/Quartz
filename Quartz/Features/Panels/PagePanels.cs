@@ -1,4 +1,5 @@
 using Quartz.Core;
+using Quartz.Overlay;
 using Quartz.Resource;
 using Quartz.Tween;
 using Quartz.UI.Generator;
@@ -24,6 +25,7 @@ internal static partial class PagePanels {
         var headerRow = GenerateUI.Row(content.transform);
         var headerText = GenerateUI.AddTextH1(headerRow);
         GenerateUI.Localize(headerText, "SECTION_PANELS", "Panels");
+        OverlayFontPicker.Dropdown(content.transform, PanelsOverlay.FontKey, "panels_font");
         GenerateUI.Button(
             GenerateUI.Row(content.transform),
             () => {

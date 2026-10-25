@@ -151,6 +151,8 @@
     "FONT_ADD": "＋  Add custom font…",
     "FONT_ADDED": "Added '{0}'.",
     "FONT_DEFAULT_OF": "Default ({0})",
+    "FONT_OVERLAY": "Font",
+    "FONT_OVERLAY_GLOBAL": "Global font ({0})",
     "FONT_DELETE": "Delete",
     "FONT_DELETED": "Deleted '{0}'.",
     "FONT_DELETE_CONFIRM": "Sure?",

@@ -36,6 +36,7 @@ public static class PageSongTitle {
         );
         OverlayAnchors.Dropdown(sec.Body, (OverlayAnchor)def.Anchor, OverlayAnchors.Parse(conf.Anchor),
             SongTitleOverlay.SetAnchor, "songtitle_anchor");
+        OverlayFontPicker.Dropdown(sec.Body, SongTitleOverlay.FontKey, "songtitle_font");
         GenerateUI.SnapSlider(sec.Body, "Font Size", "songtitle_fontsize",
             def.FontSize, 12f, 120f, conf.FontSize, "0 px", 1f,
             v => conf.FontSize = v, Apply, Save);

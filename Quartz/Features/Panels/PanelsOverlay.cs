@@ -14,6 +14,7 @@ using Quartz.Overlay;
 using Quartz.Features.Overlay;
 namespace Quartz.Features.Panels;
 public static partial class PanelsOverlay {
+    public const string FontKey = "panels";
     public static SettingsFile<PanelsSettings> ConfMgr { get; private set; }
     public static PanelsSettings Conf => ConfMgr?.Data;
     [Obsolete("The overlay master switch moved to Quartz.Features.Overlay.OverlaySwitch.Enabled.")]
@@ -198,6 +199,7 @@ public static partial class PanelsOverlay {
         if(canvasObj != null) return;
         EnsureConf();
         canvasObj = UnityUtils.CreateOverlayCanvas("QuartzPanelsCanvas", root.transform, 32760, out raycaster);
+        canvasObj.AddComponent<OverlayFontScope>().Key = FontKey;
         BuildPanels();
         updater = canvasObj.AddComponent<Updater>();
         gateWant = true;
@@ -247,7 +249,7 @@ public static partial class PanelsOverlay {
         if(p?.Config == null) return;
         if(p.Rect != null) p.Rect.localEulerAngles = new Vector3(0f, 0f, p.Config.Rotation);
         if(p.Text != null) {
-            p.Text.font = FontManager.Current;
+            p.Text.font = FontManager.For(FontKey);
             p.Text.fontSize = p.Config.FontSize;
             p.Text.color = p.Config.GetTextColor();
             p.Text.lineSpacing = p.Config.LineSpacing;
@@ -315,7 +317,7 @@ public static partial class PanelsOverlay {
         textRect.offsetMin = new Vector2(PadX, PadY);
         textRect.offsetMax = new Vector2(-PadX, -PadY);
         TextMeshProUGUI text = textObj.AddComponent<TextMeshProUGUI>();
-        text.font = FontManager.Current;
+        text.font = FontManager.For(FontKey);
         text.alignment = anchor.x switch {
             0f => TextAlignmentOptions.TopLeft,
             1f => TextAlignmentOptions.TopRight,

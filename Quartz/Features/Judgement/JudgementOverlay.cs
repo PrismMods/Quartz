@@ -16,6 +16,7 @@ using Quartz.Overlay;
 using Quartz.Features.Overlay;
 namespace Quartz.Features.Judgement;
 public static class JudgementOverlay {
+    public const string FontKey = "judgement";
     public static SettingsFile<JudgementSettings> ConfMgr { get; private set; }
     public static JudgementSettings Conf => ConfMgr.Data;
     private const float BaseFontSize = 38f;
@@ -79,6 +80,7 @@ public static class JudgementOverlay {
         EnsureConf();
         compact = Conf.CompactRow;
         canvasObj = UnityUtils.CreateOverlayCanvas("QuartzJudgementCanvas", rootObject.transform, 32756, out raycaster);
+        canvasObj.AddComponent<OverlayFontScope>().Key = FontKey;
         GameObject rowObj = new("JudgementRow");
         rowObj.transform.SetParent(canvasObj.transform, false);
         root = rowObj.AddComponent<RectTransform>();
@@ -113,7 +115,7 @@ public static class JudgementOverlay {
             obj.transform.SetParent(rowObj.transform, false);
             obj.AddComponent<RectTransform>();
             TextMeshProUGUI text = obj.AddComponent<TextMeshProUGUI>();
-            text.font = FontManager.Current;
+            text.font = FontManager.For(FontKey);
             text.alignment = TextAlignmentOptions.Center;
             text.color = Judgement.SlotColors[i];
             text.raycastTarget = false;
@@ -142,7 +144,7 @@ public static class JudgementOverlay {
         labelObj.transform.SetParent(rowObj.transform, false);
         labelObj.AddComponent<RectTransform>();
         rowLabel = labelObj.AddComponent<TextMeshProUGUI>();
-        rowLabel.font = FontManager.Current;
+        rowLabel.font = FontManager.For(FontKey);
         rowLabel.alignment = TextAlignmentOptions.Center;
         rowLabel.richText = true;
         rowLabel.raycastTarget = false;
@@ -185,7 +187,7 @@ public static class JudgementOverlay {
         obj.transform.SetParent(root, false);
         obj.AddComponent<RectTransform>();
         TextMeshProUGUI text = obj.AddComponent<TextMeshProUGUI>();
-        text.font = FontManager.Current;
+        text.font = FontManager.For(FontKey);
         text.alignment = TextAlignmentOptions.Center;
         text.color = color;
         text.raycastTarget = false;
@@ -250,7 +252,7 @@ public static class JudgementOverlay {
                 Conf.OffsetX = stored.x;
                 Conf.OffsetY = stored.y - BottomMargin;
             }
-            TMP_FontAsset font = FontManager.Current;
+            TMP_FontAsset font = FontManager.For(FontKey);
             float fontSize = FontSize();
             if(compact) UpdateCompact(font, fontSize);
             else UpdateMultiLabel(font, fontSize);

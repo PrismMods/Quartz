@@ -12,6 +12,7 @@ using Object = UnityEngine.Object;
 using Quartz.Features.Overlay;
 namespace Quartz.Features.Practice;
 public static class PracticeOverlay {
+    public const string FontKey = "practice";
     private static PracticeSettings Conf => PracticeDifficulty.Conf;
     private static GameObject canvasObj;
     private static GraphicRaycaster raycaster;
@@ -41,6 +42,7 @@ public static class PracticeOverlay {
         if(canvasObj != null) return;
         PracticeDifficulty.EnsureConf();
         canvasObj = UnityUtils.CreateOverlayCanvas("QuartzPracticeCanvas", rootObject.transform, 32754, out raycaster);
+        canvasObj.AddComponent<OverlayFontScope>().Key = FontKey;
         GameObject holder = new("PracticeRoot");
         holder.transform.SetParent(canvasObj.transform, false);
         root = holder.AddComponent<RectTransform>();
@@ -54,7 +56,7 @@ public static class PracticeOverlay {
         labelRect.anchorMax = new Vector2(0.5f, 1f);
         labelRect.pivot = new Vector2(0.5f, 1f);
         text = label.AddComponent<TextMeshProUGUI>();
-        text.font = FontManager.Current;
+        text.font = FontManager.For(FontKey);
         text.alignment = TextAlignmentOptions.Top;
         text.raycastTarget = false;
         TextCompat.NoWrap(text);
@@ -80,7 +82,7 @@ public static class PracticeOverlay {
         root.localScale = Vector3.one * Mathf.Max(0.01f, Conf.MasterSize);
         root.localEulerAngles = new Vector3(0f, 0f, Conf.Rotation);
         if(text == null) return;
-        text.font = FontManager.Current;
+        text.font = FontManager.For(FontKey);
         text.fontSize = Mathf.Clamp(Conf.FontSize, 4f, 200f);
         text.color = Conf.GetColor();
     }
@@ -142,7 +144,7 @@ public static class PracticeOverlay {
                 Conf.OffsetX = stored.x;
                 Conf.OffsetY = stored.y;
             }
-            TMP_FontAsset font = FontManager.Current;
+            TMP_FontAsset font = FontManager.For(FontKey);
             if(text.font != font) text.font = font;
             int difficulty = PracticeDifficulty.CurrentDifficulty;
             int pending = PracticeDifficulty.PendingDifficulty;

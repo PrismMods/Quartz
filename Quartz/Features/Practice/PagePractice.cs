@@ -1,4 +1,5 @@
 using Quartz.Core;
+using Quartz.Overlay;
 using Quartz.Resource;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
@@ -19,6 +20,7 @@ public static class PagePractice {
             "Bind a key to a difficulty and a pitch. Both land between attempts, never mid-run: difficulty is held until the current attempt ends, and pitch is written into the level's own Pitch setting once, exactly as if you typed it in. The readout shows anything still queued with an arrow.",
             18f
         ));
+        OverlayFontPicker.Dropdown(sec.Body, PracticeOverlay.FontKey, "practice_font");
         GameObject list = new("PracticeBindings");
         list.transform.SetParent(sec.Body, false);
         list.AddComponent<RectTransform>();

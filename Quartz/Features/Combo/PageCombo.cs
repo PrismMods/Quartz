@@ -39,6 +39,7 @@ internal static class PageCombo {
         }
         OverlayAnchors.Dropdown(sec.Body, (OverlayAnchor)def.Anchor, OverlayAnchors.Parse(conf.Anchor),
             ComboOverlay.SetAnchor, "combo_anchor");
+        OverlayFontPicker.Dropdown(sec.Body, ComboOverlay.FontKey, "combo_font");
         GenerateUI.SnapSlider(sec.Body, "Font Size", "combo_fontsize",
             def.FontSize, 24f, 120f, conf.FontSize, "0 px", 1f,
             v => conf.FontSize = v, Apply, Save);

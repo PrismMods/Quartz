@@ -14,6 +14,7 @@ using Quartz.Overlay;
 using Quartz.Features.Overlay;
 namespace Quartz.Features.Combo;
 public static class ComboOverlay {
+    public const string FontKey = "combo";
     public static SettingsFile<ComboSettings> ConfMgr { get; private set; }
     public static ComboSettings Conf => ConfMgr.Data;
     private static GameObject canvasObj;
@@ -58,6 +59,7 @@ public static class ComboOverlay {
         if(canvasObj != null) return;
         EnsureConf();
         canvasObj = UnityUtils.CreateOverlayCanvas("QuartzComboCanvas", rootObject.transform, 32757, out raycaster);
+        canvasObj.AddComponent<OverlayFontScope>().Key = FontKey;
         GameObject rootObj = new("ComboRoot");
         rootObj.transform.SetParent(canvasObj.transform, false);
         root = rootObj.AddComponent<RectTransform>();
@@ -82,7 +84,7 @@ public static class ComboOverlay {
         obj.transform.SetParent(parent, false);
         obj.AddComponent<RectTransform>();
         TextMeshProUGUI text = obj.AddComponent<TextMeshProUGUI>();
-        text.font = FontManager.Current;
+        text.font = FontManager.For(FontKey);
         text.color = Color.white;
         text.raycastTarget = false;
         text.text = "";
@@ -122,7 +124,7 @@ public static class ComboOverlay {
         ? OverlayLayout.BottomEdge(ProgressBarBandId, NoProgressBarBand) + VerticalGap
         : 0f;
     private static void ApplyFont() {
-        TMP_FontAsset font = FontManager.Current;
+        TMP_FontAsset font = FontManager.For(FontKey);
         if(valueText != null) valueText.font = font;
         if(captionText != null) captionText.font = font;
     }
@@ -235,7 +237,7 @@ public static class ComboOverlay {
                 Conf.OffsetX = stored.x;
                 Conf.OffsetY = GetOffsetYFromPosition(stored.y);
             }
-            TMP_FontAsset font = FontManager.Current;
+            TMP_FontAsset font = FontManager.For(FontKey);
             bool fontChanged = false;
             if(valueText.font != font) {
                 valueText.font = font;

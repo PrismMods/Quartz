@@ -124,7 +124,7 @@ public static partial class PanelsOverlay {
                 p.Dirty = false;
                 return;
             }
-            TMP_FontAsset font = FontManager.Current;
+            TMP_FontAsset font = FontManager.For(FontKey);
             bool fontChanged = p.Text.font != font;
             if(fontChanged) p.Text.font = font;
             if(fontChanged || p.Dirty || body != p.LastBody) {

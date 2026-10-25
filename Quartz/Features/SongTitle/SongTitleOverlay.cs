@@ -17,6 +17,7 @@ using Quartz.Overlay;
 using Quartz.Features.Overlay;
 namespace Quartz.Features.SongTitle;
 public static class SongTitleOverlay {
+    public const string FontKey = "songtitle";
     public static SettingsFile<SongTitleSettings> ConfMgr { get; private set; }
     public static SongTitleSettings Conf => ConfMgr.Data;
     private static GameObject canvasObj;
@@ -69,6 +70,7 @@ public static class SongTitleOverlay {
         if(canvasObj != null) return;
         EnsureConf();
         canvasObj = UnityUtils.CreateOverlayCanvas("QuartzSongTitleCanvas", rootObject.transform, 32756, out raycaster);
+        canvasObj.AddComponent<OverlayFontScope>().Key = FontKey;
         GameObject titleObj = new("SongTitle");
         titleObj.transform.SetParent(canvasObj.transform, false);
         root = titleObj.AddComponent<RectTransform>();
@@ -76,7 +78,7 @@ public static class SongTitleOverlay {
         labelObj.transform.SetParent(root, false);
         labelObj.AddComponent<RectTransform>();
         text = labelObj.AddComponent<TextMeshProUGUI>();
-        text.font = FontManager.Current;
+        text.font = FontManager.For(FontKey);
         text.raycastTarget = false;
         TextCompat.NoWrap(text);
         text.text = "";
@@ -104,7 +106,7 @@ public static class SongTitleOverlay {
         if(text != null) {
             OverlayAnchors.Pin(text.rectTransform, anchor);
             text.alignment = OverlayAnchors.TextAlign(anchor);
-            text.font = FontManager.Current;
+            text.font = FontManager.For(FontKey);
             text.fontSize = Mathf.Clamp(Conf.FontSize, 4f, 400f);
             text.color = Conf.GetColor();
             ApplyShadow();
@@ -237,7 +239,7 @@ public static class SongTitleOverlay {
                 Conf.OffsetX = stored.x;
                 Conf.OffsetY = stored.y;
             }
-            TMP_FontAsset font = FontManager.Current;
+            TMP_FontAsset font = FontManager.For(FontKey);
             if(text.font != font) {
                 text.font = font;
                 ApplyShadow();

@@ -168,7 +168,7 @@ public static partial class KeyViewerOverlay {
             }
             nextKpsSample = now + 0.05f;
         }
-        TMP_FontAsset font = FontManager.Current;
+        TMP_FontAsset font = FontManager.For(FontKey);
         bool syncFont = !ReferenceEquals(font, lastSyncedFont);
         if(syncFont) lastSyncedFont = font;
         float displayDelay = dmKeyDisplayDelayMs / 1000f;

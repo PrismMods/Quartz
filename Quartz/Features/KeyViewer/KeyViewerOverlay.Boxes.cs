@@ -135,7 +135,7 @@ public static partial class KeyViewerOverlay {
         obj.transform.SetParent(parent, false);
         obj.AddComponent<RectTransform>();
         TextMeshProUGUI tmp = obj.AddComponent<TextMeshProUGUI>();
-        tmp.font = FontManager.Current;
+        tmp.font = FontManager.For(FontKey);
         tmp.fontSize = fontSize;
         tmp.alignment = TextAlignmentOptions.Center;
         TextCompat.NoWrap(tmp);
