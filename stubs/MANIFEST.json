@@ -1024,10 +1024,8 @@
       {
         "type": "PlanetarySystem",
         "members": [
-          "System.Boolean PlanetarySystem::isCW",
           "System.Collections.Generic.List\u00601\u003CscrPlanet\u003E PlanetarySystem::allPlanets",
           "System.Collections.Generic.List\u00601\u003CscrPlanet\u003E PlanetarySystem::planetList",
-          "System.Double PlanetarySystem::speed",
           "scrPlanet PlanetarySystem::planetBlue",
           "scrPlanet PlanetarySystem::planetRed"
         ]
@@ -1806,13 +1804,8 @@
         "members": [
           "PlanetRenderer scrPlanet::planetRenderer",
           "PlanetarySystem scrPlanet::planetarySystem",
-          "System.Double scrPlanet::cachedAngle",
-          "System.Double scrPlanet::get_targetExitAngle()",
-          "System.Double scrPlanet::targetExitAngle()",
           "System.Int32 scrPlanet::planetIndex",
           "System.Single scrPlanet::basePlanetScale",
-          "scrConductor scrPlanet::conductor()",
-          "scrConductor scrPlanet::get_conductor()",
           "scrPlanet scrPlanet::SwitchChosen(System.Nullable\u00601\u003CSystem.Int64\u003E)",
           "scrPlayer scrPlanet::player"
         ]
@@ -2154,7 +2147,6 @@
           "Newtonsoft.Json.Linq.JToken Newtonsoft.Json.Linq.JToken::ReadFrom(Newtonsoft.Json.JsonReader)",
           "Newtonsoft.Json.Linq.JToken Newtonsoft.Json.Linq.JToken::get_Item(System.Object)",
           "Newtonsoft.Json.Linq.JToken Newtonsoft.Json.Linq.JToken::op_Implicit(System.Boolean)",
-          "Newtonsoft.Json.Linq.JToken Newtonsoft.Json.Linq.JToken::op_Implicit(System.Double)",
           "Newtonsoft.Json.Linq.JToken Newtonsoft.Json.Linq.JToken::op_Implicit(System.Int32)",
           "Newtonsoft.Json.Linq.JToken Newtonsoft.Json.Linq.JToken::op_Implicit(System.Int64)",
           "Newtonsoft.Json.Linq.JToken Newtonsoft.Json.Linq.JToken::op_Implicit(System.Single)",
@@ -2165,7 +2157,6 @@
           "System.Boolean Newtonsoft.Json.Linq.JToken::get_HasValues()",
           "System.Boolean Newtonsoft.Json.Linq.JToken::op_Explicit(Newtonsoft.Json.Linq.JToken)",
           "System.Int32 Newtonsoft.Json.Linq.JToken::op_Explicit(Newtonsoft.Json.Linq.JToken)",
-          "System.Int64 Newtonsoft.Json.Linq.JToken::op_Explicit(Newtonsoft.Json.Linq.JToken)",
           "System.Nullable\u00601\u003CSystem.Boolean\u003E Newtonsoft.Json.Linq.JToken::op_Explicit(Newtonsoft.Json.Linq.JToken)",
           "System.Object Newtonsoft.Json.Linq.JToken::ToObject(System.Type)",
           "System.Single Newtonsoft.Json.Linq.JToken::op_Explicit(Newtonsoft.Json.Linq.JToken)",
@@ -2740,6 +2731,7 @@
           "UnityEngine.Transform TMPro.TMP_Text::transform()",
           "UnityEngine.Vector2 TMPro.TMP_Text::GetPreferredValues()",
           "UnityEngine.Vector2 TMPro.TMP_Text::GetPreferredValues(System.String)",
+          "UnityEngine.Vector2 TMPro.TMP_Text::GetPreferredValues(System.String,System.Single,System.Single)",
           "UnityEngine.Vector4 TMPro.TMP_Text::get_margin()",
           "UnityEngine.Vector4 TMPro.TMP_Text::margin()"
         ]
@@ -3745,19 +3737,8 @@
       {
         "type": "UnityEngine.LineRenderer",
         "members": [
-          "System.Boolean UnityEngine.LineRenderer::loop()",
-          "System.Boolean UnityEngine.LineRenderer::useWorldSpace()",
-          "System.Int32 UnityEngine.LineRenderer::positionCount()",
-          "System.Single UnityEngine.LineRenderer::endWidth()",
-          "System.Single UnityEngine.LineRenderer::startWidth()",
-          "System.Void UnityEngine.LineRenderer::SetPosition(System.Int32,UnityEngine.Vector3)",
           "System.Void UnityEngine.LineRenderer::set_endColor(UnityEngine.Color)",
-          "System.Void UnityEngine.LineRenderer::set_endWidth(System.Single)",
-          "System.Void UnityEngine.LineRenderer::set_loop(System.Boolean)",
-          "System.Void UnityEngine.LineRenderer::set_positionCount(System.Int32)",
           "System.Void UnityEngine.LineRenderer::set_startColor(UnityEngine.Color)",
-          "System.Void UnityEngine.LineRenderer::set_startWidth(System.Single)",
-          "System.Void UnityEngine.LineRenderer::set_useWorldSpace(System.Boolean)",
           "UnityEngine.Color UnityEngine.LineRenderer::endColor()",
           "UnityEngine.Color UnityEngine.LineRenderer::get_endColor()",
           "UnityEngine.Color UnityEngine.LineRenderer::get_startColor()",
@@ -3993,7 +3974,6 @@
           "System.Int32 UnityEngine.Renderer::sortingLayerID()",
           "System.Int32 UnityEngine.Renderer::sortingOrder()",
           "System.Void UnityEngine.Renderer::set_enabled(System.Boolean)",
-          "System.Void UnityEngine.Renderer::set_material(UnityEngine.Material)",
           "System.Void UnityEngine.Renderer::set_sortingLayerID(System.Int32)",
           "System.Void UnityEngine.Renderer::set_sortingOrder(System.Int32)",
           "UnityEngine.Material UnityEngine.Renderer::get_material()",
@@ -5262,6 +5242,7 @@
           "System.Single UnityEngine.UI.LayoutElement::flexibleHeight()",
           "System.Single UnityEngine.UI.LayoutElement::flexibleWidth()",
           "System.Single UnityEngine.UI.LayoutElement::get_flexibleWidth()",
+          "System.Single UnityEngine.UI.LayoutElement::get_minHeight()",
           "System.Single UnityEngine.UI.LayoutElement::get_minWidth()",
           "System.Single UnityEngine.UI.LayoutElement::get_preferredHeight()",
           "System.Single UnityEngine.UI.LayoutElement::get_preferredWidth()",
@@ -5548,11 +5529,13 @@
         "members": [
           "System.Boolean UnityEngine.CanvasGroup::blocksRaycasts()",
           "System.Boolean UnityEngine.CanvasGroup::get_blocksRaycasts()",
+          "System.Boolean UnityEngine.CanvasGroup::ignoreParentGroups()",
           "System.Boolean UnityEngine.CanvasGroup::interactable()",
           "System.Single UnityEngine.CanvasGroup::alpha()",
           "System.Single UnityEngine.CanvasGroup::get_alpha()",
           "System.Void UnityEngine.CanvasGroup::set_alpha(System.Single)",
           "System.Void UnityEngine.CanvasGroup::set_blocksRaycasts(System.Boolean)",
+          "System.Void UnityEngine.CanvasGroup::set_ignoreParentGroups(System.Boolean)",
           "System.Void UnityEngine.CanvasGroup::set_interactable(System.Boolean)"
         ]
       },

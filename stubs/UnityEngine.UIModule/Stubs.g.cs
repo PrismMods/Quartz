@@ -26,8 +26,8 @@ namespace UnityEngine {
     public sealed unsafe partial class CanvasGroup : global::UnityEngine.Behaviour {
         public float alpha { get => throw null; set { } }
         public bool blocksRaycasts { get => throw null; set { } }
-        public bool interactable { get => throw null; set { } }
         public bool ignoreParentGroups { get => throw null; set { } }
+        public bool interactable { get => throw null; set { } }
         private CanvasGroup() { }
     }
     public sealed unsafe partial class CanvasRenderer : global::UnityEngine.Component {

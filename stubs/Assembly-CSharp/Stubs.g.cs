@@ -397,11 +397,9 @@ public unsafe partial class PlanetSprite : global::ADOBase {
 }
 public unsafe partial class PlanetarySystem : global::ADOBase {
     public global::System.Collections.Generic.List<global::scrPlanet> allPlanets;
-    public bool isCW;
     public global::scrPlanet planetBlue;
     public global::System.Collections.Generic.List<global::scrPlanet> planetList;
     public global::scrPlanet planetRed;
-    public double speed;
     protected PlanetarySystem() { }
     public enum DeathAnimation : int {
         Explode = 0,
@@ -995,13 +993,10 @@ public unsafe partial class scrParticleDecoration : global::scrDecoration {
 }
 public unsafe partial class scrPlanet : global::ADOBase {
     public const float basePlanetScale = 78f;
-    public double cachedAngle;
     public int planetIndex;
     public global::PlanetRenderer planetRenderer;
     public global::PlanetarySystem planetarySystem;
     public global::scrPlayer player;
-    public global::scrConductor conductor { get => throw null; }
-    public double targetExitAngle { get => throw null; }
     public global::scrPlanet SwitchChosen(global::System.Nullable<long> hitTick) => throw null;
     protected scrPlanet() { }
 }

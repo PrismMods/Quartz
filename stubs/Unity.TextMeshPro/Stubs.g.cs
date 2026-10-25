@@ -241,6 +241,7 @@ namespace TMPro {
         public virtual void ForceMeshUpdate(bool ignoreActiveState = default, bool forceTextReparsing = default) => throw null;
         public global::UnityEngine.Vector2 GetPreferredValues() => throw null;
         public global::UnityEngine.Vector2 GetPreferredValues(string text) => throw null;
+        public global::UnityEngine.Vector2 GetPreferredValues(string text, float width, float height) => throw null;
         public void SetText(char[] sourceText, int start, int length) => throw null;
         public virtual void UpdateMeshPadding() => throw null;
         public virtual void UpdateVertexData(global::TMPro.TMP_VertexDataUpdateFlags flags) => throw null;

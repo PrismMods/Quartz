@@ -181,17 +181,15 @@ namespace Newtonsoft.Json.Linq {
         public object ToObject(global::System.Type objectType) => throw null;
         public string ToString(global::Newtonsoft.Json.Formatting formatting, params global::Newtonsoft.Json.JsonConverter[] converters) => throw null;
         public virtual T Value<T>(object key) => throw null;
-        public static explicit operator int(global::Newtonsoft.Json.Linq.JToken value) => throw null;
-        public static explicit operator long(global::Newtonsoft.Json.Linq.JToken value) => throw null;
-        public static explicit operator bool(global::Newtonsoft.Json.Linq.JToken value) => throw null;
         public static explicit operator float(global::Newtonsoft.Json.Linq.JToken value) => throw null;
+        public static explicit operator bool(global::Newtonsoft.Json.Linq.JToken value) => throw null;
         public static explicit operator string(global::Newtonsoft.Json.Linq.JToken value) => throw null;
+        public static explicit operator int(global::Newtonsoft.Json.Linq.JToken value) => throw null;
         public static explicit operator global::System.Nullable<bool>(global::Newtonsoft.Json.Linq.JToken value) => throw null;
         public static implicit operator global::Newtonsoft.Json.Linq.JToken(bool value) => throw null;
         public static implicit operator global::Newtonsoft.Json.Linq.JToken(string value) => throw null;
         public static implicit operator global::Newtonsoft.Json.Linq.JToken(float value) => throw null;
         public static implicit operator global::Newtonsoft.Json.Linq.JToken(int value) => throw null;
-        public static implicit operator global::Newtonsoft.Json.Linq.JToken(double value) => throw null;
         public static implicit operator global::Newtonsoft.Json.Linq.JToken(long value) => throw null;
         protected JToken() { }
         global::System.Collections.Generic.IEnumerator<global::Newtonsoft.Json.Linq.JToken> global::System.Collections.Generic.IEnumerable<global::Newtonsoft.Json.Linq.JToken>.GetEnumerator() => throw null;
