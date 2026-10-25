@@ -70,7 +70,7 @@ static class FeatureDefaultsTests {
     public static void TestFreshInstallUsesEachFeaturesDefault() {
         Assert(FeatureDefaults.FreshDefault("keyviewer"), "a default-on feature starts on");
         Assert(FeatureDefaults.FreshDefault("tweaks"), "a feature with no master toggle starts on");
-        Assert(!FeatureDefaults.FreshDefault("discord") && !FeatureDefaults.FreshDefault("uihider"),
+        Assert(!FeatureDefaults.FreshDefault("tilearc") && !FeatureDefaults.FreshDefault("uihider"),
             "a default-off feature starts off");
         Assert(FeatureDefaults.FreshDefault("some-new-feature"), "a feature with no rule starts on");
     }

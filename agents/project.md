@@ -146,7 +146,7 @@ Most features live under `Quartz/Features/<Name>/` and commonly have:
 - `<Feature>Overlay.cs` — UI shown during gameplay/editor.
 - `Page<Feature>.cs` — the feature's settings page, in the feature folder and namespace.
 
-Every file's namespace matches its folder (`Quartz/Features/KeyViewer/Editor/` is `Quartz.Features.KeyViewer.Editor`). Exceptions: `Quartz/GTweens` (vendored), `Discord/Api/IsExternalInit.cs` (compiler polyfill), and the `[Obsolete]` forwarding shim `Game/Stats/LegacyStatusShim.cs` (`Quartz.Features.Status`).
+Every file's namespace matches its folder (`Quartz/Features/KeyViewer/Editor/` is `Quartz.Features.KeyViewer.Editor`). Exceptions: `Quartz/GTweens` (vendored), and the `[Obsolete]` forwarding shim `Game/Stats/LegacyStatusShim.cs` (`Quartz.Features.Status`).
 
 Current feature areas include:
 

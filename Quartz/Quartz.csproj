@@ -284,7 +284,6 @@
 	<ItemGroup>
 		<EmbeddedResource Include="Features\*\Lang\*.json" />
 		<EmbeddedResource Include="Features\KeyLimiter\Assets\*.png" />
-		<EmbeddedResource Include="Features\Discord\voice-natives.json" />
 		<Reference Include="System.IO.Compression.FileSystem"><HintPath>$(ManagedDir)/System.IO.Compression.FileSystem.dll</HintPath></Reference>
 		<!-- Key viewer JS runtime: compiled against the vendored DLLs, byte-loaded at
 		     runtime from these resources by KvJsAssemblies (the payload is byte-loaded

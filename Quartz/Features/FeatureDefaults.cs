@@ -36,7 +36,6 @@ public static class FeatureDefaults {
         new Rule { Id = "optimizer", FileName = "Optimizer.json" },
         new Rule { Id = "editor", FileName = "Editor.json" },
         new Rule { Id = "tuf", FileName = "TUF/Settings.json" },
-        new Rule { Id = "discord", FileName = "Discord.json", Field = "Enabled", Default = false },
         new Rule { Id = "tilearc", FileName = "TileArc.json", Field = "Enabled", Default = false },
     ];
     public sealed class Plan {

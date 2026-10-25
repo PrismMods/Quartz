@@ -57,17 +57,6 @@
 		<Compile Include="../Quartz/Plugins/PluginImage.cs" Link="Source/PluginImage.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvMigrationPlan.cs" Link="Source/KvMigrationPlan.cs" />
 		<Compile Include="../Quartz/Features/Tuf/TufThumbnail.cs" Link="Source/TufThumbnail.cs" />
-		<Compile Include="../Quartz/Features/Discord/Api/IsExternalInit.cs" Link="Source/DiscordIsExternalInit.cs" />
-		<Compile Include="../Quartz/Features/Discord/Api/DiscordModels.cs" Link="Source/DiscordModels.cs" />
-		<Compile Include="../Quartz/Features/Discord/Api/DiscordPermissions.cs" Link="Source/DiscordPermissions.cs" />
-		<Compile Include="../Quartz/Features/Discord/Api/Der.cs" Link="Source/DiscordDer.cs" />
-		<Compile Include="../Quartz/Features/Discord/Api/TokenBox.cs" Link="Source/DiscordTokenBox.cs" />
-		<Compile Include="../Quartz/Features/Discord/Api/RsaOaep.cs" Link="Source/DiscordRsaOaep.cs" />
-		<Compile Include="../Quartz/Features/Discord/Api/RsaKeys.cs" Link="Source/DiscordRsaKeys.cs" />
-		<Compile Include="../Quartz/Features/Discord/Api/QrCode.cs" Link="Source/DiscordQrCode.cs" />
-		<Compile Include="../Quartz/Features/Discord/Api/Markdown.cs" Link="Source/DiscordMarkdown.cs" />
-		<Compile Include="../Quartz/Features/Discord/Api/Json.cs" Link="Source/DiscordJson.cs" />
-		<Compile Include="../Quartz/Features/Discord/Api/VoiceManifest.cs" Link="Source/DiscordVoiceManifest.cs" />
 
 		<!-- The late-binding layer. Refl.cs is deliberately free of game types so it
 		     can be linked here; the one member that needs the game's assembly

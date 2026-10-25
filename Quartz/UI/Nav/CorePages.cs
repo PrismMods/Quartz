@@ -38,8 +38,6 @@ internal static class CorePages {
         Category("others", "Others", "OTHERS", UISprite.Grid128, 75, togglable: true);
         Category("tuf", "TUF", "TUF", UISprite.Planet128, 76,
             visible: static () => CoreNav && Quartz.Features.FeatureCategories.IsEnabled("others"));
-        Category("discord", "Discord", "DISCORD", UISprite.Message128, 77,
-            visible: static () => CoreNav && Quartz.Features.FeatureCategories.IsEnabled("others"));
         Category("search", "Search", "SEARCH", UISprite.MagnifyingGlass128, 80, visible: static () => CoreNav);
         Category("profiles", "Profiles", "PROFILES", UISprite.Users128, 90, visible: static () => CoreNav);
         Category("import", "Import", "IMPORT", UISprite.Book128, 100, visible: static () => CoreNav);

@@ -32,7 +32,7 @@ public static class AutoDeafen {
         Application.platform == RuntimePlatform.WindowsPlayer
         || Application.platform == RuntimePlatform.WindowsEditor;
     public static string EffectiveMode =>
-        Conf != null && Conf.IsDiscord ? AutoDeafenSettings.ModeDiscord
+        Conf != null && Conf.IsDiscord && VoiceDeafen.Registered ? AutoDeafenSettings.ModeDiscord
         : ShortcutSupported && Conf != null && Conf.IsShortcut ? AutoDeafenSettings.ModeShortcut
         : AutoDeafenSettings.ModeBot;
     public static string Status {

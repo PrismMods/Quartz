@@ -1,3 +1,4 @@
+using Quartz.Game;
 using Quartz.Core;
 using Quartz.Resource;
 using Quartz.UI.Generator;
@@ -29,9 +30,7 @@ public static class PageAutoDeafen {
             GenerateUI.Row(sec.Body),
             AutoDeafen.ShortcutSupported ? AutoDeafenSettings.ModeShortcut : AutoDeafenSettings.ModeBot,
             AutoDeafen.EffectiveMode,
-            AutoDeafen.ShortcutSupported
-                ? new[] { AutoDeafenSettings.ModeShortcut, AutoDeafenSettings.ModeBot, AutoDeafenSettings.ModeDiscord }
-                : new[] { AutoDeafenSettings.ModeBot, AutoDeafenSettings.ModeDiscord },
+            ModeOptions(),
             m => m == AutoDeafenSettings.ModeShortcut ? MainCore.Tr.Get("AD_MODE_SHORTCUT", "Shortcut")
                 : m == AutoDeafenSettings.ModeDiscord ? MainCore.Tr.Get("AD_MODE_DISCORD", "Discord Login")
                 : MainCore.Tr.Get("AD_MODE_BOT", "Bot"),
@@ -95,6 +94,14 @@ public static class PageAutoDeafen {
         var statusRow = GenerateUI.Row(sec.Body);
         var statusText = GenerateUI.AddMutedText(statusRow, 19f, 0.6f);
         statusRow.gameObject.AddComponent<AutoDeafenStatusLabel>().Label = statusText;
+    }
+    // Discord-login mode needs a voice source (an addon) registered with VoiceDeafen; Quartz no longer ships one.
+    private static string[] ModeOptions() {
+        List<string> modes = [];
+        if(AutoDeafen.ShortcutSupported) modes.Add(AutoDeafenSettings.ModeShortcut);
+        modes.Add(AutoDeafenSettings.ModeBot);
+        if(VoiceDeafen.Registered) modes.Add(AutoDeafenSettings.ModeDiscord);
+        return [.. modes];
     }
     private static void CreateAutoDeafenShortcut(Transform body, AutoDeafenSettings conf) {
         GenerateUI.AddLocalizedMutedText(
