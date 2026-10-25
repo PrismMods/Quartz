@@ -1,13 +1,12 @@
 using Quartz.Compat.Game;
 using Quartz.Core;
 using Quartz.Features.Interop;
-using Quartz.Features.Restriction;
 using Quartz.Resource;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using Quartz.UI.Utility;
 using UnityEngine;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.Restriction;
 public static class PageRestriction {
     public static void JudgementPage(RectTransform parent) =>
         CreateJudgementRestriction(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));

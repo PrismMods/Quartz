@@ -3,7 +3,7 @@ using Quartz.Features.KeyViewer.Layout;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-namespace Quartz.UI.Editor;
+namespace Quartz.Features.KeyViewer.Editor;
 internal sealed partial class KvCanvas {
     private const float NudgeRepeatDelay = 0.4f;
     private const float NudgeRepeatInterval = 0.05f;

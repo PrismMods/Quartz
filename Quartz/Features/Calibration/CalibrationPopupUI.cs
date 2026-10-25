@@ -2,7 +2,6 @@ using GTweens.Builders;
 using GTweens.Easings;
 using GTweens.Tweens;
 using Quartz.Core;
-using Quartz.Features.Calibration;
 using Quartz.Resource;
 using Quartz.Tween;
 using Quartz.UI.Generator;
@@ -15,7 +14,8 @@ using static UnityEngine.EventSystems.PointerEventData;
 using Object = UnityEngine.Object;
 using TMPro;
 using Quartz.Compat.Game;
-namespace Quartz.UI;
+using Quartz.UI;
+namespace Quartz.Features.Calibration;
 public static class CalibrationPopupUI {
     private const float WIDTH = 460f;
     private const float HEIGHT = 210f;

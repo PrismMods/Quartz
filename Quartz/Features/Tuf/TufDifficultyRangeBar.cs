@@ -1,5 +1,4 @@
 using Quartz.Core;
-using Quartz.Features.Tuf;
 using Quartz.Localization;
 using Quartz.Resource;
 using Quartz.Tween;
@@ -11,7 +10,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-namespace Quartz.UI.Factory.Page;
+using Quartz.UI;
+namespace Quartz.Features.Tuf;
 internal sealed class TufDifficultyRangeBar : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler {
     private static readonly Color[] QuantumStops = {
         new Color32(255, 255, 255, 255), new Color32(241, 161, 5, 255), new Color32(235, 123, 41, 255),

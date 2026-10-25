@@ -1,11 +1,10 @@
 using Quartz.Core;
-using Quartz.Features.UiHider;
 using Quartz.Resource;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using Quartz.UI.Utility;
 using UnityEngine;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.UiHider;
 public static class PageUiHider {
     public static void Create(RectTransform parent) =>
         CreateUiHiding(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));

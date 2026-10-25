@@ -1,7 +1,7 @@
 using Quartz.Features.KeyViewer.Layout;
 using UnityEngine;
 using UnityEngine.UI;
-namespace Quartz.UI.Editor;
+namespace Quartz.Features.KeyViewer.Editor;
 internal sealed class KvGrid : MaskableGraphic {
     private const float MinScreenPitch = 5f;
     private float pitch = -1f;

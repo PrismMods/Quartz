@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using Newtonsoft.Json.Linq;
-using static Quartz.Features.Discord.Json;
-namespace Quartz.Features.Discord;
+using static Quartz.Features.Discord.Api.Json;
+namespace Quartz.Features.Discord.Api;
 public sealed class VoiceNativePackage {
     public string Name = "";
     public string Url = "";

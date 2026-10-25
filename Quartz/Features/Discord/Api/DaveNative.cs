@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 using Quartz.Core;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public static class DaveNative {
     public enum MediaType { Audio = 0, Video = 1 }
     public enum Codec { Unknown = 0, Opus = 1, Vp8 = 2, Vp9 = 3, H264 = 4, H265 = 5, Av1 = 6 }

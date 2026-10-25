@@ -1,5 +1,5 @@
 using System.Text;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public static class QrCode {
     private static readonly int[] CapacityL = [0, 17, 32, 53, 78, 106, 134, 154, 192, 230, 271];
     private static readonly int[] TotalCodewords = [0, 26, 44, 70, 100, 134, 172, 196, 242, 292, 346];

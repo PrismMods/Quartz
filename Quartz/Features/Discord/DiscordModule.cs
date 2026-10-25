@@ -1,6 +1,6 @@
 using Quartz.Game;
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
+using Quartz.Features.Discord.Api;
 namespace Quartz.Features.Discord;
 [Feature("discord", "others", 10, "Discord", "SECTION_DISCORD")]
 public sealed class DiscordModule : QuartzFeature {

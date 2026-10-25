@@ -1,9 +1,8 @@
 using Quartz.Core;
-using Quartz.Features.Optimizer;
 using Quartz.UI.Factory;
 using Quartz.UI.Generator;
 using UnityEngine;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.Optimizer;
 public static class PageOptimizer {
     public static void Create(RectTransform parent) {
         RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);

@@ -5,8 +5,8 @@ using Quartz.UI;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using Quartz.Overlay;
 using Quartz.Features.KeyViewer.Js;
+using Quartz.Features.Overlay;
 namespace Quartz.Features.KeyViewer;
 public static partial class KeyViewerOverlay {
     private sealed class Updater : MonoBehaviour {

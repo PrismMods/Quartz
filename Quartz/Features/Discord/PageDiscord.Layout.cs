@@ -1,12 +1,12 @@
 using Quartz.Core;
 using Quartz.Resource;
-using Quartz.Features.Discord;
 using Quartz.UI.Generator;
 using Quartz.UI.Utility;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-namespace Quartz.UI.Factory.Page;
+using Quartz.Features.Discord.Api;
+namespace Quartz.Features.Discord;
 public static partial class PageDiscord {
     private static RectTransform Node(Transform parent, string name) {
         GameObject obj = new(name);

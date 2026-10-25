@@ -1,9 +1,8 @@
-using Quartz.Features.Editor;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using Quartz.UI.Utility;
 using UnityEngine;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.Editor;
 internal static partial class PageEditor {
     public static void TileReadoutPage(RectTransform parent) {
         EditorFeature.EnsureConf();

@@ -1,6 +1,6 @@
 using Quartz.Features.KeyViewer.Layout;
 using UnityEngine;
-namespace Quartz.UI.Editor;
+namespace Quartz.Features.KeyViewer.Editor;
 internal sealed partial class KvCanvas {
     internal Func<bool> InputSuppressed { get; set; }
     internal void AddElement(KvElement el) {

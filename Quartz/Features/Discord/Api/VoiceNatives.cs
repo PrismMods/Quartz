@@ -1,7 +1,7 @@
 using System.IO.Compression;
 using System.Runtime.InteropServices;
 using Quartz.Core;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public static class VoiceNatives {
     private const string ManifestResource = "Quartz.Features.Discord.voice-natives.json";
     private const string StageFolder = ".quartz-voice-tmp";

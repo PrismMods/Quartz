@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 using Quartz.IO;
 using Quartz.IO.Interface;
 using UnityEngine;
-namespace Quartz.Overlay;
+namespace Quartz.Features.Overlay;
 public sealed class OverlaySettings : ISettingsFile {
     public bool Enabled = true;
     public bool PopEnabled;

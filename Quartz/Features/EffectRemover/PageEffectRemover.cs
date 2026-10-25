@@ -1,11 +1,11 @@
 using Quartz.Core;
-using Quartz.Features.EffectRemover;
 using Quartz.Resource;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using Quartz.UI.Utility;
 using UnityEngine;
-namespace Quartz.UI.Factory.Page;
+using Quartz.UI;
+namespace Quartz.Features.EffectRemover;
 public static class PageEffectRemover {
     public static void Create(RectTransform parent) =>
         CreateEffectRemover(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));

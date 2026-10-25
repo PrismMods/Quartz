@@ -1,5 +1,5 @@
 using UnityEngine;
-namespace Quartz.UI.Editor;
+namespace Quartz.Features.KeyViewer.Editor;
 internal sealed class KvSplit : MonoBehaviour {
     internal RectTransform Pane;
     internal RectTransform CanvasHost;

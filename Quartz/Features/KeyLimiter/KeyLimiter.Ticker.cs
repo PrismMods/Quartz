@@ -11,7 +11,7 @@ public static partial class KeyLimiter {
         private bool wasCapturing;
         private void Update() {
             InPlayerControl();
-            ChatterBlocker.ChatterBlocker.SampleInjectedKeyReleases();
+            ChatterBlocker.SampleInjectedKeyReleases();
             if(!IsCapturing) {
                 wasCapturing = false;
                 if(prevHeld.Count > 0) prevHeld.Clear();

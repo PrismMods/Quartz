@@ -1,13 +1,12 @@
 using Quartz.Core;
-using Quartz.Features.KeyViewer;
 using Quartz.Features.KeyViewer.Layout;
 using Quartz.Resource;
-using Quartz.UI.Editor;
 using Quartz.UI.Objects.Impl;
 using Quartz.UI.Utility;
 using TMPro;
 using UnityEngine;
-namespace Quartz.UI.Factory.Page;
+using Quartz.Features.KeyViewer.Editor;
+namespace Quartz.Features.KeyViewer;
 internal static partial class PageKeyViewer {
     private static Action AppendTabStrip(
         RectTransform bar, KvCanvas canvas,

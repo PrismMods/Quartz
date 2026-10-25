@@ -3,7 +3,7 @@ using Quartz.Async;
 using Quartz.Core;
 using Quartz.Resource;
 using UnityEngine;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public static class ImageCache {
     private const int MaxEntries = 48;
     private const int MaxBytes = 8 * 1024 * 1024;

@@ -1,8 +1,7 @@
-using Quartz.Features.KeyViewer;
 using Quartz.UI.Generator;
 using Quartz.UI.Utility;
 using UnityEngine;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.KeyViewer;
 internal static partial class PageKeyViewer {
     public static void AppendTo(Transform content, UIScrollController pageScroll = null) {
         KeyViewerOverlay.EnsureConf();

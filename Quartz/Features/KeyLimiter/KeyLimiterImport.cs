@@ -18,13 +18,13 @@ public sealed class KeyLimiterImport : IImportHandler {
             count++;
         }
         if(source.TryExtra(ImportKeys.ChatterThresholdMs, out int threshold)) {
-            ChatterBlocker.ChatterBlocker.EnsureConf();
-            ChatterBlocker.ChatterBlocker.Conf.ThresholdMs = Mathf.Max(0, threshold);
+            ChatterBlocker.EnsureConf();
+            ChatterBlocker.Conf.ThresholdMs = Mathf.Max(0, threshold);
             count++;
         }
         if(source.TryExtra(ImportKeys.ChatterEnabled, out bool chatterOn)) {
-            ChatterBlocker.ChatterBlocker.EnsureConf();
-            ChatterBlocker.ChatterBlocker.Conf.Enabled = chatterOn;
+            ChatterBlocker.EnsureConf();
+            ChatterBlocker.Conf.Enabled = chatterOn;
             count++;
         }
         return count;
@@ -32,13 +32,13 @@ public sealed class KeyLimiterImport : IImportHandler {
     private static int ApplyV1(ImportSource source) {
         int count = 0;
         if(source.TryBool("KCBOn", out bool chatterOn)) {
-            ChatterBlocker.ChatterBlocker.EnsureConf();
-            ChatterBlocker.ChatterBlocker.Conf.Enabled = chatterOn;
+            ChatterBlocker.EnsureConf();
+            ChatterBlocker.Conf.Enabled = chatterOn;
             count++;
         }
         if(source.TryFloat("KCBThresholdMs", out float threshold)) {
-            ChatterBlocker.ChatterBlocker.EnsureConf();
-            ChatterBlocker.ChatterBlocker.Conf.ThresholdMs = Mathf.Max(0f, threshold);
+            ChatterBlocker.EnsureConf();
+            ChatterBlocker.Conf.ThresholdMs = Mathf.Max(0f, threshold);
             count++;
         }
         if(source.TryBool("KeyLimiterOn", out bool limiterOn)) {
@@ -54,8 +54,8 @@ public sealed class KeyLimiterImport : IImportHandler {
         return count;
     }
     public void Refresh() {
-        ChatterBlocker.ChatterBlocker.EnsureConf();
-        ChatterBlocker.ChatterBlocker.Save();
+        ChatterBlocker.EnsureConf();
+        ChatterBlocker.Save();
         KeyLimiter.EnsureConf();
         KeyLimiter.Save();
     }

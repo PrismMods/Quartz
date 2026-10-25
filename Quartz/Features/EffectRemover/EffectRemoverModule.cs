@@ -1,4 +1,3 @@
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
 namespace Quartz.Features.EffectRemover;
 [Feature("effectremover", "visuals", 10, "Effect Remover", "SECTION_EFFECT_REMOVER")]

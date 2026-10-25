@@ -5,7 +5,6 @@ using Quartz.Game.Stats;
 using Quartz.IO;
 using Quartz.Overlay;
 using Quartz.Resource;
-using Quartz.UI;
 using Quartz.UI.Utility;
 using UnityEngine;
 using UnityEngine.UI;

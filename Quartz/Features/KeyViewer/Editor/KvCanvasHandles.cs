@@ -1,7 +1,8 @@
 using Quartz.Features.KeyViewer.Layout;
 using UnityEngine;
 using UnityEngine.UI;
-namespace Quartz.UI.Editor;
+using Quartz.UI;
+namespace Quartz.Features.KeyViewer.Editor;
 internal sealed partial class KvCanvas {
     private const float HandleCorner = 10f;
     private const float HandleEdgeThick = 8f;

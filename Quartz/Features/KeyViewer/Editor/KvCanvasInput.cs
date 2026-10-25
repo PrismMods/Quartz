@@ -2,7 +2,7 @@ using Quartz.Core;
 using Quartz.Features.KeyViewer.Layout;
 using UnityEngine;
 using UnityEngine.EventSystems;
-namespace Quartz.UI.Editor;
+namespace Quartz.Features.KeyViewer.Editor;
 internal sealed class KvCanvasDriver : MonoBehaviour, IPointerDownHandler, IPointerUpHandler {
     internal KvCanvas Owner;
     private void Update() => Owner?.Tick();

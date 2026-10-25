@@ -1,6 +1,5 @@
 using Quartz.Overlay;
 using Quartz.Core;
-using Quartz.Features.Panels;
 using Quartz.Resource;
 using Quartz.Tween;
 using Quartz.UI;
@@ -11,7 +10,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Quartz.Compat.Game;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.Panels;
 internal static partial class PagePanels {
     private sealed class StatColorBody {
         public RectTransform Rect;

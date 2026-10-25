@@ -1,11 +1,11 @@
 using Quartz.Overlay;
 using Quartz.Core;
-using Quartz.Features.ProgressBar;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using TMPro;
 using UnityEngine;
-namespace Quartz.UI.Factory.Page;
+using Quartz.UI;
+namespace Quartz.Features.ProgressBar;
 internal static class PageProgressBar {
     public static void AppendTo(Transform content) {
         ProgressBarOverlay.EnsureConf();

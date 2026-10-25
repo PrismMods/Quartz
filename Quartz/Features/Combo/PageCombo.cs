@@ -1,5 +1,4 @@
 using Quartz.Core;
-using Quartz.Features.Combo;
 using Quartz.Features.Interop;
 using Quartz.Overlay;
 using Quartz.Resource;
@@ -7,7 +6,7 @@ using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using TMPro;
 using UnityEngine;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.Combo;
 internal static class PageCombo {
     public static void AppendTo(Transform content) {
         ComboOverlay.EnsureConf();

@@ -1,5 +1,4 @@
 using Quartz.Core;
-using Quartz.Features.KeyViewer;
 using Quartz.Features.KeyViewer.Layout;
 using Quartz.Resource;
 using Quartz.UI.Utility;
@@ -7,7 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
-namespace Quartz.UI.Editor;
+namespace Quartz.Features.KeyViewer.Editor;
 internal sealed partial class KvCanvas {
     private sealed class Visual {
         internal KvElement El;

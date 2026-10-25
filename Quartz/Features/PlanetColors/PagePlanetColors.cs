@@ -1,13 +1,12 @@
 using Quartz.Compat.Game;
 using Quartz.Core;
-using Quartz.Features.PlanetColors;
 using Quartz.Resource;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using Quartz.UI.Utility;
 using TMPro;
 using UnityEngine;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.PlanetColors;
 public static class PagePlanetColors {
     public static void Create(RectTransform parent) =>
         CreatePlanetColors(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));

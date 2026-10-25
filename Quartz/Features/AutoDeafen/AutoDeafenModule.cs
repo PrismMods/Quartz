@@ -1,4 +1,3 @@
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
 namespace Quartz.Features.AutoDeafen;
 [Feature("autodeafen", "gameplay", 50, "Auto Deafen", "SECTION_AUTO_DEAFEN_DISCORD")]

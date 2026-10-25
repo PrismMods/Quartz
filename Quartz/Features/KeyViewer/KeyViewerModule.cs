@@ -1,5 +1,4 @@
 using Quartz.Features.KeyViewer.Js;
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
 namespace Quartz.Features.KeyViewer;
 [Feature("keyviewer", "overlay", 20, "Key Viewer", "SECTION_KEY_VIEWER", Deps = new[] { "overlay" })]

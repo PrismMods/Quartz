@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 using Quartz.Core;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public static class RsaKeys {
     public const int RequiredBits = 2048;
     public static RSA Create2048() {

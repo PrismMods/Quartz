@@ -1,4 +1,3 @@
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
 namespace Quartz.Features.HideJudgements;
 [Feature("hidejudgements", "visuals", 20, "Hide Judgements", "SECTION_HIDE_JUDGEMENTS")]

@@ -1,13 +1,12 @@
 using Quartz.Core;
-using Quartz.Features.KeyViewer;
 using Quartz.Features.KeyViewer.Js;
-using Quartz.UI.Editor;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using TMPro;
 using UnityEngine;
 
-namespace Quartz.UI.Factory.Page;
+using Quartz.Features.KeyViewer.Editor;
+namespace Quartz.Features.KeyViewer;
 
 internal static partial class PageKeyViewer {
     private static Action AppendJsPlugins(RectTransform body, KeyViewerSettings conf, bool compact) {

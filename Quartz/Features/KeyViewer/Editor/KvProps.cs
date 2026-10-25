@@ -1,9 +1,8 @@
 using System.Globalization;
 using Newtonsoft.Json.Linq;
-using Quartz.Features.KeyViewer;
 using UnityEngine;
 using Quartz.Core;
-namespace Quartz.UI.Editor;
+namespace Quartz.Features.KeyViewer.Editor;
 internal static class KvProps {
     internal static float Float(JObject o, string key, float fallback) {
         JToken t = o?[key];

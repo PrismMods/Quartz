@@ -11,12 +11,13 @@ using UnityEngine.UI;
 using Object = UnityEngine.Object;
 using TMPro;
 using Quartz.Overlay;
+using Quartz.Features.Overlay;
 namespace Quartz.Features.Panels;
 public static partial class PanelsOverlay {
     public static SettingsFile<PanelsSettings> ConfMgr { get; private set; }
     public static PanelsSettings Conf => ConfMgr?.Data;
-    [Obsolete("The overlay master switch moved to Quartz.Overlay.OverlaySwitch.Enabled.")]
-    public static bool IsEnabled => Quartz.Overlay.OverlaySwitch.Enabled;
+    [Obsolete("The overlay master switch moved to Quartz.Features.Overlay.OverlaySwitch.Enabled.")]
+    public static bool IsEnabled => Quartz.Features.Overlay.OverlaySwitch.Enabled;
     public sealed class StatDef {
         public string Id;
         public string Label;

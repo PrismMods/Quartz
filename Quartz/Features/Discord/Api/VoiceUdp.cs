@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Quartz.Core;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public sealed class VoiceUdp : IDisposable {
     public const string PreferredMode = "aead_xchacha20_poly1305_rtpsize";
     private const int HeaderSize = 12;

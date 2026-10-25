@@ -1,5 +1,4 @@
 using Quartz.Core;
-using Quartz.Features.KeyViewer;
 using Quartz.Resource;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects;
@@ -9,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.EventSystems.PointerEventData;
 using TMPro;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.KeyViewer;
 internal static partial class PageKeyViewer {
     public static void Create(RectTransform parent) {
         RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(

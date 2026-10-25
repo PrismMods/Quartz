@@ -1,4 +1,3 @@
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
 namespace Quartz.Features.UiHider;
 [Feature("uihider", "visuals", 60, "UI Hiding", "SECTION_UI_HIDING")]

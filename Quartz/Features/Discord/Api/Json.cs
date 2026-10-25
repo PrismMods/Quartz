@@ -2,7 +2,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Quartz.Core;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public static class Json {
     public static JToken Parse(string text) {
         using StringReader source = new(text);

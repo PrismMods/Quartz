@@ -1,11 +1,10 @@
 using Quartz.Core;
-using Quartz.Features.KeyViewer;
-using Quartz.UI.Editor;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using TMPro;
 using UnityEngine;
-namespace Quartz.UI.Factory.Page;
+using Quartz.Features.KeyViewer.Editor;
+namespace Quartz.Features.KeyViewer;
 internal static partial class PageKeyViewer {
     private static UIToggle DmToggle(
         RectTransform body, bool compact, bool def, bool value, Action<bool> onChanged, string text, string id

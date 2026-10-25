@@ -1,4 +1,4 @@
-namespace Quartz.UI.Editor;
+namespace Quartz.Features.KeyViewer.Editor;
 
 internal sealed class KvTabDragState {
     private string tab;

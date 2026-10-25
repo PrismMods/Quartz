@@ -1,4 +1,3 @@
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
 namespace Quartz.Features.MainMenu;
 [Feature("mainmenu", "tweaks", 15, "Main Menu", "SECTION_MAIN_MENU")]

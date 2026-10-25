@@ -1,8 +1,7 @@
-using Quartz.Features.MainMenu;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using UnityEngine;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.MainMenu;
 public static class PageMainMenu {
     public static void Create(RectTransform parent) {
         MenuTweaks.EnsureConf();

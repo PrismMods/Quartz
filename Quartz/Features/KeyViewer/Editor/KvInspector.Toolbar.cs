@@ -5,7 +5,7 @@ using Quartz.UI.Generator;
 using Quartz.UI.Objects;
 using Quartz.UI.Objects.Impl;
 using UnityEngine;
-namespace Quartz.UI.Editor;
+namespace Quartz.Features.KeyViewer.Editor;
 internal sealed partial class KvInspector {
     private const float StatW = 100f;
     private const float StatH = 30f;

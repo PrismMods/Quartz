@@ -1,4 +1,4 @@
-using Quartz.UI.Editor;
+using Quartz.Features.KeyViewer.Editor;
 using static Asserts;
 
 static class KvTabDragTests {

@@ -1,12 +1,12 @@
 using Newtonsoft.Json.Linq;
 using Quartz.Core;
-using Quartz.Features.KeyViewer;
 using Quartz.Features.KeyViewer.Layout;
 using Quartz.Resource;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-namespace Quartz.UI.Editor;
+using Quartz.UI;
+namespace Quartz.Features.KeyViewer.Editor;
 internal sealed partial class KvCanvas {
     private const string DefaultBg = "rgba(46, 46, 47, 0.9)";
     private const string DefaultBorder = "rgba(113, 113, 113, 0.9)";

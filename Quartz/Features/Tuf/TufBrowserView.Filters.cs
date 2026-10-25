@@ -1,6 +1,5 @@
 using System.Text;
 using Quartz.Core;
-using Quartz.Features.Tuf;
 using Quartz.Localization;
 using Quartz.Resource;
 using Quartz.Tween;
@@ -14,7 +13,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Quartz.Compat.Game;
-namespace Quartz.UI.Factory.Page;
+using Quartz.UI;
+namespace Quartz.Features.Tuf;
 internal sealed partial class TufBrowserView : MonoBehaviour {
     private void BuildHeader(RectTransform parent) {
         RectTransform titleRect = Rect("Title", parent, new(0f, 1f), new(1f, 1f), new(0f, -30f), Vector2.zero);

@@ -1,7 +1,7 @@
 using Newtonsoft.Json.Linq;
 using Quartz.IO;
 using Quartz.IO.Interface;
-namespace Quartz.Features.ChatterBlocker;
+namespace Quartz.Features.KeyLimiter;
 public sealed class ChatterBlockerSettings : ISettingsFile {
     public bool Enabled = true;
     public float ThresholdMs = 35f;

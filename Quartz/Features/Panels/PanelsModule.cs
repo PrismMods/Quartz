@@ -1,4 +1,3 @@
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
 namespace Quartz.Features.Panels;
 [Feature("panels", "overlay", 70, "Panels", "SECTION_PANELS", Deps = new[] { "overlay" })]

@@ -1,6 +1,6 @@
 using Quartz.Async;
 using Quartz.Core;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public static class DiscordSession {
     public const string DirectMessagesId = "@me";
     private sealed class GuildView {

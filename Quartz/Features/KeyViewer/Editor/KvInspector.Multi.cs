@@ -4,7 +4,7 @@ using Quartz.UI.Generator;
 using Quartz.UI.Objects;
 using Quartz.UI.Objects.Impl;
 using UnityEngine;
-namespace Quartz.UI.Editor;
+namespace Quartz.Features.KeyViewer.Editor;
 internal sealed partial class KvInspector {
     private static string MixedText => MainCore.Tr.Get("KVI_MIXED", "Mixed");
     private static readonly Color MixedSwatch = new(0.4f, 0.4f, 0.4f, 1f);

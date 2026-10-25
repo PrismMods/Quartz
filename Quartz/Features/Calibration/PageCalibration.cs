@@ -1,8 +1,7 @@
 using Quartz.Core;
-using Quartz.Features.Calibration;
 using Quartz.UI.Generator;
 using UnityEngine;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.Calibration;
 public static class PageCalibration {
     public static void AppendTo(Transform content) {
         Calibration.EnsureConf();

@@ -4,8 +4,8 @@ using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using Quartz.Core;
-using static Quartz.Features.Discord.Json;
-namespace Quartz.Features.Discord;
+using static Quartz.Features.Discord.Api.Json;
+namespace Quartz.Features.Discord.Api;
 public sealed class RemoteAuth : IDisposable {
     private const string GatewayUrl = "wss://remote-auth-gateway.discord.gg/?v=2";
     private const string LoginEndpoint = "https://discord.com/api/v9/users/@me/remote-auth/login";

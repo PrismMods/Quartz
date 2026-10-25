@@ -1,7 +1,6 @@
-using Quartz.Features.Tweaks;
 using Quartz.UI.Generator;
 using UnityEngine;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.Tweaks;
 public static class PageTweaks {
     public static void GeneralPage(RectTransform parent) {
         Tweaks.EnsureConf();

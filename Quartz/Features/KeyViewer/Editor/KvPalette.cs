@@ -1,5 +1,5 @@
 using UnityEngine;
-namespace Quartz.UI.Editor;
+namespace Quartz.Features.KeyViewer.Editor;
 internal static class KvPalette {
     private static Color Hex(string hex)
         => ColorUtility.TryParseHtmlString(hex, out Color c) ? c : Color.magenta;

@@ -1,4 +1,3 @@
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
 namespace Quartz.Features.VisualTweaks;
 [Feature("visualtweaks", "visuals", 30, "Visual Tweaks", "SECTION_VISUAL_TWEAKS")]

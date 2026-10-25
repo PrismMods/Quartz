@@ -2,8 +2,8 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using Quartz.Core;
-using static Quartz.Features.Discord.Json;
-namespace Quartz.Features.Discord;
+using static Quartz.Features.Discord.Api.Json;
+namespace Quartz.Features.Discord.Api;
 public sealed class DiscordRest : IDisposable {
     public const string ApiBase = "https://discord.com/api/v10";
     private const string UserAgent =

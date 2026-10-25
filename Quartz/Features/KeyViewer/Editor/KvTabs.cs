@@ -11,7 +11,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static UnityEngine.EventSystems.PointerEventData;
 using Quartz.Compat.Game;
-namespace Quartz.UI.Editor;
+namespace Quartz.Features.KeyViewer.Editor;
 internal static class KvTabs {
     private static float TrackHeight => 30f * KvPalette.Scale;
     private static float TrackPad => 3f * KvPalette.Scale;

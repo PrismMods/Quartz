@@ -1,13 +1,12 @@
 using Quartz.Core;
 using Quartz.Features.InGameOverlay;
 using Quartz.Features.Interop;
-using Quartz.Features.Judgement;
 using Quartz.Overlay;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using TMPro;
 using UnityEngine;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.Judgement;
 internal static class PageJudgement {
     public static void AppendTo(Transform content) {
         JudgementOverlay.EnsureConf();

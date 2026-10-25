@@ -1,7 +1,7 @@
 using Newtonsoft.Json.Linq;
 using Quartz.Async;
 using Quartz.Core;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public static class VoiceSession {
     public enum State { Idle, Requesting, Signalling, Connected, Failed }
     private static DiscordGateway attached;

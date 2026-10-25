@@ -3,9 +3,9 @@ using Quartz.Localization;
 using Quartz.UI.Generator;
 using TMPro;
 using UnityEngine;
-using Quartz.Overlay;
 using GTweens.Easings;
-namespace Quartz.UI.Factory.Page;
+using Quartz.UI;
+namespace Quartz.Features.Overlay;
 internal static class PageOverlayGeneral {
     public static void Create(RectTransform parent) {
         RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);

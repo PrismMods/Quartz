@@ -3,7 +3,6 @@ using Quartz.Core;
 using Quartz.Localization;
 using Quartz.Resource;
 using Quartz.UI.Factory;
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects;
 using Quartz.UI.Panes;

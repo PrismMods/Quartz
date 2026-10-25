@@ -1,6 +1,6 @@
 using Quartz.Features.KeyViewer.Layout;
 using UnityEngine;
-namespace Quartz.UI.Editor;
+namespace Quartz.Features.KeyViewer.Editor;
 internal sealed partial class KvCanvas {
     private const float FitPadding = 40f;
     private bool panning;

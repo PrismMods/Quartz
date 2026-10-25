@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-namespace Quartz.UI.Editor;
+namespace Quartz.Features.KeyViewer.Editor;
 internal sealed class KvTabRemeasure : MonoBehaviour {
     private readonly List<(LayoutElement Le, TextMeshProUGUI Label, float Pad)> pills = [];
     private RectTransform track;

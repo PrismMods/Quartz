@@ -1,5 +1,5 @@
 using System.Security.Cryptography;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public static class Der {
     private static readonly byte[] RsaEncryptionOid = [0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x01, 0x01];
     private static readonly byte[] DerNull = [0x05, 0x00];

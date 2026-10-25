@@ -1,7 +1,7 @@
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using UnityEngine;
-namespace Quartz.UI.Editor;
+namespace Quartz.Features.KeyViewer.Editor;
 internal static partial class KvWidgets {
     internal static UIColorPicker ColorPicker(
         Transform parent,

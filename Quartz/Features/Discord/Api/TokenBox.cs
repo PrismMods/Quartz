@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public static class TokenBox {
     public const int KeySize = 32;
     public const int KeyMaterialSize = KeySize * 2;

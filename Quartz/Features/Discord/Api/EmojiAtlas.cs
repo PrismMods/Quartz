@@ -5,7 +5,7 @@ using Quartz.Core;
 using TMPro;
 using UnityEngine;
 using UnityEngine.TextCore;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public static class EmojiAtlas {
     private const string Twemoji = "https://cdn.jsdelivr.net/gh/jdecked/twemoji@15.1.0/assets/72x72/";
     private const int MaxSprites = 192;

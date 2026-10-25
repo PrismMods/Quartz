@@ -1,11 +1,10 @@
 using Newtonsoft.Json.Linq;
 using Quartz.Core;
-using Quartz.Features.KeyViewer;
 using Quartz.Features.KeyViewer.Layout;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects;
 using UnityEngine;
-namespace Quartz.UI.Editor;
+namespace Quartz.Features.KeyViewer.Editor;
 internal sealed partial class KvInspector {
     private static readonly string[] NoteAligns = ["left", "center", "right"];
     private void BuildNoteTab(RectTransform root, List<UIObject> tracked, KvElement[] batch) {

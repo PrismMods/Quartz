@@ -1,4 +1,3 @@
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
 namespace Quartz.Features.PlanetColors;
 [Feature("planetcolors", "visuals", 40, "Planet Colors", "SECTION_PLANET_COLORS")]

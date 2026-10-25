@@ -1,4 +1,3 @@
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
 namespace Quartz.Features.Countdown;
 [Feature("countdown", "gameplay", 40, "Countdown", "SECTION_COUNTDOWN")]

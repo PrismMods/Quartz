@@ -1,8 +1,8 @@
-using Quartz.Features.Countdown;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using UnityEngine;
-namespace Quartz.UI.Factory.Page;
+using Quartz.UI.Factory;
+namespace Quartz.Features.Countdown;
 internal static class PageCountdown {
     public static void Create(RectTransform parent) {
         CountdownFeature.EnsureConf();

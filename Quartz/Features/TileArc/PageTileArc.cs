@@ -1,8 +1,7 @@
-using Quartz.Features.TileArc;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using UnityEngine;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.TileArc;
 public static class PageTileArc {
     public static void Create(RectTransform parent) =>
         CreateTileArc(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));

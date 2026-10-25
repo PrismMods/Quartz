@@ -11,6 +11,7 @@ using UnityEngine.UI;
 using Object = UnityEngine.Object;
 using TMPro;
 using Quartz.Overlay;
+using Quartz.Features.Overlay;
 namespace Quartz.Features.Combo;
 public static class ComboOverlay {
     public static SettingsFile<ComboSettings> ConfMgr { get; private set; }

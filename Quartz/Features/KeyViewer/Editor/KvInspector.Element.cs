@@ -1,5 +1,4 @@
 using Quartz.Core;
-using Quartz.Features.KeyViewer;
 using Quartz.Features.KeyViewer.Layout;
 using Quartz.Resource;
 using Quartz.UI.Generator;
@@ -7,7 +6,7 @@ using Quartz.UI.Objects;
 using Quartz.UI.Objects.Impl;
 using TMPro;
 using UnityEngine;
-namespace Quartz.UI.Editor;
+namespace Quartz.Features.KeyViewer.Editor;
 internal sealed partial class KvInspector {
     private static readonly string[] StatTypes = ["kps", "kpsAvg", "kpsMax", "total"];
     private static readonly string[] GraphTypes = ["line", "bar"];

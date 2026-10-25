@@ -2,7 +2,6 @@ using Quartz.Async;
 using Quartz.Compat.Interface;
 using Quartz.Core;
 using Quartz.IO;
-using Quartz.UI;
 namespace Quartz.Features.Tuf;
 public sealed partial class TufService : IRuntimeService {
     internal void RecordInstalledLevel(TufLevel level) {

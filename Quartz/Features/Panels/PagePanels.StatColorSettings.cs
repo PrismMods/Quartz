@@ -4,8 +4,7 @@ using Quartz.Core;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using UnityEngine;
-using Quartz.Features.Panels;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.Panels;
 internal static partial class PagePanels {
     private static void BuildStatColorSettings(
         Transform parent, StatEntry entry, Action save, Action rebuild, string idp, Action refreshRow

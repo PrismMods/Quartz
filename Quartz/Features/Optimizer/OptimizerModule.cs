@@ -1,4 +1,3 @@
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
 namespace Quartz.Features.Optimizer;
 [Feature("optimizer", "tweaks", 20, "Optimizer", "SECTION_OPTIMIZER")]

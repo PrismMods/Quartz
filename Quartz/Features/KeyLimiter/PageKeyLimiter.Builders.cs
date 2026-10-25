@@ -1,14 +1,13 @@
 using Quartz.Core;
-using Quartz.Features.ChatterBlocker;
 using Quartz.Features.Interop;
-using Quartz.Features.KeyLimiter;
 using Quartz.Resource;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using Quartz.UI.Utility;
 using UnityEngine;
 using Quartz.Utility;
-namespace Quartz.UI.Factory.Page;
+using Quartz.UI;
+namespace Quartz.Features.KeyLimiter;
 public static partial class PageKeyLimiter {
     private static void CreateProfileControls(Transform body) {
         int count = KeyLimiter.Profiles.Count;

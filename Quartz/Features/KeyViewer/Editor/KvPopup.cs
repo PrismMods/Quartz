@@ -11,7 +11,8 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static UnityEngine.EventSystems.PointerEventData;
 using Quartz.Compat.Game;
-namespace Quartz.UI.Editor;
+using Quartz.UI;
+namespace Quartz.Features.KeyViewer.Editor;
 internal sealed class KvPopup : MonoBehaviour {
     private static float ItemHeight => 24f * KvPalette.Scale;
     private static float MinWidth => (108f + 10f) * KvPalette.Scale;

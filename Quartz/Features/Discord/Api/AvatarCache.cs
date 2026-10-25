@@ -3,7 +3,7 @@ using Quartz.Async;
 using Quartz.Core;
 using Quartz.Resource;
 using UnityEngine;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public static class AvatarCache {
     private const string Cdn = "https://cdn.discordapp.com";
     private const int Size = 64;

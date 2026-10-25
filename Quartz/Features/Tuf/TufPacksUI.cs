@@ -1,6 +1,5 @@
 using System.Text;
 using Quartz.Core;
-using Quartz.Features.Tuf;
 using Quartz.Localization;
 using Quartz.Resource;
 using Quartz.Tween;
@@ -14,7 +13,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Quartz.Compat.Game;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.Tuf;
 public static class TufPacksUI {
     public static void Create(RectTransform parent) {
         TufPacksView view = parent.gameObject.AddComponent<TufPacksView>();

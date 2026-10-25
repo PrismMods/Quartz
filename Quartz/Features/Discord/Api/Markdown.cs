@@ -1,6 +1,6 @@
 using System.Text;
 using System.Text.RegularExpressions;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public static class Markdown {
     private const string Link = "#00A8FC";
     private const string Muted = "#949BA4";

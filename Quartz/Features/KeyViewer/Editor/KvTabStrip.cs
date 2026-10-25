@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static UnityEngine.EventSystems.PointerEventData;
 using Quartz.Compat.Game;
-namespace Quartz.UI.Editor;
+namespace Quartz.Features.KeyViewer.Editor;
 internal sealed class KvTabStrip {
     private static float ButtonHeight => KvPalette.IconButton;
     private static float LabelPadX => 8f * KvPalette.Scale;

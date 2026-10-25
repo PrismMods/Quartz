@@ -9,7 +9,8 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static UnityEngine.EventSystems.PointerEventData;
 using Quartz.Compat.Game;
-namespace Quartz.UI.Editor;
+using Quartz.UI;
+namespace Quartz.Features.KeyViewer.Editor;
 internal static partial class KvWidgets {
     internal const float MinPaneWidth = 260f;
     internal static float DefaultPaneWidth => KvPalette.PanelWidth;

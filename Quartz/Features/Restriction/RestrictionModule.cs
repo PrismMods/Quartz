@@ -1,4 +1,3 @@
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
 namespace Quartz.Features.Restriction;
 [Feature("restriction", "gameplay", 30, "Judgement Restriction", "SECTION_JUDGEMENT_RESTRICTION")]

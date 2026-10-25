@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static UnityEngine.EventSystems.PointerEventData;
-namespace Quartz.UI.Editor;
+namespace Quartz.Features.KeyViewer.Editor;
 internal static class KvToolbar {
     internal static RectTransform Bar(RectTransform parent) {
         RectTransform bar = GenerateUI.Row(parent, KvPalette.BarHeight);

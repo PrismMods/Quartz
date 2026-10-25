@@ -1,11 +1,13 @@
 using Quartz.Core;
 using Quartz.Resource;
-using Quartz.UI.Editor;
 using Quartz.UI.Generator;
 using Quartz.UI.Utility;
 using UnityEngine;
 using UnityEngine.UI;
-namespace Quartz.UI.Factory.Page;
+using Quartz.Features.KeyViewer.Editor;
+using Quartz.UI;
+using Quartz.UI.Factory;
+namespace Quartz.Features.KeyViewer;
 internal static partial class PageKeyViewer {
     private const float EditorCanvasMinHeight = 200f;
     private const float ThinRowHeight = 26f;

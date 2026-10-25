@@ -1,7 +1,7 @@
 using System.Numerics;
 using System.Security.Cryptography;
 using Quartz.Core;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public static class RsaOaep {
     private const int HashLength = 32;
     public static byte[] DecryptSha256(RSA rsa, byte[] ciphertext) {

@@ -6,7 +6,7 @@ using Quartz.UI;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
-namespace Quartz.Overlay;
+namespace Quartz.Features.Overlay;
 public enum OverlayPopEdge {
     Nearest,
     Left,

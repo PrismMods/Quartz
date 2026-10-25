@@ -1,4 +1,4 @@
-using Quartz.Features.Discord;
+using Quartz.Features.Discord.Api;
 using static Asserts;
 static class DiscordVoiceTests {
     const string Sha = "84569f5a6c41e737cec90ea87c5f1a664b3d7ffc885f65cb96d25b60be09c6a7";

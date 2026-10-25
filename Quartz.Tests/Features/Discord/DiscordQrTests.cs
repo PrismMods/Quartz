@@ -1,5 +1,5 @@
 using System.Text;
-using Quartz.Features.Discord;
+using Quartz.Features.Discord.Api;
 using static Asserts;
 static class DiscordQrTests {
     public static void TestReedSolomonRemainderIsDivisibleByTheGenerator() {

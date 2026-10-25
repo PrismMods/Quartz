@@ -144,17 +144,18 @@ Most features live under `Quartz/Features/<Name>/` and commonly have:
 - `<Feature>Settings.cs` — persisted settings object.
 - `<Feature>Patches.cs` or focused patch files — Harmony patches.
 - `<Feature>Overlay.cs` — UI shown during gameplay/editor.
-- Matching UI controls under `Quartz/UI/Factory/Page/`.
+- `Page<Feature>.cs` — the feature's settings page, in the feature folder and namespace.
+
+Every file's namespace matches its folder (`Quartz/Features/KeyViewer/Editor/` is `Quartz.Features.KeyViewer.Editor`). Exceptions: `Quartz/GTweens` (vendored), `Discord/Api/IsExternalInit.cs` (compiler polyfill), and the `[Obsolete]` forwarding shim `Game/Stats/LegacyStatusShim.cs` (`Quartz.Features.Status`).
 
 Current feature areas include:
 
 - `AutoDeafen` — Discord/RPC-driven deafen behavior.
-- `ChatterBlocker` — input/chat blocking behavior.
 - `Combo`, `Judgement`, `ProgressBar`, `SongTitle`, `Panels` — gameplay HUD overlays.
 - `Editor` — editor-focused tweaks/readouts/BGA/difficulty behavior.
 - `EffectRemover`, `PlanetColors`, `UiHider`, `Tweaks` — visual/gameplay presentation tweaks.
 - `InGameOverlay` — applies the mod font to three specific pieces of the game's own native HUD text (song title, countdown, per-hit judgement); replaces an earlier scene-scanning `GameOverlayFont` that was removed for performance.
-- `KeyLimiter`, `Restriction` — input/gameplay restrictions.
+- `KeyLimiter`, `Restriction` — input/gameplay restrictions. `KeyLimiter` also holds the chatter blocker (`ChatterBlocker.json`).
 - `Calibration` — input-offset calibration flow: per-device float offsets, on-death calibration popup, and a detailed timing readout.
 - `KeyViewer` — key display overlay and DM Note-compatible CSS parser/rendering.
 - `Optimizer` — performance/background execution/process priority toggles.
@@ -173,7 +174,7 @@ The in-game menu is built in code under `Quartz/UI`. It is a two-column sidebar 
 - `Quartz/UI/UICore.cs` creates the top-level canvas, panel, sidebar, first-run helper, reorganize mode, resize handle, tooltips, and global open/close behavior. It also defines `OriginalMenuState`, the ordered list of built-in pages.
 - `Quartz/UI/Factory/MenuFactory.cs` groups `OriginalMenuState` values into sidebar categories via `CategoryChildren`; each category's first value is its representative state. The enum is never persisted by name, so pages can be reordered/regrouped without corrupting saved settings.
 - `Quartz/UI/Factory/PageFactory.cs` wires each state to its page builder.
-- `Quartz/UI/Factory/Page/Page*.cs` are the settings pages. Several build more than one state via static methods (e.g. `PageGameplay`, `PageVisuals`, `PageTweaks`, `PageEditor`), so one file can back a whole sidebar category.
+- `Quartz/UI/Factory/Page/Page*.cs` are the core settings pages; feature pages live in `Quartz/Features/<Feature>/Page*.cs`. Several build more than one state via static methods (e.g. `PageGameplay`, `PageVisuals`, `PageTweaks`, `PageEditor`), so one file can back a whole sidebar category.
 - `Quartz/UI/Panes/PaneHost.cs` — docked context/live-preview panes shown beside a page (currently wired for Key Viewer).
 - `Quartz/UI/Generator/GenerateUI*.cs` creates common rows/controls: toggles, buttons, sliders, inputs, dropdowns, color pickers, keybinds, collapsibles.
 - `Quartz/UI/Objects/Impl/*` are backing objects for those controls.
@@ -282,11 +283,11 @@ Do not overwrite or casually reformat unrelated work. If a file is already modif
 - Commit rules: `agents/commits.md`.
 - Localization: `Quartz/Localization/*`, `Quartz/Resource/Export/Lang/*.json`, `agents/i18n.md`.
 - Settings persistence: `Quartz/IO/SettingsFile.cs`, `Quartz/IO/CoreSettings.cs`, feature `*Settings.cs` files.
-- Main UI: `Quartz/UI/UICore.cs`, `Quartz/UI/Factory/Page/*.cs`, `Quartz/UI/Generator/*.cs`.
+- Main UI: `Quartz/UI/UICore.cs`, `Quartz/UI/Factory/Page/*.cs` (core pages), `Quartz/UI/Generator/*.cs`.
 - Feature modules: `Quartz/Features/<Feature>/`.
-- Stat panels: `Quartz/Features/Panels/PanelsOverlay.cs`, `PanelsSettings.cs`, `Quartz/UI/Factory/Page/PagePanels.cs`.
-- TUF browser: `Quartz/Features/Tuf/*`, UI in `Quartz/UI/Factory/Page/TufBrowserUI.cs`, `TufPacksUI.cs`, `TufSettingsUI.cs`.
-- Calibration: `Quartz/Features/Calibration/*`, `Quartz/Core/OverlayCalibration.cs`, `Quartz/UI/CalibrationPopupUI.cs`, `Quartz/UI/Factory/Page/PageCalibration.cs`.
+- Stat panels: `Quartz/Features/Panels/PanelsOverlay.cs`, `PanelsSettings.cs`, `PagePanels*.cs`.
+- TUF browser: `Quartz/Features/Tuf/*`, UI in `TufBrowserUI.cs`, `TufPacksUI.cs`, `TufSettingsUI.cs` (same folder).
+- Calibration: `Quartz/Features/Calibration/*`, `Quartz/Core/OverlayCalibration.cs`, `CalibrationPopupUI.cs` and `PageCalibration.cs` in the feature folder.
 - Addon system: `Quartz/Addons/*` (service wired in `Quartz/Core/QuartzRuntime.cs`).
 - Menu sidebar/pages: `Quartz/UI/UICore.cs` (`OriginalMenuState`), `Quartz/UI/Factory/MenuFactory.cs`, `Quartz/UI/Factory/PageFactory.cs`, `Quartz/UI/Factory/Page/*.cs`.
 - Key viewer CSS parser: `Quartz/Features/KeyViewer/KeyViewerCss.cs`, tests in `Quartz.Tests/Program.cs`.

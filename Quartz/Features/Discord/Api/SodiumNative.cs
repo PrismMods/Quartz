@@ -1,5 +1,5 @@
 using System.Runtime.InteropServices;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public static class SodiumNative {
     public const int KeyBytes = 32;
     public const int NonceBytes = 24;

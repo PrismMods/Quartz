@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.EventSystems.PointerEventData;
 using Quartz.Compat.Game;
-namespace Quartz.UI.Editor;
+namespace Quartz.Features.KeyViewer.Editor;
 internal static partial class KvWidgets {
     private const float IconReserve = 44f;
     internal static UIInput Input(

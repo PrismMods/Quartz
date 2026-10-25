@@ -1,7 +1,7 @@
 using Newtonsoft.Json.Linq;
 using Quartz.Core;
 using Quartz.IO;
-namespace Quartz.Overlay;
+namespace Quartz.Features.Overlay;
 public static class OverlaySwitch {
     private const string FileName = "Overlay.json";
     private const string LegacyFileName = "OverlayPanels.json";

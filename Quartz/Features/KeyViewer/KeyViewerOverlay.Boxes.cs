@@ -1,6 +1,5 @@
 using Quartz.Core;
 using Quartz.Resource;
-using Quartz.UI;
 using Quartz.UI.Utility;
 using UnityEngine;
 using UnityEngine.UI;

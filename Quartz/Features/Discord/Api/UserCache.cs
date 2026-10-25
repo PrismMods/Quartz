@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public static class UserCache {
     private static readonly ConcurrentDictionary<string, string> names = new();
     public static void Remember(string id, string name) {

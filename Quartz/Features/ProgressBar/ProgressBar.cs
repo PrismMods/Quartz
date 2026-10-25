@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 using Quartz.Overlay;
+using Quartz.Features.Overlay;
 namespace Quartz.Features.ProgressBar;
 public static class ProgressBarOverlay {
     public static SettingsFile<ProgressBarSettings> ConfMgr { get; private set; }

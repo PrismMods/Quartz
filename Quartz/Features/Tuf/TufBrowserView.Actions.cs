@@ -1,6 +1,5 @@
 using System.Text;
 using Quartz.Core;
-using Quartz.Features.Tuf;
 using Quartz.Localization;
 using Quartz.Resource;
 using Quartz.Tween;
@@ -14,7 +13,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Quartz.Compat.Game;
-namespace Quartz.UI.Factory.Page;
+using Quartz.UI;
+namespace Quartz.Features.Tuf;
 internal sealed partial class TufBrowserView : MonoBehaviour {
     private void AddDelete(RectTransform card, TufLevel level) =>
         BuildDelete(Rect("Delete", card, new(1f, 0.5f), new(1f, 0.5f), new(-192f, -23f), new(-146f, 23f)), level);

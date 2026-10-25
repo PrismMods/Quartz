@@ -1,12 +1,11 @@
 using Newtonsoft.Json.Linq;
 using Quartz.Core;
-using Quartz.Features.KeyViewer;
 using Quartz.Features.KeyViewer.Layout;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects;
 using Quartz.UI.Objects.Impl;
 using UnityEngine;
-namespace Quartz.UI.Editor;
+namespace Quartz.Features.KeyViewer.Editor;
 internal sealed partial class KvInspector {
     private const string DefBg = "rgba(46, 46, 47, 0.9)";
     private const string DefBgActive = "rgba(121, 121, 121, 0.9)";

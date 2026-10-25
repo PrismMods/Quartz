@@ -1,9 +1,6 @@
-using Quartz.Overlay;
 using Quartz.Core;
-using Quartz.Features.Panels;
 using Quartz.Resource;
 using Quartz.Tween;
-using Quartz.UI;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using Quartz.UI.Utility;
@@ -18,7 +15,7 @@ using Object = UnityEngine.Object;
 using GTweenExtensions = GTweens.Extensions.GTweenExtensions;
 using static UnityEngine.EventSystems.PointerEventData;
 using TMPro;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.Panels;
 internal static partial class PagePanels {
     private static void CreatePanelSection(Transform parent, PanelConfig panel, int index) {
         PanelConfig def = new();

@@ -9,7 +9,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
-using Quartz.Overlay;
+using Quartz.Features.Overlay;
 namespace Quartz.Features.Practice;
 public static class PracticeOverlay {
     private static PracticeSettings Conf => PracticeDifficulty.Conf;

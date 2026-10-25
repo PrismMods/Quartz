@@ -1,4 +1,4 @@
-using Quartz.Features.Discord;
+using Quartz.Features.Discord.Api;
 using static Asserts;
 static class DiscordMarkdownTests {
     public static void TestInlineEmphasis() {

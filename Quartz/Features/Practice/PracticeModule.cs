@@ -1,4 +1,3 @@
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
 namespace Quartz.Features.Practice;
 [Feature("practice", "gameplay", 60, "Practice Difficulty", "SECTION_PRACTICE_DIFFICULTY", Deps = new[] { "overlay" })]

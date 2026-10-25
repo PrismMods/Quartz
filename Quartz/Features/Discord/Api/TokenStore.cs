@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 using Quartz.Core;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public static class TokenStore {
     private static string Dir => MainCore.Paths.RootPath;
     private static string CredentialsFile => Path.Combine(Dir, "Discord.credentials");

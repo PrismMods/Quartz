@@ -7,7 +7,7 @@ using UnityEngine;
 using System.Reflection;
 using Quartz.Compat.Game;
 using Quartz.Utility;
-namespace Quartz.Features.ChatterBlocker;
+namespace Quartz.Features.KeyLimiter;
 public static class ChatterBlocker {
     private static readonly System.Collections.Generic.List<AnyKeyCode> MainPressKeysBuffer = new();
     public static SettingsFile<ChatterBlockerSettings> ConfMgr { get; private set; }
@@ -19,7 +19,7 @@ public static class ChatterBlocker {
         return MainCore.IsModEnabled && Conf.Enabled;
     }
     private static bool HasAnyFilter() =>
-        IsActive() || KeyLimiter.KeyLimiter.IsEnabled() || KeyLimiter.KeyLimiter.IsMenuBlockEnabled()
+        IsActive() || KeyLimiter.IsEnabled() || KeyLimiter.IsMenuBlockEnabled()
         || Quartz.Game.InjectedKeys.GuardActive;
     private static long ThresholdMs() => Math.Max(0L, (long)Math.Round(Conf?.ThresholdMs ?? 0f));
     private static readonly Stopwatch clock = Stopwatch.StartNew();
@@ -96,7 +96,7 @@ public static class ChatterBlocker {
         scrController controller = scrController.instance;
         if(controller == null) return CacheEvaluation(0);
         ResetKeyLimiterOverCounter(controller);
-        if(KeyLimiter.KeyLimiter.IsMenuBlockActive()) return CacheEvaluation(0);
+        if(KeyLimiter.IsMenuBlockActive()) return CacheEvaluation(0);
         bool chatterActive = IsActive();
         long now = NowMs();
         long threshold = ThresholdMs();
@@ -117,13 +117,13 @@ public static class ChatterBlocker {
                 if(normalized != KeyCode.None && !physicalKeysThisEvaluation.Add(normalized)) continue;
                 if(Quartz.Game.InjectedKeys.Is(normalized)) continue;
                 if(ConsumeLateReportOfInjected(normalized, now)) continue;
-                if(KeyLimiter.KeyLimiter.ShouldBlockKey(key)) continue;
+                if(KeyLimiter.ShouldBlockKey(key)) continue;
                 if(IsCrossSourceDuplicate(normalized, InputSource.Unity, now)) continue;
                 RecordKeyStats(controller, key);
                 if(AcceptNormalKey(normalized, now, threshold, chatterActive)) count++;
             } else if(value is AsyncKeyCode asyncKey) {
                 KeyCode physical = KeyCodes.Normalize(
-                    KeyLimiter.KeyLimiter.HookKeyToPhysicalUnityKey(asyncKey.key, asyncKey.label));
+                    KeyLimiter.HookKeyToPhysicalUnityKey(asyncKey.key, asyncKey.label));
                 if(physical != KeyCode.None) reportedKeysThisFrame.Add(physical);
                 if(physical != KeyCode.None) {
                     if(!physicalKeysThisEvaluation.Add(physical)) continue;
@@ -132,7 +132,7 @@ public static class ChatterBlocker {
                 }
                 if(Quartz.Game.InjectedKeys.Is(physical)) continue;
                 if(ConsumeLateReportOfInjected(physical, now)) continue;
-                if(KeyLimiter.KeyLimiter.ShouldBlockAsyncKeyFromHook(asyncKey.key, asyncKey.label)) continue;
+                if(KeyLimiter.ShouldBlockAsyncKeyFromHook(asyncKey.key, asyncKey.label)) continue;
                 if(IsCrossSourceDuplicate(physical, InputSource.Async, now)) continue;
                 RecordKeyStats(controller, asyncKey);
                 if(physical != KeyCode.None) {
@@ -182,8 +182,8 @@ public static class ChatterBlocker {
         return count;
     }
     private static int CountKeysMissedByGame(scrController controller, long now, long threshold, bool chatterActive) {
-        bool limiterActive = KeyLimiter.KeyLimiter.IsActive();
-        if((!limiterActive && !chatterActive) || !KeyLimiter.KeyLimiter.InPlayerControl()) {
+        bool limiterActive = KeyLimiter.IsActive();
+        if((!limiterActive && !chatterActive) || !KeyLimiter.InPlayerControl()) {
             injectedKeyHeldPrev.Clear();
             injectedAwaitingGame.Clear();
             injectedComputeFrame = -1;
@@ -203,7 +203,7 @@ public static class ChatterBlocker {
         bool asyncActive = AsyncKeyboardActive();
         int injected = 0;
         if(limiterActive) {
-            int[] allowed = KeyLimiter.KeyLimiter.Conf?.AllowedKeys;
+            int[] allowed = KeyLimiter.Conf?.AllowedKeys;
             if(allowed == null || allowed.Length == 0) {
                 injectedKeyHeldPrev.Clear();
                 return 0;
@@ -223,19 +223,19 @@ public static class ChatterBlocker {
     }
     private static int TryInjectMissedKey(scrController controller, KeyCode key, long now, long threshold,
         bool chatterActive, bool asyncActive) {
-        if(key == KeyCode.None || KeyLimiter.KeyLimiter.IsMouseKey(key)) return 0;
+        if(key == KeyCode.None || KeyLimiter.IsMouseKey(key)) return 0;
         if(reportedKeysThisFrame.Contains(key)) {
             injectedKeyHeldPrev.Add(key);
             return 0;
         }
-        if(asyncActive && KeyLimiter.KeyLimiter.HookEverSaw(key)) {
+        if(asyncActive && KeyLimiter.HookEverSaw(key)) {
             injectedKeyHeldPrev.Remove(key);
             return 0;
         }
         bool held;
         try { held = Quartz.Game.HookInput.PhysicalKeyHeld(key); }
         catch(Exception e) { Diag.Ignore(e); return 0; }
-        if(!held) held = KeyLimiter.KeyLimiter.HookKeyHeld(key);
+        if(!held) held = KeyLimiter.HookKeyHeld(key);
         if(held && !injectedKeyHeldPrev.Contains(key)) {
             RecordKeyStats(controller, key);
             if(AcceptNormalKey(key, now, threshold, chatterActive)) {
@@ -258,7 +258,7 @@ public static class ChatterBlocker {
             bool held;
             try { held = Quartz.Game.HookInput.PhysicalKeyHeld(key); }
             catch(Exception e) { Diag.Ignore(e); held = false; }
-            if(!held) held = KeyLimiter.KeyLimiter.HookKeyHeld(key);
+            if(!held) held = KeyLimiter.HookKeyHeld(key);
             if(!held) injectedKeyHeldPrev.Remove(key);
         }
     }

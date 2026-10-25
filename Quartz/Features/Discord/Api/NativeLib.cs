@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 using Quartz.Core;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public static class NativeLib {
     private const int RtldNow = 2;
     public static bool IsWindows => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);

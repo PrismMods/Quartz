@@ -1,7 +1,6 @@
-using Quartz.Features.KeyLimiter;
 using Quartz.UI.Generator;
 using UnityEngine;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.KeyLimiter;
 public static partial class PageKeyLimiter {
     private static void CreateChartKeyLimiter(Transform body) {
         ChartKeyLimiter.EnsureConf();

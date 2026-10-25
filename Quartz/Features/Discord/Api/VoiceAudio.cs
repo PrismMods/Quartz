@@ -1,6 +1,6 @@
 using Quartz.Core;
 using UnityEngine;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public sealed class VoiceAudio : MonoBehaviour {
     private const int ClipSeconds = 1;
     private const int JitterCap = OpusNative.SampleRate * 2;

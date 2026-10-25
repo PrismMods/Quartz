@@ -1,4 +1,3 @@
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
 namespace Quartz.Features.DeathLimit;
 [Feature("deathlimit", "gameplay", 40, "Death Limit", "SECTION_DEATH_LIMIT")]

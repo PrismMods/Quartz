@@ -3,8 +3,8 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using Quartz.Async;
 using Quartz.Core;
-using static Quartz.Features.Discord.Json;
-namespace Quartz.Features.Discord;
+using static Quartz.Features.Discord.Api.Json;
+namespace Quartz.Features.Discord.Api;
 public sealed class VoiceGateway : IDisposable {
     private readonly string endpoint;
     private readonly string serverId;

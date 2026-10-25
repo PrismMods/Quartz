@@ -13,6 +13,7 @@ using Object = UnityEngine.Object;
 using TMPro;
 using Quartz.Compat.Game;
 using Quartz.Overlay;
+using Quartz.Features.Overlay;
 namespace Quartz.Features.Judgement;
 public static class JudgementOverlay {
     public static SettingsFile<JudgementSettings> ConfMgr { get; private set; }

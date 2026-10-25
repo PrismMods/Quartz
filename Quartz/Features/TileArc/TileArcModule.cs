@@ -1,4 +1,3 @@
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
 namespace Quartz.Features.TileArc;
 [Feature("tilearc", "visuals", 25, "Tile Arc", "SECTION_TILE_ARC")]

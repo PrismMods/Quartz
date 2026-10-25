@@ -1,4 +1,3 @@
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
 namespace Quartz.Features.Judgement;
 [Feature("judgement", "overlay", 50, "Judgement", "SECTION_JUDGEMENT", Deps = new[] { "overlay" })]

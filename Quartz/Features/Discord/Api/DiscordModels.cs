@@ -1,4 +1,4 @@
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public readonly record struct DiscordGuild(string Id, string Name, string Icon);
 public readonly record struct DiscordRole(string Id, string Name, ulong Permissions);
 public readonly record struct PermissionOverwrite(string Id, int Type, ulong Allow, ulong Deny);

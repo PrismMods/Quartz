@@ -1,13 +1,12 @@
 using Quartz.Compat.Game;
 using Quartz.Core;
 using Quartz.Features.Interop;
-using Quartz.Features.HideJudgements;
 using Quartz.Resource;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using Quartz.UI.Utility;
 using UnityEngine;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.HideJudgements;
 public static class PageHideJudgements {
     public static void Create(RectTransform parent) =>
         CreateHideJudgements(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));

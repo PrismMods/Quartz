@@ -1,11 +1,11 @@
 using Quartz.Core;
-using Quartz.Features.Tuf;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using TMPro;
 using UnityEngine;
 using Quartz.Compat.Game;
-namespace Quartz.UI.Factory.Page;
+using Quartz.UI.Factory;
+namespace Quartz.Features.Tuf;
 internal sealed class TufSettingsView : MonoBehaviour {
     private TufService service;
     private TMP_Text folderValue;

@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 using Quartz.Core;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public sealed class DaveSession : IDisposable {
     private static readonly DaveNative.MlsFailure FailureCallback = OnMlsFailure;
     private readonly Dictionary<string, IntPtr> decryptors = [];

@@ -1,4 +1,3 @@
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
 namespace Quartz.Features.SongTitle;
 [Feature("songtitle", "overlay", 60, "Song Title", "SECTION_SONG_TITLE", Deps = new[] { "overlay" })]

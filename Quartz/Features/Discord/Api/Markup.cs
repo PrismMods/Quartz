@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public static class Markup {
     private static readonly Regex Token = new(
         @"(?<url>https?://[^\s<>]+)"

@@ -1,11 +1,10 @@
 using Quartz.Core;
-using Quartz.Features.Practice;
 using Quartz.Resource;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using Quartz.UI.Utility;
 using UnityEngine;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.Practice;
 public static class PagePractice {
     public static void Create(RectTransform parent) {
         Transform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);

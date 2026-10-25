@@ -1,4 +1,4 @@
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public static class DiscordPermissions {
     public const ulong Administrator = 1UL << 3;
     public const ulong ViewChannel = 1UL << 10;

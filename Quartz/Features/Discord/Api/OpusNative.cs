@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 using Quartz.Core;
-namespace Quartz.Features.Discord;
+namespace Quartz.Features.Discord.Api;
 public static class OpusNative {
     public const int SampleRate = 48000;
     public const int Channels = 1;

@@ -1,7 +1,5 @@
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
-using Quartz.Features;
-namespace Quartz.Overlay;
+namespace Quartz.Features.Overlay;
 [Feature("overlay", "overlay", 5, "Overlay Core", "MODULE_OVERLAY_CORE", Patches = new string[0])]
 public sealed class OverlayModule : QuartzFeature {
     public override void OnLoad() {

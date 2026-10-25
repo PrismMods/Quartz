@@ -1,5 +1,4 @@
 using Quartz.Core;
-using Quartz.Features.AutoDeafen;
 using Quartz.Resource;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
@@ -8,7 +7,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.EventSystems.PointerEventData;
 using TMPro;
-namespace Quartz.UI.Factory.Page;
+using Quartz.UI;
+namespace Quartz.Features.AutoDeafen;
 public static class PageAutoDeafen {
     public static void Create(UnityEngine.RectTransform parent) =>
         CreateAutoDeafen(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));

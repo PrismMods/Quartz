@@ -1,6 +1,5 @@
 using System.Text;
 using Quartz.Core;
-using Quartz.Features.Tuf;
 using Quartz.Localization;
 using Quartz.Resource;
 using Quartz.Tween;
@@ -14,7 +13,9 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Quartz.Compat.Game;
-namespace Quartz.UI.Factory.Page;
+using Quartz.UI;
+using Quartz.UI.Factory;
+namespace Quartz.Features.Tuf;
 internal sealed partial class TufPacksView : MonoBehaviour {
     private void AddLoadingStatus(string message, float height = 70f) {
         RectTransform row = FixedRow("Loading", height);

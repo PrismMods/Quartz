@@ -1,7 +1,5 @@
 using Quartz.Core;
-using Quartz.Features.ChatterBlocker;
 using Quartz.Features.Interop;
-using Quartz.Features.KeyLimiter;
 using Quartz.Resource;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
@@ -10,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.EventSystems.PointerEventData;
 using TMPro;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.KeyLimiter;
 public static partial class PageKeyLimiter {
     private static Action keysChangedHandler;
     private static Action syncLockChangedHandler;

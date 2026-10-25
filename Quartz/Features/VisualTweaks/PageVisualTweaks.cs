@@ -1,8 +1,7 @@
 using Quartz.Core;
-using Quartz.Features.VisualTweaks;
 using Quartz.UI.Generator;
 using UnityEngine;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.VisualTweaks;
 public static class PageVisualTweaks {
     public static void Create(RectTransform parent) =>
         CreateVisualTweaks(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));

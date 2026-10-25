@@ -1,11 +1,10 @@
 using GTweens.Easings;
 using GTweens.Tweens;
 using Quartz.Core;
-using Quartz.Features.Tuf;
 using Quartz.Tween;
 using UnityEngine;
 using UnityEngine.UI;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.Tuf;
 internal sealed class TufPreviewGroup {
     private readonly Dictionary<string, Slot> slots = new(StringComparer.Ordinal);
     private volatile bool dirty;

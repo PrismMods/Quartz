@@ -1,13 +1,12 @@
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
 namespace Quartz.Features.KeyLimiter;
-[Feature("keylimiter", "gameplay", 10, "Key Limiter", "SECTION_KEY_LIMITER", Patches = new[] { "Quartz.Features.KeyLimiter", "Quartz.Features.ChatterBlocker" })]
+[Feature("keylimiter", "gameplay", 10, "Key Limiter", "SECTION_KEY_LIMITER")]
 public sealed class KeyLimiterModule : QuartzFeature {
     public override void OnLoad() {
         foreach(string lang in new[] { "en-US", "ko-KR", "zh-CN" })
             Context.RegisterTranslations(typeof(KeyLimiterModule), $"Quartz.Features.KeyLimiter.Lang.{lang}.json");
         KeyLimiter.EnsureConf();
-        ChatterBlocker.ChatterBlocker.EnsureConf();
+        ChatterBlocker.EnsureConf();
         ChartKeyLimiter.EnsureConf();
         EnumToStringPatch.Bind(Context.Harmony);
         Quartz.Resource.ResourceManager assets = Context.Resources(typeof(KeyLimiterModule), "Quartz.Features.KeyLimiter.Assets.");

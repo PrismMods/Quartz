@@ -1,6 +1,5 @@
 using Quartz.Core;
 using Quartz.Tween;
-using Quartz.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -11,8 +10,7 @@ using GTweens.Tweens;
 using GTweenExtensions = GTweens.Extensions.GTweenExtensions;
 using static UnityEngine.EventSystems.PointerEventData;
 using Object = UnityEngine.Object;
-using Quartz.Features.Panels;
-namespace Quartz.UI.Factory.Page;
+namespace Quartz.Features.Panels;
 internal static partial class PagePanels {
     private sealed class PanelSectionMarker : MonoBehaviour {
         public PanelConfig Config;

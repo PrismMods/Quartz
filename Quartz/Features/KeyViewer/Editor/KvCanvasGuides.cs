@@ -3,7 +3,8 @@ using Quartz.Features.KeyViewer.Layout;
 using Quartz.Resource;
 using UnityEngine;
 using UnityEngine.UI;
-namespace Quartz.UI.Editor;
+using Quartz.UI;
+namespace Quartz.Features.KeyViewer.Editor;
 internal sealed partial class KvCanvas {
     private const float GuideThickness = 1f;
     private static readonly Color GuideColor = new(1f, 0.35f, 0.6f, 0.9f);

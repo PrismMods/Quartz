@@ -14,6 +14,7 @@ using Object = UnityEngine.Object;
 using TMPro;
 using Quartz.Compat.Game;
 using Quartz.Overlay;
+using Quartz.Features.Overlay;
 namespace Quartz.Features.SongTitle;
 public static class SongTitleOverlay {
     public static SettingsFile<SongTitleSettings> ConfMgr { get; private set; }

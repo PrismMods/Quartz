@@ -1,4 +1,3 @@
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
 namespace Quartz.Features.ProgressBar;
 [Feature("progressbar", "overlay", 30, "Progress Bar", "SECTION_PROGRESS_BAR", Deps = new[] { "overlay" })]
