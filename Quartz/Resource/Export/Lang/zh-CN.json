@@ -522,6 +522,8 @@
     "FAQ_NONE": "没有可显示的问题。",
     "FONT_DEFAULT": "默认字体（Cookie Run粗体）",
     "HELP": "帮助",
-    "REORGANIZE_ROTATION": "旋转"
+    "REORGANIZE_ROTATION": "旋转",
+    "DESC_KEYVIEWER_EDITOR_TAB_DUPLICATE": "将正在编辑的手键标签页连同其中所有元素复制到新标签页。",
+    "DESC_KEYVIEWER_EDITOR_FOOT_DUPLICATE": "将当前打开的脚键标签页连同其中所有元素复制到新的脚键标签页。"
   }
 }

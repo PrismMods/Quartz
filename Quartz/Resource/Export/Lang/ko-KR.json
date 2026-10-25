@@ -513,6 +513,8 @@
     "HOME_RESET_FAILED": "실패했어요. 자세한 내용은 로그에 있어요",
     "INACTIVE_TITLE": "Quartz가 꺼져 있어요",
     "INACTIVE_HINT": "모든 기능이 꺼져 있어요. 다시 켜야 설정을 바꿀 수 있어요.",
-    "INACTIVE_TURN_ON": "켜기"
+    "INACTIVE_TURN_ON": "켜기",
+    "DESC_KEYVIEWER_EDITOR_TAB_DUPLICATE": "편집 중인 손 탭을 요소째로 새 탭에 복사해요.",
+    "DESC_KEYVIEWER_EDITOR_FOOT_DUPLICATE": "열어 둔 발키 탭을 요소째로 새 발키 탭에 복사해요."
   }
 }

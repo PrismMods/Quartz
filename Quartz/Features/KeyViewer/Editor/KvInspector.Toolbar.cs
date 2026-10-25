@@ -15,6 +15,7 @@ internal sealed partial class KvInspector {
     private const float ChevronScale = 2f;
     private UIButton undoButton;
     private UIButton redoButton;
+    private UIButton pasteStyleButton;
     private readonly List<UIObject> selectionScoped = [];
     internal void BuildToolbar(RectTransform bar) {
         RectTransform host = PopupHost(bar);
@@ -41,6 +42,15 @@ internal sealed partial class KvInspector {
             element, UISprite.PlusBold128, "kvi_duplicate", canvas.DuplicateSelection,
             "DESC_KVI_DUPLICATE", "Copy the selected elements, offset slightly from the originals."
         ));
+        Scoped(KvToolbar.Icon(
+            element, UISprite.Palette128, "kvi_copy_style", canvas.CopyStyle,
+            "DESC_KVI_COPY_STYLE", "Copy the look of the selected element: colors, shape, text, notes and counter. Ctrl+Shift+C does the same."
+        ));
+        pasteStyleButton = KvToolbar.Icon(
+            element, UISprite.Pencil128, "kvi_paste_style", canvas.PasteStyle,
+            "DESC_KVI_PASTE_STYLE", "Give the selected elements the copied look. Position, size, key and label stay. Ctrl+Shift+V does the same."
+        );
+        KvCanvas.StyleClipboardChanged += SyncToolbar;
         UIButton front = KvToolbar.Icon(
             element, UISprite.ChevronDown128, "kvi_z_front", () => canvas.NudgeZ(true),
             "DESC_KVI_Z_FRONT", "Draw the selected elements one step in front of the ones they overlap.",
@@ -106,6 +116,7 @@ internal sealed partial class KvInspector {
     internal void SyncToolbar() {
         bool any = canvas.Selection.Count > 0;
         foreach(UIObject obj in selectionScoped) obj.SetBlocked(!any, true);
+        pasteStyleButton?.SetBlocked(!any || !canvas.HasStyleClipboard, true);
         undoButton?.SetBlocked(!canvas.CanUndo, true);
         redoButton?.SetBlocked(!canvas.CanRedo, true);
     }

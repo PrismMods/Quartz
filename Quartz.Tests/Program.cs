@@ -99,6 +99,8 @@ List<(string Name, Action Run)> tests = [
     ("A fresh install starts each feature on its default", FeatureDefaultsTests.TestFreshInstallUsesEachFeaturesDefault),
     ("KeyViewer class and inline-style priority round-trip on flat and nested elements", KvDocumentTests.TestClassAndInlinePriorityRoundTrip),
     ("KeyViewer export carries only the selected tab", KvDocumentTests.TestExportKeepsOnlyTheSelectedTab),
+    ("KeyViewer tab duplicate copies elements independently", KvDocumentTests.TestDuplicateTabCopiesElementsIndependently),
+    ("KeyViewer paste style keeps place and binding", KvDocumentTests.TestPasteStyleKeepsPlaceAndBinding),
     ("KeyViewer editor grid step tracks zoom", KvSnapTests.TestGridStepTracksZoom),
     ("KeyViewer editor zoom clamps to DM Note's range", KvSnapTests.TestZoomClamps),
     ("KeyViewer editor shift-drag axis lock matches DM Note", KvSnapTests.TestShiftAxisLockMatchesDmNote),

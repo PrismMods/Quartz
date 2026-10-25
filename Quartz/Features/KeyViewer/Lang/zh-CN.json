@@ -210,6 +210,10 @@
     "KVI_LABEL_ENABLED": "显示标签",
     "KVI_HOME_ON": "开启",
     "KVI_HOME_OFF": "关闭",
-    "KVI_HOME_RAIN": "雨键{0} · 速度{1:0}px/s"
+    "KVI_HOME_RAIN": "雨键{0} · 速度{1:0}px/s",
+    "KVI_COPY_STYLE": "复制样式",
+    "DESC_KVI_COPY_STYLE": "复制所选元素的外观：颜色、形状、文字、音符和计数器。也可按 Ctrl+Shift+C。",
+    "KVI_PASTE_STYLE": "粘贴样式",
+    "DESC_KVI_PASTE_STYLE": "将复制的外观应用到所选元素。位置、大小、按键和标签保持不变。也可按 Ctrl+Shift+V。"
   }
 }

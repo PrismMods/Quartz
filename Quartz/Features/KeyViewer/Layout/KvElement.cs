@@ -200,5 +200,11 @@ internal sealed partial class KvElement {
         W = w;
         H = h;
     }
-    internal KvElement Clone() => new((JObject)Raw.DeepClone(), Kind) { GlobalKey = GlobalKey };
+    // Clones the whole stored entry, so fields kept beside "position" survive the copy.
+    internal KvElement Clone() {
+        bool nested = !ReferenceEquals(Container, Raw);
+        JObject outer = (JObject)Container.DeepClone();
+        JObject raw = nested && outer["position"] is JObject position ? position : outer;
+        return new(raw, Kind) { GlobalKey = GlobalKey };
+    }
 }

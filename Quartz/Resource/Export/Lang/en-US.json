@@ -513,6 +513,8 @@
     "HOME_RESET_FAILED": "Failed. Check the log.",
     "INACTIVE_TITLE": "Quartz is inactive",
     "INACTIVE_HINT": "Every feature is off. Turn Quartz back on to change settings.",
-    "INACTIVE_TURN_ON": "Turn On"
+    "INACTIVE_TURN_ON": "Turn On",
+    "DESC_KEYVIEWER_EDITOR_TAB_DUPLICATE": "Copies the hand tab you are editing, with every element on it, into a new tab.",
+    "DESC_KEYVIEWER_EDITOR_FOOT_DUPLICATE": "Copies the foot tab you have open, with every element on it, into a new foot tab."
   }
 }

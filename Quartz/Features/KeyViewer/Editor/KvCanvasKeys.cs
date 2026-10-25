@@ -9,6 +9,8 @@ internal sealed partial class KvCanvas {
     private const float NudgeRepeatDelay = 0.4f;
     private const float NudgeRepeatInterval = 0.05f;
     private static readonly List<KvElement> clipboard = [];
+    private static Newtonsoft.Json.Linq.JObject styleClipboard;
+    private static KvElementKind styleClipboardKind;
     private static readonly (KeyCode key, int dx, int dy)[] Arrows = [
         (KeyCode.LeftArrow, -1, 0),
         (KeyCode.RightArrow, 1, 0),
@@ -34,6 +36,15 @@ internal sealed partial class KvCanvas {
     private void HandleKeyboard() {
         if(doc == null || TextInputFocused() || (InputSuppressed?.Invoke() ?? false)) return;
         if(CtrlOrCmdHeld()) {
+            bool shift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+            if(shift && Input.GetKeyDown(KeyCode.C)) {
+                CopyStyle();
+                return;
+            }
+            if(shift && Input.GetKeyDown(KeyCode.V)) {
+                PasteStyle();
+                return;
+            }
             if(Input.GetKeyDown(KeyCode.C)) {
                 Copy();
                 return;
@@ -155,6 +166,30 @@ internal sealed partial class KvCanvas {
         SetSelection(pasted);
         Mutated();
     }
+    internal bool HasStyleClipboard => styleClipboard != null;
+    internal void CopyStyle() {
+        if(selection.Count == 0) return;
+        styleClipboard = selection[0].CopyStyle();
+        styleClipboardKind = selection[0].Kind;
+        StyleClipboardChanged?.Invoke();
+    }
+    // Keys and stats draw the same box, so they share looks; graphs and knobs only take their own kind's.
+    private static bool StyleFits(KvElementKind kind) =>
+        kind == styleClipboardKind
+        || (kind is KvElementKind.Key or KvElementKind.Stat && styleClipboardKind is KvElementKind.Key or KvElementKind.Stat);
+    internal void PasteStyle() {
+        if(styleClipboard == null || doc == null || selection.Count == 0) return;
+        bool any = false;
+        foreach(KvElement el in selection) any |= StyleFits(el.Kind);
+        if(!any) return;
+        PushHistory();
+        foreach(KvElement el in selection)
+            if(StyleFits(el.Kind)) el.PasteStyle(styleClipboard);
+        Rebuild();
+        SetSelection([.. selection]);
+        Mutated();
+    }
+    internal static event Action StyleClipboardChanged;
     internal void NudgeZ(bool forward) {
         if(selection.Count == 0 || doc == null) return;
         PushHistory();

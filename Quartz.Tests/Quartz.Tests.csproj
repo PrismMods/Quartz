@@ -95,6 +95,7 @@
 		<Compile Include="../Quartz/Features/KeyViewer/Js/KvJsTemplate.cs" Link="Source/KvJsTemplate.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/Js/KvJsVNode.cs" Link="Source/KvJsVNode.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvElement.cs" Link="Source/KvElement.cs" />
+		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvElement.Style.cs" Link="Source/KvElement.Style.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvDocument.cs" Link="Source/KvDocument.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvDocument.Images.cs" Link="Source/KvDocument.Images.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvExportShaping.cs" Link="Source/KvExportShaping.cs" />

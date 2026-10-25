@@ -149,6 +149,25 @@ internal sealed partial class KvDocument {
         custom.Add(new JObject { ["id"] = tab, ["name"] = unique });
         return unique;
     }
+    // A new tab right after the source, with copies of all its elements, its anchor and its tab-entry fields.
+    internal string DuplicateTab(string tab) {
+        if(!HasTab(tab)) return null;
+        string id = NewTabId();
+        EnsureTab(id, UniqueTabName(TabName(tab)));
+        if(CustomTabEntry(tab) is JObject source && CustomTabEntry(id) is JObject entry)
+            foreach(JProperty p in source.Properties())
+                if(p.Name != "id" && p.Name != "name") entry[p.Name] = p.Value.DeepClone();
+        foreach((_, KvElementKind kind) in Tables) {
+            List<KvElement> into = Bucket(id, kind);
+            foreach(KvElement el in Bucket(tab, kind)) into.Add(el.Clone());
+        }
+        if(TryGetRenderAnchor(tab, out float x, out float y)) SetRenderAnchor(id, x, y);
+        List<string> order = [.. Tabs];
+        order.Remove(id);
+        order.Insert(order.IndexOf(tab) + 1, id);
+        Root[TabOrderKey] = new JArray(order);
+        return id;
+    }
     internal bool RemoveTab(string tab) {
         if(string.IsNullOrWhiteSpace(tab) || !tabs.ContainsKey(tab)) return false;
         bool foot = IsFootTab(tab);

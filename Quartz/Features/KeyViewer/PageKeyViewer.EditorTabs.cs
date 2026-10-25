@@ -21,6 +21,7 @@ internal static partial class PageKeyViewer {
         RectTransform host = KvToolbar.RegionOf(bar);
         UIButton delete = null;
         UIButton footDelete = null;
+        UIButton footDuplicate = null;
         void Refresh() {
             KvDocument doc = KvStore.Current;
             List<string> hands = [];
@@ -32,6 +33,7 @@ internal static partial class PageKeyViewer {
             footStrip.Rebuild(feet, tab => tab == foot, canvas.Tab, doc.TabName, Select, Reorder);
             delete?.SetBlocked(doc.HandTabCount <= 1, true);
             footDelete?.SetBlocked(FootTarget() == null, true);
+            footDuplicate?.SetBlocked(FootTarget() == null, true);
         }
         void Select(string tab) {
             KvDocument doc = KvStore.Current;
@@ -65,6 +67,16 @@ internal static partial class PageKeyViewer {
             doc.EnsureTab(tab, doc.UniqueTabName(StyleName(style)));
             KvMigration.GenerateStockTab(doc, tab, style);
             Select(tab);
+        }
+        void Duplicate(string tab) {
+            if(AtTabLimit()) return;
+            KvDocument doc = KvStore.Current;
+            if(!doc.HasTab(tab)) return;
+            canvas.PushHistory();
+            string copy = doc.DuplicateTab(tab);
+            if(copy == null) return;
+            canvas.Mutated();
+            Select(copy);
         }
         void Reorder(string tab, int index) {
             KvDocument doc = KvStore.Current;
@@ -114,6 +126,11 @@ internal static partial class PageKeyViewer {
             "Add a hand-key tab holding one of the Simple mode key layouts, ready to edit."
         );
         add.OnClick = () => KvPopup.Show(host, add.Rect, PresetItems(), index => Create(KvPresets.Styles[index]));
+        KvToolbar.Icon(
+            handStrip.Pill, UISprite.Layer128, "keyviewer_editor_tab_duplicate", () => Duplicate(KvStore.Current.SelectedTab),
+            "DESC_KEYVIEWER_EDITOR_TAB_DUPLICATE",
+            "Copy the hand tab you are editing, with every element on it, into a new tab."
+        );
         delete = KvToolbar.Icon(
             handStrip.Pill, UISprite.Minus128, "keyviewer_editor_tab_delete", null,
             "DESC_KEYVIEWER_EDITOR_TAB_DELETE",
@@ -132,6 +149,13 @@ internal static partial class PageKeyViewer {
             "Add another foot-key tab, drawn alongside the hand tab you have open. Pick how many foot keys it starts with."
         );
         footAdd.OnClick = () => KvPopup.Show(host, footAdd.Rect, FootItems(), index => AddFoot((index + 1) * 2));
+        footDuplicate = KvToolbar.Icon(
+            footStrip.Pill, UISprite.Layer128, "keyviewer_editor_foot_duplicate", () => {
+                if(FootTarget() is string foot) Duplicate(foot);
+            },
+            "DESC_KEYVIEWER_EDITOR_FOOT_DUPLICATE",
+            "Copy the foot tab you have open, with every element on it, into a new foot tab."
+        );
         footDelete = KvToolbar.Icon(
             footStrip.Pill, UISprite.Minus128, "keyviewer_editor_foot_delete", null,
             "DESC_KEYVIEWER_EDITOR_FOOT_DELETE",

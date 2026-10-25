@@ -75,6 +75,7 @@ internal sealed partial class KvInspector {
         capture?.EndCapture();
         canvas.SelectionChanged -= OnSelectionChanged;
         canvas.Changed -= SyncToolbar;
+        KvCanvas.StyleClipboardChanged -= SyncToolbar;
         canvas.InputSuppressed = null;
         DisposeTracked();
         host = null;

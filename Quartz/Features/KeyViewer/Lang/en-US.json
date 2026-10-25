@@ -210,6 +210,10 @@
     "KVI_LABEL_ENABLED": "Show Label",
     "KVI_HOME_ON": "on",
     "KVI_HOME_OFF": "off",
-    "KVI_HOME_RAIN": "Rain {0} · speed {1:0} px/s"
+    "KVI_HOME_RAIN": "Rain {0} · speed {1:0} px/s",
+    "KVI_COPY_STYLE": "Copy Style",
+    "DESC_KVI_COPY_STYLE": "Copies the look of the selected element: colors, shape, text, notes and counter. Ctrl+Shift+C does the same.",
+    "KVI_PASTE_STYLE": "Paste Style",
+    "DESC_KVI_PASTE_STYLE": "Gives the selected elements the copied look. Position, size, key and label stay. Ctrl+Shift+V does the same."
   }
 }
