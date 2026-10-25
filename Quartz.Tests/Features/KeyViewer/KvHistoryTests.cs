@@ -46,4 +46,13 @@ static class KvHistoryTests {
         h.PushNudge("e", 1.1f);
         Assert(h.UndoDepth == 3, "releasing the key breaks coalescing immediately");
     }
+    public static void TestNoOpPressesDoNotEatUndo() {
+        KvHistory h = new();
+        h.Push("a");
+        h.Push("b");
+        h.Push("b");
+        Assert(h.UndoDepth == 2, "a repeat snapshot is not a new step");
+        Assert(h.Undo("b") == "a", "undo skips entries equal to the current state");
+        Assert(h.Undo("a") == null, "nothing that would change the state is left");
+    }
 }
