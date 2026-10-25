@@ -39,8 +39,8 @@ public sealed class PracticeSettings : ISettingsFile {
     public float FontSize = 26f;
     public float MasterSize = 1f;
     public float OffsetX = 0f;
-    public float OffsetY = -110f;
     public float Rotation = 0f;
+    public float OffsetY = -197f;
     public float ColorR = 1f, ColorG = 1f, ColorB = 1f, ColorA = 0.85f;
     public readonly List<PracticeBinding> Bindings = [];
     public static int ClampPitch(int value) => Mathf.Clamp(value, MinPitch, MaxPitch);

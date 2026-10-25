@@ -3,7 +3,7 @@ using Quartz.IO;
 using Quartz.IO.Interface;
 namespace Quartz.Features.MainMenu;
 public sealed class MenuTweaksSettings : ISettingsFile {
-    public bool DisableMenuMusic = true;
+    public bool DisableMenuMusic = false;
     public bool MenuBpmEnabled = false;
     public float MenuSlowBpm = 100f;
     public float MenuHighBpm = 200f;

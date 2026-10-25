@@ -8,12 +8,12 @@ public sealed class OptimizerSettings : ISettingsFile {
     public bool CollectOnLevelLoad = true;
     public bool BoostProcessPriority = true;
     public bool RunInBackground = true;
-    public bool LossyTextureCompression = false;
-    public bool FastBloom = false;
+    public bool LossyTextureCompression = true;
+    public bool FastBloom = true;
     public bool SkipNoOpScreenFilters = true;
     public bool LightTextShadows = true;
     public float ShadowUnderlayOffsetScale = 6f;
-    public bool RenderAllHitSounds = false;
+    public bool RenderAllHitSounds = true;
     public bool CacheScreenScale = true;
     public bool SkipIdleParticles = true;
     public bool PauseOffscreenParticles = false;

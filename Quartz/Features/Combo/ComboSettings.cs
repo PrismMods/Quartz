@@ -13,8 +13,8 @@ public sealed class ComboSettings : ISettingsFile {
     public float CaptionScale = 0.35f;
     public int Anchor = (int)OverlayAnchor.TopCenter;
     public float OffsetX = 0f;
-    public float OffsetY = 58.8050537f;
     public float Rotation = 0f;
+    public float OffsetY = 52.8050537f;
     public bool ShowCaption = true;
     public string CaptionText = "Combo";
     public float CaptionOffsetY = -40f;

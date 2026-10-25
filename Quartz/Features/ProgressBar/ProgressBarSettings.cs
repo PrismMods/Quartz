@@ -12,20 +12,20 @@ public sealed class ProgressBarSettings : ISettingsFile {
     public bool Enabled = true;
     public ProgressBarStyle Style = ProgressBarStyle.Modern;
     public float Width = 800f;
-    public float Height = 8f;
+    public float Height = 14f;
     public int Anchor = (int)OverlayAnchor.TopCenter;
     public float OffsetX = 0f;
     public float Rotation = 0f;
     public float TopOffset = 10f;
-    public float Rounding = 1f;
-    public float OutlineThickness = 1.75f;
+    public float Rounding = 6f;
+    public float OutlineThickness = 1f;
     public float LineThickness = 3f;
     public bool LineAtBottom = false;
     public bool PrefillStart = false;
-    public bool UseMapTime = false;
-    public float FillR = 1f, FillG = 0f, FillB = 0f, FillA = 0.96f;
+    public bool UseMapTime = true;
+    public float FillR = 0.746976733f, FillG = 1f, FillB = 0.701258063f, FillA = 0.96f;
     public float BackR = 0.05f, BackG = 0.05f, BackB = 0.06f, BackA = 0.80f;
-    public float OutlineColR = 1f, OutlineColG = 1f, OutlineColB = 1f, OutlineColA = 1f;
+    public float OutlineColR = 0.4357322f, OutlineColG = 0.4357322f, OutlineColB = 0.4357322f, OutlineColA = 1f;
     public StatColor FillGradient = StatColor.DefaultFor("progress");
     public Color GetFillColorForProgress(float progress) =>
         FillGradient is { Enabled: true } ? FillGradient.Evaluate(progress) : GetFillColor();

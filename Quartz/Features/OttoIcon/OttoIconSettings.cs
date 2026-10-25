@@ -17,7 +17,7 @@ public sealed class OttoIconSettings : ISettingsFile {
     public float OffsetX = -10f;
     public float OffsetY = 5f;
     public string ImagePath = "";
-    public bool TintImage = false;
+    public bool TintImage = true;
     public Color GetColor() => IOUtils.Rgba(R, G, B, A);
     public void SetColor(Color c) => IOUtils.SetRgba(c, ref R, ref G, ref B, ref A);
     public Color GetHighBpmColor() => IOUtils.Rgba(HighBpmR, HighBpmG, HighBpmB, HighBpmA);

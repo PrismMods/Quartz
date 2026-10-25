@@ -6,11 +6,11 @@ using UnityEngine;
 namespace Quartz.Features.Overlay;
 public sealed class OverlaySettings : ISettingsFile {
     public bool Enabled = true;
-    public bool PopEnabled;
+    public bool PopEnabled = true;
     public bool PopExit = true;
     public OverlayPopEdge PopEdge = OverlayPopEdge.Nearest;
     public Easing PopEase = Easing.OutCubic;
-    public float PopSeconds = 0.5f;
+    public float PopSeconds = 1f;
     public JToken Serialize() => new JObject {
         [nameof(Enabled)] = Enabled,
         [nameof(PopEnabled)] = PopEnabled,

@@ -9,11 +9,11 @@ public sealed class SongTitleSettings : ISettingsFile {
     public string Format = "{artist} - {title}";
     public bool StripFormatting = false;
     public float FontSize = 40f;
-    public float MasterSize = 1f;
+    public float MasterSize = 0.5697336f;
     public int Anchor = (int)OverlayAnchor.TopCenter;
     public float OffsetX = 0f;
-    public float OffsetY = -55f;
     public float Rotation = 0f;
+    public float OffsetY = -46.75464f;
     public float ColorR = 1f, ColorG = 1f, ColorB = 1f, ColorA = 1f;
     public bool ShadowEnabled = true;
     public float ShadowX = 2f, ShadowY = -2f, ShadowSoftness = 0f;

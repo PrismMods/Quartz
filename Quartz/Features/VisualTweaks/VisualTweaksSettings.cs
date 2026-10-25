@@ -4,9 +4,9 @@ using Quartz.IO.Interface;
 namespace Quartz.Features.VisualTweaks;
 public sealed class VisualTweaksSettings : ISettingsFile {
     public bool RemoveAllCheckpoints = true;
-    public bool RemoveBallCoreParticles = true;
-    public bool DisableTileHitGlow = true;
-    public bool RemovePlanetGlow = true;
+    public bool RemoveBallCoreParticles = false;
+    public bool DisableTileHitGlow = false;
+    public bool RemovePlanetGlow = false;
     public bool ShowSpeedChangeBpm = false;
     public int SpeedBpmDisplay = 0;
     public int SpeedBpmPosition = 0;

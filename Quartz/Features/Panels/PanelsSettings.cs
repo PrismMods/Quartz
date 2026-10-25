@@ -163,8 +163,8 @@ public sealed class PanelsSettings : ISettingsFile {
         new PanelConfig {
             Name = "left",
             Anchor = (int)PanelAnchor.TopLeft,
-            PosX = 22.7f,
-            PosY = -19.5f,
+            PosX = 0f,
+            PosY = -3.911255f,
             Stats = [new("progress"), new("best"), new("xaccuracy"), new("maxaccuracy"), new("fps")],
             LabelSeparator = "|",
             BackgroundEnabled = false,
@@ -175,8 +175,8 @@ public sealed class PanelsSettings : ISettingsFile {
         new PanelConfig {
             Name = "right",
             Anchor = (int)PanelAnchor.TopRight,
-            PosX = -19.2f,
-            PosY = -28.5f,
+            PosX = 1.5f,
+            PosY = 0f,
             Stats = [new("tbpm"), new("cbpm"), new("kps")],
             LabelSeparator = "|",
             BackgroundEnabled = false,
@@ -187,8 +187,8 @@ public sealed class PanelsSettings : ISettingsFile {
         new PanelConfig {
             Name = "attempts",
             Anchor = (int)PanelAnchor.BottomRight,
-            PosX = 1.5f,
-            PosY = 63.8f,
+            PosX = 0f,
+            PosY = 127.929993f,
             Stats = [new("attempt"), new("totalattempts")],
             LabelSeparator = "|",
             BackgroundEnabled = false,
