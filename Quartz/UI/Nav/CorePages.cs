@@ -1,7 +1,6 @@
 using Quartz.Core;
 using Quartz.Resource;
 using Quartz.UI.Factory.Page;
-using Quartz.UI.Generator;
 namespace Quartz.UI.Nav;
 internal static class CorePages {
     internal const string HomeCategoryKey = "home";
@@ -45,7 +44,6 @@ internal static class CorePages {
         Category("profiles", "Profiles", "PROFILES", UISprite.Users128, 90, visible: static () => CoreNav);
         Category("import", "Import", "IMPORT", UISprite.Book128, 100, visible: static () => CoreNav);
         Category("settings", "Settings", "SETTINGS", UISprite.Gear128, 120, visible: static () => CoreNav);
-        Category("help", "Help", "HELP", UISprite.QuestionMarkCircle128, 130, alwaysSubmenu: true, visible: static () => CoreNav);
         Category("credits", "Credits", "CREDITS", UISprite.Star128, 140, visible: static () => CoreNav);
         Category("developer", "Developer", "DEVELOPER", UISprite.Code128, 150, visible: static () => CoreNav && Info.IsDev);
     }
@@ -65,8 +63,6 @@ internal static class CorePages {
         Page(AddonsPageKey, AddonsCategoryKey, 90, "Addons", "ADDONS", PageAddons.Create, separatorBefore: true,
             visible: static () => CoreNav);
         Page(SettingsPageKey, "settings", 10, "Settings", "SETTINGS", PageSettings.Create);
-        Page("help.faq", "help", 10, "FAQ", "FAQ", PageHelp.FaqPage,
-            static () => GenerateUI.Tr("HELP", "Help") + " · " + GenerateUI.Tr("FAQ", "FAQ"));
         Page("credits.main", "credits", 10, "Credits", "CREDITS", PageCredits.Create);
         Page("developer.main", "developer", 10, "Developer", "DEVELOPER", PageDeveloper.Create,
             visible: static () => CoreNav && Info.IsDev);
