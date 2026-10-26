@@ -5,7 +5,6 @@ namespace Quartz.Features.Countdown;
 internal static class CountdownPatches {
     [HarmonyPatch(typeof(scrController), nameof(scrController.Start_Rewind))]
     internal static class StartRewindPatch {
-        private static void Prefix() => CountdownScreenFx.ResetVolatileState();
         private static void Postfix() {
             CountdownHaywire.PendingCheckpoint = -1;
             if(GCS.checkpointNum == 0) return;
@@ -15,7 +14,6 @@ internal static class CountdownPatches {
     }
     [HarmonyPatch(typeof(scrController), nameof(scrController.Scrub))]
     internal static class InitialScrubPatch {
-        private static void Prefix() => CountdownScreenFx.ResetVolatileState();
         private static void Postfix() => CountdownHaywire.OnScrubCompleted();
     }
     [HarmonyPatch(typeof(scrConductor), nameof(scrConductor.ScrubMusicToTime))]
