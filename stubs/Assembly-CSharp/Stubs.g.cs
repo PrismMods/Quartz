@@ -853,9 +853,6 @@ public unsafe partial class scnLevelSelect : global::LevelSelectBase {
 public unsafe partial class scrCamera : global::ADOBase {
     public global::UnityEngine.Camera Bgcamstatic;
     public const float DefaultCameraOrthoSize = 69f;
-    public global::UnityEngine.Renderer flashPlusRendererBg;
-    public global::UnityEngine.Renderer flashPlusRendererFg;
-    public static global::scrCamera instance { get => throw null; set { } }
     public void SetCustomFrameRate(bool enable, float frame = default) => throw null;
     protected scrCamera() { }
 }

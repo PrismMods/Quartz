@@ -11,9 +11,3 @@
 // </auto-generated>
 #pragma warning disable CS0067, CS0169, CS0649, CS0108, CS0109, CS0114, CS0465, CS0824
 
-namespace DG.Tweening {
-    public unsafe partial class DOTween {
-        public static int Kill(object targetOrId, bool complete = default) => throw null;
-        protected DOTween() { }
-    }
-}

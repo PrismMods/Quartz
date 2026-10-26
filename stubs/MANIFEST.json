@@ -1623,11 +1623,7 @@
         "members": [
           "System.Single scrCamera::DefaultCameraOrthoSize",
           "System.Void scrCamera::SetCustomFrameRate(System.Boolean,System.Single)",
-          "UnityEngine.Camera scrCamera::Bgcamstatic",
-          "UnityEngine.Renderer scrCamera::flashPlusRendererBg",
-          "UnityEngine.Renderer scrCamera::flashPlusRendererFg",
-          "scrCamera scrCamera::get_instance()",
-          "scrCamera scrCamera::instance()"
+          "UnityEngine.Camera scrCamera::Bgcamstatic"
         ]
       },
       {
@@ -1947,14 +1943,7 @@
   },
   {
     "assembly": "DOTween",
-    "types": [
-      {
-        "type": "DG.Tweening.DOTween",
-        "members": [
-          "System.Int32 DG.Tweening.DOTween::Kill(System.Object,System.Boolean)"
-        ]
-      }
-    ]
+    "types": []
   },
   {
     "assembly": "MelonLoader",
@@ -3804,10 +3793,8 @@
           "System.Void UnityEngine.Material::SetFloat(System.Int32,System.Single)",
           "System.Void UnityEngine.Material::SetFloat(System.String,System.Single)",
           "System.Void UnityEngine.Material::SetTexture(System.Int32,UnityEngine.Texture)",
-          "System.Void UnityEngine.Material::set_color(UnityEngine.Color)",
           "System.Void UnityEngine.Material::set_mainTexture(UnityEngine.Texture)",
           "System.Void UnityEngine.Material::set_shader(UnityEngine.Shader)",
-          "UnityEngine.Color UnityEngine.Material::color()",
           "UnityEngine.Shader UnityEngine.Material::get_shader()",
           "UnityEngine.Shader UnityEngine.Material::shader()",
           "UnityEngine.Texture UnityEngine.Material::get_mainTexture()",
@@ -4026,9 +4013,7 @@
           "System.Void UnityEngine.Renderer::set_enabled(System.Boolean)",
           "System.Void UnityEngine.Renderer::set_sortingLayerID(System.Int32)",
           "System.Void UnityEngine.Renderer::set_sortingOrder(System.Int32)",
-          "UnityEngine.Material UnityEngine.Renderer::get_material()",
           "UnityEngine.Material UnityEngine.Renderer::get_sharedMaterial()",
-          "UnityEngine.Material UnityEngine.Renderer::material()",
           "UnityEngine.Material UnityEngine.Renderer::sharedMaterial()"
         ]
       },
