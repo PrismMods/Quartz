@@ -45,7 +45,9 @@ public static class XPerfectBridge {
             return -1;
         }
     }
-    public static bool Native => NativeX >= 0;
+    private static bool GameHasX => NativeX >= 0;
+    // The XPerfect mod still runs on builds with native X judgements; while it is enabled its counts win.
+    public static bool Native => GameHasX && !ModEnabled;
     private static readonly Refl.Member HitMarginColours = new(typeof(RDC), "hitMarginColoursBySettings");
     private static Refl.Member xPerfectColourMember;
     public static UnityEngine.Color NativeXColor() {
@@ -56,22 +58,37 @@ public static class XPerfectBridge {
     }
     public static bool Installed {
         get {
-            if(Native) return true;
             EnsureResolved();
-            return installed;
+            return installed || GameHasX;
+        }
+    }
+    private static int modFrame = -1;
+    private static bool modCache;
+    private static bool ModEnabled {
+        get {
+            if(modFrame == UnityEngine.Time.frameCount) return modCache;
+            EnsureResolved();
+            bool result;
+            try {
+                result = installed && (enabledFast != null ? enabledFast()
+                    : enabledProp == null || (enabledProp.GetValue(null, null) is bool b && b));
+            } catch(Exception e) {
+                Diag.Ignore(e);
+                result = false;
+            }
+            modFrame = UnityEngine.Time.frameCount;
+            modCache = result;
+            return result;
         }
     }
     private static int activeFrame = -1;
     private static bool activeCache;
     public static bool Active {
         get {
-            if(!Installed) return false;
             if(activeFrame == UnityEngine.Time.frameCount) return activeCache;
             bool result;
             try {
-                result = Native ? Convert.ToInt32(PerfectTextPreset.Get(null) ?? 0) != 0
-                    : enabledFast != null ? enabledFast()
-                    : enabledProp == null || (enabledProp.GetValue(null, null) is bool b && b);
+                result = ModEnabled || GameHasX && Convert.ToInt32(PerfectTextPreset.Get(null) ?? 0) != 0;
             } catch(Exception e) {
                 Diag.Ignore(e);
                 result = false;
