@@ -145,7 +145,6 @@ namespace SkyHook {
         public readonly long TimeSec;
         public readonly uint TimeSubsecNano;
         public readonly global::SkyHook.EventType Type;
-        public long GetTimeInTicks() => throw null;
     }
     public unsafe partial class SkyHookManager : global::UnityEngine.MonoBehaviour {
         protected SkyHookManager() { }

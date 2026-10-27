@@ -21,12 +21,6 @@
       "assembly": "Assembly-CSharp"
     },
     {
-      "type": "AsyncInputManager",
-      "member": "ClearKeys",
-      "resolved": true,
-      "assembly": "Assembly-CSharp"
-    },
-    {
       "type": "AudioManager",
       "member": "StopAllSounds",
       "resolved": true,
@@ -149,12 +143,6 @@
     {
       "type": "RDInput",
       "member": "get_mouseScrollDelta",
-      "resolved": true,
-      "assembly": "Assembly-CSharp"
-    },
-    {
-      "type": "RDInputType_Keyboard",
-      "member": "CheckKeyState",
       "resolved": true,
       "assembly": "Assembly-CSharp"
     },
@@ -532,12 +520,6 @@
     },
     {
       "type": "scrController",
-      "member": "UpdateInput",
-      "resolved": true,
-      "assembly": "Assembly-CSharp"
-    },
-    {
-      "type": "scrController",
       "member": "WaitForStartCo",
       "resolved": true,
       "assembly": "Assembly-CSharp"
@@ -641,24 +623,6 @@
     {
       "type": "scrPlayer",
       "member": "Die",
-      "resolved": true,
-      "assembly": "Assembly-CSharp"
-    },
-    {
-      "type": "scrPlayer",
-      "member": "Simulated_PlayerControl_Update",
-      "resolved": true,
-      "assembly": "Assembly-CSharp"
-    },
-    {
-      "type": "scrPlayer",
-      "member": "UpdateHoldBehavior",
-      "resolved": true,
-      "assembly": "Assembly-CSharp"
-    },
-    {
-      "type": "scrPlayer",
-      "member": "ValidInputWasReleased",
       "resolved": true,
       "assembly": "Assembly-CSharp"
     },

@@ -550,24 +550,14 @@
         "type": "AsyncInputManager",
         "members": [
           "System.Boolean AsyncInputManager::get_isActive()",
-          "System.Boolean AsyncInputManager::isActive()",
-          "System.Collections.Concurrent.ConcurrentQueue\u00601\u003CSkyHook.SkyHookEvent\u003E AsyncInputManager::keyQueue",
-          "System.Collections.Generic.HashSet\u00601\u003CAsyncKeyCode\u003E AsyncInputManager::frameDependentKeyDownMask",
-          "System.Collections.Generic.HashSet\u00601\u003CAsyncKeyCode\u003E AsyncInputManager::frameDependentKeyMask",
-          "System.Collections.Generic.HashSet\u00601\u003CAsyncKeyCode\u003E AsyncInputManager::frameDependentKeyUpMask",
-          "System.Collections.Generic.HashSet\u00601\u003CAsyncKeyCode\u003E AsyncInputManager::keyDownMask",
-          "System.Collections.Generic.HashSet\u00601\u003CAsyncKeyCode\u003E AsyncInputManager::keyMask",
-          "System.Collections.Generic.HashSet\u00601\u003CAsyncKeyCode\u003E AsyncInputManager::keyUpMask",
-          "System.Int64 AsyncInputManager::currFrameTick",
-          "System.Void AsyncInputManager::ClearKeys()"
+          "System.Boolean AsyncInputManager::isActive()"
         ]
       },
       {
         "type": "AsyncKeyCode",
         "members": [
           "SkyHook.KeyLabel AsyncKeyCode::label",
-          "System.UInt16 AsyncKeyCode::key",
-          "System.Void AsyncKeyCode::.ctor(System.UInt16,SkyHook.KeyLabel)"
+          "System.UInt16 AsyncKeyCode::key"
         ]
       },
       {
@@ -920,8 +910,6 @@
         "members": [
           "MonsterLove.StateMachine.StateEngine MonsterLove.StateMachine.StateBehaviour::get_stateMachine()",
           "MonsterLove.StateMachine.StateEngine MonsterLove.StateMachine.StateBehaviour::stateMachine()",
-          "States MonsterLove.StateMachine.StateBehaviour::get_state()",
-          "States MonsterLove.StateMachine.StateBehaviour::state()",
           "System.Void MonsterLove.StateMachine.StateBehaviour::ChangeState(System.Enum)",
           "System.Void MonsterLove.StateMachine.StateBehaviour::ChangeState(System.Enum,MonsterLove.StateMachine.StateTransition)"
         ]
@@ -1040,7 +1028,6 @@
         "members": [
           "System.Collections.Generic.List\u00601\u003CscrPlanet\u003E PlanetarySystem::allPlanets",
           "System.Collections.Generic.List\u00601\u003CscrPlanet\u003E PlanetarySystem::planetList",
-          "System.Double PlanetarySystem::speed",
           "scrPlanet PlanetarySystem::planetBlue",
           "scrPlanet PlanetarySystem::planetRed"
         ]
@@ -1130,10 +1117,6 @@
       {
         "type": "RDInput",
         "members": [
-          "RDInputType_AsyncKeyboard RDInput::asyncKeyboard",
-          "RDInputType_AsyncKeyboard RDInput::asyncKeyboardLeft",
-          "RDInputType_AsyncKeyboard RDInput::asyncKeyboardRight",
-          "RDInputType_Keyboard RDInput::keyboardInput",
           "System.Boolean RDInput::GetState(InputAction,ButtonState)",
           "System.Boolean RDInput::IsDown(UnityEngine.KeyCode)",
           "System.Boolean RDInput::WentDown(UnityEngine.KeyCode)",
@@ -1149,17 +1132,6 @@
       },
       {
         "type": "RDInputType",
-        "members": [
-          "System.Boolean RDInputType::get_isActive()",
-          "System.Boolean RDInputType::isActive()"
-        ]
-      },
-      {
-        "type": "RDInputType_AsyncKeyboard",
-        "members": []
-      },
-      {
-        "type": "RDInputType_Keyboard",
         "members": []
       },
       {
@@ -1673,7 +1645,6 @@
           "System.Boolean scrController::gameworld",
           "System.Boolean scrController::get_paused()",
           "System.Boolean scrController::paused()",
-          "System.Boolean scrController::requireHolding",
           "System.Collections.Generic.List\u00601\u003CPlanetRenderer\u003E scrController::dummyPlanets",
           "System.Collections.IEnumerator scrController::WaitForStartCo(System.Int32,System.Boolean)",
           "System.Int32 scrController::checkpointsUsed",
@@ -1690,15 +1661,12 @@
           "System.Void scrController::Scrub(System.Int32,System.Boolean)",
           "System.Void scrController::StartLoadingScene(WipeDirection)",
           "System.Void scrController::Start_Rewind(System.Int32)",
-          "System.Void scrController::UpdateInput()",
           "UnityEngine.UI.Text scrController::txtLevelName",
           "scrController scrController::get_instance()",
           "scrController scrController::instance()",
           "scrFloor scrController::currFloor()",
           "scrFloor scrController::firstFloor",
-          "scrFloor scrController::get_currFloor()",
-          "scrPlayer scrController::get_playerOne()",
-          "scrPlayer scrController::playerOne()"
+          "scrFloor scrController::get_currFloor()"
         ]
       },
       {
@@ -1739,7 +1707,6 @@
           "System.Int32 scrFloor::seqID",
           "System.Single scrFloor::extraBeats",
           "System.Single scrFloor::floatDirection",
-          "System.Single scrFloor::holdCompletion",
           "System.Single scrFloor::speed",
           "System.String scrFloor::checkpointIconFilename",
           "System.String scrFloor::gizmoIconFilename",
@@ -1808,18 +1775,7 @@
       },
       {
         "type": "scrMisc",
-        "members": [
-          "scrMisc/HitMarginGeneralWithXPerfectValuesStruct\u00601\u003CSystem.Double\u003E scrMisc::GetAdjustedAngleBoundaryInDeg(Difficulty,System.Double,System.Double,System.Double)"
-        ]
-      },
-      {
-        "type": "scrMisc/HitMarginGeneralWithXPerfectValuesStruct\u00601",
-        "members": [
-          "T scrMisc/HitMarginGeneralWithXPerfectValuesStruct\u00601::Counted",
-          "T scrMisc/HitMarginGeneralWithXPerfectValuesStruct\u00601::Perfect",
-          "T scrMisc/HitMarginGeneralWithXPerfectValuesStruct\u00601::Pure",
-          "T scrMisc/HitMarginGeneralWithXPerfectValuesStruct\u00601::XPerfect"
-        ]
+        "members": []
       },
       {
         "type": "scrMistakesManager",
@@ -1856,25 +1812,16 @@
       {
         "type": "scrPlayer",
         "members": [
-          "PlanetarySystem scrPlayer::planetarySystem",
-          "System.Boolean scrPlayer::ValidInputWasReleased()",
-          "System.Boolean scrPlayer::alive",
-          "System.Collections.Generic.List\u00601\u003CAnyKeyCode\u003E scrPlayer::holdKeys",
           "System.Double scrPlayer::lastHit",
           "System.Int32 scrPlayer::playerID",
-          "System.Void scrPlayer::Die(System.Boolean,System.Boolean,System.String,System.Boolean)",
-          "System.Void scrPlayer::Simulated_PlayerControl_Update(System.Nullable\u00601\u003CSystem.Int64\u003E)",
-          "scrFloor scrPlayer::currFloor()",
-          "scrFloor scrPlayer::get_currFloor()"
+          "System.Void scrPlayer::Die(System.Boolean,System.Boolean,System.String,System.Boolean)"
         ]
       },
       {
         "type": "scrPlayerManager",
         "members": [
           "System.Collections.Generic.IEnumerator\u00601\u003CscrPlayer\u003E scrPlayerManager::GetEnumerator()",
-          "System.Int32 scrPlayerManager::MaxPlayers",
-          "scrPlayer[] scrPlayerManager::get_players()",
-          "scrPlayer[] scrPlayerManager::players()"
+          "System.Int32 scrPlayerManager::MaxPlayers"
         ]
       },
       {
@@ -2401,7 +2348,6 @@
         "members": [
           "SkyHook.EventType SkyHook.SkyHookEvent::Type",
           "SkyHook.KeyLabel SkyHook.SkyHookEvent::Label",
-          "System.Int64 SkyHook.SkyHookEvent::GetTimeInTicks()",
           "System.Int64 SkyHook.SkyHookEvent::TimeSec",
           "System.UInt16 SkyHook.SkyHookEvent::Key",
           "System.UInt32 SkyHook.SkyHookEvent::TimeSubsecNano"

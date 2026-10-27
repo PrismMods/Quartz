@@ -42,22 +42,12 @@ public unsafe partial struct AnyKeyCode {
     public readonly global::System.Type valueType;
 }
 public unsafe partial class AsyncInputManager : global::UnityEngine.MonoBehaviour {
-    public static long currFrameTick;
-    public static readonly global::System.Collections.Generic.HashSet<global::AsyncKeyCode> frameDependentKeyDownMask;
-    public static readonly global::System.Collections.Generic.HashSet<global::AsyncKeyCode> frameDependentKeyMask;
-    public static readonly global::System.Collections.Generic.HashSet<global::AsyncKeyCode> frameDependentKeyUpMask;
-    public static readonly global::System.Collections.Generic.HashSet<global::AsyncKeyCode> keyDownMask;
-    public static readonly global::System.Collections.Generic.HashSet<global::AsyncKeyCode> keyMask;
-    public static global::System.Collections.Concurrent.ConcurrentQueue<global::SkyHook.SkyHookEvent> keyQueue;
-    public static readonly global::System.Collections.Generic.HashSet<global::AsyncKeyCode> keyUpMask;
     public static bool isActive { get => throw null; }
-    public static void ClearKeys() => throw null;
     protected AsyncInputManager() { }
 }
 public unsafe partial struct AsyncKeyCode : global::System.IEquatable<global::AsyncKeyCode> {
     public readonly ushort key;
     public readonly global::SkyHook.KeyLabel label;
-    public AsyncKeyCode(ushort key, global::SkyHook.KeyLabel label) => throw null;
     bool global::System.IEquatable<global::AsyncKeyCode>.Equals(global::AsyncKeyCode other) => throw null;
 }
 public unsafe partial class AudioManager : global::ADOBase {
@@ -412,7 +402,6 @@ public unsafe partial class PlanetarySystem : global::ADOBase {
     public global::scrPlanet planetBlue;
     public global::System.Collections.Generic.List<global::scrPlanet> planetList;
     public global::scrPlanet planetRed;
-    public double speed;
     protected PlanetarySystem() { }
     public enum DeathAnimation : int {
         Explode = 0,
@@ -474,10 +463,6 @@ public abstract unsafe partial class RDFile {
     protected RDFile() { }
 }
 public static unsafe partial class RDInput {
-    public static global::RDInputType_AsyncKeyboard asyncKeyboard;
-    public static global::RDInputType_AsyncKeyboard asyncKeyboardLeft;
-    public static global::RDInputType_AsyncKeyboard asyncKeyboardRight;
-    public static global::RDInputType_Keyboard keyboardInput;
     public static bool holdingControl { get => throw null; }
     public static bool holdingShift { get => throw null; }
     public static global::UnityEngine.Vector2 mouseScrollDelta { get => throw null; }
@@ -488,14 +473,7 @@ public static unsafe partial class RDInput {
     public static bool WentUp(this global::UnityEngine.KeyCode key) => throw null;
 }
 public abstract unsafe partial class RDInputType {
-    public virtual bool isActive { get => throw null; set { } }
     protected RDInputType() { }
-}
-public unsafe partial class RDInputType_AsyncKeyboard : global::RDInputType {
-    protected RDInputType_AsyncKeyboard() { }
-}
-public unsafe partial class RDInputType_Keyboard : global::RDInputType {
-    protected RDInputType_Keyboard() { }
 }
 public static unsafe partial class RDString {
     public const string BoothButtonKeySuffix = "BoothButtonKeySuffix";
@@ -894,13 +872,11 @@ public unsafe partial class scrController : global::MonsterLove.StateMachine.Sta
     public global::scrFloor firstFloor;
     public bool gameworld;
     public global::PauseMenu pauseMenu;
-    public bool requireHolding;
     public global::UnityEngine.UI.Text txtLevelName;
     public global::scrFloor currFloor { get => throw null; }
     public static global::scrController instance { get => throw null; }
     public bool paused { get => throw null; set { } }
     public float percentComplete { get => throw null; }
-    public global::scrPlayer playerOne { get => throw null; }
     public void EnterLevel(string worldAndLevel, bool speedTrial = default) => throw null;
     public void FailAction(bool overload = default, bool multipress = default, string failMessage = default, bool hitbox = default) => throw null;
     public void OnLandOnPortal(global::scrPlanet planetThatWon, global::Portal portalDestination, string portalArguments) => throw null;
@@ -911,7 +887,6 @@ public unsafe partial class scrController : global::MonsterLove.StateMachine.Sta
     public void StartLoadingScene(global::WipeDirection wipeDirection = default) => throw null;
     public void Start_Rewind(int _currentSeqID = default) => throw null;
     public bool TogglePauseGame() => throw null;
-    public void UpdateInput() => throw null;
     public global::System.Collections.IEnumerator WaitForStartCo(int seqID = default, bool remakeFloors = default) => throw null;
     protected scrController() { }
 }
@@ -944,7 +919,6 @@ public unsafe partial class scrFloor : global::ADOBase {
     public global::FloorIcon floorIcon;
     public global::FloorRenderer floorRenderer;
     public const string gizmoIconFilename = "gizmoIconFilename";
-    public float holdCompletion;
     public int holdLength;
     public global::scrHoldRenderer holdRenderer;
     public global::UnityEngine.SpriteRenderer iconsprite;
@@ -1002,13 +976,6 @@ public unsafe partial class scrLogoText : global::UnityEngine.MonoBehaviour {
     protected scrLogoText() { }
 }
 public static unsafe partial class scrMisc {
-    public static global::scrMisc.HitMarginGeneralWithXPerfectValuesStruct<double> GetAdjustedAngleBoundaryInDeg(global::Difficulty difficulty, double bpmTimesSpeed, double conductorPitch, double marginMult = default) => throw null;
-    public unsafe partial struct HitMarginGeneralWithXPerfectValuesStruct<T> {
-        public T Counted;
-        public T Perfect;
-        public T Pure;
-        public T XPerfect;
-    }
 }
 public unsafe partial class scrMistakesManager : global::ADOClass {
     public void MarkCheckpoint(int checkpointTileOffset) => throw null;
@@ -1034,20 +1001,13 @@ public unsafe partial class scrPlanet : global::ADOBase {
     protected scrPlanet() { }
 }
 public unsafe partial class scrPlayer : global::ADOBase {
-    public bool alive;
-    public global::System.Collections.Generic.List<global::AnyKeyCode> holdKeys;
     public double lastHit;
-    public global::PlanetarySystem planetarySystem;
     public int playerID;
-    public global::scrFloor currFloor { get => throw null; }
     public void Die(bool overload = default, bool multipress = default, string failMessage = default, bool hitbox = default) => throw null;
-    public void Simulated_PlayerControl_Update(global::System.Nullable<long> targetTick = default) => throw null;
-    public bool ValidInputWasReleased() => throw null;
     protected scrPlayer() { }
 }
 public unsafe partial class scrPlayerManager : global::ADOBase {
     public const int MaxPlayers = 79;
-    public global::scrPlayer[] players { get => throw null; }
     public global::System.Collections.Generic.IEnumerator<global::scrPlayer> GetEnumerator() => throw null;
     protected scrPlayerManager() { }
 }
@@ -1368,7 +1328,6 @@ namespace ADOFAI.Editor.Actions {
 }
 namespace MonsterLove.StateMachine {
     public unsafe partial class StateBehaviour : global::ADOBase {
-        public global::States state { get => throw null; }
         public global::MonsterLove.StateMachine.StateEngine stateMachine { get => throw null; }
         public virtual void ChangeState(global::System.Enum newState) => throw null;
         protected virtual void ChangeState(global::System.Enum newState, global::MonsterLove.StateMachine.StateTransition transition) => throw null;
