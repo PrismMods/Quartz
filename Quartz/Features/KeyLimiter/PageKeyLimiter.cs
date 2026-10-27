@@ -14,4 +14,6 @@ public static partial class PageKeyLimiter {
     private static Action syncLockChangedHandler;
     public static void KeyLimiterPage(RectTransform parent) =>
         CreateKeyLimiter(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
+    public static void ChatterBlockerPage(RectTransform parent) =>
+        CreateChatterBlocker(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
 }

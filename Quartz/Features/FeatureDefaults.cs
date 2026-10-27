@@ -20,7 +20,7 @@ public static class FeatureDefaults {
         new Rule { Id = "hidejudgements", FileName = "JudgementPopupHider.json", Field = "Enabled", Default = true },
         new Rule { Id = "planetcolors", FileName = "PlanetColors.json", Field = "Enabled", Default = true },
         new Rule { Id = "ottoicon", FileName = "OttoIcon.json", Field = "Enabled", Default = true },
-        new Rule { Id = "antichatter", FileName = "ChatterBlocker.json", Field = "Enabled", Default = true },
+        new Rule { Id = "keylimiter", FileName = "ChatterBlocker.json", Field = "Enabled", Default = true },
         new Rule { Id = "keylimiter", FileName = "KeyLimiter.json", Field = "Enabled", Default = true },
         new Rule { Id = "effectremover", FileName = "EffectRemover.json", Field = "On", Default = true },
         new Rule { Id = "uihider", FileName = "UiHider.json", Field = "Enabled", Default = false },

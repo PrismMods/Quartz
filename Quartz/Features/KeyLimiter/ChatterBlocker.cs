@@ -1,18 +1,31 @@
+using System.Diagnostics;
 using HarmonyLib;
 using Quartz.Core;
+using Quartz.IO;
 using SkyHook;
 using UnityEngine;
 using System.Reflection;
 using Quartz.Compat.Game;
 using Quartz.Utility;
 namespace Quartz.Features.KeyLimiter;
-// Replaces the game's key count while Key Limiter (or an injected-key guard) needs to filter presses.
-public static class KeyPressFilter {
+public static class ChatterBlocker {
     private static readonly System.Collections.Generic.List<AnyKeyCode> MainPressKeysBuffer = new();
+    public static SettingsFile<ChatterBlockerSettings> ConfMgr { get; private set; }
+    public static ChatterBlockerSettings Conf => ConfMgr?.Data;
+    public static void EnsureConf() => ConfMgr ??= SettingsFile<ChatterBlockerSettings>.Loaded("ChatterBlocker.json");
+    public static void Save() => ConfMgr?.RequestSave();
+    private static bool IsActive() {
+        EnsureConf();
+        return MainCore.IsModEnabled && Conf.Enabled;
+    }
     private static bool HasAnyFilter() =>
-        KeyLimiter.IsEnabled() || KeyLimiter.IsMenuBlockEnabled() || Quartz.Game.InjectedKeys.GuardActive;
-    private static readonly System.Diagnostics.Stopwatch clock = System.Diagnostics.Stopwatch.StartNew();
+        IsActive() || KeyLimiter.IsEnabled() || KeyLimiter.IsMenuBlockEnabled()
+        || Quartz.Game.InjectedKeys.GuardActive;
+    private static long ThresholdMs() => Math.Max(0L, (long)Math.Round(Conf?.ThresholdMs ?? 0f));
+    private static readonly Stopwatch clock = Stopwatch.StartNew();
     private static long NowMs() => clock.ElapsedMilliseconds;
+    private static readonly Dictionary<KeyCode, long> lastKeyPress = [];
+    private static readonly Dictionary<ushort, long> lastAsyncKeyPress = [];
     private static readonly HashSet<KeyCode> reportedKeysThisFrame = [];
     // RDInput merges backends, so Unity and the async hook can report the same edge; gameplay must see it once.
     private static readonly HashSet<KeyCode> physicalKeysThisEvaluation = [];
@@ -30,6 +43,35 @@ public static class KeyPressFilter {
     // Presses counted before the game reported them; the game's later report must not count again.
     private static readonly Dictionary<KeyCode, long> injectedAwaitingGame = [];
     private const long InjectedReportGraceMs = 100L;
+    private static readonly bool DebugLog = false;
+    private static bool AcceptNormalKey(KeyCode key, long now, long thresholdMs, bool active) {
+        if(!active) return true;
+        if(!lastKeyPress.TryGetValue(key, out long last)) {
+            lastKeyPress[key] = now;
+            return true;
+        }
+        long elapsed = now - last;
+        if(thresholdMs <= 0L || elapsed > thresholdMs) {
+            lastKeyPress[key] = now;
+            return true;
+        }
+        if(DebugLog) MainCore.Log.Msg($"[ChatterBlocker] Blocked Key: {key} time: {elapsed}ms.");
+        return false;
+    }
+    private static bool AcceptAsyncKey(ushort key, long now, long thresholdMs, bool active) {
+        if(!active) return true;
+        if(!lastAsyncKeyPress.TryGetValue(key, out long last)) {
+            lastAsyncKeyPress[key] = now;
+            return true;
+        }
+        long elapsed = now - last;
+        if(thresholdMs <= 0L || elapsed > thresholdMs) {
+            lastAsyncKeyPress[key] = now;
+            return true;
+        }
+        if(DebugLog) MainCore.Log.Msg($"[ChatterBlocker] Blocked Async Key: {key} time: {elapsed}ms.");
+        return false;
+    }
     private static void RecordKeyStats(scrController controller, object key) {
         try {
             GameApi.RecordKeyPress(controller, key);
@@ -49,7 +91,9 @@ public static class KeyPressFilter {
         if(controller == null) return CacheEvaluation(0);
         ResetKeyLimiterOverCounter(controller);
         if(KeyLimiter.IsMenuBlockActive()) return CacheEvaluation(0);
+        bool chatterActive = IsActive();
         long now = NowMs();
+        long threshold = ThresholdMs();
         int count = 0;
         physicalKeysThisEvaluation.Clear();
         unknownAsyncKeysThisEvaluation.Clear();
@@ -70,7 +114,7 @@ public static class KeyPressFilter {
                 if(KeyLimiter.ShouldBlockKey(key)) continue;
                 if(IsCrossSourceDuplicate(normalized, InputSource.Unity, now)) continue;
                 RecordKeyStats(controller, key);
-                count++;
+                if(AcceptNormalKey(normalized, now, threshold, chatterActive)) count++;
             } else if(value is AsyncKeyCode asyncKey) {
                 KeyCode physical = KeyCodes.Normalize(
                     KeyLimiter.HookKeyToPhysicalUnityKey(asyncKey.key, asyncKey.label));
@@ -85,10 +129,14 @@ public static class KeyPressFilter {
                 if(KeyLimiter.ShouldBlockAsyncKeyFromHook(asyncKey.key, asyncKey.label)) continue;
                 if(IsCrossSourceDuplicate(physical, InputSource.Async, now)) continue;
                 RecordKeyStats(controller, asyncKey);
-                count++;
+                if(physical != KeyCode.None) {
+                    if(AcceptNormalKey(physical, now, threshold, chatterActive)) count++;
+                } else if(AcceptAsyncKey(asyncKey.key, now, threshold, chatterActive)) {
+                    count++;
+                }
             }
         }
-        count += CountKeysMissedByGame(controller, now);
+        count += CountKeysMissedByGame(controller, now, threshold, chatterActive);
         return CacheEvaluation(count);
     }
     private static bool IsCrossSourceDuplicate(KeyCode key, InputSource source, long now) {
@@ -111,6 +159,11 @@ public static class KeyPressFilter {
     private static int injectedComputeFrame = -1;
     private static int injectedBatch = -1;
     private static int injectedCount;
+    private static readonly KeyCode[] hookFallbackKeys = [
+        KeyCode.LeftShift, KeyCode.RightShift,
+        KeyCode.LeftControl, KeyCode.RightControl,
+        KeyCode.LeftAlt, KeyCode.RightAlt,
+    ];
     public static void NotePlayerBatch(bool entered) {
         inPlayerBatch = entered;
         if(entered) injectionBatch++;
@@ -122,8 +175,9 @@ public static class KeyPressFilter {
         }
         return count;
     }
-    private static int CountKeysMissedByGame(scrController controller, long now) {
-        if(!KeyLimiter.IsActive() || !KeyLimiter.InPlayerControl()) {
+    private static int CountKeysMissedByGame(scrController controller, long now, long threshold, bool chatterActive) {
+        bool limiterActive = KeyLimiter.IsActive();
+        if((!limiterActive && !chatterActive) || !KeyLimiter.InPlayerControl()) {
             injectedKeyHeldPrev.Clear();
             injectedAwaitingGame.Clear();
             injectedComputeFrame = -1;
@@ -134,23 +188,35 @@ public static class KeyPressFilter {
         if(injectedComputeFrame != frame) {
             injectedComputeFrame = frame;
             injectedBatch = injectionBatch;
-            injectedCount = ComputeInjectedKeys(controller, now);
+            injectedCount = ComputeInjectedKeys(controller, now, threshold, chatterActive, limiterActive);
         }
         return injectionBatch == injectedBatch ? injectedCount : 0;
     }
-    private static int ComputeInjectedKeys(scrController controller, long now) {
-        int[] allowed = KeyLimiter.Conf?.AllowedKeys;
-        if(allowed == null || allowed.Length == 0) {
-            injectedKeyHeldPrev.Clear();
-            return 0;
-        }
+    private static int ComputeInjectedKeys(scrController controller, long now, long threshold, bool chatterActive,
+        bool limiterActive) {
         bool asyncActive = AsyncKeyboardActive();
         int injected = 0;
-        for(int i = 0; i < allowed.Length; i++)
-            injected += TryInjectMissedKey(controller, KeyCodes.Normalize((KeyCode)allowed[i]), now, asyncActive);
+        if(limiterActive) {
+            int[] allowed = KeyLimiter.Conf?.AllowedKeys;
+            if(allowed == null || allowed.Length == 0) {
+                injectedKeyHeldPrev.Clear();
+                return 0;
+            }
+            for(int i = 0; i < allowed.Length; i++) {
+                KeyCode key = KeyCodes.Normalize((KeyCode)allowed[i]);
+                injected += TryInjectMissedKey(controller, key, now, threshold, chatterActive, asyncActive);
+            }
+            return injected;
+        }
+        for(int i = 0; i < hookFallbackKeys.Length; i++) {
+            KeyCode key = hookFallbackKeys[i];
+            if(!Quartz.Game.HookInput.IsHookTrackedKey(key)) continue;
+            injected += TryInjectMissedKey(controller, key, now, threshold, chatterActive, asyncActive);
+        }
         return injected;
     }
-    private static int TryInjectMissedKey(scrController controller, KeyCode key, long now, bool asyncActive) {
+    private static int TryInjectMissedKey(scrController controller, KeyCode key, long now, long threshold,
+        bool chatterActive, bool asyncActive) {
         if(key == KeyCode.None || KeyLimiter.IsMouseKey(key)) return 0;
         if(reportedKeysThisFrame.Contains(key)) {
             injectedKeyHeldPrev.Add(key);
@@ -166,9 +232,11 @@ public static class KeyPressFilter {
         if(!held) held = KeyLimiter.HookKeyHeld(key);
         if(held && !injectedKeyHeldPrev.Contains(key)) {
             RecordKeyStats(controller, key);
-            injectedKeyHeldPrev.Add(key);
-            injectedAwaitingGame[key] = now;
-            return 1;
+            if(AcceptNormalKey(key, now, threshold, chatterActive)) {
+                injectedKeyHeldPrev.Add(key);
+                injectedAwaitingGame[key] = now;
+                return 1;
+            }
         }
         if(held) injectedKeyHeldPrev.Add(key);
         else injectedKeyHeldPrev.Remove(key);

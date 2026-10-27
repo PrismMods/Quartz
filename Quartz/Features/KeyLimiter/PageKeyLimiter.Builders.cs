@@ -178,4 +178,31 @@ public static partial class PageKeyLimiter {
         });
         GenerateUI.MiniButton(bg, "Remove", "REMOVE", -8f, 90f, () => KeyLimiter.ToggleAllowedKey(key));
     }
+    private static void CreateChatterBlocker(Transform content) {
+        ChatterBlocker.EnsureConf();
+        ChatterBlockerSettings conf = ChatterBlocker.Conf;
+        ChatterBlockerSettings def = new();
+        var sec = GenerateUI.FlatSection(
+            content, "Keyboard Chatter Blocker",
+            v => {
+                conf.Enabled = v;
+                ChatterBlocker.Save();
+            },
+            conf.Enabled,
+            "Enable Keyboard Chatter Blocker", "chatterblocker_enable", def.Enabled
+        );
+        UISlider threshold = GenerateUI.Slider(
+            GenerateUI.Row(sec.Body),
+            def.ThresholdMs, 0f, 100f, conf.ThresholdMs,
+            v => Mathf.Round(v), null, null,
+            "Threshold (ms)",
+            "kcb_ms"
+        );
+        threshold.Format = "0 ms";
+        threshold.OnChanged = v => conf.ThresholdMs = v;
+        threshold.OnComplete = v => {
+            conf.ThresholdMs = v;
+            ChatterBlocker.Save();
+        };
+    }
 }

@@ -1,4 +1,5 @@
 using Quartz.Interop;
+using UnityEngine;
 namespace Quartz.Features.KeyLimiter;
 public sealed class KeyLimiterImport : IImportHandler {
     public int Apply(ImportSource source) => source.Kind switch {
@@ -16,10 +17,30 @@ public sealed class KeyLimiterImport : IImportHandler {
             KeyLimiter.SetAllowedKeys(keys);
             count++;
         }
+        if(source.TryExtra(ImportKeys.ChatterThresholdMs, out int threshold)) {
+            ChatterBlocker.EnsureConf();
+            ChatterBlocker.Conf.ThresholdMs = Mathf.Max(0, threshold);
+            count++;
+        }
+        if(source.TryExtra(ImportKeys.ChatterEnabled, out bool chatterOn)) {
+            ChatterBlocker.EnsureConf();
+            ChatterBlocker.Conf.Enabled = chatterOn;
+            count++;
+        }
         return count;
     }
     private static int ApplyV1(ImportSource source) {
         int count = 0;
+        if(source.TryBool("KCBOn", out bool chatterOn)) {
+            ChatterBlocker.EnsureConf();
+            ChatterBlocker.Conf.Enabled = chatterOn;
+            count++;
+        }
+        if(source.TryFloat("KCBThresholdMs", out float threshold)) {
+            ChatterBlocker.EnsureConf();
+            ChatterBlocker.Conf.ThresholdMs = Mathf.Max(0f, threshold);
+            count++;
+        }
         if(source.TryBool("KeyLimiterOn", out bool limiterOn)) {
             KeyLimiter.EnsureConf();
             KeyLimiter.Conf.Enabled = limiterOn;
@@ -33,6 +54,8 @@ public sealed class KeyLimiterImport : IImportHandler {
         return count;
     }
     public void Refresh() {
+        ChatterBlocker.EnsureConf();
+        ChatterBlocker.Save();
         KeyLimiter.EnsureConf();
         KeyLimiter.Save();
     }

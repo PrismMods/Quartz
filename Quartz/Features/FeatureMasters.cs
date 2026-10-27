@@ -17,7 +17,6 @@ internal static class FeatureMasters {
         ("planetcolors", "PlanetColors.json", "Enabled"),
         ("ottoicon", "OttoIcon.json", "Enabled"),
         ("keylimiter", "KeyLimiter.json", "Enabled"),
-        ("antichatter", "AntiChatter.json", "Enabled"),
         ("effectremover", "EffectRemover.json", "On"),
         ("uihider", "UiHider.json", "Enabled"),
         ("practice", "Practice.json", "Enabled"),
