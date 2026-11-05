@@ -111,8 +111,9 @@ public static partial class UiHider {
         KeyCode key = (KeyCode)Conf.ShortcutKey;
         if(!Keybind.IsUsableKey(key)) return false;
         try {
-            return Keybind.ModifierHeld((Keybind.KeyModifier)Conf.ShortcutModifier)
-                && Input.GetKeyDown(key);
+            // KeyDown first: it must be polled every frame, and it sees Option+letter on macOS.
+            return Keybind.KeyDown(key)
+                && Keybind.ModifierHeld((Keybind.KeyModifier)Conf.ShortcutModifier);
         } catch(Exception e) {
             Diag.Ignore(e);
             return false;

@@ -18,7 +18,6 @@ namespace UnityEngine {
         public static global::UnityEngine.Vector2 mouseScrollDelta { get => throw null; }
         public static bool GetKey(global::UnityEngine.KeyCode key) => throw null;
         public static bool GetKeyDown(global::UnityEngine.KeyCode key) => throw null;
-        public static bool GetKeyUp(global::UnityEngine.KeyCode key) => throw null;
         public static bool GetMouseButton(int button) => throw null;
         public static bool GetMouseButtonDown(int button) => throw null;
         public static bool GetMouseButtonUp(int button) => throw null;

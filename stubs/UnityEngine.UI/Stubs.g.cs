@@ -28,6 +28,7 @@ namespace UnityEngine.EventSystems {
         public static global::UnityEngine.EventSystems.EventSystem current { get => throw null; set { } }
         public global::UnityEngine.GameObject currentSelectedGameObject { get => throw null; }
         public void RaycastAll(global::UnityEngine.EventSystems.PointerEventData eventData, global::System.Collections.Generic.List<global::UnityEngine.EventSystems.RaycastResult> raycastResults) => throw null;
+        public void SetSelectedGameObject(global::UnityEngine.GameObject selected) => throw null;
         protected EventSystem() { }
     }
     public unsafe partial class EventTrigger : global::UnityEngine.MonoBehaviour, global::UnityEngine.EventSystems.IPointerDownHandler, global::UnityEngine.EventSystems.IPointerUpHandler, global::UnityEngine.EventSystems.IPointerClickHandler, global::UnityEngine.EventSystems.IBeginDragHandler, global::UnityEngine.EventSystems.IDragHandler, global::UnityEngine.EventSystems.IEndDragHandler {
@@ -386,6 +387,23 @@ namespace UnityEngine.UI {
     public abstract unsafe partial class MaskableGraphic : global::UnityEngine.UI.Graphic {
         protected MaskableGraphic() => throw null;
     }
+    public unsafe partial struct Navigation : global::System.IEquatable<global::UnityEngine.UI.Navigation> {
+        private global::UnityEngine.UI.Navigation.Mode m_Mode;
+        private global::UnityEngine.UI.Selectable m_SelectOnDown;
+        private global::UnityEngine.UI.Selectable m_SelectOnLeft;
+        private global::UnityEngine.UI.Selectable m_SelectOnRight;
+        private global::UnityEngine.UI.Selectable m_SelectOnUp;
+        private bool m_WrapAround;
+        public global::UnityEngine.UI.Navigation.Mode mode { get => throw null; set { } }
+        bool global::System.IEquatable<global::UnityEngine.UI.Navigation>.Equals(global::UnityEngine.UI.Navigation other) => throw null;
+        public enum Mode : int {
+            None = 0,
+            Horizontal = 1,
+            Vertical = 2,
+            Automatic = 3,
+            Explicit = 4,
+        }
+    }
     public unsafe partial class RawImage : global::UnityEngine.UI.MaskableGraphic {
         public global::UnityEngine.Texture texture { get => throw null; set { } }
         public global::UnityEngine.Rect uvRect { get => throw null; set { } }
@@ -423,6 +441,7 @@ namespace UnityEngine.UI {
     }
     public unsafe partial class Selectable : global::UnityEngine.EventSystems.UIBehaviour, global::UnityEngine.EventSystems.IPointerDownHandler, global::UnityEngine.EventSystems.IPointerUpHandler {
         public bool interactable { get => throw null; set { } }
+        public global::UnityEngine.UI.Navigation navigation { get => throw null; set { } }
         public global::UnityEngine.UI.SpriteState spriteState { get => throw null; set { } }
         public global::UnityEngine.UI.Selectable.Transition transition { get => throw null; set { } }
         public virtual void Select() => throw null;

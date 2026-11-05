@@ -116,6 +116,8 @@ namespace TMPro {
         public global::TMPro.TMP_InputField.SelectionEvent onDeselect { get => throw null; set { } }
         public global::TMPro.TMP_InputField.SubmitEvent onEndEdit { get => throw null; set { } }
         public bool onFocusSelectAll { get => throw null; set { } }
+        public global::TMPro.TMP_InputField.SelectionEvent onSelect { get => throw null; set { } }
+        public global::TMPro.TMP_InputField.SubmitEvent onSubmit { get => throw null; set { } }
         public global::TMPro.TMP_InputField.OnChangeEvent onValueChanged { get => throw null; set { } }
         public global::UnityEngine.UI.Graphic placeholder { get => throw null; set { } }
         public bool richText { get => throw null; set { } }
@@ -236,6 +238,7 @@ namespace TMPro {
         public virtual global::UnityEngine.Vector4 margin { get => throw null; set { } }
         public global::TMPro.TextOverflowModes overflowMode { get => throw null; set { } }
         public float paragraphSpacing { get => throw null; set { } }
+        public virtual float preferredWidth { get => throw null; }
         public global::UnityEngine.RectTransform rectTransform { get => throw null; }
         public bool richText { get => throw null; set { } }
         public global::TMPro.TMP_SpriteAsset spriteAsset { get => throw null; set { } }

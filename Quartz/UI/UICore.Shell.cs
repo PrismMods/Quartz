@@ -181,6 +181,8 @@ public static partial class UICore {
             powerBg.color = PowerColor(MainCore.Conf.Active);
             var btn = power.AddComponent<Button>();
             btn.transition = Selectable.Transition.None;
+            // Never selected, or Enter/Space (Submit) toggles power for as long as the rail is up.
+            btn.navigation = new Navigation { mode = Navigation.Mode.None };
             btn.onClick.AddListener(TogglePower);
             GameObject powerIcon = new("PowerIcon");
             powerIcon.transform.SetParent(powerRect, false);
@@ -307,6 +309,8 @@ public static partial class UICore {
             trigger.triggers.Add(enter);
             trigger.triggers.Add(exit);
         }
+        // The KeyViewer-only shell is one page; it never had search.
+        if(!ShellNavHidden) Quartz.UI.Search.SettingsSearch.CreateBar(topRect, (RectTransform)panel.transform);
         {
             GameObject border = new("Border");
             border.transform.SetParent(panel.transform, false);

@@ -37,7 +37,7 @@ public static class ToggleBinds {
         if(binds.Count == 0 || Keybind.Capturing || !MainCore.IsModEnabled) return;
         foreach(var kvp in binds) {
             KeyCode key = (KeyCode)kvp.Value.Key;
-            if(key == KeyCode.None || !Input.GetKeyDown(key)) continue;
+            if(key == KeyCode.None || !Keybind.KeyDown(key)) continue;
             if(!Keybind.ModifierHeld((Keybind.KeyModifier)kvp.Value.Modifier)) continue;
             pending.Add(kvp.Key);
         }

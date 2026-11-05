@@ -6,20 +6,35 @@ using Quartz.UI.Objects.Impl;
 using Quartz.UI.Utility;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Quartz.Features.KeyViewer.Editor;
 namespace Quartz.Features.KeyViewer;
 internal static partial class PageKeyViewer {
+    // Inside the canvas beside the zoom badge rather than a row of its own: a row here comes straight out of the canvas height.
+    private static void CanvasHint(RectTransform canvasHost) {
+        TextMeshProUGUI hint = GenerateUI.AddLocalizedMutedText(
+            canvasHost, "KVI_TOOLBAR_HINT",
+            "Scroll to pan, or drag with the middle or right mouse button. Press + and - to zoom, 0 for actual size. Arrow keys nudge, Delete removes.",
+            13f, 0.4f, true
+        );
+        hint.gameObject.AddComponent<LayoutElement>().ignoreLayout = true;
+        RectTransform rect = hint.rectTransform;
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = new Vector2(1f, 0f);
+        rect.pivot = Vector2.zero;
+        rect.offsetMin = new Vector2(68f, 8f);
+        rect.offsetMax = new Vector2(-8f, 32f);
+        hint.alignment = TextAlignmentOptions.BottomLeft;
+        hint.overflowMode = TextOverflowModes.Ellipsis;
+        hint.raycastTarget = false;
+    }
     private static Action AppendEditor(RectTransform body, KeyViewerSettings conf, UIScrollController pageScroll) {
         RectTransform editor = EditorRegion(body, pageScroll);
         EditorSplit split = EditorSplitRow(editor);
         KvCanvas canvas = KvCanvas.Create(split.CanvasHost);
         KvInspector inspector = KvInspector.Attach(canvas);
         canvas.Bind(KvStore.Current, KvStore.Current.SelectedTab);
-        GenerateUI.WrapGrow(GenerateUI.AddLocalizedMutedText(
-            GenerateUI.Row(editor, ThinRowHeight), "KVI_TOOLBAR_HINT",
-            "Scroll to pan, or drag with the middle or right mouse button. Press + and - to zoom, 0 for actual size. Arrow keys nudge, Delete removes.",
-            15f, 0.45f
-        ));
+        CanvasHint(split.CanvasHost);
         TextMeshProUGUI status = GenerateUI.AddMutedText(GenerateUI.Row(editor, ThinRowHeight), 17f, 0.45f);
         GenerateUI.WrapGrow(status);
         RectTransform toolbar = KvToolbar.Bar(editor);
@@ -61,6 +76,7 @@ internal static partial class PageKeyViewer {
         };
         AppendFileStrip(toolbar, status, Rebind, RefreshStatus);
         inspector.BindSettings(panel.Settings, refreshSettings);
+        panel.Settings.gameObject.AddComponent<Quartz.UI.Search.SearchReveal>().Reveal = inspector.ShowSettings;
         inspector.BindHost(panel.Tabs, panel.Props, panel.Scroll);
         RectTransform panelViewport = panel.Scroll.viewport;
         RectTransform divider = split.Divider;

@@ -103,6 +103,8 @@
 		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvSnap.cs" Link="Source/KvSnap.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvHistory.cs" Link="Source/KvHistory.cs" />
 		<Compile Include="../Quartz/UI/Utility/UndoTimeline.cs" Link="Source/UndoTimeline.cs" />
+		<Compile Include="../Quartz/UI/Search/SearchMatcher.cs" Link="Source/SearchMatcher.cs" />
+		<Compile Include="../Quartz/Utility/StringUtils.cs" Link="Source/StringUtils.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/Editor/KvTabDragState.cs" Link="Source/KvTabDragState.cs" />
 		<Compile Include="../Quartz/Features/Tuf/TufModels.cs" Link="Source/TufModels.cs" />
 		<Compile Include="../Quartz/Features/Tuf/TufSettings.cs" Link="Source/TufSettings.cs" />

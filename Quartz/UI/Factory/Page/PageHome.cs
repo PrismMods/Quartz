@@ -37,7 +37,7 @@ internal static class PageHome {
         GenerateUI.Localize(
             hint,
             "HOME_HINT",
-            "Everything Quartz does lives in the tabs on the left. Search finds any setting by name."
+            "Everything Quartz does lives in the tabs on the left. The search box at the top finds any setting by name."
         );
     }
     private static void Setup(RectTransform content) {

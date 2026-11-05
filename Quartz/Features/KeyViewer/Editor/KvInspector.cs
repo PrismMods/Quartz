@@ -63,6 +63,12 @@ internal sealed partial class KvInspector {
         settingsHost = hostRect;
         onSettingsShown = onShown;
     }
+    /// <summary>Switch to the viewer Settings tab (every selection has one), e.g. for search jumping to a setting.</summary>
+    internal void ShowSettings() {
+        if(tab == InspTab.Settings) return;
+        tab = InspTab.Settings;
+        Push();
+    }
     internal void BindHost(RectTransform tabsRect, RectTransform hostRect, UIScrollController scrollController) {
         tabsHost = tabsRect;
         host = hostRect;

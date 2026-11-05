@@ -132,6 +132,7 @@ namespace UnityEngine {
         public T GetComponentInParent<T>(bool includeInactive) => throw null;
         public T[] GetComponents<T>() => throw null;
         public T[] GetComponentsInChildren<T>(bool includeInactive) => throw null;
+        public T[] GetComponentsInParent<T>(bool includeInactive) => throw null;
         public bool TryGetComponent<T>(out T component) => throw null;
         protected Component() { }
     }

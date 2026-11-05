@@ -39,7 +39,7 @@ public sealed class FeatureState {
             MainCore.Log.Wrn($"[Features] couldn't read Features.json, using defaults: {e.Message}");
             return new FeatureState();
         }
-        FeatureState state = FromLegacy() ?? FromSettings() ?? new FeatureState();
+        FeatureState state = FromLegacy() ?? FromSettings() ?? FreshInstall();
         state.Save();
         // Only after the new file is written: the migration reads the old binaries.
         if(File.Exists(Path)) RemoveLegacyBinaries();
@@ -51,6 +51,13 @@ public sealed class FeatureState {
         } catch(Exception e) {
             MainCore.Log.Err($"[Features] couldn't write Features.json: {e.Message}");
         }
+    }
+    // Brand-new install: judgement restriction fails runs, so it waits until someone turns it on. Pinned here, not in
+    // FeatureDefaults: Features.json only stores toggled ids, so a rule change would also switch it off for existing installs.
+    private static FeatureState FreshInstall() {
+        FeatureState state = new();
+        state.Features["restriction"] = false;
+        return state;
     }
     // Module-era install: a feature stays on only if its module was installed and enabled.
     private static FeatureState FromLegacy() {

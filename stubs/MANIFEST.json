@@ -2520,9 +2520,13 @@
           "TMPro.TMP_InputField/OnChangeEvent TMPro.TMP_InputField::get_onValueChanged()",
           "TMPro.TMP_InputField/OnChangeEvent TMPro.TMP_InputField::onValueChanged()",
           "TMPro.TMP_InputField/SelectionEvent TMPro.TMP_InputField::get_onDeselect()",
+          "TMPro.TMP_InputField/SelectionEvent TMPro.TMP_InputField::get_onSelect()",
           "TMPro.TMP_InputField/SelectionEvent TMPro.TMP_InputField::onDeselect()",
+          "TMPro.TMP_InputField/SelectionEvent TMPro.TMP_InputField::onSelect()",
           "TMPro.TMP_InputField/SubmitEvent TMPro.TMP_InputField::get_onEndEdit()",
+          "TMPro.TMP_InputField/SubmitEvent TMPro.TMP_InputField::get_onSubmit()",
           "TMPro.TMP_InputField/SubmitEvent TMPro.TMP_InputField::onEndEdit()",
+          "TMPro.TMP_InputField/SubmitEvent TMPro.TMP_InputField::onSubmit()",
           "TMPro.TMP_Text TMPro.TMP_InputField::get_textComponent()",
           "TMPro.TMP_Text TMPro.TMP_InputField::textComponent()",
           "UnityEngine.Color TMPro.TMP_InputField::caretColor()",
@@ -2530,6 +2534,7 @@
           "UnityEngine.Color TMPro.TMP_InputField::selectionColor()",
           "UnityEngine.RectTransform TMPro.TMP_InputField::get_textViewport()",
           "UnityEngine.RectTransform TMPro.TMP_InputField::textViewport()",
+          "UnityEngine.UI.Graphic TMPro.TMP_InputField::get_placeholder()",
           "UnityEngine.UI.Graphic TMPro.TMP_InputField::placeholder()"
         ]
       },
@@ -2683,9 +2688,11 @@
           "System.Single TMPro.TMP_Text::get_fontSizeMin()",
           "System.Single TMPro.TMP_Text::get_lineSpacing()",
           "System.Single TMPro.TMP_Text::get_paragraphSpacing()",
+          "System.Single TMPro.TMP_Text::get_preferredWidth()",
           "System.Single TMPro.TMP_Text::get_wordSpacing()",
           "System.Single TMPro.TMP_Text::lineSpacing()",
           "System.Single TMPro.TMP_Text::paragraphSpacing()",
+          "System.Single TMPro.TMP_Text::preferredWidth()",
           "System.Single TMPro.TMP_Text::wordSpacing()",
           "System.String TMPro.TMP_Text::get_text()",
           "System.String TMPro.TMP_Text::text()",
@@ -3224,6 +3231,7 @@
           "T UnityEngine.Component::GetComponentInParent(System.Boolean)",
           "T[] UnityEngine.Component::GetComponents()",
           "T[] UnityEngine.Component::GetComponentsInChildren(System.Boolean)",
+          "T[] UnityEngine.Component::GetComponentsInParent(System.Boolean)",
           "UnityEngine.GameObject UnityEngine.Component::gameObject()",
           "UnityEngine.GameObject UnityEngine.Component::get_gameObject()",
           "UnityEngine.Transform UnityEngine.Component::get_transform()",
@@ -4457,7 +4465,6 @@
         "members": [
           "System.Boolean UnityEngine.Input::GetKey(UnityEngine.KeyCode)",
           "System.Boolean UnityEngine.Input::GetKeyDown(UnityEngine.KeyCode)",
-          "System.Boolean UnityEngine.Input::GetKeyUp(UnityEngine.KeyCode)",
           "System.Boolean UnityEngine.Input::GetMouseButton(System.Int32)",
           "System.Boolean UnityEngine.Input::GetMouseButtonDown(System.Int32)",
           "System.Boolean UnityEngine.Input::GetMouseButtonUp(System.Int32)",
@@ -4716,6 +4723,7 @@
         "type": "UnityEngine.EventSystems.EventSystem",
         "members": [
           "System.Void UnityEngine.EventSystems.EventSystem::RaycastAll(UnityEngine.EventSystems.PointerEventData,System.Collections.Generic.List\u00601\u003CUnityEngine.EventSystems.RaycastResult\u003E)",
+          "System.Void UnityEngine.EventSystems.EventSystem::SetSelectedGameObject(UnityEngine.GameObject)",
           "UnityEngine.EventSystems.EventSystem UnityEngine.EventSystems.EventSystem::current()",
           "UnityEngine.EventSystems.EventSystem UnityEngine.EventSystems.EventSystem::get_current()",
           "UnityEngine.GameObject UnityEngine.EventSystems.EventSystem::currentSelectedGameObject()",
@@ -5321,6 +5329,30 @@
         ]
       },
       {
+        "type": "UnityEngine.UI.Navigation",
+        "members": [
+          "System.Boolean UnityEngine.UI.Navigation::m_WrapAround",
+          "System.Void UnityEngine.UI.Navigation::set_mode(UnityEngine.UI.Navigation/Mode)",
+          "UnityEngine.UI.Navigation/Mode UnityEngine.UI.Navigation::m_Mode",
+          "UnityEngine.UI.Navigation/Mode UnityEngine.UI.Navigation::mode()",
+          "UnityEngine.UI.Selectable UnityEngine.UI.Navigation::m_SelectOnDown",
+          "UnityEngine.UI.Selectable UnityEngine.UI.Navigation::m_SelectOnLeft",
+          "UnityEngine.UI.Selectable UnityEngine.UI.Navigation::m_SelectOnRight",
+          "UnityEngine.UI.Selectable UnityEngine.UI.Navigation::m_SelectOnUp"
+        ]
+      },
+      {
+        "type": "UnityEngine.UI.Navigation/Mode",
+        "members": [
+          "System.Int32 UnityEngine.UI.Navigation/Mode::value__",
+          "UnityEngine.UI.Navigation/Mode UnityEngine.UI.Navigation/Mode::Automatic",
+          "UnityEngine.UI.Navigation/Mode UnityEngine.UI.Navigation/Mode::Explicit",
+          "UnityEngine.UI.Navigation/Mode UnityEngine.UI.Navigation/Mode::Horizontal",
+          "UnityEngine.UI.Navigation/Mode UnityEngine.UI.Navigation/Mode::None",
+          "UnityEngine.UI.Navigation/Mode UnityEngine.UI.Navigation/Mode::Vertical"
+        ]
+      },
+      {
         "type": "UnityEngine.UI.RawImage",
         "members": [
           "System.Void UnityEngine.UI.RawImage::.ctor()",
@@ -5382,8 +5414,10 @@
           "System.Boolean UnityEngine.UI.Selectable::interactable()",
           "System.Void UnityEngine.UI.Selectable::Select()",
           "System.Void UnityEngine.UI.Selectable::set_interactable(System.Boolean)",
+          "System.Void UnityEngine.UI.Selectable::set_navigation(UnityEngine.UI.Navigation)",
           "System.Void UnityEngine.UI.Selectable::set_spriteState(UnityEngine.UI.SpriteState)",
           "System.Void UnityEngine.UI.Selectable::set_transition(UnityEngine.UI.Selectable/Transition)",
+          "UnityEngine.UI.Navigation UnityEngine.UI.Selectable::navigation()",
           "UnityEngine.UI.Selectable/Transition UnityEngine.UI.Selectable::transition()",
           "UnityEngine.UI.SpriteState UnityEngine.UI.Selectable::get_spriteState()",
           "UnityEngine.UI.SpriteState UnityEngine.UI.Selectable::spriteState()"

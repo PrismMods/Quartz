@@ -103,6 +103,9 @@ public static partial class GenerateUI {
     private static Transform AddToolTipInternal(this Transform parent, System.Func<string> getText) {
         EventTrigger trigger = parent.gameObject.GetComponent<EventTrigger>()
             ?? parent.gameObject.AddComponent<EventTrigger>();
+        Quartz.UI.Search.SearchTip tip = parent.gameObject.GetComponent<Quartz.UI.Search.SearchTip>()
+            ?? parent.gameObject.AddComponent<Quartz.UI.Search.SearchTip>();
+        tip.Text = getText;
         UnityUtils.AddEvent(
             EventTriggerType.PointerEnter,
             _ => Tooltip.Show(getText()),
