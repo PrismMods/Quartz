@@ -34,7 +34,12 @@ internal static class SettingsSearch {
     }
     private const int MAX_RESULTS = 8;
     private const float BOX_WIDTH = 320f;
+    private const float MIN_BOX_WIDTH = 160f;
     private const float POPUP_WIDTH = 480f;
+    private const float ROW_HEIGHT = 40f;
+    private const float ROW_SPACING = 4f;
+    // Popup padding (8 + 6), the footer row and the gap above it.
+    private const float POPUP_CHROME = 8f + 6f + 26f + ROW_SPACING;
     // Clear of the close button.
     private const float RIGHT_OFFSET = 66f;
     private const float INDEX_TTL_SECONDS = 10f;
@@ -49,6 +54,10 @@ internal static class SettingsSearch {
     }
     private static readonly List<ResultRow> resultRows = [];
     private static UIInput input;
+    private static RectTransform box;
+    private static RectTransform bar;
+    private static RectTransform panelRect;
+    private static TMP_Text wordmark;
     private static RectTransform popup;
     private static RectTransform footer;
     private static TextMeshProUGUI footerText;
@@ -56,9 +65,14 @@ internal static class SettingsSearch {
         cachedIndex = null;
         topMatch = null;
         resultRows.Clear();
-        GameObject box = new("Search");
-        box.transform.SetParent(topBar, false);
-        RectTransform boxRect = box.AddComponent<RectTransform>();
+        bar = topBar;
+        panelRect = panel;
+        Transform mark = topBar.Find("Wordmark");
+        wordmark = mark != null ? mark.GetComponent<TMP_Text>() : null;
+        GameObject boxObj = new("Search");
+        boxObj.transform.SetParent(topBar, false);
+        RectTransform boxRect = boxObj.AddComponent<RectTransform>();
+        box = boxRect;
         boxRect.anchorMin = new(1f, 0.5f);
         boxRect.anchorMax = new(1f, 0.5f);
         boxRect.pivot = new(1f, 0.5f);
@@ -93,11 +107,29 @@ internal static class SettingsSearch {
         bg.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
         bg.type = Image.Type.Sliced;
         bg.color = UIColors.TopBar;
-        GenerateUI.FitVertical(obj, 4f).padding = new RectOffset(8, 8, 8, 6);
+        GenerateUI.FitVertical(obj, ROW_SPACING).padding = new RectOffset(8, 8, 8, 6);
         footer = GenerateUI.Row(rect, 26f);
         footerText = GenerateUI.AddMutedText(footer, 15f);
         obj.SetActive(false);
         return rect;
+    }
+    // Per frame from UICore. Deselect can't close a list whose own background took the click, so any later press
+    // elsewhere does, and so does the panel closing. Also keeps the box clear of the wordmark on narrow panels.
+    internal static void Tick() {
+        if(box == null) return;
+        FitBox();
+        if(popup == null || !popup.gameObject.activeSelf) return;
+        if(!UICore.IsOpen || (Input.GetMouseButtonDown(0) && !PointerOver(popup) && !PointerOver(box))) HidePopup();
+    }
+    private static void FitBox() {
+        float left = wordmark != null ? wordmark.rectTransform.anchoredPosition.x + wordmark.preferredWidth + 16f : 0f;
+        float width = Mathf.Clamp(bar.rect.width - RIGHT_OFFSET - left, MIN_BOX_WIDTH, BOX_WIDTH);
+        if(Mathf.Abs(box.sizeDelta.x - width) > 0.5f) box.sizeDelta = new Vector2(width, box.sizeDelta.y);
+    }
+    // The panel's mask clips past its bottom edge, so list only the rows that fit under the bar.
+    private static int RowsThatFit() {
+        float room = panelRect.rect.height + popup.anchoredPosition.y - POPUP_CHROME;
+        return Mathf.Clamp(Mathf.FloorToInt((room + ROW_SPACING) / (ROW_HEIGHT + ROW_SPACING)), 1, MAX_RESULTS);
     }
     private static bool PointerOver(RectTransform rect) =>
         rect != null && rect.gameObject.activeInHierarchy
@@ -152,13 +184,13 @@ internal static class SettingsSearch {
             return string.Compare(a.Text, b.Text, StringComparison.OrdinalIgnoreCase);
         });
         topMatch = matches[0];
-        int shown = Mathf.Min(matches.Count, MAX_RESULTS);
+        int shown = Mathf.Min(matches.Count, RowsThatFit());
         for(int i = 0; i < shown; i++)
             ShowResultRow(i, matches[i]);
         HideRowsFrom(shown);
         string enter = GenerateUI.Tr("SEARCH_ENTER_HINT", "Press Enter to jump to the top result.");
-        footerText.text = matches.Count > MAX_RESULTS
-            ? string.Format(GenerateUI.Tr("SEARCH_RESULTS_CAPPED", "{0} results (showing first {1})"), matches.Count, MAX_RESULTS) + " · " + enter
+        footerText.text = matches.Count > shown
+            ? string.Format(GenerateUI.Tr("SEARCH_RESULTS_CAPPED", "{0} results (showing first {1})"), matches.Count, shown) + " · " + enter
             : enter;
         ShowPopup();
     }
@@ -172,7 +204,7 @@ internal static class SettingsSearch {
     }
     private static void ShowResultRow(int index, Entry e) {
         while(resultRows.Count <= index) {
-            var row = GenerateUI.Row(popup, 40f);
+            var row = GenerateUI.Row(popup, ROW_HEIGHT);
             var btn = GenerateUI.Button(row, null, "", "search_result", 0f).SetSecondary();
             btn.Label.overflowMode = TextOverflowModes.Ellipsis;
             btn.Label.fontSize = 17f;

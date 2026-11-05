@@ -126,6 +126,7 @@ public static partial class UICore {
         if(!held) holdingToggle = false;
         if(isOpen && !editing && !Keybind.Capturing) HandleShortcuts();
         ToggleBinds.HandleUpdate();
+        Quartz.UI.Search.SettingsSearch.Tick();
         if(!canvasObj.activeSelf) {
             if(canvasWasVisible) {
                 canvasWasVisible = false;
