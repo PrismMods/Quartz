@@ -23,6 +23,7 @@ internal static class PageSearch {
     }
     private const int MAX_RESULTS = 40;
     private const float INDEX_TTL_SECONDS = 10f;
+    private const int MAX_LABEL_LENGTH = 60;
     private static List<Entry> cachedIndex;
     private static float cachedIndexTime;
     private static string cachedIndexLang;
@@ -162,9 +163,10 @@ internal static class PageSearch {
                 if(body != null) Walk(body, state, title, list);
                 continue;
             }
-            if((name == "Text" || name == "Label") && child.TryGetComponent(out TMP_Text tmp)) {
+            // Any localized label, whatever the control named it (ColorLabel, BindLabel…); long ones are hints, not settings.
+            if(child.TryGetComponent(out TMP_Text tmp) && child.GetComponent<TextLocalization>() != null) {
                 string text = tmp.text;
-                if(!string.IsNullOrWhiteSpace(text) && child.GetComponent<TextLocalization>() != null) {
+                if(!string.IsNullOrWhiteSpace(text) && text.Length <= MAX_LABEL_LENGTH) {
                     RectTransform target = RowTarget(child, state);
                     if(target != null) {
                         list.Add(new Entry {
