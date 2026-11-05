@@ -258,8 +258,9 @@ internal static class SettingsSearch {
                 if(body != null) Walk(body, state, title, titleEnglish, list);
                 continue;
             }
-            // Any localized label, whatever the control named it (ColorLabel, BindLabel…); long ones are hints, not settings.
-            if(child.TryGetComponent(out TMP_Text tmp) && child.TryGetComponent(out TextLocalization loc)) {
+            // Any localized label, whatever the control named it (ColorLabel, BindLabel…); long ones are hints, not settings,
+            // and an input's placeholder ("Name") names nothing.
+            if(child.TryGetComponent(out TMP_Text tmp) && child.TryGetComponent(out TextLocalization loc) && !IsPlaceholder(child, tmp)) {
                 string text = tmp.text;
                 if(!string.IsNullOrWhiteSpace(text) && text.Length <= MAX_LABEL_LENGTH) {
                     RectTransform target = RowTarget(child, state);
@@ -279,6 +280,8 @@ internal static class SettingsSearch {
             Walk(child, state, section, sectionEnglish, list);
         }
     }
+    private static bool IsPlaceholder(Transform label, TMP_Text tmp) =>
+        label.parent != null && label.parent.TryGetComponent(out TMP_InputField field) && ReferenceEquals(field.placeholder, tmp);
     private static RectTransform RowTarget(Transform label, int state) {
         RectTransform page = UICore.Pages[state];
         Transform cur = label;
