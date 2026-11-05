@@ -116,6 +116,7 @@ namespace TMPro {
         public global::TMPro.TMP_InputField.SelectionEvent onDeselect { get => throw null; set { } }
         public global::TMPro.TMP_InputField.SubmitEvent onEndEdit { get => throw null; set { } }
         public bool onFocusSelectAll { get => throw null; set { } }
+        public global::TMPro.TMP_InputField.SelectionEvent onSelect { get => throw null; set { } }
         public global::TMPro.TMP_InputField.SubmitEvent onSubmit { get => throw null; set { } }
         public global::TMPro.TMP_InputField.OnChangeEvent onValueChanged { get => throw null; set { } }
         public global::UnityEngine.UI.Graphic placeholder { get => throw null; set { } }

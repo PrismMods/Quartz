@@ -2520,7 +2520,9 @@
           "TMPro.TMP_InputField/OnChangeEvent TMPro.TMP_InputField::get_onValueChanged()",
           "TMPro.TMP_InputField/OnChangeEvent TMPro.TMP_InputField::onValueChanged()",
           "TMPro.TMP_InputField/SelectionEvent TMPro.TMP_InputField::get_onDeselect()",
+          "TMPro.TMP_InputField/SelectionEvent TMPro.TMP_InputField::get_onSelect()",
           "TMPro.TMP_InputField/SelectionEvent TMPro.TMP_InputField::onDeselect()",
+          "TMPro.TMP_InputField/SelectionEvent TMPro.TMP_InputField::onSelect()",
           "TMPro.TMP_InputField/SubmitEvent TMPro.TMP_InputField::get_onEndEdit()",
           "TMPro.TMP_InputField/SubmitEvent TMPro.TMP_InputField::get_onSubmit()",
           "TMPro.TMP_InputField/SubmitEvent TMPro.TMP_InputField::onEndEdit()",
@@ -4718,6 +4720,7 @@
         "type": "UnityEngine.EventSystems.EventSystem",
         "members": [
           "System.Void UnityEngine.EventSystems.EventSystem::RaycastAll(UnityEngine.EventSystems.PointerEventData,System.Collections.Generic.List\u00601\u003CUnityEngine.EventSystems.RaycastResult\u003E)",
+          "System.Void UnityEngine.EventSystems.EventSystem::SetSelectedGameObject(UnityEngine.GameObject)",
           "UnityEngine.EventSystems.EventSystem UnityEngine.EventSystems.EventSystem::current()",
           "UnityEngine.EventSystems.EventSystem UnityEngine.EventSystems.EventSystem::get_current()",
           "UnityEngine.GameObject UnityEngine.EventSystems.EventSystem::currentSelectedGameObject()",

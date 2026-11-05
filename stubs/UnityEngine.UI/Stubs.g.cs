@@ -28,6 +28,7 @@ namespace UnityEngine.EventSystems {
         public static global::UnityEngine.EventSystems.EventSystem current { get => throw null; set { } }
         public global::UnityEngine.GameObject currentSelectedGameObject { get => throw null; }
         public void RaycastAll(global::UnityEngine.EventSystems.PointerEventData eventData, global::System.Collections.Generic.List<global::UnityEngine.EventSystems.RaycastResult> raycastResults) => throw null;
+        public void SetSelectedGameObject(global::UnityEngine.GameObject selected) => throw null;
         protected EventSystem() { }
     }
     public unsafe partial class EventTrigger : global::UnityEngine.MonoBehaviour, global::UnityEngine.EventSystems.IPointerDownHandler, global::UnityEngine.EventSystems.IPointerUpHandler, global::UnityEngine.EventSystems.IPointerClickHandler, global::UnityEngine.EventSystems.IBeginDragHandler, global::UnityEngine.EventSystems.IDragHandler, global::UnityEngine.EventSystems.IEndDragHandler {
