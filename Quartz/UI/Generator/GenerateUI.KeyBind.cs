@@ -130,13 +130,15 @@ internal sealed class KeyCapture : MonoBehaviour {
             OnCleared?.Invoke();
             return;
         }
-        if(!Input.anyKeyDown) return;
+        // macOS: Option+letter raises no anyKeyDown, so scan every frame through Keybind to keep each key's edge current.
+        bool mac = Keybind.IsMac;
+        if(!mac && !Input.anyKeyDown) return;
         for(int i = 0; i < AllKeys.Length; i++) {
             KeyCode kc = AllKeys[i];
             if(kc == KeyCode.None) continue;
             if((int)kc >= (int)KeyCode.Mouse0) continue;
             if(Keybind.IsModifier(kc)) continue;
-            if(!Input.GetKeyDown(kc)) continue;
+            if(!(mac ? Keybind.KeyDown(kc) : Input.GetKeyDown(kc))) continue;
             Modifier = Keybind.HeldModifier();
             Key = kc;
             Bound = true;

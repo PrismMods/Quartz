@@ -111,8 +111,10 @@ public static partial class UICore {
         KeyCode key = (KeyCode)MainCore.Conf.ToggleKey;
         bool modHeld = Keybind.ModifierHeld(mod);
         bool editing = UIInputBlocker.IsEditing;
-        bool pressed = !editing && modHeld && Input.GetKey(key);
-        if(!editing && !Keybind.Capturing && modHeld && Input.GetKeyDown(key)) {
+        bool down = Keybind.KeyDown(key);
+        bool held = Keybind.KeyHeld(key);
+        bool pressed = !editing && modHeld && held;
+        if(!editing && !Keybind.Capturing && modHeld && down) {
             Toggle();
             holdStartTime = Time.unscaledTime;
             holdingToggle = true;
@@ -121,7 +123,7 @@ public static partial class UICore {
             ResetScalePosition(!isOpen);
             holdingToggle = false;
         }
-        if(Input.GetKeyUp(key)) holdingToggle = false;
+        if(!held) holdingToggle = false;
         if(isOpen && !editing && !Keybind.Capturing) HandleShortcuts();
         ToggleBinds.HandleUpdate();
         if(!canvasObj.activeSelf) {

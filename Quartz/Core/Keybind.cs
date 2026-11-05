@@ -56,11 +56,46 @@ public static class Keybind {
     public static bool ModifierHeld(KeyModifier mod) => mod switch {
         KeyModifier.None => true,
         KeyModifier.Ctrl => Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl),
-        KeyModifier.Alt => Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt) || Input.GetKey(KeyCode.AltGr),
+        // On macOS also the window server's flags: the same clock KeyDown reads Option+letter from, so a chord pressed
+        // in one frame (Unity can see Option a frame late) still lines up.
+        KeyModifier.Alt => Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt) || Input.GetKey(KeyCode.AltGr)
+            || MacHeld(KeyCode.LeftAlt) || MacHeld(KeyCode.RightAlt),
         KeyModifier.Shift => Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift),
         KeyModifier.Cmd => AnyCmdHeld(),
         _ => false,
     };
+    // macOS: while Option is held Unity never reports a letter's keydown (Option+K composes ˚; seen in-game,
+    // anyKeyDown only shows LeftAlt). Under Alt the key's edge comes from the window server instead. One source per
+    // frame, so a key Unity does report is never counted twice. Callers must poll every frame to see the edge.
+    private sealed class MacKey {
+        public int Frame = -2;
+        public bool Mapped, Held, Down;
+    }
+    private static readonly Dictionary<KeyCode, MacKey> macKeys = [];
+    private static MacKey PollMac(KeyCode key) {
+        if(!IsMac) return null;
+        if(!macKeys.TryGetValue(key, out MacKey s)) macKeys[key] = s = new MacKey();
+        int frame = Time.frameCount;
+        if(s.Frame != frame) {
+            s.Mapped = Quartz.Game.HookInput.TryMacKeyState(key, out bool held);
+            // Global HID state: a press typed into another app must not reach the game.
+            held &= s.Mapped && Application.isFocused;
+            s.Down = held && !s.Held && s.Frame == frame - 1;
+            s.Held = held;
+            s.Frame = frame;
+        }
+        return s.Mapped ? s : null;
+    }
+    private static bool MacHeld(KeyCode key) =>
+        IsMac && Application.isFocused && Quartz.Game.HookInput.TryMacKeyState(key, out bool held) && held;
+    public static bool KeyDown(KeyCode key) {
+        MacKey mac = PollMac(key);
+        return mac != null && ModifierHeld(KeyModifier.Alt) ? mac.Down : Input.GetKeyDown(key);
+    }
+    public static bool KeyHeld(KeyCode key) {
+        MacKey mac = PollMac(key);
+        return Input.GetKey(key) || (mac != null && mac.Held);
+    }
     public static KeyModifier HeldModifier() {
         if(ModifierHeld(KeyModifier.Ctrl)) return KeyModifier.Ctrl;
         if(ModifierHeld(KeyModifier.Cmd)) return KeyModifier.Cmd;
