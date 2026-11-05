@@ -309,7 +309,8 @@ public static partial class UICore {
             trigger.triggers.Add(enter);
             trigger.triggers.Add(exit);
         }
-        Quartz.UI.Search.SettingsSearch.CreateBar(topRect, (RectTransform)panel.transform);
+        // The KeyViewer-only shell is one page; it never had search.
+        if(!ShellNavHidden) Quartz.UI.Search.SettingsSearch.CreateBar(topRect, (RectTransform)panel.transform);
         {
             GameObject border = new("Border");
             border.transform.SetParent(panel.transform, false);
