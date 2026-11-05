@@ -26,6 +26,7 @@ internal static class SettingsSearch {
         public RectTransform Target;
         public SearchTip Tip;
         public bool IsCategory;
+        public bool IsPage;
         public SearchText[] Label;
         public SearchText[] Context;
         public SearchText Detail;
@@ -116,6 +117,11 @@ internal static class SettingsSearch {
         if(EventSystem.current != null) EventSystem.current.SetSelectedGameObject(null);
         Navigate(e);
     }
+    private static (string Local, string English) CategoryName(int state) {
+        Quartz.UI.Nav.NavPage page = Quartz.UI.Nav.NavRegistry.ByState(state);
+        Quartz.UI.Nav.NavCategory category = page == null ? null : Quartz.UI.Nav.NavRegistry.Category(page.CategoryKey);
+        return category == null ? (null, null) : (GenerateUI.Tr(category.LocaleKey, category.Title), category.Title);
+    }
     private static string TabName(int state) {
         Quartz.UI.Nav.NavPage page = Quartz.UI.Nav.NavRegistry.ByState(state);
         if(page == null) return "?";
@@ -176,11 +182,11 @@ internal static class SettingsSearch {
         }
         ResultRow slot = resultRows[index];
         string text = e.Text.Length > 60 ? e.Text[..57] + "…" : e.Text;
-        string path = string.IsNullOrEmpty(e.Section)
-            ? TabName(e.State)
+        string path = e.IsPage ? CategoryName(e.State).Local
+            : string.IsNullOrEmpty(e.Section) ? TabName(e.State)
             : $"{TabName(e.State)} › {e.Section}";
         slot.Button.OnClick = () => Go(e);
-        slot.Button.Label.text = $"<alpha=#77>{path} ›<alpha=#FF> {text}";
+        slot.Button.Label.text = string.IsNullOrEmpty(path) || path == text ? text : $"<alpha=#77>{path} ›<alpha=#FF> {text}";
         slot.Row.gameObject.SetActive(true);
     }
     private static void HideRowsFrom(int from) {
@@ -201,7 +207,12 @@ internal static class SettingsSearch {
                 pages[e.State] = page = Texts(korean, TabName(e.State), Quartz.UI.Nav.NavRegistry.ByState(e.State)?.Title);
             // Label in the UI language and in English, so a Korean menu still answers "note rain".
             e.Label = Texts(korean, e.Text, e.English);
-            e.Context = [.. Texts(korean, e.Section, e.SectionEnglish), .. page];
+            if(e.IsPage) {
+                (string local, string english) = CategoryName(e.State);
+                e.Context = Texts(korean, local, english);
+            } else {
+                e.Context = [.. Texts(korean, e.Section, e.SectionEnglish), .. page];
+            }
             string tip = null;
             if(e.Tip != null && e.Tip.Text != null) {
                 try { tip = e.Tip.Text(); } catch(Exception ex) { Diag.Ignore(ex); }
@@ -230,6 +241,18 @@ internal static class SettingsSearch {
         List<Entry> list = [];
         foreach(KeyValuePair<int, RectTransform> page in UICore.Pages) {
             if(page.Value == null) continue;
+            // The page itself, so a tab's name opens that tab rather than whichever row elsewhere also says it.
+            Quartz.UI.Nav.NavPage nav = Quartz.UI.Nav.NavRegistry.ByState(page.Key);
+            if(nav != null) {
+                list.Add(new Entry {
+                    State = page.Key,
+                    Text = TabName(page.Key),
+                    English = nav.Title,
+                    Target = page.Value,
+                    IsCategory = true,
+                    IsPage = true,
+                });
+            }
             Walk(page.Value, page.Key, null, null, list);
         }
         return list;
@@ -303,6 +326,11 @@ internal static class SettingsSearch {
             if(e.Target == s.Section || e.Target.IsChildOf(s.Body)) s.SetExpanded(true, false, false);
         }
         MenuFactory.SetState(e.State);
+        if(e.IsPage) {
+            UIScrollController pageScroll = e.Target.GetComponentInChildren<UIScrollController>(true);
+            if(pageScroll != null) pageScroll.ScrollTo(0f);
+            return;
+        }
         // Innermost scroller brings the row into view, each outer one brings the inner scroller's viewport.
         RectTransform focus = e.Target;
         foreach(UIScrollController scroller in e.Target.GetComponentsInParent<UIScrollController>(true)) {
