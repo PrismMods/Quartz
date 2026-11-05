@@ -5,6 +5,7 @@ using Quartz.Core;
 using Quartz.Localization;
 using Quartz.Resource;
 using Quartz.UI.Generator;
+using Quartz.UI.Search;
 using Quartz.UI.Utility;
 using Quartz.Utility;
 using UnityEngine;
@@ -16,10 +17,16 @@ internal static class PageSearch {
     private sealed class Entry {
         public int State;
         public string Text;
-        public string NormText;
+        public string English;
         public string Section;
+        public string SectionEnglish;
         public RectTransform Target;
+        public SearchTip Tip;
         public bool IsCategory;
+        public SearchText[] Label;
+        public SearchText[] Context;
+        public SearchText Detail;
+        public int Score;
     }
     private const int MAX_RESULTS = 40;
     private const float INDEX_TTL_SECONDS = 10f;
@@ -58,12 +65,6 @@ internal static class PageSearch {
         GenerateUI.FitVertical(results, 8f);
         RunSearch("");
     }
-    private static string Norm(string input) {
-        string normalized = StringUtils.Normalize(input);
-        if(MainCore.Conf.Language == "ko-KR" && !string.IsNullOrEmpty(normalized))
-            normalized = StringUtils.NormalizeToHangulChosung(normalized);
-        return normalized;
-    }
     private static string TabName(int state) {
         Quartz.UI.Nav.NavPage page = Quartz.UI.Nav.NavRegistry.ByState(state);
         if(page == null) return "?";
@@ -71,27 +72,27 @@ internal static class PageSearch {
     }
     private static void RunSearch(string query) {
         if(resultsContainer == null) return;
-        string q = Norm(query ?? "");
-        if(string.IsNullOrWhiteSpace(q)) {
+        string[][] tokens = SearchMatcher.Tokens(query ?? "", StringUtils.Normalize);
+        if(tokens.Length == 0) {
             statusText.text = GenerateUI.Tr("SEARCH_HINT", "Type to search every tab — categories, toggles, buttons, everything.");
             HideRowsFrom(0);
             return;
         }
-        List<Entry> matches = [];
-        foreach(Entry e in Index())
-            if(e.NormText.Contains(q)) matches.Add(e);
-        matches.Sort((a, b) => {
-            bool ap = a.NormText.StartsWith(q);
-            bool bp = b.NormText.StartsWith(q);
-            if(ap != bp) return ap ? -1 : 1;
-            if(a.IsCategory != b.IsCategory) return a.IsCategory ? -1 : 1;
-            return string.Compare(a.Text, b.Text, StringComparison.OrdinalIgnoreCase);
-        });
+        string phrase = StringUtils.Normalize(query);
+        List<Entry> index = Index();
+        List<Entry> matches = Match(index, tokens, phrase, false);
+        if(matches.Count == 0) matches = Match(index, tokens, phrase, true);
         if(matches.Count == 0) {
             statusText.text = GenerateUI.Tr("SEARCH_NO_RESULTS", "No results.");
             HideRowsFrom(0);
             return;
         }
+        matches.Sort((a, b) => {
+            if(a.Score != b.Score) return b.Score.CompareTo(a.Score);
+            if(a.IsCategory != b.IsCategory) return a.IsCategory ? -1 : 1;
+            if(a.Text.Length != b.Text.Length) return a.Text.Length.CompareTo(b.Text.Length);
+            return string.Compare(a.Text, b.Text, StringComparison.OrdinalIgnoreCase);
+        });
         int shown = Mathf.Min(matches.Count, MAX_RESULTS);
         statusText.text = matches.Count > MAX_RESULTS
             ? string.Format(GenerateUI.Tr("SEARCH_RESULTS_CAPPED", "{0} results (showing first {1})"), matches.Count, MAX_RESULTS)
@@ -99,6 +100,14 @@ internal static class PageSearch {
         for(int i = 0; i < shown; i++)
             ShowResultRow(i, matches[i]);
         HideRowsFrom(shown);
+    }
+    private static List<Entry> Match(List<Entry> index, string[][] tokens, string phrase, bool fuzzy) {
+        List<Entry> matches = [];
+        foreach(Entry e in index) {
+            e.Score = SearchMatcher.Score(tokens, phrase, e.Label, e.Context, e.Detail, fuzzy);
+            if(e.Score > 0) matches.Add(e);
+        }
+        return matches;
     }
     private static void ShowResultRow(int index, Entry e) {
         while(resultRows.Count <= index) {
@@ -130,41 +139,72 @@ internal static class PageSearch {
             return cachedIndex;
         }
         cachedIndex = BuildIndex();
-        foreach(Entry e in cachedIndex) e.NormText = Norm(e.Text);
+        bool korean = MainCore.Conf.Language == "ko-KR";
+        Dictionary<int, SearchText[]> pages = [];
+        foreach(Entry e in cachedIndex) {
+            if(!pages.TryGetValue(e.State, out SearchText[] page))
+                pages[e.State] = page = Texts(korean, TabName(e.State), Quartz.UI.Nav.NavRegistry.ByState(e.State)?.Title);
+            // Label in the UI language and in English, so a Korean menu still answers "note rain".
+            e.Label = Texts(korean, e.Text, e.English);
+            e.Context = [.. Texts(korean, e.Section, e.SectionEnglish), .. page];
+            string tip = null;
+            if(e.Tip != null && e.Tip.Text != null) {
+                try { tip = e.Tip.Text(); } catch(Exception ex) { Diag.Ignore(ex); }
+            }
+            e.Detail = string.IsNullOrWhiteSpace(tip) ? null : new SearchText(tip, StringUtils.Normalize);
+        }
         cachedIndexTime = Time.unscaledTime;
         cachedIndexLang = MainCore.Conf.Language;
         return cachedIndex;
+    }
+    // Each distinct string, plus its 초성 form in Korean so "ㄴㅌ" still finds 노트 while full syllables match exactly.
+    private static SearchText[] Texts(bool korean, params string[] raws) {
+        List<SearchText> list = [];
+        HashSet<string> seen = [];
+        foreach(string raw in raws) {
+            if(string.IsNullOrWhiteSpace(raw) || !seen.Add(raw)) continue;
+            list.Add(new SearchText(raw, StringUtils.Normalize));
+            if(!korean) continue;
+            string chosung = StringUtils.NormalizeToHangulChosung(raw);
+            if(chosung != raw) list.Add(new SearchText(chosung, StringUtils.Normalize));
+        }
+        return [.. list];
     }
     private static List<Entry> BuildIndex() {
         Quartz.UI.Factory.PageFactory.EnsureAllBuilt();
         List<Entry> list = [];
         foreach(KeyValuePair<int, RectTransform> page in UICore.Pages) {
             if(page.Key == Quartz.UI.Nav.NavRegistry.StateFor(Quartz.UI.Nav.CorePages.SearchPageKey) || page.Value == null) continue;
-            Walk(page.Value, page.Key, null, list);
+            Walk(page.Value, page.Key, null, null, list);
         }
         return list;
     }
-    private static void Walk(Transform t, int state, string section, List<Entry> list) {
+    private static void Walk(Transform t, int state, string section, string sectionEnglish, List<Entry> list) {
         for(int i = 0; i < t.childCount; i++) {
             Transform child = t.GetChild(i);
             string name = child.name;
             if(name == "List") continue;
             if(name.StartsWith("Section_")) {
-                TMP_Text headerLabel = child.Find("Header/Bar/Label")?.GetComponent<TMP_Text>();
+                Transform header = child.Find("Header/Bar/Label");
+                TMP_Text headerLabel = header != null ? header.GetComponent<TMP_Text>() : null;
+                TextLocalization headerLoc = header != null ? header.GetComponent<TextLocalization>() : null;
                 string title = headerLabel != null ? headerLabel.text : name["Section_".Length..];
+                string titleEnglish = headerLoc != null ? headerLoc.Default : null;
                 list.Add(new Entry {
                     State = state,
                     Text = title,
+                    English = titleEnglish,
                     Section = section,
+                    SectionEnglish = sectionEnglish,
                     Target = (RectTransform)child,
                     IsCategory = true,
                 });
                 Transform body = child.Find("Body");
-                if(body != null) Walk(body, state, title, list);
+                if(body != null) Walk(body, state, title, titleEnglish, list);
                 continue;
             }
             // Any localized label, whatever the control named it (ColorLabel, BindLabel…); long ones are hints, not settings.
-            if(child.TryGetComponent(out TMP_Text tmp) && child.GetComponent<TextLocalization>() != null) {
+            if(child.TryGetComponent(out TMP_Text tmp) && child.TryGetComponent(out TextLocalization loc)) {
                 string text = tmp.text;
                 if(!string.IsNullOrWhiteSpace(text) && text.Length <= MAX_LABEL_LENGTH) {
                     RectTransform target = RowTarget(child, state);
@@ -172,13 +212,16 @@ internal static class PageSearch {
                         list.Add(new Entry {
                             State = state,
                             Text = text,
+                            English = loc.Default,
                             Section = section,
+                            SectionEnglish = sectionEnglish,
                             Target = target,
+                            Tip = target.GetComponentInChildren<SearchTip>(true),
                         });
                     }
                 }
             }
-            Walk(child, state, section, list);
+            Walk(child, state, section, sectionEnglish, list);
         }
     }
     private static RectTransform RowTarget(Transform label, int state) {
