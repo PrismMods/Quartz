@@ -61,6 +61,7 @@ internal static partial class PageKeyViewer {
         };
         AppendFileStrip(toolbar, status, Rebind, RefreshStatus);
         inspector.BindSettings(panel.Settings, refreshSettings);
+        panel.Settings.gameObject.AddComponent<Quartz.UI.Search.SearchReveal>().Reveal = inspector.ShowSettings;
         inspector.BindHost(panel.Tabs, panel.Props, panel.Scroll);
         RectTransform panelViewport = panel.Scroll.viewport;
         RectTransform divider = split.Divider;

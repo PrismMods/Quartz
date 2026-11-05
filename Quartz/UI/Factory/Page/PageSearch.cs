@@ -34,6 +34,7 @@ internal static class PageSearch {
     private static List<Entry> cachedIndex;
     private static float cachedIndexTime;
     private static string cachedIndexLang;
+    private static Entry topMatch;
     private sealed class ResultRow {
         public RectTransform Row;
         public UI.Objects.Impl.UIButton Button;
@@ -43,6 +44,7 @@ internal static class PageSearch {
     private static TextMeshProUGUI statusText;
     public static void Create(RectTransform parent) {
         cachedIndex = null;
+        topMatch = null;
         resultRows.Clear();
         RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
         var inputRow = GenerateUI.Row(content.transform);
@@ -57,6 +59,9 @@ internal static class PageSearch {
         );
         input.Placeholder.gameObject.AddComponent<TextLocalization>().Init("SEARCH", "Search");
         input.InputField.characterLimit = 40;
+        input.InputField.onSubmit.AddListener(_ => {
+            if(topMatch != null) Navigate(topMatch);
+        });
         var statusRow = GenerateUI.Row(content.transform, 32f);
         statusText = GenerateUI.AddMutedText(statusRow, 18f);
         GameObject results = new("Results");
@@ -72,6 +77,7 @@ internal static class PageSearch {
     }
     private static void RunSearch(string query) {
         if(resultsContainer == null) return;
+        topMatch = null;
         string[][] tokens = SearchMatcher.Tokens(query ?? "", StringUtils.Normalize);
         if(tokens.Length == 0) {
             statusText.text = GenerateUI.Tr("SEARCH_HINT", "Type to search every tab — categories, toggles, buttons, everything.");
@@ -93,10 +99,12 @@ internal static class PageSearch {
             if(a.Text.Length != b.Text.Length) return a.Text.Length.CompareTo(b.Text.Length);
             return string.Compare(a.Text, b.Text, StringComparison.OrdinalIgnoreCase);
         });
+        topMatch = matches[0];
         int shown = Mathf.Min(matches.Count, MAX_RESULTS);
-        statusText.text = matches.Count > MAX_RESULTS
+        string count = matches.Count > MAX_RESULTS
             ? string.Format(GenerateUI.Tr("SEARCH_RESULTS_CAPPED", "{0} results (showing first {1})"), matches.Count, MAX_RESULTS)
             : string.Format(GenerateUI.Tr("SEARCH_RESULTS", "{0} result(s)"), matches.Count);
+        statusText.text = count + " · " + GenerateUI.Tr("SEARCH_ENTER_HINT", "Press Enter to jump to the top result.");
         for(int i = 0; i < shown; i++)
             ShowResultRow(i, matches[i]);
         HideRowsFrom(shown);
@@ -235,48 +243,62 @@ internal static class PageSearch {
     }
     private static void Navigate(Entry e) {
         if(e.Target == null) return;
+        // Open what the row sits in, outermost first: a tab that only shows it on demand, then collapsed sections.
+        SearchReveal[] reveals = e.Target.GetComponentsInParent<SearchReveal>(true);
+        for(int i = reveals.Length - 1; i >= 0; i--) {
+            try { reveals[i].Reveal?.Invoke(); } catch(Exception ex) { Diag.Warn(ex, "Search/Reveal"); }
+        }
         foreach(GenerateUI.CollapsibleSection s in GenerateUI.Sections) {
             if(s.Body == null) continue;
             if(e.Target == s.Section || e.Target.IsChildOf(s.Body)) s.SetExpanded(true, false, false);
         }
         MenuFactory.SetState(e.State);
-        RectTransform page = UICore.Pages[e.State];
-        UIScrollController scroller = page.GetComponentInChildren<UIScrollController>(true);
-        if(scroller == null || scroller.content == null) return;
-        LayoutRebuilder.ForceRebuildLayoutImmediate(scroller.content);
-        Vector3 worldCenter = e.Target.TransformPoint(e.Target.rect.center);
-        float localY = scroller.content.InverseTransformPoint(worldCenter).y;
-        float top = -localY - (e.Target.rect.height * 0.5f);
-        scroller.ScrollTo(top - 8f);
+        // Innermost scroller brings the row into view, each outer one brings the inner scroller's viewport.
+        RectTransform focus = e.Target;
+        foreach(UIScrollController scroller in e.Target.GetComponentsInParent<UIScrollController>(true)) {
+            if(scroller.content == null) continue;
+            LayoutRebuilder.ForceRebuildLayoutImmediate(scroller.content);
+            Vector3 worldCenter = focus.TransformPoint(focus.rect.center);
+            float localY = scroller.content.InverseTransformPoint(worldCenter).y;
+            scroller.ScrollTo(-localY - focus.rect.height * 0.5f - 8f);
+            if(scroller.viewport != null) focus = scroller.viewport;
+        }
         Flash(e.Target);
     }
+    // Blink, hold, fade: a single soft fade was easy to miss.
     private static void Flash(RectTransform target) {
         GameObject flash = new("SearchFlash");
         flash.transform.SetParent(target, false);
         RectTransform rect = flash.AddComponent<RectTransform>();
+        // Rows with a layout group would otherwise lay the flash out as one more cell.
+        flash.AddComponent<LayoutElement>().ignoreLayout = true;
         rect.anchorMin = Vector2.zero;
         rect.anchorMax = Vector2.one;
         rect.offsetMin = Vector2.zero;
-        rect.offsetMax = new Vector2(-250f, 0f);
+        rect.offsetMax = Vector2.zero;
         Image img = flash.AddComponent<Image>();
         img.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
         img.type = Image.Type.Sliced;
         Color accent = UIColors.ObjectActive;
-        img.color = new Color(accent.r, accent.g, accent.b, 0.45f);
+        img.color = new Color(accent.r, accent.g, accent.b, 0.55f);
         img.raycastTarget = false;
+        GTweens.Tweens.GTween Alpha(float to, float duration) => GTweenExtensions.Tween(
+            () => img == null ? 0f : img.color.a,
+            a => {
+                if(img == null) return;
+                Color c = img.color;
+                c.a = a;
+                img.color = c;
+            },
+            to,
+            duration
+        ).SetEasing(Easing.OutSine);
         var seq = GTweenSequenceBuilder.New()
-            .AppendTime(0.35f)
-            .Append(GTweenExtensions.Tween(
-                () => img == null ? 0f : img.color.a,
-                a => {
-                    if(img == null) return;
-                    Color c = img.color;
-                    c.a = a;
-                    img.color = c;
-                },
-                0f,
-                0.8f
-            ).SetEasing(Easing.OutSine))
+            .AppendTime(0.2f)
+            .Append(Alpha(0.1f, 0.18f))
+            .Append(Alpha(0.55f, 0.18f))
+            .AppendTime(0.9f)
+            .Append(Alpha(0f, 1f))
             .AppendCallback(() => {
                 if(flash != null) Object.Destroy(flash);
             })

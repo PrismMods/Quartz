@@ -450,6 +450,7 @@
     "SEARCH_QUERY": "Search",
     "SEARCH_RESULTS": "{0} result(s)",
     "SEARCH_RESULTS_CAPPED": "{0} results (showing first {1})",
+    "SEARCH_ENTER_HINT": "Press Enter to jump to the top result.",
     "SECTION_COLORS": "Colors",
     "SECTION_DECORATION_TYPES": "Decoration Types",
     "SECTION_FONTS": "Fonts",

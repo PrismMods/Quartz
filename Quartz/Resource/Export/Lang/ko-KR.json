@@ -450,6 +450,7 @@
     "SEARCH_QUERY": "검색",
     "SEARCH_RESULTS": "{0}개 결과",
     "SEARCH_RESULTS_CAPPED": "결과 {0}개 중 {1}개만 보여 드려요",
+    "SEARCH_ENTER_HINT": "Enter를 누르면 첫 번째 결과로 바로 이동해요.",
     "SECTION_COLORS": "색상",
     "SECTION_DECORATION_TYPES": "장식 유형",
     "SECTION_FONTS": "폰트",
