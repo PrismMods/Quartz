@@ -2534,6 +2534,7 @@
           "UnityEngine.Color TMPro.TMP_InputField::selectionColor()",
           "UnityEngine.RectTransform TMPro.TMP_InputField::get_textViewport()",
           "UnityEngine.RectTransform TMPro.TMP_InputField::textViewport()",
+          "UnityEngine.UI.Graphic TMPro.TMP_InputField::get_placeholder()",
           "UnityEngine.UI.Graphic TMPro.TMP_InputField::placeholder()"
         ]
       },
