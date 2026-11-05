@@ -238,6 +238,7 @@ namespace TMPro {
         public virtual global::UnityEngine.Vector4 margin { get => throw null; set { } }
         public global::TMPro.TextOverflowModes overflowMode { get => throw null; set { } }
         public float paragraphSpacing { get => throw null; set { } }
+        public virtual float preferredWidth { get => throw null; }
         public global::UnityEngine.RectTransform rectTransform { get => throw null; }
         public bool richText { get => throw null; set { } }
         public global::TMPro.TMP_SpriteAsset spriteAsset { get => throw null; set { } }
