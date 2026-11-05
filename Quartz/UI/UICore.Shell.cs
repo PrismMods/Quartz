@@ -307,6 +307,7 @@ public static partial class UICore {
             trigger.triggers.Add(enter);
             trigger.triggers.Add(exit);
         }
+        Quartz.UI.Search.SettingsSearch.CreateBar(topRect, (RectTransform)panel.transform);
         {
             GameObject border = new("Border");
             border.transform.SetParent(panel.transform, false);

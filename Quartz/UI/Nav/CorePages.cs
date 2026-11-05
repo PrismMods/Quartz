@@ -5,7 +5,6 @@ namespace Quartz.UI.Nav;
 internal static class CorePages {
     internal const string HomeCategoryKey = "home";
     internal const string HomePageKey = "home.overview";
-    internal const string SearchPageKey = "search.main";
     internal const string FeaturesCategoryKey = "features";
     internal const string AddonsCategoryKey = FeaturesCategoryKey;
     internal const string AddonsPageKey = "addons.main";
@@ -38,7 +37,6 @@ internal static class CorePages {
         Category("others", "Others", "OTHERS", UISprite.Grid128, 75, togglable: true);
         Category("tuf", "TUF", "TUF", UISprite.Planet128, 76,
             visible: static () => CoreNav && Quartz.Features.FeatureCategories.IsEnabled("others"));
-        Category("search", "Search", "SEARCH", UISprite.MagnifyingGlass128, 80, visible: static () => CoreNav);
         Category("profiles", "Profiles", "PROFILES", UISprite.Users128, 90, visible: static () => CoreNav);
         Category("import", "Import", "IMPORT", UISprite.Book128, 100, visible: static () => CoreNav);
         Category("settings", "Settings", "SETTINGS", UISprite.Gear128, 120, visible: static () => CoreNav);
@@ -53,7 +51,6 @@ internal static class CorePages {
     }
     private static void Standalone() {
         Page(HomePageKey, HomeCategoryKey, 10, "Home", "HOME", PageHome.Create);
-        Page(SearchPageKey, "search", 10, "Search", "SEARCH", PageSearch.Create);
         Page("profiles.main", "profiles", 10, "Profiles", "PROFILES", PageProfiles.Create);
         Page("import.main", "import", 10, "Import", "IMPORT", PageImport.Create);
         Page(FeaturesPageKey, FeaturesCategoryKey, 0, "Features", "FEATURES", PageFeatures.Create,

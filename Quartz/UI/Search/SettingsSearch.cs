@@ -4,16 +4,19 @@ using GTweens.Extensions;
 using Quartz.Core;
 using Quartz.Localization;
 using Quartz.Resource;
+using Quartz.UI.Factory;
 using Quartz.UI.Generator;
-using Quartz.UI.Search;
+using Quartz.UI.Objects.Impl;
 using Quartz.UI.Utility;
 using Quartz.Utility;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 using TMPro;
-namespace Quartz.UI.Factory.Page;
-internal static class PageSearch {
+namespace Quartz.UI.Search;
+/// <summary>Settings search on the top bar: results drop down under the box; Enter or a click jumps to the setting.</summary>
+internal static class SettingsSearch {
     private sealed class Entry {
         public int State;
         public string Text;
@@ -28,7 +31,11 @@ internal static class PageSearch {
         public SearchText Detail;
         public int Score;
     }
-    private const int MAX_RESULTS = 40;
+    private const int MAX_RESULTS = 8;
+    private const float BOX_WIDTH = 320f;
+    private const float POPUP_WIDTH = 480f;
+    // Clear of the close button.
+    private const float RIGHT_OFFSET = 66f;
     private const float INDEX_TTL_SECONDS = 10f;
     private const int MAX_LABEL_LENGTH = 60;
     private static List<Entry> cachedIndex;
@@ -37,38 +44,77 @@ internal static class PageSearch {
     private static Entry topMatch;
     private sealed class ResultRow {
         public RectTransform Row;
-        public UI.Objects.Impl.UIButton Button;
+        public UIButton Button;
     }
     private static readonly List<ResultRow> resultRows = [];
-    private static RectTransform resultsContainer;
-    private static TextMeshProUGUI statusText;
-    public static void Create(RectTransform parent) {
+    private static UIInput input;
+    private static RectTransform popup;
+    private static RectTransform footer;
+    private static TextMeshProUGUI footerText;
+    public static void CreateBar(RectTransform topBar, RectTransform panel) {
         cachedIndex = null;
         topMatch = null;
         resultRows.Clear();
-        RectTransform content = Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent);
-        var inputRow = GenerateUI.Row(content.transform);
-        var input = GenerateUI.Input(
-            inputRow,
-            "",
-            "",
-            RunSearch,
-            "Search",
-            MainCore.Spr.Get(UISprite.MagnifyingGlass128),
-            "search_query"
+        GameObject box = new("Search");
+        box.transform.SetParent(topBar, false);
+        RectTransform boxRect = box.AddComponent<RectTransform>();
+        boxRect.anchorMin = new(1f, 0.5f);
+        boxRect.anchorMax = new(1f, 0.5f);
+        boxRect.pivot = new(1f, 0.5f);
+        boxRect.anchoredPosition = new(-RIGHT_OFFSET, 0f);
+        boxRect.sizeDelta = new(BOX_WIDTH, 40f);
+        input = GenerateUI.Input(
+            boxRect, "", "", RunSearch, "Search",
+            MainCore.Spr.Get(UISprite.MagnifyingGlass128), "search_query", 0f
         );
         input.Placeholder.gameObject.AddComponent<TextLocalization>().Init("SEARCH", "Search");
         input.InputField.characterLimit = 40;
         input.InputField.onSubmit.AddListener(_ => {
-            if(topMatch != null) Navigate(topMatch);
+            if(topMatch != null) Go(topMatch);
         });
-        var statusRow = GenerateUI.Row(content.transform, 32f);
-        statusText = GenerateUI.AddMutedText(statusRow, 18f);
-        GameObject results = new("Results");
-        results.transform.SetParent(content.transform, false);
-        resultsContainer = results.AddComponent<RectTransform>();
-        GenerateUI.FitVertical(results, 8f);
-        RunSearch("");
+        input.InputField.onSelect.AddListener(RunSearch);
+        // Deselect also fires on the click that picks a result, so only a click elsewhere closes the list.
+        input.InputField.onDeselect.AddListener(_ => {
+            if(!PointerOver(popup)) HidePopup();
+        });
+        popup = CreatePopup(panel, topBar.sizeDelta.y);
+    }
+    private static RectTransform CreatePopup(RectTransform panel, float topBarHeight) {
+        GameObject obj = new("SearchResults");
+        obj.transform.SetParent(panel, false);
+        RectTransform rect = obj.AddComponent<RectTransform>();
+        rect.anchorMin = new(1f, 1f);
+        rect.anchorMax = new(1f, 1f);
+        rect.pivot = new(1f, 1f);
+        rect.anchoredPosition = new(-RIGHT_OFFSET, -topBarHeight - 4f);
+        rect.sizeDelta = new(POPUP_WIDTH, 0f);
+        Image bg = obj.AddComponent<Image>();
+        bg.sprite = MainCore.Spr.Get(UISliceSprite.Circle256P2048);
+        bg.type = Image.Type.Sliced;
+        bg.color = UIColors.TopBar;
+        GenerateUI.FitVertical(obj, 4f).padding = new RectOffset(8, 8, 8, 6);
+        footer = GenerateUI.Row(rect, 26f);
+        footerText = GenerateUI.AddMutedText(footer, 15f);
+        obj.SetActive(false);
+        return rect;
+    }
+    private static bool PointerOver(RectTransform rect) =>
+        rect != null && rect.gameObject.activeInHierarchy
+        && RectTransformUtility.RectangleContainsScreenPoint(rect, Input.mousePosition, null);
+    private static void ShowPopup() {
+        popup.gameObject.SetActive(true);
+        popup.SetAsLastSibling();
+        footer.SetAsLastSibling();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(popup);
+    }
+    private static void HidePopup() {
+        if(popup != null) popup.gameObject.SetActive(false);
+    }
+    private static void Go(Entry e) {
+        HidePopup();
+        input.Set("", false);
+        if(EventSystem.current != null) EventSystem.current.SetSelectedGameObject(null);
+        Navigate(e);
     }
     private static string TabName(int state) {
         Quartz.UI.Nav.NavPage page = Quartz.UI.Nav.NavRegistry.ByState(state);
@@ -76,12 +122,11 @@ internal static class PageSearch {
         return page.SearchLabel != null ? page.SearchLabel() : GenerateUI.Tr(page.LocaleKey, page.Title);
     }
     private static void RunSearch(string query) {
-        if(resultsContainer == null) return;
+        if(popup == null) return;
         topMatch = null;
         string[][] tokens = SearchMatcher.Tokens(query ?? "", StringUtils.Normalize);
         if(tokens.Length == 0) {
-            statusText.text = GenerateUI.Tr("SEARCH_HINT", "Type to search every tab — categories, toggles, buttons, everything.");
-            HideRowsFrom(0);
+            HidePopup();
             return;
         }
         string phrase = StringUtils.Normalize(query);
@@ -89,8 +134,9 @@ internal static class PageSearch {
         List<Entry> matches = Match(index, tokens, phrase, false);
         if(matches.Count == 0) matches = Match(index, tokens, phrase, true);
         if(matches.Count == 0) {
-            statusText.text = GenerateUI.Tr("SEARCH_NO_RESULTS", "No results.");
             HideRowsFrom(0);
+            footerText.text = GenerateUI.Tr("SEARCH_NO_RESULTS", "No results.");
+            ShowPopup();
             return;
         }
         matches.Sort((a, b) => {
@@ -101,13 +147,14 @@ internal static class PageSearch {
         });
         topMatch = matches[0];
         int shown = Mathf.Min(matches.Count, MAX_RESULTS);
-        string count = matches.Count > MAX_RESULTS
-            ? string.Format(GenerateUI.Tr("SEARCH_RESULTS_CAPPED", "{0} results (showing first {1})"), matches.Count, MAX_RESULTS)
-            : string.Format(GenerateUI.Tr("SEARCH_RESULTS", "{0} result(s)"), matches.Count);
-        statusText.text = count + " · " + GenerateUI.Tr("SEARCH_ENTER_HINT", "Press Enter to jump to the top result.");
         for(int i = 0; i < shown; i++)
             ShowResultRow(i, matches[i]);
         HideRowsFrom(shown);
+        string enter = GenerateUI.Tr("SEARCH_ENTER_HINT", "Press Enter to jump to the top result.");
+        footerText.text = matches.Count > MAX_RESULTS
+            ? string.Format(GenerateUI.Tr("SEARCH_RESULTS_CAPPED", "{0} results (showing first {1})"), matches.Count, MAX_RESULTS) + " · " + enter
+            : enter;
+        ShowPopup();
     }
     private static List<Entry> Match(List<Entry> index, string[][] tokens, string phrase, bool fuzzy) {
         List<Entry> matches = [];
@@ -119,10 +166,10 @@ internal static class PageSearch {
     }
     private static void ShowResultRow(int index, Entry e) {
         while(resultRows.Count <= index) {
-            var row = GenerateUI.Row(resultsContainer);
-            var btn = GenerateUI.Button(row, null, "", "search_result").SetSecondary();
+            var row = GenerateUI.Row(popup, 40f);
+            var btn = GenerateUI.Button(row, null, "", "search_result", 0f).SetSecondary();
             btn.Label.overflowMode = TextOverflowModes.Ellipsis;
-            btn.Label.fontSize = 19f;
+            btn.Label.fontSize = 17f;
             TextLocalization loc = btn.Label.GetComponent<TextLocalization>();
             if(loc != null) Object.Destroy(loc);
             resultRows.Add(new ResultRow { Row = row, Button = btn });
@@ -132,7 +179,7 @@ internal static class PageSearch {
         string path = string.IsNullOrEmpty(e.Section)
             ? TabName(e.State)
             : $"{TabName(e.State)} › {e.Section}";
-        slot.Button.OnClick = () => Navigate(e);
+        slot.Button.OnClick = () => Go(e);
         slot.Button.Label.text = $"<alpha=#77>{path} ›<alpha=#FF> {text}";
         slot.Row.gameObject.SetActive(true);
     }
@@ -182,7 +229,7 @@ internal static class PageSearch {
         Quartz.UI.Factory.PageFactory.EnsureAllBuilt();
         List<Entry> list = [];
         foreach(KeyValuePair<int, RectTransform> page in UICore.Pages) {
-            if(page.Key == Quartz.UI.Nav.NavRegistry.StateFor(Quartz.UI.Nav.CorePages.SearchPageKey) || page.Value == null) continue;
+            if(page.Value == null) continue;
             Walk(page.Value, page.Key, null, null, list);
         }
         return list;
