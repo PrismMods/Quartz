@@ -8,9 +8,11 @@
 		<StubProject Include="$(MSBuildThisFileDirectory)Assembly-CSharp/Assembly-CSharp.csproj" />
 		<StubProject Include="$(MSBuildThisFileDirectory)Assembly-CSharp-firstpass/Assembly-CSharp-firstpass.csproj" />
 		<StubProject Include="$(MSBuildThisFileDirectory)DOTween/DOTween.csproj" />
-		<StubProject Include="$(MSBuildThisFileDirectory)Facet.0.1/Facet.0.1.csproj" />
+		<StubProject Include="$(MSBuildThisFileDirectory)Facet.0.2/Facet.0.2.csproj" />
 		<StubProject Include="$(MSBuildThisFileDirectory)MelonLoader/MelonLoader.csproj" />
 		<StubProject Include="$(MSBuildThisFileDirectory)Newtonsoft.Json/Newtonsoft.Json.csproj" />
+		<StubProject Include="$(MSBuildThisFileDirectory)PrismLib/PrismLib.csproj" />
+		<StubProject Include="$(MSBuildThisFileDirectory)PrismLib.UI/PrismLib.UI.csproj" />
 		<StubProject Include="$(MSBuildThisFileDirectory)RDTools/RDTools.csproj" />
 		<StubProject Include="$(MSBuildThisFileDirectory)SkyHook.Unity/SkyHook.Unity.csproj" />
 		<StubProject Include="$(MSBuildThisFileDirectory)Unity.TextMeshPro/Unity.TextMeshPro.csproj" />

@@ -139,7 +139,10 @@ if [ -n "$prev_tag" ]; then footer="${footer}  ·  ${prev_tag}…${tag}"; fi
 # with no hint which is the mod, so without this the answer to "what do I click"
 # is buried.
 dl="https://github.com/${owner}/${repo}/releases/download/${tag}"
-downloads=$(cat <<EOF
+# A function, not $(cat <<EOF …): macOS's bash 3.2 reads the apostrophe in "don't" below as an
+# open quote inside $( ) and cannot parse the script at all.
+downloads_md() {
+cat <<EOF
 ## Download
 
 | | |
@@ -153,7 +156,8 @@ Every feature is included; you pick what to turn on from **Features** inside the
 
 The other files below are for the mod itself — you don't need to download them.
 EOF
-)
+}
+downloads=$(downloads_md)
 
 if [ -n "$changelog" ]; then
   body=$(printf '%s\n\n---\n\n%s\n\n---\n%s\n' "$downloads" "$changelog" "$footer")
@@ -190,9 +194,13 @@ if [ "$release_commit" != "$(git rev-parse -q --verify '@{u}' 2>/dev/null)" ]; t
   exit 1
 fi
 
-# Every build below ships lib/Facet.0.1.dll: make it a fresh build of a committed Facet,
+# Every build below ships lib/Facet.0.2.dll: make it a fresh build of a committed Facet,
 # not whatever lib/ happens to hold. Stops on a Facet tree with uncommitted changes.
 tools/update-facet.sh
+
+# Quartz also ships PrismLib (PrismLib.bundle, PrismLib.UI.dll): the published release, plus the
+# feed's Facet when it lists one. A build that needs an unreleased PrismLib API fails here.
+tools/update-prismlib.sh
 
 # --- Commit the build-number bump (prerelease only) ----------------------
 if [ "$bumped" -eq 1 ]; then

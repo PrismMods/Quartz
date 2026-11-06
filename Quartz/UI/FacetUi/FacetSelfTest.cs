@@ -79,9 +79,9 @@ public sealed class FacetSelfTest : IRuntimeTick {
         int unavailable = CountOccurrences(newLog, "Facet unavailable");
         if(facet) {
             // Check 2: Facet loaded, exactly one assembly of that name.
-            int loaded = AppDomain.CurrentDomain.GetAssemblies().Count(a => a.GetName().Name == "Facet.0.1");
+            int loaded = AppDomain.CurrentDomain.GetAssemblies().Count(a => a.GetName().Name == "Facet.0.2");
             Check("facet available", true);
-            Check("exactly one Facet.0.1 assembly loaded", loaded == 1, $"loaded={loaded}");
+            Check("exactly one Facet.0.2 assembly loaded", loaded == 1, $"loaded={loaded}");
             Check("no 'Facet unavailable' logged", unavailable == 0, $"count={unavailable}");
             // Facet-naming checks live in their own class so this one never names a Facet type.
             yield return FacetSelfTestChecks.Run(Check, Info);

@@ -16,7 +16,7 @@ namespace Quartz.UI.FacetUi;
 internal static partial class FacetSelfTestChecks {
     [MethodImpl(MethodImplOptions.NoInlining)]
     internal static IEnumerator Run(Action<string, bool, string> check, Action<string> info) {
-        info($"facet assembly {typeof(Host).Assembly.Location} loaded={AppDomain.CurrentDomain.GetAssemblies().Count(a => a.GetName().Name == "Facet.0.1")}");
+        info($"facet assembly {typeof(Host).Assembly.Location} loaded={AppDomain.CurrentDomain.GetAssemblies().Count(a => a.GetName().Name == "Facet.0.2")}");
         // Every window these checks open writes its geometry into the live settings: put the map back.
         var windows = new Dictionary<string, string>(MainCore.Conf.FacetWindows);
         try {

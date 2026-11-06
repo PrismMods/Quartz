@@ -142,9 +142,16 @@
 	     runtime.json marks each versioned folder so the bootstrap can verify it. -->
 	<PropertyGroup>
 		<QuartzBootstrapDll>$(MSBuildProjectDirectory)/../Quartz.Bootstrap/bin/$(QuartzAxis)/$(Configuration)/netstandard2.1/$(QuartzBootstrapName).dll</QuartzBootstrapDll>
-		<FacetDll>$(LibDir)/Facet.0.1.dll</FacetDll>
+		<FacetDll>$(LibDir)/Facet.0.2.dll</FacetDll>
 		<!-- No Facet page under IL2CPP or in the KeyViewer flavour, so nothing to ship. -->
 		<FacetDll Condition="$(Configuration.Contains('IL2CPP')) Or '$(Flavor)' == 'KeyViewer'"></FacetDll>
+		<!-- PrismLib.UI ships beside Quartz.dll; PrismLib.dll ships as PrismLib.bundle, which
+		     the vendored PrismBootstrap installs into the shared PrismLib folder. Same
+		     exclusions as Facet. tools/update-prismlib.sh fills lib/. -->
+		<PrismLibUiDll>$(LibDir)/PrismLib.UI.dll</PrismLibUiDll>
+		<PrismLibDll>$(LibDir)/PrismLib.dll</PrismLibDll>
+		<PrismLibUiDll Condition="$(Configuration.Contains('IL2CPP')) Or '$(Flavor)' == 'KeyViewer'"></PrismLibUiDll>
+		<PrismLibDll Condition="$(Configuration.Contains('IL2CPP')) Or '$(Flavor)' == 'KeyViewer'"></PrismLibDll>
 		<QuartzEngineDll>$(MSBuildProjectDirectory)/../Quartz.UpdateEngine/bin/$(QuartzAxis)/$(Configuration)/netstandard2.1/$(QuartzEngineName).dll</QuartzEngineDll>
 		<QuartzStateJson>{"SchemaVersion": 1, "Current": "$(QuartzDisplayVersion)"}</QuartzStateJson>
 		<QuartzRuntimeMarkerJson>{"Version": "$(QuartzDisplayVersion)"}</QuartzRuntimeMarkerJson>
@@ -249,8 +256,52 @@
 		<!-- Facet (UI Toolkit engine; tools/update-facet.sh drops it into lib/). Ships
 		     beside Quartz.dll in the versioned runtime dir, where PayloadLoader resolves
 		     it. Never copied to UserLibs: other Prism mods ship their own copy there. -->
-		<Reference Include="Facet.0.1"><HintPath>$(LibDir)/Facet.0.1.dll</HintPath></Reference>
+		<Reference Include="Facet.0.2"><HintPath>$(LibDir)/Facet.0.2.dll</HintPath></Reference>
+		<!-- PrismLib (shared across Prism mods) and PrismLib.UI (shipped with the mod);
+		     tools/update-prismlib.sh drops both into lib/. Never copied to UserLibs here:
+		     the vendored bootstrap installs PrismLib from PrismLib.bundle. -->
 	</ItemGroup>
+	<ItemGroup Condition="!$(Configuration.Contains('IL2CPP')) And '$(Flavor)' != 'KeyViewer'">
+		<Reference Include="PrismLib"><HintPath>$(LibDir)/PrismLib.dll</HintPath></Reference>
+		<Reference Include="PrismLib.UI"><HintPath>$(LibDir)/PrismLib.UI.dll</HintPath></Reference>
+	</ItemGroup>
+
+	<!-- The Prism bootstrap is vendored verbatim from PrismLib (never edited here), outside
+	     Quartz/ so the conventions check (500-line cap, no silent catch) does not scan it. -->
+	<ItemGroup Condition="!$(Configuration.Contains('IL2CPP')) And '$(Flavor)' != 'KeyViewer'">
+		<Compile Include="../vendor/PrismBootstrap.cs" Link="Prism/PrismBootstrap.cs" />
+	</ItemGroup>
+
+	<!-- The oldest PrismLib Quartz runs against, from tools/prismlib-floor.txt (the one source;
+	     tools/update-prismlib.sh gates the feed on it too). Generated as a constant for
+	     PrismBootstrap.Ensure's `minimum`. It must rise to the first PrismLib release with
+	     Layout and Facet 0.2 before a Quartz release. -->
+	<Target Name="GeneratePrismFloor" BeforeTargets="CoreCompile" Condition="!$(Configuration.Contains('IL2CPP')) And '$(Flavor)' != 'KeyViewer'">
+		<PropertyGroup>
+			<_PrismFloor>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)/../tools/prismlib-floor.txt').Trim())</_PrismFloor>
+			<_PrismFloorCs>$(IntermediateOutputPath)PrismFloor.g.cs</_PrismFloorCs>
+		</PropertyGroup>
+		<WriteLinesToFile File="$(_PrismFloorCs)" Lines="namespace Quartz.Prism%3B internal static class PrismFloor { public static readonly System.Version PrismLib = new System.Version(&quot;$(_PrismFloor)&quot;)%3B }" Overwrite="true" WriteOnlyWhenDifferent="true" />
+		<ItemGroup><Compile Include="$(_PrismFloorCs)" /></ItemGroup>
+	</Target>
+
+	<!-- The PrismLib.UI in lib/ must be one this build can ship: both DLLs present, and the
+	     Facet minor PrismLib.UI was built against must sit beside it (a mismatch loads but
+	     fails at the first Facet call). Metadata strings are ASCII, so reading the DLL as
+	     text finds the reference name. -->
+	<Target Name="CheckPrismLib" BeforeTargets="ResolveAssemblyReferences" Condition="'$(UseStubs)' != 'true' And !$(Configuration.Contains('IL2CPP')) And '$(Flavor)' != 'KeyViewer'">
+		<Error Condition="!Exists('$(LibDir)/PrismLib.dll') Or !Exists('$(LibDir)/PrismLib.UI.dll')" Text="lib/PrismLib.dll or lib/PrismLib.UI.dll is missing: run tools/update-prismlib.sh (DEV=1 for a local PrismLib build)." />
+		<PropertyGroup Condition="Exists('$(LibDir)/PrismLib.UI.dll')">
+			<_PrismUiFacet>$([System.Text.RegularExpressions.Regex]::Match($([System.IO.File]::ReadAllText('$(LibDir)/PrismLib.UI.dll')), 'Facet\.[0-9]+\.[0-9]+').Value)</_PrismUiFacet>
+		</PropertyGroup>
+		<!-- _PrismUiFacet is empty when PrismLib.UI names no Facet at all (a build that does not
+		     stand on it): nothing to match then. -->
+		<PropertyGroup>
+			<_QuartzFacet>$([System.IO.Path]::GetFileNameWithoutExtension('$(FacetDll)'))</_QuartzFacet>
+		</PropertyGroup>
+		<Error Condition="'$(_PrismUiFacet)' != '' And '$(_PrismUiFacet)' != '$(_QuartzFacet)'" Text="PrismLib.UI wants $(_PrismUiFacet) but Quartz ships $(_QuartzFacet): update PrismLib (tools/update-prismlib.sh)." />
+		<Error Condition="'$(_PrismUiFacet)' != '' And !Exists('$(LibDir)/$(_PrismUiFacet).dll')" Text="lib/PrismLib.UI.dll was built against $(_PrismUiFacet), but lib/$(_PrismUiFacet).dll is missing: run tools/update-facet.sh (or tools/update-prismlib.sh when the feed lists it)." />
+	</Target>
 
 	<!-- lib/ fallback. RAR tries each reference's HintPath (the game install) first
 	     and only falls through to the search paths when that file is absent, so lib/
@@ -365,14 +416,16 @@
 
 		<MakeDir Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" Directories="$(MlDataRoot);$(_MlVersionDir)" />
 		<Copy Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(MlDataRoot)/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
-		<Copy Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" SourceFiles="$(TargetPath);$(QuartzEngineDll);$(FacetDll)" DestinationFolder="$(_MlVersionDir)" SkipUnchangedFiles="true" />
+		<Copy Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" SourceFiles="$(TargetPath);$(QuartzEngineDll);$(FacetDll);$(PrismLibUiDll)" DestinationFolder="$(_MlVersionDir)" SkipUnchangedFiles="true" />
+		<Copy Condition="'$(PrismLibDll)' != '' And '$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" SourceFiles="$(PrismLibDll)" DestinationFiles="$(_MlVersionDir)/PrismLib.bundle" />
 		<WriteLinesToFile Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" File="$(_MlVersionDir)/runtime.json" Lines="$(QuartzRuntimeMarkerJson)" Overwrite="true" />
 		<WriteLinesToFile Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" File="$(MlDataRoot)/Runtime/state.json" Lines="$(QuartzStateJson)" Overwrite="true" />
 
 		<RemoveDir Directories="$(PackageStageRoot)" Condition="'$(TargetPath)' != ''" />
 		<MakeDir Directories="$(DistDir);$(PackageStageModsDir);$(PackageStageDataDir);$(_StageVersionDir)" Condition="'$(TargetPath)' != ''" />
 		<Copy Condition="'$(TargetPath)' != ''" SourceFiles="$(QuartzBootstrapDll)" DestinationFolder="$(PackageStageModsDir)" />
-		<Copy Condition="'$(TargetPath)' != ''" SourceFiles="$(TargetPath);$(QuartzEngineDll);$(FacetDll)" DestinationFolder="$(_StageVersionDir)" />
+		<Copy Condition="'$(TargetPath)' != ''" SourceFiles="$(TargetPath);$(QuartzEngineDll);$(FacetDll);$(PrismLibUiDll)" DestinationFolder="$(_StageVersionDir)" />
+		<Copy Condition="'$(PrismLibDll)' != '' And '$(TargetPath)' != ''" SourceFiles="$(PrismLibDll)" DestinationFiles="$(_StageVersionDir)/PrismLib.bundle" />
 		<WriteLinesToFile Condition="'$(TargetPath)' != ''" File="$(_StageVersionDir)/runtime.json" Lines="$(QuartzRuntimeMarkerJson)" Overwrite="true" />
 		<WriteLinesToFile Condition="'$(TargetPath)' != ''" File="$(PackageStageDataDir)/Runtime/state.json" Lines="$(QuartzStateJson)" Overwrite="true" />
 		<Copy Condition="'$(TargetPath)' != ''" SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(PackageStageDataDir)/%(RecursiveDir)%(Filename)%(Extension)')" />
@@ -413,7 +466,8 @@
 		<RemoveDir Directories="$(PackageStageRoot)" />
 		<MakeDir Directories="$(DistDir);$(UmmStageModDir);$(UmmStageDataDir);$(_UmmStageVersionDir)" />
 		<Copy SourceFiles="$(QuartzBootstrapDll)" DestinationFolder="$(UmmStageModDir)" />
-		<Copy SourceFiles="$(TargetPath);$(QuartzEngineDll);$(FacetDll)" DestinationFolder="$(_UmmStageVersionDir)" />
+		<Copy SourceFiles="$(TargetPath);$(QuartzEngineDll);$(FacetDll);$(PrismLibUiDll)" DestinationFolder="$(_UmmStageVersionDir)" />
+		<Copy Condition="'$(PrismLibDll)' != ''" SourceFiles="$(PrismLibDll)" DestinationFiles="$(_UmmStageVersionDir)/PrismLib.bundle" />
 		<WriteLinesToFile File="$(_UmmStageVersionDir)/runtime.json" Lines="$(QuartzRuntimeMarkerJson)" Overwrite="true" />
 		<WriteLinesToFile File="$(UmmStageModDir)/Runtime/state.json" Lines="$(QuartzStateJson)" Overwrite="true" />
 		<WriteLinesToFile File="$(UmmStageModDir)/Info.json" Lines="$(_InfoJson)" Overwrite="true" />
@@ -427,7 +481,8 @@
 		     MelonLoader is present (the ML build already covers this game). -->
 		<MakeDir Directories="$(UmmModDir);$(UmmModDataDir);$(_UmmModVersionDir)" Condition="'$(UmmAutoInstall)' == 'true'" />
 		<Copy Condition="'$(UmmAutoInstall)' == 'true'" SourceFiles="$(QuartzBootstrapDll)" DestinationFolder="$(UmmModDir)" SkipUnchangedFiles="true" />
-		<Copy Condition="'$(UmmAutoInstall)' == 'true'" SourceFiles="$(TargetPath);$(QuartzEngineDll);$(FacetDll)" DestinationFolder="$(_UmmModVersionDir)" SkipUnchangedFiles="true" />
+		<Copy Condition="'$(UmmAutoInstall)' == 'true'" SourceFiles="$(TargetPath);$(QuartzEngineDll);$(FacetDll);$(PrismLibUiDll)" DestinationFolder="$(_UmmModVersionDir)" SkipUnchangedFiles="true" />
+		<Copy Condition="'$(PrismLibDll)' != '' And '$(UmmAutoInstall)' == 'true'" SourceFiles="$(PrismLibDll)" DestinationFiles="$(_UmmModVersionDir)/PrismLib.bundle" />
 		<WriteLinesToFile Condition="'$(UmmAutoInstall)' == 'true'" File="$(_UmmModVersionDir)/runtime.json" Lines="$(QuartzRuntimeMarkerJson)" Overwrite="true" />
 		<WriteLinesToFile Condition="'$(UmmAutoInstall)' == 'true'" File="$(UmmModDir)/Runtime/state.json" Lines="$(QuartzStateJson)" Overwrite="true" />
 		<!-- The pre-bootstrap layout had the payload at the mod folder root. -->

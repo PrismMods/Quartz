@@ -29,7 +29,7 @@ internal static class FacetBridge {
             return false;
         }
         try {
-            return LoadedFacetName() == "Facet.0.1";
+            return LoadedFacetName() == "Facet.0.2";
         } catch(Exception e) { // optional-dependency boundary: a mismatched Facet can also throw MissingMethod/TypeInitialization
             MainCore.Log.Wrn($"Facet unavailable: {e}");
             return false;

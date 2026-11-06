@@ -161,3 +161,15 @@ is Noto Sans CJK SC Medium, subset to the GB2312 character set plus the
 characters Quartz's Chinese translations use. Copyright 2014-2021 Adobe
 (http://www.adobe.com/), SIL Open Font License 1.1.
 Source: https://github.com/notofonts/noto-cjk
+
+## PrismLib
+
+PrismLib, by PrismMods (https://github.com/PrismMods/PrismLib), MIT License.
+Quartz vendors `PrismBootstrap.cs` unchanged (`vendor/PrismBootstrap.cs`) and
+ships `PrismLib.dll` as `PrismLib.bundle` and `PrismLib.UI.dll` in its runtime
+store, unmodified.
+
+## Facet
+
+Facet, by PrismMods, MIT License. Quartz ships `Facet.0.2.dll` in its runtime
+store, unmodified; PrismLib.UI is built on it.

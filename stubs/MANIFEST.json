@@ -1893,7 +1893,7 @@
     "types": []
   },
   {
-    "assembly": "Facet.0.1",
+    "assembly": "Facet.0.2",
     "types": [
       {
         "type": "Facet.Bind",
@@ -2361,6 +2361,14 @@
         ]
       }
     ]
+  },
+  {
+    "assembly": "PrismLib",
+    "types": []
+  },
+  {
+    "assembly": "PrismLib.UI",
+    "types": []
   },
   {
     "assembly": "RDTools",
