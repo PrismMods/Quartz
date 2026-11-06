@@ -210,6 +210,9 @@ public sealed class QuartzRuntime {
         ticks.Add(tweenService);
         ticks.Add(Quartz.Features.FeatureService.Ticker);
         ticks.Add(Quartz.Addons.AddonService.Ticker);
+#if DEBUG && !IL2CPP
+        ticks.Add(new Quartz.UI.FacetUi.FacetSelfTest());
+#endif
         services.Initialize(Logger);
         Quartz.Features.Interop.XPerfectRecursionGuard.TryApply(harmonyService.Harmony);
         xperfectGuardHandler = (_, _) => Quartz.Features.Interop.XPerfectRecursionGuard.TryApply(harmonyService.Harmony);

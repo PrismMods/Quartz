@@ -1,0 +1,88 @@
+#if DEBUG && !IL2CPP
+using System.Runtime.CompilerServices;
+using System.Text;
+using Quartz.Compat.Interface;
+using Quartz.Core;
+using UnityEngine;
+namespace Quartz.UI.FacetUi;
+/// <summary>
+/// Debug-only in-game self-test, driven by the file UserData/Quartz/facet-selftest.
+/// Writes PASS/FAIL lines to facet-selftest.log, ends with "DONE pass=N fail=M", then
+/// quits the game. Names no Facet type; Facet-dependent checks live in FacetBridge.
+/// </summary>
+public sealed class FacetSelfTest : IRuntimeTick {
+    private const float StartAfterSeconds = 25f;
+    private bool done;
+    private int pass, fail;
+    private StringBuilder log;
+    public void Tick() {
+        if(done || Time.realtimeSinceStartup < StartAfterSeconds) return;
+        string marker = Path.Combine(MainCore.Paths.RootPath, "facet-selftest");
+        if(!File.Exists(marker)) { done = true; return; }
+        done = true;
+        string logPath = Path.Combine(MainCore.Paths.RootPath, "facet-selftest.log");
+        log = new StringBuilder();
+        try {
+            Run();
+        } catch(Exception e) {
+            Check("runner", false, e.ToString());
+        }
+        log.AppendLine($"DONE pass={pass} fail={fail}");
+        File.WriteAllText(logPath, log.ToString());
+        Application.Quit();
+    }
+    private void Check(string name, bool ok, string detail = null) {
+        if(ok) pass++; else fail++;
+        log.AppendLine($"{(ok ? "PASS" : "FAIL")} {name}{(detail == null ? "" : " - " + detail)}");
+    }
+    private void Run() {
+        bool facet = FacetBridge.Available();
+        log.AppendLine($"MODE {(facet ? "facet-present" : "facet-absent")}");
+        // Check 1: the page is registered, and its builder runs twice here, outside
+        // PageFactory.EnsureBuilt (which swallows build exceptions), so a failure reaches FAIL.
+        try {
+            int state = Quartz.UI.Nav.NavRegistry.StateFor("visuals.effectremover");
+            Check("effectremover page is registered", state >= 0);
+            for(int i = 0; i < 2; i++) {
+                var host = new GameObject("FacetSelfTestPage", typeof(RectTransform)).GetComponent<RectTransform>();
+                host.SetParent(UICore.Panel, false);
+                try { Quartz.Features.EffectRemover.PageEffectRemover.Create(host); }
+                finally { UnityEngine.Object.Destroy(host.gameObject); }
+            }
+            Check("effectremover page builds", true);
+        } catch(Exception e) {
+            Check("effectremover page builds", false, e.Message);
+        }
+        string newLog = ReadQuartzLog();
+        int unavailable = CountOccurrences(newLog, "Facet unavailable");
+        if(facet) {
+            // Check 2: Facet loaded, exactly one assembly of that name.
+            int loaded = AppDomain.CurrentDomain.GetAssemblies().Count(a => a.GetName().Name == "Facet.0.1");
+            Check("facet available", true);
+            Check("exactly one Facet.0.1 assembly loaded", loaded == 1, $"loaded={loaded}");
+            Check("no 'Facet unavailable' logged", unavailable == 0, $"count={unavailable}");
+        } else {
+            // Check 3: absent, reported exactly once after two page builds.
+            Check("facet reported unavailable", !FacetBridge.Available());
+            Check("exactly one 'Facet unavailable' log line", unavailable == 1, $"count={unavailable}");
+        }
+    }
+    // MelonLoader's log; null-safe empty string elsewhere (UMM). The file is held open
+    // by the loader, so open it shared.
+    private static string ReadQuartzLog() {
+        try {
+            string game = Path.GetFullPath(Path.Combine(MainCore.Paths.RootPath, "..", ".."));
+            string path = Path.Combine(game, "MelonLoader", "Latest.log");
+            if(!File.Exists(path)) return "";
+            using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var sr = new StreamReader(fs);
+            return sr.ReadToEnd();
+        } catch(Exception e) { Diag.Ignore(e); return ""; }
+    }
+    private static int CountOccurrences(string text, string needle) {
+        int n = 0, i = 0;
+        while((i = text.IndexOf(needle, i, StringComparison.Ordinal)) >= 0) { n++; i += needle.Length; }
+        return n;
+    }
+}
+#endif

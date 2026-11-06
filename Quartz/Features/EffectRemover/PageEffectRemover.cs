@@ -10,6 +10,8 @@ public static class PageEffectRemover {
     public static void Create(RectTransform parent) =>
         CreateEffectRemover(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
     private static void CreateEffectRemover(RectTransform content) {
+        // Gates nothing yet; the Facet window button (shown only when true) lands later.
+        _ = Quartz.UI.FacetUi.FacetBridge.Available();
         EffectRemover.EnsureConf();
         EffectRemoverSettings conf = EffectRemover.Conf;
         EffectRemoverSettings def = new();

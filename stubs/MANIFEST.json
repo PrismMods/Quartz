@@ -1893,6 +1893,15 @@
     "types": []
   },
   {
+    "assembly": "Facet.0.1",
+    "types": [
+      {
+        "type": "Facet.Host",
+        "members": []
+      }
+    ]
+  },
+  {
     "assembly": "MelonLoader",
     "types": [
       {
@@ -4659,6 +4668,10 @@
         ]
       }
     ]
+  },
+  {
+    "assembly": "UnityEngine.TextCoreTextEngineModule",
+    "types": []
   },
   {
     "assembly": "UnityEngine.TextRenderingModule",

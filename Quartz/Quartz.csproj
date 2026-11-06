@@ -142,6 +142,8 @@
 	     runtime.json marks each versioned folder so the bootstrap can verify it. -->
 	<PropertyGroup>
 		<QuartzBootstrapDll>$(MSBuildProjectDirectory)/../Quartz.Bootstrap/bin/$(QuartzAxis)/$(Configuration)/netstandard2.1/$(QuartzBootstrapName).dll</QuartzBootstrapDll>
+		<FacetDll>$(LibDir)/Facet.0.1.dll</FacetDll>
+		<FacetDll Condition="$(Configuration.Contains('IL2CPP'))"></FacetDll>
 		<QuartzEngineDll>$(MSBuildProjectDirectory)/../Quartz.UpdateEngine/bin/$(QuartzAxis)/$(Configuration)/netstandard2.1/$(QuartzEngineName).dll</QuartzEngineDll>
 		<QuartzStateJson>{"SchemaVersion": 1, "Current": "$(QuartzDisplayVersion)"}</QuartzStateJson>
 		<QuartzRuntimeMarkerJson>{"Version": "$(QuartzDisplayVersion)"}</QuartzRuntimeMarkerJson>
@@ -232,6 +234,12 @@
 		<Reference Include="UnityEngine.TextCoreFontEngineModule" Condition="Exists('$(ManagedDir)/UnityEngine.TextCoreFontEngineModule.dll') Or Exists('$(LibDir)/UnityEngine.TextCoreFontEngineModule.dll')"><HintPath>$(ManagedDir)/UnityEngine.TextCoreFontEngineModule.dll</HintPath></Reference>
 		<Reference Include="UnityEngine.UI"><HintPath>$(ManagedDir)/UnityEngine.UI.dll</HintPath></Reference>
 		<Reference Include="UnityEngine.UIModule"><HintPath>$(ManagedDir)/UnityEngine.UIModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.UIElementsModule"><HintPath>$(ManagedDir)/UnityEngine.UIElementsModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.TextCoreTextEngineModule"><HintPath>$(ManagedDir)/UnityEngine.TextCoreTextEngineModule.dll</HintPath></Reference>
+		<!-- Facet (UI Toolkit engine; tools/update-facet.sh drops it into lib/). Ships
+		     beside Quartz.dll in the versioned runtime dir, where PayloadLoader resolves
+		     it. Never copied to UserLibs: other Prism mods ship their own copy there. -->
+		<Reference Include="Facet.0.1"><HintPath>$(LibDir)/Facet.0.1.dll</HintPath></Reference>
 	</ItemGroup>
 
 	<!-- lib/ fallback. RAR tries each reference's HintPath (the game install) first
@@ -347,14 +355,14 @@
 
 		<MakeDir Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" Directories="$(MlDataRoot);$(_MlVersionDir)" />
 		<Copy Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(MlDataRoot)/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
-		<Copy Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" SourceFiles="$(TargetPath);$(QuartzEngineDll)" DestinationFolder="$(_MlVersionDir)" SkipUnchangedFiles="true" />
+		<Copy Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" SourceFiles="$(TargetPath);$(QuartzEngineDll);$(FacetDll)" DestinationFolder="$(_MlVersionDir)" SkipUnchangedFiles="true" />
 		<WriteLinesToFile Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" File="$(_MlVersionDir)/runtime.json" Lines="$(QuartzRuntimeMarkerJson)" Overwrite="true" />
 		<WriteLinesToFile Condition="'$(AutoInstall)' == 'true' And '$(TargetPath)' != ''" File="$(MlDataRoot)/Runtime/state.json" Lines="$(QuartzStateJson)" Overwrite="true" />
 
 		<RemoveDir Directories="$(PackageStageRoot)" Condition="'$(TargetPath)' != ''" />
 		<MakeDir Directories="$(DistDir);$(PackageStageModsDir);$(PackageStageDataDir);$(_StageVersionDir)" Condition="'$(TargetPath)' != ''" />
 		<Copy Condition="'$(TargetPath)' != ''" SourceFiles="$(QuartzBootstrapDll)" DestinationFolder="$(PackageStageModsDir)" />
-		<Copy Condition="'$(TargetPath)' != ''" SourceFiles="$(TargetPath);$(QuartzEngineDll)" DestinationFolder="$(_StageVersionDir)" />
+		<Copy Condition="'$(TargetPath)' != ''" SourceFiles="$(TargetPath);$(QuartzEngineDll);$(FacetDll)" DestinationFolder="$(_StageVersionDir)" />
 		<WriteLinesToFile Condition="'$(TargetPath)' != ''" File="$(_StageVersionDir)/runtime.json" Lines="$(QuartzRuntimeMarkerJson)" Overwrite="true" />
 		<WriteLinesToFile Condition="'$(TargetPath)' != ''" File="$(PackageStageDataDir)/Runtime/state.json" Lines="$(QuartzStateJson)" Overwrite="true" />
 		<Copy Condition="'$(TargetPath)' != ''" SourceFiles="@(ExportFiles)" DestinationFiles="@(ExportFiles->'$(PackageStageDataDir)/%(RecursiveDir)%(Filename)%(Extension)')" />
@@ -395,7 +403,7 @@
 		<RemoveDir Directories="$(PackageStageRoot)" />
 		<MakeDir Directories="$(DistDir);$(UmmStageModDir);$(UmmStageDataDir);$(_UmmStageVersionDir)" />
 		<Copy SourceFiles="$(QuartzBootstrapDll)" DestinationFolder="$(UmmStageModDir)" />
-		<Copy SourceFiles="$(TargetPath);$(QuartzEngineDll)" DestinationFolder="$(_UmmStageVersionDir)" />
+		<Copy SourceFiles="$(TargetPath);$(QuartzEngineDll);$(FacetDll)" DestinationFolder="$(_UmmStageVersionDir)" />
 		<WriteLinesToFile File="$(_UmmStageVersionDir)/runtime.json" Lines="$(QuartzRuntimeMarkerJson)" Overwrite="true" />
 		<WriteLinesToFile File="$(UmmStageModDir)/Runtime/state.json" Lines="$(QuartzStateJson)" Overwrite="true" />
 		<WriteLinesToFile File="$(UmmStageModDir)/Info.json" Lines="$(_InfoJson)" Overwrite="true" />
@@ -409,7 +417,7 @@
 		     MelonLoader is present (the ML build already covers this game). -->
 		<MakeDir Directories="$(UmmModDir);$(UmmModDataDir);$(_UmmModVersionDir)" Condition="'$(UmmAutoInstall)' == 'true'" />
 		<Copy Condition="'$(UmmAutoInstall)' == 'true'" SourceFiles="$(QuartzBootstrapDll)" DestinationFolder="$(UmmModDir)" SkipUnchangedFiles="true" />
-		<Copy Condition="'$(UmmAutoInstall)' == 'true'" SourceFiles="$(TargetPath);$(QuartzEngineDll)" DestinationFolder="$(_UmmModVersionDir)" SkipUnchangedFiles="true" />
+		<Copy Condition="'$(UmmAutoInstall)' == 'true'" SourceFiles="$(TargetPath);$(QuartzEngineDll);$(FacetDll)" DestinationFolder="$(_UmmModVersionDir)" SkipUnchangedFiles="true" />
 		<WriteLinesToFile Condition="'$(UmmAutoInstall)' == 'true'" File="$(_UmmModVersionDir)/runtime.json" Lines="$(QuartzRuntimeMarkerJson)" Overwrite="true" />
 		<WriteLinesToFile Condition="'$(UmmAutoInstall)' == 'true'" File="$(UmmModDir)/Runtime/state.json" Lines="$(QuartzStateJson)" Overwrite="true" />
 		<!-- The pre-bootstrap layout had the payload at the mod folder root. -->
