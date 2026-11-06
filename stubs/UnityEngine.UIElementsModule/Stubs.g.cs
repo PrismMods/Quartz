@@ -70,9 +70,6 @@ namespace UnityEngine.UIElements {
             None = 3,
         }
     }
-    public unsafe partial class MeshGenerationContext {
-        protected MeshGenerationContext() { }
-    }
     public unsafe partial class ScrollView : global::UnityEngine.UIElements.VisualElement {
         public ScrollView() => throw null;
         public enum TouchScrollBehavior : int {
@@ -123,7 +120,6 @@ namespace UnityEngine.UIElements {
     }
     public unsafe partial class VisualElement : global::UnityEngine.UIElements.Focusable {
         public virtual global::UnityEngine.UIElements.VisualElement contentContainer { get => throw null; }
-        public global::System.Action<global::UnityEngine.UIElements.MeshGenerationContext> generateVisualContent { get => throw null; set { } }
         public global::UnityEngine.UIElements.VisualElement parent { get => throw null; }
         public global::UnityEngine.UIElements.IStyle style { get => throw null; }
         public void Add(global::UnityEngine.UIElements.VisualElement child) => throw null;

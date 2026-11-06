@@ -6,6 +6,7 @@ using Quartz.Core;
 using Quartz.Features.KeyLimiter;
 using Quartz.UI.Objects;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi;
 /// <summary>
@@ -14,15 +15,17 @@ namespace Quartz.UI.FacetUi;
 /// </summary>
 internal static partial class FacetSelfTestChecks {
     [MethodImpl(MethodImplOptions.NoInlining)]
-    internal static IEnumerator Run(Action<string, bool, string> check) {
+    internal static IEnumerator Run(Action<string, bool, string> check, Action<string> info) {
+        info($"facet assembly {typeof(Host).Assembly.Location} loaded={AppDomain.CurrentDomain.GetAssemblies().Count(a => a.GetName().Name == "Facet.0.1")}");
         // Every window these checks open writes its geometry into the live settings: put the map back.
         var windows = new Dictionary<string, string>(MainCore.Conf.FacetWindows);
         try {
-            yield return EffectRemoverWindow(check);
+            yield return EffectRemoverWindow(check, info);
             yield return Escape(check);
             yield return TextFocus(check);
             yield return Block(check);
             check("translate and language", TranslateAndLanguage(out string d), d);
+            check("a language Facet cannot draw shows English", UndrawableShowsEnglish(out d), d);
             check("read/write round trip", ReadWrite(out d), d);
             yield return Teardown(check);   // last: it disposes Quartz's surfaces, as quitting does
         } finally {
@@ -32,6 +35,26 @@ internal static partial class FacetSelfTestChecks {
         }
         check("no window keys left in the settings", MainCore.Conf.FacetWindows.Keys.All(windows.ContainsKey),
             string.Join(",", MainCore.Conf.FacetWindows.Keys.Where(k => !windows.ContainsKey(k))));
+    }
+    // P26: clicks may reach the game behind a Quartz-only preview. What a click at the open window's centre
+    // would hit through the uGUI EventSystem, and whether KeyLimiter's block holds right now. Not asserted.
+    private static void ClickReach(Action<string> info) {
+        VisualElement root = FacetEffectRemover.Window.Root;
+        Vector2 centre = root.worldBound.center;
+        float scale = Screen.width / root.panel.visualTree.layout.width;
+        var screen = new Vector2(centre.x * scale, Screen.height - (centre.y * scale));   // panel y runs down
+        var hits = new List<RaycastResult>();
+        EventSystem es = EventSystem.current;
+        if(es != null) es.RaycastAll(new PointerEventData(es) { position = screen }, hits);
+        string what = es == null ? "no EventSystem" : string.Join(", ",
+            hits.Select(h => $"{(h.gameObject != null ? h.gameObject.name : "null")} ({(h.module != null ? h.module.GetType().Name : "null")})"));
+        info($"raycast at the window centre {screen} (panel {centre}, scale {scale:0.###}) hits {hits.Count}: {what}");
+        ModState state = MainCore.Runtime.State;
+        bool wasEnabled = state.IsEnabled, asIs = KeyLimiter.IsMenuBlockActive(), modOn;
+        state.IsEnabled = true;
+        try { modOn = KeyLimiter.IsMenuBlockActive(); } finally { state.IsEnabled = wasEnabled; }
+        info($"keylimiter block as-is={asIs} (mod enabled={wasEnabled}), with the mod on={modOn}; bridge blocks={FacetBridge.BlocksGameInput()}"
+            + $" window blocks={FacetEffectRemover.Surface.BlocksGameInput} setting={MainCore.Conf.BlockInputsWhileMenuOpen}");
     }
     private static IEnumerator Frames(int n) {
         for(int i = 0; i < n; i++) {
@@ -147,6 +170,23 @@ internal static partial class FacetSelfTestChecks {
             && QuartzHost.LanguageCode("") == "en" && QuartzHost.LanguageCode(null) == "en";
         detail = $"lang={lang} code={code} got={got} unknown={unknown}";
         return ok;
+    }
+    // Facet draws Latin, and Hangul only for "ko". The language is swapped and put back within this call.
+    private static bool UndrawableShowsEnglish(out string detail) {
+        const string key = "FXRM_MODE_SIMPLE";
+        string was = MainCore.Tr.Language;
+        string english = MainCore.Tr.GetForLanguage(key, "en-US", key);
+        try {
+            MainCore.Tr.Language = "zh-CN";
+            string zh = MainCore.Tr.Get(key, english), zhShown = QuartzHost.Host.Translate(key);
+            string zhFilter = FacetEffectRemover.FilterLabel(Filter.NightVision);
+            MainCore.Tr.Language = "ko-KR";
+            string ko = MainCore.Tr.Get(key, english), koShown = QuartzHost.Host.Translate(key);
+            detail = $"game={RDString.language} en={english} zh={zh}->{zhShown} ko={ko}->{koShown} zhFilter={zhFilter}";
+            return zh != english && zhShown == english && ko != english && koShown == ko && zhFilter.All(c => c < 0x2E80);
+        } finally {
+            MainCore.Tr.Language = was;
+        }
     }
     private static bool ReadWrite(out string detail) {
         const string key = "selftest.roundtrip";

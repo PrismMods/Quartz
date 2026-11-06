@@ -104,7 +104,6 @@ namespace Facet {
         public static global::UnityEngine.UIElements.VisualElement Box(global::UnityEngine.UIElements.VisualElement parent = default) => throw null;
     }
     public static unsafe partial class WarmUp {
-        public static bool Done { get => throw null; }
         public static void Run() => throw null;
     }
     public sealed unsafe partial class Window {

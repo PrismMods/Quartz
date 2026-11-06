@@ -207,7 +207,7 @@ public static class OverlayMotion {
         EnsureLayers();
         bool inGame = GameStats.InGame;
         if(!inGame) MarkOutsideGame();
-        if(!OverlaySwitch.Enabled || !inGame || UICore.IsOpen || UICore.IsReorganizing) {
+        if(!OverlaySwitch.Enabled || !inGame || UICore.MenuShowing || UICore.IsReorganizing) {
             UnwrapAll();
             ShowAll();
             return;

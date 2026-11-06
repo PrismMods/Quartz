@@ -1,5 +1,5 @@
 #if !IL2CPP
-using System.Diagnostics;
+using System.Text.RegularExpressions;
 using Facet;
 using Quartz.Core;
 using Quartz.Features.EffectRemover;
@@ -13,17 +13,14 @@ namespace Quartz.UI.FacetUi;
 internal static class FacetEffectRemover {
     internal static Surface Surface { get; private set; }
     internal static Window Window { get; private set; }
-    /// <summary>The first open, from the click to the window laid out, in ms; -1 until measured.</summary>
-    internal static double FirstOpenMs { get; private set; } = -1;
     // Read on every call: a profile switch may replace what EffectRemover.Conf returns.
     private static EffectRemoverSettings C => EffectRemover.Conf;
     private static readonly EffectRemoverSettings Def = new();
     private static void Save() => EffectRemover.Save();
     internal static void Open() {
-        var clock = Stopwatch.StartNew();
         EffectRemover.EnsureConf();
-        Surface s = Surface ?? Build(clock);   // first: a build that throws leaves the menu open
-        UICore.Close(true);   // the menu's canvas draws above every UI Toolkit panel
+        Surface s = Surface ?? Build();   // first: a build that throws leaves the menu open
+        UICore.HandToPreview();
         s.BlocksGameInput = MainCore.Conf.BlockInputsWhileMenuOpen;
         s.Visible = true;
     }
@@ -39,8 +36,8 @@ internal static class FacetEffectRemover {
         Window = null;
     }
     // Whoever hid it (the close button, Escape, the menu hotkey): the menu comes back on this page.
-    private static void MenuBack() => UICore.Open();
-    private static Surface Build(Stopwatch clock) {
+    private static void MenuBack() => UICore.BackFromPreview();
+    private static Surface Build() {
         Surface s = QuartzHost.NewSurface("QuartzEffectRemover", Layer.Window);
         try {
             var w = new Window(s.Root, "effectremover", "SECTION_EFFECT_REMOVER", new Rect(160f, 90f, 560f, 680f));
@@ -50,12 +47,6 @@ internal static class FacetEffectRemover {
             scroll.style.minHeight = 0f;
             w.Body.Add(scroll);
             Page(scroll.contentContainer);
-            // Mesh generation runs after layout in the frame the window first draws: that is "open".
-            scroll.generateVisualContent = _ => {
-                if(FirstOpenMs >= 0) return;
-                FirstOpenMs = clock.Elapsed.TotalMilliseconds;
-                MainCore.Log.Msg($"[perf] Effect Remover window first open {FirstOpenMs:0.0} ms (warm-up done: {WarmUp.Done})");
-            };
             s.Hidden += MenuBack;
             Window = w;
             return Surface = s;
@@ -117,8 +108,8 @@ internal static class FacetEffectRemover {
         VisualElement filters = Controls.Section(excluded, "SECTION_EXCLUDED_FILTERS", false);
         foreach(Filter value in Enum.GetValues(typeof(Filter))) {
             Filter filter = value;
-            // The game's own name for the filter: no Quartz key, so it passes through untranslated.
-            Controls.Toggle(filters, RDString.GetEnumValue(filter), Bind.To(() => C.SimpleFilterExcludeList.Contains(filter), v => {
+            // No Quartz key, so the label passes through untranslated.
+            Controls.Toggle(filters, FilterLabel(filter), Bind.To(() => C.SimpleFilterExcludeList.Contains(filter), v => {
                 if(!v) C.SimpleFilterExcludeList.Remove(filter);
                 else if(!C.SimpleFilterExcludeList.Contains(filter)) C.SimpleFilterExcludeList.Add(filter);
                 Save();
@@ -141,6 +132,14 @@ internal static class FacetEffectRemover {
         });
         return null;
     }
+    // The game names filters in its own language, which Facet can draw when it is English, or Korean under
+    // Quartz's Korean (Facet's Hangul fallback). Otherwise the enum name: the game has no English lookup
+    // short of switching its language.
+    internal static string FilterLabel(Filter f) =>
+        RDString.language == SystemLanguage.English
+            || (RDString.language == SystemLanguage.Korean && QuartzHost.LanguageCode(MainCore.Tr.Language) == "ko")
+            ? RDString.GetEnumValue(f)
+            : Regex.Replace(f.ToString(), "(?<=[a-z])(?=[A-Z0-9])", " ");
     // Returns the Decoration Types wrapper, shown only while Decoration is on.
     private static VisualElement Enhanced(VisualElement p) {
         Flag(p, "FXRM_ENABLE_SAVE", c => c.EnableSave, (c, v) => { c.EnableSave = v; EffectRemover.RefreshEditorSaveButtons(); },

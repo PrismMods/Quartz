@@ -48,6 +48,8 @@ public sealed class FacetSelfTest : IRuntimeTick {
         File.WriteAllText(Path.Combine(MainCore.Paths.RootPath, "facet-selftest.log"), log.ToString());
         Application.Quit();
     }
+    // Logged, never counted: facts for a reader, not assertions.
+    private void Info(string line) => log.AppendLine("INFO " + line);
     private void Check(string name, bool ok, string detail = null) {
         if(ok) pass++; else fail++;
         log.AppendLine($"{(ok ? "PASS" : "FAIL")} {name}{(detail == null ? "" : " - " + detail)}");
@@ -70,6 +72,9 @@ public sealed class FacetSelfTest : IRuntimeTick {
         } catch(Exception e) {
             Check("effectremover page builds", false, e.Message);
         }
+        Check("unity 6 gate", FacetBridge.IsUnity6("6000.3.2f1") && !FacetBridge.IsUnity6("2022.3.62f1")
+            && !FacetBridge.IsUnity6("") && !FacetBridge.IsUnity6(null) && FacetBridge.IsUnity6(Application.unityVersion),
+            $"unity={Application.unityVersion}");
         string newLog = ReadQuartzLog();
         int unavailable = CountOccurrences(newLog, "Facet unavailable");
         if(facet) {
@@ -79,7 +84,7 @@ public sealed class FacetSelfTest : IRuntimeTick {
             Check("exactly one Facet.0.1 assembly loaded", loaded == 1, $"loaded={loaded}");
             Check("no 'Facet unavailable' logged", unavailable == 0, $"count={unavailable}");
             // Facet-naming checks live in their own class so this one never names a Facet type.
-            yield return FacetSelfTestChecks.Run(Check);
+            yield return FacetSelfTestChecks.Run(Check, Info);
         } else {
             // Check 3: absent, reported exactly once after two page builds.
             Check("facet reported unavailable", !FacetBridge.Available());

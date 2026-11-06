@@ -1,5 +1,6 @@
 #if DEBUG && !IL2CPP
 using System.Collections;
+using System.Reflection;
 using Facet;
 using Newtonsoft.Json.Linq;
 using Quartz.Core;
@@ -23,7 +24,7 @@ internal static partial class FacetSelfTestChecks {
         C.IsSimple
             ? ("FXRM_S_FILTER", nameof(EffectRemoverSettings.SimpleFilter), c => c.SimpleFilter, (c, v) => c.SimpleFilter = v)
             : ("FXRM_ENABLE_SAVE", nameof(EffectRemoverSettings.EnableSave), c => c.EnableSave, (c, v) => c.EnableSave = v);
-    private static IEnumerator EffectRemoverWindow(Action<string, bool, string> check) {
+    private static IEnumerator EffectRemoverWindow(Action<string, bool, string> check, Action<string> info) {
         EffectRemover.EnsureConf();
         string path = EffectRemover.ConfMgr.Path;
         byte[] file = File.Exists(path) ? File.ReadAllBytes(path) : null;
@@ -34,6 +35,7 @@ internal static partial class FacetSelfTestChecks {
             yield return Frames(2);
             yield return FirstOpen(check);
             if(FacetEffectRemover.Window == null) yield break;
+            ClickReach(info);
             yield return PageMirrorsMenu(check);
             yield return ClickFlips(check);
             yield return ShowsBehindWindow(check);
@@ -81,13 +83,22 @@ internal static partial class FacetSelfTestChecks {
         while(!WarmUp.Done && Time.realtimeSinceStartup < until) yield return null;
         check("facet warm-up done before the first open", WarmUp.Done, null);
         bool first = FacetEffectRemover.Surface == null;
+        // Open builds the window synchronously; its first mesh generation, after layout in the frame
+        // it first draws, comes later. That is "open".
+        double ms = -1;
+        var clock = System.Diagnostics.Stopwatch.StartNew();
         FacetBridge.OpenEffectRemover();
+        ScrollView scroll = FacetEffectRemover.Window?.Body.Q<ScrollView>();
+        if(scroll != null) scroll.generateVisualContent = _ => {
+            if(ms >= 0) return;
+            ms = clock.Elapsed.TotalMilliseconds;
+            MainCore.Log.Msg($"[perf] Effect Remover window first open {ms:0.0} ms (warm-up done: {WarmUp.Done})");
+        };
         yield return Frames(2);
-        double ms = FacetEffectRemover.FirstOpenMs;
         check("[perf] first open is at most 50 ms", first && ms >= 0 && ms <= 50, $"first={first} ms={ms:0.0}");
-        check("opening hides the menu and shows the window",
-            !UICore.IsOpen && !UICore.CanvasObj.activeSelf && FacetEffectRemover.Surface?.Visible == true,
-            $"menu={UICore.IsOpen} canvas={UICore.CanvasObj.activeSelf} window={FacetEffectRemover.Surface?.Visible}");
+        check("opening hides the menu and shows the window, which counts as a menu showing",
+            !UICore.IsOpen && !UICore.CanvasObj.activeSelf && FacetEffectRemover.Surface?.Visible == true && UICore.MenuShowing,
+            $"menu={UICore.IsOpen} canvas={UICore.CanvasObj.activeSelf} window={FacetEffectRemover.Surface?.Visible} showing={UICore.MenuShowing}");
     }
     // Toggles are the rows whose input is a bare VisualElement (Facet's switch track); every row has an Id.
     private static int FacetToggles() =>
@@ -250,6 +261,43 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(2);
         check("the menu hotkey hides the window and the menu comes back once",
             hidden && !s.Visible && UICore.IsOpen && !UICore.IsReorganizing, $"hidden={hidden} window={s.Visible} menu={UICore.IsOpen} hub={UICore.IsReorganizing}");
+        // Any other opener (the update toast's "open settings") hides the window rather than stacking the menu over it.
+        FacetBridge.OpenEffectRemover();
+        yield return Frames(2);
+        hidden = !UICore.IsOpen;
+        UICore.Open();
+        yield return Frames(2);
+        check("an opener hides the window and the menu comes back once", hidden && !s.Visible && UICore.IsOpen && UICore.CanvasObj.activeSelf,
+            $"hidden={hidden} window={s.Visible} menu={UICore.IsOpen}");
+        // The window's own mode dropdown rebuilds the menu behind it; with show-on-startup that re-runs an open.
+        bool startup = MainCore.Conf.ShowOnStartup;
+        MainCore.Conf.ShowOnStartup = true;
+        try {
+            FacetBridge.OpenEffectRemover();
+            yield return Frames(2);
+            UICore.Rebuild();
+            yield return Frames(2);
+            check("a menu rebuild behind the window keeps it up and the menu shut", s.Visible && !UICore.IsOpen && !UICore.CanvasObj.activeSelf,
+                $"window={s.Visible} menu={UICore.IsOpen} canvas={UICore.CanvasObj.activeSelf}");
+        } finally {
+            MainCore.Conf.ShowOnStartup = startup;
+        }
+        // Opened from the settings panel over the hub (the hub's Settings button), it comes back there.
+        FacetEffectRemover.Hide();
+        UICore.Close(true);
+        UICore.OpenToHub();
+        typeof(UICore).GetMethod("ShowPanelOverHub", BindingFlags.NonPublic | BindingFlags.Static)?.Invoke(null, null);
+        yield return Frames(2);
+        bool overHub = UICore.IsReorganizing && UICore.PanelInteractive;
+        FacetBridge.OpenEffectRemover();
+        yield return Frames(2);
+        hidden = !UICore.IsOpen && !UICore.IsReorganizing;
+        FacetEffectRemover.Hide();
+        yield return Frames(2);
+        check("closing the window returns to the settings panel over the hub",
+            overHub && hidden && UICore.IsOpen && UICore.IsReorganizing && UICore.PanelInteractive,
+            $"before={overHub} hidden={hidden} menu={UICore.IsOpen} hub={UICore.IsReorganizing} panel={UICore.PanelInteractive}");
+        UICore.Close(true);
     }
 }
 #endif

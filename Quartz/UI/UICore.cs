@@ -107,7 +107,8 @@ public static partial class UICore {
         TextLocalization.RefreshAll();
         FontManager.ApplyMenuFont();
         if(MainCore.Conf.IsFirstRun) MakeFirstRunHelper();
-        if(MainCore.Conf.ShowOnStartup) Open(true);
+        // Rebuild runs this too: never over the preview, which Open would hide.
+        if(MainCore.Conf.ShowOnStartup && !Quartz.UI.FacetUi.FacetBridge.EffectRemoverVisible()) Open(true);
     }
     public static void SetPanelOpacity(float value, bool save) {
         MainCore.Conf.PanelOpacity = Mathf.Clamp01(value);

@@ -52,7 +52,7 @@ So `git log <prev-tag>..HEAD` — what `--dry-run` shows as `range:` — will re
 
 ## Procedure
 
-1. **Preconditions.** On `main`, `gh auth status` OK. Feature work that belongs in this release should already be **committed** (the changelog reflects committed history) — if the tree has uncommitted features, stop and commit them first per [`agents/commits.md`](commits.md).
+1. **Preconditions.** On `main`, `gh auth status` OK. Facet (`../Facet` beside the main checkout, or `FACET_ROOT`) is committed: the script rebuilds it into `lib/` with `tools/update-facet.sh` and stops on uncommitted changes. Feature work that belongs in this release should already be **committed** (the changelog reflects committed history) — if the tree has uncommitted features, stop and commit them first per [`agents/commits.md`](commits.md).
 2. **See identity + the raw range.** Run `./tools/release.sh --dry-run`. Note `tag`, `range`, and read the auto-draft. This is the starting pile, not the release.
 3. **Read the real commits.** `git log <range> --pretty='%h %s%n%b'` (use the `range` from step 2). Subjects + bodies tell you *what* and *why*.
 4. **De-dup against shipped notes *and* the real build boundary.** List recent releases and read their bodies:

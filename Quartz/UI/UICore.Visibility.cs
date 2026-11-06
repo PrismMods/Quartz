@@ -26,6 +26,8 @@ public static partial class UICore {
     private static GTween resetSequence;
     private static bool isOpen = false;
     public static bool IsOpen => isOpen;
+    /// <summary>A Quartz menu is up: the uGUI menu, or the Facet preview standing in for it.</summary>
+    internal static bool MenuShowing => isOpen || FacetBridge.EffectRemoverVisible();
     public static Vector2 LastPanelPosition;
     public static Vector2 LastPanelSize;
     public static Vector2 DefaultPanelSize {
@@ -216,6 +218,9 @@ public static partial class UICore {
     }
     public static void Open(bool noAnimate = false) {
         if(isOpen || Panel == null) return;
+        // The preview stands in for the menu, so no opener stacks the menu over it: hiding it brings the
+        // menu back (its Hidden calls in here again, with the window already hidden).
+        if(FacetBridge.HideEffectRemover()) return;
         isOpen = true;
         Panel.gameObject.SetActive(true);
         if(panelCanvasGroup != null) {
@@ -297,6 +302,18 @@ public static partial class UICore {
             .SetEasing(Easing.OutExpo)
             .OnComplete(() => canvasObj.SetActive(false));
         MainCore.TC.Play(panelTweener);
+    }
+    // The preview opens from the settings panel, often the one over the hub; it comes back to the same place.
+    private static bool previewFromHub, previewOverHub;
+    internal static void HandToPreview() {
+        previewFromHub = IsReorganizing;
+        previewOverHub = panelOverHub;
+        Close(true);   // the menu's canvas draws above every UI Toolkit panel
+    }
+    internal static void BackFromPreview() {
+        if(!previewFromHub) { Open(); return; }
+        Open(true);
+        RestoreHub(previewOverHub);
     }
     // The panel's X: settings opened from the hub closes back to the hub, not out of the UI.
     private static void ClosePanel() {

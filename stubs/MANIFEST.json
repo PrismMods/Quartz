@@ -2046,8 +2046,6 @@
       {
         "type": "Facet.WarmUp",
         "members": [
-          "System.Boolean Facet.WarmUp::Done()",
-          "System.Boolean Facet.WarmUp::get_Done()",
           "System.Void Facet.WarmUp::Run()"
         ]
       },
@@ -3237,6 +3235,8 @@
           "System.Boolean UnityEngine.Application::runInBackground()",
           "System.String UnityEngine.Application::dataPath()",
           "System.String UnityEngine.Application::get_dataPath()",
+          "System.String UnityEngine.Application::get_unityVersion()",
+          "System.String UnityEngine.Application::unityVersion()",
           "System.Void UnityEngine.Application::OpenURL(System.String)",
           "System.Void UnityEngine.Application::Quit()",
           "System.Void UnityEngine.Application::set_runInBackground(System.Boolean)",
@@ -5790,10 +5790,6 @@
         ]
       },
       {
-        "type": "UnityEngine.UIElements.MeshGenerationContext",
-        "members": []
-      },
-      {
         "type": "UnityEngine.UIElements.ScrollView",
         "members": [
           "System.Void UnityEngine.UIElements.ScrollView::.ctor()"
@@ -5871,10 +5867,8 @@
       {
         "type": "UnityEngine.UIElements.VisualElement",
         "members": [
-          "System.Action\u00601\u003CUnityEngine.UIElements.MeshGenerationContext\u003E UnityEngine.UIElements.VisualElement::generateVisualContent()",
           "System.Void UnityEngine.UIElements.VisualElement::Add(UnityEngine.UIElements.VisualElement)",
           "System.Void UnityEngine.UIElements.VisualElement::Clear()",
-          "System.Void UnityEngine.UIElements.VisualElement::set_generateVisualContent(System.Action\u00601\u003CUnityEngine.UIElements.MeshGenerationContext\u003E)",
           "UnityEngine.UIElements.IStyle UnityEngine.UIElements.VisualElement::get_style()",
           "UnityEngine.UIElements.IStyle UnityEngine.UIElements.VisualElement::style()",
           "UnityEngine.UIElements.VisualElement UnityEngine.UIElements.VisualElement::contentContainer()",

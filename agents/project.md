@@ -76,7 +76,7 @@ Top level:
 - `Quartz/` — main mod source.
 - `Quartz.Tests/` — plain .NET tests for Unity-free code (see Tests below).
 - `sdk/` — addon SDK shipped to modders (see Addons system).
-- `lib/` — gitignored per-developer drop folder for reference assemblies the game install lacks (MelonLoader on a UMM-only box, and vice versa). The install always wins; `lib/` is a fallback search path only, and `Assembly-CSharp*` is never taken from it. Builds also need `lib/Facet.0.1.dll` (the Facet UI engine, shipped beside `Quartz.dll`); run `tools/update-facet.sh` first, including before a release build.
+- `lib/` — gitignored per-developer drop folder for reference assemblies the game install lacks (MelonLoader on a UMM-only box, and vice versa). The install always wins; `lib/` is a fallback search path only, and `Assembly-CSharp*` is never taken from it. Builds also need `lib/Facet.0.1.dll` (the Facet UI engine, shipped beside `Quartz.dll`); run `tools/update-facet.sh` first (`tools/release.sh` runs it itself).
 - `scripts/` — `i18n_sync.py`, `validate_i18n.py`.
 - `tools/release.sh` — GitHub release automation.
 - `build.sh` — local build/auto-install/package script.
@@ -179,6 +179,13 @@ The in-game menu is built in code under `Quartz/UI`. It is a two-column sidebar 
 - `Quartz/UI/Generator/GenerateUI*.cs` creates common rows/controls: toggles, buttons, sliders, inputs, dropdowns, color pickers, keybinds, collapsibles.
 - `Quartz/UI/Objects/Impl/*` are backing objects for those controls.
 - `Quartz/UI/Utility/Reorganizer.cs` and related utility files handle draggable overlay layout.
+
+Facet (UI Toolkit) preview windows:
+
+- All of Quartz's Facet code lives in `Quartz/UI/FacetUi/` (`FacetBridge`, `QuartzHost`, the Effect Remover window `FacetEffectRemover`).
+- Outside that folder, reach Facet only through `FacetBridge`'s wrappers, which return a safe default when Facet is missing. A direct Facet call in a per-frame path (`UICore.HandleUpdate`) throws at JIT time on an install without Facet and kills the uGUI menu.
+- DEBUG builds run an in-game self-test when the marker file `UserData/Quartz/facet-selftest` exists: about 25 s after launch it writes PASS/FAIL/INFO lines and `DONE pass=N fail=M` to `UserData/Quartz/facet-selftest.log`, then quits the game. Delete the marker afterwards.
+- `tools/update-facet.sh` builds Facet (`../Facet` beside the main checkout, or `FACET_ROOT`) and copies it into `lib/`; it refuses a Facet tree with uncommitted changes unless `FORCE=1`.
 
 Localization convention for UI controls is important: many `GenerateUI` controls auto-localize by normalizing the control `id` into a key. Read `agents/i18n.md` before adding or changing user-facing strings.
 

@@ -1,28 +1,31 @@
 #!/usr/bin/env bash
-# Copy the built Facet engine into lib/ (gitignored) so Quartz and gen-stubs can
-# reference it.
+# Build the Facet engine and copy it into lib/ (gitignored), where Quartz and gen-stubs
+# reference it and every build ships it beside Quartz.dll. tools/release.sh runs this.
 #
-# Usage: tools/update-facet.sh [--build]
-#   --build  run `dotnet build -c Release` in the Facet repo first
+# Usage: [FACET_ROOT=<Facet repo>] [FORCE=1] tools/update-facet.sh
 #
-# The Facet repo is $FACET_DIR if set, else ../../Facet relative to the MAIN
+# The Facet repo is $FACET_ROOT if set, else ../../Facet relative to the MAIN
 # checkout (found via the git common dir, so this works from a worktree).
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-if [[ -n "${FACET_DIR:-}" ]]; then
-    FACET="$FACET_DIR"
+if [[ -n "${FACET_ROOT:-}" ]]; then
+    FACET="$FACET_ROOT"
 else
     FACET="$(cd "$(git rev-parse --path-format=absolute --git-common-dir)/.." && pwd)/../../Facet"
 fi
-[[ -d "$FACET" ]] || { echo "ERROR: Facet repo not found at $FACET. Set FACET_DIR." >&2; exit 1; }
+[[ -d "$FACET" ]] || { echo "ERROR: Facet repo not found at $FACET. Set FACET_ROOT." >&2; exit 1; }
 
-[[ "${1:-}" == "--build" ]] && dotnet build "$FACET/Facet/Facet.csproj" -c Release -v quiet --nologo
+# This copy ships with Quartz, so it must be a committed Facet.
+if [[ "${FORCE:-}" != 1 && -n "$(git -C "$FACET" status --porcelain)" ]]; then
+    echo "$FACET has uncommitted changes; commit them first (or FORCE=1 $0 for a throwaway build)" >&2
+    git -C "$FACET" status --short >&2
+    exit 1
+fi
+dotnet build "$FACET/Facet/Facet.csproj" -c Release -v quiet --nologo
 
 DLL="$FACET/Facet/bin/Release/netstandard2.1/Facet.0.1.dll"
-[[ -f "$DLL" ]] || { echo "ERROR: $DLL missing. Build Facet first (re-run with --build)." >&2; exit 1; }
-
 mkdir -p lib
 cp "$DLL" lib/Facet.0.1.dll
-echo "lib/Facet.0.1.dll <- $DLL"
+echo "lib/Facet.0.1.dll <- $DLL  md5 $(md5 -q lib/Facet.0.1.dll 2>/dev/null || md5sum lib/Facet.0.1.dll | cut -d' ' -f1)"

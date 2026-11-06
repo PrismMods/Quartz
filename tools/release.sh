@@ -190,6 +190,10 @@ if [ "$release_commit" != "$(git rev-parse -q --verify '@{u}' 2>/dev/null)" ]; t
   exit 1
 fi
 
+# Every build below ships lib/Facet.0.1.dll: make it a fresh build of a committed Facet,
+# not whatever lib/ happens to hold. Stops on a Facet tree with uncommitted changes.
+tools/update-facet.sh
+
 # --- Commit the build-number bump (prerelease only) ----------------------
 if [ "$bumped" -eq 1 ]; then
   tmp=$(mktemp)

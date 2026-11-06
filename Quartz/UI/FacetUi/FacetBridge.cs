@@ -8,9 +8,9 @@ namespace Quartz.UI.FacetUi;
 /// throws when the assembly cannot load. So every public entry here is NoInlining and
 /// only calls a separate NoInlining method that names Facet types: the throw then
 /// happens inside the try, and callers never touch a Facet type themselves.
-/// Add new wrappers in the same shape.
+/// Add new wrappers in the same shape. Internal: it stays out of the addon SDK.
 /// </summary>
-public static class FacetBridge {
+internal static class FacetBridge {
     private static int state; // 0 = not probed, 1 = available, 2 = unavailable
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static bool Available() {
@@ -22,13 +22,25 @@ public static class FacetBridge {
 #if IL2CPP
         return false; // Facet is not referenced under IL2CPP.
 #else
+        if(Info.KeyViewerOnly) return false;   // that flavour ships no Facet and has no Facet page: nothing to warm or report
+        // Prism's UI Toolkit windows support Unity 6 only; an older game keeps the uGUI menu alone.
+        if(!IsUnity6(Application.unityVersion)) {
+            MainCore.Log.Wrn($"Facet unavailable: Unity {Application.unityVersion} is older than Unity 6");
+            return false;
+        }
         try {
             return LoadedFacetName() == "Facet.0.1";
         } catch(Exception e) { // optional-dependency boundary: a mismatched Facet can also throw MissingMethod/TypeInitialization
-            MainCore.Log.Wrn($"Facet unavailable: {e.Message}");
+            MainCore.Log.Wrn($"Facet unavailable: {e}");
             return false;
         }
 #endif
+    }
+    // "6000.3.2f1" is Unity 6; "2022.3.62f1" is not.
+    internal static bool IsUnity6(string version) {
+        if(string.IsNullOrEmpty(version)) return false;
+        int dot = version.IndexOf('.');
+        return dot > 0 && int.TryParse(version[..dot], out int major) && major >= 6000;
     }
     /// <summary>A Facet text field has keyboard focus. False when Facet is unavailable.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -85,6 +97,16 @@ public static class FacetBridge {
 #endif
         return false;
     }
+    /// <summary>The Effect Remover preview is showing. Never probes, so it is cheap per frame.</summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static bool EffectRemoverVisible() {
+#if !IL2CPP
+        if(state == 1) {
+            try { return EffectRemoverVisibleImpl(); } catch(Exception e) { Fail(e); }
+        }
+#endif
+        return false;
+    }
     /// <summary>Re-tints Quartz's Facet windows with the accent. No-op until Quartz has made one.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void Recolour(Color accent) {
@@ -127,7 +149,7 @@ public static class FacetBridge {
     private static void Fail(Exception e) {
         if(state == 2) return;
         state = 2;
-        MainCore.Log.Wrn($"Facet unavailable: {e.Message}");
+        MainCore.Log.Wrn($"Facet unavailable: {e}");
     }
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool TextFocusedImpl() => global::Facet.Input.TextFocused;
@@ -140,6 +162,8 @@ public static class FacetBridge {
     private static void OpenEffectRemoverImpl() => FacetEffectRemover.Open();
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool HideEffectRemoverImpl() => FacetEffectRemover.Hide();
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static bool EffectRemoverVisibleImpl() => FacetEffectRemover.Surface?.Visible == true;
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void WarmUpNow() {
         try { WarmUpImpl(); } catch(Exception e) { Fail(e); }

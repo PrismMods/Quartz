@@ -143,7 +143,8 @@
 	<PropertyGroup>
 		<QuartzBootstrapDll>$(MSBuildProjectDirectory)/../Quartz.Bootstrap/bin/$(QuartzAxis)/$(Configuration)/netstandard2.1/$(QuartzBootstrapName).dll</QuartzBootstrapDll>
 		<FacetDll>$(LibDir)/Facet.0.1.dll</FacetDll>
-		<FacetDll Condition="$(Configuration.Contains('IL2CPP'))"></FacetDll>
+		<!-- No Facet page under IL2CPP or in the KeyViewer flavour, so nothing to ship. -->
+		<FacetDll Condition="$(Configuration.Contains('IL2CPP')) Or '$(Flavor)' == 'KeyViewer'"></FacetDll>
 		<QuartzEngineDll>$(MSBuildProjectDirectory)/../Quartz.UpdateEngine/bin/$(QuartzAxis)/$(Configuration)/netstandard2.1/$(QuartzEngineName).dll</QuartzEngineDll>
 		<QuartzStateJson>{"SchemaVersion": 1, "Current": "$(QuartzDisplayVersion)"}</QuartzStateJson>
 		<QuartzRuntimeMarkerJson>{"Version": "$(QuartzDisplayVersion)"}</QuartzRuntimeMarkerJson>

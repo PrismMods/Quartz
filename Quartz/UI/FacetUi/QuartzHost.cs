@@ -16,8 +16,7 @@ internal static class QuartzHost {
         get {
             host ??= Host.Create("Quartz", o => {
                 o.Log = m => MainCore.Log.Msg(m);
-                // Labels are Lang keys; the DEFAULT language answers every Get with its fallback, so make that the English text.
-                o.Translate = s => MainCore.Tr.Get(s, MainCore.Tr.GetForLanguage(s, "en-US", s));
+                o.Translate = Translate;
                 o.Language = () => LanguageCode(MainCore.Tr.Language);
                 o.Read = key => MainCore.Conf.FacetWindows.TryGetValue(key, out string v) ? v : null;
                 o.Write = Write;
@@ -30,8 +29,12 @@ internal static class QuartzHost {
             return host;
         }
     }
-    /// <summary>The scheme Quartz's Facet windows wear; <c>Recolour(accent)</c> re-tints them all.</summary>
-    internal static Theme Theme => Host.Theme;
+    // Labels are Lang keys; the DEFAULT language answers every Get with its fallback, so that is the English text.
+    // Facet's faces draw Latin, plus Hangul only when the host says "ko": any other language would draw boxes, so it reads English.
+    internal static string Translate(string s) {
+        string english = MainCore.Tr.GetForLanguage(s, "en-US", s);
+        return LanguageCode(MainCore.Tr.Language) is "en" or "ko" ? MainCore.Tr.Get(s, english) : english;
+    }
     /// <summary>Re-tints every Quartz window. Before the host exists there is nothing to tint: it starts from the accent.</summary>
     internal static void Recolour(Color accent) => host?.Theme.Recolour(accent);
     /// <summary>A surface on this host that is relabelled when Quartz's language changes and disposed on shutdown.</summary>

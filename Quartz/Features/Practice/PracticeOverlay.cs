@@ -171,7 +171,8 @@ public static class PracticeInput {
     internal static void Poll() {
         PracticeSettings conf = PracticeDifficulty.Conf;
         if(conf == null || !conf.Enabled || conf.Bindings.Count == 0) return;
-        if(UICore.IsOpen || UICore.IsReorganizing) return;
+        // Not while a menu is up or a text field (uGUI or Facet) has the keys.
+        if(UICore.MenuShowing || UICore.IsReorganizing || Quartz.UI.Objects.UIInputBlocker.IsEditing) return;
         if(Time.unscaledTime - lastApply < 0.2f) return;
         foreach(PracticeBinding binding in conf.Bindings) {
             if(!Keybind.IsUsableKey(binding.Key) || !Input.GetKeyDown(binding.Key)) continue;

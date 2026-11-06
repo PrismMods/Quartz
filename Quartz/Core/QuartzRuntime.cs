@@ -182,7 +182,7 @@ public sealed class QuartzRuntime {
         Quartz.Plugins.PluginIdentityResolver.Hook();
         CreateRootObject();
         RootObject.AddComponent<MainThread>();
-        SaveGate.DeferWrites = static () => Game.Stats.GameStats.InGame && !UI.UICore.IsOpen;
+        SaveGate.DeferWrites = static () => Game.Stats.GameStats.InGame && !UI.UICore.MenuShowing;
         Config.Load();
         AprilFools.SetDevForced(Config.Data.AprilFoolsForced);
         ProfileManager.Initialize();

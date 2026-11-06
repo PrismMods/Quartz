@@ -20,7 +20,7 @@ resources, and no types the mod never touches.
 | `Assembly-CSharp` | 129 | 1071 |
 | `Assembly-CSharp-firstpass` | 2 | 12 |
 | `DOTween` | 0 | 0 |
-| `Facet.0.1` | 18 | 78 |
+| `Facet.0.1` | 18 | 76 |
 | `MelonLoader` | 8 | 23 |
 | `Newtonsoft.Json` | 21 | 127 |
 | `RDTools` | 2 | 0 |
@@ -28,7 +28,7 @@ resources, and no types the mod never touches.
 | `Unity.TextMeshPro` | 36 | 348 |
 | `UnityEngine` | 0 | 0 |
 | `UnityEngine.AudioModule` | 18 | 70 |
-| `UnityEngine.CoreModule` | 77 | 1016 |
+| `UnityEngine.CoreModule` | 77 | 1018 |
 | `UnityEngine.ImageConversionModule` | 1 | 1 |
 | `UnityEngine.InputLegacyModule` | 1 | 11 |
 | `UnityEngine.ParticleSystemModule` | 9 | 53 |
@@ -36,11 +36,11 @@ resources, and no types the mod never touches.
 | `UnityEngine.TextCoreTextEngineModule` | 2 | 0 |
 | `UnityEngine.TextRenderingModule` | 3 | 20 |
 | `UnityEngine.UI` | 94 | 354 |
-| `UnityEngine.UIElementsModule` | 35 | 57 |
+| `UnityEngine.UIElementsModule` | 34 | 55 |
 | `UnityEngine.UIModule` | 6 | 34 |
 | `UnityModManager` | 4 | 12 |
 
-**490 types, 3543 members.**
+**489 types, 3541 members.**
 
 ## How it is used
 
@@ -75,3 +75,16 @@ exists, so drift is caught from both directions:
   nothing else can check them — and a patch pointing at a member the game dropped
   makes Mono discard the whole patched method at JIT time, silently.
   `scripts/check_conventions.py` fails on an unresolved entry, and needs no game.
+
+## Known gaps
+
+StubGen derives the set from Release builds, and two UI Toolkit APIs come out in a
+form that does not compile:
+
+- `RegisterCallback<GeometryChangedEvent>`: the event's stub gets a `protected`
+  parameterless constructor, which breaks the `new()` constraint.
+- `schedule.Execute`: the scheduler interface's stub has the `Action<TimerState>`
+  overload but no `TimerState` type.
+
+Release code avoids both. DEBUG-only code is not stubbed at all, so a stubs build
+leaves out the in-game Facet self-test (`Quartz/UI/FacetUi/FacetSelfTest*.cs`).

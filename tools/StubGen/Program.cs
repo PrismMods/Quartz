@@ -323,6 +323,19 @@ static class Program {
           makes Mono discard the whole patched method at JIT time, silently.
           `scripts/check_conventions.py` fails on an unresolved entry, and needs no game.
 
+        ## Known gaps
+
+        StubGen derives the set from Release builds, and two UI Toolkit APIs come out in a
+        form that does not compile:
+
+        - `RegisterCallback<GeometryChangedEvent>`: the event's stub gets a `protected`
+          parameterless constructor, which breaks the `new()` constraint.
+        - `schedule.Execute`: the scheduler interface's stub has the `Action<TimerState>`
+          overload but no `TimerState` type.
+
+        Release code avoids both. DEBUG-only code is not stubbed at all, so a stubs build
+        leaves out the in-game Facet self-test (`Quartz/UI/FacetUi/FacetSelfTest*.cs`).
+
         """;
     }
 
