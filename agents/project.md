@@ -185,6 +185,7 @@ Facet (UI Toolkit) preview windows:
 - All of Quartz's Facet code lives in `Quartz/UI/FacetUi/` (`FacetBridge`, `QuartzHost`, the Effect Remover window `FacetEffectRemover`).
 - Outside that folder, reach Facet only through `FacetBridge`'s wrappers, which return a safe default when Facet is missing. A direct Facet call in a per-frame path (`UICore.HandleUpdate`) throws at JIT time on an install without Facet and kills the uGUI menu.
 - DEBUG builds run an in-game self-test when the marker file `UserData/Quartz/facet-selftest` exists: about 25 s after launch it writes PASS/FAIL/INFO lines and `DONE pass=N fail=M` to `UserData/Quartz/facet-selftest.log`, then quits the game. Delete the marker afterwards.
+- Prism's shared windows (Alt+D debug, Alt+P settings) are drawn by `Quartz/Prism/PrismWindows.cs`; Quartz keeps their geometry in its own settings file (`FacetWindows`) under the debounced save, not in a file of its own.
 - `tools/update-facet.sh` builds Facet (`../Facet` beside the main checkout, or `FACET_ROOT`) and copies it into `lib/`; it refuses a Facet tree with uncommitted changes unless `FORCE=1`.
 
 Localization convention for UI controls is important: many `GenerateUI` controls auto-localize by normalizing the control `id` into a key. Read `agents/i18n.md` before adding or changing user-facing strings.

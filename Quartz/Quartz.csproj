@@ -174,13 +174,14 @@
 		<DefineConstants>$(DefineConstants);IL2CPP</DefineConstants>
 	</PropertyGroup>
 
-	<!-- The DEBUG Facet self-test names UI Toolkit API the stubs lack (stubs/README.md), so a
-	     stubs build leaves it out; QUARTZ_STUBS drops its one hook in QuartzRuntime. -->
+	<!-- The DEBUG Facet and Prism self-tests name API the stubs lack (stubs/README.md), so a
+	     stubs build leaves them out; QUARTZ_STUBS drops their hooks in QuartzRuntime. -->
 	<PropertyGroup Condition="'$(UseStubs)' == 'true'">
 		<DefineConstants>$(DefineConstants);QUARTZ_STUBS</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup Condition="'$(UseStubs)' == 'true'">
 		<Compile Remove="UI/FacetUi/FacetSelfTest*.cs" />
+		<Compile Remove="Prism/PrismSelfTest*.cs" />
 	</ItemGroup>
 
 	<!-- Shared references (both loaders). Every HintPath points into the game

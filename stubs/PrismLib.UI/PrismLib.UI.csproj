@@ -22,5 +22,7 @@
 		<Compile Include="Stubs.g.cs" />
 	</ItemGroup>
 	<ItemGroup>
+		<ProjectReference Include="../UnityEngine.CoreModule/UnityEngine.CoreModule.csproj" />
+		<ProjectReference Include="../UnityEngine.TextCoreTextEngineModule/UnityEngine.TextCoreTextEngineModule.csproj" />
 	</ItemGroup>
 </Project>

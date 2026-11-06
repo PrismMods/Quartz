@@ -11,3 +11,113 @@
 // </auto-generated>
 #pragma warning disable CS0067, CS0169, CS0649, CS0108, CS0109, CS0114, CS0465, CS0824
 
+namespace PrismLib.UI.Toolkit {
+    public static unsafe partial class Anim {
+        public const int Fast = 0;
+        public const int Instant = 1;
+        public const int Normal = 2;
+        public const int Slow = 3;
+        public static int Duration { get => throw null; set { } }
+    }
+    public sealed unsafe partial class DebugPanel : global::System.IDisposable {
+        public DebugPanel(string title, global::System.Func<global::System.Collections.Generic.IEnumerable<global::PrismLib.UI.Toolkit.DebugTab>> tabs, global::UnityEngine.TextCore.Text.FontAsset font = default) => throw null;
+        public void Dispose() => throw null;
+        public void Tick() => throw null;
+        public void Toggle() => throw null;
+        private DebugPanel() { }
+        void global::System.IDisposable.Dispose() => throw null;
+    }
+    public sealed unsafe partial class DebugTab {
+        public global::System.Action Clear;
+        public global::System.Func<global::System.Collections.Generic.IEnumerable<string>> Lines;
+        public string Name;
+        public string Path;
+        public DebugTab() => throw null;
+    }
+    public static unsafe partial class FontFix {
+        public static void EnsureInstalled(string owner, global::System.Action<global::System.Reflection.MethodBase, global::System.Reflection.MethodInfo, string> patch) => throw null;
+        public static void Uninstalled(string owner) => throw null;
+    }
+    public static unsafe partial class FpsCounter {
+        public static void Tick(bool show) => throw null;
+    }
+    public static unsafe partial class History {
+        public const float CoalesceSeconds = 4f;
+        public const int Limit = 5;
+        public static bool Redo() => throw null;
+        public static bool Undo() => throw null;
+    }
+    public static unsafe partial class InputGate {
+        public static void AddBypass(global::System.Func<bool> probe) => throw null;
+        public static void AddMouseExemption(global::System.Func<bool> probe) => throw null;
+        public static void EnsureInstalled(string owner, global::System.Action<global::System.Reflection.MethodBase, global::System.Reflection.MethodInfo, string> postfix) => throw null;
+        public static void Exempt(global::System.Action reads) => throw null;
+        public static global::System.Reflection.MethodInfo RedirectFor(global::System.Reflection.MethodBase called) => throw null;
+        public static void Uninstalled(string owner) => throw null;
+    }
+    public static unsafe partial class MacKeys {
+        public static bool Down(global::UnityEngine.KeyCode key) => throw null;
+        public static bool Held(global::UnityEngine.KeyCode key) => throw null;
+        public static bool TryPhysical(global::UnityEngine.KeyCode key, out bool held) => throw null;
+    }
+    public enum SettingControl : int {
+        Bool = 0,
+        Int = 1,
+        Float = 2,
+        Choice = 3,
+        Text = 4,
+        Action = 5,
+        Colour = 6,
+        Key = 7,
+        Info = 8,
+        Dropdown = 9,
+    }
+    public sealed unsafe partial class SettingRow {
+        public string ActionLabel;
+        public global::System.Action<global::System.Action<string>> Capture;
+        public global::System.Func<object> Get;
+        public string Group;
+        public global::PrismLib.UI.Toolkit.SettingControl Kind;
+        public string Label;
+        public float Max;
+        public float Min;
+        public string[] Options;
+        public string Owner;
+        public string Page;
+        public global::System.Action<object> Set;
+        public string Tooltip;
+        public SettingRow() => throw null;
+    }
+    public sealed unsafe partial class SettingsPanel : global::System.IDisposable {
+        public SettingsPanel(string title, global::System.Func<global::System.Collections.Generic.IEnumerable<global::PrismLib.UI.Toolkit.SettingRow>> source, global::UnityEngine.TextCore.Text.FontAsset font = default) => throw null;
+        public void Dispose() => throw null;
+        public void Tick() => throw null;
+        public void Toggle() => throw null;
+        private SettingsPanel() { }
+        void global::System.IDisposable.Dispose() => throw null;
+    }
+    public sealed unsafe partial class Theme {
+        public global::UnityEngine.Color Accent { get => throw null; set { } }
+        public Theme() => throw null;
+        public void Recolour(global::UnityEngine.Color accent, float tint = default) => throw null;
+        public static global::System.IDisposable Use(global::PrismLib.UI.Toolkit.Theme t) => throw null;
+    }
+    public static unsafe partial class Ui {
+        public static global::System.Action<string> Log;
+        public static bool AnyWindowOpen { get => throw null; }
+        public static bool CloseTop() => throw null;
+        public static void ConsumeEscape() => throw null;
+        public static void TickWheel(global::UnityEngine.Vector2 pointerScreen, float delta) => throw null;
+    }
+    public sealed unsafe partial class Window {
+        public const float MinHeight = 6f;
+        public const float MinWidth = 7f;
+        public const float RailAlign = 8f;
+        public static global::System.Func<string, string> Read;
+        public static global::System.Action<string, string> Write;
+        private Window() { }
+    }
+    public static unsafe partial class Words {
+        public static global::System.Func<string> Language;
+    }
+}

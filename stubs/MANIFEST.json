@@ -127,7 +127,10 @@
       {
         "type": "HarmonyLib.PatchProcessor",
         "members": [
+          "HarmonyLib.PatchProcessor HarmonyLib.PatchProcessor::AddFinalizer(HarmonyLib.HarmonyMethod)",
+          "HarmonyLib.PatchProcessor HarmonyLib.PatchProcessor::AddPostfix(HarmonyLib.HarmonyMethod)",
           "HarmonyLib.PatchProcessor HarmonyLib.PatchProcessor::AddPrefix(HarmonyLib.HarmonyMethod)",
+          "HarmonyLib.PatchProcessor HarmonyLib.PatchProcessor::AddTranspiler(HarmonyLib.HarmonyMethod)",
           "System.Reflection.MethodInfo HarmonyLib.PatchProcessor::Patch()"
         ]
       },
@@ -2364,11 +2367,327 @@
   },
   {
     "assembly": "PrismLib",
-    "types": []
+    "types": [
+      {
+        "type": "PrismLib.Claim",
+        "members": [
+          "System.Void PrismLib.Claim::Release()"
+        ]
+      },
+      {
+        "type": "PrismLib.Claims",
+        "members": [
+          "System.Collections.Generic.IEnumerable\u00601\u003CSystem.Collections.Generic.KeyValuePair\u00602\u003CPrismLib.StateKey,System.String\u003E\u003E PrismLib.Claims::Held()",
+          "System.Collections.Generic.IEnumerable\u00601\u003CSystem.Collections.Generic.KeyValuePair\u00602\u003CPrismLib.StateKey,System.String\u003E\u003E PrismLib.Claims::get_Held()",
+          "System.String PrismLib.Claims::OwnerOf(PrismLib.StateKey)",
+          "System.Void PrismLib.Claims::ReleaseAll(System.String)"
+        ]
+      },
+      {
+        "type": "PrismLib.Config",
+        "members": [
+          "System.Boolean PrismLib.Config::GetBool(System.String,System.Boolean)"
+        ]
+      },
+      {
+        "type": "PrismLib.Diagnostics",
+        "members": [
+          "System.Action PrismLib.Diagnostics::ToggleRequested",
+          "System.Collections.Generic.IEnumerable\u00601\u003CPrismLib.FieldGroup\u003E PrismLib.Diagnostics::Fields()",
+          "System.Collections.Generic.IEnumerable\u00601\u003CPrismLib.FieldGroup\u003E PrismLib.Diagnostics::get_Fields()",
+          "System.Collections.Generic.IEnumerable\u00601\u003CPrismLib.LogSource\u003E PrismLib.Diagnostics::Logs()",
+          "System.Collections.Generic.IEnumerable\u00601\u003CPrismLib.LogSource\u003E PrismLib.Diagnostics::get_Logs()",
+          "System.Void PrismLib.Diagnostics::RequestToggle()",
+          "System.Void PrismLib.Diagnostics::Unregister(System.String)",
+          "System.Void PrismLib.Diagnostics::add_ToggleRequested(System.Action)",
+          "System.Void PrismLib.Diagnostics::remove_ToggleRequested(System.Action)"
+        ]
+      },
+      {
+        "type": "PrismLib.FieldGroup",
+        "members": [
+          "System.Func\u00601\u003CSystem.Collections.Generic.IEnumerable\u00601\u003CSystem.Collections.Generic.KeyValuePair\u00602\u003CSystem.String,System.String\u003E\u003E\u003E PrismLib.FieldGroup::Read",
+          "System.String PrismLib.FieldGroup::Name",
+          "System.String PrismLib.FieldGroup::Owner"
+        ]
+      },
+      {
+        "type": "PrismLib.KeyBinding",
+        "members": []
+      },
+      {
+        "type": "PrismLib.KeyMods",
+        "members": [
+          "PrismLib.KeyMods PrismLib.KeyMods::Alt",
+          "PrismLib.KeyMods PrismLib.KeyMods::Cmd",
+          "PrismLib.KeyMods PrismLib.KeyMods::Ctrl",
+          "PrismLib.KeyMods PrismLib.KeyMods::None",
+          "PrismLib.KeyMods PrismLib.KeyMods::Shift",
+          "System.Int32 PrismLib.KeyMods::value__"
+        ]
+      },
+      {
+        "type": "PrismLib.Keys",
+        "members": [
+          "System.Collections.Generic.IEnumerable\u00601\u003CPrismLib.KeyBinding\u003E PrismLib.Keys::All()",
+          "System.Collections.Generic.IEnumerable\u00601\u003CPrismLib.KeyBinding\u003E PrismLib.Keys::get_All()",
+          "System.Collections.Generic.IEnumerable\u00601\u003CSystem.Collections.Generic.KeyValuePair\u00602\u003CPrismLib.KeyBinding,PrismLib.KeyBinding\u003E\u003E PrismLib.Keys::Conflicts()",
+          "System.Func\u00602\u003CSystem.Int32,System.String\u003E PrismLib.Keys::KeyName",
+          "System.Void PrismLib.Keys::Unregister(System.String)"
+        ]
+      },
+      {
+        "type": "PrismLib.Layout",
+        "members": [
+          "System.Void PrismLib.Layout::Unregister(System.String)"
+        ]
+      },
+      {
+        "type": "PrismLib.LogSource",
+        "members": [
+          "System.Action PrismLib.LogSource::Clear",
+          "System.Func\u00601\u003CSystem.Collections.Generic.IEnumerable\u00601\u003CSystem.String\u003E\u003E PrismLib.LogSource::Tail",
+          "System.String PrismLib.LogSource::Name",
+          "System.String PrismLib.LogSource::Owner",
+          "System.String PrismLib.LogSource::Path"
+        ]
+      },
+      {
+        "type": "PrismLib.ModHandle",
+        "members": [
+          "PrismLib.Claim PrismLib.ModHandle::ClaimState(PrismLib.StateKey,System.String)",
+          "PrismLib.KeyBinding PrismLib.ModHandle::BindKey(System.String,System.Int32,PrismLib.KeyMods,System.String)",
+          "System.Void PrismLib.ModHandle::AddFields(System.String,System.Func\u00601\u003CSystem.Collections.Generic.IEnumerable\u00601\u003CSystem.Collections.Generic.KeyValuePair\u00602\u003CSystem.String,System.String\u003E\u003E\u003E)",
+          "System.Void PrismLib.ModHandle::AddLog(System.String,System.Func\u00601\u003CSystem.Collections.Generic.IEnumerable\u00601\u003CSystem.String\u003E\u003E,System.String,System.Action)",
+          "System.Void PrismLib.ModHandle::ReportPointerOverUi(System.Func\u00601\u003CSystem.Boolean\u003E)"
+        ]
+      },
+      {
+        "type": "PrismLib.Prism",
+        "members": [
+          "PrismLib.ModHandle PrismLib.Prism::Register(System.String,System.Version)",
+          "System.Boolean PrismLib.Prism::IsLoaded(System.String,System.Version\u0026)",
+          "System.Collections.Generic.IEnumerable\u00601\u003CSystem.String\u003E PrismLib.Prism::LoadedMods()",
+          "System.Collections.Generic.IEnumerable\u00601\u003CSystem.String\u003E PrismLib.Prism::get_LoadedMods()",
+          "System.Int32 PrismLib.Prism::AnimDuration()",
+          "System.Int32 PrismLib.Prism::get_AnimDuration()",
+          "System.String PrismLib.Prism::AnimKey",
+          "System.String PrismLib.Prism::FpsKey",
+          "System.String PrismLib.Prism::RestartKey",
+          "System.Version PrismLib.Prism::Version"
+        ]
+      },
+      {
+        "type": "PrismLib.SettingEntry",
+        "members": [
+          "PrismLib.SettingKind PrismLib.SettingEntry::Kind",
+          "System.Action\u00601\u003CSystem.Object\u003E PrismLib.SettingEntry::Set",
+          "System.Double PrismLib.SettingEntry::Max",
+          "System.Double PrismLib.SettingEntry::Min",
+          "System.Func\u00601\u003CSystem.Object\u003E PrismLib.SettingEntry::Get",
+          "System.String PrismLib.SettingEntry::ActionLabel",
+          "System.String PrismLib.SettingEntry::Group",
+          "System.String PrismLib.SettingEntry::Label",
+          "System.String PrismLib.SettingEntry::Page",
+          "System.String PrismLib.SettingEntry::Tooltip",
+          "System.String[] PrismLib.SettingEntry::Options"
+        ]
+      },
+      {
+        "type": "PrismLib.SettingKind",
+        "members": [
+          "PrismLib.SettingKind PrismLib.SettingKind::Action",
+          "PrismLib.SettingKind PrismLib.SettingKind::Bool",
+          "PrismLib.SettingKind PrismLib.SettingKind::Colour",
+          "PrismLib.SettingKind PrismLib.SettingKind::Enum",
+          "PrismLib.SettingKind PrismLib.SettingKind::Float",
+          "PrismLib.SettingKind PrismLib.SettingKind::Int",
+          "PrismLib.SettingKind PrismLib.SettingKind::Key",
+          "PrismLib.SettingKind PrismLib.SettingKind::Text",
+          "System.Int32 PrismLib.SettingKind::value__"
+        ]
+      },
+      {
+        "type": "PrismLib.Settings",
+        "members": [
+          "System.Collections.Generic.IEnumerable\u00601\u003CSystem.Collections.Generic.KeyValuePair\u00602\u003CSystem.String,PrismLib.SettingEntry\u003E\u003E PrismLib.Settings::Search(System.String)",
+          "System.Void PrismLib.Settings::Unregister(System.String)"
+        ]
+      },
+      {
+        "type": "PrismLib.StateKey",
+        "members": [
+          "PrismLib.StateKey PrismLib.StateKey::Autoplay",
+          "PrismLib.StateKey PrismLib.StateKey::DebugPanel",
+          "PrismLib.StateKey PrismLib.StateKey::EditorCamera",
+          "PrismLib.StateKey PrismLib.StateKey::EditorHud",
+          "PrismLib.StateKey PrismLib.StateKey::GameHud",
+          "PrismLib.StateKey PrismLib.StateKey::GamePanels",
+          "PrismLib.StateKey PrismLib.StateKey::InputCapture",
+          "PrismLib.StateKey PrismLib.StateKey::LayoutEditor",
+          "PrismLib.StateKey PrismLib.StateKey::NoFail",
+          "PrismLib.StateKey PrismLib.StateKey::PathLock",
+          "System.Int32 PrismLib.StateKey::value__"
+        ]
+      }
+    ]
   },
   {
     "assembly": "PrismLib.UI",
-    "types": []
+    "types": [
+      {
+        "type": "PrismLib.UI.Toolkit.Anim",
+        "members": [
+          "System.Int32 PrismLib.UI.Toolkit.Anim::Duration()",
+          "System.Int32 PrismLib.UI.Toolkit.Anim::Fast",
+          "System.Int32 PrismLib.UI.Toolkit.Anim::Instant",
+          "System.Int32 PrismLib.UI.Toolkit.Anim::Normal",
+          "System.Int32 PrismLib.UI.Toolkit.Anim::Slow",
+          "System.Void PrismLib.UI.Toolkit.Anim::set_Duration(System.Int32)"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.DebugPanel",
+        "members": [
+          "System.Void PrismLib.UI.Toolkit.DebugPanel::.ctor(System.String,System.Func\u00601\u003CSystem.Collections.Generic.IEnumerable\u00601\u003CPrismLib.UI.Toolkit.DebugTab\u003E\u003E,UnityEngine.TextCore.Text.FontAsset)",
+          "System.Void PrismLib.UI.Toolkit.DebugPanel::Dispose()",
+          "System.Void PrismLib.UI.Toolkit.DebugPanel::Tick()",
+          "System.Void PrismLib.UI.Toolkit.DebugPanel::Toggle()"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.DebugTab",
+        "members": [
+          "System.Action PrismLib.UI.Toolkit.DebugTab::Clear",
+          "System.Func\u00601\u003CSystem.Collections.Generic.IEnumerable\u00601\u003CSystem.String\u003E\u003E PrismLib.UI.Toolkit.DebugTab::Lines",
+          "System.String PrismLib.UI.Toolkit.DebugTab::Name",
+          "System.String PrismLib.UI.Toolkit.DebugTab::Path",
+          "System.Void PrismLib.UI.Toolkit.DebugTab::.ctor()"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.FontFix",
+        "members": [
+          "System.Void PrismLib.UI.Toolkit.FontFix::EnsureInstalled(System.String,System.Action\u00603\u003CSystem.Reflection.MethodBase,System.Reflection.MethodInfo,System.String\u003E)",
+          "System.Void PrismLib.UI.Toolkit.FontFix::Uninstalled(System.String)"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.FpsCounter",
+        "members": [
+          "System.Void PrismLib.UI.Toolkit.FpsCounter::Tick(System.Boolean)"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.History",
+        "members": [
+          "System.Boolean PrismLib.UI.Toolkit.History::Redo()",
+          "System.Boolean PrismLib.UI.Toolkit.History::Undo()",
+          "System.Int32 PrismLib.UI.Toolkit.History::Limit",
+          "System.Single PrismLib.UI.Toolkit.History::CoalesceSeconds"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.InputGate",
+        "members": [
+          "System.Reflection.MethodInfo PrismLib.UI.Toolkit.InputGate::RedirectFor(System.Reflection.MethodBase)",
+          "System.Void PrismLib.UI.Toolkit.InputGate::AddBypass(System.Func\u00601\u003CSystem.Boolean\u003E)",
+          "System.Void PrismLib.UI.Toolkit.InputGate::AddMouseExemption(System.Func\u00601\u003CSystem.Boolean\u003E)",
+          "System.Void PrismLib.UI.Toolkit.InputGate::EnsureInstalled(System.String,System.Action\u00603\u003CSystem.Reflection.MethodBase,System.Reflection.MethodInfo,System.String\u003E)",
+          "System.Void PrismLib.UI.Toolkit.InputGate::Exempt(System.Action)",
+          "System.Void PrismLib.UI.Toolkit.InputGate::Uninstalled(System.String)"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.MacKeys",
+        "members": [
+          "System.Boolean PrismLib.UI.Toolkit.MacKeys::Down(UnityEngine.KeyCode)",
+          "System.Boolean PrismLib.UI.Toolkit.MacKeys::Held(UnityEngine.KeyCode)",
+          "System.Boolean PrismLib.UI.Toolkit.MacKeys::TryPhysical(UnityEngine.KeyCode,System.Boolean\u0026)"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.SettingControl",
+        "members": [
+          "PrismLib.UI.Toolkit.SettingControl PrismLib.UI.Toolkit.SettingControl::Action",
+          "PrismLib.UI.Toolkit.SettingControl PrismLib.UI.Toolkit.SettingControl::Bool",
+          "PrismLib.UI.Toolkit.SettingControl PrismLib.UI.Toolkit.SettingControl::Choice",
+          "PrismLib.UI.Toolkit.SettingControl PrismLib.UI.Toolkit.SettingControl::Colour",
+          "PrismLib.UI.Toolkit.SettingControl PrismLib.UI.Toolkit.SettingControl::Dropdown",
+          "PrismLib.UI.Toolkit.SettingControl PrismLib.UI.Toolkit.SettingControl::Float",
+          "PrismLib.UI.Toolkit.SettingControl PrismLib.UI.Toolkit.SettingControl::Info",
+          "PrismLib.UI.Toolkit.SettingControl PrismLib.UI.Toolkit.SettingControl::Int",
+          "PrismLib.UI.Toolkit.SettingControl PrismLib.UI.Toolkit.SettingControl::Key",
+          "PrismLib.UI.Toolkit.SettingControl PrismLib.UI.Toolkit.SettingControl::Text",
+          "System.Int32 PrismLib.UI.Toolkit.SettingControl::value__"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.SettingRow",
+        "members": [
+          "PrismLib.UI.Toolkit.SettingControl PrismLib.UI.Toolkit.SettingRow::Kind",
+          "System.Action\u00601\u003CSystem.Action\u00601\u003CSystem.String\u003E\u003E PrismLib.UI.Toolkit.SettingRow::Capture",
+          "System.Action\u00601\u003CSystem.Object\u003E PrismLib.UI.Toolkit.SettingRow::Set",
+          "System.Func\u00601\u003CSystem.Object\u003E PrismLib.UI.Toolkit.SettingRow::Get",
+          "System.Single PrismLib.UI.Toolkit.SettingRow::Max",
+          "System.Single PrismLib.UI.Toolkit.SettingRow::Min",
+          "System.String PrismLib.UI.Toolkit.SettingRow::ActionLabel",
+          "System.String PrismLib.UI.Toolkit.SettingRow::Group",
+          "System.String PrismLib.UI.Toolkit.SettingRow::Label",
+          "System.String PrismLib.UI.Toolkit.SettingRow::Owner",
+          "System.String PrismLib.UI.Toolkit.SettingRow::Page",
+          "System.String PrismLib.UI.Toolkit.SettingRow::Tooltip",
+          "System.String[] PrismLib.UI.Toolkit.SettingRow::Options",
+          "System.Void PrismLib.UI.Toolkit.SettingRow::.ctor()"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.SettingsPanel",
+        "members": [
+          "System.Void PrismLib.UI.Toolkit.SettingsPanel::.ctor(System.String,System.Func\u00601\u003CSystem.Collections.Generic.IEnumerable\u00601\u003CPrismLib.UI.Toolkit.SettingRow\u003E\u003E,UnityEngine.TextCore.Text.FontAsset)",
+          "System.Void PrismLib.UI.Toolkit.SettingsPanel::Dispose()",
+          "System.Void PrismLib.UI.Toolkit.SettingsPanel::Tick()",
+          "System.Void PrismLib.UI.Toolkit.SettingsPanel::Toggle()"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.Theme",
+        "members": [
+          "System.IDisposable PrismLib.UI.Toolkit.Theme::Use(PrismLib.UI.Toolkit.Theme)",
+          "System.Void PrismLib.UI.Toolkit.Theme::.ctor()",
+          "System.Void PrismLib.UI.Toolkit.Theme::Recolour(UnityEngine.Color,System.Single)",
+          "System.Void PrismLib.UI.Toolkit.Theme::set_Accent(UnityEngine.Color)",
+          "UnityEngine.Color PrismLib.UI.Toolkit.Theme::Accent()"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.Ui",
+        "members": [
+          "System.Action\u00601\u003CSystem.String\u003E PrismLib.UI.Toolkit.Ui::Log",
+          "System.Boolean PrismLib.UI.Toolkit.Ui::AnyWindowOpen()",
+          "System.Boolean PrismLib.UI.Toolkit.Ui::CloseTop()",
+          "System.Boolean PrismLib.UI.Toolkit.Ui::get_AnyWindowOpen()",
+          "System.Void PrismLib.UI.Toolkit.Ui::ConsumeEscape()",
+          "System.Void PrismLib.UI.Toolkit.Ui::TickWheel(UnityEngine.Vector2,System.Single)"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.Window",
+        "members": [
+          "System.Action\u00602\u003CSystem.String,System.String\u003E PrismLib.UI.Toolkit.Window::Write",
+          "System.Func\u00602\u003CSystem.String,System.String\u003E PrismLib.UI.Toolkit.Window::Read",
+          "System.Single PrismLib.UI.Toolkit.Window::MinHeight",
+          "System.Single PrismLib.UI.Toolkit.Window::MinWidth",
+          "System.Single PrismLib.UI.Toolkit.Window::RailAlign"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.Words",
+        "members": [
+          "System.Func\u00601\u003CSystem.String\u003E PrismLib.UI.Toolkit.Words::Language"
+        ]
+      }
+    ]
   },
   {
     "assembly": "RDTools",

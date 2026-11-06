@@ -522,6 +522,8 @@
     "FEATURE_OFF_NEEDS": "This feature needs {0}. Turning it on turns that on too.",
     "FEATURE_TURN_ON": "Turn On",
     "FEATURE_PAGE_ENABLE": "Use this feature",
-    "FEATURE_OPEN": "Open"
+    "FEATURE_OPEN": "Open",
+    "PRISM_KEY_DEBUG": "Open the debug panel",
+    "PRISM_KEY_SETTINGS": "Open the Prism settings panel"
   }
 }

@@ -30,6 +30,7 @@
 		<Compile Include="../Quartz/Compat/Interface/IRuntimeService.cs" Link="Source/IRuntimeService.cs" />
 		<Compile Include="../Quartz/Compat/Interface/IRuntimeTick.cs" Link="Source/IRuntimeTick.cs" />
 		<Compile Include="../Quartz/Compat/QuartzLogger.cs" Link="Source/QuartzLogger.cs" />
+		<Compile Include="../Quartz/Prism/PrismRules.cs" Link="Source/PrismRules.cs" />
 		<Compile Include="../Quartz/Core/FeatureRegistry.cs" Link="Source/FeatureRegistry.cs" />
 		<Compile Include="../Quartz/Core/ModState.cs" Link="Source/ModState.cs" />
 		<Compile Include="../Quartz/Core/RuntimeServices.cs" Link="Source/RuntimeServices.cs" />

@@ -188,6 +188,10 @@ List<(string Name, Action Run)> tests = [
     ("A bound property getter reads without boxing", AllocationTests.TestABoundPropertyGetterDoesNotBox),
     ("A bound method call boxes neither arguments nor return", AllocationTests.TestABoundMethodDoesNotBoxItsArgumentsOrReturn),
     ("Delegate binding is inert on mismatches", AllocationTests.TestBindingIsInertOnMismatchesRatherThanThrowing),
+    ("Prism mods root: UMM is the mod folder's parent, ML the Mods folder", PrismRulesTests.TestModsRoot),
+    ("Prism finds every PrismLib.UI copy a loader could load", PrismRulesTests.TestUiCopies),
+    ("Prism key modifiers map Keybind's order onto PrismLib's bits", PrismRulesTests.TestPrismMods),
+    ("Quartz keeps its newest thousand log lines for the debug window", QuartzLoggerTests.TestRecentKeepsTheNewestThousand),
 ];
 if(args.Contains("--bench")) AllocationTests.ReportBaseline();
 int failed = 0;

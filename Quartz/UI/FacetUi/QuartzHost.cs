@@ -51,7 +51,7 @@ internal static class QuartzHost {
     }
     // Writes arrive every frame of a window drag; only a changed value asks for a save, and
     // SettingsFile.RequestSave debounces those (the write lands 500 ms after the last change).
-    private static void Write(string key, string value) {
+    internal static void Write(string key, string value) {
         var map = MainCore.Conf.FacetWindows;
         if(value == null) {
             if(!map.Remove(key)) return;

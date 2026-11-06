@@ -85,6 +85,7 @@ public static class UIColors {
         SoftRed = BaseSoftRed;
         // Every accent change passes here, each step of a picker drag included.
         Quartz.UI.FacetUi.FacetBridge.Recolour(accent);
+        Quartz.Prism.PrismBridge.Recolour(accent);
     }
     // A neutral grey leaning toward the accent: the system's warm red-tinted surfaces.
     private static Color Tint(float grey, Color accent, float amount)

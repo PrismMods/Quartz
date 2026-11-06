@@ -95,7 +95,10 @@ namespace HarmonyLib {
         protected PatchClassProcessor() { }
     }
     public unsafe partial class PatchProcessor {
+        public global::HarmonyLib.PatchProcessor AddFinalizer(global::HarmonyLib.HarmonyMethod finalizer) => throw null;
+        public global::HarmonyLib.PatchProcessor AddPostfix(global::HarmonyLib.HarmonyMethod postfix) => throw null;
         public global::HarmonyLib.PatchProcessor AddPrefix(global::HarmonyLib.HarmonyMethod prefix) => throw null;
+        public global::HarmonyLib.PatchProcessor AddTranspiler(global::HarmonyLib.HarmonyMethod transpiler) => throw null;
         public global::System.Reflection.MethodInfo Patch() => throw null;
         protected PatchProcessor() { }
     }

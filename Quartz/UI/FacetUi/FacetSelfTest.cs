@@ -7,11 +7,12 @@ using Quartz.Core;
 using UnityEngine;
 namespace Quartz.UI.FacetUi;
 /// <summary>
-/// Debug-only in-game self-test, driven by the file UserData/Quartz/facet-selftest.
-/// Writes PASS/FAIL lines to facet-selftest.log, ends with "DONE pass=N fail=M", then
-/// quits the game. Names no Facet type; Facet-dependent checks live in FacetBridge.
+/// Debug-only in-game self-test, driven by the file UserData/Quartz/&lt;name&gt; (default facet-selftest).
+/// Writes PASS/FAIL lines to &lt;name&gt;.log, ends with "DONE pass=N fail=M", then quits the game.
+/// Runs <c>body(check, info)</c>, or the Facet checks when there is none. Names no Facet type;
+/// Facet-dependent checks live in FacetBridge.
 /// </summary>
-public sealed class FacetSelfTest : IRuntimeTick {
+public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<string, bool, string>, Action<string>, IEnumerator> body = null) : IRuntimeTick {
     private const float StartAfterSeconds = 25f;
     private bool done;
     private int pass, fail;
@@ -21,10 +22,10 @@ public sealed class FacetSelfTest : IRuntimeTick {
     public void Tick() {
         if(done || Time.realtimeSinceStartup < StartAfterSeconds) return;
         if(steps.Count == 0) {
-            string marker = Path.Combine(MainCore.Paths.RootPath, "facet-selftest");
+            string marker = Path.Combine(MainCore.Paths.RootPath, name);
             if(!File.Exists(marker)) { done = true; return; }
             log = new StringBuilder();
-            steps.Push(Run());
+            steps.Push(body != null ? body(Check, Info) : Run());
         }
         while(steps.Count > 0) {
             IEnumerator top = steps.Peek();
@@ -45,14 +46,14 @@ public sealed class FacetSelfTest : IRuntimeTick {
         }
         done = true;
         log.AppendLine($"DONE pass={pass} fail={fail}");
-        File.WriteAllText(Path.Combine(MainCore.Paths.RootPath, "facet-selftest.log"), log.ToString());
+        File.WriteAllText(Path.Combine(MainCore.Paths.RootPath, name + ".log"), log.ToString());
         Application.Quit();
     }
     // Logged, never counted: facts for a reader, not assertions.
     private void Info(string line) => log.AppendLine("INFO " + line);
-    private void Check(string name, bool ok, string detail = null) {
+    private void Check(string check, bool ok, string detail = null) {
         if(ok) pass++; else fail++;
-        log.AppendLine($"{(ok ? "PASS" : "FAIL")} {name}{(detail == null ? "" : " - " + detail)}");
+        log.AppendLine($"{(ok ? "PASS" : "FAIL")} {check}{(detail == null ? "" : " - " + detail)}");
     }
     private IEnumerator Run() {
         bool facet = FacetBridge.Available();

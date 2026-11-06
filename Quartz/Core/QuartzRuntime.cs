@@ -171,6 +171,7 @@ public sealed class QuartzRuntime {
         MigrateModRootDataIntoDataRoot();
         MigrateLegacyData();
         Paths.Initialize();
+        Quartz.Prism.PrismBridge.Init(Host);
         foreach(string stale in new[] { "Quartz.dll.old", "QuartzUmm.dll.old", "Koren.dll.old" }) {
             try {
                 string oldDll = Path.Combine(Host.ModsPath, stale);
@@ -212,8 +213,12 @@ public sealed class QuartzRuntime {
         ticks.Add(Quartz.Addons.AddonService.Ticker);
 #if DEBUG && !IL2CPP && !QUARTZ_STUBS
         ticks.Add(new Quartz.UI.FacetUi.FacetSelfTest());
+#if !QUARTZ_KEYVIEWER
+        ticks.Add(new Quartz.UI.FacetUi.FacetSelfTest("prism-selftest", Quartz.Prism.PrismSelfTest.Run));
+#endif
 #endif
         services.Initialize(Logger);
+        Quartz.Prism.PrismBridge.Register();
         Quartz.UI.FacetUi.FacetBridge.WarmUp();
         Quartz.Features.Interop.XPerfectRecursionGuard.TryApply(harmonyService.Harmony);
         xperfectGuardHandler = (_, _) => Quartz.Features.Interop.XPerfectRecursionGuard.TryApply(harmonyService.Harmony);
@@ -250,6 +255,7 @@ public sealed class QuartzRuntime {
         });
         // Before the final save: disposing a surface can still Write window state.
         Safe(Quartz.UI.FacetUi.FacetBridge.Shutdown);
+        Safe(Quartz.Prism.PrismBridge.Shutdown);
         Safe(() => Config.Save());
         Safe(() => ProfileManager.CaptureActive());
         Safe(() => services.Dispose());

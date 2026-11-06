@@ -11,3 +11,116 @@
 // </auto-generated>
 #pragma warning disable CS0067, CS0169, CS0649, CS0108, CS0109, CS0114, CS0465, CS0824
 
+namespace PrismLib {
+    public sealed unsafe partial class Claim : global::System.IDisposable {
+        public void Release() => throw null;
+        private Claim() { }
+        void global::System.IDisposable.Dispose() => throw null;
+    }
+    public static unsafe partial class Claims {
+        public static global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<global::PrismLib.StateKey, string>> Held { get => throw null; }
+        public static string OwnerOf(global::PrismLib.StateKey key) => throw null;
+        public static void ReleaseAll(string owner) => throw null;
+    }
+    public static unsafe partial class Config {
+        public static bool GetBool(string key, bool fallback = default) => throw null;
+    }
+    public static unsafe partial class Diagnostics {
+        public static global::System.Collections.Generic.IEnumerable<global::PrismLib.FieldGroup> Fields { get => throw null; }
+        public static global::System.Collections.Generic.IEnumerable<global::PrismLib.LogSource> Logs { get => throw null; }
+        public static event global::System.Action ToggleRequested { add { } remove { } }
+        public static void RequestToggle() => throw null;
+        public static void Unregister(string owner) => throw null;
+    }
+    public sealed unsafe partial class FieldGroup {
+        public string Name;
+        public string Owner;
+        public global::System.Func<global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, string>>> Read;
+        private FieldGroup() { }
+    }
+    public sealed unsafe partial class KeyBinding {
+        private KeyBinding() { }
+    }
+    public enum KeyMods : int {
+        None = 0,
+        Shift = 1,
+        Ctrl = 2,
+        Alt = 4,
+        Cmd = 8,
+    }
+    public static unsafe partial class Keys {
+        public static global::System.Func<int, string> KeyName;
+        public static global::System.Collections.Generic.IEnumerable<global::PrismLib.KeyBinding> All { get => throw null; }
+        public static global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<global::PrismLib.KeyBinding, global::PrismLib.KeyBinding>> Conflicts() => throw null;
+        public static void Unregister(string owner) => throw null;
+    }
+    public static unsafe partial class Layout {
+        public static void Unregister(string owner) => throw null;
+    }
+    public sealed unsafe partial class LogSource {
+        public global::System.Action Clear;
+        public string Name;
+        public string Owner;
+        public string Path;
+        public global::System.Func<global::System.Collections.Generic.IEnumerable<string>> Tail;
+        private LogSource() { }
+    }
+    public sealed unsafe partial class ModHandle {
+        public void AddFields(string name, global::System.Func<global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, string>>> read) => throw null;
+        public void AddLog(string name, global::System.Func<global::System.Collections.Generic.IEnumerable<string>> tail, string path = default, global::System.Action clear = default) => throw null;
+        public global::PrismLib.KeyBinding BindKey(string id, int keyCode, global::PrismLib.KeyMods mods, string label) => throw null;
+        public global::PrismLib.Claim ClaimState(global::PrismLib.StateKey key, string reason = default) => throw null;
+        public void ReportPointerOverUi(global::System.Func<bool> probe) => throw null;
+        private ModHandle() { }
+    }
+    public static unsafe partial class Prism {
+        public const string AnimKey = "AnimKey";
+        public const string FpsKey = "FpsKey";
+        public const string RestartKey = "RestartKey";
+        public static readonly global::System.Version Version;
+        public static int AnimDuration { get => throw null; }
+        public static global::System.Collections.Generic.IEnumerable<string> LoadedMods { get => throw null; }
+        public static bool IsLoaded(string id, out global::System.Version version) => throw null;
+        public static global::PrismLib.ModHandle Register(string id, global::System.Version version) => throw null;
+    }
+    public sealed unsafe partial class SettingEntry {
+        public string ActionLabel;
+        public global::System.Func<object> Get;
+        public string Group;
+        public global::PrismLib.SettingKind Kind;
+        public string Label;
+        public double Max;
+        public double Min;
+        public string[] Options;
+        public string Page;
+        public global::System.Action<object> Set;
+        public string Tooltip;
+        private SettingEntry() { }
+    }
+    public enum SettingKind : int {
+        Bool = 0,
+        Int = 1,
+        Float = 2,
+        Enum = 3,
+        Key = 4,
+        Colour = 5,
+        Text = 6,
+        Action = 7,
+    }
+    public static unsafe partial class Settings {
+        public static global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, global::PrismLib.SettingEntry>> Search(string query) => throw null;
+        public static void Unregister(string owner) => throw null;
+    }
+    public enum StateKey : int {
+        Autoplay = 0,
+        NoFail = 1,
+        EditorCamera = 2,
+        PathLock = 3,
+        EditorHud = 4,
+        GamePanels = 5,
+        GameHud = 6,
+        InputCapture = 7,
+        DebugPanel = 8,
+        LayoutEditor = 9,
+    }
+}
