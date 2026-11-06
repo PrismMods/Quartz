@@ -83,6 +83,8 @@ public static class UIColors {
         TextSecondary = Tint(0.745f, accent, 0.17f);
         LogoFace = Shade(accent, 1.5f, 0.898f);
         SoftRed = BaseSoftRed;
+        // Every accent change passes here, each step of a picker drag included.
+        Quartz.UI.FacetUi.FacetBridge.Recolour(accent);
     }
     // A neutral grey leaning toward the accent: the system's warm red-tinted surfaces.
     private static Color Tint(float grey, Color accent, float amount)

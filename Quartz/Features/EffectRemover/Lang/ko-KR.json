@@ -59,6 +59,7 @@
     "FXRM_S_SCREENTILE": "화면 타일링/스크롤 끄기",
     "DESC_FXRM_S_SCREENTILE": "채보는 그대로 두고 플레이 중 화면 타일링(만화경/반복)과 화면 스크롤 VFX를 꺼요.",
     "FXRM_S_MOVEMAX": "최대 타일 이동 수",
-    "DESC_FXRM_S_MOVEMAX": "트랙 이동 이벤트 하나가 움직일 수 있는 타일 수를 제한해요. 최댓값은 무제한이에요."
+    "DESC_FXRM_S_MOVEMAX": "트랙 이동 이벤트 하나가 움직일 수 있는 타일 수를 제한해요. 최댓값은 무제한이에요.",
+    "FXRM_OPEN_NEW_MENU": "새 메뉴에서 열기 (미리보기)"
   }
 }

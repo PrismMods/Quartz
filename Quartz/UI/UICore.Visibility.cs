@@ -2,6 +2,7 @@ using Quartz.Async;
 using Quartz.Core;
 using Quartz.Localization;
 using Quartz.Resource;
+using Quartz.UI.FacetUi;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects;
 using Quartz.UI.Panes;
@@ -105,6 +106,11 @@ public static partial class UICore {
         }
     }
     public static void HandleUpdate() {
+        // Polled even with the menu closed: a Facet window can be open on its own.
+        if(Input.GetKeyDown(KeyCode.Escape)) EscapeDown();
+        // A runtime UI Toolkit panel here does not get WheelEvent; Facet scrolls its window from this.
+        float wheel = Input.mouseScrollDelta.y;
+        if(wheel != 0f) FacetBridge.TickWheel(Input.mousePosition, wheel);
         if(canvasObj == null) return;
         HandleResolutionChange();
         Keybind.KeyModifier mod = (Keybind.KeyModifier)MainCore.Conf.ToggleModifier;
@@ -114,7 +120,7 @@ public static partial class UICore {
         bool down = Keybind.KeyDown(key);
         bool held = Keybind.KeyHeld(key);
         bool pressed = !editing && modHeld && held;
-        if(!editing && !Keybind.Capturing && modHeld && down) {
+        if(ToggleHotkeyAllowed(modHeld, down)) {
             Toggle();
             holdStartTime = Time.unscaledTime;
             holdingToggle = true;
@@ -138,6 +144,27 @@ public static partial class UICore {
         UIObject.TickAll();
         Tooltip.Tick();
     }
+    // The menu hotkey fires only when nobody is typing (uGUI or Facet) or capturing a key.
+    internal static bool ToggleHotkeyAllowed(bool modHeld, bool down) =>
+        modHeld && down && !UIInputBlocker.IsEditing && !Keybind.Capturing;
+    // The one place an Escape press is decided, in the frame it goes down. A Facet window takes it
+    // first and then nothing else happens; otherwise the open menu closes (deferred, see below).
+    internal static void EscapeDown() {
+        // Synchronously and once: Facet answers one Escape per frame for every loaded mod, so a
+        // deferred retry would get false and the menu would close along with the Facet window.
+        if(!Keybind.Capturing && FacetBridge.HandleEscape()) return;
+        if(isOpen && !UIInputBlocker.IsEditing && !Keybind.Capturing) QueueMenuEscape();
+    }
+    private static void QueueMenuEscape() {
+        int frame = Time.frameCount;
+        // Next pump, so a widget's Update later this frame can still claim the key.
+        MainThread.Enqueue(() => {
+            if(escConsumedFrame == frame || !isOpen) return;
+            if(IsReorganizing && !panelOverHub && Reorganizer.Selected != null) Reorganizer.Deselect();
+            else if(IsReorganizing && !panelOverHub) Close();
+            else ClosePanel();
+        });
+    }
     private static int escConsumedFrame = -1;
     // For widgets that use Esc themselves (KeyViewer editor selection, key capture): this frame's Esc is theirs.
     internal static void ConsumeEscape() => escConsumedFrame = Time.frameCount;
@@ -155,16 +182,6 @@ public static partial class UICore {
     }
     private static void HandleShortcuts() {
         if(IsReorganizing && Reorganizer.Selected != null && Input.GetMouseButtonDown(0) && !PointerOverQuartz()) Reorganizer.Deselect();
-        if(Input.GetKeyDown(KeyCode.Escape)) {
-            int frame = Time.frameCount;
-            // Next pump, so a widget's Update later this frame can still claim the key.
-            MainThread.Enqueue(() => {
-                if(escConsumedFrame == frame || !isOpen) return;
-                if(IsReorganizing && !panelOverHub && Reorganizer.Selected != null) Reorganizer.Deselect();
-                else if(IsReorganizing && !panelOverHub) Close();
-                else ClosePanel();
-            });
-        }
         bool ctrl = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)
             || Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand);
         if(!ctrl || !MainCore.IsModEnabled) return;
@@ -287,6 +304,8 @@ public static partial class UICore {
         else Close();
     }
     public static void Toggle(bool noAnimate = false) {
+        // The Effect Remover preview stands in for the menu: hiding it brings the menu back (its Hidden), never a second one over it.
+        if(FacetBridge.HideEffectRemover()) return;
         if(isOpen) Close(noAnimate);
         else OpenToHub();
     }

@@ -11,3 +11,11 @@
 // </auto-generated>
 #pragma warning disable CS0067, CS0169, CS0649, CS0108, CS0109, CS0114, CS0465, CS0824
 
+namespace UnityEngine.TextCore.Text {
+    public unsafe partial class FontAsset : global::UnityEngine.TextCore.Text.TextAsset {
+        protected FontAsset() { }
+    }
+    public abstract unsafe partial class TextAsset : global::UnityEngine.ScriptableObject {
+        protected TextAsset() { }
+    }
+}

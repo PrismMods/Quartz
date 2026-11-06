@@ -59,6 +59,7 @@
     "FXRM_S_SCREENTILE": "Disable Screen Tiling/Scroll",
     "DESC_FXRM_S_SCREENTILE": "Turns off screen tiling (kaleidoscope/repeat) and screen scroll in play. The chart isn't changed.",
     "FXRM_S_MOVEMAX": "Max Tile Movements",
-    "DESC_FXRM_S_MOVEMAX": "Limits how many tiles one Move Track event can move. Max means no limit."
+    "DESC_FXRM_S_MOVEMAX": "Limits how many tiles one Move Track event can move. Max means no limit.",
+    "FXRM_OPEN_NEW_MENU": "Open in the new menu (preview)"
   }
 }

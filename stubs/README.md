@@ -20,7 +20,7 @@ resources, and no types the mod never touches.
 | `Assembly-CSharp` | 129 | 1071 |
 | `Assembly-CSharp-firstpass` | 2 | 12 |
 | `DOTween` | 0 | 0 |
-| `Facet.0.1` | 1 | 0 |
+| `Facet.0.1` | 18 | 78 |
 | `MelonLoader` | 8 | 23 |
 | `Newtonsoft.Json` | 21 | 127 |
 | `RDTools` | 2 | 0 |
@@ -33,14 +33,14 @@ resources, and no types the mod never touches.
 | `UnityEngine.InputLegacyModule` | 1 | 11 |
 | `UnityEngine.ParticleSystemModule` | 9 | 53 |
 | `UnityEngine.TextCoreFontEngineModule` | 4 | 54 |
-| `UnityEngine.TextCoreTextEngineModule` | 0 | 0 |
+| `UnityEngine.TextCoreTextEngineModule` | 2 | 0 |
 | `UnityEngine.TextRenderingModule` | 3 | 20 |
 | `UnityEngine.UI` | 94 | 354 |
-| `UnityEngine.UIElementsModule` | 13 | 7 |
+| `UnityEngine.UIElementsModule` | 35 | 57 |
 | `UnityEngine.UIModule` | 6 | 34 |
 | `UnityModManager` | 4 | 12 |
 
-**449 types, 3415 members.**
+**490 types, 3543 members.**
 
 ## How it is used
 

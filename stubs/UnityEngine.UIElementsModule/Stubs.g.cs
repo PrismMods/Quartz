@@ -12,23 +12,107 @@
 #pragma warning disable CS0067, CS0169, CS0649, CS0108, CS0109, CS0114, CS0465, CS0824
 
 namespace UnityEngine.UIElements {
+    public unsafe partial class BindableElement : global::UnityEngine.UIElements.VisualElement {
+        protected BindableElement() { }
+    }
+    public unsafe partial class Button : global::UnityEngine.UIElements.TextElement {
+        protected Button() { }
+    }
     public abstract unsafe partial class CallbackEventHandler {
         protected CallbackEventHandler() { }
     }
+    public enum DisplayStyle : int {
+        Flex = 0,
+        None = 1,
+    }
     public abstract unsafe partial class Focusable : global::UnityEngine.UIElements.CallbackEventHandler {
         protected Focusable() { }
+    }
+    public unsafe partial interface IBindable {
     }
     public unsafe partial interface IEventHandler {
     }
     public unsafe partial interface IExperimentalFeatures {
     }
+    public unsafe partial interface INotifyValueChanged<T> {
+    }
     public unsafe partial interface IResolvedStyle {
     }
+    public unsafe partial interface IStyle {
+        global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.DisplayStyle> display { get; set; }
+        global::UnityEngine.UIElements.StyleFloat flexGrow { get; set; }
+        global::UnityEngine.UIElements.StyleLength minHeight { get; set; }
+    }
     public unsafe partial interface IStylePropertyAnimations {
+    }
+    public unsafe partial interface IStyleValue<T> {
+    }
+    public unsafe partial interface ITextEdition {
+    }
+    public unsafe partial interface ITextElement {
+    }
+    public unsafe partial interface ITextElementExperimentalFeatures : global::UnityEngine.UIElements.IExperimentalFeatures {
+    }
+    public unsafe partial interface ITextSelection {
     }
     public unsafe partial interface ITransform {
     }
     public unsafe partial interface IVisualElementScheduler {
+    }
+    public unsafe partial struct Length : global::System.IEquatable<global::UnityEngine.UIElements.Length> {
+        private global::UnityEngine.UIElements.Length.Unit m_Unit;
+        private float m_Value;
+        bool global::System.IEquatable<global::UnityEngine.UIElements.Length>.Equals(global::UnityEngine.UIElements.Length other) => throw null;
+        public enum Unit : int {
+            Pixel = 0,
+            Percent = 1,
+            Auto = 2,
+            None = 3,
+        }
+    }
+    public unsafe partial class MeshGenerationContext {
+        protected MeshGenerationContext() { }
+    }
+    public unsafe partial class ScrollView : global::UnityEngine.UIElements.VisualElement {
+        public ScrollView() => throw null;
+        public enum TouchScrollBehavior : int {
+            Unrestricted = 0,
+            Elastic = 1,
+            Clamped = 2,
+        }
+        public enum NestedInteractionKind : int {
+            Default = 0,
+            StopScrolling = 1,
+            ForwardScrolling = 2,
+        }
+    }
+    public unsafe partial struct StyleEnum<T> : global::System.IEquatable<global::UnityEngine.UIElements.StyleEnum<T>> where T : struct, global::System.IConvertible {
+        private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
+        private T m_Value;
+        public static implicit operator global::UnityEngine.UIElements.StyleEnum<T>(T v) => throw null;
+        bool global::System.IEquatable<global::UnityEngine.UIElements.StyleEnum<T>>.Equals(global::UnityEngine.UIElements.StyleEnum<T> other) => throw null;
+    }
+    public unsafe partial struct StyleFloat : global::System.IEquatable<global::UnityEngine.UIElements.StyleFloat> {
+        private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
+        private float m_Value;
+        public static implicit operator global::UnityEngine.UIElements.StyleFloat(float v) => throw null;
+        bool global::System.IEquatable<global::UnityEngine.UIElements.StyleFloat>.Equals(global::UnityEngine.UIElements.StyleFloat other) => throw null;
+    }
+    public enum StyleKeyword : int {
+        Undefined = 0,
+        Null = 1,
+        Auto = 2,
+        None = 3,
+        Initial = 4,
+    }
+    public unsafe partial struct StyleLength : global::System.IEquatable<global::UnityEngine.UIElements.StyleLength> {
+        private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
+        private global::UnityEngine.UIElements.Length m_Value;
+        public static implicit operator global::UnityEngine.UIElements.StyleLength(float v) => throw null;
+        bool global::System.IEquatable<global::UnityEngine.UIElements.StyleLength>.Equals(global::UnityEngine.UIElements.StyleLength other) => throw null;
+    }
+    public unsafe partial class TextElement : global::UnityEngine.UIElements.BindableElement {
+        protected TextElement() { }
     }
     public sealed unsafe partial class UIDocument : global::UnityEngine.MonoBehaviour {
         private UIDocument() { }
@@ -38,6 +122,12 @@ namespace UnityEngine.UIElements {
         }
     }
     public unsafe partial class VisualElement : global::UnityEngine.UIElements.Focusable {
+        public virtual global::UnityEngine.UIElements.VisualElement contentContainer { get => throw null; }
+        public global::System.Action<global::UnityEngine.UIElements.MeshGenerationContext> generateVisualContent { get => throw null; set { } }
+        public global::UnityEngine.UIElements.VisualElement parent { get => throw null; }
+        public global::UnityEngine.UIElements.IStyle style { get => throw null; }
+        public void Add(global::UnityEngine.UIElements.VisualElement child) => throw null;
+        public void Clear() => throw null;
         protected VisualElement() { }
         public enum MeasureMode : int {
             Undefined = 0,

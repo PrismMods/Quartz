@@ -7,7 +7,9 @@ public static class UIInputBlocker {
     private static GameObject lastSelected;
     private static TMP_InputField lastTmp;
     private static InputField lastLegacy;
-    public static bool IsEditing {
+    // Typing into a uGUI field or a Facet field: the hotkey paths stay quiet for both.
+    public static bool IsEditing => UguiEditing || Quartz.UI.FacetUi.FacetBridge.TextFocused();
+    private static bool UguiEditing {
         get {
             EventSystem es = EventSystem.current;
             if(es == null) return false;

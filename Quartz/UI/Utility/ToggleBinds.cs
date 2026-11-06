@@ -46,12 +46,7 @@ public static class ToggleBinds {
             for(int i = 0; i < pending.Count; i++) Fire(pending[i]);
         pending.Clear();
     }
-    private static bool IsTyping() {
-        GameObject selected = EventSystem.current == null ? null : EventSystem.current.currentSelectedGameObject;
-        if(selected == null) return false;
-        TMP_InputField field = selected.GetComponent<TMP_InputField>();
-        return field != null && field.isFocused;
-    }
+    private static bool IsTyping() => Quartz.UI.Objects.UIInputBlocker.IsEditing;
     private static void Fire(string id) {
         if(!live.TryGetValue(id, out List<UIToggle> list)) {
             Quartz.UI.Factory.PageFactory.EnsureAllBuilt();

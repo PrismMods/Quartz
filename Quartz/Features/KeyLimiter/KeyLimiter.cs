@@ -24,8 +24,15 @@ public static partial class KeyLimiter {
         return MainCore.IsModEnabled && Conf.Enabled;
     }
     public static bool IsActive() => IsEnabled() && !IsCapturing;
-    public static bool IsMenuBlockEnabled() => MainCore.IsModEnabled && MainCore.Conf.BlockInputsWhileMenuOpen;
-    public static bool IsMenuBlockActive() => Quartz.UI.UICore.IsOpen && IsMenuBlockEnabled() && !Autoplaying;
+    // The block can apply at all: the menu setting is on, or a Facet window may be open.
+    public static bool IsMenuBlockEnabled() =>
+        MainCore.IsModEnabled && (MainCore.Conf.BlockInputsWhileMenuOpen || Quartz.UI.FacetUi.FacetBridge.BlocksGameInput());
+    // Patches RDInput (the game's own input), not UnityEngine.Input, so Quartz's own polls still see keys.
+    // Facet windows block by their own Surface.BlocksGameInput, whatever the menu setting says.
+    public static bool IsMenuBlockActive() =>
+        MainCore.IsModEnabled
+        && ((Quartz.UI.UICore.IsOpen && MainCore.Conf.BlockInputsWhileMenuOpen) || Quartz.UI.FacetUi.FacetBridge.BlocksGameInput())
+        && !Autoplaying;
     private static bool Autoplaying {
         get { try { return RDC.auto; } catch(Exception e) { Diag.Ignore(e); return false; } }
     }

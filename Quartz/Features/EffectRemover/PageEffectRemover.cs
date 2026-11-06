@@ -10,13 +10,19 @@ public static class PageEffectRemover {
     public static void Create(RectTransform parent) =>
         CreateEffectRemover(Quartz.UI.Factory.PageFactory.CreateScrollablePage(parent));
     private static void CreateEffectRemover(RectTransform content) {
-        // Gates nothing yet; the Facet window button (shown only when true) lands later.
-        _ = Quartz.UI.FacetUi.FacetBridge.Available();
         EffectRemover.EnsureConf();
         EffectRemoverSettings conf = EffectRemover.Conf;
         EffectRemoverSettings def = new();
         void Save() => EffectRemover.Save();
         var sec = GenerateUI.FlatSection(content.transform, "Effect Remover");
+        // The same page in a Facet window, the preview of the next menu; only when Facet loaded.
+        if(Quartz.UI.FacetUi.FacetBridge.Available())
+            GenerateUI.Button(
+                GenerateUI.Row(sec.Body),
+                Quartz.UI.FacetUi.FacetBridge.OpenEffectRemover,
+                "Open in the new menu (preview)",
+                "fxrm_open_new_menu"
+            ).SetSecondary();
         GenerateUI.DropDown(
             GenerateUI.Row(sec.Body),
             EffectRemoverSettings.ModeEnhanced,

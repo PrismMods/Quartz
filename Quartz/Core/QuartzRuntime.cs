@@ -210,10 +210,11 @@ public sealed class QuartzRuntime {
         ticks.Add(tweenService);
         ticks.Add(Quartz.Features.FeatureService.Ticker);
         ticks.Add(Quartz.Addons.AddonService.Ticker);
-#if DEBUG && !IL2CPP
+#if DEBUG && !IL2CPP && !QUARTZ_STUBS
         ticks.Add(new Quartz.UI.FacetUi.FacetSelfTest());
 #endif
         services.Initialize(Logger);
+        Quartz.UI.FacetUi.FacetBridge.WarmUp();
         Quartz.Features.Interop.XPerfectRecursionGuard.TryApply(harmonyService.Harmony);
         xperfectGuardHandler = (_, _) => Quartz.Features.Interop.XPerfectRecursionGuard.TryApply(harmonyService.Harmony);
         UnityEngine.SceneManagement.SceneManager.sceneLoaded += xperfectGuardHandler;
@@ -247,6 +248,8 @@ public sealed class QuartzRuntime {
                 xperfectGuardHandler = null;
             }
         });
+        // Before the final save: disposing a surface can still Write window state.
+        Safe(Quartz.UI.FacetUi.FacetBridge.Shutdown);
         Safe(() => Config.Save());
         Safe(() => ProfileManager.CaptureActive());
         Safe(() => services.Dispose());

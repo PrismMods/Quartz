@@ -166,6 +166,15 @@
 		<DefineConstants>$(DefineConstants);IL2CPP</DefineConstants>
 	</PropertyGroup>
 
+	<!-- The DEBUG Facet self-test names UI Toolkit API the stubs lack (stubs/README.md), so a
+	     stubs build leaves it out; QUARTZ_STUBS drops its one hook in QuartzRuntime. -->
+	<PropertyGroup Condition="'$(UseStubs)' == 'true'">
+		<DefineConstants>$(DefineConstants);QUARTZ_STUBS</DefineConstants>
+	</PropertyGroup>
+	<ItemGroup Condition="'$(UseStubs)' == 'true'">
+		<Compile Remove="UI/FacetUi/FacetSelfTest*.cs" />
+	</ItemGroup>
+
 	<!-- Shared references (both loaders). Every HintPath points into the game
 	     install, which stays the source of truth; anything the install doesn't have
 	     is resolved from lib/ instead (see AddLibSearchPath). The Exists() guards

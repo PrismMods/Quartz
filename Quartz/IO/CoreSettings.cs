@@ -20,6 +20,8 @@ public sealed class CoreSettings : ISettingsFile {
     public Dictionary<string, (float Scale, float LineSpacing)> FontAdjust = [];
     // Overlay key to font name; a missing key follows FontName.
     public Dictionary<string, string> OverlayFonts = [];
+    // Facet window key to its saved state string (position, size); opaque to Quartz.
+    public Dictionary<string, string> FacetWindows = [];
     public float ScrollSpeed = 80f;
     public float FpsRefreshInterval = 0f;
     public float PanelOpacity = 1.0f;
@@ -72,6 +74,8 @@ public sealed class CoreSettings : ISettingsFile {
             fontAdjust[kvp.Key] = new JArray(kvp.Value.Scale, kvp.Value.LineSpacing);
         JObject overlayFonts = [];
         foreach(var kvp in OverlayFonts) overlayFonts[kvp.Key] = kvp.Value;
+        JObject facetWindows = [];
+        foreach(var kvp in FacetWindows) facetWindows[kvp.Key] = kvp.Value;
         return new JObject {
             [nameof(Active)] = Active,
             [nameof(Language)] = Language,
@@ -88,6 +92,7 @@ public sealed class CoreSettings : ISettingsFile {
             [nameof(SettingsFontName)] = SettingsFontName,
             [nameof(FontAdjust)] = fontAdjust,
             [nameof(OverlayFonts)] = overlayFonts,
+            [nameof(FacetWindows)] = facetWindows,
             [nameof(ScrollSpeed)] = ScrollSpeed,
             [nameof(FpsRefreshInterval)] = FpsRefreshInterval,
             [nameof(PanelOpacity)] = PanelOpacity,
@@ -184,6 +189,11 @@ public sealed class CoreSettings : ISettingsFile {
         if(token[nameof(OverlayFonts)] is JObject overlayFonts) {
             foreach(var prop in overlayFonts.Properties())
                 if(prop.Value.Type == JTokenType.String && !string.IsNullOrEmpty((string)prop.Value)) OverlayFonts[prop.Name] = (string)prop.Value;
+        }
+        FacetWindows.Clear();
+        if(token[nameof(FacetWindows)] is JObject facetWindows) {
+            foreach(var prop in facetWindows.Properties())
+                if(prop.Value.Type == JTokenType.String) FacetWindows[prop.Name] = (string)prop.Value;
         }
         AccentR = IOUtils.Read(token, nameof(AccentR), AccentR);
         AccentG = IOUtils.Read(token, nameof(AccentG), AccentG);

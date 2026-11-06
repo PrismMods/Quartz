@@ -12,7 +12,107 @@
 #pragma warning disable CS0067, CS0169, CS0649, CS0108, CS0109, CS0114, CS0465, CS0824
 
 namespace Facet {
+    public static unsafe partial class Bind {
+        public static global::Facet.Bind<T> To<T>(global::System.Func<T> get, global::System.Action<T> set) => throw null;
+    }
+    public sealed unsafe partial class Bind<T> {
+        private Bind() { }
+    }
+    public unsafe partial class ControlOptions {
+        public string Id { get => throw null; set { } }
+        public string Tooltip { get => throw null; set { } }
+        public global::System.Func<bool> VisibleWhen { get => throw null; set { } }
+        protected ControlOptions() { }
+    }
+    public sealed unsafe partial class Control<T> {
+        public T Value { get => throw null; }
+        public void Set(T v, bool notify = default) => throw null;
+        private Control() { }
+    }
+    public static unsafe partial class Controls {
+        public const float RowHeight = 0f;
+        public static global::UnityEngine.UIElements.Button Action(global::UnityEngine.UIElements.VisualElement parent, string label, string button, global::System.Action onClick, global::System.Action<global::Facet.ControlOptions> configure = default) => throw null;
+        public static global::Facet.Control<int> Dropdown(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<int> bind, global::System.Action<global::Facet.DropdownOptions> configure = default) => throw null;
+        public static global::UnityEngine.UIElements.VisualElement Section(global::UnityEngine.UIElements.VisualElement parent, string title, bool defaultOpen = default) => throw null;
+        public static global::Facet.Control<float> Slider(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<float> bind, global::System.Action<global::Facet.SliderOptions> configure = default) => throw null;
+        public static global::Facet.Control<bool> Toggle(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<bool> bind, global::System.Action<global::Facet.Options<bool>> configure = default) => throw null;
+        public static global::UnityEngine.UIElements.VisualElement ToggleGroup(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<bool> bind, global::System.Action<global::Facet.Options<bool>> configure = default) => throw null;
+    }
+    public unsafe partial class DropdownOptions : global::Facet.Options<int> {
+        public global::System.Collections.Generic.IList<string> Items { get => throw null; set { } }
+        protected DropdownOptions() { }
+    }
     public sealed unsafe partial class Host {
+        public global::Facet.Theme Theme { get => throw null; }
+        public static global::Facet.Host Create(string name, global::System.Action<global::Facet.HostOptions> configure = default) => throw null;
         private Host() { }
+    }
+    public sealed unsafe partial class HostOptions {
+        public global::System.Func<string> Language;
+        public global::System.Action<string> Log;
+        public global::System.Func<string, string> Read;
+        public global::Facet.Theme Theme;
+        public global::System.Func<string, string> Translate;
+        public global::System.Action<string, string> Write;
+        private HostOptions() { }
+    }
+    public static unsafe partial class Input {
+        public static bool BlocksGameInput { get => throw null; }
+        public static bool HeldThisFrame { get => throw null; }
+        public static bool TextFocused { get => throw null; }
+        public static bool HandleEscape() => throw null;
+        public static void TickWheel(global::UnityEngine.Vector2 screen, float delta) => throw null;
+    }
+    public enum Layer : int {
+        Hud = 0,
+        Window = 1,
+        Popup = 2,
+        Modal = 3,
+        Tooltip = 4,
+    }
+    public unsafe partial class Options<T> : global::Facet.ControlOptions {
+        public T Default { get => throw null; set { } }
+        protected Options() { }
+    }
+    public static unsafe partial class Skin {
+        public static void Scroll(global::UnityEngine.UIElements.ScrollView view) => throw null;
+    }
+    public unsafe partial class SliderOptions : global::Facet.Options<float> {
+        public string Format { get => throw null; set { } }
+        public float Max { get => throw null; set { } }
+        public float Min { get => throw null; set { } }
+        public float Step { get => throw null; set { } }
+        protected SliderOptions() { }
+    }
+    public sealed unsafe partial class Surface : global::System.IDisposable {
+        public bool BlocksGameInput { get => throw null; set { } }
+        public global::UnityEngine.UIElements.VisualElement Root { get => throw null; }
+        public bool Visible { get => throw null; set { } }
+        public event global::System.Action Hidden { add { } remove { } }
+        public Surface(global::Facet.Host host, string name, global::Facet.Layer layer, global::UnityEngine.TextCore.Text.FontAsset font = default) => throw null;
+        public void Dispose() => throw null;
+        public void Relabel() => throw null;
+        private Surface() { }
+        void global::System.IDisposable.Dispose() => throw null;
+    }
+    public sealed unsafe partial class Theme {
+        public static global::Facet.Theme FromAccent(global::UnityEngine.Color accent, float tint = default) => throw null;
+        public void Recolour(global::UnityEngine.Color accent, float tint = default) => throw null;
+        private Theme() { }
+    }
+    public static unsafe partial class Ui {
+        public static global::UnityEngine.UIElements.VisualElement Box(global::UnityEngine.UIElements.VisualElement parent = default) => throw null;
+    }
+    public static unsafe partial class WarmUp {
+        public static bool Done { get => throw null; }
+        public static void Run() => throw null;
+    }
+    public sealed unsafe partial class Window {
+        public const float MinHeight = 1f;
+        public const float MinWidth = 2f;
+        public const float RailAlign = 3f;
+        public global::UnityEngine.UIElements.VisualElement Body { get => throw null; }
+        public Window(global::UnityEngine.UIElements.VisualElement parent, string id, string title, global::UnityEngine.Rect initial) => throw null;
+        private Window() { }
     }
 }
