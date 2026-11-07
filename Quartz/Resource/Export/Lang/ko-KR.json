@@ -550,6 +550,14 @@
     "MENU_CHIP_ON": "켜짐",
     "MENU_CHIP_OFF": "꺼짐",
     "MENU_TAB_HIDE": "사이드바에서 숨기기",
-    "MENU_TAB_SHOW": "사이드바에 표시"
+    "MENU_TAB_SHOW": "사이드바에 표시",
+    "MENU_GROUP_APPEARANCE": "모양",
+    "MENU_GROUP_BEHAVIOUR": "동작",
+    "MENU_GROUP_MAINTENANCE": "관리",
+    "MENU_RELOAD_LANG": "언어 파일 다시 불러오기",
+    "MENU_ANIM": "애니메이션 길이",
+    "MENU_OPEN_PRISM": "Prism · 설정 열기",
+    "MENU_CLASSIC_MENU": "기존 메뉴",
+    "MENU_SETTINGS_CLASSIC": "업데이트와 폰트 설정은 아직 기존 메뉴에 있습니다"
   }
 }

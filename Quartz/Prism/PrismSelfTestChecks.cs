@@ -192,6 +192,36 @@ internal static partial class PrismSelfTestChecks {
         } else info("keys: not a Mac, MacKeys not exercised");
         yield break;
     }
+    // The new menu's link to Prism · Settings, and its hotkey capture under an open blocking window.
+    internal static IEnumerator NewMenu(Action<string, bool, string> check, Action<string> info) {
+        bool was = PrismWindows.SettingsVisible;
+        try {
+            PrismBridge.OpenPrismSettings();
+            yield return Frames(2);
+            bool shown = PrismWindows.SettingsVisible;
+            PrismBridge.OpenPrismSettings();
+            yield return Frames(2);
+            check("new menu: Open Prism · Settings shows it, and a second call leaves it showing", shown && PrismWindows.SettingsVisible, $"first={shown}");
+            // The capture runner polls outside every mod's UI tick: past the input gate, or an open window would hide every key from it.
+            bool blocking = InputGate.Blocking, ended = false;
+            KeyCode got = KeyCode.A;
+            KeyCaptureService.Start(k => got = k, () => ended = true);
+            EnsureProbe();
+            chordKey = KeyCode.Escape;
+            chordFrame = Time.frameCount + 1;
+            yield return Frames(4);
+            check("new menu: a key capture hears Escape while a blocking window is open, and ends without a key",
+                blocking && ended && got == KeyCode.None && !KeyCaptureService.IsCapturing, $"blocking={blocking} ended={ended} got={got}");
+            // Every other Prism mod polls Escape too, and one that offers it to Facet before Quartz's runner spends it closes the window.
+            if(PrismLibMods().Count == 1) check("new menu: that Escape leaves the window open", PrismWindows.SettingsVisible, null);
+            else info($"new menu: beside other Prism mods, the window after that Escape is {(PrismWindows.SettingsVisible ? "open" : "closed")}");
+        } finally {
+            chordKey = KeyCode.Z;
+            KeyCaptureService.Cancel();
+            if(PrismWindows.SettingsVisible != was) PrismBridge.TogglePrismSettings();
+        }
+        yield return Frames(2);
+    }
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static string[] RowIds() => PrismLib.Settings.Of(PrismBridge.Id).Select(kv => kv.Value.Id).ToArray();
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -298,7 +328,8 @@ internal static partial class PrismSelfTestChecks {
     // Input.GetKey(F15) read as pressed, and Harmony still runs every postfix after a prefix that skips the original, so the
     // gate's postfix decides what the caller sees. (game read, read inside Exempt). The prefixes stay, inert, for the session.
     private static bool probing;
-    private static int chordFrame = -1; // Ctrl+Z reads as pressed in this frame only
+    private static int chordFrame = -1; // Ctrl+<chordKey> reads as pressed in this frame only
+    private static KeyCode chordKey = KeyCode.Z;
     private static HarmonyLib.Harmony probe;
     private static void EnsureProbe() {
         if(probe != null) return;
@@ -328,7 +359,7 @@ internal static partial class PrismSelfTestChecks {
         return false;
     }
     private static bool PressKeyDown(KeyCode __0, ref bool __result) {
-        if(__0 != KeyCode.Z || Time.frameCount != chordFrame) return true;
+        if(__0 != chordKey || Time.frameCount != chordFrame) return true;
         __result = true;
         return false;
     }

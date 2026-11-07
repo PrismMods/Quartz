@@ -78,6 +78,15 @@ internal static class FacetBridge {
 #endif
         return false;
     }
+    /// <summary>This frame's Escape went to a key capture: Facet's HandleEscape takes it without closing a window. Never probes.</summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void ConsumeEscape() {
+#if !IL2CPP
+        if(state == 1) {
+            try { ConsumeEscapeImpl(); } catch(Exception e) { Fail(e); }
+        }
+#endif
+    }
     /// <summary>Opens the new menu, on pageKey when given. fromClassic: the classic menu hands off to it and comes back when it closes.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void OpenNewMenu(string pageKey = null, bool fromClassic = false) {
@@ -176,6 +185,8 @@ internal static class FacetBridge {
         global::Facet.Input.BlocksGameInput || global::Facet.Input.HeldThisFrame || global::Facet.Input.TextFocused;
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool HandleEscapeImpl() => global::Facet.Input.HandleEscape();
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void ConsumeEscapeImpl() => global::Facet.Input.ConsumeEscape();
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void OpenNewMenuImpl(string pageKey, bool fromClassic) => QuartzShell.Open(pageKey, fromClassic);
     [MethodImpl(MethodImplOptions.NoInlining)]

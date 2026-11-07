@@ -19,6 +19,16 @@ internal static partial class PrismBridge {
 #endif
         return false;
     }
+    /// <summary>Shows Prism · Settings, Quartz's own copy whoever holds the debug claim; one already showing stays.</summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    internal static void OpenPrismSettings() {
+#if !IL2CPP && !QUARTZ_KEYVIEWER
+        if(UiAvailable && !winOff) {
+            hosted = true;
+            try { PrismWindows.ShowSettings(); } catch(Exception e) { WindowsOff(e); }
+        }
+#endif
+    }
 #if !IL2CPP && !QUARTZ_KEYVIEWER
     private static bool suiteGone;
     // The one place outside FacetUi that names a Facet type: reached only past UiAvailable, which means Facet loaded.

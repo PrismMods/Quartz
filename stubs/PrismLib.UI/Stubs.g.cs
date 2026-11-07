@@ -118,6 +118,7 @@ namespace PrismLib.UI.Toolkit {
         public SettingRow() => throw null;
     }
     public sealed unsafe partial class SettingsPanel : global::System.IDisposable {
+        public bool Visible { get => throw null; set { } }
         public SettingsPanel(string title, global::System.Func<global::System.Collections.Generic.IEnumerable<global::PrismLib.UI.Toolkit.SettingRow>> source, global::UnityEngine.TextCore.Text.FontAsset font = default) => throw null;
         public void Dispose() => throw null;
         public void Tick() => throw null;

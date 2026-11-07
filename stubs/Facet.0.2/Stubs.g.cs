@@ -20,6 +20,7 @@ namespace Facet {
     }
     public sealed unsafe partial class CardOptions : global::Facet.ControlOptions {
         public global::System.Collections.Generic.List<global::System.Collections.Generic.KeyValuePair<string, global::System.Action>> Actions { get => throw null; set { } }
+        public string Note { get => throw null; set { } }
         public global::System.Func<string> NoteText { get => throw null; set { } }
         private CardOptions() { }
     }
@@ -27,7 +28,11 @@ namespace Facet {
         public global::System.Collections.Generic.IList<string> Items { get => throw null; set { } }
         protected ChoiceOptions() { }
     }
+    public unsafe partial class ColourOptions : global::Facet.Options<global::UnityEngine.Color> {
+        protected ColourOptions() { }
+    }
     public unsafe partial class ControlOptions {
+        public string Help { get => throw null; set { } }
         public string Id { get => throw null; set { } }
         public string Tooltip { get => throw null; set { } }
         public global::System.Func<string> TooltipText { get => throw null; set { } }
@@ -36,6 +41,7 @@ namespace Facet {
     }
     public sealed unsafe partial class Control<T> {
         public T Value { get => throw null; }
+        public event global::System.Action<T> Committed { add { } remove { } }
         public void Set(T v, bool notify = default) => throw null;
         private Control() { }
     }
@@ -44,8 +50,11 @@ namespace Facet {
         public static global::UnityEngine.UIElements.Button Action(global::UnityEngine.UIElements.VisualElement parent, string label, string button, global::System.Action onClick, global::System.Action<global::Facet.ControlOptions> configure = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Card(global::UnityEngine.UIElements.VisualElement parent, string title, global::System.Action<global::Facet.CardOptions> configure = default) => throw null;
         public static global::Facet.Control<int> Choice(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<int> bind, global::System.Action<global::Facet.ChoiceOptions> configure = default) => throw null;
+        public static global::Facet.Control<global::UnityEngine.Color> Colour(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<global::UnityEngine.Color> bind, global::System.Action<global::Facet.ColourOptions> configure = default) => throw null;
+        public static global::UnityEngine.UIElements.Button Danger(global::UnityEngine.UIElements.VisualElement parent, string label, string button, global::System.Action onConfirm, global::System.Action<global::Facet.ControlOptions> configure = default) => throw null;
         public static global::Facet.Control<int> Dropdown(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<int> bind, global::System.Action<global::Facet.DropdownOptions> configure = default) => throw null;
         public static global::Facet.Control<string> Info(global::UnityEngine.UIElements.VisualElement parent, string label, global::System.Func<string> value, global::System.Action<global::Facet.ControlOptions> configure = default) => throw null;
+        public static global::Facet.Control<string> Key(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<string> bind, global::System.Action<global::Facet.KeyOptions> configure = default) => throw null;
         public static global::Facet.Control<bool> PageHeader(global::UnityEngine.UIElements.VisualElement parent, string title, global::Facet.Bind<bool> on, global::System.Action<global::Facet.PageHeaderOptions> configure = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Section(global::UnityEngine.UIElements.VisualElement parent, string title, bool defaultOpen = default) => throw null;
         public static global::Facet.Control<float> Slider(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<float> bind, global::System.Action<global::Facet.SliderOptions> configure = default) => throw null;
@@ -58,6 +67,11 @@ namespace Facet {
     public unsafe partial class DropdownOptions : global::Facet.Options<int> {
         public global::System.Collections.Generic.IList<string> Items { get => throw null; set { } }
         protected DropdownOptions() { }
+    }
+    public static unsafe partial class History {
+        public const float CoalesceSeconds = 1f;
+        public const int Limit = 2;
+        public static bool Applying { get => throw null; }
     }
     public sealed unsafe partial class Host {
         public global::Facet.Theme Theme { get => throw null; }
@@ -79,8 +93,14 @@ namespace Facet {
         public static bool BlocksGameInput { get => throw null; }
         public static bool HeldThisFrame { get => throw null; }
         public static bool TextFocused { get => throw null; }
+        public static void ConsumeEscape() => throw null;
         public static bool HandleEscape() => throw null;
         public static void TickWheel(global::UnityEngine.Vector2 screen, float delta) => throw null;
+    }
+    public unsafe partial class KeyOptions : global::Facet.Options<string> {
+        public global::System.Action CancelCapture { get => throw null; set { } }
+        public global::System.Action<global::System.Action<string>> Capture { get => throw null; set { } }
+        protected KeyOptions() { }
     }
     public enum Layer : int {
         Hud = 0,
@@ -90,9 +110,9 @@ namespace Facet {
         Tooltip = 4,
     }
     public sealed unsafe partial class Nav {
-        public const float CollapseAt = 1f;
-        public const float MaxRail = 2f;
-        public const float MinRail = 3f;
+        public const float CollapseAt = 3f;
+        public const float MaxRail = 4f;
+        public const float MinRail = 5f;
         public global::System.Action<float> OnInsetChanged;
         public Nav(global::UnityEngine.UIElements.VisualElement parent, global::System.Collections.Generic.IEnumerable<global::Facet.NavItem> items, float railWidth = default) => throw null;
         public void AddSearchSource(global::System.Func<global::System.Collections.Generic.IEnumerable<global::Facet.SearchIndex.Entry>> source) => throw null;
@@ -160,6 +180,7 @@ namespace Facet {
         protected SliderOptions() { }
     }
     public sealed unsafe partial class Surface : global::System.IDisposable {
+        public global::System.Func<bool> EscapeHandler;
         public bool BlocksGameInput { get => throw null; set { } }
         public global::UnityEngine.UIElements.VisualElement Root { get => throw null; }
         public bool Visible { get => throw null; set { } }
@@ -200,9 +221,9 @@ namespace Facet {
         public static void Run() => throw null;
     }
     public sealed unsafe partial class Window {
-        public const float MinHeight = 4f;
-        public const float MinWidth = 5f;
-        public const float RailAlign = 6f;
+        public const float MinHeight = 6f;
+        public const float MinWidth = 7f;
+        public const float RailAlign = 8f;
         public global::UnityEngine.UIElements.VisualElement Body { get => throw null; }
         public global::UnityEngine.Rect Rect { get => throw null; set { } }
         public global::UnityEngine.UIElements.VisualElement Root { get => throw null; }

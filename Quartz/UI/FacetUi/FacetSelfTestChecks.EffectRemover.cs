@@ -8,6 +8,7 @@ using Quartz.Features;
 using Quartz.Features.EffectRemover;
 using Quartz.IO;
 using Quartz.Resource;
+using Quartz.UI.Nav;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -50,6 +51,7 @@ internal static partial class FacetSelfTestChecks {
             yield return ClickFlips(check);
             yield return ShowsBehindWindow(check);
             yield return ProfileSwitch(check, path, file);
+            yield return ClassicAfterHandBack(check);
             yield return MenuHandOff(check);
         } finally {
             MainCore.Conf.ExperimentalNewMenu = newMenu;
@@ -238,6 +240,34 @@ internal static partial class FacetSelfTestChecks {
         EffectRemover.ConfMgr.CancelPendingSave();
         EffectRemover.ConfMgr.LoadOrDefaults();
         yield return Await(track, v, ms);
+    }
+    // The classic page's button hands off to this window, and its close hands back: a row written here shows on that page,
+    // though a classic toggle never reads its field again. Written twice, so the second puts it back the same way.
+    private static IEnumerator ClassicAfterHandBack(Action<string, bool, string> check) {
+        var p = Probe();
+        int state = NavRegistry.StateFor(FxPage);
+        bool before = p.get(C), ok = true;
+        var seen = new string[2];
+        for(int i = 0; i < 2; i++) {
+            QuartzShell.Hide();
+            if(!UICore.IsOpen) UICore.Open(true);
+            Factory.MenuFactory.SetState(state);   // its page built and shown, as the user sees it before the button
+            yield return Frames(2);
+            FacetBridge.OpenNewMenu(FxPage, fromClassic: true);
+            yield return Frames(2);
+            VisualElement track = Body.Q(name: p.key + "-input");
+            if(track != null) Click(track);
+            yield return Frames(2);
+            QuartzShell.Hide();
+            yield return Frames(2);
+            if(UICore.CurrentMenuState != state) Factory.MenuFactory.SetState(state);
+            var live = LiveToggle(p.key.ToLowerInvariant(), state);
+            bool want = i == 0 ? !before : before;
+            ok &= p.get(C) == want && live != null && live.Value == want && UICore.IsOpen && !FacetBridge.NewMenuVisible();
+            seen[i] = $"field={p.get(C)} classic={live?.Value.ToString() ?? "none"} menu={UICore.IsOpen} window={FacetBridge.NewMenuVisible()}";
+        }
+        check("a row written in the window shows on the classic page its close hands back to, and so does writing it back", ok,
+            $"{p.field} before={before}: {string.Join("; ", seen)}");
     }
     private static bool Near(Color a, Color b) =>
         Mathf.Abs(a.r - b.r) < 0.01f && Mathf.Abs(a.g - b.g) < 0.01f && Mathf.Abs(a.b - b.b) < 0.01f;

@@ -25,6 +25,12 @@ internal static partial class QuartzShell {
     private static int layoutWait = -1;
     private static bool layoutSeen;
 
+    /// <summary>The bind of a row writing a field the classic menu shows too: that menu rebuilds before it next shows.</summary>
+    internal static Bind<T> Writes<T>(Func<T> get, Action<T> set) => Bind.To(get, v => {
+        UICore.ClassicStale = true;   // first: a writer that rebuilds the classic menu itself leaves it fresh
+        set(v);
+    });
+
     /// <summary>Builds the window hidden, on the page left last time (Home when that is gone). Once.</summary>
     internal static void Prebuild() {
         if(Surface != null) return;
@@ -51,6 +57,7 @@ internal static partial class QuartzShell {
             // The first query builds every classic page for its rows, as the classic menu's own search does.
             Window.ShowSearch("SEARCH", q => Nav.Filter(q));
             s.Hidden += Hidden;
+            s.EscapeHandler = OnEscape;
             Surface = s;
         } catch {
             s.Dispose();   // a half-built window is never kept or shown; the next open builds afresh
@@ -90,6 +97,7 @@ internal static partial class QuartzShell {
     /// <summary>"Open it" on a classic card: this window hides and the classic menu opens on that page, and comes back here on close.</summary>
     internal static void OpenClassic(int state) {
         MenuHandOff.ReturnTo = MenuHandOff.Menu.None;
+        UICore.FreshenClassic();   // before the hide: a rebuild re-runs the show-on-startup open, which this window showing keeps shut
         Hide();
         UICore.OpenAt(state);
     }
@@ -123,10 +131,18 @@ internal static partial class QuartzShell {
         if(!UICore.IsOpen) Open();
     }
 
+    // Facet's Escape, whichever mod offers it: kept while a key capture owns the keyboard (its runner cancels on that key,
+    // before or after this in the frame), else the window hides as it would without a handler.
+    private static bool OnEscape() {
+        if(!Keybind.Capturing) Hide();
+        return true;
+    }
+
     // Whoever hid it (the close button, Escape, the menu hotkey, an opener): a classic menu it came from comes back.
     private static void Hidden() {
         if(MenuHandOff.ReturnTo != MenuHandOff.Menu.Classic) return;
         MenuHandOff.ReturnTo = MenuHandOff.Menu.None;
+        UICore.FreshenClassic();
         UICore.BackFromPreview();
     }
 

@@ -150,9 +150,9 @@ public static partial class UICore {
         UIObject.TickAll();
         Tooltip.Tick();
     }
-    // The menu hotkey fires only when nobody is typing (uGUI or Facet) or capturing a key.
+    // The menu hotkey fires only when nobody is typing (uGUI or Facet) or capturing a key, nor in the frame a capture took it.
     internal static bool ToggleHotkeyAllowed(bool modHeld, bool down) =>
-        modHeld && down && !UIInputBlocker.IsEditing && !Keybind.Capturing && !SharedLayoutOpen;
+        modHeld && down && !UIInputBlocker.IsEditing && !Keybind.Capturing && !KeyCaptureCoordinator.ReleasedThisFrame && !SharedLayoutOpen;
     // The one place an Escape press is decided, in the frame it goes down. A Facet window takes it
     // first and then nothing else happens; otherwise the open menu closes (deferred, see below).
     internal static void EscapeDown() {

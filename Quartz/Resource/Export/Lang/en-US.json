@@ -550,6 +550,14 @@
     "MENU_CHIP_ON": "On",
     "MENU_CHIP_OFF": "Off",
     "MENU_TAB_HIDE": "Hide from sidebar",
-    "MENU_TAB_SHOW": "Show in sidebar"
+    "MENU_TAB_SHOW": "Show in sidebar",
+    "MENU_GROUP_APPEARANCE": "Appearance",
+    "MENU_GROUP_BEHAVIOUR": "Behaviour",
+    "MENU_GROUP_MAINTENANCE": "Maintenance",
+    "MENU_RELOAD_LANG": "Reload language files",
+    "MENU_ANIM": "Animation duration",
+    "MENU_OPEN_PRISM": "Open Prism · Settings",
+    "MENU_CLASSIC_MENU": "Classic menu",
+    "MENU_SETTINGS_CLASSIC": "Updates and fonts are still in the classic menu"
   }
 }

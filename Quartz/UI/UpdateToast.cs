@@ -312,6 +312,7 @@ public static class UpdateToast {
         Hide();
     }
     private static void OpenSettings() {
+        UICore.FreshenClassic();   // first: a rebuild remakes this toast, which the Hide below then hides
         Hide();
         if(UICore.IsReorganizing) UICore.ExitReorganize();
         UICore.Open();

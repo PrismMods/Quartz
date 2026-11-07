@@ -17,6 +17,7 @@ internal static partial class QuartzShell {
         [CorePages.HomePageKey] = ShellHome.Build,
         ["visuals.effectremover"] = FacetEffectRemover.Page,
         [CorePages.FeaturesPageKey] = ShellFeatures.Build,
+        [CorePages.SettingsPageKey] = ShellSettings.Build,
     };
     /// <summary>The tab row of the open category, when it has one.</summary>
     internal static Tabs TabRow { get; private set; }
@@ -80,12 +81,19 @@ internal static partial class QuartzShell {
     // A search result on a page still in the classic menu goes on to that menu; a moved or off page is the destination.
     private static Action<SearchIndex.Hit> ClassicHit(NavPage page) => IsClassic(page) ? _ => OpenClassic(page.State) : null;
 
+    // The rows of the classic Settings page's Updates and Font sections, which the moved page leaves there.
+    private static readonly HashSet<string> LeftClassic = [
+        "UPDATES", "CHECK_FOR_UPDATES", "UPDATE_NOTES", "UPDATE_SKIP", "UPDATE_INSTALL", "UPDATE_UNDO", "UPDATE_RESTART",
+        "FONT", "FONT_SCALE", "FONT_LINE_SPACING", "FONT_RENAME", "FONT_DELETE", "SETTINGS_FONT",
+    ];
+
     // The classic pages' rows, each jumping to its page in the classic menu. Asked whenever the index builds.
     private static IEnumerable<SearchIndex.Entry> ClassicRows() {
         foreach(var (key, english, state) in SettingsSearch.Rows()) {
             NavPage page = NavRegistry.ByState(state);
             // A row naming its own page is the page's title, which its header already indexes.
-            if(page == null || !IsClassic(page) || key == page.LocaleKey) continue;
+            if(page == null || key == page.LocaleKey) continue;
+            if(!IsClassic(page) && !(page.Key == CorePages.SettingsPageKey && LeftClassic.Contains(key))) continue;
             yield return new SearchIndex.Entry {
                 Label = Label(key, english),
                 Where = Label(page.LocaleKey, page.Title),

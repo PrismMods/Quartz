@@ -1913,7 +1913,9 @@
         "members": [
           "System.Collections.Generic.List\u00601\u003CSystem.Collections.Generic.KeyValuePair\u00602\u003CSystem.String,System.Action\u003E\u003E Facet.CardOptions::Actions()",
           "System.Func\u00601\u003CSystem.String\u003E Facet.CardOptions::NoteText()",
+          "System.String Facet.CardOptions::Note()",
           "System.Void Facet.CardOptions::set_Actions(System.Collections.Generic.List\u00601\u003CSystem.Collections.Generic.KeyValuePair\u00602\u003CSystem.String,System.Action\u003E\u003E)",
+          "System.Void Facet.CardOptions::set_Note(System.String)",
           "System.Void Facet.CardOptions::set_NoteText(System.Func\u00601\u003CSystem.String\u003E)"
         ]
       },
@@ -1925,12 +1927,18 @@
         ]
       },
       {
+        "type": "Facet.ColourOptions",
+        "members": []
+      },
+      {
         "type": "Facet.ControlOptions",
         "members": [
           "System.Func\u00601\u003CSystem.Boolean\u003E Facet.ControlOptions::VisibleWhen()",
           "System.Func\u00601\u003CSystem.String\u003E Facet.ControlOptions::TooltipText()",
+          "System.String Facet.ControlOptions::Help()",
           "System.String Facet.ControlOptions::Id()",
           "System.String Facet.ControlOptions::Tooltip()",
+          "System.Void Facet.ControlOptions::set_Help(System.String)",
           "System.Void Facet.ControlOptions::set_Id(System.String)",
           "System.Void Facet.ControlOptions::set_Tooltip(System.String)",
           "System.Void Facet.ControlOptions::set_TooltipText(System.Func\u00601\u003CSystem.String\u003E)",
@@ -1940,7 +1948,9 @@
       {
         "type": "Facet.Control\u00601",
         "members": [
+          "System.Action\u00601\u003CT\u003E Facet.Control\u00601::Committed",
           "System.Void Facet.Control\u00601::Set(T,System.Boolean)",
+          "System.Void Facet.Control\u00601::add_Committed(System.Action\u00601\u003CT\u003E)",
           "T Facet.Control\u00601::Value()",
           "T Facet.Control\u00601::get_Value()"
         ]
@@ -1955,9 +1965,12 @@
           "Facet.Control\u00601\u003CSystem.Int32\u003E Facet.Controls::Dropdown(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Int32\u003E,System.Action\u00601\u003CFacet.DropdownOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.Single\u003E Facet.Controls::Slider(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Single\u003E,System.Action\u00601\u003CFacet.SliderOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.String\u003E Facet.Controls::Info(UnityEngine.UIElements.VisualElement,System.String,System.Func\u00601\u003CSystem.String\u003E,System.Action\u00601\u003CFacet.ControlOptions\u003E)",
+          "Facet.Control\u00601\u003CSystem.String\u003E Facet.Controls::Key(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.String\u003E,System.Action\u00601\u003CFacet.KeyOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.String\u003E Facet.Controls::Text(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.String\u003E,System.Action\u00601\u003CFacet.TextOptions\u003E)",
+          "Facet.Control\u00601\u003CUnityEngine.Color\u003E Facet.Controls::Colour(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CUnityEngine.Color\u003E,System.Action\u00601\u003CFacet.ColourOptions\u003E)",
           "System.Single Facet.Controls::RowHeight",
           "UnityEngine.UIElements.Button Facet.Controls::Action(UnityEngine.UIElements.VisualElement,System.String,System.String,System.Action,System.Action\u00601\u003CFacet.ControlOptions\u003E)",
+          "UnityEngine.UIElements.Button Facet.Controls::Danger(UnityEngine.UIElements.VisualElement,System.String,System.String,System.Action,System.Action\u00601\u003CFacet.ControlOptions\u003E)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Card(UnityEngine.UIElements.VisualElement,System.String,System.Action\u00601\u003CFacet.CardOptions\u003E)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Section(UnityEngine.UIElements.VisualElement,System.String,System.Boolean)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Tiles(UnityEngine.UIElements.VisualElement,System.Action\u00601\u003CFacet.TilesOptions\u003E)",
@@ -1969,6 +1982,15 @@
         "members": [
           "System.Collections.Generic.IList\u00601\u003CSystem.String\u003E Facet.DropdownOptions::Items()",
           "System.Void Facet.DropdownOptions::set_Items(System.Collections.Generic.IList\u00601\u003CSystem.String\u003E)"
+        ]
+      },
+      {
+        "type": "Facet.History",
+        "members": [
+          "System.Boolean Facet.History::Applying()",
+          "System.Boolean Facet.History::get_Applying()",
+          "System.Int32 Facet.History::Limit",
+          "System.Single Facet.History::CoalesceSeconds"
         ]
       },
       {
@@ -2002,7 +2024,17 @@
           "System.Boolean Facet.Input::get_BlocksGameInput()",
           "System.Boolean Facet.Input::get_HeldThisFrame()",
           "System.Boolean Facet.Input::get_TextFocused()",
+          "System.Void Facet.Input::ConsumeEscape()",
           "System.Void Facet.Input::TickWheel(UnityEngine.Vector2,System.Single)"
+        ]
+      },
+      {
+        "type": "Facet.KeyOptions",
+        "members": [
+          "System.Action Facet.KeyOptions::CancelCapture()",
+          "System.Action\u00601\u003CSystem.Action\u00601\u003CSystem.String\u003E\u003E Facet.KeyOptions::Capture()",
+          "System.Void Facet.KeyOptions::set_CancelCapture(System.Action)",
+          "System.Void Facet.KeyOptions::set_Capture(System.Action\u00601\u003CSystem.Action\u00601\u003CSystem.String\u003E\u003E)"
         ]
       },
       {
@@ -2121,6 +2153,7 @@
           "System.Boolean Facet.Surface::BlocksGameInput()",
           "System.Boolean Facet.Surface::Visible()",
           "System.Boolean Facet.Surface::get_Visible()",
+          "System.Func\u00601\u003CSystem.Boolean\u003E Facet.Surface::EscapeHandler",
           "System.Void Facet.Surface::.ctor(Facet.Host,System.String,Facet.Layer,UnityEngine.TextCore.Text.FontAsset)",
           "System.Void Facet.Surface::Dispose()",
           "System.Void Facet.Surface::Relabel()",
@@ -2855,6 +2888,8 @@
       {
         "type": "PrismLib.UI.Toolkit.SettingsPanel",
         "members": [
+          "System.Boolean PrismLib.UI.Toolkit.SettingsPanel::Visible()",
+          "System.Boolean PrismLib.UI.Toolkit.SettingsPanel::get_Visible()",
           "System.Void PrismLib.UI.Toolkit.SettingsPanel::.ctor(System.String,System.Func\u00601\u003CSystem.Collections.Generic.IEnumerable\u00601\u003CPrismLib.UI.Toolkit.SettingRow\u003E\u003E,UnityEngine.TextCore.Text.FontAsset)",
           "System.Void PrismLib.UI.Toolkit.SettingsPanel::Dispose()",
           "System.Void PrismLib.UI.Toolkit.SettingsPanel::Tick()",

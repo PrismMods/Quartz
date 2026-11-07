@@ -53,7 +53,8 @@ internal static class PrismWindows {
             if(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) History.Redo();
             else History.Undo();
         }
-        if(Input.GetKeyDown(KeyCode.Escape) && Ui.AnyWindowOpen) Ui.CloseTop();
+        // Not while one of Quartz's key captures owns the keyboard: its runner spends this Escape on the cancel.
+        if(Input.GetKeyDown(KeyCode.Escape) && Ui.AnyWindowOpen && !Keybind.Capturing) Ui.CloseTop();
         // A capture in progress owns the keyboard: no window opens with its key.
         if(own && capture == null) {
             if(alt && pDown) ToggleSettings();
@@ -77,6 +78,10 @@ internal static class PrismWindows {
     /// <summary>Self-test: Quartz's own debug window whoever holds the claim.</summary>
     internal static void ToggleOwnDebug() => ToggleOwn();
 #endif
+    internal static bool SettingsVisible => settings?.Visible == true;
+    internal static void ShowSettings() {
+        if(!SettingsVisible) ToggleSettings();
+    }
     internal static void ToggleSettings() {
         try {
             if(!PrismBridge.Available) { MainCore.Log.Msg("[prism] settings window needs PrismLib"); return; }

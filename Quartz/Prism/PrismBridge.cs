@@ -317,25 +317,10 @@ internal static partial class PrismBridge {
             },
         ];
     }
-    private static void SetMenuKey(object value) {
-        if(!Enum.TryParse(Convert.ToString(value), out KeyCode key) || !Enum.IsDefined(typeof(KeyCode), key) || PrismRules.HotkeyRefused(MainCore.Conf.ToggleModifier, (int)key)) {
-            MainCore.Log.Msg($"Menu hotkey refused: {value}");
-            return;
-        }
-        MainCore.Conf.ToggleKey = (int)key;
-        MainCore.ConfMgr.RequestSave();
-        RebindMenuKey();
-    }
-    private static void SetMenuModifier(object value) {
-        int mod = Convert.ToInt32(value);
-        if(mod < 0 || mod > (int)Keybind.KeyModifier.Cmd || PrismRules.HotkeyRefused(mod, MainCore.Conf.ToggleKey)) {
-            MainCore.Log.Msg($"Menu hotkey modifier refused: {value}");
-            return;
-        }
-        MainCore.Conf.ToggleModifier = mod;
-        MainCore.ConfMgr.RequestSave();
-        RebindMenuKey();
-    }
+    // A name that is no key reads as none, which is refused.
+    private static void SetMenuKey(object value) =>
+        UICore.TrySetMenuHotkey(MainCore.Conf.ToggleModifier, Enum.TryParse(Convert.ToString(value), out KeyCode key) ? (int)key : 0);
+    private static void SetMenuModifier(object value) => UICore.TrySetMenuHotkey(Convert.ToInt32(value), MainCore.Conf.ToggleKey);
     private static IEnumerable<KeyValuePair<string, string>> StateFields() => [
         new("version", Info.DisplayVersion),
         new("loader", Loader),

@@ -116,8 +116,10 @@ internal sealed class KeyCapture : MonoBehaviour {
     }
     private void Update() {
         if(!listening) return;
-        if(Input.GetKeyDown(KeyCode.Escape)
-            || (AllowClear && (Input.GetKeyDown(KeyCode.Backspace) || Input.GetKeyDown(KeyCode.Delete)))) {
+        bool escape = Input.GetKeyDown(KeyCode.Escape);
+        // Spent here: a window over the menu stays open whichever mod offers this Escape to Facet afterwards.
+        if(escape) Quartz.UI.FacetUi.FacetBridge.ConsumeEscape();
+        if(escape || (AllowClear && (Input.GetKeyDown(KeyCode.Backspace) || Input.GetKeyDown(KeyCode.Delete)))) {
             if(!AllowClear) {
                 Cancel();
                 return;

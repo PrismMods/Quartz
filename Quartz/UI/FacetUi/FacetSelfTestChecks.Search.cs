@@ -33,9 +33,13 @@ internal static partial class FacetSelfTestChecks {
             yield return SearchMovedRow(check);
             yield return SearchModeChange(check);
             yield return SearchClassic(check, "profiles", h => h.PageRef != null && h.Key == "PROFILES", "profiles.main", "a classic page's hit");
-            // A row of the classic Settings page, until that page moves.
-            string middle = QuartzHost.Host.Translate("MIDDLE_CLICK_TO_SET_AS_DEFAULT");
-            yield return SearchClassic(check, "middle-click", h => h.PageRef == null && h.Label == middle, CorePages.SettingsPageKey, "a classic row's hit");
+            // A row of a page still in the classic menu.
+            string recalibrate = QuartzHost.Host.Translate("PROFILE_RECALIBRATE");
+            yield return SearchClassic(check, "recalibrate", h => h.PageRef == null && h.Label == recalibrate, "profiles.main", "a classic row's hit");
+            // A row the moved Settings page leaves on the classic page.
+            string updates = QuartzHost.Host.Translate("CHECK_FOR_UPDATES");
+            yield return SearchClassic(check, "check for updates", h => h.PageRef == null && h.Label == updates, CorePages.SettingsPageKey,
+                "a row the moved Settings page leaves to the classic menu");
             SearchNoCardRows(check);
             yield return SearchKorean(check);
             yield return SearchFresh(check);
@@ -107,17 +111,21 @@ internal static partial class FacetSelfTestChecks {
     private static IEnumerator PickMode(string itemKey) {
         QuartzShell.Nav.Filter("");   // a search's results hide the page
         yield return Frames(2);
-        Button b = Body.Q<Button>("FXRM_MODE-input");
+        yield return PickItem("FXRM_MODE", QuartzHost.Host.Translate(itemKey));
+    }
+
+    // Opens the open page's dropdown row `id` and picks the item that reads `shown`, as a click would.
+    private static IEnumerator PickItem(string id, string shown) {
+        Button b = Body.Q<Button>(id + "-input");
         if(b == null) yield break;
         ContentScroll.ScrollTo(b);
         yield return Frames(2);
         Submit(b);
         yield return Frames(2);
         // The menu lives on Facet's popup surface, a document of its own.
-        string want = QuartzHost.Host.Translate(itemKey);
         VisualElement row = null;
         foreach(UIDocument d in UnityEngine.Object.FindObjectsByType<UIDocument>(FindObjectsSortMode.None))
-            if(d.rootVisualElement != null) row ??= d.rootVisualElement.Query<Label>().Where(l => l.text == want && l.panel != null).First()?.parent;
+            if(d.rootVisualElement != null) row ??= d.rootVisualElement.Query<Label>().Where(l => l.text == shown && l.panel != null).First()?.parent;
         if(row != null) {
             using PointerUpEvent ev = Pooled<PointerUpEvent>();
             typeof(PointerEventBase<PointerUpEvent>).GetProperty("button").SetValue(ev, 0);   // the popup takes the primary button only

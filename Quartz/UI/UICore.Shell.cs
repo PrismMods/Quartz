@@ -70,6 +70,42 @@ public static partial class UICore {
                 new Vector2(ReferenceResolution.x, ReferenceResolution.y) / field;
         }
     } = 1f;
+    private static GTween scaleSeq;
+    /// <summary>The UI scale, saved; the classic panel rescales and keeps its size on screen, over 0.4 s or at once.</summary>
+    internal static void ApplyUIScale(float value, bool animate) {
+        MainCore.Conf.UIScale = value;
+        MainCore.ConfMgr.RequestSave();
+        scaleSeq?.Kill();
+        float scaleStart = PanelScale;
+        Vector2 targetSize = Panel.sizeDelta * (scaleStart / value);
+        targetSize = new Vector2(
+            Mathf.Clamp(targetSize.x, ResizeHandle.MIN_WIDTH / value, Screen.width / value),
+            Mathf.Clamp(targetSize.y, ResizeHandle.MIN_HEIGHT / value, Screen.height / value)
+        );
+        LastPanelSize = targetSize;
+        MainCore.Conf.PanelWidth = targetSize.x;
+        MainCore.Conf.PanelHeight = targetSize.y;
+        if(!animate) {
+            PanelScale = value;
+            Panel.sizeDelta = targetSize;
+            return;
+        }
+        scaleSeq = GTweenSequenceBuilder.New()
+            .Append(
+                GTweenExtensions.Tween(
+                    () => scaleStart,
+                    x => PanelScale = x,
+                    value,
+                    0.4f
+                ).SetEasing(Easing.OutExpo)
+            )
+            .Join(
+                Panel.GTSizeDelta(targetSize, 0.4f)
+                    .SetEasing(Easing.OutExpo)
+            )
+            .Build();
+        MainCore.TC.Play(scaleSeq);
+    }
     private static void CreatePanel() {
         GameObject panel = new("Panel");
         panel.transform.SetParent(canvasObj.transform, false);

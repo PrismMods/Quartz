@@ -8,7 +8,8 @@ using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi;
 /// <summary>
 /// The Effect Remover page in the new menu (a QuartzShell.Moved builder). Mirrors PageEffectRemover row for row.
-/// Labels are Quartz Lang keys, which QuartzHost translates live.
+/// Labels are Quartz Lang keys, which QuartzHost translates live. Value rows write through QuartzShell.Writes: the
+/// classic page this window hands back to never reads a toggle's field again, so it rebuilds first.
 /// </summary>
 internal static class FacetEffectRemover {
     // Read on every call: a profile switch may replace what EffectRemover.Conf returns.
@@ -56,7 +57,7 @@ internal static class FacetEffectRemover {
     }
     private static Control<bool> Flag(VisualElement p, string key, Func<EffectRemoverSettings, bool> get,
         Action<EffectRemoverSettings, bool> set, bool def, string tip = null, Func<bool> visible = null) =>
-        Controls.Toggle(p, key, Bind.To(() => get(C), v => { set(C, v); Save(); }), o => {
+        Controls.Toggle(p, key, QuartzShell.Writes(() => get(C), v => { set(C, v); Save(); }), o => {
             o.Id = key;
             o.Default = def;
             o.Tooltip = tip;
@@ -71,13 +72,13 @@ internal static class FacetEffectRemover {
     private static VisualElement Simple(VisualElement body) {
         VisualElement p = Controls.Card(body, null);
         VisualElement excluded = Controls.ToggleGroup(p, "FXRM_S_FILTER",
-            Bind.To(() => C.SimpleFilter, v => { C.SimpleFilter = v; Save(); }),
+            QuartzShell.Writes(() => C.SimpleFilter, v => { C.SimpleFilter = v; Save(); }),
             o => { o.Id = "FXRM_S_FILTER"; o.Default = Def.SimpleFilter; o.Tooltip = "DESC_FXRM_S_FILTER"; });
         VisualElement filters = Controls.Section(excluded, "SECTION_EXCLUDED_FILTERS", false);
         foreach(Filter value in Enum.GetValues(typeof(Filter))) {
             Filter filter = value;
             // No Quartz key, so the label passes through untranslated.
-            Controls.Toggle(filters, FilterLabel(filter), Bind.To(() => C.SimpleFilterExcludeList.Contains(filter), v => {
+            Controls.Toggle(filters, FilterLabel(filter), QuartzShell.Writes(() => C.SimpleFilterExcludeList.Contains(filter), v => {
                 if(!v) C.SimpleFilterExcludeList.Remove(filter);
                 else if(!C.SimpleFilterExcludeList.Contains(filter)) C.SimpleFilterExcludeList.Add(filter);
                 Save();
@@ -89,7 +90,7 @@ internal static class FacetEffectRemover {
         Flag(p, "FXRM_S_HOM", c => c.SimpleHallOfMirrors, (c, v) => c.SimpleHallOfMirrors = v, Def.SimpleHallOfMirrors, "DESC_FXRM_S_HOM");
         Flag(p, "FXRM_S_SHAKE", c => c.SimpleScreenShake, (c, v) => c.SimpleScreenShake = v, Def.SimpleScreenShake, "DESC_FXRM_S_SHAKE");
         Flag(p, "FXRM_S_SCREENTILE", c => c.SimpleScreenTile, (c, v) => c.SimpleScreenTile = v, Def.SimpleScreenTile, "DESC_FXRM_S_SCREENTILE");
-        Controls.Slider(p, "FXRM_S_MOVEMAX", Bind.To(() => (float)C.SimpleMoveTrackMax, v => { C.SimpleMoveTrackMax = Mathf.RoundToInt(v); Save(); }), o => {
+        Controls.Slider(p, "FXRM_S_MOVEMAX", QuartzShell.Writes(() => (float)C.SimpleMoveTrackMax, v => { C.SimpleMoveTrackMax = Mathf.RoundToInt(v); Save(); }), o => {
             o.Id = "FXRM_S_MOVEMAX";
             o.Min = 5f;
             o.Max = EffectRemoverSettings.MoveTrackUpperBound + 5f;
@@ -157,7 +158,7 @@ internal static class FacetEffectRemover {
             "DESC_FXRM_REMOVE_ALL_DECO", () => C.Decorations);
         Flag(misc, "FXRM_LIMIT_OPACITY", c => c.LimitTrackOpacity, (c, v) => c.LimitTrackOpacity = v, Def.LimitTrackOpacity);
         Flag(misc, "FXRM_SET_ZOOM", c => c.SetCameraZoom, (c, v) => c.SetCameraZoom = v, Def.SetCameraZoom, null, () => C.Cameras);
-        Controls.Slider(misc, "FXRM_ZOOM_SCALE", Bind.To(() => C.CameraZoomScale, v => { C.CameraZoomScale = v; Save(); }), o => {
+        Controls.Slider(misc, "FXRM_ZOOM_SCALE", QuartzShell.Writes(() => C.CameraZoomScale, v => { C.CameraZoomScale = v; Save(); }), o => {
             o.Id = "FXRM_ZOOM_SCALE";
             o.Min = 100f;
             o.Max = 1000f;

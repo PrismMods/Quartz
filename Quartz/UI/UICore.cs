@@ -138,6 +138,21 @@ public static partial class UICore {
         if(on) FacetBridge.PrebuildNewMenu();
         RequestPagesRebuild();
     }
+    /// <summary>
+    /// The menu hotkey from a row that can be handed anything (Prism · Settings, the new menu): one Quartz won't take is refused
+    /// with one log line, else it is saved and PrismLib's key registry follows.
+    /// </summary>
+    internal static void TrySetMenuHotkey(int modifier, int key) {
+        if(modifier < 0 || modifier > (int)Keybind.KeyModifier.Cmd || !Enum.IsDefined(typeof(KeyCode), key)
+            || Quartz.Prism.PrismRules.HotkeyRefused(modifier, key)) {
+            MainCore.Log.Msg($"Menu hotkey refused: {Keybind.Format((Keybind.KeyModifier)modifier, (KeyCode)key)}");
+            return;
+        }
+        MainCore.Conf.ToggleModifier = modifier;
+        MainCore.Conf.ToggleKey = key;
+        MainCore.ConfMgr.RequestSave();
+        Quartz.Prism.PrismBridge.RebindMenuKey();
+    }
     // Deferred one pump: handlers still pending in this event snapshot would touch destroyed UI.
     private static void RequestPagesRebuild() {
         if(rebuildQueued) return;
@@ -149,6 +164,15 @@ public static partial class UICore {
         });
     }
     public static void Rebuild() => Rebuild(false);
+    /// <summary>
+    /// The new menu wrote a field the classic pages show, and a classic toggle never reads its field again: they are stale
+    /// until the next rebuild, which clears this.
+    /// </summary>
+    internal static bool ClassicStale;
+    /// <summary>Before the classic menu shows: rebuilt once if the new menu left it stale, untouched otherwise.</summary>
+    internal static void FreshenClassic() {
+        if(ClassicStale) Rebuild();
+    }
     // Rebuild closes and reopens the classic menu; neither is a user's close, so neither hands back to the new menu.
     private static bool rebuilding;
     public static void Rebuild(bool reloadPanelSize) {
@@ -156,6 +180,7 @@ public static partial class UICore {
         try { RebuildNow(reloadPanelSize); } finally { rebuilding = false; }
     }
     private static void RebuildNow(bool reloadPanelSize) {
+        ClassicStale = false;
         bool wasOpen = isOpen;
         bool wasHub = IsReorganizing;
         bool wasOverHub = panelOverHub;

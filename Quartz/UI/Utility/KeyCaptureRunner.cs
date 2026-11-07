@@ -19,6 +19,7 @@ public sealed class KeyCaptureRunner : MonoBehaviour {
     private bool prevHookRAlt;
     private bool prevHookRCtrl;
     private bool wasListening;
+    private Action poll;
     public bool BeginCapture() {
         if(IsListening == null || !IsListening()) {
             EndCapture();
@@ -38,6 +39,10 @@ public sealed class KeyCaptureRunner : MonoBehaviour {
             return;
         }
         if(!KeyCaptureCoordinator.Owns(this) && !BeginCapture()) return;
+        // Past PrismLib's input gate: an open blocking window (the new menu, a Prism window) hides every key from code outside it.
+        Quartz.Prism.PrismBridge.Exempt(poll ??= Poll);
+    }
+    private void Poll() {
         bool hookRAlt = Quartz.Game.HookKeys.Held(KeyCode.RightAlt);
         bool hookRCtrl = Quartz.Game.HookKeys.Held(KeyCode.RightControl);
         bool firstListeningFrame = !wasListening;
@@ -49,7 +54,10 @@ public sealed class KeyCaptureRunner : MonoBehaviour {
         int hookCaps = System.Threading.Volatile.Read(ref hookCapsPresses);
         bool capsEdge = !firstListeningFrame && hookCaps != prevHookCaps;
         prevHookCaps = hookCaps;
-        if(Input.GetKeyDown(KeyCode.Escape) || (ShouldCancel?.Invoke() ?? false)) {
+        bool escape = Input.GetKeyDown(KeyCode.Escape);
+        // Spent here: the window being bound in stays open when another mod offers this Escape to Facet afterwards.
+        if(escape) Quartz.UI.FacetUi.FacetBridge.ConsumeEscape();
+        if(escape || (ShouldCancel?.Invoke() ?? false)) {
             CancelCapture();
             return;
         }
@@ -100,6 +108,9 @@ public sealed class KeyCaptureRunner : MonoBehaviour {
 public static class KeyCaptureCoordinator {
     private static object owner;
     private static Action cancelOwner;
+    private static int releasedFrame = -1;
+    /// <summary>A capture ended this frame: the key it took is still down, and must not also act as a hotkey.</summary>
+    public static bool ReleasedThisFrame => releasedFrame == Time.frameCount;
     public static bool Claim(object claimant, Action cancel) {
         if(claimant == null || cancel == null) return false;
         if(ReferenceEquals(owner, claimant)) {
@@ -124,5 +135,6 @@ public static class KeyCaptureCoordinator {
         owner = null;
         cancelOwner = null;
         Keybind.Capturing = false;
+        releasedFrame = Time.frameCount;
     }
 }

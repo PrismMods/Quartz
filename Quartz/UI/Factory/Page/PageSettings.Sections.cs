@@ -22,29 +22,43 @@ namespace Quartz.UI.Factory.Page;
 internal static partial class PageSettings {
     private static bool reopenAccentPicker;
     private static bool reopenAccentHsv;
+    // The language actions, shared with the new menu's Settings page.
+    internal static string[] Languages() => [.. MainCore.Tr.GetLanguages().OrderBy(x => x, StringComparer.OrdinalIgnoreCase)];
+    internal static string LanguageName(string lang) {
+        if(lang == Translator.FALLBACK_LANGUAGE) return "DEFAULT";
+        string native = MainCore.Tr.GetForLanguage("0NATIVELANG", lang, lang);
+        return $"{native} ({lang})";
+    }
+    internal static void ApplyLanguage(string lang) {
+        MainCore.Tr.Language = lang;
+        MainCore.Conf.Language = lang;
+        MainCore.Conf.LanguageAutoDetected = true;
+        MainCore.ConfMgr.RequestSave();
+        TextLocalization.RefreshAll();
+    }
+    /// <summary>Reads the language files again; <paramref name="done"/> runs on the main thread before the labels refresh.</summary>
+    internal static void ReloadLanguages(Action done) {
+        _ = Task.Run(async () => {
+            await MainCore.Tr.Load(MainCore.Paths.LangPath);
+            MainThread.Enqueue(() => {
+                done?.Invoke();
+                TextLocalization.RefreshAll();
+                RefreshUpdates();
+            });
+        });
+    }
     private static void CreateLanguageSection(RectTransform content, CoreSettings defSet) {
         var langLabelRow = GenerateUI.Row(content.transform);
         var langText = GenerateUI.AddTextH1(langLabelRow);
         var langTextTr = langText.gameObject.AddComponent<TextLocalization>().Init("LANGUAGE", "Language");
-        string[] langs = [.. MainCore.Tr.GetLanguages().OrderBy(x => x, StringComparer.OrdinalIgnoreCase)];
         var langRow = GenerateUI.Row(content.transform);
         languageDropdown = GenerateUI.DropDown(
             langRow,
             null,
             MainCore.Tr.Language,
-            langs,
-            lang => {
-                if(lang == Translator.FALLBACK_LANGUAGE) return "DEFAULT";
-                string native = MainCore.Tr.GetForLanguage("0NATIVELANG", lang, lang);
-                return $"{native} ({lang})";
-            },
-            value => {
-                MainCore.Tr.Language = value;
-                MainCore.Conf.Language = value;
-                MainCore.Conf.LanguageAutoDetected = true;
-                MainCore.ConfMgr.RequestSave();
-                TextLocalization.RefreshAll();
-            },
+            Languages(),
+            LanguageName,
+            ApplyLanguage,
             "language_dropdown"
         );
         UIButton langBtn = GenerateUI.Button(
@@ -58,14 +72,9 @@ internal static partial class PageSettings {
             languageDropdown.SetBlocked(true);
             langBtn.SetBlocked(true);
             langBtn.Label.text = "...";
-            _ = Task.Run(async () => {
-                await MainCore.Tr.Load(MainCore.Paths.LangPath);
-                MainThread.Enqueue(() => {
-                    languageDropdown.SetBlocked(false);
-                    langBtn.SetBlocked(false);
-                    TextLocalization.RefreshAll();
-                    RefreshUpdates();
-                });
+            ReloadLanguages(() => {
+                languageDropdown.SetBlocked(false);
+                langBtn.SetBlocked(false);
             });
         };
         {
@@ -215,36 +224,7 @@ internal static partial class PageSettings {
         );
         uiScale.Format = "0.00x";
         uiScale.OnChanged = value => MainCore.Conf.UIScale = value;
-        GTween scaleSeq = null;
-        uiScale.OnComplete = value => {
-            MainCore.Conf.UIScale = value;
-            MainCore.ConfMgr.RequestSave();
-            scaleSeq?.Kill();
-            float scaleStart = UICore.PanelScale;
-            Vector2 targetSize = UICore.Panel.sizeDelta * (scaleStart / value);
-            targetSize = new Vector2(
-                Mathf.Clamp(targetSize.x, ResizeHandle.MIN_WIDTH / value, Screen.width / value),
-                Mathf.Clamp(targetSize.y, ResizeHandle.MIN_HEIGHT / value, Screen.height / value)
-            );
-            UICore.LastPanelSize = targetSize;
-            MainCore.Conf.PanelWidth = targetSize.x;
-            MainCore.Conf.PanelHeight = targetSize.y;
-            scaleSeq = GTweenSequenceBuilder.New()
-                .Append(
-                    GTweenExtensions.Tween(
-                        () => scaleStart,
-                        x => UICore.PanelScale = x,
-                        value,
-                        0.4f
-                    ).SetEasing(Easing.OutExpo)
-                )
-                .Join(
-                    UICore.Panel.GTSizeDelta(targetSize, 0.4f)
-                        .SetEasing(Easing.OutExpo)
-                )
-                .Build();
-            MainCore.TC.Play(scaleSeq);
-        };
+        uiScale.OnComplete = value => UICore.ApplyUIScale(value, true);
         var uiScaleTr = uiScale.Label.gameObject.AddComponent<TextLocalization>().Init("UI_SCALE", "UI Scale");
         var scrollRow = GenerateUI.Row(content.transform);
         UISlider scrollSpeed = GenerateUI.Slider(
