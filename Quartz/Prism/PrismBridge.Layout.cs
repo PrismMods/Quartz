@@ -40,14 +40,20 @@ internal static partial class PrismBridge {
     }
     private static int described = int.MinValue;
     private static string describedIn;
-    // Quartz's targets go to PrismLib's registry again when a handle is tagged or destroyed, or the labels' language changes.
+    /// <summary>
+    /// What the targets' labels read in: the language, or "loading" while the table loads (Tr answers in English then; at
+    /// startup it loads after the first describe). A change means the labels need reading again.
+    /// </summary>
+    internal static string LabelState => MainCore.Tr.IsLoading ? "loading" : MainCore.Tr.Language;
+    // Quartz's targets go to PrismLib's registry again when a handle is tagged or destroyed, or the labels' state changes.
     private static void TickLayout() {
         if(layoutOff) return;
         try {
             int version = ReorganizeHandle.LayoutVersion;
-            if(Available && (version != described || describedIn != MainCore.Tr.Language)) {
+            string labels = LabelState;
+            if(Available && (version != described || describedIn != labels)) {
                 described = version;
-                describedIn = MainCore.Tr.Language;
+                describedIn = labels;
                 DescribeLayoutImpl();
             }
             QuartzLayout.Tick();

@@ -24,6 +24,17 @@ internal static class PrismRules {
         foreach(string data in Dirs(Path.Combine(gameRoot, "UserData"))) AddStore(found, data);
         return found;
     }
+    /// <summary>
+    /// The runtime store folder holding Quartz.dll: where it loaded from, or for a byte-loaded Quartz.dll (empty location)
+    /// the version's folder under the runtime root, which UMM keeps in the mod folder and MelonLoader in Quartz's data folder.
+    /// </summary>
+    public static string StoreDir(string location, bool umm, string modsPath, string quartzFilePath, string version) =>
+        location.Length > 0 ? Path.GetDirectoryName(location) : Path.Combine(umm ? modsPath : quartzFilePath, "Runtime", "versions", version);
+    /// <summary>
+    /// Quartz answers the Prism window chords (Alt+D, Alt+P, Ctrl+Z) when it holds the debug claim, or when no PrismLib is
+    /// loaded at all. A PrismLib Quartz could not use (another mod loaded an older one) has its own holder, who answers.
+    /// </summary>
+    public static bool OwnsChords(bool available, bool debugClaimed, bool foreignLib) => debugClaimed || !available && !foreignLib;
     /// <summary>Keybind.KeyModifier (None, Ctrl, Alt, Shift, Cmd) as PrismLib's KeyMods bits (Shift 1, Ctrl 2, Alt 4, Cmd 8).</summary>
     public static int ToPrismMods(int keybindModifier) => keybindModifier switch {
         1 => 2,
@@ -53,9 +64,26 @@ internal static class PrismRules {
         ["Experimental: new menu"] = "PRISM_NEW_MENU",
         ["The menu hotkey opens the new menu. It is still being built; the classic menu stays available"] = "PRISM_NEW_MENU_TIP",
     };
-    /// <summary>The translation of one of those English labels, or null when the text is not Quartz's.</summary>
-    public static string Translate(string english, Func<string, string, string> get) =>
-        english != null && EnglishToKey.TryGetValue(english, out string key) ? get(key, english) : null;
+    /// <summary>The English names of Quartz's debug log and fields in PrismLib's registry.</summary>
+    public const string DebugLog = "log", DebugState = "State";
+    /// <summary>
+    /// Every holder of the debug window draws a tab as "&lt;owner&gt; · &lt;name&gt;" and PrismLib.UI translates that whole text
+    /// through Words at draw time, so Quartz registers English names and answers the "Quartz · " form. A name translated at
+    /// registration would stay in the language of that moment: the table loads after Register.
+    /// </summary>
+    public static readonly IReadOnlyDictionary<string, string> TabToKey = new Dictionary<string, string> {
+        [DebugLog] = "PRISM_DEBUG_LOG",
+        [DebugState] = "PRISM_DEBUG_STATE",
+    };
+    public const string TabPrefix = "Quartz · ";
+    /// <summary>The translation of one of those English labels or tabs, or null when the text is not Quartz's.</summary>
+    public static string Translate(string english, Func<string, string, string> get) {
+        if(english == null) return null;
+        if(EnglishToKey.TryGetValue(english, out string key)) return get(key, english);
+        if(!english.StartsWith(TabPrefix, StringComparison.Ordinal)) return null;
+        string name = english.Substring(TabPrefix.Length);
+        return TabToKey.TryGetValue(name, out key) ? TabPrefix + get(key, name) : null;
+    }
     /// <summary>
     /// PrismLib gives a mod no "the layout editor is open" signal, but the editor reads every target's box each
     /// frame it is open: a frame with a read opens the session, and it stays open Grace frames past the last one.

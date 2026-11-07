@@ -47,8 +47,11 @@ internal static partial class PrismBridge {
             loaded = Available = EnsureImpl(host);
             if(!loaded) MainCore.Log.Wrn($"PrismLib unavailable (below {PrismFloor.PrismLib} or missing)");
         } catch(Exception e) { LibOff(e); }
+        ForeignLib = !loaded && AppDomain.CurrentDomain.GetAssemblies().Any(a => a.GetName().Name == "PrismLib");
 #endif
     }
+    /// <summary>Another mod loaded a PrismLib Quartz cannot use (older than its floor): that mod's holder answers the Prism chords.</summary>
+    internal static bool ForeignLib { get; private set; }
     /// <summary>Registers Quartz with PrismLib and its menu with the input gate. After the services exist.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
     internal static void Register() {
@@ -61,7 +64,7 @@ internal static partial class PrismBridge {
         }
         if(UiAvailable) {
             try { UiWiringImpl(); } catch(Exception e) { UiOff(e); }
-            if(Available) {
+            if(Available && ui == 1) { // a mod that holds a claim must draw what it claims
                 try { ClaimDebugImpl(); } catch(Exception e) { MainCore.Log.Wrn($"PrismLib debug claim failed: {e.Message}"); }
                 try { ClaimLayoutImpl(); } catch(Exception e) { LayoutOff(e); }
             }
@@ -181,6 +184,7 @@ internal static partial class PrismBridge {
             try { PrismWindows.Shutdown(); } catch(Exception e) { MainCore.Log.Wrn($"Prism windows shutdown failed: {e.Message}"); } // writes geometry: before the settings save
             try { PrismGate.Shutdown(); } catch(Exception e) { MainCore.Log.Wrn($"Prism gate shutdown failed: {e.Message}"); }
             try { QuartzLayout.Shutdown(); } catch(Exception e) { MainCore.Log.Wrn($"Layout editor shutdown failed: {e.Message}"); }
+            try { PrismWindows.Unwire(); } catch(Exception e) { MainCore.Log.Wrn($"Prism hooks unwire failed: {e.Message}"); } // PrismLib.UI's shared hooks
         }
         if(!loaded) return;
         loaded = Available = false;
@@ -233,21 +237,22 @@ internal static partial class PrismBridge {
         if(layoutOff || !UiAvailable) return;
         try { RefreshLayoutClaimImpl(); } catch(Exception e) { LayoutOff(e); }
     }
+    // Without PrismLib.UI Quartz draws neither shared window: its claims go, so another mod's retry takes them.
     private static void UiOff(Exception e) {
         ui = 2;
         MainCore.Log.Wrn($"PrismLib.UI unavailable: {e}");
+        if(!Available) return;
+        try { ReleaseDebugClaimImpl(); } catch(Exception d) { Diag.Ignore(d); }
+        try { ReleaseLayoutClaimImpl(); } catch(Exception d) { Diag.Ignore(d); }
     }
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static string UiName() => typeof(PrismLib.UI.Toolkit.InputGate).Assembly.GetName().Name;
-    // The store folder holding Quartz.dll (PayloadLoader loads it from there); a byte-loaded Quartz.dll (empty
-    // Location) takes the current version's folder from Quartz's own runtime layout.
-    internal static string StoreDir(string quartzFilePath) {
-        string self = typeof(PrismBridge).Assembly.Location;
-        return self.Length > 0 ? Path.GetDirectoryName(self) : Path.Combine(quartzFilePath, "Runtime", "versions", Info.DisplayVersion);
-    }
+    // The store folder holding Quartz.dll (PayloadLoader loads it from there).
+    internal static string StoreDir(IQuartzHost host) =>
+        PrismRules.StoreDir(typeof(PrismBridge).Assembly.Location, Loader == "UMM", host.ModsPath, host.QuartzFilePath, Info.DisplayVersion);
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool EnsureImpl(IQuartzHost host) {
-        string bundle = Path.Combine(StoreDir(host.QuartzFilePath), PrismLib.Bootstrap.PrismBootstrap.BundleName);
+        string bundle = Path.Combine(StoreDir(host), PrismLib.Bootstrap.PrismBootstrap.BundleName);
         return PrismLib.Bootstrap.PrismBootstrap.Ensure(m => MainCore.Log.Msg(m), PrismFloor.PrismLib,
             PrismRules.ModsRoot(host.ModsPath, umm: Loader == "UMM"), bundle);
     }
@@ -256,9 +261,9 @@ internal static partial class PrismBridge {
         PrismLib.ModHandle me = PrismLib.Prism.Register(Id, MainCore.Version);
         handle = me;
         PrismLib.Keys.KeyName = i => ((KeyCode)i).ToString();
-        // Names are read once: re-adding a log under a new name would give it a second tab.
-        me.AddLog(MainCore.Tr.Get("PRISM_DEBUG_LOG", "log"), QuartzLogger.Recent, null, QuartzLogger.ClearRecent);
-        me.AddFields(MainCore.Tr.Get("PRISM_DEBUG_STATE", "State"), StateFields);
+        // English names: the tab text is translated where it is drawn (PrismRules.Translate), so it follows the language.
+        me.AddLog(PrismRules.DebugLog, QuartzLogger.Recent, null, QuartzLogger.ClearRecent);
+        me.AddFields(PrismRules.DebugState, StateFields);
         me.BindKey("DebugPanel", (int)KeyCode.D, PrismLib.KeyMods.Alt, MainCore.Tr.Get("PRISM_KEY_DEBUG", "Open the debug panel"));
         me.BindKey("SettingsPanelPrism", (int)KeyCode.P, PrismLib.KeyMods.Alt, MainCore.Tr.Get("PRISM_KEY_SETTINGS", "Open the Prism settings panel"));
         BindMenuKey(me);
@@ -352,9 +357,9 @@ internal static partial class PrismBridge {
     private static void UiWiringImpl() {
         PrismLib.UI.Toolkit.InputGate.AddMouseExemption(MenuOpen);
         PrismLib.UI.Toolkit.InputGate.AddBypass(Autoplay);
-        PrismLib.UI.Toolkit.Words.Language = PrismWindows.Language;
-        PrismLib.UI.Toolkit.Words.AddTranslator(s => PrismRules.Translate(s, (k, d) => MainCore.Tr.Get(k, d)));
-        PrismLib.UI.Toolkit.Ui.Log = m => MainCore.Log.Msg("[prism] " + m);
+        PrismLib.UI.Toolkit.Words.Language = PrismWindows.LanguageHook;
+        PrismLib.UI.Toolkit.Words.AddTranslator(s => MainCore.Runtime == null ? null : PrismRules.Translate(s, (k, d) => MainCore.Tr.Get(k, d)));
+        PrismLib.UI.Toolkit.Ui.Log = PrismWindows.LogHook;
     }
     // Exactly one mod draws the shared debug window; the claim says which, and the others ask through RequestToggle.
     [MethodImpl(MethodImplOptions.NoInlining)]

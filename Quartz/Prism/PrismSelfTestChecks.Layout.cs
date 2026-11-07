@@ -403,7 +403,9 @@ internal static partial class PrismSelfTestChecks {
             apply?.Invoke();
             file.CancelPendingSave();
             if(existed) file.Save();
-            else if(File.Exists(file.Path)) File.Delete(file.Path); // the run created it
+            else if(File.Exists(file.Path)) { // the run created it; a failed delete must not stop the other restores
+                try { File.Delete(file.Path); } catch(Exception e) { MainCore.Log.Wrn($"prism self-test: could not delete {file.Path}: {e.Message}"); }
+            }
         };
     }
     // Shows what a setting hides so it can be arranged; returns how to put the setting back.

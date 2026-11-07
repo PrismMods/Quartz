@@ -6,7 +6,10 @@ using System.Runtime.CompilerServices;
 using PrismLib.UI.Toolkit;
 using Newtonsoft.Json.Linq;
 using Quartz.Core;
+using Quartz.Features.Panels;
+using Quartz.UI;
 using Quartz.UI.FacetUi;
+using Quartz.UI.Utility;
 using UnityEngine;
 namespace Quartz.Prism;
 /// <summary>
@@ -19,7 +22,7 @@ internal static partial class PrismSelfTestChecks {
         Assembly[] ui = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetName().Name == "PrismLib.UI").ToArray();
         Version loaded = ui.Length > 0 ? ui[0].GetName().Version : null;
         string game = Path.GetDirectoryName(PrismRules.ModsRoot(MainCore.Host.ModsPath, umm: PrismBridge.Loader == "UMM"));
-        string store = PrismBridge.StoreDir(MainCore.Host.QuartzFilePath);
+        string store = PrismBridge.StoreDir(MainCore.Host);
         IReadOnlyList<string> copies = PrismRules.UiCopies(game);
         check("prism: PrismLib wired", PrismBridge.Available && PrismBridge.UiAvailable, $"lib={PrismBridge.Available} ui={PrismBridge.UiAvailable}");
         check("prism: exactly one PrismLib.UI loaded", ui.Length == 1, string.Join(", ", ui.Select(a => a.Location)));
@@ -31,11 +34,21 @@ internal static partial class PrismSelfTestChecks {
         check("prism: the store holds the bundle, never PrismLib.dll",
             File.Exists(Path.Combine(store, "PrismLib.bundle")) && !File.Exists(Path.Combine(store, "PrismLib.dll")), store);
         check("prism: Quartz is registered", Registered(), null);
-        check("prism: Quartz's log is in the debug registry", LogListed(MainCore.Tr.Get("PRISM_DEBUG_LOG", "log")), null);
-        check("prism: Quartz's fields are in the debug registry", FieldsListed(MainCore.Tr.Get("PRISM_DEBUG_STATE", "State")), null);
+        check("prism: Quartz's log is in the debug registry", LogListed(PrismRules.DebugLog), null);
+        check("prism: Quartz's fields are in the debug registry", FieldsListed(PrismRules.DebugState), null);
+        // Registered in English, shown in Quartz's language: the tab text goes through Words where it is drawn.
+        string[] shown = [Words.T(PrismRules.TabPrefix + PrismRules.DebugLog), Words.T(PrismRules.TabPrefix + PrismRules.DebugState)];
+        check("prism: Quartz's debug tabs show in Quartz's language",
+            shown[0] == PrismRules.TabPrefix + MainCore.Tr.Get("PRISM_DEBUG_LOG", PrismRules.DebugLog)
+            && shown[1] == PrismRules.TabPrefix + MainCore.Tr.Get("PRISM_DEBUG_STATE", PrismRules.DebugState),
+            $"{MainCore.Tr.Language}: {string.Join(" | ", shown)}");
         check("prism: the menu key is registered", MenuKeyBound(), null);
         HarmonyLib.Patches gate = HarmonyLib.Harmony.GetPatchInfo(typeof(Input).GetMethod("GetKey", [typeof(KeyCode)]));
-        check("prism: the input gate is patched",
+        // Under UMMBridge Quartz's HarmonyLib is the UMM-side copy, which does not list patches made through MelonLoader's:
+        // with no patch info but an installer on record, the gate is someone else's. The windows check's key probe is the guard.
+        string installer = gate == null && PrismBridge.Loader == "UMM" ? GateInstaller() : null;
+        if(installer != null) info($"prism: the input gate is installed by {installer} through another Harmony; Quartz's HarmonyLib sees no patch info (UMMBridge's split Harmony)");
+        else check("prism: the input gate is patched",
             gate?.Postfixes.Any(p => p.PatchMethod.DeclaringType?.FullName?.StartsWith("PrismLib.UI.Toolkit.InputGate", StringComparison.Ordinal) == true) == true,
             "owners=" + (gate == null ? "none" : string.Join(",", gate.Postfixes.Select(p => p.owner))));
         // Alone, Quartz's gate is the only one there is: its patches carry Quartz's Harmony id.
@@ -49,10 +62,22 @@ internal static partial class PrismSelfTestChecks {
         try { PrismBridge.Exempt(() => throw thrown); } catch(Exception e) { caught = e; }
         check("prism: an exception from Exempt's action reaches the caller and keeps PrismLib.UI on",
             ReferenceEquals(caught, thrown) && PrismBridge.UiAvailable, $"caught={caught?.GetType().Name} ui={PrismBridge.UiAvailable}");
+        // A throw from Quartz's menu update still runs the Prism tick that frame, and still reaches the caller.
+        int gateTicks = PrismGate.Ticks;
+        caught = null;
+        try { Quartz.Core.Service.UIService.Tick(() => throw thrown); } catch(Exception e) { caught = e; }
+        check("prism: a throw from the menu update still runs the Prism tick", ReferenceEquals(caught, thrown) && PrismGate.Ticks == gateTicks + 1,
+            $"caught={caught?.GetType().Name} gate ticks {gateTicks} -> {PrismGate.Ticks}");
         // Quartz's TickAnim copies anim.duration into Facet: see 240 in the same frame (other mods copy it every
         // frame too, so waiting would pass without Quartz).
         int seen = AnimProbe();
         check("prism: anim.duration reaches Facet in Quartz's own tick", seen == 240, $"Anim.Duration={seen}");
+        // Layout labels in Quartz's language once its table has loaded: at startup the first describe can come while it loads
+        // (Tr answers in English until then). Then that race on demand: a reload with a describe in the middle of it.
+        yield return Labels("layout: target labels are in Quartz's language", check);
+        _ = MainCore.Tr.Load(MainCore.Paths.LangPath);
+        PanelsOverlay.Rebuild(); // tags a handle again: Quartz describes while the table loads
+        yield return Labels("layout: ...and after a reload that described while it loaded", check);
         info($"MODE {Mode()} loader={PrismBridge.Loader}");
         var sw = new Stopwatch();
         for(int i = 0; i < 600; i++) {
@@ -62,6 +87,50 @@ internal static partial class PrismSelfTestChecks {
             yield return null;
         }
         info($"[perf] PrismBridge.Tick mean over 600 frames, nothing open: {sw.Elapsed.TotalMilliseconds * 1000 / 600:0.0} µs");
+    }
+    private static IEnumerator Labels(string name, Action<string, bool, string> check) {
+        for(float until = Time.unscaledTime + 10f; MainCore.Tr.IsLoading && Time.unscaledTime < until;) yield return null;
+        yield return Frames(3);
+        string combo = MineById(LayoutIds.Combo)?.Label;
+        string[] stale = [.. Mine().Where(t => ReorganizeHandle.FindLayout(t.Id)?.GetName?.Invoke() is { } now && now != t.Label).Select(t => t.Id + "=" + t.Label)];
+        check(name, combo == MainCore.Tr.Get("COMBO", "Combo") && stale.Length == 0, $"{MainCore.Tr.Language}: combo={combo} stale={string.Join(",", stale)}");
+    }
+    // One Ctrl+Z undoes one step. History is every mod's, so of its pollers (each Prism mod and an open layout editor)
+    // exactly one may act on a press. The press goes through Input for one frame, as every poller reads it.
+    internal static IEnumerator Undo(Action<string, bool, string> check) {
+        // The windows checks can leave the debug claim free for up to a second (Quartz's retry takes it back when alone).
+        for(float until = Time.unscaledTime + 1.5f; DebugOwner() == null && Time.unscaledTime < until;) yield return null;
+        PrismBridge.TogglePrismSettings();
+        yield return Frames(2);
+        yield return OnePress("undo: one Ctrl+Z with Prism · Settings open undoes one step", false, check);
+        PrismBridge.TogglePrismSettings();
+        yield return Frames(4);
+        PrismBridge.OpenLayoutEditor();
+        yield return Frames(4);
+        yield return OnePress("undo: one Ctrl+Z in the shared layout editor undoes one step", true, check);
+        Ui.CloseTop();
+        yield return Frames(4);
+    }
+    private static IEnumerator OnePress(string name, bool inEditor, Action<string, bool, string> check) {
+        int undone = 0;
+        History.Record(name, name + "#1", () => undone++, () => { }); // keys of their own: History coalesces a repeated key
+        History.Record(name, name + "#2", () => undone++, () => { });
+        bool window = Ui.AnyWindowOpen, editor = UICore.SharedLayoutOpen;
+        EnsureProbe();
+        chordFrame = Time.frameCount + 1;
+        yield return Frames(4);
+        check(name, window && editor == inEditor && undone == 1, $"undone={undone} window={window} editor={editor}");
+    }
+    // Last, as it turns the UI half off for the rest of the session: a failing UI tick drops Quartz's claims, so another mod's
+    // retry can take them and draw what Quartz no longer can.
+    internal static IEnumerator UiOff(Action<string, bool, string> check) {
+        string debug0 = DebugOwner(), layout0 = LayoutHost();
+        PrismGate.ThrowInTick = true;
+        yield return Frames(2);
+        PrismGate.ThrowInTick = false;
+        check("prism: a failing UI tick turns PrismLib.UI off and drops Quartz's claims",
+            !PrismBridge.UiAvailable && DebugOwner() != PrismBridge.Id && LayoutHost() != PrismBridge.Id,
+            $"ui={PrismBridge.UiAvailable} debug {debug0} -> {DebugOwner()} layout {layout0} -> {LayoutHost()}");
     }
     // Quartz's Prism · Settings rows: described once, writing Quartz's own settings, and the hotkey rebinding in PrismLib's registry.
     internal static IEnumerator Settings(Action<string, bool, string> check, Action<string> info) {
@@ -151,9 +220,13 @@ internal static partial class PrismSelfTestChecks {
         yield return Frames(2);
         check("windows: the Alt+D path opens the debug window", Ui.AnyWindowOpen, null);
         check("windows: an open Prism window withholds game input", InputGate.Blocking, null); // the self-test ticks outside Exempt
+        var (gated, exempt) = ProbeKey();
+        check("windows: the gate turns a pressed key into no key for the game, and Exempt still reads it", !gated && exempt, $"game={gated} exempt={exempt}");
         PrismBridge.ToggleDebug();
         yield return Frames(2);
         check("windows: and closes it", !Ui.AnyWindowOpen, null);
+        var (open, _) = ProbeKey();
+        check("windows: with no window open the game reads that key", open, $"game={open}");
         PrismWindows.ToggleOwnDebug();
         yield return Frames(2);
         check("windows: Quartz's own debug window opens", Ui.AnyWindowOpen, null);
@@ -161,9 +234,9 @@ internal static partial class PrismSelfTestChecks {
         yield return Frames(2);
         check("windows: and closes", !Ui.AnyWindowOpen, null);
         if(owner == PrismBridge.Id) {
-            string log = MainCore.Tr.Get("PRISM_DEBUG_LOG", "log"), state = MainCore.Tr.Get("PRISM_DEBUG_STATE", "State");
             string[] tabs = PrismWindows.DebugTabs().Select(t => t.Name).ToArray();
-            check("windows: debug tabs list Quartz", new[] { "Quartz · " + log, "Quartz · " + state, "Prism" }.All(tabs.Contains), string.Join(" | ", tabs));
+            check("windows: debug tabs list Quartz", new[] { PrismRules.TabPrefix + PrismRules.DebugLog, PrismRules.TabPrefix + PrismRules.DebugState, "Prism" }.All(tabs.Contains),
+                string.Join(" | ", tabs));
         }
         PrismBridge.TogglePrismSettings();
         yield return Frames(2);
@@ -179,6 +252,11 @@ internal static partial class PrismSelfTestChecks {
             Window.Write("prism-selftest", "1");
             check("windows: geometry lands in Quartz's settings", MainCore.Conf.FacetWindows.TryGetValue("prism-selftest", out string v) && v == "1", null);
             Window.Write("prism-selftest", null); // the writer drops a null key again
+            // Quartz's shutdown hands back PrismLib.UI's shared hooks it still holds; the next window build takes them again.
+            PrismWindows.Unwire();
+            bool handed = Ui.Log != PrismWindows.LogHook && Words.Language == null && Window.Read == null && Window.Write == null;
+            PrismWindows.Wire();
+            check("windows: Quartz hands PrismLib.UI's shared hooks back, and takes them again", handed && Ui.Log == PrismWindows.LogHook && Words.Language == PrismWindows.LanguageHook, null);
         } else info("windows: Words.Language and Window.Write not asserted beside other Prism mods");
         // Another holder (Sapphire, Topaz) lets go: Quartz's once-a-second retry takes the claim. Quartz never releases its
         // own, which would drop every claim it holds until that retry.
@@ -208,6 +286,47 @@ internal static partial class PrismSelfTestChecks {
             if(held != null) check("windows: the debug holder gets its claims back", GiveBack(holder, held) && DebugOwner() == holder, $"holder={holder} now={DebugOwner()}");
         }
     }
+    // The gate at work, whoever installed it and through whichever Harmony: a prefix of the self-test's own makes
+    // Input.GetKey(F15) read as pressed, and Harmony still runs every postfix after a prefix that skips the original, so the
+    // gate's postfix decides what the caller sees. (game read, read inside Exempt). The prefixes stay, inert, for the session.
+    private static bool probing;
+    private static int chordFrame = -1; // Ctrl+Z reads as pressed in this frame only
+    private static HarmonyLib.Harmony probe;
+    private static void EnsureProbe() {
+        if(probe != null) return;
+        probe = new HarmonyLib.Harmony("Quartz.PrismSelfTest");
+        Prefix("GetKey", nameof(PressKey));
+        Prefix("GetKeyDown", nameof(PressKeyDown));
+    }
+    private static void Prefix(string read, string prefix) {
+        HarmonyLib.PatchProcessor proc = probe.CreateProcessor(typeof(Input).GetMethod(read, [typeof(KeyCode)]));
+        proc.AddPrefix(new HarmonyLib.HarmonyMethod(typeof(PrismSelfTestChecks).GetMethod(prefix, BindingFlags.NonPublic | BindingFlags.Static)));
+        proc.Patch();
+    }
+    private static (bool, bool) ProbeKey() {
+        EnsureProbe();
+        probing = true;
+        try {
+            bool game = Input.GetKey(KeyCode.F15), exempt = false;
+            PrismBridge.Exempt(() => exempt = Input.GetKey(KeyCode.F15));
+            return (game, exempt);
+        } finally {
+            probing = false;
+        }
+    }
+    private static bool PressKey(KeyCode __0, ref bool __result) {
+        if(!(probing && __0 == KeyCode.F15 || __0 == KeyCode.LeftControl && Time.frameCount == chordFrame)) return true;
+        __result = true;
+        return false;
+    }
+    private static bool PressKeyDown(KeyCode __0, ref bool __result) {
+        if(__0 != KeyCode.Z || Time.frameCount != chordFrame) return true;
+        __result = true;
+        return false;
+    }
+    // PrismLib.UI keeps the installing mod's id private; null when it has none or the field is gone.
+    private static string GateInstaller() =>
+        typeof(InputGate).GetField("_installedBy", BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(null) as string;
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void ReleaseOwner(string owner) => PrismLib.Claims.ReleaseAll(owner);
     [MethodImpl(MethodImplOptions.NoInlining)]

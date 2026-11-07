@@ -14,10 +14,14 @@ internal static class PrismGate {
     private static HarmonyLib.Harmony harmony;   // qualified: MelonLoader also has a "Harmony" namespace
 #if DEBUG
     internal static int Ticks; // the self-test sees the gate keep ticking
+#pragma warning disable CS0649 // set by the self-test, which a stubs build leaves out
+    internal static bool ThrowInTick; // the self-test's stand-in for any failure in the UI tick
+#pragma warning restore CS0649
 #endif
     internal static void Tick() {
 #if DEBUG
         Ticks++;
+        if(ThrowInTick) throw new InvalidOperationException("prism self-test: UI tick failure");
 #endif
         harmony ??= new HarmonyLib.Harmony(HarmonyId);
         InputGate.EnsureInstalled(PrismBridge.Id, Patch);

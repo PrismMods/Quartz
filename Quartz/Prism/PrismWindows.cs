@@ -21,8 +21,8 @@ internal static class PrismWindows {
     private static Action<string> capture;
     private static bool noMac, wired;
     private static float nextClaimCheck;
-    /// <summary>Quartz draws the debug window: it holds the claim, or there is no PrismLib to hold one.</summary>
-    internal static bool OwnsDebug => !PrismBridge.Available || PrismBridge.DebugClaimed;
+    /// <summary>Quartz draws the debug window: it holds the claim, or no PrismLib is loaded to hold one.</summary>
+    internal static bool OwnsDebug => PrismRules.OwnsChords(PrismBridge.Available, PrismBridge.DebugClaimed, PrismBridge.ForeignLib);
 #if DEBUG
     /// <summary>Self-test hook: the next Tick throws, standing in for any failure inside window hosting.</summary>
 #pragma warning disable CS0649 // set by the self-test, which a stubs build leaves out
@@ -45,8 +45,9 @@ internal static class PrismWindows {
         bool own = OwnsDebug;
         // The wheel has to be polled: the game's input module does not forward it to UI Toolkit panels.
         if(own) Ui.TickWheel(Input.mousePosition, Input.mouseScrollDelta.y);
-        // Undo and redo only while a Prism window is open, so the editor keeps its own Ctrl+Z.
-        if(Ui.AnyWindowOpen && !UICore.IsOpen && Input.GetKeyDown(KeyCode.Z)
+        // Undo and redo while a Prism window is open (the game's editor keeps its own Ctrl+Z). History is every mod's, so exactly
+        // one poller acts on a press: the window host, and nobody while a shared layout editor is open, which reads it itself.
+        if(own && !UICore.SharedLayoutOpen && !QuartzLayout.Visible && Ui.AnyWindowOpen && !UICore.IsOpen && Input.GetKeyDown(KeyCode.Z)
             && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand))) {
             if(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) History.Redo();
             else History.Undo();
@@ -61,7 +62,7 @@ internal static class PrismWindows {
         settings?.Tick();
     }
     internal static void ToggleDebug() {
-        if(OwnsDebug) { ToggleOwn(); return; }
+        if(OwnsDebug || !PrismBridge.Available) { ToggleOwn(); return; } // no PrismLib to ask the holder through: the button opens Quartz's own
         try { PrismBridge.RequestToggle(); } catch(Exception e) { MainCore.Log.Wrn("[prism] debug window request failed: " + e); } // another mod draws it: ask that one
     }
     // Quartz's own window, whoever holds the claim (the self-test drives it beside other mods).
@@ -99,16 +100,32 @@ internal static class PrismWindows {
         Wire();
         using(PrismTheme.Use(Scheme())) settings = new SettingsPanel("Prism · Settings", SettingRows);
     }
-    // Quartz's language, log and settings file for what the Prism windows say, report and remember.
+    // Quartz's language, log and settings file for what the Prism windows say, report and remember. PrismLib.UI keeps these
+    // hooks for every mod's windows, so each one survives a Quartz that is gone (a failed reload, the quit order) and
+    // Unwire hands back the ones still Quartz's.
+    internal static readonly Func<string> LanguageHook = Language;
+    internal static readonly Action<string> LogHook = m => MainCore.Runtime?.Logger.Msg("[prism] " + m);
+    private static readonly Func<string, string> ReadHook = key =>
+        MainCore.Runtime is { } r && r.Config.Data.FacetWindows.TryGetValue(key, out string v) ? v : null;
+    private static readonly Action<string, string> WriteHook = (key, value) => {
+        if(MainCore.Runtime != null) QuartzHost.Write(key, value); // a drag writes every frame; only a changed value asks for a save
+    };
     internal static void Wire() {
         if(wired) return;
         wired = true;
-        Words.Language = Language;
-        Ui.Log = m => MainCore.Log.Msg("[prism] " + m);
-        Window.Read = key => MainCore.Conf.FacetWindows.TryGetValue(key, out string v) ? v : null;
-        Window.Write = QuartzHost.Write; // a drag writes every frame; only a changed value asks for a save
+        Words.Language = LanguageHook;
+        Ui.Log = LogHook;
+        Window.Read = ReadHook;
+        Window.Write = WriteHook;
     }
-    internal static string Language() => QuartzHost.LanguageCode(MainCore.Tr.Language) == "ko" ? "ko" : "en";
+    internal static void Unwire() {
+        wired = false;
+        if(Words.Language == LanguageHook) Words.Language = null;
+        if(Ui.Log == LogHook) Ui.Log = _ => { };
+        if(Window.Read == ReadHook) Window.Read = null;
+        if(Window.Write == WriteHook) Window.Write = null;
+    }
+    internal static string Language() => MainCore.Runtime == null || QuartzHost.LanguageCode(MainCore.Tr.Language) != "ko" ? "en" : "ko";
     internal static PrismTheme Scheme() {
         if(scheme == null) scheme = new PrismTheme { Accent = MainCore.Conf.GetAccentColor() };
         return scheme;
@@ -198,7 +215,7 @@ internal static class PrismWindows {
     internal static IEnumerable<DebugTab> DebugTabs() {
         var tabs = new List<DebugTab>();
         if(PrismBridge.Available) AddPrismTabs(tabs);
-        else tabs.Add(new DebugTab { Name = "Quartz · " + MainCore.Tr.Get("PRISM_DEBUG_LOG", "log"), Lines = QuartzLogger.Recent, Clear = QuartzLogger.ClearRecent });
+        else tabs.Add(new DebugTab { Name = PrismRules.TabPrefix + PrismRules.DebugLog, Lines = QuartzLogger.Recent, Clear = QuartzLogger.ClearRecent });
         return tabs;
     }
     [MethodImpl(MethodImplOptions.NoInlining)]

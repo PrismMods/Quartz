@@ -94,9 +94,10 @@ fi
 build_one() {
     local loader="$1"
     local extra=()
-    [[ "$loader" == "UMM" ]] && extra=("${UMM_FORCE[@]}")
+    # ${x[@]+...}: an empty array is "unbound" under set -u in bash 3.2 (macOS /bin/bash).
+    [[ "$loader" == "UMM" ]] && extra=(${UMM_FORCE[@]+"${UMM_FORCE[@]}"})
     echo ">> building Quartz/Quartz.csproj ($CONFIG, LoaderTarget=$loader)..."
-    dotnet build Quartz/Quartz.csproj -c "$CONFIG" -p:AutoInstall=true -p:LoaderTarget="$loader" "${extra[@]}"
+    dotnet build Quartz/Quartz.csproj -c "$CONFIG" -p:AutoInstall=true -p:LoaderTarget="$loader" ${extra[@]+"${extra[@]}"}
 }
 
 case "$TARGET" in
@@ -109,3 +110,4 @@ esac
 echo ">> done."
 [[ "$TARGET" == "ML"  || "$TARGET" == "both" ]] && echo ">> MelonLoader:     Mods/Quartz.Bootstrap.dll + UserData/Quartz/Runtime/* — dist/Quartz.zip"
 [[ "$TARGET" == "UMM" || "$TARGET" == "both" ]] && echo ">> UnityModManager: UMMMods/Quartz (or Mods/Quartz) + Quartz/Runtime/* — dist/QuartzUmm.zip"
+exit 0 # the line above is false for an ML-only build

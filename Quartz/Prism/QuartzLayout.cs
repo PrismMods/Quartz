@@ -15,6 +15,7 @@ internal static class QuartzLayout {
     private static LayoutEditor editor;
     private static bool editorAll; // the editor shows every mod's targets, not only Quartz's
     private static int reloaded = -1;
+    private static string reloadedIn;
     /// <summary>Quartz draws the editor: it holds the claim, or there is no PrismLib to hold one.</summary>
     internal static bool OwnsEditor => !PrismBridge.Available || PrismBridge.LayoutClaimed;
     internal static bool Visible => editor != null && editor.Visible;
@@ -90,9 +91,11 @@ internal static class QuartzLayout {
     }
     internal static void Tick() {
         if(editor == null) return;
-        // Quartz's own list has no Layout.Changed to follow: a handle tagged or destroyed while open shows on the next frame.
-        if(!editorAll && editor.Visible && reloaded != ReorganizeHandle.LayoutVersion) {
+        // Quartz's own list has no Layout.Changed to follow: a handle tagged or destroyed, or its labels' language changing or
+        // finishing loading, while open shows on the next frame.
+        if(!editorAll && editor.Visible && (reloaded != ReorganizeHandle.LayoutVersion || reloadedIn != PrismBridge.LabelState)) {
             reloaded = ReorganizeHandle.LayoutVersion;
+            reloadedIn = PrismBridge.LabelState;
             editor.Reload();
         }
         editor.Tick();

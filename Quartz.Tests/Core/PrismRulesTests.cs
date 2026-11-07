@@ -31,6 +31,19 @@ static class PrismRulesTests {
             Directory.Delete(root, true);
         }
     }
+    public static void TestStoreDir() {
+        string g = Path.Combine(Path.GetTempPath(), "g"), mod = Path.Combine(g, "UMMMods", "Quartz"), data = Path.Combine(g, "UserData", "Quartz");
+        string dll = Path.Combine(data, "Runtime", "versions", "3.0.0", "Quartz.dll");
+        Assert(PrismRules.StoreDir(dll, umm: true, mod, Path.Combine(mod, "UserData"), "9.9.9") == Path.GetDirectoryName(dll), "a loaded file's own folder");
+        Assert(PrismRules.StoreDir("", umm: true, mod, Path.Combine(mod, "UserData"), "3.0.0") == Path.Combine(mod, "Runtime", "versions", "3.0.0"), "UMM, byte-loaded: the mod folder's store");
+        Assert(PrismRules.StoreDir("", umm: false, Path.Combine(g, "Mods"), data, "3.0.0") == Path.Combine(data, "Runtime", "versions", "3.0.0"), "ML, byte-loaded: the data folder's store");
+    }
+    public static void TestOwnsChords() {
+        Assert(PrismRules.OwnsChords(available: true, debugClaimed: true, foreignLib: false), "the claim holder answers");
+        Assert(!PrismRules.OwnsChords(available: true, debugClaimed: false, foreignLib: false), "beside a holder, Quartz stands down");
+        Assert(PrismRules.OwnsChords(available: false, debugClaimed: false, foreignLib: false), "no PrismLib anywhere: Quartz answers alone");
+        Assert(!PrismRules.OwnsChords(available: false, debugClaimed: false, foreignLib: true), "another mod's older PrismLib: its holder answers, not Quartz too");
+    }
     public static void TestLayoutSession() {
         var s = new PrismRules.LayoutSession();
         Assert(!s.Open(0), "closed before any read");
@@ -62,6 +75,14 @@ static class PrismRulesTests {
         foreach(string key in new[] { "PRISM_KEY_MENU", "PRISM_DEBUG_LOG", "PRISM_DEBUG_STATE" }) {
             Assert(enBlock.TryGetProperty(key, out _) && koBlock.TryGetProperty(key, out _), $"{key}: in both files");
         }
+        foreach(var (name, key) in PrismRules.TabToKey) {
+            Assert(enBlock.GetProperty(key).GetString() == name, $"{key}: en-US value is the English name Quartz registers");
+            string korean = koBlock.GetProperty(key).GetString();
+            Assert(PrismRules.Translate(PrismRules.TabPrefix + name, (k, d) => koBlock.GetProperty(k).GetString()) == PrismRules.TabPrefix + korean,
+                $"{key}: the tab \"Quartz · {name}\" shows as \"Quartz · {korean}\" in ko-KR");
+        }
+        Assert(PrismRules.Translate("Sapphire · log", (k, d) => k) == null && PrismRules.Translate("log", (k, d) => k) == null,
+            "only Quartz's own tabs are answered, not another mod's or a bare word");
         Assert(PrismRules.Translate("Menu hotkey", (k, d) => k) == "PRISM_MENU_HOTKEY" && PrismRules.Translate("Undo", (k, d) => k) == null,
             "known English maps to its key; anything else is not ours");
     }
