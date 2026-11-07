@@ -3,6 +3,7 @@ using Facet;
 using Quartz.Core;
 using Quartz.Features;
 using Quartz.UI.Nav;
+using Quartz.UI.Search;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi;
 /// <summary>
@@ -28,7 +29,7 @@ internal static partial class QuartzShell {
     /// <summary>Something the rail or pages show changed that NavRegistry.Version does not count: the open page rebuilds.</summary>
     internal static void Changed() => changes++;
 
-    /// <summary>A Lang key, when English has it; else the title as given (an addon's, or a feature whose keys unloaded with it).</summary>
+    /// <summary>A Lang key, when English has it; else the title as given (an addon page's, which has no key).</summary>
     internal static string Label(string localeKey, string title) =>
         MainCore.Tr.HasKeyForLanguage(localeKey, "en-US") ? localeKey : title;
 
@@ -58,13 +59,39 @@ internal static partial class QuartzShell {
         Nav = new Facet.Nav(Window.Body, groups.Select(g => NavItem.Heading(null, [.. g])), RailWidth);
         Nav.OnInsetChanged = Window.SetContentInset;
         Window.SetContentInset(RailWidth + 7f);   // the Nav reported its inset before anyone listened
+        Nav.AddSearchSource(ClassicRows);
     }
 
     private static NavItem CategoryItem(NavCategory c) => new(Label(c.LocaleKey, c.Title), p => BuildCategory(p, c)) {
         VisibleWhen = () => c.IsVisible && NavRegistry.PagesIn(c.Key).Count > 0,
         // Both only grow, so their sum moves whenever either does.
         Revision = static () => NavRegistry.Version + changes,
+        // A category without tabs is its one page, which can change under it: asked when the hit lands.
+        OnHit = h => {
+            IReadOnlyList<NavPage> pages = NavRegistry.PagesIn(c.Key);
+            if(!NavRegistry.ShowsSubmenu(c) && pages.Count > 0) ClassicHit(pages[0])?.Invoke(h);
+        },
     };
+
+    private static bool IsClassic(NavPage page) => !Moved.ContainsKey(page.Key) && !FeaturePages.IsStub(page);
+
+    // A search result on a page still in the classic menu goes on to that menu; a moved or off page is the destination.
+    private static Action<SearchIndex.Hit> ClassicHit(NavPage page) => IsClassic(page) ? _ => OpenClassic(page.State) : null;
+
+    // The classic pages' rows, each jumping to its page in the classic menu. Asked whenever the index builds.
+    private static IEnumerable<SearchIndex.Entry> ClassicRows() {
+        foreach(var (key, english, state) in SettingsSearch.Rows()) {
+            NavPage page = NavRegistry.ByState(state);
+            // A row naming its own page is the page's title, which its header already indexes.
+            if(page == null || !IsClassic(page) || key == page.LocaleKey) continue;
+            yield return new SearchIndex.Entry {
+                Label = Label(key, english),
+                Where = Label(page.LocaleKey, page.Title),
+                Tip = english,   // an English query still finds the row in another language
+                Open = () => OpenClassic(state),
+            };
+        }
+    }
 
     private static void BuildCategory(VisualElement p, NavCategory c) {
         IReadOnlyList<NavPage> pages = NavRegistry.PagesIn(c.Key);
@@ -77,7 +104,10 @@ internal static partial class QuartzShell {
         int tab = going != null
             ? ShellModel.TabIndex(keyed, going.Key, FeaturePages.FeatureOf(going))
             : ShellModel.TabIndex(keyed, CurrentPage, currentFeature);
-        Tabs row = Tabs.Pages(p, pages.Select(pg => new NavItem(Label(pg.LocaleKey, pg.Title), b => BuildPage(b, pg)) { VisibleWhen = pg.Visible }).ToList(), tab);
+        Tabs row = Tabs.Pages(p, pages.Select(pg => new NavItem(Label(pg.LocaleKey, pg.Title), b => BuildPage(b, pg)) {
+            VisibleWhen = pg.Visible,
+            OnHit = ClassicHit(pg),
+        }).ToList(), tab);
         if(p.panel != null) TabRow = row;
     }
 
@@ -116,6 +146,7 @@ internal static partial class QuartzShell {
     private static void Classic(VisualElement p, NavPage page) {
         string feature = FeaturePages.FeatureOf(page);
         Controls.PageHeader(p, Label(page.LocaleKey, page.Title), feature == null ? null : FeatureSwitch(feature), o => o.Id = "menu-header");
+        if(p.panel == null) return;   // the search index's throwaway build: the card is the same on every classic page
         Controls.Action(Controls.Card(p, null), "MENU_CLASSIC_PAGE", "MENU_CLASSIC_OPEN", () => OpenClassic(page.State), o => o.Id = "menu-classic");
     }
 }

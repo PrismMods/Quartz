@@ -20,6 +20,7 @@ internal static class SettingsSearch {
     private sealed class Entry {
         public int State;
         public string Text;
+        public string Key;
         public string English;
         public string Section;
         public string SectionEnglish;
@@ -268,6 +269,24 @@ internal static class SettingsSearch {
         }
         return [.. list];
     }
+    private static List<(string Key, string English, int State)> cachedRows;
+    private static int cachedRowsVersion = -1;
+    /// <summary>
+    /// The rows of the classic pages (their page entries left out) as Lang key, English and page state, for the new menu's
+    /// search. Builds every classic page not built yet; the rows are kept until NavRegistry.Version moves, since a Lang key
+    /// does not depend on the language and a page state stays valid until then.
+    /// </summary>
+    // ponytail: classic content that changes without a Version bump goes stale, the same limit the Nav index has.
+    internal static List<(string Key, string English, int State)> Rows() {
+        int version = Quartz.UI.Nav.NavRegistry.Version;
+        if(cachedRowsVersion != version || cachedRows == null) {
+            var clock = System.Diagnostics.Stopwatch.StartNew();
+            cachedRows = [.. BuildIndex().Where(e => !e.IsPage).Select(e => (e.Key, e.English ?? e.Text, e.State))];
+            cachedRowsVersion = version;
+            MainCore.Log.Msg($"[perf] classic rows for the new menu's search: {cachedRows.Count} rows built in {clock.ElapsedMilliseconds} ms");
+        }
+        return cachedRows;
+    }
     private static List<Entry> BuildIndex() {
         Quartz.UI.Factory.PageFactory.EnsureAllBuilt();
         List<Entry> list = [];
@@ -297,12 +316,13 @@ internal static class SettingsSearch {
             if(name.StartsWith("Section_")) {
                 Transform header = child.Find("Header/Bar/Label");
                 TMP_Text headerLabel = header != null ? header.GetComponent<TMP_Text>() : null;
-                TextLocalization headerLoc = header != null ? header.GetComponent<TextLocalization>() : null;
+                TextLocalization headerLoc = header != null ? LastLocalization(header) : null;
                 string title = headerLabel != null ? headerLabel.text : name["Section_".Length..];
                 string titleEnglish = headerLoc != null ? headerLoc.Default : null;
                 list.Add(new Entry {
                     State = state,
                     Text = title,
+                    Key = headerLoc != null ? headerLoc.Key : null,
                     English = titleEnglish,
                     Section = section,
                     SectionEnglish = sectionEnglish,
@@ -315,7 +335,7 @@ internal static class SettingsSearch {
             }
             // Any localized label, whatever the control named it (ColorLabel, BindLabel…); long ones are hints, not settings,
             // and an input's placeholder ("Name") names nothing.
-            if(child.TryGetComponent(out TMP_Text tmp) && child.TryGetComponent(out TextLocalization loc) && !IsPlaceholder(child, tmp)) {
+            if(child.TryGetComponent(out TMP_Text tmp) && LastLocalization(child) is TextLocalization loc && !IsPlaceholder(child, tmp)) {
                 string text = tmp.text;
                 if(!string.IsNullOrWhiteSpace(text) && text.Length <= MAX_LABEL_LENGTH) {
                     RectTransform target = RowTarget(child, state);
@@ -323,6 +343,7 @@ internal static class SettingsSearch {
                         list.Add(new Entry {
                             State = state,
                             Text = text,
+                            Key = loc.Key,
                             English = loc.Default,
                             Section = section,
                             SectionEnglish = sectionEnglish,
@@ -334,6 +355,11 @@ internal static class SettingsSearch {
             }
             Walk(child, state, section, sectionEnglish, list);
         }
+    }
+    // A page built and walked in one frame can still hold a TextLocalization Init is about to destroy; Init keeps the last.
+    private static TextLocalization LastLocalization(Transform t) {
+        TextLocalization[] all = t.GetComponents<TextLocalization>();
+        return all.Length > 0 ? all[^1] : null;
     }
     private static bool IsPlaceholder(Transform label, TMP_Text tmp) =>
         label.parent != null && label.parent.TryGetComponent(out TMP_InputField field) && ReferenceEquals(field.placeholder, tmp);

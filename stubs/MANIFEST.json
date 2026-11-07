@@ -2006,6 +2006,8 @@
           "System.Single Facet.Nav::MaxRail",
           "System.Single Facet.Nav::MinRail",
           "System.Void Facet.Nav::.ctor(UnityEngine.UIElements.VisualElement,System.Collections.Generic.IEnumerable\u00601\u003CFacet.NavItem\u003E,System.Single)",
+          "System.Void Facet.Nav::AddSearchSource(System.Func\u00601\u003CSystem.Collections.Generic.IEnumerable\u00601\u003CFacet.SearchIndex/Entry\u003E\u003E)",
+          "System.Void Facet.Nav::Filter(System.String)",
           "System.Void Facet.Nav::Go(Facet.NavItem)",
           "System.Void Facet.Nav::Tick()"
         ]
@@ -2014,6 +2016,7 @@
         "type": "Facet.NavItem",
         "members": [
           "Facet.NavItem Facet.NavItem::Heading(System.String,Facet.NavItem[])",
+          "System.Action\u00601\u003CFacet.SearchIndex/Hit\u003E Facet.NavItem::OnHit",
           "System.Func\u00601\u003CSystem.Boolean\u003E Facet.NavItem::VisibleWhen",
           "System.Func\u00601\u003CSystem.Int32\u003E Facet.NavItem::Revision",
           "System.Void Facet.NavItem::.ctor(System.String,System.Action\u00601\u003CUnityEngine.UIElements.VisualElement\u003E)"
@@ -2055,6 +2058,24 @@
           "Facet.Role Facet.Role::TitleBar",
           "System.Int32 Facet.Role::value__"
         ]
+      },
+      {
+        "type": "Facet.SearchIndex",
+        "members": []
+      },
+      {
+        "type": "Facet.SearchIndex/Entry",
+        "members": [
+          "System.Action Facet.SearchIndex/Entry::Open",
+          "System.String Facet.SearchIndex/Entry::Label",
+          "System.String Facet.SearchIndex/Entry::Tip",
+          "System.String Facet.SearchIndex/Entry::Where",
+          "System.Void Facet.SearchIndex/Entry::.ctor()"
+        ]
+      },
+      {
+        "type": "Facet.SearchIndex/Hit",
+        "members": []
       },
       {
         "type": "Facet.SliderOptions",
@@ -2126,6 +2147,7 @@
           "System.Single Facet.Window::Scale()",
           "System.Void Facet.Window::.ctor(UnityEngine.UIElements.VisualElement,System.String,System.String,UnityEngine.Rect)",
           "System.Void Facet.Window::SetContentInset(System.Single)",
+          "System.Void Facet.Window::ShowSearch(System.String,System.Action\u00601\u003CSystem.String\u003E)",
           "System.Void Facet.Window::set_Rect(UnityEngine.Rect)",
           "System.Void Facet.Window::set_Scale(System.Single)",
           "UnityEngine.Rect Facet.Window::Rect()",

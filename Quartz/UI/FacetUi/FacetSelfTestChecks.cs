@@ -24,6 +24,7 @@ internal static partial class FacetSelfTestChecks {
             yield return Shell(check, info);   // first: its open is the new menu's first of the session
             yield return EffectRemoverWindow(check, info);
             yield return SwitchHandOff(check);
+            yield return ShellSearch(check);
             yield return Escape(check);
             yield return TextFocus(check);
             yield return Block(check);

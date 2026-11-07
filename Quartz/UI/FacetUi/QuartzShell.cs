@@ -44,6 +44,8 @@ internal static partial class QuartzShell {
             logo.style.backgroundImage = new StyleBackground(MainCore.Spr.Get(UISprite.QuartzLogo));
             Window.TitleBarLeft.Insert(0, logo);
             BuildNav();
+            // The first query builds every classic page for its rows, as the classic menu's own search does.
+            Window.ShowSearch("SEARCH", q => Nav.Filter(q));
             s.Hidden += Hidden;
             Surface = s;
         } catch {

@@ -84,11 +84,14 @@ namespace Facet {
         public const float MinRail = 3f;
         public global::System.Action<float> OnInsetChanged;
         public Nav(global::UnityEngine.UIElements.VisualElement parent, global::System.Collections.Generic.IEnumerable<global::Facet.NavItem> items, float railWidth = default) => throw null;
+        public void AddSearchSource(global::System.Func<global::System.Collections.Generic.IEnumerable<global::Facet.SearchIndex.Entry>> source) => throw null;
+        public void Filter(string query) => throw null;
         public void Go(global::Facet.NavItem target) => throw null;
         public void Tick() => throw null;
         private Nav() { }
     }
     public sealed unsafe partial class NavItem {
+        public global::System.Action<global::Facet.SearchIndex.Hit> OnHit;
         public global::System.Func<int> Revision;
         public global::System.Func<bool> VisibleWhen;
         public NavItem(string title, global::System.Action<global::UnityEngine.UIElements.VisualElement> build = default) => throw null;
@@ -120,6 +123,19 @@ namespace Facet {
         Rail = 12,
         Line = 13,
         Off = 14,
+    }
+    public sealed unsafe partial class SearchIndex {
+        private SearchIndex() { }
+        public sealed unsafe partial class Hit {
+            private Hit() { }
+        }
+        public sealed unsafe partial class Entry {
+            public string Label;
+            public global::System.Action Open;
+            public string Tip;
+            public string Where;
+            public Entry() => throw null;
+        }
     }
     public unsafe partial class SliderOptions : global::Facet.Options<float> {
         public string Format { get => throw null; set { } }
@@ -167,6 +183,7 @@ namespace Facet {
         public global::UnityEngine.UIElements.VisualElement TitleBarLeft { get => throw null; }
         public Window(global::UnityEngine.UIElements.VisualElement parent, string id, string title, global::UnityEngine.Rect initial) => throw null;
         public void SetContentInset(float inset) => throw null;
+        public void ShowSearch(string placeholder, global::System.Action<string> onChange) => throw null;
         private Window() { }
     }
 }
