@@ -86,14 +86,12 @@ public static class JudgementOverlay {
         root = rowObj.AddComponent<RectTransform>();
         if(compact) BuildCompactRow(rowObj);
         else BuildMultiLabelRow(rowObj);
-        dragObj = ReorganizeHandle.CreateDragSurface(root, () => MainCore.Tr.Get("JUDGEMENT", "Judgement"), Save, ignoreLayout: true);
+        dragObj = ReorganizeHandle.CreateDragSurface(root, () => MainCore.Tr.Get("JUDGEMENT", "Judgement"), Moved, ignoreLayout: true);
+        ReorganizeHandle.SetLayoutTarget(dragObj, LayoutIds.Judgement);
         ReorganizeHandle.SetAnchorSource(dragObj, () => Conf.AnchorClosest, a => {
             OverlayAnchors.Rebase(root, () => { Conf.Anchor = (int)a; Apply(); });
-            Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
-            Conf.OffsetX = stored.x;
-            Conf.OffsetY = stored.y - BottomMargin;
-            Save();
-        });
+            Moved();
+        }, v => { Conf.AnchorClosest = v; Save(); });
         ReorganizeHandle.SetSizeSource(
             dragObj,
             () => Conf.Size,
@@ -203,6 +201,17 @@ public static class JudgementOverlay {
         return text;
     }
     public static void Save() => ConfMgr?.RequestSave();
+    // A move lands on the RectTransform (a drag, an undo, the shared editor), in or out of arranging: keep it before saving.
+    private static void Moved() {
+        CapturePosition();
+        Save();
+    }
+    private static void CapturePosition() {
+        if(root == null) return;
+        Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
+        Conf.OffsetX = stored.x;
+        Conf.OffsetY = stored.y - BottomMargin;
+    }
     public static void ResetPosition() {
         JudgementSettings def = new();
         OverlayAnchor anchor = OverlayAnchors.Parse(Conf.Anchor);
@@ -256,11 +265,7 @@ public static class JudgementOverlay {
             if(dragObj != null && dragObj.activeSelf != isReorganizing) dragObj.SetActive(isReorganizing);
             if(!show) return;
             // Arranging copies the RectTransform into Conf every frame: a shared-editor SetBox must move the RectTransform (or this capture skip shared sessions), or it is overwritten.
-            if(arranging) {
-                Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
-                Conf.OffsetX = stored.x;
-                Conf.OffsetY = stored.y - BottomMargin;
-            }
+            if(arranging) CapturePosition();
             TMP_FontAsset font = FontManager.For(FontKey);
             float fontSize = FontSize();
             if(compact) UpdateCompact(font, fontSize);

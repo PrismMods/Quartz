@@ -122,6 +122,7 @@ List<(string Name, Action Run)> tests = [
     ("KeyViewer editor held nudges coalesce into one undo step", KvHistoryTests.TestHeldNudgeCoalescesToOneStep),
     ("KeyViewer editor presses that change nothing do not eat undo", KvHistoryTests.TestNoOpPressesDoNotEatUndo),
     ("Undo timeline interleaves steps and skips dead ones", UndoTimelineTests.TestInterleavedStepsUndoInOrderAndSkipDead),
+    ("Layout ids list the fixed elements in order, then panels by number", LayoutIdsTests.TestOrderListsFixedIdsThenPanelsByIndex),
     ("Search words land across label, section, and page", SearchMatcherTests.TestWordsLandAcrossLabelSectionAndPage),
     ("Search tolerates typos only when nothing exact matches", SearchMatcherTests.TestTyposOnlyWhenNothingExactMatches),
     ("Search reads tooltips as a last resort", SearchMatcherTests.TestTooltipWordsAreALastResort),

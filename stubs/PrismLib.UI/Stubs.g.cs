@@ -34,6 +34,26 @@ namespace PrismLib.UI.Toolkit {
         public string Path;
         public DebugTab() => throw null;
     }
+    public sealed unsafe partial class EditTarget {
+        public global::System.Func<int> GetAnchor;
+        public global::System.Func<bool> GetAnchorClosest;
+        public global::System.Func<float[]> GetBox;
+        public global::System.Func<float[]> GetCrop;
+        public global::System.Func<float> GetRotation;
+        public global::System.Func<float> GetScale;
+        public string Id;
+        public string Label;
+        public float MaxScale;
+        public float MinScale;
+        public global::System.Action<float, float> MoveTo;
+        public string Owner;
+        public global::System.Action<int> SetAnchor;
+        public global::System.Action<bool> SetAnchorClosest;
+        public global::System.Action<float[]> SetCrop;
+        public global::System.Action<float> SetRotation;
+        public global::System.Action<float> SetScale;
+        public EditTarget() => throw null;
+    }
     public static unsafe partial class FontFix {
         public static void EnsureInstalled(string owner, global::System.Action<global::System.Reflection.MethodBase, global::System.Reflection.MethodInfo, string> patch) => throw null;
         public static void Uninstalled(string owner) => throw null;
@@ -54,6 +74,15 @@ namespace PrismLib.UI.Toolkit {
         public static void Exempt(global::System.Action reads) => throw null;
         public static global::System.Reflection.MethodInfo RedirectFor(global::System.Reflection.MethodBase called) => throw null;
         public static void Uninstalled(string owner) => throw null;
+    }
+    public sealed unsafe partial class LayoutEditor : global::System.IDisposable {
+        public bool Visible { get => throw null; set { } }
+        public LayoutEditor(global::System.Func<global::System.Collections.Generic.IEnumerable<global::PrismLib.UI.Toolkit.EditTarget>> source, global::UnityEngine.TextCore.Text.FontAsset font = default) => throw null;
+        public void Dispose() => throw null;
+        public void Reload() => throw null;
+        public void Tick() => throw null;
+        private LayoutEditor() { }
+        void global::System.IDisposable.Dispose() => throw null;
     }
     public static unsafe partial class MacKeys {
         public static bool Down(global::UnityEngine.KeyCode key) => throw null;

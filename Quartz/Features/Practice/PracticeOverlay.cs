@@ -62,7 +62,8 @@ public static class PracticeOverlay {
         TextCompat.NoWrap(text);
         text.text = "";
         dragObj = ReorganizeHandle.CreateDragSurface(root,
-            () => MainCore.Tr.Get("SECTION_PRACTICE_DIFFICULTY", "Practice Difficulty"), PracticeDifficulty.Save);
+            () => MainCore.Tr.Get("SECTION_PRACTICE_DIFFICULTY", "Practice Difficulty"), Moved);
+        ReorganizeHandle.SetLayoutTarget(dragObj, LayoutIds.Practice);
         ReorganizeHandle.SetSizeSource(
             dragObj,
             () => Conf.FontSize,
@@ -85,6 +86,17 @@ public static class PracticeOverlay {
         text.font = FontManager.For(FontKey);
         text.fontSize = Mathf.Clamp(Conf.FontSize, 4f, 200f);
         text.color = Conf.GetColor();
+    }
+    // A move lands on the RectTransform (a drag, an undo, the shared editor), in or out of arranging: keep it before saving.
+    private static void Moved() {
+        CapturePosition();
+        PracticeDifficulty.Save();
+    }
+    private static void CapturePosition() {
+        if(root == null) return;
+        Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
+        Conf.OffsetX = stored.x;
+        Conf.OffsetY = stored.y;
     }
     public static void ResetPosition() {
         PracticeSettings def = new();
@@ -141,11 +153,7 @@ public static class PracticeOverlay {
             if(dragObj != null && dragObj.activeSelf != isReorganizing) dragObj.SetActive(isReorganizing);
             if(!show) return;
             // Arranging copies the RectTransform into Conf every frame: a shared-editor SetBox must move the RectTransform (or this capture skip shared sessions), or it is overwritten.
-            if(arranging) {
-                Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
-                Conf.OffsetX = stored.x;
-                Conf.OffsetY = stored.y;
-            }
+            if(arranging) CapturePosition();
             TMP_FontAsset font = FontManager.For(FontKey);
             if(text.font != font) text.font = font;
             int difficulty = PracticeDifficulty.CurrentDifficulty;

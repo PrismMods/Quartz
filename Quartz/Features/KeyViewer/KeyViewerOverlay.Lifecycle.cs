@@ -176,9 +176,11 @@ public static partial class KeyViewerOverlay {
         }
     }
     internal static OverlayAnchor Anchor => OverlayAnchors.Parse(Conf.DmAnchor);
-    // Re-anchors hand and foot together without moving either on screen.
+    // Re-anchors hand and foot together without moving either on screen. A foot with no keys is not built: its inactive
+    // root gives no real spot to keep, so it is reseeded beside the hand once foot keys appear instead.
     private static void RebaseAnchor(OverlayAnchor anchor) {
-        Vector3 footBefore = footRoot != null ? footRoot.TransformPoint(footRoot.rect.center) : Vector3.zero;
+        RectTransform foot = footBuilt ? footRoot : null;
+        Vector3 footBefore = foot != null ? foot.TransformPoint(foot.rect.center) : Vector3.zero;
         OverlayAnchors.Rebase(root, () => {
             Conf.DmAnchor = (int)anchor;
             OverlayAnchors.Pin(root, anchor);
@@ -187,14 +189,35 @@ public static partial class KeyViewerOverlay {
         Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
         Conf.DmOffsetX = stored.x;
         Conf.DmOffsetY = stored.y;
-        if(footRoot != null) {
-            footRoot.position += footBefore - footRoot.TransformPoint(footRoot.rect.center);
+        if(foot != null) {
+            foot.position += footBefore - foot.TransformPoint(foot.rect.center);
+            Vector2 storedFoot = OverlayCalibration.Unscale(foot.anchoredPosition);
+            Conf.DmFootOffsetX = storedFoot.x - stored.x;
+            Conf.DmFootOffsetY = storedFoot.y - stored.y;
+        } else Conf.DmFootPlaced = false;
+        handAnchoredPrev = root.anchoredPosition;
+        Save();
+    }
+    // A move lands on the RectTransform (a drag, an undo, the shared editor), in or out of arranging and with or without
+    // focus: keep it before saving. Hand and foot handles both come here.
+    private static void Moved() {
+        CapturePosition();
+        Save();
+    }
+    // The foot follows the hand's move and keeps its own offset from it; an unbuilt foot keeps its settings untouched.
+    private static void CapturePosition() {
+        if(root == null) return;
+        Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
+        Conf.DmOffsetX = stored.x;
+        Conf.DmOffsetY = stored.y;
+        if(footBuilt && footRoot != null) {
+            Vector2 handDelta = root.anchoredPosition - handAnchoredPrev;
+            if(handDelta != Vector2.zero) footRoot.anchoredPosition += handDelta;
             Vector2 storedFoot = OverlayCalibration.Unscale(footRoot.anchoredPosition);
             Conf.DmFootOffsetX = storedFoot.x - stored.x;
             Conf.DmFootOffsetY = storedFoot.y - stored.y;
         }
         handAnchoredPrev = root.anchoredPosition;
-        Save();
     }
     public static void SetAnchor(OverlayAnchor anchor) {
         Conf.DmAnchor = (int)anchor;

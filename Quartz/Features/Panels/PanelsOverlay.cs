@@ -239,7 +239,11 @@ public static partial class PanelsOverlay {
     }
     private static void BuildPanels() {
         List<PanelConfig> configs = Conf.Panels;
-        for(int i = 0; i < configs.Count; i++) panels.Add(CreatePanel(configs[i]));
+        for(int i = 0; i < configs.Count; i++) {
+            LivePanel panel = CreatePanel(configs[i]);
+            ReorganizeHandle.SetLayoutTarget(panel.DragObj, LayoutIds.Panel(i), owner: configs[i]); // steps follow the panel, not its place
+            panels.Add(panel);
+        }
         for(int i = configs.Count - 1; i >= 0; i--) panels[i].Rect.SetAsLastSibling();
     }
     public static void Apply() {
@@ -262,11 +266,18 @@ public static partial class PanelsOverlay {
                 p.Config.GetTextShadowColor()
             );
             p.Dirty = true;
+            if(p.Rect != null && !string.IsNullOrEmpty(p.Text.text)) Fit(p);
         }
         if(p.Background != null) {
             p.Background.enabled = p.Config.BackgroundEnabled;
             p.Background.color = p.Config.GetBackgroundColor();
         }
+    }
+    // Sized now, not on the next update: a move in the same frame (an undo putting size and place back) measures the new box.
+    private static void Fit(LivePanel p) {
+        Vector2 pref = p.Text.GetPreferredValues();
+        Vector2 size = new(pref.x + PadX * 2f, pref.y + PadY * 2f);
+        if(p.Rect.sizeDelta != size) p.Rect.sizeDelta = size;
     }
     public static void ResetPosition(PanelConfig config) {
         Vector2 def = PanelConfig.DefaultOffset((PanelAnchor)config.Anchor);
@@ -301,17 +312,21 @@ public static partial class PanelsOverlay {
         bg.type = Image.Type.Sliced;
         bg.color = config.GetBackgroundColor();
         bg.raycastTarget = false;
-        GameObject drag = ReorganizeHandle.CreateDragSurface(rect, () => config.Name, Save);
+        // A move lands on the RectTransform (a drag, an undo, the shared editor), in or out of arranging: keep it before saving.
+        void Moved() {
+            Vector2 stored = OverlayCalibration.Unscale(rect.anchoredPosition);
+            config.PosX = stored.x;
+            config.PosY = stored.y;
+            Save();
+        }
+        GameObject drag = ReorganizeHandle.CreateDragSurface(rect, () => config.Name, Moved);
         ReorganizeHandle.SetAnchorSource(drag, () => config.AnchorClosest, a => {
             OverlayAnchors.Rebase(rect, () => {
                 config.Anchor = (int)a;
                 OverlayAnchors.Pin(rect, a);
             });
-            Vector2 stored = OverlayCalibration.Unscale(rect.anchoredPosition);
-            config.PosX = stored.x;
-            config.PosY = stored.y;
-            Save();
-        });
+            Moved();
+        }, v => { config.AnchorClosest = v; Save(); });
         ReorganizeHandle.SetSizeSource(
             drag,
             () => config.FontSize,

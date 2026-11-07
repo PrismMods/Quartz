@@ -165,6 +165,7 @@ public static class CalibrationPopupUI {
             () => MainCore.Tr.Get("SECTION_CALIBRATION", "Calibration"),
             CaptureOffset
         );
+        ReorganizeHandle.SetLayoutTarget(dragObj, LayoutIds.Calibration);
         ApplyTheme();
         panelObj.SetActive(false);
     }

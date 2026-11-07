@@ -2439,7 +2439,37 @@
       {
         "type": "PrismLib.Layout",
         "members": [
-          "System.Void PrismLib.Layout::Unregister(System.String)"
+          "System.Action PrismLib.Layout::Changed",
+          "System.Action PrismLib.Layout::OpenRequested",
+          "System.Collections.Generic.IEnumerable\u00601\u003CSystem.Collections.Generic.KeyValuePair\u00602\u003CSystem.String,PrismLib.LayoutTarget\u003E\u003E PrismLib.Layout::All()",
+          "System.Void PrismLib.Layout::RequestOpen()",
+          "System.Void PrismLib.Layout::Unregister(System.String)",
+          "System.Void PrismLib.Layout::add_Changed(System.Action)",
+          "System.Void PrismLib.Layout::add_OpenRequested(System.Action)",
+          "System.Void PrismLib.Layout::remove_Changed(System.Action)",
+          "System.Void PrismLib.Layout::remove_OpenRequested(System.Action)"
+        ]
+      },
+      {
+        "type": "PrismLib.LayoutTarget",
+        "members": [
+          "System.Action\u00601\u003CSystem.Boolean\u003E PrismLib.LayoutTarget::SetAnchorClosest",
+          "System.Action\u00601\u003CSystem.Int32\u003E PrismLib.LayoutTarget::SetAnchor",
+          "System.Action\u00601\u003CSystem.Single\u003E PrismLib.LayoutTarget::SetRotation",
+          "System.Action\u00601\u003CSystem.Single\u003E PrismLib.LayoutTarget::SetScale",
+          "System.Action\u00601\u003CSystem.Single[]\u003E PrismLib.LayoutTarget::SetCrop",
+          "System.Action\u00602\u003CSystem.Single,System.Single\u003E PrismLib.LayoutTarget::MoveTo",
+          "System.Func\u00601\u003CSystem.Boolean\u003E PrismLib.LayoutTarget::GetAnchorClosest",
+          "System.Func\u00601\u003CSystem.Int32\u003E PrismLib.LayoutTarget::GetAnchor",
+          "System.Func\u00601\u003CSystem.Single\u003E PrismLib.LayoutTarget::GetRotation",
+          "System.Func\u00601\u003CSystem.Single\u003E PrismLib.LayoutTarget::GetScale",
+          "System.Func\u00601\u003CSystem.Single[]\u003E PrismLib.LayoutTarget::GetBox",
+          "System.Func\u00601\u003CSystem.Single[]\u003E PrismLib.LayoutTarget::GetCrop",
+          "System.Single PrismLib.LayoutTarget::MaxScale",
+          "System.Single PrismLib.LayoutTarget::MinScale",
+          "System.String PrismLib.LayoutTarget::Id",
+          "System.String PrismLib.LayoutTarget::Label",
+          "System.Void PrismLib.LayoutTarget::.ctor()"
         ]
       },
       {
@@ -2459,6 +2489,8 @@
           "PrismLib.KeyBinding PrismLib.ModHandle::BindKey(System.String,System.Int32,PrismLib.KeyMods,System.String)",
           "System.Void PrismLib.ModHandle::AddFields(System.String,System.Func\u00601\u003CSystem.Collections.Generic.IEnumerable\u00601\u003CSystem.Collections.Generic.KeyValuePair\u00602\u003CSystem.String,System.String\u003E\u003E\u003E)",
           "System.Void PrismLib.ModHandle::AddLog(System.String,System.Func\u00601\u003CSystem.Collections.Generic.IEnumerable\u00601\u003CSystem.String\u003E\u003E,System.String,System.Action)",
+          "System.Void PrismLib.ModHandle::DescribeLayout(System.Collections.Generic.IEnumerable\u00601\u003CPrismLib.LayoutTarget\u003E)",
+          "System.Void PrismLib.ModHandle::DescribeSettings(System.Collections.Generic.IEnumerable\u00601\u003CPrismLib.SettingEntry\u003E)",
           "System.Void PrismLib.ModHandle::ReportPointerOverUi(System.Func\u00601\u003CSystem.Boolean\u003E)"
         ]
       },
@@ -2485,12 +2517,16 @@
           "System.Double PrismLib.SettingEntry::Max",
           "System.Double PrismLib.SettingEntry::Min",
           "System.Func\u00601\u003CSystem.Object\u003E PrismLib.SettingEntry::Get",
+          "System.Int32 PrismLib.SettingEntry::Order",
           "System.String PrismLib.SettingEntry::ActionLabel",
           "System.String PrismLib.SettingEntry::Group",
+          "System.String PrismLib.SettingEntry::Id",
           "System.String PrismLib.SettingEntry::Label",
           "System.String PrismLib.SettingEntry::Page",
           "System.String PrismLib.SettingEntry::Tooltip",
-          "System.String[] PrismLib.SettingEntry::Options"
+          "System.String[] PrismLib.SettingEntry::Keywords",
+          "System.String[] PrismLib.SettingEntry::Options",
+          "System.Void PrismLib.SettingEntry::.ctor()"
         ]
       },
       {
@@ -2566,6 +2602,29 @@
         ]
       },
       {
+        "type": "PrismLib.UI.Toolkit.EditTarget",
+        "members": [
+          "System.Action\u00601\u003CSystem.Boolean\u003E PrismLib.UI.Toolkit.EditTarget::SetAnchorClosest",
+          "System.Action\u00601\u003CSystem.Int32\u003E PrismLib.UI.Toolkit.EditTarget::SetAnchor",
+          "System.Action\u00601\u003CSystem.Single\u003E PrismLib.UI.Toolkit.EditTarget::SetRotation",
+          "System.Action\u00601\u003CSystem.Single\u003E PrismLib.UI.Toolkit.EditTarget::SetScale",
+          "System.Action\u00601\u003CSystem.Single[]\u003E PrismLib.UI.Toolkit.EditTarget::SetCrop",
+          "System.Action\u00602\u003CSystem.Single,System.Single\u003E PrismLib.UI.Toolkit.EditTarget::MoveTo",
+          "System.Func\u00601\u003CSystem.Boolean\u003E PrismLib.UI.Toolkit.EditTarget::GetAnchorClosest",
+          "System.Func\u00601\u003CSystem.Int32\u003E PrismLib.UI.Toolkit.EditTarget::GetAnchor",
+          "System.Func\u00601\u003CSystem.Single\u003E PrismLib.UI.Toolkit.EditTarget::GetRotation",
+          "System.Func\u00601\u003CSystem.Single\u003E PrismLib.UI.Toolkit.EditTarget::GetScale",
+          "System.Func\u00601\u003CSystem.Single[]\u003E PrismLib.UI.Toolkit.EditTarget::GetBox",
+          "System.Func\u00601\u003CSystem.Single[]\u003E PrismLib.UI.Toolkit.EditTarget::GetCrop",
+          "System.Single PrismLib.UI.Toolkit.EditTarget::MaxScale",
+          "System.Single PrismLib.UI.Toolkit.EditTarget::MinScale",
+          "System.String PrismLib.UI.Toolkit.EditTarget::Id",
+          "System.String PrismLib.UI.Toolkit.EditTarget::Label",
+          "System.String PrismLib.UI.Toolkit.EditTarget::Owner",
+          "System.Void PrismLib.UI.Toolkit.EditTarget::.ctor()"
+        ]
+      },
+      {
         "type": "PrismLib.UI.Toolkit.FontFix",
         "members": [
           "System.Void PrismLib.UI.Toolkit.FontFix::EnsureInstalled(System.String,System.Action\u00603\u003CSystem.Reflection.MethodBase,System.Reflection.MethodInfo,System.String\u003E)",
@@ -2596,6 +2655,18 @@
           "System.Void PrismLib.UI.Toolkit.InputGate::EnsureInstalled(System.String,System.Action\u00603\u003CSystem.Reflection.MethodBase,System.Reflection.MethodInfo,System.String\u003E)",
           "System.Void PrismLib.UI.Toolkit.InputGate::Exempt(System.Action)",
           "System.Void PrismLib.UI.Toolkit.InputGate::Uninstalled(System.String)"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.LayoutEditor",
+        "members": [
+          "System.Boolean PrismLib.UI.Toolkit.LayoutEditor::Visible()",
+          "System.Boolean PrismLib.UI.Toolkit.LayoutEditor::get_Visible()",
+          "System.Void PrismLib.UI.Toolkit.LayoutEditor::.ctor(System.Func\u00601\u003CSystem.Collections.Generic.IEnumerable\u00601\u003CPrismLib.UI.Toolkit.EditTarget\u003E\u003E,UnityEngine.TextCore.Text.FontAsset)",
+          "System.Void PrismLib.UI.Toolkit.LayoutEditor::Dispose()",
+          "System.Void PrismLib.UI.Toolkit.LayoutEditor::Reload()",
+          "System.Void PrismLib.UI.Toolkit.LayoutEditor::Tick()",
+          "System.Void PrismLib.UI.Toolkit.LayoutEditor::set_Visible(System.Boolean)"
         ]
       },
       {
@@ -2684,7 +2755,8 @@
       {
         "type": "PrismLib.UI.Toolkit.Words",
         "members": [
-          "System.Func\u00601\u003CSystem.String\u003E PrismLib.UI.Toolkit.Words::Language"
+          "System.Func\u00601\u003CSystem.String\u003E PrismLib.UI.Toolkit.Words::Language",
+          "System.Void PrismLib.UI.Toolkit.Words::AddTranslator(System.Func\u00602\u003CSystem.String,System.String\u003E)"
         ]
       }
     ]

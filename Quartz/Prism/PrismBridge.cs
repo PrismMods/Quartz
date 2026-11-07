@@ -15,7 +15,7 @@ namespace Quartz.Prism;
 /// outside Quartz/Prism names one: the CLR resolves field types when a class loads and a method's types
 /// when it is JITted, before any try can catch. PrismLib's tools/check-bridge.sh pins this.
 /// </summary>
-internal static class PrismBridge {
+internal static partial class PrismBridge {
     internal const string Id = "Quartz";
 #if QUARTZ_UMM
     internal const string Loader = "UMM";
@@ -63,6 +63,7 @@ internal static class PrismBridge {
             try { UiWiringImpl(); } catch(Exception e) { UiOff(e); }
             if(Available) {
                 try { ClaimDebugImpl(); } catch(Exception e) { MainCore.Log.Wrn($"PrismLib debug claim failed: {e.Message}"); }
+                try { ClaimLayoutImpl(); } catch(Exception e) { LayoutOff(e); }
             }
         }
 #endif
@@ -179,6 +180,7 @@ internal static class PrismBridge {
         if(hosted) { // whatever turned a half off: what ran is cleaned up
             try { PrismWindows.Shutdown(); } catch(Exception e) { MainCore.Log.Wrn($"Prism windows shutdown failed: {e.Message}"); } // writes geometry: before the settings save
             try { PrismGate.Shutdown(); } catch(Exception e) { MainCore.Log.Wrn($"Prism gate shutdown failed: {e.Message}"); }
+            try { QuartzLayout.Shutdown(); } catch(Exception e) { MainCore.Log.Wrn($"Layout editor shutdown failed: {e.Message}"); }
         }
         if(!loaded) return;
         loaded = Available = false;
@@ -224,9 +226,12 @@ internal static class PrismBridge {
         if(winOff) return;
         try { PrismWindows.Tick(); } catch(Exception e) { WindowsOff(e); }
     }
-    /// <summary>Once a second: takes the debug claim when it is free (its holder unloaded), notes it when lost.</summary>
+    /// <summary>Once a second: takes the debug and layout claims when they are free (their holder unloaded), notes them when lost.</summary>
     internal static void RefreshClaim() {
-        if(Available) RefreshClaimImpl();
+        if(!Available) return;
+        RefreshClaimImpl();
+        if(layoutOff || !UiAvailable) return;
+        try { RefreshLayoutClaimImpl(); } catch(Exception e) { LayoutOff(e); }
     }
     private static void UiOff(Exception e) {
         ui = 2;
@@ -370,7 +375,7 @@ internal static class PrismBridge {
         if(owner == null) ClaimDebugImpl();
     }
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static void ReleaseDebugClaimImpl() {
+    internal static void ReleaseDebugClaimImpl() {
         (debugClaim as PrismLib.Claim)?.Release();
         debugClaim = null;
         PrismLib.Diagnostics.ToggleRequested -= ToggleDebug;
@@ -396,6 +401,7 @@ internal static class PrismBridge {
         hosted = true;
         PrismGate.Tick();
         TickWindows();
+        TickLayout();
     }
     // Exempt hands the gate one static method (its delegate is cached, so a frame allocates nothing).
     // `started` tells a failure to reach PrismLib.UI (before the action ran) from a throw of the action.
@@ -415,14 +421,12 @@ internal static class PrismBridge {
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void UnregisterImpl() {
         PrismLib.Diagnostics.ToggleRequested -= ToggleDebug;
-        debugClaim = handle = null;
+        debugClaim = layoutClaim = handle = null;
         PrismLib.Claims.ReleaseAll(Id);
         PrismLib.Keys.Unregister(Id);
         PrismLib.Settings.Unregister(Id);
         PrismLib.Diagnostics.Unregister(Id);
         UnregisterLayout(); // last, on its own: a PrismLib older than Layout fails only this call
     }
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    private static void UnregisterLayout() => PrismLib.Layout.Unregister(Id);
 #endif
 }

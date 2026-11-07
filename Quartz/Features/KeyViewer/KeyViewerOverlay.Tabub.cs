@@ -28,6 +28,7 @@ public static partial class KeyViewerOverlay {
             static () => MainCore.Tr.Get("KEYVIEWER_TABUB", "This Tabub Is Mine"),
             StoreTabubPosition
         );
+        ReorganizeHandle.SetLayoutTarget(tabubDragObj, LayoutIds.Tabub);
         ReorganizeHandle.SetSizeSource(
             tabubDragObj,
             () => Conf.TabubScale,

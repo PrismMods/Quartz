@@ -23,8 +23,8 @@ resources, and no types the mod never touches.
 | `Facet.0.2` | 18 | 76 |
 | `MelonLoader` | 8 | 23 |
 | `Newtonsoft.Json` | 21 | 127 |
-| `PrismLib` | 16 | 83 |
-| `PrismLib.UI` | 15 | 77 |
+| `PrismLib` | 17 | 114 |
+| `PrismLib.UI` | 17 | 103 |
 | `RDTools` | 2 | 0 |
 | `SkyHook.Unity` | 4 | 130 |
 | `Unity.TextMeshPro` | 36 | 348 |
@@ -42,7 +42,7 @@ resources, and no types the mod never touches.
 | `UnityEngine.UIModule` | 6 | 34 |
 | `UnityModManager` | 4 | 12 |
 
-**520 types, 3704 members.**
+**523 types, 3761 members.**
 
 ## How it is used
 

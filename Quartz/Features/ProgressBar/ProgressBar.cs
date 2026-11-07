@@ -90,14 +90,12 @@ public static class ProgressBarOverlay {
         fillRect.offsetMax = Vector2.zero;
         fill = fillObj.AddComponent<Image>();
         fill.raycastTarget = false;
-        dragObj = ReorganizeHandle.CreateDragSurface(bar, () => MainCore.Tr.Get("SECTION_PROGRESS_BAR", "Progress Bar"), Save);
+        dragObj = ReorganizeHandle.CreateDragSurface(bar, () => MainCore.Tr.Get("SECTION_PROGRESS_BAR", "Progress Bar"), Moved);
+        ReorganizeHandle.SetLayoutTarget(dragObj, LayoutIds.ProgressBar, static () => Conf.Style != ProgressBarStyle.Line);
         ReorganizeHandle.SetAnchorSource(dragObj, () => Conf.AnchorClosest, a => {
             OverlayAnchors.Rebase(bar, () => { Conf.Anchor = (int)a; Apply(); });
-            Vector2 stored = OverlayCalibration.Unscale(bar.anchoredPosition);
-            Conf.OffsetX = stored.x;
-            Conf.TopOffset = -stored.y;
-            Save();
-        });
+            Moved();
+        }, v => { Conf.AnchorClosest = v; Save(); });
         ReorganizeHandle.SetRotationSource(dragObj, () => Conf.Rotation, v => { Conf.Rotation = v; Apply(); });
         updater = canvasObj.AddComponent<Updater>();
         gateWant = true;
@@ -134,6 +132,18 @@ public static class ProgressBarOverlay {
         ApplyOutline();
     }
     public static void Save() => ConfMgr?.RequestSave();
+    // A move lands on the RectTransform (a drag, an undo, the shared editor), in or out of arranging: keep it before saving.
+    private static void Moved() {
+        CapturePosition();
+        Save();
+    }
+    // The line style spans the screen edge and has no position of its own.
+    private static void CapturePosition() {
+        if(bar == null || Conf.Style == ProgressBarStyle.Line) return;
+        Vector2 stored = OverlayCalibration.Unscale(bar.anchoredPosition);
+        Conf.OffsetX = stored.x;
+        Conf.TopOffset = -stored.y;
+    }
     public static void ResetPosition() {
         ProgressBarSettings def = new();
         Vector2 d = OverlayAnchors.DefaultOffset(OverlayAnchors.Parse(Conf.Anchor), def.TopOffset);
@@ -210,11 +220,7 @@ public static class ProgressBarOverlay {
             if(dragObj != null && dragObj.activeSelf != movable) dragObj.SetActive(movable);
             if(!show) return;
             // Arranging copies the RectTransform into Conf every frame: a shared-editor SetBox must move the RectTransform (or this capture skip shared sessions), or it is overwritten.
-            if(arranging && Conf.Style != ProgressBarStyle.Line) {
-                Vector2 stored = OverlayCalibration.Unscale(bar.anchoredPosition);
-                Conf.OffsetX = stored.x;
-                Conf.TopOffset = -stored.y;
-            }
+            if(arranging) CapturePosition();
             GetProgressValues(out float start, out float now);
             float fillFrom = Conf.PrefillStart ? 0f : start;
             float totalW = bar.rect.width;

@@ -82,14 +82,12 @@ public static class SongTitleOverlay {
         text.raycastTarget = false;
         TextCompat.NoWrap(text);
         text.text = "";
-        dragObj = ReorganizeHandle.CreateDragSurface(root, () => MainCore.Tr.Get("SONG_TITLE", "Song Title"), Save);
+        dragObj = ReorganizeHandle.CreateDragSurface(root, () => MainCore.Tr.Get("SONG_TITLE", "Song Title"), Moved);
+        ReorganizeHandle.SetLayoutTarget(dragObj, LayoutIds.SongTitle);
         ReorganizeHandle.SetAnchorSource(dragObj, () => Conf.AnchorClosest, a => {
             OverlayAnchors.Rebase(root, () => { Conf.Anchor = (int)a; Apply(); });
-            Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
-            Conf.OffsetX = stored.x;
-            Conf.OffsetY = stored.y;
-            Save();
-        });
+            Moved();
+        }, v => { Conf.AnchorClosest = v; Save(); });
         ReorganizeHandle.SetSizeSource(
             dragObj,
             () => Conf.MasterSize,
@@ -132,6 +130,17 @@ public static class SongTitleOverlay {
         );
     }
     public static void Save() => ConfMgr?.RequestSave();
+    // A move lands on the RectTransform (a drag, an undo, the shared editor), in or out of arranging: keep it before saving.
+    private static void Moved() {
+        CapturePosition();
+        Save();
+    }
+    private static void CapturePosition() {
+        if(root == null) return;
+        Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
+        Conf.OffsetX = stored.x;
+        Conf.OffsetY = stored.y;
+    }
     public static void ResetPosition() {
         Vector2 d = DefaultOffset(OverlayAnchors.Parse(Conf.Anchor));
         Conf.OffsetX = d.x;
@@ -243,11 +252,7 @@ public static class SongTitleOverlay {
             if(dragObj != null && dragObj.activeSelf != isReorganizing) dragObj.SetActive(isReorganizing);
             if(!show) return;
             // Arranging copies the RectTransform into Conf every frame: a shared-editor SetBox must move the RectTransform (or this capture skip shared sessions), or it is overwritten.
-            if(arranging) {
-                Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
-                Conf.OffsetX = stored.x;
-                Conf.OffsetY = stored.y;
-            }
+            if(arranging) CapturePosition();
             TMP_FontAsset font = FontManager.For(FontKey);
             if(text.font != font) {
                 text.font = font;

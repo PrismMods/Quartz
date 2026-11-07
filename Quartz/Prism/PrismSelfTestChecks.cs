@@ -180,27 +180,33 @@ internal static partial class PrismSelfTestChecks {
             check("windows: geometry lands in Quartz's settings", MainCore.Conf.FacetWindows.TryGetValue("prism-selftest", out string v) && v == "1", null);
             Window.Write("prism-selftest", null); // the writer drops a null key again
         } else info("windows: Words.Language and Window.Write not asserted beside other Prism mods");
-        // The holder lets go (whoever it is: Sapphire, Topaz, or Quartz itself): Quartz's once-a-second retry takes the claim.
+        // Another holder (Sapphire, Topaz) lets go: Quartz's once-a-second retry takes the claim. Quartz never releases its
+        // own, which would drop every claim it holds until that retry.
         string holder = DebugOwner();
-        if(holder != null) ReleaseOwner(holder);
-        float until = Time.unscaledTime + 1.5f;
-        while(DebugOwner() != PrismBridge.Id && Time.unscaledTime < until) yield return null;
-        check("windows: Quartz takes the debug claim over when its holder lets go", DebugOwner() == PrismBridge.Id, $"holder={holder} now={DebugOwner()}");
-        // A throw inside window hosting must cost only the windows: the claim and the windows go, TickAnim and the gate carry on.
-        PrismWindows.ToggleOwnDebug();
-        yield return Frames(2);
-        bool wasOpen = Ui.AnyWindowOpen;
-        int gateTicks = PrismGate.Ticks;
-        PrismWindows.ThrowInTick = true;
-        yield return Frames(3);
-        PrismWindows.ThrowInTick = false;
-        check("windows: a failing window tick drops the windows and the debug claim",
-            wasOpen && !Ui.AnyWindowOpen && DebugOwner() != PrismBridge.Id, $"wasOpen={wasOpen} open={Ui.AnyWindowOpen} owner={DebugOwner()}");
-        int anim = AnimProbe();
-        check("windows: ...and anim.duration still reaches Facet", anim == 240 && PrismBridge.UiAvailable, $"Anim.Duration={anim} ui={PrismBridge.UiAvailable}");
-        check("windows: ...and the input gate is still ticked", PrismGate.Ticks >= gateTicks + 3, $"ticks {gateTicks} -> {PrismGate.Ticks}");
-        PrismBridge.ResetWindowsOff();
-        yield return Frames(2);
+        object held = holder != null && holder != PrismBridge.Id ? HeldBy(holder) : null;
+        try {
+            if(held != null) ReleaseOwner(holder);
+            float until = Time.unscaledTime + 1.5f;
+            while(DebugOwner() != PrismBridge.Id && Time.unscaledTime < until) yield return null;
+            check("windows: Quartz takes the debug claim over when its holder lets go", DebugOwner() == PrismBridge.Id, $"holder={holder} now={DebugOwner()}");
+            // A throw inside window hosting must cost only the windows: the claim and the windows go, TickAnim and the gate carry on.
+            PrismWindows.ToggleOwnDebug();
+            yield return Frames(2);
+            bool wasOpen = Ui.AnyWindowOpen;
+            int gateTicks = PrismGate.Ticks;
+            PrismWindows.ThrowInTick = true;
+            yield return Frames(3);
+            PrismWindows.ThrowInTick = false;
+            check("windows: a failing window tick drops the windows and the debug claim",
+                wasOpen && !Ui.AnyWindowOpen && DebugOwner() != PrismBridge.Id, $"wasOpen={wasOpen} open={Ui.AnyWindowOpen} owner={DebugOwner()}");
+            int anim = AnimProbe();
+            check("windows: ...and anim.duration still reaches Facet", anim == 240 && PrismBridge.UiAvailable, $"Anim.Duration={anim} ui={PrismBridge.UiAvailable}");
+            check("windows: ...and the input gate is still ticked", PrismGate.Ticks >= gateTicks + 3, $"ticks {gateTicks} -> {PrismGate.Ticks}");
+            PrismBridge.ResetWindowsOff();
+            yield return Frames(2);
+        } finally {
+            if(held != null) check("windows: the debug holder gets its claims back", GiveBack(holder, held) && DebugOwner() == holder, $"holder={holder} now={DebugOwner()}");
+        }
     }
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void ReleaseOwner(string owner) => PrismLib.Claims.ReleaseAll(owner);

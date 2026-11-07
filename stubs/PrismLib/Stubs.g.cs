@@ -55,7 +55,30 @@ namespace PrismLib {
         public static void Unregister(string owner) => throw null;
     }
     public static unsafe partial class Layout {
+        public static event global::System.Action Changed { add { } remove { } }
+        public static event global::System.Action OpenRequested { add { } remove { } }
+        public static global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, global::PrismLib.LayoutTarget>> All() => throw null;
+        public static void RequestOpen() => throw null;
         public static void Unregister(string owner) => throw null;
+    }
+    public sealed unsafe partial class LayoutTarget {
+        public global::System.Func<int> GetAnchor;
+        public global::System.Func<bool> GetAnchorClosest;
+        public global::System.Func<float[]> GetBox;
+        public global::System.Func<float[]> GetCrop;
+        public global::System.Func<float> GetRotation;
+        public global::System.Func<float> GetScale;
+        public string Id;
+        public string Label;
+        public float MaxScale;
+        public float MinScale;
+        public global::System.Action<float, float> MoveTo;
+        public global::System.Action<int> SetAnchor;
+        public global::System.Action<bool> SetAnchorClosest;
+        public global::System.Action<float[]> SetCrop;
+        public global::System.Action<float> SetRotation;
+        public global::System.Action<float> SetScale;
+        public LayoutTarget() => throw null;
     }
     public sealed unsafe partial class LogSource {
         public global::System.Action Clear;
@@ -70,6 +93,7 @@ namespace PrismLib {
         public void AddLog(string name, global::System.Func<global::System.Collections.Generic.IEnumerable<string>> tail, string path = default, global::System.Action clear = default) => throw null;
         public global::PrismLib.KeyBinding BindKey(string id, int keyCode, global::PrismLib.KeyMods mods, string label) => throw null;
         public global::PrismLib.Claim ClaimState(global::PrismLib.StateKey key, string reason = default) => throw null;
+        public void DescribeLayout(global::System.Collections.Generic.IEnumerable<global::PrismLib.LayoutTarget> targets) => throw null;
         public void DescribeSettings(global::System.Collections.Generic.IEnumerable<global::PrismLib.SettingEntry> entries) => throw null;
         public void ReportPointerOverUi(global::System.Func<bool> probe) => throw null;
         private ModHandle() { }

@@ -15,6 +15,7 @@ internal static class PrismSelfTest {
         yield return PrismSelfTestChecks.Windows(check, info);
         yield return PrismSelfTestChecks.Settings(check, info);
         yield return PrismSelfTestChecks.Arrange(check);
+        yield return PrismSelfTestChecks.Layout(check, info);
     }
 }
 #endif

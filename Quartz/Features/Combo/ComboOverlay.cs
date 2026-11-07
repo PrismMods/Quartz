@@ -65,14 +65,12 @@ public static class ComboOverlay {
         root = rootObj.AddComponent<RectTransform>();
         valueText = CreateLabel(root, "Value");
         captionText = CreateLabel(root, "Caption");
-        dragObj = ReorganizeHandle.CreateDragSurface(root, () => MainCore.Tr.Get("COMBO", "Combo"), Save);
+        dragObj = ReorganizeHandle.CreateDragSurface(root, () => MainCore.Tr.Get("COMBO", "Combo"), Moved);
+        ReorganizeHandle.SetLayoutTarget(dragObj, LayoutIds.Combo);
         ReorganizeHandle.SetAnchorSource(dragObj, () => Conf.AnchorClosest, a => {
             OverlayAnchors.Rebase(root, () => { Conf.Anchor = (int)a; Apply(); });
-            Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
-            Conf.OffsetX = stored.x;
-            Conf.OffsetY = GetOffsetYFromPosition(stored.y);
-            Save();
-        });
+            Moved();
+        }, v => { Conf.AnchorClosest = v; Save(); });
         ReorganizeHandle.SetSizeSource(
             dragObj,
             () => Conf.MasterSize,
@@ -149,6 +147,17 @@ public static class ComboOverlay {
         return OverlayCalibration.Scale(new Vector2(Conf.OffsetX, y));
     }
     public static void Save() => ConfMgr?.RequestSave();
+    // A move lands on the RectTransform (a drag, an undo, the shared editor), in or out of arranging: keep it before saving.
+    private static void Moved() {
+        CapturePosition();
+        Save();
+    }
+    private static void CapturePosition() {
+        if(root == null) return;
+        Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
+        Conf.OffsetX = stored.x;
+        Conf.OffsetY = GetOffsetYFromPosition(stored.y);
+    }
     public static void ResetPosition() {
         ComboSettings def = new();
         OverlayAnchor anchor = Anchor;
@@ -166,11 +175,7 @@ public static class ComboOverlay {
     public static void ApplyCaptionShadow() => ApplyCaptionMaterial();
     public static void Dispose() {
         if(canvasObj == null) return;
-        if(root != null) {
-            Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
-            Conf.OffsetX = stored.x;
-            Conf.OffsetY = GetOffsetYFromPosition(stored.y);
-        }
+        CapturePosition();
         ConfMgr?.Save();
         Object.Destroy(canvasObj);
         canvasObj = null;
@@ -241,11 +246,7 @@ public static class ComboOverlay {
             if(dragObj != null && dragObj.activeSelf != isReorganizing) dragObj.SetActive(isReorganizing);
             if(!show) return;
             // Arranging copies the RectTransform into Conf every frame: a shared-editor SetBox must move the RectTransform (or this capture skip shared sessions), or it is overwritten.
-            if(arranging) {
-                Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
-                Conf.OffsetX = stored.x;
-                Conf.OffsetY = GetOffsetYFromPosition(stored.y);
-            }
+            if(arranging) CapturePosition();
             TMP_FontAsset font = FontManager.For(FontKey);
             bool fontChanged = false;
             if(valueText.font != font) {

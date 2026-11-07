@@ -100,7 +100,7 @@ internal static class PrismWindows {
         using(PrismTheme.Use(Scheme())) settings = new SettingsPanel("Prism · Settings", SettingRows);
     }
     // Quartz's language, log and settings file for what the Prism windows say, report and remember.
-    private static void Wire() {
+    internal static void Wire() {
         if(wired) return;
         wired = true;
         Words.Language = Language;
@@ -109,7 +109,7 @@ internal static class PrismWindows {
         Window.Write = QuartzHost.Write; // a drag writes every frame; only a changed value asks for a save
     }
     internal static string Language() => QuartzHost.LanguageCode(MainCore.Tr.Language) == "ko" ? "ko" : "en";
-    private static PrismTheme Scheme() {
+    internal static PrismTheme Scheme() {
         if(scheme == null) scheme = new PrismTheme { Accent = MainCore.Conf.GetAccentColor() };
         return scheme;
     }

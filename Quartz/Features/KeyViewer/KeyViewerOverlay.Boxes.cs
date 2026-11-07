@@ -9,7 +9,8 @@ namespace Quartz.Features.KeyViewer;
 public static partial class KeyViewerOverlay {
     private static void AddReorganizeHandles() {
         dragObj = BuildReorganizeHandle(root, "Drag", "KEYVIEWER_TITLE", "Key Viewer");
-        ReorganizeHandle.SetAnchorSource(dragObj, () => Conf.DmAnchorClosest, RebaseAnchor);
+        ReorganizeHandle.SetLayoutTarget(dragObj, LayoutIds.KeyViewer);
+        ReorganizeHandle.SetAnchorSource(dragObj, () => Conf.DmAnchorClosest, RebaseAnchor, v => { Conf.DmAnchorClosest = v; Save(); });
         dragRect = (RectTransform)dragObj.transform;
         if(dragObj.GetComponent<ReorganizeHandle>() is { } handle) handle.Bounds = dragRect;
         ReorganizeHandle.SetSizeSource(
@@ -23,6 +24,7 @@ public static partial class KeyViewerOverlay {
             footDragObj = BuildReorganizeHandle(
                 footRoot, "FootDrag", "KEYVIEWER_FOOT_TITLE", "Key Viewer (Foot)"
             );
+            ReorganizeHandle.SetLayoutTarget(footDragObj, LayoutIds.KeyViewerFoot);
             footDragRect = (RectTransform)footDragObj.transform;
             if(footDragObj.GetComponent<ReorganizeHandle>() is { } footHandle) footHandle.Bounds = footDragRect;
             ReorganizeHandle.SetSizeSource(
@@ -97,7 +99,7 @@ public static partial class KeyViewerOverlay {
         ReorganizeHandle handle = drag.AddComponent<ReorganizeHandle>();
         handle.Target = target;
         handle.GetName = () => MainCore.Tr.Get(titleKey, titleFallback);
-        handle.OnMoved = Save;
+        handle.OnMoved = Moved;
         drag.SetActive(false);
         return drag;
     }

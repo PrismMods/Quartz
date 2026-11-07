@@ -132,9 +132,7 @@ public static partial class PanelsOverlay {
             if(fontChanged) p.Text.font = font;
             if(fontChanged || p.Dirty || body != p.LastBody) {
                 p.Text.text = body;
-                Vector2 pref = p.Text.GetPreferredValues();
-                Vector2 size = new(pref.x + PadX * 2f, pref.y + PadY * 2f);
-                if(p.Rect.sizeDelta != size) p.Rect.sizeDelta = size;
+                Fit(p);
                 TMPTextShadow.Apply(
                     p.Text,
                     p.Config.TextShadowEnabled,

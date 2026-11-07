@@ -130,19 +130,7 @@ public static partial class KeyViewerOverlay {
                 return;
             }
             // Arranging copies the RectTransform into Conf every frame: a shared-editor SetBox must move the RectTransform (or this capture skip shared sessions), or it is overwritten.
-            if(arranging) {
-                Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
-                Conf.DmOffsetX = stored.x;
-                Conf.DmOffsetY = stored.y;
-                if(footRoot != null) {
-                    Vector2 handDelta = root.anchoredPosition - handAnchoredPrev;
-                    if(handDelta != Vector2.zero) footRoot.anchoredPosition += handDelta;
-                    Vector2 storedFoot = OverlayCalibration.Unscale(footRoot.anchoredPosition);
-                    Conf.DmFootOffsetX = storedFoot.x - stored.x;
-                    Conf.DmFootOffsetY = storedFoot.y - stored.y;
-                }
-                handAnchoredPrev = root.anchoredPosition;
-            }
+            if(arranging) CapturePosition();
             EnsureInputPrimed(now);
             UpdateDmNote(now);
             TryFlushCounts(now, inGame);
