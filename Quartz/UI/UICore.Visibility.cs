@@ -222,6 +222,8 @@ public static partial class UICore {
     }
     public static void Open(bool noAnimate = false) {
         if(isOpen || Panel == null) return;
+        FreshenClassic();   // every classic opener comes through here: pages the new menu left stale rebuild once first
+        if(isOpen || Panel == null) return;   // that rebuild's show-on-startup open got there first
         // Never over the new menu: it hides. Opened from here, its Hidden brings this menu back (calling in here
         // again, with it hidden); otherwise this menu opens and a user's close goes back to the new one.
         bool handedBack = MenuHandOff.ReturnTo == MenuHandOff.Menu.Classic;

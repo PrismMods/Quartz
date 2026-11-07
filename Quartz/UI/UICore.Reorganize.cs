@@ -73,12 +73,12 @@ public static partial class UICore {
         // Behind the panel, so "Settings" opens the panel on top of the hub.
         reorganizeHub.transform.SetAsFirstSibling();
         reorganizeHub.SetActive(false);
-        // Own canvas just under the overlays (32754+): dims the game, not the HUD being arranged.
+        // Own canvas just under the overlays (28754+, under Facet's window bands at 29000+): dims the game, not the HUD being arranged.
         reorganizeDim = new GameObject("QuartzReorganizeDim");
         reorganizeDim.transform.SetParent(MainCore.Root.transform, false);
         var dimCanvas = reorganizeDim.AddComponent<Canvas>();
         dimCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        dimCanvas.sortingOrder = 32700;
+        dimCanvas.sortingOrder = 28700;
         reorganizeDimGroup = reorganizeDim.AddComponent<CanvasGroup>();
         reorganizeDimGroup.blocksRaycasts = false;
         reorganizeDimGroup.interactable = false;

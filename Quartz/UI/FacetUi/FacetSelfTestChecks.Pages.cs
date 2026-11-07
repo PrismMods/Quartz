@@ -13,7 +13,8 @@ using HandOff = Quartz.UI.MenuHandOff;
 namespace Quartz.UI.FacetUi;
 /// <summary>
 /// The new menu's Home: its header line, the quick switches and their Edit… popup, the status rows against the classic
-/// Home, and Edit layout there and on a classic page with an on-screen element.
+/// Home, and Edit layout there and on a classic page with an on-screen element. Then how pages lay out: a tab row, the
+/// search results heading, the overlays under every Prism window, and a close after the switch went off.
 /// </summary>
 internal static partial class FacetSelfTestChecks {
     private const string Switches = "home.switches", FailedText = "This card failed to build — see the log.";
@@ -198,6 +199,11 @@ internal static partial class FacetSelfTestChecks {
         for(; frames < 60 && !UICore.SharedLayoutOpen; frames++) yield return null;
         check("Edit layout hides the new menu and a shared layout session opens within 60 frames", hid && UICore.SharedLayoutOpen,
             $"hid={hid} frames={frames} {Showing()}");
+        float editor = UnityEngine.Object.FindObjectsByType<UIDocument>(FindObjectsSortMode.None)
+            .FirstOrDefault(d => d.name == "PrismLayoutEditor")?.panelSettings?.sortingOrder ?? -1f;
+        List<Canvas> overlays = OverlayCanvases();
+        check("Quartz's overlays sit under the layout editor, like the other mods'", editor > 0f && overlays.Count > 0 && overlays.All(c => c.sortingOrder < editor),
+            $"editor={editor} {OverlayOrders(overlays)}");
         yield return Frames(1);
         bool took = FacetBridge.HandleEscape();
         int back = 0;
@@ -271,5 +277,85 @@ internal static partial class FacetSelfTestChecks {
         check("a classic page with an on-screen element links to the layout editor, Profiles does not", shown && none,
             $"page={combo} row={row != null} profiles={!none}");
     }
+
+    private static IEnumerator PageLayout(Action<string, bool, string> check) {
+        bool wasOpen = UICore.IsOpen;
+        if(wasOpen) UICore.Close(true);
+        HandOff.ReturnTo = HandOff.Menu.None;
+        try {
+            FacetBridge.OpenNewMenu("overlay.general");
+            yield return Frames(2);
+            TabRowFits(check);
+            yield return ResultsHeading(check);
+            yield return SwitchedOffClose(check);
+            List<Canvas> overlays = OverlayCanvases();
+            check("every Quartz overlay canvas sorts under Facet's window bands (below 29000)", overlays.Count > 0 && overlays.All(c => c.sortingOrder < 29000),
+                OverlayOrders(overlays));
+        } finally {
+            QuartzShell.Nav?.Filter("");
+            HandOff.ReturnTo = HandOff.Menu.None;
+            QuartzShell.Hide();
+            if(UICore.IsOpen) UICore.Close(true);
+            if(wasOpen) UICore.Open(true);
+        }
+        yield return Frames(3);
+    }
+
+    // A tab whose button lost its text measure draws its name one letter per line, over the page above it.
+    private static void TabRowFits(Action<string, bool, string> check) {
+        global::Facet.Tabs row = QuartzShell.TabRow;
+        List<Button> tabs = row?.Element.Query<Button>().ToList().Where(Displayed).ToList() ?? [];
+        var bad = new List<string>();
+        foreach(Button b in tabs) {
+            Vector2 m = b.MeasureTextSize(b.text, 0f, VisualElement.MeasureMode.Undefined, 0f, VisualElement.MeasureMode.Undefined);
+            if(b.contentRect.width + 0.5f < m.x || b.contentRect.height > m.y * 1.5f) bad.Add($"{b.text} {b.contentRect.size} needs {m}");
+        }
+        bool above = row != null && row.Element.worldBound.yMax <= row.Content.worldBound.yMin + 0.5f;
+        check("every tab on Overlay's tab row is as wide as its name and one line tall, and the row sits above its page",
+            tabs.Count > 1 && bad.Count == 0 && above, $"page={QuartzShell.CurrentPage} tabs={tabs.Count} above={above} {string.Join(", ", bad)}");
+    }
+
+    private static IEnumerator ResultsHeading(Action<string, bool, string> check) {
+        QuartzShell.Nav.Filter("key");
+        yield return Frames(2);
+        string want = global::Facet.Words.OwnF("Results for \u201c{0}\u201d", QuartzHost.Host.Language, "key");
+        Label heading = ContentScroll.parent.Query<Label>().Where(l => l.text == want).First();
+        VisualElement first = Body.childCount > 0 ? Body[0] : null;
+        check("the search results heading sits above the first result", heading != null && first != null && heading.worldBound.yMax <= first.worldBound.yMin + 0.5f,
+            $"heading={heading?.worldBound.yMax} first={first?.worldBound.yMin}");
+        QuartzShell.Nav.Filter("");
+        yield return Frames(1);
+    }
+
+    // "Open it", then the new menu switched off in classic Settings: the classic menu's close has nothing to go back to.
+    private static IEnumerator SwitchedOffClose(Action<string, bool, string> check) {
+        bool was = MainCore.Conf.ExperimentalNewMenu;
+        try {
+            QuartzShell.Go("profiles.main");
+            yield return Frames(2);
+            Button open = Body.Q<Button>("menu-classic-input");
+            if(open != null) Submit(open);
+            yield return Frames(2);
+            bool handed = UICore.IsOpen && HandOff.ReturnTo == HandOff.Menu.New;
+            UICore.SetNewMenuSwitch(false);
+            yield return Frames(3);   // the classic pages rebuild a pump later
+            UICore.Close(true);
+            yield return Frames(2);
+            check("a classic menu opened from the new one closes to nothing once the switch went off", handed && !FacetBridge.NewMenuVisible() && !UICore.IsOpen,
+                $"handed={handed} {Showing()}");
+        } finally {
+            if(MainCore.Conf.ExperimentalNewMenu != was) UICore.SetNewMenuSwitch(was);
+        }
+        yield return Frames(3);
+        FacetBridge.OpenNewMenu();
+        yield return Frames(1);
+    }
+
+    // Quartz's on-screen overlays and the reorganizer's dim under them; not its menus, toast or dialogs, which stay on top.
+    private static readonly string[] Overlays = ["QuartzKeyViewerCanvas", "QuartzPanelsCanvas", "QuartzComboCanvas", "QuartzSongTitleCanvas",
+        "QuartzJudgementCanvas", "QuartzProgressBarCanvas", "QuartzPracticeCanvas", "QuartzReorganizeDim"];
+    private static List<Canvas> OverlayCanvases() =>
+        [.. UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None).Where(c => Overlays.Contains(c.gameObject.name))];
+    private static string OverlayOrders(List<Canvas> overlays) => string.Join(", ", overlays.Select(c => $"{c.gameObject.name}={c.sortingOrder}"));
 }
 #endif

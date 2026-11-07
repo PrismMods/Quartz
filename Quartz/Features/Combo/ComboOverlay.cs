@@ -58,7 +58,7 @@ public static class ComboOverlay {
     public static void Initialize(GameObject rootObject) {
         if(canvasObj != null) return;
         EnsureConf();
-        canvasObj = UnityUtils.CreateOverlayCanvas("QuartzComboCanvas", rootObject.transform, 32757, out raycaster);
+        canvasObj = UnityUtils.CreateOverlayCanvas("QuartzComboCanvas", rootObject.transform, 28757, out raycaster);
         canvasObj.AddComponent<OverlayFontScope>().Key = FontKey;
         GameObject rootObj = new("ComboRoot");
         rootObj.transform.SetParent(canvasObj.transform, false);

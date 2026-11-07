@@ -79,7 +79,7 @@ public static class JudgementOverlay {
         if(canvasObj != null) return;
         EnsureConf();
         compact = Conf.CompactRow;
-        canvasObj = UnityUtils.CreateOverlayCanvas("QuartzJudgementCanvas", rootObject.transform, 32756, out raycaster);
+        canvasObj = UnityUtils.CreateOverlayCanvas("QuartzJudgementCanvas", rootObject.transform, 28756, out raycaster);
         canvasObj.AddComponent<OverlayFontScope>().Key = FontKey;
         GameObject rowObj = new("JudgementRow");
         rowObj.transform.SetParent(canvasObj.transform, false);

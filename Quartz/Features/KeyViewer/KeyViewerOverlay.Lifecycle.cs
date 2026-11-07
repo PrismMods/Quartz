@@ -22,7 +22,7 @@ public static partial class KeyViewerOverlay {
         canvasObj.transform.SetParent(rootObject.transform, false);
         Canvas canvas = canvasObj.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 32758;
+        canvas.sortingOrder = 28758;
         CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920, 1080);

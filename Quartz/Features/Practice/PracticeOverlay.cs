@@ -41,7 +41,7 @@ public static class PracticeOverlay {
     public static void Initialize(GameObject rootObject) {
         if(canvasObj != null) return;
         PracticeDifficulty.EnsureConf();
-        canvasObj = UnityUtils.CreateOverlayCanvas("QuartzPracticeCanvas", rootObject.transform, 32754, out raycaster);
+        canvasObj = UnityUtils.CreateOverlayCanvas("QuartzPracticeCanvas", rootObject.transform, 28754, out raycaster);
         canvasObj.AddComponent<OverlayFontScope>().Key = FontKey;
         GameObject holder = new("PracticeRoot");
         holder.transform.SetParent(canvasObj.transform, false);

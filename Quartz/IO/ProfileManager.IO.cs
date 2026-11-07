@@ -169,6 +169,8 @@ public static partial class ProfileManager {
             : MainCore.Conf.Language;
         Addons.AddonService.Reload();
         Quartz.Prism.PrismBridge.RebindMenuKey(); // every reload path re-reads the hotkey: tell PrismLib's registry
+        // The switch is per profile, so a load or reset can turn it off under a classic menu opened from the new one.
+        if(!MainCore.Conf.ExperimentalNewMenu && Quartz.UI.MenuHandOff.ReturnTo == Quartz.UI.MenuHandOff.Menu.New) Quartz.UI.MenuHandOff.ReturnTo = Quartz.UI.MenuHandOff.Menu.None;
     }
     private static void SavePointer() {
         if(!TryDirOf(Active, out _)) throw new IOException("active profile name is invalid");

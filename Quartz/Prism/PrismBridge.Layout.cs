@@ -22,7 +22,7 @@ internal static partial class PrismBridge {
             return;
         }
         hosted = true;
-        try { QuartzLayout.Open(all: Available); } catch(Exception e) { LayoutOff(e); }
+        try { OpenEditorImpl(Available); } catch(Exception e) { LayoutOff(e); }
 #endif
     }
 #if !IL2CPP && !QUARTZ_KEYVIEWER
@@ -35,7 +35,7 @@ internal static partial class PrismBridge {
     private static void LayoutOff(Exception e) {
         layoutOff = true;
         MainCore.Log.Wrn($"Quartz's layout targets off: {e}");
-        try { QuartzLayout.Shutdown(); } catch(Exception d) { Diag.Ignore(d); }
+        try { ShutdownLayoutImpl(); } catch(Exception d) { Diag.Ignore(d); }
         try { if(Available) ReleaseLayoutClaimImpl(); } catch(Exception d) { Diag.Ignore(d); }
     }
     private static int described = int.MinValue;
@@ -56,9 +56,14 @@ internal static partial class PrismBridge {
                 describedIn = labels;
                 DescribeLayoutImpl();
             }
-            QuartzLayout.Tick();
+            TickEditorImpl();
         } catch(Exception e) { LayoutOff(e); }
     }
+    // QuartzLayout holds a LayoutEditor field: named only in these Impls (see PrismBridge.cs).
+    [MethodImpl(MethodImplOptions.NoInlining)] private static void OpenEditorImpl(bool all) => QuartzLayout.Open(all);
+    [MethodImpl(MethodImplOptions.NoInlining)] private static void TickEditorImpl() => QuartzLayout.Tick();
+    [MethodImpl(MethodImplOptions.NoInlining)] private static void ReloadEditorImpl() => QuartzLayout.Reload();
+    [MethodImpl(MethodImplOptions.NoInlining)] private static void ShutdownLayoutImpl() => QuartzLayout.Shutdown();
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void DescribeLayoutImpl() => ((PrismLib.ModHandle)handle).DescribeLayout(QuartzLayout.LayoutTargets());
     // One mod draws the shared layout editor; the claim says which, and the others ask it through Layout.RequestOpen.
@@ -96,11 +101,11 @@ internal static partial class PrismBridge {
     private static void LayoutRequested() {
         if(layoutClaim == null || layoutOff) return;
         hosted = true;
-        try { QuartzLayout.Open(all: true); } catch(Exception e) { LayoutOff(e); }
+        try { OpenEditorImpl(true); } catch(Exception e) { LayoutOff(e); }
     }
     private static void LayoutChanged() {
         if(layoutOff) return;
-        try { QuartzLayout.Reload(); } catch(Exception e) { LayoutOff(e); }
+        try { ReloadEditorImpl(); } catch(Exception e) { LayoutOff(e); }
     }
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void UnregisterLayout() {

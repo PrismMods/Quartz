@@ -25,12 +25,13 @@ internal static partial class PrismBridge {
 #if !IL2CPP && !QUARTZ_KEYVIEWER
         if(UiAvailable && !winOff) {
             hosted = true;
-            try { PrismWindows.ShowSettings(); } catch(Exception e) { WindowsOff(e); }
+            try { ShowSettingsImpl(); } catch(Exception e) { WindowsOff(e); }
         }
 #endif
     }
 #if !IL2CPP && !QUARTZ_KEYVIEWER
     private static bool suiteGone;
+    [MethodImpl(MethodImplOptions.NoInlining)] private static void ShowSettingsImpl() => PrismWindows.ShowSettings();   // see PrismBridge.cs: never name PrismWindows outside an Impl
     // The one place outside FacetUi that names a Facet type: reached only past UiAvailable, which means Facet loaded.
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool WearSuiteImpl(object theme) {

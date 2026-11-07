@@ -175,8 +175,9 @@ internal static class FacetBridge {
     // A Facet failure after a successful probe (a mismatched build): report once, stay off.
     private static void Fail(Exception e) {
         if(state == 2) return;
-        state = 2;
+        state = 2;   // first: anything the hide below calls back into finds the bridge off, never this again
         MainCore.Log.Wrn($"Facet unavailable: {e}");
+        try { HideNewMenuImpl(); } catch(Exception h) { Diag.Ignore(h); }   // off, the bridge could never hide a window left showing
     }
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool TextFocusedImpl() => global::Facet.Input.TextFocused;

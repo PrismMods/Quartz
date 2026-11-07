@@ -1,5 +1,6 @@
 #if DEBUG && !IL2CPP
 using System.Collections;
+using System.Reflection;
 using Quartz.Core;
 using Quartz.Features;
 using Quartz.UI.Factory;
@@ -36,6 +37,7 @@ internal static partial class FacetSelfTestChecks {
             yield return PingPong(check);
             yield return RebuildBehind(check);
             yield return HeaderSwitch(check);
+            yield return ProfileLoadSwitchesOff(check);
         } finally {
             HandOff.ReturnTo = HandOff.Menu.None;
             QuartzShell.Hide();
@@ -171,6 +173,27 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(2);
         QuartzShell.Hide();
         yield return Frames(2);
+    }
+
+    // A profile load or reset re-reads the switch and runs ApplyRuntimeSettings; if it comes back off, a pending
+    // hand-back to the new menu has nothing to go back to.
+    private static IEnumerator ProfileLoadSwitchesOff(Action<string, bool, string> check) {
+        MethodInfo apply = typeof(Quartz.IO.ProfileManager).GetMethod("ApplyRuntimeSettings", BindingFlags.NonPublic | BindingFlags.Static);
+        bool was = MainCore.Conf.ExperimentalNewMenu;
+        try {
+            MainCore.Conf.ExperimentalNewMenu = true;
+            HandOff.ReturnTo = HandOff.Menu.New;
+            apply.Invoke(null, null);
+            bool keptOn = HandOff.ReturnTo == HandOff.Menu.New;
+            MainCore.Conf.ExperimentalNewMenu = false;   // what a loaded profile with the switch off leaves
+            apply.Invoke(null, null);
+            check("a profile load that leaves the new menu on keeps a pending hand-back, and one that turns it off clears it",
+                keptOn && HandOff.ReturnTo == HandOff.Menu.None, $"keptOn={keptOn} returnTo={HandOff.ReturnTo}");
+        } finally {
+            MainCore.Conf.ExperimentalNewMenu = was;
+            HandOff.ReturnTo = HandOff.Menu.None;
+        }
+        yield break;
     }
 
     // On a moved page: Effect Remover switched off from its own header, then on from its off page's header.

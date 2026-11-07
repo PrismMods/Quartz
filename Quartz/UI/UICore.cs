@@ -135,6 +135,8 @@ public static partial class UICore {
 #endif
         MainCore.Conf.ExperimentalNewMenu = on;
         MainCore.ConfMgr.RequestSave();
+        // Switched off under a classic menu opened from the new one: its close has nothing to go back to.
+        if(!on && MenuHandOff.ReturnTo == MenuHandOff.Menu.New) MenuHandOff.ReturnTo = MenuHandOff.Menu.None;
         if(on) FacetBridge.PrebuildNewMenu();
         RequestPagesRebuild();
     }

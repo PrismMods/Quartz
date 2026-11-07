@@ -77,7 +77,7 @@ internal static partial class PrismBridge {
 #if !IL2CPP && !QUARTZ_KEYVIEWER
         if(UiAvailable && !winOff) {
             hosted = true;
-            try { PrismWindows.ToggleDebug(); } catch(Exception e) { WindowsOff(e); }
+            try { ToggleDebugImpl(); } catch(Exception e) { WindowsOff(e); }
         }
 #endif
     }
@@ -90,7 +90,7 @@ internal static partial class PrismBridge {
 #if !IL2CPP && !QUARTZ_KEYVIEWER
         if(UiAvailable && !winOff) {
             hosted = true;
-            try { PrismWindows.ToggleSettings(); } catch(Exception e) { WindowsOff(e); }
+            try { ToggleSettingsImpl(); } catch(Exception e) { WindowsOff(e); }
         }
 #endif
     }
@@ -116,7 +116,7 @@ internal static partial class PrismBridge {
     internal static void Recolour(Color accent) {
 #if !IL2CPP && !QUARTZ_KEYVIEWER
         if(ui != 1 || winOff) return;
-        try { PrismWindows.Recolour(accent); } catch(Exception e) { WindowsOff(e); }
+        try { RecolourImpl(accent); } catch(Exception e) { WindowsOff(e); }
 #endif
     }
     /// <summary>
@@ -181,10 +181,10 @@ internal static partial class PrismBridge {
         try { UICore.SetSharedLayout(false); } catch(Exception e) { Diag.Ignore(e); } // never leave a session stuck open
 #if !IL2CPP && !QUARTZ_KEYVIEWER
         if(hosted) { // whatever turned a half off: what ran is cleaned up
-            try { PrismWindows.Shutdown(); } catch(Exception e) { MainCore.Log.Wrn($"Prism windows shutdown failed: {e.Message}"); } // writes geometry: before the settings save
+            try { ShutdownWindowsImpl(); } catch(Exception e) { MainCore.Log.Wrn($"Prism windows shutdown failed: {e.Message}"); } // writes geometry: before the settings save
             try { PrismGate.Shutdown(); } catch(Exception e) { MainCore.Log.Wrn($"Prism gate shutdown failed: {e.Message}"); }
-            try { QuartzLayout.Shutdown(); } catch(Exception e) { MainCore.Log.Wrn($"Layout editor shutdown failed: {e.Message}"); }
-            try { PrismWindows.Unwire(); } catch(Exception e) { MainCore.Log.Wrn($"Prism hooks unwire failed: {e.Message}"); } // PrismLib.UI's shared hooks
+            try { ShutdownLayoutImpl(); } catch(Exception e) { MainCore.Log.Wrn($"Layout editor shutdown failed: {e.Message}"); }
+            try { UnwireImpl(); } catch(Exception e) { MainCore.Log.Wrn($"Prism hooks unwire failed: {e.Message}"); } // PrismLib.UI's shared hooks
         }
         if(!loaded) return;
         loaded = Available = false;
@@ -223,13 +223,22 @@ internal static partial class PrismBridge {
     private static void WindowsOff(Exception e) {
         winOff = true;
         MainCore.Log.Wrn($"Prism windows off: {e}");
-        try { PrismWindows.Shutdown(); } catch(Exception d) { Diag.Ignore(d); }
+        try { ShutdownWindowsImpl(); } catch(Exception d) { Diag.Ignore(d); }
         try { if(Available) ReleaseDebugClaimImpl(); } catch(Exception d) { Diag.Ignore(d); }
     }
     private static void TickWindows() {
         if(winOff) return;
-        try { PrismWindows.Tick(); } catch(Exception e) { WindowsOff(e); }
+        try { TickWindowsImpl(); } catch(Exception e) { WindowsOff(e); }
     }
+    /* PrismWindows and QuartzLayout hold PrismLib.UI types in fields, and Mono lays out a class's fields when it compiles
+       a call into it: a method naming either throws TypeLoadException before its first line runs when PrismLib.UI is
+       missing or older. So only these name them, each reached past a check and inside a try. */
+    [MethodImpl(MethodImplOptions.NoInlining)] private static void ToggleDebugImpl() => PrismWindows.ToggleDebug();
+    [MethodImpl(MethodImplOptions.NoInlining)] private static void ToggleSettingsImpl() => PrismWindows.ToggleSettings();
+    [MethodImpl(MethodImplOptions.NoInlining)] private static void RecolourImpl(Color accent) => PrismWindows.Recolour(accent);
+    [MethodImpl(MethodImplOptions.NoInlining)] private static void TickWindowsImpl() => PrismWindows.Tick();
+    [MethodImpl(MethodImplOptions.NoInlining)] private static void ShutdownWindowsImpl() => PrismWindows.Shutdown();
+    [MethodImpl(MethodImplOptions.NoInlining)] private static void UnwireImpl() => PrismWindows.Unwire();
     /// <summary>Once a second: takes the debug and layout claims when they are free (their holder unloaded), notes them when lost.</summary>
     internal static void RefreshClaim() {
         if(!Available) return;
@@ -294,7 +303,7 @@ internal static partial class PrismBridge {
             Keybind.ModifierName(Keybind.KeyModifier.Ctrl), Keybind.ModifierName(Keybind.KeyModifier.Alt),
             Keybind.ModifierName(Keybind.KeyModifier.Shift), Keybind.ModifierName(Keybind.KeyModifier.Cmd),
         ];
-        return [
+        List<PrismLib.SettingEntry> rows = [
             new PrismLib.SettingEntry {
                 Id = "quartz.menu.key", Kind = PrismLib.SettingKind.Key, Page = "Quartz", Group = "Menu", Order = 0,
                 Label = "Menu hotkey", Tooltip = "The key that opens Quartz's menu, with the modifier below",
@@ -308,14 +317,16 @@ internal static partial class PrismBridge {
                 Get = () => MainCore.Conf.ToggleModifier,
                 Set = SetMenuModifier,
             },
-            new PrismLib.SettingEntry {
+        ];
+        if(FacetBridge.Available()) // no switch for a menu that cannot open
+            rows.Add(new PrismLib.SettingEntry {
                 Id = "quartz.experimental.newMenu", Kind = PrismLib.SettingKind.Bool, Page = "Quartz", Group = "Experimental", Order = 2,
                 Label = "Experimental: new menu", Tooltip = "The menu hotkey opens the new menu. It is still being built; the classic menu stays available",
                 Keywords = ["facet", "preview", "beta"],
                 Get = () => MainCore.Conf.ExperimentalNewMenu,
                 Set = v => UICore.SetNewMenuSwitch(Convert.ToBoolean(v)),
-            },
-        ];
+            });
+        return rows;
     }
     // A name that is no key reads as none, which is refused.
     private static void SetMenuKey(object value) =>

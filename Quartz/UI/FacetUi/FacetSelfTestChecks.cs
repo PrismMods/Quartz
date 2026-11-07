@@ -26,6 +26,7 @@ internal static partial class FacetSelfTestChecks {
             yield return SwitchHandOff(check);
             yield return ShellSearch(check);
             yield return HomePage(check, info);
+            yield return PageLayout(check);
             yield return FeaturesPage(check, info);
             yield return SettingsPage(check);
             yield return Escape(check);

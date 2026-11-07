@@ -198,7 +198,7 @@ public static partial class PanelsOverlay {
     public static void Initialize(GameObject root) {
         if(canvasObj != null) return;
         EnsureConf();
-        canvasObj = UnityUtils.CreateOverlayCanvas("QuartzPanelsCanvas", root.transform, 32760, out raycaster);
+        canvasObj = UnityUtils.CreateOverlayCanvas("QuartzPanelsCanvas", root.transform, 28760, out raycaster);
         canvasObj.AddComponent<OverlayFontScope>().Key = FontKey;
         BuildPanels();
         updater = canvasObj.AddComponent<Updater>();

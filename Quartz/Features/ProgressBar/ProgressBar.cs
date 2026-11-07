@@ -55,7 +55,7 @@ public static class ProgressBarOverlay {
     public static void Initialize(GameObject root) {
         if(canvasObj != null) return;
         EnsureConf();
-        canvasObj = UnityUtils.CreateOverlayCanvas("QuartzProgressBarCanvas", root.transform, 32755, out raycaster);
+        canvasObj = UnityUtils.CreateOverlayCanvas("QuartzProgressBarCanvas", root.transform, 28755, out raycaster);
         GameObject barObj = new("Bar");
         barObj.transform.SetParent(canvasObj.transform, false);
         bar = barObj.AddComponent<RectTransform>();

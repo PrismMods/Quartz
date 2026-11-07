@@ -69,7 +69,7 @@ public static class SongTitleOverlay {
     public static void Initialize(GameObject rootObject) {
         if(canvasObj != null) return;
         EnsureConf();
-        canvasObj = UnityUtils.CreateOverlayCanvas("QuartzSongTitleCanvas", rootObject.transform, 32756, out raycaster);
+        canvasObj = UnityUtils.CreateOverlayCanvas("QuartzSongTitleCanvas", rootObject.transform, 28756, out raycaster);
         canvasObj.AddComponent<OverlayFontScope>().Key = FontKey;
         GameObject titleObj = new("SongTitle");
         titleObj.transform.SetParent(canvasObj.transform, false);
