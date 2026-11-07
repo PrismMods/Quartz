@@ -32,7 +32,8 @@ internal static partial class FacetSelfTestChecks {
         string path = EffectRemover.ConfMgr.Path;
         byte[] file = File.Exists(path) ? File.ReadAllBytes(path) : null;
         string saved = C.Serialize().ToString();
-        bool wasOpen = UICore.IsOpen;
+        bool wasOpen = UICore.IsOpen, newMenu = MainCore.Conf.ExperimentalNewMenu;
+        MainCore.Conf.ExperimentalNewMenu = true;   // the classic page's button, which these checks stand in for, shows only with it on
         try {
             if(!UICore.IsOpen) UICore.Open(true);
             yield return Frames(2);
@@ -51,6 +52,7 @@ internal static partial class FacetSelfTestChecks {
             yield return ProfileSwitch(check, path, file);
             yield return MenuHandOff(check);
         } finally {
+            MainCore.Conf.ExperimentalNewMenu = newMenu;
             QuartzShell.Hide();
             RestoreSettings(path, file, saved);
             if(wasOpen && !UICore.IsOpen) UICore.Open(true);

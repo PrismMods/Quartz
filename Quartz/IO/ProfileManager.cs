@@ -4,6 +4,7 @@ using Quartz.Core;
 using Quartz.Localization;
 using Quartz.Features;
 using Quartz.Resource;
+using Quartz.UI.FacetUi;
 namespace Quartz.IO;
 public static partial class ProfileManager {
     public const string DEFAULT_NAME = "Default";
@@ -135,6 +136,7 @@ public static partial class ProfileManager {
         Dictionary<string, string> previousFiles = null;
         bool runtimeStopped = false;
         bool switchStarted = false;
+        bool newMenuWasOn = MainCore.Conf.ExperimentalNewMenu;
         try {
             if(!CaptureActive()) throw new IOException("could not capture the active profile before switching");
             Dictionary<string, string> targetFiles = ReadSettingsDirectory(targetDir, validateJson: true);
@@ -151,6 +153,8 @@ public static partial class ProfileManager {
             SavePointer();
             MainCore.Runtime.SetModEnabled(MainCore.Conf.Active, true);
             CompleteSwitch();
+            // The profile load rebuilds the UI; only the new menu's build-ahead is skipped, so a switch turning it on does it here.
+            if(!newMenuWasOn && MainCore.Conf.ExperimentalNewMenu && FacetBridge.Available()) FacetBridge.PrebuildNewMenu();
             return true;
         } catch(Exception e) {
             MainCore.Log.Err($"[{nameof(ProfileManager)}] Apply '{name}' failed: {e}");

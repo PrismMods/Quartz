@@ -90,7 +90,22 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
             // Check 3: absent, reported exactly once after two page builds.
             Check("facet reported unavailable", !FacetBridge.Available());
             Check("exactly one 'Facet unavailable' log line", unavailable == 1, $"count={unavailable}");
-            Check("no preview button on the menu page", !PreviewButtonOnPage());
+            // The switch on where the new menu cannot run changes nothing: the hotkey keeps the classic menu.
+            bool was = MainCore.Conf.ExperimentalNewMenu, wasOpen = UICore.IsOpen;
+            MainCore.Conf.ExperimentalNewMenu = true;
+            try {
+                if(wasOpen) UICore.Close(true);
+                UICore.Toggle();
+                for(int f = Time.frameCount + 2; Time.frameCount < f;) yield return null;
+                Check("switch on without Facet: the hotkey opens the classic menu", UICore.IsOpen && !FacetBridge.NewMenuVisible(), $"open={UICore.IsOpen}");
+                Check("no new-menu switch on the Settings page", !SwitchRowOnSettingsPage());
+                Check("no preview button on the menu page", !PreviewButtonOnPage());
+            } finally {
+                MainCore.Conf.ExperimentalNewMenu = was;
+                MainCore.ConfMgr.RequestSave();   // a save while it was on would have written it
+                if(wasOpen && !UICore.IsOpen) UICore.Open(true);
+                else if(!wasOpen && UICore.IsOpen) UICore.Close(true);
+            }
         }
     }
     // The menu page's "open in the new menu" button, found by its label on a freshly built page.
@@ -99,10 +114,26 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
         host.SetParent(UICore.Panel, false);
         try {
             Quartz.Features.EffectRemover.PageEffectRemover.Create(host);
-            string label = MainCore.Tr.Get("FXRM_OPEN_NEW_MENU", "Open in the new menu (preview)");
-            return host.GetComponentsInChildren<TMPro.TextMeshProUGUI>(true).Any(t => t.text == label);
+            return HasPreviewButton(host);
         } finally { UnityEngine.Object.Destroy(host.gameObject); }
     }
+    internal static bool HasPreviewButton(Transform page) =>
+        HasLabel(page, MainCore.Tr.Get("FXRM_OPEN_NEW_MENU", "Open in the new menu (preview)"));
+    // The classic Settings page's new-menu switch, found by its label on a page built into a throwaway host. Here, not
+    // with the Facet checks: the facet-absent run asks it too.
+    internal static bool SwitchRowOnSettingsPage() {
+        var host = new GameObject("FacetSelfTestSettings", typeof(RectTransform)).GetComponent<RectTransform>();
+        host.SetParent(UICore.Panel, false);
+        try {
+            Quartz.UI.Factory.Page.PageSettings.Create(host);
+            return HasLabel(host, MainCore.Tr.Get("PRISM_NEW_MENU", "Experimental: new menu"));
+        } finally {
+            UnityEngine.Object.Destroy(host.gameObject);
+            UICore.Rebuild();   // the build pointed the Settings page's static references at this host
+        }
+    }
+    private static bool HasLabel(Transform page, string text) =>
+        page.GetComponentsInChildren<TMPro.TextMeshProUGUI>(true).Any(t => t.text == text);
     // MelonLoader's log; null-safe empty string elsewhere (UMM). The file is held open
     // by the loader, so open it shared.
     private static string ReadQuartzLog() {

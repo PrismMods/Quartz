@@ -28,6 +28,8 @@ public static partial class UICore {
     public static bool IsOpen => isOpen;
     /// <summary>A Quartz menu is up: the classic uGUI menu or the new one.</summary>
     internal static bool MenuShowing => isOpen || FacetBridge.NewMenuVisible();
+    /// <summary>The menu hotkey opens the new menu: the experimental switch is on and Facet can run it.</summary>
+    internal static bool NewMenuWanted => MainCore.Conf.ExperimentalNewMenu && FacetBridge.Available();
     public static Vector2 LastPanelPosition;
     public static Vector2 LastPanelSize;
     public static Vector2 DefaultPanelSize {
@@ -129,7 +131,8 @@ public static partial class UICore {
             holdingToggle = true;
         }
         if(holdingToggle && pressed && Time.unscaledTime - holdStartTime >= 0.4f) {
-            ResetScalePosition(!isOpen);
+            // With the switch on the hotkey toggles the new menu: a long press must not reset the classic panel behind it.
+            if(isOpen || !NewMenuWanted) ResetScalePosition(!isOpen);
             holdingToggle = false;
         }
         if(!held) holdingToggle = false;
@@ -346,8 +349,15 @@ public static partial class UICore {
     public static void Toggle(bool noAnimate = false) {
         // The new menu hides (its Hidden brings back a classic menu it came from), never with the classic one over it.
         if(FacetBridge.HideNewMenu()) return;
-        if(isOpen) Close(noAnimate);
-        else OpenToHub();
+        if(isOpen) {
+            Close(noAnimate);   // a classic menu opened from the new one goes back there
+            return;
+        }
+        if(NewMenuWanted) {
+            FacetBridge.OpenNewMenu();
+            if(FacetBridge.NewMenuVisible()) return;   // one that failed to build turned Facet off: the classic menu opens instead
+        }
+        OpenToHub();
     }
     public static void ResetScalePosition(bool noAnimate = false) {
         Vector2 targetSize = DefaultPanelSize;

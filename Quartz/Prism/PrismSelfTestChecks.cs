@@ -139,11 +139,19 @@ internal static partial class PrismSelfTestChecks {
             ids.OrderBy(k => k).SequenceEqual(new[] { "quartz.experimental.newMenu", "quartz.menu.key", "quartz.menu.modifier" }), string.Join(",", ids));
         check("settings: the new-menu switch defaults off", !new Quartz.IO.CoreSettings().ExperimentalNewMenu, null);
         bool was = MainCore.Conf.ExperimentalNewMenu;
+        var windows = new Dictionary<string, string>(MainCore.Conf.FacetWindows);
         var (nmGet, nmSet) = Row("quartz.experimental.newMenu");
+        int calls = UICore.NewMenuSwitchCalls;
         nmSet(true);
+        check("settings: the new-menu row goes through the shared switch helper", UICore.NewMenuSwitchCalls == calls + 1, null);
         check("settings: the switch writes Quartz's settings", MainCore.Conf.ExperimentalNewMenu && (bool)nmGet(), null);
         check("settings: the switch is saved", MainCore.Conf.Serialize()["ExperimentalNewMenu"]?.Value<bool>() == true, null);
         nmSet(was);
+        // On, it built the new menu ahead, which stores its page: put the map back (saved below), and let the classic pages'
+        // rebuild land before the arrange checks enter reorganize mode.
+        MainCore.Conf.FacetWindows.Clear();
+        foreach(var kv in windows) MainCore.Conf.FacetWindows[kv.Key] = kv.Value;
+        yield return Frames(3);
         var dflt = new Quartz.IO.CoreSettings { ExperimentalNewMenu = true };
         dflt.Deserialize(new JObject());
         check("settings: a config without the switch reads off, not the previous value", !dflt.ExperimentalNewMenu, null);

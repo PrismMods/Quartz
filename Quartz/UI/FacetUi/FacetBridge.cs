@@ -189,6 +189,10 @@ internal static class FacetBridge {
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void WarmUpNow() {
         try { WarmUpImpl(); } catch(Exception e) { Fail(e); }
+        // With the switch on, the new menu is built a second later, so its first open only shows it (a cold build is ~70 ms).
+        _ = Task.Delay(1000).ContinueWith(_ => Quartz.Async.MainThread.Enqueue(() => {
+            if(UICore.NewMenuWanted) PrebuildNewMenu();
+        }));
     }
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void WarmUpImpl() => global::Facet.WarmUp.Run();

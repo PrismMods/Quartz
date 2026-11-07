@@ -2,6 +2,7 @@ using Quartz.Async;
 using Quartz.Core;
 using Quartz.Localization;
 using Quartz.Resource;
+using Quartz.UI.FacetUi;
 using Quartz.UI.Factory;
 using Quartz.UI.Factory.Page;
 using Quartz.UI.Generator;
@@ -108,12 +109,34 @@ public static partial class UICore {
         FontManager.ApplyMenuFont();
         if(MainCore.Conf.IsFirstRun) MakeFirstRunHelper();
         // Rebuild runs this too: never over the new menu, which Open would hide.
-        if(MainCore.Conf.ShowOnStartup && !Quartz.UI.FacetUi.FacetBridge.NewMenuVisible()) Open(true);
+        if(MainCore.Conf.ShowOnStartup && !FacetBridge.NewMenuVisible()) {
+            // The game's start shows the new menu when the switch is on: a pump later, once the runtime is up. A rebuild never opens it.
+            if(!startedOnce && NewMenuWanted) MainThread.Enqueue(() => { FacetBridge.OpenNewMenu(); if(!FacetBridge.NewMenuVisible()) Open(true); });
+            else Open(true);
+        }
+        startedOnce = true;
     }
+    private static bool startedOnce;
     public static void SetPanelOpacity(float value, bool save) {
         MainCore.Conf.PanelOpacity = Mathf.Clamp01(value);
         if(panelCanvasGroup != null && (!IsReorganizing || panelOverHub)) panelCanvasGroup.alpha = MainCore.Conf.PanelOpacity;
         if(save) MainCore.ConfMgr.RequestSave();
+    }
+#if DEBUG
+    internal static int NewMenuSwitchCalls;   // self-test hook: Prism's row must come through here
+#endif
+    /// <summary>
+    /// Every row that writes the new-menu switch goes through here: saved, the new menu built ahead when on (so its first
+    /// open only shows it), and the classic pages rebuilt, since Effect Remover's cached page shows its button only with it on.
+    /// </summary>
+    internal static void SetNewMenuSwitch(bool on) {
+#if DEBUG
+        NewMenuSwitchCalls++;
+#endif
+        MainCore.Conf.ExperimentalNewMenu = on;
+        MainCore.ConfMgr.RequestSave();
+        if(on) FacetBridge.PrebuildNewMenu();
+        RequestPagesRebuild();
     }
     // Deferred one pump: handlers still pending in this event snapshot would touch destroyed UI.
     private static void RequestPagesRebuild() {

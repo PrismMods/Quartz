@@ -179,6 +179,21 @@ internal static partial class PageSettings {
             "Lays the color picker out side by side instead of stacked.\nUseful on short windows where the tall picker does not fit"
         );
         var pickerLayoutToggleTr = pickerLayoutToggle.Label.gameObject.AddComponent<TextLocalization>().Init("COLOR_PICKER_HORIZONTAL", "Wide color picker");
+        // Only where the new menu can run; the same switch as Prism · Settings' row.
+        if(Quartz.UI.FacetUi.FacetBridge.Available()) {
+            UIToggle newMenuToggle = GenerateUI.Toggle(
+                GenerateUI.Row(content.transform),
+                defSet.ExperimentalNewMenu,
+                MainCore.Conf.ExperimentalNewMenu,
+                UICore.SetNewMenuSwitch,
+                "Experimental: new menu",
+                "prism_new_menu"
+            );
+            newMenuToggle.Rect.AddToolTip(
+                "PRISM_NEW_MENU_TIP",
+                "The menu hotkey opens the new menu. It is still being built; the classic menu stays available"
+            );
+        }
     }
     private static void CreateAppearanceSection(RectTransform content, CoreSettings defSet) {
         static float uiScaleFilter(float v) {

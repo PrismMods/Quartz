@@ -313,10 +313,7 @@ internal static partial class PrismBridge {
                 Label = "Experimental: new menu", Tooltip = "The menu hotkey opens the new menu. It is still being built; the classic menu stays available",
                 Keywords = ["facet", "preview", "beta"],
                 Get = () => MainCore.Conf.ExperimentalNewMenu,
-                Set = v => {
-                    MainCore.Conf.ExperimentalNewMenu = Convert.ToBoolean(v);
-                    MainCore.ConfMgr.RequestSave();
-                },
+                Set = v => UICore.SetNewMenuSwitch(Convert.ToBoolean(v)),
             },
         ];
     }

@@ -66,6 +66,8 @@ internal static partial class FacetSelfTestChecks {
         info($"new menu cold build {clock.Elapsed.TotalMilliseconds:0.0} ms (first build: {first})");
         check("the new menu builds", QuartzShell.Window != null, null);
         if(QuartzShell.Window == null) yield break;
+        string stored = QuartzHost.Host.Read("window." + QuartzShell.WindowId);
+        check("a new menu built ahead and not shown stores no window rect", !first || stored == null, $"first={first} stored={stored}");
         yield return Frames(3);
         ScrollView scroll = ContentScroll;
         var was = scroll.generateVisualContent;
@@ -213,11 +215,7 @@ internal static partial class FacetSelfTestChecks {
             check("switching it back on brings its classic card back on the same tab",
                 QuartzShell.CurrentPage == key && Body.Q(name: "menu-classic") != null && !AnyFailed(), $"page={QuartzShell.CurrentPage} want={key}");
         } finally {
-            if(FeatureService.IsEnabled(id) != was) FeatureService.SetEnabled(id, was);
-            // SetEnabled records the value; a rig that never chose one keeps its fresh-install default, and Features.json its bytes.
-            if(had) FeatureService.State.Features[id] = stored;
-            else FeatureService.State.Features.Remove(id);
-            FeatureService.State.Save();
+            RestoreFeature(id, was, had, stored);
         }
         yield return Frames(3);
     }
