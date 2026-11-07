@@ -524,6 +524,17 @@
     "FEATURE_PAGE_ENABLE": "Use this feature",
     "FEATURE_OPEN": "Open",
     "PRISM_KEY_DEBUG": "Open the debug panel",
-    "PRISM_KEY_SETTINGS": "Open the Prism settings panel"
+    "PRISM_KEY_SETTINGS": "Open the Prism settings panel",
+    "PRISM_KEY_MENU": "Open the Quartz menu",
+    "PRISM_DEBUG_LOG": "log",
+    "PRISM_DEBUG_STATE": "State",
+    "PRISM_GROUP_MENU": "Menu",
+    "PRISM_GROUP_EXPERIMENTAL": "Experimental",
+    "PRISM_MENU_HOTKEY": "Menu hotkey",
+    "PRISM_MENU_HOTKEY_TIP": "The key that opens Quartz's menu, with the modifier below",
+    "PRISM_MENU_MODIFIER": "Menu hotkey modifier",
+    "PRISM_MODIFIER_NONE": "None",
+    "PRISM_NEW_MENU": "Experimental: new menu",
+    "PRISM_NEW_MENU_TIP": "The menu hotkey opens the new menu. It is still being built; the classic menu stays available"
   }
 }

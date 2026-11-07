@@ -119,5 +119,6 @@ namespace PrismLib.UI.Toolkit {
     }
     public static unsafe partial class Words {
         public static global::System.Func<string> Language;
+        public static void AddTranslator(global::System.Func<string, string> t) => throw null;
     }
 }

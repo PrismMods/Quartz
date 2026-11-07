@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Quartz.Prism;
 using UnityEngine;
 namespace Quartz.Core;
 public static class Keybind {
@@ -77,7 +78,7 @@ public static class Keybind {
         if(!macKeys.TryGetValue(key, out MacKey s)) macKeys[key] = s = new MacKey();
         int frame = Time.frameCount;
         if(s.Frame != frame) {
-            s.Mapped = Quartz.Game.HookInput.TryMacKeyState(key, out bool held);
+            s.Mapped = MacState(key, out bool held);
             // Global HID state: a press typed into another app must not reach the game.
             held &= s.Mapped && Application.isFocused;
             s.Down = held && !s.Held && s.Frame == frame - 1;
@@ -87,7 +88,17 @@ public static class Keybind {
         return s.Mapped ? s : null;
     }
     private static bool MacHeld(KeyCode key) =>
-        IsMac && Application.isFocused && Quartz.Game.HookInput.TryMacKeyState(key, out bool held) && held;
+        IsMac && Application.isFocused && MacState(key, out bool held) && held;
+    /// <summary>The window server's state of a key: PrismLib.UI's MacKeys first, Quartz's own reader when that has no answer.</summary>
+    private static bool MacState(KeyCode key, out bool held) {
+        if(PrismBridge.TryPhysical(key, out held)) {
+            MacKeysInUse = true;
+            return true;
+        }
+        return Quartz.Game.HookInput.TryMacKeyState(key, out held);
+    }
+    /// <summary>A key read has been answered by PrismLib.UI's MacKeys (the self-test checks it on a Mac).</summary>
+    internal static bool MacKeysInUse;
     public static bool KeyDown(KeyCode key) {
         MacKey mac = PollMac(key);
         return mac != null && ModifierHeld(KeyModifier.Alt) ? mac.Down : Input.GetKeyDown(key);

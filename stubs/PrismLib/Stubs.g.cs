@@ -70,6 +70,7 @@ namespace PrismLib {
         public void AddLog(string name, global::System.Func<global::System.Collections.Generic.IEnumerable<string>> tail, string path = default, global::System.Action clear = default) => throw null;
         public global::PrismLib.KeyBinding BindKey(string id, int keyCode, global::PrismLib.KeyMods mods, string label) => throw null;
         public global::PrismLib.Claim ClaimState(global::PrismLib.StateKey key, string reason = default) => throw null;
+        public void DescribeSettings(global::System.Collections.Generic.IEnumerable<global::PrismLib.SettingEntry> entries) => throw null;
         public void ReportPointerOverUi(global::System.Func<bool> probe) => throw null;
         private ModHandle() { }
     }
@@ -87,15 +88,18 @@ namespace PrismLib {
         public string ActionLabel;
         public global::System.Func<object> Get;
         public string Group;
+        public string Id;
+        public string[] Keywords;
         public global::PrismLib.SettingKind Kind;
         public string Label;
         public double Max;
         public double Min;
         public string[] Options;
+        public int Order;
         public string Page;
         public global::System.Action<object> Set;
         public string Tooltip;
-        private SettingEntry() { }
+        public SettingEntry() => throw null;
     }
     public enum SettingKind : int {
         Bool = 0,

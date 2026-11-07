@@ -191,6 +191,8 @@ List<(string Name, Action Run)> tests = [
     ("Prism mods root: UMM is the mod folder's parent, ML the Mods folder", PrismRulesTests.TestModsRoot),
     ("Prism finds every PrismLib.UI copy a loader could load", PrismRulesTests.TestUiCopies),
     ("Prism key modifiers map Keybind's order onto PrismLib's bits", PrismRulesTests.TestPrismMods),
+    ("The menu hotkey refuses Prism's chords, bare modifiers and mouse buttons", PrismRulesTests.TestHotkeyRefusals),
+    ("Every English label Quartz hands Prism has a Lang key in both languages", PrismRulesTests.TestPrismWordsMatchLang),
     ("Quartz keeps its newest thousand log lines for the debug window", QuartzLoggerTests.TestRecentKeepsTheNewestThousand),
 ];
 if(args.Contains("--bench")) AllocationTests.ReportBaseline();

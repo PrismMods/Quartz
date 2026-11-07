@@ -524,6 +524,17 @@
     "FEATURE_PAGE_ENABLE": "이 기능 사용",
     "FEATURE_OPEN": "열기",
     "PRISM_KEY_DEBUG": "디버그 창 열기",
-    "PRISM_KEY_SETTINGS": "Prism 설정 창 열기"
+    "PRISM_KEY_SETTINGS": "Prism 설정 창 열기",
+    "PRISM_KEY_MENU": "Quartz 메뉴 열기",
+    "PRISM_DEBUG_LOG": "로그",
+    "PRISM_DEBUG_STATE": "상태",
+    "PRISM_GROUP_MENU": "메뉴",
+    "PRISM_GROUP_EXPERIMENTAL": "실험적 기능",
+    "PRISM_MENU_HOTKEY": "메뉴 단축키",
+    "PRISM_MENU_HOTKEY_TIP": "Quartz 메뉴를 여는 키 (아래 보조 키와 함께)",
+    "PRISM_MENU_MODIFIER": "메뉴 단축키 보조 키",
+    "PRISM_MODIFIER_NONE": "없음",
+    "PRISM_NEW_MENU": "실험적: 새 메뉴",
+    "PRISM_NEW_MENU_TIP": "메뉴 단축키로 새 메뉴를 엽니다. 아직 만드는 중이며 기존 메뉴도 계속 쓸 수 있습니다"
   }
 }

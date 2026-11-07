@@ -43,6 +43,7 @@ public sealed class CoreSettings : ISettingsFile {
     public Dictionary<string, (int Modifier, int Key)> ToggleKeybinds = [];
     public int ToggleModifier = (int)Keybind.KeyModifier.Alt;
     public int ToggleKey = (int)KeyCode.K;
+    public bool ExperimentalNewMenu;
     public int UpdateChannel = (int)ReleaseChannel.Alpha;
     public string SkippedVersion = "";
     public bool AprilFoolsForced = false;
@@ -112,6 +113,7 @@ public sealed class CoreSettings : ISettingsFile {
             [nameof(ReorganizePanelY)] = ReorganizePanelY,
             [nameof(ToggleModifier)] = ToggleModifier,
             [nameof(ToggleKey)] = ToggleKey,
+            [nameof(ExperimentalNewMenu)] = ExperimentalNewMenu,
             [nameof(UpdateChannel)] = UpdateChannel,
             [nameof(SkippedVersion)] = SkippedVersion,
             [nameof(AprilFoolsForced)] = AprilFoolsForced,
@@ -156,6 +158,7 @@ public sealed class CoreSettings : ISettingsFile {
         ReorganizePanelY = IOUtils.Read(token, nameof(ReorganizePanelY), ReorganizePanelY);
         ToggleModifier = IOUtils.Read(token, nameof(ToggleModifier), ToggleModifier);
         ToggleKey = IOUtils.Read(token, nameof(ToggleKey), ToggleKey);
+        ExperimentalNewMenu = IOUtils.Read(token, nameof(ExperimentalNewMenu), false); // a profile without the key is off, never the previous profile's value
         UpdateChannel = IOUtils.Read(token, nameof(UpdateChannel), UpdateChannel);
         SkippedVersion = IOUtils.Read(token, nameof(SkippedVersion), SkippedVersion);
         AprilFoolsForced = IOUtils.Read(token, nameof(AprilFoolsForced), AprilFoolsForced);

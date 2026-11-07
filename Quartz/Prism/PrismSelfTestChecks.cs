@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using PrismLib.UI.Toolkit;
+using Newtonsoft.Json.Linq;
 using Quartz.Core;
 using Quartz.UI.FacetUi;
 using UnityEngine;
@@ -62,6 +63,69 @@ internal static class PrismSelfTestChecks {
         }
         info($"[perf] PrismBridge.Tick mean over 600 frames, nothing open: {sw.Elapsed.TotalMilliseconds * 1000 / 600:0.0} µs");
     }
+    // Quartz's Prism · Settings rows: described once, writing Quartz's own settings, and the hotkey rebinding in PrismLib's registry.
+    internal static IEnumerator Settings(Action<string, bool, string> check, Action<string> info) {
+        string[] ids = RowIds();
+        check("settings: Quartz describes three rows",
+            ids.OrderBy(k => k).SequenceEqual(new[] { "quartz.experimental.newMenu", "quartz.menu.key", "quartz.menu.modifier" }), string.Join(",", ids));
+        check("settings: the new-menu switch defaults off", !new Quartz.IO.CoreSettings().ExperimentalNewMenu, null);
+        bool was = MainCore.Conf.ExperimentalNewMenu;
+        var (nmGet, nmSet) = Row("quartz.experimental.newMenu");
+        nmSet(true);
+        check("settings: the switch writes Quartz's settings", MainCore.Conf.ExperimentalNewMenu && (bool)nmGet(), null);
+        check("settings: the switch is saved", MainCore.Conf.Serialize()["ExperimentalNewMenu"]?.Value<bool>() == true, null);
+        nmSet(was);
+        var dflt = new Quartz.IO.CoreSettings { ExperimentalNewMenu = true };
+        dflt.Deserialize(new JObject());
+        check("settings: a config without the switch reads off, not the previous value", !dflt.ExperimentalNewMenu, null);
+        int k0 = MainCore.Conf.ToggleKey, m0 = MainCore.Conf.ToggleModifier;
+        var (_, keySet) = Row("quartz.menu.key");
+        var (_, modSet) = Row("quartz.menu.modifier");
+        try {
+            modSet(2);
+            keySet("J");
+            check("settings: the hotkey row rebinds", MainCore.Conf.ToggleKey == (int)KeyCode.J && MenuKeyBound(), $"key={MainCore.Conf.ToggleKey}");
+            keySet("D");
+            check("settings: a Prism chord is refused", MainCore.Conf.ToggleKey == (int)KeyCode.J, null);
+            keySet("LeftShift");
+            check("settings: a bare modifier is refused", MainCore.Conf.ToggleKey == (int)KeyCode.J, null);
+            keySet("106");
+            check("settings: a numeric string is refused", MainCore.Conf.ToggleKey == (int)KeyCode.J, null);
+            modSet(1);
+            check("settings: the modifier row writes Ctrl", MainCore.Conf.ToggleModifier == 1 && MenuKeyBound(), null);
+            // A profile switch, reset or import re-reads Conf and runs ApplyRuntimeSettings: the registry must follow.
+            MainCore.Conf.ToggleKey = (int)KeyCode.H;
+            MainCore.Conf.ToggleModifier = 3;
+            typeof(Quartz.IO.ProfileManager).GetMethod("ApplyRuntimeSettings", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, null);
+            check("settings: a profile reload rebinds the hotkey in PrismLib's registry", MenuKeyBound(), $"key={MainCore.Conf.ToggleKey} mod={MainCore.Conf.ToggleModifier}");
+        } finally {
+            // Straight to Conf: the user's real hotkey may be one the row refuses (Alt+D).
+            MainCore.Conf.ToggleKey = k0;
+            MainCore.Conf.ToggleModifier = m0;
+            MainCore.ConfMgr.RequestSave();
+            PrismBridge.RebindMenuKey();
+        }
+        check("settings: the hotkey is restored", MainCore.Conf.ToggleKey == k0 && MainCore.Conf.ToggleModifier == m0 && MenuKeyBound(), null);
+        string others = WantedBy(MainCore.Conf.ToggleKey, MainCore.Conf.ToggleModifier);
+        check("keys: the menu hotkey is wanted by no other mod", others.Length == 0, others);
+        check("settings: every Prism label has a Lang key", PrismRules.EnglishToKey.Values.All(k => MainCore.Tr.HasKey(k)), null);
+        if(Keybind.IsMac) {
+            Keybind.KeyHeld(KeyCode.K); // a read through the Mac path
+            check("keys: the Mac path reads PrismLib's MacKeys", Keybind.MacKeysInUse, $"ui={PrismBridge.UiAvailable}");
+        } else info("keys: not a Mac, MacKeys not exercised");
+        yield break;
+    }
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static string[] RowIds() => PrismLib.Settings.Of(PrismBridge.Id).Select(kv => kv.Value.Id).ToArray();
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static (Func<object>, Action<object>) Row(string id) {
+        PrismLib.SettingEntry e = PrismLib.Settings.Of(PrismBridge.Id).First(kv => kv.Value.Id == id).Value;
+        return (e.Get, e.Set);
+    }
+    // Quartz's modifier (None, Ctrl, Alt, Shift, Cmd) as PrismLib's bits.
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static string WantedBy(int key, int modifier) =>
+        string.Join(",", PrismLib.Keys.Wanting(key, (PrismLib.KeyMods)PrismRules.ToPrismMods(modifier), PrismBridge.Id).Select(b => b.Owner));
     // Sets anim.duration to 240 and Facet's copy to a sentinel, ticks Quartz once and returns what Facet now holds. Both put back.
     private static int AnimProbe() {
         string was = AnimGet();
@@ -179,7 +243,8 @@ internal static class PrismSelfTestChecks {
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool MenuKeyBound() {
         foreach(PrismLib.KeyBinding k in PrismLib.Keys.All)
-            if(k.Owner == PrismBridge.Id && k.Id == "Menu" && k.KeyCode == MainCore.Conf.ToggleKey) return true;
+            if(k.Owner == PrismBridge.Id && k.Id == "Menu" && k.KeyCode == MainCore.Conf.ToggleKey
+                && (int)k.Mods == PrismRules.ToPrismMods(MainCore.Conf.ToggleModifier)) return true;
         return false;
     }
     [MethodImpl(MethodImplOptions.NoInlining)]

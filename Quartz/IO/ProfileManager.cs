@@ -29,6 +29,7 @@ public static partial class ProfileManager {
         nameof(CoreSettings.Language),
         nameof(CoreSettings.ToggleModifier),
         nameof(CoreSettings.ToggleKey),
+        nameof(CoreSettings.ExperimentalNewMenu),
     ];
     public static string Active { get; private set; } = DEFAULT_NAME;
     public static string ProfilesPath => Path.Combine(MainCore.Paths.RootPath, "Profiles");

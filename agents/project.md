@@ -300,3 +300,4 @@ Do not overwrite or casually reformat unrelated work. If a file is already modif
 - Menu sidebar/pages: `Quartz/UI/UICore.cs` (`OriginalMenuState`), `Quartz/UI/Factory/MenuFactory.cs`, `Quartz/UI/Factory/PageFactory.cs`, `Quartz/UI/Factory/Page/*.cs`.
 - Key viewer CSS parser: `Quartz/Features/KeyViewer/KeyViewerCss.cs`, tests in `Quartz.Tests/Program.cs`.
 - Tests: `Quartz.Tests/Program.cs`, `test.sh`.
+- Quartz's `Words` translator (PrismBridge) answers exact English strings globally, so words like "None" or "Menu" are translated for any mod drawing them. Acceptable while the languages agree.

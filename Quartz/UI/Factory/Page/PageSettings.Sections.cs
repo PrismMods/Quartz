@@ -115,6 +115,7 @@ internal static partial class PageSettings {
                 MainCore.Conf.ToggleModifier = (int)mod;
                 MainCore.Conf.ToggleKey = (int)key;
                 MainCore.ConfMgr.RequestSave();
+                Quartz.Prism.PrismBridge.RebindMenuKey();
             },
             "Toggle Menu Keybind",
             "toggle_keybind"

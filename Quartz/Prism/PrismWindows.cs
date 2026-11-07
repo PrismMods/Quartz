@@ -5,6 +5,7 @@ using Quartz.Core;
 using Quartz.Compat;
 using Quartz.UI;
 using Quartz.UI.FacetUi;
+using Quartz.UI.Utility;
 using UnityEngine;
 using PrismTheme = PrismLib.UI.Toolkit.Theme;
 namespace Quartz.Prism;
@@ -145,10 +146,12 @@ internal static class PrismWindows {
             return;
         }
     }
+    private static readonly object CaptureOwner = new();
+    // Also the coordinator's cancel when an old-menu capture takes over (Release is then a no-op: it is no longer the owner).
     private static void CancelCapture() {
         if(capture == null) return;
         capture = null;
-        Keybind.Capturing = false;
+        KeyCaptureCoordinator.Release(CaptureOwner);
     }
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool FpsShown() => PrismLib.Config.GetBool(PrismLib.Prism.FpsKey);
@@ -174,7 +177,7 @@ internal static class PrismWindows {
         Func<object> get = e.Get; // delegates, not the entry: a closure keeps no PrismLib type
         Action<object> set = e.Set;
         return done => {
-            Keybind.Capturing = true;
+            if(!KeyCaptureCoordinator.Claim(CaptureOwner, CancelCapture)) return;
             capture = name => {
                 if(name != null) set?.Invoke(name);
                 done(get != null ? Convert.ToString(get()) : name);

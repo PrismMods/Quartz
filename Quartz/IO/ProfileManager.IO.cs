@@ -168,6 +168,7 @@ public static partial class ProfileManager {
             ? Translator.FALLBACK_LANGUAGE
             : MainCore.Conf.Language;
         Addons.AddonService.Reload();
+        Quartz.Prism.PrismBridge.RebindMenuKey(); // every reload path re-reads the hotkey: tell PrismLib's registry
     }
     private static void SavePointer() {
         if(!TryDirOf(Active, out _)) throw new IOException("active profile name is invalid");

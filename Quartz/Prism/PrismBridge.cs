@@ -247,9 +247,76 @@ internal static class PrismBridge {
         me.AddFields(MainCore.Tr.Get("PRISM_DEBUG_STATE", "State"), StateFields);
         me.BindKey("DebugPanel", (int)KeyCode.D, PrismLib.KeyMods.Alt, MainCore.Tr.Get("PRISM_KEY_DEBUG", "Open the debug panel"));
         me.BindKey("SettingsPanelPrism", (int)KeyCode.P, PrismLib.KeyMods.Alt, MainCore.Tr.Get("PRISM_KEY_SETTINGS", "Open the Prism settings panel"));
-        me.BindKey("Menu", MainCore.Conf.ToggleKey, (PrismLib.KeyMods)PrismRules.ToPrismMods(MainCore.Conf.ToggleModifier),
-            MainCore.Tr.Get("PRISM_KEY_MENU", "Open the Quartz menu"));
+        BindMenuKey(me);
+        me.DescribeSettings(SettingRows()); // once: it replaces whatever was described
         me.ReportPointerOverUi(() => UICore.IsOpen);
+    }
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void BindMenuKey(PrismLib.ModHandle me) =>
+        me.BindKey("Menu", MainCore.Conf.ToggleKey, (PrismLib.KeyMods)PrismRules.ToPrismMods(MainCore.Conf.ToggleModifier),
+            MainCore.Tr.Get("PRISM_KEY_MENU", "Open the Quartz menu")); // the same id replaces the old binding
+    /// <summary>Tells PrismLib's key registry where the menu hotkey is now. Runs after any change to it.</summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    internal static void RebindMenuKey() {
+#if !IL2CPP && !QUARTZ_KEYVIEWER
+        if(!Available || handle == null) return;
+        try { RebindMenuKeyImpl(); } catch(Exception e) { MainCore.Log.Wrn($"PrismLib menu key rebind failed: {e.Message}"); }
+#endif
+    }
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void RebindMenuKeyImpl() => BindMenuKey((PrismLib.ModHandle)handle);
+    // English labels: PrismLib.UI translates them at draw time through the translator UiWiringImpl adds.
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static List<PrismLib.SettingEntry> SettingRows() {
+        string[] mods = [
+            "None",
+            Keybind.ModifierName(Keybind.KeyModifier.Ctrl), Keybind.ModifierName(Keybind.KeyModifier.Alt),
+            Keybind.ModifierName(Keybind.KeyModifier.Shift), Keybind.ModifierName(Keybind.KeyModifier.Cmd),
+        ];
+        return [
+            new PrismLib.SettingEntry {
+                Id = "quartz.menu.key", Kind = PrismLib.SettingKind.Key, Page = "Quartz", Group = "Menu", Order = 0,
+                Label = "Menu hotkey", Tooltip = "The key that opens Quartz's menu, with the modifier below",
+                Keywords = ["keybind", "shortcut", "toggle", "open"],
+                Get = () => Keybind.Format((Keybind.KeyModifier)MainCore.Conf.ToggleModifier, (KeyCode)MainCore.Conf.ToggleKey),
+                Set = SetMenuKey,
+            },
+            new PrismLib.SettingEntry {
+                Id = "quartz.menu.modifier", Kind = PrismLib.SettingKind.Enum, Page = "Quartz", Group = "Menu", Order = 1,
+                Label = "Menu hotkey modifier", Options = mods, Keywords = ["keybind", "shortcut", "alt", "ctrl"],
+                Get = () => MainCore.Conf.ToggleModifier,
+                Set = SetMenuModifier,
+            },
+            new PrismLib.SettingEntry {
+                Id = "quartz.experimental.newMenu", Kind = PrismLib.SettingKind.Bool, Page = "Quartz", Group = "Experimental", Order = 2,
+                Label = "Experimental: new menu", Tooltip = "The menu hotkey opens the new menu. It is still being built; the classic menu stays available",
+                Keywords = ["facet", "preview", "beta"],
+                Get = () => MainCore.Conf.ExperimentalNewMenu,
+                Set = v => {
+                    MainCore.Conf.ExperimentalNewMenu = Convert.ToBoolean(v);
+                    MainCore.ConfMgr.RequestSave();
+                },
+            },
+        ];
+    }
+    private static void SetMenuKey(object value) {
+        if(!Enum.TryParse(Convert.ToString(value), out KeyCode key) || !Enum.IsDefined(typeof(KeyCode), key) || PrismRules.HotkeyRefused(MainCore.Conf.ToggleModifier, (int)key)) {
+            MainCore.Log.Msg($"Menu hotkey refused: {value}");
+            return;
+        }
+        MainCore.Conf.ToggleKey = (int)key;
+        MainCore.ConfMgr.RequestSave();
+        RebindMenuKey();
+    }
+    private static void SetMenuModifier(object value) {
+        int mod = Convert.ToInt32(value);
+        if(mod < 0 || mod > (int)Keybind.KeyModifier.Cmd || PrismRules.HotkeyRefused(mod, MainCore.Conf.ToggleKey)) {
+            MainCore.Log.Msg($"Menu hotkey modifier refused: {value}");
+            return;
+        }
+        MainCore.Conf.ToggleModifier = mod;
+        MainCore.ConfMgr.RequestSave();
+        RebindMenuKey();
     }
     private static IEnumerable<KeyValuePair<string, string>> StateFields() => [
         new("version", Info.DisplayVersion),
@@ -257,7 +324,7 @@ internal static class PrismBridge {
         new("enabled", MainCore.IsModEnabled ? "on" : "off"),
         new("menu", UICore.IsOpen ? "open" : "closed"),
         new("arranging", "n/a"),
-        new("newMenu", "n/a"),
+        new("newMenu", MainCore.Conf.ExperimentalNewMenu ? "on" : "off"),
         new("hotkey", Keybind.Format((Keybind.KeyModifier)MainCore.Conf.ToggleModifier, (KeyCode)MainCore.Conf.ToggleKey)),
         new("facet", FacetBridge.Available() ? "loaded" : "unavailable"),
         new("prismlib.ui", UiAvailable ? "loaded" : "unavailable"),
@@ -270,6 +337,7 @@ internal static class PrismBridge {
         PrismLib.UI.Toolkit.InputGate.AddMouseExemption(MenuOpen);
         PrismLib.UI.Toolkit.InputGate.AddBypass(Autoplay);
         PrismLib.UI.Toolkit.Words.Language = PrismWindows.Language;
+        PrismLib.UI.Toolkit.Words.AddTranslator(s => PrismRules.Translate(s, (k, d) => MainCore.Tr.Get(k, d)));
         PrismLib.UI.Toolkit.Ui.Log = m => MainCore.Log.Msg("[prism] " + m);
     }
     // Exactly one mod draws the shared debug window; the claim says which, and the others ask through RequestToggle.
