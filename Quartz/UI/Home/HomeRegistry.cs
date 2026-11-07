@@ -5,8 +5,8 @@ public static class HomeRegistry {
     public static HomeCard Add(HomeCard card) {
         if(card == null || string.IsNullOrWhiteSpace(card.Key))
             throw new ArgumentException("a home card needs a Key");
-        if(card.Build == null)
-            throw new ArgumentException($"home card '{card.Key}' needs a Build delegate");
+        if(card.Build == null && card.Lines == null)
+            throw new ArgumentException($"home card '{card.Key}' needs a Build or Lines delegate");
         cards.RemoveAll(c => c.Key == card.Key);
         cards.Add(card);
         return card;

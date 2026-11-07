@@ -1,6 +1,7 @@
 #if !IL2CPP
 using Facet;
 using Quartz.Core;
+using Quartz.Prism;
 using Quartz.Resource;
 using Quartz.UI.Nav;
 using UnityEngine;
@@ -20,6 +21,9 @@ internal static partial class QuartzShell {
     /// <summary>No geometry was saved for the window when it was built, so its first show takes the initial rect.</summary>
     internal static bool FreshGeometry { get; private set; }
     private static bool rectPending;
+    // Edit layout's wait for its session: -1 when none is pending, else the frames waited for it to start.
+    private static int layoutWait = -1;
+    private static bool layoutSeen;
 
     /// <summary>Builds the window hidden, on the page left last time (Home when that is gone). Once.</summary>
     internal static void Prebuild() {
@@ -90,6 +94,35 @@ internal static partial class QuartzShell {
         UICore.OpenAt(state);
     }
 
+    /// <summary>"Edit layout": the window steps aside for the shared layout editor, and comes back when that session ends.</summary>
+    internal static void EditLayout() {
+        MenuHandOff.ReturnTo = MenuHandOff.Menu.None;   // a classic menu this came from stays shut under the editor
+        Hide();
+        layoutWait = 0;
+        layoutSeen = false;
+        PrismBridge.OpenLayoutEditor();
+    }
+
+    /// <summary>The Edit layout row, shown only where the shared layout editor can open.</summary>
+    internal static void LayoutRow(VisualElement card, string id) =>
+        Controls.Action(card, "MENU_LAYOUT_HINT", "MENU_EDIT_LAYOUT", EditLayout, o => {
+            o.Id = id;
+            o.VisibleWhen = () => PrismBridge.UiAvailable;
+        });
+
+    // Only the session Edit layout started brings the window back: one another mod starts leaves it shut. The flag is
+    // this one, not MenuHandOff.ReturnTo, which the session's start clears.
+    private static void BackFromLayout() {
+        if(UICore.IsArranging || LayoutEditorProbe.Shown()) {
+            layoutSeen = true;
+            return;
+        }
+        if(!layoutSeen && ++layoutWait < 120) return;
+        if(!layoutSeen) MainCore.Log.Wrn("[Menu] the layout editor did not appear within 120 frames of Edit layout: the new menu comes back");
+        layoutWait = -1;
+        if(!UICore.IsOpen) Open();
+    }
+
     // Whoever hid it (the close button, Escape, the menu hotkey, an opener): a classic menu it came from comes back.
     private static void Hidden() {
         if(MenuHandOff.ReturnTo != MenuHandOff.Menu.Classic) return;
@@ -104,8 +137,9 @@ internal static partial class QuartzShell {
         Window.Root.style.opacity = MainCore.Conf.PanelOpacity;
     }
 
-    /// <summary>Per frame. Nothing while hidden.</summary>
+    /// <summary>Per frame. Nothing while hidden, unless Edit layout is waiting to bring it back.</summary>
     internal static void Tick() {
+        if(layoutWait >= 0) BackFromLayout();
         if(Surface == null || !Surface.Visible) return;
         Nav.Tick();
         float pw = Surface.Root.layout.width;   // NaN or 0 until the shown window has been laid out
@@ -125,6 +159,7 @@ internal static partial class QuartzShell {
         TabRow = null;
         CurrentPage = null;
         currentFeature = null;
+        layoutWait = -1;
     }
 }
 #endif

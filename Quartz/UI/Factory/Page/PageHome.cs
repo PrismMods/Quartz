@@ -67,7 +67,8 @@ internal static class PageHome {
             ? card.Title
             : MainCore.Tr.Get(card.LocaleKey, card.Title));
         try {
-            card.Build(body as RectTransform);
+            if(card.Build != null) card.Build(body as RectTransform);
+            else foreach(string line in card.Lines()) HomeUI.Line(body, line);
         } catch(Exception e) {
             MainCore.Log.Err($"[Home] card '{card.Key}' failed to build: {e}");
             HomeUI.Line(body, MainCore.Tr.Get("HOME_CARD_FAILED", "This card failed to build — see the log."));

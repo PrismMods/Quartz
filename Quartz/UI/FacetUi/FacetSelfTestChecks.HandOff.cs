@@ -117,7 +117,7 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(2);
     }
 
-    // Review Focus 2: Effect Remover's button, "Open it", then each close back down the chain, which ends with neither menu.
+    // Effect Remover's button, "Open it", then each close back down the chain, which ends with neither menu.
     private static IEnumerator PingPong(Action<string, bool, string> check) {
         UICore.Open(true);
         yield return Frames(2);
@@ -173,7 +173,7 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(2);
     }
 
-    // Review Focus 3 on a moved page: Effect Remover switched off from its own header, then on from its off page's header.
+    // On a moved page: Effect Remover switched off from its own header, then on from its off page's header.
     private static IEnumerator HeaderSwitch(Action<string, bool, string> check) {
         FacetBridge.OpenNewMenu(FxPage);
         yield return Frames(2);

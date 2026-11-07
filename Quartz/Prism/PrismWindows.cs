@@ -46,9 +46,10 @@ internal static class PrismWindows {
         // The wheel has to be polled: the game's input module does not forward it to UI Toolkit panels.
         if(own) Ui.TickWheel(Input.mousePosition, Input.mouseScrollDelta.y);
         // Undo and redo while a Prism window is open (the game's editor keeps its own Ctrl+Z). History is every mod's, so exactly
-        // one poller acts on a press: the window host, and nobody while a shared layout editor is open, which reads it itself.
+        // one poller acts on a press: the window host, and nobody while a shared layout editor is open (whoever draws it), which reads it itself.
         if(own && !UICore.SharedLayoutOpen && !QuartzLayout.Visible && Ui.AnyWindowOpen && !UICore.IsOpen && Input.GetKeyDown(KeyCode.Z)
-            && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand))) {
+            && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand))
+            && !LayoutEditorProbe.Shown()) {
             if(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) History.Redo();
             else History.Undo();
         }

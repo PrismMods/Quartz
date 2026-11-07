@@ -99,6 +99,7 @@ namespace UnityEngine.UIElements {
     public unsafe partial struct StyleEnum<T> : global::System.IEquatable<global::UnityEngine.UIElements.StyleEnum<T>> where T : struct, global::System.IConvertible {
         private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
         private T m_Value;
+        public T value { get => throw null; set { } }
         public static implicit operator global::UnityEngine.UIElements.StyleEnum<T>(T v) => throw null;
         bool global::System.IEquatable<global::UnityEngine.UIElements.StyleEnum<T>>.Equals(global::UnityEngine.UIElements.StyleEnum<T> other) => throw null;
     }
@@ -125,6 +126,7 @@ namespace UnityEngine.UIElements {
         protected TextElement() { }
     }
     public sealed unsafe partial class UIDocument : global::UnityEngine.MonoBehaviour {
+        public global::UnityEngine.UIElements.VisualElement rootVisualElement { get => throw null; }
         private UIDocument() { }
         public enum WorldSpaceSizeMode : int {
             Dynamic = 0,

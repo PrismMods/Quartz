@@ -206,7 +206,7 @@ internal static partial class PrismSelfTestChecks {
             unforce?.Invoke();
         }
     }
-    // Review Focus: an element that cannot move right now, the editor's own lifecycle, a move just before a session ends.
+    // Edge cases: an element that cannot move right now, the editor's own lifecycle, a move just before a session ends.
     private static IEnumerator Edges(Action<string, bool, string> check, Action<string> info, List<string> seen) {
         if(MineById(LayoutIds.ProgressBar) is { } bar) {
             ProgressBarStyle style = ProgressBarOverlay.Conf.Style;

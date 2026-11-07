@@ -38,18 +38,18 @@ public sealed class KeyLimiterModule : QuartzFeature {
             Title = "Key Limiter",
             LocaleKey = "SECTION_KEY_LIMITER",
             Order = 20,
-            Build = body => {
+            Lines = () => {
                 KeyLimiter.EnsureConf();
                 KeyLimiterSettings conf = KeyLimiter.Conf;
-                if(conf == null) return;
-                Quartz.UI.Home.HomeUI.Line(body, string.Format(
+                if(conf == null) return [];
+                return [string.Format(
                     System.Globalization.CultureInfo.InvariantCulture,
                     Quartz.Core.MainCore.Tr.Get("KL_HOME_KEYS", "{0}: {1} keys · {2}"),
                     conf.ActiveProfileOrDefault().Name,
                     conf.AllowedKeys.Length,
                     conf.Enabled
                         ? Quartz.Core.MainCore.Tr.Get("KL_HOME_ON", "limiting")
-                        : Quartz.Core.MainCore.Tr.Get("KL_HOME_OFF", "off")));
+                        : Quartz.Core.MainCore.Tr.Get("KL_HOME_OFF", "off"))];
             },
         });
         Context.RegisterImportHandler(new KeyLimiterImport());

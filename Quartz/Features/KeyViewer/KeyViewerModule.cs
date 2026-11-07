@@ -31,20 +31,22 @@ public sealed class KeyViewerModule : QuartzFeature {
             Title = "Key Viewer",
             LocaleKey = "SECTION_KEY_VIEWER",
             Order = 10,
-            Build = body => {
+            Lines = () => {
                 KeyViewerOverlay.EnsureConf();
                 KeyViewerSettings conf = KeyViewerOverlay.Conf;
-                if(conf == null) return;
-                Quartz.UI.Home.HomeUI.Line(body, conf.Enabled
-                    ? Quartz.Core.MainCore.Tr.Get("KVI_HOME_ON", "Showing during play")
-                    : Quartz.Core.MainCore.Tr.Get("KVI_HOME_OFF", "Hidden"));
-                Quartz.UI.Home.HomeUI.Line(body, string.Format(
-                    System.Globalization.CultureInfo.InvariantCulture,
-                    Quartz.Core.MainCore.Tr.Get("KVI_HOME_RAIN", "Rain {0} · speed {1:0} px/s"),
-                    conf.RainEnabled
-                        ? Quartz.Core.MainCore.Tr.Get("KVI_HOME_ON", "on")
-                        : Quartz.Core.MainCore.Tr.Get("KVI_HOME_OFF", "off"),
-                    conf.DmNoteSpeed));
+                if(conf == null) return [];
+                return [
+                    conf.Enabled
+                        ? Quartz.Core.MainCore.Tr.Get("KVI_HOME_ON", "Showing during play")
+                        : Quartz.Core.MainCore.Tr.Get("KVI_HOME_OFF", "Hidden"),
+                    string.Format(
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        Quartz.Core.MainCore.Tr.Get("KVI_HOME_RAIN", "Rain {0} · speed {1:0} px/s"),
+                        conf.RainEnabled
+                            ? Quartz.Core.MainCore.Tr.Get("KVI_HOME_ON", "on")
+                            : Quartz.Core.MainCore.Tr.Get("KVI_HOME_OFF", "off"),
+                        conf.DmNoteSpeed),
+                ];
             },
         });
         Context.RegisterImportHandler(new KeyViewerImport());

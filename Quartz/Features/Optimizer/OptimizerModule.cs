@@ -21,17 +21,17 @@ public sealed class OptimizerModule : QuartzFeature {
             Title = "Optimizer",
             LocaleKey = "SECTION_OPTIMIZER",
             Order = 40,
-            Build = body => {
+            Lines = () => {
                 Optimizer.EnsureConf();
                 OptimizerSettings conf = Optimizer.Conf;
-                if(conf == null) return;
+                if(conf == null) return [];
                 List<string> on = [];
                 if(conf.SmoothGC) on.Add(Quartz.Core.MainCore.Tr.Get("OPT_SMOOTHGC", "Smooth GC"));
                 if(conf.LeakGuard) on.Add(Quartz.Core.MainCore.Tr.Get("OPT_LEAKGUARD", "Leak Guard"));
                 if(conf.RunInBackground) on.Add(Quartz.Core.MainCore.Tr.Get("OPT_RUNBG", "Run In Background"));
-                Quartz.UI.Home.HomeUI.Line(body, on.Count == 0
+                return [on.Count == 0
                     ? Quartz.Core.MainCore.Tr.Get("OPT_HOME_NONE", "No optimizations enabled.")
-                    : string.Join(" · ", on));
+                    : string.Join(" · ", on)];
             },
         });
         Context.PatchAll();

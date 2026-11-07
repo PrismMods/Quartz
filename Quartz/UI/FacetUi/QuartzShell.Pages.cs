@@ -14,6 +14,7 @@ internal static partial class QuartzShell {
     private const float RailWidth = 160f;
     /// <summary>Pages drawn in Facet, by page key. Every other page is a classic card.</summary>
     internal static readonly Dictionary<string, Action<VisualElement>> Moved = new() {
+        [CorePages.HomePageKey] = ShellHome.Build,
         ["visuals.effectremover"] = FacetEffectRemover.Page,
     };
     /// <summary>The tab row of the open category, when it has one.</summary>
@@ -147,7 +148,10 @@ internal static partial class QuartzShell {
         string feature = FeaturePages.FeatureOf(page);
         Controls.PageHeader(p, Label(page.LocaleKey, page.Title), feature == null ? null : FeatureSwitch(feature), o => o.Id = "menu-header");
         if(p.panel == null) return;   // the search index's throwaway build: the card is the same on every classic page
-        Controls.Action(Controls.Card(p, null), "MENU_CLASSIC_PAGE", "MENU_CLASSIC_OPEN", () => OpenClassic(page.State), o => o.Id = "menu-classic");
+        VisualElement card = Controls.Card(p, null);
+        Controls.Action(card, "MENU_CLASSIC_PAGE", "MENU_CLASSIC_OPEN", () => OpenClassic(page.State), o => o.Id = "menu-classic");
+        // The feature puts an element on screen: its elements move in the shared layout editor.
+        if(ShellModel.HasLayout(feature)) LayoutRow(card, "menu-classic-layout");
     }
 }
 #endif

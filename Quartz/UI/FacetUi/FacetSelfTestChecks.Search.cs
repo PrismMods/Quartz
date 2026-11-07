@@ -167,7 +167,7 @@ internal static partial class FacetSelfTestChecks {
         check("a classic card's row is not indexed once per page", !hits.Any(h => h.Key == "MENU_CLASSIC_PAGE" || h.Key == "MENU_CLASSIC_OPEN"), Hits(hits));
     }
 
-    // Review Focus 4: Korean initials find a moved page's row.
+    // Korean initials find a moved page's row.
     private static IEnumerator SearchKorean(Action<string, bool, string> check) {
         const string key = "FXRM_ENABLE_SAVE";
         string was = MainCore.Tr.Language, english = MainCore.Tr.GetForLanguage(key, "en-US", key), q = null;
@@ -184,7 +184,7 @@ internal static partial class FacetSelfTestChecks {
         check("Korean initials find a moved page's row", q != Hangul.Initials(english) && hits.Any(h => h.Key == key), $"q={q} {Hits(hits)}");
     }
 
-    // Review Focus 3: the index follows a feature switched off. On its tab the classic page's rows give way to the off
+    // The index follows a feature switched off. On its tab the classic page's rows give way to the off
     // page, whose header has the same title (the feature's Lang keys stay loaded). The switch lands on a later pump,
     // which a busy queue can push past a fixed frame count: wait for it.
     private static IEnumerator SearchFresh(Action<string, bool, string> check) {

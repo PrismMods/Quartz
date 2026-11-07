@@ -48,14 +48,16 @@ public sealed class TufModule : QuartzFeature {
             Title = "TUF",
             LocaleKey = "TUF",
             Order = 30,
-            Build = body => {
+            Lines = () => {
                 TufService service = TufService.Instance;
-                if(service == null) return;
-                Quartz.UI.Home.HomeUI.Line(body, string.Format(
-                    System.Globalization.CultureInfo.InvariantCulture,
-                    Quartz.Core.MainCore.Tr.Get("TUF_HOME_INSTALLED", "{0} levels installed"),
-                    service.InstalledCount));
-                Quartz.UI.Home.HomeUI.Line(body, service.ActiveRootPath);
+                if(service == null) return [];
+                return [
+                    string.Format(
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        Quartz.Core.MainCore.Tr.Get("TUF_HOME_INSTALLED", "{0} levels installed"),
+                        service.InstalledCount),
+                    service.ActiveRootPath,
+                ];
             },
         });
         Context.PatchAll();

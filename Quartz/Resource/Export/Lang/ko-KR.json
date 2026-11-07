@@ -537,6 +537,13 @@
     "PRISM_NEW_MENU": "실험적: 새 메뉴",
     "PRISM_NEW_MENU_TIP": "메뉴 단축키로 새 메뉴를 엽니다. 아직 만드는 중이며 기존 메뉴도 계속 쓸 수 있습니다",
     "MENU_CLASSIC_PAGE": "이 페이지는 아직 기존 메뉴에 있습니다",
-    "MENU_CLASSIC_OPEN": "열기"
+    "MENU_CLASSIC_OPEN": "열기",
+    "MENU_HOME_LINE": "{0} · 기능 {2}개 중 {1}개 켜짐 · 프로필 {3}",
+    "MENU_QUICK_SWITCHES": "빠른 전환",
+    "MENU_EDIT": "편집…",
+    "MENU_STATUS": "상태",
+    "MENU_LAYOUT": "레이아웃",
+    "MENU_LAYOUT_HINT": "Quartz와 다른 Prism 모드의 화면 요소를 옮깁니다",
+    "MENU_EDIT_LAYOUT": "레이아웃 편집"
   }
 }

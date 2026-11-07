@@ -189,7 +189,7 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(1);
     }
 
-    // Review Focus 3: a feature switched off and on under its open page keeps its tab.
+    // A feature switched off and on under its open page keeps its tab.
     private static IEnumerator ShellFeatureFlip(Action<string, bool, string> check) {
         const string id = "ottoicon";
         bool was = FeatureService.IsEnabled(id), had = FeatureService.State.Features.TryGetValue(id, out bool stored);
@@ -220,7 +220,7 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(3);
     }
 
-    // Review Focus 5: the page it showed, and Home when the stored page is gone.
+    // The page it showed, and Home when the stored page is gone.
     private static IEnumerator ShellLastPage(Action<string, bool, string> check) {
         QuartzShell.Go("visuals.effectremover");
         string page = QuartzShell.CurrentPage;
@@ -239,7 +239,7 @@ internal static partial class FacetSelfTestChecks {
         check("a stored page that is gone opens Home", FacetBridge.NewMenuVisible() && QuartzShell.CurrentPage == CorePages.HomePageKey, Showing());
     }
 
-    // Review Focus 4: the rail and the open page relabel in the same frame; Chinese draws.
+    // The rail and the open page relabel in the same frame; Chinese draws.
     private static IEnumerator ShellLanguage(Action<string, bool, string> check) {
         QuartzShell.Go("profiles.main");
         NavCategory overlay = NavRegistry.Category("overlay");
