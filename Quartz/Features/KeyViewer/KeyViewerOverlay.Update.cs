@@ -95,7 +95,8 @@ public static partial class KeyViewerOverlay {
             wasInGame = inGame;
             gameStateKnown = true;
             bool isReorganizing = UICore.IsReorganizing;
-            bool show = OverlaySwitch.Enabled && Conf.Enabled && (Conf.ShowOutsideGame || inGame) || isReorganizing;
+            bool arranging = UICore.IsArranging;
+            bool show = OverlaySwitch.Enabled && Conf.Enabled && (Conf.ShowOutsideGame || inGame) || arranging;
             bool focused = focusKnown ? hasFocus : Application.isFocused;
             bool independent = Conf.Enabled && Conf.IndependentInput;
             KvInputQueue.SetWanted(independent);
@@ -107,6 +108,11 @@ public static partial class KeyViewerOverlay {
             if(footRoot != null && footRoot.gameObject.activeSelf != showFoot)
                 footRoot.gameObject.SetActive(showFoot);
             bool showDrag = isReorganizing;
+            if(arranging && !wasArranging) {
+                Canvas.ForceUpdateCanvases();
+                RefreshDragBounds();
+            }
+            wasArranging = arranging;
             if(dragObj != null && dragObj.activeSelf != showDrag) {
                 if(showDrag) {
                     Canvas.ForceUpdateCanvases();
@@ -117,13 +123,14 @@ public static partial class KeyViewerOverlay {
             bool showFootDrag = isReorganizing && footBuilt;
             if(footDragObj != null && footDragObj.activeSelf != showFootDrag)
                 footDragObj.SetActive(showFootDrag);
-            UpdateTabubVisibility(show, isReorganizing);
+            UpdateTabubVisibility(show, isReorganizing, arranging);
             if(!show || !focused) {
                 MarkInputInactive(now, clearTransientStats: !show);
                 TryFlushCounts(now, inGame);
                 return;
             }
-            if(isReorganizing) {
+            // Arranging copies the RectTransform into Conf every frame: a shared-editor SetBox must move the RectTransform (or this capture skip shared sessions), or it is overwritten.
+            if(arranging) {
                 Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
                 Conf.DmOffsetX = stored.x;
                 Conf.DmOffsetY = stored.y;

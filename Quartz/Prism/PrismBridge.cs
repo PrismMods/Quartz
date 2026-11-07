@@ -115,9 +115,17 @@ internal static class PrismBridge {
         try { PrismWindows.Recolour(accent); } catch(Exception e) { WindowsOff(e); }
 #endif
     }
+    /// <summary>
+    /// MUST be called from every layout target's GetBox that Quartz hands PrismLib: it is the only signal Quartz has that the
+    /// shared layout editor is open (the editor reads every box each frame it is open). Without it overlays never show for
+    /// arranging and the reorganizer is never stood down.
+    /// </summary>
+    internal static void TouchLayout() => layout.Touch(Time.frameCount);
+    private static readonly PrismRules.LayoutSession layout = new();
     /// <summary>Per frame, after Quartz's own UI update.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
     internal static void Tick() {
+        try { UICore.SetSharedLayout(layout.Open(Time.frameCount)); } catch(Exception e) { MainCore.Log.Wrn($"Shared layout state failed: {e.Message}"); } // no PrismLib type: runs without PrismLib too, and then never opens
 #if !IL2CPP && !QUARTZ_KEYVIEWER
         TickAnim();
         if(UiAvailable) {
@@ -166,6 +174,7 @@ internal static class PrismBridge {
     /// <summary>Hands the input gate back and takes Quartz out of every PrismLib registry.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
     internal static void Shutdown() {
+        try { UICore.SetSharedLayout(false); } catch(Exception e) { Diag.Ignore(e); } // never leave a session stuck open
 #if !IL2CPP && !QUARTZ_KEYVIEWER
         if(hosted) { // whatever turned a half off: what ran is cleaned up
             try { PrismWindows.Shutdown(); } catch(Exception e) { MainCore.Log.Wrn($"Prism windows shutdown failed: {e.Message}"); } // writes geometry: before the settings save
@@ -255,6 +264,7 @@ internal static class PrismBridge {
     private static void BindMenuKey(PrismLib.ModHandle me) =>
         me.BindKey("Menu", MainCore.Conf.ToggleKey, (PrismLib.KeyMods)PrismRules.ToPrismMods(MainCore.Conf.ToggleModifier),
             MainCore.Tr.Get("PRISM_KEY_MENU", "Open the Quartz menu")); // the same id replaces the old binding
+#endif
     /// <summary>Tells PrismLib's key registry where the menu hotkey is now. Runs after any change to it.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
     internal static void RebindMenuKey() {
@@ -263,6 +273,7 @@ internal static class PrismBridge {
         try { RebindMenuKeyImpl(); } catch(Exception e) { MainCore.Log.Wrn($"PrismLib menu key rebind failed: {e.Message}"); }
 #endif
     }
+#if !IL2CPP && !QUARTZ_KEYVIEWER
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void RebindMenuKeyImpl() => BindMenuKey((PrismLib.ModHandle)handle);
     // English labels: PrismLib.UI translates them at draw time through the translator UiWiringImpl adds.
@@ -323,7 +334,7 @@ internal static class PrismBridge {
         new("loader", Loader),
         new("enabled", MainCore.IsModEnabled ? "on" : "off"),
         new("menu", UICore.IsOpen ? "open" : "closed"),
-        new("arranging", "n/a"),
+        new("arranging", UICore.IsArranging ? (UICore.SharedLayoutOpen ? "shared editor" : "reorganize") : "no"),
         new("newMenu", MainCore.Conf.ExperimentalNewMenu ? "on" : "off"),
         new("hotkey", Keybind.Format((Keybind.KeyModifier)MainCore.Conf.ToggleModifier, (KeyCode)MainCore.Conf.ToggleKey)),
         new("facet", FacetBridge.Available() ? "loaded" : "unavailable"),

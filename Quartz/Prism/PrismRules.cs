@@ -56,6 +56,16 @@ internal static class PrismRules {
     /// <summary>The translation of one of those English labels, or null when the text is not Quartz's.</summary>
     public static string Translate(string english, Func<string, string, string> get) =>
         english != null && EnglishToKey.TryGetValue(english, out string key) ? get(key, english) : null;
+    /// <summary>
+    /// PrismLib gives a mod no "the layout editor is open" signal, but the editor reads every target's box each
+    /// frame it is open: a frame with a read opens the session, and it stays open Grace frames past the last one.
+    /// </summary>
+    public sealed class LayoutSession {
+        public const int Grace = 2;
+        private int last = int.MinValue;
+        public void Touch(int frame) => last = frame;
+        public bool Open(int frame) => last != int.MinValue && frame - last <= Grace;
+    }
     private static void AddStore(List<string> found, string owner) {
         foreach(string version in Dirs(Path.Combine(owner, "Runtime", "versions"))) Add(found, Path.Combine(version, Ui));
     }

@@ -281,7 +281,11 @@ public static class CalibrationPopupUI {
         panelObj.SetActive(true);
         panelRect.anchoredPosition = ShownPos;
         group.alpha = 1f;
-        dragObj.SetActive(true);
+        dragObj.SetActive(UICore.IsReorganizing); // a shared editor moves it from its own surface
+    }
+    // The drag surface is the reorganizer's: a shared editor arranging the popup moves it from its own surface.
+    public static void SyncDragSurface() {
+        if(reorganizing && dragObj != null) dragObj.SetActive(UICore.IsReorganizing);
     }
     public static void EndReorganize() {
         if(!reorganizing) return;

@@ -170,14 +170,14 @@ public static partial class PanelsOverlay {
     private static readonly List<LivePanel> panels = [];
     private static Updater updater;
     private static bool ShouldShow() =>
-        (OverlaySwitch.Enabled && GameStats.InGame) || UICore.IsReorganizing;
+        (OverlaySwitch.Enabled && GameStats.InGame) || UICore.IsArranging;
     private static bool gateWant;
     // Roots start visible; keep the updater until it has hidden them once.
     private static bool updaterRan;
     private static bool gateRunning = true;
     internal static void Gate() {
         if(updater == null) return;
-        bool want = ShouldShow() || UICore.IsReorganizing;
+        bool want = ShouldShow() || UICore.IsArranging;
         bool run = want || gateWant;
         gateWant = want || !updaterRan;
         if(gateRunning == run) return;

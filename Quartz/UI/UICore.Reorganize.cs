@@ -119,6 +119,7 @@ public static partial class UICore {
     }
     // A rebuild (a feature toggled from the panel) lands back in the hub as it was, without the fades.
     private static void RestoreHub(bool overHub) {
+        if(SharedLayoutOpen) return;
         EnterReorganize();
         reorganizeSeq?.CompleteAndKill();
         if(!overHub || Panel == null) return;
@@ -131,6 +132,7 @@ public static partial class UICore {
     [Obsolete("The movable exit button was replaced by the centred hub; this does nothing.")]
     public static void ResetExitReorganizePosition() { }
     internal static void OpenToHub() {
+        if(SharedLayoutOpen) return; // EnterReorganize would be refused and leave an invisible menu
         Open(true);
         // Hidden before the fade so the panel doesn't flash on its way out.
         if(panelCanvasGroup != null) panelCanvasGroup.alpha = 0f;
@@ -144,10 +146,39 @@ public static partial class UICore {
             MainCore.Log.Err($"[UI] reorganize listener threw: {e.Message}");
         }
     }
+    /// <summary>PrismLib's shared layout editor is open (inferred from its box reads, see PrismBridge). Overlays show while it is.</summary>
+    public static bool SharedLayoutOpen { get; private set; }
+    /// <summary>Some editor is moving Quartz's overlays: the reorganize hub or the shared layout editor. Never both.</summary>
+    public static bool IsArranging => IsReorganizing || SharedLayoutOpen;
+    public static event Action<bool> OnArrangingChanged;
+    private static void SetReorganizing(bool value) {
+        bool was = IsArranging;
+        IsReorganizing = value;
+        RaiseArranging(was);
+    }
+    private static void RaiseArranging(bool was) {
+        if(was == IsArranging) return;
+        try {
+            OnArrangingChanged?.Invoke(IsArranging);
+        } catch(Exception e) {
+            MainCore.Log.Err($"[UI] arranging listener threw: {e.Message}");
+        }
+    }
+    // The flag goes up before the hub closes, so IsArranging stays true across the hand-over.
+    internal static void SetSharedLayout(bool open) {
+        if(SharedLayoutOpen == open) return;
+        bool was = IsArranging;
+        SharedLayoutOpen = open;
+        if(open) {
+            Close(noAnimate: true); // the menu (or its hub): the hotkey is ignored during a session, so it would only close via its X
+            ExitReorganize(); // Close does it when the menu is open; this covers a hub without one
+        }
+        RaiseArranging(was);
+    }
     // Pinned in the empty right inset of every Overlay page, so it stays put while the page scrolls.
     public static void EnterReorganize() {
-        if(IsReorganizing) return;
-        IsReorganizing = true;
+        if(IsReorganizing || SharedLayoutOpen) return;
+        SetReorganizing(true);
         panelOverHub = false;
         RaiseReorganize(true);
         if(panelCanvasGroup != null) {
@@ -171,7 +202,7 @@ public static partial class UICore {
     }
     public static void ExitReorganize() {
         if(!IsReorganizing) return;
-        IsReorganizing = false;
+        SetReorganizing(false);
         panelOverHub = false;
         Reorganizer.Deselect();
         RaiseReorganize(false);

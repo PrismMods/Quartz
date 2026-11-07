@@ -167,7 +167,7 @@ public static partial class UICore {
         MenuFactory.OnStateChanged -= _onDockTabChanged;
         Panes.PaneState.Changed -= _onPaneChanged;
         bool wasReorganizing = IsReorganizing;
-        IsReorganizing = false;
+        SetReorganizing(false);
         if(wasReorganizing) RaiseReorganize(false);
         panelTweener?.Kill();
         panelTweener = null;

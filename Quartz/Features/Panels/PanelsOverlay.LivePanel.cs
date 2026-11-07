@@ -37,22 +37,25 @@ public static partial class PanelsOverlay {
         private readonly StringBuilder sb = new();
         private float nextTextRefresh;
         private bool lastShow;
-        private bool lastReorganizing;
+        private bool lastReorganizing, lastArranging;
         private void Update() {
             updaterRan = true;
             bool isReorganizing = UICore.IsReorganizing;
+            bool arranging = UICore.IsArranging;
             bool show = ShouldShow();
             if(raycaster != null && raycaster.enabled != isReorganizing) raycaster.enabled = isReorganizing;
             float now = Time.unscaledTime;
-            bool stateChanged = show != lastShow || isReorganizing != lastReorganizing;
+            bool stateChanged = show != lastShow || isReorganizing != lastReorganizing || arranging != lastArranging;
             bool refreshText = stateChanged || now >= nextTextRefresh;
             if(refreshText) nextTextRefresh = now + TextRefreshInterval;
             lastShow = show;
             lastReorganizing = isReorganizing;
+            lastArranging = arranging;
             foreach(LivePanel p in panels)
-                UpdatePanel(p, show, isReorganizing, refreshText || p.Dirty);
+                UpdatePanel(p, show, isReorganizing, arranging, refreshText || p.Dirty);
         }
-        private void UpdatePanel(LivePanel p, bool show, bool isReorganizing, bool refreshText) {
+        // SyncPosition copies the RectTransform into Conf while arranging: a shared-editor SetBox must move the RectTransform (or skip this for shared sessions), or it is overwritten.
+        private void UpdatePanel(LivePanel p, bool show, bool isReorganizing, bool arranging, bool refreshText) {
             if(p?.Text == null || p.Rect == null) return;
             if(p.DragObj != null && p.DragObj.activeSelf != isReorganizing) p.DragObj.SetActive(isReorganizing);
             if(!show) {
@@ -60,7 +63,7 @@ public static partial class PanelsOverlay {
                 return;
             }
             if(!refreshText) {
-                if(isReorganizing) SyncPosition(p);
+                if(arranging) SyncPosition(p);
                 return;
             }
             sb.Clear();
@@ -114,8 +117,8 @@ public static partial class PanelsOverlay {
             string body = BuilderEquals(sb, bodyLength, p.LastBody)
                 ? p.LastBody
                 : bodyLength == 0 ? "" : sb.ToString(0, bodyLength);
-            if(isReorganizing && body.Length == 0) body = p.Config.Name;
-            bool active = body.Length > 0 || isReorganizing;
+            if(arranging && body.Length == 0) body = p.Config.Name;
+            bool active = body.Length > 0 || arranging;
             if(p.Rect.gameObject.activeSelf != active) {
                 p.Rect.gameObject.SetActive(active);
                 if(active) p.Dirty = true;
@@ -143,7 +146,7 @@ public static partial class PanelsOverlay {
                 p.LastBody = body;
                 p.Dirty = false;
             }
-            if(isReorganizing) SyncPosition(p);
+            if(arranging) SyncPosition(p);
         }
         private static StatDef FindStat(string id) => PanelsOverlay.FindStat(id);
         private static Func<string, string> MakeResolver(PanelConfig config) =>

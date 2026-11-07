@@ -24,14 +24,14 @@ public static class ProgressBarOverlay {
     private static Updater updater;
     private static GraphicRaycaster raycaster;
     private static bool ShouldShow() =>
-        (OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame) || UICore.IsReorganizing;
+        (OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame) || UICore.IsArranging;
     private static bool gateWant;
     // Roots start visible; keep the updater until it has hidden them once.
     private static bool updaterRan;
     private static bool gateRunning = true;
     internal static void Gate() {
         if(updater == null) return;
-        bool want = ShouldShow() || UICore.IsReorganizing;
+        bool want = ShouldShow() || UICore.IsArranging;
         bool run = want || gateWant;
         gateWant = want || !updaterRan;
         if(gateRunning == run) return;
@@ -202,13 +202,15 @@ public static class ProgressBarOverlay {
             if(bar == null) return;
             bool show = ShouldShow();
             bool isReorganizing = UICore.IsReorganizing;
+            bool arranging = UICore.IsArranging;
             // The line style spans the screen edge, so only the bar style can be moved.
             bool movable = isReorganizing && Conf.Style != ProgressBarStyle.Line;
             if(raycaster != null && raycaster.enabled != movable) raycaster.enabled = movable;
             if(bar.gameObject.activeSelf != show) bar.gameObject.SetActive(show);
             if(dragObj != null && dragObj.activeSelf != movable) dragObj.SetActive(movable);
             if(!show) return;
-            if(movable) {
+            // Arranging copies the RectTransform into Conf every frame: a shared-editor SetBox must move the RectTransform (or this capture skip shared sessions), or it is overwritten.
+            if(arranging && Conf.Style != ProgressBarStyle.Line) {
                 Vector2 stored = OverlayCalibration.Unscale(bar.anchoredPosition);
                 Conf.OffsetX = stored.x;
                 Conf.TopOffset = -stored.y;

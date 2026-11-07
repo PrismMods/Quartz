@@ -82,7 +82,7 @@ public static partial class KeyViewerOverlay {
     private static bool layoutRebuildPending;
     private static float layoutRebuildAt;
     private static bool gameStateKnown;
-    private static bool wasInGame;
+    private static bool wasInGame, wasArranging;
     private static bool inputWasActive;
     private static bool inputPrimed;
     private sealed class Box {

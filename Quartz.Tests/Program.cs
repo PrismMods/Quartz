@@ -190,6 +190,7 @@ List<(string Name, Action Run)> tests = [
     ("Delegate binding is inert on mismatches", AllocationTests.TestBindingIsInertOnMismatchesRatherThanThrowing),
     ("Prism mods root: UMM is the mod folder's parent, ML the Mods folder", PrismRulesTests.TestModsRoot),
     ("Prism finds every PrismLib.UI copy a loader could load", PrismRulesTests.TestUiCopies),
+    ("A shared layout session is open while an editor reads and for two frames after", PrismRulesTests.TestLayoutSession),
     ("Prism key modifiers map Keybind's order onto PrismLib's bits", PrismRulesTests.TestPrismMods),
     ("The menu hotkey refuses Prism's chords, bare modifiers and mouse buttons", PrismRulesTests.TestHotkeyRefusals),
     ("Every English label Quartz hands Prism has a Lang key in both languages", PrismRulesTests.TestPrismWordsMatchLang),

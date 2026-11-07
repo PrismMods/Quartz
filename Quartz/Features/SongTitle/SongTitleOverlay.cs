@@ -27,14 +27,14 @@ public static class SongTitleOverlay {
     private static GameObject dragObj;
     private static Updater updater;
     private static bool ShouldShow() =>
-        (OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame) || UICore.IsReorganizing;
+        (OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame) || UICore.IsArranging;
     private static bool gateWant;
     // Roots start visible; keep the updater until it has hidden them once.
     private static bool updaterRan;
     private static bool gateRunning = true;
     internal static void Gate() {
         if(updater == null) return;
-        bool want = ShouldShow() || UICore.IsReorganizing;
+        bool want = ShouldShow() || UICore.IsArranging;
         bool run = want || gateWant;
         gateWant = want || !updaterRan;
         if(gateRunning == run) return;
@@ -236,12 +236,14 @@ public static class SongTitleOverlay {
             updaterRan = true;
             if(root == null || text == null) return;
             bool isReorganizing = UICore.IsReorganizing;
+            bool arranging = UICore.IsArranging;
             bool show = ShouldShow();
             if(raycaster != null && raycaster.enabled != isReorganizing) raycaster.enabled = isReorganizing;
             if(root.gameObject.activeSelf != show) root.gameObject.SetActive(show);
             if(dragObj != null && dragObj.activeSelf != isReorganizing) dragObj.SetActive(isReorganizing);
             if(!show) return;
-            if(isReorganizing) {
+            // Arranging copies the RectTransform into Conf every frame: a shared-editor SetBox must move the RectTransform (or this capture skip shared sessions), or it is overwritten.
+            if(arranging) {
                 Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
                 Conf.OffsetX = stored.x;
                 Conf.OffsetY = stored.y;
@@ -251,7 +253,7 @@ public static class SongTitleOverlay {
                 text.font = font;
                 ApplyShadow();
             }
-            string body = BuildBody(isReorganizing);
+            string body = BuildBody(arranging);
             if(body != lastBody) {
                 text.text = body;
                 lastBody = body;

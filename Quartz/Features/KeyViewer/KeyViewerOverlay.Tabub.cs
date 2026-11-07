@@ -174,9 +174,9 @@ public static partial class KeyViewerOverlay {
             box.DelayedReleaseTime = -1f;
         }
     }
-    private static void UpdateTabubVisibility(bool show, bool isReorganizing) {
+    private static void UpdateTabubVisibility(bool show, bool isReorganizing, bool arranging) {
         if(tabubRoot == null || Conf == null) return;
-        float alpha = isReorganizing ? 1f : TabubTargetAlpha();
+        float alpha = arranging ? 1f : TabubTargetAlpha();
         bool want = show && Conf.TabubEnabled && alpha > 0.002f && tabubImage.texture != null;
         if(want && !Mathf.Approximately(alpha, tabubAlpha)) {
             tabubAlpha = alpha;
@@ -187,7 +187,7 @@ public static partial class KeyViewerOverlay {
         if(tabubRoot.gameObject.activeSelf != want) tabubRoot.gameObject.SetActive(want);
         bool dragWanted = want && isReorganizing;
         if(tabubDragObj != null && tabubDragObj.activeSelf != dragWanted) tabubDragObj.SetActive(dragWanted);
-        if(dragWanted) CaptureTabubPosition();
+        if(want && arranging) CaptureTabubPosition();
     }
     private static void DisposeTabub() {
         if(tabubCustomTex != null) Object.Destroy(tabubCustomTex);

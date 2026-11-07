@@ -189,6 +189,7 @@ public static partial class Reorganizer {
     private const float VirtualH = 1080f;
     private const float SnapThreshold = 8f;
     private static readonly List<ReorganizeHandle> handles = [];
+    internal static int LiveHandleCount => handles.Count;
     public static ReorganizeHandle Selected { get; private set; }
     private static GameObject canvasObj;
     private static GameObject panelObj;

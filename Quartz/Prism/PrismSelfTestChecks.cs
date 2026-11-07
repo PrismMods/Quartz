@@ -14,7 +14,7 @@ namespace Quartz.Prism;
 /// the NoInlining helpers below, never in the iterator's locals or a lambda's signature: either one
 /// becomes a typed field of a compiler-made class.
 /// </summary>
-internal static class PrismSelfTestChecks {
+internal static partial class PrismSelfTestChecks {
     internal static IEnumerator Loading(Action<string, bool, string> check, Action<string> info) {
         Assembly[] ui = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetName().Name == "PrismLib.UI").ToArray();
         Version loaded = ui.Length > 0 ? ui[0].GetName().Version : null;

@@ -22,7 +22,7 @@ public static class PracticeOverlay {
     private static Updater updater;
     private static bool ShouldShow() =>
         (OverlaySwitch.Enabled && Conf.Enabled && Conf.ShowIndicator
-            && (!Conf.IndicatorOnlyInGame || GameStats.InGame)) || UICore.IsReorganizing;
+            && (!Conf.IndicatorOnlyInGame || GameStats.InGame)) || UICore.IsArranging;
     private static bool gateWant;
     // Roots start visible; keep the updater until it has hidden them once.
     private static bool updaterRan;
@@ -31,7 +31,7 @@ public static class PracticeOverlay {
         if(updater == null) return;
         PracticeInput.Poll();
         PracticeDifficulty.FlushPendingDifficulty();
-        bool want = ShouldShow() || UICore.IsReorganizing;
+        bool want = ShouldShow() || UICore.IsArranging;
         bool run = want || gateWant;
         gateWant = want || !updaterRan;
         if(gateRunning == run) return;
@@ -134,12 +134,14 @@ public static class PracticeOverlay {
             updaterRan = true;
             if(root == null || text == null) return;
             bool isReorganizing = UICore.IsReorganizing;
+            bool arranging = UICore.IsArranging;
             bool show = ShouldShow();
             if(raycaster != null && raycaster.enabled != isReorganizing) raycaster.enabled = isReorganizing;
             if(root.gameObject.activeSelf != show) root.gameObject.SetActive(show);
             if(dragObj != null && dragObj.activeSelf != isReorganizing) dragObj.SetActive(isReorganizing);
             if(!show) return;
-            if(isReorganizing) {
+            // Arranging copies the RectTransform into Conf every frame: a shared-editor SetBox must move the RectTransform (or this capture skip shared sessions), or it is overwritten.
+            if(arranging) {
                 Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
                 Conf.OffsetX = stored.x;
                 Conf.OffsetY = stored.y;
@@ -172,7 +174,7 @@ public static class PracticeInput {
         PracticeSettings conf = PracticeDifficulty.Conf;
         if(conf == null || !conf.Enabled || conf.Bindings.Count == 0) return;
         // Not while a menu is up or a text field (uGUI or Facet) has the keys.
-        if(UICore.MenuShowing || UICore.IsReorganizing || Quartz.UI.Objects.UIInputBlocker.IsEditing) return;
+        if(UICore.MenuShowing || UICore.IsArranging || Quartz.UI.Objects.UIInputBlocker.IsEditing) return;
         if(Time.unscaledTime - lastApply < 0.2f) return;
         foreach(PracticeBinding binding in conf.Bindings) {
             if(!Keybind.IsUsableKey(binding.Key) || !Input.GetKeyDown(binding.Key)) continue;

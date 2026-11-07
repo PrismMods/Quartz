@@ -31,6 +31,13 @@ static class PrismRulesTests {
             Directory.Delete(root, true);
         }
     }
+    public static void TestLayoutSession() {
+        var s = new PrismRules.LayoutSession();
+        Assert(!s.Open(0), "closed before any read");
+        s.Touch(10);
+        Assert(s.Open(10) && s.Open(12), "open on the read frame and for Grace frames after");
+        Assert(!s.Open(13), "closed once Grace frames pass with no read");
+    }
     public static void TestPrismMods() {
         Assert(PrismRules.ToPrismMods(0) == 0 && PrismRules.ToPrismMods(1) == 2 && PrismRules.ToPrismMods(2) == 4
             && PrismRules.ToPrismMods(3) == 1 && PrismRules.ToPrismMods(4) == 8, "Keybind None/Ctrl/Alt/Shift/Cmd -> PrismLib KeyMods bits");

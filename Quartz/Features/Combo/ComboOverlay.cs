@@ -25,14 +25,14 @@ public static class ComboOverlay {
     private static GameObject dragObj;
     private static Updater updater;
     private static bool ShouldShow() =>
-        (OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame) || UICore.IsReorganizing;
+        (OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame) || UICore.IsArranging;
     private static bool gateWant;
     // Roots start visible; keep the updater until it has hidden them once.
     private static bool updaterRan;
     private static bool gateRunning = true;
     internal static void Gate() {
         if(updater == null) return;
-        bool want = ShouldShow() || UICore.IsReorganizing;
+        bool want = ShouldShow() || UICore.IsArranging;
         bool run = want || gateWant;
         gateWant = want || !updaterRan;
         if(gateRunning == run) return;
@@ -234,12 +234,14 @@ public static class ComboOverlay {
             updaterRan = true;
             if(root == null || valueText == null) return;
             bool isReorganizing = UICore.IsReorganizing;
+            bool arranging = UICore.IsArranging;
             bool show = ShouldShow();
             if(raycaster != null && raycaster.enabled != isReorganizing) raycaster.enabled = isReorganizing;
             if(root.gameObject.activeSelf != show) root.gameObject.SetActive(show);
             if(dragObj != null && dragObj.activeSelf != isReorganizing) dragObj.SetActive(isReorganizing);
             if(!show) return;
-            if(isReorganizing) {
+            // Arranging copies the RectTransform into Conf every frame: a shared-editor SetBox must move the RectTransform (or this capture skip shared sessions), or it is overwritten.
+            if(arranging) {
                 Vector2 stored = OverlayCalibration.Unscale(root.anchoredPosition);
                 Conf.OffsetX = stored.x;
                 Conf.OffsetY = GetOffsetYFromPosition(stored.y);
@@ -257,7 +259,7 @@ public static class ComboOverlay {
                 ApplyCaptionMaterial();
                 captionFontChanged = true;
             }
-            int count = isReorganizing && Combo.Count <= 0 ? 42 : Combo.Count;
+            int count = arranging && Combo.Count <= 0 ? 42 : Combo.Count;
             (float pulse, float pulseIntensity) = Combo.EvaluatePulse(Conf.CountPulseScale, Conf.PulseDuration);
             float valueSize = Conf.FontSize * pulse;
             Color color = Conf.GetComboColor(count);
