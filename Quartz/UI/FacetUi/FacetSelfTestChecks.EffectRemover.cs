@@ -40,7 +40,6 @@ internal static partial class FacetSelfTestChecks {
             yield return ClickFlips(check);
             yield return ShowsBehindWindow(check);
             yield return ProfileSwitch(check, path, file);
-            AccentFollows(check);
             yield return MenuHandOff(check);
         } finally {
             FacetEffectRemover.Hide();
@@ -224,18 +223,6 @@ internal static partial class FacetSelfTestChecks {
     }
     private static bool Near(Color a, Color b) =>
         Mathf.Abs(a.r - b.r) < 0.01f && Mathf.Abs(a.g - b.g) < 0.01f && Mathf.Abs(a.b - b.b) < 0.01f;
-    private static void AccentFollows(Action<string, bool, string> check) {
-        VisualElement bar = FacetEffectRemover.Window.Root[0];
-        Color accent = MainCore.Conf.GetAccentColor();
-        // Red, unless the accent already is red-ish and the change would not show.
-        Color test = Near(Theme.FromAccent(accent)[Role.TitleBar], Theme.FromAccent(Color.red)[Role.TitleBar]) ? Color.cyan : Color.red;
-        UIColors.ApplyAccent(test);
-        Color mid = bar.style.backgroundColor.value;   // same frame
-        UIColors.ApplyAccent(accent);
-        Color back = bar.style.backgroundColor.value;
-        check("the accent recolours the title bar in the same frame", Near(mid, Theme.FromAccent(test)[Role.TitleBar]), $"test={test} bar={mid}");
-        check("restoring the accent recolours it back", !Near(mid, back) && Near(back, Theme.FromAccent(accent)[Role.TitleBar]), $"bar={back}");
-    }
     private static IEnumerator MenuHandOff(Action<string, bool, string> check) {
         Surface s = FacetEffectRemover.Surface;
         if(!s.Visible) FacetBridge.OpenEffectRemover();

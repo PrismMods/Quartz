@@ -2,6 +2,7 @@
 using Facet;
 using Quartz.Core;
 using Quartz.Localization;
+using Quartz.Prism;
 using UnityEngine;
 namespace Quartz.UI.FacetUi;
 /// <summary>
@@ -12,6 +13,8 @@ internal static class QuartzHost {
     private static Host host;
     private static bool hooked;
     private static readonly List<Surface> surfaces = [];
+    /// <summary>The theme wears the Prism suite look (PrismLib.UI's skin), or Facet's own look without it.</summary>
+    internal static bool Suited { get; private set; }
     internal static Host Host {
         get {
             host ??= Host.Create("Quartz", o => {
@@ -20,7 +23,7 @@ internal static class QuartzHost {
                 o.Language = () => LanguageCode(MainCore.Tr.Language);
                 o.Read = key => MainCore.Conf.FacetWindows.TryGetValue(key, out string v) ? v : null;
                 o.Write = Write;
-                o.Theme = Theme.FromAccent(MainCore.Conf.GetAccentColor());
+                o.Theme = MakeTheme(MainCore.Conf.GetAccentColor());
             });
             if(!hooked) {
                 hooked = true;
@@ -30,13 +33,32 @@ internal static class QuartzHost {
         }
     }
     // Labels are Lang keys; the DEFAULT language answers every Get with its fallback, so that is the English text.
-    // Facet's faces draw Latin, plus Hangul only when the host says "ko": any other language would draw boxes, so it reads English.
-    internal static string Translate(string s) {
-        string english = MainCore.Tr.GetForLanguage(s, "en-US", s);
-        return LanguageCode(MainCore.Tr.Language) is "en" or "ko" ? MainCore.Tr.Get(s, english) : english;
-    }
+    // Facet's faces draw Latin, plus Hangul, Han and kana through its CJK fallback; any other language would draw boxes, so it reads English.
+    internal static string Translate(string s) => Text(s, MainCore.Tr.GetForLanguage(s, "en-US", s));
+    /// <summary>Text Quartz formats itself: the key's translation when Facet can draw the language, else the given English.</summary>
+    internal static string Text(string key, string english) =>
+        Drawable(LanguageCode(MainCore.Tr.Language)) ? MainCore.Tr.Get(key, english) : english;
+    /// <summary>True for the languages Facet draws: Latin, plus the Korean, Chinese and Japanese fallbacks.</summary>
+    internal static bool Drawable(string code) => code is "en" or "ko" or "zh" or "ja";
     /// <summary>Re-tints every Quartz window. Before the host exists there is nothing to tint: it starts from the accent.</summary>
-    internal static void Recolour(Color accent) => host?.Theme.Recolour(accent);
+    internal static void Recolour(Color accent) {
+        if(host == null) return;
+        if(Suited) Accent(host.Theme, accent);
+        else host.Theme.Recolour(accent);
+    }
+    private static Theme MakeTheme(Color accent) {
+        var t = new Theme();
+        Suited = PrismBridge.WearSuite(t);
+        if(!Suited) return Theme.FromAccent(accent);
+        Accent(t, accent);
+        return t;
+    }
+    // The suite leaves Accent, Focus and AccentText to the host; a derived scheme knows the text that reads on this accent.
+    private static void Accent(Theme t, Color accent) {
+        t[Role.Accent] = t[Role.Focus] = accent;
+        t[Role.AccentText] = Theme.FromAccent(accent)[Role.AccentText];
+        t.Notify();
+    }
     /// <summary>A surface on this host that is relabelled when Quartz's language changes and disposed on shutdown.</summary>
     internal static Surface NewSurface(string name, Layer layer) {
         var surface = new Surface(Host, name, layer);

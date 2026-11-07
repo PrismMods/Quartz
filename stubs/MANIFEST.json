@@ -1997,6 +1997,27 @@
         ]
       },
       {
+        "type": "Facet.Role",
+        "members": [
+          "Facet.Role Facet.Role::Accent",
+          "Facet.Role Facet.Role::AccentText",
+          "Facet.Role Facet.Role::Danger",
+          "Facet.Role Facet.Role::Focus",
+          "Facet.Role Facet.Role::Line",
+          "Facet.Role Facet.Role::Off",
+          "Facet.Role Facet.Role::Panel",
+          "Facet.Role Facet.Role::PanelBorder",
+          "Facet.Role Facet.Role::Rail",
+          "Facet.Role Facet.Role::Row",
+          "Facet.Role Facet.Role::RowAlt",
+          "Facet.Role Facet.Role::RowHover",
+          "Facet.Role Facet.Role::Text",
+          "Facet.Role Facet.Role::TextMuted",
+          "Facet.Role Facet.Role::TitleBar",
+          "System.Int32 Facet.Role::value__"
+        ]
+      },
+      {
         "type": "Facet.Skin",
         "members": [
           "System.Void Facet.Skin::Scroll(UnityEngine.UIElements.ScrollView)"
@@ -2037,7 +2058,12 @@
         "type": "Facet.Theme",
         "members": [
           "Facet.Theme Facet.Theme::FromAccent(UnityEngine.Color,System.Single)",
-          "System.Void Facet.Theme::Recolour(UnityEngine.Color,System.Single)"
+          "System.Void Facet.Theme::.ctor()",
+          "System.Void Facet.Theme::Notify()",
+          "System.Void Facet.Theme::Recolour(UnityEngine.Color,System.Single)",
+          "System.Void Facet.Theme::set_Item(Facet.Role,UnityEngine.Color)",
+          "UnityEngine.Color Facet.Theme::Item(Facet.Role)",
+          "UnityEngine.Color Facet.Theme::get_Item(Facet.Role)"
         ]
       },
       {
@@ -2719,6 +2745,12 @@
           "System.Void PrismLib.UI.Toolkit.SettingsPanel::Dispose()",
           "System.Void PrismLib.UI.Toolkit.SettingsPanel::Tick()",
           "System.Void PrismLib.UI.Toolkit.SettingsPanel::Toggle()"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.Suite",
+        "members": [
+          "Facet.Theme PrismLib.UI.Toolkit.Suite::Wear(Facet.Theme)"
         ]
       },
       {

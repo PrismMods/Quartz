@@ -126,7 +126,7 @@ internal static class FacetBridge {
         if(Available()) _ = Task.Delay(500).ContinueWith(_ => Quartz.Async.MainThread.Enqueue(WarmUpNow));
 #endif
     }
-    /// <summary>Scrolls the topmost Facet window while Quartz's own window shows. Only after Facet has been probed: no probe per frame.</summary>
+    /// <summary>Scrolls the topmost Facet window. Only after Facet has been probed: no probe per frame.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void TickWheel(Vector2 pointer, float delta) {
 #if !IL2CPP
@@ -174,9 +174,7 @@ internal static class FacetBridge {
     private static void RecolourImpl(Color accent) => QuartzHost.Recolour(accent);
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void TickWheelImpl(Vector2 pointer, float delta) {
-        // Other Prism mods tick the wheel too and Facet does not dedupe per frame, so only for our own window.
-        // Facet follow-up: make Input.TickWheel per-frame idempotent like HandleEscape, then drop this gate.
-        if(FacetEffectRemover.Surface?.Visible == true) global::Facet.Input.TickWheel(pointer, delta);
+        global::Facet.Input.TickWheel(pointer, delta);   // Facet counts a notch once per frame across mods
     }
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void ShutdownImpl() => QuartzHost.Shutdown();

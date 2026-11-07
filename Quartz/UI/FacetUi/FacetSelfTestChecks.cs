@@ -20,12 +20,14 @@ internal static partial class FacetSelfTestChecks {
         // Every window these checks open writes its geometry into the live settings: put the map back.
         var windows = new Dictionary<string, string>(MainCore.Conf.FacetWindows);
         try {
+            yield return Suite(check, info);
             yield return EffectRemoverWindow(check, info);
             yield return Escape(check);
             yield return TextFocus(check);
             yield return Block(check);
             check("translate and language", TranslateAndLanguage(out string d), d);
-            check("a language Facet cannot draw shows English", UndrawableShowsEnglish(out d), d);
+            yield return ChineseDraws(check);
+            check("FilterLabel follows the game's script", FilterLabelScripts(out d), d);
             check("read/write round trip", ReadWrite(out d), d);
             yield return Teardown(check);   // last: it disposes Quartz's surfaces, as quitting does
         } finally {
@@ -171,20 +173,50 @@ internal static partial class FacetSelfTestChecks {
         detail = $"lang={lang} code={code} got={got} unknown={unknown}";
         return ok;
     }
-    // Facet draws Latin, and Hangul only for "ko". The language is swapped and put back within this call.
-    private static bool UndrawableShowsEnglish(out string detail) {
+    // Facet draws Latin, Hangul, Han and kana. The language is swapped and put back in the finally; Quartz's
+    // surfaces relabel a frame after the change, and that is what loads Facet's CJK fallback face.
+    private static IEnumerator ChineseDraws(Action<string, bool, string> check) {
         const string key = "FXRM_MODE_SIMPLE";
         string was = MainCore.Tr.Language;
         string english = MainCore.Tr.GetForLanguage(key, "en-US", key);
+        bool ok = false;
+        string detail = "";
         try {
             MainCore.Tr.Language = "zh-CN";
-            string zh = MainCore.Tr.Get(key, english), zhShown = QuartzHost.Host.Translate(key);
-            string zhFilter = FacetEffectRemover.FilterLabel(Filter.NightVision);
-            MainCore.Tr.Language = "ko-KR";
-            string ko = MainCore.Tr.Get(key, english), koShown = QuartzHost.Host.Translate(key);
-            detail = $"game={RDString.language} en={english} zh={zh}->{zhShown} ko={ko}->{koShown} zhFilter={zhFilter}";
-            return zh != english && zhShown == english && ko != english && koShown == ko && zhFilter.All(c => c < 0x2E80);
+            // The relabel lands within a frame or two; wait for the font to hold the text instead of a fixed count.
+            for(int i = 0; i < 30 && !Fonts.Has(Fonts.Regular(QuartzHost.Host), QuartzHost.Host.Translate(key)); i++) yield return null;
+            string zh = MainCore.Tr.Get(key, english), shown = QuartzHost.Host.Translate(key);
+            bool has = Fonts.Has(Fonts.Regular(QuartzHost.Host), shown);
+            bool codes = QuartzHost.Drawable("ja") && !QuartzHost.Drawable("pt");
+            bool filter = RDString.language != SystemLanguage.English
+                || FacetEffectRemover.FilterLabel(Filter.NightVision) == RDString.GetEnumValue(Filter.NightVision);
+            detail = $"game={RDString.language} en={english} zh={zh} shown={shown} has={has} codes={codes} filter={filter}";
+            ok = shown == zh && zh != english && has && codes && filter;
         } finally {
+            MainCore.Tr.Language = was;
+        }
+        yield return null;   // let the restored language relabel before the next check
+        check("ChineseDraws", ok, detail);
+    }
+    // The game's own filter name shows only when Facet can draw its script: the game's language and Quartz's agree.
+    private static bool FilterLabelScripts(out string detail) {
+        string was = MainCore.Tr.Language;
+        SystemLanguage game = RDString.language;
+        try {
+            string Own() => RDString.GetEnumValue(Filter.NightVision);
+            string Label() => FacetEffectRemover.FilterLabel(Filter.NightVision);
+            RDString.language = SystemLanguage.Japanese;
+            MainCore.Tr.Language = "ja-JP"; bool ja = Label() == Own();
+            MainCore.Tr.Language = "zh-CN"; bool jaUnderZh = Label() == "Night Vision";
+            RDString.language = SystemLanguage.ChineseSimplified;
+            bool zh = Label() == Own();
+            RDString.language = SystemLanguage.ChineseTraditional;
+            bool zhTw = Label() == Own();
+            MainCore.Tr.Language = "ko-KR"; bool zhUnderKo = Label() == "Night Vision";
+            detail = $"ja={ja} jaUnderZh={jaUnderZh} zh={zh} zhTw={zhTw} zhUnderKo={zhUnderKo}";
+            return ja && jaUnderZh && zh && zhTw && zhUnderKo;
+        } finally {
+            RDString.language = game;
             MainCore.Tr.Language = was;
         }
     }

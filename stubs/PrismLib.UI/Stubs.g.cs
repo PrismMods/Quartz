@@ -125,6 +125,9 @@ namespace PrismLib.UI.Toolkit {
         private SettingsPanel() { }
         void global::System.IDisposable.Dispose() => throw null;
     }
+    public static unsafe partial class Suite {
+        public static global::Facet.Theme Wear(global::Facet.Theme t) => throw null;
+    }
     public sealed unsafe partial class Theme {
         public global::UnityEngine.Color Accent { get => throw null; set { } }
         public Theme() => throw null;

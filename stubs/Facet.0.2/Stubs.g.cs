@@ -74,6 +74,23 @@ namespace Facet {
         public T Default { get => throw null; set { } }
         protected Options() { }
     }
+    public enum Role : int {
+        Panel = 0,
+        PanelBorder = 1,
+        TitleBar = 2,
+        Row = 3,
+        RowAlt = 4,
+        RowHover = 5,
+        Text = 6,
+        TextMuted = 7,
+        Accent = 8,
+        Danger = 9,
+        AccentText = 10,
+        Focus = 11,
+        Rail = 12,
+        Line = 13,
+        Off = 14,
+    }
     public static unsafe partial class Skin {
         public static void Scroll(global::UnityEngine.UIElements.ScrollView view) => throw null;
     }
@@ -96,9 +113,11 @@ namespace Facet {
         void global::System.IDisposable.Dispose() => throw null;
     }
     public sealed unsafe partial class Theme {
+        public global::UnityEngine.Color this[global::Facet.Role r] { get => throw null; set { } }
+        public Theme() => throw null;
         public static global::Facet.Theme FromAccent(global::UnityEngine.Color accent, float tint = default) => throw null;
+        public void Notify() => throw null;
         public void Recolour(global::UnityEngine.Color accent, float tint = default) => throw null;
-        private Theme() { }
     }
     public static unsafe partial class Ui {
         public static global::UnityEngine.UIElements.VisualElement Box(global::UnityEngine.UIElements.VisualElement parent = default) => throw null;

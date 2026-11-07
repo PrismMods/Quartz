@@ -132,12 +132,16 @@ internal static class FacetEffectRemover {
         });
         return null;
     }
-    // The game names filters in its own language, which Facet can draw when it is English, or Korean under
-    // Quartz's Korean (Facet's Hangul fallback). Otherwise the enum name: the game has no English lookup
-    // short of switching its language.
+    // The game names filters in its own language, which Facet can draw when it is English, or when its script
+    // is the one Quartz's language draws (Korean, Chinese, Japanese). Otherwise the enum name: the game has
+    // no English lookup short of switching its language.
     internal static string FilterLabel(Filter f) =>
-        RDString.language == SystemLanguage.English
-            || (RDString.language == SystemLanguage.Korean && QuartzHost.LanguageCode(MainCore.Tr.Language) == "ko")
+        RDString.language == SystemLanguage.English || RDString.language switch {
+            SystemLanguage.Korean => "ko",
+            SystemLanguage.ChineseSimplified or SystemLanguage.ChineseTraditional or SystemLanguage.Chinese => "zh",
+            SystemLanguage.Japanese => "ja",
+            _ => null
+        } == QuartzHost.LanguageCode(MainCore.Tr.Language)
             ? RDString.GetEnumValue(f)
             : Regex.Replace(f.ToString(), "(?<=[a-z])(?=[A-Z0-9])", " ");
     // Returns the Decoration Types wrapper, shown only while Decoration is on.
