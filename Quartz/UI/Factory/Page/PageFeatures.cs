@@ -52,7 +52,7 @@ internal static class PageFeatures {
         input.Placeholder.gameObject.AddComponent<TextLocalization>().Init("FEATURES_FILTER", "Filter features");
         input.InputField.characterLimit = 40;
     }
-    private static string Norm(string text) {
+    internal static string Norm(string text) {
         string normalized = StringUtils.Normalize(text);
         if(MainCore.Conf.Language == "ko-KR" && !string.IsNullOrEmpty(normalized))
             normalized = StringUtils.NormalizeToHangulChosung(normalized);

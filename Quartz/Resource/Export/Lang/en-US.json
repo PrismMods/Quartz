@@ -544,6 +544,12 @@
     "MENU_STATUS": "Status",
     "MENU_LAYOUT": "Layout",
     "MENU_LAYOUT_HINT": "Move Quartz's on-screen elements, and other Prism mods'",
-    "MENU_EDIT_LAYOUT": "Edit layout"
+    "MENU_EDIT_LAYOUT": "Edit layout",
+    "MENU_FEATURES_LINE": "{0} of {1} on · a feature that's off is fully unloaded",
+    "MENU_CHIP_ALL": "All",
+    "MENU_CHIP_ON": "On",
+    "MENU_CHIP_OFF": "Off",
+    "MENU_TAB_HIDE": "Hide from sidebar",
+    "MENU_TAB_SHOW": "Show in sidebar"
   }
 }

@@ -1912,17 +1912,28 @@
         "type": "Facet.CardOptions",
         "members": [
           "System.Collections.Generic.List\u00601\u003CSystem.Collections.Generic.KeyValuePair\u00602\u003CSystem.String,System.Action\u003E\u003E Facet.CardOptions::Actions()",
-          "System.Void Facet.CardOptions::set_Actions(System.Collections.Generic.List\u00601\u003CSystem.Collections.Generic.KeyValuePair\u00602\u003CSystem.String,System.Action\u003E\u003E)"
+          "System.Func\u00601\u003CSystem.String\u003E Facet.CardOptions::NoteText()",
+          "System.Void Facet.CardOptions::set_Actions(System.Collections.Generic.List\u00601\u003CSystem.Collections.Generic.KeyValuePair\u00602\u003CSystem.String,System.Action\u003E\u003E)",
+          "System.Void Facet.CardOptions::set_NoteText(System.Func\u00601\u003CSystem.String\u003E)"
+        ]
+      },
+      {
+        "type": "Facet.ChoiceOptions",
+        "members": [
+          "System.Collections.Generic.IList\u00601\u003CSystem.String\u003E Facet.ChoiceOptions::Items()",
+          "System.Void Facet.ChoiceOptions::set_Items(System.Collections.Generic.IList\u00601\u003CSystem.String\u003E)"
         ]
       },
       {
         "type": "Facet.ControlOptions",
         "members": [
           "System.Func\u00601\u003CSystem.Boolean\u003E Facet.ControlOptions::VisibleWhen()",
+          "System.Func\u00601\u003CSystem.String\u003E Facet.ControlOptions::TooltipText()",
           "System.String Facet.ControlOptions::Id()",
           "System.String Facet.ControlOptions::Tooltip()",
           "System.Void Facet.ControlOptions::set_Id(System.String)",
           "System.Void Facet.ControlOptions::set_Tooltip(System.String)",
+          "System.Void Facet.ControlOptions::set_TooltipText(System.Func\u00601\u003CSystem.String\u003E)",
           "System.Void Facet.ControlOptions::set_VisibleWhen(System.Func\u00601\u003CSystem.Boolean\u003E)"
         ]
       },
@@ -1940,9 +1951,11 @@
           "Facet.Control\u00601\u003CSystem.Boolean\u003E Facet.Controls::PageHeader(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Boolean\u003E,System.Action\u00601\u003CFacet.PageHeaderOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.Boolean\u003E Facet.Controls::Tile(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Boolean\u003E,System.Action\u00601\u003CFacet.TileOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.Boolean\u003E Facet.Controls::Toggle(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Boolean\u003E,System.Action\u00601\u003CFacet.Options\u00601\u003CSystem.Boolean\u003E\u003E)",
+          "Facet.Control\u00601\u003CSystem.Int32\u003E Facet.Controls::Choice(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Int32\u003E,System.Action\u00601\u003CFacet.ChoiceOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.Int32\u003E Facet.Controls::Dropdown(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Int32\u003E,System.Action\u00601\u003CFacet.DropdownOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.Single\u003E Facet.Controls::Slider(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Single\u003E,System.Action\u00601\u003CFacet.SliderOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.String\u003E Facet.Controls::Info(UnityEngine.UIElements.VisualElement,System.String,System.Func\u00601\u003CSystem.String\u003E,System.Action\u00601\u003CFacet.ControlOptions\u003E)",
+          "Facet.Control\u00601\u003CSystem.String\u003E Facet.Controls::Text(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.String\u003E,System.Action\u00601\u003CFacet.TextOptions\u003E)",
           "System.Single Facet.Controls::RowHeight",
           "UnityEngine.UIElements.Button Facet.Controls::Action(UnityEngine.UIElements.VisualElement,System.String,System.String,System.Action,System.Action\u00601\u003CFacet.ControlOptions\u003E)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Card(UnityEngine.UIElements.VisualElement,System.String,System.Action\u00601\u003CFacet.CardOptions\u003E)",
@@ -2124,6 +2137,10 @@
         "members": [
           "Facet.Tabs Facet.Tabs::Pages(UnityEngine.UIElements.VisualElement,System.Collections.Generic.IList\u00601\u003CFacet.NavItem\u003E,System.Int32,System.Action\u00601\u003CSystem.Int32\u003E)"
         ]
+      },
+      {
+        "type": "Facet.TextOptions",
+        "members": []
       },
       {
         "type": "Facet.Theme",

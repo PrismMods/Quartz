@@ -16,6 +16,7 @@ internal static partial class QuartzShell {
     internal static readonly Dictionary<string, Action<VisualElement>> Moved = new() {
         [CorePages.HomePageKey] = ShellHome.Build,
         ["visuals.effectremover"] = FacetEffectRemover.Page,
+        [CorePages.FeaturesPageKey] = ShellFeatures.Build,
     };
     /// <summary>The tab row of the open category, when it has one.</summary>
     internal static Tabs TabRow { get; private set; }

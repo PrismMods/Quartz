@@ -544,6 +544,12 @@
     "MENU_STATUS": "상태",
     "MENU_LAYOUT": "레이아웃",
     "MENU_LAYOUT_HINT": "Quartz와 다른 Prism 모드의 화면 요소를 옮깁니다",
-    "MENU_EDIT_LAYOUT": "레이아웃 편집"
+    "MENU_EDIT_LAYOUT": "레이아웃 편집",
+    "MENU_FEATURES_LINE": "{1}개 중 {0}개 켜짐 · 꺼진 기능은 완전히 언로드됩니다",
+    "MENU_CHIP_ALL": "전체",
+    "MENU_CHIP_ON": "켜짐",
+    "MENU_CHIP_OFF": "꺼짐",
+    "MENU_TAB_HIDE": "사이드바에서 숨기기",
+    "MENU_TAB_SHOW": "사이드바에 표시"
   }
 }
