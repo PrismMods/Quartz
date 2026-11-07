@@ -18,6 +18,9 @@ namespace Facet {
     public sealed unsafe partial class Bind<T> {
         private Bind() { }
     }
+    public sealed unsafe partial class CardOptions : global::Facet.ControlOptions {
+        private CardOptions() { }
+    }
     public unsafe partial class ControlOptions {
         public string Id { get => throw null; set { } }
         public string Tooltip { get => throw null; set { } }
@@ -32,7 +35,10 @@ namespace Facet {
     public static unsafe partial class Controls {
         public const float RowHeight = 0f;
         public static global::UnityEngine.UIElements.Button Action(global::UnityEngine.UIElements.VisualElement parent, string label, string button, global::System.Action onClick, global::System.Action<global::Facet.ControlOptions> configure = default) => throw null;
+        public static global::UnityEngine.UIElements.VisualElement Card(global::UnityEngine.UIElements.VisualElement parent, string title, global::System.Action<global::Facet.CardOptions> configure = default) => throw null;
         public static global::Facet.Control<int> Dropdown(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<int> bind, global::System.Action<global::Facet.DropdownOptions> configure = default) => throw null;
+        public static global::Facet.Control<string> Info(global::UnityEngine.UIElements.VisualElement parent, string label, global::System.Func<string> value, global::System.Action<global::Facet.ControlOptions> configure = default) => throw null;
+        public static global::Facet.Control<bool> PageHeader(global::UnityEngine.UIElements.VisualElement parent, string title, global::Facet.Bind<bool> on, global::System.Action<global::Facet.PageHeaderOptions> configure = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Section(global::UnityEngine.UIElements.VisualElement parent, string title, bool defaultOpen = default) => throw null;
         public static global::Facet.Control<float> Slider(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<float> bind, global::System.Action<global::Facet.SliderOptions> configure = default) => throw null;
         public static global::Facet.Control<bool> Toggle(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<bool> bind, global::System.Action<global::Facet.Options<bool>> configure = default) => throw null;
@@ -45,6 +51,8 @@ namespace Facet {
     public sealed unsafe partial class Host {
         public global::Facet.Theme Theme { get => throw null; }
         public static global::Facet.Host Create(string name, global::System.Action<global::Facet.HostOptions> configure = default) => throw null;
+        public string Read(string key) => throw null;
+        public void Write(string key, string value) => throw null;
         private Host() { }
     }
     public sealed unsafe partial class HostOptions {
@@ -70,9 +78,31 @@ namespace Facet {
         Modal = 3,
         Tooltip = 4,
     }
+    public sealed unsafe partial class Nav {
+        public const float CollapseAt = 1f;
+        public const float MaxRail = 2f;
+        public const float MinRail = 3f;
+        public global::System.Action<float> OnInsetChanged;
+        public Nav(global::UnityEngine.UIElements.VisualElement parent, global::System.Collections.Generic.IEnumerable<global::Facet.NavItem> items, float railWidth = default) => throw null;
+        public void Go(global::Facet.NavItem target) => throw null;
+        public void Tick() => throw null;
+        private Nav() { }
+    }
+    public sealed unsafe partial class NavItem {
+        public global::System.Func<int> Revision;
+        public global::System.Func<bool> VisibleWhen;
+        public NavItem(string title, global::System.Action<global::UnityEngine.UIElements.VisualElement> build = default) => throw null;
+        public static global::Facet.NavItem Heading(string title, params global::Facet.NavItem[] children) => throw null;
+        private NavItem() { }
+    }
     public unsafe partial class Options<T> : global::Facet.ControlOptions {
         public T Default { get => throw null; set { } }
         protected Options() { }
+    }
+    public sealed unsafe partial class PageHeaderOptions : global::Facet.Options<bool> {
+        public string Description { get => throw null; set { } }
+        public global::System.Func<string> DescriptionText { get => throw null; set { } }
+        private PageHeaderOptions() { }
     }
     public enum Role : int {
         Panel = 0,
@@ -90,9 +120,6 @@ namespace Facet {
         Rail = 12,
         Line = 13,
         Off = 14,
-    }
-    public static unsafe partial class Skin {
-        public static void Scroll(global::UnityEngine.UIElements.ScrollView view) => throw null;
     }
     public unsafe partial class SliderOptions : global::Facet.Options<float> {
         public string Format { get => throw null; set { } }
@@ -112,6 +139,10 @@ namespace Facet {
         private Surface() { }
         void global::System.IDisposable.Dispose() => throw null;
     }
+    public sealed unsafe partial class Tabs {
+        public static global::Facet.Tabs Pages(global::UnityEngine.UIElements.VisualElement parent, global::System.Collections.Generic.IList<global::Facet.NavItem> pages, int selected = default, global::System.Action<int> onSelect = default) => throw null;
+        private Tabs() { }
+    }
     public sealed unsafe partial class Theme {
         public global::UnityEngine.Color this[global::Facet.Role r] { get => throw null; set { } }
         public Theme() => throw null;
@@ -126,11 +157,16 @@ namespace Facet {
         public static void Run() => throw null;
     }
     public sealed unsafe partial class Window {
-        public const float MinHeight = 1f;
-        public const float MinWidth = 2f;
-        public const float RailAlign = 3f;
+        public const float MinHeight = 4f;
+        public const float MinWidth = 5f;
+        public const float RailAlign = 6f;
         public global::UnityEngine.UIElements.VisualElement Body { get => throw null; }
+        public global::UnityEngine.Rect Rect { get => throw null; set { } }
+        public global::UnityEngine.UIElements.VisualElement Root { get => throw null; }
+        public float Scale { get => throw null; set { } }
+        public global::UnityEngine.UIElements.VisualElement TitleBarLeft { get => throw null; }
         public Window(global::UnityEngine.UIElements.VisualElement parent, string id, string title, global::UnityEngine.Rect initial) => throw null;
+        public void SetContentInset(float inset) => throw null;
         private Window() { }
     }
 }

@@ -12,6 +12,20 @@
 #pragma warning disable CS0067, CS0169, CS0649, CS0108, CS0109, CS0114, CS0465, CS0824
 
 namespace UnityEngine.UIElements {
+    public enum Align : int {
+        Auto = 0,
+        FlexStart = 1,
+        Center = 2,
+        FlexEnd = 3,
+        Stretch = 4,
+    }
+    public unsafe partial struct Background : global::System.IEquatable<global::UnityEngine.UIElements.Background> {
+        private global::UnityEngine.RenderTexture m_RenderTexture;
+        private global::UnityEngine.Sprite m_Sprite;
+        private global::UnityEngine.Texture2D m_Texture;
+        private global::UnityEngine.UIElements.VectorImage m_VectorImage;
+        bool global::System.IEquatable<global::UnityEngine.UIElements.Background>.Equals(global::UnityEngine.UIElements.Background other) => throw null;
+    }
     public unsafe partial class BindableElement : global::UnityEngine.UIElements.VisualElement {
         protected BindableElement() { }
     }
@@ -36,12 +50,18 @@ namespace UnityEngine.UIElements {
     }
     public unsafe partial interface INotifyValueChanged<T> {
     }
+    public unsafe partial interface IPanel : global::System.IDisposable {
+    }
     public unsafe partial interface IResolvedStyle {
     }
     public unsafe partial interface IStyle {
+        global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.Align> alignSelf { get; set; }
+        global::UnityEngine.UIElements.StyleBackground backgroundImage { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.DisplayStyle> display { get; set; }
-        global::UnityEngine.UIElements.StyleFloat flexGrow { get; set; }
-        global::UnityEngine.UIElements.StyleLength minHeight { get; set; }
+        global::UnityEngine.UIElements.StyleLength height { get; set; }
+        global::UnityEngine.UIElements.StyleLength marginRight { get; set; }
+        global::UnityEngine.UIElements.StyleFloat opacity { get; set; }
+        global::UnityEngine.UIElements.StyleLength width { get; set; }
     }
     public unsafe partial interface IStylePropertyAnimations {
     }
@@ -70,18 +90,11 @@ namespace UnityEngine.UIElements {
             None = 3,
         }
     }
-    public unsafe partial class ScrollView : global::UnityEngine.UIElements.VisualElement {
-        public ScrollView() => throw null;
-        public enum TouchScrollBehavior : int {
-            Unrestricted = 0,
-            Elastic = 1,
-            Clamped = 2,
-        }
-        public enum NestedInteractionKind : int {
-            Default = 0,
-            StopScrolling = 1,
-            ForwardScrolling = 2,
-        }
+    public unsafe partial struct StyleBackground : global::System.IEquatable<global::UnityEngine.UIElements.StyleBackground> {
+        private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
+        private global::UnityEngine.UIElements.Background m_Value;
+        public StyleBackground(global::UnityEngine.Sprite v) => throw null;
+        bool global::System.IEquatable<global::UnityEngine.UIElements.StyleBackground>.Equals(global::UnityEngine.UIElements.StyleBackground other) => throw null;
     }
     public unsafe partial struct StyleEnum<T> : global::System.IEquatable<global::UnityEngine.UIElements.StyleEnum<T>> where T : struct, global::System.IConvertible {
         private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
@@ -118,12 +131,18 @@ namespace UnityEngine.UIElements {
             Fixed = 1,
         }
     }
+    public sealed unsafe partial class VectorImage : global::UnityEngine.ScriptableObject {
+        private VectorImage() { }
+    }
     public unsafe partial class VisualElement : global::UnityEngine.UIElements.Focusable {
-        public virtual global::UnityEngine.UIElements.VisualElement contentContainer { get => throw null; }
+        public global::UnityEngine.Rect layout { get => throw null; }
+        public string name { get => throw null; set { } }
+        public global::UnityEngine.UIElements.IPanel panel { get => throw null; }
         public global::UnityEngine.UIElements.VisualElement parent { get => throw null; }
         public global::UnityEngine.UIElements.IStyle style { get => throw null; }
         public void Add(global::UnityEngine.UIElements.VisualElement child) => throw null;
         public void Clear() => throw null;
+        public void Insert(int index, global::UnityEngine.UIElements.VisualElement element) => throw null;
         protected VisualElement() { }
         public enum MeasureMode : int {
             Undefined = 0,

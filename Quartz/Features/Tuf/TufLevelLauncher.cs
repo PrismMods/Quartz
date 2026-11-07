@@ -113,7 +113,7 @@ public sealed class TufLevelLauncher : MonoBehaviour {
         while(load.MoveNext()) yield return load.Current;
     }
     private IEnumerator ResolveUnsavedChanges(scnEditor editor) {
-        UICore.Close(true);
+        UICore.Dismiss();
         dialogChoice = TufUnsavedDialog.Pending;
         TufUnsavedDialog.Show(choice => dialogChoice = choice);
         while(dialogChoice == TufUnsavedDialog.Pending) {
@@ -233,7 +233,7 @@ public sealed class TufLevelLauncher : MonoBehaviour {
         pending = null;
         TufUnsavedDialog.Close();
         HideLoadingCover();
-        if(success) UICore.Close(true);
+        if(success) UICore.Dismiss();
         Action<bool, string> callback = completion;
         completion = null;
         callback?.Invoke(success, error ?? "");

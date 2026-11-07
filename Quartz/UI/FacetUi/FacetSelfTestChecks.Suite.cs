@@ -40,6 +40,16 @@ internal static partial class FacetSelfTestChecks {
         string midDetail = $"accent={th[Role.Accent]} focus={th[Role.Focus]} text={th[Role.AccentText]} titlebar={th[Role.TitleBar]}";
         QuartzHost.Recolour(accent);
         check("suite: Recolour sets the accent in the same frame and keeps the neutrals", mid, midDetail);
+        // The accent text is picked by contrast: light on a dark accent, dark on a light one.
+        var textOn = new List<(string name, Color accent, bool light)> { ("navy", new Color(.1f, .12f, .35f), true), ("red", Color.red, false), ("Quartz's default", accent, false) };
+        var wrong = new List<string>();
+        foreach(var (name, c, light) in textOn) {
+            QuartzHost.Recolour(c);
+            float r = th[Role.AccentText].r;
+            if(light ? r <= .8f : r >= .2f) wrong.Add($"{name} r={r:0.##}");
+        }
+        QuartzHost.Recolour(accent);
+        check("suite: a dark accent gets light text on the accent, a light one dark text", wrong.Count == 0, string.Join(", ", wrong));
         check("suite: restoring the accent", Near(th[Role.Accent], accent) && Near(th[Role.Focus], accent) && Near(th[Role.AccentText], Text(accent)),
             $"accent={th[Role.Accent]} text={th[Role.AccentText]}");
     }

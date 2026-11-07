@@ -78,34 +78,52 @@ internal static class FacetBridge {
 #endif
         return false;
     }
-    /// <summary>Opens the Effect Remover page in a Facet window (the preview) in place of the menu.</summary>
+    /// <summary>Opens the new menu, on pageKey when given. fromClassic: the classic menu hands off to it and comes back when it closes.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public static void OpenEffectRemover() {
+    public static void OpenNewMenu(string pageKey = null, bool fromClassic = false) {
 #if !IL2CPP
         if(Available()) {
-            try { OpenEffectRemoverImpl(); } catch(Exception e) { Fail(e); }
+            try { OpenNewMenuImpl(pageKey, fromClassic); } catch(Exception e) { Fail(e); }
         }
 #endif
     }
-    /// <summary>Hides the Effect Remover window if it is showing (its Hidden brings the menu back); true when it was.</summary>
+    /// <summary>Hides the new menu if it is showing (its Hidden does any hand-back); true when it was.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public static bool HideEffectRemover() {
+    public static bool HideNewMenu() {
 #if !IL2CPP
         if(state == 1) {
-            try { return HideEffectRemoverImpl(); } catch(Exception e) { Fail(e); }
+            try { return HideNewMenuImpl(); } catch(Exception e) { Fail(e); }
         }
 #endif
         return false;
     }
-    /// <summary>The Effect Remover preview is showing. Never probes, so it is cheap per frame.</summary>
+    /// <summary>The new menu is showing. Never probes, so it is cheap per frame.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public static bool EffectRemoverVisible() {
+    public static bool NewMenuVisible() {
 #if !IL2CPP
         if(state == 1) {
-            try { return EffectRemoverVisibleImpl(); } catch(Exception e) { Fail(e); }
+            try { return NewMenuVisibleImpl(); } catch(Exception e) { Fail(e); }
         }
 #endif
         return false;
+    }
+    /// <summary>Builds the new menu hidden, so its first open only shows it.</summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void PrebuildNewMenu() {
+#if !IL2CPP
+        if(Available()) {
+            try { PrebuildNewMenuImpl(); } catch(Exception e) { Fail(e); }
+        }
+#endif
+    }
+    /// <summary>Per frame: the new menu's page refresh while it shows. Never probes; nothing while it is hidden.</summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void TickNewMenu() {
+#if !IL2CPP
+        if(state == 1) {
+            try { TickNewMenuImpl(); } catch(Exception e) { Fail(e); }
+        }
+#endif
     }
     /// <summary>Re-tints Quartz's Facet windows with the accent. No-op until Quartz has made one.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -159,11 +177,15 @@ internal static class FacetBridge {
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool HandleEscapeImpl() => global::Facet.Input.HandleEscape();
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static void OpenEffectRemoverImpl() => FacetEffectRemover.Open();
+    private static void OpenNewMenuImpl(string pageKey, bool fromClassic) => QuartzShell.Open(pageKey, fromClassic);
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static bool HideEffectRemoverImpl() => FacetEffectRemover.Hide();
+    private static bool HideNewMenuImpl() => QuartzShell.Hide();
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static bool EffectRemoverVisibleImpl() => FacetEffectRemover.Surface?.Visible == true;
+    private static bool NewMenuVisibleImpl() => QuartzShell.Surface?.Visible == true;
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void PrebuildNewMenuImpl() => QuartzShell.Prebuild();
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void TickNewMenuImpl() => QuartzShell.Tick();
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void WarmUpNow() {
         try { WarmUpImpl(); } catch(Exception e) { Fail(e); }

@@ -33,11 +33,13 @@ public class PageSwicher {
             .Join(GTweenSequenceBuilder.New()
                 .AppendTime(0.1f)
                 .AppendCallback(() => {
+                    if(toCg == null) return;   // a rebuild destroyed the page; the next switch still completes this sequence
                     toCg.interactable = true;
                     toCg.blocksRaycasts = true;
                 }).Build()
             )
             .AppendCallback(() => {
+                if(fromCg == null) return;
                 fromCg.interactable = false;
                 fromCg.blocksRaycasts = false;
                 fromPage.gameObject.SetActive(false);

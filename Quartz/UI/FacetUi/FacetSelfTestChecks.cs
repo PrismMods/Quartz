@@ -21,6 +21,7 @@ internal static partial class FacetSelfTestChecks {
         var windows = new Dictionary<string, string>(MainCore.Conf.FacetWindows);
         try {
             yield return Suite(check, info);
+            yield return Shell(check, info);   // first: its open is the new menu's first of the session
             yield return EffectRemoverWindow(check, info);
             yield return Escape(check);
             yield return TextFocus(check);
@@ -41,7 +42,7 @@ internal static partial class FacetSelfTestChecks {
     // P26: clicks may reach the game behind a Quartz-only preview. What a click at the open window's centre
     // would hit through the uGUI EventSystem, and whether KeyLimiter's block holds right now. Not asserted.
     private static void ClickReach(Action<string> info) {
-        VisualElement root = FacetEffectRemover.Window.Root;
+        VisualElement root = QuartzShell.Window.Root;
         Vector2 centre = root.worldBound.center;
         float scale = Screen.width / root.panel.visualTree.layout.width;
         var screen = new Vector2(centre.x * scale, Screen.height - (centre.y * scale));   // panel y runs down
@@ -56,7 +57,7 @@ internal static partial class FacetSelfTestChecks {
         state.IsEnabled = true;
         try { modOn = KeyLimiter.IsMenuBlockActive(); } finally { state.IsEnabled = wasEnabled; }
         info($"keylimiter block as-is={asIs} (mod enabled={wasEnabled}), with the mod on={modOn}; bridge blocks={FacetBridge.BlocksGameInput()}"
-            + $" window blocks={FacetEffectRemover.Surface.BlocksGameInput} setting={MainCore.Conf.BlockInputsWhileMenuOpen}");
+            + $" window blocks={QuartzShell.Surface.BlocksGameInput} setting={MainCore.Conf.BlockInputsWhileMenuOpen}");
     }
     private static IEnumerator Frames(int n) {
         for(int i = 0; i < n; i++) {

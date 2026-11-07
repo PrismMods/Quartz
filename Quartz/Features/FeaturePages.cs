@@ -62,7 +62,7 @@ internal static class FeaturePages {
         error.color = UIColors.SoftRed;
         error.text = handle.Error.Length > 900 ? handle.Error[..900] + "…" : handle.Error;
     }
-    private static FeatureService.Handle Blocker(FeatureService.Handle handle) {
+    internal static FeatureService.Handle Blocker(FeatureService.Handle handle) {
         foreach(string dep in handle.Info.Deps)
             if(FeatureService.Find(dep) is { Loaded: false } off) return off;
         return null;

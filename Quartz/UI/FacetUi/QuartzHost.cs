@@ -89,7 +89,7 @@ internal static class QuartzHost {
     internal static void Shutdown() {
         if(hooked) MainCore.Tr.OnLanguageChanged -= OnLanguageChanged;
         hooked = false;
-        FacetEffectRemover.Shutdown();
+        QuartzShell.Shutdown();
         foreach(Surface s in surfaces) s.Dispose();
         surfaces.Clear();
     }

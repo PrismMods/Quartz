@@ -40,6 +40,7 @@
     "FXRM_TUTORIAL_PATTERNS": "튜토리얼 배경 패턴 끄기",
     "FXRM_ZOOM_SCALE": "카메라 확대",
     "SECTION_EFFECT_REMOVER": "이펙트 제거",
+    "FXRM_DESC": "레벨을 불러올 때 고른 효과를 제거합니다",
     "FXRM_MODE_LABEL": "모드",
     "FXRM_MODE_SIMPLE": "간단",
     "FXRM_MODE_ENHANCED": "고급",

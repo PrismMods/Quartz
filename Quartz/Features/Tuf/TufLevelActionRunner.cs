@@ -109,7 +109,7 @@ internal sealed class TufLevelActionRunner {
         Quartz.Features.AprilFools.QuizGate.GateMain(code, level.Difficulty, () => {
             if(disposed) return;
             if(TufMainLevel.Launch(code)) {
-                UICore.Close(true);
+                UICore.Dismiss();
                 return;
             }
             level.Error = MainCore.Tr.Get("TUF_MAIN_LAUNCH_FAILED", "Could not open the base-game level.");

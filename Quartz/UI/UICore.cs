@@ -107,8 +107,8 @@ public static partial class UICore {
         TextLocalization.RefreshAll();
         FontManager.ApplyMenuFont();
         if(MainCore.Conf.IsFirstRun) MakeFirstRunHelper();
-        // Rebuild runs this too: never over the preview, which Open would hide.
-        if(MainCore.Conf.ShowOnStartup && !Quartz.UI.FacetUi.FacetBridge.EffectRemoverVisible()) Open(true);
+        // Rebuild runs this too: never over the new menu, which Open would hide.
+        if(MainCore.Conf.ShowOnStartup && !Quartz.UI.FacetUi.FacetBridge.NewMenuVisible()) Open(true);
     }
     public static void SetPanelOpacity(float value, bool save) {
         MainCore.Conf.PanelOpacity = Mathf.Clamp01(value);
@@ -126,7 +126,13 @@ public static partial class UICore {
         });
     }
     public static void Rebuild() => Rebuild(false);
+    // Rebuild closes and reopens the classic menu; neither is a user's close, so neither hands back to the new menu.
+    private static bool rebuilding;
     public static void Rebuild(bool reloadPanelSize) {
+        rebuilding = true;
+        try { RebuildNow(reloadPanelSize); } finally { rebuilding = false; }
+    }
+    private static void RebuildNow(bool reloadPanelSize) {
         bool wasOpen = isOpen;
         bool wasHub = IsReorganizing;
         bool wasOverHub = panelOverHub;

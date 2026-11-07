@@ -26,8 +26,8 @@ public static partial class UICore {
     private static GTween resetSequence;
     private static bool isOpen = false;
     public static bool IsOpen => isOpen;
-    /// <summary>A Quartz menu is up: the uGUI menu, or the Facet preview standing in for it.</summary>
-    internal static bool MenuShowing => isOpen || FacetBridge.EffectRemoverVisible();
+    /// <summary>A Quartz menu is up: the classic uGUI menu or the new one.</summary>
+    internal static bool MenuShowing => isOpen || FacetBridge.NewMenuVisible();
     public static Vector2 LastPanelPosition;
     public static Vector2 LastPanelSize;
     public static Vector2 DefaultPanelSize {
@@ -113,6 +113,7 @@ public static partial class UICore {
         // A runtime UI Toolkit panel here does not get WheelEvent; Facet scrolls its window from this.
         float wheel = Input.mouseScrollDelta.y;
         if(wheel != 0f) FacetBridge.TickWheel(Input.mousePosition, wheel);
+        FacetBridge.TickNewMenu();
         if(canvasObj == null) return;
         HandleResolutionChange();
         Keybind.KeyModifier mod = (Keybind.KeyModifier)MainCore.Conf.ToggleModifier;
@@ -218,9 +219,13 @@ public static partial class UICore {
     }
     public static void Open(bool noAnimate = false) {
         if(isOpen || Panel == null) return;
-        // The preview stands in for the menu, so no opener stacks the menu over it: hiding it brings the
-        // menu back (its Hidden calls in here again, with the window already hidden).
-        if(FacetBridge.HideEffectRemover()) return;
+        // Never over the new menu: it hides. Opened from here, its Hidden brings this menu back (calling in here
+        // again, with it hidden); otherwise this menu opens and a user's close goes back to the new one.
+        bool handedBack = MenuHandOff.ReturnTo == MenuHandOff.Menu.Classic;
+        if(FacetBridge.HideNewMenu()) {
+            if(handedBack) return;
+            MenuHandOff.ReturnTo = MenuHandOff.Menu.New;
+        }
         isOpen = true;
         Panel.gameObject.SetActive(true);
         if(panelCanvasGroup != null) {
@@ -278,6 +283,12 @@ public static partial class UICore {
     }
     public static void Close(bool noAnimate = false) {
         if(!isOpen) return;
+        // A classic menu opened from the new one goes back there; a rebuild's close is no user's.
+        bool handBack = !rebuilding && MenuHandOff.ReturnTo == MenuHandOff.Menu.New;
+        if(handBack) {
+            MenuHandOff.ReturnTo = MenuHandOff.Menu.None;
+            noAnimate = true;   // the new menu opens below; a sliding panel would draw over it and take its clicks
+        }
         // From the hub the panel is invisible; sliding it out would flash it back in.
         if(IsReorganizing) noAnimate = true;
         ExitReorganize();
@@ -292,16 +303,28 @@ public static partial class UICore {
         );
         panelTweener.CompleteAndKill();
         resetSequence.CompleteAndKill();
-        if(noAnimate) {
-            canvasObj.SetActive(false);
-            return;
+        if(noAnimate) canvasObj.SetActive(false);
+        else {
+            Vector2 targetPos = GetRandomOffscreenPosition();
+            panelTweener = Panel
+                .GTAnchorPos(targetPos, 0.25f)
+                .SetEasing(Easing.OutExpo)
+                .OnComplete(() => canvasObj.SetActive(false));
+            MainCore.TC.Play(panelTweener);
         }
-        Vector2 targetPos = GetRandomOffscreenPosition();
-        panelTweener = Panel
-            .GTAnchorPos(targetPos, 0.25f)
-            .SetEasing(Easing.OutExpo)
-            .OnComplete(() => canvasObj.SetActive(false));
-        MainCore.TC.Play(panelTweener);
+        if(handBack) FacetBridge.OpenNewMenu();
+    }
+    /// <summary>Closes the classic menu to get it out of the way (a level launch, an overlay): no hand-back to the new menu, which stays shut too.</summary>
+    internal static void Dismiss() {
+        MenuHandOff.ReturnTo = MenuHandOff.Menu.None;
+        FacetBridge.HideNewMenu();
+        Close(true);
+    }
+    /// <summary>The classic menu on a page, opened from the new menu: a user's close goes back there.</summary>
+    internal static void OpenAt(int state) {
+        Open();
+        if(state >= 0) Factory.MenuFactory.SetState(state);
+        if(isOpen) MenuHandOff.ReturnTo = MenuHandOff.Menu.New;
     }
     // The preview opens from the settings panel, often the one over the hub; it comes back to the same place.
     private static bool previewFromHub, previewOverHub;
@@ -321,8 +344,8 @@ public static partial class UICore {
         else Close();
     }
     public static void Toggle(bool noAnimate = false) {
-        // The Effect Remover preview stands in for the menu: hiding it brings the menu back (its Hidden), never a second one over it.
-        if(FacetBridge.HideEffectRemover()) return;
+        // The new menu hides (its Hidden brings back a classic menu it came from), never with the classic one over it.
+        if(FacetBridge.HideNewMenu()) return;
         if(isOpen) Close(noAnimate);
         else OpenToHub();
     }

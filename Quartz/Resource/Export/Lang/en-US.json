@@ -535,6 +535,8 @@
     "PRISM_MENU_MODIFIER": "Menu hotkey modifier",
     "PRISM_MODIFIER_NONE": "None",
     "PRISM_NEW_MENU": "Experimental: new menu",
-    "PRISM_NEW_MENU_TIP": "The menu hotkey opens the new menu. It is still being built; the classic menu stays available"
+    "PRISM_NEW_MENU_TIP": "The menu hotkey opens the new menu. It is still being built; the classic menu stays available",
+    "MENU_CLASSIC_PAGE": "This page is still in the classic menu",
+    "MENU_CLASSIC_OPEN": "Open it"
   }
 }

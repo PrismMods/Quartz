@@ -44,7 +44,7 @@ public static class QuizOverlay {
             onPassed = passed;
             return;
         }
-        UICore.Close(true);
+        UICore.Dismiss();
         difficulty = level;
         onPassed = passed;
         wrongCount = 0;

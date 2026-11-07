@@ -4,6 +4,7 @@ using System.Reflection;
 using Facet;
 using Newtonsoft.Json.Linq;
 using Quartz.Core;
+using Quartz.Features;
 using Quartz.Features.EffectRemover;
 using Quartz.IO;
 using Quartz.Resource;
@@ -12,13 +13,15 @@ using UnityEngine;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi;
 /// <summary>
-/// The Effect Remover window checks. Run first, so its open is Quartz's first Facet window of the
-/// session. Every setting they touch is put back, the settings file byte-for-byte (Run restores window keys).
+/// The Effect Remover page in the new menu, opened from the classic menu's button. Every setting they touch is put
+/// back, the settings file byte-for-byte (Run restores window keys).
 /// </summary>
 internal static partial class FacetSelfTestChecks {
     private const float Within = 0.15f;
     private static EffectRemoverSettings C => EffectRemover.Conf;
-    private static VisualElement Body => FacetEffectRemover.Window.Body;
+    // The new menu's scrollers in tree order are the rail's, then the content's; Body is the open page.
+    private static ScrollView ContentScroll => QuartzShell.Window.Body.Query<ScrollView>().ToList()[1];
+    private static VisualElement Body => ContentScroll.contentContainer;
     // One top-level toggle per mode (always on screen, never folded away): the field behind it.
     private static (string key, string field, Func<EffectRemoverSettings, bool> get, Action<EffectRemoverSettings, bool> set) Probe() =>
         C.IsSimple
@@ -33,16 +36,22 @@ internal static partial class FacetSelfTestChecks {
         try {
             if(!UICore.IsOpen) UICore.Open(true);
             yield return Frames(2);
-            yield return FirstOpen(check);
-            if(FacetEffectRemover.Window == null) yield break;
+            FacetBridge.OpenNewMenu("visuals.effectremover", fromClassic: true);
+            yield return Frames(2);
+            check("the menu's button hides it and shows Effect Remover in the new menu, which counts as a menu showing",
+                !UICore.IsOpen && !UICore.CanvasObj.activeSelf && QuartzShell.Surface?.Visible == true && UICore.MenuShowing
+                    && QuartzShell.CurrentPage == "visuals.effectremover",
+                $"menu={UICore.IsOpen} canvas={UICore.CanvasObj.activeSelf} window={QuartzShell.Surface?.Visible} showing={UICore.MenuShowing} page={QuartzShell.CurrentPage}");
+            if(QuartzShell.Window == null) yield break;
             ClickReach(info);
+            yield return HeaderAndCards(check);
             yield return PageMirrorsMenu(check);
             yield return ClickFlips(check);
             yield return ShowsBehindWindow(check);
             yield return ProfileSwitch(check, path, file);
             yield return MenuHandOff(check);
         } finally {
-            FacetEffectRemover.Hide();
+            QuartzShell.Hide();
             RestoreSettings(path, file, saved);
             if(wasOpen && !UICore.IsOpen) UICore.Open(true);
             else if(!wasOpen && UICore.IsOpen) UICore.Close(true);
@@ -53,19 +62,19 @@ internal static partial class FacetSelfTestChecks {
         RestoreSettings(path, file, saved);
         check("effect remover settings restored byte-for-byte", SameBytes(path, file) && C.Serialize().ToString() == saved, null);
     }
-    // QuartzRuntime.Dispose reaches QuartzHost.Shutdown with the window open: no menu may come back.
+    // QuartzRuntime.Dispose reaches QuartzHost.Shutdown with the new menu open from the classic one: no menu may come back.
     private static IEnumerator Teardown(Action<string, bool, string> check) {
         bool wasOpen = UICore.IsOpen;
         if(!wasOpen) UICore.Open(true);
-        FacetBridge.OpenEffectRemover();
+        FacetBridge.OpenNewMenu(fromClassic: true);
         yield return Frames(2);
-        Surface s = FacetEffectRemover.Surface;
+        Surface s = QuartzShell.Surface;
         bool shown = s?.Visible == true && !UICore.IsOpen;
         QuartzHost.Shutdown();
         yield return Frames(2);
         check("teardown disposes the open window without reopening the menu",
-            shown && s?.Visible == false && !UICore.IsOpen && FacetEffectRemover.Surface == null && FacetEffectRemover.Window == null,
-            $"shown={shown} window={s?.Visible} menu={UICore.IsOpen} kept={FacetEffectRemover.Surface != null}");
+            shown && s?.Visible == false && !UICore.IsOpen && QuartzShell.Surface == null && QuartzShell.Window == null,
+            $"shown={shown} window={s?.Visible} menu={UICore.IsOpen} kept={QuartzShell.Surface != null}");
         if(wasOpen && !UICore.IsOpen) UICore.Open(true);
         else if(!wasOpen && UICore.IsOpen) UICore.Close(true);
     }
@@ -77,31 +86,37 @@ internal static partial class FacetSelfTestChecks {
     }
     private static bool SameBytes(string path, byte[] file) =>
         file == null ? !File.Exists(path) : File.Exists(path) && File.ReadAllBytes(path).SequenceEqual(file);
-    private static IEnumerator FirstOpen(Action<string, bool, string> check) {
-        float until = Time.realtimeSinceStartup + 10f;
-        while(!WarmUp.Done && Time.realtimeSinceStartup < until) yield return null;
-        check("facet warm-up done before the first open", WarmUp.Done, null);
-        bool first = FacetEffectRemover.Surface == null;
-        // Open builds the window synchronously; its first mesh generation, after layout in the frame
-        // it first draws, comes later. That is "open".
-        double ms = -1;
-        var clock = System.Diagnostics.Stopwatch.StartNew();
-        FacetBridge.OpenEffectRemover();
-        ScrollView scroll = FacetEffectRemover.Window?.Body.Q<ScrollView>();
-        if(scroll != null) scroll.generateVisualContent = _ => {
-            if(ms >= 0) return;
-            ms = clock.Elapsed.TotalMilliseconds;
-            MainCore.Log.Msg($"[perf] Effect Remover window first open {ms:0.0} ms (warm-up done: {WarmUp.Done})");
-        };
-        yield return Frames(2);
-        check("[perf] first open is at most 50 ms", first && ms >= 0 && ms <= 50, $"first={first} ms={ms:0.0}");
-        check("opening hides the menu and shows the window, which counts as a menu showing",
-            !UICore.IsOpen && !UICore.CanvasObj.activeSelf && FacetEffectRemover.Surface?.Visible == true && UICore.MenuShowing,
-            $"menu={UICore.IsOpen} canvas={UICore.CanvasObj.activeSelf} window={FacetEffectRemover.Surface?.Visible} showing={UICore.MenuShowing}");
-    }
     // Toggles are the rows whose input is a bare VisualElement (Facet's switch track); every row has an Id.
+    // The header's switch is skipped: a classic page built directly has no "Use this feature" row to match it.
     private static int FacetToggles() =>
-        Body.Query<VisualElement>().Where(e => e.GetType() == typeof(VisualElement) && e.name != null && e.name.EndsWith("-input")).ToList().Count;
+        Body.Query<VisualElement>().Where(e => e.GetType() == typeof(VisualElement) && e.name != null && e.name.EndsWith("-input")
+            && e.name != "FXRM_HEADER-input").ToList().Count;
+    private static bool HasCaps(string key) {
+        string want = QuartzHost.Host.Translate(key).ToUpperInvariant();
+        return Body.Query<Label>().Where(l => l.text == want).ToList().Count > 0;
+    }
+    // The page opens with its header (title, switch) and, in Enhanced, a card per heading.
+    private static IEnumerator HeaderAndCards(Action<string, bool, string> check) {
+        Label title = Body.Q(name: "FXRM_HEADER")?.Q<Label>();
+        string want = QuartzHost.Host.Translate("SECTION_EFFECT_REMOVER");
+        float size = QuartzHost.Host.Theme.Sizes.Title;
+        check("the page header reads the feature's title, bold, at the title size",
+            title != null && title.text == want && title.resolvedStyle.unityFontStyleAndWeight == FontStyle.Bold && title.resolvedStyle.fontSize == size,
+            $"text={title?.text} want={want} weight={title?.resolvedStyle.unityFontStyleAndWeight} size={title?.resolvedStyle.fontSize} want={size}");
+        VisualElement track = Body.Q(name: "FXRM_HEADER-input");
+        bool on = FeatureService.IsEnabled("effectremover");
+        check("the header's switch shows whether the feature is on", track != null && Shows(track, on), $"on={on} track={track != null}");
+        string was = C.Mode;
+        C.Mode = EffectRemoverSettings.ModeEnhanced;
+        float t0 = Time.realtimeSinceStartup;
+        while(!HasCaps("HEADING_MISC") && Time.realtimeSinceStartup - t0 < 1f) yield return null;
+        bool cards = HasCaps("HEADING_NON_DLC_EVENTS") && HasCaps("HEADING_DLC_EVENTS") && HasCaps("HEADING_MISC");
+        check("Enhanced has a card headed by each of the three groups", cards,
+            $"nonDlc={HasCaps("HEADING_NON_DLC_EVENTS")} dlc={HasCaps("HEADING_DLC_EVENTS")} misc={HasCaps("HEADING_MISC")}");
+        C.Mode = was;
+        t0 = Time.realtimeSinceStartup;
+        while(HasCaps("HEADING_MISC") != (was == EffectRemoverSettings.ModeEnhanced) && Time.realtimeSinceStartup - t0 < 1f) yield return null;
+    }
     // The uGUI page built as the menu builds it; every GenerateUI.Toggle has one ToggleCircle.
     private static T WithMenuPage<T>(Func<RectTransform, T> read) {
         var host = new GameObject("FacetSelfTestPage", typeof(RectTransform)).GetComponent<RectTransform>();
@@ -164,7 +179,7 @@ internal static partial class FacetSelfTestChecks {
         VisualElement track = Body.Q(name: p.key + "-input");
         if(track == null) { check("clicking a facet toggle flips the setting", false, $"no {p.key}"); yield break; }
         bool before = p.get(C);
-        Body.Q<ScrollView>()?.ScrollTo(track);
+        ContentScroll.ScrollTo(track);
         yield return Frames(2);
         Click(track);
         yield return Frames(2);
@@ -175,8 +190,9 @@ internal static partial class FacetSelfTestChecks {
         EffectRemover.Save();
         yield return Frames(1);
     }
+    // A switch's track: Accent on, Off off (Facet's Looks.Switch).
     private static bool Shows(VisualElement track, bool on) {
-        Color want = FacetEffectRemover.Surface.Theme[on ? Role.Accent : Role.RowAlt], got = track.style.backgroundColor.value;
+        Color want = QuartzShell.Surface.Theme[on ? Role.Accent : Role.Off], got = track.style.backgroundColor.value;
         return Mathf.Abs(want.r - got.r) < 0.01f && Mathf.Abs(want.g - got.g) < 0.01f && Mathf.Abs(want.b - got.b) < 0.01f && Mathf.Abs(want.a - got.a) < 0.01f;
     }
     // Waits for track to show `on`; the elapsed ms, or -1 when it never did within a second.
@@ -224,24 +240,24 @@ internal static partial class FacetSelfTestChecks {
     private static bool Near(Color a, Color b) =>
         Mathf.Abs(a.r - b.r) < 0.01f && Mathf.Abs(a.g - b.g) < 0.01f && Mathf.Abs(a.b - b.b) < 0.01f;
     private static IEnumerator MenuHandOff(Action<string, bool, string> check) {
-        Surface s = FacetEffectRemover.Surface;
-        if(!s.Visible) FacetBridge.OpenEffectRemover();
+        Surface s = QuartzShell.Surface;
+        if(!s.Visible) FacetBridge.OpenNewMenu("visuals.effectremover", fromClassic: true);
         yield return Frames(2);
         bool hidden = !UICore.IsOpen;   // each hand-back below only counts when the menu was really gone
-        Button close = FacetEffectRemover.Window.TitleBarRight.Query<Button>().ToList().LastOrDefault();
+        Button close = QuartzShell.Window.TitleBarRight.Query<Button>().ToList().LastOrDefault();
         if(close != null) Submit(close);
         yield return Frames(2);
         check("the close button hides the window and brings the menu back", hidden && !s.Visible && UICore.IsOpen, $"hidden={hidden} window={s.Visible} menu={UICore.IsOpen}");
-        FacetBridge.OpenEffectRemover();
+        FacetBridge.OpenNewMenu("visuals.effectremover", fromClassic: true);
         yield return Frames(2);
         check("reopening reuses the surface and hides the menu",
-            ReferenceEquals(FacetEffectRemover.Surface, s) && s.Visible && !UICore.IsOpen && !UICore.CanvasObj.activeSelf,
-            $"same={ReferenceEquals(FacetEffectRemover.Surface, s)} window={s.Visible} menu={UICore.IsOpen}");
+            ReferenceEquals(QuartzShell.Surface, s) && s.Visible && !UICore.IsOpen && !UICore.CanvasObj.activeSelf,
+            $"same={ReferenceEquals(QuartzShell.Surface, s)} window={s.Visible} menu={UICore.IsOpen}");
         hidden = !UICore.IsOpen;
         UICore.EscapeDown();
         yield return Frames(3);
         check("Escape hides the window and brings the menu back", hidden && !s.Visible && UICore.IsOpen, $"hidden={hidden} window={s.Visible} menu={UICore.IsOpen}");
-        FacetBridge.OpenEffectRemover();
+        FacetBridge.OpenNewMenu("visuals.effectremover", fromClassic: true);
         yield return Frames(2);
         hidden = !UICore.IsOpen;
         UICore.Toggle();   // the menu hotkey's action
@@ -249,7 +265,7 @@ internal static partial class FacetSelfTestChecks {
         check("the menu hotkey hides the window and the menu comes back once",
             hidden && !s.Visible && UICore.IsOpen && !UICore.IsReorganizing, $"hidden={hidden} window={s.Visible} menu={UICore.IsOpen} hub={UICore.IsReorganizing}");
         // Any other opener (the update toast's "open settings") hides the window rather than stacking the menu over it.
-        FacetBridge.OpenEffectRemover();
+        FacetBridge.OpenNewMenu("visuals.effectremover", fromClassic: true);
         yield return Frames(2);
         hidden = !UICore.IsOpen;
         UICore.Open();
@@ -260,7 +276,7 @@ internal static partial class FacetSelfTestChecks {
         bool startup = MainCore.Conf.ShowOnStartup;
         MainCore.Conf.ShowOnStartup = true;
         try {
-            FacetBridge.OpenEffectRemover();
+            FacetBridge.OpenNewMenu("visuals.effectremover", fromClassic: true);
             yield return Frames(2);
             UICore.Rebuild();
             yield return Frames(2);
@@ -270,16 +286,16 @@ internal static partial class FacetSelfTestChecks {
             MainCore.Conf.ShowOnStartup = startup;
         }
         // Opened from the settings panel over the hub (the hub's Settings button), it comes back there.
-        FacetEffectRemover.Hide();
+        QuartzShell.Hide();
         UICore.Close(true);
         UICore.OpenToHub();
         typeof(UICore).GetMethod("ShowPanelOverHub", BindingFlags.NonPublic | BindingFlags.Static)?.Invoke(null, null);
         yield return Frames(2);
         bool overHub = UICore.IsReorganizing && UICore.PanelInteractive;
-        FacetBridge.OpenEffectRemover();
+        FacetBridge.OpenNewMenu("visuals.effectremover", fromClassic: true);
         yield return Frames(2);
         hidden = !UICore.IsOpen && !UICore.IsReorganizing;
-        FacetEffectRemover.Hide();
+        QuartzShell.Hide();
         yield return Frames(2);
         check("closing the window returns to the settings panel over the hub",
             overHub && hidden && UICore.IsOpen && UICore.IsReorganizing && UICore.PanelInteractive,

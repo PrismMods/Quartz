@@ -7,55 +7,21 @@ using UnityEngine;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi;
 /// <summary>
-/// The Effect Remover page in a Facet window, the preview of Quartz's next menu. Mirrors
-/// PageEffectRemover row for row. Labels are Quartz Lang keys, which QuartzHost translates live.
+/// The Effect Remover page in the new menu (a QuartzShell.Moved builder). Mirrors PageEffectRemover row for row.
+/// Labels are Quartz Lang keys, which QuartzHost translates live.
 /// </summary>
 internal static class FacetEffectRemover {
-    internal static Surface Surface { get; private set; }
-    internal static Window Window { get; private set; }
     // Read on every call: a profile switch may replace what EffectRemover.Conf returns.
     private static EffectRemoverSettings C => EffectRemover.Conf;
     private static readonly EffectRemoverSettings Def = new();
     private static void Save() => EffectRemover.Save();
-    internal static void Open() {
+    internal static void Page(VisualElement page) {
         EffectRemover.EnsureConf();
-        Surface s = Surface ?? Build();   // first: a build that throws leaves the menu open
-        UICore.HandToPreview();
-        s.BlocksGameInput = MainCore.Conf.BlockInputsWhileMenuOpen;
-        s.Visible = true;
-    }
-    internal static bool Hide() {
-        if(Surface == null || !Surface.Visible) return false;
-        Surface.Visible = false;
-        return true;
-    }
-    /// <summary>Before QuartzHost disposes the surface: a dispose raises Hidden, which must not reopen the menu.</summary>
-    internal static void Shutdown() {
-        if(Surface != null) Surface.Hidden -= MenuBack;
-        Surface = null;
-        Window = null;
-    }
-    // Whoever hid it (the close button, Escape, the menu hotkey): the menu comes back on this page.
-    private static void MenuBack() => UICore.BackFromPreview();
-    private static Surface Build() {
-        Surface s = QuartzHost.NewSurface("QuartzEffectRemover", Layer.Window);
-        try {
-            var w = new Window(s.Root, "effectremover", "SECTION_EFFECT_REMOVER", new Rect(160f, 90f, 560f, 680f));
-            var scroll = new ScrollView();
-            Skin.Scroll(scroll);
-            scroll.style.flexGrow = 1f;
-            scroll.style.minHeight = 0f;
-            w.Body.Add(scroll);
-            Page(scroll.contentContainer);
-            s.Hidden += MenuBack;
-            Window = w;
-            return Surface = s;
-        } catch {
-            s.Dispose();   // a half-built window is never kept or shown; the next click builds afresh
-            throw;
-        }
-    }
-    private static void Page(VisualElement page) {
+        // The switch is the page's own: the classic menu gets its "Use this feature" row from the page factory.
+        Controls.PageHeader(page, "SECTION_EFFECT_REMOVER", QuartzShell.FeatureSwitch("effectremover"), o => {
+            o.Id = "FXRM_HEADER";
+            o.Description = "FXRM_DESC";
+        });
         // Only this part depends on the mode. Facet has no group that follows a non-bool value
         // (ToggleGroup is bool and brings its own switch), so it follows on the refresher's tick:
         // the dropdown's VisibleWhen is asked on every refresh while the window shows. A mode set
@@ -73,7 +39,7 @@ internal static class FacetEffectRemover {
             // A Section has no VisibleWhen; its wrapper follows the switch instead.
             if(decoTypes != null) decoTypes.style.display = C.Decorations ? DisplayStyle.Flex : DisplayStyle.None;
         }
-        Controls.Dropdown(page, "FXRM_MODE_LABEL", Bind.To(() => C.IsSimple ? 0 : 1, v => {
+        Controls.Dropdown(Controls.Card(page, null), "FXRM_MODE_LABEL", Bind.To(() => C.IsSimple ? 0 : 1, v => {
             C.Mode = v == 0 ? EffectRemoverSettings.ModeSimple : EffectRemoverSettings.ModeEnhanced;
             Save();
             EffectRemover.RefreshEditorSaveButtons();
@@ -101,7 +67,8 @@ internal static class FacetEffectRemover {
             bool value = rows.All(r => !r.Value);
             foreach(Control<bool> r in rows) r.Set(value);
         }, o => o.Id = key);
-    private static VisualElement Simple(VisualElement p) {
+    private static VisualElement Simple(VisualElement body) {
+        VisualElement p = Controls.Card(body, null);
         VisualElement excluded = Controls.ToggleGroup(p, "FXRM_S_FILTER",
             Bind.To(() => C.SimpleFilter, v => { C.SimpleFilter = v; Save(); }),
             o => { o.Id = "FXRM_S_FILTER"; o.Default = Def.SimpleFilter; o.Tooltip = "DESC_FXRM_S_FILTER"; });
@@ -145,10 +112,10 @@ internal static class FacetEffectRemover {
             ? RDString.GetEnumValue(f)
             : Regex.Replace(f.ToString(), "(?<=[a-z])(?=[A-Z0-9])", " ");
     // Returns the Decoration Types wrapper, shown only while Decoration is on.
-    private static VisualElement Enhanced(VisualElement p) {
-        Flag(p, "FXRM_ENABLE_SAVE", c => c.EnableSave, (c, v) => { c.EnableSave = v; EffectRemover.RefreshEditorSaveButtons(); },
+    private static VisualElement Enhanced(VisualElement body) {
+        Flag(Controls.Card(body, null), "FXRM_ENABLE_SAVE", c => c.EnableSave, (c, v) => { c.EnableSave = v; EffectRemover.RefreshEditorSaveButtons(); },
             Def.EnableSave, "DESC_FXRM_ENABLE_SAVE");
-        VisualElement events = Controls.Section(p, "HEADING_NON_DLC_EVENTS");
+        VisualElement events = Controls.Card(body, "HEADING_NON_DLC_EVENTS");
         Flag(events, "FXRM_FILTERS", c => c.Filters, (c, v) => c.Filters = v, Def.Filters);
         Flag(events, "FXRM_ADVFILTERS", c => c.AdvancedFilters, (c, v) => c.AdvancedFilters = v, Def.AdvancedFilters);
         Flag(events, "FXRM_DECORATIONS", c => c.Decorations, (c, v) => c.Decorations = v, Def.Decorations);
@@ -170,10 +137,10 @@ internal static class FacetEffectRemover {
         trackRows[1] = Flag(track, "FXRM_TRACK_MOVES", c => c.TrackMoves, (c, v) => c.TrackMoves = v, Def.TrackMoves);
         trackRows[2] = Flag(track, "FXRM_TRACK_POSITIONS", c => c.TrackPositions, (c, v) => c.TrackPositions = v, Def.TrackPositions);
         trackRows[3] = Flag(track, "FXRM_TRACK_COLORS", c => c.TrackColors, (c, v) => c.TrackColors = v, Def.TrackColors);
-        VisualElement dlc = Controls.Section(p, "HEADING_DLC_EVENTS");
+        VisualElement dlc = Controls.Card(body, "HEADING_DLC_EVENTS");
         Flag(dlc, "FXRM_HOLDSOUNDS", c => c.HoldSounds, (c, v) => c.HoldSounds = v, Def.HoldSounds);
         Flag(dlc, "FXRM_HIDEICONS", c => c.HideIcons, (c, v) => c.HideIcons = v, Def.HideIcons);
-        VisualElement misc = Controls.Section(p, "HEADING_MISC");
+        VisualElement misc = Controls.Card(body, "HEADING_MISC");
         VisualElement decoTypes = Ui.Box(misc);
         VisualElement types = Controls.Section(decoTypes, "SECTION_DECORATION_TYPES", false);
         var typeRows = new Control<bool>[6];

@@ -15,11 +15,11 @@ public static class PageEffectRemover {
         EffectRemoverSettings def = new();
         void Save() => EffectRemover.Save();
         var sec = GenerateUI.FlatSection(content.transform, "Effect Remover");
-        // The same page in a Facet window, the preview of the next menu; only when Facet loaded.
+        // The same page in the new menu; only when Facet loaded. Closing it comes back here.
         if(Quartz.UI.FacetUi.FacetBridge.Available())
             GenerateUI.Button(
                 GenerateUI.Row(sec.Body),
-                Quartz.UI.FacetUi.FacetBridge.OpenEffectRemover,
+                () => Quartz.UI.FacetUi.FacetBridge.OpenNewMenu("visuals.effectremover", fromClassic: true),
                 "Open in the new menu (preview)",
                 "fxrm_open_new_menu"
             ).SetSecondary();

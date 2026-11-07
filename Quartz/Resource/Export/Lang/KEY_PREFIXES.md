@@ -21,6 +21,7 @@ Prefix -> feature (source of truth: the C# owning the setting / building the UI 
 | `TW_`     | Visual Tweaks                         | `Features/Tweaks`, built in `PageVisuals.cs` |
 | `UIH_`    | UI Hiding                             | `Features/UiHider`, built in `PageVisuals.cs` |
 | `PRISM_`  | Prism · Settings rows, debug tabs and Prism key labels | `Prism/PrismBridge.cs`, `Prism/PrismRules.cs` (`EnglishToKey`) |
+| `MENU_`   | The new menu (Facet)                  | `Quartz/UI/FacetUi/` |
 
 Notes:
 - `DL_` and `JR_` both live on the single `Restriction` feature/settings class under the hood,

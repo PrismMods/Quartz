@@ -40,6 +40,7 @@
     "FXRM_TUTORIAL_PATTERNS": "Hide Tutorial Background Patterns",
     "FXRM_ZOOM_SCALE": "Camera Zoom",
     "SECTION_EFFECT_REMOVER": "Effect Remover",
+    "FXRM_DESC": "Removes the effects you pick from levels as they load",
     "FXRM_MODE_LABEL": "Mode",
     "FXRM_MODE_SIMPLE": "Simple",
     "FXRM_MODE_ENHANCED": "Enhanced",

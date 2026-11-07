@@ -170,7 +170,8 @@ public static partial class UICore {
         bool was = IsArranging;
         SharedLayoutOpen = open;
         if(open) {
-            Close(noAnimate: true); // the menu (or its hub): the hotkey is ignored during a session, so it would only close via its X
+            // Both menus shut for good: neither hands back to the other over another mod's session.
+            Dismiss(); // the menu (or its hub): the hotkey is ignored during a session, so it would only close via its X
             ExitReorganize(); // Close does it when the menu is open; this covers a hub without one
         }
         RaiseArranging(was);
