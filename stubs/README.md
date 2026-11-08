@@ -20,7 +20,7 @@ resources, and no types the mod never touches.
 | `Assembly-CSharp` | 129 | 1071 |
 | `Assembly-CSharp-firstpass` | 2 | 12 |
 | `DOTween` | 0 | 0 |
-| `Facet.0.2` | 37 | 188 |
+| `Facet.0.2` | 39 | 222 |
 | `MelonLoader` | 8 | 23 |
 | `Newtonsoft.Json` | 21 | 127 |
 | `PrismLib` | 17 | 114 |
@@ -30,7 +30,7 @@ resources, and no types the mod never touches.
 | `Unity.TextMeshPro` | 36 | 348 |
 | `UnityEngine` | 0 | 0 |
 | `UnityEngine.AudioModule` | 18 | 70 |
-| `UnityEngine.CoreModule` | 77 | 1018 |
+| `UnityEngine.CoreModule` | 78 | 1082 |
 | `UnityEngine.ImageConversionModule` | 1 | 1 |
 | `UnityEngine.InputLegacyModule` | 1 | 11 |
 | `UnityEngine.ParticleSystemModule` | 9 | 53 |
@@ -38,11 +38,11 @@ resources, and no types the mod never touches.
 | `UnityEngine.TextCoreTextEngineModule` | 2 | 0 |
 | `UnityEngine.TextRenderingModule` | 3 | 20 |
 | `UnityEngine.UI` | 94 | 354 |
-| `UnityEngine.UIElementsModule` | 44 | 96 |
-| `UnityEngine.UIModule` | 6 | 34 |
+| `UnityEngine.UIElementsModule` | 44 | 106 |
+| `UnityEngine.UIModule` | 6 | 35 |
 | `UnityModManager` | 4 | 12 |
 
-**553 types, 3917 members.**
+**556 types, 4026 members.**
 
 ## How it is used
 

@@ -45,9 +45,20 @@ namespace UnityEngine {
         public const int kMaxBladeCount = 1;
         public const float kMinAperture = 2f;
         public const int kMinBladeCount = 3;
+        public static global::UnityEngine.Camera[] allCameras { get => throw null; }
+        public bool allowHDR { get => throw null; set { } }
+        public bool allowMSAA { get => throw null; set { } }
         public float aspect { get => throw null; set { } }
+        public global::UnityEngine.Color backgroundColor { get => throw null; set { } }
         public global::UnityEngine.CameraClearFlags clearFlags { get => throw null; set { } }
+        public int cullingMask { get => throw null; set { } }
+        public float farClipPlane { get => throw null; set { } }
+        public float nearClipPlane { get => throw null; set { } }
+        public bool orthographic { get => throw null; set { } }
         public float orthographicSize { get => throw null; set { } }
+        public global::UnityEngine.RenderTexture targetTexture { get => throw null; set { } }
+        public bool useOcclusionCulling { get => throw null; set { } }
+        public void Render() => throw null;
         private Camera() { }
         public enum GateFitMode : int {
             Vertical = 1,
@@ -172,6 +183,7 @@ namespace UnityEngine {
     public sealed unsafe partial class GameObject : global::UnityEngine.Object {
         public bool activeInHierarchy { get => throw null; }
         public bool activeSelf { get => throw null; }
+        public int layer { get => throw null; set { } }
         public global::UnityEngine.Transform transform { get => throw null; }
         public GameObject(string name) => throw null;
         public GameObject(string name, params global::System.Type[] components) => throw null;
@@ -696,8 +708,39 @@ namespace UnityEngine {
         }
     }
     public unsafe partial class RenderTexture : global::UnityEngine.Texture {
+        public RenderTexture(int width, int height, int depth, global::UnityEngine.RenderTextureFormat format) => throw null;
         public void Release() => throw null;
         protected RenderTexture() { }
+    }
+    public enum RenderTextureFormat : int {
+        ARGB32 = 0,
+        Depth = 1,
+        ARGBHalf = 2,
+        Shadowmap = 3,
+        RGB565 = 4,
+        ARGB4444 = 5,
+        ARGB1555 = 6,
+        Default = 7,
+        ARGB2101010 = 8,
+        DefaultHDR = 9,
+        ARGB64 = 10,
+        ARGBFloat = 11,
+        RGFloat = 12,
+        RGHalf = 13,
+        RFloat = 14,
+        RHalf = 15,
+        R8 = 16,
+        ARGBInt = 17,
+        RGInt = 18,
+        RInt = 19,
+        BGRA32 = 20,
+        RGB111110Float = 22,
+        RG32 = 23,
+        RGBAUShort = 24,
+        RG16 = 25,
+        BGRA10101010_XR = 26,
+        BGR101010_XR = 27,
+        R16 = 28,
     }
     public unsafe partial class Renderer : global::UnityEngine.Component {
         public bool enabled { get => throw null; set { } }
@@ -964,6 +1007,7 @@ namespace UnityEngine {
         public global::UnityEngine.Vector3 lossyScale { get => throw null; }
         public global::UnityEngine.Transform parent { get => throw null; set { } }
         public global::UnityEngine.Vector3 position { get => throw null; set { } }
+        public global::UnityEngine.Quaternion rotation { get => throw null; set { } }
         public global::UnityEngine.Transform Find(string n) => throw null;
         public global::UnityEngine.Transform GetChild(int index) => throw null;
         public virtual global::System.Collections.IEnumerator GetEnumerator() => throw null;
@@ -1019,6 +1063,8 @@ namespace UnityEngine {
         public Vector3(float x, float y, float z) => throw null;
         public static float Distance(global::UnityEngine.Vector3 a, global::UnityEngine.Vector3 b) => throw null;
         public static global::UnityEngine.Vector3 LerpUnclamped(global::UnityEngine.Vector3 a, global::UnityEngine.Vector3 b, float t) => throw null;
+        public static global::UnityEngine.Vector3 Max(global::UnityEngine.Vector3 lhs, global::UnityEngine.Vector3 rhs) => throw null;
+        public static global::UnityEngine.Vector3 Min(global::UnityEngine.Vector3 lhs, global::UnityEngine.Vector3 rhs) => throw null;
         public static global::UnityEngine.Vector3 operator +(global::UnityEngine.Vector3 a, global::UnityEngine.Vector3 b) => throw null;
         public static bool operator ==(global::UnityEngine.Vector3 lhs, global::UnityEngine.Vector3 rhs) => throw null;
         public static bool operator !=(global::UnityEngine.Vector3 lhs, global::UnityEngine.Vector3 rhs) => throw null;
@@ -1080,6 +1126,7 @@ namespace UnityEngine.SceneManagement {
         bool global::System.IEquatable<global::UnityEngine.SceneManagement.SceneHandle>.Equals(global::UnityEngine.SceneManagement.SceneHandle other) => throw null;
     }
     public unsafe partial class SceneManager {
+        public static event global::UnityEngine.Events.UnityAction<global::UnityEngine.SceneManagement.Scene, global::UnityEngine.SceneManagement.Scene> activeSceneChanged { add { } remove { } }
         public static event global::UnityEngine.Events.UnityAction<global::UnityEngine.SceneManagement.Scene, global::UnityEngine.SceneManagement.LoadSceneMode> sceneLoaded { add { } remove { } }
         public static event global::UnityEngine.Events.UnityAction<global::UnityEngine.SceneManagement.Scene> sceneUnloaded { add { } remove { } }
         public static global::UnityEngine.SceneManagement.Scene GetActiveScene() => throw null;

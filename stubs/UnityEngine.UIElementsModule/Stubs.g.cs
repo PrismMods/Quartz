@@ -24,6 +24,7 @@ namespace UnityEngine.UIElements {
         private global::UnityEngine.Sprite m_Sprite;
         private global::UnityEngine.Texture2D m_Texture;
         private global::UnityEngine.UIElements.VectorImage m_VectorImage;
+        public static global::UnityEngine.UIElements.Background FromRenderTexture(global::UnityEngine.RenderTexture rt) => throw null;
         public static global::UnityEngine.UIElements.Background FromSprite(global::UnityEngine.Sprite s) => throw null;
         bool global::System.IEquatable<global::UnityEngine.UIElements.Background>.Equals(global::UnityEngine.UIElements.Background other) => throw null;
     }
@@ -63,6 +64,7 @@ namespace UnityEngine.UIElements {
     public unsafe partial interface INotifyValueChanged<T> {
     }
     public unsafe partial interface IPanel : global::System.IDisposable {
+        float scaledPixelsPerPoint { get; }
     }
     public unsafe partial interface IPrefixLabel {
     }
@@ -79,6 +81,7 @@ namespace UnityEngine.UIElements {
         global::UnityEngine.UIElements.StyleLength marginBottom { get; set; }
         global::UnityEngine.UIElements.StyleLength marginLeft { get; set; }
         global::UnityEngine.UIElements.StyleLength marginRight { get; set; }
+        global::UnityEngine.UIElements.StyleLength marginTop { get; set; }
         global::UnityEngine.UIElements.StyleLength minHeight { get; set; }
         global::UnityEngine.UIElements.StyleLength minWidth { get; set; }
         global::UnityEngine.UIElements.StyleFloat opacity { get; set; }
@@ -118,6 +121,8 @@ namespace UnityEngine.UIElements {
         private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
         private global::UnityEngine.UIElements.Background m_Value;
         public StyleBackground(global::UnityEngine.Sprite v) => throw null;
+        public static implicit operator global::UnityEngine.UIElements.StyleBackground(global::UnityEngine.UIElements.Background v) => throw null;
+        public static implicit operator global::UnityEngine.UIElements.StyleBackground(global::UnityEngine.UIElements.StyleKeyword keyword) => throw null;
         bool global::System.IEquatable<global::UnityEngine.UIElements.StyleBackground>.Equals(global::UnityEngine.UIElements.StyleBackground other) => throw null;
     }
     public unsafe partial struct StyleEnum<T> : global::System.IEquatable<global::UnityEngine.UIElements.StyleEnum<T>> where T : struct, global::System.IConvertible {
@@ -172,8 +177,10 @@ namespace UnityEngine.UIElements {
         public global::UnityEngine.UIElements.IPanel panel { get => throw null; }
         public global::UnityEngine.UIElements.VisualElement parent { get => throw null; }
         public global::UnityEngine.UIElements.IStyle style { get => throw null; }
+        public global::UnityEngine.Rect worldBound { get => throw null; }
         public void Add(global::UnityEngine.UIElements.VisualElement child) => throw null;
         public void Clear() => throw null;
+        public int IndexOf(global::UnityEngine.UIElements.VisualElement element) => throw null;
         public void Insert(int index, global::UnityEngine.UIElements.VisualElement element) => throw null;
         protected VisualElement() { }
         public enum MeasureMode : int {

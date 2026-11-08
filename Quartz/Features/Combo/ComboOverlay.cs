@@ -25,7 +25,7 @@ public static class ComboOverlay {
     private static GameObject dragObj;
     private static Updater updater;
     private static bool ShouldShow() =>
-        (OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame) || UICore.IsArranging;
+        (OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame) || UICore.IsArranging || OverlayPreview.Is(FontKey);
     private static bool gateWant;
     // Roots start visible; keep the updater until it has hidden them once.
     private static bool updaterRan;
@@ -79,6 +79,9 @@ public static class ComboOverlay {
         );
         ReorganizeHandle.SetRotationSource(dragObj, () => Conf.Rotation, v => { Conf.Rotation = v; Apply(); });
         updater = canvasObj.AddComponent<Updater>();
+        RectTransform[] frame = [root];
+        OverlayPreview.Register(FontKey, () => canvasObj ? canvasObj.GetComponent<Canvas>() : null, () => frame,
+            shown: () => root ? root.gameObject : null);
         gateWant = true;
         updaterRan = false;
         gateRunning = true;
@@ -175,6 +178,7 @@ public static class ComboOverlay {
     public static void ApplyCaptionShadow() => ApplyCaptionMaterial();
     public static void Dispose() {
         if(canvasObj == null) return;
+        OverlayPreview.Unregister(FontKey);   // first: a borrowed canvas goes back before its position is kept
         CapturePosition();
         ConfMgr?.Save();
         Object.Destroy(canvasObj);
@@ -260,7 +264,7 @@ public static class ComboOverlay {
                 ApplyCaptionMaterial();
                 captionFontChanged = true;
             }
-            int count = arranging && Combo.Count <= 0 ? 42 : Combo.Count;
+            int count = (arranging || OverlayPreview.Is(FontKey)) && Combo.Count <= 0 ? 42 : Combo.Count;
             (float pulse, float pulseIntensity) = Combo.EvaluatePulse(Conf.CountPulseScale, Conf.PulseDuration);
             float valueSize = Conf.FontSize * pulse;
             Color color = Conf.GetComboColor(count);
