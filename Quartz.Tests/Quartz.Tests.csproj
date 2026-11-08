@@ -57,6 +57,7 @@
 		<Compile Include="../Quartz/Plugins/PluginImage.cs" Link="Source/PluginImage.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvMigrationPlan.cs" Link="Source/KvMigrationPlan.cs" />
 		<Compile Include="../Quartz/Features/Tuf/TufThumbnail.cs" Link="Source/TufThumbnail.cs" />
+		<Compile Include="../Quartz/Features/Optimizer/DecorationImageScanner.cs" Link="Source/DecorationImageScanner.cs" />
 
 		<!-- The late-binding layer. Refl.cs is deliberately free of game types so it
 		     can be linked here; the one member that needs the game's assembly
