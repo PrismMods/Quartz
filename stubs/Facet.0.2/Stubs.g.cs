@@ -237,6 +237,7 @@ namespace Facet {
         public event global::System.Action Hidden { add { } remove { } }
         public Surface(global::Facet.Host host, string name, global::Facet.Layer layer, global::UnityEngine.TextCore.Text.FontAsset font = default) => throw null;
         public void Dispose() => throw null;
+        public void Refresh() => throw null;
         public void Relabel() => throw null;
         private Surface() { }
         void global::System.IDisposable.Dispose() => throw null;

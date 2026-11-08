@@ -85,8 +85,10 @@ public static class SongTitleOverlay {
         text.raycastTarget = false;
         TextCompat.NoWrap(text);
         text.text = "";
-        // A box the root's size until the text first draws, so a lease can begin.
+        // A box the root's size until the text first draws, so a lease can begin. Active only while previewed: the pop-in
+        // animation measures the title over its active rects.
         GameObject frameObj = new("PreviewFrame");
+        frameObj.SetActive(false);
         frameObj.transform.SetParent(labelObj.transform, false);
         previewFrame = frameObj.AddComponent<RectTransform>();
         framed = default;
@@ -106,7 +108,7 @@ public static class SongTitleOverlay {
         updater = canvasObj.AddComponent<Updater>();
         RectTransform[] frame = [previewFrame];
         OverlayPreview.Register(FontKey, () => canvasObj ? canvasObj.GetComponent<Canvas>() : null, () => frame,
-            shown: () => root ? root.gameObject : null);
+            () => frameObj.SetActive(true), () => { if(frameObj) frameObj.SetActive(false); }, () => root ? root.gameObject : null);
         gateWant = true;
         updaterRan = false;
         gateRunning = true;
@@ -273,7 +275,7 @@ public static class SongTitleOverlay {
             }
             // A preview outside a level shows the placeholder title through the format, as arranging does; in a level, the title.
             bool previewing = OverlayPreview.Is(FontKey);
-            string body = BuildBody(arranging || (previewing && !GameStats.InGame));
+            string body = BuildBody(arranging || (previewing && !GameStats.InLevel));
             if(body != lastBody) {
                 text.text = body;
                 lastBody = body;

@@ -14,6 +14,7 @@ public static class GameStats {
         }
     }
     private static FrameCached<bool> inGameCache;
+    private static FrameCached<bool> inLevelCache;
     private static FrameCached<float> progressCache;
     private static FrameCached<float> accuracyCache;
     private static FrameCached<float> xAccuracyCache;
@@ -30,17 +31,20 @@ public static class GameStats {
     private static FrameCached<string> songTitleCache;
     private static FrameCached<string> songTitleRawCache;
     private static FrameCached<int> fpsCache;
-    public static bool InGame => inGameCache.Get(static () => {
+    public static bool InGame => inGameCache.Get(static () => Level(playing: true));
+    /// <summary>A level is loaded, played or paused: InGame is false while paused. Not the editor while editing.</summary>
+    public static bool InLevel => inLevelCache.Get(static () => Level(playing: false));
+    private static bool Level(bool playing) {
         try {
             scrController c = scrController.instance;
-            if (c == null || !c.gameworld || c.paused) return false;
+            if (c == null || !c.gameworld || (playing && c.paused)) return false;
             if (ADOBase.isLevelEditor) {
                 scnEditor ed = scnEditor.instance;
                 if (ed != null && ed.inStrictlyEditingMode) return false;
             }
             return true;
         } catch(Exception e) { Diag.Ignore(e); return false; }
-    });
+    }
     public static float Progress => progressCache.Get(static () => {
         try {
             scrController c = scrController.instance;

@@ -11,6 +11,8 @@ using Quartz.Overlay;
 using Quartz.Features.Overlay;
 namespace Quartz.Features.ProgressBar;
 public static class ProgressBarOverlay {
+    /// <summary>The preview pane's id for the bar.</summary>
+    internal const string PreviewId = "progressbar";
     public static SettingsFile<ProgressBarSettings> ConfMgr { get; private set; }
     public static ProgressBarSettings Conf => ConfMgr.Data;
     private static GameObject canvasObj;
@@ -20,11 +22,13 @@ public static class ProgressBarOverlay {
     private static Image back;
     private static RectTransform fillContainer;
     private static Image fill;
+    // The Line style spans the screen edge: its preview frames a centred slice of it at true size.
+    private static RectTransform previewFrame;
     private static GameObject dragObj;
     private static Updater updater;
     private static GraphicRaycaster raycaster;
     private static bool ShouldShow() =>
-        (OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame) || UICore.IsArranging;
+        (OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame) || UICore.IsArranging || OverlayPreview.Is(PreviewId);
     private static bool gateWant;
     // Roots start visible; keep the updater until it has hidden them once.
     private static bool updaterRan;
@@ -90,6 +94,14 @@ public static class ProgressBarOverlay {
         fillRect.offsetMax = Vector2.zero;
         fill = fillObj.AddComponent<Image>();
         fill.raycastTarget = false;
+        // Active only while previewed: the pop-in animation measures the bar over its active rects.
+        GameObject frameObj = new("PreviewFrame");
+        frameObj.SetActive(false);
+        frameObj.transform.SetParent(bar, false);
+        previewFrame = frameObj.AddComponent<RectTransform>();
+        previewFrame.anchorMin = new Vector2(0.5f, 0f);
+        previewFrame.anchorMax = new Vector2(0.5f, 1f);
+        previewFrame.sizeDelta = new Vector2(600f, 0f);
         dragObj = ReorganizeHandle.CreateDragSurface(bar, () => MainCore.Tr.Get("SECTION_PROGRESS_BAR", "Progress Bar"), Moved);
         ReorganizeHandle.SetLayoutTarget(dragObj, LayoutIds.ProgressBar, static () => Conf.Style != ProgressBarStyle.Line);
         ReorganizeHandle.SetAnchorSource(dragObj, () => Conf.AnchorClosest, a => {
@@ -98,6 +110,11 @@ public static class ProgressBarOverlay {
         }, v => { Conf.AnchorClosest = v; Save(); });
         ReorganizeHandle.SetRotationSource(dragObj, () => Conf.Rotation, v => { Conf.Rotation = v; Apply(); });
         updater = canvasObj.AddComponent<Updater>();
+        // Modern frames the bar; its border is off at no outline.
+        RectTransform[] modern = [bar], line = [previewFrame];
+        OverlayPreview.Register(PreviewId, () => canvasObj ? canvasObj.GetComponent<Canvas>() : null,
+            () => Conf.Style == ProgressBarStyle.Line ? line : modern, () => frameObj.SetActive(true), () => { if(frameObj) frameObj.SetActive(false); },
+            () => bar ? bar.gameObject : null);
         gateWant = true;
         updaterRan = false;
         gateRunning = true;
@@ -158,6 +175,7 @@ public static class ProgressBarOverlay {
     }
     public static void Dispose() {
         if(canvasObj == null) return;
+        OverlayPreview.Unregister(PreviewId);   // first: a borrowed canvas goes back before it is destroyed
         ConfMgr?.Save();
         Object.Destroy(canvasObj);
         canvasObj = null;
@@ -167,6 +185,7 @@ public static class ProgressBarOverlay {
         back = null;
         fillContainer = null;
         fill = null;
+        previewFrame = null;
         dragObj = null;
         raycaster = null;
         updater = null;
@@ -183,6 +202,12 @@ public static class ProgressBarOverlay {
         }
     }
     private static void GetProgressValues(out float start, out float now) {
+        // A preview outside a level shows a run part-way through, so the fill, its gradient and the outline show.
+        if(OverlayPreview.Is(PreviewId) && !GameStats.InLevel) {
+            start = 0f;
+            now = 0.42f;
+            return;
+        }
         if(Conf.UseMapTime) {
             start = Mathf.Clamp01(GameStats.RunStartMapTimeRatio);
             now = Mathf.Clamp01(GameStats.MapTimeRatio);

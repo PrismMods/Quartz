@@ -4,6 +4,7 @@ using System.Reflection;
 using Facet;
 using Quartz.Core;
 using Quartz.Features;
+using Quartz.Overlay;
 using Quartz.UI.Nav;
 using Quartz.UI.Objects.Impl;
 using Quartz.UI.Utility;
@@ -20,18 +21,22 @@ internal static partial class FacetSelfTestChecks {
     /// <summary>The open page is pageKey drawn in Facet, and each key names a shown row on it (its Id, or its input's): the row
     /// and everything around it up to the page display. A fold the rows sit in is opened first, as a player opens it, and shut
     /// again after; a switch's group is not, so the caller makes every row's switch and VisibleWhen hold first. hidden names
-    /// rows that must not show.</summary>
+    /// rows that must not show, their folds opened too: a row in a shut fold would not show whatever hides it.</summary>
     internal static IEnumerator Parity(Action<string, bool, string> check, string pageKey, string[] keys, string[] hidden = null) {
         VisualElement page = PageContent();
         VisualElement Row(string k) => page.Q(name: k) ?? page.Q(name: k + "-input");
         List<Action<bool, bool>> opened = [];
-        foreach(string k in keys)
-            for(VisualElement e = Row(k)?.parent; e != null && e != page; e = e.parent)
-                if(FindFold.Invoke(null, [e]) is { } fold && !((Func<bool>)FoldIsOpen.GetValue(fold))()) {
-                    var set = (Action<bool, bool>)FoldSet.GetValue(fold);
-                    set(true, false);
-                    opened.Add(set);
-                }
+        if(Folds(out string miss)) {
+            foreach(string k in keys.Concat(hidden ?? []))
+                for(VisualElement e = Row(k)?.parent; e != null && e != page; e = e.parent)
+                    if(findFold.Invoke(null, [e]) is { } fold && !((Func<bool>)foldIsOpen.GetValue(fold))()) {
+                        var set = (Action<bool, bool>)foldSet.GetValue(fold);
+                        set(true, false);
+                        opened.Add(set);
+                    }
+        } else {
+            check($"{pageKey}: Facet's fold record is found, so the rows in folds are opened before they are read", false, miss);
+        }
         yield return Frames(1);   // the resolved styles catch up
         bool Shown(string k) {
             VisualElement e = Row(k);
@@ -46,10 +51,24 @@ internal static partial class FacetSelfTestChecks {
             $"page={QuartzShell.CurrentPage} classicCard={!moved} missing={string.Join(",", missing)} shown={string.Join(",", shows)} unfolded={opened.Count}");
     }
 
-    // Facet's record of a fold (an Advanced or a Section body), internal to it.
-    private static readonly Type FoldType = typeof(Controls).GetNestedType("Fold", BindingFlags.NonPublic);
-    private static readonly MethodInfo FindFold = typeof(Data).GetMethod(nameof(Data.Find)).MakeGenericMethod(FoldType);
-    private static readonly FieldInfo FoldSet = FoldType.GetField("Set"), FoldIsOpen = FoldType.GetField("IsOpen");
+    // Facet's record of a fold (an Advanced or a Section body), internal to it. Looked up on first use, so a rename in Facet
+    // fails Parity's check instead of the self-test's class initialiser, which would take every check down.
+    private static MethodInfo findFold;
+    private static FieldInfo foldSet, foldIsOpen;
+
+    private static bool Folds(out string miss) {
+        miss = null;
+        if(findFold != null) return true;
+        Type fold = typeof(Controls).GetNestedType("Fold", BindingFlags.NonPublic);
+        (foldSet, foldIsOpen) = (fold?.GetField("Set"), fold?.GetField("IsOpen"));
+        if(fold == null || foldSet == null || foldIsOpen == null) {
+            miss = $"Controls.Fold={fold != null} Set={foldSet != null} IsOpen={foldIsOpen != null}";
+            return false;
+        }
+        findFold = typeof(Data).GetMethod(nameof(Data.Find))?.MakeGenericMethod(fold);
+        miss = findFold == null ? "Data.Find" : null;
+        return findFold != null;
+    }
 
     /// <summary>A switch flipped on the open moved page shows on the live classic page opened next; a second flip puts it back.
     /// The classic toggle's id is the row's key in lower case. field writes the setting as its row does, for the restore.</summary>
@@ -267,6 +286,39 @@ internal static partial class FacetSelfTestChecks {
             QuartzShell.Window.Rect = was;
         }
         yield return Frames(2);
+    }
+
+    /// <summary>The pop-in animation measures an overlay's root over its active rects (RectTransformUtility's relative bounds).
+    /// With no preview, the root's PreviewFrame is not one of them: the bounds are those of every other rect. The root is
+    /// shown for the reading, as in a level, and put back in the same frame.</summary>
+    private static void MotionBounds(Action<string, bool, string> check, string pageKey, RectTransform root) {
+        string tag = $"{pageKey}: with no preview the pop-in animation's bounds leave the preview frame out";
+        if(root == null) {
+            check(tag, false, "no root");
+            return;
+        }
+        bool was = root.gameObject.activeSelf, any = false;
+        Bounds with, without = default;
+        var corners = new Vector3[4];
+        try {
+            root.gameObject.SetActive(true);
+            with = RectTransformUtility.CalculateRelativeRectTransformBounds(root, root);
+            foreach(RectTransform r in root.GetComponentsInChildren<RectTransform>(false)) {
+                if(r.name == "PreviewFrame") continue;
+                r.GetWorldCorners(corners);
+                foreach(Vector3 c in corners) {
+                    Vector3 local = root.InverseTransformPoint(c);
+                    if(any) without.Encapsulate(local);
+                    else without = new Bounds(local, Vector3.zero);
+                    any = true;
+                }
+            }
+        } finally {
+            root.gameObject.SetActive(was);
+        }
+        bool framed = root.GetComponentsInChildren<RectTransform>(true).Any(r => r.name == "PreviewFrame");
+        check(tag, OverlayPreview.Target == null && framed && any && Vector3.Distance(with.min, without.min) < 0.01f && Vector3.Distance(with.max, without.max) < 0.01f,
+            $"target={OverlayPreview.Target} frame={framed} bounds={with.size}@{with.center} without={without.size}@{without.center}");
     }
 
     // A colour row's red, green and blue, set through its picker's channel sliders as dragging them would; alpha stays.

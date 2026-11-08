@@ -264,7 +264,7 @@ public static class ComboOverlay {
                 ApplyCaptionMaterial();
                 captionFontChanged = true;
             }
-            int count = (arranging || OverlayPreview.Is(FontKey)) && Combo.Count <= 0 ? 42 : Combo.Count;
+            int count = (arranging || (OverlayPreview.Is(FontKey) && !GameStats.InLevel)) && Combo.Count <= 0 ? 42 : Combo.Count;
             (float pulse, float pulseIntensity) = Combo.EvaluatePulse(Conf.CountPulseScale, Conf.PulseDuration);
             float valueSize = Conf.FontSize * pulse;
             Color color = Conf.GetComboColor(count);

@@ -276,6 +276,12 @@ internal static class OverlayPreview {
             (rect.localScale, rect.localPosition, rect.localRotation, rect.sizeDelta) = (scale, position, rotation, size);
             // Backwards: an object recorded twice (moved off the layer by its owner meanwhile) ends on its first layer.
             for(int i = tree.Count - 1; i >= 0; i--) if(tree[i] != null) tree[i].gameObject.layer = layers[i];
+            // An object made on the preview layer while lent (TMP gives a sub-mesh its parent's layer) was never recorded:
+            // it takes its parent's, as it would have been made outside the lease. Parents come first in the walk.
+            Canvas.GetComponentsInChildren(true, walk);
+            foreach(Transform t in walk)
+                if(t.gameObject.layer == Layer && t != rect && t.parent != null && !tree.Contains(t)) t.gameObject.layer = t.parent.gameObject.layer;
+            walk.Clear();
         }
 
         private void FreeTexture() {

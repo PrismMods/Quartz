@@ -2,6 +2,7 @@
   "en-US": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "PROGRESSBAR_ANCHOR_LABEL": "Anchor",
+    "PROGRESSBAR_DESC": "Shows how far into the level you are",
     "DESC_PROGRESSBAR_PREFILLSTART": "If you start mid-chart (checkpoint or editor play), the bar starts filled up to that point.",
     "DESC_PROGRESSBAR_USEMAPTIME": "Move the bar by the chart's elapsed time, not tiles cleared. It fills smoothly instead of stepping on each tile.",
     "DESC_PROGRESSBAR_FILLGRADIENT": "Change the fill color as the run goes from 0% to 100%, instead of one flat color.",

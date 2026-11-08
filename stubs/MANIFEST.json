@@ -2243,6 +2243,7 @@
           "System.Func\u00601\u003CSystem.Boolean\u003E Facet.Surface::EscapeHandler",
           "System.Void Facet.Surface::.ctor(Facet.Host,System.String,Facet.Layer,UnityEngine.TextCore.Text.FontAsset)",
           "System.Void Facet.Surface::Dispose()",
+          "System.Void Facet.Surface::Refresh()",
           "System.Void Facet.Surface::Relabel()",
           "System.Void Facet.Surface::add_Hidden(System.Action)",
           "System.Void Facet.Surface::remove_Hidden(System.Action)",

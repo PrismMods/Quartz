@@ -62,6 +62,7 @@ internal static partial class FacetSelfTestChecks {
         Color want = SameRgb(colour, Color.red) ? Color.green : Color.red;
         yield return PreviewChecks(check, info, SongTitlePage, SongTitleOverlay.FontKey, () => SetChannels("SONGTITLE_COLOR", want),
             () => SongTitleText() is { } text && SameRgb(text.color, want));
+        MotionBounds(check, SongTitlePage, OverlayPreview.ShownOf(SongTitleOverlay.FontKey)?.transform as RectTransform);
     }
 
     // A long title widens the pane's frame to the drawn text, so it fits the pane instead of running past its sides.
@@ -85,7 +86,8 @@ internal static partial class FacetSelfTestChecks {
     }
 
     // A shadow switched on through its row while the pane shows builds its own canvas under the borrowed one: within 3 frames
-    // that canvas, and all else under the borrowed one, is on the preview layer, which the pane's camera draws.
+    // that canvas, and all else under the borrowed one, is on the preview layer, which the pane's camera draws. Given back,
+    // everything under the canvas is on the canvas's layer again, an object made on the preview layer meanwhile included.
     private static IEnumerator SongTitleShadowDrawn(Action<string, bool, string> check) {
         string tag = $"{SongTitlePage}: a shadow switched on with the pane shown is drawn: within 3 frames its new canvas is on the preview layer";
         int frames = 0;
@@ -111,6 +113,19 @@ internal static partial class FacetSelfTestChecks {
         for(frames = 0; frames < 3 && !Drawn(); frames++) yield return null;
         check(tag, SongTitleConf.ShadowEnabled && !lease.Released && Drawn(),
             $"on={SongTitleConf.ShadowEnabled} frames={frames} nested={nested} offLayer={off} layer={lease.Layer} relayers={OverlayPreview.Relayers}");
+        // As TMP makes a sub-mesh: on its parent's layer, which is the preview layer while the canvas is lent.
+        var made = new GameObject("PreviewLayerProbe", typeof(RectTransform));
+        made.transform.SetParent(text.transform, false);
+        made.layer = lease.Layer;
+        Canvas borrowed = lease.Canvas;
+        lease.Release();
+        Transform[] under = borrowed.GetComponentsInChildren<Transform>(true);
+        int stays = under.Count(t => t.gameObject.layer == lease.Layer), other = under.Count(t => t.gameObject.layer != borrowed.gameObject.layer);
+        check($"{SongTitlePage}: given back, every object under the canvas is on the canvas's layer, one made on the preview layer meanwhile included",
+            lease.Released && stays == 0 && other == 0 && made.layer == borrowed.gameObject.layer,
+            $"objects={under.Length} onPreviewLayer={stays} offCanvasLayer={other} made={made.layer} canvas={borrowed.gameObject.layer} preview={lease.Layer}");
+        UnityEngine.Object.Destroy(made);
+        yield return Frames(1);   // the pane borrows the canvas again
     }
 
     private static TextMeshProUGUI SongTitleText() => OverlayPreview.ShownOf(SongTitleOverlay.FontKey)?.transform.Find("Label")?.GetComponent<TextMeshProUGUI>();

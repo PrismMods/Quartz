@@ -50,7 +50,7 @@ public static class JudgementOverlay {
     private static readonly int[] Sample = [0, 2, 5, 31, 412, 27, 4, 1, 0];
     // The perfect slot counts X judgements while they are shown.
     private static int Count(int slot, bool xpMode) =>
-        OverlayPreview.Is(FontKey) && !GameStats.InGame ? Sample[slot]
+        OverlayPreview.Is(FontKey) && !GameStats.InLevel ? Sample[slot]
         : slot == PerfectSlot && xpMode ? XPerfectBridge.XCount() : Judgement.SlotCount(slot);
     private static TextMeshProUGUI xPlusLabel;
     private static TextMeshProUGUI xMinusLabel;

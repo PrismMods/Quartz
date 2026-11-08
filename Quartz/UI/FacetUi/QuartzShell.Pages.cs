@@ -21,6 +21,7 @@ internal static partial class QuartzShell {
         [CorePages.FeaturesPageKey] = ShellFeatures.Build,
         [CorePages.SettingsPageKey] = ShellSettings.Build,
         ["overlay.general"] = OverlayPages.General.Page,
+        ["overlay.progressbar"] = OverlayPages.ProgressBar.Page,
         ["overlay.combo"] = OverlayPages.Combo.Page,
         ["overlay.judgement"] = OverlayPages.Judgement.Page,
         ["overlay.songtitle"] = OverlayPages.SongTitle.Page,
