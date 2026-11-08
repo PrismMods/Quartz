@@ -27,6 +27,11 @@
     "OPT_SKIPIDLEPARTICLES": "Skip Idle Particle Updates",
     "OPT_SKIPNOOPFILTERS": "Skip No-Op Screen Filters",
     "OPT_SMOOTHGC": "Smooth GC",
-    "SECTION_OPTIMIZER": "Optimizer"
+    "SECTION_OPTIMIZER": "Optimizer",
+    "OPT_PARALLELDECO": "Parallel Decoration Loading",
+    "DESC_OPT_PARALLELDECO": "Decodes a custom level's decoration images on worker threads, many at once, before the level loads, instead of one by one on the main thread while it loads. Cuts the load hitch on decoration-heavy levels. Any image it can't handle is loaded the normal way.",
+    "OPT_DECOPROGRESS": "Show Decoration Load Progress",
+    "DESC_OPT_DECOPROGRESS": "Shows a progress bar at the bottom of the screen while Parallel Decoration Loading is decoding a level's images.",
+    "OPT_DECO_LOADING": "Loading decorations… {0} / {1}"
   }
 }
