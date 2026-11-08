@@ -292,6 +292,21 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(3);
     }
 
+    /// <summary>On a page moved in part, the card whose button is Id id opens the classic menu on the page, where the parts left
+    /// there are; closing it brings the new menu back on the page.</summary>
+    internal static IEnumerator EditorLink(Action<string, bool, string> check, string pageKey, string id) {
+        int state = NavRegistry.StateFor(pageKey);
+        Button open = Body.Q<Button>(id + "-input");
+        if(open != null) Submit(open);
+        yield return Frames(2);
+        bool classic = open != null && UICore.IsOpen && UICore.CurrentMenuState == state && !FacetBridge.NewMenuVisible();
+        UICore.Close();
+        yield return Frames(2);
+        Step(check, $"{pageKey}: the editor card opens the classic menu on this page, and closing it brings the new menu back there",
+            classic && FacetBridge.NewMenuVisible() && !UICore.IsOpen && QuartzShell.CurrentPage == pageKey,
+            $"button={open != null} classic={classic} state={UICore.CurrentMenuState}/{state} {Showing()}");
+    }
+
     /// <summary>The open page's two columns: side by side, the page's parts share the header's edges, the settings cards their
     /// own and the preview ends on the header's right edge. The same once the window is narrowed until the columns stack.</summary>
     internal static IEnumerator ColumnEdges(Action<string, bool, string> check, string pageKey, string overlayId) {

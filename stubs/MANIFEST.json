@@ -2333,6 +2333,12 @@
           "UnityEngine.UIElements.VisualElement Facet.Window::get_Root()",
           "UnityEngine.UIElements.VisualElement Facet.Window::get_TitleBarLeft()"
         ]
+      },
+      {
+        "type": "Facet.Words",
+        "members": [
+          "System.Void Facet.Words::Label(UnityEngine.UIElements.TextElement,System.String,System.Boolean)"
+        ]
       }
     ]
   },

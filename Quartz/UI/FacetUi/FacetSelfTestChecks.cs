@@ -37,6 +37,7 @@ internal static partial class FacetSelfTestChecks {
             yield return OverlaySongTitle(check, info);
             yield return OverlayProgressBar(check, info);
             yield return OverlayKeyViewer(check, info);
+            yield return OverlayPanels(check, info);
             yield return Escape(check);
             yield return TextFocus(check);
             yield return Block(check);

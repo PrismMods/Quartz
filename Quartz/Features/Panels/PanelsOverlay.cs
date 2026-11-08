@@ -169,8 +169,11 @@ public static partial class PanelsOverlay {
     private static GraphicRaycaster raycaster;
     private static readonly List<LivePanel> panels = [];
     private static Updater updater;
+    internal static bool Built => canvasObj != null;
     private static bool ShouldShow() =>
-        (OverlaySwitch.Enabled && GameStats.InGame) || UICore.IsArranging;
+        (OverlaySwitch.Enabled && GameStats.InGame) || UICore.IsArranging || previewing;
+    // From the preview's begin to its end: every panel shows with its live values (zeros outside a level), as while arranging.
+    private static bool previewing;
     private static bool gateWant;
     // Roots start visible; keep the updater until it has hidden them once.
     private static bool updaterRan;
@@ -205,9 +208,34 @@ public static partial class PanelsOverlay {
         gateWant = true;
         updaterRan = false;
         gateRunning = true;
+        OverlayPreview.Register(FontKey, () => canvasObj ? canvasObj.GetComponent<Canvas>() : null, PreviewFrame, BeginPreview, EndPreview,
+            () => panels.Count > 0 && panels[0].Rect != null ? panels[0].Rect.gameObject : null);
     }
+    // The panels show and are sized at once, so the lease's first look has them to frame.
+    private static void BeginPreview() {
+        previewing = true;
+        if(updater != null) updater.Update();
+    }
+    // And hide at once: a lease that failed after the begin ends the preview before the gate ever saw it, and would leave
+    // the panels up over the menus.
+    private static void EndPreview() {
+        previewing = false;
+        if(updater != null) updater.Update();
+    }
+    // The panels shown, in an array kept between calls: the pane frames them every frame.
+    private static RectTransform[] previewFrame = [];
+    private static IEnumerable<RectTransform> PreviewFrame() {
+        int n = 0;
+        foreach(LivePanel p in panels) if(Shown(p)) n++;
+        if(previewFrame.Length != n) previewFrame = new RectTransform[n];
+        n = 0;
+        foreach(LivePanel p in panels) if(Shown(p)) previewFrame[n++] = p.Rect;
+        return previewFrame;
+    }
+    private static bool Shown(LivePanel p) => p.Rect != null && p.Rect.gameObject.activeSelf;
     public static void Dispose() {
         if(canvasObj == null) return;
+        OverlayPreview.Unregister(FontKey);   // first: a borrowed canvas goes back before the positions are kept and it is destroyed
         SyncPositionsToConfig();
         ConfMgr?.Save();
         foreach(LivePanel p in panels) ReleasePanelImages(p);
@@ -229,6 +257,18 @@ public static partial class PanelsOverlay {
         BuildPanels();
         Apply();
     }
+    /// <summary>More panels than this, and both menus warn that the game may slow down.</summary>
+    internal const int PanelSoftCap = 10;
+    /// <summary>A new empty panel, 24 px further right and down than the one before it: saved, and built on screen.</summary>
+    internal static void CreatePanel() {
+        List<PanelConfig> list = Conf.Panels;
+        PanelConfig p = new() { Name = "Panel " + (list.Count + 1) };
+        p.PosX += 24f * list.Count;
+        p.PosY -= 24f * list.Count;
+        list.Add(p);
+        Save();
+        Rebuild();
+    }
     public static void SetAnchor(PanelConfig config, PanelAnchor anchor) {
         config.Anchor = (int)anchor;
         Vector2 def = PanelConfig.DefaultOffset(anchor);
@@ -240,7 +280,7 @@ public static partial class PanelsOverlay {
     private static void BuildPanels() {
         List<PanelConfig> configs = Conf.Panels;
         for(int i = 0; i < configs.Count; i++) {
-            LivePanel panel = CreatePanel(configs[i]);
+            LivePanel panel = BuildPanel(configs[i]);
             ReorganizeHandle.SetLayoutTarget(panel.DragObj, LayoutIds.Panel(i), owner: configs[i]); // steps follow the panel, not its place
             panels.Add(panel);
         }
@@ -298,7 +338,7 @@ public static partial class PanelsOverlay {
             }
         }
     }
-    private static LivePanel CreatePanel(PanelConfig config) {
+    private static LivePanel BuildPanel(PanelConfig config) {
         GameObject panelObj = new("Panel_" + config.Name);
         panelObj.transform.SetParent(canvasObj.transform, false);
         Vector2 anchor = PanelConfig.AnchorVector((PanelAnchor)config.Anchor);

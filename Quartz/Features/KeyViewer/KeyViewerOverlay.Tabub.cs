@@ -70,6 +70,7 @@ public static partial class KeyViewerOverlay {
             if(tex != null) tabubCustomTex = tex;
         } catch(Exception ex) {
             MainCore.Log.Msg("[KeyViewer] Tabub image load failed: " + ex.Message);
+            imageFailLogged = true;
         }
     }
     public static bool ImportTabubImage(out string error) {
@@ -85,11 +86,12 @@ public static partial class KeyViewerOverlay {
         }
         if(string.IsNullOrEmpty(picked)) return false;
         Conf.TabubImagePath = picked;
+        imageFailLogged = false;
         ApplyTabub();
         Save();
         if(tabubCustomTex == null) {
             error = "Could not read that image";
-            MainCore.Log.Msg("[KeyViewer] " + error + ": " + picked);
+            if(!imageFailLogged) MainCore.Log.Msg("[KeyViewer] " + error + ": " + picked);   // once: a failed read or decode said why already
             return false;
         }
         MainCore.Log.Msg("[KeyViewer] Tabub image set to " + picked);

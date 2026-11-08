@@ -123,12 +123,13 @@ internal static class ShellRows {
     }
 
     /// <summary>A read-only status line, Id id. Every refresh reads it, so its text is made again only when input or the
-    /// language changes.</summary>
+    /// language changes. Nothing is kept while the language loads: its table is half there.</summary>
     internal static Control<string> Info<T>(VisualElement card, string id, Func<T> input, Func<T, string> text, Func<bool> visible = null) {
         T last = default;
         string language = null, shown = null;
         return Controls.Info(card, "", () => {
             T now = input();
+            if(MainCore.Tr.IsLoading) return text(now);
             if(shown == null || language != MainCore.Tr.Language || !EqualityComparer<T>.Default.Equals(now, last))
                 (last, language, shown) = (now, MainCore.Tr.Language, text(now));
             return shown;

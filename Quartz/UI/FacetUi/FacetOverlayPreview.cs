@@ -11,14 +11,19 @@ namespace Quartz.UI.FacetUi;
 /// for again every frame, and while there is none a note under the stage says why it is empty.
 /// </summary>
 internal static class FacetOverlayPreview {
-    /// <summary>The pane, in the page's right column. Every Overlay feature's overlay id is its feature id.</summary>
-    internal static VisualElement Pane(VisualElement right, string overlayId, string emptyKey = "MENU_PREVIEW_IN_LEVEL") {
+    /// <summary>The pane, in the page's right column. Every Overlay feature's overlay id is its feature id. emptyKey says why
+    /// the stage is empty, asked while it is (null: the element is not loaded yet).</summary>
+    internal static VisualElement Pane(VisualElement right, string overlayId, Func<string> emptyKey = null) {
+        emptyKey ??= () => "MENU_PREVIEW_IN_LEVEL";
         OverlayPreview.Lease lease = null;
         Label note = null;
         bool noteShown = true;
+        string noteKey = emptyKey();
         void Follow() {
             bool want = lease == null || lease.Released;
-            if(note == null || want == noteShown) return;
+            if(note == null) return;
+            if(want && emptyKey() is var key && key != noteKey) Words.Label(note, noteKey = key);   // the reason changed while empty
+            if(want == noteShown) return;
             noteShown = want;
             note.style.display = want ? DisplayStyle.Flex : DisplayStyle.None;
         }
@@ -47,7 +52,7 @@ internal static class FacetOverlayPreview {
         });
         // Under the stage, above the link; Facet's own Note is fixed text and cannot follow the lease.
         VisualElement pane = stage.parent;
-        note = Ui.Muted(emptyKey, pane);
+        note = Ui.Muted(noteKey, pane);
         note.name = overlayId + "-preview-empty";
         note.style.marginTop = Theme.For(pane).Sizes.Gap / 2f;
         pane.Insert(pane.IndexOf(stage) + 1, note);

@@ -29,14 +29,7 @@ internal static partial class PagePanels {
         GenerateUI.Button(
             GenerateUI.Row(content.transform),
             () => {
-                PanelConfig p = new() {
-                    Name = "Panel " + (PanelsOverlay.Conf.Panels.Count + 1),
-                };
-                p.PosX += 24f * PanelsOverlay.Conf.Panels.Count;
-                p.PosY -= 24f * PanelsOverlay.Conf.Panels.Count;
-                PanelsOverlay.Conf.Panels.Add(p);
-                PanelsOverlay.Save();
-                PanelsOverlay.Rebuild();
+                PanelsOverlay.CreatePanel();
                 RebuildPanelsList();
             },
             "Create Panel",
@@ -51,7 +44,6 @@ internal static partial class PagePanels {
         GenerateUI.FitVertical(panelsList);
         RebuildPanelsList();
     }
-    private const int PANEL_SOFT_CAP = 10;
     private static void RebuildPanelsList() {
         if(panelsList == null) return;
         GenerateUI.ClearChildren(panelsList.transform);
@@ -61,7 +53,7 @@ internal static partial class PagePanels {
                 GenerateUI.Row(panelsList.transform), "PANEL_NO_PANELS", "No panels. Create one above.", 19f);
             return;
         }
-        if(panels.Count > PANEL_SOFT_CAP) {
+        if(panels.Count > PanelsOverlay.PanelSoftCap) {
             GenerateUI.AddMutedText(GenerateUI.Row(panelsList.transform), 19f).text = string.Format(
                 GenerateUI.Tr("PANEL_TOO_MANY", "{0} panels — that's a lot; performance may suffer."),
                 panels.Count

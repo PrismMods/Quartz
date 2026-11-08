@@ -75,6 +75,9 @@
     "PANEL_TEXTSHADOW": "Text Shadow",
     "PANEL_TEXT_PLACEHOLDER": "Custom text…",
     "SECTION_PANELS": "Panels",
-    "PANEL_TOO_MANY": "{0} panels is a lot. The game may slow down."
+    "PANEL_TOO_MANY": "{0} panels is a lot. The game may slow down.",
+    "PANELS_DESC": "Text panels with live stats such as accuracy and BPM",
+    "MENU_PANELS_EDITOR": "Panels, their stats and order are edited in the classic menu",
+    "PANEL_COUNT": "Panels: {0}"
   }
 }

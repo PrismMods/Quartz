@@ -61,6 +61,8 @@ public static partial class KeyViewerOverlay {
             return false;
         }
     }
+    // A read or decode failure was logged since a picture import began, so the import does not log it a second time.
+    private static bool imageFailLogged;
     private static byte[] ReadImageFile(string path) {
         FileInfo info = new(path);
         if(!info.Exists || info.Length <= 0 || info.Length > KvImageSafety.MaxEncodedBytes) return null;
@@ -96,6 +98,7 @@ public static partial class KeyViewerOverlay {
             UnityEngine.Object.Destroy(tex);
         } catch(Exception ex) {
             MainCore.Log.Msg("[KeyViewer] Extended image decode failed: " + ex.Message);
+            imageFailLogged = true;
         }
         return null;
     }

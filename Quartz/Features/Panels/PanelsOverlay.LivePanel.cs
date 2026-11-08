@@ -38,7 +38,7 @@ public static partial class PanelsOverlay {
         private float nextTextRefresh;
         private bool lastShow;
         private bool lastReorganizing, lastArranging;
-        private void Update() {
+        internal void Update() {   // also called by a preview's begin
             updaterRan = true;
             bool isReorganizing = UICore.IsReorganizing;
             bool arranging = UICore.IsArranging;
@@ -117,7 +117,7 @@ public static partial class PanelsOverlay {
             string body = BuilderEquals(sb, bodyLength, p.LastBody)
                 ? p.LastBody
                 : bodyLength == 0 ? "" : sb.ToString(0, bodyLength);
-            if(arranging && body.Length == 0) body = p.Config.Name;
+            if((arranging || previewing) && body.Length == 0) body = p.Config.Name;   // an empty panel shows its name to be found
             bool active = body.Length > 0 || arranging;
             if(p.Rect.gameObject.activeSelf != active) {
                 p.Rect.gameObject.SetActive(active);

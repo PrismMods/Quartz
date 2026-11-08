@@ -292,4 +292,7 @@ namespace Facet {
         public void ShowSearch(string placeholder, global::System.Action<string> onChange) => throw null;
         private Window() { }
     }
+    public static unsafe partial class Words {
+        public static void Label(global::UnityEngine.UIElements.TextElement e, string english, bool own = default) => throw null;
+    }
 }

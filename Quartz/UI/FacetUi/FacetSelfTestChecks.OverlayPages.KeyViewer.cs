@@ -57,7 +57,7 @@ internal static partial class FacetSelfTestChecks {
             KeyViewerOverlay.Rebuild();
             KeyViewerOverlay.Save();
         }));
-        yield return KeyViewerEditorLink(check);
+        yield return EditorLink(check, KeyViewerPage, "MENU_KV_EDITOR");
         KeyViewerSearch(check);
         yield return KeyViewerLights(check);
         // Through the row's own slider: the scale half a step up (down near the top), read off the hand's root.
@@ -98,20 +98,6 @@ internal static partial class FacetSelfTestChecks {
         QuartzShell.Go(KeyViewerPage);
         info($"[perf] Key Viewer page build {clock.Elapsed.TotalMilliseconds:0.0} ms (page={QuartzShell.CurrentPage})");
         yield return Frames(3);
-    }
-
-    // The editor card opens the classic menu on the Key Viewer page; closing it brings the new menu back on this page.
-    private static IEnumerator KeyViewerEditorLink(Action<string, bool, string> check) {
-        int state = NavRegistry.StateFor(KeyViewerPage);
-        Button open = Body.Q<Button>("MENU_KV_EDITOR-input");
-        if(open != null) Submit(open);
-        yield return Frames(2);
-        bool classic = open != null && UICore.IsOpen && UICore.CurrentMenuState == state && !FacetBridge.NewMenuVisible();
-        UICore.Close();
-        yield return Frames(2);
-        Step(check, $"{KeyViewerPage}: the editor card opens the classic menu on the Key Viewer page, and closing it brings the new menu back there",
-            classic && FacetBridge.NewMenuVisible() && !UICore.IsOpen && QuartzShell.CurrentPage == KeyViewerPage,
-            $"button={open != null} classic={classic} state={UICore.CurrentMenuState}/{state} {Showing()}");
     }
 
     // A key the Key Viewer polls (the async hook off) lights its box in the pane while the new menu holds keys from the game.

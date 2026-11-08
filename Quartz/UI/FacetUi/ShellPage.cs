@@ -4,10 +4,12 @@ using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi;
 /// <summary>
 /// The frame of a moved feature page: its header with the feature's switch and a one-line description, then its cards.
-/// A page whose feature puts an element on screen has two columns, the cards left and the element's live preview right.
+/// A page whose feature puts an element on screen has two columns, the cards left and the element's live preview right,
+/// with emptyKey's reason under it while it has nothing to show.
 /// </summary>
 internal static class ShellPage {
-    internal static void Feature(VisualElement p, string featureId, string titleKey, string descKey, string overlayId, Action<VisualElement> cards) {
+    internal static void Feature(VisualElement p, string featureId, string titleKey, string descKey, string overlayId, Action<VisualElement> cards,
+        Func<string> emptyKey = null) {
         Controls.PageHeader(p, titleKey, QuartzShell.FeatureSwitch(featureId), o => {
             o.Id = titleKey;
             o.Description = descKey;
@@ -22,7 +24,7 @@ internal static class ShellPage {
             o.StackBelow = 760f;
         });
         cards(left);
-        FacetOverlayPreview.Pane(right, overlayId);
+        FacetOverlayPreview.Pane(right, overlayId, emptyKey);
     }
 }
 #endif
