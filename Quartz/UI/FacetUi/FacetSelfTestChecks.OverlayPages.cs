@@ -210,9 +210,12 @@ internal static partial class FacetSelfTestChecks {
     }
 
     // A right-click on a row, which opens its context menu.
-    private static void RightClick(VisualElement e) {
+    private static void RightClick(VisualElement e) => Press(e, 1);
+
+    // A mouse button going down on a row: 1 is the right button, 2 the middle.
+    private static void Press(VisualElement e, int button) {
         using PointerDownEvent ev = Pooled<PointerDownEvent>();
-        typeof(PointerEventBase<PointerDownEvent>).GetProperty("button").SetValue(ev, 1);
+        typeof(PointerEventBase<PointerDownEvent>).GetProperty("button").SetValue(ev, button);
         ev.target = e;
         e.SendEvent(ev);
     }

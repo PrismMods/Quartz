@@ -1,7 +1,9 @@
 #if DEBUG && !IL2CPP
 using System.Collections;
+using Quartz.Async;
 using Quartz.Core;
 using Quartz.Features;
+using Quartz.Features.Practice;
 using Quartz.IO;
 using Quartz.Prism;
 using Quartz.UI.Home;
@@ -271,21 +273,48 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(3);
     }
 
-    // A classic page whose feature puts an element on screen: Practice, which stays classic, when it is on, else another such
-    // page still classic and on. None is switched on for this: a first switch-on writes the feature's settings file.
+    // Practice stays classic and puts an element on screen, so it is the page checked, switched on for the check when it is
+    // off. A first switch-on leaves Practice.json behind (its teardown saves, and so does the quit after it): that file and
+    // a profile copy of it are removed again, so the check leaves the settings folder as it found it.
     private static IEnumerator ClassicLayoutRow(Action<string, bool, string> check) {
-        string page = new[] { "practice", "keyviewer", "judgement", "songtitle", "progressbar", "panels", "calibration" }
-            .Where(FeatureService.IsEnabled).Select(f => NavRegistry.KeyFor(FeaturePages.StateFor(f)))
-            .FirstOrDefault(k => k != null && !QuartzShell.Moved.ContainsKey(k));
-        if(page != null) QuartzShell.Go(page);
-        yield return Frames(1);
-        VisualElement row = Body.Q(name: "menu-classic-layout");
-        bool shown = page != null && row != null && Displayed(row) == PrismBridge.UiAvailable;
-        QuartzShell.Go("profiles.main");
-        yield return Frames(1);
-        bool none = Body.Q(name: "menu-classic-layout") == null;
-        check("a classic page with an on-screen element links to the layout editor, Profiles does not", shown && none,
-            $"page={page} row={row != null} profiles={!none}");
+        var saved = new[] { "overlay", "practice" }.Select(id => (id, was: FeatureService.IsEnabled(id), had: FeatureService.State.Features.TryGetValue(id, out bool v), value: v)).ToList();
+        string[] files = [Path.Combine(MainCore.Paths.RootPath, "Practice.json"), Path.Combine(ProfileManager.ProfilesPath, ProfileManager.Active, "Practice.json")];
+        bool[] existed = [.. files.Select(File.Exists)];
+        bool first = !saved[1].was && !existed[0];
+        try {
+            if(!saved[1].was) FeatureService.SetEnabled("practice", true);
+            yield return Frames(3);
+            string page = NavRegistry.KeyFor(FeaturePages.StateFor("practice"));
+            if(page != null) QuartzShell.Go(page);
+            yield return Frames(1);
+            VisualElement row = Body.Q(name: "menu-classic-layout");
+            bool shown = page != null && row != null && Displayed(row) == PrismBridge.UiAvailable;
+            QuartzShell.Go("profiles.main");
+            yield return Frames(1);
+            bool none = Body.Q(name: "menu-classic-layout") == null;
+            check("a classic page with an on-screen element (Practice) links to the layout editor, Profiles does not", shown && none,
+                $"page={page} switched={!saved[1].was} row={row != null} profiles={!none}");
+        } finally {
+            for(int i = saved.Count - 1; i >= 0; i--) RestoreFeature(saved[i].id, saved[i].was, saved[i].had, saved[i].value);
+            // Queued behind the switch-off, whose teardown saves: then the settings it loaded are dropped, unsaved.
+            if(first) MainThread.Enqueue(() => ForgetPractice(files, existed));
+        }
+        yield return Frames(3);
+        if(!first) yield break;
+        string[] left = [.. files.Where((f, i) => !existed[i] && File.Exists(f))];
+        check("the layout-row check leaves no Practice file it made, and drops Practice's unsaved settings",
+            left.Length == 0 && PracticeDifficulty.ConfMgr == null, $"left={string.Join(",", left)} conf={PracticeDifficulty.ConfMgr != null}");
+    }
+
+    // The files go first: a later step that throws must not leave them behind.
+    private static void ForgetPractice(string[] files, bool[] existed) {
+        SettingsFile<PracticeSettings> conf = PracticeDifficulty.ConfMgr;
+        if(conf != null) {
+            conf.CancelPendingSave();
+            SettingsRegistry.Unregister(conf);
+        }
+        for(int i = 0; i < files.Length; i++) if(!existed[i] && File.Exists(files[i])) File.Delete(files[i]);
+        if(conf != null) typeof(PracticeDifficulty).GetProperty(nameof(PracticeDifficulty.ConfMgr)).SetValue(null, null);   // the next switch-on loads afresh
     }
 
     private static IEnumerator PageLayout(Action<string, bool, string> check) {

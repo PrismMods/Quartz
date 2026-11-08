@@ -109,6 +109,19 @@ internal static class ShellRows {
             configure?.Invoke(o);
         });
 
+    /// <summary>A text field that holds limit characters, as the classic field does: typing stops there, and text written past
+    /// it another way (a paste, an undo) is cut as it is written.</summary>
+    internal static Control<string> Text(VisualElement card, string key, Bind<string> bind, int limit, Action apply, Action save,
+        Action<TextOptions> configure = null) {
+        Control<string> c = Controls.Text(card, key, Writes(Bind.To(bind.Get, v => bind.Set(v != null && v.Length > limit ? v[..limit] : v)), null, apply, save),
+            o => {
+                o.Id = key;
+                configure?.Invoke(o);
+            });
+        if(c.Input is TextField field) field.maxLength = limit;
+        return c;
+    }
+
     internal static Control<Color> Colour(VisualElement card, string key, Func<Color> get, Action<Color> set, Action apply, Action save,
         bool alpha = true, Action<ColourOptions> configure = null) =>
         Controls.Colour(card, key, Writes(Bind.To(get, set), null, apply, save), o => {

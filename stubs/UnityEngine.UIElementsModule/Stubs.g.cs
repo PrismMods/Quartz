@@ -158,6 +158,7 @@ namespace UnityEngine.UIElements {
         public TextField() => throw null;
     }
     public abstract unsafe partial class TextInputBaseField<TValueType> : global::UnityEngine.UIElements.BaseField<TValueType> {
+        public int maxLength { get => throw null; set { } }
         protected TextInputBaseField() { }
     }
     public sealed unsafe partial class UIDocument : global::UnityEngine.MonoBehaviour {

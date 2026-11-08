@@ -1966,7 +1966,9 @@
           "System.Void Facet.Control\u00601::add_Committed(System.Action\u00601\u003CT\u003E)",
           "T Facet.Control\u00601::Value()",
           "T Facet.Control\u00601::get_Value()",
+          "UnityEngine.UIElements.VisualElement Facet.Control\u00601::Input()",
           "UnityEngine.UIElements.VisualElement Facet.Control\u00601::Root()",
+          "UnityEngine.UIElements.VisualElement Facet.Control\u00601::get_Input()",
           "UnityEngine.UIElements.VisualElement Facet.Control\u00601::get_Root()"
         ]
       },
@@ -6671,7 +6673,10 @@
       },
       {
         "type": "UnityEngine.UIElements.TextInputBaseField\u00601",
-        "members": []
+        "members": [
+          "System.Int32 UnityEngine.UIElements.TextInputBaseField\u00601::maxLength()",
+          "System.Void UnityEngine.UIElements.TextInputBaseField\u00601::set_maxLength(System.Int32)"
+        ]
       },
       {
         "type": "UnityEngine.UIElements.UIDocument",

@@ -46,6 +46,7 @@ namespace Facet {
         protected ControlOptions() { }
     }
     public sealed unsafe partial class Control<T> {
+        public global::UnityEngine.UIElements.VisualElement Input { get => throw null; }
         public global::UnityEngine.UIElements.VisualElement Root { get => throw null; }
         public T Value { get => throw null; }
         public event global::System.Action<T> Committed { add { } remove { } }
