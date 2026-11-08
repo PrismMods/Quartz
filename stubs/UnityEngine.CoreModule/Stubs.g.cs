@@ -26,6 +26,9 @@ namespace UnityEngine {
         public static void Quit() => throw null;
         protected Application() { }
     }
+    public unsafe partial class AsyncOperation : global::UnityEngine.YieldInstruction {
+        protected AsyncOperation() { }
+    }
     public unsafe partial class Behaviour : global::UnityEngine.Component {
         public bool enabled { get => throw null; set { } }
         public bool isActiveAndEnabled { get => throw null; }
@@ -799,6 +802,11 @@ namespace UnityEngine {
         public global::UnityEngine.Sprite sprite { get => throw null; set { } }
         private SpriteRenderer() { }
     }
+    public sealed unsafe partial class SystemInfo {
+        public const string unsupportedIdentifier = "unsupportedIdentifier";
+        public static int processorCount { get => throw null; }
+        private SystemInfo() { }
+    }
     public enum SystemLanguage : int {
         Afrikaans = 0,
         Arabic = 1,
@@ -978,8 +986,8 @@ namespace UnityEngine {
         global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator() => throw null;
     }
     public unsafe partial struct Vector2 : global::System.IEquatable<global::UnityEngine.Vector2> {
-        public const float kEpsilon = 10f;
-        public const float kEpsilonNormalSqrt = 11f;
+        public const float kEpsilon = 11f;
+        public const float kEpsilonNormalSqrt = 12f;
         public float x;
         public float y;
         public float magnitude { get => throw null; }
@@ -1007,8 +1015,8 @@ namespace UnityEngine {
         bool global::System.IEquatable<global::UnityEngine.Vector2>.Equals(global::UnityEngine.Vector2 other) => throw null;
     }
     public unsafe partial struct Vector3 : global::System.IEquatable<global::UnityEngine.Vector3> {
-        public const float kEpsilon = 12f;
-        public const float kEpsilonNormalSqrt = 13f;
+        public const float kEpsilon = 13f;
+        public const float kEpsilonNormalSqrt = 14f;
         public float x;
         public float y;
         public float z;
@@ -1028,7 +1036,7 @@ namespace UnityEngine {
         bool global::System.IEquatable<global::UnityEngine.Vector3>.Equals(global::UnityEngine.Vector3 other) => throw null;
     }
     public unsafe partial struct Vector4 : global::System.IEquatable<global::UnityEngine.Vector4> {
-        public const float kEpsilon = 14f;
+        public const float kEpsilon = 15f;
         public float w;
         public float x;
         public float y;

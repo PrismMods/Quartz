@@ -24,6 +24,8 @@
 		<StubProject Include="$(MSBuildThisFileDirectory)UnityEngine.UI/UnityEngine.UI.csproj" />
 		<StubProject Include="$(MSBuildThisFileDirectory)UnityEngine.UIElementsModule/UnityEngine.UIElementsModule.csproj" />
 		<StubProject Include="$(MSBuildThisFileDirectory)UnityEngine.UIModule/UnityEngine.UIModule.csproj" />
+		<StubProject Include="$(MSBuildThisFileDirectory)UnityEngine.UnityWebRequestModule/UnityEngine.UnityWebRequestModule.csproj" />
+		<StubProject Include="$(MSBuildThisFileDirectory)UnityEngine.UnityWebRequestTextureModule/UnityEngine.UnityWebRequestTextureModule.csproj" />
 		<StubProject Include="$(MSBuildThisFileDirectory)UnityModManager/UnityModManager.csproj" />
 	</ItemGroup>
 	<Target Name="Build">

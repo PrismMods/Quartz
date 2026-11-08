@@ -27,6 +27,11 @@
     "OPT_SKIPIDLEPARTICLES": "변화 없는 파티클 업데이트 건너뛰기",
     "OPT_SKIPNOOPFILTERS": "효과 없는 화면 필터 건너뛰기",
     "OPT_SMOOTHGC": "부드러운 GC",
-    "SECTION_OPTIMIZER": "최적화"
+    "SECTION_OPTIMIZER": "최적화",
+    "OPT_PARALLELDECO": "장식 병렬 불러오기",
+    "DESC_OPT_PARALLELDECO": "커스텀 레벨의 장식 이미지를 레벨을 불러오기 전에 워커 스레드에서 여러 장씩 동시에 디코딩해요. 원래는 레벨을 불러오는 동안 메인 스레드에서 한 장씩 처리해요. 장식이 많은 레벨에서 로딩 멈춤이 줄어들어요. 처리하지 못한 이미지는 원래 방식으로 불러와요.",
+    "OPT_DECOPROGRESS": "장식 불러오기 진행도 표시",
+    "DESC_OPT_DECOPROGRESS": "장식 병렬 불러오기가 레벨의 이미지를 디코딩하는 동안 화면 아래에 진행 막대를 보여줘요.",
+    "OPT_DECO_LOADING": "장식 불러오는 중… {0} / {1}"
   }
 }

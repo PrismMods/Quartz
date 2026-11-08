@@ -394,6 +394,18 @@
     },
     {
       "type": "scnGame",
+      "member": "LoadAndPlayLevel",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "scnGame",
+      "member": "LoadLevel",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "scnGame",
       "member": "Play",
       "resolved": true,
       "assembly": "Assembly-CSharp"
@@ -407,6 +419,12 @@
     {
       "type": "scnGame",
       "member": "Update",
+      "resolved": true,
+      "assembly": "Assembly-CSharp"
+    },
+    {
+      "type": "scnGame",
+      "member": "UpdateDecorationObjects",
       "resolved": true,
       "assembly": "Assembly-CSharp"
     },
