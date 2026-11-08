@@ -29,7 +29,7 @@ public static class PageCalibration {
         );
         GenerateUI.ToggleTip(
             sec.Body, def.FloatOffsetEnabled, conf.FloatOffsetEnabled,
-            v => { conf.FloatOffsetEnabled = v; Save(); },
+            v => { conf.FloatOffsetEnabled = v; Save(); CalibrationPopupUI.RefreshPreview(); },
             "Decimal (Sub-Millisecond) Offset", "calibration_float_offset",
             "Allow the input offset to use decimals instead of whole milliseconds. Ctrl/Shift give .1/.01ms steps in the pause menu."
         );

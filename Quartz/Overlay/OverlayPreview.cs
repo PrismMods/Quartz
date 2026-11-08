@@ -66,8 +66,9 @@ internal static class OverlayPreview {
     internal static Canvas CanvasOf(string id) => sources.TryGetValue(id, out Source s) ? s.Canvas() : null;
     internal static GameObject ShownOf(string id) => sources.TryGetValue(id, out Source s) ? s.Shown() : null;
     internal static IEnumerable<RectTransform> FrameOf(string id) => sources.TryGetValue(id, out Source s) ? s.Frame() : null;
-    /// <summary>Walks of a borrowed canvas made because its hierarchy changed.</summary>
+    /// <summary>Walks of a borrowed canvas made because its hierarchy changed, and the time spent in them.</summary>
     internal static int Relayers;
+    internal static long RelayerTicks;
     internal static long RenderTicks;
     internal static int Renders;
     /// <summary>Frames read through an enumerator, which allocates: a render reads a list by index.</summary>
@@ -255,6 +256,9 @@ internal static class OverlayPreview {
         // does not draw. Counting the hierarchy is cheap; the canvas is walked only when the count moved.
         private static readonly List<Transform> walk = [];
         private void Relayer() {
+#if DEBUG
+            long start = System.Diagnostics.Stopwatch.GetTimestamp();
+#endif
             hierarchy = rect.hierarchyCount;
             Canvas.GetComponentsInChildren(true, walk);
             foreach(Transform t in walk) {
@@ -267,6 +271,7 @@ internal static class OverlayPreview {
             walk.Clear();
 #if DEBUG
             Relayers++;
+            RelayerTicks += System.Diagnostics.Stopwatch.GetTimestamp() - start;
 #endif
         }
 

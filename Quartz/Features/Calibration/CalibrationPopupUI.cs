@@ -2,6 +2,7 @@ using GTweens.Builders;
 using GTweens.Easings;
 using GTweens.Tweens;
 using Quartz.Core;
+using Quartz.Overlay;
 using Quartz.Resource;
 using Quartz.Tween;
 using Quartz.UI.Generator;
@@ -17,6 +18,8 @@ using Quartz.Compat.Game;
 using Quartz.UI;
 namespace Quartz.Features.Calibration;
 public static class CalibrationPopupUI {
+    /// <summary>The popup's id in a preview pane: the feature's.</summary>
+    internal const string PreviewId = LayoutIds.Calibration;
     private const float WIDTH = 460f;
     private const float HEIGHT = 200f;
     private const float TITLE_HEIGHT = 44f;
@@ -44,8 +47,18 @@ public static class CalibrationPopupUI {
     private static GameObject ownedEventSystem;
     private static GameObject dragObj;
     private static bool reorganizing;
-    public static void Initialize() => SceneManager.sceneUnloaded += OnSceneUnloaded;
+    // From a preview's begin to its end.
+    private static bool previewing;
+    private static readonly RectTransform[] previewFrame = new RectTransform[1];
+    /// <summary>A real suggestion is up (after a death), which a preview's end leaves shown.</summary>
+    internal static bool Suggesting => visible;
+    public static void Initialize() {
+        SceneManager.sceneUnloaded += OnSceneUnloaded;
+        OverlayPreview.Register(PreviewId, () => canvasObj ? canvasObj.GetComponent<Canvas>() : null, PreviewFrame, BeginPreview, EndPreview,
+            () => panelObj);
+    }
     public static void Dispose() {
+        OverlayPreview.Unregister(PreviewId);   // first: a borrowed canvas goes back before it is destroyed
         SceneManager.sceneUnloaded -= OnSceneUnloaded;
         moveSeq?.Kill();
         ReleaseEventSystem();
@@ -64,6 +77,7 @@ public static class CalibrationPopupUI {
         dragObj = null;
         visible = false;
         reorganizing = false;
+        previewing = false;
     }
     private static void OnSceneUnloaded(Scene _) => Hide();
     private static void Build() {
@@ -237,10 +251,7 @@ public static class CalibrationPopupUI {
         EnsureEventSystem();
         ApplyTheme();
         pendingOffsetMs = suggestedOffsetMs;
-        messageText.text = string.Format(
-            MainCore.Tr.Get("CALIBRATION_POPUP_CHANGE_OFFSET", "Change input offset from {0}ms to {1}ms?"),
-            Calibration.FormatMs(currentOffsetMs), Calibration.FormatMs(suggestedOffsetMs)
-        );
+        messageText.text = Suggestion(currentOffsetMs, suggestedOffsetMs);
         visible = true;
         panelObj.SetActive(true);
         Cursor.visible = true;
@@ -274,15 +285,47 @@ public static class CalibrationPopupUI {
         reorganizing = true;
         EnsureEventSystem();
         ApplyTheme();
-        messageText.text = string.Format(
-            MainCore.Tr.Get("CALIBRATION_POPUP_CHANGE_OFFSET", "Change input offset from {0}ms to {1}ms?"),
-            Calibration.FormatMs(0f), Calibration.FormatMs(12f)
-        );
+        messageText.text = Suggestion(0f, 12f);
         moveSeq?.Kill();
         panelObj.SetActive(true);
         panelRect.anchoredPosition = ShownPos;
         group.alpha = 1f;
         dragObj.SetActive(UICore.IsReorganizing); // a shared editor moves it from its own surface
+    }
+    private static string Suggestion(float from, float to) => string.Format(
+        MainCore.Tr.Get("CALIBRATION_POPUP_CHANGE_OFFSET", "Change input offset from {0}ms to {1}ms?"), Calibration.FormatMs(from), Calibration.FormatMs(to));
+    /// <summary>The preview's sample suggestion. Its decimal shows whether Decimal Offset is on.</summary>
+    internal static string Sample() => Suggestion(0f, 12.4f);
+    // The popup in a preview pane, with the sample: built on demand, with no EventSystem (nothing clicks it there) and no drag
+    // surface. A suggestion already up, or one being arranged, shows as it is.
+    private static void BeginPreview() {
+        if(canvasObj == null) Build();
+        previewing = true;
+        if(visible || reorganizing) return;
+        ApplyTheme();
+        moveSeq?.Kill();
+        messageText.text = Sample();
+        panelObj.SetActive(true);
+        panelRect.anchoredPosition = ShownPos;
+        group.alpha = 1f;
+    }
+    private static void EndPreview() {
+        if(!previewing) return;
+        previewing = false;
+        if(visible || reorganizing || panelObj == null) return;
+        panelRect.anchoredPosition = HiddenPos;
+        group.alpha = 0f;
+        panelObj.SetActive(false);
+    }
+    // A hidden popup frames nothing, so a real suggestion that hides under the pane ends the lease: the pane's note shows, and
+    // the next lease's begin writes the sample.
+    private static IEnumerable<RectTransform> PreviewFrame() {
+        previewFrame[0] = panelRect;
+        return panelObj != null && panelObj.activeSelf ? previewFrame : [];
+    }
+    /// <summary>Writes the preview's sample again after Decimal Offset changed.</summary>
+    internal static void RefreshPreview() {
+        if(previewing && !visible && !reorganizing && messageText != null) messageText.text = Sample();
     }
     // The drag surface is the reorganizer's: a shared editor arranging the popup moves it from its own surface.
     public static void SyncDragSurface() {
@@ -313,6 +356,6 @@ public static class CalibrationPopupUI {
         Calibration.Conf.PopupOffsetX = def.PopupOffsetX;
         Calibration.Conf.PopupOffsetY = def.PopupOffsetY;
         Calibration.Save();
-        if(panelRect != null) panelRect.anchoredPosition = reorganizing || visible ? ShownPos : HiddenPos;
+        if(panelRect != null) panelRect.anchoredPosition = reorganizing || visible || previewing ? ShownPos : HiddenPos;
     }
 }

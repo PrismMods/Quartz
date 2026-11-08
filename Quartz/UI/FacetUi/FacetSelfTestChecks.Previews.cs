@@ -110,14 +110,18 @@ internal static partial class FacetSelfTestChecks {
     }
 
     /// <summary>The pane of overlayId on pageKey (null: a scratch window holding only that pane, where the arranging step runs too).
-    /// applySetting changes something the element shows; elementChanged reads it off the element, never off TMP's text, and
-    /// looks the element up each time: the checks power Quartz off and on, which rebuilds the overlay. Visibility is read off
-    /// the object the overlay registered as the one it shows.</summary>
+    /// applySetting changes something the element shows; elementChanged reads it off the element and looks the element up each
+    /// time: the checks power Quartz off and on, which rebuilds the overlay. A count an overlay writes with SetCharArray leaves
+    /// TMP's text empty, so it is read some other way; a text set whole, as the calibration popup's message is, can be read.
+    /// Visibility is read off the object the overlay registered as the one it shows. Its "before the pane" is read after the
+    /// open page's own pane has given its lease back, so it is what the preview's end left: a caller whose element rests hidden
+    /// (the calibration popup) checks that itself once this returns.</summary>
     internal static IEnumerator PreviewChecks(Action<string, bool, string> check, Action<string> info, string pageKey, string overlayId,
         Func<bool> applySetting, Func<bool> elementChanged) {
         string tag = $"preview {pageKey ?? "scratch"} {overlayId}";
-        // What the element was before any pane: a page left open by the checks before this one holds the lease.
+        // The open page's pane (this page's, or one the checks before left open) holds the lease: hidden, it gives it back.
         if(QuartzShell.Hide()) yield return Frames(1);
+        BuildOnDemand(overlayId);
         Canvas canvas = OverlayPreview.CanvasOf(overlayId);
         GameObject root = OverlayPreview.ShownOf(overlayId);
         if(canvas == null || root == null) {
@@ -184,6 +188,7 @@ internal static partial class FacetSelfTestChecks {
                 $"canvas={canvas != null} camera={GameObject.Find("QuartzPreviewCamera") != null} target={OverlayPreview.Target} note={note != null && Displayed(note)}");
             MainCore.Runtime.SetModEnabled(true, false, save: false);
             off = false;
+            BuildOnDemand(overlayId);
             canvas = OverlayPreview.CanvasOf(overlayId);
             root = OverlayPreview.ShownOf(overlayId);
             if(canvas == null || root == null) {
@@ -272,6 +277,12 @@ internal static partial class FacetSelfTestChecks {
             if(pageKey != null) QuartzShell.Hide();   // first: a pane still shown borrows again on its next tick
             OverlayPreview.Current?.Release();
         }
+    }
+
+    // An overlay built on demand (the calibration popup) is built by a preview's begin: a lease taken and given back here builds
+    // it, so what it is before a pane borrows it can be read.
+    private static void BuildOnDemand(string id) {
+        if(OverlayPreview.Target == null && OverlayPreview.CanvasOf(id) == null) OverlayPreview.Take(id)?.Release();
     }
 
     // How many pixels of the texture differ from clear, and its bottom-left pixel.

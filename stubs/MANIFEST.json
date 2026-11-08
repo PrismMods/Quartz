@@ -1988,6 +1988,7 @@
           "System.Single Facet.Controls::RowHeight",
           "UnityEngine.UIElements.Button Facet.Controls::Action(UnityEngine.UIElements.VisualElement,System.String,System.String,System.Action,System.Action\u00601\u003CFacet.ControlOptions\u003E)",
           "UnityEngine.UIElements.Button Facet.Controls::Danger(UnityEngine.UIElements.VisualElement,System.String,System.String,System.Action,System.Action\u00601\u003CFacet.ControlOptions\u003E)",
+          "UnityEngine.UIElements.Label Facet.Controls::Header(UnityEngine.UIElements.VisualElement,System.String)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Advanced(UnityEngine.UIElements.VisualElement,System.String)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Card(UnityEngine.UIElements.VisualElement,System.String,System.Action\u00601\u003CFacet.CardOptions\u003E)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Columns(UnityEngine.UIElements.VisualElement,UnityEngine.UIElements.VisualElement\u0026,System.Action\u00601\u003CFacet.ColumnsOptions\u003E)",

@@ -1,6 +1,7 @@
 {
   "ko-KR": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "CALIBRATION_DESC": "플레이 후 새 입력 오프셋을 제안해요",
     "CALIBRATION_DETAIL_STATS": "평균 {0}ms / 최댓값 {1}ms / 최솟값 {2}ms",
     "CALIBRATION_DETAILED_DISPLAY": "상세 보정 표시",
     "CALIBRATION_FLOAT_OFFSET": "소수점 오프셋",

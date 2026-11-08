@@ -536,7 +536,7 @@
     "PRISM_MENU_MODIFIER": "메뉴 단축키 보조 키",
     "PRISM_MODIFIER_NONE": "없음",
     "PRISM_NEW_MENU": "실험적: 새 메뉴",
-    "PRISM_NEW_MENU_TIP": "메뉴 단축키로 새 메뉴를 엽니다. 아직 만드는 중이며 기존 메뉴도 계속 쓸 수 있습니다",
+    "PRISM_NEW_MENU_TIP": "메뉴 단축키로 새 메뉴를 열어요. 아직 만드는 중이고, 기존 메뉴도 계속 쓸 수 있어요",
     "MENU_CLASSIC_PAGE": "이 페이지는 아직 기존 메뉴에 있어요",
     "MENU_CLASSIC_OPEN": "열기",
     "MENU_HOME_LINE": "{0} · 기능 {2}개 중 {1}개 켜짐 · 프로필 {3}",

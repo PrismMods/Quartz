@@ -1,6 +1,7 @@
 {
   "en-US": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "CALIBRATION_DESC": "Suggests a new input offset after a run",
     "CALIBRATION_DETAIL_STATS": "Avg {0}ms / Max {1}ms / Min {2}ms",
     "CALIBRATION_DETAILED_DISPLAY": "Detailed Calibration",
     "CALIBRATION_FLOAT_OFFSET": "Decimal Offset",

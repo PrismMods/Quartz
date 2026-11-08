@@ -27,6 +27,7 @@ internal static partial class QuartzShell {
         ["overlay.judgement"] = OverlayPages.Judgement.Page,
         ["overlay.songtitle"] = OverlayPages.SongTitle.Page,
         ["overlay.panels"] = OverlayPages.Panels.Page,
+        ["overlay.calibration"] = OverlayPages.Calibration.Page,
     };
     /// <summary>The tab row of the open category, when it has one.</summary>
     internal static Tabs TabRow { get; private set; }

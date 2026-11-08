@@ -314,6 +314,17 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
     private static void FlushIfDirty() {
         if(dirty) Save();
     }
+#if DEBUG
+    // For a self-test that enters a level: a copy of a map's entry (null when it has none), and putting it back saved, so
+    // the run the test started never counts. Read-only: For would add an entry.
+    internal static PlayData Snapshot(string key) => playDatas.TryGetValue(key, out PlayData d) ? PlayData.Deserialize(d.Serialize()) : null;
+    internal static void Restore(string key, PlayData was) {
+        if(was == null) playDatas.Remove(key);
+        else playDatas[key] = was;
+        dirty = true;   // a failed save leaves it for the flush at quit
+        Save();
+    }
+#endif
     public static void Save() {
         try {
             JObject maps = new();

@@ -130,6 +130,11 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
             }
         }
     }
+    /// <summary>The run under the marker facet-level-selftest: checks made inside a level, which it enters itself.</summary>
+    internal static IEnumerator Level(Action<string, bool, string> check, Action<string> info) {
+        if(FacetBridge.Available()) yield return FacetSelfTestChecks.InLevel(check, info);
+        else check("facet available", false, null);
+    }
     // The menu page's "open in the new menu" button, found by its label on a freshly built page.
     internal static bool PreviewButtonOnPage() {
         var host = new GameObject("FacetSelfTestButton", typeof(RectTransform)).GetComponent<RectTransform>();

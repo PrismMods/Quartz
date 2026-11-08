@@ -89,7 +89,12 @@ internal static class QuartzHost {
     }
     // While the files reload every lookup reads the fallback, so a language change landing then drew English and kept it.
     // Relabel once they are in, as the classic menu refreshes its labels after a reload.
-    private static void OnLoadEnd(TranslationFailState _) => OnLanguageChanged(null);
+    private static void OnLoadEnd(TranslationFailState _) {
+        Loads++;
+        OnLanguageChanged(null);
+    }
+    /// <summary>Counts finished loads of the language files, a reload of the same language included: text made before one is stale.</summary>
+    internal static int Loads { get; private set; }
     internal static void Shutdown() {
         if(hooked) {
             MainCore.Tr.OnLanguageChanged -= OnLanguageChanged;
