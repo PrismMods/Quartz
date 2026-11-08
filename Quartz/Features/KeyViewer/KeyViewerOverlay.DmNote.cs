@@ -87,7 +87,7 @@ public static partial class KeyViewerOverlay {
         }
     }
     private static void RecordDmPress(Box box, float now) {
-        box.Count++;
+        if(counting) box.Count++;
         if(box.Value != null && box.Dm is { CounterAnimEnabled: true } spec && spec.CounterAnimScale > 1.001f) {
             if(!box.Bouncing) {
                 box.Bouncing = true;
@@ -98,10 +98,10 @@ public static partial class KeyViewerOverlay {
         }
         if(box.PerKeyKps) box.KpsLog.Enqueue(now);
         if(box.CountInTotal) {
-            totalCount++;
+            if(counting) totalCount++;
             pressLog.Enqueue(now);
         }
-        MarkCountsDirty(now);
+        if(counting) MarkCountsDirty(now);
     }
     private static void BeginDmNoteRain(Box box, float now) {
         DmNoteSpec spec = box.Dm;

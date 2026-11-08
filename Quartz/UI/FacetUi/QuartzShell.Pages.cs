@@ -21,6 +21,7 @@ internal static partial class QuartzShell {
         [CorePages.FeaturesPageKey] = ShellFeatures.Build,
         [CorePages.SettingsPageKey] = ShellSettings.Build,
         ["overlay.general"] = OverlayPages.General.Page,
+        ["overlay.keyviewer"] = OverlayPages.KeyViewer.Page,
         ["overlay.progressbar"] = OverlayPages.ProgressBar.Page,
         ["overlay.combo"] = OverlayPages.Combo.Page,
         ["overlay.judgement"] = OverlayPages.Judgement.Page,
@@ -98,13 +99,37 @@ internal static partial class QuartzShell {
         "FONT", "FONT_SCALE", "FONT_LINE_SPACING", "FONT_RENAME", "FONT_DELETE", "SETTINGS_FONT",
     ];
 
+    // Pages moved in part: their editors stay in the classic menu, and so do those rows' hits. A row the moved page has is its own.
+    private static readonly HashSet<string> PartlyMoved = ["overlay.keyviewer", "overlay.panels"];
+
+    // A row its moved page leaves to the classic menu: the Settings page's Updates and Font rows, or a partly moved page's
+    // rows that the moved page has no row for. Its "Use this feature" is the moved page's header switch. ids holds each partly
+    // moved page's row Ids, from a throwaway build of it.
+    private static bool LeftClassicOn(NavPage page, string key, Dictionary<string, HashSet<string>> ids) {
+        if(page.Key == CorePages.SettingsPageKey) return LeftClassic.Contains(key);
+        if(!PartlyMoved.Contains(page.Key) || key == "FEATURE_PAGE_ENABLE" || !Moved.TryGetValue(page.Key, out Action<VisualElement> build)) return false;
+        if(!ids.TryGetValue(page.Key, out HashSet<string> moved)) {
+            var throwaway = new VisualElement();
+            build(throwaway);
+            Names(throwaway, ids[page.Key] = moved = []);
+        }
+        return !moved.Contains(key);
+    }
+
+    private static void Names(VisualElement e, HashSet<string> into) {
+        if(!string.IsNullOrEmpty(e.name)) into.Add(e.name);
+        for(int i = 0; i < e.childCount; i++) Names(e[i], into);
+    }
+
     // The classic pages' rows, each jumping to its page in the classic menu. Asked whenever the index builds.
     private static IEnumerable<SearchIndex.Entry> ClassicRows() {
+        // ponytail: a partly moved page is built once more per index build; cache its Ids if that ever shows in [perf]
+        var ids = new Dictionary<string, HashSet<string>>();
         foreach(var (key, english, state) in SettingsSearch.Rows()) {
             NavPage page = NavRegistry.ByState(state);
             // A row naming its own page is the page's title, which its header already indexes.
             if(page == null || key == page.LocaleKey) continue;
-            if(!IsClassic(page) && !(page.Key == CorePages.SettingsPageKey && LeftClassic.Contains(key))) continue;
+            if(!IsClassic(page) && !LeftClassicOn(page, key, ids)) continue;
             yield return new SearchIndex.Entry {
                 Label = Label(key, english),
                 Where = Label(page.LocaleKey, page.Title),
@@ -163,7 +188,7 @@ internal static partial class QuartzShell {
                 QuartzHost.Text(blocker.Info.NameKey, blocker.Name));
     }
 
-    // Addon pages, the Key Viewer page and every page not moved yet.
+    // Addon pages and every page not moved yet.
     private static void Classic(VisualElement p, NavPage page) {
         string feature = FeaturePages.FeatureOf(page);
         Controls.PageHeader(p, Label(page.LocaleKey, page.Title), feature == null ? null : FeatureSwitch(feature), o => o.Id = "menu-header");

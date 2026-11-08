@@ -124,7 +124,7 @@ internal static partial class FacetSelfTestChecks {
             check($"{tag}: the overlay is built", false, $"canvas={canvas != null} root={root != null} on={MainCore.IsModEnabled}");
             yield break;
         }
-        bool rootWas = root.activeInHierarchy;
+        bool rootWas = root.activeSelf;   // shown outside a level too where the overlay does (the Key Viewer's default)
         int layerWas = canvas.gameObject.layer, rootLayerWas = root.layer;
         Surface scratch = null;
         bool off = false;
@@ -262,9 +262,9 @@ internal static partial class FacetSelfTestChecks {
                 && GameObject.Find("QuartzPreviewCamera") == null && held == null && OverlayPreview.Target == null,
                 $"mode={canvas.renderMode} layer={canvas.gameObject.layer}/{layerWas} camera={GameObject.Find("QuartzPreviewCamera") != null} texture={held != null} target={OverlayPreview.Target}");
             frames = 0;
-            for(; frames < 3 && root.activeInHierarchy != rootWas; frames++) yield return null;
-            check($"{tag}: within 3 frames the element is shown or hidden as before the pane", root.activeInHierarchy == rootWas,
-                $"active={root.activeInHierarchy} before={rootWas} frames={frames}");
+            for(; frames < 3 && root.activeSelf != rootWas; frames++) yield return null;
+            check($"{tag}: within 3 frames the element is shown or hidden as before the pane", root.activeSelf == rootWas,
+                $"active={root.activeSelf} before={rootWas} frames={frames}");
         } finally {
             if(off) MainCore.Runtime.SetModEnabled(true, false, save: false);
             UICore.SetSharedLayout(false);

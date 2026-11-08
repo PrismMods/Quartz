@@ -563,6 +563,7 @@
     "MENU_PREVIEW": "Preview",
     "MENU_PREVIEW_IN_LEVEL": "Shows here once the element is loaded",
     "MENU_SET_HOTKEY": "Set hotkey",
-    "MENU_CLEAR_HOTKEY": "Clear hotkey"
+    "MENU_CLEAR_HOTKEY": "Clear hotkey",
+    "MENU_KV_EDITOR": "Key layout, styles and tabs are edited in the classic menu"
   }
 }

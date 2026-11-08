@@ -173,17 +173,19 @@ namespace UnityEngine.UIElements {
         private VectorImage() { }
     }
     public unsafe partial class VisualElement : global::UnityEngine.UIElements.Focusable {
+        public global::UnityEngine.UIElements.VisualElement this[int key] { get => throw null; }
+        public int childCount { get => throw null; }
         public global::UnityEngine.Rect layout { get => throw null; }
         public string name { get => throw null; set { } }
         public global::UnityEngine.UIElements.IPanel panel { get => throw null; }
         public global::UnityEngine.UIElements.VisualElement parent { get => throw null; }
         public global::UnityEngine.UIElements.IStyle style { get => throw null; }
         public global::UnityEngine.Rect worldBound { get => throw null; }
+        public VisualElement() => throw null;
         public void Add(global::UnityEngine.UIElements.VisualElement child) => throw null;
         public void Clear() => throw null;
         public int IndexOf(global::UnityEngine.UIElements.VisualElement element) => throw null;
         public void Insert(int index, global::UnityEngine.UIElements.VisualElement element) => throw null;
-        protected VisualElement() { }
         public enum MeasureMode : int {
             Undefined = 0,
             Exactly = 1,

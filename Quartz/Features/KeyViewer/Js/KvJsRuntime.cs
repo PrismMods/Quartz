@@ -19,12 +19,18 @@ internal static partial class KvJsRuntime {
     private static bool rendering;
     private static string lastError = "";
 
+    // Read on every refresh of a status line: the text is made again only when what it says changes.
+    private static string status;
+    private static (int Plugins, int Definitions, string Error) statusOf;
     internal static string Status {
         get {
             int definitions = 0;
             foreach(PluginRuntime plugin in plugins) definitions += plugin.DefinitionCount;
+            var of = (plugins.Count, definitions, lastError);
+            if(status != null && of == statusOf) return status;
+            statusOf = of;
             string summary = $"{plugins.Count} plugin(s), {definitions} panel(s)";
-            return string.IsNullOrEmpty(lastError) ? summary : summary + " · " + lastError;
+            return status = string.IsNullOrEmpty(lastError) ? summary : summary + " · " + lastError;
         }
     }
 

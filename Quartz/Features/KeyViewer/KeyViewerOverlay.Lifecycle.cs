@@ -41,6 +41,19 @@ public static partial class KeyViewerOverlay {
         canvasObj.AddComponent<Updater>();
         BuildTabub();
         Rebuild();
+        OverlayPreview.Register(FontKey, () => canvasObj ? canvasObj.GetComponent<Canvas>() : null, PreviewFrame, shown: () => root ? root.gameObject : null);
+    }
+    // The preview frames the hand and foot as their drag handles cover them, fitted afresh: the handles are fitted only when
+    // arranging starts or they show. One array per shape, refilled: a rebuild makes new handles.
+    private static readonly RectTransform[] handFrame = new RectTransform[1], bothFrame = new RectTransform[2];
+    private static IEnumerable<RectTransform> PreviewFrame() {
+        RefreshDragBounds();
+        if(footBuilt && footDragRect != null) {
+            (bothFrame[0], bothFrame[1]) = (dragRect, footDragRect);
+            return bothFrame;
+        }
+        handFrame[0] = dragRect;
+        return handFrame;
     }
     public static void Rebuild() {
         if(root == null) return;
@@ -316,6 +329,7 @@ public static partial class KeyViewerOverlay {
     }
     public static void Dispose() {
         if(canvasObj == null) return;
+        OverlayPreview.Unregister(FontKey);   // first: a borrowed canvas goes back before it is destroyed
         KvJsRuntime.Detach();
         KvInputQueue.Shutdown();
         keyMap.Clear();

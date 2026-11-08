@@ -17,7 +17,7 @@ internal static partial class FacetSelfTestChecks {
     private const string SongTitlePage = "overlay.songtitle";
     private static SongTitleSettings SongTitleConf => SongTitleOverlay.Conf;
 
-    // Rows 1 to 13 of the classic page.
+    // Every row of the classic page, from Format to Reset Position.
     private static readonly string[] SongTitleRows = [
         "SONGTITLE_FORMAT", "SONGTITLE_STRIP", "SONGTITLE_ANCHOR_LABEL", "FONT_OVERLAY", "SONGTITLE_FONTSIZE", "SONGTITLE_MASTER", "SONGTITLE_COLOR",
         "SONGTITLE_SHADOW", "SONGTITLE_SHADOW_X", "SONGTITLE_SHADOW_Y", "SONGTITLE_SHADOW_SOFT", "SONGTITLE_SHADOW_COLOR", "SONGTITLE_RESETPOS",

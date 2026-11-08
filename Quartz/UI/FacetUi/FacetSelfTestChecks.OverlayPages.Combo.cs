@@ -19,7 +19,7 @@ internal static partial class FacetSelfTestChecks {
     private const string ComboPage = "overlay.combo";
     private static ComboSettings ComboConf => ComboOverlay.Conf;
 
-    // Rows 1 to 32 of the classic page; the XPerfect row only where that mod is installed.
+    // Every row of the classic page, from Auto to Reset Position; the XPerfect row only where that mod is installed.
     private static string[] ComboRows() => [.. new[] {
         "COMBO_AUTO", "COMBO_XPERFECT", "COMBO_ANCHOR_LABEL", "FONT_OVERLAY", "COMBO_FONTSIZE",
         "COMBO_MASTER_SIZE", "COMBO_CAPTION", "COMBO_CAPTIONTEXT", "COMBO_CAPTION_SIZE", "COMBO_CAPTIONOFFSET", "COMBO_CAPTION_SHADOW_ENABLED",

@@ -122,6 +122,22 @@ internal static class ShellRows {
         return c;
     }
 
+    /// <summary>A read-only status line, Id id. Every refresh reads it, so its text is made again only when input or the
+    /// language changes.</summary>
+    internal static Control<string> Info<T>(VisualElement card, string id, Func<T> input, Func<T, string> text, Func<bool> visible = null) {
+        T last = default;
+        string language = null, shown = null;
+        return Controls.Info(card, "", () => {
+            T now = input();
+            if(shown == null || language != MainCore.Tr.Language || !EqualityComparer<T>.Default.Equals(now, last))
+                (last, language, shown) = (now, MainCore.Tr.Language, text(now));
+            return shown;
+        }, o => {
+            o.Id = id;
+            o.VisibleWhen = visible;
+        });
+    }
+
     internal static Control<Color> Colour(VisualElement card, string key, Func<Color> get, Action<Color> set, Action apply, Action save,
         bool alpha = true, Action<ColourOptions> configure = null) =>
         Controls.Colour(card, key, Writes(Bind.To(get, set), null, apply, save), o => {

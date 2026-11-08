@@ -7,10 +7,12 @@ using UnityEngine.UI;
 using TMPro;
 using Quartz.Features.KeyViewer.Js;
 using Quartz.Features.Overlay;
+using Quartz.Overlay;
 namespace Quartz.Features.KeyViewer;
 public static partial class KeyViewerOverlay {
     private sealed class Updater : MonoBehaviour {
-        private static bool CanRebuild => !GameStats.InGame || Quartz.UI.UICore.IsOpen;
+        // Not mid-run: the classic menu or the new one is open, or no level is playing.
+        private static bool CanRebuild => !GameStats.InGame || UICore.MenuShowing;
         private bool focusKnown;
         private bool hasFocus = true;
         private void Awake() {
@@ -96,7 +98,9 @@ public static partial class KeyViewerOverlay {
             gameStateKnown = true;
             bool isReorganizing = UICore.IsReorganizing;
             bool arranging = UICore.IsArranging;
-            bool show = OverlaySwitch.Enabled && Conf.Enabled && (Conf.ShowOutsideGame || inGame) || arranging;
+            // A preview shows the keys light, but a press counts only where the Key Viewer would show without it.
+            counting = OverlaySwitch.Enabled && Conf.Enabled && (Conf.ShowOutsideGame || inGame) || arranging;
+            bool show = counting || OverlayPreview.Is(FontKey);
             bool focused = focusKnown ? hasFocus : Application.isFocused;
             bool independent = Conf.Enabled && Conf.IndependentInput;
             KvInputQueue.SetWanted(independent);
@@ -131,9 +135,17 @@ public static partial class KeyViewerOverlay {
             }
             // Arranging copies the RectTransform into Conf every frame: a shared-editor SetBox must move the RectTransform (or this capture skip shared sessions), or it is overwritten.
             if(arranging) CapturePosition();
-            EnsureInputPrimed(now);
-            UpdateDmNote(now);
+            inputNow = now;
+            // The new menu holds keys from the game while it is open; the Key Viewer's pane there must still light from them.
+            if(OverlayPreview.Is(FontKey)) Quartz.Prism.PrismBridge.Exempt(inputStep ??= ReadInput);
+            else ReadInput();
             TryFlushCounts(now, inGame);
+        }
+        private static float inputNow;
+        private static Action inputStep;
+        private static void ReadInput() {
+            EnsureInputPrimed(inputNow);
+            UpdateDmNote(inputNow);
         }
     }
 }

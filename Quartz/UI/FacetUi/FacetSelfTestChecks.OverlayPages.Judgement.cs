@@ -17,7 +17,7 @@ internal static partial class FacetSelfTestChecks {
     private const string JudgementPage = "overlay.judgement";
     private static JudgementSettings JudgementConf => JudgementOverlay.Conf;
 
-    // Rows 1 to 13 of the classic page; the XPerfect row only where that mod is installed.
+    // Every row of the classic page, from XPerfect to the popup font size; the XPerfect row only where that mod is installed.
     private static string[] JudgementRows() => [.. new[] {
         "JUDGEMENT_XPERFECT", "JUDGEMENT_ANCHOR_LABEL", "FONT_OVERLAY", "JUDGEMENT_SIZE", "JUDGEMENT_SPACING", "JUDGEMENT_SHADOW_ENABLED",
         "JUDGEMENT_SHADOW_X", "JUDGEMENT_SHADOW_Y", "JUDGEMENT_SHADOW_SOFTNESS", "JUDGEMENT_SHADOW_COLOR", "JUDGEMENT_RESETPOS",

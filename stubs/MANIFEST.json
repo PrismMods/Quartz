@@ -6714,7 +6714,11 @@
         "type": "UnityEngine.UIElements.VisualElement",
         "members": [
           "System.Int32 UnityEngine.UIElements.VisualElement::IndexOf(UnityEngine.UIElements.VisualElement)",
+          "System.Int32 UnityEngine.UIElements.VisualElement::childCount()",
+          "System.Int32 UnityEngine.UIElements.VisualElement::get_childCount()",
+          "System.String UnityEngine.UIElements.VisualElement::get_name()",
           "System.String UnityEngine.UIElements.VisualElement::name()",
+          "System.Void UnityEngine.UIElements.VisualElement::.ctor()",
           "System.Void UnityEngine.UIElements.VisualElement::Add(UnityEngine.UIElements.VisualElement)",
           "System.Void UnityEngine.UIElements.VisualElement::Clear()",
           "System.Void UnityEngine.UIElements.VisualElement::Insert(System.Int32,UnityEngine.UIElements.VisualElement)",
@@ -6727,6 +6731,8 @@
           "UnityEngine.UIElements.IPanel UnityEngine.UIElements.VisualElement::panel()",
           "UnityEngine.UIElements.IStyle UnityEngine.UIElements.VisualElement::get_style()",
           "UnityEngine.UIElements.IStyle UnityEngine.UIElements.VisualElement::style()",
+          "UnityEngine.UIElements.VisualElement UnityEngine.UIElements.VisualElement::Item(System.Int32)",
+          "UnityEngine.UIElements.VisualElement UnityEngine.UIElements.VisualElement::get_Item(System.Int32)",
           "UnityEngine.UIElements.VisualElement UnityEngine.UIElements.VisualElement::get_parent()",
           "UnityEngine.UIElements.VisualElement UnityEngine.UIElements.VisualElement::parent()"
         ]

@@ -102,6 +102,40 @@ internal static partial class FacetSelfTestChecks {
         }
     }
 
+    /// <summary>For a switch the classic page keeps out of the live toggle list (no hotkey): flipped here, it leaves the
+    /// classic menu stale, and the classic page opened next is rebuilt from the setting, which clears that; a second flip puts
+    /// it back. field writes the setting as its row does, for the restore.</summary>
+    internal static IEnumerator ClassicStale(Action<string, bool, string> check, string pageKey, string toggleKey, Bind<bool> field) {
+        string tag = $"{pageKey} {toggleKey}";
+        int state = NavRegistry.StateFor(pageKey);
+        bool before = field.Get();
+        VisualElement track = Body.Q(name: toggleKey + "-input");
+        if(track == null) {
+            check($"{tag}: a flip here leaves the classic page stale", false, "no " + toggleKey + "-input");
+            yield break;
+        }
+        try {
+            UICore.ClassicStale = false;
+            Click(track);
+            yield return Frames(2);
+            bool flipped = field.Get() == !before, stale = UICore.ClassicStale;
+            QuartzShell.OpenClassic(state);
+            yield return Frames(2);
+            bool rebuilt = UICore.IsOpen && UICore.CurrentMenuState == state && !UICore.ClassicStale;
+            UICore.Close();
+            yield return Frames(2);
+            track = Body.Q(name: toggleKey + "-input");
+            if(track != null) Click(track);
+            yield return Frames(2);
+            Step(check, $"{tag}: a flip here leaves the classic menu stale, the classic page opened next is rebuilt from the setting, "
+                + "and a second flip puts it back",
+                flipped && stale && rebuilt && field.Get() == before && FacetBridge.NewMenuVisible() && QuartzShell.CurrentPage == pageKey,
+                $"before={before} flipped={flipped} stale={stale} rebuilt={rebuilt} now={field.Get()} page={QuartzShell.CurrentPage}");
+        } finally {
+            PutBack(field, before, null);
+        }
+    }
+
     // The player's value, written straight into the setting whatever the row or the menus show now, as a write from a row
     // leaves it: the classic menu rebuilds before it next shows, and its live toggles show the value.
     private static void PutBack(Bind<bool> field, bool before, string classicId) {

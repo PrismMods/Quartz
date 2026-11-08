@@ -214,6 +214,7 @@
     "KVI_COPY_STYLE": "스타일 복사",
     "DESC_KVI_COPY_STYLE": "선택한 요소의 모양(색상, 모양, 글자, 노트, 카운터)을 복사해요. Ctrl+Shift+C로도 돼요.",
     "KVI_PASTE_STYLE": "스타일 붙여넣기",
-    "DESC_KVI_PASTE_STYLE": "복사한 모양을 선택한 요소에 입혀요. 위치, 크기, 키, 라벨은 그대로예요. Ctrl+Shift+V로도 돼요."
+    "DESC_KVI_PASTE_STYLE": "복사한 모양을 선택한 요소에 입혀요. 위치, 크기, 키, 라벨은 그대로예요. Ctrl+Shift+V로도 돼요.",
+    "KEYVIEWER_DESC": "누르는 키를 노트 레인과 횟수와 함께 보여줘요"
   }
 }

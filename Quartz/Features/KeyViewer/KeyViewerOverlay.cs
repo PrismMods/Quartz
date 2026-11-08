@@ -77,6 +77,8 @@ public static partial class KeyViewerOverlay {
     private static TMPro.TMP_FontAsset lastSyncedFont;
     private static int totalCount;
     private static bool countsDirty;
+    // Whether a press adds to the stored counts: the Key Viewer shows without a preview's help.
+    private static bool counting = true;
     private static float nextCountsSave;
     internal const float LayoutRebuildDebounceSeconds = 0.2f;
     private static bool layoutRebuildPending;

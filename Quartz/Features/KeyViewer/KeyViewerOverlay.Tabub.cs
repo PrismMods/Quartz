@@ -89,6 +89,7 @@ public static partial class KeyViewerOverlay {
         Save();
         if(tabubCustomTex == null) {
             error = "Could not read that image";
+            MainCore.Log.Msg("[KeyViewer] " + error + ": " + picked);
             return false;
         }
         MainCore.Log.Msg("[KeyViewer] Tabub image set to " + picked);

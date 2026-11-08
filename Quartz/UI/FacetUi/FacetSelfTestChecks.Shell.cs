@@ -66,6 +66,9 @@ internal static partial class FacetSelfTestChecks {
         info($"new menu cold build {clock.Elapsed.TotalMilliseconds:0.0} ms (first build: {first})");
         check("the new menu builds", QuartzShell.Window != null, null);
         if(QuartzShell.Window == null) yield break;
+        // Measured on Home whatever page the player left open (a moved page's build is logged with its own checks); Run's
+        // finally puts back the stored page.
+        if(QuartzShell.CurrentPage != CorePages.HomePageKey) QuartzShell.Go(CorePages.HomePageKey);
         string stored = QuartzHost.Host.Read("window." + QuartzShell.WindowId);
         check("a new menu built ahead and not shown stores no window rect", !first || stored == null, $"first={first} stored={stored}");
         yield return Frames(3);
