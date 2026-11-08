@@ -216,11 +216,12 @@ internal static partial class FacetSelfTestChecks {
             // Cost
             OverlayPreview.RenderTicks = 0;
             OverlayPreview.Renders = 0;
+            OverlayPreview.Relayers = 0;
             yield return Frames(120);
             double mean = OverlayPreview.Renders == 0 ? -1 : OverlayPreview.RenderTicks * 1000.0 / Stopwatch.Frequency / OverlayPreview.Renders;
-            MainCore.Log.Msg($"[perf] preview render mean {mean:0.000} ms over {OverlayPreview.Renders} renders");
+            MainCore.Log.Msg($"[perf] preview render mean {mean:0.000} ms over {OverlayPreview.Renders} renders, {OverlayPreview.Relayers} canvas walks");
             check("[perf] preview render mean over 120 frames is at most 1 ms", OverlayPreview.Renders >= 100 && mean >= 0 && mean <= 1.0,
-                $"mean={mean:0.000} ms renders={OverlayPreview.Renders}");
+                $"mean={mean:0.000} ms renders={OverlayPreview.Renders} walks={OverlayPreview.Relayers}");
             // Garbage: a render runs every frame the pane shows, so it reads the frame by index, never through an enumerator, which
             // allocates. Counted, not measured: the game's Boehm GC leaves GC.GetAllocatedBytesForCurrentThread at 0 even for a new 4 KB array.
             OverlayPreview.Lease live = OverlayPreview.Current;

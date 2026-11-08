@@ -246,6 +246,7 @@ namespace Facet {
         private Tabs() { }
     }
     public unsafe partial class TextOptions : global::Facet.Options<string> {
+        public float Width { get => throw null; set { } }
         protected TextOptions() { }
     }
     public sealed unsafe partial class Theme {

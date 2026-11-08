@@ -35,9 +35,14 @@ namespace UnityEngine {
     public unsafe partial struct Bounds : global::System.IEquatable<global::UnityEngine.Bounds> {
         private global::UnityEngine.Vector3 m_Center;
         private global::UnityEngine.Vector3 m_Extents;
+        public global::UnityEngine.Vector3 center { get => throw null; set { } }
         public global::UnityEngine.Vector3 max { get => throw null; set { } }
         public global::UnityEngine.Vector3 min { get => throw null; set { } }
         public global::UnityEngine.Vector3 size { get => throw null; set { } }
+        public static bool operator ==(global::UnityEngine.Bounds lhs, global::UnityEngine.Bounds rhs) => throw null;
+        public static bool operator !=(global::UnityEngine.Bounds lhs, global::UnityEngine.Bounds rhs) => throw null;
+        public override bool Equals(object obj) => throw null;
+        public override int GetHashCode() => throw null;
         bool global::System.IEquatable<global::UnityEngine.Bounds>.Equals(global::UnityEngine.Bounds other) => throw null;
     }
     public sealed unsafe partial class Camera : global::UnityEngine.Behaviour {
@@ -144,6 +149,7 @@ namespace UnityEngine {
         public T GetComponentInParent<T>(bool includeInactive) => throw null;
         public T[] GetComponents<T>() => throw null;
         public T[] GetComponentsInChildren<T>(bool includeInactive) => throw null;
+        public void GetComponentsInChildren<T>(bool includeInactive, global::System.Collections.Generic.List<T> result) => throw null;
         public T[] GetComponentsInParent<T>(bool includeInactive) => throw null;
         public bool TryGetComponent<T>(out T component) => throw null;
         protected Component() { }
@@ -1000,6 +1006,7 @@ namespace UnityEngine {
     }
     public unsafe partial class Transform : global::UnityEngine.Component, global::System.Collections.IEnumerable {
         public int childCount { get => throw null; }
+        public int hierarchyCount { get => throw null; }
         public global::UnityEngine.Vector3 localEulerAngles { get => throw null; set { } }
         public global::UnityEngine.Vector3 localPosition { get => throw null; set { } }
         public global::UnityEngine.Quaternion localRotation { get => throw null; set { } }

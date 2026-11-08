@@ -28,7 +28,7 @@ internal static partial class FacetSelfTestChecks {
             c.PopEnabled = true;   // the group the animation rows sit in shows
             FacetBridge.OpenNewMenu(GeneralPage);
             yield return Frames(3);
-            Parity(check, GeneralPage, GeneralRows);
+            yield return Parity(check, GeneralPage, GeneralRows);
             string misfits = EdgeMisfits(PageContent());
             check($"{GeneralPage}: every part of the page draws on the cards' left and right edges (±1)", misfits == "", misfits);
             // As the rows write them: the master switch's setter saves.

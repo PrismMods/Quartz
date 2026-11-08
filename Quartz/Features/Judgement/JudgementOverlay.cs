@@ -31,7 +31,7 @@ public static class JudgementOverlay {
     private static GameObject dragObj;
     private static Updater updater;
     private static bool ShouldShow() =>
-        (OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame) || UICore.IsArranging;
+        (OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame) || UICore.IsArranging || OverlayPreview.Is(FontKey);
     private static bool gateWant;
     // Roots start visible; keep the updater until it has hidden them once.
     private static bool updaterRan;
@@ -46,6 +46,12 @@ public static class JudgementOverlay {
         updater.enabled = run;
     }
     private const int PerfectSlot = 4;
+    // What a preview shows outside a level, where every count is 0: one count per slot.
+    private static readonly int[] Sample = [0, 2, 5, 31, 412, 27, 4, 1, 0];
+    // The perfect slot counts X judgements while they are shown.
+    private static int Count(int slot, bool xpMode) =>
+        OverlayPreview.Is(FontKey) && !GameStats.InGame ? Sample[slot]
+        : slot == PerfectSlot && xpMode ? XPerfectBridge.XCount() : Judgement.SlotCount(slot);
     private static TextMeshProUGUI xPlusLabel;
     private static TextMeshProUGUI xMinusLabel;
     private static TextMeshProUGUI xBorder;
@@ -100,6 +106,8 @@ public static class JudgementOverlay {
         );
         ReorganizeHandle.SetRotationSource(dragObj, () => Conf.Rotation, v => { Conf.Rotation = v; Apply(); });
         updater = canvasObj.AddComponent<Updater>();
+        RectTransform[] frame = [root];
+        OverlayPreview.Register(FontKey, () => canvasObj ? canvasObj.GetComponent<Canvas>() : null, () => frame);
         gateWant = true;
         updaterRan = false;
         gateRunning = true;
@@ -229,6 +237,7 @@ public static class JudgementOverlay {
     }
     public static void Dispose() {
         if(canvasObj == null) return;
+        OverlayPreview.Unregister(FontKey);   // first: a borrowed canvas goes back before it is destroyed
         ConfMgr?.Save();
         Object.Destroy(canvasObj);
         canvasObj = null;
@@ -280,7 +289,7 @@ public static class JudgementOverlay {
                 TextMeshProUGUI label = labels[i];
                 if(label.font != font) label.font = font;
                 if(label.fontSize != fontSize) label.fontSize = fontSize;
-                int count = i == PerfectSlot && xpMode ? XPerfectBridge.XCount() : Judgement.SlotCount(i);
+                int count = Count(i, xpMode);
                 if(!cacheValid || count != cached[i] || xpModeChanged) {
                     cached[i] = count;
                     UnityUtils.SetCount(label, count);
@@ -312,7 +321,7 @@ public static class JudgementOverlay {
             bool changed = !cacheValid || fontSize != lastFontSize || font != lastFont
                 || xpModeChanged || rowSpacing != lastRowSpacing;
             for(int i = 0; i < Judgement.Slots; i++) {
-                int count = i == PerfectSlot && xpMode ? XPerfectBridge.XCount() : Judgement.SlotCount(i);
+                int count = Count(i, xpMode);
                 if(!cacheValid || count != cached[i] || xpModeChanged) {
                     cached[i] = count;
                     changed = true;

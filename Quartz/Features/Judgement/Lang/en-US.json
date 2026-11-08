@@ -3,6 +3,7 @@
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "JUDGEMENT_ANCHOR_LABEL": "Anchor",
     "SECTION_JUDGEMENT": "Judgement",
+    "JUDGEMENT_DESC": "Counts each judgement as you play",
     "JUDGEMENT_RESETPOS": "Reset Position"
   }
 }

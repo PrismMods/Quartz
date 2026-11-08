@@ -2260,7 +2260,10 @@
       },
       {
         "type": "Facet.TextOptions",
-        "members": []
+        "members": [
+          "System.Single Facet.TextOptions::Width()",
+          "System.Void Facet.TextOptions::set_Width(System.Single)"
+        ]
       },
       {
         "type": "Facet.Theme",
@@ -3579,6 +3582,8 @@
           "TMPro.TextureMappingOptions TMPro.TMP_Text::horizontalMapping()",
           "TMPro.TextureMappingOptions TMPro.TMP_Text::verticalMapping()",
           "TMPro.VerticalAlignmentOptions TMPro.TMP_Text::verticalAlignment()",
+          "UnityEngine.Bounds TMPro.TMP_Text::get_textBounds()",
+          "UnityEngine.Bounds TMPro.TMP_Text::textBounds()",
           "UnityEngine.Material TMPro.TMP_Text::fontMaterial()",
           "UnityEngine.Material TMPro.TMP_Text::fontSharedMaterial()",
           "UnityEngine.Material TMPro.TMP_Text::get_fontMaterial()",
@@ -3933,6 +3938,10 @@
       {
         "type": "UnityEngine.Bounds",
         "members": [
+          "System.Boolean UnityEngine.Bounds::op_Equality(UnityEngine.Bounds,UnityEngine.Bounds)",
+          "System.Boolean UnityEngine.Bounds::op_Inequality(UnityEngine.Bounds,UnityEngine.Bounds)",
+          "UnityEngine.Vector3 UnityEngine.Bounds::center()",
+          "UnityEngine.Vector3 UnityEngine.Bounds::get_center()",
           "UnityEngine.Vector3 UnityEngine.Bounds::get_max()",
           "UnityEngine.Vector3 UnityEngine.Bounds::get_min()",
           "UnityEngine.Vector3 UnityEngine.Bounds::get_size()",
@@ -4094,6 +4103,7 @@
         "type": "UnityEngine.Component",
         "members": [
           "System.Boolean UnityEngine.Component::TryGetComponent(T\u0026)",
+          "System.Void UnityEngine.Component::GetComponentsInChildren(System.Boolean,System.Collections.Generic.List\u00601\u003CT\u003E)",
           "T UnityEngine.Component::GetComponent()",
           "T UnityEngine.Component::GetComponentInChildren()",
           "T UnityEngine.Component::GetComponentInChildren(System.Boolean)",
@@ -5252,6 +5262,8 @@
           "System.Int32 UnityEngine.Transform::GetSiblingIndex()",
           "System.Int32 UnityEngine.Transform::childCount()",
           "System.Int32 UnityEngine.Transform::get_childCount()",
+          "System.Int32 UnityEngine.Transform::get_hierarchyCount()",
+          "System.Int32 UnityEngine.Transform::hierarchyCount()",
           "System.Void UnityEngine.Transform::SetAsFirstSibling()",
           "System.Void UnityEngine.Transform::SetAsLastSibling()",
           "System.Void UnityEngine.Transform::SetParent(UnityEngine.Transform,System.Boolean)",

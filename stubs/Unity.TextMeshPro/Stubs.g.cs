@@ -243,6 +243,7 @@ namespace TMPro {
         public bool richText { get => throw null; set { } }
         public global::TMPro.TMP_SpriteAsset spriteAsset { get => throw null; set { } }
         public virtual string text { get => throw null; set { } }
+        public global::UnityEngine.Bounds textBounds { get => throw null; }
         public global::TMPro.TMP_TextInfo textInfo { get => throw null; }
         public global::UnityEngine.Transform transform { get => throw null; }
         public global::TMPro.VerticalAlignmentOptions verticalAlignment { get => throw null; set { } }

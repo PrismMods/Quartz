@@ -65,6 +65,9 @@ internal static class OverlayPreview {
     internal static Lease Current => current;
     internal static Canvas CanvasOf(string id) => sources.TryGetValue(id, out Source s) ? s.Canvas() : null;
     internal static GameObject ShownOf(string id) => sources.TryGetValue(id, out Source s) ? s.Shown() : null;
+    internal static IEnumerable<RectTransform> FrameOf(string id) => sources.TryGetValue(id, out Source s) ? s.Frame() : null;
+    /// <summary>Walks of a borrowed canvas made because its hierarchy changed.</summary>
+    internal static int Relayers;
     internal static long RenderTicks;
     internal static int Renders;
     /// <summary>Frames read through an enumerator, which allocates: a render reads a list by index.</summary>
@@ -116,8 +119,10 @@ internal static class OverlayPreview {
         private readonly Vector3 scale, position;
         private readonly Quaternion rotation;
         private readonly Vector2 size;
-        private readonly Transform[] tree;
-        private readonly int[] layers;
+        // Every object put on the preview layer, with the layer it had: those found at the start, then any made later.
+        private readonly List<Transform> tree = [];
+        private readonly List<int> layers = [];
+        private int hierarchy;
         private readonly Camera cam;
         private readonly Action<bool> onArranging;
         private readonly UnityEngine.Events.UnityAction<Scene, Scene> onScene;
@@ -130,8 +135,8 @@ internal static class OverlayPreview {
             mode = canvas.renderMode;
             (scale, position, rotation, size) = (rect.localScale, rect.localPosition, rect.localRotation, rect.sizeDelta);
             Vector2 logical = rect.rect.size;   // read while still an overlay: the screen in canvas units
-            tree = canvas.GetComponentsInChildren<Transform>(true);
-            layers = [.. tree.Select(t => t.gameObject.layer)];
+            canvas.GetComponentsInChildren(true, tree);
+            foreach(Transform t in tree) layers.Add(t.gameObject.layer);
             Layer = PickLayer();
             GameObject go = null;
             bool borrowed = false;
@@ -155,6 +160,7 @@ internal static class OverlayPreview {
                 cam.allowHDR = false;
                 cam.allowMSAA = false;
                 cam.useOcclusionCulling = false;
+                hierarchy = rect.hierarchyCount;
 #if DEBUG
                 if(FailNextLease) {
                     FailNextLease = false;
@@ -197,6 +203,7 @@ internal static class OverlayPreview {
                 return;
             }
             this.stage = stage;
+            if(rect.hierarchyCount != hierarchy) Relayer();
             float ppp = stage.panel.scaledPixelsPerPoint;
             // Up to a multiple of 32 px: a window resize does not re-create the texture every frame, and it is never smaller than
             // the stage it stretches to.
@@ -244,11 +251,31 @@ internal static class OverlayPreview {
             }
         }
 
+        // An object made under the canvas while it is lent (a shadow switched on) starts on its own layer, which the camera
+        // does not draw. Counting the hierarchy is cheap; the canvas is walked only when the count moved.
+        private static readonly List<Transform> walk = [];
+        private void Relayer() {
+            hierarchy = rect.hierarchyCount;
+            Canvas.GetComponentsInChildren(true, walk);
+            foreach(Transform t in walk) {
+                int layer = t.gameObject.layer;
+                if(layer == Layer) continue;
+                tree.Add(t);
+                layers.Add(layer);
+                t.gameObject.layer = Layer;
+            }
+            walk.Clear();
+#if DEBUG
+            Relayers++;
+#endif
+        }
+
         private void Restore() {
             if(Canvas == null) return;
             Canvas.renderMode = mode;   // the overlay mode re-drives the RectTransform; put it back anyway
             (rect.localScale, rect.localPosition, rect.localRotation, rect.sizeDelta) = (scale, position, rotation, size);
-            for(int i = 0; i < tree.Length; i++) if(tree[i] != null) tree[i].gameObject.layer = layers[i];
+            // Backwards: an object recorded twice (moved off the layer by its owner meanwhile) ends on its first layer.
+            for(int i = tree.Count - 1; i >= 0; i--) if(tree[i] != null) tree[i].gameObject.layer = layers[i];
         }
 
         private void FreeTexture() {

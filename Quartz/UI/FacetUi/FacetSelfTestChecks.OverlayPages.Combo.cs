@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Reflection;
 using Facet;
-using Quartz.Features;
 using Quartz.Features.Combo;
 using Quartz.Features.Interop;
 using Quartz.Overlay;
@@ -10,7 +9,6 @@ using Quartz.Resource;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
-using HandOff = Quartz.UI.MenuHandOff;
 namespace Quartz.UI.FacetUi;
 /// <summary>
 /// Overlay ▸ Combo in the new menu: its rows against the classic page, its two columns' edges side by side and stacked, the
@@ -32,91 +30,49 @@ internal static partial class FacetSelfTestChecks {
     }.Where(k => k != "COMBO_XPERFECT" || XPerfectBridge.Installed)];
 
     private static IEnumerator OverlayCombo(Action<string, bool, string> check, Action<string> info) {
-        bool wasOpen = UICore.IsOpen;
         ComboOverlay.EnsureConf();
-        // Every feature is read before any is flipped, and put back in reverse: "overlay" is Combo's dependency.
-        var saved = FeatureService.Features.Select(h => (id: h.Id, was: h.Enabled, had: FeatureService.State.Features.TryGetValue(h.Id, out bool v), value: v)).ToList();
         ComboSettings c = ComboConf;
         var shown = (c.ShowCaption, c.CaptionShadowEnabled, c.CountShadowEnabled, c.NoPopAnim, c.SolidColor, c.PerfectColorEnabled);
         float size = c.FontSize;
-        if(wasOpen) UICore.Close(true);
-        HandOff.ReturnTo = HandOff.Menu.None;
-        try {
-            foreach(string id in new[] { "overlay", "combo" }) if(!FeatureService.IsEnabled(id)) FeatureService.SetEnabled(id, true);
-            yield return Frames(3);
+        yield return OnPage("combo", ComboPage, () => {
             // Every row a switch hides shows for the parity check.
             (c.ShowCaption, c.CaptionShadowEnabled, c.CountShadowEnabled, c.NoPopAnim, c.SolidColor, c.PerfectColorEnabled) = (true, true, true, false, false, true);
             ComboOverlay.Apply();
-            FacetBridge.OpenNewMenu(ComboPage);
-            yield return Frames(3);
-            Parity(check, ComboPage, ComboRows());
-            yield return ComboEdges(check);
-            yield return ClassicSees(check, ComboPage, "COMBO_CAPTION", Bind.To(() => ComboConf.ShowCaption, v => {
-                ComboConf.ShowCaption = v;
-                ComboOverlay.Apply();
-                ComboOverlay.Save();
-            }));
-            yield return Hotkey(check, ComboPage, "COMBO_NOPOP", "combo_nopop", null, Bind.To(() => ComboConf.NoPopAnim, v => {
-                ComboConf.NoPopAnim = v;
-                ComboOverlay.Save();
-            }));
-            yield return ComboFontKeepsPreview(check);
-            yield return ComboFontsFollow(check);
-            yield return ShadowResets(check);
-            yield return CaptionCaps(check);
-            // Through the row's own slider: font size up 10 (down where that would pass the top), read off the counter.
-            float want = size + 10f <= 120f ? size + 10f : size - 10f;
-            yield return PreviewChecks(check, info, ComboPage, ComboOverlay.FontKey,
-                () => {
-                    if(QuartzShell.Surface?.Root.Q(name: "COMBO_FONTSIZE-input") is not Slider s) return false;
-                    s.value = (want - 24f) / (120f - 24f);   // the track runs 0 to 1 over the row's range
-                    return true;
-                },
-                () => OverlayPreview.ShownOf(ComboOverlay.FontKey)?.transform.Find("Value")?.GetComponent<TextMeshProUGUI>() is { } value
-                    && Mathf.Abs(value.fontSize - want) < 0.5f);
-        } finally {
+        }, () => {
             c = ComboConf;
             (c.ShowCaption, c.CaptionShadowEnabled, c.CountShadowEnabled, c.NoPopAnim, c.SolidColor, c.PerfectColorEnabled) = shown;
             c.FontSize = size;
             ComboOverlay.Apply();
             ComboOverlay.Save();
-            HandOff.ReturnTo = HandOff.Menu.None;
-            QuartzShell.Hide();
-            if(UICore.IsOpen) UICore.Close(true);
-            for(int i = saved.Count - 1; i >= 0; i--) RestoreFeature(saved[i].id, saved[i].was, saved[i].had, saved[i].value);
-            if(wasOpen) UICore.Open(true);
-        }
-        yield return Frames(3);
+        }, () => ComboChecks(check, info, size));
     }
 
-    // The two columns: side by side, the page's parts share the header's edges, the settings cards their own and the preview
-    // ends on the header's right edge. The same once the window is narrowed until the columns stack.
-    private static IEnumerator ComboEdges(Action<string, bool, string> check) {
-        VisualElement page = PageContent(), right = page.Q(name: ComboOverlay.FontKey + "-preview-pane")?.parent, left = right?.parent?[0];
-        if(right == null || left == null || left == right) {
-            check($"{ComboPage}: the settings and the preview sit in two columns", false, $"pane={right != null}");
-            yield break;
-        }
-        bool Stacked() => right.worldBound.yMin >= left.worldBound.yMax - 1f;
-        bool side = !Stacked();
-        string misfits = EdgeMisfits(page, left, right);
-        check($"{ComboPage}: side by side, the page's parts share the header's edges, the cards their own, and the preview ends on the header's right (±1)",
-            side && misfits == "", $"side={side} {misfits}");
-        Rect was = QuartzShell.Window.Rect;
-        try {
-            // The window's layout width is its rect over its scale; the columns stack below 760 of theirs.
-            float columns = right.parent.layout.width, cut = (columns - 700f) * QuartzShell.Window.Scale;
-            QuartzShell.Window.Rect = new Rect(was.x, was.y, was.width - cut, was.height);
-            int frames = 0;
-            for(; frames < 10 && !Stacked(); frames++) yield return null;
-            yield return Frames(2);
-            misfits = EdgeMisfits(page, left, right);
-            check($"{ComboPage}: narrowed below 760, the preview stacks under the cards and the edges still hold (±1)", Stacked() && misfits == "",
-                $"stacked={Stacked()} frames={frames} width={right.parent.layout.width:0} {misfits}");
-        } finally {
-            QuartzShell.Window.Rect = was;
-        }
-        yield return Frames(2);
+    private static IEnumerator ComboChecks(Action<string, bool, string> check, Action<string> info, float size) {
+        yield return Parity(check, ComboPage, ComboRows());
+        yield return ColumnEdges(check, ComboPage, ComboOverlay.FontKey);
+        yield return ClassicSees(check, ComboPage, "COMBO_CAPTION", Bind.To(() => ComboConf.ShowCaption, v => {
+            ComboConf.ShowCaption = v;
+            ComboOverlay.Apply();
+            ComboOverlay.Save();
+        }));
+        yield return Hotkey(check, ComboPage, "COMBO_NOPOP", "combo_nopop", null, Bind.To(() => ComboConf.NoPopAnim, v => {
+            ComboConf.NoPopAnim = v;
+            ComboOverlay.Save();
+        }));
+        yield return ComboFontKeepsPreview(check);
+        yield return ComboFontsFollow(check);
+        yield return ShadowResets(check);
+        yield return CaptionCaps(check);
+        // Through the row's own slider: font size up 10 (down where that would pass the top), read off the counter.
+        float want = size + 10f <= 120f ? size + 10f : size - 10f;
+        yield return PreviewChecks(check, info, ComboPage, ComboOverlay.FontKey,
+            () => {
+                if(QuartzShell.Surface?.Root.Q(name: "COMBO_FONTSIZE-input") is not Slider s) return false;
+                s.value = (want - 24f) / (120f - 24f);   // the track runs 0 to 1 over the row's range
+                return true;
+            },
+            () => OverlayPreview.ShownOf(ComboOverlay.FontKey)?.transform.Find("Value")?.GetComponent<TextMeshProUGUI>() is { } value
+                && Mathf.Abs(value.fontSize - want) < 0.5f);
     }
 
     // A font picked for Combo through its row changes the counter's face only: the page is not rebuilt, so the preview keeps

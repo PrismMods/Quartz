@@ -24,10 +24,13 @@ public static class SongTitleOverlay {
     private static GraphicRaycaster raycaster;
     private static RectTransform root;
     private static TextMeshProUGUI text;
+    // What the preview frames: the drawn text, not the root, so a long title fits the pane.
+    private static RectTransform previewFrame;
+    private static Bounds framed;
     private static GameObject dragObj;
     private static Updater updater;
     private static bool ShouldShow() =>
-        (OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame) || UICore.IsArranging;
+        (OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame) || UICore.IsArranging || OverlayPreview.Is(FontKey);
     private static bool gateWant;
     // Roots start visible; keep the updater until it has hidden them once.
     private static bool updaterRan;
@@ -82,6 +85,11 @@ public static class SongTitleOverlay {
         text.raycastTarget = false;
         TextCompat.NoWrap(text);
         text.text = "";
+        // A box the root's size until the text first draws, so a lease can begin.
+        GameObject frameObj = new("PreviewFrame");
+        frameObj.transform.SetParent(labelObj.transform, false);
+        previewFrame = frameObj.AddComponent<RectTransform>();
+        framed = default;
         dragObj = ReorganizeHandle.CreateDragSurface(root, () => MainCore.Tr.Get("SONG_TITLE", "Song Title"), Moved);
         ReorganizeHandle.SetLayoutTarget(dragObj, LayoutIds.SongTitle);
         ReorganizeHandle.SetAnchorSource(dragObj, () => Conf.AnchorClosest, a => {
@@ -96,6 +104,9 @@ public static class SongTitleOverlay {
         );
         ReorganizeHandle.SetRotationSource(dragObj, () => Conf.Rotation, v => { Conf.Rotation = v; Apply(); });
         updater = canvasObj.AddComponent<Updater>();
+        RectTransform[] frame = [previewFrame];
+        OverlayPreview.Register(FontKey, () => canvasObj ? canvasObj.GetComponent<Canvas>() : null, () => frame,
+            shown: () => root ? root.gameObject : null);
         gateWant = true;
         updaterRan = false;
         gateRunning = true;
@@ -158,12 +169,14 @@ public static class SongTitleOverlay {
     }
     public static void Dispose() {
         if(canvasObj == null) return;
+        OverlayPreview.Unregister(FontKey);   // first: a borrowed canvas goes back before it is destroyed
         ConfMgr?.Save();
         Object.Destroy(canvasObj);
         canvasObj = null;
         raycaster = null;
         root = null;
         text = null;
+        previewFrame = null;
         dragObj = null;
         updater = null;
         hiddenTitleGraphics.Clear();
@@ -258,13 +271,25 @@ public static class SongTitleOverlay {
                 text.font = font;
                 ApplyShadow();
             }
-            string body = BuildBody(arranging);
+            // A preview outside a level shows the placeholder title through the format, as arranging does; in a level, the title.
+            bool previewing = OverlayPreview.Is(FontKey);
+            string body = BuildBody(arranging || (previewing && !GameStats.InGame));
             if(body != lastBody) {
                 text.text = body;
                 lastBody = body;
                 ApplyShadow();
             }
+            if(previewing) FitFrame();
         }
+    }
+    // The preview's frame follows the text as last drawn: TMP's text bounds, whose size is GetRenderedValues(). Written only
+    // when they move; before anything is drawn the frame stays as it was.
+    private static void FitFrame() {
+        Bounds b = text.textBounds;
+        if(!(b.size.x > 0f && b.size.y > 0f) || b == framed) return;
+        framed = b;
+        previewFrame.localPosition = b.center;
+        previewFrame.sizeDelta = b.size;
     }
     [HarmonyPatch(typeof(scrHUDText), "Update")]
     private static class HideGameTitlePatch {

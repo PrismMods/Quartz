@@ -1,12 +1,15 @@
 #if DEBUG && !IL2CPP
 using System.Collections;
+using System.Reflection;
 using Facet;
 using Quartz.Core;
+using Quartz.Features;
 using Quartz.UI.Nav;
 using Quartz.UI.Objects.Impl;
 using Quartz.UI.Utility;
 using UnityEngine;
 using UnityEngine.UIElements;
+using HandOff = Quartz.UI.MenuHandOff;
 namespace Quartz.UI.FacetUi;
 /// <summary>
 /// What every moved Overlay page is checked for against its classic page: the same rows, a switch flipped here that the
@@ -14,15 +17,39 @@ namespace Quartz.UI.FacetUi;
 /// FacetSelfTestChecks.OverlayPages.&lt;Page&gt;.cs.
 /// </summary>
 internal static partial class FacetSelfTestChecks {
-    /// <summary>The open page is pageKey drawn in Facet, and each key names a shown row on it (its Id, or its input's). The
-    /// caller makes every row's VisibleWhen hold first.</summary>
-    internal static void Parity(Action<string, bool, string> check, string pageKey, string[] keys) {
+    /// <summary>The open page is pageKey drawn in Facet, and each key names a shown row on it (its Id, or its input's): the row
+    /// and everything around it up to the page display. A fold the rows sit in is opened first, as a player opens it, and shut
+    /// again after; a switch's group is not, so the caller makes every row's switch and VisibleWhen hold first. hidden names
+    /// rows that must not show.</summary>
+    internal static IEnumerator Parity(Action<string, bool, string> check, string pageKey, string[] keys, string[] hidden = null) {
         VisualElement page = PageContent();
-        List<string> missing = [.. keys.Where(k => (page.Q(name: k) ?? page.Q(name: k + "-input")) is not { } e || e.style.display == DisplayStyle.None)];
+        VisualElement Row(string k) => page.Q(name: k) ?? page.Q(name: k + "-input");
+        List<Action<bool, bool>> opened = [];
+        foreach(string k in keys)
+            for(VisualElement e = Row(k)?.parent; e != null && e != page; e = e.parent)
+                if(FindFold.Invoke(null, [e]) is { } fold && !((Func<bool>)FoldIsOpen.GetValue(fold))()) {
+                    var set = (Action<bool, bool>)FoldSet.GetValue(fold);
+                    set(true, false);
+                    opened.Add(set);
+                }
+        yield return Frames(1);   // the resolved styles catch up
+        bool Shown(string k) {
+            VisualElement e = Row(k);
+            for(; e != null && e != page; e = e.parent) if(e.resolvedStyle.display != DisplayStyle.Flex) return false;
+            return e == page;
+        }
+        List<string> missing = [.. keys.Where(k => !Shown(k))], shows = [.. (hidden ?? []).Where(Shown)];
+        foreach(Action<bool, bool> set in opened) set(false, false);
         bool moved = QuartzShell.CurrentPage == pageKey && page.Q(name: "menu-classic") == null;
-        check($"{pageKey}: drawn in the new menu with every row of the classic page ({keys.Length})", moved && missing.Count == 0,
-            $"page={QuartzShell.CurrentPage} classicCard={!moved} missing={string.Join(",", missing)}");
+        check($"{pageKey}: drawn in the new menu with every row of the classic page ({keys.Length})"
+            + (hidden == null ? "" : $", and none of the {hidden.Length} it hides"), moved && missing.Count == 0 && shows.Count == 0,
+            $"page={QuartzShell.CurrentPage} classicCard={!moved} missing={string.Join(",", missing)} shown={string.Join(",", shows)} unfolded={opened.Count}");
     }
+
+    // Facet's record of a fold (an Advanced or a Section body), internal to it.
+    private static readonly Type FoldType = typeof(Controls).GetNestedType("Fold", BindingFlags.NonPublic);
+    private static readonly MethodInfo FindFold = typeof(Data).GetMethod(nameof(Data.Find)).MakeGenericMethod(FoldType);
+    private static readonly FieldInfo FoldSet = FoldType.GetField("Set"), FoldIsOpen = FoldType.GetField("IsOpen");
 
     /// <summary>A switch flipped on the open moved page shows on the live classic page opened next; a second flip puts it back.
     /// The classic toggle's id is the row's key in lower case. field writes the setting as its row does, for the restore.</summary>
@@ -184,6 +211,73 @@ internal static partial class FacetSelfTestChecks {
             PutBack(field, before, classicId);   // a bind that fired as it was made flipped it
         }
     }
+
+    /// <summary>Runs checks on the moved page pageKey, opened from a closed menu with Overlay Core and featureId on. show makes
+    /// every row a switch hides show; restore puts the player's values back, whatever happens. The features and the menu are
+    /// put back as found.</summary>
+    internal static IEnumerator OnPage(string featureId, string pageKey, Action show, Action restore, Func<IEnumerator> checks) {
+        bool wasOpen = UICore.IsOpen;
+        // Every feature is read before any is flipped, and put back in reverse: "overlay" is the feature's dependency.
+        var saved = FeatureService.Features.Select(h => (id: h.Id, was: h.Enabled, had: FeatureService.State.Features.TryGetValue(h.Id, out bool v), value: v)).ToList();
+        if(wasOpen) UICore.Close(true);
+        HandOff.ReturnTo = HandOff.Menu.None;
+        try {
+            foreach(string id in new[] { "overlay", featureId }) if(!FeatureService.IsEnabled(id)) FeatureService.SetEnabled(id, true);
+            yield return Frames(3);
+            show();
+            FacetBridge.OpenNewMenu(pageKey);
+            yield return Frames(3);
+            yield return checks();
+        } finally {
+            restore();
+            HandOff.ReturnTo = HandOff.Menu.None;
+            QuartzShell.Hide();
+            if(UICore.IsOpen) UICore.Close(true);
+            for(int i = saved.Count - 1; i >= 0; i--) RestoreFeature(saved[i].id, saved[i].was, saved[i].had, saved[i].value);
+            if(wasOpen) UICore.Open(true);
+        }
+        yield return Frames(3);
+    }
+
+    /// <summary>The open page's two columns: side by side, the page's parts share the header's edges, the settings cards their
+    /// own and the preview ends on the header's right edge. The same once the window is narrowed until the columns stack.</summary>
+    internal static IEnumerator ColumnEdges(Action<string, bool, string> check, string pageKey, string overlayId) {
+        VisualElement page = PageContent(), right = page.Q(name: overlayId + "-preview-pane")?.parent, left = right?.parent?[0];
+        if(right == null || left == null || left == right) {
+            check($"{pageKey}: the settings and the preview sit in two columns", false, $"pane={right != null}");
+            yield break;
+        }
+        bool Stacked() => right.worldBound.yMin >= left.worldBound.yMax - 1f;
+        bool side = !Stacked();
+        string misfits = EdgeMisfits(page, left, right);
+        check($"{pageKey}: side by side, the page's parts share the header's edges, the cards their own, and the preview ends on the header's right (±1)",
+            side && misfits == "", $"side={side} {misfits}");
+        Rect was = QuartzShell.Window.Rect;
+        try {
+            // The window's layout width is its rect over its scale; the columns stack below 760 of theirs.
+            float columns = right.parent.layout.width, cut = (columns - 700f) * QuartzShell.Window.Scale;
+            QuartzShell.Window.Rect = new Rect(was.x, was.y, was.width - cut, was.height);
+            int frames = 0;
+            for(; frames < 10 && !Stacked(); frames++) yield return null;
+            yield return Frames(2);
+            misfits = EdgeMisfits(page, left, right);
+            check($"{pageKey}: narrowed below 760, the preview stacks under the cards and the edges still hold (±1)", Stacked() && misfits == "",
+                $"stacked={Stacked()} frames={frames} width={right.parent.layout.width:0} {misfits}");
+        } finally {
+            QuartzShell.Window.Rect = was;
+        }
+        yield return Frames(2);
+    }
+
+    // A colour row's red, green and blue, set through its picker's channel sliders as dragging them would; alpha stays.
+    private static bool SetChannels(string key, Color c) {
+        List<Slider> channels = QuartzShell.Surface?.Root.Q(name: key)?.Query<Slider>().ToList();
+        if(channels == null || channels.Count < 3) return false;
+        (channels[0].value, channels[1].value, channels[2].value) = (c.r, c.g, c.b);
+        return true;
+    }
+
+    private static bool SameRgb(Color a, Color b) => Mathf.Abs(a.r - b.r) < 0.01f && Mathf.Abs(a.g - b.g) < 0.01f && Mathf.Abs(a.b - b.b) < 0.01f;
 
     // The window server's keys, as Keybind reads them through PrismBridge, while faked: Option held, and `macKey` from the
     // frame after it was set. Patched on first use, inert after.
