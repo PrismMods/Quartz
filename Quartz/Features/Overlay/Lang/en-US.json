@@ -19,6 +19,7 @@
     "OVERLAY_POP_EASE_LABEL": "Easing",
     "OVERLAY_POP_SECONDS": "Duration",
     "OVERLAY_POP_EXIT": "Slide Out on Death or Clear",
-    "DESC_OVERLAY_POP_EXIT": "Overlays slide off screen when the run ends. Turn this off to keep them on screen."
+    "DESC_OVERLAY_POP_EXIT": "Overlays slide off screen when the run ends. Turn this off to keep them on screen.",
+    "OVERLAY_GENERAL_DESC": "Turns every overlay on or off, and sets how they slide in"
   }
 }

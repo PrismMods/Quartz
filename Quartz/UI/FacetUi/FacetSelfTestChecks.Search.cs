@@ -41,7 +41,7 @@ internal static partial class FacetSelfTestChecks {
             yield return SearchClassic(check, "check for updates", h => h.PageRef == null && h.Label == updates, CorePages.SettingsPageKey,
                 "a row the moved Settings page leaves to the classic menu");
             SearchNoCardRows(check);
-            yield return SearchKorean(check);
+            yield return SearchKorean(check, "FXRM_ENABLE_SAVE", "SECTION_EFFECT_REMOVER", "Korean initials find a moved page's row");
             yield return SearchFresh(check);
         } finally {
             C.Mode = mode;
@@ -122,16 +122,7 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(2);
         Submit(b);
         yield return Frames(2);
-        // The menu lives on Facet's popup surface, a document of its own.
-        VisualElement row = null;
-        foreach(UIDocument d in UnityEngine.Object.FindObjectsByType<UIDocument>(FindObjectsSortMode.None))
-            if(d.rootVisualElement != null) row ??= d.rootVisualElement.Query<Label>().Where(l => l.text == shown && l.panel != null).First()?.parent;
-        if(row != null) {
-            using PointerUpEvent ev = Pooled<PointerUpEvent>();
-            typeof(PointerEventBase<PointerUpEvent>).GetProperty("button").SetValue(ev, 0);   // the popup takes the primary button only
-            ev.target = row;
-            row.SendEvent(ev);
-        }
+        if(MenuRow(shown) is { } row) Pick(row);
         yield return Frames(3);
     }
 
@@ -175,9 +166,8 @@ internal static partial class FacetSelfTestChecks {
         check("a classic card's row is not indexed once per page", !hits.Any(h => h.Key == "MENU_CLASSIC_PAGE" || h.Key == "MENU_CLASSIC_OPEN"), Hits(hits));
     }
 
-    // Korean initials find a moved page's row.
-    private static IEnumerator SearchKorean(Action<string, bool, string> check) {
-        const string key = "FXRM_ENABLE_SAVE";
+    // Korean initials find a moved page's row, key on its tab.
+    private static IEnumerator SearchKorean(Action<string, bool, string> check, string key, string tab, string name) {
         string was = MainCore.Tr.Language, english = MainCore.Tr.GetForLanguage(key, "en-US", key), q = null;
         List<SearchIndex.Hit> hits = [];
         try {
@@ -189,7 +179,7 @@ internal static partial class FacetSelfTestChecks {
             MainCore.Tr.Language = was;
         }
         yield return Frames(3);   // the restored language relabels
-        check("Korean initials find a moved page's row", q != Hangul.Initials(english) && hits.Any(h => h.Key == key), $"q={q} {Hits(hits)}");
+        check(name, q != Hangul.Initials(english) && hits.Any(h => h.Key == key && h.Tab == tab && h.PageRef != null), $"q={q} {Hits(hits)}");
     }
 
     // The index follows a feature switched off. On its tab the classic page's rows give way to the off

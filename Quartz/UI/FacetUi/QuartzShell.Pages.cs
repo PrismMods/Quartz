@@ -20,6 +20,7 @@ internal static partial class QuartzShell {
         ["visuals.effectremover"] = FacetEffectRemover.Page,
         [CorePages.FeaturesPageKey] = ShellFeatures.Build,
         [CorePages.SettingsPageKey] = ShellSettings.Build,
+        ["overlay.general"] = OverlayPages.General.Page,
     };
     /// <summary>The tab row of the open category, when it has one.</summary>
     internal static Tabs TabRow { get; private set; }

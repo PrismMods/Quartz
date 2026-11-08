@@ -19,6 +19,7 @@
     "OVERLAY_POP_EASE_LABEL": "이징",
     "OVERLAY_POP_SECONDS": "지속 시간",
     "OVERLAY_POP_EXIT": "죽거나 클리어할 때 나가기",
-    "DESC_OVERLAY_POP_EXIT": "레벨이 끝나면 오버레이가 화면 밖으로 나가요. 끄면 화면에 그대로 남아요."
+    "DESC_OVERLAY_POP_EXIT": "레벨이 끝나면 오버레이가 화면 밖으로 나가요. 끄면 화면에 그대로 남아요.",
+    "OVERLAY_GENERAL_DESC": "모든 오버레이를 켜고 끄며, 나타나는 방식을 정해요"
   }
 }

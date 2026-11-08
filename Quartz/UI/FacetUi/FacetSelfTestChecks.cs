@@ -31,6 +31,7 @@ internal static partial class FacetSelfTestChecks {
             yield return SettingsPage(check);
             yield return Polish(check, info);
             yield return Previews(check, info);
+            yield return OverlayGeneral(check);
             yield return Escape(check);
             yield return TextFocus(check);
             yield return Block(check);

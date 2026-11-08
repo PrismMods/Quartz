@@ -19,6 +19,7 @@ internal static partial class FacetSelfTestChecks {
     private static IEnumerator Previews(Action<string, bool, string> check, Action<string> info) {
         string id = ComboOverlay.FontKey;
         TakeRefusals(check, id);
+        TakeEndsOnThrow(check, id);
         yield return TakeRollsBack(check, id);
         float size = ComboOverlay.Conf.FontSize;
         try {
@@ -52,6 +53,31 @@ internal static partial class FacetSelfTestChecks {
         } finally {
             first?.Release();
             OverlayPreview.Unregister(empty);
+        }
+    }
+
+    // An overlay whose canvas or frame throws once its preview has begun hears it end, once each time, and nothing is lent.
+    private static void TakeEndsOnThrow(Action<string, bool, string> check, string id) {
+        const string boom = "selftest-throws";
+        Canvas canvas = OverlayPreview.CanvasOf(id);
+        int begun = 0, ended = 0;
+        var threw = new List<string>();
+        void Try(Func<Canvas> c, Func<IEnumerable<RectTransform>> frame) {
+            OverlayPreview.Register(boom, c, frame, () => begun++, () => ended++);
+            try {
+                OverlayPreview.Take(boom)?.Release();
+            } catch(InvalidOperationException e) {
+                threw.Add(e.Message);
+            }
+        }
+        try {
+            Try(() => throw new InvalidOperationException("self-test: canvas"), () => []);
+            Try(() => canvas, () => throw new InvalidOperationException("self-test: frame"));
+            check("preview: a canvas or frame that throws still ends the preview it began, and lends nothing",
+                threw.Count == 2 && begun == 2 && ended == 2 && OverlayPreview.Target == null && OverlayPreview.Current == null,
+                $"threw={string.Join("|", threw)} begun={begun} ended={ended} target={OverlayPreview.Target}");
+        } finally {
+            OverlayPreview.Unregister(boom);
         }
     }
 
@@ -90,6 +116,8 @@ internal static partial class FacetSelfTestChecks {
     internal static IEnumerator PreviewChecks(Action<string, bool, string> check, Action<string> info, string pageKey, string overlayId,
         Func<bool> applySetting, Func<bool> elementChanged) {
         string tag = $"preview {pageKey ?? "scratch"} {overlayId}";
+        // What the element was before any pane: a page left open by the checks before this one holds the lease.
+        if(QuartzShell.Hide()) yield return Frames(1);
         Canvas canvas = OverlayPreview.CanvasOf(overlayId);
         GameObject root = OverlayPreview.ShownOf(overlayId);
         if(canvas == null || root == null) {
@@ -165,6 +193,9 @@ internal static partial class FacetSelfTestChecks {
             layerWas = canvas.gameObject.layer;
             rootLayerWas = root.layer;
             placed = (RectTransform)root.transform;
+            // A page whose feature went off and on with Quartz was rebuilt, with a new pane.
+            stage = surface.Q(overlayId + "-preview");
+            note = surface.Q(overlayId + "-preview-empty");
             for(frames = 0; frames < 10 && !Shown(); frames++) yield return null;
             Vector2 moved = placed.anchoredPosition - at;
             check($"{tag}: powered on again, the pane borrows the new canvas within 10 frames, and the element sits where its stored position put it (±0.5)",

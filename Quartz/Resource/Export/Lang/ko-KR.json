@@ -560,6 +560,8 @@
     "MENU_CLASSIC_MENU": "기존 메뉴",
     "MENU_SETTINGS_CLASSIC": "업데이트와 폰트 설정은 아직 기존 메뉴에 있어요",
     "MENU_PREVIEW": "미리보기",
-    "MENU_PREVIEW_IN_LEVEL": "요소가 로드되면 여기에 표시돼요"
+    "MENU_PREVIEW_IN_LEVEL": "요소가 로드되면 여기에 표시돼요",
+    "MENU_SET_HOTKEY": "단축키 설정",
+    "MENU_CLEAR_HOTKEY": "단축키 지우기"
   }
 }

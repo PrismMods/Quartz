@@ -50,13 +50,15 @@ internal static class OverlayPreview {
     /// <summary>A lease on the overlay's canvas, or null: not registered, not built, an empty frame, arranging, or another lease out.</summary>
     internal static Lease Take(string id) {
         if(Target != null || id == null || UICore.IsArranging || !sources.TryGetValue(id, out Source s)) return null;
-        s.Begin?.Invoke();
-        Canvas canvas = s.Canvas();
-        if(canvas == null || !Bounds(s.Frame(), out _, out _)) {
-            s.End?.Invoke();
-            return null;
+        Lease lease = null;
+        try {
+            s.Begin?.Invoke();
+            Canvas canvas = s.Canvas();
+            if(canvas != null && Bounds(s.Frame(), out _, out _)) lease = current = new Lease(id, s, canvas);
+        } finally {
+            if(lease == null) s.End?.Invoke();   // nothing borrowed, or a step threw: the overlay hears its preview end
         }
-        return current = new Lease(id, s, canvas);
+        return lease;
     }
 #if DEBUG
     /// <summary>The self-test's view of what a lease on id borrows, and the time spent in Render.</summary>
@@ -161,13 +163,12 @@ internal static class OverlayPreview {
 #endif
                 borrowed = true;
             } finally {
-                // A step that threw: what was changed goes back, the camera goes, and the overlay hears its preview end.
+                // A step that threw: what was changed goes back and the camera goes. Take ends the preview.
                 if(!borrowed) {
                     try {
                         Restore();
                     } finally {
                         if(go != null) Object.Destroy(go);
-                        source.End?.Invoke();
                     }
                 }
             }

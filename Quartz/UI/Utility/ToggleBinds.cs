@@ -32,6 +32,12 @@ public static class ToggleBinds {
         if(!MainCore.Conf.ToggleKeybinds.Remove(id)) return;
         MainCore.ConfMgr.RequestSave();
     }
+    /// <summary>A value written outside the classic menu: its toggles show it without acting on it, so a hotkey flips from it.</summary>
+    public static void Show(string id, bool value) {
+        if(string.IsNullOrEmpty(id) || !live.TryGetValue(id, out List<UIToggle> list)) return;
+        foreach(UIToggle toggle in list)
+            if(toggle != null && toggle.Rect != null) toggle.Set(value, invoke: false);
+    }
     public static void HandleUpdate() {
         var binds = MainCore.Conf.ToggleKeybinds;
         if(binds.Count == 0 || Keybind.Capturing || KeyCaptureCoordinator.ReleasedThisFrame || !MainCore.IsModEnabled) return;

@@ -59,6 +59,10 @@ internal static partial class QuartzShell {
             s.Hidden += Hidden;
             s.EscapeHandler = OnEscape;
             Surface = s;
+            // A font found or a global font chosen relabels the Overlay pages' font lists: the open page rebuilds.
+            globalFont = FontManager.CurrentName;
+            FontManager.OnFontCatalogChanged += Changed;
+            FontManager.OnFontChanged += GlobalFontChanged;
         } catch {
             s.Dispose();   // a half-built window is never kept or shown; the next open builds afresh
             Window = null;
@@ -66,6 +70,16 @@ internal static partial class QuartzShell {
             throw;
         }
         if(CurrentPage != last) Go(last);
+    }
+
+    private static string globalFont;
+
+    // An overlay's own pick fires this too, and its row reads that live: only a new global font relabels the lists, whose
+    // first item names it. A rebuild for nothing would also drop the open page's preview lease.
+    private static void GlobalFontChanged() {
+        if(FontManager.CurrentName == globalFont) return;
+        globalFont = FontManager.CurrentName;
+        Changed();
     }
 
     /// <summary>Shows the window, on pageKey when given. From the classic menu, that menu closes and a close here brings it back.</summary>
@@ -171,6 +185,8 @@ internal static partial class QuartzShell {
     /// <summary>Before QuartzHost disposes the surface: a dispose raises Hidden, which must not reopen the classic menu.</summary>
     internal static void Shutdown() {
         if(Surface != null) Surface.Hidden -= Hidden;
+        FontManager.OnFontCatalogChanged -= Changed;
+        FontManager.OnFontChanged -= GlobalFontChanged;
         if(MenuHandOff.ReturnTo == MenuHandOff.Menu.Classic) MenuHandOff.ReturnTo = MenuHandOff.Menu.None;
         Surface = null;
         Window = null;

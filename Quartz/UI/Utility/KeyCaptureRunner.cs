@@ -43,6 +43,8 @@ public sealed class KeyCaptureRunner : MonoBehaviour {
         Quartz.Prism.PrismBridge.Exempt(poll ??= Poll);
     }
     private void Poll() {
+        // First, every frame, whatever ends this one: each key's edge must be current when Option goes down.
+        KeyCode chord = Keybind.IsMac ? MacOptionChord() : KeyCode.None;
         bool hookRAlt = Quartz.Game.HookKeys.Held(KeyCode.RightAlt);
         bool hookRCtrl = Quartz.Game.HookKeys.Held(KeyCode.RightControl);
         bool firstListeningFrame = !wasListening;
@@ -73,6 +75,10 @@ public sealed class KeyCaptureRunner : MonoBehaviour {
             CompleteCapture(KeyCode.RightAlt);
             return;
         }
+        if(chord != KeyCode.None) {
+            CompleteCapture(chord);
+            return;
+        }
         if(!Input.anyKeyDown) return;
         if(Input.GetKeyDown(KeyCode.KeypadEnter)) {
             CompleteCapture(KeyCode.KeypadEnter);
@@ -85,6 +91,15 @@ public sealed class KeyCaptureRunner : MonoBehaviour {
                 return;
             }
         }
+    }
+    // macOS: under Option, Unity reports no letter's keydown (anyKeyDown shows only Option), so the chord's key is read through
+    // Keybind, from the window server, as the classic capture does. Every key is read every frame, Option or not, so each
+    // key's edge is current when Option goes down.
+    private static KeyCode MacOptionChord() {
+        KeyCode down = KeyCode.None;
+        foreach(KeyCode key in allKeys)
+            if(key != KeyCode.None && key < KeyCode.Mouse0 && !Keybind.IsModifier(key) && Keybind.KeyDown(key) && down == KeyCode.None) down = key;
+        return Keybind.ModifierHeld(Keybind.KeyModifier.Alt) ? down : KeyCode.None;
     }
     private void CompleteCapture(KeyCode key) {
         if(!KeyCaptureCoordinator.Owns(this)) return;

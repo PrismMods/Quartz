@@ -23,7 +23,7 @@ internal static partial class FacetSelfTestChecks {
     private static IEnumerator HomePage(Action<string, bool, string> check, Action<string> info) {
         bool wasOpen = UICore.IsOpen;
         string stored = QuartzHost.Host.Read(Switches);
-        // Key Limiter's card is the status row checked, Combo's page the classic layout row: both on for the duration.
+        // Key Limiter's card is the status row checked, Combo an element Edit layout moves: both on for the duration.
         var flipped = new List<(string id, bool had, bool value)>();
         if(wasOpen) UICore.Close(true);
         HandOff.ReturnTo = HandOff.Menu.None;
@@ -271,17 +271,21 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(3);
     }
 
+    // A classic page whose feature puts an element on screen: Practice, which stays classic, when it is on, else another such
+    // page still classic and on. None is switched on for this: a first switch-on writes the feature's settings file.
     private static IEnumerator ClassicLayoutRow(Action<string, bool, string> check) {
-        string combo = NavRegistry.KeyFor(FeaturePages.StateFor("combo"));
-        QuartzShell.Go(combo);
+        string page = new[] { "practice", "keyviewer", "judgement", "songtitle", "progressbar", "panels", "calibration" }
+            .Where(FeatureService.IsEnabled).Select(f => NavRegistry.KeyFor(FeaturePages.StateFor(f)))
+            .FirstOrDefault(k => k != null && !QuartzShell.Moved.ContainsKey(k));
+        if(page != null) QuartzShell.Go(page);
         yield return Frames(1);
         VisualElement row = Body.Q(name: "menu-classic-layout");
-        bool shown = row != null && Displayed(row) == PrismBridge.UiAvailable;
+        bool shown = page != null && row != null && Displayed(row) == PrismBridge.UiAvailable;
         QuartzShell.Go("profiles.main");
         yield return Frames(1);
         bool none = Body.Q(name: "menu-classic-layout") == null;
         check("a classic page with an on-screen element links to the layout editor, Profiles does not", shown && none,
-            $"page={combo} row={row != null} profiles={!none}");
+            $"page={page} row={row != null} profiles={!none}");
     }
 
     private static IEnumerator PageLayout(Action<string, bool, string> check) {

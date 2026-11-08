@@ -37,9 +37,9 @@ public static class OverlayFontPicker {
         dropdown.OnDisposed += Unhook;
         return dropdown;
     }
-    private static string Current(string overlayKey) => FontManager.OverlayFontName(overlayKey) ?? FontManager.FollowGlobal;
-    private static IReadOnlyList<string> Values() => [FontManager.FollowGlobal, .. FontManager.GetAvailableFonts()];
-    private static string Display(string name) =>
+    internal static string Current(string overlayKey) => FontManager.OverlayFontName(overlayKey) ?? FontManager.FollowGlobal;
+    internal static IReadOnlyList<string> Values() => [FontManager.FollowGlobal, .. FontManager.GetAvailableFonts()];
+    internal static string Display(string name) =>
         name == FontManager.FollowGlobal
             ? string.Format(GenerateUI.Tr("FONT_OVERLAY_GLOBAL", "Global font ({0})"), FontName(FontManager.CurrentName))
             : FontName(name);

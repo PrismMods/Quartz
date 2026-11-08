@@ -1977,9 +1977,11 @@
           "Facet.Control\u00601\u003CSystem.Boolean\u003E Facet.Controls::Tile(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Boolean\u003E,System.Action\u00601\u003CFacet.TileOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.Boolean\u003E Facet.Controls::Toggle(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Boolean\u003E,System.Action\u00601\u003CFacet.Options\u00601\u003CSystem.Boolean\u003E\u003E)",
           "Facet.Control\u00601\u003CSystem.Int32\u003E Facet.Controls::Dropdown(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Int32\u003E,System.Action\u00601\u003CFacet.DropdownOptions\u003E)",
+          "Facet.Control\u00601\u003CSystem.Int32\u003E Facet.Controls::IntSlider(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Int32\u003E,System.Action\u00601\u003CFacet.IntSliderOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.Single\u003E Facet.Controls::Slider(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Single\u003E,System.Action\u00601\u003CFacet.SliderOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.String\u003E Facet.Controls::Info(UnityEngine.UIElements.VisualElement,System.String,System.Func\u00601\u003CSystem.String\u003E,System.Action\u00601\u003CFacet.ControlOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.String\u003E Facet.Controls::Key(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.String\u003E,System.Action\u00601\u003CFacet.KeyOptions\u003E)",
+          "Facet.Control\u00601\u003CSystem.String\u003E Facet.Controls::Text(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.String\u003E,System.Action\u00601\u003CFacet.TextOptions\u003E)",
           "Facet.Control\u00601\u003CUnityEngine.Color\u003E Facet.Controls::Colour(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CUnityEngine.Color\u003E,System.Action\u00601\u003CFacet.ColourOptions\u003E)",
           "System.Single Facet.Controls::RowHeight",
           "UnityEngine.UIElements.Button Facet.Controls::Action(UnityEngine.UIElements.VisualElement,System.String,System.String,System.Action,System.Action\u00601\u003CFacet.ControlOptions\u003E)",
@@ -2058,6 +2060,15 @@
           "System.Boolean Facet.Input::get_TextFocused()",
           "System.Void Facet.Input::ConsumeEscape()",
           "System.Void Facet.Input::TickWheel(UnityEngine.Vector2,System.Single)"
+        ]
+      },
+      {
+        "type": "Facet.IntSliderOptions",
+        "members": [
+          "System.Int32 Facet.IntSliderOptions::Max()",
+          "System.Int32 Facet.IntSliderOptions::Min()",
+          "System.Void Facet.IntSliderOptions::set_Max(System.Int32)",
+          "System.Void Facet.IntSliderOptions::set_Min(System.Int32)"
         ]
       },
       {
@@ -2244,6 +2255,10 @@
         "members": [
           "Facet.Tabs Facet.Tabs::Pages(UnityEngine.UIElements.VisualElement,System.Collections.Generic.IList\u00601\u003CFacet.NavItem\u003E,System.Int32,System.Action\u00601\u003CSystem.Int32\u003E)"
         ]
+      },
+      {
+        "type": "Facet.TextOptions",
+        "members": []
       },
       {
         "type": "Facet.Theme",

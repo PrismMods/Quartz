@@ -560,6 +560,8 @@
     "MENU_CLASSIC_MENU": "Classic menu",
     "MENU_SETTINGS_CLASSIC": "Updates and fonts are still in the classic menu",
     "MENU_PREVIEW": "Preview",
-    "MENU_PREVIEW_IN_LEVEL": "Shows here once the element is loaded"
+    "MENU_PREVIEW_IN_LEVEL": "Shows here once the element is loaded",
+    "MENU_SET_HOTKEY": "Set hotkey",
+    "MENU_CLEAR_HOTKEY": "Clear hotkey"
   }
 }
