@@ -24,6 +24,9 @@ public static class DecorationLoadProgress {
             if(canvasObj == null) Build();
             if(canvasObj == null) return;
             lastDone = lastTotal = -1;
+            // Ties with the Quartz menu canvas (also 32767, same parent) are drawn in
+            // sibling order, so go last to stay in front.
+            canvasObj.transform.SetAsLastSibling();
             canvasObj.SetActive(true);
             visible = true;
             Report(0, total);
@@ -64,7 +67,9 @@ public static class DecorationLoadProgress {
         canvasObj.transform.SetParent(MainCore.Root.transform, false);
         Canvas canvas = canvasObj.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 32765;
+        // Top of the stack: the TUF launcher's full-screen loading cover sits at
+        // 32766 while a chart opens, and this card must show over it.
+        canvas.sortingOrder = 32767;
         CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = UICore.ReferenceResolution;
