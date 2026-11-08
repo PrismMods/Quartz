@@ -163,8 +163,8 @@ internal static partial class FacetSelfTestChecks {
         float was = MainCore.Conf.UIScale;
         yield return SetSlider("UI_SCALE", 0.8f, 1.6f, 1.2f);
         float ui = MainCore.Conf.UIScale, scale = QuartzShell.Window.Scale;
-        check("UI scale at 1.2 is saved, and scales the new menu by 1.2 / 0.85 and the classic panel by 1.2",
-            Mathf.Abs(ui - 1.2f) < 0.001f && Mathf.Abs(scale - (1.2f / 0.85f)) < 0.001f && Mathf.Abs(UICore.PanelScale - 1.2f) < 0.001f,
+        check("UI scale at 1.2 is saved, and scales the new menu by 1.2 / 0.85 * 1.2 (its larger base) and the classic panel by 1.2",
+            Mathf.Abs(ui - 1.2f) < 0.001f && Mathf.Abs(scale - (1.2f / 0.85f * 1.2f)) < 0.001f && Mathf.Abs(UICore.PanelScale - 1.2f) < 0.001f,
             $"UIScale={ui} window={scale} panel={UICore.PanelScale}");
         // An undo is no commit of the slider's: the scale follows it all the same.
         string undid = History.NextUndo;
@@ -172,8 +172,8 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(2);
         ui = MainCore.Conf.UIScale;
         scale = QuartzShell.Window.Scale;
-        check($"undoing the UI scale puts back {was} in the setting, the new menu and the classic panel",
-            was != 1.2f && Mathf.Abs(ui - was) < 0.001f && Mathf.Abs(scale - (was / 0.85f)) < 0.001f && Mathf.Abs(UICore.PanelScale - was) < 0.001f,
+        check($"undoing the UI scale puts back {was} in the setting, the new menu ({was} / 0.85 * 1.2) and the classic panel",
+            was != 1.2f && Mathf.Abs(ui - was) < 0.001f && Mathf.Abs(scale - (was / 0.85f * 1.2f)) < 0.001f && Mathf.Abs(UICore.PanelScale - was) < 0.001f,
             $"undid={undid} UIScale={ui} window={scale} panel={UICore.PanelScale}");
         yield return SetSlider("WINDOW_OPACITY", 20f, 100f, 70f);
         float opacity = QuartzShell.Window.Root.resolvedStyle.opacity;

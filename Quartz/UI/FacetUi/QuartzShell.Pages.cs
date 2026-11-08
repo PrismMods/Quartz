@@ -2,8 +2,10 @@
 using Facet;
 using Quartz.Core;
 using Quartz.Features;
+using Quartz.Resource;
 using Quartz.UI.Nav;
 using Quartz.UI.Search;
+using UnityEngine;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi;
 /// <summary>
@@ -47,6 +49,9 @@ internal static partial class QuartzShell {
         try { Nav.Go(item); } finally { going = null; }
     }
 
+    /// <summary>A category's icon as the classic sidebar picks it: an addon's registered asset wins over the built-in sprite.</summary>
+    internal static Sprite CategoryIcon(NavCategory c) => c.IconAsset != null ? SpriteRegistry.Get(c.IconAsset) : MainCore.Spr.Get(c.Icon);
+
     private static string CategoryKeys() => string.Join(",", NavRegistry.AllCategories.Select(c => c.Key));
 
     // Three ruled groups: Home and Features, the feature categories, then the app's own pages.
@@ -66,6 +71,7 @@ internal static partial class QuartzShell {
     }
 
     private static NavItem CategoryItem(NavCategory c) => new(Label(c.LocaleKey, c.Title), p => BuildCategory(p, c)) {
+        Icon = CategoryIcon(c) is { } icon ? Background.FromSprite(icon) : default,   // the rail draws a fixed square: IconScale has no say
         VisibleWhen = () => c.IsVisible && NavRegistry.PagesIn(c.Key).Count > 0,
         // Both only grow, so their sum moves whenever either does.
         Revision = static () => NavRegistry.Version + changes,

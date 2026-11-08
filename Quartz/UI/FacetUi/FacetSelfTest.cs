@@ -25,7 +25,7 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
             string marker = Path.Combine(MainCore.Paths.RootPath, name);
             if(!File.Exists(marker)) { done = true; return; }
             log = new StringBuilder();
-            steps.Push(body != null ? body(Check, Info) : Run());
+            steps.Push(Powered(body != null ? body(Check, Info) : Run()));
         }
         while(steps.Count > 0) {
             IEnumerator top = steps.Peek();
@@ -48,6 +48,28 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
         log.AppendLine($"DONE pass={pass} fail={fail}");
         File.WriteAllText(Path.Combine(MainCore.Paths.RootPath, name + ".log"), log.ToString());
         Application.Quit();
+    }
+    // Powered off there are no overlays or layout targets to check, and the rig may have the power saved off. Power on
+    // for the run only, never writing the player's stored switch, and put the runtime back after.
+    private IEnumerator Powered(IEnumerator run) {
+        bool wasOn = MainCore.IsModEnabled, wasActive = MainCore.Conf.Active;
+        try {
+            if(!wasOn) {
+                MainCore.Runtime.SetModEnabled(true, false, save: false);
+                Info("power: was off, powered on for the run");
+                for(int f = Time.frameCount + 3; Time.frameCount < f;) yield return null;
+            }
+            Check("Quartz is powered on for the run", MainCore.IsModEnabled, $"wasOn={wasOn}");
+            yield return run;
+        } finally {
+            if(!wasOn) {
+                MainCore.Runtime.SetModEnabled(false, false, save: false);
+                Info($"power: back off after the run (on={MainCore.IsModEnabled})");
+            }
+            Check("the run puts Quartz's power back and leaves the stored switch alone",
+                MainCore.IsModEnabled == wasOn && MainCore.Conf.Active == wasActive,
+                $"on={MainCore.IsModEnabled} wasOn={wasOn} active={MainCore.Conf.Active} wasActive={wasActive}");
+        }
     }
     // Logged, never counted: facts for a reader, not assertions.
     private void Info(string line) => log.AppendLine("INFO " + line);

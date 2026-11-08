@@ -14,7 +14,8 @@ namespace Quartz.UI.FacetUi;
 /// <summary>
 /// The new menu's Home: its header line, the quick switches and their Edit… popup, the status rows against the classic
 /// Home, and Edit layout there and on a classic page with an on-screen element. Then how pages lay out: a tab row, the
-/// search results heading, the overlays under every Prism window, and a close after the switch went off.
+/// search results heading, the overlays under every Prism window, a close after the switch went off, and a switched-off
+/// feature's name after a language change.
 /// </summary>
 internal static partial class FacetSelfTestChecks {
     private const string Switches = "home.switches", FailedText = "This card failed to build — see the log.";
@@ -185,7 +186,12 @@ internal static partial class FacetSelfTestChecks {
     }
 
     // Edit layout hands the screen to the shared editor and the new menu comes back after that session, and after no other.
+    // The session needs a Quartz element to move, so Quartz must be on (the runner powers it on); the case with no element
+    // is HomeLayoutNoTargets.
     private static IEnumerator HomeLayout(Action<string, bool, string> check) {
+        int handles = HandleList().Count(h => h != null);
+        check("Quartz is on with a layout target for Edit layout to move", MainCore.IsModEnabled && handles > 0,
+            $"on={MainCore.IsModEnabled} handles={handles}");
         QuartzShell.Go(CorePages.HomePageKey);
         yield return Frames(1);
         VisualElement row = Body.Q(name: "menu-edit-layout");
@@ -291,6 +297,7 @@ internal static partial class FacetSelfTestChecks {
             List<Canvas> overlays = OverlayCanvases();
             check("every Quartz overlay canvas sorts under Facet's window bands (below 29000)", overlays.Count > 0 && overlays.All(c => c.sortingOrder < 29000),
                 OverlayOrders(overlays));
+            yield return OffNameKorean(check);
         } finally {
             QuartzShell.Nav?.Filter("");
             HandOff.ReturnTo = HandOff.Menu.None;
@@ -349,6 +356,45 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(3);
         FacetBridge.OpenNewMenu();
         yield return Frames(1);
+    }
+
+    // A switched-off feature keeps its name in the player's language: after a language change and a reload of the
+    // language files, the Overlay tab row's Combo tab and the Combo stub's header read the Korean name.
+    private static IEnumerator OffNameKorean(Action<string, bool, string> check) {
+        const string id = "combo", key = "SECTION_COMBO";
+        bool was = FeatureService.IsEnabled(id), had = FeatureService.State.Features.TryGetValue(id, out bool stored);
+        string lang = MainCore.Tr.Language, english = MainCore.Tr.GetForLanguage(key, "en-US", key);
+        string korean = MainCore.Tr.GetForLanguage(key, "ko-KR", english), stub = null, name = null, tab = null, head = null;
+        bool isStub = false, loaded = false;
+        int frames = 0;
+        try {
+            MainCore.Tr.Language = "en-US";   // on a rig already in Korean, the switch below would change nothing
+            FeatureService.SetEnabled(id, false);
+            yield return Frames(3);
+            stub = NavRegistry.KeyFor(FeaturePages.StateFor(id));
+            isStub = FeaturePages.IsStub(NavRegistry.ByKey(stub));
+            QuartzShell.Go(stub);
+            yield return Frames(2);
+            MainCore.Tr.Language = "ko-KR";
+            Quartz.UI.Factory.Page.PageSettings.ReloadLanguages(() => loaded = true);
+            for(int i = 0; i < 600 && !loaded; i++) yield return null;
+            for(; frames <= 3; frames++) {
+                global::Facet.Tabs row = QuartzShell.TabRow;
+                List<Button> tabs = row?.Element.Query<Button>().ToList() ?? [];
+                name = row?.SelectedName;
+                tab = row != null && row.Selected >= 0 && row.Selected < tabs.Count ? tabs[row.Selected].text : null;
+                head = Body.Q(name: "menu-header")?.Q<Label>()?.text;
+                if(tab == korean && head == korean) break;
+                yield return null;
+            }
+        } finally {
+            MainCore.Tr.Language = lang;
+            RestoreFeature(id, was, had, stored);
+        }
+        check("a switched-off feature's tab and stub header read its Korean name within 3 frames of a language change and reload",
+            isStub && loaded && korean != english && name == key && tab == korean && head == korean,
+            $"stub={stub} isStub={isStub} loaded={loaded} name={name} tab={tab} head={head} want={korean} frames={frames}");
+        yield return Frames(3);
     }
 
     // Quartz's on-screen overlays and the reorganizer's dim under them; not its menus, toast or dialogs, which stay on top.

@@ -24,7 +24,13 @@ namespace UnityEngine.UIElements {
         private global::UnityEngine.Sprite m_Sprite;
         private global::UnityEngine.Texture2D m_Texture;
         private global::UnityEngine.UIElements.VectorImage m_VectorImage;
+        public static global::UnityEngine.UIElements.Background FromSprite(global::UnityEngine.Sprite s) => throw null;
         bool global::System.IEquatable<global::UnityEngine.UIElements.Background>.Equals(global::UnityEngine.UIElements.Background other) => throw null;
+    }
+    public abstract unsafe partial class BaseField<TValueType> : global::UnityEngine.UIElements.BindableElement {
+        public virtual TValueType value { get => throw null; set { } }
+        public virtual void SetValueWithoutNotify(TValueType newValue) => throw null;
+        protected BaseField() { }
     }
     public unsafe partial class BindableElement : global::UnityEngine.UIElements.VisualElement {
         protected BindableElement() { }
@@ -44,13 +50,21 @@ namespace UnityEngine.UIElements {
     }
     public unsafe partial interface IBindable {
     }
+    public unsafe partial interface IDelayedField {
+    }
+    public unsafe partial interface IEditableElement {
+    }
     public unsafe partial interface IEventHandler {
     }
     public unsafe partial interface IExperimentalFeatures {
     }
+    public unsafe partial interface IMixedValueSupport {
+    }
     public unsafe partial interface INotifyValueChanged<T> {
     }
     public unsafe partial interface IPanel : global::System.IDisposable {
+    }
+    public unsafe partial interface IPrefixLabel {
     }
     public unsafe partial interface IResolvedStyle {
     }
@@ -58,8 +72,15 @@ namespace UnityEngine.UIElements {
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.Align> alignSelf { get; set; }
         global::UnityEngine.UIElements.StyleBackground backgroundImage { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.DisplayStyle> display { get; set; }
+        global::UnityEngine.UIElements.StyleFloat flexGrow { get; set; }
+        global::UnityEngine.UIElements.StyleFloat flexShrink { get; set; }
+        global::UnityEngine.UIElements.StyleLength fontSize { get; set; }
         global::UnityEngine.UIElements.StyleLength height { get; set; }
+        global::UnityEngine.UIElements.StyleLength marginBottom { get; set; }
+        global::UnityEngine.UIElements.StyleLength marginLeft { get; set; }
         global::UnityEngine.UIElements.StyleLength marginRight { get; set; }
+        global::UnityEngine.UIElements.StyleLength minHeight { get; set; }
+        global::UnityEngine.UIElements.StyleLength minWidth { get; set; }
         global::UnityEngine.UIElements.StyleFloat opacity { get; set; }
         global::UnityEngine.UIElements.StyleLength width { get; set; }
     }
@@ -78,6 +99,9 @@ namespace UnityEngine.UIElements {
     public unsafe partial interface ITransform {
     }
     public unsafe partial interface IVisualElementScheduler {
+    }
+    public unsafe partial class Label : global::UnityEngine.UIElements.TextElement {
+        protected Label() { }
     }
     public unsafe partial struct Length : global::System.IEquatable<global::UnityEngine.UIElements.Length> {
         private global::UnityEngine.UIElements.Length.Unit m_Unit;
@@ -124,6 +148,12 @@ namespace UnityEngine.UIElements {
     }
     public unsafe partial class TextElement : global::UnityEngine.UIElements.BindableElement {
         protected TextElement() { }
+    }
+    public unsafe partial class TextField : global::UnityEngine.UIElements.TextInputBaseField<string> {
+        public TextField() => throw null;
+    }
+    public abstract unsafe partial class TextInputBaseField<TValueType> : global::UnityEngine.UIElements.BaseField<TValueType> {
+        protected TextInputBaseField() { }
     }
     public sealed unsafe partial class UIDocument : global::UnityEngine.MonoBehaviour {
         public global::UnityEngine.UIElements.VisualElement rootVisualElement { get => throw null; }

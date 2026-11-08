@@ -32,6 +32,10 @@
     "COMBO_SOLIDCOLOR": "Solid Color",
     "COMBO_XPERFECT": "XPerfect Combo (X Only)",
     "SECTION_COMBO": "Combo",
-    "COMBO_RESETPOS": "Reset Position"
+    "COMBO_RESETPOS": "Reset Position",
+    "DESC_COMBO_AUTO": "Count auto-hit judgements (e.g. holds/repeats) toward the combo, not just manual key presses.",
+    "DESC_COMBO_XPERFECT": "Count only dead-center X perfects toward the combo when the XPerfect mod is active. The caption becomes \"XCombo\".",
+    "DESC_COMBO_SOLIDCOLOR": "Use a single flat color instead of blending between Low and High Combo Color as the combo grows.",
+    "DESC_COMBO_PERFECTCOLOR_ENABLED": "Switch to Perfect Color once the combo reaches Color Max Combo, instead of staying on High Combo Color."
   }
 }

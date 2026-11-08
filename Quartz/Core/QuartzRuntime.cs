@@ -277,10 +277,12 @@ public sealed class QuartzRuntime {
     private void RegisterFeatures() {
         features.Register("InGameOverlayFont", InGameOverlayFont.Refresh, InGameOverlayFont.RestoreAll);
     }
-    public void SetModEnabled(bool enabled, bool isDispose) {
+    public void SetModEnabled(bool enabled, bool isDispose) => SetModEnabled(enabled, isDispose, !isDispose);
+    // save=false: the power switch's path for this session only, leaving the player's stored switch alone (self-tests).
+    internal void SetModEnabled(bool enabled, bool isDispose, bool save) {
         if(State.IsEnabled == enabled) return;
         State.IsEnabled = enabled;
-        if(!isDispose) {
+        if(save) {
             Config.Data.Active = enabled;
             Config.RequestSave();
         }

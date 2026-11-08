@@ -28,6 +28,7 @@ internal static class QuartzHost {
             if(!hooked) {
                 hooked = true;
                 MainCore.Tr.OnLanguageChanged += OnLanguageChanged;
+                MainCore.Tr.OnLoadEnd += OnLoadEnd;
             }
             return host;
         }
@@ -86,8 +87,14 @@ internal static class QuartzHost {
     private static void OnLanguageChanged(string _) {
         foreach(Surface s in surfaces) s.Relabel();
     }
+    // While the files reload every lookup reads the fallback, so a language change landing then drew English and kept it.
+    // Relabel once they are in, as the classic menu refreshes its labels after a reload.
+    private static void OnLoadEnd(TranslationFailState _) => OnLanguageChanged(null);
     internal static void Shutdown() {
-        if(hooked) MainCore.Tr.OnLanguageChanged -= OnLanguageChanged;
+        if(hooked) {
+            MainCore.Tr.OnLanguageChanged -= OnLanguageChanged;
+            MainCore.Tr.OnLoadEnd -= OnLoadEnd;
+        }
         hooked = false;
         QuartzShell.Shutdown();
         foreach(Surface s in surfaces) s.Dispose();

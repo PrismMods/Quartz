@@ -24,10 +24,6 @@ namespace Facet {
         public global::System.Func<string> NoteText { get => throw null; set { } }
         private CardOptions() { }
     }
-    public unsafe partial class ChoiceOptions : global::Facet.Options<int> {
-        public global::System.Collections.Generic.IList<string> Items { get => throw null; set { } }
-        protected ChoiceOptions() { }
-    }
     public unsafe partial class ColourOptions : global::Facet.Options<global::UnityEngine.Color> {
         protected ColourOptions() { }
     }
@@ -49,7 +45,6 @@ namespace Facet {
         public const float RowHeight = 0f;
         public static global::UnityEngine.UIElements.Button Action(global::UnityEngine.UIElements.VisualElement parent, string label, string button, global::System.Action onClick, global::System.Action<global::Facet.ControlOptions> configure = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Card(global::UnityEngine.UIElements.VisualElement parent, string title, global::System.Action<global::Facet.CardOptions> configure = default) => throw null;
-        public static global::Facet.Control<int> Choice(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<int> bind, global::System.Action<global::Facet.ChoiceOptions> configure = default) => throw null;
         public static global::Facet.Control<global::UnityEngine.Color> Colour(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<global::UnityEngine.Color> bind, global::System.Action<global::Facet.ColourOptions> configure = default) => throw null;
         public static global::UnityEngine.UIElements.Button Danger(global::UnityEngine.UIElements.VisualElement parent, string label, string button, global::System.Action onConfirm, global::System.Action<global::Facet.ControlOptions> configure = default) => throw null;
         public static global::Facet.Control<int> Dropdown(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<int> bind, global::System.Action<global::Facet.DropdownOptions> configure = default) => throw null;
@@ -58,11 +53,19 @@ namespace Facet {
         public static global::Facet.Control<bool> PageHeader(global::UnityEngine.UIElements.VisualElement parent, string title, global::Facet.Bind<bool> on, global::System.Action<global::Facet.PageHeaderOptions> configure = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Section(global::UnityEngine.UIElements.VisualElement parent, string title, bool defaultOpen = default) => throw null;
         public static global::Facet.Control<float> Slider(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<float> bind, global::System.Action<global::Facet.SliderOptions> configure = default) => throw null;
-        public static global::Facet.Control<string> Text(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<string> bind, global::System.Action<global::Facet.TextOptions> configure = default) => throw null;
         public static global::Facet.Control<bool> Tile(global::UnityEngine.UIElements.VisualElement grid, string label, global::Facet.Bind<bool> on, global::System.Action<global::Facet.TileOptions> configure = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Tiles(global::UnityEngine.UIElements.VisualElement parent, global::System.Action<global::Facet.TilesOptions> configure = default) => throw null;
         public static global::Facet.Control<bool> Toggle(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<bool> bind, global::System.Action<global::Facet.Options<bool>> configure = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement ToggleGroup(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<bool> bind, global::System.Action<global::Facet.Options<bool>> configure = default) => throw null;
+    }
+    public static unsafe partial class Cursors {
+        public static void Set(global::UnityEngine.UIElements.VisualElement e, global::Facet.Cursors.Kind kind) => throw null;
+        public enum Kind : int {
+            Default = 0,
+            ResizeHorizontal = 1,
+            ResizeCorner = 2,
+            Text = 3,
+        }
     }
     public unsafe partial class DropdownOptions : global::Facet.Options<int> {
         public global::System.Collections.Generic.IList<string> Items { get => throw null; set { } }
@@ -122,6 +125,7 @@ namespace Facet {
         private Nav() { }
     }
     public sealed unsafe partial class NavItem {
+        public global::UnityEngine.UIElements.Background Icon;
         public global::System.Action<global::Facet.SearchIndex.Hit> OnHit;
         public global::System.Func<int> Revision;
         public global::System.Func<bool> VisibleWhen;
@@ -137,6 +141,9 @@ namespace Facet {
         public string Description { get => throw null; set { } }
         public global::System.Func<string> DescriptionText { get => throw null; set { } }
         private PageHeaderOptions() { }
+    }
+    public static unsafe partial class Paint {
+        public static void Select(global::UnityEngine.UIElements.VisualElement e, bool on) => throw null;
     }
     public sealed unsafe partial class Popup {
         public static global::Facet.Popup Open(global::UnityEngine.UIElements.VisualElement anchor, global::System.Action<global::UnityEngine.UIElements.VisualElement> build, global::System.Action onClose = default) => throw null;
@@ -172,6 +179,16 @@ namespace Facet {
             public Entry() => throw null;
         }
     }
+    public sealed unsafe partial class Sizes {
+        public float Gap;
+        public float RowHeight;
+        public float Small;
+        private Sizes() { }
+    }
+    public static unsafe partial class Skin {
+        public static void Field(global::UnityEngine.UIElements.VisualElement field) => throw null;
+        public static void When<T>(global::UnityEngine.UIElements.VisualElement e, global::System.Action<T> apply) where T : global::UnityEngine.UIElements.VisualElement => throw null;
+    }
     public unsafe partial class SliderOptions : global::Facet.Options<float> {
         public string Format { get => throw null; set { } }
         public float Max { get => throw null; set { } }
@@ -195,12 +212,11 @@ namespace Facet {
         public static global::Facet.Tabs Pages(global::UnityEngine.UIElements.VisualElement parent, global::System.Collections.Generic.IList<global::Facet.NavItem> pages, int selected = default, global::System.Action<int> onSelect = default) => throw null;
         private Tabs() { }
     }
-    public unsafe partial class TextOptions : global::Facet.Options<string> {
-        protected TextOptions() { }
-    }
     public sealed unsafe partial class Theme {
         public global::UnityEngine.Color this[global::Facet.Role r] { get => throw null; set { } }
+        public global::Facet.Sizes Sizes { get => throw null; }
         public Theme() => throw null;
+        public static global::Facet.Theme For(global::UnityEngine.UIElements.VisualElement e) => throw null;
         public static global::Facet.Theme FromAccent(global::UnityEngine.Color accent, float tint = default) => throw null;
         public void Notify() => throw null;
         public void Recolour(global::UnityEngine.Color accent, float tint = default) => throw null;
@@ -216,6 +232,9 @@ namespace Facet {
     }
     public static unsafe partial class Ui {
         public static global::UnityEngine.UIElements.VisualElement Box(global::UnityEngine.UIElements.VisualElement parent = default) => throw null;
+        public static global::UnityEngine.UIElements.Button Btn(string text, global::System.Action onClick, global::UnityEngine.UIElements.VisualElement parent = default, bool own = default) => throw null;
+        public static global::UnityEngine.UIElements.VisualElement Row(global::UnityEngine.UIElements.VisualElement parent = default) => throw null;
+        public static global::UnityEngine.UIElements.Label Text(string text, global::UnityEngine.UIElements.VisualElement parent = default, global::System.Nullable<float> size = default, global::Facet.Role role = default, bool own = default) => throw null;
     }
     public static unsafe partial class WarmUp {
         public static void Run() => throw null;

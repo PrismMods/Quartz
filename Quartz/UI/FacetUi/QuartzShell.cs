@@ -146,10 +146,13 @@ internal static partial class QuartzShell {
         UICore.BackFromPreview();
     }
 
-    /// <summary>The classic menu's scale and opacity: its default scale, 0.85, is 1×.</summary>
+    /// <summary>The window's scale at the classic menu's default, 0.85: larger than that menu, whose text it would otherwise match.</summary>
+    internal const float BaseScale = 1.2f;
+
+    /// <summary>The classic menu's scale and opacity: its default scale, 0.85, is BaseScale here.</summary>
     internal static void ApplyLook() {
         if(Window == null) return;
-        Window.Scale = MainCore.Conf.UIScale / 0.85f;
+        Window.Scale = MainCore.Conf.UIScale / 0.85f * BaseScale;
         Window.Root.style.opacity = MainCore.Conf.PanelOpacity;
     }
 

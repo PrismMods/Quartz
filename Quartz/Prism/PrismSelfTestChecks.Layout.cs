@@ -70,7 +70,7 @@ internal static partial class PrismSelfTestChecks {
             seen.Add(m);
             log?.Invoke(m);
         };
-        Action[] keep = KeepSettings();
+        (Action Set, Action Finish)[] keep = KeepSettings();
         try {
             string[] required = [LayoutIds.KeyViewer, LayoutIds.Combo, LayoutIds.Judgement, LayoutIds.SongTitle, LayoutIds.Practice, LayoutIds.Calibration, LayoutIds.Panel(0)];
             yield return Session(3);
@@ -91,7 +91,8 @@ internal static partial class PrismSelfTestChecks {
         } finally {
             Ui.Log = log;
             if(UICore.IsReorganizing) UICore.ExitReorganize();
-            foreach(Action put in keep) put?.Invoke();
+            foreach((Action Set, Action Finish) k in keep) k.Set?.Invoke();
+            foreach((Action Set, Action Finish) k in keep) k.Finish?.Invoke();
         }
     }
     // One target, both ways: a shared-editor change lands where the reorganizer reads it, and the reverse.
@@ -357,8 +358,10 @@ internal static partial class PrismSelfTestChecks {
         return n;
     }
     // Every Conf field a layout target writes, kept raw and put back after the run, then saved (a file the run created is
-    // deleted), so neither the run's moves nor a float round trip through the geometry reach the settings files.
-    private static Action[] KeepSettings() => [
+    // deleted), so neither the run's moves nor a float round trip through the geometry reach the settings files. Every
+    // field goes back before any element re-applies: Combo sits under the progress bar's band, and laid out against the
+    // band's unrestored offset its RectTransform would read back (an arranging frame, Dispose) as a drifted offset.
+    private static (Action Set, Action Finish)[] KeepSettings() => [
         Keep(ComboOverlay.ConfMgr, c => (c.OffsetX, c.OffsetY, c.MasterSize, c.Rotation, c.Anchor, c.AnchorClosest),
             (c, v) => (c.OffsetX, c.OffsetY, c.MasterSize, c.Rotation, c.Anchor, c.AnchorClosest) = v, ComboOverlay.Apply),
         Keep(JudgementOverlay.ConfMgr, c => (c.OffsetX, c.OffsetY, c.Size, c.Rotation, c.Anchor, c.AnchorClosest),
@@ -393,20 +396,19 @@ internal static partial class PrismSelfTestChecks {
                 }
             }, PanelsOverlay.Apply),
     ];
-    private static Action Keep<TConf, TValue>(SettingsFile<TConf> file, Func<TConf, TValue> get, Action<TConf, TValue> set, Action apply)
+    private static (Action Set, Action Finish) Keep<TConf, TValue>(SettingsFile<TConf> file, Func<TConf, TValue> get, Action<TConf, TValue> set, Action apply)
         where TConf : class, ISettingsFile, new() {
-        if(file?.Data is not { } conf) return null;
+        if(file?.Data is not { } conf) return default;
         TValue kept = get(conf);
         bool existed = File.Exists(file.Path);
-        return () => {
-            set(conf, kept);
+        return (() => set(conf, kept), () => {
             apply?.Invoke();
             file.CancelPendingSave();
             if(existed) file.Save();
             else if(File.Exists(file.Path)) { // the run created it; a failed delete must not stop the other restores
                 try { File.Delete(file.Path); } catch(Exception e) { MainCore.Log.Wrn($"prism self-test: could not delete {file.Path}: {e.Message}"); }
             }
-        };
+        });
     }
     // Shows what a setting hides so it can be arranged; returns how to put the setting back.
     private static Action ForceShown(string id) {

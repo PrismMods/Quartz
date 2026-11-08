@@ -20,7 +20,7 @@ resources, and no types the mod never touches.
 | `Assembly-CSharp` | 129 | 1071 |
 | `Assembly-CSharp-firstpass` | 2 | 12 |
 | `DOTween` | 0 | 0 |
-| `Facet.0.2` | 34 | 173 |
+| `Facet.0.2` | 37 | 188 |
 | `MelonLoader` | 8 | 23 |
 | `Newtonsoft.Json` | 21 | 127 |
 | `PrismLib` | 17 | 114 |
@@ -38,11 +38,11 @@ resources, and no types the mod never touches.
 | `UnityEngine.TextCoreTextEngineModule` | 2 | 0 |
 | `UnityEngine.TextRenderingModule` | 3 | 20 |
 | `UnityEngine.UI` | 94 | 354 |
-| `UnityEngine.UIElementsModule` | 36 | 77 |
+| `UnityEngine.UIElementsModule` | 44 | 96 |
 | `UnityEngine.UIModule` | 6 | 34 |
 | `UnityModManager` | 4 | 12 |
 
-**542 types, 3883 members.**
+**553 types, 3917 members.**
 
 ## How it is used
 
@@ -80,13 +80,17 @@ exists, so drift is caught from both directions:
 
 ## Known gaps
 
-StubGen derives the set from Release builds, and two UI Toolkit APIs come out in a
+StubGen derives the set from Release builds, and three UI Toolkit APIs come out in a
 form that does not compile:
 
-- `RegisterCallback<GeometryChangedEvent>`: the event's stub gets a `protected`
-  parameterless constructor, which breaks the `new()` constraint.
+- Any event (`RegisterCallback<GeometryChangedEvent>`, Facet's `Events.On<ChangeEvent<T>>`):
+  the event's stub gets a `protected` parameterless constructor, which breaks the
+  `new()` constraint.
 - `schedule.Execute`: the scheduler interface's stub has the `Action<TimerState>`
   overload but no `TimerState` type.
+- `ITextEdition` (a field's `textEdition.placeholder`), even named only in a `typeof`:
+  `TextElement`'s stub then implements it explicitly, internal members included,
+  which the interface's stub does not declare.
 
-Release code avoids both. DEBUG-only code is not stubbed at all, so a stubs build
+Release code avoids all three. DEBUG-only code is not stubbed at all, so a stubs build
 leaves out the in-game Facet self-test (`Quartz/UI/FacetUi/FacetSelfTest*.cs`).

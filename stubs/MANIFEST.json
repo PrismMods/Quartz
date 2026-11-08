@@ -1920,13 +1920,6 @@
         ]
       },
       {
-        "type": "Facet.ChoiceOptions",
-        "members": [
-          "System.Collections.Generic.IList\u00601\u003CSystem.String\u003E Facet.ChoiceOptions::Items()",
-          "System.Void Facet.ChoiceOptions::set_Items(System.Collections.Generic.IList\u00601\u003CSystem.String\u003E)"
-        ]
-      },
-      {
         "type": "Facet.ColourOptions",
         "members": []
       },
@@ -1961,12 +1954,10 @@
           "Facet.Control\u00601\u003CSystem.Boolean\u003E Facet.Controls::PageHeader(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Boolean\u003E,System.Action\u00601\u003CFacet.PageHeaderOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.Boolean\u003E Facet.Controls::Tile(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Boolean\u003E,System.Action\u00601\u003CFacet.TileOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.Boolean\u003E Facet.Controls::Toggle(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Boolean\u003E,System.Action\u00601\u003CFacet.Options\u00601\u003CSystem.Boolean\u003E\u003E)",
-          "Facet.Control\u00601\u003CSystem.Int32\u003E Facet.Controls::Choice(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Int32\u003E,System.Action\u00601\u003CFacet.ChoiceOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.Int32\u003E Facet.Controls::Dropdown(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Int32\u003E,System.Action\u00601\u003CFacet.DropdownOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.Single\u003E Facet.Controls::Slider(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Single\u003E,System.Action\u00601\u003CFacet.SliderOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.String\u003E Facet.Controls::Info(UnityEngine.UIElements.VisualElement,System.String,System.Func\u00601\u003CSystem.String\u003E,System.Action\u00601\u003CFacet.ControlOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.String\u003E Facet.Controls::Key(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.String\u003E,System.Action\u00601\u003CFacet.KeyOptions\u003E)",
-          "Facet.Control\u00601\u003CSystem.String\u003E Facet.Controls::Text(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.String\u003E,System.Action\u00601\u003CFacet.TextOptions\u003E)",
           "Facet.Control\u00601\u003CUnityEngine.Color\u003E Facet.Controls::Colour(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CUnityEngine.Color\u003E,System.Action\u00601\u003CFacet.ColourOptions\u003E)",
           "System.Single Facet.Controls::RowHeight",
           "UnityEngine.UIElements.Button Facet.Controls::Action(UnityEngine.UIElements.VisualElement,System.String,System.String,System.Action,System.Action\u00601\u003CFacet.ControlOptions\u003E)",
@@ -1975,6 +1966,22 @@
           "UnityEngine.UIElements.VisualElement Facet.Controls::Section(UnityEngine.UIElements.VisualElement,System.String,System.Boolean)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Tiles(UnityEngine.UIElements.VisualElement,System.Action\u00601\u003CFacet.TilesOptions\u003E)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::ToggleGroup(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Boolean\u003E,System.Action\u00601\u003CFacet.Options\u00601\u003CSystem.Boolean\u003E\u003E)"
+        ]
+      },
+      {
+        "type": "Facet.Cursors",
+        "members": [
+          "System.Void Facet.Cursors::Set(UnityEngine.UIElements.VisualElement,Facet.Cursors/Kind)"
+        ]
+      },
+      {
+        "type": "Facet.Cursors/Kind",
+        "members": [
+          "Facet.Cursors/Kind Facet.Cursors/Kind::Default",
+          "Facet.Cursors/Kind Facet.Cursors/Kind::ResizeCorner",
+          "Facet.Cursors/Kind Facet.Cursors/Kind::ResizeHorizontal",
+          "Facet.Cursors/Kind Facet.Cursors/Kind::Text",
+          "System.Int32 Facet.Cursors/Kind::value__"
         ]
       },
       {
@@ -2069,7 +2076,8 @@
           "System.Action\u00601\u003CFacet.SearchIndex/Hit\u003E Facet.NavItem::OnHit",
           "System.Func\u00601\u003CSystem.Boolean\u003E Facet.NavItem::VisibleWhen",
           "System.Func\u00601\u003CSystem.Int32\u003E Facet.NavItem::Revision",
-          "System.Void Facet.NavItem::.ctor(System.String,System.Action\u00601\u003CUnityEngine.UIElements.VisualElement\u003E)"
+          "System.Void Facet.NavItem::.ctor(System.String,System.Action\u00601\u003CUnityEngine.UIElements.VisualElement\u003E)",
+          "UnityEngine.UIElements.Background Facet.NavItem::Icon"
         ]
       },
       {
@@ -2086,6 +2094,12 @@
           "System.String Facet.PageHeaderOptions::Description()",
           "System.Void Facet.PageHeaderOptions::set_Description(System.String)",
           "System.Void Facet.PageHeaderOptions::set_DescriptionText(System.Func\u00601\u003CSystem.String\u003E)"
+        ]
+      },
+      {
+        "type": "Facet.Paint",
+        "members": [
+          "System.Void Facet.Paint::Select(UnityEngine.UIElements.VisualElement,System.Boolean)"
         ]
       },
       {
@@ -2134,6 +2148,21 @@
         "members": []
       },
       {
+        "type": "Facet.Sizes",
+        "members": [
+          "System.Single Facet.Sizes::Gap",
+          "System.Single Facet.Sizes::RowHeight",
+          "System.Single Facet.Sizes::Small"
+        ]
+      },
+      {
+        "type": "Facet.Skin",
+        "members": [
+          "System.Void Facet.Skin::Field(UnityEngine.UIElements.VisualElement)",
+          "System.Void Facet.Skin::When(UnityEngine.UIElements.VisualElement,System.Action\u00601\u003CT\u003E)"
+        ]
+      },
+      {
         "type": "Facet.SliderOptions",
         "members": [
           "System.Single Facet.SliderOptions::Max()",
@@ -2172,12 +2201,11 @@
         ]
       },
       {
-        "type": "Facet.TextOptions",
-        "members": []
-      },
-      {
         "type": "Facet.Theme",
         "members": [
+          "Facet.Sizes Facet.Theme::Sizes()",
+          "Facet.Sizes Facet.Theme::get_Sizes()",
+          "Facet.Theme Facet.Theme::For(UnityEngine.UIElements.VisualElement)",
           "Facet.Theme Facet.Theme::FromAccent(UnityEngine.Color,System.Single)",
           "System.Void Facet.Theme::.ctor()",
           "System.Void Facet.Theme::Notify()",
@@ -2206,7 +2234,10 @@
       {
         "type": "Facet.Ui",
         "members": [
-          "UnityEngine.UIElements.VisualElement Facet.Ui::Box(UnityEngine.UIElements.VisualElement)"
+          "UnityEngine.UIElements.Button Facet.Ui::Btn(System.String,System.Action,UnityEngine.UIElements.VisualElement,System.Boolean)",
+          "UnityEngine.UIElements.Label Facet.Ui::Text(System.String,UnityEngine.UIElements.VisualElement,System.Nullable\u00601\u003CSystem.Single\u003E,Facet.Role,System.Boolean)",
+          "UnityEngine.UIElements.VisualElement Facet.Ui::Box(UnityEngine.UIElements.VisualElement)",
+          "UnityEngine.UIElements.VisualElement Facet.Ui::Row(UnityEngine.UIElements.VisualElement)"
         ]
       },
       {
@@ -6278,7 +6309,16 @@
           "UnityEngine.RenderTexture UnityEngine.UIElements.Background::m_RenderTexture",
           "UnityEngine.Sprite UnityEngine.UIElements.Background::m_Sprite",
           "UnityEngine.Texture2D UnityEngine.UIElements.Background::m_Texture",
+          "UnityEngine.UIElements.Background UnityEngine.UIElements.Background::FromSprite(UnityEngine.Sprite)",
           "UnityEngine.UIElements.VectorImage UnityEngine.UIElements.Background::m_VectorImage"
+        ]
+      },
+      {
+        "type": "UnityEngine.UIElements.BaseField\u00601",
+        "members": [
+          "System.Void UnityEngine.UIElements.BaseField\u00601::SetValueWithoutNotify(TValueType)",
+          "TValueType UnityEngine.UIElements.BaseField\u00601::get_value()",
+          "TValueType UnityEngine.UIElements.BaseField\u00601::value()"
         ]
       },
       {
@@ -6314,6 +6354,14 @@
         "members": []
       },
       {
+        "type": "UnityEngine.UIElements.IDelayedField",
+        "members": []
+      },
+      {
+        "type": "UnityEngine.UIElements.IEditableElement",
+        "members": []
+      },
+      {
         "type": "UnityEngine.UIElements.IEventHandler",
         "members": []
       },
@@ -6322,11 +6370,19 @@
         "members": []
       },
       {
+        "type": "UnityEngine.UIElements.IMixedValueSupport",
+        "members": []
+      },
+      {
         "type": "UnityEngine.UIElements.INotifyValueChanged\u00601",
         "members": []
       },
       {
         "type": "UnityEngine.UIElements.IPanel",
+        "members": []
+      },
+      {
+        "type": "UnityEngine.UIElements.IPrefixLabel",
         "members": []
       },
       {
@@ -6339,17 +6395,31 @@
           "System.Void UnityEngine.UIElements.IStyle::set_alignSelf(UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Align\u003E)",
           "System.Void UnityEngine.UIElements.IStyle::set_backgroundImage(UnityEngine.UIElements.StyleBackground)",
           "System.Void UnityEngine.UIElements.IStyle::set_display(UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.DisplayStyle\u003E)",
+          "System.Void UnityEngine.UIElements.IStyle::set_flexGrow(UnityEngine.UIElements.StyleFloat)",
+          "System.Void UnityEngine.UIElements.IStyle::set_flexShrink(UnityEngine.UIElements.StyleFloat)",
+          "System.Void UnityEngine.UIElements.IStyle::set_fontSize(UnityEngine.UIElements.StyleLength)",
           "System.Void UnityEngine.UIElements.IStyle::set_height(UnityEngine.UIElements.StyleLength)",
+          "System.Void UnityEngine.UIElements.IStyle::set_marginBottom(UnityEngine.UIElements.StyleLength)",
+          "System.Void UnityEngine.UIElements.IStyle::set_marginLeft(UnityEngine.UIElements.StyleLength)",
           "System.Void UnityEngine.UIElements.IStyle::set_marginRight(UnityEngine.UIElements.StyleLength)",
+          "System.Void UnityEngine.UIElements.IStyle::set_minHeight(UnityEngine.UIElements.StyleLength)",
+          "System.Void UnityEngine.UIElements.IStyle::set_minWidth(UnityEngine.UIElements.StyleLength)",
           "System.Void UnityEngine.UIElements.IStyle::set_opacity(UnityEngine.UIElements.StyleFloat)",
           "System.Void UnityEngine.UIElements.IStyle::set_width(UnityEngine.UIElements.StyleLength)",
           "UnityEngine.UIElements.StyleBackground UnityEngine.UIElements.IStyle::backgroundImage()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Align\u003E UnityEngine.UIElements.IStyle::alignSelf()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.DisplayStyle\u003E UnityEngine.UIElements.IStyle::display()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.DisplayStyle\u003E UnityEngine.UIElements.IStyle::get_display()",
+          "UnityEngine.UIElements.StyleFloat UnityEngine.UIElements.IStyle::flexGrow()",
+          "UnityEngine.UIElements.StyleFloat UnityEngine.UIElements.IStyle::flexShrink()",
           "UnityEngine.UIElements.StyleFloat UnityEngine.UIElements.IStyle::opacity()",
+          "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::fontSize()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::height()",
+          "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::marginBottom()",
+          "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::marginLeft()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::marginRight()",
+          "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::minHeight()",
+          "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::minWidth()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::width()"
         ]
       },
@@ -6383,6 +6453,10 @@
       },
       {
         "type": "UnityEngine.UIElements.IVisualElementScheduler",
+        "members": []
+      },
+      {
+        "type": "UnityEngine.UIElements.Label",
         "members": []
       },
       {
@@ -6449,6 +6523,16 @@
       },
       {
         "type": "UnityEngine.UIElements.TextElement",
+        "members": []
+      },
+      {
+        "type": "UnityEngine.UIElements.TextField",
+        "members": [
+          "System.Void UnityEngine.UIElements.TextField::.ctor()"
+        ]
+      },
+      {
+        "type": "UnityEngine.UIElements.TextInputBaseField\u00601",
         "members": []
       },
       {
