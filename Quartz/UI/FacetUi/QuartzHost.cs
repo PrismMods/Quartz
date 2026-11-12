@@ -3,6 +3,7 @@ using Facet;
 using Quartz.Core;
 using Quartz.Localization;
 using Quartz.Prism;
+using Quartz.UI.Utility;
 using UnityEngine;
 namespace Quartz.UI.FacetUi;
 /// <summary>
@@ -24,6 +25,7 @@ internal static class QuartzHost {
                 o.Read = key => MainCore.Conf.FacetWindows.TryGetValue(key, out string v) ? v : null;
                 o.Write = Write;
                 o.Theme = MakeTheme(MainCore.Conf.GetAccentColor());
+                o.Cursor = OsCursor;
             });
             if(!hooked) {
                 hooked = true;
@@ -65,6 +67,17 @@ internal static class QuartzHost {
         var surface = new Surface(Host, name, layer);
         surfaces.Add(surface);
         return surface;
+    }
+    // The OS's own cursors, as the classic menu's resize edges show; where the OS has none, Facet draws its own.
+    private static bool OsCursor(Cursors.Kind kind) {
+        if(!NativeCursor.Native) return false;
+        switch(kind) {
+            case Cursors.Kind.ResizeHorizontal: NativeCursor.Apply(ResizeCursorShape.Horizontal); break;
+            case Cursors.Kind.ResizeCorner: NativeCursor.Apply(ResizeCursorShape.DiagNWSE); break;
+            case Cursors.Kind.Text: NativeCursor.IBeam(); break;
+            default: NativeCursor.Reset(); break;
+        }
+        return true;
     }
     // Facet's Korean font fallback fires only on exactly "ko"; Quartz says "ko-KR", "en-US" or "DEFAULT".
     internal static string LanguageCode(string language) {

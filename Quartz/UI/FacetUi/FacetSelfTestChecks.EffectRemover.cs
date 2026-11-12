@@ -21,7 +21,7 @@ internal static partial class FacetSelfTestChecks {
     private const float Within = 0.15f;
     private static EffectRemoverSettings C => EffectRemover.Conf;
     // The new menu's scrollers in tree order are the rail's, then the content's; Body is the open page.
-    private static ScrollView ContentScroll => QuartzShell.Window.Body.Query<ScrollView>().ToList()[1];
+    private static ScrollView ContentScroll => QuartzShell.Window.Body.Query<ScrollView>().Where(s => s != RailScroll).First();
     private static VisualElement Body => ContentScroll.contentContainer;
     // One top-level toggle per mode (always on screen, never folded away): the field behind it.
     private static (string key, string field, Func<EffectRemoverSettings, bool> get, Action<EffectRemoverSettings, bool> set) Probe() =>

@@ -31,6 +31,7 @@ internal static partial class FacetSelfTestChecks {
             yield return Parity(check, GeneralPage, GeneralRows);
             string misfits = EdgeMisfits(PageContent());
             check($"{GeneralPage}: every part of the page draws on the cards' left and right edges (±1)", misfits == "", misfits);
+            HeaderSwitchEdge(check, GeneralPage, "MODULE_OVERLAY_CORE", "OVERLAY_ENABLED");
             // As the rows write them: the master switch's setter saves.
             Bind<bool> popExit = Bind.To(() => OverlaySwitch.Conf.PopExit, v => {
                 OverlaySwitch.Conf.PopExit = v;

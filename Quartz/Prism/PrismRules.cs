@@ -62,7 +62,7 @@ internal static class PrismRules {
         ["Menu hotkey modifier"] = "PRISM_MENU_MODIFIER",
         ["None"] = "PRISM_MODIFIER_NONE",
         ["Experimental: new menu"] = "PRISM_NEW_MENU",
-        ["The menu hotkey opens the new menu. It is still being built; the classic menu stays available"] = "PRISM_NEW_MENU_TIP",
+        ["The Settings button the menu hotkey shows opens the new menu. It is still being built; the classic menu stays available"] = "PRISM_NEW_MENU_TIP",
     };
     /// <summary>The English names of Quartz's debug log and fields in PrismLib's registry.</summary>
     public const string DebugLog = "log", DebugState = "State";

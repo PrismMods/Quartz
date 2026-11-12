@@ -321,7 +321,7 @@ internal static partial class PrismBridge {
         if(FacetBridge.Available()) // no switch for a menu that cannot open
             rows.Add(new PrismLib.SettingEntry {
                 Id = "quartz.experimental.newMenu", Kind = PrismLib.SettingKind.Bool, Page = "Quartz", Group = "Experimental", Order = 2,
-                Label = "Experimental: new menu", Tooltip = "The menu hotkey opens the new menu. It is still being built; the classic menu stays available",
+                Label = "Experimental: new menu", Tooltip = "The Settings button the menu hotkey shows opens the new menu. It is still being built; the classic menu stays available",
                 Keywords = ["facet", "preview", "beta"],
                 Get = () => MainCore.Conf.ExperimentalNewMenu,
                 Set = v => UICore.SetNewMenuSwitch(Convert.ToBoolean(v)),

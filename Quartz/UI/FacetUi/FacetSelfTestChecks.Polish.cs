@@ -1,9 +1,11 @@
 #if DEBUG && !IL2CPP
 using System.Collections;
+using System.Reflection;
 using Facet;
 using Quartz.Core;
 using Quartz.Features;
 using Quartz.UI.Nav;
+using Quartz.UI.Utility;
 using UnityEngine;
 using UnityEngine.UIElements;
 using HandOff = Quartz.UI.MenuHandOff;
@@ -31,6 +33,7 @@ internal static partial class FacetSelfTestChecks {
             VisualElement last = PageContent().Children().LastOrDefault(e => Ink(e) != null);
             info($"Home at the default scale: its last part ends at {last?.worldBound.yMax:0} on a viewport ending at {ContentScroll.contentViewport.worldBound.yMax:0}");
             RailIcons(check);
+            yield return OsCursor(check);
             if(!fxWas) FeatureService.SetEnabled(Fx, true);   // its page, not the feature-off stub
             foreach(string key in EdgePages) {
                 QuartzShell.Go(key);
@@ -72,6 +75,24 @@ internal static partial class FacetSelfTestChecks {
         check("every rail entry whose category has an icon draws it", drawn > 0 && bad.Count == 0, $"drawn={drawn} missing={string.Join(",", bad)}");
     }
 
+    // Over the search field the new menu shows the OS's own text cursor, as the classic menu showed the OS's resize cursors,
+    // and the OS arrow once the pointer leaves; Facet's drawn cursor stays unset throughout. On macOS the app's current
+    // NSCursor is read back; elsewhere only the drawn cursor is.
+    private static IEnumerator OsCursor(Action<string, bool, string> check) {
+        FieldInfo drawn = typeof(Cursors).GetField("_drawn", BindingFlags.NonPublic | BindingFlags.Static);
+        bool mac = Application.platform == RuntimePlatform.OSXPlayer;
+        TextField search = QuartzShell.Window.Search;
+        Hover(search);
+        yield return Frames(2);
+        bool overDrawn = (bool)drawn.GetValue(null), overBeam = !mac || NativeCursor.MacShowing("IBeamCursor");
+        Leave(search);
+        yield return Frames(2);
+        bool leftDrawn = (bool)drawn.GetValue(null), leftArrow = !mac || NativeCursor.MacShowing("arrowCursor");
+        check("over the search field the OS's text cursor shows, not a drawn one, and the OS arrow after it leaves",
+            NativeCursor.Native && !overDrawn && overBeam && !leftDrawn && leftArrow,
+            $"mac={mac} over: drawn={overDrawn} ibeam={overBeam}; left: drawn={leftDrawn} arrow={leftArrow}");
+    }
+
     // The Settings page's first card holds the hotkey, its modifier and two switches: every control ends on one right edge.
     private static void ControlEdges(Action<string, bool, string> check) {
         List<VisualElement> inputs = SettingsCard(SettingsCardKeys[0])?.Query<VisualElement>().ToList()
@@ -99,8 +120,9 @@ internal static partial class FacetSelfTestChecks {
     }
 
     // Where a page's parts leave its edges, "" when none. One column: every part the page holds draws from the first card's left
-    // edge to its right edge. Two (left and right from Controls.Columns): the page's parts share the header's edges, the left
-    // column's cards share their own, and the right column ends on the header's right edge.
+    // edge to its right edge. Two (left and right from Controls.Columns): the page's parts share the first part's edges, the
+    // left column's cards share their own, and the right column ends on the first part's right edge. The page header's ink
+    // ends on the cards' control edge instead, a card border and Pad in, so its switch stands over the rows' switches.
     private static string EdgeMisfits(VisualElement page, VisualElement left = null, VisualElement right = null) {
         var bad = new List<string>();
         (float min, float max)? Off(VisualElement holder, bool byCard, string where) {
@@ -109,8 +131,9 @@ internal static partial class FacetSelfTestChecks {
             var want = parts[byCard ? Math.Max(0, parts.FindIndex(p => Paints(p.e))) : 0].ink;   // the first card, else the first part
             for(int i = 0; i < parts.Count; i++) {
                 var got = parts[i].ink;
-                if(Mathf.Abs(got.Item1 - want.Item1) > 1f || Mathf.Abs(got.Item2 - want.Item2) > 1f)
-                    bad.Add($"{where}{i} {parts[i].e.name} {got.Item1:0.0}..{got.Item2:0.0} vs {want.Item1:0.0}..{want.Item2:0.0}");
+                float max = want.Item2 - (i > 0 || byCard ? HeaderInset(parts[i].e) : 0f);
+                if(Mathf.Abs(got.Item1 - want.Item1) > 1f || Mathf.Abs(got.Item2 - max) > 1f)
+                    bad.Add($"{where}{i} {parts[i].e.name} {got.Item1:0.0}..{got.Item2:0.0} vs {want.Item1:0.0}..{max:0.0}");
             }
             return want;
         }
@@ -119,6 +142,14 @@ internal static partial class FacetSelfTestChecks {
         if(left != null) Off(left, true, "left ");
         if(right != null && Ink(right) is { } r && Mathf.Abs(r.max - edges.Value.max) > 1f) bad.Add($"right column ends {r.max:0.0} vs {edges.Value.max:0.0}");
         return string.Join("; ", bad);
+    }
+
+    // A page header (its first label is the bold title) ends Line + Pad in from the card edge, in world px; anything else 0.
+    private static float HeaderInset(VisualElement e) {
+        Sizes sz = QuartzHost.Host.Theme.Sizes;
+        Label title = e.Q<Label>();
+        bool header = title != null && title.resolvedStyle.unityFontStyleAndWeight == FontStyle.Bold && Mathf.Abs(title.resolvedStyle.fontSize - sz.Title) < 0.01f;
+        return header && e.layout.width > 0f ? (sz.Line + sz.Pad) * e.worldBound.width / e.layout.width : 0f;
     }
 
     // Text typed in the Features toolbar's field filters the tiles: the page reads the field on its next refresh, even after the

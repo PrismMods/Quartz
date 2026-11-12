@@ -85,6 +85,8 @@ namespace UnityEngine.UIElements {
         global::UnityEngine.UIElements.StyleLength minHeight { get; set; }
         global::UnityEngine.UIElements.StyleLength minWidth { get; set; }
         global::UnityEngine.UIElements.StyleFloat opacity { get; set; }
+        global::UnityEngine.UIElements.StyleLength paddingLeft { get; set; }
+        global::UnityEngine.UIElements.StyleLength paddingRight { get; set; }
         global::UnityEngine.UIElements.StyleLength width { get; set; }
     }
     public unsafe partial interface IStylePropertyAnimations {

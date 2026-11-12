@@ -2047,6 +2047,7 @@
           "System.Action\u00601\u003CSystem.String\u003E Facet.HostOptions::Log",
           "System.Action\u00602\u003CSystem.String,System.String\u003E Facet.HostOptions::Write",
           "System.Func\u00601\u003CSystem.String\u003E Facet.HostOptions::Language",
+          "System.Func\u00602\u003CFacet.Cursors/Kind,System.Boolean\u003E Facet.HostOptions::Cursor",
           "System.Func\u00602\u003CSystem.String,System.String\u003E Facet.HostOptions::Read",
           "System.Func\u00602\u003CSystem.String,System.String\u003E Facet.HostOptions::Translate"
         ]
@@ -2097,7 +2098,10 @@
       {
         "type": "Facet.Nav",
         "members": [
+          "System.Action\u00601\u003CSystem.Boolean\u003E Facet.Nav::OnCompactChanged",
           "System.Action\u00601\u003CSystem.Single\u003E Facet.Nav::OnInsetChanged",
+          "System.Boolean Facet.Nav::Compact()",
+          "System.Boolean Facet.Nav::CompactButton()",
           "System.Single Facet.Nav::CollapseAt",
           "System.Single Facet.Nav::MaxRail",
           "System.Single Facet.Nav::MinRail",
@@ -2105,7 +2109,9 @@
           "System.Void Facet.Nav::AddSearchSource(System.Func\u00601\u003CSystem.Collections.Generic.IEnumerable\u00601\u003CFacet.SearchIndex/Entry\u003E\u003E)",
           "System.Void Facet.Nav::Filter(System.String)",
           "System.Void Facet.Nav::Go(Facet.NavItem)",
-          "System.Void Facet.Nav::Tick()"
+          "System.Void Facet.Nav::Tick()",
+          "System.Void Facet.Nav::set_Compact(System.Boolean)",
+          "System.Void Facet.Nav::set_CompactButton(System.Boolean)"
         ]
       },
       {
@@ -2210,6 +2216,7 @@
         "type": "Facet.Sizes",
         "members": [
           "System.Single Facet.Sizes::Gap",
+          "System.Single Facet.Sizes::Pad",
           "System.Single Facet.Sizes::RowHeight",
           "System.Single Facet.Sizes::Small"
         ]
@@ -6562,6 +6569,8 @@
           "System.Void UnityEngine.UIElements.IStyle::set_minHeight(UnityEngine.UIElements.StyleLength)",
           "System.Void UnityEngine.UIElements.IStyle::set_minWidth(UnityEngine.UIElements.StyleLength)",
           "System.Void UnityEngine.UIElements.IStyle::set_opacity(UnityEngine.UIElements.StyleFloat)",
+          "System.Void UnityEngine.UIElements.IStyle::set_paddingLeft(UnityEngine.UIElements.StyleLength)",
+          "System.Void UnityEngine.UIElements.IStyle::set_paddingRight(UnityEngine.UIElements.StyleLength)",
           "System.Void UnityEngine.UIElements.IStyle::set_width(UnityEngine.UIElements.StyleLength)",
           "UnityEngine.UIElements.StyleBackground UnityEngine.UIElements.IStyle::backgroundImage()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Align\u003E UnityEngine.UIElements.IStyle::alignSelf()",
@@ -6578,6 +6587,8 @@
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::marginTop()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::minHeight()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::minWidth()",
+          "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::paddingLeft()",
+          "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::paddingRight()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::width()"
         ]
       },

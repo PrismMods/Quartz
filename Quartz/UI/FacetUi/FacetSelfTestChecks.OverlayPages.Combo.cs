@@ -50,6 +50,7 @@ internal static partial class FacetSelfTestChecks {
     private static IEnumerator ComboChecks(Action<string, bool, string> check, Action<string> info, float size) {
         yield return Parity(check, ComboPage, ComboRows());
         yield return ColumnEdges(check, ComboPage, ComboOverlay.FontKey);
+        HeaderSwitchEdge(check, ComboPage, "SECTION_COMBO", "COMBO_CAPTION");
         yield return ClassicSees(check, ComboPage, "COMBO_CAPTION", Bind.To(() => ComboConf.ShowCaption, v => {
             ComboConf.ShowCaption = v;
             ComboOverlay.Apply();

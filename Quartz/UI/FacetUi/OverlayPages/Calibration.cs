@@ -79,11 +79,13 @@ internal static class Calibration {
     }
 
     // A caption, then each timing newest first, whose Apply sets the game's input offset to it; or a note that there are none.
-    // A timing's label is its value, so its Id carries a running number instead.
+    // A timing's label is its value, so its Id carries a running number instead. The caption and the note sit straight in the
+    // card, which pads only its rows: they take the rows' inset themselves, so their text starts where the row labels do.
     private static void History(VisualElement card, string captionKey, IReadOnlyList<float> timings, ref int n) {
-        Controls.Header(card, captionKey);
+        Sizes sz = Theme.For(card).Sizes;
+        Inset(Controls.Header(card, captionKey), sz);
         if(timings.Count == 0) {
-            Ui.Muted("CALIBRATION_TIMING_NONE", card);
+            Inset(Ui.Muted("CALIBRATION_TIMING_NONE", card), sz).style.marginBottom = sz.Gap;
             return;
         }
         for(int i = timings.Count - 1; i >= 0; i--) {
@@ -91,6 +93,12 @@ internal static class Calibration {
             string id = "CALIBRATION_TIMING_APPLY-" + n++;
             Controls.Action(card, Cal.FormatMs(value) + "ms", "CALIBRATION_TIMING_APPLY", () => Cal.SetOffsetMs(value), o => o.Id = id);
         }
+    }
+
+    private static VisualElement Inset(VisualElement e, Sizes sz) {
+        e.style.paddingLeft = sz.Pad;
+        e.style.paddingRight = sz.Pad;
+        return e;
     }
 }
 #endif

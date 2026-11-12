@@ -17,6 +17,8 @@ public static class NativeCursor {
     private static readonly bool isMac =
         Application.platform == RuntimePlatform.OSXPlayer
         || Application.platform == RuntimePlatform.OSXEditor;
+    /// <summary>The OS draws these cursors itself (Windows, macOS); elsewhere Apply draws a texture and IBeam does nothing.</summary>
+    public static bool Native => isWindows || isMac;
     public static void Apply(ResizeCursorShape shape) {
         try {
             if(isWindows) ApplyWindows(shape);
@@ -40,7 +42,23 @@ public static class NativeCursor {
         } catch(Exception e) { Diag.Ignore(e); }
         Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
     }
+    /// <summary>The OS's text cursor, for a field the pointer is over.</summary>
+    public static void IBeam() {
+        try {
+            if(isWindows) SetCursor(LoadWinCursor(IDC_IBEAM));
+            else if(isMac) MacSet(NSCursorByName("IBeamCursor"));
+        } catch(Exception e) { Diag.Ignore(e); }
+    }
+#if DEBUG
+    /// <summary>macOS: the app's current cursor is the NSCursor that selName returns. False elsewhere. For the self-test.</summary>
+    internal static bool MacShowing(string selName) {
+        if(!isMac) return false;
+        IntPtr want = NSCursorByName(selName);
+        return want != IntPtr.Zero && objc_msgSend(nsCursorClass, sel_registerName("currentCursor")) == want;
+    }
+#endif
     private const int IDC_ARROW = 32512;
+    private const int IDC_IBEAM = 32513;
     private const int IDC_SIZENWSE = 32642;
     private const int IDC_SIZENESW = 32643;
     private const int IDC_SIZEWE = 32644;

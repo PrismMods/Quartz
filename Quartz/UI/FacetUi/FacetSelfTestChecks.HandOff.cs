@@ -6,11 +6,12 @@ using Quartz.Features;
 using Quartz.UI.Factory;
 using Quartz.UI.Nav;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 using HandOff = Quartz.UI.MenuHandOff;
 namespace Quartz.UI.FacetUi;
 /// <summary>
-/// The experimental switch: the menu the hotkey opens, the Settings row and Effect Remover's button, then the two menus
+/// The experimental switch: the hub the hotkey opens and where its Settings leads, the Settings row and Effect Remover's button, then the two menus
 /// opened from each other or rebuilt behind, and a moved page's feature switched from its header. Every step checks that
 /// at most one menu shows.
 /// </summary>
@@ -84,6 +85,10 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(2);
         Step(check, "switch off: the hotkey opens the classic menu in the hub, the new one shut",
             UICore.IsOpen && UICore.IsReorganizing && !FacetBridge.NewMenuVisible());
+        bool clicked = ClickHubSettings();
+        yield return Frames(2);
+        Step(check, "switch off: the hub's Settings opens the classic panel over the hub, the new menu shut",
+            clicked && UICore.IsOpen && UICore.IsReorganizing && UICore.PanelInteractive && !FacetBridge.NewMenuVisible(), $"clicked={clicked}");
         UICore.Toggle();
         yield return Frames(2);
         Step(check, "switch off: the hotkey again shuts both", !UICore.IsOpen && !FacetBridge.NewMenuVisible());
@@ -94,19 +99,55 @@ internal static partial class FacetSelfTestChecks {
 
     private static IEnumerator SwitchOn(Action<string, bool, string> check) {
         yield return LivePageButton(check, true);   // leaves the switch on for the steps after it
-        UICore.Toggle();
-        yield return Frames(2);
-        Step(check, "switch on: the hotkey opens the new menu, which counts as a menu showing",
-            FacetBridge.NewMenuVisible() && UICore.MenuShowing && !UICore.IsOpen);
-        UICore.Toggle();
-        yield return Frames(2);
-        Step(check, "switch on: the hotkey again hides it, nothing open", !FacetBridge.NewMenuVisible() && !UICore.IsOpen);
+        yield return HubFlow(check);
         Step(check, "switch on: Effect Remover's page has the new-menu button", FacetSelfTest.PreviewButtonOnPage());
+    }
+
+    // The hotkey opens the hub, as with the switch off. Its Settings opens the new menu on the page last left, out of
+    // reorganize mode, and that menu's close and Escape come back to the hub; the hotkey over it shuts everything.
+    private static IEnumerator HubFlow(Action<string, bool, string> check) {
+        UICore.Toggle();
+        yield return Frames(2);
+        Step(check, "switch on: the hotkey opens the hub, not the new menu",
+            UICore.IsOpen && UICore.IsReorganizing && !UICore.PanelInteractive && !FacetBridge.NewMenuVisible());
+        string last = QuartzShell.CurrentPage;
+        foreach(string way in new[] { "close", "escape" }) {
+            bool clicked = ClickHubSettings();
+            yield return Frames(2);
+            Step(check, $"switch on: the hub's Settings opens the new menu on the page last left, out of reorganize mode ({way})",
+                clicked && FacetBridge.NewMenuVisible() && UICore.MenuShowing && !UICore.IsOpen && !UICore.IsArranging && QuartzShell.CurrentPage == last,
+                $"clicked={clicked} last={last}");
+            Button close = QuartzShell.Window.TitleBarRight.Query<Button>().ToList().LastOrDefault();
+            if(way == "close") { if(close != null) Submit(close); }
+            else UICore.EscapeDown();
+            yield return Frames(3);
+            Step(check, $"switch on: the new menu's {way} goes back to the hub",
+                !FacetBridge.NewMenuVisible() && UICore.IsOpen && UICore.IsReorganizing && !UICore.PanelInteractive);
+        }
+        bool up = ClickHubSettings();
+        yield return Frames(2);
+        up &= FacetBridge.NewMenuVisible();
+        UICore.Toggle();
+        yield return Frames(3);
+        Step(check, "switch on: the hotkey over the new menu opened from the hub shuts everything",
+            up && !FacetBridge.NewMenuVisible() && !UICore.IsOpen && !UICore.IsReorganizing && HandOff.ReturnTo == HandOff.Menu.None, $"up={up}");
+    }
+
+    // The hub's Settings button, released over itself as a click is; false when the hub shows no such button.
+    private static bool ClickHubSettings() {
+        Transform hub = UICore.CanvasObj.transform.Find("ReorganizeHub");
+        string want = MainCore.Tr.Get("SETTINGS", "Settings");
+        TMPro.TextMeshProUGUI label = hub == null ? null : hub.GetComponentsInChildren<TMPro.TextMeshProUGUI>(true).FirstOrDefault(t => t.text == want);
+        EventSystem es = EventSystem.current;
+        if(hub == null || label == null || es == null || !hub.gameObject.activeInHierarchy) return false;
+        GameObject button = label.transform.parent.gameObject;
+        var up = new PointerEventData(es) { button = PointerEventData.InputButton.Left, pointerCurrentRaycast = new RaycastResult { gameObject = button } };
+        return ExecuteEvents.Execute(button, up, ExecuteEvents.pointerUpHandler);
     }
 
     // Any other opener (the update toast's "open settings") over the new menu, then that classic menu's close.
     private static IEnumerator OpenerOver(Action<string, bool, string> check) {
-        UICore.Toggle();
+        FacetBridge.OpenNewMenu();
         yield return Frames(2);
         bool up = FacetBridge.NewMenuVisible();
         UICore.Open();
@@ -153,7 +194,7 @@ internal static partial class FacetSelfTestChecks {
     // A rebuild behind either menu (show-on-startup re-runs the startup open inside it) leaves the same one showing.
     private static IEnumerator RebuildBehind(Action<string, bool, string> check) {
         MainCore.Conf.ShowOnStartup = true;   // SwitchHandOff puts it back
-        UICore.Toggle();
+        FacetBridge.OpenNewMenu();
         yield return Frames(2);
         bool up = FacetBridge.NewMenuVisible();
         UICore.Rebuild();

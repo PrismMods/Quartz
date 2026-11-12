@@ -50,6 +50,7 @@ internal static partial class FacetSelfTestChecks {
         }));
         yield return CalibrationMinimum(check);
         CalibrationHistory(check);
+        CalibrationInset(check);
         yield return CalibrationDismissed(check, info);
         // Through Decimal Offset's own switch: the sample suggestion is written again, read off the popup's message.
         bool dec = CalConf.FloatOffsetEnabled;
@@ -178,6 +179,19 @@ internal static partial class FacetSelfTestChecks {
     // The timing history as the classic page lists it: each timing of the current map, then of all maps, newest first, under
     // its caption with Apply; a note where a list is empty. Nothing is applied: Apply writes the game's input offset.
     // Against what the page read as it was built: a run may have ended since.
+    // The history's captions and its empty note start their text where the rows' labels do (±1), and the note ends a Pad in.
+    private static void CalibrationInset(Action<string, bool, string> check) {
+        string[] texts = [QuartzHost.Translate("CALIBRATION_TIMING_CURRENT_MAP"), QuartzHost.Translate("CALIBRATION_TIMING_ALL_MAPS"),
+            QuartzHost.Translate("CALIBRATION_TIMING_NONE")];
+        List<Label> parts = Body.Query<Label>().Where(l => texts.Contains(l.text) && Displayed(l)).ToList();
+        Label row = Body.Q(name: "CALIBRATION_SONG_PITCH")?.Q<Label>();
+        float want = row?.worldBound.xMin ?? float.NaN;
+        var off = parts.Select(l => l.LocalToWorld(l.contentRect).xMin).Where(x => !(Mathf.Abs(x - want) <= 1f)).ToList();
+        check($"{CalibrationPage}: the timing history's captions and its note start where the row labels do (±1)",
+            row != null && parts.Count >= 2 && off.Count == 0,
+            $"row={want:0.0} parts={string.Join(",", parts.Select(l => $"{l.text}@{l.LocalToWorld(l.contentRect).xMin:0.0}"))}");
+    }
+
     private static void CalibrationHistory(Action<string, bool, string> check) {
         (IReadOnlyList<float> map, IReadOnlyList<float> all) = OverlayPages.Calibration.Listed;
         List<string> want = [.. map.Reverse().Concat(all.Reverse()).Select(v => Cal.FormatMs(v) + "ms")];

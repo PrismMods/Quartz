@@ -3,6 +3,7 @@ using Quartz.Core;
 using Quartz.IO;
 using Quartz.Localization;
 using Quartz.Resource;
+using Quartz.UI.FacetUi;
 using Quartz.UI.Generator;
 using Quartz.UI.Objects;
 using Quartz.UI.Panes;
@@ -56,7 +57,7 @@ public static partial class UICore {
         wordmarkRect.pivot = new Vector2(0.5f, 1f);
         wordmarkRect.sizeDelta = new Vector2(0f, 40f);
         wordmarkRect.anchoredPosition = new Vector2(0f, -128f);
-        var settings = GenerateUI.Button(rect, ShowPanelOverHub, "Settings", "settings");
+        var settings = GenerateUI.Button(rect, HubSettings, "Settings", "settings");
         var br = settings.Rect;
         br.anchorMin = new Vector2(0.5f, 0f);
         br.anchorMax = new Vector2(0.5f, 0f);
@@ -92,6 +93,16 @@ public static partial class UICore {
         dimRect.offsetMin = Vector2.zero;
         dimRect.offsetMax = Vector2.zero;
         reorganizeDim.SetActive(false);
+    }
+    // The new menu when it is wanted, Home the first time and else the page left; its close comes back to the hub. One that
+    // fails to build turned Facet off, and the classic panel opens over the hub instead.
+    private static void HubSettings() {
+        if(NewMenuWanted) {
+            FacetBridge.OpenNewMenu(fromClassic: true);   // leaves reorganize mode first: previews refuse to lease while arranging
+            if(FacetBridge.NewMenuVisible()) return;
+            if(!IsReorganizing) OpenToHub();   // a build that failed after the hand-off took the hub down
+        }
+        ShowPanelOverHub();
     }
     private static void ShowPanelOverHub() {
         if(!IsReorganizing || Panel == null) return;

@@ -1,5 +1,6 @@
 #if DEBUG && !IL2CPP
 using System.Collections;
+using System.Reflection;
 using Facet;
 using Quartz.Compat;
 using Quartz.Core;
@@ -44,6 +45,7 @@ internal static partial class FacetSelfTestChecks {
             yield return SettingsSwitchRows(check);
             yield return SettingsFromToast(check);
             yield return SettingsSliders(check);
+            yield return SettingsSidebar(check);
             yield return SettingsHotkey(check);
             yield return SettingsHandOffs(check);
             SettingsRest(check);
@@ -297,6 +299,92 @@ internal static partial class FacetSelfTestChecks {
         VisualElement card = SettingsCard("CREDITS");
         var bad = credits.Where(k => card?.Q<TextElement>(k + "-input")?.text != QuartzHost.Translate(k + "_BODY")).ToList();
         check("the Credits card holds its four rows, each showing its text", card != null && bad.Count == 0, string.Join(",", bad));
+        // Its licence note, in the header, ends on the rows' right edge as their text does.
+        string license = QuartzHost.Translate("CREDITS_LICENSE");
+        Label note = card?.Query<Label>().Where(l => l.text == license).First();
+        VisualElement value = card?.Q<TextElement>("CREDITS_TEAM-input");
+        check("the Credits card's licence note ends on the rows' right edge (±1)",
+            note != null && value != null && Mathf.Abs(note.worldBound.xMax - value.worldBound.xMax) <= 1f,
+            $"note={note?.worldBound.xMax:0.0} row={value?.worldBound.xMax:0.0}");
+    }
+
+    // The open rail's width, which a drag of its handle may have changed.
+    private static float RailFull => (float)typeof(Facet.Nav).GetField("_railWidth", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(QuartzShell.Nav);
+    private static VisualElement RailButton => RailScroll?.Q(name: "rail-button");
+
+    // Waits up to a second for the rail to land on a width, and reads it.
+    private static IEnumerator RailSettles(float width, float[] got) {
+        for(float t0 = Time.realtimeSinceStartup; Time.realtimeSinceStartup - t0 < 1f && Mathf.Abs(RailScroll.resolvedStyle.width - width) > 0.5f;) yield return null;
+        got[0] = RailScroll.resolvedStyle.width;
+    }
+
+    // The Sidebar row, picked as a click would, applies at once. Toggleable shows the rail open with a button that folds it to
+    // its icons, kept through a rebuild and a reopen; Always visible has no button; Always hidden is the icon strip, which
+    // widens over the page while the pointer rests on it, without moving the page, and narrows when it leaves.
+    private static IEnumerator SettingsSidebar(Action<string, bool, string> check) {
+        string mode = QuartzHost.Host.Read(QuartzShell.SidebarStore), compact = QuartzHost.Host.Read(QuartzShell.CompactStore);
+        Sizes sz = QuartzHost.Host.Theme.Sizes;
+        float strip = 2f * 10f + sz.Icon, full = RailFull;
+        var got = new float[1];
+        try {
+            QuartzHost.Host.Write(QuartzShell.CompactStore, null);
+            yield return PickItem("MENU_SIDEBAR", QuartzHost.Translate("MENU_SIDEBAR_TOGGLE"));
+            yield return RailSettles(full, got);
+            bool button = RailButton != null && Displayed(RailButton);
+            check("Sidebar, Toggleable: the rail is open with its button", QuartzShell.SidebarMode == 0 && button && !QuartzShell.Nav.Compact && Mathf.Abs(got[0] - full) <= 0.5f,
+                $"mode={QuartzShell.SidebarMode} button={button} width={got[0]:0.0}/{full:0.0}");
+            if(RailButton != null) Click(RailButton);
+            yield return RailSettles(strip, got);
+            string kept = QuartzHost.Host.Read(QuartzShell.CompactStore);
+            check("its button folds the rail to the icon strip, and the fold is kept", QuartzShell.Nav.Compact && kept == "1" && Mathf.Abs(got[0] - strip) <= 0.5f,
+                $"kept={kept} width={got[0]:0.0}/{strip:0.0}");
+            // As an added or removed category rebuilds the rail, then a close and an open.
+            typeof(QuartzShell).GetMethod("BuildNav", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, null);
+            QuartzShell.Go(CorePages.SettingsPageKey);
+            yield return Frames(2);
+            bool rebuilt = QuartzShell.Nav.Compact && RailButton != null;
+            QuartzShell.Hide();
+            yield return Frames(2);
+            FacetBridge.OpenNewMenu(CorePages.SettingsPageKey);
+            yield return RailSettles(strip, got);
+            check("the fold survives a rebuild of the rail and a reopen", rebuilt && QuartzShell.Nav.Compact && RailButton != null && Mathf.Abs(got[0] - strip) <= 0.5f,
+                $"rebuilt={rebuilt} width={got[0]:0.0}");
+            if(RailButton != null) Click(RailButton);
+            yield return RailSettles(full, got);
+            check("the button opens it again, and the open rail is kept", !QuartzShell.Nav.Compact && QuartzHost.Host.Read(QuartzShell.CompactStore) == null
+                && Mathf.Abs(got[0] - full) <= 0.5f, $"width={got[0]:0.0}");
+            QuartzHost.Host.Write(QuartzShell.CompactStore, "1");   // a fold kept from Toggleable: the other modes ignore it
+            yield return PickItem("MENU_SIDEBAR", QuartzHost.Translate("MENU_SIDEBAR_SHOWN"));
+            yield return RailSettles(full, got);
+            check("Sidebar, Always visible: the rail is open, with no button", QuartzShell.SidebarMode == 1 && !QuartzShell.Nav.Compact && RailButton == null
+                && Mathf.Abs(got[0] - full) <= 0.5f, $"button={RailButton != null} width={got[0]:0.0}");
+            yield return PickItem("MENU_SIDEBAR", QuartzHost.Translate("MENU_SIDEBAR_HIDDEN"));
+            yield return RailSettles(strip, got);
+            check("Sidebar, Always hidden: the rail is the icon strip, with no button", QuartzShell.SidebarMode == 2 && QuartzShell.Nav.Compact && RailButton == null
+                && Mathf.Abs(got[0] - strip) <= 0.5f, $"button={RailButton != null} width={got[0]:0.0}");
+            VisualElement page = Body;
+            float x = page.worldBound.xMin;
+            Leave(RailScroll);
+            Hover(RailScroll);
+            yield return RailSettles(full, got);
+            bool still = Mathf.Abs(page.worldBound.xMin - x) <= 0.5f;
+            check("resting on the strip widens it over the page, which does not move", Mathf.Abs(got[0] - full) <= 0.5f && still,
+                $"width={got[0]:0.0}/{full:0.0} page={x:0.0}->{page.worldBound.xMin:0.0}");
+            Leave(RailScroll);
+            yield return RailSettles(strip, got);
+            check("leaving it narrows it again", Mathf.Abs(got[0] - strip) <= 0.5f, $"width={got[0]:0.0}");
+        } finally {
+            QuartzHost.Host.Write(QuartzShell.CompactStore, compact);
+            QuartzHost.Host.Write(QuartzShell.SidebarStore, mode);
+            QuartzShell.ApplySidebar();
+        }
+        yield return Frames(2);
+    }
+
+    private static void Leave(VisualElement e) {
+        using MouseLeaveEvent ev = Pooled<MouseLeaveEvent>();
+        ev.target = e;
+        e.SendEvent(ev);
     }
 
     // Picked from the row, as a click would: both languages follow and the card titles relabel.

@@ -110,6 +110,12 @@ internal static class ShellSettings {
             o.Format = "0'%'";
             o.Tooltip = "DESC_WINDOW_OPACITY";
         });
+        // The new menu's own: the classic menu keeps its own rail.
+        Controls.Dropdown(card, "MENU_SIDEBAR", Bind.To(() => QuartzShell.SidebarMode, v => QuartzShell.SidebarMode = v), o => {
+            o.Id = "MENU_SIDEBAR";
+            o.Items = ["MENU_SIDEBAR_TOGGLE", "MENU_SIDEBAR_SHOWN", "MENU_SIDEBAR_HIDDEN"];
+            o.Tooltip = "MENU_SIDEBAR_TIP";
+        });
         Switch(card, "COLOR_PICKER_HORIZONTAL", () => C.ColorPickerHorizontal, v => {
             C.ColorPickerHorizontal = v;
             Save();

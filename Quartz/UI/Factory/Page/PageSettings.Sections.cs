@@ -200,7 +200,7 @@ internal static partial class PageSettings {
             );
             newMenuToggle.Rect.AddToolTip(
                 "PRISM_NEW_MENU_TIP",
-                "The menu hotkey opens the new menu. It is still being built; the classic menu stays available"
+                "The Settings button the menu hotkey shows opens the new menu. It is still being built; the classic menu stays available"
             );
         }
     }

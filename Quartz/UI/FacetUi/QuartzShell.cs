@@ -108,7 +108,7 @@ internal static partial class QuartzShell {
         return true;
     }
 
-    /// <summary>"Open it" on a classic card: this window hides and the classic menu opens on that page, and comes back here on close.</summary>
+    /// <summary>"Open" on a classic card: this window hides and the classic menu opens on that page, and comes back here on close.</summary>
     internal static void OpenClassic(int state) {
         MenuHandOff.ReturnTo = MenuHandOff.Menu.None;
         UICore.FreshenClassic();   // before the hide: a rebuild re-runs the show-on-startup open, which this window showing keeps shut

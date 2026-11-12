@@ -76,6 +76,27 @@ internal static partial class QuartzShell {
         Nav.OnInsetChanged = Window.SetContentInset;
         Window.SetContentInset(RailWidth + 7f);   // the Nav reported its inset before anyone listened
         Nav.AddSearchSource(ClassicRows);
+        Nav.OnCompactChanged = c => QuartzHost.Host.Write(CompactStore, c ? "1" : null);
+        ApplySidebar();
+    }
+
+    internal const string SidebarStore = "menu.sidebar", CompactStore = "menu.compact";
+
+    /// <summary>The Sidebar setting: 0 toggleable (a button folds the rail to its icons, and the choice is kept), 1 always
+    /// visible, 2 always hidden (the icon strip, widening over the page while the pointer rests on it). Applies at once.</summary>
+    internal static int SidebarMode {
+        get => QuartzHost.Host.Read(SidebarStore) switch { "1" => 1, "2" => 2, _ => 0 };
+        set {
+            QuartzHost.Host.Write(SidebarStore, value is 1 or 2 ? value.ToString() : null);
+            ApplySidebar();
+        }
+    }
+
+    internal static void ApplySidebar() {
+        if(Nav == null) return;
+        int mode = SidebarMode;
+        Nav.CompactButton = mode == 0;
+        Nav.Compact = mode == 2 || mode == 0 && QuartzHost.Host.Read(CompactStore) == "1";
     }
 
     private static NavItem CategoryItem(NavCategory c) => new(Label(c.LocaleKey, c.Title), p => BuildCategory(p, c)) {

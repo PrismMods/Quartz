@@ -102,6 +102,7 @@ namespace Facet {
         private Host() { }
     }
     public sealed unsafe partial class HostOptions {
+        public global::System.Func<global::Facet.Cursors.Kind, bool> Cursor;
         public global::System.Func<string> Language;
         public global::System.Action<string> Log;
         public global::System.Func<string, string> Read;
@@ -139,7 +140,10 @@ namespace Facet {
         public const float CollapseAt = 3f;
         public const float MaxRail = 4f;
         public const float MinRail = 5f;
+        public global::System.Action<bool> OnCompactChanged;
         public global::System.Action<float> OnInsetChanged;
+        public bool Compact { get => throw null; set { } }
+        public bool CompactButton { get => throw null; set { } }
         public Nav(global::UnityEngine.UIElements.VisualElement parent, global::System.Collections.Generic.IEnumerable<global::Facet.NavItem> items, float railWidth = default) => throw null;
         public void AddSearchSource(global::System.Func<global::System.Collections.Generic.IEnumerable<global::Facet.SearchIndex.Entry>> source) => throw null;
         public void Filter(string query) => throw null;
@@ -215,6 +219,7 @@ namespace Facet {
     }
     public sealed unsafe partial class Sizes {
         public float Gap;
+        public float Pad;
         public float RowHeight;
         public float Small;
         private Sizes() { }

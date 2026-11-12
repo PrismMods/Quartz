@@ -1,5 +1,6 @@
 #if DEBUG && !IL2CPP
 using System.Collections;
+using System.Reflection;
 using Facet;
 using Quartz.Core;
 using Quartz.Features;
@@ -14,9 +15,11 @@ namespace Quartz.UI.FacetUi;
 /// open page, the page it reopens on, a language switch, the wheel and the cost of a closed tick.
 /// </summary>
 internal static partial class FacetSelfTestChecks {
-    private static ScrollView RailScroll => QuartzShell.Window.Body.Query<ScrollView>().First();
+    // The Nav's rail, read from the Nav: while compact it is drawn in front of the page, last in the tree.
+    private static ScrollView RailScroll =>
+        (ScrollView)typeof(Facet.Nav).GetField("_railScroll", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(QuartzShell.Nav);
     private static List<Label> RailLabels() =>
-        RailScroll.contentContainer.Children().Where(e => e.name != "rule").Select(e => e.Q<Label>()).ToList();
+        RailScroll.contentContainer.Children().Where(e => e.name is not ("rule" or "rail-button")).Select(e => e.Q<Label>()).ToList();
     private static string SelectedTab() {
         Tabs row = QuartzShell.TabRow;
         if(row == null) return null;
