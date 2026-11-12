@@ -80,8 +80,10 @@ public static class ComboOverlay {
         ReorganizeHandle.SetRotationSource(dragObj, () => Conf.Rotation, v => { Conf.Rotation = v; Apply(); });
         updater = canvasObj.AddComponent<Updater>();
         RectTransform[] frame = [root];
+        // The end hides the element at once where it rests hidden: given back as it was lent, it would flash on the screen
+        // until the next Update.
         OverlayPreview.Register(FontKey, () => canvasObj ? canvasObj.GetComponent<Canvas>() : null, () => frame,
-            shown: () => root ? root.gameObject : null);
+            end: () => { if(root) root.gameObject.SetActive(ShouldShow()); }, shown: () => root ? root.gameObject : null);
         gateWant = true;
         updaterRan = false;
         gateRunning = true;

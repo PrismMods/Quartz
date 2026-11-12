@@ -55,7 +55,7 @@ internal static partial class FacetSelfTestChecks {
         check("no window keys left in the settings", MainCore.Conf.FacetWindows.Keys.All(windows.ContainsKey),
             string.Join(",", MainCore.Conf.FacetWindows.Keys.Where(k => !windows.ContainsKey(k))));
     }
-    // P26: clicks may reach the game behind a Quartz-only preview. What a click at the open window's centre
+    // Clicks may reach the game behind a Quartz-only preview. What a click at the open window's centre
     // would hit through the uGUI EventSystem, and whether KeyLimiter's block holds right now. Not asserted.
     private static void ClickReach(Action<string> info) {
         VisualElement root = QuartzShell.Window.Root;

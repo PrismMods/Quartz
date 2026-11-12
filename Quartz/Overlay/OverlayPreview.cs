@@ -22,11 +22,14 @@ internal static class OverlayPreview {
         Func<GameObject> shown = null) { }
     internal static void Unregister(string id) { }
 #else
-    internal sealed class Source(Func<Canvas> canvas, Func<IEnumerable<RectTransform>> frame, Action begin, Action end, Func<GameObject> shown) {
+    internal sealed class Source(Func<Canvas> canvas, Func<IEnumerable<RectTransform>> frame, Action begin, Action end) {
         internal readonly Func<Canvas> Canvas = canvas;
         internal readonly Func<IEnumerable<RectTransform>> Frame = frame;
         internal readonly Action Begin = begin, End = end;
-        internal readonly Func<GameObject> Shown = shown ?? (() => frame()?.FirstOrDefault() is { } r && r != null ? r.gameObject : null);
+#if DEBUG
+        /// <summary>The self-test's handle on the object the overlay shows and hides.</summary>
+        internal Func<GameObject> Shown;
+#endif
     }
     private static readonly Dictionary<string, Source> sources = new(StringComparer.Ordinal);
     private static Lease current;
@@ -40,7 +43,11 @@ internal static class OverlayPreview {
     internal static void Register(string id, Func<Canvas> canvas, Func<IEnumerable<RectTransform>> frame, Action begin = null, Action end = null,
         Func<GameObject> shown = null) {
         if(Target == id) current?.Release();
-        sources[id] = new Source(canvas, frame, begin, end, shown);
+        var source = new Source(canvas, frame, begin, end);
+#if DEBUG
+        source.Shown = shown ?? (() => frame()?.FirstOrDefault() is { } r && r != null ? r.gameObject : null);
+#endif
+        sources[id] = source;
     }
     /// <summary>First in an overlay's Dispose: a borrowed canvas goes back before the overlay keeps its position or is destroyed.</summary>
     internal static void Unregister(string id) {

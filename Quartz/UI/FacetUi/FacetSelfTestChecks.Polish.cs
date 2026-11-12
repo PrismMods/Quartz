@@ -33,7 +33,7 @@ internal static partial class FacetSelfTestChecks {
             VisualElement last = PageContent().Children().LastOrDefault(e => Ink(e) != null);
             info($"Home at the default scale: its last part ends at {last?.worldBound.yMax:0} on a viewport ending at {ContentScroll.contentViewport.worldBound.yMax:0}");
             RailIcons(check);
-            yield return OsCursor(check);
+            yield return OsCursor(check, info, QuartzShell.Window.Search, "the search field");
             if(!fxWas) FeatureService.SetEnabled(Fx, true);   // its page, not the feature-off stub
             foreach(string key in EdgePages) {
                 QuartzShell.Go(key);
@@ -75,22 +75,27 @@ internal static partial class FacetSelfTestChecks {
         check("every rail entry whose category has an icon draws it", drawn > 0 && bad.Count == 0, $"drawn={drawn} missing={string.Join(",", bad)}");
     }
 
-    // Over the search field the new menu shows the OS's own text cursor, as the classic menu showed the OS's resize cursors,
-    // and the OS arrow once the pointer leaves; Facet's drawn cursor stays unset throughout. On macOS the app's current
-    // NSCursor is read back; elsewhere only the drawn cursor is.
-    private static IEnumerator OsCursor(Action<string, bool, string> check) {
+    // Over a text field the new menu shows the OS's own text cursor, as the classic menu showed the OS's resize cursors, and
+    // the OS arrow once the pointer leaves; Facet's drawn cursor stays unset throughout. On macOS the app's current NSCursor
+    // is read back; elsewhere only the drawn cursor is. Where the OS has no cursors to show, Facet draws its own: set over
+    // the field, cleared after.
+    private static IEnumerator OsCursor(Action<string, bool, string> check, Action<string> info, VisualElement field, string what) {
         FieldInfo drawn = typeof(Cursors).GetField("_drawn", BindingFlags.NonPublic | BindingFlags.Static);
-        bool mac = Application.platform == RuntimePlatform.OSXPlayer;
-        TextField search = QuartzShell.Window.Search;
-        Hover(search);
+        bool mac = Application.platform == RuntimePlatform.OSXPlayer, native = NativeCursor.Native;
+        Hover(field);
         yield return Frames(2);
-        bool overDrawn = (bool)drawn.GetValue(null), overBeam = !mac || NativeCursor.MacShowing("IBeamCursor");
-        Leave(search);
+        bool overDrawn = (bool)drawn.GetValue(null), overBeam = !mac || !native || NativeCursor.MacShowing("IBeamCursor");
+        Leave(field);
         yield return Frames(2);
-        bool leftDrawn = (bool)drawn.GetValue(null), leftArrow = !mac || NativeCursor.MacShowing("arrowCursor");
-        check("over the search field the OS's text cursor shows, not a drawn one, and the OS arrow after it leaves",
-            NativeCursor.Native && !overDrawn && overBeam && !leftDrawn && leftArrow,
-            $"mac={mac} over: drawn={overDrawn} ibeam={overBeam}; left: drawn={leftDrawn} arrow={leftArrow}");
+        bool leftDrawn = (bool)drawn.GetValue(null), leftArrow = !mac || !native || NativeCursor.MacShowing("arrowCursor");
+        string detail = $"field={field != null} mac={mac} native={native} over: drawn={overDrawn} ibeam={overBeam}; left: drawn={leftDrawn} arrow={leftArrow}";
+        if(native) {
+            check($"over {what} the OS's text cursor shows, not a drawn one, and the OS arrow after it leaves",
+                field != null && !overDrawn && overBeam && !leftDrawn && leftArrow, detail);
+            yield break;
+        }
+        info($"no OS cursors on {Application.platform}: Facet draws its own over {what}");
+        check($"over {what} Facet's drawn text cursor shows, and is cleared after it leaves", field != null && overDrawn && !leftDrawn, detail);
     }
 
     // The Settings page's first card holds the hotkey, its modifier and two switches: every control ends on one right edge.

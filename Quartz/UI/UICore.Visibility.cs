@@ -126,9 +126,10 @@ public static partial class UICore {
         bool held = Keybind.KeyHeld(key);
         bool pressed = !editing && modHeld && held;
         if(ToggleHotkeyAllowed(modHeld, down)) {
+            // A press that hides the new menu toggles no classic panel: held on, it must not reset that panel's saved size.
+            holdingToggle = !FacetBridge.NewMenuVisible();
             Toggle();
             holdStartTime = Time.unscaledTime;
-            holdingToggle = true;
         }
         if(holdingToggle && pressed && Time.unscaledTime - holdStartTime >= 0.4f) {
             ResetScalePosition(!isOpen);
@@ -357,7 +358,9 @@ public static partial class UICore {
             return;
         }
         if(isOpen) {
-            Close(noAnimate);   // a classic menu opened from the new one goes back there
+            // A classic menu opened from the new one goes back there, unless that one came from the hub: then all shuts.
+            if(MenuHandOff.FromHub) MenuHandOff.ReturnTo = MenuHandOff.Menu.None;
+            Close(noAnimate);
             return;
         }
         OpenToHub();

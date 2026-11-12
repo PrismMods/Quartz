@@ -108,6 +108,7 @@ namespace Facet {
         public global::System.Func<string, string> Read;
         public global::Facet.Theme Theme;
         public global::System.Func<string, string> Translate;
+        public global::System.Func<float> WheelSpeed;
         public global::System.Action<string, string> Write;
         private HostOptions() { }
     }
@@ -142,6 +143,7 @@ namespace Facet {
         public const float MinRail = 5f;
         public global::System.Action<bool> OnCompactChanged;
         public global::System.Action<float> OnInsetChanged;
+        public bool Collapsible { get => throw null; set { } }
         public bool Compact { get => throw null; set { } }
         public bool CompactButton { get => throw null; set { } }
         public Nav(global::UnityEngine.UIElements.VisualElement parent, global::System.Collections.Generic.IEnumerable<global::Facet.NavItem> items, float railWidth = default) => throw null;

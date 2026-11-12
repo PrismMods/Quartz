@@ -367,7 +367,7 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(1);
     }
 
-    // "Open it", then the new menu switched off in classic Settings: the classic menu's close has nothing to go back to.
+    // "Open", then the new menu switched off in classic Settings: the classic menu's close has nothing to go back to.
     private static IEnumerator SwitchedOffClose(Action<string, bool, string> check) {
         bool was = MainCore.Conf.ExperimentalNewMenu;
         try {

@@ -139,7 +139,7 @@ internal static partial class FacetSelfTestChecks {
     private static int EventSystems() => UnityEngine.Object.FindObjectsByType<EventSystem>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length;
 
     // Use Minimum Offset switched off through its row hides the minimum's row within 3 frames and clears the minimum, as the
-    // classic switch does. Both are put back.
+    // classic switch does; undone, the minimum and its row come back. Both are put back.
     private static IEnumerator CalibrationMinimum(Action<string, bool, string> check) {
         (bool use, int min) = (CalConf.SongUseMinimum, CalConf.SongMinimum);
         VisualElement track = Body.Q(name: "CALIBRATION_SONG_USE_MINIMUM-input"), row = Body.Q(name: "CALIBRATION_SONG_MINIMUM");
@@ -152,6 +152,12 @@ internal static partial class FacetSelfTestChecks {
             check($"{CalibrationPage}: Use Minimum Offset switched off through its row hides the minimum's row within 3 frames and sets the minimum to 0",
                 track != null && shown && !Displayed(row) && !CalConf.SongUseMinimum && CalConf.SongMinimum == 0,
                 $"row={row != null} track={track != null} shownBefore={shown} frames={frames} on={CalConf.SongUseMinimum} minimum={CalConf.SongMinimum}");
+            string undid = History.NextUndo;
+            bool undone = History.Undo();
+            for(frames = 0; frames < 3 && row != null && !Displayed(row); frames++) yield return null;
+            check($"{CalibrationPage}: undoing that switch-off brings back the minimum it cleared, and the minimum's row within 3 frames",
+                undone && CalConf.SongUseMinimum && CalConf.SongMinimum == 100 && row != null && Displayed(row),
+                $"undid='{undid}' undone={undone} on={CalConf.SongUseMinimum} minimum={CalConf.SongMinimum} shown={row != null && Displayed(row)} frames={frames}");
         } finally {
             (CalConf.SongUseMinimum, CalConf.SongMinimum) = (use, min);
             Cal.Save();

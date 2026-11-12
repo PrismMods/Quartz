@@ -6,4 +6,9 @@ namespace Quartz.UI;
 internal static class MenuHandOff {
     internal enum Menu { None, Classic, New }
     internal static Menu ReturnTo;
+    /// <summary>
+    /// The new menu came from the hub's Settings: after a trip away (a classic page, Edit layout) and back, its close still
+    /// goes to the hub, and the hotkey over any of those screens shuts everything. Cleared once nothing shows.
+    /// </summary>
+    internal static bool FromHub;
 }

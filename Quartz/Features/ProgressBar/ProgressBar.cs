@@ -113,8 +113,10 @@ public static class ProgressBarOverlay {
         // Modern frames the bar; its border is off at no outline.
         RectTransform[] modern = [bar], line = [previewFrame];
         OverlayPreview.Register(PreviewId, () => canvasObj ? canvasObj.GetComponent<Canvas>() : null,
-            () => Conf.Style == ProgressBarStyle.Line ? line : modern, () => frameObj.SetActive(true), () => { if(frameObj) frameObj.SetActive(false); },
-            () => bar ? bar.gameObject : null);
+            () => Conf.Style == ProgressBarStyle.Line ? line : modern, () => frameObj.SetActive(true), () => {
+                if(frameObj) frameObj.SetActive(false);
+                if(bar) bar.gameObject.SetActive(ShouldShow());   // at once, or it flashes on the screen until the next Update
+            }, () => bar ? bar.gameObject : null);
         gateWant = true;
         updaterRan = false;
         gateRunning = true;

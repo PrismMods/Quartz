@@ -3,6 +3,7 @@ using System.Collections;
 using System.Reflection;
 using Quartz.Core;
 using Quartz.Features;
+using Quartz.Prism;
 using Quartz.UI.Factory;
 using Quartz.UI.Nav;
 using UnityEngine;
@@ -100,6 +101,8 @@ internal static partial class FacetSelfTestChecks {
     private static IEnumerator SwitchOn(Action<string, bool, string> check) {
         yield return LivePageButton(check, true);   // leaves the switch on for the steps after it
         yield return HubFlow(check);
+        yield return HubTrips(check);
+        yield return HoldOverNewMenu(check);
         Step(check, "switch on: Effect Remover's page has the new-menu button", FacetSelfTest.PreviewButtonOnPage());
     }
 
@@ -117,12 +120,9 @@ internal static partial class FacetSelfTestChecks {
             Step(check, $"switch on: the hub's Settings opens the new menu on the page last left, out of reorganize mode ({way})",
                 clicked && FacetBridge.NewMenuVisible() && UICore.MenuShowing && !UICore.IsOpen && !UICore.IsArranging && QuartzShell.CurrentPage == last,
                 $"clicked={clicked} last={last}");
-            Button close = QuartzShell.Window.TitleBarRight.Query<Button>().ToList().LastOrDefault();
-            if(way == "close") { if(close != null) Submit(close); }
-            else UICore.EscapeDown();
+            CloseNewMenu(way);
             yield return Frames(3);
-            Step(check, $"switch on: the new menu's {way} goes back to the hub",
-                !FacetBridge.NewMenuVisible() && UICore.IsOpen && UICore.IsReorganizing && !UICore.PanelInteractive);
+            Step(check, $"switch on: the new menu's {way} goes back to the hub", AtHub());
         }
         bool up = ClickHubSettings();
         yield return Frames(2);
@@ -131,6 +131,151 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(3);
         Step(check, "switch on: the hotkey over the new menu opened from the hub shuts everything",
             up && !FacetBridge.NewMenuVisible() && !UICore.IsOpen && !UICore.IsReorganizing && HandOff.ReturnTo == HandOff.Menu.None, $"up={up}");
+    }
+
+    private static bool AtHub() => !FacetBridge.NewMenuVisible() && UICore.IsOpen && UICore.IsReorganizing && !UICore.PanelInteractive;
+
+    private static bool AllShut() => !FacetBridge.NewMenuVisible() && !UICore.IsOpen && !UICore.IsReorganizing && !UICore.SharedLayoutOpen;
+
+    // The new menu's X, or Escape.
+    private static void CloseNewMenu(string way) {
+        if(way == "escape") { UICore.EscapeDown(); return; }
+        Button close = QuartzShell.Window.TitleBarRight.Query<Button>().ToList().LastOrDefault();
+        if(close != null) Submit(close);
+    }
+
+    // The hotkey, then the hub's Settings: the new menu, opened from the hub.
+    private static IEnumerator FromHub(bool[] up) {
+        UICore.Toggle();
+        yield return Frames(2);
+        up[0] = ClickHubSettings();
+        yield return Frames(2);
+        up[0] &= FacetBridge.NewMenuVisible();
+    }
+
+    // Nothing open, as the hotkey over the hub leaves it.
+    private static IEnumerator ShutAll() {
+        HandOff.ReturnTo = HandOff.Menu.None;
+        QuartzShell.Hide();
+        if(UICore.IsOpen) UICore.Close(true);
+        yield return Frames(2);
+    }
+
+    // Settings' Classic menu (an "Open"), then, unless stay, that classic panel's close: the new menu is back. ok[0] says
+    // each step held.
+    private static IEnumerator ClassicTrip(bool[] ok, bool stay = false) {
+        QuartzShell.Go(CorePages.SettingsPageKey);
+        yield return Frames(2);
+        Button open = Body.Q<Button>("MENU_CLASSIC_MENU-input");
+        if(open != null) Submit(open);
+        yield return Frames(2);
+        ok[0] &= open != null && UICore.IsOpen && !UICore.IsReorganizing && !FacetBridge.NewMenuVisible();
+        if(stay) yield break;
+        UICore.Close();
+        yield return Frames(2);
+        ok[0] &= FacetBridge.NewMenuVisible() && !UICore.IsOpen;
+    }
+
+    // Home's Edit layout, then that session closed with Escape: the new menu is back.
+    private static IEnumerator LayoutTrip(bool[] ok) {
+        QuartzShell.Go(CorePages.HomePageKey);
+        yield return Frames(2);
+        Button edit = Body.Q<Button>("menu-edit-layout-input");
+        if(edit != null) Submit(edit);
+        int frames = 0;
+        for(; frames < 60 && !UICore.SharedLayoutOpen; frames++) yield return null;
+        ok[0] &= edit != null && UICore.SharedLayoutOpen && !FacetBridge.NewMenuVisible();
+        yield return Frames(1);
+        ok[0] &= FacetBridge.HandleEscape();
+        for(int i = 0; i < 10 && !FacetBridge.NewMenuVisible(); i++) yield return null;
+        ok[0] &= FacetBridge.NewMenuVisible() && !UICore.SharedLayoutOpen && !UICore.IsOpen;
+    }
+
+    // A new menu opened from the hub goes back there after a trip away and back: a classic page's Open and that page's close,
+    // or Edit layout's session. The hotkey over any screen of it shuts everything. Edit layout needs PrismLib.UI.
+    private static IEnumerator HubTrips(Action<string, bool, string> check) {
+        bool layout = PrismBridge.UiAvailable;
+        var ok = new bool[1];
+        foreach(string way in new[] { "close", "escape" }) {
+            yield return FromHub(ok);
+            yield return ClassicTrip(ok);
+            CloseNewMenu(way);
+            yield return Frames(3);
+            Step(check, $"switch on: from the hub, after a classic Open and its close, the new menu's {way} goes back to the hub", ok[0] && AtHub());
+            if(layout) {
+                yield return ShutAll();   // each trip starts afresh, so one that fails leaves the next its own result
+                yield return FromHub(ok);
+                yield return LayoutTrip(ok);
+                CloseNewMenu(way);
+                yield return Frames(3);
+                Step(check, $"switch on: from the hub, after Edit layout's session, the new menu's {way} goes back to the hub", ok[0] && AtHub());
+            }
+            yield return ShutAll();
+        }
+        yield return FromHub(ok);
+        yield return ClassicTrip(ok, stay: true);
+        UICore.Toggle();
+        yield return Frames(3);
+        Step(check, "switch on: from the hub, the hotkey over a classic page opened from the new menu shuts everything", ok[0] && AllShut());
+        yield return ShutAll();
+        yield return FromHub(ok);
+        yield return ClassicTrip(ok);
+        if(layout) yield return LayoutTrip(ok);
+        UICore.Toggle();
+        yield return Frames(3);
+        Step(check, "switch on: from the hub, the hotkey over the new menu back from its trips shuts everything",
+            ok[0] && AllShut() && HandOff.ReturnTo == HandOff.Menu.None);
+        yield return ShutAll();
+    }
+
+    // Holding the hotkey resets the classic panel's saved size, but not when the press hid the new menu: that panel was not
+    // the one toggled. With nothing open the press opens the hub, and the hold still resets. The hotkey is a free key of
+    // F13-F15 for the checks; the hotkey, the size and the settings file are the player's and are put back.
+    private static IEnumerator HoldOverNewMenu(Action<string, bool, string> check) {
+        IO.CoreSettings c = MainCore.Conf;
+        string path = MainCore.ConfMgr.Path;
+        KeyCode key = new[] { KeyCode.F13, KeyCode.F14, KeyCode.F15 }.FirstOrDefault(k => (int)k != c.ToggleKey && !c.ToggleKeybinds.Any(b => b.Value.Key == (int)k));
+        if(key == KeyCode.None) { check("a long hotkey press over the new menu", false, "F13-F15 all bound by the player"); yield break; }
+        MainCore.ConfMgr.Save();   // pending saves land now: the bytes compared at the end are these
+        byte[] file = File.ReadAllBytes(path);
+        var was = (c.ToggleKey, c.ToggleModifier, c.PanelWidth, c.PanelHeight, c.PanelWidthFrac, c.PanelHeightFrac, UICore.LastPanelSize, UICore.LastPanelPosition);
+        var known = (1234f, 567f, 0.61f, 0.57f);
+        (float, float, float, float) Size() => (c.PanelWidth, c.PanelHeight, c.PanelWidthFrac, c.PanelHeightFrac);
+        IEnumerator Hold() {
+            HoldKey(key);
+            PressNextFrame(key);
+            float t0 = Time.realtimeSinceStartup;
+            while(Time.realtimeSinceStartup - t0 < 0.7f) yield return null;
+            HoldKey(KeyCode.None);
+            yield return Frames(2);
+        }
+        try {
+            (c.ToggleModifier, c.ToggleKey) = ((int)Keybind.KeyModifier.None, (int)key);
+            (c.PanelWidth, c.PanelHeight, c.PanelWidthFrac, c.PanelHeightFrac) = known;
+            FacetBridge.OpenNewMenu();
+            yield return Frames(2);
+            bool up = FacetBridge.NewMenuVisible();
+            yield return Hold();
+            Step(check, "holding the hotkey over the new menu hides it and leaves the classic panel's saved size alone",
+                up && AllShut() && Size() == known, $"up={up} size={Size()}");
+            yield return Hold();
+            bool hub = AtHub();
+            Step(check, "holding it with nothing open opens the hub and still resets the classic panel's saved size",
+                hub && Size() == (0f, 0f, 0f, 0f), $"hub={hub} size={Size()}");
+        } finally {
+            HoldKey(KeyCode.None);
+            HandOff.ReturnTo = HandOff.Menu.None;
+            QuartzShell.Hide();
+            if(UICore.IsOpen) UICore.Close(true);   // first: a close stores the panel's size as the last one
+            MainCore.ConfMgr.CancelPendingSave();
+            (c.ToggleKey, c.ToggleModifier, c.PanelWidth, c.PanelHeight, c.PanelWidthFrac, c.PanelHeightFrac, UICore.LastPanelSize, UICore.LastPanelPosition) = was;
+        }
+        // A save the reset asked for, already handed to a worker, can land after the finally: settle, then save what was put back.
+        float until = Time.realtimeSinceStartup + 1f;
+        while(Time.realtimeSinceStartup < until) yield return null;
+        MainCore.ConfMgr.Save();
+        check("the player's hotkey, panel size and settings file are as before the long presses", SameBytes(path, file),
+            $"bytes={File.ReadAllBytes(path).Length}/{file.Length}");
     }
 
     // The hub's Settings button, released over itself as a click is; false when the hub shows no such button.
@@ -160,7 +305,7 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(2);
     }
 
-    // Effect Remover's button, "Open it", then each close back down the chain, which ends with neither menu.
+    // Effect Remover's button, "Open", then each close back down the chain, which ends with neither menu.
     private static IEnumerator PingPong(Action<string, bool, string> check) {
         UICore.Open(true);
         yield return Frames(2);
@@ -175,7 +320,7 @@ internal static partial class FacetSelfTestChecks {
         if(open != null) Submit(open);
         yield return Frames(2);
         int state = NavRegistry.StateFor("profiles.main");
-        Step(check, "ping-pong 3: Open it swaps back to the classic menu on that page",
+        Step(check, "ping-pong 3: Open swaps back to the classic menu on that page",
             open != null && UICore.IsOpen && UICore.CurrentMenuState == state && HandOff.ReturnTo == HandOff.Menu.New,
             $"button={open != null} state={UICore.CurrentMenuState}/{state}");
         UICore.Close();

@@ -353,11 +353,13 @@ internal static partial class FacetSelfTestChecks {
             yield return RailSettles(full, got);
             check("the button opens it again, and the open rail is kept", !QuartzShell.Nav.Compact && QuartzHost.Host.Read(QuartzShell.CompactStore) == null
                 && Mathf.Abs(got[0] - full) <= 0.5f, $"width={got[0]:0.0}");
+            yield return RailDragStops(check, "Toggleable");
             QuartzHost.Host.Write(QuartzShell.CompactStore, "1");   // a fold kept from Toggleable: the other modes ignore it
             yield return PickItem("MENU_SIDEBAR", QuartzHost.Translate("MENU_SIDEBAR_SHOWN"));
             yield return RailSettles(full, got);
             check("Sidebar, Always visible: the rail is open, with no button", QuartzShell.SidebarMode == 1 && !QuartzShell.Nav.Compact && RailButton == null
                 && Mathf.Abs(got[0] - full) <= 0.5f, $"button={RailButton != null} width={got[0]:0.0}");
+            yield return RailDragStops(check, "Always visible");
             yield return PickItem("MENU_SIDEBAR", QuartzHost.Translate("MENU_SIDEBAR_HIDDEN"));
             yield return RailSettles(strip, got);
             check("Sidebar, Always hidden: the rail is the icon strip, with no button", QuartzShell.SidebarMode == 2 && QuartzShell.Nav.Compact && RailButton == null
@@ -379,6 +381,46 @@ internal static partial class FacetSelfTestChecks {
             QuartzShell.ApplySidebar();
         }
         yield return Frames(2);
+    }
+
+    // The Sidebar setting alone decides whether the rail shows: its handle dragged far left stops at the rail's minimum width
+    // instead of shutting it. A second drag puts the width back. The rail's open animation writes its width each frame until
+    // it ends, over a drag's, so the drag waits for the width the animation writes to stay put for three frames.
+    private static IEnumerator RailDragStops(Action<string, bool, string> check, string mode) {
+        var handle = (VisualElement)typeof(Facet.Nav).GetField("_handle", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(QuartzShell.Nav);
+        float last = float.NaN;
+        for(int still = 0, f = 0; still < 3 && f < 120; f++) {
+            float now = RailScroll.style.width.value.value;
+            still = now == last ? still + 1 : 0;
+            last = now;
+            yield return null;
+        }
+        float was = RailScroll.resolvedStyle.width;
+        DragHandle(handle, -400f);
+        yield return Frames(2);
+        bool open = QuartzShell.Nav.RailOpen;
+        float w = RailScroll.resolvedStyle.width;
+        check($"Sidebar, {mode}: dragging the rail's handle far left stops at its minimum width",
+            open && Displayed(RailScroll) && Mathf.Abs(w - Facet.Nav.MinRail) <= 0.5f, $"open={open} width={w:0.0}/{Facet.Nav.MinRail}");
+        DragHandle(handle, was - (open ? w : 0f));   // from a shut rail a drag starts at no width
+        var got = new float[1];
+        yield return RailSettles(was, got);
+    }
+
+    // Down, a move by dx and up in one frame, so the real pointer's moves cannot land between them.
+    private static void DragHandle(VisualElement handle, float dx) {
+        Vector2 at = handle.worldBound.center;
+        Pointer<PointerDownEvent>(handle, at);
+        Pointer<PointerMoveEvent>(handle, at + new Vector2(dx, 0f));
+        Pointer<PointerUpEvent>(handle, at + new Vector2(dx, 0f));
+    }
+
+    private static void Pointer<T>(VisualElement e, Vector2 at) where T : PointerEventBase<T>, new() {
+        using T ev = Pooled<T>();
+        typeof(PointerEventBase<T>).GetProperty("button").SetValue(ev, 0);
+        typeof(PointerEventBase<T>).GetProperty("position").SetValue(ev, (Vector3)at);
+        ev.target = e;
+        e.SendEvent(ev);
     }
 
     private static void Leave(VisualElement e) {

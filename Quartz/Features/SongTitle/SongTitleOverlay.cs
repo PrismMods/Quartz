@@ -108,7 +108,10 @@ public static class SongTitleOverlay {
         updater = canvasObj.AddComponent<Updater>();
         RectTransform[] frame = [previewFrame];
         OverlayPreview.Register(FontKey, () => canvasObj ? canvasObj.GetComponent<Canvas>() : null, () => frame,
-            () => frameObj.SetActive(true), () => { if(frameObj) frameObj.SetActive(false); }, () => root ? root.gameObject : null);
+            () => frameObj.SetActive(true), () => {
+                if(frameObj) frameObj.SetActive(false);
+                if(root) root.gameObject.SetActive(ShouldShow());   // at once, or it flashes on the screen until the next Update
+            }, () => root ? root.gameObject : null);
         gateWant = true;
         updaterRan = false;
         gateRunning = true;

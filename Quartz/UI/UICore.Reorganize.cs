@@ -99,7 +99,10 @@ public static partial class UICore {
     private static void HubSettings() {
         if(NewMenuWanted) {
             FacetBridge.OpenNewMenu(fromClassic: true);   // leaves reorganize mode first: previews refuse to lease while arranging
-            if(FacetBridge.NewMenuVisible()) return;
+            if(FacetBridge.NewMenuVisible()) {
+                MenuHandOff.FromHub = true;
+                return;
+            }
             if(!IsReorganizing) OpenToHub();   // a build that failed after the hand-off took the hub down
         }
         ShowPanelOverHub();

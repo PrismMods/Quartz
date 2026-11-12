@@ -14,11 +14,11 @@ using UnityEngine.SceneManagement;
 namespace Quartz.UI.FacetUi;
 /// <summary>
 /// The Combo preview inside a level, run alone under the marker facet-level-selftest: it enters 1-1 from the level select and
-/// opens Overlay ▸ Combo there. The pane shows the live count while the element is off every game camera, and switching to
-/// General puts the element back on screen within a frame. Logs every camera's culling mask and what a canvas walk costs.
-/// Entering a level starts a run, which Quartz's PlayCount counts: the test puts 1-1's entry back and saves it, so the
-/// attempts end as they began. The game's own save (User/data.sav, its current level) still moves, and only a rig puts
-/// that back.
+/// opens Overlay ▸ Combo there. The pane shows the live count, paused too, while the element is off every game camera, and
+/// switching to General puts the element back on screen within a frame. Logs every camera's culling mask and what a canvas
+/// walk costs. Entering a level starts a run, which Quartz's PlayCount counts: the test puts 1-1's entry back and saves it,
+/// so the attempts, in memory and in PlayCount.json, end as they began. The game's own save (User/data.sav, its current
+/// level) still moves, and only a rig puts that back.
 /// </summary>
 internal static partial class FacetSelfTestChecks {
     private const string LevelCode = "1-1";
@@ -28,6 +28,8 @@ internal static partial class FacetSelfTestChecks {
     internal static IEnumerator InLevel(Action<string, bool, string> check, Action<string> info) {
         var windows = new Dictionary<string, string>(MainCore.Conf.FacetWindows);
         PlayData played = PlayCount.Snapshot(MapKey);
+        string file = PlayCount.FilePath;
+        byte[] bytesWas = File.Exists(file) ? File.ReadAllBytes(file) : null;
         try {
             yield return EnterLevel(check, info);
             if(!GameStats.InLevel) yield break;
@@ -47,8 +49,11 @@ internal static partial class FacetSelfTestChecks {
             int before = played?.TotalAttempts ?? 0, inRun = PlayCount.Snapshot(MapKey)?.TotalAttempts ?? 0;
             PlayCount.Restore(MapKey, played);
             int after = PlayCount.Snapshot(MapKey)?.TotalAttempts ?? 0;
-            check($"level: the run leaves {LevelCode}'s attempts in Quartz's play stats as they were", after == before,
-                $"before={before} inRun={inRun} after={after} entry={played != null}");
+            // The file, not just the entry Restore has just written: with none before, the run made one, so only the count is read.
+            bool bytes = bytesWas == null ? after == 0 : File.Exists(file) && File.ReadAllBytes(file).SequenceEqual(bytesWas);
+            if(inRun == before) info($"level: the run counted no attempt for {LevelCode} (autoplay counts none), so the take-back went untested");
+            check($"level: the run leaves {LevelCode}'s attempts in Quartz's play stats as they were, in memory and in PlayCount.json",
+                after == before && bytes, $"before={before} inRun={inRun} after={after} entry={played != null} file={bytesWas != null} bytesSame={bytes}");
         }
     }
 
@@ -58,7 +63,11 @@ internal static partial class FacetSelfTestChecks {
         while(Time.realtimeSinceStartup - t0 < 30f && (scrController.instance == null || SceneManager.GetActiveScene().name != GameApi.SceneLevelSelect))
             yield return null;
         string from = SceneManager.GetActiveScene().name;
-        scrController.instance?.EnterLevel(LevelCode, false);
+        if(from != GameApi.SceneLevelSelect || scrController.instance == null) {
+            check($"level: the level select is up within 30 s, to enter {LevelCode} from", false, $"scene={from} controller={scrController.instance != null}");
+            yield break;
+        }
+        scrController.instance.EnterLevel(LevelCode, false);
         t0 = Time.realtimeSinceStartup;
         while(Time.realtimeSinceStartup - t0 < 30f && !GameStats.InGame) yield return null;
         float s = Time.realtimeSinceStartup - t0;
@@ -101,6 +110,21 @@ internal static partial class FacetSelfTestChecks {
         }
         check("level: the Combo pane shows the live count, 7 then 0, not the sample 42", GameStats.InLevel && seven == "7" && zero == "0",
             $"seven='{seven}' zero='{zero}' inLevel={GameStats.InLevel}");
+        // Paused, InGame is false while InLevel holds: the pane still shows the level's count, not the sample. The property, not
+        // TogglePauseGame, which Calibration patches.
+        string paused;
+        bool pausedInGame, pausedInLevel;
+        try {
+            scrController.instance.paused = true;
+            Combo.Count = 0;
+            yield return Frames(2);
+            (paused, pausedInGame, pausedInLevel) = (Shows(), GameStats.InGame, GameStats.InLevel);
+        } finally {
+            if(scrController.instance != null) scrController.instance.paused = false;
+            Combo.Count = count;
+        }
+        check("level: paused in the level, the Combo pane shows the live count 0, not the sample 42", !pausedInGame && pausedInLevel && paused == "0",
+            $"shows='{paused}' inGame={pausedInGame} inLevel={pausedInLevel}");
         // Off screen: world space, parked off-world, every object on the preview layer, which no game camera draws.
         int layer = lease.Layer, stray = canvas.GetComponentsInChildren<Transform>(true).Count(t => t.gameObject.layer != layer);
         var drawing = new List<string>();
@@ -143,14 +167,16 @@ internal static partial class FacetSelfTestChecks {
             + $"{OverlayPreview.Renders - renders0} renders");
         check("level: an object made under the borrowed canvas goes on the preview layer at the next render", extraLayer == layer && walks > byHits,
             $"layer={extraLayer}/{layer} walks={walks} byHits={byHits}");
-        // Back: General has no pane, so the lease goes as the tab switches.
+        // Back: General has no pane, so the lease goes as the tab switches. Every object leaves the preview layer, not just the root.
         QuartzShell.Go("overlay.general");
         yield return Frames(1);
-        check("level: switching to General puts Combo back on screen within 1 frame: overlay mode, its layer, shown as before the menu",
+        int left = canvas.GetComponentsInChildren<Transform>(true).Count(t => t.gameObject.layer == layer);
+        check("level: switching to General puts Combo back on screen within 1 frame: overlay mode, its layer, nothing left on the preview layer, "
+            + "shown as before the menu",
             shownWas && OverlayPreview.Target == null && canvas.renderMode == RenderMode.ScreenSpaceOverlay && canvas.gameObject.layer == layerWas
-            && root.activeInHierarchy && GameObject.Find("QuartzPreviewCamera") == null,
+            && left == 0 && root.activeInHierarchy && GameObject.Find("QuartzPreviewCamera") == null,
             $"shownBefore={shownWas} target={OverlayPreview.Target} mode={canvas.renderMode} layer={canvas.gameObject.layer}/{layerWas} "
-            + $"shown={root.activeInHierarchy} page={QuartzShell.CurrentPage}");
+            + $"onPreviewLayer={left} shown={root.activeInHierarchy} page={QuartzShell.CurrentPage}");
     }
 }
 #endif

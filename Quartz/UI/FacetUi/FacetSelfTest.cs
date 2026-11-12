@@ -14,6 +14,9 @@ namespace Quartz.UI.FacetUi;
 /// </summary>
 public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<string, bool, string>, Action<string>, IEnumerator> body = null) : IRuntimeTick {
     private const float StartAfterSeconds = 25f;
+    // Every runner's marker. Two armed in one launch would run interleaved, and the first DONE quits before the other's
+    // finally puts things back (1-1's attempt flushed into the player's PlayCount.json).
+    private static readonly string[] Markers = ["facet-selftest", "prism-selftest", "facet-level-selftest"];
     private bool done;
     private int pass, fail;
     private StringBuilder log;
@@ -24,6 +27,14 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
         if(steps.Count == 0) {
             string marker = Path.Combine(MainCore.Paths.RootPath, name);
             if(!File.Exists(marker)) { done = true; return; }
+            string[] others = [.. Markers.Where(m => m != name && File.Exists(Path.Combine(MainCore.Paths.RootPath, m)))];
+            if(others.Length > 0) {
+                done = true;
+                File.WriteAllText(Path.Combine(MainCore.Paths.RootPath, name + ".log"),
+                    $"FAIL one marker per launch - also armed: {string.Join(", ", others)}\nDONE pass=0 fail=1\n");
+                Application.Quit();
+                return;
+            }
             log = new StringBuilder();
             steps.Push(Powered(body != null ? body(Check, Info) : Run()));
         }

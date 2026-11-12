@@ -50,35 +50,37 @@ internal static partial class FacetSelfTestChecks {
             RemovePanels(had);
         }
         PanelsOverlay.ConfMgr.Save();   // now, not half a second on
-        check($"{PanelsPage}: after the page's checks, the preview's power-off among them, OverlayPanels.json is byte for byte as before",
-            SameFile(file, was, out string detail), detail);
+        (int left, bool same) = (PanelsOverlay.Conf.Panels.Count, SameFile(file, was, out string detail));
+        check($"{PanelsPage}: after the page's checks, the preview's power-off among them, the list and OverlayPanels.json are as before",
+            same && left == had, $"panels={left}/{had} {detail}");
+        SearchButtonRow(check, PanelsPage, "PANELS_CREATE");
     }
 
-    // Create Panel adds a panel: within 3 frames the count reads one more and the preview frames one more panel, which, empty,
-    // shows its name; the classic page is due a rebuild. Taken out again as the classic page's Delete does, OverlayPanels.json is
-    // as before.
+    // Create Panel adds a panel: within 3 frames the count reads one more and the preview frames the new panel alone, at its
+    // true size, which, empty, shows its name; the classic page is due a rebuild. Taken out again as the classic page's Delete
+    // does, the list and OverlayPanels.json are as before.
     private static IEnumerator PanelsCreate(Action<string, bool, string> check, string file, byte[] was) {
         List<PanelConfig> list = PanelsOverlay.Conf.Panels;
         int n = list.Count, frames = 0;
         for(; n > 0 && frames < 10 && OverlayPreview.Current is not { Released: false }; frames++) yield return null;   // the pane's lease
-        int framed = Framed();
         Label count = Body.Q<Label>("PANEL_COUNT-input");
         Button create = Body.Q<Button>("PANELS_CREATE-input");
         string before = count?.text, want = OverlayPages.Panels.CountText(n + 1);
         string Named() => OverlayPreview.FrameOf(PanelsOverlay.FontKey)?.LastOrDefault()?.Find("Text")?.GetComponent<TextMeshProUGUI>()?.text;
-        bool Grew() => list.Count == n + 1 && count?.text == want && Framed() == framed + 1 && Named() == list[^1].Name;
+        bool Grew() => list.Count == n + 1 && count?.text == want && Framed() == 1 && Named() == list[^1].Name;
         UICore.ClassicStale = false;
         if(create != null) Submit(create);
         bool stale = UICore.ClassicStale;
         for(frames = 0; frames < 3 && !Grew(); frames++) yield return null;
-        (bool grew, int after, string named) = (Grew(), Framed(), Named());
+        (bool grew, int framed, string named) = (Grew(), Framed(), Named());
         RemovePanels(n);
+        int left = list.Count;
         PanelsOverlay.ConfMgr.Save();   // now, not half a second on
         bool same = SameFile(file, was, out string detail);
-        check($"{PanelsPage}: Create Panel adds one, which the count and the preview follow within 3 frames and the classic page is due to show, "
-            + "and taken out again the classic way it leaves OverlayPanels.json as before",
-            create != null && grew && stale && same,
-            $"button={create != null} panels={n}->{n + 1} count='{before}'->'{count?.text}' want='{want}' framed={framed}->{after} named='{named}' frames={frames} "
+        check($"{PanelsPage}: Create Panel adds one, which the count follows and the preview frames alone within 3 frames and the classic page "
+            + "is due to show, and taken out again the classic way it leaves the list and OverlayPanels.json as before",
+            create != null && grew && stale && left == n && same,
+            $"button={create != null} panels={n}->{n + 1}->{left} count='{before}'->'{count?.text}' want='{want}' framed={framed} named='{named}' frames={frames} "
             + $"stale={stale} {detail}");
     }
 

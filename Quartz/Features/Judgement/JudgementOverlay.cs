@@ -107,7 +107,9 @@ public static class JudgementOverlay {
         ReorganizeHandle.SetRotationSource(dragObj, () => Conf.Rotation, v => { Conf.Rotation = v; Apply(); });
         updater = canvasObj.AddComponent<Updater>();
         RectTransform[] frame = [root];
-        OverlayPreview.Register(FontKey, () => canvasObj ? canvasObj.GetComponent<Canvas>() : null, () => frame);
+        // The end hides the row at once where it rests hidden, or it would flash on the screen until the next Update.
+        OverlayPreview.Register(FontKey, () => canvasObj ? canvasObj.GetComponent<Canvas>() : null, () => frame,
+            end: () => { if(root) root.gameObject.SetActive(ShouldShow()); });
         gateWant = true;
         updaterRan = false;
         gateRunning = true;

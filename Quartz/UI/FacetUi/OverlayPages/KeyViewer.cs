@@ -126,7 +126,8 @@ internal static class KeyViewer {
                 plugin.Enabled = v;
                 KvJsRuntime.Reload(c);
             }), null, KeyViewerOverlay.Save, o => {
-                o.Id = "KEYVIEWER_JS_PLUGIN_" + plugin.PluginId.ToUpperInvariant();
+                // The classic toggle's id as its key: a plugin id's "-" becomes "_" there, and search drops the classic twin only on a match.
+                o.Id = Quartz.UI.Generator.GenerateUI.LocaleKeyFromId("keyviewer_js_plugin_" + plugin.PluginId);
                 o.Default = true;
             });
         }

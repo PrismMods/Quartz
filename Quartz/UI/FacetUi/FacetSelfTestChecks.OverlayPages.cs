@@ -151,13 +151,16 @@ internal static partial class FacetSelfTestChecks {
     /// its tooltip shows translated above the key. A bind of the player's and the setting are put back.</summary>
     internal static IEnumerator Hotkey(Action<string, bool, string> check, string pageKey, string toggleKey, string classicId, string descKey,
         Bind<bool> field) {
-        const KeyCode key = KeyCode.F13;
-        string tag = $"{pageKey} {toggleKey}", shown = Keybind.Format(Keybind.KeyModifier.None, key);
+        string tag = $"{pageKey} {toggleKey}";
+        // A key none of the player's other binds uses: pressing it must flip this row alone, or another toggle flips and is saved.
+        KeyCode key = new[] { KeyCode.F13, KeyCode.F14, KeyCode.F15 }.FirstOrDefault(k => (int)k != MainCore.Conf.ToggleKey
+            && !MainCore.Conf.ToggleKeybinds.Any(b => b.Key != classicId && b.Value.Key == (int)k));
         VisualElement row = Body.Q(name: toggleKey), track = Body.Q(name: toggleKey + "-input");
-        if(row == null || track == null) {
-            check($"{tag}: a hotkey bound here", false, $"row={row != null} track={track != null}");
+        if(row == null || track == null || key == KeyCode.None) {
+            check($"{tag}: a hotkey bound here", false, $"row={row != null} track={track != null}{(key == KeyCode.None ? " F13-F15 all bound by the player" : "")}");
             yield break;
         }
+        string shown = Keybind.Format(Keybind.KeyModifier.None, key);
         bool before = field.Get(), had = ToggleBinds.TryGet(classicId, out Keybind.KeyModifier hadMod, out KeyCode hadKey);
         if(had) ShellRows.ClearHotkey(classicId);
         string set = QuartzHost.Host.Translate("MENU_SET_HOTKEY"), clear = QuartzHost.Host.Translate("MENU_CLEAR_HOTKEY");

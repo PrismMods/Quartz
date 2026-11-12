@@ -77,6 +77,7 @@ internal static partial class QuartzShell {
         Window.SetContentInset(RailWidth + 7f);   // the Nav reported its inset before anyone listened
         Nav.AddSearchSource(ClassicRows);
         Nav.OnCompactChanged = c => QuartzHost.Host.Write(CompactStore, c ? "1" : null);
+        Nav.Collapsible = false;   // the Sidebar setting alone decides whether the rail shows: its handle never drags it shut
         ApplySidebar();
     }
 

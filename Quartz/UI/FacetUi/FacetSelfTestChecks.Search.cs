@@ -160,6 +160,17 @@ internal static partial class FacetSelfTestChecks {
         Step(check, $"{what}: closing the classic menu brings the new one back", jumped && FacetBridge.NewMenuVisible() && !UICore.IsOpen);
     }
 
+    /// <summary>A row that is only a button, with no label, is found by its button's text on its moved page.</summary>
+    private static void SearchButtonRow(Action<string, bool, string> check, string pageKey, string key) {
+        try {
+            List<SearchIndex.Hit> hits = Find(QuartzHost.Host.Translate(key));
+            check($"{pageKey}: search finds the button-only row {key} by its button's text, on this page", hits.Any(h => h.Key == key && h.PageRef != null),
+                Hits(hits));
+        } finally {
+            QuartzShell.Nav?.Filter("");
+        }
+    }
+
     // The classic cards' own row is not indexed: "classic" finds no card, one per page before.
     private static void SearchNoCardRows(Action<string, bool, string> check) {
         List<SearchIndex.Hit> hits = Find("classic");

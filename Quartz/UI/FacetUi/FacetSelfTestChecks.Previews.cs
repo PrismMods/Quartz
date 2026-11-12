@@ -261,15 +261,14 @@ internal static partial class FacetSelfTestChecks {
                 $"lease={holding != null} released={holding?.Released} texture={held != null}");
             if(scratch != null) scratch.Visible = false;
             else QuartzShell.Hide();
+            bool activeAtHide = root.activeSelf;   // before any overlay's Update: what the screen shows this frame
             yield return Frames(1);
             check($"{tag}: hiding the pane gives everything back within 1 frame: render mode, layers, no camera, no texture, no target",
                 canvas.renderMode == RenderMode.ScreenSpaceOverlay && canvas.gameObject.layer == layerWas && root.gameObject.layer == rootLayerWas
                 && GameObject.Find("QuartzPreviewCamera") == null && held == null && OverlayPreview.Target == null,
                 $"mode={canvas.renderMode} layer={canvas.gameObject.layer}/{layerWas} camera={GameObject.Find("QuartzPreviewCamera") != null} texture={held != null} target={OverlayPreview.Target}");
-            frames = 0;
-            for(; frames < 3 && root.activeSelf != rootWas; frames++) yield return null;
-            check($"{tag}: within 3 frames the element is shown or hidden as before the pane", root.activeSelf == rootWas,
-                $"active={root.activeSelf} before={rootWas} frames={frames}");
+            check($"{tag}: in the frame the pane hides, the element is shown or hidden as before the pane, so it never flashes on the screen",
+                activeAtHide == rootWas && root.activeSelf == rootWas, $"atHide={activeAtHide} after={root.activeSelf} before={rootWas}");
         } finally {
             if(off) MainCore.Runtime.SetModEnabled(true, false, save: false);
             UICore.SetSharedLayout(false);

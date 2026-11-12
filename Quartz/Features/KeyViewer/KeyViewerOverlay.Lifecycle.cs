@@ -13,6 +13,8 @@ using TMPro;
 using Quartz.Compat.Game;
 using Quartz.Utility;
 using Quartz.Features.KeyViewer.Js;
+using Quartz.Features.Overlay;
+using Quartz.UI;
 namespace Quartz.Features.KeyViewer;
 public static partial class KeyViewerOverlay {
     public static void Initialize(GameObject rootObject) {
@@ -41,7 +43,17 @@ public static partial class KeyViewerOverlay {
         canvasObj.AddComponent<Updater>();
         BuildTabub();
         Rebuild();
-        OverlayPreview.Register(FontKey, () => canvasObj ? canvasObj.GetComponent<Canvas>() : null, PreviewFrame, shown: () => root ? root.gameObject : null);
+        OverlayPreview.Register(FontKey, () => canvasObj ? canvasObj.GetComponent<Canvas>() : null, PreviewFrame, end: EndPreview,
+            shown: () => root ? root.gameObject : null);
+    }
+    /// <summary>Where the Key Viewer shows without a preview, and where a press counts.</summary>
+    private static bool Shows(bool inGame) => OverlaySwitch.Enabled && Conf.Enabled && (Conf.ShowOutsideGame || inGame) || UICore.IsArranging;
+    // Hidden again at once where it rests hidden: given back as it was lent, the keys would flash on the screen until the next Update.
+    private static void EndPreview() {
+        bool show = Shows(GameStats.InGame);
+        if(root) root.gameObject.SetActive(show);
+        if(footRoot) footRoot.gameObject.SetActive(show && footBuilt);
+        UpdateTabubVisibility(show, UICore.IsReorganizing, UICore.IsArranging);
     }
     // The preview frames the hand and foot as their drag handles cover them, fitted afresh: the handles are fitted only when
     // arranging starts or they show. One array per shape, refilled: a rebuild makes new handles.

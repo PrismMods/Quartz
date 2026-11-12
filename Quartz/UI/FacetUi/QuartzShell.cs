@@ -95,7 +95,7 @@ internal static partial class QuartzShell {
             MenuHandOff.ReturnTo = MenuHandOff.Menu.None;   // the classic close below is no user's close
             UICore.HandToPreview();
             MenuHandOff.ReturnTo = MenuHandOff.Menu.Classic;
-        }
+        } else if(MenuHandOff.FromHub) MenuHandOff.ReturnTo = MenuHandOff.Menu.Classic;   // back from a trip away: its close still goes to the hub
         if(pageKey != null) Go(pageKey);
         ApplyLook();
         Surface.BlocksGameInput = MainCore.Conf.BlockInputsWhileMenuOpen;
@@ -173,6 +173,7 @@ internal static partial class QuartzShell {
     /// <summary>Per frame. Nothing while hidden, unless Edit layout is waiting to bring it back.</summary>
     internal static void Tick() {
         if(layoutWait >= 0) BackFromLayout();
+        else if(MenuHandOff.FromHub && !UICore.MenuShowing) MenuHandOff.FromHub = false;   // everything shut: that session is over
         if(Surface == null || !Surface.Visible) return;
         Nav.Tick();
         float pw = Surface.Root.layout.width;   // NaN or 0 until the shown window has been laid out

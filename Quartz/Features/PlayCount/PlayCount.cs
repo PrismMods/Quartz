@@ -289,7 +289,7 @@ public sealed class PlayCount : IRuntimeService, IRuntimeTick {
         }
         return sb.ToString();
     }
-    private static string FilePath => Path.Combine(MainCore.Paths.RootPath, "PlayCount.json");
+    internal static string FilePath => Path.Combine(MainCore.Paths.RootPath, "PlayCount.json");
     private static void Load() {
         playDatas.Clear();
         currentMapKey = "";

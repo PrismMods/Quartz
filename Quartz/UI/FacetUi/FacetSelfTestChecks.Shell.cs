@@ -52,6 +52,7 @@ internal static partial class FacetSelfTestChecks {
             yield return ShellLastPage(check);
             yield return ShellLanguage(check);
             yield return ShellWheel(check);
+            yield return ShellWheelSpeed(check);
             yield return ShellClosedCost(check);
         } finally {
             HandOff.ReturnTo = HandOff.Menu.None;
@@ -146,16 +147,16 @@ internal static partial class FacetSelfTestChecks {
             Body.Q(name: "menu-classic") != null && title == profiles, $"title={title} want={profiles}");
     }
 
-    // "Open it" on a classic card, then each way a user closes the classic menu, which brings the new one back.
+    // "Open" on a classic card, then each way a user closes the classic menu, which brings the new one back.
     private static IEnumerator ShellHandOff(Action<string, bool, string> check) {
         int state = NavRegistry.StateFor("profiles.main");
         foreach(string way in new[] { "close", "escape", "hotkey" }) {
             QuartzShell.Go("profiles.main");
             Button open = Body.Q<Button>("menu-classic-input");
-            if(open == null) { check($"Open it ({way})", false, "no menu-classic-input"); yield break; }
+            if(open == null) { check($"Open ({way})", false, "no menu-classic-input"); yield break; }
             Submit(open);
             yield return Frames(2);
-            check($"Open it hands the page to the classic menu ({way})",
+            check($"Open hands the page to the classic menu ({way})",
                 !FacetBridge.NewMenuVisible() && UICore.IsOpen && !UICore.IsReorganizing && UICore.CurrentMenuState == state,
                 $"{Showing()} state={UICore.CurrentMenuState}/{state}");
             if(way == "close") UICore.Close();
@@ -286,16 +287,55 @@ internal static partial class FacetSelfTestChecks {
             ScrollView sv = ContentScroll;
             sv.scrollOffset = Vector2.zero;
             yield return Frames(1);
-            Vector2 centre = sv.worldBound.center;
-            float scale = Screen.width / sv.panel.visualTree.layout.width;
-            var screen = new Vector2(centre.x * scale, Screen.height - (centre.y * scale));   // panel y runs down
             float before = sv.scrollOffset.y;
-            FacetBridge.TickWheel(screen, -1f);
-            FacetBridge.TickWheel(screen, -1f);
+            FacetBridge.TickWheel(ScreenCentre(sv), -1f);
+            FacetBridge.TickWheel(ScreenCentre(sv), -1f);
             float moved = sv.scrollOffset.y - before;
-            check("two wheel ticks in one frame scroll the new menu one notch", Mathf.Abs(moved - 60f) < 0.5f, $"moved={moved:0.#}");
+            // One notch in the page's own px: Scroll Speed in classic canvas px, brought to this window's scale.
+            float notch = MainCore.Conf.ScrollSpeed * ClassicPx / (PanelPx(sv) * QuartzShell.Window.Scale);
+            check("two wheel ticks in one frame scroll the new menu one notch", Mathf.Abs(moved - notch) < 0.5f, $"moved={moved:0.#} notch={notch:0.#}");
         } finally {
             EffectRemover.Conf.Mode = mode;
+            QuartzShell.Window.Rect = rect;
+        }
+    }
+
+    // Screen px per panel px, and per classic canvas px; both canvases scale with the screen from 1920x1080.
+    private static float PanelPx(VisualElement e) => Screen.width / e.panel.visualTree.layout.width;
+    private static float ClassicPx => Screen.width / UICore.CanvasSize.x;
+    private static Vector2 ScreenCentre(VisualElement e) {
+        Vector2 centre = e.worldBound.center;
+        float k = PanelPx(e);
+        return new Vector2(centre.x * k, Screen.height - (centre.y * k));   // panel y runs down
+    }
+
+    // A wheel unit moves the page as far on screen as the classic menu at the same Scroll Speed, a trackpad's tenth a
+    // tenth of that, and a changed Scroll Speed shows on the next scroll.
+    private static IEnumerator ShellWheelSpeed(Action<string, bool, string> check) {
+        float speed = MainCore.Conf.ScrollSpeed;
+        Rect rect = QuartzShell.Window.Rect;
+        QuartzShell.Window.Rect = new Rect(rect.x, rect.y, rect.width, global::Facet.Window.MinHeight);
+        try {
+            QuartzShell.Go(CorePages.SettingsPageKey);
+            yield return Frames(3);
+            ScrollView sv = ContentScroll;
+            (string name, float s, float delta)[] steps = [
+                ("a wheel notch moves the new menu as far on screen as the classic menu (Scroll Speed 80)", 80f, 1f),
+                ("...a trackpad's 0.1 a tenth of that", 80f, 0.1f),
+                ("...and Scroll Speed 160 twice as far, on the next scroll", 160f, 1f),
+            ];
+            foreach(var (name, s, delta) in steps) {
+                MainCore.Conf.ScrollSpeed = s;
+                sv.scrollOffset = Vector2.zero;
+                yield return Frames(1);
+                float top = sv.contentContainer.worldBound.y;
+                FacetBridge.TickWheel(ScreenCentre(sv), -delta);
+                yield return Frames(1);
+                float moved = (top - sv.contentContainer.worldBound.y) * PanelPx(sv), want = s * delta * ClassicPx;
+                check(name, Mathf.Abs(moved - want) <= 1f, $"moved={moved:0.0} want={want:0.0} screen px");
+            }
+        } finally {
+            MainCore.Conf.ScrollSpeed = speed;
             QuartzShell.Window.Rect = rect;
         }
     }

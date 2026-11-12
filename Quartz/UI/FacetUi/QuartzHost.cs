@@ -26,6 +26,7 @@ internal static class QuartzHost {
                 o.Write = Write;
                 o.Theme = MakeTheme(MainCore.Conf.GetAccentColor());
                 o.Cursor = OsCursor;
+                o.WheelSpeed = WheelSpeed;
             });
             if(!hooked) {
                 hooked = true;
@@ -78,6 +79,14 @@ internal static class QuartzHost {
             default: NativeCursor.Reset(); break;
         }
         return true;
+    }
+    // Panel px per wheel unit, asked on every scroll so Scroll Speed applies live. The classic menu moves Scroll Speed of
+    // its canvas px; both canvases scale with the screen from 1920x1080, the classic one by its UI scale on top and this
+    // window by its own Scale, so the page moves as far on screen as the classic menu's.
+    private static float WheelSpeed() {
+        float ui = MainCore.Conf.UIScale <= 0f ? 1f : MainCore.Conf.UIScale;
+        float scale = QuartzShell.Window?.Scale ?? ui;
+        return MainCore.Conf.ScrollSpeed * ui / scale;
     }
     // Facet's Korean font fallback fires only on exactly "ko"; Quartz says "ko-KR", "en-US" or "DEFAULT".
     internal static string LanguageCode(string language) {

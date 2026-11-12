@@ -2046,6 +2046,7 @@
           "Facet.Theme Facet.HostOptions::Theme",
           "System.Action\u00601\u003CSystem.String\u003E Facet.HostOptions::Log",
           "System.Action\u00602\u003CSystem.String,System.String\u003E Facet.HostOptions::Write",
+          "System.Func\u00601\u003CSystem.Single\u003E Facet.HostOptions::WheelSpeed",
           "System.Func\u00601\u003CSystem.String\u003E Facet.HostOptions::Language",
           "System.Func\u00602\u003CFacet.Cursors/Kind,System.Boolean\u003E Facet.HostOptions::Cursor",
           "System.Func\u00602\u003CSystem.String,System.String\u003E Facet.HostOptions::Read",
@@ -2100,6 +2101,7 @@
         "members": [
           "System.Action\u00601\u003CSystem.Boolean\u003E Facet.Nav::OnCompactChanged",
           "System.Action\u00601\u003CSystem.Single\u003E Facet.Nav::OnInsetChanged",
+          "System.Boolean Facet.Nav::Collapsible()",
           "System.Boolean Facet.Nav::Compact()",
           "System.Boolean Facet.Nav::CompactButton()",
           "System.Single Facet.Nav::CollapseAt",
@@ -2110,6 +2112,7 @@
           "System.Void Facet.Nav::Filter(System.String)",
           "System.Void Facet.Nav::Go(Facet.NavItem)",
           "System.Void Facet.Nav::Tick()",
+          "System.Void Facet.Nav::set_Collapsible(System.Boolean)",
           "System.Void Facet.Nav::set_Compact(System.Boolean)",
           "System.Void Facet.Nav::set_CompactButton(System.Boolean)"
         ]
@@ -2328,6 +2331,7 @@
           "System.Single Facet.Window::MinWidth",
           "System.Single Facet.Window::RailAlign",
           "System.Single Facet.Window::Scale()",
+          "System.Single Facet.Window::get_Scale()",
           "System.Void Facet.Window::.ctor(UnityEngine.UIElements.VisualElement,System.String,System.String,UnityEngine.Rect)",
           "System.Void Facet.Window::SetContentInset(System.Single)",
           "System.Void Facet.Window::ShowSearch(System.String,System.Action\u00601\u003CSystem.String\u003E)",

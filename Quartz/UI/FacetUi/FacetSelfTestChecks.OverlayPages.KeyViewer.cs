@@ -31,16 +31,20 @@ internal static partial class FacetSelfTestChecks {
         "KEYVIEWER_DM_CSS_STATUS", "KEYVIEWER_DM_CSS_ENABLED", "KEYVIEWER_DM_CSS_IMPORT", "KEYVIEWER_DM_CSS_CLEAR",
         "KEYVIEWER_JS_STATUS", "KEYVIEWER_JS_ENABLED", "KEYVIEWER_JS_IMPORT", "KEYVIEWER_JS_RELOAD", "KEYVIEWER_JS_CLEAR",
         "KEYVIEWER_ANCHOR_LABEL", "KEYVIEWER_RESETPOS", "KEYVIEWER_RESETCOUNTS",
-    }.Where(k => k != "KEYVIEWER_SYNCLIMITER" || KvKeyLimiterBridge.Available), .. KvConf.JsPlugins.Select(p => "KEYVIEWER_JS_PLUGIN_" + p.PluginId.ToUpperInvariant())];
+    }.Where(k => k != "KEYVIEWER_SYNCLIMITER" || KvKeyLimiterBridge.Available), .. KvConf.JsPlugins.Select(p => Quartz.UI.Generator.GenerateUI.LocaleKeyFromId("keyviewer_js_plugin_" + p.PluginId))];
 
     private static IEnumerator OverlayKeyViewer(Action<string, bool, string> check, Action<string> info) {
         KeyViewerOverlay.EnsureConf();
         KeyViewerSettings c = KvConf;
         (bool tabub, bool dotted, float scale) = (c.TabubEnabled, c.GhostRainDotted, c.DmScale);
+        // A plugin whose id has a "-", off and never loaded: its switch must carry the classic toggle's key, where it is "_".
+        var plugin = new Quartz.Features.KeyViewer.Js.KvJsPluginRecord { Name = "Self Test Plugin", Enabled = false };
         yield return OnPage("keyviewer", KeyViewerPage, () => {
             (c.TabubEnabled, c.GhostRainDotted) = (true, true);   // the rows they hide show for the parity check
+            c.JsPlugins.Add(plugin);
             KeyViewerOverlay.Apply();
         }, () => {
+            c.JsPlugins.Remove(plugin);
             (c.TabubEnabled, c.GhostRainDotted, c.DmScale) = (tabub, dotted, scale);
             KeyViewerOverlay.Apply();
             KeyViewerOverlay.Save();
@@ -59,6 +63,7 @@ internal static partial class FacetSelfTestChecks {
         }));
         yield return EditorLink(check, KeyViewerPage, "MENU_KV_EDITOR");
         KeyViewerSearch(check);
+        SearchButtonRow(check, KeyViewerPage, "KEYVIEWER_RESETCOUNTS");
         yield return KeyViewerLights(check);
         // Through the row's own slider: the scale half a step up (down near the top), read off the hand's root.
         float want = scale + 0.5f <= 4f ? scale + 0.5f : scale - 0.5f;

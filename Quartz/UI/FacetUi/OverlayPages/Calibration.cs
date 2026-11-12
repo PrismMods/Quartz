@@ -13,8 +13,12 @@ internal static class Calibration {
     // Read on every call: a profile switch may replace what Calibration.Conf returns.
     private static CalibrationSettings C => Cal.Conf;
     private static readonly CalibrationSettings Def = new();
-    /// <summary>The timings the page last listed, copied as it read them: the logger's lists grow as runs end.</summary>
+    // The minimum the last switch-off cleared.
+    private static int cleared;
+#if DEBUG
+    /// <summary>The self-test's copy of the timings the page last listed, taken as it read them: the logger's lists grow as runs end.</summary>
     internal static (float[] Map, float[] All) Listed { get; private set; } = ([], []);
+#endif
 
     internal static void Page(VisualElement p) {
         Cal.EnsureConf();
@@ -53,10 +57,14 @@ internal static class Calibration {
             o.Max = 20;
             o.Default = Def.SongRepeat;
         });
-        // Off clears the minimum, as the classic switch does. The minimum's row follows at once: Facet re-reads rows every 100 ms.
+        // Off clears the minimum, as the classic switch does; undoing the off brings the cleared minimum back, which History
+        // never recorded. The minimum's row follows at once: Facet re-reads rows every 100 ms.
         ShellRows.Toggle(song, "CALIBRATION_SONG_USE_MINIMUM", "calibration_song_use_minimum", Bind.To(() => C.SongUseMinimum, v => {
             C.SongUseMinimum = v;
-            if(!v) C.SongMinimum = 0;
+            if(!v) {
+                cleared = C.SongMinimum;
+                C.SongMinimum = 0;
+            } else if(Facet.History.Applying && C.SongMinimum == 0) C.SongMinimum = cleared;
         }), () => QuartzShell.Surface?.Refresh(), save, o => {
             o.Default = Def.SongUseMinimum;
             o.Tooltip = "DESC_CALIBRATION_SONG_USE_MINIMUM";
@@ -70,10 +78,15 @@ internal static class Calibration {
 
         // Read as the page is built, as the classic page reads it: a run that ends later shows on the next visit.
         VisualElement history = Controls.Card(p, "SECTION_CALIBRATION_TIMING_HISTORY");
+#if DEBUG
         Listed = ([.. CalibrationTimingLogger.RecentForCurrentMap()], [.. CalibrationTimingLogger.RecentAll()]);
+        (IReadOnlyList<float> map, IReadOnlyList<float> all) = Listed;
+#else
+        IReadOnlyList<float> map = CalibrationTimingLogger.RecentForCurrentMap(), all = CalibrationTimingLogger.RecentAll();
+#endif
         int n = 0;
-        History(history, "CALIBRATION_TIMING_CURRENT_MAP", Listed.Map, ref n);
-        History(history, "CALIBRATION_TIMING_ALL_MAPS", Listed.All, ref n);
+        History(history, "CALIBRATION_TIMING_CURRENT_MAP", map, ref n);
+        History(history, "CALIBRATION_TIMING_ALL_MAPS", all, ref n);
 
         ShellRows.ResetPosition(Controls.Card(p, "MENU_LAYOUT"), "CALIBRATION_RESETPOS", CalibrationPopupUI.ResetPosition);
     }

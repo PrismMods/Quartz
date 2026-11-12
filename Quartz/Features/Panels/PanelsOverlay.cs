@@ -222,15 +222,17 @@ public static partial class PanelsOverlay {
         previewing = false;
         if(updater != null) updater.Update();
     }
-    // The panels shown, in an array kept between calls: the pane frames them every frame.
-    private static RectTransform[] previewFrame = [];
+    // The last panel shown, alone at its true size: framing them all shrinks panels spread over the screen until the font the
+    // page edits can't be judged. None shown gives an empty frame, so the pane's note says why. Kept between calls: the pane
+    // frames it every frame.
+    private static readonly RectTransform[] previewFrame = new RectTransform[1];
     private static IEnumerable<RectTransform> PreviewFrame() {
-        int n = 0;
-        foreach(LivePanel p in panels) if(Shown(p)) n++;
-        if(previewFrame.Length != n) previewFrame = new RectTransform[n];
-        n = 0;
-        foreach(LivePanel p in panels) if(Shown(p)) previewFrame[n++] = p.Rect;
-        return previewFrame;
+        for(int i = panels.Count - 1; i >= 0; i--)
+            if(Shown(panels[i])) {
+                previewFrame[0] = panels[i].Rect;
+                return previewFrame;
+            }
+        return [];
     }
     private static bool Shown(LivePanel p) => p.Rect != null && p.Rect.gameObject.activeSelf;
     public static void Dispose() {

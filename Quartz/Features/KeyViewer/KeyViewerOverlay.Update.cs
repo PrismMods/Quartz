@@ -99,7 +99,7 @@ public static partial class KeyViewerOverlay {
             bool isReorganizing = UICore.IsReorganizing;
             bool arranging = UICore.IsArranging;
             // A preview shows the keys light, but a press counts only where the Key Viewer would show without it.
-            counting = OverlaySwitch.Enabled && Conf.Enabled && (Conf.ShowOutsideGame || inGame) || arranging;
+            counting = Shows(inGame);
             bool show = counting || OverlayPreview.Is(FontKey);
             bool focused = focusKnown ? hasFocus : Application.isFocused;
             bool independent = Conf.Enabled && Conf.IndependentInput;

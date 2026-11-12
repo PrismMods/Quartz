@@ -50,8 +50,10 @@ public static class CalibrationPopupUI {
     // From a preview's begin to its end.
     private static bool previewing;
     private static readonly RectTransform[] previewFrame = new RectTransform[1];
-    /// <summary>A real suggestion is up (after a death), which a preview's end leaves shown.</summary>
+#if DEBUG
+    /// <summary>The self-test's view: a real suggestion is up (after a death), which a preview's end leaves shown.</summary>
     internal static bool Suggesting => visible;
+#endif
     public static void Initialize() {
         SceneManager.sceneUnloaded += OnSceneUnloaded;
         OverlayPreview.Register(PreviewId, () => canvasObj ? canvasObj.GetComponent<Canvas>() : null, PreviewFrame, BeginPreview, EndPreview,
