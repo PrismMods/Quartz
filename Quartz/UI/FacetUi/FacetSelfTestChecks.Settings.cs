@@ -317,10 +317,13 @@ internal static partial class FacetSelfTestChecks {
     // The open rail's width, which a drag of its handle may have changed.
     private static float RailFull => (float)typeof(Facet.Nav).GetField("_railWidth", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(QuartzShell.Nav);
     private static VisualElement RailButton => RailScroll?.Q(name: "rail-button");
+    // Layout puts each edge on a whole screen pixel, so a width reads up to a pixel off the one set (at 1.287 px/pt the 36 pt
+    // strip lays out as 47 px, 36.5 pt): one pixel, in points.
+    private static float RailTol => 1.01f / PanelPx(RailScroll);
 
     // Waits up to a second for the rail to land on a width, and reads it.
     private static IEnumerator RailSettles(float width, float[] got) {
-        for(float t0 = Time.realtimeSinceStartup; Time.realtimeSinceStartup - t0 < 1f && Mathf.Abs(RailScroll.resolvedStyle.width - width) > 0.5f;) yield return null;
+        for(float t0 = Time.realtimeSinceStartup; Time.realtimeSinceStartup - t0 < 1f && Mathf.Abs(RailScroll.resolvedStyle.width - width) > RailTol;) yield return null;
         got[0] = RailScroll.resolvedStyle.width;
     }
 
@@ -337,12 +340,12 @@ internal static partial class FacetSelfTestChecks {
             yield return PickItem("MENU_SIDEBAR", QuartzHost.Translate("MENU_SIDEBAR_TOGGLE"));
             yield return RailSettles(full, got);
             bool button = RailButton != null && Displayed(RailButton);
-            check("Sidebar, Toggleable: the rail is open with its button", QuartzShell.SidebarMode == 0 && button && !QuartzShell.Nav.Compact && Mathf.Abs(got[0] - full) <= 0.5f,
+            check("Sidebar, Toggleable: the rail is open with its button", QuartzShell.SidebarMode == 0 && button && !QuartzShell.Nav.Compact && Mathf.Abs(got[0] - full) <= RailTol,
                 $"mode={QuartzShell.SidebarMode} button={button} width={got[0]:0.0}/{full:0.0}");
             if(RailButton != null) Click(RailButton);
             yield return RailSettles(strip, got);
             string kept = QuartzHost.Host.Read(QuartzShell.CompactStore);
-            check("its button folds the rail to the icon strip, and the fold is kept", QuartzShell.Nav.Compact && kept == "1" && Mathf.Abs(got[0] - strip) <= 0.5f,
+            check("its button folds the rail to the icon strip, and the fold is kept", QuartzShell.Nav.Compact && kept == "1" && Mathf.Abs(got[0] - strip) <= RailTol,
                 $"kept={kept} width={got[0]:0.0}/{strip:0.0}");
             // As an added or removed category rebuilds the rail, then a close and an open.
             typeof(QuartzShell).GetMethod("BuildNav", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, null);
@@ -353,34 +356,34 @@ internal static partial class FacetSelfTestChecks {
             yield return Frames(2);
             FacetBridge.OpenNewMenu(CorePages.SettingsPageKey);
             yield return RailSettles(strip, got);
-            check("the fold survives a rebuild of the rail and a reopen", rebuilt && QuartzShell.Nav.Compact && RailButton != null && Mathf.Abs(got[0] - strip) <= 0.5f,
+            check("the fold survives a rebuild of the rail and a reopen", rebuilt && QuartzShell.Nav.Compact && RailButton != null && Mathf.Abs(got[0] - strip) <= RailTol,
                 $"rebuilt={rebuilt} width={got[0]:0.0}");
             if(RailButton != null) Click(RailButton);
             yield return RailSettles(full, got);
             check("the button opens it again, and the open rail is kept", !QuartzShell.Nav.Compact && QuartzHost.Host.Read(QuartzShell.CompactStore) == null
-                && Mathf.Abs(got[0] - full) <= 0.5f, $"width={got[0]:0.0}");
+                && Mathf.Abs(got[0] - full) <= RailTol, $"width={got[0]:0.0}");
             yield return RailDragStops(check, "Toggleable");
             QuartzHost.Host.Write(QuartzShell.CompactStore, "1");   // a fold kept from Toggleable: the other modes ignore it
             yield return PickItem("MENU_SIDEBAR", QuartzHost.Translate("MENU_SIDEBAR_SHOWN"));
             yield return RailSettles(full, got);
             check("Sidebar, Always visible: the rail is open, with no button", QuartzShell.SidebarMode == 1 && !QuartzShell.Nav.Compact && RailButton == null
-                && Mathf.Abs(got[0] - full) <= 0.5f, $"button={RailButton != null} width={got[0]:0.0}");
+                && Mathf.Abs(got[0] - full) <= RailTol, $"button={RailButton != null} width={got[0]:0.0}");
             yield return RailDragStops(check, "Always visible");
             yield return PickItem("MENU_SIDEBAR", QuartzHost.Translate("MENU_SIDEBAR_HIDDEN"));
             yield return RailSettles(strip, got);
             check("Sidebar, Always hidden: the rail is the icon strip, with no button", QuartzShell.SidebarMode == 2 && QuartzShell.Nav.Compact && RailButton == null
-                && Mathf.Abs(got[0] - strip) <= 0.5f, $"button={RailButton != null} width={got[0]:0.0}");
+                && Mathf.Abs(got[0] - strip) <= RailTol, $"button={RailButton != null} width={got[0]:0.0}");
             VisualElement page = Body;
             float x = page.worldBound.xMin;
             Leave(RailScroll);
             Hover(RailScroll);
             yield return RailSettles(full, got);
             bool still = Mathf.Abs(page.worldBound.xMin - x) <= 0.5f;
-            check("resting on the strip widens it over the page, which does not move", Mathf.Abs(got[0] - full) <= 0.5f && still,
+            check("resting on the strip widens it over the page, which does not move", Mathf.Abs(got[0] - full) <= RailTol && still,
                 $"width={got[0]:0.0}/{full:0.0} page={x:0.0}->{page.worldBound.xMin:0.0}");
             Leave(RailScroll);
             yield return RailSettles(strip, got);
-            check("leaving it narrows it again", Mathf.Abs(got[0] - strip) <= 0.5f, $"width={got[0]:0.0}");
+            check("leaving it narrows it again", Mathf.Abs(got[0] - strip) <= RailTol, $"width={got[0]:0.0}");
         } finally {
             QuartzHost.Host.Write(QuartzShell.CompactStore, compact);
             QuartzHost.Host.Write(QuartzShell.SidebarStore, mode);
@@ -407,7 +410,7 @@ internal static partial class FacetSelfTestChecks {
         bool open = QuartzShell.Nav.RailOpen;
         float w = RailScroll.resolvedStyle.width;
         check($"Sidebar, {mode}: dragging the rail's handle far left stops at its minimum width",
-            open && Displayed(RailScroll) && Mathf.Abs(w - Facet.Nav.MinRail) <= 0.5f, $"open={open} width={w:0.0}/{Facet.Nav.MinRail}");
+            open && Displayed(RailScroll) && Mathf.Abs(w - Facet.Nav.MinRail) <= RailTol, $"open={open} width={w:0.0}/{Facet.Nav.MinRail}");
         DragHandle(handle, was - (open ? w : 0f));   // from a shut rail a drag starts at no width
         var got = new float[1];
         yield return RailSettles(was, got);

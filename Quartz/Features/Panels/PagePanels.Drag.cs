@@ -1,5 +1,6 @@
 using Quartz.Core;
 using Quartz.Tween;
+using Quartz.UI.Generator;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -14,6 +15,8 @@ namespace Quartz.Features.Panels;
 internal static partial class PagePanels {
     private sealed class PanelSectionMarker : MonoBehaviour {
         public PanelConfig Config;
+        public int Built;   // the place its rows' ids ("panel2_textshadow") were made for
+        public GenerateUI.CollapsibleSection Section;
     }
     private abstract class RowDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler {
         public RectTransform Row;
@@ -27,6 +30,10 @@ internal static partial class PagePanels {
         private readonly List<(RectTransform rt, Vector2 oldPos)> reflowCapture = [];
         protected abstract bool IsRow(Transform t);
         protected abstract void OnDropped();
+        private void OnDestroy() {   // a drop can build the list again under its own tweens
+            scaleSeq?.Kill();
+            foreach(GTween slide in rowSlides.Values) slide?.Kill();
+        }
         private void AnimateReflow(Transform container) {
             reflowCapture.Clear();
             for(int i = 0; i < container.childCount; i++) {

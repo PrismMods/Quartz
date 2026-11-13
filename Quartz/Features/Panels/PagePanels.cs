@@ -46,6 +46,9 @@ internal static partial class PagePanels {
     }
     private static void RebuildPanelsList() {
         if(panelsList == null) return;
+        // Each panel's section opens or stays shut as it was, by the panel itself: names repeat.
+        Dictionary<PanelConfig, bool> open = [];
+        foreach(PanelSectionMarker m in panelsList.GetComponentsInChildren<PanelSectionMarker>(true)) open[m.Config] = m.Section.Expanded;
         GenerateUI.ClearChildren(panelsList.transform);
         List<PanelConfig> panels = PanelsOverlay.Conf.Panels;
         if(panels.Count == 0) {
@@ -60,7 +63,7 @@ internal static partial class PagePanels {
             );
         }
         for(int i = 0; i < panels.Count; i++)
-            CreatePanelSection(panelsList.transform, panels[i], i);
+            CreatePanelSection(panelsList.transform, panels[i], i, open.TryGetValue(panels[i], out bool was) ? was : null);
     }
     private static GameObject MakeListContainer(string name, Transform parent, float spacing) {
         GameObject obj = new(name);

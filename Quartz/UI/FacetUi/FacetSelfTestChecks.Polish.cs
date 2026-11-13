@@ -199,8 +199,9 @@ internal static partial class FacetSelfTestChecks {
                 if(t == null || !Displayed(t) || t.hierarchy.childCount == 0) continue;
                 seen++;
                 VisualElement knob = t.hierarchy[0];
-                float line = t.resolvedStyle.borderLeftWidth;
-                float want = h.Enabled ? t.resolvedStyle.width - knob.resolvedStyle.width - 2f - line : 2f - line;
+                // The knob rests 2 in from the track's outer edges. resolvedStyle.left is its laid-out x, which counts from the
+                // outer edge, border included (style.left counts from inside it), on whole screen pixels.
+                float want = h.Enabled ? t.resolvedStyle.width - knob.resolvedStyle.width - 2f : 2f;
                 if(Mathf.Abs(knob.resolvedStyle.left - want) >= 1f) off.Add($"{h.Id} {knob.resolvedStyle.left:0.#} vs {want:0.#}");
             }
             check("a tile's switch rebuilds the Features page, and every switch on it is at its value on the first frame after",

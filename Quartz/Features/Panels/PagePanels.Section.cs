@@ -18,12 +18,19 @@ using static UnityEngine.EventSystems.PointerEventData;
 using TMPro;
 namespace Quartz.Features.Panels;
 internal static partial class PagePanels {
-    private static void CreatePanelSection(Transform parent, PanelConfig panel, int index) {
+    private static readonly LabelSeparatorSpacing[] SeparatorSpacings = [LabelSeparatorSpacing.Both, LabelSeparatorSpacing.After, LabelSeparatorSpacing.None];
+    private static string SeparatorSpacingName(LabelSeparatorSpacing s) => s switch {
+        LabelSeparatorSpacing.After => GenerateUI.Tr("PANEL_SEPARATORSPACING_AFTER", "After only"),
+        LabelSeparatorSpacing.None => GenerateUI.Tr("PANEL_SEPARATORSPACING_NONE", "None"),
+        _ => GenerateUI.Tr("PANEL_SEPARATORSPACING_BOTH", "Both sides"),
+    };
+    private static void CreatePanelSection(Transform parent, PanelConfig panel, int index, bool? expanded) {
         PanelConfig def = new();
         string idp = "panel" + index;
         var sec = GenerateUI.Collapsible(parent, panel.Name, startExpanded: false);
         TMP_Text header = sec.Section.Find("Header/Bar/Label")?.GetComponent<TMP_Text>();
-        sec.Section.gameObject.AddComponent<PanelSectionMarker>().Config = panel;
+        PanelSectionMarker marker = sec.Section.gameObject.AddComponent<PanelSectionMarker>();
+        (marker.Config, marker.Built, marker.Section) = (panel, index, sec);
         AddPanelLayerHandle(sec, panel);
         void Save() => PanelsOverlay.Save();
         UIInput name = GenerateUI.Input(
@@ -135,6 +142,7 @@ internal static partial class PagePanels {
                 }, () => {
                     panel.Stats.Remove(entry);
                     colorExpanded.Remove(entry);
+                    if(replaceTarget == entry) ClosePicker();   // a pick would swap the removed stat, and be lost
                     Save();
                     RebuildRows();
                 }, () => {
@@ -225,6 +233,9 @@ internal static partial class PagePanels {
             idp + "_separator"
         );
         sep.InputField.characterLimit = 8;
+        GenerateUI.DropDown(GenerateUI.Row(sec.Body), def.LabelSeparatorSpacing, panel.LabelSeparatorSpacing, SeparatorSpacings, SeparatorSpacingName,
+            v => { panel.LabelSeparatorSpacing = v; Save(); }, idp + "_separatorspacing", 260f, "Separator spacing"
+        ).Rect.AddToolTip("DESC_PANEL_SEPARATORSPACING", "Spaces drawn around the label separator. None draws it exactly as typed.");
         static float fontFilter(float v) => Mathf.Clamp(Mathf.Round(v), 12f, 48f);
         UISlider font = GenerateUI.Slider(
             GenerateUI.Row(sec.Body),
@@ -332,12 +343,11 @@ internal static partial class PagePanels {
             GenerateUI.Row(sec.Body),
             () => {
                 PanelsOverlay.Conf.Panels.Remove(panel);
-                PanelsOverlay.Save();
-                PanelsOverlay.Rebuild();
-                RebuildPanelsList();
+                PanelsMoved();
             },
             "Delete Panel",
             idp + "_delete"
         ).SetSecondary();
+        if(expanded is bool open) sec.SetExpanded(open, false, false);   // as it was before the list was built again
     }
 }

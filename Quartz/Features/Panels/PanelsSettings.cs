@@ -65,6 +65,7 @@ public sealed class PanelConfig {
     public int Decimals = 2;
     public float FontSize = 22f;
     public string LabelSeparator = "|";
+    public LabelSeparatorSpacing LabelSeparatorSpacing = LabelSeparatorSpacing.Both;
     public float LineSpacing = 0f;
     public bool BackgroundEnabled = true;
     public float BgR = 0.165f;
@@ -106,6 +107,7 @@ public sealed class PanelConfig {
             [nameof(Decimals)] = Decimals,
             [nameof(FontSize)] = FontSize,
             [nameof(LabelSeparator)] = LabelSeparator,
+            [PanelSeparator.Key] = (int)LabelSeparatorSpacing,
             [nameof(LineSpacing)] = LineSpacing,
             [nameof(BackgroundEnabled)] = BackgroundEnabled,
             [nameof(BgR)] = BgR,
@@ -147,6 +149,7 @@ public sealed class PanelConfig {
         p.Decimals = IOUtils.Read(token, nameof(Decimals), p.Decimals);
         p.FontSize = IOUtils.Read(token, nameof(FontSize), p.FontSize);
         p.LabelSeparator = IOUtils.Read(token, nameof(LabelSeparator), p.LabelSeparator);
+        p.LabelSeparatorSpacing = PanelSeparator.Read(token, p.LabelSeparator);   // after the text: a panel saved without it keeps its look
         p.LineSpacing = IOUtils.Read(token, nameof(LineSpacing), p.LineSpacing);
         p.BackgroundEnabled = IOUtils.Read(token, nameof(BackgroundEnabled), p.BackgroundEnabled);
         IOUtils.ReadRgba(token, "Bg", ref p.BgR, ref p.BgG, ref p.BgB, ref p.BgA);

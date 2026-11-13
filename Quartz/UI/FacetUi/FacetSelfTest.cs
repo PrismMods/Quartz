@@ -84,9 +84,9 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
         }
     }
     // The player may have switched off features the Facet checks open: Effect Remover's page, Otto Icon's tile switch, and
-    // Visual Tweaks beside it on the Features page. Turn them on for the run only, in memory, and put every switch back after:
-    // Features.json is the player's and keeps its bytes.
-    private static readonly string[] Needed = ["effectremover", "ottoicon", "visualtweaks"];
+    // Visual Tweaks beside it on the Features page, and Combo, whose overlay the preview checks borrow. Turn them on for the
+    // run only, in memory, and put every switch back after: Features.json is the player's and keeps its bytes.
+    private static readonly string[] Needed = ["effectremover", "ottoicon", "visualtweaks", "combo"];
     private IEnumerator FeaturesOn(IEnumerator run) {
         string path = FeatureState.Path;
         byte[] file = File.Exists(path) ? File.ReadAllBytes(path) : null;

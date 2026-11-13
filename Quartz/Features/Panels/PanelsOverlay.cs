@@ -128,10 +128,6 @@ public static partial class PanelsOverlay {
             ? MainCore.Tr.Get(LocaleKey("PANEL_STAT_", stat.Id), stat.Label)
             : stat.Label;
     }
-    internal static string EffectiveSeparator(string raw) {
-        if(string.IsNullOrEmpty(raw)) return " ";
-        return raw.Length == 1 ? " " + raw + " " : raw;
-    }
     public static string LocalizedCategory(string category)
         => MainCore.Tr.Get(LocaleKey("PANEL_CATEGORY_", category), category);
     private static string LocaleKey(string prefix, string id) {

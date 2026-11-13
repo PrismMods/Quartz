@@ -117,10 +117,21 @@ internal static partial class PagePanels {
                 panelsList.transform.GetChild(i).GetComponent<PanelSectionMarker>();
             if(marker != null && marker.Config != null) order.Add(marker.Config);
         }
-        if(order.Count == 0) return;
+        if(order.Count == 0 || order.SequenceEqual(PanelsOverlay.Conf.Panels)) return;
         PanelsOverlay.Conf.Panels.Clear();
         PanelsOverlay.Conf.Panels.AddRange(order);
+        PanelsMoved();
+    }
+    // The list was reordered or a panel deleted under the classic sections: each panel's hotkeys follow it from the place its
+    // section was built at to its place now (a deleted panel's go with it), and the sections are built again, so their rows'
+    // ids match the new places, and the hotkeys stay on their panels after a restart too.
+    private static void PanelsMoved() {
+        PanelSectionMarker[] built = panelsList.GetComponentsInChildren<PanelSectionMarker>(true);
+        int[] to = Enumerable.Repeat(-1, built.Select(m => m.Built + 1).DefaultIfEmpty().Max()).ToArray();
+        foreach(PanelSectionMarker m in built) to[m.Built] = PanelsOverlay.Conf.Panels.IndexOf(m.Config);
+        if(PanelBinds.Moved(MainCore.Conf.ToggleKeybinds, to)) MainCore.ConfMgr.RequestSave();
         PanelsOverlay.Save();
         PanelsOverlay.Rebuild();
+        RebuildPanelsList();
     }
 }

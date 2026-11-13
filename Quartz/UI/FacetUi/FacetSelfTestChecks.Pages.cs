@@ -25,15 +25,16 @@ internal static partial class FacetSelfTestChecks {
     private static IEnumerator HomePage(Action<string, bool, string> check, Action<string> info) {
         bool wasOpen = UICore.IsOpen;
         string stored = QuartzHost.Host.Read(Switches);
-        // Key Limiter's card is the status row checked, Combo an element Edit layout moves: both on for the duration.
-        var flipped = new List<(string id, bool had, bool value)>();
+        // Key Limiter's card is the status row checked, Combo an element Edit layout moves: both on for the duration, in memory
+        // only. Neither they nor the dependency switching one on pulls in reach Features.json; the run's end puts that back.
+        var flipped = new List<string>();
         if(wasOpen) UICore.Close(true);
         HandOff.ReturnTo = HandOff.Menu.None;
         try {
             foreach(string id in new[] { "keylimiter", "combo" }) {
                 if(FeatureService.IsEnabled(id)) continue;
-                flipped.Add((id, FeatureService.State.Features.TryGetValue(id, out bool v), v));
-                FeatureService.SetEnabled(id, true);
+                flipped.Add(id);
+                FeatureService.SetEnabledForRun(id, true);
             }
             yield return Frames(3);
             FacetBridge.OpenNewMenu(CorePages.HomePageKey);
@@ -52,7 +53,7 @@ internal static partial class FacetSelfTestChecks {
             HandOff.ReturnTo = HandOff.Menu.None;
             QuartzShell.Hide();
             if(UICore.IsOpen) UICore.Close(true);
-            for(int i = flipped.Count - 1; i >= 0; i--) RestoreFeature(flipped[i].id, false, flipped[i].had, flipped[i].value);
+            for(int i = flipped.Count - 1; i >= 0; i--) FeatureService.SetEnabledForRun(flipped[i], false);
             if(wasOpen) UICore.Open(true);
         }
         yield return Frames(3);
@@ -393,16 +394,17 @@ internal static partial class FacetSelfTestChecks {
 
     // A switched-off feature keeps its name in the player's language: after a language change and a reload of the
     // language files, the Overlay tab row's Combo tab and the Combo stub's header read the Korean name.
+    // Combo goes off for the run only: Features.json keeps its bytes.
     private static IEnumerator OffNameKorean(Action<string, bool, string> check) {
         const string id = "combo", key = "SECTION_COMBO";
-        bool was = FeatureService.IsEnabled(id), had = FeatureService.State.Features.TryGetValue(id, out bool stored);
+        bool was = FeatureService.IsEnabled(id);
         string lang = MainCore.Tr.Language, english = MainCore.Tr.GetForLanguage(key, "en-US", key);
         string korean = MainCore.Tr.GetForLanguage(key, "ko-KR", english), stub = null, name = null, tab = null, head = null;
         bool isStub = false, loaded = false;
         int frames = 0;
         try {
             MainCore.Tr.Language = "en-US";   // on a rig already in Korean, the switch below would change nothing
-            FeatureService.SetEnabled(id, false);
+            FeatureService.SetEnabledForRun(id, false);
             yield return Frames(3);
             stub = NavRegistry.KeyFor(FeaturePages.StateFor(id));
             isStub = FeaturePages.IsStub(NavRegistry.ByKey(stub));
@@ -422,7 +424,7 @@ internal static partial class FacetSelfTestChecks {
             }
         } finally {
             MainCore.Tr.Language = lang;
-            RestoreFeature(id, was, had, stored);
+            if(FeatureService.IsEnabled(id) != was) FeatureService.SetEnabledForRun(id, was);
         }
         check("a switched-off feature's tab and stub header read its Korean name within 3 frames of a language change and reload",
             isStub && loaded && korean != english && name == key && tab == korean && head == korean,

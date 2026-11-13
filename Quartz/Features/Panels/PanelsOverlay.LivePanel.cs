@@ -23,6 +23,7 @@ public static partial class PanelsOverlay {
         public string LastBody;
         public bool Dirty = true;
         public string SeparatorSource;
+        public LabelSeparatorSpacing SeparatorSpacing;
         public string Separator;
         public Func<string, string> ResolveToken;
         public TMP_SpriteAsset Sprites;
@@ -70,9 +71,10 @@ public static partial class PanelsOverlay {
             if(show) {
                 PanelConfig c = p.Config;
                 SyncPanelImages(p);
-                if(p.Separator == null || p.SeparatorSource != c.LabelSeparator) {
+                if(p.Separator == null || p.SeparatorSource != c.LabelSeparator || p.SeparatorSpacing != c.LabelSeparatorSpacing) {
                     p.SeparatorSource = c.LabelSeparator;
-                    p.Separator = EffectiveSeparator(c.LabelSeparator);
+                    p.SeparatorSpacing = c.LabelSeparatorSpacing;
+                    p.Separator = PanelSeparator.Draw(c.LabelSeparator, c.LabelSeparatorSpacing);
                 }
                 string separator = p.Separator;
                 if(!string.IsNullOrEmpty(c.Prefix)) sb.AppendLine(c.Prefix);
