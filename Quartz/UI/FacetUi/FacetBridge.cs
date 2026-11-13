@@ -162,6 +162,22 @@ internal static class FacetBridge {
         }
 #endif
     }
+    /// <summary>
+    /// Per frame from PrismBridge.Tick: Facet's smooth scrolling flag, shared by every loaded Facet, follows PrismLib's setting.
+    /// Never probes, and writes only a change. A Facet without the flag (an older copy) loses only this, with one log line:
+    /// it never takes the new menu down.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void SetSmoothScroll(bool on) {
+#if !IL2CPP
+        if(state == 1 && !smoothGone) {
+            try { SetSmoothScrollImpl(on); } catch(Exception e) {
+                smoothGone = true;
+                MainCore.Log.Wrn($"Facet smooth scrolling unavailable: {e.Message}");
+            }
+        }
+#endif
+    }
     /// <summary>Drops the language hook and disposes Quartz's Facet surfaces. No-op when Facet never ran.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void Shutdown() {
@@ -172,6 +188,7 @@ internal static class FacetBridge {
 #endif
     }
 #if !IL2CPP
+    private static bool smoothGone;   // the flag's own: a Facet without it keeps everything else
     // A Facet failure after a successful probe (a mismatched build): report once, stay off.
     private static void Fail(Exception e) {
         if(state == 2) return;
@@ -213,6 +230,10 @@ internal static class FacetBridge {
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void TickWheelImpl(Vector2 pointer, float delta) {
         global::Facet.Input.TickWheel(pointer, delta);   // Facet counts a notch once per frame across mods
+    }
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void SetSmoothScrollImpl(bool on) {
+        if(global::Facet.Anim.SmoothScroll != on) global::Facet.Anim.SmoothScroll = on;
     }
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void ShutdownImpl() => QuartzHost.Shutdown();

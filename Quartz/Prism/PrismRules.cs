@@ -85,6 +85,14 @@ internal static class PrismRules {
         return TabToKey.TryGetValue(name, out key) ? TabPrefix + get(key, name) : null;
     }
     /// <summary>
+    /// PrismLib's shared smooth scrolling switch as stored under scroll.smooth: off only when the trimmed value is "0" or
+    /// "false" (any case); missing, empty or anything else reads on. Config.GetBool would read a stray value as off.
+    /// </summary>
+    public static bool SmoothOn(string stored) {
+        string v = stored?.Trim();
+        return v != "0" && !string.Equals(v, "false", StringComparison.OrdinalIgnoreCase);
+    }
+    /// <summary>
     /// PrismLib gives a mod no "the layout editor is open" signal, but the editor reads every target's box each
     /// frame it is open: a frame with a read opens the session, and it stays open Grace frames past the last one.
     /// </summary>

@@ -4,7 +4,7 @@ using System.Reflection;
 using Facet;
 using Quartz.Core;
 using Quartz.Features;
-using Quartz.Features.EffectRemover;
+using Quartz.Prism;
 using Quartz.UI.Nav;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -273,30 +273,39 @@ internal static partial class FacetSelfTestChecks {
         foreach(var r in results) check(r.name, r.ok, r.detail);
     }
 
-    // Two mods ticking the wheel in one frame scroll one notch.
+    // Two mods ticking the wheel in one frame scroll one notch: at once with smooth scrolling off, and with it on once the
+    // glide has settled (nothing moves in the step's own frame). The glide is 200 ms whatever the player's animation duration.
+    // The page must overflow by a notch, whichever features the player has on: Settings, in a window at its minimum height.
     private static IEnumerator ShellWheel(Action<string, bool, string> check) {
-        string mode = EffectRemover.Conf.Mode;
         Rect rect = QuartzShell.Window.Rect;
-        // The page must overflow by a notch: Enhanced is the longer mode, and a window at its minimum height leaves
-        // little room (with its sections folded, Enhanced fits an 80% window).
-        EffectRemover.Conf.Mode = EffectRemoverSettings.ModeEnhanced;
+        Action restore = PrismBridge.KeepPrismConfig();
         QuartzShell.Window.Rect = new Rect(rect.x, rect.y, rect.width, global::Facet.Window.MinHeight);
         try {
-            QuartzShell.Go("visuals.effectremover");
+            QuartzShell.Go(CorePages.SettingsPageKey);
             yield return Frames(3);
             ScrollView sv = ContentScroll;
-            sv.scrollOffset = Vector2.zero;
-            yield return Frames(1);
-            float before = sv.scrollOffset.y;
-            FacetBridge.TickWheel(ScreenCentre(sv), -1f);
-            FacetBridge.TickWheel(ScreenCentre(sv), -1f);
-            float moved = sv.scrollOffset.y - before;
-            // One notch in the page's own px: Scroll Speed in classic canvas px, brought to this window's scale.
-            float notch = MainCore.Conf.ScrollSpeed * ClassicPx / (PanelPx(sv) * QuartzShell.Window.Scale);
-            check("two wheel ticks in one frame scroll the new menu one notch", Mathf.Abs(moved - notch) < 0.5f, $"moved={moved:0.#} notch={notch:0.#}");
+            foreach(bool on in new[] { false, true }) {
+                SmoothSwitch(on);
+                sv.scrollOffset = Vector2.zero;
+                yield return Frames(1);
+                float before = sv.scrollOffset.y, speed = global::Facet.Anim.Speed;
+                global::Facet.Anim.Speed = 1f;
+                FacetBridge.TickWheel(ScreenCentre(sv), -1f);
+                FacetBridge.TickWheel(ScreenCentre(sv), -1f);
+                global::Facet.Anim.Speed = speed;
+                float now = sv.scrollOffset.y - before;
+                if(on) yield return WaitGlide();
+                float moved = sv.scrollOffset.y - before;
+                // One notch in the page's own px: Scroll Speed in classic canvas px, brought to this window's scale.
+                float notch = MainCore.Conf.ScrollSpeed * ClassicPx / (PanelPx(sv) * QuartzShell.Window.Scale);
+                if(on) check("smooth scrolling on: two wheel ticks in one frame glide the new menu one notch, nothing in that frame",
+                    Mathf.Abs(now) < 0.5f && Mathf.Abs(moved - notch) < 0.5f, $"in its frame={now:0.#} settled={moved:0.#} notch={notch:0.#}");
+                else check("two wheel ticks in one frame scroll the new menu one notch", Mathf.Abs(moved - notch) < 0.5f, $"moved={moved:0.#} notch={notch:0.#}");
+            }
         } finally {
-            EffectRemover.Conf.Mode = mode;
             QuartzShell.Window.Rect = rect;
+            restore();
+            PrismBridge.Tick();
         }
     }
 
@@ -310,10 +319,13 @@ internal static partial class FacetSelfTestChecks {
     }
 
     // A wheel unit moves the page as far on screen as the classic menu at the same Scroll Speed, a trackpad's tenth a
-    // tenth of that, and a changed Scroll Speed shows on the next scroll.
+    // tenth of that, and a changed Scroll Speed shows on the next scroll. Smooth scrolling off, the step lands in its own
+    // frame; on, it glides there: a quarter into the 200 ms glide the page is strictly between start and target (a frame
+    // that ran past the glide's end re-runs the step once), and once settled it has moved the same distance.
     private static IEnumerator ShellWheelSpeed(Action<string, bool, string> check) {
         float speed = MainCore.Conf.ScrollSpeed;
         Rect rect = QuartzShell.Window.Rect;
+        Action restore = PrismBridge.KeepPrismConfig();
         QuartzShell.Window.Rect = new Rect(rect.x, rect.y, rect.width, global::Facet.Window.MinHeight);
         try {
             QuartzShell.Go(CorePages.SettingsPageKey);
@@ -324,19 +336,41 @@ internal static partial class FacetSelfTestChecks {
                 ("...a trackpad's 0.1 a tenth of that", 80f, 0.1f),
                 ("...and Scroll Speed 160 twice as far, on the next scroll", 160f, 1f),
             ];
-            foreach(var (name, s, delta) in steps) {
-                MainCore.Conf.ScrollSpeed = s;
-                sv.scrollOffset = Vector2.zero;
-                yield return Frames(1);
-                float top = sv.contentContainer.worldBound.y;
-                FacetBridge.TickWheel(ScreenCentre(sv), -delta);
-                yield return Frames(1);
-                float moved = (top - sv.contentContainer.worldBound.y) * PanelPx(sv), want = s * delta * ClassicPx;
-                check(name, Mathf.Abs(moved - want) <= 1f, $"moved={moved:0.0} want={want:0.0} screen px");
+            foreach(bool on in new[] { false, true }) {
+                SmoothSwitch(on);
+                foreach(var (name, s, delta) in steps) {
+                    MainCore.Conf.ScrollSpeed = s;
+                    float now = 0f, mid = float.NaN, moved = 0f;
+                    for(int run = 0; run < 2 && float.IsNaN(mid); run++) {
+                        sv.scrollOffset = Vector2.zero;
+                        yield return Frames(1);
+                        float top = sv.contentContainer.worldBound.y, start = Time.realtimeSinceStartup, anim = global::Facet.Anim.Speed;
+                        global::Facet.Anim.Speed = 1f;
+                        FacetBridge.TickWheel(ScreenCentre(sv), -delta);
+                        global::Facet.Anim.Speed = anim;
+                        now = sv.scrollOffset.y;
+                        if(on) {
+                            while(Time.realtimeSinceStartup - start < 0.05f) yield return null;
+                            if(Time.realtimeSinceStartup - start < 0.2f) mid = sv.scrollOffset.y;
+                            yield return WaitGlide();
+                        } else {
+                            mid = now;
+                            yield return Frames(1);
+                        }
+                        moved = (top - sv.contentContainer.worldBound.y) * PanelPx(sv);
+                    }
+                    float want = s * delta * ClassicPx, end = sv.scrollOffset.y, step = want / (PanelPx(sv) * QuartzShell.Window.Scale);
+                    string d = $"moved={moved:0.0} want={want:0.0} screen px; page px: in its frame={now:0.##} a quarter in={mid:0.##} settled={end:0.##}";
+                    if(on) check("smooth scrolling on: " + name + ", gliding there",
+                        Mathf.Abs(now) < 0.01f && mid > 0.01f && mid < end - 0.01f && Mathf.Abs(moved - want) <= 1f, d);
+                    else check(name + ", in its own frame (smooth scrolling off)", Mathf.Abs(now - step) < 0.5f && Mathf.Abs(moved - want) <= 1f, d);
+                }
             }
         } finally {
             MainCore.Conf.ScrollSpeed = speed;
             QuartzShell.Window.Rect = rect;
+            restore();
+            PrismBridge.Tick();
         }
     }
 

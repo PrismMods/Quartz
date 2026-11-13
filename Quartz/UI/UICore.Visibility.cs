@@ -334,8 +334,11 @@ public static partial class UICore {
     // The preview opens from the settings panel, often the one over the hub; it comes back to the same place.
     private static bool previewFromHub, previewOverHub;
     internal static void HandToPreview() {
-        previewFromHub = IsReorganizing;
-        previewOverHub = panelOverHub;
+        // A classic page's own button to the new menu, in a session the hub began, keeps the hub's hand-back.
+        if(IsReorganizing || !MenuHandOff.FromHub) {
+            previewFromHub = IsReorganizing;
+            previewOverHub = panelOverHub;
+        }
         Close(true);   // the menu's canvas draws above every UI Toolkit panel
     }
     internal static void BackFromPreview() {
@@ -353,7 +356,7 @@ public static partial class UICore {
         if(FacetBridge.NewMenuVisible()) {
             // Opened over the hub it shuts everything, as the hotkey does over the classic panel there; opened from a
             // classic panel elsewhere, its Hidden brings that panel back.
-            if(previewFromHub && MenuHandOff.ReturnTo == MenuHandOff.Menu.Classic) MenuHandOff.ReturnTo = MenuHandOff.Menu.None;
+            if((previewFromHub || MenuHandOff.FromHub) && MenuHandOff.ReturnTo == MenuHandOff.Menu.Classic) MenuHandOff.ReturnTo = MenuHandOff.Menu.None;
             FacetBridge.HideNewMenu();
             return;
         }

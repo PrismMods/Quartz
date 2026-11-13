@@ -160,6 +160,24 @@ public static class FeatureService {
             RebuildUI(follow);
         });
     }
+#if DEBUG && !IL2CPP
+    // Self-tests only: SetEnabled for this session, never written to FeatureState or Features.json, so a run can bring up
+    // the features its checks open and put the player's switches back after. Runs on the main thread, as the self-test does.
+    internal static void SetEnabledForRun(string id, bool enabled) {
+        Handle handle = Find(id);
+        if(handle == null) return;
+        HashSet<string> affected = new(StringComparer.Ordinal);
+        Collect(handle, enabled, affected);
+        foreach(string other in affected) {
+            if(Find(other) is not Handle target) continue;
+            target.Enabled = enabled;
+            if(enabled) target.Error = null;
+        }
+        string follow = FeaturePages.FeatureOf(Quartz.UI.Nav.NavRegistry.ByState(UICore.CurrentMenuState));
+        Sync();
+        RebuildUI(follow);
+    }
+#endif
     private static void Collect(Handle handle, bool enabled, HashSet<string> into) {
         if(!into.Add(handle.Id)) return;
         if(enabled) {

@@ -18,7 +18,7 @@ namespace Quartz.UI.FacetUi;
 /// </summary>
 internal static partial class FacetSelfTestChecks {
     private static readonly string[] SettingsCardKeys =
-        ["PRISM_GROUP_MENU", "MENU_GROUP_APPEARANCE", "MENU_GROUP_BEHAVIOUR", "LANGUAGE", "MENU_GROUP_MAINTENANCE", "PRISM_GROUP_EXPERIMENTAL", "CREDITS"];
+        ["PRISM_GROUP_MENU", "MENU_GROUP_APPEARANCE", "HEADING_ANIMATION", "MENU_GROUP_BEHAVIOUR", "LANGUAGE", "MENU_GROUP_MAINTENANCE", "PRISM_GROUP_EXPERIMENTAL", "CREDITS"];
     // Each switch row, the classic page's toggle for the same field, and the field.
     private static readonly (string row, string classic, Func<bool> get)[] SettingsSwitches = [
         ("SHOW_OVERLAYER_PANEL_AT_STARTUP", "show_on_startup", () => MainCore.Conf.ShowOnStartup),
@@ -27,6 +27,7 @@ internal static partial class FacetSelfTestChecks {
         ("SHOW_TOOLTIP", "show_tooltip", () => MainCore.Conf.Tooltip),
         ("MIDDLE_CLICK_TO_SET_AS_DEFAULT", "middle_click_default", () => MainCore.Conf.MiddleClickToDefault),
         ("PRISM_NEW_MENU", "prism_new_menu", () => MainCore.Conf.ExperimentalNewMenu),
+        ("SMOOTH_SCROLL", "smooth_scroll", () => PrismBridge.SmoothScroll),   // PrismLib's: the page puts its settings file back
     ];
 
     private static IEnumerator SettingsPage(Action<string, bool, string> check) {
@@ -36,6 +37,7 @@ internal static partial class FacetSelfTestChecks {
             c.ScrollSpeed, c.ToggleKey, c.ToggleModifier, c.Language, c.LanguageAutoDetected, c.PanelWidth, c.PanelHeight, UICore.LastPanelSize);
         bool newMenu = c.ExperimentalNewMenu;
         string trLang = MainCore.Tr.Language;
+        Action restore = PrismBridge.KeepPrismConfig();
         if(wasOpen) UICore.Close(true);
         HandOff.ReturnTo = HandOff.Menu.None;
         try {
@@ -49,8 +51,11 @@ internal static partial class FacetSelfTestChecks {
             yield return SettingsHotkey(check);
             yield return SettingsHandOffs(check);
             SettingsRest(check);
+            yield return SettingsSmooth(check);
             yield return SettingsLanguage(check);
         } finally {
+            restore();
+            PrismBridge.Tick();
             MainCore.Tr.Language = trLang;
             c = MainCore.Conf;
             Vector2 size;
@@ -104,6 +109,7 @@ internal static partial class FacetSelfTestChecks {
     private static IEnumerator SettingsSwitchRows(Action<string, bool, string> check) {
         int state = NavRegistry.StateFor(CorePages.SettingsPageKey);
         foreach(var (row, classic, get) in SettingsSwitches) {
+            if(row == "SMOOTH_SCROLL" && !PrismBridge.Available) continue;   // that switch is PrismLib's
             bool before = get();
             VisualElement track = Body.Q(name: row + "-input");
             if(track == null) { check($"{row}: its switch", false, "no " + row + "-input"); continue; }

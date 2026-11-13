@@ -241,6 +241,21 @@ internal static partial class PageSettings {
         );
         scrollSpeed.Format = "0 px";
         var scrollTr = scrollSpeed.Label.gameObject.AddComponent<TextLocalization>().Init("SCROLL_SPEED", "Scroll Speed");
+        // PrismLib's setting, shared by every Prism window: only where PrismLib is.
+        if(Quartz.Prism.PrismBridge.Available) {
+            UIToggle smoothToggle = GenerateUI.Toggle(
+                GenerateUI.Row(content.transform),
+                true,
+                Quartz.Prism.PrismBridge.SmoothScroll,
+                v => Quartz.Prism.PrismBridge.SmoothScroll = v,
+                "Smooth Scrolling",
+                "smooth_scroll"
+            );
+            smoothToggle.Rect.AddToolTip(
+                "DESC_SMOOTH_SCROLL",
+                "Glides every Prism window to where the mouse wheel sends it instead of jumping. The same setting as in Prism · Settings."
+            );
+        }
         var opacityRow = GenerateUI.Row(content.transform);
         UISlider opacity = GenerateUI.Slider(
             opacityRow,

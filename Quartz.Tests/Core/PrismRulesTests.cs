@@ -44,6 +44,16 @@ static class PrismRulesTests {
         Assert(PrismRules.OwnsChords(available: false, debugClaimed: false, foreignLib: false), "no PrismLib anywhere: Quartz answers alone");
         Assert(!PrismRules.OwnsChords(available: false, debugClaimed: false, foreignLib: true), "another mod's older PrismLib: its holder answers, not Quartz too");
     }
+    public static void TestSmoothOn() {
+        Assert(PrismRules.SmoothOn(null), "a missing scroll.smooth reads on");
+        Assert(PrismRules.SmoothOn(""), "an empty one reads on");
+        Assert(PrismRules.SmoothOn("1"), "\"1\" reads on");
+        Assert(!PrismRules.SmoothOn("0"), "\"0\" reads off");
+        Assert(PrismRules.SmoothOn("true"), "\"true\" reads on");
+        Assert(!PrismRules.SmoothOn("False"), "\"False\" reads off, in any case");
+        Assert(PrismRules.SmoothOn("garbage"), "a stray value reads on");
+        Assert(!PrismRules.SmoothOn(" 0 "), "\" 0 \" reads off once trimmed");
+    }
     public static void TestLayoutSession() {
         var s = new PrismRules.LayoutSession();
         Assert(!s.Open(0), "closed before any read");

@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Quartz.Compat.Interface;
 using Quartz.Core;
+using Quartz.Features;
 using UnityEngine;
 namespace Quartz.UI.FacetUi;
 /// <summary>
@@ -36,7 +37,7 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
                 return;
             }
             log = new StringBuilder();
-            steps.Push(Powered(body != null ? body(Check, Info) : Run()));
+            steps.Push(Powered(body != null ? body(Check, Info) : FeaturesOn(Run())));
         }
         while(steps.Count > 0) {
             IEnumerator top = steps.Peek();
@@ -80,6 +81,31 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
             Check("the run puts Quartz's power back and leaves the stored switch alone",
                 MainCore.IsModEnabled == wasOn && MainCore.Conf.Active == wasActive,
                 $"on={MainCore.IsModEnabled} wasOn={wasOn} active={MainCore.Conf.Active} wasActive={wasActive}");
+        }
+    }
+    // The player may have switched off features the Facet checks open: Effect Remover's page, Otto Icon's tile switch, and
+    // Visual Tweaks beside it on the Features page. Turn them on for the run only, in memory, and put every switch back after:
+    // Features.json is the player's and keeps its bytes.
+    private static readonly string[] Needed = ["effectremover", "ottoicon", "visualtweaks"];
+    private IEnumerator FeaturesOn(IEnumerator run) {
+        string path = FeatureState.Path;
+        byte[] file = File.Exists(path) ? File.ReadAllBytes(path) : null;
+        Dictionary<string, bool> was = FeatureService.Features.ToDictionary(h => h.Id, h => h.Enabled);
+        try {
+            foreach(string id in Needed)
+                if(!FeatureService.IsEnabled(id)) FeatureService.SetEnabledForRun(id, true);
+            string on = string.Join(", ", FeatureService.Features.Where(h => h.Enabled && !was[h.Id]).Select(h => h.Id));
+            Info($"features: turned on for the run: {(on == "" ? "none" : on)}");
+            if(on != "") for(int f = Time.frameCount + 3; Time.frameCount < f;) yield return null;
+            yield return run;
+        } finally {
+            foreach(FeatureService.Handle h in FeatureService.Features)
+                if(h.Enabled != was[h.Id]) FeatureService.SetEnabledForRun(h.Id, was[h.Id]);
+            string off = string.Join(", ", FeatureService.Features.Where(h => h.Enabled != was[h.Id]).Select(h => h.Id));
+            byte[] now = File.Exists(path) ? File.ReadAllBytes(path) : null;
+            Check("the run puts every feature switch back and leaves Features.json's bytes alone",
+                off == "" && (file == null ? now == null : now != null && now.SequenceEqual(file)),
+                $"not back={(off == "" ? "none" : off)} bytes={now?.Length ?? -1}/{file?.Length ?? -1}");
         }
     }
     // Logged, never counted: facts for a reader, not assertions.

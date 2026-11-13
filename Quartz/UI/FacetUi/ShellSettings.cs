@@ -22,6 +22,7 @@ internal static class ShellSettings {
         Controls.PageHeader(p, "SETTINGS", null, o => o.Id = "menu-header");
         Menu(Card(p, "PRISM_GROUP_MENU"));
         Appearance(Card(p, "MENU_GROUP_APPEARANCE"));
+        Animation(Card(p, "HEADING_ANIMATION", o => o.VisibleWhen = () => PrismBridge.Available));   // its switch is a PrismLib setting
         Behaviour(Card(p, "MENU_GROUP_BEHAVIOUR"));
         Language(Card(p, "LANGUAGE"));
         Maintenance(Card(p, "MENU_GROUP_MAINTENANCE"));
@@ -121,6 +122,11 @@ internal static class ShellSettings {
             Save();
             UICore.Rebuild();
         }, "DESC_COLOR_PICKER_HORIZONTAL");
+    }
+
+    // PrismLib's Smooth scrolling, shared by every Prism window, then the animation duration Prism · Settings holds.
+    private static void Animation(VisualElement card) {
+        Switch(card, "SMOOTH_SCROLL", () => PrismBridge.SmoothScroll, v => PrismBridge.SmoothScroll = v, "DESC_SMOOTH_SCROLL");
         Controls.Action(card, "MENU_ANIM", "MENU_OPEN_PRISM", PrismBridge.OpenPrismSettings, o => {
             o.Id = "MENU_ANIM";
             o.VisibleWhen = () => PrismBridge.Available && PrismBridge.UiAvailable;   // Prism · Settings needs PrismLib.dll as well

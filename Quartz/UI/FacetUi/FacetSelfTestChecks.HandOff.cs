@@ -226,6 +226,31 @@ internal static partial class FacetSelfTestChecks {
         Step(check, "switch on: from the hub, the hotkey over the new menu back from its trips shuts everything",
             ok[0] && AllShut() && HandOff.ReturnTo == HandOff.Menu.None);
         yield return ShutAll();
+        yield return FxHop(ok);
+        UICore.Toggle();
+        yield return Frames(3);
+        Step(check, "switch on: from the hub, the hotkey over the new menu a classic page's own button opened shuts everything",
+            ok[0] && AllShut() && HandOff.ReturnTo == HandOff.Menu.None);
+        yield return ShutAll();
+        yield return FxHop(ok);
+        CloseNewMenu("close");
+        yield return Frames(3);
+        Step(check, "switch on: from the hub, the close of the new menu a classic page's own button opened goes back to the hub", ok[0] && AtHub());
+        yield return ShutAll();
+    }
+
+    // From the hub, Settings' Classic menu, then the classic Effect Remover page's "Open in the new menu (preview)": the
+    // session stays the hub's.
+    private static IEnumerator FxHop(bool[] ok) {
+        yield return FromHub(ok);
+        yield return ClassicTrip(ok, stay: true);
+        int state = NavRegistry.StateFor(FxPage);
+        MenuFactory.SetState(state);
+        yield return Frames(2);
+        ok[0] &= UICore.Pages.TryGetValue(state, out RectTransform page) && page != null
+            && ClickLabel(page, MainCore.Tr.Get("FXRM_OPEN_NEW_MENU", "Open in the new menu (preview)"));
+        yield return Frames(2);
+        ok[0] &= FacetBridge.NewMenuVisible() && !UICore.IsOpen && QuartzShell.CurrentPage == FxPage;
     }
 
     // Holding the hotkey resets the classic panel's saved size, but not when the press hid the new menu: that panel was not
@@ -279,12 +304,14 @@ internal static partial class FacetSelfTestChecks {
     }
 
     // The hub's Settings button, released over itself as a click is; false when the hub shows no such button.
-    private static bool ClickHubSettings() {
-        Transform hub = UICore.CanvasObj.transform.Find("ReorganizeHub");
-        string want = MainCore.Tr.Get("SETTINGS", "Settings");
-        TMPro.TextMeshProUGUI label = hub == null ? null : hub.GetComponentsInChildren<TMPro.TextMeshProUGUI>(true).FirstOrDefault(t => t.text == want);
+    private static bool ClickHubSettings() =>
+        ClickLabel(UICore.CanvasObj.transform.Find("ReorganizeHub"), MainCore.Tr.Get("SETTINGS", "Settings"));
+
+    // A classic button under root, found by its label, clicked as the pointer's release over it does.
+    private static bool ClickLabel(Transform root, string want) {
+        TMPro.TextMeshProUGUI label = root == null ? null : root.GetComponentsInChildren<TMPro.TextMeshProUGUI>(true).FirstOrDefault(t => t.text == want);
         EventSystem es = EventSystem.current;
-        if(hub == null || label == null || es == null || !hub.gameObject.activeInHierarchy) return false;
+        if(root == null || label == null || es == null || !root.gameObject.activeInHierarchy) return false;
         GameObject button = label.transform.parent.gameObject;
         var up = new PointerEventData(es) { button = PointerEventData.InputButton.Left, pointerCurrentRaycast = new RaycastResult { gameObject = button } };
         return ExecuteEvents.Execute(button, up, ExecuteEvents.pointerUpHandler);

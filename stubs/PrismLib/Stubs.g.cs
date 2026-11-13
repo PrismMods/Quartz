@@ -23,7 +23,9 @@ namespace PrismLib {
         public static void ReleaseAll(string owner) => throw null;
     }
     public static unsafe partial class Config {
+        public static string Get(string key, string fallback = default) => throw null;
         public static bool GetBool(string key, bool fallback = default) => throw null;
+        public static void SetBool(string key, bool value) => throw null;
     }
     public static unsafe partial class Diagnostics {
         public static global::System.Collections.Generic.IEnumerable<global::PrismLib.FieldGroup> Fields { get => throw null; }
@@ -102,6 +104,7 @@ namespace PrismLib {
         public const string AnimKey = "AnimKey";
         public const string FpsKey = "FpsKey";
         public const string RestartKey = "RestartKey";
+        public const string SmoothKey = "SmoothKey";
         public static readonly global::System.Version Version;
         public static int AnimDuration { get => throw null; }
         public static global::System.Collections.Generic.IEnumerable<string> LoadedMods { get => throw null; }

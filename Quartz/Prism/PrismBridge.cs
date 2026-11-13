@@ -130,6 +130,7 @@ internal static partial class PrismBridge {
     [MethodImpl(MethodImplOptions.NoInlining)]
     internal static void Tick() {
         try { UICore.SetSharedLayout(layout.Open(Time.frameCount)); } catch(Exception e) { MainCore.Log.Wrn($"Shared layout state failed: {e.Message}"); } // no PrismLib type: runs without PrismLib too, and then never opens
+        TickSmooth();   // every flavour, outside the UI half: Facet's flag follows with PrismLib.UI missing or PrismLib absent
 #if !IL2CPP && !QUARTZ_KEYVIEWER
         TickAnim();
         if(UiAvailable) {

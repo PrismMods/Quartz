@@ -197,6 +197,7 @@ List<(string Name, Action Run)> tests = [
     ("Prism finds every PrismLib.UI copy a loader could load", PrismRulesTests.TestUiCopies),
     ("Prism's store folder: a byte-loaded Quartz.dll finds its loader's runtime root", PrismRulesTests.TestStoreDir),
     ("Quartz answers the Prism chords only as the holder, or with no PrismLib loaded", PrismRulesTests.TestOwnsChords),
+    ("Smooth scrolling reads off only for a stored \"0\" or \"false\"", PrismRulesTests.TestSmoothOn),
     ("A shared layout session is open while an editor reads and for two frames after", PrismRulesTests.TestLayoutSession),
     ("Prism key modifiers map Keybind's order onto PrismLib's bits", PrismRulesTests.TestPrismMods),
     ("The menu hotkey refuses Prism's chords, bare modifiers and mouse buttons", PrismRulesTests.TestHotkeyRefusals),

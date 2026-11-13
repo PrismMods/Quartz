@@ -445,6 +445,8 @@
     "REORGANIZE_Y": "Y 위치",
     "REORGANIZE_ROTATION": "회전",
     "SCROLL_SPEED": "스크롤 속도",
+    "SMOOTH_SCROLL": "부드러운 스크롤",
+    "DESC_SMOOTH_SCROLL": "마우스 휠로 스크롤할 때 모든 Prism 창이 바로 건너뛰지 않고 부드럽게 움직여요. Prism · 설정과 같은 설정이에요.",
     "SEARCH": "검색",
     "SEARCH_NO_RESULTS": "검색 결과가 없어요",
     "SEARCH_QUERY": "검색",

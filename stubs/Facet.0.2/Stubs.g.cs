@@ -12,6 +12,14 @@
 #pragma warning disable CS0067, CS0169, CS0649, CS0108, CS0109, CS0114, CS0465, CS0824
 
 namespace Facet {
+    public static unsafe partial class Anim {
+        public const int Fast = 0;
+        public const int Hover = 1;
+        public const int Instant = 2;
+        public const int Normal = 3;
+        public const int Slow = 4;
+        public static bool SmoothScroll { get => throw null; set { } }
+    }
     public static unsafe partial class Bind {
         public static global::Facet.Bind<T> To<T>(global::System.Func<T> get, global::System.Action<T> set) => throw null;
     }
@@ -54,7 +62,7 @@ namespace Facet {
         private Control() { }
     }
     public static unsafe partial class Controls {
-        public const float RowHeight = 0f;
+        public const float RowHeight = 5f;
         public static global::UnityEngine.UIElements.Button Action(global::UnityEngine.UIElements.VisualElement parent, string label, string button, global::System.Action onClick, global::System.Action<global::Facet.ControlOptions> configure = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Advanced(global::UnityEngine.UIElements.VisualElement card, string label = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Card(global::UnityEngine.UIElements.VisualElement parent, string title, global::System.Action<global::Facet.CardOptions> configure = default) => throw null;
@@ -90,8 +98,8 @@ namespace Facet {
         protected DropdownOptions() { }
     }
     public static unsafe partial class History {
-        public const float CoalesceSeconds = 1f;
-        public const int Limit = 2;
+        public const float CoalesceSeconds = 6f;
+        public const int Limit = 7;
         public static bool Applying { get => throw null; }
     }
     public sealed unsafe partial class Host {
@@ -138,9 +146,9 @@ namespace Facet {
         Tooltip = 4,
     }
     public sealed unsafe partial class Nav {
-        public const float CollapseAt = 3f;
-        public const float MaxRail = 4f;
-        public const float MinRail = 5f;
+        public const float CollapseAt = 8f;
+        public const float MaxRail = 9f;
+        public const float MinRail = 10f;
         public global::System.Action<bool> OnCompactChanged;
         public global::System.Action<float> OnInsetChanged;
         public bool Collapsible { get => throw null; set { } }
@@ -287,9 +295,9 @@ namespace Facet {
         public static void Run() => throw null;
     }
     public sealed unsafe partial class Window {
-        public const float MinHeight = 6f;
-        public const float MinWidth = 7f;
-        public const float RailAlign = 8f;
+        public const float MinHeight = 11f;
+        public const float MinWidth = 12f;
+        public const float RailAlign = 13f;
         public global::UnityEngine.UIElements.VisualElement Body { get => throw null; }
         public global::UnityEngine.Rect Rect { get => throw null; set { } }
         public global::UnityEngine.UIElements.VisualElement Root { get => throw null; }

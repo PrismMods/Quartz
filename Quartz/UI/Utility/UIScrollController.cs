@@ -2,6 +2,7 @@
 using GTweens.Extensions;
 using GTweens.Tweens;
 using Quartz.Core;
+using Quartz.Prism;
 using UnityEngine;
 using UnityEngine.UI;
 namespace Quartz.UI.Utility;
@@ -21,6 +22,13 @@ public class UIScrollController : MonoBehaviour {
         if(content == null || viewport == null) return;
         HandleWheel();
         HandleRightDrag();
+        // Content that shrank under the offset (an open section deleted at the page's end) left the view past its end, blank,
+        // until the next wheel notch. Checked here, a frame on: a deleted row is destroyed and laid out only after the frame.
+        float max = Mathf.Max(0f, content.rect.height - viewport.rect.height);
+        if(targetY > max) {
+            targetY = max;
+            ApplyTween();
+        }
     }
     private bool PointerOverViewport() =>
         viewport != null && RectTransformUtility.RectangleContainsScreenPoint(viewport, Input.mousePosition, null);
@@ -75,6 +83,13 @@ public class UIScrollController : MonoBehaviour {
         targetY = Mathf.Clamp(targetY, 0f, maxOffset);
     }
     private void ApplyTween() {
+        if(!PrismBridge.SmoothScroll) {   // PrismLib's Smooth scrolling off: the wheel, a right-drag and ScrollTo land at once
+            tweenedTo = targetY;
+            scrollTween?.Kill();
+            scrollTween = null;
+            content.anchoredPosition = new Vector2(content.anchoredPosition.x, targetY);
+            return;
+        }
         if(scrollTween != null && tweenedTo.Equals(targetY)) return;
         tweenedTo = targetY;
         scrollTween?.Kill();

@@ -1899,6 +1899,19 @@
     "assembly": "Facet.0.2",
     "types": [
       {
+        "type": "Facet.Anim",
+        "members": [
+          "System.Boolean Facet.Anim::SmoothScroll()",
+          "System.Boolean Facet.Anim::get_SmoothScroll()",
+          "System.Int32 Facet.Anim::Fast",
+          "System.Int32 Facet.Anim::Hover",
+          "System.Int32 Facet.Anim::Instant",
+          "System.Int32 Facet.Anim::Normal",
+          "System.Int32 Facet.Anim::Slow",
+          "System.Void Facet.Anim::set_SmoothScroll(System.Boolean)"
+        ]
+      },
+      {
         "type": "Facet.Bind",
         "members": [
           "Facet.Bind\u00601\u003CT\u003E Facet.Bind::To(System.Func\u00601\u003CT\u003E,System.Action\u00601\u003CT\u003E)"
@@ -2675,7 +2688,9 @@
       {
         "type": "PrismLib.Config",
         "members": [
-          "System.Boolean PrismLib.Config::GetBool(System.String,System.Boolean)"
+          "System.Boolean PrismLib.Config::GetBool(System.String,System.Boolean)",
+          "System.String PrismLib.Config::Get(System.String,System.String)",
+          "System.Void PrismLib.Config::SetBool(System.String,System.Boolean)"
         ]
       },
       {
@@ -2795,6 +2810,7 @@
           "System.String PrismLib.Prism::AnimKey",
           "System.String PrismLib.Prism::FpsKey",
           "System.String PrismLib.Prism::RestartKey",
+          "System.String PrismLib.Prism::SmoothKey",
           "System.Version PrismLib.Prism::Version"
         ]
       },

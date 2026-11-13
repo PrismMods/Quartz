@@ -15,10 +15,12 @@ internal static class PrismSelfTest {
         yield return PrismSelfTestChecks.Windows(check, info);
         yield return PrismSelfTestChecks.Undo(check);
         yield return PrismSelfTestChecks.Settings(check, info);
+        yield return PrismSelfTestChecks.Smooth(check);
         yield return PrismSelfTestChecks.NewMenu(check, info);
         yield return PrismSelfTestChecks.Arrange(check);
         yield return PrismSelfTestChecks.Layout(check, info);
         yield return PrismSelfTestChecks.UiOff(check);
+        PrismSelfTestChecks.SmoothUiOff(check);
     }
 }
 #endif

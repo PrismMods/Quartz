@@ -445,6 +445,8 @@
     "REORGANIZE_Y": "Y Position",
     "REORGANIZE_ROTATION": "Rotation",
     "SCROLL_SPEED": "Scroll Speed",
+    "SMOOTH_SCROLL": "Smooth Scrolling",
+    "DESC_SMOOTH_SCROLL": "Glides every Prism window to where the mouse wheel sends it instead of jumping. The same setting as in Prism · Settings.",
     "SEARCH": "Search",
     "SEARCH_NO_RESULTS": "No results.",
     "SEARCH_QUERY": "Search",
