@@ -241,10 +241,6 @@ internal static partial class FacetSelfTestChecks {
 
     // With no Quartz element to move, no session ever starts: the editor alone keeps the new menu shut, until it closes.
     private static IEnumerator HomeLayoutNoTargets(Action<string, bool, string> check, Action<string> info) {
-        if(!PrismBridge.UiAvailable) {
-            info("PrismLib.UI is not loaded: the no-target Edit layout check is skipped");
-            yield break;
-        }
         var saved = new List<(string id, bool was, bool had, bool value)>();
         List<ReorganizeHandle> handles = HandleList(), kept = [.. handles];
         try {

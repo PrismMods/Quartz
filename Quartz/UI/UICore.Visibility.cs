@@ -28,8 +28,8 @@ public static partial class UICore {
     public static bool IsOpen => isOpen;
     /// <summary>A Quartz menu is up: the classic uGUI menu or the new one.</summary>
     internal static bool MenuShowing => isOpen || FacetBridge.NewMenuVisible();
-    /// <summary>The hub's Settings button opens the new menu: the experimental switch is on and Facet can run it.</summary>
-    internal static bool NewMenuWanted => MainCore.Conf.ExperimentalNewMenu && FacetBridge.Available();
+    /// <summary>The hub's Settings button opens the new menu: the experimental switch is on and the new menu can exist (FacetBridge.MenuAvailable).</summary>
+    internal static bool NewMenuWanted => MainCore.Conf.ExperimentalNewMenu && FacetBridge.MenuAvailable();
     public static Vector2 LastPanelPosition;
     public static Vector2 LastPanelSize;
     public static Vector2 DefaultPanelSize {

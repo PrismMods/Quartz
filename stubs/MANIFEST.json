@@ -3281,6 +3281,14 @@
         ]
       },
       {
+        "type": "PrismLib.UI.Toolkit.SuiteShell",
+        "members": [
+          "System.String PrismLib.UI.Toolkit.SuiteShell::CompactStore",
+          "System.String PrismLib.UI.Toolkit.SuiteShell::PageStore",
+          "System.String PrismLib.UI.Toolkit.SuiteShell::SidebarStore"
+        ]
+      },
+      {
         "type": "PrismLib.UI.Toolkit.Theme",
         "members": [
           "System.IDisposable PrismLib.UI.Toolkit.Theme::Use(PrismLib.UI.Toolkit.Theme)",

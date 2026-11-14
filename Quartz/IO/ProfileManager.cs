@@ -154,7 +154,7 @@ public static partial class ProfileManager {
             MainCore.Runtime.SetModEnabled(MainCore.Conf.Active, true);
             CompleteSwitch();
             // The profile load rebuilds the UI; only the new menu's build-ahead is skipped, so a switch turning it on does it here.
-            if(!newMenuWasOn && MainCore.Conf.ExperimentalNewMenu && FacetBridge.Available()) FacetBridge.PrebuildNewMenu();
+            if(!newMenuWasOn && MainCore.Conf.ExperimentalNewMenu && FacetBridge.MenuAvailable()) FacetBridge.PrebuildNewMenu();
             return true;
         } catch(Exception e) {
             MainCore.Log.Err($"[{nameof(ProfileManager)}] Apply '{name}' failed: {e}");

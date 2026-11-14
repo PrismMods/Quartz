@@ -12,9 +12,10 @@ namespace Quartz.Prism;
 /// KeyViewer flavour, before Unity 6 or when its Facet is missing). FacetBridge's shape: every entry is
 /// NoInlining, checks its half, and calls a NoInlining ...Impl inside a try; a failure turns that half
 /// off with one log line. No PrismLib or PrismLib.UI type in a field or a signature here, and no file
-/// outside Quartz/Prism names one, except the key viewer editor's FacetUi files (KvEditorDoor's door):
-/// the CLR resolves field types when a class loads and a method's types when it is JITted, before any
-/// try can catch. PrismLib's tools/check-bridge.sh pins this.
+/// outside Quartz/Prism names one, except the key viewer editor's FacetUi files (KvEditorDoor's door) and
+/// the new menu's suite shell, reached only past ShellAvailable (FacetBridge.MenuAvailable) from NoInlining
+/// helpers: the CLR resolves field types when a class loads and a method's types when it is JITted, before
+/// any try can catch. PrismLib's tools/check-bridge.sh pins this.
 /// </summary>
 internal static partial class PrismBridge {
     internal const string Id = "Quartz";
@@ -33,6 +34,32 @@ internal static partial class PrismBridge {
             if(ui == 0) ui = ProbeUi() ? 1 : 2;
             return ui == 1;
         }
+    }
+    private static int shell; // 0 = not probed, 1 = has the suite shell, 2 = has not
+    /// <summary>
+    /// PrismLib.UI is available and has the suite shell the new menu is built on: an older copy that another mod
+    /// loaded first has not. UiAvailable is read live (a failure can turn it off later); only the shell probe is cached.
+    /// </summary>
+    internal static bool ShellAvailable {
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        get {
+            if(!UiAvailable) return false;
+            if(shell == 0) shell = ProbeShell() ? 1 : 2;
+            return shell == 1;
+        }
+    }
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static bool ProbeShell() {
+#if IL2CPP || QUARTZ_KEYVIEWER
+        return false;
+#else
+        try {
+            return ShellName() == "PrismLib.UI";
+        } catch(Exception e) {
+            MainCore.Log.Wrn($"PrismLib.UI has no suite shell (an older copy loaded first): the classic menu only - {e.GetType().Name}");
+            return false;
+        }
+#endif
     }
     /// <summary>Loads PrismLib through the vendored bootstrap. Runs before anything loads PrismLib.UI or Facet.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -258,6 +285,8 @@ internal static partial class PrismBridge {
     }
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static string UiName() => typeof(PrismLib.UI.Toolkit.InputGate).Assembly.GetName().Name;
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static string ShellName() => typeof(PrismLib.UI.Toolkit.SuiteShell).Assembly.GetName().Name;
     // The store folder holding Quartz.dll (PayloadLoader loads it from there).
     internal static string StoreDir(IQuartzHost host) =>
         PrismRules.StoreDir(typeof(PrismBridge).Assembly.Location, Loader == "UMM", host.ModsPath, host.QuartzFilePath, Info.DisplayVersion);
@@ -320,7 +349,7 @@ internal static partial class PrismBridge {
                 Set = SetMenuModifier,
             },
         ];
-        if(FacetBridge.Available()) // no switch for a menu that cannot open
+        if(FacetBridge.MenuAvailable()) // no switch for a menu that cannot open
             rows.Add(new PrismLib.SettingEntry {
                 Id = "quartz.experimental.newMenu", Kind = PrismLib.SettingKind.Bool, Page = "Quartz", Group = "Experimental", Order = 2,
                 Label = "Experimental: new menu", Tooltip = "The Settings button the menu hotkey shows opens the new menu. It is still being built; the classic menu stays available",
@@ -344,6 +373,7 @@ internal static partial class PrismBridge {
         new("hotkey", Keybind.Format((Keybind.KeyModifier)MainCore.Conf.ToggleModifier, (KeyCode)MainCore.Conf.ToggleKey)),
         new("facet", FacetBridge.Available() ? "loaded" : "unavailable"),
         new("prismlib.ui", UiAvailable ? "loaded" : "unavailable"),
+        new("suite shell", ShellAvailable ? "loaded" : "unavailable"),
         new("scene", UnityEngine.SceneManagement.SceneManager.GetActiveScene().name),
     ];
     // Quartz's menu stays clickable under another mod's window; autoplay keeps its input; Prism windows speak

@@ -5,6 +5,7 @@ using System.Text;
 using Quartz.Compat.Interface;
 using Quartz.Core;
 using Quartz.Features;
+using Quartz.Prism;
 using UnityEngine;
 namespace Quartz.UI.FacetUi;
 /// <summary>
@@ -141,8 +142,10 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
         log.AppendLine($"{(ok ? "PASS" : "FAIL")} {check}{(detail == null ? "" : " - " + detail)}");
     }
     private IEnumerator Run() {
-        bool facet = FacetBridge.Available();
-        log.AppendLine($"MODE {(facet ? "facet-present" : "facet-absent")}");
+        bool menu = FacetBridge.MenuAvailable();
+        // Why the new menu is absent: the first of Facet, PrismLib.UI and its suite shell that is missing.
+        string reason = !FacetBridge.Available() ? "facet" : !PrismBridge.UiAvailable ? "prismlib-ui" : "shell";
+        log.AppendLine(menu ? "MODE menu-present" : $"MODE menu-absent reason={reason}");
         // Check 1: the page is registered, and its builder runs twice here, outside
         // PageFactory.EnsureBuilt (which swallows build exceptions), so a failure reaches FAIL.
         try {
@@ -164,7 +167,7 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
         Check("a throwing section logs one runner FAIL and the run goes on with the next check", RunnerSurvivesThrow(out string runner), runner);
         string newLog = ReadQuartzLog();
         int unavailable = CountOccurrences(newLog, "Facet unavailable");
-        if(facet) {
+        if(menu) {
             // Check 2: Facet loaded, exactly one assembly of that name.
             int loaded = AppDomain.CurrentDomain.GetAssemblies().Count(a => a.GetName().Name == "Facet.0.2");
             Check("facet available", true);
@@ -173,31 +176,62 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
             // Facet-naming checks live in their own class so this one never names a Facet type.
             yield return FacetSelfTestChecks.Run(Check, Info);
         } else {
-            // Check 3: absent, reported exactly once after two page builds.
-            Check("facet reported unavailable", !FacetBridge.Available());
-            Check("exactly one 'Facet unavailable' log line", unavailable == 1, $"count={unavailable}");
-            // The switch on where the new menu cannot run changes nothing: the hotkey keeps the classic menu.
-            bool was = MainCore.Conf.ExperimentalNewMenu, wasOpen = UICore.IsOpen;
-            MainCore.Conf.ExperimentalNewMenu = true;
-            try {
-                if(wasOpen) UICore.Close(true);
-                UICore.Toggle();
-                for(int f = Time.frameCount + 2; Time.frameCount < f;) yield return null;
-                Check("switch on without Facet: the hotkey opens the classic menu", UICore.IsOpen && !FacetBridge.NewMenuVisible(), $"open={UICore.IsOpen}");
-                Check("no new-menu switch on the Settings page", !SwitchRowOnSettingsPage());
-                Check("no preview button on the menu page", !PreviewButtonOnPage());
-            } finally {
-                MainCore.Conf.ExperimentalNewMenu = was;
-                MainCore.ConfMgr.RequestSave();   // a save while it was on would have written it
-                if(wasOpen && !UICore.IsOpen) UICore.Open(true);
-                else if(!wasOpen && UICore.IsOpen) UICore.Close(true);
+            // Check 3: absent, reported exactly once, by the first missing part.
+            if(reason == "facet") {
+                Check("facet reported unavailable", !FacetBridge.Available());
+                Check("exactly one 'Facet unavailable' log line", unavailable == 1, $"count={unavailable}");
+            } else if(reason == "prismlib-ui") {
+                int ui = CountOccurrences(newLog, "PrismLib.UI unavailable");
+                Check("facet available", FacetBridge.Available());
+                Check("PrismLib.UI reported unavailable", !PrismBridge.UiAvailable);
+                Check("exactly one 'PrismLib.UI unavailable' log line", ui == 1, $"count={ui}");
+                Check("no 'Facet unavailable' logged", unavailable == 0, $"count={unavailable}");
+            } else {
+                int noShell = CountOccurrences(newLog, "PrismLib.UI has no suite shell");
+                Check("facet available", FacetBridge.Available());
+                Check("the suite shell reported unavailable", PrismBridge.UiAvailable && !PrismBridge.ShellAvailable,
+                    $"ui={PrismBridge.UiAvailable} shell={PrismBridge.ShellAvailable}");
+                Check("exactly one 'PrismLib.UI has no suite shell' log line", noShell == 1, $"count={noShell}");
+                Check("no 'Facet unavailable' logged", unavailable == 0, $"count={unavailable}");
             }
+            yield return ClassicFallback();
+        }
+    }
+    // Without the new menu the switch on changes nothing: the hotkey keeps the classic menu, and nothing offers the new one.
+    private IEnumerator ClassicFallback() {
+        bool was = MainCore.Conf.ExperimentalNewMenu, wasOpen = UICore.IsOpen;
+        MainCore.Conf.ExperimentalNewMenu = true;
+        try {
+            if(wasOpen) UICore.Close(true);
+            UICore.Toggle();
+            for(int f = Time.frameCount + 2; Time.frameCount < f;) yield return null;
+            Check("switch on without the new menu: the hotkey opens the classic menu", UICore.IsOpen && !FacetBridge.NewMenuVisible(), $"open={UICore.IsOpen}");
+            Check("no new-menu switch on the Settings page", !SwitchRowOnSettingsPage());
+            Check("no preview button on the menu page", !PreviewButtonOnPage());
+            // Shows nothing because the gate refused, not because a caught throw turned Facet off for the session.
+            bool open = UICore.IsOpen, facet = FacetBridge.Available();
+            int logged = CountOccurrences(ReadQuartzLog(), "Facet unavailable");
+            FacetBridge.OpenNewMenu();
+            for(int f = Time.frameCount + 2; Time.frameCount < f;) yield return null;
+            int loggedAfter = CountOccurrences(ReadQuartzLog(), "Facet unavailable");
+            Check("OpenNewMenu shows nothing",
+                !FacetBridge.NewMenuVisible() && UICore.IsOpen == open && FacetBridge.Available() == facet && loggedAfter == logged,
+                $"open={open}->{UICore.IsOpen} facet={facet}->{FacetBridge.Available()} 'Facet unavailable'={logged}->{loggedAfter}");
+#if !QUARTZ_KEYVIEWER
+            // A PrismLib.UI with the layout switcher but no suite shell: the switcher's Edit keeps to the classic menu.
+            if(FacetBridge.KvSwitcherUsable()) yield return FacetSelfTestChecks.KvSwitcherEditClassic(Check);
+#endif
+        } finally {
+            MainCore.Conf.ExperimentalNewMenu = was;
+            MainCore.ConfMgr.RequestSave();   // a save while it was on would have written it
+            if(wasOpen && !UICore.IsOpen) UICore.Open(true);
+            else if(!wasOpen && UICore.IsOpen) UICore.Close(true);
         }
     }
     /// <summary>The run under the marker facet-level-selftest: checks made inside a level, which it enters itself.</summary>
     internal static IEnumerator Level(Action<string, bool, string> check, Action<string> info) {
-        if(FacetBridge.Available()) yield return FacetSelfTestChecks.InLevel(check, info);
-        else check("facet available", false, null);
+        if(FacetBridge.MenuAvailable()) yield return FacetSelfTestChecks.InLevel(check, info);
+        else check("new menu available", false, null);
     }
     // The menu page's "open in the new menu" button, found by its label on a freshly built page.
     internal static bool PreviewButtonOnPage() {
@@ -211,7 +245,7 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
     internal static bool HasPreviewButton(Transform page) =>
         HasLabel(page, MainCore.Tr.Get("FXRM_OPEN_NEW_MENU", "Open in the new menu (preview)"));
     // The classic Settings page's new-menu switch, found by its label on a page built into a throwaway host. Here, not
-    // with the Facet checks: the facet-absent run asks it too.
+    // with the Facet checks: the menu-absent run asks it too.
     internal static bool SwitchRowOnSettingsPage() {
         var host = new GameObject("FacetSelfTestSettings", typeof(RectTransform)).GetComponent<RectTransform>();
         host.SetParent(UICore.Panel, false);

@@ -2,7 +2,6 @@
 using System.Collections;
 using Facet;
 using Quartz.Core;
-using Quartz.Prism;
 using UnityEngine;
 namespace Quartz.UI.FacetUi;
 /// <summary>The suite look on Quartz's Facet theme: sizes, neutral roles, the accent, and what a window wears.</summary>
@@ -10,11 +9,6 @@ internal static partial class FacetSelfTestChecks {
     private static bool Hex(Color c, uint rgb) =>
         Near(c, new Color32((byte)(rgb >> 16), (byte)(rgb >> 8), (byte)rgb, 255));
     private static IEnumerator Suite(Action<string, bool, string> check, Action<string> info) {
-        if(!PrismBridge.UiAvailable) {
-            info("suite: PrismLib.UI unavailable, Facet's own look");
-            check("suite: unsuited without PrismLib.UI", !QuartzHost.Suited, $"suited={QuartzHost.Suited}");
-            yield break;
-        }
         Theme th = QuartzHost.Host.Theme;
         Sizes z = th.Sizes;
         Color accent = MainCore.Conf.GetAccentColor();

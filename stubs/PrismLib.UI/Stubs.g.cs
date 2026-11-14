@@ -261,6 +261,13 @@ namespace PrismLib.UI.Toolkit {
     public static unsafe partial class Suite {
         public static global::Facet.Theme Wear(global::Facet.Theme t) => throw null;
     }
+    public sealed unsafe partial class SuiteShell : global::System.IDisposable {
+        public const string CompactStore = "CompactStore";
+        public const string PageStore = "PageStore";
+        public const string SidebarStore = "SidebarStore";
+        private SuiteShell() { }
+        void global::System.IDisposable.Dispose() => throw null;
+    }
     public sealed unsafe partial class Theme {
         public global::UnityEngine.Color Accent { get => throw null; set { } }
         public Theme() => throw null;
@@ -275,9 +282,9 @@ namespace PrismLib.UI.Toolkit {
         public static void TickWheel(global::UnityEngine.Vector2 pointerScreen, float delta) => throw null;
     }
     public sealed unsafe partial class Window {
-        public const float MinHeight = 54f;
-        public const float MinWidth = 55f;
-        public const float RailAlign = 56f;
+        public const float MinHeight = 57f;
+        public const float MinWidth = 58f;
+        public const float RailAlign = 59f;
         public static global::System.Func<string, string> Read;
         public static global::System.Action<string, string> Write;
         private Window() { }

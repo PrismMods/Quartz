@@ -379,6 +379,21 @@ internal static partial class FacetSelfTestChecks {
         yield return KvBackOnPage();
     }
 
+    /// <summary>The menu-absent run's check, with the new-menu switch on but no suite shell: a card's Edit opens the classic
+    /// menu on the Key Viewer page, never the new menu.</summary>
+    internal static IEnumerator KvSwitcherEditClassic(Action<string, bool, string> check) => KvGuard(check, () => KvEditClassic(check));
+
+    private static IEnumerator KvEditClassic(Action<string, bool, string> check) {
+        if(UICore.IsOpen) UICore.Close(true);
+        yield return Frames(1);
+        typeof(KvEditorPage).GetMethod("Edit", BindingFlags.NonPublic | BindingFlags.Static)!.Invoke(null, [KvStore.Current.SelectedTab]);
+        yield return Frames(3);
+        int state = NavRegistry.StateFor(KeyViewerPage);
+        check("without the suite shell, the switcher's Edit opens the classic menu on the Key Viewer page",
+            UICore.IsOpen && UICore.CurrentMenuState == state && !FacetBridge.NewMenuVisible(),
+            $"open={UICore.IsOpen} state={UICore.CurrentMenuState}/{state} menu={FacetBridge.NewMenuVisible()}");
+    }
+
     private static IEnumerator KvBackOnPage() {
         Quartz.UI.MenuHandOff.ReturnTo = Quartz.UI.MenuHandOff.Menu.None;
         Quartz.UI.MenuHandOff.FromHub = false;

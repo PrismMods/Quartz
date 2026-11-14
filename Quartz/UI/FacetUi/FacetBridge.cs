@@ -42,6 +42,12 @@ internal static class FacetBridge {
         int dot = version.IndexOf('.');
         return dot > 0 && int.TryParse(version[..dot], out int major) && major >= 6000;
     }
+    /// <summary>
+    /// The new menu can exist: Facet loads, and so does a PrismLib.UI with the suite shell. Without it Quartz has the
+    /// classic menu alone. Not part of Probe: PrismBridge.UiAvailable probes Facet itself.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static bool MenuAvailable() => Available() && Quartz.Prism.PrismBridge.ShellAvailable;
     /// <summary>A Facet text field has keyboard focus. False when Facet is unavailable.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static bool TextFocused() {
@@ -91,7 +97,7 @@ internal static class FacetBridge {
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void OpenNewMenu(string pageKey = null, bool fromClassic = false) {
 #if !IL2CPP
-        if(Available()) {
+        if(MenuAvailable()) {
             try { OpenNewMenuImpl(pageKey, fromClassic); } catch(Exception e) { Fail(e); }
         }
 #endif
@@ -120,7 +126,7 @@ internal static class FacetBridge {
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void PrebuildNewMenu() {
 #if !IL2CPP
-        if(Available()) {
+        if(MenuAvailable()) {
             try { PrebuildNewMenuImpl(); } catch(Exception e) { Fail(e); }
         }
 #endif

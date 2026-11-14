@@ -190,7 +190,7 @@ internal static partial class PageSettings {
         );
         var pickerLayoutToggleTr = pickerLayoutToggle.Label.gameObject.AddComponent<TextLocalization>().Init("COLOR_PICKER_HORIZONTAL", "Wide color picker");
         // Only where the new menu can run; the same switch as Prism · Settings' row.
-        if(Quartz.UI.FacetUi.FacetBridge.Available()) {
+        if(Quartz.UI.FacetUi.FacetBridge.MenuAvailable()) {
             UIToggle newMenuToggle = GenerateUI.Toggle(
                 GenerateUI.Row(content.transform),
                 defSet.ExperimentalNewMenu,
