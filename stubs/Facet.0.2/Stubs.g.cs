@@ -128,12 +128,14 @@ namespace Facet {
         public static global::System.Func<bool> BoundTo(global::System.Func<object> document) => throw null;
         public static void Invalidate() => throw null;
         public static void Record(string label, string key, global::System.Action undo, global::System.Action redo, global::System.Func<string, string> translate = default) => throw null;
+        public static void Snapshot<T>(string label, string key, global::System.Func<T> capture, global::System.Action<T> restore, global::System.Action change, global::System.Func<bool> valid = default, global::System.Func<string, string> translate = default) => throw null;
         public static global::System.IDisposable Step(string label, string key = default, global::System.Func<bool> valid = default, global::System.Func<string, string> translate = default) => throw null;
     }
     public sealed unsafe partial class Host {
         public global::Facet.Theme Theme { get => throw null; }
         public static global::Facet.Host Create(string name, global::System.Action<global::Facet.HostOptions> configure = default) => throw null;
         public string Read(string key) => throw null;
+        public string Translate(string s) => throw null;
         public void Write(string key, string value) => throw null;
         private Host() { }
     }
@@ -184,6 +186,7 @@ namespace Facet {
         public string Id { get => throw null; set { } }
         public global::System.Collections.Generic.IList<global::Facet.MenuItem> Items { get => throw null; set { } }
         public global::System.Action Run { get => throw null; set { } }
+        public static global::Facet.MenuItem Separator { get => throw null; }
         public string Text { get => throw null; set { } }
         public MenuItem() => throw null;
     }
@@ -204,9 +207,11 @@ namespace Facet {
         private Nav() { }
     }
     public sealed unsafe partial class NavItem {
+        public global::System.Action<global::UnityEngine.UIElements.VisualElement> Build;
         public global::UnityEngine.UIElements.Background Icon;
         public global::System.Action<global::Facet.SearchIndex.Hit> OnHit;
         public global::System.Func<int> Revision;
+        public string Title;
         public global::System.Func<bool> VisibleWhen;
         public NavItem(string title, global::System.Action<global::UnityEngine.UIElements.VisualElement> build = default) => throw null;
         public static global::Facet.NavItem Heading(string title, params global::Facet.NavItem[] children) => throw null;

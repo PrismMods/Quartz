@@ -67,7 +67,9 @@ internal static partial class KvInspectorPages {
                 if(page.Title != tab) continue;
                 var box = new VisualElement();
                 page.Build(box);
-                return [.. box.Query<VisualElement>().ToList().Select(v => v.name).Where(IsRowId).Distinct()];
+                var names = new List<string>();
+                Names(box, names);   // a plain walk: CI's stubs have no UQueryBuilder
+                return [.. names.Where(IsRowId).Distinct()];
             }
             return [];
         } finally {
@@ -76,6 +78,11 @@ internal static partial class KvInspectorPages {
     }
 
     // A row's own name: a Lang key, or a choice row's kv-* id; not a section, nor a part of a row (KVI_BG-swatch).
+    private static void Names(VisualElement v, List<string> into) {
+        into.Add(v.name);
+        for(int i = 0; i < v.childCount; i++) Names(v[i], into);
+    }
+
     private static bool IsRowId(string n) =>
         n != null && (n.StartsWith("KVI_") && n.IndexOf('-') < 0 && !n.StartsWith("KVI_SEC_") || n.StartsWith("kv-") && !n.EndsWith("-input"));
 

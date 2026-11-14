@@ -49,15 +49,17 @@ internal sealed partial class KvLayoutModel : PrismLib.UI.Toolkit.KeyLayoutModel
         }
     }
 
-    public override void Restore(string snapshot) {
+    public override void Restore(string snapshot) => Restore(snapshot, KvStore.Current.Root.Property(ImagesKey));
+
+    // images: the table the restored document gets (detached from its owner, not copied); null leaves it with none.
+    private void Restore(string snapshot, JProperty images) {
         int cut = snapshot.IndexOf('\n');
         string tab = cut < 0 ? null : snapshot[..cut];
         KeyViewerOverlay.FlushCounts();
         KvDocument live = KvStore.Current, next = KvDocument.Parse(cut < 0 ? snapshot : snapshot[(cut + 1)..]);
         next.KeepCountsFrom(live);
-        // The live image table moves across, detached first so it is not deep-copied.
         next.Root.Remove(ImagesKey);
-        if(live.Root.Property(ImagesKey) is { } images) {
+        if(images != null) {
             images.Remove();
             next.Root.Add(images);
         }

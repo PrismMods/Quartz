@@ -2080,6 +2080,7 @@
           "System.Single Facet.History::CoalesceSeconds",
           "System.Void Facet.History::Invalidate()",
           "System.Void Facet.History::Record(System.String,System.String,System.Action,System.Action,System.Func\u00602\u003CSystem.String,System.String\u003E)",
+          "System.Void Facet.History::Snapshot(System.String,System.String,System.Func\u00601\u003CT\u003E,System.Action\u00601\u003CT\u003E,System.Action,System.Func\u00601\u003CSystem.Boolean\u003E,System.Func\u00602\u003CSystem.String,System.String\u003E)",
           "System.Void Facet.History::add_AfterApply(System.Action)"
         ]
       },
@@ -2090,6 +2091,7 @@
           "Facet.Theme Facet.Host::Theme()",
           "Facet.Theme Facet.Host::get_Theme()",
           "System.String Facet.Host::Read(System.String)",
+          "System.String Facet.Host::Translate(System.String)",
           "System.Void Facet.Host::Write(System.String,System.String)"
         ]
       },
@@ -2162,6 +2164,8 @@
       {
         "type": "Facet.MenuItem",
         "members": [
+          "Facet.MenuItem Facet.MenuItem::Separator()",
+          "Facet.MenuItem Facet.MenuItem::get_Separator()",
           "System.Action Facet.MenuItem::Run()",
           "System.Collections.Generic.IList\u00601\u003CFacet.MenuItem\u003E Facet.MenuItem::Items()",
           "System.String Facet.MenuItem::Id()",
@@ -2201,8 +2205,10 @@
         "members": [
           "Facet.NavItem Facet.NavItem::Heading(System.String,Facet.NavItem[])",
           "System.Action\u00601\u003CFacet.SearchIndex/Hit\u003E Facet.NavItem::OnHit",
+          "System.Action\u00601\u003CUnityEngine.UIElements.VisualElement\u003E Facet.NavItem::Build",
           "System.Func\u00601\u003CSystem.Boolean\u003E Facet.NavItem::VisibleWhen",
           "System.Func\u00601\u003CSystem.Int32\u003E Facet.NavItem::Revision",
+          "System.String Facet.NavItem::Title",
           "System.Void Facet.NavItem::.ctor(System.String,System.Action\u00601\u003CUnityEngine.UIElements.VisualElement\u003E)",
           "UnityEngine.UIElements.Background Facet.NavItem::Icon"
         ]

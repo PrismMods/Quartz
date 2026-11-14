@@ -295,6 +295,7 @@
     "KEYVIEWER_EDITOR_IMPORT": "Import",
     "KEYVIEWER_EDITOR_IMPORTED_QKV": "Imported. {0} Key Viewer setting(s) from the .qkv replaced yours.",
     "KEYVIEWER_EDITOR_IMPORT_EMPTY": "No presets found. Put a .qkv or .json in {0}",
+    "KEYVIEWER_EDITOR_IMPORT_NO_KEYS": "That file has no keys to import.",
     "KEYVIEWER_EDITOR_MIGRATE": "Migrate",
     "KEYVIEWER_EDITOR_MIGRATE_HINT": "This layout is empty. Migrate rebuilds it from your Simple mode settings.",
     "KEYVIEWER_EDITOR_OPEN_FOLDER": "Open Presets Folder",
@@ -596,6 +597,10 @@
     "MENU_KVE_HIDDEN": "Hidden",
     "MENU_KVE_NEW_FROM_PRESET": "New from Preset",
     "MENU_KVE_EDIT_LAYOUT": "Edit",
-    "MENU_KVE_MOVE_LAYOUT": "Move Layout"
+    "MENU_KVE_MOVE_LAYOUT": "Move Layout",
+    "MENU_KVE_NEW_TAB_NAME": "Layout",
+    "MENU_KVE_IMPORT_JSON": "Import DM Note Config (.json)",
+    "MENU_KVE_IMPORT_QKV": "Import Quartz Layout (.qkv)",
+    "MENU_KVE_IMPORTED": "Imported \"{0}\"."
   }
 }
