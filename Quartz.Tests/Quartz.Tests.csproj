@@ -103,6 +103,8 @@
 		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvExportEmbedding.cs" Link="Source/KvExportEmbedding.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvSnap.cs" Link="Source/KvSnap.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvHistory.cs" Link="Source/KvHistory.cs" />
+		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvEditEpoch.cs" Link="Source/KvEditEpoch.cs" />
+		<Compile Include="../Quartz/Features/KeyViewer/Layout/KvEditOps.cs" Link="Source/KvEditOps.cs" />
 		<Compile Include="../Quartz/UI/Utility/UndoTimeline.cs" Link="Source/UndoTimeline.cs" />
 		<Compile Include="../Quartz/UI/Utility/LayoutIds.cs" Link="Source/LayoutIds.cs" />
 		<Compile Include="../Quartz/UI/FacetUi/ShellModel.cs" Link="Source/ShellModel.cs" />

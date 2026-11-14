@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Globalization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -48,6 +49,7 @@ internal sealed partial class KvDocument {
     internal bool IsFootTab(string tab) {
         JToken flag = CustomTabEntry(tab)?[FootTabKey];
         if(flag == null) return false;
+        if(flag is JValue { Value: bool b }) return b;   // the per-frame path: no boxing
         try { return flag.ToObject<bool>(); }
         catch(Exception e) { Diag.Ignore(e); return false; }
     }
@@ -109,8 +111,8 @@ internal sealed partial class KvDocument {
     }
     private JObject CustomTabEntry(string tab) {
         if(tab == null || Root["customTabs"] is not JArray custom) return null;
-        foreach(JToken entry in custom)
-            if(entry is JObject o && o["id"]?.ToString() == tab) return o;
+        for(int i = 0; i < custom.Count; i++)   // by index: a foreach boxes the enumerator, and this runs per frame
+            if(custom[i] is JObject o && o["id"]?.ToString() == tab) return o;
         return null;
     }
     private bool HasTabNamed(string name) {
@@ -359,6 +361,38 @@ internal sealed partial class KvDocument {
             ReindexZOrder(id);
             if(SelectedFootTab == null || string.Equals(tab, SelectedTab, StringComparison.Ordinal))
                 SelectedFootTab = id;
+        }
+    }
+    // Changes on any add, delete, move between tabs or reparse (element identity), never on a field edit.
+    internal int StructureHash() {
+        HashCode h = new();
+        foreach(KeyValuePair<string, Dictionary<KvElementKind, List<KvElement>>> tab in tabs) {
+            h.Add(tab.Key, StringComparer.Ordinal);
+            h.Add(IsFootTab(tab.Key));
+            foreach((_, KvElementKind kind) in Tables) {
+                h.Add(kind);
+                if(!tab.Value.TryGetValue(kind, out List<KvElement> list)) continue;
+                foreach(KvElement el in list) h.Add(RuntimeHelpers.GetHashCode(el));
+            }
+        }
+        return h.ToHashCode();
+    }
+    // Per tab, the n-th key bound to g takes the count of live's n-th key bound to g; keys with
+    // no such partner keep theirs. With two keys on one binding the pairing is by order only:
+    // restoring the first of them gives it the survivor's live count, and the survivor its
+    // own snapshot count.
+    internal void KeepCountsFrom(KvDocument live) {
+        if(live == null) return;
+        foreach(string tab in tabs.Keys) {
+            if(!live.HasTab(tab)) continue;
+            Dictionary<string, Queue<int>> counts = new(StringComparer.Ordinal);
+            foreach(KvElement el in live.Bucket(tab, KvElementKind.Key)) {
+                string g = el.GlobalKey ?? "";
+                if(!counts.TryGetValue(g, out Queue<int> q)) counts[g] = q = new();
+                q.Enqueue(el.Count);
+            }
+            foreach(KvElement el in Bucket(tab, KvElementKind.Key))
+                if(counts.TryGetValue(el.GlobalKey ?? "", out Queue<int> q) && q.Count > 0) el.Count = q.Dequeue();
         }
     }
     internal void ReindexZOrder(string tab) {

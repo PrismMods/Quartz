@@ -112,10 +112,11 @@ public static partial class UICore {
     public static void HandleUpdate() {
         // Polled even with the menu closed: a Facet window can be open on its own.
         if(Input.GetKeyDown(KeyCode.Escape)) EscapeDown();
-        // A runtime UI Toolkit panel here does not get WheelEvent; Facet scrolls its window from this.
-        float wheel = Input.mouseScrollDelta.y;
-        if(wheel != 0f) FacetBridge.TickWheel(Input.mousePosition, wheel);
+        // A runtime UI Toolkit panel here does not get WheelEvent; Facet scrolls its window from this, and pans a canvas on both axes.
+        Vector2 wheel = Input.mouseScrollDelta;
+        if(wheel != Vector2.zero) FacetBridge.TickWheel(Input.mousePosition, wheel.y);
         FacetBridge.TickNewMenu();
+        FacetBridge.TickKvEditor();
         if(canvasObj == null) return;
         HandleResolutionChange();
         Keybind.KeyModifier mod = (Keybind.KeyModifier)MainCore.Conf.ToggleModifier;

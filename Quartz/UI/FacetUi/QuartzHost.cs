@@ -76,7 +76,8 @@ internal static class QuartzHost {
             case Cursors.Kind.ResizeHorizontal: NativeCursor.Apply(ResizeCursorShape.Horizontal); break;
             case Cursors.Kind.ResizeCorner: NativeCursor.Apply(ResizeCursorShape.DiagNWSE); break;
             case Cursors.Kind.Text: NativeCursor.IBeam(); break;
-            default: NativeCursor.Reset(); break;
+            case Cursors.Kind.Default: NativeCursor.Reset(); break;
+            default: return false;   // a canvas's move and other resize shapes: Facet draws them
         }
         return true;
     }

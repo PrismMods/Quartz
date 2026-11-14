@@ -4,13 +4,14 @@ using Quartz.Core;
 using Quartz.Features.KeyViewer;
 using Quartz.Features.KeyViewer.Js;
 using Quartz.Overlay;
+using Quartz.UI.FacetUi.KeyViewerEditor;
 using Quartz.UI.Nav;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi.OverlayPages;
 /// <summary>
-/// Overlay ▸ Key Viewer in the new menu: the settings rows of the classic page's inspector, beside a live preview of the key
-/// viewer. The canvas editor, its inspector, the tab and file strips and the per-tab name stay in the classic menu, which a
-/// card opens. Its switches have no hotkey, as in the classic page.
+/// Overlay ▸ Key Viewer in the new menu: the settings rows of the classic page's inspector on the left, and the layout
+/// editor (menu bar, tab strips, canvas, inspector, status) pinned on the right. Without a usable PrismLib.UI the right
+/// column is a card that opens the classic editor instead. Its switches have no hotkey, as in the classic page.
 /// </summary>
 internal static class KeyViewer {
     // Read on every call: a profile switch may replace what KeyViewerOverlay.Conf returns.
@@ -19,7 +20,20 @@ internal static class KeyViewer {
 
     internal static void Page(VisualElement p) {
         KeyViewerOverlay.EnsureConf();
-        ShellPage.Feature(p, "keyviewer", "SECTION_KEY_VIEWER", "KEYVIEWER_DESC", KeyViewerOverlay.FontKey, Cards);
+        var cols = Controls.Columns(p, o => {
+            o.Left = 36f;
+            o.Right = 64f;
+            o.StackBelow = 760f;
+            o.RightFill = true;
+        });
+        Controls.PageHeader(cols.Left, "SECTION_KEY_VIEWER", QuartzShell.FeatureSwitch("keyviewer"), o => {
+            o.Id = "SECTION_KEY_VIEWER";
+            o.Description = "KEYVIEWER_DESC";
+        });
+        Cards(cols.Left);
+        int state = NavRegistry.StateFor("overlay.keyviewer");
+        if(!KvEditorDoor.Build(cols.Right))
+            Controls.Action(Controls.Card(cols.Right, null), "MENU_KV_EDITOR", "MENU_CLASSIC_OPEN", () => QuartzShell.OpenClassic(state), o => o.Id = "MENU_KV_EDITOR");
     }
 
     private static void Cards(VisualElement p) {
@@ -33,9 +47,6 @@ internal static class KeyViewer {
             o.VisibleWhen = () => KvKeyLimiterBridge.Available;
         });
         ShellRows.Font(kv, KeyViewerOverlay.FontKey);
-
-        int state = NavRegistry.StateFor("overlay.keyviewer");
-        Controls.Action(Controls.Card(p, null), "MENU_KV_EDITOR", "MENU_CLASSIC_OPEN", () => QuartzShell.OpenClassic(state), o => o.Id = "MENU_KV_EDITOR");
 
         VisualElement rain = Controls.Card(p, "KEYVIEWER_DM_NOTE");
         Toggle(rain, "KEYVIEWER_DM_NOTE", () => C.DmNoteEffect, v => C.DmNoteEffect = v, Def.DmNoteEffect, rebuild);

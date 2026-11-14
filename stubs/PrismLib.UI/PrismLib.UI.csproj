@@ -25,5 +25,6 @@
 		<ProjectReference Include="../Facet.0.2/Facet.0.2.csproj" />
 		<ProjectReference Include="../UnityEngine.CoreModule/UnityEngine.CoreModule.csproj" />
 		<ProjectReference Include="../UnityEngine.TextCoreTextEngineModule/UnityEngine.TextCoreTextEngineModule.csproj" />
+		<ProjectReference Include="../UnityEngine.UIElementsModule/UnityEngine.UIElementsModule.csproj" />
 	</ItemGroup>
 </Project>

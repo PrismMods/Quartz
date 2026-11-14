@@ -107,6 +107,7 @@ namespace Newtonsoft.Json.Linq {
     }
     public abstract unsafe partial class JContainer : global::Newtonsoft.Json.Linq.JToken, global::System.Collections.Generic.IList<global::Newtonsoft.Json.Linq.JToken>, global::System.Collections.IList {
         public virtual int Count { get => throw null; }
+        public virtual void Add(object content) => throw null;
         protected JContainer() { }
         void global::System.Collections.Generic.ICollection<global::Newtonsoft.Json.Linq.JToken>.Add(global::Newtonsoft.Json.Linq.JToken item) => throw null;
         void global::System.Collections.Generic.ICollection<global::Newtonsoft.Json.Linq.JToken>.Clear() => throw null;
@@ -143,6 +144,7 @@ namespace Newtonsoft.Json.Linq {
         public static global::Newtonsoft.Json.Linq.JObject Load(global::Newtonsoft.Json.JsonReader reader) => throw null;
         public static global::Newtonsoft.Json.Linq.JObject Parse(string json) => throw null;
         public global::System.Collections.Generic.IEnumerable<global::Newtonsoft.Json.Linq.JProperty> Properties() => throw null;
+        public global::Newtonsoft.Json.Linq.JProperty Property(string name) => throw null;
         public virtual bool Remove(string propertyName) => throw null;
         public virtual bool TryGetValue(string propertyName, out global::Newtonsoft.Json.Linq.JToken value) => throw null;
         public bool TryGetValue(string propertyName, global::System.StringComparison comparison, out global::Newtonsoft.Json.Linq.JToken value) => throw null;
@@ -217,6 +219,7 @@ namespace Newtonsoft.Json.Linq {
     }
     public unsafe partial class JValue : global::Newtonsoft.Json.Linq.JToken, global::System.IEquatable<global::Newtonsoft.Json.Linq.JValue>, global::System.IComparable<global::Newtonsoft.Json.Linq.JValue>, global::System.IConvertible {
         public object Value { get => throw null; set { } }
+        public static global::Newtonsoft.Json.Linq.JValue CreateNull() => throw null;
         protected JValue() { }
         int global::System.IComparable<global::Newtonsoft.Json.Linq.JValue>.CompareTo(global::Newtonsoft.Json.Linq.JValue other) => throw null;
         global::System.TypeCode global::System.IConvertible.GetTypeCode() => throw null;

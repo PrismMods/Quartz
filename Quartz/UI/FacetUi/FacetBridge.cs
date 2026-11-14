@@ -134,6 +134,25 @@ internal static class FacetBridge {
         }
 #endif
     }
+    /// <summary>Per frame: the Key Viewer page's editor reads its keys. Never probes; nothing unless the editor is live. The door
+    /// catches its own failures, which never take the new menu down.</summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void TickKvEditor() {
+#if !IL2CPP
+        if(state == 1) KeyViewerEditor.KvEditorDoor.Tick();
+#endif
+    }
+    /// <summary>Facet's undo chord (Ctrl/Cmd+Z, Shift for redo, Y redoes): none during a canvas drag, a key capture or typing,
+    /// and once a frame across mods. True when it acted. Never probes.</summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static bool HandleUndo(bool ctrlOrCmd, bool shift, bool z, bool y) {
+#if !IL2CPP
+        if(state == 1) {
+            try { return HandleUndoImpl(ctrlOrCmd, shift, z, y); } catch(Exception e) { Fail(e); }
+        }
+#endif
+        return false;
+    }
     /// <summary>Re-tints Quartz's Facet windows with the accent. No-op until Quartz has made one.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void Recolour(Color accent) {
@@ -215,6 +234,8 @@ internal static class FacetBridge {
     private static void PrebuildNewMenuImpl() => QuartzShell.Prebuild();
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void TickNewMenuImpl() => QuartzShell.Tick();
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static bool HandleUndoImpl(bool ctrlOrCmd, bool shift, bool z, bool y) => global::Facet.Input.HandleUndo(ctrlOrCmd, shift, z, y);
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void WarmUpNow() {
         try { WarmUpImpl(); } catch(Exception e) { Fail(e); }

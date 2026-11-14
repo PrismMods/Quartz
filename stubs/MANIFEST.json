@@ -1954,11 +1954,13 @@
       {
         "type": "Facet.ColumnsOptions",
         "members": [
+          "System.Boolean Facet.ColumnsOptions::RightFill()",
           "System.Single Facet.ColumnsOptions::Left()",
           "System.Single Facet.ColumnsOptions::Right()",
           "System.Single Facet.ColumnsOptions::StackBelow()",
           "System.Void Facet.ColumnsOptions::set_Left(System.Single)",
           "System.Void Facet.ColumnsOptions::set_Right(System.Single)",
+          "System.Void Facet.ColumnsOptions::set_RightFill(System.Boolean)",
           "System.Void Facet.ColumnsOptions::set_StackBelow(System.Single)"
         ]
       },
@@ -2050,10 +2052,13 @@
       {
         "type": "Facet.History",
         "members": [
+          "System.Action Facet.History::AfterApply",
           "System.Boolean Facet.History::Applying()",
           "System.Boolean Facet.History::get_Applying()",
           "System.Int32 Facet.History::Limit",
-          "System.Single Facet.History::CoalesceSeconds"
+          "System.Single Facet.History::CoalesceSeconds",
+          "System.Void Facet.History::Invalidate()",
+          "System.Void Facet.History::add_AfterApply(System.Action)"
         ]
       },
       {
@@ -2088,6 +2093,7 @@
         "members": [
           "System.Boolean Facet.Input::BlocksGameInput()",
           "System.Boolean Facet.Input::HandleEscape()",
+          "System.Boolean Facet.Input::HandleUndo(System.Boolean,System.Boolean,System.Boolean,System.Boolean)",
           "System.Boolean Facet.Input::HeldThisFrame()",
           "System.Boolean Facet.Input::TextFocused()",
           "System.Boolean Facet.Input::get_BlocksGameInput()",
@@ -2126,6 +2132,10 @@
           "Facet.Layer Facet.Layer::Window",
           "System.Int32 Facet.Layer::value__"
         ]
+      },
+      {
+        "type": "Facet.MenuItem",
+        "members": []
       },
       {
         "type": "Facet.Nav",
@@ -2287,6 +2297,7 @@
           "System.Boolean Facet.Surface::get_Visible()",
           "System.Func\u00601\u003CSystem.Boolean\u003E Facet.Surface::EscapeHandler",
           "System.Void Facet.Surface::.ctor(Facet.Host,System.String,Facet.Layer,UnityEngine.TextCore.Text.FontAsset)",
+          "System.Void Facet.Surface::BringToFront()",
           "System.Void Facet.Surface::Dispose()",
           "System.Void Facet.Surface::Refresh()",
           "System.Void Facet.Surface::Relabel()",
@@ -2361,6 +2372,7 @@
       {
         "type": "Facet.Window",
         "members": [
+          "System.Action Facet.Window::Raised",
           "System.Single Facet.Window::MinHeight",
           "System.Single Facet.Window::MinWidth",
           "System.Single Facet.Window::RailAlign",
@@ -2369,6 +2381,7 @@
           "System.Void Facet.Window::.ctor(UnityEngine.UIElements.VisualElement,System.String,System.String,UnityEngine.Rect)",
           "System.Void Facet.Window::SetContentInset(System.Single)",
           "System.Void Facet.Window::ShowSearch(System.String,System.Action\u00601\u003CSystem.String\u003E)",
+          "System.Void Facet.Window::add_Raised(System.Action)",
           "System.Void Facet.Window::set_Rect(UnityEngine.Rect)",
           "System.Void Facet.Window::set_Scale(System.Single)",
           "UnityEngine.Rect Facet.Window::Rect()",
@@ -2596,7 +2609,8 @@
         "type": "Newtonsoft.Json.Linq.JContainer",
         "members": [
           "System.Int32 Newtonsoft.Json.Linq.JContainer::Count()",
-          "System.Int32 Newtonsoft.Json.Linq.JContainer::get_Count()"
+          "System.Int32 Newtonsoft.Json.Linq.JContainer::get_Count()",
+          "System.Void Newtonsoft.Json.Linq.JContainer::Add(System.Object)"
         ]
       },
       {
@@ -2604,6 +2618,7 @@
         "members": [
           "Newtonsoft.Json.Linq.JObject Newtonsoft.Json.Linq.JObject::Load(Newtonsoft.Json.JsonReader)",
           "Newtonsoft.Json.Linq.JObject Newtonsoft.Json.Linq.JObject::Parse(System.String)",
+          "Newtonsoft.Json.Linq.JProperty Newtonsoft.Json.Linq.JObject::Property(System.String)",
           "Newtonsoft.Json.Linq.JToken Newtonsoft.Json.Linq.JObject::Item(System.String)",
           "Newtonsoft.Json.Linq.JToken Newtonsoft.Json.Linq.JObject::get_Item(System.String)",
           "System.Boolean Newtonsoft.Json.Linq.JObject::Remove(System.String)",
@@ -2621,7 +2636,8 @@
           "Newtonsoft.Json.Linq.JToken Newtonsoft.Json.Linq.JProperty::Value()",
           "Newtonsoft.Json.Linq.JToken Newtonsoft.Json.Linq.JProperty::get_Value()",
           "System.String Newtonsoft.Json.Linq.JProperty::Name()",
-          "System.String Newtonsoft.Json.Linq.JProperty::get_Name()"
+          "System.String Newtonsoft.Json.Linq.JProperty::get_Name()",
+          "System.Void Newtonsoft.Json.Linq.JProperty::set_Value(Newtonsoft.Json.Linq.JToken)"
         ]
       },
       {
@@ -2682,6 +2698,7 @@
       {
         "type": "Newtonsoft.Json.Linq.JValue",
         "members": [
+          "Newtonsoft.Json.Linq.JValue Newtonsoft.Json.Linq.JValue::CreateNull()",
           "System.Object Newtonsoft.Json.Linq.JValue::Value()",
           "System.Object Newtonsoft.Json.Linq.JValue::get_Value()"
         ]
@@ -2964,15 +2981,6 @@
         ]
       },
       {
-        "type": "PrismLib.UI.Toolkit.History",
-        "members": [
-          "System.Boolean PrismLib.UI.Toolkit.History::Redo()",
-          "System.Boolean PrismLib.UI.Toolkit.History::Undo()",
-          "System.Int32 PrismLib.UI.Toolkit.History::Limit",
-          "System.Single PrismLib.UI.Toolkit.History::CoalesceSeconds"
-        ]
-      },
-      {
         "type": "PrismLib.UI.Toolkit.InputGate",
         "members": [
           "System.Reflection.MethodInfo PrismLib.UI.Toolkit.InputGate::RedirectFor(System.Reflection.MethodBase)",
@@ -2981,6 +2989,138 @@
           "System.Void PrismLib.UI.Toolkit.InputGate::EnsureInstalled(System.String,System.Action\u00603\u003CSystem.Reflection.MethodBase,System.Reflection.MethodInfo,System.String\u003E)",
           "System.Void PrismLib.UI.Toolkit.InputGate::Exempt(System.Action)",
           "System.Void PrismLib.UI.Toolkit.InputGate::Uninstalled(System.String)"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.KeyLayoutBox",
+        "members": [
+          "System.Boolean PrismLib.UI.Toolkit.KeyLayoutBox::Dim",
+          "UnityEngine.Color PrismLib.UI.Toolkit.KeyLayoutBox::Border",
+          "UnityEngine.Color PrismLib.UI.Toolkit.KeyLayoutBox::Fill",
+          "UnityEngine.Rect PrismLib.UI.Toolkit.KeyLayoutBox::Rect"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.KeyLayoutEditor\u00601",
+        "members": [
+          "PrismLib.UI.Toolkit.KeyLayoutEditor\u00601\u003CT\u003E PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Build(UnityEngine.UIElements.VisualElement,PrismLib.UI.Toolkit.KeyLayoutModel\u00601\u003CT\u003E,System.Action)",
+          "System.Boolean PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Tick(System.Func\u00602\u003CUnityEngine.KeyCode,System.Boolean\u003E,System.Func\u00602\u003CUnityEngine.KeyCode,System.Boolean\u003E,System.Boolean,System.Boolean,System.Boolean)",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Refresh()",
+          "UnityEngine.UIElements.VisualElement PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Root()",
+          "UnityEngine.UIElements.VisualElement PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::get_Root()"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.KeyLayoutModel\u00601",
+        "members": [
+          "Facet.Host PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Host()",
+          "Facet.Host PrismLib.UI.Toolkit.KeyLayoutModel\u00601::get_Host()",
+          "System.Boolean PrismLib.UI.Toolkit.KeyLayoutModel\u00601::CanPasteStyle()",
+          "System.Boolean PrismLib.UI.Toolkit.KeyLayoutModel\u00601::CanRebind(T)",
+          "System.Boolean PrismLib.UI.Toolkit.KeyLayoutModel\u00601::CopyStyle(T)",
+          "System.Boolean PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Hidden(T)",
+          "System.Boolean PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Pref(System.String)",
+          "System.Boolean PrismLib.UI.Toolkit.KeyLayoutModel\u00601::get_CanPasteStyle()",
+          "System.Collections.Generic.IList\u00601\u003CFacet.MenuItem\u003E PrismLib.UI.Toolkit.KeyLayoutModel\u00601::FileItems(PrismLib.UI.Toolkit.KeyLayoutEditor\u00601\u003CT\u003E)",
+          "System.Collections.Generic.IList\u00601\u003CFacet.MenuItem\u003E PrismLib.UI.Toolkit.KeyLayoutModel\u00601::InsertItems(PrismLib.UI.Toolkit.KeyLayoutEditor\u00601\u003CT\u003E)",
+          "System.Collections.Generic.IList\u00601\u003CFacet.MenuItem\u003E PrismLib.UI.Toolkit.KeyLayoutModel\u00601::NewItems(PrismLib.UI.Toolkit.LayoutGroup,System.Action\u00601\u003CSystem.String\u003E)",
+          "System.Collections.Generic.IList\u00601\u003CFacet.NavItem\u003E PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Inspector(System.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E)",
+          "System.Collections.Generic.IReadOnlyList\u00601\u003CSystem.String\u003E PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Layouts(PrismLib.UI.Toolkit.LayoutGroup)",
+          "System.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Duplicate(System.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E)",
+          "System.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Elements()",
+          "System.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Ghosts()",
+          "System.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Paste(System.String)",
+          "System.Object PrismLib.UI.Toolkit.KeyLayoutModel\u00601::UndoDocument()",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Capture()",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Copy(System.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E)",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Duplicate(System.String)",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Editing()",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutModel\u00601::InspectorTitle(System.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E)",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Key(T)",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Label(System.String,System.String)",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutModel\u00601::LimitText()",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Name(System.String)",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Shown(PrismLib.UI.Toolkit.LayoutGroup)",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutModel\u00601::StatusText()",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutModel\u00601::get_Editing()",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutModel\u00601::.ctor()",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Committed()",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Delete(System.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E)",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Delete(System.String)",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Draw(UnityEngine.UIElements.VisualElement,T)",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Export(System.String)",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Move(System.String,System.Int32)",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutModel\u00601::PasteStyle(System.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E)",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Rebind(PrismLib.UI.Toolkit.KeyLayoutEditor\u00601\u003CT\u003E,System.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E)",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Rename(System.String,System.String)",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Restore(System.String)",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutModel\u00601::SetHidden(System.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E,System.Boolean)",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutModel\u00601::SetOrder(System.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E)",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutModel\u00601::SetPref(System.String,System.Boolean)",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutModel\u00601::SetRect(T,UnityEngine.Rect)",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Show(PrismLib.UI.Toolkit.LayoutGroup,System.String)",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Thumb(System.String,System.Collections.Generic.List\u00601\u003CPrismLib.UI.Toolkit.KeyLayoutBox\u003E)",
+          "T PrismLib.UI.Toolkit.KeyLayoutModel\u00601::Find(System.String)",
+          "UnityEngine.Rect PrismLib.UI.Toolkit.KeyLayoutModel\u00601::GetRect(T)",
+          "UnityEngine.Vector2 PrismLib.UI.Toolkit.KeyLayoutModel\u00601::CanvasSize()",
+          "UnityEngine.Vector2 PrismLib.UI.Toolkit.KeyLayoutModel\u00601::get_CanvasSize()"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.KeyLayoutText",
+        "members": [
+          "System.Collections.Generic.IReadOnlyList\u00601\u003CSystem.String\u003E PrismLib.UI.Toolkit.KeyLayoutText::Ids()",
+          "System.Collections.Generic.IReadOnlyList\u00601\u003CSystem.String\u003E PrismLib.UI.Toolkit.KeyLayoutText::get_Ids()",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::AlignBottom",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::AlignLeft",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::AlignRight",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::AlignTop",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Arrange",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Cancel",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::CanvasHint",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Copy",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::CopyStyle",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Cut",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Delete",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::DeleteConfirm",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Duplicate",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Edit",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::EditLayout",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::ExportDm",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Feet",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::File",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Fit",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Grid",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Guides",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Hands",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Hidden",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Hide",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::HideFeet",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Insert",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Layouts",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::MoveLayout",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::NewFromPreset",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::NewLayout",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Paste",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::PasteStyle",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Presets",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Rebind",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::RebindInOrder",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Redo",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Rename",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::SelectAll",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Show",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Snap",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::SpreadH",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::SpreadV",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Switcher",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::ToBack",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::ToFront",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::Undo",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::View",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::ZoomIn",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::ZoomOut",
+          "System.String PrismLib.UI.Toolkit.KeyLayoutText::ZoomReset"
         ]
       },
       {
@@ -2993,6 +3133,14 @@
           "System.Void PrismLib.UI.Toolkit.LayoutEditor::Reload()",
           "System.Void PrismLib.UI.Toolkit.LayoutEditor::Tick()",
           "System.Void PrismLib.UI.Toolkit.LayoutEditor::set_Visible(System.Boolean)"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.LayoutGroup",
+        "members": [
+          "PrismLib.UI.Toolkit.LayoutGroup PrismLib.UI.Toolkit.LayoutGroup::Feet",
+          "PrismLib.UI.Toolkit.LayoutGroup PrismLib.UI.Toolkit.LayoutGroup::Hands",
+          "System.Int32 PrismLib.UI.Toolkit.LayoutGroup::value__"
         ]
       },
       {

@@ -46,6 +46,7 @@ namespace Facet {
     public sealed unsafe partial class ColumnsOptions {
         public float Left { get => throw null; set { } }
         public float Right { get => throw null; set { } }
+        public bool RightFill { get => throw null; set { } }
         public float StackBelow { get => throw null; set { } }
         private ColumnsOptions() { }
     }
@@ -110,6 +111,8 @@ namespace Facet {
         public const float CoalesceSeconds = 6f;
         public const int Limit = 7;
         public static bool Applying { get => throw null; }
+        public static event global::System.Action AfterApply { add { } remove { } }
+        public static void Invalidate() => throw null;
     }
     public sealed unsafe partial class Host {
         public global::Facet.Theme Theme { get => throw null; }
@@ -139,6 +142,7 @@ namespace Facet {
         public static bool TextFocused { get => throw null; }
         public static void ConsumeEscape() => throw null;
         public static bool HandleEscape() => throw null;
+        public static bool HandleUndo(bool ctrlOrCmd, bool shift, bool z, bool y) => throw null;
         public static void TickWheel(global::UnityEngine.Vector2 screen, float delta) => throw null;
     }
     public unsafe partial class IntSliderOptions : global::Facet.Options<int> {
@@ -157,6 +161,9 @@ namespace Facet {
         Popup = 2,
         Modal = 3,
         Tooltip = 4,
+    }
+    public sealed unsafe partial class MenuItem {
+        private MenuItem() { }
     }
     public sealed unsafe partial class Nav {
         public const float CollapseAt = 9f;
@@ -266,6 +273,7 @@ namespace Facet {
         public bool Visible { get => throw null; set { } }
         public event global::System.Action Hidden { add { } remove { } }
         public Surface(global::Facet.Host host, string name, global::Facet.Layer layer, global::UnityEngine.TextCore.Text.FontAsset font = default) => throw null;
+        public void BringToFront() => throw null;
         public void Dispose() => throw null;
         public void Refresh() => throw null;
         public void Relabel() => throw null;
@@ -317,6 +325,7 @@ namespace Facet {
         public global::UnityEngine.UIElements.VisualElement Root { get => throw null; }
         public float Scale { get => throw null; set { } }
         public global::UnityEngine.UIElements.VisualElement TitleBarLeft { get => throw null; }
+        public event global::System.Action Raised { add { } remove { } }
         public Window(global::UnityEngine.UIElements.VisualElement parent, string id, string title, global::UnityEngine.Rect initial) => throw null;
         public void SetContentInset(float inset) => throw null;
         public void ShowSearch(string placeholder, global::System.Action<string> onChange) => throw null;

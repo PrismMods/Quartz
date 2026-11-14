@@ -43,6 +43,7 @@ internal static partial class QuartzShell {
             // A placeholder until the first show knows the panel's size.
             var (x, y, w, h) = ShellModel.InitialRect(1920f, 1080f);
             Window = new Window(s.Root, WindowId, "QUARTZ", new Rect(x, y, w, h));
+            Window.Raised += s.BringToFront;   // a press raises it, so its menus' shortcuts answer over another window
             // Facet stores the rect a window is built with: a prebuild never shown must not leave the placeholder as the user's.
             if(FreshGeometry) QuartzHost.Host.Write("window." + WindowId, null);
             VisualElement logo = Ui.Box();

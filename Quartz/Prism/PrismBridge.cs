@@ -12,8 +12,9 @@ namespace Quartz.Prism;
 /// KeyViewer flavour, before Unity 6 or when its Facet is missing). FacetBridge's shape: every entry is
 /// NoInlining, checks its half, and calls a NoInlining ...Impl inside a try; a failure turns that half
 /// off with one log line. No PrismLib or PrismLib.UI type in a field or a signature here, and no file
-/// outside Quartz/Prism names one: the CLR resolves field types when a class loads and a method's types
-/// when it is JITted, before any try can catch. PrismLib's tools/check-bridge.sh pins this.
+/// outside Quartz/Prism names one, except the key viewer editor's FacetUi files (KvEditorDoor's door):
+/// the CLR resolves field types when a class loads and a method's types when it is JITted, before any
+/// try can catch. PrismLib's tools/check-bridge.sh pins this.
 /// </summary>
 internal static partial class PrismBridge {
     internal const string Id = "Quartz";

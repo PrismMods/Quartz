@@ -123,7 +123,7 @@ internal static partial class QuartzShell {
     ];
 
     // Pages moved in part: their editors stay in the classic menu, and so do those rows' hits. A row the moved page has is its own.
-    private static readonly HashSet<string> PartlyMoved = ["overlay.keyviewer", "overlay.panels"];
+    private static readonly HashSet<string> PartlyMoved = ["overlay.panels"];
 
     // A row its moved page leaves to the classic menu: the Settings page's Updates and Font rows, or a partly moved page's
     // rows that the moved page has no row for. Its "Use this feature" is the moved page's header switch. ids holds each partly

@@ -47,12 +47,11 @@ internal static class PrismWindows {
         if(own) Ui.TickWheel(Input.mousePosition, Input.mouseScrollDelta.y);
         // Undo and redo while a Prism window is open (the game's editor keeps its own Ctrl+Z). History is every mod's, so exactly
         // one poller acts on a press: the window host, and nobody while a shared layout editor is open (whoever draws it), which reads it itself.
-        if(own && !UICore.SharedLayoutOpen && !QuartzLayout.Visible && Ui.AnyWindowOpen && !UICore.IsOpen && Input.GetKeyDown(KeyCode.Z)
-            && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand))
-            && !LayoutEditorProbe.Shown()) {
-            if(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) History.Redo();
-            else History.Undo();
-        }
+        // Through Facet's chord: it stands down during a canvas drag, a key capture or typing.
+        bool zDown = Input.GetKeyDown(KeyCode.Z), yDown = Input.GetKeyDown(KeyCode.Y);
+        if(own && (zDown || yDown) && !UICore.SharedLayoutOpen && !QuartzLayout.Visible && Ui.AnyWindowOpen && !UICore.IsOpen && !LayoutEditorProbe.Shown())
+            FacetBridge.HandleUndo(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftCommand)
+                || Input.GetKey(KeyCode.RightCommand), Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift), zDown, yDown);
         // Not while one of Quartz's key captures owns the keyboard: its runner spends this Escape on the cancel.
         if(Input.GetKeyDown(KeyCode.Escape) && Ui.AnyWindowOpen && !Keybind.Capturing) Ui.CloseTop();
         // A capture in progress owns the keyboard: no window opens with its key.

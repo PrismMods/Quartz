@@ -35,6 +35,8 @@ public sealed class CoreSettings : ISettingsFile {
     public float CalibHeight = 0f;
     public float KvInspectorWidth = 0f;
     public bool KvSnapToGrid = true;
+    public bool KvShowGrid = true;
+    public bool KvShowGuides = true;
     public float ExitReorganizeOffsetX = -40f;
     public float ExitReorganizeOffsetY = 40f;
     public float ReorganizePanelX = 18f;
@@ -107,6 +109,8 @@ public sealed class CoreSettings : ISettingsFile {
             [nameof(CalibHeight)] = CalibHeight,
             [nameof(KvInspectorWidth)] = KvInspectorWidth,
             [nameof(KvSnapToGrid)] = KvSnapToGrid,
+            [nameof(KvShowGrid)] = KvShowGrid,
+            [nameof(KvShowGuides)] = KvShowGuides,
             [nameof(ExitReorganizeOffsetX)] = ExitReorganizeOffsetX,
             [nameof(ExitReorganizeOffsetY)] = ExitReorganizeOffsetY,
             [nameof(ReorganizePanelX)] = ReorganizePanelX,
@@ -152,6 +156,8 @@ public sealed class CoreSettings : ISettingsFile {
         CalibHeight = IOUtils.Read(token, nameof(CalibHeight), CalibHeight);
         KvInspectorWidth = IOUtils.Read(token, nameof(KvInspectorWidth), KvInspectorWidth);
         KvSnapToGrid = IOUtils.Read(token, nameof(KvSnapToGrid), KvSnapToGrid);
+        KvShowGrid = IOUtils.Read(token, nameof(KvShowGrid), KvShowGrid);
+        KvShowGuides = IOUtils.Read(token, nameof(KvShowGuides), KvShowGuides);
         ExitReorganizeOffsetX = IOUtils.Read(token, nameof(ExitReorganizeOffsetX), ExitReorganizeOffsetX);
         ExitReorganizeOffsetY = IOUtils.Read(token, nameof(ExitReorganizeOffsetY), ExitReorganizeOffsetY);
         ReorganizePanelX = IOUtils.Read(token, nameof(ReorganizePanelX), ReorganizePanelX);

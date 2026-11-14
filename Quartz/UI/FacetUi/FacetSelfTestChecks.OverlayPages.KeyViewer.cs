@@ -10,9 +10,9 @@ using UnityEngine;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi;
 /// <summary>
-/// Overlay ▸ Key Viewer in the new menu: its build time, its rows against the classic page's settings, its two columns' edges,
-/// the note rain switch leaving the classic page stale, the editor card's way to the classic menu and back, search keeping the
-/// editor's rows as classic hits, and the preview pane, which borrows the live key viewer.
+/// Overlay ▸ Key Viewer in the new menu: its build time, its rows against the classic page's settings, the note rain switch
+/// leaving the classic page stale, search finding its rows on this page only, and a polled key lighting the live key viewer.
+/// The layout editor beside the settings has its own checks (FacetSelfTestChecks.KvEditor.cs).
 /// </summary>
 internal static partial class FacetSelfTestChecks {
     private const string KeyViewerPage = "overlay.keyviewer";
@@ -48,32 +48,21 @@ internal static partial class FacetSelfTestChecks {
             (c.TabubEnabled, c.GhostRainDotted, c.DmScale) = (tabub, dotted, scale);
             KeyViewerOverlay.Apply();
             KeyViewerOverlay.Save();
-        }, () => KeyViewerChecks(check, info, scale));
+        }, () => KeyViewerChecks(check, info));
     }
 
-    private static IEnumerator KeyViewerChecks(Action<string, bool, string> check, Action<string> info, float scale) {
+    private static IEnumerator KeyViewerChecks(Action<string, bool, string> check, Action<string> info) {
         yield return KeyViewerBuild(info);
         yield return Parity(check, KeyViewerPage, KeyViewerRows());
         yield return KeyViewerOffRows(check);
-        yield return ColumnEdges(check, KeyViewerPage, KeyViewerOverlay.FontKey);
         yield return ClassicStale(check, KeyViewerPage, "KEYVIEWER_DM_NOTE", Bind.To(() => KvConf.DmNoteEffect, v => {
             KvConf.DmNoteEffect = v;
             KeyViewerOverlay.Rebuild();
             KeyViewerOverlay.Save();
         }));
-        yield return EditorLink(check, KeyViewerPage, "MENU_KV_EDITOR");
         KeyViewerSearch(check);
         SearchButtonRow(check, KeyViewerPage, "KEYVIEWER_RESETCOUNTS");
         yield return KeyViewerLights(check);
-        // Through the row's own slider: the scale half a step up (down near the top), read off the hand's root.
-        float want = scale + 0.5f <= 4f ? scale + 0.5f : scale - 0.5f;
-        bool SetScale() {
-            if(Body.Q<Slider>("KEYVIEWER_DM_SCALE-input") is not { } s) return false;
-            s.value = (want - 0.2f) / 3.8f;   // the track runs 0 to 1 over the row's 0.2 to 4
-            return true;
-        }
-        yield return PreviewChecks(check, info, KeyViewerPage, KeyViewerOverlay.FontKey, SetScale,
-            () => OverlayPreview.ShownOf(KeyViewerOverlay.FontKey) is { } root && Mathf.Abs(root.transform.localScale.x - want) < 0.005f);
     }
 
     // Tabub and dotted rain switched off through their own switches hide the rows they gate, and only those; on again after.
@@ -105,11 +94,21 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(3);
     }
 
-    // A key the Key Viewer polls (the async hook off) lights its box in the pane while the new menu holds keys from the game.
-    // Show Outside Gameplay is off, so outside a level the Key Viewer shows for the pane alone: the press counts nowhere.
+    // A key the Key Viewer polls (the async hook off) lights its box while the new menu holds keys from the game. The page has no
+    // preview pane, so the check takes its own lease to show the key viewer. Show Outside Gameplay is off, so outside a level the
+    // Key Viewer shows for the lease alone: the press counts nowhere.
     // The press is synthetic: Input.GetKey reads it as held, and the gate still has its say. The counts go back after anyway.
     private static IEnumerator KeyViewerLights(Action<string, bool, string> check) {
-        for(int i = 0; i < 10 && !OverlayPreview.Is(KeyViewerOverlay.FontKey); i++) yield return null;   // back from the search
+        OverlayPreview.Lease lease = OverlayPreview.Take(KeyViewerOverlay.FontKey);
+        try {
+            yield return KeyViewerLit(check);
+        } finally {
+            lease?.Release();
+        }
+    }
+
+    private static IEnumerator KeyViewerLit(Action<string, bool, string> check) {
+        for(int i = 0; i < 10 && !OverlayPreview.Is(KeyViewerOverlay.FontKey); i++) yield return null;
         Type t = typeof(KeyViewerOverlay), box = t.GetNestedType("Box", BindingFlags.NonPublic);
         var boxes = (IList)t.GetField("boxes", Static).GetValue(null);
         FieldInfo count = box.GetField("Count"), boxKey = box.GetField("Key"), isFoot = box.GetField("IsFoot");
@@ -139,7 +138,7 @@ internal static partial class FacetSelfTestChecks {
         for(int i = 0; i < counts.Length && i < boxes.Count; i++) count.SetValue(boxes[i], counts[i]);
         for(int i = 0; i < stats.Length; i++) stats[i].SetValue(null, saved[i]);
         if(flushed) stats[1].SetValue(null, true);
-        check($"{KeyViewerPage}: a key the Key Viewer polls lights its box in the pane while the new menu holds keys from the game, and with Show "
+        check($"{KeyViewerPage}: a key the Key Viewer polls lights its box while the new menu holds keys from the game, and with Show "
             + "Outside Gameplay off adds to no stored count",
             key != KeyCode.None && blocking && shown && !level && lit && added == 0 && total == 0,
             $"key={key} blocking={blocking} shown={shown} level={level} lit={lit} frames={frames} added={added} total={total} focused={Application.isFocused} "
@@ -165,26 +164,21 @@ internal static partial class FacetSelfTestChecks {
         return false;
     }
 
-    // The page is moved in part: a row of the classic page this page has no row for (its editor's) is still a classic hit, and a
-    // row both have, or the classic "Use this feature" (the header switch here), is found on this page only.
+    // The page is moved whole: no row of the classic page is a classic hit any more (its editor's Snap included), and a row both
+    // have, or the classic "Use this feature" (the header switch here), is found on this page only.
     private static void KeyViewerSearch(Action<string, bool, string> check) {
-        int state = NavRegistry.StateFor(KeyViewerPage);
         NavPage page = NavRegistry.ByKey(KeyViewerPage);
-        List<(string Key, string English, int State)> editor = [.. SettingsSearch.Rows().Where(r => r.State == state && r.Key != null
-            && r.Key != page?.LocaleKey && r.Key != "FEATURE_PAGE_ENABLE" && !string.IsNullOrEmpty(r.English)
-            && Body.Q(name: r.Key) == null && Body.Q(name: r.Key + "-input") == null)];
-        var (key, english, _) = editor.FirstOrDefault();
+        string title = QuartzShell.Label(page?.LocaleKey, page?.Title);
         bool Classic(List<SearchIndex.Hit> hits, string k, string en) => hits.Any(h => h.PageRef == null && h.Label == QuartzHost.Host.Translate(QuartzShell.Label(k, en)));
         try {
-            List<SearchIndex.Hit> left = key == null ? [] : Find(english);
-            bool classic = key != null && Classic(left, key, english);
+            List<SearchIndex.Hit> snap = Find("Snap");
+            bool snapClassic = snap.Any(h => h.PageRef == null && h.Page == title);
             List<SearchIndex.Hit> moved = Find(QuartzHost.Host.Translate("KEYVIEWER_DM_NOTE")), feature = Find("use this feature");
             bool own = moved.Any(h => h.PageRef != null && h.Key == "KEYVIEWER_DM_NOTE"), twice = Classic(moved, "KEYVIEWER_DM_NOTE", "Note Rain");
-            bool switchTwice = feature.Any(h => h.PageRef == null && h.Page == QuartzShell.Label(page?.LocaleKey, page?.Title));
-            check($"{KeyViewerPage}: search keeps a row left to the classic editor as a classic hit, and finds a moved row and the feature switch on this page only",
-                classic && own && !twice && !switchTwice,
-                $"editor rows={editor.Count} left={key}/'{english}' classic={classic} {Hits(left)}; moved own={own} classic={twice} {Hits(moved)}; "
-                + $"feature switch classic={switchTwice}");
+            bool switchTwice = feature.Any(h => h.PageRef == null && h.Page == title);
+            check($"{KeyViewerPage}: search finds no classic hit for this page (Snap included), and a moved row and the feature switch on this page only",
+                !snapClassic && own && !twice && !switchTwice,
+                $"snap classic={snapClassic} {Hits(snap)}; moved own={own} classic={twice} {Hits(moved)}; feature switch classic={switchTwice}");
         } finally {
             QuartzShell.Nav?.Filter("");
         }

@@ -38,6 +38,9 @@ internal static partial class FacetSelfTestChecks {
             yield return OverlaySongTitle(check, info);
             yield return OverlayProgressBar(check, info);
             yield return OverlayKeyViewer(check, info);
+#if !QUARTZ_KEYVIEWER
+            yield return KvEditorPageChecks(check, info);
+#endif
             yield return OverlayPanels(check, info);
             yield return OverlayCalibrationPage(check, info);
             yield return Escape(check);

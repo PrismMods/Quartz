@@ -61,12 +61,6 @@ namespace PrismLib.UI.Toolkit {
     public static unsafe partial class FpsCounter {
         public static void Tick(bool show) => throw null;
     }
-    public static unsafe partial class History {
-        public const float CoalesceSeconds = 4f;
-        public const int Limit = 5;
-        public static bool Redo() => throw null;
-        public static bool Undo() => throw null;
-    }
     public static unsafe partial class InputGate {
         public static void AddBypass(global::System.Func<bool> probe) => throw null;
         public static void AddMouseExemption(global::System.Func<bool> probe) => throw null;
@@ -74,6 +68,121 @@ namespace PrismLib.UI.Toolkit {
         public static void Exempt(global::System.Action reads) => throw null;
         public static global::System.Reflection.MethodInfo RedirectFor(global::System.Reflection.MethodBase called) => throw null;
         public static void Uninstalled(string owner) => throw null;
+    }
+    public unsafe partial struct KeyLayoutBox {
+        public global::UnityEngine.Color Border;
+        public bool Dim;
+        public global::UnityEngine.Color Fill;
+        public global::UnityEngine.Rect Rect;
+    }
+    public sealed unsafe partial class KeyLayoutEditor<T> where T : class {
+        public global::UnityEngine.UIElements.VisualElement Root { get => throw null; }
+        public static global::PrismLib.UI.Toolkit.KeyLayoutEditor<T> Build(global::UnityEngine.UIElements.VisualElement parent, global::PrismLib.UI.Toolkit.KeyLayoutModel<T> model, global::System.Action openSwitcher) => throw null;
+        public void Refresh() => throw null;
+        public bool Tick(global::System.Func<global::UnityEngine.KeyCode, bool> down, global::System.Func<global::UnityEngine.KeyCode, bool> held, bool ctrlOrCmd, bool shift, bool alt) => throw null;
+        private KeyLayoutEditor() { }
+    }
+    public abstract unsafe partial class KeyLayoutModel<T> where T : class {
+        public virtual bool CanPasteStyle { get => throw null; }
+        public virtual global::UnityEngine.Vector2 CanvasSize { get => throw null; }
+        public virtual string Editing { get => throw null; }
+        public virtual global::Facet.Host Host { get => throw null; }
+        protected KeyLayoutModel() => throw null;
+        public virtual bool CanRebind(T e) => throw null;
+        public virtual string Capture() => throw null;
+        public virtual void Committed() => throw null;
+        public virtual string Copy(global::System.Collections.Generic.IReadOnlyList<T> items) => throw null;
+        public virtual bool CopyStyle(T item) => throw null;
+        public virtual void Delete(string layout) => throw null;
+        public virtual void Delete(global::System.Collections.Generic.IReadOnlyList<T> items) => throw null;
+        public virtual void Draw(global::UnityEngine.UIElements.VisualElement box, T e) => throw null;
+        public virtual string Duplicate(string layout) => throw null;
+        public virtual global::System.Collections.Generic.IReadOnlyList<T> Duplicate(global::System.Collections.Generic.IReadOnlyList<T> items) => throw null;
+        public virtual global::System.Collections.Generic.IReadOnlyList<T> Elements() => throw null;
+        public virtual void Export(string layout) => throw null;
+        public virtual global::System.Collections.Generic.IList<global::Facet.MenuItem> FileItems(global::PrismLib.UI.Toolkit.KeyLayoutEditor<T> editor) => throw null;
+        public virtual T Find(string key) => throw null;
+        public virtual global::UnityEngine.Rect GetRect(T e) => throw null;
+        public virtual global::System.Collections.Generic.IReadOnlyList<T> Ghosts() => throw null;
+        public virtual bool Hidden(T e) => throw null;
+        public virtual global::System.Collections.Generic.IList<global::Facet.MenuItem> InsertItems(global::PrismLib.UI.Toolkit.KeyLayoutEditor<T> editor) => throw null;
+        public virtual global::System.Collections.Generic.IList<global::Facet.NavItem> Inspector(global::System.Collections.Generic.IReadOnlyList<T> selection) => throw null;
+        public virtual string InspectorTitle(global::System.Collections.Generic.IReadOnlyList<T> selection) => throw null;
+        public virtual string Key(T e) => throw null;
+        public virtual string Label(string id, string english) => throw null;
+        public virtual global::System.Collections.Generic.IReadOnlyList<string> Layouts(global::PrismLib.UI.Toolkit.LayoutGroup group) => throw null;
+        public virtual string LimitText() => throw null;
+        public virtual void Move(string layout, int indexInGroup) => throw null;
+        public virtual string Name(string layout) => throw null;
+        public virtual global::System.Collections.Generic.IList<global::Facet.MenuItem> NewItems(global::PrismLib.UI.Toolkit.LayoutGroup group, global::System.Action<string> created) => throw null;
+        public virtual global::System.Collections.Generic.IReadOnlyList<T> Paste(string clip) => throw null;
+        public virtual void PasteStyle(global::System.Collections.Generic.IReadOnlyList<T> items) => throw null;
+        public virtual bool Pref(string id) => throw null;
+        public virtual void Rebind(global::PrismLib.UI.Toolkit.KeyLayoutEditor<T> editor, global::System.Collections.Generic.IReadOnlyList<T> inOrder) => throw null;
+        public virtual void Rename(string layout, string name) => throw null;
+        public virtual void Restore(string snapshot) => throw null;
+        public virtual void SetHidden(global::System.Collections.Generic.IReadOnlyList<T> items, bool hidden) => throw null;
+        public virtual void SetOrder(global::System.Collections.Generic.IReadOnlyList<T> drawOrder) => throw null;
+        public virtual void SetPref(string id, bool on) => throw null;
+        public virtual void SetRect(T e, global::UnityEngine.Rect r) => throw null;
+        public virtual void Show(global::PrismLib.UI.Toolkit.LayoutGroup group, string layout) => throw null;
+        public virtual string Shown(global::PrismLib.UI.Toolkit.LayoutGroup group) => throw null;
+        public virtual string StatusText() => throw null;
+        public virtual void Thumb(string layout, global::System.Collections.Generic.List<global::PrismLib.UI.Toolkit.KeyLayoutBox> into) => throw null;
+        public virtual object UndoDocument() => throw null;
+    }
+    public static unsafe partial class KeyLayoutText {
+        public const string AlignBottom = "AlignBottom";
+        public const string AlignLeft = "AlignLeft";
+        public const string AlignRight = "AlignRight";
+        public const string AlignTop = "AlignTop";
+        public const string Arrange = "Arrange";
+        public const string Cancel = "Cancel";
+        public const string CanvasHint = "CanvasHint";
+        public const string Copy = "Copy";
+        public const string CopyStyle = "CopyStyle";
+        public const string Cut = "Cut";
+        public const string Delete = "Delete";
+        public const string DeleteConfirm = "DeleteConfirm";
+        public const string Duplicate = "Duplicate";
+        public const string Edit = "Edit";
+        public const string EditLayout = "EditLayout";
+        public const string ExportDm = "ExportDm";
+        public const string Feet = "Feet";
+        public const string File = "File";
+        public const string Fit = "Fit";
+        public const string Grid = "Grid";
+        public const string Guides = "Guides";
+        public const string Hands = "Hands";
+        public const string Hidden = "Hidden";
+        public const string Hide = "Hide";
+        public const string HideFeet = "HideFeet";
+        public const string Insert = "Insert";
+        public const string Layouts = "Layouts";
+        public const string MoveLayout = "MoveLayout";
+        public const string NewFromPreset = "NewFromPreset";
+        public const string NewLayout = "NewLayout";
+        public const string Paste = "Paste";
+        public const string PasteStyle = "PasteStyle";
+        public const string Presets = "Presets";
+        public const string Rebind = "Rebind";
+        public const string RebindInOrder = "RebindInOrder";
+        public const string Redo = "Redo";
+        public const string Rename = "Rename";
+        public const string SelectAll = "SelectAll";
+        public const string Show = "Show";
+        public const string Snap = "Snap";
+        public const string SpreadH = "SpreadH";
+        public const string SpreadV = "SpreadV";
+        public const string Switcher = "Switcher";
+        public const string ToBack = "ToBack";
+        public const string ToFront = "ToFront";
+        public const string Undo = "Undo";
+        public const string View = "View";
+        public const string ZoomIn = "ZoomIn";
+        public const string ZoomOut = "ZoomOut";
+        public const string ZoomReset = "ZoomReset";
+        public static global::System.Collections.Generic.IReadOnlyList<string> Ids { get => throw null; }
     }
     public sealed unsafe partial class LayoutEditor : global::System.IDisposable {
         public bool Visible { get => throw null; set { } }
@@ -83,6 +192,10 @@ namespace PrismLib.UI.Toolkit {
         public void Tick() => throw null;
         private LayoutEditor() { }
         void global::System.IDisposable.Dispose() => throw null;
+    }
+    public enum LayoutGroup : int {
+        Hands = 0,
+        Feet = 1,
     }
     public static unsafe partial class MacKeys {
         public static bool Down(global::UnityEngine.KeyCode key) => throw null;
@@ -143,9 +256,9 @@ namespace PrismLib.UI.Toolkit {
         public static void TickWheel(global::UnityEngine.Vector2 pointerScreen, float delta) => throw null;
     }
     public sealed unsafe partial class Window {
-        public const float MinHeight = 6f;
-        public const float MinWidth = 7f;
-        public const float RailAlign = 8f;
+        public const float MinHeight = 54f;
+        public const float MinWidth = 55f;
+        public const float RailAlign = 56f;
         public static global::System.Func<string, string> Read;
         public static global::System.Action<string, string> Write;
         private Window() { }

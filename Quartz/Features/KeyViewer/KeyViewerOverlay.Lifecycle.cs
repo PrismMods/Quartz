@@ -328,7 +328,7 @@ public static partial class KeyViewerOverlay {
             else Conf.SetCount(box.Name, box.Count);
         }
     }
-    private static bool FlushCounts(bool immediate = false) {
+    internal static bool FlushCounts(bool immediate = false) {
         if(!countsDirty) return false;
         CaptureCounts();
         countsDirty = false;
