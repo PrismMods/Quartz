@@ -109,6 +109,7 @@
 		<Compile Include="../Quartz/UI/Utility/UndoTimeline.cs" Link="Source/UndoTimeline.cs" />
 		<Compile Include="../Quartz/UI/Utility/LayoutIds.cs" Link="Source/LayoutIds.cs" />
 		<Compile Include="../Quartz/UI/FacetUi/ShellModel.cs" Link="Source/ShellModel.cs" />
+		<Compile Include="../Quartz/UI/FacetUi/PageRules.cs" Link="Source/PageRules.cs" />
 		<Compile Include="../Quartz/UI/Search/SearchMatcher.cs" Link="Source/SearchMatcher.cs" />
 		<Compile Include="../Quartz/Utility/StringUtils.cs" Link="Source/StringUtils.cs" />
 		<Compile Include="../Quartz/Features/KeyViewer/Editor/KvTabDragState.cs" Link="Source/KvTabDragState.cs" />

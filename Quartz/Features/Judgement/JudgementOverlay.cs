@@ -61,7 +61,7 @@ public static class JudgementOverlay {
     private static readonly Color PlusMinusPerfectColor = new(0.38f, 1f, 0.31f, 1f);
     private static readonly string[] SlotHex =
         System.Array.ConvertAll(Judgement.SlotColors, ColorUtility.ToHtmlStringRGB);
-    private static Color XColor() => XPerfectBridge.Native ? XPerfectBridge.NativeXColor() : XPerfectColor;
+    internal static Color XColor() => XPerfectBridge.Native ? XPerfectBridge.NativeXColor() : XPerfectColor;
     private static void SyncBorder(TextMeshProUGUI target, bool show, string text) {
         if(!show) {
             if(xBorder != null && xBorder.gameObject.activeSelf) xBorder.gameObject.SetActive(false);

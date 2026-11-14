@@ -246,6 +246,9 @@ namespace UnityEngine.UIElements {
             Fixed = 1,
         }
     }
+    public static unsafe partial class UQueryExtensions {
+        public static global::UnityEngine.UIElements.VisualElement Q(this global::UnityEngine.UIElements.VisualElement e, string name = default, string className = default) => throw null;
+    }
     public sealed unsafe partial class VectorImage : global::UnityEngine.ScriptableObject {
         private VectorImage() { }
     }

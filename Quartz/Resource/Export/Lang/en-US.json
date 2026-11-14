@@ -572,6 +572,8 @@
     "MENU_PREVIEW_IN_LEVEL": "Shows here once the element is loaded",
     "MENU_SET_HOTKEY": "Set hotkey",
     "MENU_CLEAR_HOTKEY": "Clear hotkey",
+    "MENU_ALL": "All",
+    "MENU_NONE": "None",
     "MENU_KV_EDITOR": "Key layout, styles and tabs are edited in the classic menu",
     "MENU_KVE_FILE": "File",
     "MENU_KVE_EDIT": "Edit",

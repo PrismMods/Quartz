@@ -216,6 +216,7 @@ public sealed class QuartzRuntime {
 #if !QUARTZ_KEYVIEWER
         ticks.Add(new Quartz.UI.FacetUi.FacetSelfTest("prism-selftest", Quartz.Prism.PrismSelfTest.Run));
         ticks.Add(new Quartz.UI.FacetUi.FacetSelfTest("facet-level-selftest", Quartz.UI.FacetUi.FacetSelfTest.Level));
+        ticks.Add(new Quartz.UI.FacetUi.FacetSelfTest("facet-pages-selftest", Quartz.UI.FacetUi.FacetSelfTest.Pages, featuresOn: true));
 #endif
 #endif
         services.Initialize(Logger);

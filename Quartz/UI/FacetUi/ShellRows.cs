@@ -11,7 +11,7 @@ namespace Quartz.UI.FacetUi;
 /// The rows the Overlay pages share, each the classic row's twin: the same field, then the overlay's apply and save
 /// (save is a debounced request, so a save per change is fine). A row's Id is its label key.
 /// </summary>
-internal static class ShellRows {
+internal static partial class ShellRows {
     // Written through QuartzShell.Writes, so the classic menu rebuilds before it next shows.
     private static Bind<T> Writes<T>(Bind<T> bind, Action<T> after, Action apply, Action save) => QuartzShell.Writes(bind.Get, v => {
         bind.Set(v);
@@ -25,32 +25,12 @@ internal static class ShellRows {
     internal static Control<bool> Toggle(VisualElement card, string key, string classicId, Bind<bool> bind, Action apply, Action save,
         Action<Options<bool>> configure = null) {
         // The classic toggles show the value too: a hotkey fires one of them, and flips from what it shows.
-        var menu = new List<KeyValuePair<string, Action>>();
         Control<bool> c = null;
         c = Controls.Toggle(card, key, Writes(bind, ShowOnClassic(classicId), apply, save), o => {
             o.Id = key;
             configure?.Invoke(o);
-            if(classicId == null) return;
-            string tip = o.Tooltip;
-            // Asked as the pointer comes over the row, so before any right-click on it: the menu is offered afresh there, as
-            // the classic menu may have bound or cleared the key since.
-            o.TooltipText = () => {
-                Offer();
-                return Tip(tip, classicId);
-            };
-            o.ContextMenu = menu;
+            Hotkeys(o, classicId, () => c!.Root);   // picked from the built row
         });
-        if(classicId == null) return c;
-        // Clear only while bound.
-        void Offer() {
-            menu.Clear();
-            menu.Add(new("MENU_SET_HOTKEY", () => Capture(c!.Root, classicId, Offer)));   // picked from the built row
-            if(ToggleBinds.TryGet(classicId, out _, out _)) menu.Add(new("MENU_CLEAR_HOTKEY", () => {
-                ClearHotkey(classicId);
-                Offer();
-            }));
-        }
-        Offer();
         return c;
     }
 
@@ -113,21 +93,24 @@ internal static class ShellRows {
         });
 
     /// <summary>A text field that holds limit characters, as the classic field does: typing stops there, and text written past
-    /// it another way (a paste, an undo) is cut as it is written.</summary>
+    /// it another way (a paste, an undo) is cut as it is written. A limit of 0 or less is none, as on the classic inputs
+    /// that have none.</summary>
     internal static Control<string> Text(VisualElement card, string key, Bind<string> bind, int limit, Action apply, Action save,
         Action<TextOptions> configure = null) {
-        Control<string> c = Controls.Text(card, key, Writes(Bind.To(bind.Get, v => bind.Set(v != null && v.Length > limit ? v[..limit] : v)), null, apply, save),
+        Control<string> c = Controls.Text(card, key, Writes(Bind.To(bind.Get, v => bind.Set(limit > 0 && v != null && v.Length > limit ? v[..limit] : v)), null, apply, save),
             o => {
                 o.Id = key;
                 configure?.Invoke(o);
             });
-        if(c.Input is TextField field) field.maxLength = limit;
+        if(limit > 0 && c.Input is TextField field) field.maxLength = limit;
         return c;
     }
 
     /// <summary>A read-only status line, Id id. Every refresh reads it, so its text is made again only when input or the
-    /// language changes, or the language files load again. Nothing is kept while they load: the table is half there.</summary>
-    internal static Control<string> Info<T>(VisualElement card, string id, Func<T> input, Func<T, string> text, Func<bool> visible = null) {
+    /// language changes, or the language files load again. Nothing is kept while they load: the table is half there. tone,
+    /// when given, paints the text in a role (Danger for a problem), asked on every refresh.</summary>
+    internal static Control<string> Info<T>(VisualElement card, string id, Func<T> input, Func<T, string> text, Func<bool> visible = null,
+        Func<Role> tone = null) {
         T last = default;
         string language = null, shown = null;
         int loads = 0;
@@ -137,9 +120,10 @@ internal static class ShellRows {
             if(shown == null || loads != QuartzHost.Loads || language != MainCore.Tr.Language || !EqualityComparer<T>.Default.Equals(now, last))
                 (last, language, loads, shown) = (now, MainCore.Tr.Language, QuartzHost.Loads, text(now));
             return shown;
-        }, o => {
+        }, (InfoOptions o) => {
             o.Id = id;
             o.VisibleWhen = visible;
+            o.Tone = tone;
         });
     }
 

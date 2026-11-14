@@ -11,14 +11,16 @@ namespace Quartz.UI.FacetUi;
 /// <summary>
 /// Debug-only in-game self-test, driven by the file UserData/Quartz/&lt;name&gt; (default facet-selftest).
 /// Writes PASS/FAIL lines to &lt;name&gt;.log, ends with "DONE pass=N fail=M", then quits the game.
-/// Runs <c>body(check, info)</c>, or the Facet checks when there is none. Names no Facet type;
+/// Runs <c>body(check, info)</c>, or the Facet checks when there is none; with featuresOn, the body runs with the features the
+/// checks need on, as the Facet checks do. Names no Facet type;
 /// Facet-dependent checks live in FacetBridge.
 /// </summary>
-public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<string, bool, string>, Action<string>, IEnumerator> body = null) : IRuntimeTick {
+public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<string, bool, string>, Action<string>, IEnumerator> body = null,
+    bool featuresOn = false) : IRuntimeTick {
     private const float StartAfterSeconds = 25f;
     // Every runner's marker. Two armed in one launch would run interleaved, and the first DONE quits before the other's
     // finally puts things back (1-1's attempt flushed into the player's PlayCount.json).
-    private static readonly string[] Markers = ["facet-selftest", "prism-selftest", "facet-level-selftest"];
+    private static readonly string[] Markers = ["facet-selftest", "prism-selftest", "facet-level-selftest", "facet-pages-selftest"];
     private bool done;
     private int pass, fail;
     private StringBuilder log;
@@ -38,7 +40,7 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
                 return;
             }
             log = new StringBuilder();
-            steps.Push(Powered(body != null ? body(Check, Info) : FeaturesOn(Run())));
+            steps.Push(Powered(body == null ? FeaturesOn(Run()) : featuresOn ? FeaturesOn(body(Check, Info)) : body(Check, Info)));
         }
         if(!Step(steps, Check)) return;
         done = true;
@@ -232,6 +234,11 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
     internal static IEnumerator Level(Action<string, bool, string> check, Action<string> info) {
         if(FacetBridge.MenuAvailable()) yield return FacetSelfTestChecks.InLevel(check, info);
         else check("new menu available", false, null);
+    }
+    /// <summary>The run under the marker facet-pages-selftest: the form pages moved into the new menu.</summary>
+    internal static IEnumerator Pages(Action<string, bool, string> check, Action<string> info) {
+        if(FacetBridge.MenuAvailable()) yield return FacetSelfTestChecks.FormPages(check, info);
+        else check("the new menu is available", false, null);
     }
     // The menu page's "open in the new menu" button, found by its label on a freshly built page.
     internal static bool PreviewButtonOnPage() {
