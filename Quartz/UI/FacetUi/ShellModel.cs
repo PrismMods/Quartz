@@ -1,6 +1,6 @@
 namespace Quartz.UI.FacetUi;
 /// <summary>
-/// The new menu shell's pure rules: rail grouping, quick-switch lists, last-page and tab lookup, and the first window
+/// The new menu shell's pure rules: rail grouping, quick-switch lists and the first window
 /// rectangle. BCL only, so the test project can link it and pin the behaviour without the game.
 /// </summary>
 internal static class ShellModel {
@@ -30,20 +30,6 @@ internal static class ShellModel {
     }
 
     internal static string FormatSwitches(IEnumerable<string> ids) => string.Join(",", ids);
-
-    /// <summary>The stored page when it is set and still exists, else Home.</summary>
-    internal static string LastPage(string stored, Func<string, bool> exists, string home) =>
-        !string.IsNullOrEmpty(stored) && exists(stored) ? stored : home;
-
-    /// <summary>
-    /// The tab for the open page: first by page key, then by owning feature (so a feature's stub finds the feature's
-    /// real tab), else -1 to keep Facet's remembered tab.
-    /// </summary>
-    internal static int TabIndex(IReadOnlyList<KeyValuePair<string, string>> pages, string currentKey, string currentFeature) {
-        for(int i = 0; i < pages.Count; i++) if(pages[i].Key == currentKey) return i;
-        if(currentFeature != null) for(int i = 0; i < pages.Count; i++) if(pages[i].Value == currentFeature) return i;
-        return -1;
-    }
 
     /// <summary>The first window rectangle: 80% of the panel, centred.</summary>
     internal static (float X, float Y, float W, float H) InitialRect(float panelW, float panelH) =>

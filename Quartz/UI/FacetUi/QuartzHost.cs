@@ -107,9 +107,8 @@ internal static class QuartzHost {
         }
         MainCore.ConfMgr.RequestSave();
     }
-    private static void OnLanguageChanged(string _) {
-        foreach(Surface s in surfaces) s.Relabel();
-    }
+    // Every surface made on this host: Quartz's own and the new menu's, which its settings window made.
+    private static void OnLanguageChanged(string _) => host?.RelabelSurfaces();
     // While the files reload every lookup reads the fallback, so a language change landing then drew English and kept it.
     // Relabel once they are in, as the classic menu refreshes its labels after a reload.
     private static void OnLoadEnd(TranslationFailState _) {

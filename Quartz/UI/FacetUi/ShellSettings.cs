@@ -28,7 +28,7 @@ internal static class ShellSettings {
         Maintenance(Card(p, "MENU_GROUP_MAINTENANCE"));
         VisualElement experimental = Card(p, "PRISM_GROUP_EXPERIMENTAL");
         Switch(experimental, "PRISM_NEW_MENU", () => C.ExperimentalNewMenu, UICore.SetNewMenuSwitch, "PRISM_NEW_MENU_TIP");
-        Controls.Action(experimental, "MENU_CLASSIC_MENU", "MENU_CLASSIC_OPEN", () => QuartzShell.OpenClassic(-1), o => o.Id = "MENU_CLASSIC_MENU");
+        QuartzShell.ClassicMenuRow(experimental, () => QuartzShell.OpenClassic(-1));
         Controls.Action(Controls.Card(p, null, o => o.Id = "menu-settings-classic"), "MENU_SETTINGS_CLASSIC", "MENU_CLASSIC_OPEN",
             () => QuartzShell.OpenClassic(NavRegistry.StateFor(CorePages.SettingsPageKey)), o => o.Id = "MENU_SETTINGS_CLASSIC");
         VisualElement credits = Card(p, "CREDITS", o => o.Note = "CREDITS_LICENSE");
@@ -38,11 +38,7 @@ internal static class ShellSettings {
         }
     }
 
-    private static VisualElement Card(VisualElement p, string title, Action<CardOptions> more = null) =>
-        Controls.Card(p, title, o => {
-            o.Id = "menu-settings-" + title;
-            more?.Invoke(o);
-        });
+    private static VisualElement Card(VisualElement p, string title, Action<CardOptions> more = null) => QuartzShell.SettingsCard(p, title, more);
 
     private static void Save() => MainCore.ConfMgr.RequestSave();
 
@@ -113,11 +109,7 @@ internal static class ShellSettings {
             o.Tooltip = "DESC_WINDOW_OPACITY";
         });
         // The new menu's own: the classic menu keeps its own rail.
-        Controls.Dropdown(card, "MENU_SIDEBAR", Bind.To(() => QuartzShell.SidebarMode, v => QuartzShell.SidebarMode = v), o => {
-            o.Id = "MENU_SIDEBAR";
-            o.Items = ["MENU_SIDEBAR_TOGGLE", "MENU_SIDEBAR_SHOWN", "MENU_SIDEBAR_HIDDEN"];
-            o.Tooltip = "MENU_SIDEBAR_TIP";
-        });
+        QuartzShell.SidebarRow(card);
         Switch(card, "COLOR_PICKER_HORIZONTAL", () => C.ColorPickerHorizontal, v => {
             C.ColorPickerHorizontal = v;
             Save();
@@ -127,11 +119,9 @@ internal static class ShellSettings {
 
     // PrismLib's Smooth scrolling, shared by every Prism window, then the animation duration Prism · Settings holds.
     private static void Animation(VisualElement card) {
-        Switch(card, "SMOOTH_SCROLL", () => PrismBridge.SmoothScroll, v => PrismBridge.SmoothScroll = v, "DESC_SMOOTH_SCROLL");
-        Controls.Action(card, "MENU_ANIM", "MENU_OPEN_PRISM", PrismBridge.OpenPrismSettings, o => {
-            o.Id = "MENU_ANIM";
-            o.VisibleWhen = () => PrismBridge.Available && PrismBridge.UiAvailable;   // Prism · Settings needs PrismLib.dll as well
-        });
+        QuartzShell.SmoothRow(card, QuartzShell.Writes(() => PrismBridge.SmoothScroll, v => PrismBridge.SmoothScroll = v));
+        // Prism · Settings needs PrismLib.dll as well
+        QuartzShell.PrismLinkRow(card, PrismBridge.OpenPrismSettings, () => PrismBridge.Available && PrismBridge.UiAvailable);
     }
 
     // Saved, and both menus rescaled.
@@ -151,16 +141,10 @@ internal static class ShellSettings {
             C.MiddleClickToDefault = v;
             Save();
         }, "DESC_MIDDLE_CLICK_TO_SET_AS_DEFAULT");
-        Controls.Slider(card, "SCROLL_SPEED", QuartzShell.Writes(() => C.ScrollSpeed, v => {
+        QuartzShell.ScrollSpeedRow(card, QuartzShell.Writes(() => C.ScrollSpeed, v => {
             C.ScrollSpeed = v;
             Save();
-        }), o => {
-            o.Id = "SCROLL_SPEED";
-            o.Min = 20f;
-            o.Max = 300f;
-            o.Step = 1f;
-            o.Format = "0 px";
-        });
+        }));
     }
 
     private static void Language(VisualElement card) {

@@ -2093,6 +2093,7 @@
           "Facet.Theme Facet.Host::get_Theme()",
           "System.String Facet.Host::Read(System.String)",
           "System.String Facet.Host::Translate(System.String)",
+          "System.Void Facet.Host::RelabelSurfaces()",
           "System.Void Facet.Host::Write(System.String,System.String)"
         ]
       },
@@ -2184,37 +2185,17 @@
       {
         "type": "Facet.Nav",
         "members": [
-          "System.Action\u00601\u003CSystem.Boolean\u003E Facet.Nav::CompactChanged",
-          "System.Action\u00601\u003CSystem.Single\u003E Facet.Nav::InsetChanged",
-          "System.Boolean Facet.Nav::Collapsible()",
-          "System.Boolean Facet.Nav::Compact()",
-          "System.Boolean Facet.Nav::CompactButton()",
           "System.Single Facet.Nav::CollapseAt",
           "System.Single Facet.Nav::MaxRail",
-          "System.Single Facet.Nav::MinRail",
-          "System.Void Facet.Nav::.ctor(UnityEngine.UIElements.VisualElement,System.Collections.Generic.IEnumerable\u00601\u003CFacet.NavItem\u003E,System.Single)",
-          "System.Void Facet.Nav::AddSearchSource(System.Func\u00601\u003CSystem.Collections.Generic.IEnumerable\u00601\u003CFacet.SearchIndex/Entry\u003E\u003E)",
-          "System.Void Facet.Nav::Filter(System.String)",
-          "System.Void Facet.Nav::Go(Facet.NavItem)",
-          "System.Void Facet.Nav::Tick()",
-          "System.Void Facet.Nav::add_CompactChanged(System.Action\u00601\u003CSystem.Boolean\u003E)",
-          "System.Void Facet.Nav::add_InsetChanged(System.Action\u00601\u003CSystem.Single\u003E)",
-          "System.Void Facet.Nav::set_Collapsible(System.Boolean)",
-          "System.Void Facet.Nav::set_Compact(System.Boolean)",
-          "System.Void Facet.Nav::set_CompactButton(System.Boolean)"
+          "System.Single Facet.Nav::MinRail"
         ]
       },
       {
         "type": "Facet.NavItem",
         "members": [
-          "Facet.NavItem Facet.NavItem::Heading(System.String,Facet.NavItem[])",
-          "System.Action\u00601\u003CFacet.SearchIndex/Hit\u003E Facet.NavItem::OnHit",
           "System.Action\u00601\u003CUnityEngine.UIElements.VisualElement\u003E Facet.NavItem::Build",
-          "System.Func\u00601\u003CSystem.Boolean\u003E Facet.NavItem::VisibleWhen",
-          "System.Func\u00601\u003CSystem.Int32\u003E Facet.NavItem::Revision",
           "System.String Facet.NavItem::Title",
-          "System.Void Facet.NavItem::.ctor(System.String,System.Action\u00601\u003CUnityEngine.UIElements.VisualElement\u003E)",
-          "UnityEngine.UIElements.Background Facet.NavItem::Icon"
+          "System.Void Facet.NavItem::.ctor(System.String,System.Action\u00601\u003CUnityEngine.UIElements.VisualElement\u003E)"
         ]
       },
       {
@@ -2343,29 +2324,18 @@
       {
         "type": "Facet.Surface",
         "members": [
-          "System.Action Facet.Surface::Hidden",
           "System.Boolean Facet.Surface::BlocksGameInput()",
           "System.Boolean Facet.Surface::Visible()",
           "System.Boolean Facet.Surface::get_Visible()",
-          "System.Func\u00601\u003CSystem.Boolean\u003E Facet.Surface::EscapeHandler",
           "System.Void Facet.Surface::.ctor(Facet.Host,System.String,Facet.Layer,UnityEngine.TextCore.Text.FontAsset)",
-          "System.Void Facet.Surface::BringToFront()",
           "System.Void Facet.Surface::Dispose()",
           "System.Void Facet.Surface::Refresh()",
-          "System.Void Facet.Surface::Relabel()",
-          "System.Void Facet.Surface::add_Hidden(System.Action)",
-          "System.Void Facet.Surface::remove_Hidden(System.Action)",
-          "System.Void Facet.Surface::set_BlocksGameInput(System.Boolean)",
-          "System.Void Facet.Surface::set_Visible(System.Boolean)",
-          "UnityEngine.UIElements.VisualElement Facet.Surface::Root()",
-          "UnityEngine.UIElements.VisualElement Facet.Surface::get_Root()"
+          "System.Void Facet.Surface::set_BlocksGameInput(System.Boolean)"
         ]
       },
       {
         "type": "Facet.Tabs",
-        "members": [
-          "Facet.Tabs Facet.Tabs::Pages(UnityEngine.UIElements.VisualElement,System.Collections.Generic.IList\u00601\u003CFacet.NavItem\u003E,System.Int32,System.Action\u00601\u003CSystem.Int32\u003E)"
-        ]
+        "members": []
       },
       {
         "type": "Facet.TextOptions",
@@ -2426,25 +2396,11 @@
       {
         "type": "Facet.Window",
         "members": [
-          "System.Action Facet.Window::Raised",
           "System.Single Facet.Window::MinHeight",
           "System.Single Facet.Window::MinWidth",
           "System.Single Facet.Window::RailAlign",
           "System.Single Facet.Window::Scale()",
-          "System.Single Facet.Window::get_Scale()",
-          "System.Void Facet.Window::.ctor(UnityEngine.UIElements.VisualElement,System.String,System.String,UnityEngine.Rect)",
-          "System.Void Facet.Window::SetContentInset(System.Single)",
-          "System.Void Facet.Window::ShowSearch(System.String,System.Action\u00601\u003CSystem.String\u003E)",
-          "System.Void Facet.Window::add_Raised(System.Action)",
-          "System.Void Facet.Window::set_Rect(UnityEngine.Rect)",
-          "System.Void Facet.Window::set_Scale(System.Single)",
-          "UnityEngine.Rect Facet.Window::Rect()",
-          "UnityEngine.UIElements.VisualElement Facet.Window::Body()",
-          "UnityEngine.UIElements.VisualElement Facet.Window::Root()",
-          "UnityEngine.UIElements.VisualElement Facet.Window::TitleBarLeft()",
-          "UnityEngine.UIElements.VisualElement Facet.Window::get_Body()",
-          "UnityEngine.UIElements.VisualElement Facet.Window::get_Root()",
-          "UnityEngine.UIElements.VisualElement Facet.Window::get_TitleBarLeft()"
+          "System.Single Facet.Window::get_Scale()"
         ]
       },
       {
@@ -3281,11 +3237,133 @@
         ]
       },
       {
+        "type": "PrismLib.UI.Toolkit.SuiteAdapter",
+        "members": [
+          "Facet.Host PrismLib.UI.Toolkit.SuiteAdapter::Host()",
+          "Facet.Host PrismLib.UI.Toolkit.SuiteAdapter::get_Host()",
+          "System.Boolean PrismLib.UI.Toolkit.SuiteAdapter::BlockInput()",
+          "System.Boolean PrismLib.UI.Toolkit.SuiteAdapter::CanEditLayout()",
+          "System.Boolean PrismLib.UI.Toolkit.SuiteAdapter::KeepEscape()",
+          "System.Boolean PrismLib.UI.Toolkit.SuiteAdapter::LayoutEditorShowing()",
+          "System.Boolean PrismLib.UI.Toolkit.SuiteAdapter::ReturnFromLayout()",
+          "System.Boolean PrismLib.UI.Toolkit.SuiteAdapter::get_BlockInput()",
+          "System.Boolean PrismLib.UI.Toolkit.SuiteAdapter::get_CanEditLayout()",
+          "System.Boolean PrismLib.UI.Toolkit.SuiteAdapter::get_KeepEscape()",
+          "System.Boolean PrismLib.UI.Toolkit.SuiteAdapter::get_LayoutEditorShowing()",
+          "System.Boolean PrismLib.UI.Toolkit.SuiteAdapter::get_ReturnFromLayout()",
+          "System.Collections.Generic.IEnumerable\u00601\u003CFacet.SearchIndex/Entry\u003E PrismLib.UI.Toolkit.SuiteAdapter::SearchRows()",
+          "System.Collections.Generic.IList\u00601\u003CPrismLib.UI.Toolkit.SuiteCategory\u003E PrismLib.UI.Toolkit.SuiteAdapter::Categories()",
+          "System.Int32 PrismLib.UI.Toolkit.SuiteAdapter::Revision()",
+          "System.Int32 PrismLib.UI.Toolkit.SuiteAdapter::get_Revision()",
+          "System.Nullable\u00601\u003CUnityEngine.UIElements.Background\u003E PrismLib.UI.Toolkit.SuiteAdapter::Logo()",
+          "System.Nullable\u00601\u003CUnityEngine.UIElements.Background\u003E PrismLib.UI.Toolkit.SuiteAdapter::get_Logo()",
+          "System.Single PrismLib.UI.Toolkit.SuiteAdapter::Opacity()",
+          "System.Single PrismLib.UI.Toolkit.SuiteAdapter::RailWidth()",
+          "System.Single PrismLib.UI.Toolkit.SuiteAdapter::Scale()",
+          "System.Single PrismLib.UI.Toolkit.SuiteAdapter::get_Opacity()",
+          "System.Single PrismLib.UI.Toolkit.SuiteAdapter::get_RailWidth()",
+          "System.Single PrismLib.UI.Toolkit.SuiteAdapter::get_Scale()",
+          "System.String PrismLib.UI.Toolkit.SuiteAdapter::HomePage()",
+          "System.String PrismLib.UI.Toolkit.SuiteAdapter::Key(System.String,System.String)",
+          "System.String PrismLib.UI.Toolkit.SuiteAdapter::Title()",
+          "System.String PrismLib.UI.Toolkit.SuiteAdapter::WindowId()",
+          "System.String PrismLib.UI.Toolkit.SuiteAdapter::get_HomePage()",
+          "System.String PrismLib.UI.Toolkit.SuiteAdapter::get_Title()",
+          "System.String PrismLib.UI.Toolkit.SuiteAdapter::get_WindowId()",
+          "System.Void PrismLib.UI.Toolkit.SuiteAdapter::.ctor()",
+          "System.Void PrismLib.UI.Toolkit.SuiteAdapter::BuildPage(UnityEngine.UIElements.VisualElement,PrismLib.UI.Toolkit.SuitePage)",
+          "System.Void PrismLib.UI.Toolkit.SuiteAdapter::OnLeaving()",
+          "System.Void PrismLib.UI.Toolkit.SuiteAdapter::OnReturning()",
+          "System.Void PrismLib.UI.Toolkit.SuiteAdapter::OpenLayoutEditor()"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.SuiteCategory",
+        "members": [
+          "System.Action\u00601\u003CFacet.SearchIndex/Hit\u003E PrismLib.UI.Toolkit.SuiteCategory::OnHit()",
+          "System.Boolean PrismLib.UI.Toolkit.SuiteCategory::Tabs()",
+          "System.Func\u00601\u003CSystem.Boolean\u003E PrismLib.UI.Toolkit.SuiteCategory::Visible()",
+          "System.Func\u00601\u003CSystem.Collections.Generic.IList\u00601\u003CPrismLib.UI.Toolkit.SuitePage\u003E\u003E PrismLib.UI.Toolkit.SuiteCategory::Pages()",
+          "System.Int32 PrismLib.UI.Toolkit.SuiteCategory::Group()",
+          "System.String PrismLib.UI.Toolkit.SuiteCategory::Key()",
+          "System.String PrismLib.UI.Toolkit.SuiteCategory::Label()",
+          "System.Void PrismLib.UI.Toolkit.SuiteCategory::.ctor()",
+          "System.Void PrismLib.UI.Toolkit.SuiteCategory::set_Group(System.Int32)",
+          "System.Void PrismLib.UI.Toolkit.SuiteCategory::set_Icon(UnityEngine.UIElements.Background)",
+          "System.Void PrismLib.UI.Toolkit.SuiteCategory::set_Key(System.String)",
+          "System.Void PrismLib.UI.Toolkit.SuiteCategory::set_Label(System.String)",
+          "System.Void PrismLib.UI.Toolkit.SuiteCategory::set_OnHit(System.Action\u00601\u003CFacet.SearchIndex/Hit\u003E)",
+          "System.Void PrismLib.UI.Toolkit.SuiteCategory::set_Pages(System.Func\u00601\u003CSystem.Collections.Generic.IList\u00601\u003CPrismLib.UI.Toolkit.SuitePage\u003E\u003E)",
+          "System.Void PrismLib.UI.Toolkit.SuiteCategory::set_Tabs(System.Boolean)",
+          "System.Void PrismLib.UI.Toolkit.SuiteCategory::set_Visible(System.Func\u00601\u003CSystem.Boolean\u003E)",
+          "UnityEngine.UIElements.Background PrismLib.UI.Toolkit.SuiteCategory::Icon()"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.SuitePage",
+        "members": [
+          "System.Action\u00601\u003CFacet.SearchIndex/Hit\u003E PrismLib.UI.Toolkit.SuitePage::OnHit()",
+          "System.Func\u00601\u003CSystem.Boolean\u003E PrismLib.UI.Toolkit.SuitePage::Visible()",
+          "System.String PrismLib.UI.Toolkit.SuitePage::Feature()",
+          "System.String PrismLib.UI.Toolkit.SuitePage::Key()",
+          "System.String PrismLib.UI.Toolkit.SuitePage::Label()",
+          "System.String PrismLib.UI.Toolkit.SuitePage::get_Key()",
+          "System.Void PrismLib.UI.Toolkit.SuitePage::.ctor()",
+          "System.Void PrismLib.UI.Toolkit.SuitePage::set_Feature(System.String)",
+          "System.Void PrismLib.UI.Toolkit.SuitePage::set_Key(System.String)",
+          "System.Void PrismLib.UI.Toolkit.SuitePage::set_Label(System.String)",
+          "System.Void PrismLib.UI.Toolkit.SuitePage::set_OnHit(System.Action\u00601\u003CFacet.SearchIndex/Hit\u003E)",
+          "System.Void PrismLib.UI.Toolkit.SuitePage::set_Visible(System.Func\u00601\u003CSystem.Boolean\u003E)"
+        ]
+      },
+      {
         "type": "PrismLib.UI.Toolkit.SuiteShell",
         "members": [
+          "Facet.Control\u00601\u003CSystem.Boolean\u003E PrismLib.UI.Toolkit.SuiteShell::Header(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Boolean\u003E,System.Func\u00601\u003CSystem.String\u003E)",
+          "Facet.Control\u00601\u003CSystem.Boolean\u003E PrismLib.UI.Toolkit.SuiteShell::SmoothRow(UnityEngine.UIElements.VisualElement,Facet.Bind\u00601\u003CSystem.Boolean\u003E)",
+          "Facet.Control\u00601\u003CSystem.Int32\u003E PrismLib.UI.Toolkit.SuiteShell::SidebarRow(UnityEngine.UIElements.VisualElement)",
+          "Facet.Control\u00601\u003CSystem.Single\u003E PrismLib.UI.Toolkit.SuiteShell::ScrollSpeedRow(UnityEngine.UIElements.VisualElement,Facet.Bind\u00601\u003CSystem.Single\u003E)",
+          "Facet.Nav PrismLib.UI.Toolkit.SuiteShell::Nav()",
+          "Facet.Nav PrismLib.UI.Toolkit.SuiteShell::get_Nav()",
+          "Facet.Surface PrismLib.UI.Toolkit.SuiteShell::Surface()",
+          "Facet.Surface PrismLib.UI.Toolkit.SuiteShell::get_Surface()",
+          "Facet.Tabs PrismLib.UI.Toolkit.SuiteShell::TabRow()",
+          "Facet.Tabs PrismLib.UI.Toolkit.SuiteShell::get_TabRow()",
+          "Facet.Window PrismLib.UI.Toolkit.SuiteShell::Window()",
+          "Facet.Window PrismLib.UI.Toolkit.SuiteShell::get_Window()",
+          "System.Action PrismLib.UI.Toolkit.SuiteShell::Hidden",
+          "System.Boolean PrismLib.UI.Toolkit.SuiteShell::FreshGeometry()",
+          "System.Boolean PrismLib.UI.Toolkit.SuiteShell::Hide()",
+          "System.Boolean PrismLib.UI.Toolkit.SuiteShell::WaitingForLayout()",
+          "System.Boolean PrismLib.UI.Toolkit.SuiteShell::get_FreshGeometry()",
+          "System.Boolean PrismLib.UI.Toolkit.SuiteShell::get_WaitingForLayout()",
+          "System.Int32 PrismLib.UI.Toolkit.SuiteShell::SidebarMode()",
+          "System.Int32 PrismLib.UI.Toolkit.SuiteShell::get_SidebarMode()",
           "System.String PrismLib.UI.Toolkit.SuiteShell::CompactStore",
+          "System.String PrismLib.UI.Toolkit.SuiteShell::CurrentPage()",
           "System.String PrismLib.UI.Toolkit.SuiteShell::PageStore",
-          "System.String PrismLib.UI.Toolkit.SuiteShell::SidebarStore"
+          "System.String PrismLib.UI.Toolkit.SuiteShell::SidebarStore",
+          "System.String PrismLib.UI.Toolkit.SuiteShell::get_CurrentPage()",
+          "System.Void PrismLib.UI.Toolkit.SuiteShell::.ctor(PrismLib.UI.Toolkit.SuiteAdapter)",
+          "System.Void PrismLib.UI.Toolkit.SuiteShell::ApplyLook()",
+          "System.Void PrismLib.UI.Toolkit.SuiteShell::ApplySidebar()",
+          "System.Void PrismLib.UI.Toolkit.SuiteShell::Changed()",
+          "System.Void PrismLib.UI.Toolkit.SuiteShell::ClassicCard(UnityEngine.UIElements.VisualElement,System.Action,System.Boolean)",
+          "System.Void PrismLib.UI.Toolkit.SuiteShell::ClassicMenuRow(UnityEngine.UIElements.VisualElement,System.Action)",
+          "System.Void PrismLib.UI.Toolkit.SuiteShell::Dispose()",
+          "System.Void PrismLib.UI.Toolkit.SuiteShell::EditLayout()",
+          "System.Void PrismLib.UI.Toolkit.SuiteShell::FeatureFrame(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Boolean\u003E,System.String,System.Action\u00601\u003CUnityEngine.UIElements.VisualElement\u003E,System.Action\u00601\u003CUnityEngine.UIElements.VisualElement\u003E)",
+          "System.Void PrismLib.UI.Toolkit.SuiteShell::Go(System.String)",
+          "System.Void PrismLib.UI.Toolkit.SuiteShell::LayoutRow(UnityEngine.UIElements.VisualElement,System.String)",
+          "System.Void PrismLib.UI.Toolkit.SuiteShell::Open(System.String)",
+          "System.Void PrismLib.UI.Toolkit.SuiteShell::Prebuild()",
+          "System.Void PrismLib.UI.Toolkit.SuiteShell::PrismLinkRow(UnityEngine.UIElements.VisualElement,System.Action,System.Func\u00601\u003CSystem.Boolean\u003E)",
+          "System.Void PrismLib.UI.Toolkit.SuiteShell::RebuildRail()",
+          "System.Void PrismLib.UI.Toolkit.SuiteShell::Tick()",
+          "System.Void PrismLib.UI.Toolkit.SuiteShell::add_Hidden(System.Action)",
+          "System.Void PrismLib.UI.Toolkit.SuiteShell::remove_Hidden(System.Action)",
+          "System.Void PrismLib.UI.Toolkit.SuiteShell::set_SidebarMode(System.Int32)",
+          "UnityEngine.UIElements.VisualElement PrismLib.UI.Toolkit.SuiteShell::SettingsCard(UnityEngine.UIElements.VisualElement,System.String,System.Action\u00601\u003CFacet.CardOptions\u003E)"
         ]
       },
       {
@@ -6859,7 +6937,6 @@
         "type": "UnityEngine.UIElements.IStyle",
         "members": [
           "System.Void UnityEngine.UIElements.IStyle::set_alignItems(UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Align\u003E)",
-          "System.Void UnityEngine.UIElements.IStyle::set_alignSelf(UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Align\u003E)",
           "System.Void UnityEngine.UIElements.IStyle::set_backgroundColor(UnityEngine.UIElements.StyleColor)",
           "System.Void UnityEngine.UIElements.IStyle::set_backgroundImage(UnityEngine.UIElements.StyleBackground)",
           "System.Void UnityEngine.UIElements.IStyle::set_backgroundSize(UnityEngine.UIElements.StyleBackgroundSize)",
@@ -6891,7 +6968,6 @@
           "System.Void UnityEngine.UIElements.IStyle::set_marginTop(UnityEngine.UIElements.StyleLength)",
           "System.Void UnityEngine.UIElements.IStyle::set_minHeight(UnityEngine.UIElements.StyleLength)",
           "System.Void UnityEngine.UIElements.IStyle::set_minWidth(UnityEngine.UIElements.StyleLength)",
-          "System.Void UnityEngine.UIElements.IStyle::set_opacity(UnityEngine.UIElements.StyleFloat)",
           "System.Void UnityEngine.UIElements.IStyle::set_paddingBottom(UnityEngine.UIElements.StyleLength)",
           "System.Void UnityEngine.UIElements.IStyle::set_paddingLeft(UnityEngine.UIElements.StyleLength)",
           "System.Void UnityEngine.UIElements.IStyle::set_paddingRight(UnityEngine.UIElements.StyleLength)",
@@ -6912,7 +6988,6 @@
           "UnityEngine.UIElements.StyleColor UnityEngine.UIElements.IStyle::color()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.TextAnchor\u003E UnityEngine.UIElements.IStyle::unityTextAlign()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Align\u003E UnityEngine.UIElements.IStyle::alignItems()",
-          "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Align\u003E UnityEngine.UIElements.IStyle::alignSelf()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.DisplayStyle\u003E UnityEngine.UIElements.IStyle::display()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.DisplayStyle\u003E UnityEngine.UIElements.IStyle::get_display()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.FlexDirection\u003E UnityEngine.UIElements.IStyle::flexDirection()",
@@ -6925,7 +7000,6 @@
           "UnityEngine.UIElements.StyleFloat UnityEngine.UIElements.IStyle::borderTopWidth()",
           "UnityEngine.UIElements.StyleFloat UnityEngine.UIElements.IStyle::flexGrow()",
           "UnityEngine.UIElements.StyleFloat UnityEngine.UIElements.IStyle::flexShrink()",
-          "UnityEngine.UIElements.StyleFloat UnityEngine.UIElements.IStyle::opacity()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::borderBottomLeftRadius()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::borderBottomRightRadius()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::borderTopLeftRadius()",
@@ -7036,7 +7110,6 @@
       {
         "type": "UnityEngine.UIElements.StyleBackground",
         "members": [
-          "System.Void UnityEngine.UIElements.StyleBackground::.ctor(UnityEngine.Sprite)",
           "UnityEngine.UIElements.Background UnityEngine.UIElements.StyleBackground::m_Value",
           "UnityEngine.UIElements.StyleBackground UnityEngine.UIElements.StyleBackground::op_Implicit(UnityEngine.Texture2D)",
           "UnityEngine.UIElements.StyleBackground UnityEngine.UIElements.StyleBackground::op_Implicit(UnityEngine.UIElements.Background)",

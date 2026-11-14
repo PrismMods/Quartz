@@ -91,7 +91,6 @@ namespace UnityEngine.UIElements {
     }
     public unsafe partial interface IStyle {
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.Align> alignItems { get; set; }
-        global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.Align> alignSelf { get; set; }
         global::UnityEngine.UIElements.StyleColor backgroundColor { get; set; }
         global::UnityEngine.UIElements.StyleBackground backgroundImage { get; set; }
         global::UnityEngine.UIElements.StyleBackgroundSize backgroundSize { get; set; }
@@ -123,7 +122,6 @@ namespace UnityEngine.UIElements {
         global::UnityEngine.UIElements.StyleLength marginTop { get; set; }
         global::UnityEngine.UIElements.StyleLength minHeight { get; set; }
         global::UnityEngine.UIElements.StyleLength minWidth { get; set; }
-        global::UnityEngine.UIElements.StyleFloat opacity { get; set; }
         global::UnityEngine.UIElements.StyleLength paddingBottom { get; set; }
         global::UnityEngine.UIElements.StyleLength paddingLeft { get; set; }
         global::UnityEngine.UIElements.StyleLength paddingRight { get; set; }
@@ -186,7 +184,6 @@ namespace UnityEngine.UIElements {
     public unsafe partial struct StyleBackground : global::System.IEquatable<global::UnityEngine.UIElements.StyleBackground> {
         private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
         private global::UnityEngine.UIElements.Background m_Value;
-        public StyleBackground(global::UnityEngine.Sprite v) => throw null;
         public static implicit operator global::UnityEngine.UIElements.StyleBackground(global::UnityEngine.Texture2D v) => throw null;
         public static implicit operator global::UnityEngine.UIElements.StyleBackground(global::UnityEngine.UIElements.Background v) => throw null;
         public static implicit operator global::UnityEngine.UIElements.StyleBackground(global::UnityEngine.UIElements.StyleKeyword keyword) => throw null;

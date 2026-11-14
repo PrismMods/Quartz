@@ -1,7 +1,6 @@
 using Quartz.UI.FacetUi;
 using static Asserts;
 static class ShellModelTests {
-    static KeyValuePair<string, string> Kv(string key, string feature) => new(key, feature);
     static bool Near(float a, float b) => MathF.Abs(a - b) <= 0.01f;
     public static void TestRailGroups() {
         Assert(ShellModel.RailGroup("home") == 0 && ShellModel.RailGroup("features") == 0, "home and features lead");
@@ -18,18 +17,6 @@ static class ShellModelTests {
         Assert(ShellModel.ParseSwitches("Combo", known).Count == 0, "ids are case-sensitive");
         Assert(ShellModel.ParseSwitches("combo,combo", known).SequenceEqual(new[] { "combo" }), "a repeat counts once");
         Assert(ShellModel.FormatSwitches(new[] { "a", "b" }) == "a,b", "comma-joined");
-    }
-    public static void TestLastPageAndTabs() {
-        Func<string, bool> has = k => k == "visuals.effectremover";
-        Assert(ShellModel.LastPage("visuals.effectremover", has, "home.overview") == "visuals.effectremover", "a known page reopens");
-        Assert(ShellModel.LastPage("nope.page", has, "home.overview") == "home.overview" && ShellModel.LastPage(null, has, "home.overview") == "home.overview", "gone or unset: Home");
-        Assert(ShellModel.LastPage("", has, "home.overview") == "home.overview", "empty: Home");
-        var tabs = new[] { Kv("visuals.hidejudgements", "hidejudgements"), Kv("feature-off.effectremover", "effectremover") };
-        Assert(ShellModel.TabIndex(tabs, "visuals.effectremover", "effectremover") == 1, "a stub takes its feature's tab");
-        Assert(ShellModel.TabIndex(tabs, "visuals.hidejudgements", null) == 0 && ShellModel.TabIndex(tabs, "x", null) == -1, "by key, else Facet's memory");
-        Assert(ShellModel.TabIndex(tabs, "feature-off.effectremover", "hidejudgements") == 1, "a key match beats an earlier feature match");
-        var shared = new[] { Kv("a.one", "keyviewer"), Kv("a.two", "keyviewer") };
-        Assert(ShellModel.TabIndex(shared, "x", "keyviewer") == 0, "pages sharing a feature: the first");
     }
     public static void TestInitialRectAndLayout() {
         var r = ShellModel.InitialRect(1920, 1080);

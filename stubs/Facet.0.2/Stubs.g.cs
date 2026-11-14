@@ -135,6 +135,7 @@ namespace Facet {
         public global::Facet.Theme Theme { get => throw null; }
         public static global::Facet.Host Create(string name, global::System.Action<global::Facet.HostOptions> configure = default) => throw null;
         public string Read(string key) => throw null;
+        public void RelabelSurfaces() => throw null;
         public string Translate(string s) => throw null;
         public void Write(string key, string value) => throw null;
         private Host() { }
@@ -195,27 +196,12 @@ namespace Facet {
         public const float CollapseAt = 9f;
         public const float MaxRail = 10f;
         public const float MinRail = 11f;
-        public bool Collapsible { get => throw null; set { } }
-        public bool Compact { get => throw null; set { } }
-        public bool CompactButton { get => throw null; set { } }
-        public event global::System.Action<bool> CompactChanged { add { } remove { } }
-        public event global::System.Action<float> InsetChanged { add { } remove { } }
-        public Nav(global::UnityEngine.UIElements.VisualElement parent, global::System.Collections.Generic.IEnumerable<global::Facet.NavItem> items, float railWidth = default) => throw null;
-        public void AddSearchSource(global::System.Func<global::System.Collections.Generic.IEnumerable<global::Facet.SearchIndex.Entry>> source) => throw null;
-        public void Filter(string query) => throw null;
-        public void Go(global::Facet.NavItem target) => throw null;
-        public void Tick() => throw null;
         private Nav() { }
     }
     public sealed unsafe partial class NavItem {
         public global::System.Action<global::UnityEngine.UIElements.VisualElement> Build;
-        public global::UnityEngine.UIElements.Background Icon;
-        public global::System.Action<global::Facet.SearchIndex.Hit> OnHit;
-        public global::System.Func<int> Revision;
         public string Title;
-        public global::System.Func<bool> VisibleWhen;
         public NavItem(string title, global::System.Action<global::UnityEngine.UIElements.VisualElement> build = default) => throw null;
-        public static global::Facet.NavItem Heading(string title, params global::Facet.NavItem[] children) => throw null;
         private NavItem() { }
     }
     public unsafe partial class Options<T> : global::Facet.ControlOptions {
@@ -299,21 +285,15 @@ namespace Facet {
         private StatusLine() { }
     }
     public sealed unsafe partial class Surface : global::System.IDisposable {
-        public global::System.Func<bool> EscapeHandler;
         public bool BlocksGameInput { get => throw null; set { } }
-        public global::UnityEngine.UIElements.VisualElement Root { get => throw null; }
         public bool Visible { get => throw null; set { } }
-        public event global::System.Action Hidden { add { } remove { } }
         public Surface(global::Facet.Host host, string name, global::Facet.Layer layer, global::UnityEngine.TextCore.Text.FontAsset font = default) => throw null;
-        public void BringToFront() => throw null;
         public void Dispose() => throw null;
         public void Refresh() => throw null;
-        public void Relabel() => throw null;
         private Surface() { }
         void global::System.IDisposable.Dispose() => throw null;
     }
     public sealed unsafe partial class Tabs {
-        public static global::Facet.Tabs Pages(global::UnityEngine.UIElements.VisualElement parent, global::System.Collections.Generic.IList<global::Facet.NavItem> pages, int selected = default, global::System.Action<int> onSelect = default) => throw null;
         private Tabs() { }
     }
     public unsafe partial class TextOptions : global::Facet.Options<string> {
@@ -353,15 +333,7 @@ namespace Facet {
         public const float MinHeight = 12f;
         public const float MinWidth = 13f;
         public const float RailAlign = 14f;
-        public global::UnityEngine.UIElements.VisualElement Body { get => throw null; }
-        public global::UnityEngine.Rect Rect { get => throw null; set { } }
-        public global::UnityEngine.UIElements.VisualElement Root { get => throw null; }
         public float Scale { get => throw null; set { } }
-        public global::UnityEngine.UIElements.VisualElement TitleBarLeft { get => throw null; }
-        public event global::System.Action Raised { add { } remove { } }
-        public Window(global::UnityEngine.UIElements.VisualElement parent, string id, string title, global::UnityEngine.Rect initial) => throw null;
-        public void SetContentInset(float inset) => throw null;
-        public void ShowSearch(string placeholder, global::System.Action<string> onChange) => throw null;
         private Window() { }
     }
     public static unsafe partial class Words {

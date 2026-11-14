@@ -261,10 +261,84 @@ namespace PrismLib.UI.Toolkit {
     public static unsafe partial class Suite {
         public static global::Facet.Theme Wear(global::Facet.Theme t) => throw null;
     }
+    public abstract unsafe partial class SuiteAdapter {
+        public virtual bool BlockInput { get => throw null; }
+        public virtual bool CanEditLayout { get => throw null; }
+        public virtual string HomePage { get => throw null; }
+        public virtual global::Facet.Host Host { get => throw null; }
+        public virtual bool KeepEscape { get => throw null; }
+        public virtual bool LayoutEditorShowing { get => throw null; }
+        public virtual global::System.Nullable<global::UnityEngine.UIElements.Background> Logo { get => throw null; }
+        public virtual float Opacity { get => throw null; }
+        public virtual float RailWidth { get => throw null; }
+        public virtual bool ReturnFromLayout { get => throw null; }
+        public virtual int Revision { get => throw null; }
+        public virtual float Scale { get => throw null; }
+        public virtual string Title { get => throw null; }
+        public virtual string WindowId { get => throw null; }
+        protected SuiteAdapter() => throw null;
+        public virtual void BuildPage(global::UnityEngine.UIElements.VisualElement panel, global::PrismLib.UI.Toolkit.SuitePage page) => throw null;
+        public virtual global::System.Collections.Generic.IList<global::PrismLib.UI.Toolkit.SuiteCategory> Categories() => throw null;
+        public virtual string Key(string id, string english) => throw null;
+        public virtual void OnLeaving() => throw null;
+        public virtual void OnReturning() => throw null;
+        public virtual void OpenLayoutEditor() => throw null;
+        public virtual global::System.Collections.Generic.IEnumerable<global::Facet.SearchIndex.Entry> SearchRows() => throw null;
+    }
+    public sealed unsafe partial class SuiteCategory {
+        public int Group { get => throw null; set { } }
+        public global::UnityEngine.UIElements.Background Icon { get => throw null; set { } }
+        public string Key { get => throw null; set { } }
+        public string Label { get => throw null; set { } }
+        public global::System.Action<global::Facet.SearchIndex.Hit> OnHit { get => throw null; set { } }
+        public global::System.Func<global::System.Collections.Generic.IList<global::PrismLib.UI.Toolkit.SuitePage>> Pages { get => throw null; set { } }
+        public bool Tabs { get => throw null; set { } }
+        public global::System.Func<bool> Visible { get => throw null; set { } }
+        public SuiteCategory() => throw null;
+    }
+    public sealed unsafe partial class SuitePage {
+        public string Feature { get => throw null; set { } }
+        public string Key { get => throw null; set { } }
+        public string Label { get => throw null; set { } }
+        public global::System.Action<global::Facet.SearchIndex.Hit> OnHit { get => throw null; set { } }
+        public global::System.Func<bool> Visible { get => throw null; set { } }
+        public SuitePage() => throw null;
+    }
     public sealed unsafe partial class SuiteShell : global::System.IDisposable {
         public const string CompactStore = "CompactStore";
         public const string PageStore = "PageStore";
         public const string SidebarStore = "SidebarStore";
+        public string CurrentPage { get => throw null; }
+        public bool FreshGeometry { get => throw null; }
+        public global::Facet.Nav Nav { get => throw null; }
+        public int SidebarMode { get => throw null; set { } }
+        public global::Facet.Surface Surface { get => throw null; }
+        public global::Facet.Tabs TabRow { get => throw null; }
+        public bool WaitingForLayout { get => throw null; }
+        public global::Facet.Window Window { get => throw null; }
+        public event global::System.Action Hidden { add { } remove { } }
+        public SuiteShell(global::PrismLib.UI.Toolkit.SuiteAdapter adapter) => throw null;
+        public void ApplyLook() => throw null;
+        public void ApplySidebar() => throw null;
+        public void Changed() => throw null;
+        public void ClassicCard(global::UnityEngine.UIElements.VisualElement page, global::System.Action open, bool layout) => throw null;
+        public void ClassicMenuRow(global::UnityEngine.UIElements.VisualElement card, global::System.Action open) => throw null;
+        public void Dispose() => throw null;
+        public void EditLayout() => throw null;
+        public void FeatureFrame(global::UnityEngine.UIElements.VisualElement page, string title, global::Facet.Bind<bool> on, string description, global::System.Action<global::UnityEngine.UIElements.VisualElement> cards, global::System.Action<global::UnityEngine.UIElements.VisualElement> preview = default) => throw null;
+        public void Go(string pageKey) => throw null;
+        public global::Facet.Control<bool> Header(global::UnityEngine.UIElements.VisualElement page, string title, global::Facet.Bind<bool> on, global::System.Func<string> description = default) => throw null;
+        public bool Hide() => throw null;
+        public void LayoutRow(global::UnityEngine.UIElements.VisualElement card, string id) => throw null;
+        public void Open(string pageKey = default) => throw null;
+        public void Prebuild() => throw null;
+        public void PrismLinkRow(global::UnityEngine.UIElements.VisualElement card, global::System.Action open, global::System.Func<bool> shown) => throw null;
+        public void RebuildRail() => throw null;
+        public global::Facet.Control<float> ScrollSpeedRow(global::UnityEngine.UIElements.VisualElement card, global::Facet.Bind<float> speed) => throw null;
+        public global::UnityEngine.UIElements.VisualElement SettingsCard(global::UnityEngine.UIElements.VisualElement page, string title, global::System.Action<global::Facet.CardOptions> more = default) => throw null;
+        public global::Facet.Control<int> SidebarRow(global::UnityEngine.UIElements.VisualElement card) => throw null;
+        public global::Facet.Control<bool> SmoothRow(global::UnityEngine.UIElements.VisualElement card, global::Facet.Bind<bool> on) => throw null;
+        public void Tick() => throw null;
         private SuiteShell() { }
         void global::System.IDisposable.Dispose() => throw null;
     }

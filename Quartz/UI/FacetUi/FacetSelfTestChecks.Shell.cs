@@ -145,6 +145,39 @@ internal static partial class FacetSelfTestChecks {
         string title = Body.Q(name: "menu-header")?.Q<Label>()?.text, profiles = MainCore.Tr.Get("PROFILES", "Profiles");
         check("a classic page shows its title and the card that opens it",
             Body.Q(name: "menu-classic") != null && title == profiles, $"title={title} want={profiles}");
+        yield return ShellHiddenCategory(check);
+    }
+
+    // Two run-scoped categories, one with a shown page and one whose only page is hidden: the second stays off the rail
+    // and its page is no Go target. Both are removed again, and the rail rebuilt without them.
+    private static IEnumerator ShellHiddenCategory(Action<string, bool, string> check) {
+        const string owner = "selftest.rail";
+        bool OnRail(string title) => RailLabels().Any(l => l?.text == QuartzHost.Host.Translate(QuartzShell.Label(null, title)));
+        void Add(string key, string title, bool shown) {
+            NavRegistry.AddCategory(new NavCategory { Key = key, Title = title, OwnerId = owner });
+            NavRegistry.AddPage(new NavPage { Key = key + ".page", CategoryKey = key, Title = title, OwnerId = owner, Visible = () => shown, Build = _ => { } });
+        }
+        bool shownOn = false, hiddenOff = false, noGo = false, gone = false;
+        string page = null;
+        try {
+            Add("selftest.shown", "Self-test shown", true);
+            Add("selftest.hidden", "Self-test hidden", false);
+            FacetBridge.OpenNewMenu();   // a category added since the last open joins the rail
+            yield return Frames(1);
+            shownOn = OnRail("Self-test shown");
+            hiddenOff = !OnRail("Self-test hidden");
+            string before = QuartzShell.CurrentPage;
+            QuartzShell.Go("selftest.hidden.page");
+            page = QuartzShell.CurrentPage;
+            noGo = page == before;
+        } finally {
+            NavRegistry.RemoveOwner(owner);
+            FacetBridge.OpenNewMenu();
+        }
+        yield return Frames(1);
+        gone = !OnRail("Self-test shown");
+        check("a category whose pages are all hidden stays off the rail, and its page is no Go target",
+            shownOn && hiddenOff && noGo && gone, $"shown={shownOn} hiddenOff={hiddenOff} page={page} removed={gone}");
     }
 
     // "Open" on a classic card, then each way a user closes the classic menu, which brings the new one back.

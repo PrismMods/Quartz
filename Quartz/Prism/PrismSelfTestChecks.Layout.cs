@@ -331,6 +331,10 @@ internal static partial class PrismSelfTestChecks {
     // lands whole or not at all. Checked on the handle, not GetBox, which would start a session.
     private static IEnumerator HiddenTakesNothing(Action<string, bool, string> check) {
         yield return Frames(4);
+        if(ComboOverlay.ConfMgr == null) { // Combo never turned on: no settings to write to
+            check("layout: a hidden element takes no writes, so a replayed step lands whole or not at all", false, "combo off");
+            yield break;
+        }
         EditTarget t = MineById(LayoutIds.Combo);
         ComboSettings c = ComboOverlay.Conf;
         bool hidden = ReorganizeHandle.FindLayout(LayoutIds.Combo) is { LayoutShown: false };

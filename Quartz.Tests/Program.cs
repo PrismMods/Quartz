@@ -143,7 +143,6 @@ List<(string Name, Action Run)> tests = [
     ("Hotkeys that are no panel's stay as they are", PanelBindsTests.TestBindsThatAreNoPanelsStayAsTheyAre),
     ("New menu rail groups home, features, then app pages; credits leaves the rail", ShellModelTests.TestRailGroups),
     ("New menu switch list defaults, parses, and drops unknown or repeated ids", ShellModelTests.TestSwitches),
-    ("New menu reopens its last page or Home, and tabs find a stub's feature", ShellModelTests.TestLastPageAndTabs),
     ("New menu opens centred at 80% and offers layout on on-screen features", ShellModelTests.TestInitialRectAndLayout),
     ("Search words land across label, section, and page", SearchMatcherTests.TestWordsLandAcrossLabelSectionAndPage),
     ("Search tolerates typos only when nothing exact matches", SearchMatcherTests.TestTyposOnlyWhenNothingExactMatches),

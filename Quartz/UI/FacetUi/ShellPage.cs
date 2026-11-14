@@ -10,26 +10,8 @@ namespace Quartz.UI.FacetUi;
 /// </summary>
 internal static class ShellPage {
     internal static void Feature(VisualElement p, string featureId, string titleKey, string descKey, string overlayId, Action<VisualElement> cards,
-        Func<string> emptyKey = null) {
-        if(overlayId == null) {
-            Header(p, featureId, titleKey, descKey);
-            cards(p);
-            return;
-        }
-        Facet.Columns cols = Controls.Columns(p, o => {
-            o.Left = 1.25f;
-            o.Right = 1f;
-            o.StackBelow = 760f;
-        });
-        Header(cols.Left, featureId, titleKey, descKey);
-        cards(cols.Left);
-        FacetOverlayPreview.Pane(cols.Right, overlayId, emptyKey);
-    }
-
-    private static void Header(VisualElement p, string featureId, string titleKey, string descKey) =>
-        Controls.PageHeader(p, titleKey, QuartzShell.FeatureSwitch(featureId), o => {
-            o.Id = titleKey;
-            o.Description = descKey;
-        });
+        Func<string> emptyKey = null) =>
+        QuartzShell.FeatureFrame(p, titleKey, QuartzShell.FeatureSwitch(featureId), descKey, cards,
+            overlayId == null ? null : r => FacetOverlayPreview.Pane(r, overlayId, emptyKey));
 }
 #endif

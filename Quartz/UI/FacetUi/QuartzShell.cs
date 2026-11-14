@@ -1,29 +1,31 @@
 #if !IL2CPP
+using System.Runtime.CompilerServices;
 using Facet;
 using Quartz.Core;
 using Quartz.Prism;
 using Quartz.Resource;
-using Quartz.UI.Nav;
-using UnityEngine;
 using UnityEngine.UIElements;
+#if !QUARTZ_KEYVIEWER
+using SuiteShell = PrismLib.UI.Toolkit.SuiteShell;
+#endif
 namespace Quartz.UI.FacetUi;
 /// <summary>
-/// The new menu: one Facet window whose rail is NavRegistry's categories and whose tab rows are their pages
-/// (QuartzShell.Pages). It stands in for the classic menu and hands off to it and back through MenuHandOff.
+/// The new menu: PrismLib.UI's suite shell, fed by <see cref="QuartzSuite"/>, behind a facade that names no PrismLib.UI
+/// type. The shell is held as object and reached only through NoInlining …Impl helpers, so Quartz loads beside an older
+/// PrismLib.UI without one. It stands in for the classic menu and hands off to it and back through MenuHandOff.
 /// </summary>
 internal static partial class QuartzShell {
-    internal const string WindowId = "quartz.menu", PageStore = "menu.page";
-    internal static Surface Surface { get; private set; }
-    internal static Window Window { get; private set; }
-    internal static Facet.Nav Nav { get; private set; }
+    internal const string WindowId = "quartz.menu", PageStore = "menu.page", SidebarStore = "menu.sidebar", CompactStore = "menu.compact";
+    private static object shell;
+    internal static Surface Surface => shell == null ? null : SurfaceImpl();
+    internal static Window Window => shell == null ? null : WindowImpl();
+    internal static Facet.Nav Nav => shell == null ? null : NavImpl();
+    /// <summary>The tab row of the open category, when it has one.</summary>
+    internal static Tabs TabRow => shell == null ? null : TabRowImpl();
     /// <summary>The page the window last built on screen.</summary>
-    internal static string CurrentPage { get; private set; }
-    /// <summary>No geometry was saved for the window when it was built, so its first show takes the initial rect.</summary>
-    internal static bool FreshGeometry { get; private set; }
-    private static bool rectPending;
-    // Edit layout's wait for its session: -1 when none is pending, else the frames waited for it to start.
-    private static int layoutWait = -1;
-    private static bool layoutSeen;
+    internal static string CurrentPage => shell == null ? null : CurrentPageImpl();
+    /// <summary>No geometry was kept for the window when it was built, so its first show takes the initial rect.</summary>
+    internal static bool FreshGeometry => shell != null && FreshGeometryImpl();
 
     /// <summary>The bind of a row writing a field the classic menu shows too: that menu rebuilds before it next shows.</summary>
     internal static Bind<T> Writes<T>(Func<T> get, Action<T> set) => Bind.To(get, v => {
@@ -33,44 +35,12 @@ internal static partial class QuartzShell {
 
     /// <summary>Builds the window hidden, on the page left last time (Home when that is gone). Once.</summary>
     internal static void Prebuild() {
-        if(Surface != null) return;
-        // Read before the Nav opens its first page, which stores itself.
-        string last = ShellModel.LastPage(QuartzHost.Host.Read(PageStore), k => NavRegistry.ByKey(k) != null, CorePages.HomePageKey);
-        Surface s = QuartzHost.NewSurface("QuartzMenu", Layer.Window);
-        try {
-            s.Visible = false;
-            FreshGeometry = rectPending = QuartzHost.Host.Read("window." + WindowId) == null;
-            // A placeholder until the first show knows the panel's size.
-            var (x, y, w, h) = ShellModel.InitialRect(1920f, 1080f);
-            Window = new Window(s.Root, WindowId, "QUARTZ", new Rect(x, y, w, h));
-            Window.Raised += s.BringToFront;   // a press raises it, so its menus' shortcuts answer over another window
-            // Facet stores the rect a window is built with: a prebuild never shown must not leave the placeholder as the user's.
-            if(FreshGeometry) QuartzHost.Host.Write("window." + WindowId, null);
-            VisualElement logo = Ui.Box();
-            logo.name = "menu-logo";
-            logo.style.width = 18f;
-            logo.style.height = 18f;
-            logo.style.marginRight = 6f;
-            logo.style.alignSelf = Align.Center;
-            logo.style.backgroundImage = new StyleBackground(MainCore.Spr.Get(UISprite.QuartzLogo));
-            Window.TitleBarLeft.Insert(0, logo);
-            BuildNav();
-            // The first query builds every classic page for its rows, as the classic menu's own search does.
-            Window.ShowSearch("SEARCH", q => Nav.Filter(q));
-            s.Hidden += Hidden;
-            s.EscapeHandler = OnEscape;
-            Surface = s;
-            // A font found or a global font chosen relabels the Overlay pages' font lists: the open page rebuilds.
-            globalFont = FontManager.CurrentName;
-            FontManager.OnFontCatalogChanged += Changed;
-            FontManager.OnFontChanged += GlobalFontChanged;
-        } catch {
-            s.Dispose();   // a half-built window is never kept or shown; the next open builds afresh
-            Window = null;
-            Nav = null;
-            throw;
-        }
-        if(CurrentPage != last) Go(last);
+        if(shell != null) return;
+        BuildImpl();
+        // A font found or a global font chosen relabels the Overlay pages' font lists: the open page rebuilds.
+        globalFont = FontManager.CurrentName;
+        FontManager.OnFontCatalogChanged += Changed;
+        FontManager.OnFontChanged += GlobalFontChanged;
     }
 
     private static string globalFont;
@@ -83,30 +53,28 @@ internal static partial class QuartzShell {
         Changed();
     }
 
+    /// <summary>Something the rail or pages show changed that NavRegistry.Version does not count: the open page rebuilds.</summary>
+    internal static void Changed() {
+        if(shell != null) ChangedImpl();
+    }
+
     /// <summary>Shows the window, on pageKey when given. From the classic menu, that menu closes and a close here brings it back.</summary>
     internal static void Open(string pageKey = null, bool fromClassic = false) {
         Prebuild();   // first: a build that throws leaves the classic menu as it was
-        if(builtCategories != CategoryKeys()) {
-            // An addon added or removed a category: rebuild the rail's groups, on the page it showed.
-            string at = CurrentPage;
-            BuildNav();
-            if(at != null) Go(at);
-        }
+        if(shell == null) return;
         if(fromClassic) {
             MenuHandOff.ReturnTo = MenuHandOff.Menu.None;   // the classic close below is no user's close
             UICore.HandToPreview();
             MenuHandOff.ReturnTo = MenuHandOff.Menu.Classic;
         } else if(MenuHandOff.FromHub) MenuHandOff.ReturnTo = MenuHandOff.Menu.Classic;   // back from a trip away: its close still goes to the hub
-        if(pageKey != null) Go(pageKey);
-        ApplyLook();
-        Surface.BlocksGameInput = MainCore.Conf.BlockInputsWhileMenuOpen;
-        Surface.Visible = true;
+        OpenImpl(pageKey);
     }
 
-    internal static bool Hide() {
-        if(Surface == null || !Surface.Visible) return false;
-        Surface.Visible = false;
-        return true;
+    internal static bool Hide() => shell != null && HideImpl();
+
+    /// <summary>Opens a page: its category in the rail, and its tab there.</summary>
+    internal static void Go(string pageKey) {
+        if(shell != null) GoImpl(pageKey);
     }
 
     /// <summary>"Open" on a classic card: this window hides and the classic menu opens on that page, and comes back here on close.</summary>
@@ -119,38 +87,49 @@ internal static partial class QuartzShell {
 
     /// <summary>"Edit layout": the window steps aside for the shared layout editor, and comes back when that session ends.</summary>
     internal static void EditLayout() {
-        MenuHandOff.ReturnTo = MenuHandOff.Menu.None;   // a classic menu this came from stays shut under the editor
-        Hide();
-        layoutWait = 0;
-        layoutSeen = false;
-        PrismBridge.OpenLayoutEditor();
+        if(shell != null) EditLayoutImpl();
+    }
+
+    // The shell's page frames and Settings rows, for the page builders. With no shell a header or card is null and a row
+    // is not built: no page builds then.
+    internal static Control<bool> Header(VisualElement page, string title, Bind<bool> on, Func<string> description = null) =>
+        shell == null ? null : HeaderImpl(page, title, on, description);
+
+    internal static void FeatureFrame(VisualElement page, string title, Bind<bool> on, string description, Action<VisualElement> cards,
+        Action<VisualElement> preview = null) {
+        if(shell != null) FeatureFrameImpl(page, title, on, description, cards, preview);
+    }
+
+    internal static void ClassicCard(VisualElement page, Action open, bool layout) {
+        if(shell != null) ClassicCardImpl(page, open, layout);
     }
 
     /// <summary>The Edit layout row, shown only where the shared layout editor can open.</summary>
-    internal static void LayoutRow(VisualElement card, string id) =>
-        Controls.Action(card, "MENU_LAYOUT_HINT", "MENU_EDIT_LAYOUT", EditLayout, o => {
-            o.Id = id;
-            o.VisibleWhen = () => PrismBridge.UiAvailable;
-        });
-
-    // Only the session Edit layout started brings the window back: one another mod starts leaves it shut. The flag is
-    // this one, not MenuHandOff.ReturnTo, which the session's start clears.
-    private static void BackFromLayout() {
-        if(UICore.IsArranging || LayoutEditorProbe.Shown()) {
-            layoutSeen = true;
-            return;
-        }
-        if(!layoutSeen && ++layoutWait < 120) return;
-        if(!layoutSeen) MainCore.Log.Wrn("[Menu] the layout editor did not appear within 120 frames of Edit layout: the new menu comes back");
-        layoutWait = -1;
-        if(!UICore.IsOpen) Open();
+    internal static void LayoutRow(VisualElement card, string id) {
+        if(shell != null) LayoutRowImpl(card, id);
     }
 
-    // Facet's Escape, whichever mod offers it: kept while a key capture owns the keyboard (its runner cancels on that key,
-    // before or after this in the frame), else the window hides as it would without a handler.
-    private static bool OnEscape() {
-        if(!Keybind.Capturing) Hide();
-        return true;
+    internal static VisualElement SettingsCard(VisualElement page, string title, Action<CardOptions> more = null) =>
+        shell == null ? null : SettingsCardImpl(page, title, more);
+
+    internal static void SidebarRow(VisualElement card) {
+        if(shell != null) SidebarRowImpl(card);
+    }
+
+    internal static void SmoothRow(VisualElement card, Bind<bool> on) {
+        if(shell != null) SmoothRowImpl(card, on);
+    }
+
+    internal static void PrismLinkRow(VisualElement card, Action open, Func<bool> shown) {
+        if(shell != null) PrismLinkRowImpl(card, open, shown);
+    }
+
+    internal static void ScrollSpeedRow(VisualElement card, Bind<float> speed) {
+        if(shell != null) ScrollSpeedRowImpl(card, speed);
+    }
+
+    internal static void ClassicMenuRow(VisualElement card, Action open) {
+        if(shell != null) ClassicMenuRowImpl(card, open);
     }
 
     // Whoever hid it (the close button, Escape, the menu hotkey, an opener): a classic menu it came from comes back.
@@ -164,39 +143,292 @@ internal static partial class QuartzShell {
     /// <summary>The window's scale at the classic menu's default, 0.85: larger than that menu, whose text it would otherwise match.</summary>
     internal const float BaseScale = 1.2f;
 
-    /// <summary>The classic menu's scale and opacity: its default scale, 0.85, is BaseScale here.</summary>
+    /// <summary>The classic menu's scale and opacity, and its input blocking: its default scale, 0.85, is BaseScale here.</summary>
     internal static void ApplyLook() {
-        if(Window == null) return;
-        Window.Scale = MainCore.Conf.UIScale / 0.85f * BaseScale;
-        Window.Root.style.opacity = MainCore.Conf.PanelOpacity;
+        if(shell != null) ApplyLookImpl();
+    }
+
+    /// <summary>The Sidebar setting: 0 toggleable (a button folds the rail to its icons, and the choice is kept), 1 always
+    /// visible, 2 always hidden (the icon strip, widening over the page while the pointer rests on it). Applies at once.</summary>
+    internal static int SidebarMode {
+        get => shell == null ? QuartzHost.Host.Read(SidebarStore) switch { "1" => 1, "2" => 2, _ => 0 } : SidebarModeImpl();
+        set {
+            if(shell == null) QuartzHost.Host.Write(SidebarStore, value is 1 or 2 ? value.ToString() : null);
+            else SetSidebarModeImpl(value);
+        }
+    }
+
+    internal static void ApplySidebar() {
+        if(shell != null) ApplySidebarImpl();
+    }
+
+    // The rail refilled from NavRegistry, as an added or removed category does on the next open.
+    private static void BuildNav() {
+        if(shell != null) RebuildImpl();
     }
 
     /// <summary>Per frame. Nothing while hidden, unless Edit layout is waiting to bring it back.</summary>
     internal static void Tick() {
-        if(layoutWait >= 0) BackFromLayout();
-        else if(MenuHandOff.FromHub && !UICore.MenuShowing) MenuHandOff.FromHub = false;   // everything shut: that session is over
-        if(Surface == null || !Surface.Visible) return;
-        Nav.Tick();
-        float pw = Surface.Root.layout.width;   // NaN or 0 until the shown window has been laid out
-        if(!rectPending || !(pw > 0f)) return;
-        rectPending = false;
-        var (x, y, w, h) = ShellModel.InitialRect(pw, Surface.Root.layout.height);
-        Window.Rect = new Rect(x, y, w, h);
+        // Everything shut, and no layout session to come back from: that session is over.
+        if(MenuHandOff.FromHub && !UICore.MenuShowing && (shell == null || !WaitingImpl())) MenuHandOff.FromHub = false;
+        if(shell != null) TickImpl();
     }
 
-    /// <summary>Before QuartzHost disposes the surface: a dispose raises Hidden, which must not reopen the classic menu.</summary>
+    /// <summary>Before QuartzHost disposes its own surfaces: the shell's dispose raises no Hidden, so no classic menu reopens.</summary>
     internal static void Shutdown() {
-        if(Surface != null) Surface.Hidden -= Hidden;
         FontManager.OnFontCatalogChanged -= Changed;
         FontManager.OnFontChanged -= GlobalFontChanged;
         if(MenuHandOff.ReturnTo == MenuHandOff.Menu.Classic) MenuHandOff.ReturnTo = MenuHandOff.Menu.None;
-        Surface = null;
-        Window = null;
-        Nav = null;
-        TabRow = null;
-        CurrentPage = null;
-        currentFeature = null;
-        layoutWait = -1;
+        if(shell != null) DisposeImpl();
+        shell = null;
+    }
+
+    // The doors: only these name the shell's type, each under the KeyViewer guard (that flavour has no PrismLib.UI and
+    // never builds the shell). Their signatures are Facet or BCL types.
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void BuildImpl() {
+#if !QUARTZ_KEYVIEWER
+        var s = new SuiteShell(new QuartzSuite());
+        shell = s;   // first: the page Prebuild builds reaches the shell through this facade
+        try {
+            s.Hidden += Hidden;
+            s.Prebuild();
+            // A window that could not build logs and stays null: throw, so the bridge falls back to the classic menu.
+            if(s.Surface == null) throw new System.InvalidOperationException("new menu: no surface");
+        } catch {
+            shell = null;
+            s.Dispose();   // a half-built window is never kept or shown; the next open builds afresh
+            throw;
+        }
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void DisposeImpl() {
+#if !QUARTZ_KEYVIEWER
+        var s = (SuiteShell)shell;
+        s.Hidden -= Hidden;
+        s.Dispose();
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void OpenImpl(string pageKey) {
+#if !QUARTZ_KEYVIEWER
+        ((SuiteShell)shell).Open(pageKey);
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static bool HideImpl() {
+#if !QUARTZ_KEYVIEWER
+        return ((SuiteShell)shell).Hide();
+#else
+        return false;
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void GoImpl(string pageKey) {
+#if !QUARTZ_KEYVIEWER
+        ((SuiteShell)shell).Go(pageKey);
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void ChangedImpl() {
+#if !QUARTZ_KEYVIEWER
+        ((SuiteShell)shell).Changed();
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void ApplyLookImpl() {
+#if !QUARTZ_KEYVIEWER
+        ((SuiteShell)shell).ApplyLook();
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void ApplySidebarImpl() {
+#if !QUARTZ_KEYVIEWER
+        ((SuiteShell)shell).ApplySidebar();
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static int SidebarModeImpl() {
+#if !QUARTZ_KEYVIEWER
+        return ((SuiteShell)shell).SidebarMode;
+#else
+        return 0;
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void SetSidebarModeImpl(int mode) {
+#if !QUARTZ_KEYVIEWER
+        ((SuiteShell)shell).SidebarMode = mode;
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void EditLayoutImpl() {
+#if !QUARTZ_KEYVIEWER
+        ((SuiteShell)shell).EditLayout();
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void RebuildImpl() {
+#if !QUARTZ_KEYVIEWER
+        ((SuiteShell)shell).RebuildRail();
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static bool WaitingImpl() {
+#if !QUARTZ_KEYVIEWER
+        return ((SuiteShell)shell).WaitingForLayout;
+#else
+        return false;
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void TickImpl() {
+#if !QUARTZ_KEYVIEWER
+        ((SuiteShell)shell).Tick();
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static Surface SurfaceImpl() {
+#if !QUARTZ_KEYVIEWER
+        return ((SuiteShell)shell).Surface;
+#else
+        return null;
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static Window WindowImpl() {
+#if !QUARTZ_KEYVIEWER
+        return ((SuiteShell)shell).Window;
+#else
+        return null;
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static Facet.Nav NavImpl() {
+#if !QUARTZ_KEYVIEWER
+        return ((SuiteShell)shell).Nav;
+#else
+        return null;
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static Tabs TabRowImpl() {
+#if !QUARTZ_KEYVIEWER
+        return ((SuiteShell)shell).TabRow;
+#else
+        return null;
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static string CurrentPageImpl() {
+#if !QUARTZ_KEYVIEWER
+        return ((SuiteShell)shell).CurrentPage;
+#else
+        return null;
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static bool FreshGeometryImpl() {
+#if !QUARTZ_KEYVIEWER
+        return ((SuiteShell)shell).FreshGeometry;
+#else
+        return false;
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static Control<bool> HeaderImpl(VisualElement page, string title, Bind<bool> on, Func<string> description) {
+#if !QUARTZ_KEYVIEWER
+        return ((SuiteShell)shell).Header(page, title, on, description);
+#else
+        return null;
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void FeatureFrameImpl(VisualElement page, string title, Bind<bool> on, string description, Action<VisualElement> cards,
+        Action<VisualElement> preview) {
+#if !QUARTZ_KEYVIEWER
+        ((SuiteShell)shell).FeatureFrame(page, title, on, description, cards, preview);
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void ClassicCardImpl(VisualElement page, Action open, bool layout) {
+#if !QUARTZ_KEYVIEWER
+        ((SuiteShell)shell).ClassicCard(page, open, layout);
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void LayoutRowImpl(VisualElement card, string id) {
+#if !QUARTZ_KEYVIEWER
+        ((SuiteShell)shell).LayoutRow(card, id);
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static VisualElement SettingsCardImpl(VisualElement page, string title, Action<CardOptions> more) {
+#if !QUARTZ_KEYVIEWER
+        return ((SuiteShell)shell).SettingsCard(page, title, more);
+#else
+        return null;
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void SidebarRowImpl(VisualElement card) {
+#if !QUARTZ_KEYVIEWER
+        ((SuiteShell)shell).SidebarRow(card);
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void SmoothRowImpl(VisualElement card, Bind<bool> on) {
+#if !QUARTZ_KEYVIEWER
+        ((SuiteShell)shell).SmoothRow(card, on);
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void PrismLinkRowImpl(VisualElement card, Action open, Func<bool> shown) {
+#if !QUARTZ_KEYVIEWER
+        ((SuiteShell)shell).PrismLinkRow(card, open, shown);
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void ScrollSpeedRowImpl(VisualElement card, Bind<float> speed) {
+#if !QUARTZ_KEYVIEWER
+        ((SuiteShell)shell).ScrollSpeedRow(card, speed);
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void ClassicMenuRowImpl(VisualElement card, Action open) {
+#if !QUARTZ_KEYVIEWER
+        ((SuiteShell)shell).ClassicMenuRow(card, open);
+#endif
     }
 }
 #endif
