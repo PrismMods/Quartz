@@ -33,7 +33,34 @@ internal sealed partial class KvLayoutModel {
 
     private static List<KvElement> ElementsOf(KvDocument doc, string tab) => tab != null && doc.HasTab(tab) ? doc.AllElements(tab) : [];
 
-    public override string Key(KvElement e) => KvEditOps.Key(KvStore.Current, Editing, e);
+    // An element of the document a replace just swapped out keeps the key it had there, so the canvas re-finds the
+    // selection (and the inspector its rows) in the new document by key.
+    private KvDocument keyDoc, lastKeyDoc;
+    // Each element's key with the list and index it was found at, for this document and layout: a row's drag asks for every
+    // selected element's key each frame, so a key still at its place is returned without a search or a new string.
+    private readonly Dictionary<KvElement, (string key, List<KvElement> list, int index)> keys = [];
+    private string keysTab;
+
+    public override string Key(KvElement e) {
+        KvDocument doc = KvStore.Current;
+        string tab = Editing;
+        if(!ReferenceEquals(doc, keyDoc)) {
+            (lastKeyDoc, keyDoc) = (keyDoc, doc);
+            keys.Clear();
+        }
+        if(!string.Equals(tab, keysTab, StringComparison.Ordinal)) {
+            keys.Clear();
+            keysTab = tab;
+        }
+        if(e == null) return null;
+        if(keys.TryGetValue(e, out var hit) && hit.index < hit.list.Count && ReferenceEquals(hit.list[hit.index], e)) return hit.key;
+        if(KvEditOps.Key(doc, tab, e) is { } key) {
+            List<KvElement> list = doc.Elements(tab, e.Kind);
+            keys[e] = (key, list, list.IndexOf(e));
+            return key;
+        }
+        return lastKeyDoc == null ? null : KvEditOps.Key(lastKeyDoc, tab, e);
+    }
 
     // A key is "<tab>/<kind>:<index>", so its tab is everything before the last slash.
     public override KvElement Find(string key) {
@@ -134,8 +161,22 @@ internal sealed partial class KvLayoutModel {
         Next(0);
     }
 
-    public override string InspectorTitle(IReadOnlyList<KvElement> selection) => "";
-    public override IList<global::Facet.NavItem> Inspector(IReadOnlyList<KvElement> selection) => [];
+    public override string InspectorTitle(IReadOnlyList<KvElement> selection) => KvInspectorPages.Title(selection);
+
+    public override IList<global::Facet.NavItem> Inspector(IReadOnlyList<KvElement> selection) {
+        Inspected.Tab = Editing;
+        return KvInspectorPages.For(selection, Inspected);
+    }
+
+    // Static lookups only: every row step keeps these delegates for the session.
+    private static readonly KvInspectorContext Inspected = new() {
+        Selection = () => KvEditorPage.Editor?.Canvas.Selection ?? [],
+        All = () => KvEditorPage.Model.Elements(),
+        Key = e => KvEditorPage.Model.Key(e),
+        UndoDocument = () => KvEditorPage.Model.UndoDocument(),
+        Changed = () => KvEditorPage.Editor?.Changed(),
+        Dirty = () => KvEditorPage.Editor?.MarkDirty(),
+    };
 
     // A switcher card's boxes: each element's rectangle in its idle fill and border colours.
     private static void ThumbBoxes(KvDocument doc, string tab, List<KeyLayoutBox> into) {

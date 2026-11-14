@@ -21,14 +21,17 @@ namespace Facet {
         public static bool SmoothScroll { get => throw null; set { } }
     }
     public static unsafe partial class Bind {
+        public static global::Facet.Bind<T> Many<TItem, T>(global::System.Func<global::System.Collections.Generic.IReadOnlyList<TItem>> items, global::System.Func<TItem, T> get, global::System.Action<TItem, T> set, global::System.Func<TItem, string> key = default, global::System.Func<global::System.Collections.Generic.IReadOnlyList<TItem>> all = default) => throw null;
         public static global::Facet.Bind<T> To<T>(global::System.Func<T> get, global::System.Action<T> set) => throw null;
     }
     public sealed unsafe partial class Bind<T> {
         public T Get() => throw null;
         public void Set(T v) => throw null;
+        public global::Facet.Bind<T> Then(global::System.Action<T> after) => throw null;
         private Bind() { }
     }
     public sealed unsafe partial class Canvas<T> where T : class {
+        public global::System.Collections.Generic.IReadOnlyList<T> Selection { get => throw null; }
         public global::UnityEngine.Vector2 ViewCentre { get => throw null; }
         private Canvas() { }
     }
@@ -37,6 +40,9 @@ namespace Facet {
         public string Note { get => throw null; set { } }
         public global::System.Func<string> NoteText { get => throw null; set { } }
         private CardOptions() { }
+    }
+    public sealed unsafe partial class ChoiceOptions<T> : global::Facet.Options<T> {
+        private ChoiceOptions() { }
     }
     public unsafe partial class ColourOptions : global::Facet.Options<global::UnityEngine.Color> {
         public bool Alpha { get => throw null; set { } }
@@ -60,6 +66,7 @@ namespace Facet {
         public string Id { get => throw null; set { } }
         public string Tooltip { get => throw null; set { } }
         public global::System.Func<string> TooltipText { get => throw null; set { } }
+        public global::System.Func<object> UndoDocument { get => throw null; set { } }
         public global::System.Func<bool> VisibleWhen { get => throw null; set { } }
         protected ControlOptions() { }
     }
@@ -76,6 +83,7 @@ namespace Facet {
         public static global::UnityEngine.UIElements.Button Action(global::UnityEngine.UIElements.VisualElement parent, string label, string button, global::System.Action onClick, global::System.Action<global::Facet.ControlOptions> configure = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Advanced(global::UnityEngine.UIElements.VisualElement card, string label = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Card(global::UnityEngine.UIElements.VisualElement parent, string title, global::System.Action<global::Facet.CardOptions> configure = default) => throw null;
+        public static global::Facet.Control<T> Choice<T>(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<T> bind, global::System.Collections.Generic.IList<T> values, global::System.Func<T, string> text, global::System.Action<global::Facet.ChoiceOptions<T>> configure = default) => throw null;
         public static global::Facet.Control<global::UnityEngine.Color> Colour(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<global::UnityEngine.Color> bind, global::System.Action<global::Facet.ColourOptions> configure = default) => throw null;
         public static global::Facet.Columns Columns(global::UnityEngine.UIElements.VisualElement parent, global::System.Action<global::Facet.ColumnsOptions> configure = default) => throw null;
         public static global::UnityEngine.UIElements.Button Danger(global::UnityEngine.UIElements.VisualElement parent, string label, string button, global::System.Action onConfirm, global::System.Action<global::Facet.ControlOptions> configure = default) => throw null;
@@ -85,6 +93,7 @@ namespace Facet {
         public static global::Facet.Control<string> Info(global::UnityEngine.UIElements.VisualElement parent, string label, global::System.Func<string> value, global::System.Action<global::Facet.ControlOptions> configure) => throw null;
         public static global::Facet.Control<int> IntSlider(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<int> bind, global::System.Action<global::Facet.IntSliderOptions> configure = default) => throw null;
         public static global::Facet.Control<string> Key(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<string> bind, global::System.Action<global::Facet.KeyOptions> configure = default) => throw null;
+        public static global::Facet.Control<float> Number(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<float> bind, global::System.Action<global::Facet.SliderOptions> configure = default) => throw null;
         public static global::Facet.Control<bool> PageHeader(global::UnityEngine.UIElements.VisualElement parent, string title, global::Facet.Bind<bool> on, global::System.Action<global::Facet.PageHeaderOptions> configure = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Preview(global::UnityEngine.UIElements.VisualElement parent, string label, global::System.Action<global::Facet.PreviewOptions> configure = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Section(global::UnityEngine.UIElements.VisualElement parent, string title, bool defaultOpen = default) => throw null;
@@ -116,7 +125,10 @@ namespace Facet {
         public const int Limit = 7;
         public static bool Applying { get => throw null; }
         public static event global::System.Action AfterApply { add { } remove { } }
+        public static global::System.Func<bool> BoundTo(global::System.Func<object> document) => throw null;
         public static void Invalidate() => throw null;
+        public static void Record(string label, string key, global::System.Action undo, global::System.Action redo, global::System.Func<string, string> translate = default) => throw null;
+        public static global::System.IDisposable Step(string label, string key = default, global::System.Func<bool> valid = default, global::System.Func<string, string> translate = default) => throw null;
     }
     public sealed unsafe partial class Host {
         public global::Facet.Theme Theme { get => throw null; }
@@ -276,6 +288,10 @@ namespace Facet {
         public float Step { get => throw null; set { } }
         protected SliderOptions() { }
     }
+    public sealed unsafe partial class StatusLine {
+        public void Show(global::System.Func<string> text, global::Facet.Role role = default, float seconds = default) => throw null;
+        private StatusLine() { }
+    }
     public sealed unsafe partial class Surface : global::System.IDisposable {
         public global::System.Func<bool> EscapeHandler;
         public bool BlocksGameInput { get => throw null; set { } }
@@ -295,6 +311,7 @@ namespace Facet {
         private Tabs() { }
     }
     public unsafe partial class TextOptions : global::Facet.Options<string> {
+        public int MaxLength { get => throw null; set { } }
         public float Width { get => throw null; set { } }
         protected TextOptions() { }
     }

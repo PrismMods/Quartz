@@ -41,6 +41,7 @@ internal static partial class FacetSelfTestChecks {
 #if !QUARTZ_KEYVIEWER
             yield return KvEditorPageChecks(check, info);
             yield return KvCanvasChecks(check, info);
+            yield return KvInspectorChecks(check, info);
 #endif
             yield return OverlayPanels(check, info);
             yield return OverlayCalibrationPage(check, info);

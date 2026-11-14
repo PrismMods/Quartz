@@ -1914,12 +1914,14 @@
       {
         "type": "Facet.Bind",
         "members": [
+          "Facet.Bind\u00601\u003CT\u003E Facet.Bind::Many(System.Func\u00601\u003CSystem.Collections.Generic.IReadOnlyList\u00601\u003CTItem\u003E\u003E,System.Func\u00602\u003CTItem,T\u003E,System.Action\u00602\u003CTItem,T\u003E,System.Func\u00602\u003CTItem,System.String\u003E,System.Func\u00601\u003CSystem.Collections.Generic.IReadOnlyList\u00601\u003CTItem\u003E\u003E)",
           "Facet.Bind\u00601\u003CT\u003E Facet.Bind::To(System.Func\u00601\u003CT\u003E,System.Action\u00601\u003CT\u003E)"
         ]
       },
       {
         "type": "Facet.Bind\u00601",
         "members": [
+          "Facet.Bind\u00601\u003CT\u003E Facet.Bind\u00601::Then(System.Action\u00601\u003CT\u003E)",
           "System.Void Facet.Bind\u00601::Set(T)",
           "T Facet.Bind\u00601::Get()"
         ]
@@ -1927,6 +1929,8 @@
       {
         "type": "Facet.Canvas\u00601",
         "members": [
+          "System.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E Facet.Canvas\u00601::Selection()",
+          "System.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E Facet.Canvas\u00601::get_Selection()",
           "UnityEngine.Vector2 Facet.Canvas\u00601::ViewCentre()",
           "UnityEngine.Vector2 Facet.Canvas\u00601::get_ViewCentre()"
         ]
@@ -1941,6 +1945,10 @@
           "System.Void Facet.CardOptions::set_Note(System.String)",
           "System.Void Facet.CardOptions::set_NoteText(System.Func\u00601\u003CSystem.String\u003E)"
         ]
+      },
+      {
+        "type": "Facet.ChoiceOptions\u00601",
+        "members": []
       },
       {
         "type": "Facet.ColourOptions",
@@ -1976,6 +1984,7 @@
         "members": [
           "System.Collections.Generic.List\u00601\u003CSystem.Collections.Generic.KeyValuePair\u00602\u003CSystem.String,System.Action\u003E\u003E Facet.ControlOptions::ContextMenu()",
           "System.Func\u00601\u003CSystem.Boolean\u003E Facet.ControlOptions::VisibleWhen()",
+          "System.Func\u00601\u003CSystem.Object\u003E Facet.ControlOptions::UndoDocument()",
           "System.Func\u00601\u003CSystem.String\u003E Facet.ControlOptions::TooltipText()",
           "System.String Facet.ControlOptions::Help()",
           "System.String Facet.ControlOptions::Id()",
@@ -1986,6 +1995,7 @@
           "System.Void Facet.ControlOptions::set_Id(System.String)",
           "System.Void Facet.ControlOptions::set_Tooltip(System.String)",
           "System.Void Facet.ControlOptions::set_TooltipText(System.Func\u00601\u003CSystem.String\u003E)",
+          "System.Void Facet.ControlOptions::set_UndoDocument(System.Func\u00601\u003CSystem.Object\u003E)",
           "System.Void Facet.ControlOptions::set_VisibleWhen(System.Func\u00601\u003CSystem.Boolean\u003E)"
         ]
       },
@@ -2012,11 +2022,13 @@
           "Facet.Control\u00601\u003CSystem.Boolean\u003E Facet.Controls::Toggle(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Boolean\u003E,System.Action\u00601\u003CFacet.Options\u00601\u003CSystem.Boolean\u003E\u003E)",
           "Facet.Control\u00601\u003CSystem.Int32\u003E Facet.Controls::Dropdown(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Int32\u003E,System.Action\u00601\u003CFacet.DropdownOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.Int32\u003E Facet.Controls::IntSlider(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Int32\u003E,System.Action\u00601\u003CFacet.IntSliderOptions\u003E)",
+          "Facet.Control\u00601\u003CSystem.Single\u003E Facet.Controls::Number(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Single\u003E,System.Action\u00601\u003CFacet.SliderOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.Single\u003E Facet.Controls::Slider(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Single\u003E,System.Action\u00601\u003CFacet.SliderOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.String\u003E Facet.Controls::Info(UnityEngine.UIElements.VisualElement,System.String,System.Func\u00601\u003CSystem.String\u003E,System.Action\u00601\u003CFacet.ControlOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.String\u003E Facet.Controls::Info(UnityEngine.UIElements.VisualElement,System.String,System.Func\u00601\u003CSystem.String\u003E,System.Action\u00601\u003CFacet.InfoOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.String\u003E Facet.Controls::Key(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.String\u003E,System.Action\u00601\u003CFacet.KeyOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.String\u003E Facet.Controls::Text(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.String\u003E,System.Action\u00601\u003CFacet.TextOptions\u003E)",
+          "Facet.Control\u00601\u003CT\u003E Facet.Controls::Choice(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CT\u003E,System.Collections.Generic.IList\u00601\u003CT\u003E,System.Func\u00602\u003CT,System.String\u003E,System.Action\u00601\u003CFacet.ChoiceOptions\u00601\u003CT\u003E\u003E)",
           "Facet.Control\u00601\u003CUnityEngine.Color\u003E Facet.Controls::Colour(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CUnityEngine.Color\u003E,System.Action\u00601\u003CFacet.ColourOptions\u003E)",
           "System.Single Facet.Controls::RowHeight",
           "UnityEngine.UIElements.Button Facet.Controls::Action(UnityEngine.UIElements.VisualElement,System.String,System.String,System.Action,System.Action\u00601\u003CFacet.ControlOptions\u003E)",
@@ -2062,9 +2074,12 @@
           "System.Action Facet.History::AfterApply",
           "System.Boolean Facet.History::Applying()",
           "System.Boolean Facet.History::get_Applying()",
+          "System.Func\u00601\u003CSystem.Boolean\u003E Facet.History::BoundTo(System.Func\u00601\u003CSystem.Object\u003E)",
+          "System.IDisposable Facet.History::Step(System.String,System.String,System.Func\u00601\u003CSystem.Boolean\u003E,System.Func\u00602\u003CSystem.String,System.String\u003E)",
           "System.Int32 Facet.History::Limit",
           "System.Single Facet.History::CoalesceSeconds",
           "System.Void Facet.History::Invalidate()",
+          "System.Void Facet.History::Record(System.String,System.String,System.Action,System.Action,System.Func\u00602\u003CSystem.String,System.String\u003E)",
           "System.Void Facet.History::add_AfterApply(System.Action)"
         ]
       },
@@ -2310,6 +2325,12 @@
         ]
       },
       {
+        "type": "Facet.StatusLine",
+        "members": [
+          "System.Void Facet.StatusLine::Show(System.Func\u00601\u003CSystem.String\u003E,Facet.Role,System.Single)"
+        ]
+      },
+      {
         "type": "Facet.Surface",
         "members": [
           "System.Action Facet.Surface::Hidden",
@@ -2339,7 +2360,9 @@
       {
         "type": "Facet.TextOptions",
         "members": [
+          "System.Int32 Facet.TextOptions::MaxLength()",
           "System.Single Facet.TextOptions::Width()",
+          "System.Void Facet.TextOptions::set_MaxLength(System.Int32)",
           "System.Void Facet.TextOptions::set_Width(System.Single)"
         ]
       },
@@ -3026,9 +3049,13 @@
         "members": [
           "Facet.Canvas\u00601\u003CT\u003E PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Canvas()",
           "Facet.Canvas\u00601\u003CT\u003E PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::get_Canvas()",
+          "Facet.StatusLine PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Status()",
+          "Facet.StatusLine PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::get_Status()",
           "PrismLib.UI.Toolkit.KeyLayoutEditor\u00601\u003CT\u003E PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Build(UnityEngine.UIElements.VisualElement,PrismLib.UI.Toolkit.KeyLayoutModel\u00601\u003CT\u003E,System.Action)",
           "System.Boolean PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Tick(System.Func\u00602\u003CUnityEngine.KeyCode,System.Boolean\u003E,System.Func\u00602\u003CUnityEngine.KeyCode,System.Boolean\u003E,System.Boolean,System.Boolean,System.Boolean)",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Changed()",
           "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Do(System.String,System.Action)",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::MarkDirty()",
           "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Refresh()",
           "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Say(System.String,Facet.Role)",
           "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Select(System.Collections.Generic.IEnumerable\u00601\u003CT\u003E)",
