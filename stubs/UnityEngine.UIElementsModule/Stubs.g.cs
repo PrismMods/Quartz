@@ -28,6 +28,19 @@ namespace UnityEngine.UIElements {
         public static global::UnityEngine.UIElements.Background FromSprite(global::UnityEngine.Sprite s) => throw null;
         bool global::System.IEquatable<global::UnityEngine.UIElements.Background>.Equals(global::UnityEngine.UIElements.Background other) => throw null;
     }
+    public unsafe partial struct BackgroundSize : global::System.IEquatable<global::UnityEngine.UIElements.BackgroundSize> {
+        private global::UnityEngine.UIElements.BackgroundSizeType m_SizeType;
+        private global::UnityEngine.UIElements.Length m_X;
+        private global::UnityEngine.UIElements.Length m_Y;
+        public BackgroundSize(global::UnityEngine.UIElements.BackgroundSizeType sizeType) => throw null;
+        public BackgroundSize(global::UnityEngine.UIElements.Length sizeX, global::UnityEngine.UIElements.Length sizeY) => throw null;
+        bool global::System.IEquatable<global::UnityEngine.UIElements.BackgroundSize>.Equals(global::UnityEngine.UIElements.BackgroundSize other) => throw null;
+    }
+    public enum BackgroundSizeType : int {
+        Length = 0,
+        Cover = 1,
+        Contain = 2,
+    }
     public abstract unsafe partial class BaseField<TValueType> : global::UnityEngine.UIElements.BindableElement {
         public virtual TValueType value { get => throw null; set { } }
         public virtual void SetValueWithoutNotify(TValueType newValue) => throw null;
@@ -45,6 +58,12 @@ namespace UnityEngine.UIElements {
     public enum DisplayStyle : int {
         Flex = 0,
         None = 1,
+    }
+    public enum FlexDirection : int {
+        Column = 0,
+        ColumnReverse = 1,
+        Row = 2,
+        RowReverse = 3,
     }
     public abstract unsafe partial class Focusable : global::UnityEngine.UIElements.CallbackEventHandler {
         protected Focusable() { }
@@ -71,13 +90,33 @@ namespace UnityEngine.UIElements {
     public unsafe partial interface IResolvedStyle {
     }
     public unsafe partial interface IStyle {
+        global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.Align> alignItems { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.Align> alignSelf { get; set; }
+        global::UnityEngine.UIElements.StyleColor backgroundColor { get; set; }
         global::UnityEngine.UIElements.StyleBackground backgroundImage { get; set; }
+        global::UnityEngine.UIElements.StyleBackgroundSize backgroundSize { get; set; }
+        global::UnityEngine.UIElements.StyleColor borderBottomColor { get; set; }
+        global::UnityEngine.UIElements.StyleLength borderBottomLeftRadius { get; set; }
+        global::UnityEngine.UIElements.StyleLength borderBottomRightRadius { get; set; }
+        global::UnityEngine.UIElements.StyleFloat borderBottomWidth { get; set; }
+        global::UnityEngine.UIElements.StyleColor borderLeftColor { get; set; }
+        global::UnityEngine.UIElements.StyleFloat borderLeftWidth { get; set; }
+        global::UnityEngine.UIElements.StyleColor borderRightColor { get; set; }
+        global::UnityEngine.UIElements.StyleFloat borderRightWidth { get; set; }
+        global::UnityEngine.UIElements.StyleColor borderTopColor { get; set; }
+        global::UnityEngine.UIElements.StyleLength borderTopLeftRadius { get; set; }
+        global::UnityEngine.UIElements.StyleLength borderTopRightRadius { get; set; }
+        global::UnityEngine.UIElements.StyleFloat borderTopWidth { get; set; }
+        global::UnityEngine.UIElements.StyleLength bottom { get; set; }
+        global::UnityEngine.UIElements.StyleColor color { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.DisplayStyle> display { get; set; }
+        global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.FlexDirection> flexDirection { get; set; }
         global::UnityEngine.UIElements.StyleFloat flexGrow { get; set; }
         global::UnityEngine.UIElements.StyleFloat flexShrink { get; set; }
         global::UnityEngine.UIElements.StyleLength fontSize { get; set; }
         global::UnityEngine.UIElements.StyleLength height { get; set; }
+        global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.Justify> justifyContent { get; set; }
+        global::UnityEngine.UIElements.StyleLength left { get; set; }
         global::UnityEngine.UIElements.StyleLength marginBottom { get; set; }
         global::UnityEngine.UIElements.StyleLength marginLeft { get; set; }
         global::UnityEngine.UIElements.StyleLength marginRight { get; set; }
@@ -85,8 +124,15 @@ namespace UnityEngine.UIElements {
         global::UnityEngine.UIElements.StyleLength minHeight { get; set; }
         global::UnityEngine.UIElements.StyleLength minWidth { get; set; }
         global::UnityEngine.UIElements.StyleFloat opacity { get; set; }
+        global::UnityEngine.UIElements.StyleLength paddingBottom { get; set; }
         global::UnityEngine.UIElements.StyleLength paddingLeft { get; set; }
         global::UnityEngine.UIElements.StyleLength paddingRight { get; set; }
+        global::UnityEngine.UIElements.StyleLength paddingTop { get; set; }
+        global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.Position> position { get; set; }
+        global::UnityEngine.UIElements.StyleLength right { get; set; }
+        global::UnityEngine.UIElements.StyleLength top { get; set; }
+        global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.TextAnchor> unityTextAlign { get; set; }
+        global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.WhiteSpace> whiteSpace { get; set; }
         global::UnityEngine.UIElements.StyleLength width { get; set; }
     }
     public unsafe partial interface IStylePropertyAnimations {
@@ -105,12 +151,22 @@ namespace UnityEngine.UIElements {
     }
     public unsafe partial interface IVisualElementScheduler {
     }
+    public enum Justify : int {
+        FlexStart = 0,
+        Center = 1,
+        FlexEnd = 2,
+        SpaceBetween = 3,
+        SpaceAround = 4,
+        SpaceEvenly = 5,
+    }
     public unsafe partial class Label : global::UnityEngine.UIElements.TextElement {
+        public Label(string text) => throw null;
         protected Label() { }
     }
     public unsafe partial struct Length : global::System.IEquatable<global::UnityEngine.UIElements.Length> {
         private global::UnityEngine.UIElements.Length.Unit m_Unit;
         private float m_Value;
+        public static global::UnityEngine.UIElements.Length Percent(float value) => throw null;
         bool global::System.IEquatable<global::UnityEngine.UIElements.Length>.Equals(global::UnityEngine.UIElements.Length other) => throw null;
         public enum Unit : int {
             Pixel = 0,
@@ -119,13 +175,34 @@ namespace UnityEngine.UIElements {
             None = 3,
         }
     }
+    public enum PickingMode : int {
+        Position = 0,
+        Ignore = 1,
+    }
+    public enum Position : int {
+        Relative = 0,
+        Absolute = 1,
+    }
     public unsafe partial struct StyleBackground : global::System.IEquatable<global::UnityEngine.UIElements.StyleBackground> {
         private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
         private global::UnityEngine.UIElements.Background m_Value;
         public StyleBackground(global::UnityEngine.Sprite v) => throw null;
+        public static implicit operator global::UnityEngine.UIElements.StyleBackground(global::UnityEngine.Texture2D v) => throw null;
         public static implicit operator global::UnityEngine.UIElements.StyleBackground(global::UnityEngine.UIElements.Background v) => throw null;
         public static implicit operator global::UnityEngine.UIElements.StyleBackground(global::UnityEngine.UIElements.StyleKeyword keyword) => throw null;
         bool global::System.IEquatable<global::UnityEngine.UIElements.StyleBackground>.Equals(global::UnityEngine.UIElements.StyleBackground other) => throw null;
+    }
+    public unsafe partial struct StyleBackgroundSize : global::System.IEquatable<global::UnityEngine.UIElements.StyleBackgroundSize> {
+        private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
+        private global::UnityEngine.UIElements.BackgroundSize m_Value;
+        public static implicit operator global::UnityEngine.UIElements.StyleBackgroundSize(global::UnityEngine.UIElements.BackgroundSize v) => throw null;
+        bool global::System.IEquatable<global::UnityEngine.UIElements.StyleBackgroundSize>.Equals(global::UnityEngine.UIElements.StyleBackgroundSize other) => throw null;
+    }
+    public unsafe partial struct StyleColor : global::System.IEquatable<global::UnityEngine.UIElements.StyleColor> {
+        private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
+        private global::UnityEngine.Color m_Value;
+        public static implicit operator global::UnityEngine.UIElements.StyleColor(global::UnityEngine.Color v) => throw null;
+        bool global::System.IEquatable<global::UnityEngine.UIElements.StyleColor>.Equals(global::UnityEngine.UIElements.StyleColor other) => throw null;
     }
     public unsafe partial struct StyleEnum<T> : global::System.IEquatable<global::UnityEngine.UIElements.StyleEnum<T>> where T : struct, global::System.IConvertible {
         private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
@@ -154,6 +231,7 @@ namespace UnityEngine.UIElements {
         bool global::System.IEquatable<global::UnityEngine.UIElements.StyleLength>.Equals(global::UnityEngine.UIElements.StyleLength other) => throw null;
     }
     public unsafe partial class TextElement : global::UnityEngine.UIElements.BindableElement {
+        public bool enableRichText { get => throw null; set { } }
         protected TextElement() { }
     }
     public unsafe partial class TextField : global::UnityEngine.UIElements.TextInputBaseField<string> {
@@ -181,6 +259,7 @@ namespace UnityEngine.UIElements {
         public string name { get => throw null; set { } }
         public global::UnityEngine.UIElements.IPanel panel { get => throw null; }
         public global::UnityEngine.UIElements.VisualElement parent { get => throw null; }
+        public global::UnityEngine.UIElements.PickingMode pickingMode { get => throw null; set { } }
         public global::UnityEngine.UIElements.IStyle style { get => throw null; }
         public global::UnityEngine.Rect worldBound { get => throw null; }
         public VisualElement() => throw null;
@@ -193,6 +272,12 @@ namespace UnityEngine.UIElements {
             Exactly = 1,
             AtMost = 2,
         }
+    }
+    public enum WhiteSpace : int {
+        Normal = 0,
+        NoWrap = 1,
+        Pre = 2,
+        PreWrap = 3,
     }
 }
 namespace UnityEngine.UIElements.Experimental {

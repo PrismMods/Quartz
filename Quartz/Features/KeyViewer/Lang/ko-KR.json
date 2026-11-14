@@ -21,6 +21,7 @@
     "KVI_KIND_STAT": "스탯",
     "KVI_KIND_GRAPH": "그래프",
     "KVI_KIND_KNOB": "노브",
+    "KVI_KNOB": "노브",
     "KVI_LISTENING": "키 입력을 기다리고 있어요. Esc를 누르면 취소돼요",
     "KVI_GHOST_LISTENING": "고스트 키 입력을 기다리고 있어요. Esc를 누르면 취소돼요",
     "KVI_MULTI_TITLE": "요소 {0}개를 선택했어요",

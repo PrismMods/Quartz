@@ -21,6 +21,7 @@
     "KVI_KIND_STAT": "stat",
     "KVI_KIND_GRAPH": "graph",
     "KVI_KIND_KNOB": "knob",
+    "KVI_KNOB": "Knob",
     "KVI_LISTENING": "Press a key... (Esc cancels)",
     "KVI_GHOST_LISTENING": "Press the ghost key... (Esc cancels)",
     "KVI_MULTI_TITLE": "{0} elements selected",

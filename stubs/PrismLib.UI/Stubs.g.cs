@@ -76,9 +76,13 @@ namespace PrismLib.UI.Toolkit {
         public global::UnityEngine.Rect Rect;
     }
     public sealed unsafe partial class KeyLayoutEditor<T> where T : class {
+        public global::Facet.Canvas<T> Canvas { get => throw null; }
         public global::UnityEngine.UIElements.VisualElement Root { get => throw null; }
         public static global::PrismLib.UI.Toolkit.KeyLayoutEditor<T> Build(global::UnityEngine.UIElements.VisualElement parent, global::PrismLib.UI.Toolkit.KeyLayoutModel<T> model, global::System.Action openSwitcher) => throw null;
+        public void Do(string labelId, global::System.Action change) => throw null;
         public void Refresh() => throw null;
+        public void Say(string text, global::Facet.Role role = default) => throw null;
+        public void Select(global::System.Collections.Generic.IEnumerable<T> items) => throw null;
         public bool Tick(global::System.Func<global::UnityEngine.KeyCode, bool> down, global::System.Func<global::UnityEngine.KeyCode, bool> held, bool ctrlOrCmd, bool shift, bool alt) => throw null;
         private KeyLayoutEditor() { }
     }

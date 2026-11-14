@@ -28,6 +28,10 @@ namespace Facet {
         public void Set(T v) => throw null;
         private Bind() { }
     }
+    public sealed unsafe partial class Canvas<T> where T : class {
+        public global::UnityEngine.Vector2 ViewCentre { get => throw null; }
+        private Canvas() { }
+    }
     public sealed unsafe partial class CardOptions : global::Facet.ControlOptions {
         public global::System.Collections.Generic.List<global::System.Collections.Generic.KeyValuePair<string, global::System.Action>> Actions { get => throw null; set { } }
         public string Note { get => throw null; set { } }
@@ -132,6 +136,8 @@ namespace Facet {
         public global::System.Action<string, string> Write;
         private HostOptions() { }
     }
+    public unsafe partial interface ICanvasView {
+    }
     public sealed unsafe partial class InfoOptions : global::Facet.ControlOptions {
         private InfoOptions() { }
     }
@@ -163,7 +169,11 @@ namespace Facet {
         Tooltip = 4,
     }
     public sealed unsafe partial class MenuItem {
-        private MenuItem() { }
+        public string Id { get => throw null; set { } }
+        public global::System.Collections.Generic.IList<global::Facet.MenuItem> Items { get => throw null; set { } }
+        public global::System.Action Run { get => throw null; set { } }
+        public string Text { get => throw null; set { } }
+        public MenuItem() => throw null;
     }
     public sealed unsafe partial class Nav {
         public const float CollapseAt = 9f;
