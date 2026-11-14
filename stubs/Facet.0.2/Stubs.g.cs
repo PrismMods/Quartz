@@ -38,6 +38,11 @@ namespace Facet {
         public bool Alpha { get => throw null; set { } }
         protected ColourOptions() { }
     }
+    public sealed unsafe partial class Columns {
+        public global::UnityEngine.UIElements.VisualElement Left { get => throw null; }
+        public global::UnityEngine.UIElements.VisualElement Right { get => throw null; }
+        private Columns() { }
+    }
     public sealed unsafe partial class ColumnsOptions {
         public float Left { get => throw null; set { } }
         public float Right { get => throw null; set { } }
@@ -67,11 +72,12 @@ namespace Facet {
         public static global::UnityEngine.UIElements.VisualElement Advanced(global::UnityEngine.UIElements.VisualElement card, string label = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Card(global::UnityEngine.UIElements.VisualElement parent, string title, global::System.Action<global::Facet.CardOptions> configure = default) => throw null;
         public static global::Facet.Control<global::UnityEngine.Color> Colour(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<global::UnityEngine.Color> bind, global::System.Action<global::Facet.ColourOptions> configure = default) => throw null;
-        public static global::UnityEngine.UIElements.VisualElement Columns(global::UnityEngine.UIElements.VisualElement parent, out global::UnityEngine.UIElements.VisualElement right, global::System.Action<global::Facet.ColumnsOptions> configure = default) => throw null;
+        public static global::Facet.Columns Columns(global::UnityEngine.UIElements.VisualElement parent, global::System.Action<global::Facet.ColumnsOptions> configure = default) => throw null;
         public static global::UnityEngine.UIElements.Button Danger(global::UnityEngine.UIElements.VisualElement parent, string label, string button, global::System.Action onConfirm, global::System.Action<global::Facet.ControlOptions> configure = default) => throw null;
         public static global::Facet.Control<int> Dropdown(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<int> bind, global::System.Action<global::Facet.DropdownOptions> configure = default) => throw null;
         public static global::UnityEngine.UIElements.Label Header(global::UnityEngine.UIElements.VisualElement parent, string text) => throw null;
-        public static global::Facet.Control<string> Info(global::UnityEngine.UIElements.VisualElement parent, string label, global::System.Func<string> value, global::System.Action<global::Facet.ControlOptions> configure = default) => throw null;
+        public static global::Facet.Control<string> Info(global::UnityEngine.UIElements.VisualElement parent, string label, global::System.Func<string> value, global::System.Action<global::Facet.InfoOptions> configure = default) => throw null;
+        public static global::Facet.Control<string> Info(global::UnityEngine.UIElements.VisualElement parent, string label, global::System.Func<string> value, global::System.Action<global::Facet.ControlOptions> configure) => throw null;
         public static global::Facet.Control<int> IntSlider(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<int> bind, global::System.Action<global::Facet.IntSliderOptions> configure = default) => throw null;
         public static global::Facet.Control<string> Key(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<string> bind, global::System.Action<global::Facet.KeyOptions> configure = default) => throw null;
         public static global::Facet.Control<bool> PageHeader(global::UnityEngine.UIElements.VisualElement parent, string title, global::Facet.Bind<bool> on, global::System.Action<global::Facet.PageHeaderOptions> configure = default) => throw null;
@@ -91,6 +97,9 @@ namespace Facet {
             ResizeHorizontal = 1,
             ResizeCorner = 2,
             Text = 3,
+            Move = 4,
+            ResizeVertical = 5,
+            ResizeCornerNESW = 6,
         }
     }
     public unsafe partial class DropdownOptions : global::Facet.Options<int> {
@@ -120,7 +129,11 @@ namespace Facet {
         public global::System.Action<string, string> Write;
         private HostOptions() { }
     }
+    public sealed unsafe partial class InfoOptions : global::Facet.ControlOptions {
+        private InfoOptions() { }
+    }
     public static unsafe partial class Input {
+        public const string ChordCancel = "ChordCancel";
         public static bool BlocksGameInput { get => throw null; }
         public static bool HeldThisFrame { get => throw null; }
         public static bool TextFocused { get => throw null; }
@@ -146,14 +159,14 @@ namespace Facet {
         Tooltip = 4,
     }
     public sealed unsafe partial class Nav {
-        public const float CollapseAt = 8f;
-        public const float MaxRail = 9f;
-        public const float MinRail = 10f;
-        public global::System.Action<bool> OnCompactChanged;
-        public global::System.Action<float> OnInsetChanged;
+        public const float CollapseAt = 9f;
+        public const float MaxRail = 10f;
+        public const float MinRail = 11f;
         public bool Collapsible { get => throw null; set { } }
         public bool Compact { get => throw null; set { } }
         public bool CompactButton { get => throw null; set { } }
+        public event global::System.Action<bool> CompactChanged { add { } remove { } }
+        public event global::System.Action<float> InsetChanged { add { } remove { } }
         public Nav(global::UnityEngine.UIElements.VisualElement parent, global::System.Collections.Generic.IEnumerable<global::Facet.NavItem> items, float railWidth = default) => throw null;
         public void AddSearchSource(global::System.Func<global::System.Collections.Generic.IEnumerable<global::Facet.SearchIndex.Entry>> source) => throw null;
         public void Filter(string query) => throw null;
@@ -213,6 +226,7 @@ namespace Facet {
         Rail = 12,
         Line = 13,
         Off = 14,
+        Guide = 15,
     }
     public sealed unsafe partial class SearchIndex {
         private SearchIndex() { }
@@ -286,18 +300,18 @@ namespace Facet {
     }
     public static unsafe partial class Ui {
         public static global::UnityEngine.UIElements.VisualElement Box(global::UnityEngine.UIElements.VisualElement parent = default) => throw null;
-        public static global::UnityEngine.UIElements.Button Btn(string text, global::System.Action onClick, global::UnityEngine.UIElements.VisualElement parent = default, bool own = default) => throw null;
-        public static global::UnityEngine.UIElements.Label Muted(string text, global::UnityEngine.UIElements.VisualElement parent = default, bool own = default) => throw null;
+        public static global::UnityEngine.UIElements.Button Btn(global::UnityEngine.UIElements.VisualElement parent, string text, global::System.Action onClick, bool own = default) => throw null;
+        public static global::UnityEngine.UIElements.Label Muted(global::UnityEngine.UIElements.VisualElement parent, string text, bool own = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Row(global::UnityEngine.UIElements.VisualElement parent = default) => throw null;
-        public static global::UnityEngine.UIElements.Label Text(string text, global::UnityEngine.UIElements.VisualElement parent = default, global::System.Nullable<float> size = default, global::Facet.Role role = default, bool own = default) => throw null;
+        public static global::UnityEngine.UIElements.Label Text(global::UnityEngine.UIElements.VisualElement parent, string text, global::System.Nullable<float> size = default, global::Facet.Role role = default, bool own = default) => throw null;
     }
     public static unsafe partial class WarmUp {
         public static void Run() => throw null;
     }
     public sealed unsafe partial class Window {
-        public const float MinHeight = 11f;
-        public const float MinWidth = 12f;
-        public const float RailAlign = 13f;
+        public const float MinHeight = 12f;
+        public const float MinWidth = 13f;
+        public const float RailAlign = 14f;
         public global::UnityEngine.UIElements.VisualElement Body { get => throw null; }
         public global::UnityEngine.Rect Rect { get => throw null; set { } }
         public global::UnityEngine.UIElements.VisualElement Root { get => throw null; }

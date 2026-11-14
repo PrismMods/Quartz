@@ -73,10 +73,9 @@ internal static partial class QuartzShell {
         }
         builtCategories = CategoryKeys();
         Nav = new Facet.Nav(Window.Body, groups.Select(g => NavItem.Heading(null, [.. g])), RailWidth);
-        Nav.OnInsetChanged = Window.SetContentInset;
-        Window.SetContentInset(RailWidth + 7f);   // the Nav reported its inset before anyone listened
+        Nav.InsetChanged += Window.SetContentInset;
         Nav.AddSearchSource(ClassicRows);
-        Nav.OnCompactChanged = c => QuartzHost.Host.Write(CompactStore, c ? "1" : null);
+        Nav.CompactChanged += c => QuartzHost.Host.Write(CompactStore, c ? "1" : null);
         Nav.Collapsible = false;   // the Sidebar setting alone decides whether the rail shows: its handle never drags it shut
         ApplySidebar();
     }

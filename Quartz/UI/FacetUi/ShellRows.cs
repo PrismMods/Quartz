@@ -27,7 +27,7 @@ internal static class ShellRows {
         // The classic toggles show the value too: a hotkey fires one of them, and flips from what it shows.
         var menu = new List<KeyValuePair<string, Action>>();
         Control<bool> c = null;
-        c = Controls.Toggle(card, key, Writes(bind, v => ToggleBinds.Show(classicId, v), apply, save), o => {
+        c = Controls.Toggle(card, key, Writes(bind, ShowOnClassic(classicId), apply, save), o => {
             o.Id = key;
             configure?.Invoke(o);
             if(classicId == null) return;
@@ -54,6 +54,9 @@ internal static class ShellRows {
         return c;
     }
 
+    // Built apart from Toggle so the bind, which History keeps, shares no closure with the row.
+    private static Action<bool> ShowOnClassic(string classicId) => v => ToggleBinds.Show(classicId, v);
+
     // The description, and the bound key on a line of its own.
     private static string Tip(string descKey, string classicId) {
         string desc = descKey == null ? "" : QuartzHost.Translate(descKey);
@@ -77,7 +80,7 @@ internal static class ShellRows {
     // Escape or a click outside cancels it. Backspace or Delete clears the bind, as in the classic menu.
     private static void Capture(VisualElement row, string classicId, Action done) {
         bool waiting = true, again = false;
-        Popup prompt = Popup.Open(row, content => Ui.Muted("PRESS_A_KEY", content).name = "menu-hotkey-press", () => {
+        Popup prompt = Popup.Open(row, content => Ui.Muted(content, "PRESS_A_KEY").name = "menu-hotkey-press", () => {
             if(waiting) KeyCaptureService.Cancel();
         });
         void Listen() => KeyCaptureService.Start(k => {

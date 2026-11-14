@@ -90,7 +90,7 @@ internal static class ShellFeatures {
         Sizes sz = Theme.For(bar).Sizes;
         bar.style.minHeight = sz.RowHeight;
         bar.style.marginBottom = sz.Gap;
-        Ui.Text("FEATURES_FILTER", bar).style.marginRight = sz.Gap;
+        Ui.Text(bar, "FEATURES_FILTER").style.marginRight = sz.Gap;
         var f = new TextField { name = "menu-features-query" };
         f.SetValueWithoutNotify(Query);
         f.style.flexGrow = 1f;
@@ -104,10 +104,10 @@ internal static class ShellFeatures {
         var chips = new List<Button>();
         for(int i = 0; i < Chips.Length; i++) {
             int chip = i;
-            Button b = Ui.Btn(Chips[i], () => {
+            Button b = Ui.Btn(bar, Chips[i], () => {
                 Chip = chip;
                 for(int j = 0; j < chips.Count; j++) Paint.Select(chips[j], j == chip);
-            }, bar);
+            });
             b.name = "menu-features-chip-" + i;
             b.style.marginLeft = sz.Gap;   // the gap goes before a chip: the last ends on the cards' right edge
             b.style.marginRight = 0f;

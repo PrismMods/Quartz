@@ -153,12 +153,13 @@ internal static class ProgressBar {
             });
             Control<float> pos = ShellRows.Slider(fill, Stop("PROGRESSBAR_STOP_POS", "Stop {0} Position", i), Bind.To(() => point.Pos * 100f, v => {
                 point.Pos = v * 0.01f;
-                if(History.Applying) g.SortPoints();   // an undo or redo writes the position with no let-go; the refresh after it re-reads the rows
+                // An undo or redo sorts here, as it raises the row's commit only while the row is on a panel; the refresh after it re-reads the rows.
+                if(History.Applying) g.SortPoints();
             }), 0f, 100f, 1f, "0' %'", apply, save, o => {
                 o.Id = "PROGRESSBAR_STOPPOS_" + i;
                 o.Default = point.Pos * 100f;   // where the stop sat when its rows were built, as the classic slider's default
             });
-            pos.Committed += _ => Edit(() => { });   // in order once let go: the rows follow
+            pos.Committed += _ => { if(!History.Applying) Edit(() => { }); };   // in order once let go: the rows follow; an undo sorted, applied and saved as it wrote
             if(g.Points.Count > 1)
                 Controls.Action(fill, "", Stop("PROGRESSBAR_STOP_REMOVE", "Remove Stop {0}", i), () => Edit(() => g.Points.Remove(point)),
                     o => o.Id = "PROGRESSBAR_STOPREMOVE_" + i);

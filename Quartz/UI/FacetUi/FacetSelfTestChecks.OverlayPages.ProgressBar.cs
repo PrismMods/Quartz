@@ -129,8 +129,8 @@ internal static partial class FacetSelfTestChecks {
             $"remove={remove != null} at={fresh} stops={g.Points.Count} rows={StopRows()} want={RowsFor(count)} frames={frames}");
     }
 
-    // The first stop let go halfway past the second, then undone as the title bar's Undo does: an undo writes the position alone,
-    // with no let-go, and the stops and their rows are in order again within 3 frames. Undone only when the top step is that
+    // The first stop let go halfway past the second, then undone as the title bar's Undo does: the undo sorts the stops as it writes
+    // the position, and the stops and their rows are in order again within 3 frames. Undone only when the top step is that
     // move, so nothing else of the player's is undone; the stop's position is put back as found either way. Read by position,
     // not index: stops at one position may sort either way.
     private static IEnumerator PbStopUndo(Action<string, bool, string> check, StatColor g) {

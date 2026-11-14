@@ -52,7 +52,7 @@ internal static class FacetOverlayPreview {
         });
         // Under the stage, above the link; Facet's own Note is fixed text and cannot follow the lease.
         VisualElement pane = stage.parent;
-        note = Ui.Muted(noteKey, pane);
+        note = Ui.Muted(pane, noteKey);
         note.name = overlayId + "-preview-empty";
         note.style.marginTop = Theme.For(pane).Sizes.Gap / 2f;
         pane.Insert(pane.IndexOf(stage) + 1, note);

@@ -174,7 +174,7 @@ internal static partial class FacetSelfTestChecks {
         check("UI scale at 1.2 is saved, and scales the new menu by 1.2 / 0.85 * 1.2 (its larger base) and the classic panel by 1.2",
             Mathf.Abs(ui - 1.2f) < 0.001f && Mathf.Abs(scale - (1.2f / 0.85f * 1.2f)) < 0.001f && Mathf.Abs(UICore.PanelScale - 1.2f) < 0.001f,
             $"UIScale={ui} window={scale} panel={UICore.PanelScale}");
-        // An undo is no commit of the slider's: the scale follows it all the same.
+        // An undo raises the slider's commit while it is on the panel; the setter applies the scale either way.
         string undid = History.NextUndo;
         History.Undo();
         yield return Frames(2);
@@ -183,6 +183,20 @@ internal static partial class FacetSelfTestChecks {
         check($"undoing the UI scale puts back {was} in the setting, the new menu ({was} / 0.85 * 1.2) and the classic panel",
             was != 1.2f && Mathf.Abs(ui - was) < 0.001f && Mathf.Abs(scale - (was / 0.85f * 1.2f)) < 0.001f && Mathf.Abs(UICore.PanelScale - was) < 0.001f,
             $"undid={undid} UIScale={ui} window={scale} panel={UICore.PanelScale}");
+        // Undone with the page switched away: the row is off the panel and raises no commit, so the setter alone applies it.
+        yield return SetSlider("UI_SCALE", 0.8f, 1.6f, 1.2f);
+        QuartzShell.Go(CorePages.HomePageKey);
+        yield return Frames(2);
+        undid = History.NextUndo;
+        bool undone = Body.Q<Slider>("UI_SCALE-input") == null && History.Undo();
+        yield return Frames(2);
+        ui = MainCore.Conf.UIScale;
+        scale = QuartzShell.Window.Scale;
+        check($"undoing the UI scale from another page puts back {was} in the setting, the new menu and the classic panel",
+            undone && Mathf.Abs(ui - was) < 0.001f && Mathf.Abs(scale - (was / 0.85f * 1.2f)) < 0.001f && Mathf.Abs(UICore.PanelScale - was) < 0.001f,
+            $"undid={undid} undone={undone} UIScale={ui} window={scale} panel={UICore.PanelScale}");
+        QuartzShell.Go(CorePages.SettingsPageKey);
+        yield return Frames(3);
         yield return SetSlider("WINDOW_OPACITY", 20f, 100f, 70f);
         float opacity = QuartzShell.Window.Root.resolvedStyle.opacity;
         check("window opacity at 70 is saved as 0.7, and the new menu takes it",
@@ -316,7 +330,8 @@ internal static partial class FacetSelfTestChecks {
 
     // The open rail's width, which a drag of its handle may have changed.
     private static float RailFull => (float)typeof(Facet.Nav).GetField("_railWidth", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(QuartzShell.Nav);
-    private static VisualElement RailButton => RailScroll?.Q(name: "rail-button");
+    // The sidebar toggle in the window's title bar; a hidden one counts as none.
+    private static VisualElement RailButton => QuartzShell.Window?.Root.Q(name: "sidebar-toggle") is { } b && Displayed(b) ? b : null;
     // Layout puts each edge on a whole screen pixel, so a width reads up to a pixel off the one set (at 1.287 px/pt the 36 pt
     // strip lays out as 47 px, 36.5 pt): one pixel, in points.
     private static float RailTol => 1.01f / PanelPx(RailScroll);

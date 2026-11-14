@@ -16,14 +16,14 @@ internal static class ShellPage {
             cards(p);
             return;
         }
-        VisualElement left = Controls.Columns(p, out VisualElement right, o => {
+        Facet.Columns cols = Controls.Columns(p, o => {
             o.Left = 1.25f;
             o.Right = 1f;
             o.StackBelow = 760f;
         });
-        Header(left, featureId, titleKey, descKey);
-        cards(left);
-        FacetOverlayPreview.Pane(right, overlayId, emptyKey);
+        Header(cols.Left, featureId, titleKey, descKey);
+        cards(cols.Left);
+        FacetOverlayPreview.Pane(cols.Right, overlayId, emptyKey);
     }
 
     private static void Header(VisualElement p, string featureId, string titleKey, string descKey) =>

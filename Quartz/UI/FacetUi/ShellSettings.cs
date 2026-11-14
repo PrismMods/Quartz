@@ -90,7 +90,8 @@ internal static class ShellSettings {
         });
         Control<float> scale = Controls.Slider(card, "UI_SCALE", QuartzShell.Writes(() => C.UIScale, v => {
             C.UIScale = v;
-            if(History.Applying) ApplyScale(v);   // an undo or redo is no commit of the slider's
+            // An undo or redo applies here: it raises the slider's commit only while the row is on a panel, not with its page switched away.
+            if(History.Applying) ApplyScale(v);
         }), o => {
             o.Id = "UI_SCALE";
             o.Min = 0.8f;
@@ -99,7 +100,7 @@ internal static class ShellSettings {
             o.Format = "0.00x";
         });
         // At the end of a change, as the classic slider does: rescaling every step of a drag would move the track under the pointer.
-        scale.Committed += ApplyScale;
+        scale.Committed += v => { if(!History.Applying) ApplyScale(v); };   // an undo applied it as it wrote
         Controls.Slider(card, "WINDOW_OPACITY", QuartzShell.Writes(() => C.PanelOpacity * 100f, v => {
             UICore.SetPanelOpacity(v / 100f, true);
             QuartzShell.ApplyLook();

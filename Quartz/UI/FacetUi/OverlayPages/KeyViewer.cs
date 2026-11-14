@@ -44,11 +44,12 @@ internal static class KeyViewer {
         Slider(rain, "KEYVIEWER_DM_SCALE", () => C.DmScale, v => C.DmScale = v, Def.DmScale, 0.2f, 4f, 0.01f, "0.00 x", apply);
         Slider(rain, "KEYVIEWER_DM_FOOT_SCALE", () => C.DmFootScale, v => C.DmFootScale = v, Def.DmFootScale, 0.2f, 4f, 0.01f, "0.00 x", apply);
         Slider(rain, "KEYVIEWER_DM_SPEED", () => C.DmNoteSpeed, v => C.DmNoteSpeed = v, Def.DmNoteSpeed, 10f, 1000f, 1f, "0 px/s", apply);
-        // The track is laid out by a rebuild: once a drag is let go, not per tick. An undo writes no let-go, so it rebuilds as it writes.
+        // The track is laid out by a rebuild: once a drag is let go, not per tick. An undo or redo rebuilds as it writes, since it raises the
+        // row's commit only while the row is on a panel; the commit then skips its second rebuild.
         Slider(rain, "KEYVIEWER_DM_TRACK", () => C.DmTrackHeight, v => {
             C.DmTrackHeight = v;
             if(History.Applying) rebuild();
-        }, Def.DmTrackHeight, 0f, 1000f, 1f, "0 px", null).Committed += _ => rebuild();
+        }, Def.DmTrackHeight, 0f, 1000f, 1f, "0 px", null).Committed += _ => { if(!History.Applying) rebuild(); };
         Slider(rain, "KEYVIEWER_DM_FADE", () => C.DmFadePx, v => C.DmFadePx = v, Def.DmFadePx, 0f, 500f, 1f, "0 px", apply);
         Toggle(rain, "KEYVIEWER_DM_DELAY_ENABLED", () => C.DmDelayedNoteEnabled, v => C.DmDelayedNoteEnabled = v, Def.DmDelayedNoteEnabled, apply);
         VisualElement timing = Controls.Advanced(rain);

@@ -1943,6 +1943,15 @@
         ]
       },
       {
+        "type": "Facet.Columns",
+        "members": [
+          "UnityEngine.UIElements.VisualElement Facet.Columns::Left()",
+          "UnityEngine.UIElements.VisualElement Facet.Columns::Right()",
+          "UnityEngine.UIElements.VisualElement Facet.Columns::get_Left()",
+          "UnityEngine.UIElements.VisualElement Facet.Columns::get_Right()"
+        ]
+      },
+      {
         "type": "Facet.ColumnsOptions",
         "members": [
           "System.Single Facet.ColumnsOptions::Left()",
@@ -1988,6 +1997,7 @@
       {
         "type": "Facet.Controls",
         "members": [
+          "Facet.Columns Facet.Controls::Columns(UnityEngine.UIElements.VisualElement,System.Action\u00601\u003CFacet.ColumnsOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.Boolean\u003E Facet.Controls::PageHeader(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Boolean\u003E,System.Action\u00601\u003CFacet.PageHeaderOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.Boolean\u003E Facet.Controls::Tile(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Boolean\u003E,System.Action\u00601\u003CFacet.TileOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.Boolean\u003E Facet.Controls::Toggle(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Boolean\u003E,System.Action\u00601\u003CFacet.Options\u00601\u003CSystem.Boolean\u003E\u003E)",
@@ -1995,6 +2005,7 @@
           "Facet.Control\u00601\u003CSystem.Int32\u003E Facet.Controls::IntSlider(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Int32\u003E,System.Action\u00601\u003CFacet.IntSliderOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.Single\u003E Facet.Controls::Slider(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Single\u003E,System.Action\u00601\u003CFacet.SliderOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.String\u003E Facet.Controls::Info(UnityEngine.UIElements.VisualElement,System.String,System.Func\u00601\u003CSystem.String\u003E,System.Action\u00601\u003CFacet.ControlOptions\u003E)",
+          "Facet.Control\u00601\u003CSystem.String\u003E Facet.Controls::Info(UnityEngine.UIElements.VisualElement,System.String,System.Func\u00601\u003CSystem.String\u003E,System.Action\u00601\u003CFacet.InfoOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.String\u003E Facet.Controls::Key(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.String\u003E,System.Action\u00601\u003CFacet.KeyOptions\u003E)",
           "Facet.Control\u00601\u003CSystem.String\u003E Facet.Controls::Text(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.String\u003E,System.Action\u00601\u003CFacet.TextOptions\u003E)",
           "Facet.Control\u00601\u003CUnityEngine.Color\u003E Facet.Controls::Colour(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CUnityEngine.Color\u003E,System.Action\u00601\u003CFacet.ColourOptions\u003E)",
@@ -2004,7 +2015,6 @@
           "UnityEngine.UIElements.Label Facet.Controls::Header(UnityEngine.UIElements.VisualElement,System.String)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Advanced(UnityEngine.UIElements.VisualElement,System.String)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Card(UnityEngine.UIElements.VisualElement,System.String,System.Action\u00601\u003CFacet.CardOptions\u003E)",
-          "UnityEngine.UIElements.VisualElement Facet.Controls::Columns(UnityEngine.UIElements.VisualElement,UnityEngine.UIElements.VisualElement\u0026,System.Action\u00601\u003CFacet.ColumnsOptions\u003E)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Preview(UnityEngine.UIElements.VisualElement,System.String,System.Action\u00601\u003CFacet.PreviewOptions\u003E)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Section(UnityEngine.UIElements.VisualElement,System.String,System.Boolean)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Tiles(UnityEngine.UIElements.VisualElement,System.Action\u00601\u003CFacet.TilesOptions\u003E)",
@@ -2021,8 +2031,11 @@
         "type": "Facet.Cursors/Kind",
         "members": [
           "Facet.Cursors/Kind Facet.Cursors/Kind::Default",
+          "Facet.Cursors/Kind Facet.Cursors/Kind::Move",
           "Facet.Cursors/Kind Facet.Cursors/Kind::ResizeCorner",
+          "Facet.Cursors/Kind Facet.Cursors/Kind::ResizeCornerNESW",
           "Facet.Cursors/Kind Facet.Cursors/Kind::ResizeHorizontal",
+          "Facet.Cursors/Kind Facet.Cursors/Kind::ResizeVertical",
           "Facet.Cursors/Kind Facet.Cursors/Kind::Text",
           "System.Int32 Facet.Cursors/Kind::value__"
         ]
@@ -2067,6 +2080,10 @@
         ]
       },
       {
+        "type": "Facet.InfoOptions",
+        "members": []
+      },
+      {
         "type": "Facet.Input",
         "members": [
           "System.Boolean Facet.Input::BlocksGameInput()",
@@ -2076,6 +2093,7 @@
           "System.Boolean Facet.Input::get_BlocksGameInput()",
           "System.Boolean Facet.Input::get_HeldThisFrame()",
           "System.Boolean Facet.Input::get_TextFocused()",
+          "System.String Facet.Input::ChordCancel",
           "System.Void Facet.Input::ConsumeEscape()",
           "System.Void Facet.Input::TickWheel(UnityEngine.Vector2,System.Single)"
         ]
@@ -2112,8 +2130,8 @@
       {
         "type": "Facet.Nav",
         "members": [
-          "System.Action\u00601\u003CSystem.Boolean\u003E Facet.Nav::OnCompactChanged",
-          "System.Action\u00601\u003CSystem.Single\u003E Facet.Nav::OnInsetChanged",
+          "System.Action\u00601\u003CSystem.Boolean\u003E Facet.Nav::CompactChanged",
+          "System.Action\u00601\u003CSystem.Single\u003E Facet.Nav::InsetChanged",
           "System.Boolean Facet.Nav::Collapsible()",
           "System.Boolean Facet.Nav::Compact()",
           "System.Boolean Facet.Nav::CompactButton()",
@@ -2125,6 +2143,8 @@
           "System.Void Facet.Nav::Filter(System.String)",
           "System.Void Facet.Nav::Go(Facet.NavItem)",
           "System.Void Facet.Nav::Tick()",
+          "System.Void Facet.Nav::add_CompactChanged(System.Action\u00601\u003CSystem.Boolean\u003E)",
+          "System.Void Facet.Nav::add_InsetChanged(System.Action\u00601\u003CSystem.Single\u003E)",
           "System.Void Facet.Nav::set_Collapsible(System.Boolean)",
           "System.Void Facet.Nav::set_Compact(System.Boolean)",
           "System.Void Facet.Nav::set_CompactButton(System.Boolean)"
@@ -2196,6 +2216,7 @@
           "Facet.Role Facet.Role::AccentText",
           "Facet.Role Facet.Role::Danger",
           "Facet.Role Facet.Role::Focus",
+          "Facet.Role Facet.Role::Guide",
           "Facet.Role Facet.Role::Line",
           "Facet.Role Facet.Role::Off",
           "Facet.Role Facet.Role::Panel",
@@ -2324,9 +2345,9 @@
       {
         "type": "Facet.Ui",
         "members": [
-          "UnityEngine.UIElements.Button Facet.Ui::Btn(System.String,System.Action,UnityEngine.UIElements.VisualElement,System.Boolean)",
-          "UnityEngine.UIElements.Label Facet.Ui::Muted(System.String,UnityEngine.UIElements.VisualElement,System.Boolean)",
-          "UnityEngine.UIElements.Label Facet.Ui::Text(System.String,UnityEngine.UIElements.VisualElement,System.Nullable\u00601\u003CSystem.Single\u003E,Facet.Role,System.Boolean)",
+          "UnityEngine.UIElements.Button Facet.Ui::Btn(UnityEngine.UIElements.VisualElement,System.String,System.Action,System.Boolean)",
+          "UnityEngine.UIElements.Label Facet.Ui::Muted(UnityEngine.UIElements.VisualElement,System.String,System.Boolean)",
+          "UnityEngine.UIElements.Label Facet.Ui::Text(UnityEngine.UIElements.VisualElement,System.String,System.Nullable\u00601\u003CSystem.Single\u003E,Facet.Role,System.Boolean)",
           "UnityEngine.UIElements.VisualElement Facet.Ui::Box(UnityEngine.UIElements.VisualElement)",
           "UnityEngine.UIElements.VisualElement Facet.Ui::Row(UnityEngine.UIElements.VisualElement)"
         ]

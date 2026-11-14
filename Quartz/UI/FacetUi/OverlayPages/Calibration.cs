@@ -98,7 +98,7 @@ internal static class Calibration {
         Sizes sz = Theme.For(card).Sizes;
         Inset(Controls.Header(card, captionKey), sz);
         if(timings.Count == 0) {
-            Inset(Ui.Muted("CALIBRATION_TIMING_NONE", card), sz).style.marginBottom = sz.Gap;
+            Inset(Ui.Muted(card, "CALIBRATION_TIMING_NONE"), sz).style.marginBottom = sz.Gap;
             return;
         }
         for(int i = timings.Count - 1; i >= 0; i--) {
