@@ -57,7 +57,15 @@ public static partial class UICore {
         wordmarkRect.pivot = new Vector2(0.5f, 1f);
         wordmarkRect.sizeDelta = new Vector2(0f, 40f);
         wordmarkRect.anchoredPosition = new Vector2(0f, -128f);
-        var settings = GenerateUI.Button(rect, HubSettings, "Settings", "settings");
+        var layouts = GenerateUI.Button(rect, HubLayouts, "Layouts", "menu_kve_layouts");
+        var lr = layouts.Rect;
+        lr.anchorMin = new Vector2(0.5f, 0f);
+        lr.anchorMax = new Vector2(0.5f, 0f);
+        lr.pivot = new Vector2(0.5f, 0f);
+        lr.sizeDelta = new Vector2(240f, 56f);
+        lr.anchoredPosition = new Vector2(0f, 128f);
+        hubLayouts = layouts.Rect.gameObject;
+        var settings = GenerateUI.Button(rect, () => HubOpen(null), "Settings", "settings");
         var br = settings.Rect;
         br.anchorMin = new Vector2(0.5f, 0f);
         br.anchorMax = new Vector2(0.5f, 0f);
@@ -94,11 +102,44 @@ public static partial class UICore {
         dimRect.offsetMax = Vector2.zero;
         reorganizeDim.SetActive(false);
     }
-    // The new menu when it is wanted, Home the first time and else the page left; its close comes back to the hub. One that
-    // fails to build turned Facet off, and the classic panel opens over the hub instead.
-    private static void HubSettings() {
+    // The Layouts button: shown only while the key viewer layout switcher can open, which a door can learn after startup.
+    private static GameObject hubLayouts;
+    // The switcher opened from the hub draws under the hub's canvas: the hub hides until the switcher does.
+    private static bool hubUnderSwitcher;
+    private static void FitHub() {
+        if(reorganizeHub == null || hubLayouts == null) return;
+        bool layouts = FacetBridge.KvSwitcherUsable();
+        hubLayouts.SetActive(layouts);
+        ((RectTransform)reorganizeHub.transform).sizeDelta = new Vector2(260f, layouts ? 364f : 300f);
+    }
+    private static void HubLayouts() {
+        FacetBridge.OpenKvSwitcher();
+        if(!FacetBridge.KvSwitcherVisible() || reorganizeHubGroup == null) return;
+        hubUnderSwitcher = true;
+        reorganizeSeq?.CompleteAndKill();   // a fade still running would bring the hub back over it
+        reorganizeHubGroup.alpha = 0f;
+        reorganizeHubGroup.blocksRaycasts = false;
+    }
+    // Per frame: the hub comes back once the switcher over it hides.
+    private static void TickHubUnderSwitcher() {
+        if(!hubUnderSwitcher || FacetBridge.KvSwitcherVisible()) return;
+        hubUnderSwitcher = false;
+        if(reorganizeHubGroup == null) return;
+        reorganizeHubGroup.blocksRaycasts = true;
+        if(IsReorganizing) reorganizeHubGroup.alpha = 1f;
+    }
+    /// <summary>The classic menu on a page: over the hub when arranging, else opened.</summary>
+    internal static void OpenClassicAt(string pageKey) {
+        if(IsReorganizing) ShowPanelOverHub();
+        else if(!isOpen) Open();
+        int state = Nav.NavRegistry.StateFor(pageKey);
+        if(state >= 0) Factory.MenuFactory.SetState(state);
+    }
+    // The new menu when it is wanted, on pageKey (null: Home the first time and else the page left); its close comes back to
+    // the hub. One that fails to build turned Facet off, and the classic panel opens over the hub instead.
+    internal static void HubOpen(string pageKey) {
         if(NewMenuWanted) {
-            FacetBridge.OpenNewMenu(fromClassic: true);   // leaves reorganize mode first: previews refuse to lease while arranging
+            FacetBridge.OpenNewMenu(pageKey, fromClassic: true);   // leaves reorganize mode first: previews refuse to lease while arranging
             if(FacetBridge.NewMenuVisible()) {
                 MenuHandOff.FromHub = true;
                 return;
@@ -201,6 +242,7 @@ public static partial class UICore {
             panelCanvasGroup.blocksRaycasts = false;
         }
         if(reorganizeHub != null) reorganizeHub.SetActive(true);
+        FitHub();
         if(reorganizeHubGroup != null) reorganizeHubGroup.alpha = 0f;
         if(reorganizeDim != null) reorganizeDim.SetActive(true);
         if(reorganizeDimGroup != null) reorganizeDimGroup.alpha = 0f;

@@ -32,6 +32,7 @@ internal static partial class FacetSelfTestChecks {
         JToken conf = KeyViewerOverlay.Conf.Serialize();
         CoreSettings c = MainCore.Conf;
         (bool snap, bool grid, bool guides) = (c.KvSnapToGrid, c.KvShowGrid, c.KvShowGuides);
+        (int switcherKey, int switcherModifier) = (c.KvSwitcherKey, c.KvSwitcherModifier);
         var windows = new Dictionary<string, string>(c.FacetWindows);
         global::Facet.History.Clear();
         try {
@@ -40,6 +41,7 @@ internal static partial class FacetSelfTestChecks {
             KvStore.Replace(KvDocument.Parse(saved));
             KeyViewerOverlay.Conf.Deserialize(conf);
             (c.KvSnapToGrid, c.KvShowGrid, c.KvShowGuides) = (snap, grid, guides);
+            (c.KvSwitcherKey, c.KvSwitcherModifier) = (switcherKey, switcherModifier);
             c.FacetWindows.Clear();
             foreach(var kv in windows) c.FacetWindows[kv.Key] = kv.Value;
             MainCore.ConfMgr.RequestSave();

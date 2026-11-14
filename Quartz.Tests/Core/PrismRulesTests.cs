@@ -73,6 +73,17 @@ static class PrismRulesTests {
         foreach(int k in new[] { 0, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 323, 329 })
             Assert(PrismRules.HotkeyRefused(Alt, k), "no key, a modifier key or a mouse button is never a hotkey");
     }
+    public static void TestSwitcherHotkeyRefusals() {
+        const int None = 0, Ctrl = 1, Alt = 2, K = 107, P = 112, F9 = 290, Escape = 27;
+        Assert(PrismRules.SwitcherHotkeyRefused(Alt, K, Alt, K), "the menu's own chord");
+        Assert(PrismRules.SwitcherHotkeyRefused(None, K, Alt, K), "a bare K fires with Alt+K too");
+        Assert(PrismRules.SwitcherHotkeyRefused(Ctrl, K, None, K), "a bare-K menu fires with Ctrl+K too");
+        Assert(!PrismRules.SwitcherHotkeyRefused(Ctrl, K, Alt, K), "Ctrl+K and Alt+K are different chords");
+        Assert(PrismRules.SwitcherHotkeyRefused(Alt, P, Alt, K) && PrismRules.SwitcherHotkeyRefused(None, P, Alt, K), "Prism's Alt+P, bare or not");
+        Assert(!PrismRules.SwitcherHotkeyRefused(Ctrl, P, Alt, K), "Ctrl+P is not a Prism chord");
+        Assert(PrismRules.SwitcherHotkeyRefused(None, Escape, Alt, K) && PrismRules.SwitcherHotkeyRefused(Ctrl, Escape, Alt, K), "Escape closes the switcher");
+        Assert(!PrismRules.SwitcherHotkeyRefused(None, F9, Alt, K), "a bare F9 is free");
+    }
     public static void TestPrismWordsMatchLang() {
         string lang = Path.Combine(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../")), "Quartz", "Resource", "Export", "Lang");
         using JsonDocument en = JsonDocument.Parse(File.ReadAllText(Path.Combine(lang, "en-US.json")));

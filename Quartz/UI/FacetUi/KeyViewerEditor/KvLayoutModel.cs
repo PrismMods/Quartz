@@ -29,6 +29,9 @@ internal sealed partial class KvLayoutModel : PrismLib.UI.Toolkit.KeyLayoutModel
         global::Facet.History.AfterApply += Committed;
     }
 
+    /// <summary>Quartz is unloading: no later undo reaches this model.</summary>
+    internal void Dispose() => global::Facet.History.AfterApply -= Committed;
+
     public override global::Facet.Host Host => QuartzHost.Host;
     public override string Label(string id, string english) => KvLabels.KeyFor(id) ?? english;
     public override object UndoDocument() => epoch.Token(KvStore.Current);
@@ -78,6 +81,8 @@ internal sealed partial class KvLayoutModel : PrismLib.UI.Toolkit.KeyLayoutModel
 #if DEBUG
         OverlayRebuildRequests++;
 #endif
+        // The cards follow edits made with the switcher open.
+        if(KvEditorPage.Switcher is { Visible: true } switcher) switcher.Refresh();
     }
 
     public override bool Pref(string id) => id switch {
@@ -126,9 +131,6 @@ internal sealed partial class KvLayoutModel : PrismLib.UI.Toolkit.KeyLayoutModel
         else doc.SelectedTab = layout;
         if(layout != null) editing = layout;
     }
-
-    // Filled with the layout switcher.
-    public override void Thumb(string layout, List<KeyLayoutBox> into) { }
 
     public override string StatusText() {
         KvDocument doc = KvStore.Current;

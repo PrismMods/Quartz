@@ -86,6 +86,7 @@ namespace PrismLib.UI.Toolkit {
         public void Refresh() => throw null;
         public void Say(string text, global::Facet.Role role = default) => throw null;
         public void Select(global::System.Collections.Generic.IEnumerable<T> items) => throw null;
+        public static void Step(global::PrismLib.UI.Toolkit.KeyLayoutModel<T> model, string labelId, global::System.Action change) => throw null;
         public bool Tick(global::System.Func<global::UnityEngine.KeyCode, bool> down, global::System.Func<global::UnityEngine.KeyCode, bool> held, bool ctrlOrCmd, bool shift, bool alt) => throw null;
         private KeyLayoutEditor() { }
     }
@@ -137,6 +138,17 @@ namespace PrismLib.UI.Toolkit {
         public virtual string StatusText() => throw null;
         public virtual void Thumb(string layout, global::System.Collections.Generic.List<global::PrismLib.UI.Toolkit.KeyLayoutBox> into) => throw null;
         public virtual object UndoDocument() => throw null;
+    }
+    public sealed unsafe partial class KeyLayoutSwitcher<T> : global::System.IDisposable where T : class {
+        public bool Visible { get => throw null; }
+        public void Dispose() => throw null;
+        public void Hide() => throw null;
+        public static global::PrismLib.UI.Toolkit.KeyLayoutSwitcher<T> Open(global::PrismLib.UI.Toolkit.KeyLayoutModel<T> model, global::System.Action<string> edit) => throw null;
+        public void Refresh() => throw null;
+        public void Say(string text, global::Facet.Role role = default) => throw null;
+        public void Show() => throw null;
+        private KeyLayoutSwitcher() { }
+        void global::System.IDisposable.Dispose() => throw null;
     }
     public static unsafe partial class KeyLayoutText {
         public const string AlignBottom = "AlignBottom";

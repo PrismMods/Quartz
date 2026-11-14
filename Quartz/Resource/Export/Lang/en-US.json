@@ -601,6 +601,10 @@
     "MENU_KVE_NEW_TAB_NAME": "Layout",
     "MENU_KVE_IMPORT_JSON": "Import DM Note Config (.json)",
     "MENU_KVE_IMPORT_QKV": "Import Quartz Layout (.qkv)",
-    "MENU_KVE_IMPORTED": "Imported \"{0}\"."
+    "MENU_KVE_IMPORTED": "Imported \"{0}\".",
+    "MENU_KVE_SWITCHER_KEY": "Layout Switcher Hotkey",
+    "DESC_MENU_KVE_SWITCHER_KEY": "Opens the key viewer layout switcher. Unbound until you set one, and ignored while a level is playing.",
+    "MENU_KVE_SWITCHER_MODIFIER": "Layout Switcher Modifier",
+    "MENU_KVE_SWITCHER_KEY_TAKEN": "That key is already used by the menu or a Prism window."
   }
 }

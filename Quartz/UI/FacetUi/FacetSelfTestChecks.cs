@@ -43,6 +43,8 @@ internal static partial class FacetSelfTestChecks {
             yield return KvCanvasChecks(check, info);
             yield return KvInspectorChecks(check, info);
             yield return KvFilesChecks(check, info);
+            yield return KvSwitcherChecks(check, info);
+            yield return KvPerfChecks(check, info);
 #endif
             yield return OverlayPanels(check, info);
             yield return OverlayCalibrationPage(check, info);

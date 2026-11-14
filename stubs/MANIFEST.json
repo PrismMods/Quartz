@@ -2081,7 +2081,8 @@
           "System.Void Facet.History::Invalidate()",
           "System.Void Facet.History::Record(System.String,System.String,System.Action,System.Action,System.Func\u00602\u003CSystem.String,System.String\u003E)",
           "System.Void Facet.History::Snapshot(System.String,System.String,System.Func\u00601\u003CT\u003E,System.Action\u00601\u003CT\u003E,System.Action,System.Func\u00601\u003CSystem.Boolean\u003E,System.Func\u00602\u003CSystem.String,System.String\u003E)",
-          "System.Void Facet.History::add_AfterApply(System.Action)"
+          "System.Void Facet.History::add_AfterApply(System.Action)",
+          "System.Void Facet.History::remove_AfterApply(System.Action)"
         ]
       },
       {
@@ -2114,7 +2115,10 @@
       },
       {
         "type": "Facet.InfoOptions",
-        "members": []
+        "members": [
+          "System.Func\u00601\u003CFacet.Role\u003E Facet.InfoOptions::Tone()",
+          "System.Void Facet.InfoOptions::set_Tone(System.Func\u00601\u003CFacet.Role\u003E)"
+        ]
       },
       {
         "type": "Facet.Input",
@@ -3065,6 +3069,7 @@
           "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Refresh()",
           "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Say(System.String,Facet.Role)",
           "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Select(System.Collections.Generic.IEnumerable\u00601\u003CT\u003E)",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Step(PrismLib.UI.Toolkit.KeyLayoutModel\u00601\u003CT\u003E,System.String,System.Action)",
           "UnityEngine.UIElements.VisualElement PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Root()",
           "UnityEngine.UIElements.VisualElement PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::get_Root()"
         ]
@@ -3123,6 +3128,19 @@
           "UnityEngine.Rect PrismLib.UI.Toolkit.KeyLayoutModel\u00601::GetRect(T)",
           "UnityEngine.Vector2 PrismLib.UI.Toolkit.KeyLayoutModel\u00601::CanvasSize()",
           "UnityEngine.Vector2 PrismLib.UI.Toolkit.KeyLayoutModel\u00601::get_CanvasSize()"
+        ]
+      },
+      {
+        "type": "PrismLib.UI.Toolkit.KeyLayoutSwitcher\u00601",
+        "members": [
+          "PrismLib.UI.Toolkit.KeyLayoutSwitcher\u00601\u003CT\u003E PrismLib.UI.Toolkit.KeyLayoutSwitcher\u00601::Open(PrismLib.UI.Toolkit.KeyLayoutModel\u00601\u003CT\u003E,System.Action\u00601\u003CSystem.String\u003E)",
+          "System.Boolean PrismLib.UI.Toolkit.KeyLayoutSwitcher\u00601::Visible()",
+          "System.Boolean PrismLib.UI.Toolkit.KeyLayoutSwitcher\u00601::get_Visible()",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutSwitcher\u00601::Dispose()",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutSwitcher\u00601::Hide()",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutSwitcher\u00601::Refresh()",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutSwitcher\u00601::Say(System.String,Facet.Role)",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutSwitcher\u00601::Show()"
         ]
       },
       {

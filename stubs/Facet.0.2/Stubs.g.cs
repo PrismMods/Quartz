@@ -153,6 +153,7 @@ namespace Facet {
     public unsafe partial interface ICanvasView {
     }
     public sealed unsafe partial class InfoOptions : global::Facet.ControlOptions {
+        public global::System.Func<global::Facet.Role> Tone { get => throw null; set { } }
         private InfoOptions() { }
     }
     public static unsafe partial class Input {

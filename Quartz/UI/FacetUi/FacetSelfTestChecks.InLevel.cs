@@ -16,7 +16,8 @@ namespace Quartz.UI.FacetUi;
 /// The Combo preview inside a level, run alone under the marker facet-level-selftest: it enters 1-1 from the level select and
 /// opens Overlay ▸ Combo there. The pane shows the live count, paused too, while the element is off every game camera, and
 /// switching to General puts the element back on screen within a frame. Logs every camera's culling mask and what a canvas
-/// walk costs. Entering a level starts a run, which Quartz's PlayCount counts: the test puts 1-1's entry back and saves it,
+/// walk costs. Last it opens the level editor, checks the key viewer switcher's hotkey there, and returns to the level select.
+/// Entering a level starts a run, which Quartz's PlayCount counts: the test puts 1-1's entry back and saves it,
 /// so the attempts, in memory and in PlayCount.json, end as they began. The game's own save (User/data.sav, its current
 /// level) still moves, and only a rig puts that back.
 /// </summary>
@@ -33,6 +34,9 @@ internal static partial class FacetSelfTestChecks {
         try {
             yield return EnterLevel(check, info);
             if(!GameStats.InLevel) yield break;
+#if !QUARTZ_KEYVIEWER
+            yield return KvGuard(check, () => KvSwitcherInLevel(check));
+#endif
             string id = ComboOverlay.FontKey;
             int layerWas = -1;
             bool shownWas = false;
@@ -42,6 +46,9 @@ internal static partial class FacetSelfTestChecks {
                 layerWas = c != null ? c.gameObject.layer : -1;
                 shownWas = OverlayPreview.ShownOf(id) is { } r && r.activeInHierarchy;
             }, () => { }, () => ComboInLevel(check, info, layerWas, shownWas));
+#if !QUARTZ_KEYVIEWER
+            yield return KvGuard(check, () => KvSwitcherInEditor(check));
+#endif
         } finally {
             MainCore.Conf.FacetWindows.Clear();
             foreach(var kv in windows) MainCore.Conf.FacetWindows[kv.Key] = kv.Value;

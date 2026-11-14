@@ -15,9 +15,11 @@ namespace Quartz.UI.FacetUi.KeyViewerEditor;
 internal sealed partial class KvLayoutModel {
     private static string Tr(string key) => QuartzHost.Translate(key);
 
-    // Said on the editor when there is one (the switcher can act with the page never built).
+    // Said on the editor when there is one, and on the switcher while it shows: it can act with the page never built.
     private static void Say(string text, Role role = Role.TextMuted) {
-        if(!string.IsNullOrEmpty(text)) KvEditorPage.Editor?.Say(text, role);
+        if(string.IsNullOrEmpty(text)) return;
+        KvEditorPage.Editor?.Say(text, role);
+        if(KvEditorPage.Switcher is { Visible: true } switcher) switcher.Say(text, role);
     }
 
     public override string LimitText() => KvStore.Current.CustomTabCount < KvDocument.MaxCustomTabs ? null
@@ -95,14 +97,24 @@ internal sealed partial class KvLayoutModel {
     public override void Move(string layout, int indexInGroup) => KvStore.Current.MoveTabTo(layout, indexInGroup);
 
     // The switcher's export of any card: that layout is shown only while it is written, and no step is recorded.
-    public override void Export(string layout) {
+    public override void Export(string layout) => AsShown(layout, () => PickAndExport(KvExportFormat.DmNote));
+
+    /// <summary>The switcher's export of a layout, to path instead of through the picker.</summary>
+    internal bool ExportPath(string layout, string path, out string message) {
+        (bool ok, string said) = (false, null);
+        AsShown(layout, () => ok = ExportPath(path, KvExportFormat.DmNote, out said));
+        message = said;
+        return ok;
+    }
+
+    private void AsShown(string layout, Action run) {
         KvDocument doc = KvStore.Current;
         if(!doc.HasTab(layout)) return;
         (string hand, string foot, string was) = (doc.SelectedTab, doc.SelectedFootTab, editing);
         if(doc.IsFootTab(layout)) doc.SelectedFootTab = layout;
         else doc.SelectedTab = layout;
         try {
-            PickAndExport(KvExportFormat.DmNote);
+            run();
         } finally {
             (doc.SelectedTab, doc.SelectedFootTab, editing) = (hand, foot, was);
         }

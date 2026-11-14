@@ -117,6 +117,8 @@ public static partial class UICore {
         if(wheel != Vector2.zero) FacetBridge.TickWheel(Input.mousePosition, wheel.y);
         FacetBridge.TickNewMenu();
         FacetBridge.TickKvEditor();
+        KvSwitcherHotkey.Tick();
+        TickHubUnderSwitcher();
         if(canvasObj == null) return;
         HandleResolutionChange();
         Keybind.KeyModifier mod = (Keybind.KeyModifier)MainCore.Conf.ToggleModifier;

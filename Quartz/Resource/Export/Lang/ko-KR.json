@@ -601,6 +601,10 @@
     "MENU_KVE_NEW_TAB_NAME": "레이아웃",
     "MENU_KVE_IMPORT_JSON": "DM Note 설정 가져오기 (.json)",
     "MENU_KVE_IMPORT_QKV": "Quartz 레이아웃 가져오기 (.qkv)",
-    "MENU_KVE_IMPORTED": "\"{0}\"을(를) 가져왔어요."
+    "MENU_KVE_IMPORTED": "\"{0}\"을(를) 가져왔어요.",
+    "MENU_KVE_SWITCHER_KEY": "레이아웃 전환 단축키",
+    "DESC_MENU_KVE_SWITCHER_KEY": "키 뷰어 레이아웃 전환 창을 열어요. 직접 지정하기 전에는 비어 있고, 레벨을 플레이하는 동안에는 반응하지 않아요.",
+    "MENU_KVE_SWITCHER_MODIFIER": "레이아웃 전환 보조 키",
+    "MENU_KVE_SWITCHER_KEY_TAKEN": "메뉴나 Prism 창이 이미 쓰는 키예요."
   }
 }

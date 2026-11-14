@@ -142,6 +142,46 @@ internal static class FacetBridge {
         if(state == 1) KeyViewerEditor.KvEditorDoor.Tick();
 #endif
     }
+    /// <summary>Opens the key viewer layout switcher. Nothing unless the editor's door is usable; the door catches its own
+    /// failures, which never take the new menu down.</summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void OpenKvSwitcher() {
+#if !IL2CPP
+        if(Available()) KeyViewerEditor.KvEditorDoor.OpenSwitcher();
+#endif
+    }
+    /// <summary>Opens the key viewer layout switcher, or hides it when it shows.</summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void ToggleKvSwitcher() {
+#if !IL2CPP
+        if(Available()) KeyViewerEditor.KvEditorDoor.ToggleSwitcher();
+#endif
+    }
+    /// <summary>Hides the layout switcher if it was ever opened. Never probes.</summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void HideKvSwitcher() {
+#if !IL2CPP
+        if(state == 1) KeyViewerEditor.KvEditorDoor.HideSwitcher();
+#endif
+    }
+    /// <summary>The layout switcher shows. Never probes, so it is cheap per frame.</summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static bool KvSwitcherVisible() {
+#if !IL2CPP
+        if(state == 1) return KeyViewerEditor.KvEditorDoor.SwitcherVisible;
+#endif
+        return false;
+    }
+    /// <summary>The layout switcher can open: false under IL2CPP, in the KeyViewer flavour and without a usable PrismLib.UI, so
+    /// the every-flavour hub can ask.</summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static bool KvSwitcherUsable() {
+#if !IL2CPP
+        return Available() && KeyViewerEditor.KvEditorDoor.Usable;
+#else
+        return false;
+#endif
+    }
     /// <summary>Facet's undo chord (Ctrl/Cmd+Z, Shift for redo, Y redoes): none during a canvas drag, a key capture or typing,
     /// and once a frame across mods. True when it acted. Never probes.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -202,6 +242,7 @@ internal static class FacetBridge {
     public static void Shutdown() {
 #if !IL2CPP
         if(state == 1) {
+            KeyViewerEditor.KvEditorDoor.Shutdown();   // first: its switcher's surface is Quartz's host's
             try { ShutdownImpl(); } catch(Exception e) { Fail(e); }
         }
 #endif

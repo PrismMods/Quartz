@@ -179,6 +179,11 @@ internal sealed partial class KvLayoutModel {
     };
 
     // A switcher card's boxes: each element's rectangle in its idle fill and border colours.
+    public override void Thumb(string layout, List<KeyLayoutBox> into) {
+        KvDocument doc = KvStore.Current;
+        if(layout != null && doc.HasTab(layout)) ThumbBoxes(doc, layout, into);   // a missing tab is never created by a read
+    }
+
     private static void ThumbBoxes(KvDocument doc, string tab, List<KeyLayoutBox> into) {
         foreach(KvElement e in ElementsOf(doc, tab))
             into.Add(new KeyLayoutBox { Rect = new Rect(e.X, e.Y, e.W, e.H), Fill = KvElementView.Fill(e), Border = KvElementView.Border(e), Dim = e.Hidden });

@@ -218,6 +218,7 @@ List<(string Name, Action Run)> tests = [
     ("A shared layout session is open while an editor reads and for two frames after", PrismRulesTests.TestLayoutSession),
     ("Prism key modifiers map Keybind's order onto PrismLib's bits", PrismRulesTests.TestPrismMods),
     ("The menu hotkey refuses Prism's chords, bare modifiers and mouse buttons", PrismRulesTests.TestHotkeyRefusals),
+    ("The switcher hotkey refuses Escape and any chord the menu or a Prism chord also fires on", PrismRulesTests.TestSwitcherHotkeyRefusals),
     ("Every English label Quartz hands Prism has a Lang key in both languages", PrismRulesTests.TestPrismWordsMatchLang),
     ("Quartz keeps its newest thousand log lines for the debug window", QuartzLoggerTests.TestRecentKeepsTheNewestThousand),
 ];

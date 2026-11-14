@@ -52,7 +52,9 @@ internal static partial class FacetSelfTestChecks {
     }
 
     private static IEnumerator KeyViewerChecks(Action<string, bool, string> check, Action<string> info) {
-        yield return KeyViewerBuild(info);
+#if QUARTZ_KEYVIEWER
+        yield return KeyViewerBuild(info, "");   // the other flavours time it with the 108-key tab shown (KvPerf)
+#endif
         yield return Parity(check, KeyViewerPage, KeyViewerRows());
         yield return KeyViewerOffRows(check);
         yield return ClassicStale(check, KeyViewerPage, "KEYVIEWER_DM_NOTE", Bind.To(() => KvConf.DmNoteEffect, v => {
@@ -83,14 +85,16 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(1);
     }
 
-    // The page's build from another category, as a first open landing on it pays: logged, not held to the first-open budget,
-    // which is read on Home.
-    private static IEnumerator KeyViewerBuild(Action<string> info) {
+    private static double kvPageBuildMs = -1;
+
+    // The page's build from another category, as a first open landing on it pays; the time is kept in kvPageBuildMs.
+    private static IEnumerator KeyViewerBuild(Action<string> info, string note) {
         QuartzShell.Go(CorePages.HomePageKey);
         yield return Frames(2);
         var clock = System.Diagnostics.Stopwatch.StartNew();
         QuartzShell.Go(KeyViewerPage);
-        info($"[perf] Key Viewer page build {clock.Elapsed.TotalMilliseconds:0.0} ms (page={QuartzShell.CurrentPage})");
+        kvPageBuildMs = clock.Elapsed.TotalMilliseconds;
+        info($"[perf] Key Viewer page build {kvPageBuildMs:0.0} ms (page={QuartzShell.CurrentPage}{note})");
         yield return Frames(3);
     }
 

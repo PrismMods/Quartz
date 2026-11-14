@@ -47,6 +47,9 @@ internal static class KeyViewer {
             o.VisibleWhen = () => KvKeyLimiterBridge.Available;
         });
         ShellRows.Font(kv, KeyViewerOverlay.FontKey);
+#if !QUARTZ_KEYVIEWER
+        SwitcherHotkey(kv);
+#endif
 
         VisualElement rain = Controls.Card(p, "KEYVIEWER_DM_NOTE");
         Toggle(rain, "KEYVIEWER_DM_NOTE", () => C.DmNoteEffect, v => C.DmNoteEffect = v, Def.DmNoteEffect, rebuild);
@@ -161,6 +164,40 @@ internal static class KeyViewer {
             QuartzShell.Changed();
         });
     }
+
+#if !QUARTZ_KEYVIEWER
+    // The layout switcher's hotkey, unbound until set; shown while the switcher can open. A chord the menu or a Prism window
+    // owns is refused, and a line under the rows says so.
+    private static void SwitcherHotkey(VisualElement kv) {
+        Func<bool> usable = () => KvEditorDoor.Usable;
+        Controls.Key(kv, "MENU_KVE_SWITCHER_KEY", Bind.To(
+            () => MainCore.Conf.KvSwitcherKey == 0 ? null : ((UnityEngine.KeyCode)MainCore.Conf.KvSwitcherKey).ToString(),
+            name => KvSwitcherHotkey.TrySet(MainCore.Conf.KvSwitcherModifier,
+                Enum.TryParse(name, out UnityEngine.KeyCode key) ? (int)key : 0)), o => {
+            o.Id = "MENU_KVE_SWITCHER_KEY";
+            o.Tooltip = "DESC_MENU_KVE_SWITCHER_KEY";
+            // Unbound is the default: the reset hands the setter null, which clears the key.
+            o.Default = null;
+            // Escape or a cancelled capture hands Facet its cancel value, which leaves the binding as it was.
+            o.Capture = done => Utility.KeyCaptureService.Start(
+                k => done(k == UnityEngine.KeyCode.None ? global::Facet.Input.ChordCancel : k.ToString()), null);
+            o.CancelCapture = Utility.KeyCaptureService.Cancel;
+            o.VisibleWhen = usable;
+        });
+        Controls.Dropdown(kv, "MENU_KVE_SWITCHER_MODIFIER", Bind.To(() => MainCore.Conf.KvSwitcherModifier,
+            m => KvSwitcherHotkey.TrySet(m, MainCore.Conf.KvSwitcherKey)), o => {
+            o.Id = "MENU_KVE_SWITCHER_MODIFIER";
+            o.Items = ["PRISM_MODIFIER_NONE", .. new[] { Keybind.KeyModifier.Ctrl, Keybind.KeyModifier.Alt, Keybind.KeyModifier.Shift, Keybind.KeyModifier.Cmd }
+                .Select(Keybind.ModifierName)];
+            o.VisibleWhen = usable;
+        });
+        Controls.Info(kv, "", () => QuartzHost.Translate("MENU_KVE_SWITCHER_KEY_TAKEN"), o => {
+            o.Id = "MENU_KVE_SWITCHER_KEY_TAKEN";
+            o.Tone = () => Role.Danger;
+            o.VisibleWhen = () => KvEditorDoor.Usable && KvSwitcherHotkey.Refused;
+        });
+    }
+#endif
 
     // The classic page shows a file action's error beside it, in English; this page leaves it to the log.
     private static void Log(string error) {

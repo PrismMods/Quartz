@@ -15,7 +15,7 @@ namespace Quartz.UI.FacetUi.KeyViewerEditor;
 internal static class KvEditorDoor {
 #if !QUARTZ_KEYVIEWER
     private static VisualElement editorRoot;
-    private static bool gone, probed;
+    private static bool gone, probed, switcherMade;
     private static float nextLog;
 #endif
 #if DEBUG && !QUARTZ_KEYVIEWER
@@ -87,11 +87,60 @@ internal static class KvEditorDoor {
 
     /// <summary>Opens the layout switcher.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
-    internal static void OpenSwitcher() { }
+    internal static void OpenSwitcher() {
+#if !QUARTZ_KEYVIEWER
+        if(!Usable) return;
+        try {
+            switcherMade = true;
+            OpenSwitcherImpl();
+        } catch(Exception e) { Failed(e); }
+#endif
+    }
 
     /// <summary>Opens the layout switcher, or hides it when it shows.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
-    internal static void ToggleSwitcher() { }
+    internal static void ToggleSwitcher() {
+#if !QUARTZ_KEYVIEWER
+        if(!Usable) return;
+        try {
+            switcherMade = true;
+            ToggleSwitcherImpl();
+        } catch(Exception e) { Failed(e); }
+#endif
+    }
+
+    /// <summary>Hides the layout switcher; nothing when it was never opened.</summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    internal static void HideSwitcher() {
+#if !QUARTZ_KEYVIEWER
+        if(!switcherMade) return;
+        try { HideSwitcherImpl(); } catch(Exception e) { Failed(e); }
+#endif
+    }
+
+    /// <summary>The layout switcher shows.</summary>
+    internal static bool SwitcherVisible {
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        get {
+#if !QUARTZ_KEYVIEWER
+            if(!switcherMade) return false;
+            try { return SwitcherVisibleImpl(); } catch(Exception e) { Failed(e); }
+#endif
+            return false;
+        }
+    }
+
+    /// <summary>Quartz is unloading: the switcher is disposed and the editor's statics let go, so no stale window or model
+    /// outlives it.</summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    internal static void Shutdown() {
+#if !QUARTZ_KEYVIEWER
+        if(!switcherMade && editorRoot == null) return;
+        switcherMade = false;
+        editorRoot = null;
+        try { ShutdownImpl(); } catch(Exception e) { Failed(e); }
+#endif
+    }
 
 #if !QUARTZ_KEYVIEWER
     // A missing or older PrismLib.UI throws one of these from the JIT or the loader; anything else is a bug in a build.
@@ -118,6 +167,21 @@ internal static class KvEditorDoor {
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static VisualElement BuildImpl(VisualElement right) => KvEditorPage.Build(right);
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void OpenSwitcherImpl() => KvEditorPage.OpenSwitcher();
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void ToggleSwitcherImpl() => KvEditorPage.ToggleSwitcher();
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void HideSwitcherImpl() => KvEditorPage.Switcher?.Hide();
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static bool SwitcherVisibleImpl() => KvEditorPage.Switcher?.Visible == true;
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void ShutdownImpl() => KvEditorPage.Shutdown();
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void TickImpl(bool ctrl, bool shift, bool alt, bool keys) => KvEditorPage.Tick(down, held, ctrl, shift, alt, keys);

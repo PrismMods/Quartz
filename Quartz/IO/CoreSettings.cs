@@ -45,6 +45,8 @@ public sealed class CoreSettings : ISettingsFile {
     public Dictionary<string, (int Modifier, int Key)> ToggleKeybinds = [];
     public int ToggleModifier = (int)Keybind.KeyModifier.Alt;
     public int ToggleKey = (int)KeyCode.K;
+    public int KvSwitcherKey = 0;
+    public int KvSwitcherModifier = (int)Keybind.KeyModifier.None;
     public bool ExperimentalNewMenu;
     public int UpdateChannel = (int)ReleaseChannel.Alpha;
     public string SkippedVersion = "";
@@ -117,6 +119,8 @@ public sealed class CoreSettings : ISettingsFile {
             [nameof(ReorganizePanelY)] = ReorganizePanelY,
             [nameof(ToggleModifier)] = ToggleModifier,
             [nameof(ToggleKey)] = ToggleKey,
+            [nameof(KvSwitcherKey)] = KvSwitcherKey,
+            [nameof(KvSwitcherModifier)] = KvSwitcherModifier,
             [nameof(ExperimentalNewMenu)] = ExperimentalNewMenu,
             [nameof(UpdateChannel)] = UpdateChannel,
             [nameof(SkippedVersion)] = SkippedVersion,
@@ -164,6 +168,8 @@ public sealed class CoreSettings : ISettingsFile {
         ReorganizePanelY = IOUtils.Read(token, nameof(ReorganizePanelY), ReorganizePanelY);
         ToggleModifier = IOUtils.Read(token, nameof(ToggleModifier), ToggleModifier);
         ToggleKey = IOUtils.Read(token, nameof(ToggleKey), ToggleKey);
+        KvSwitcherKey = IOUtils.Read(token, nameof(KvSwitcherKey), KvSwitcherKey);
+        KvSwitcherModifier = IOUtils.Read(token, nameof(KvSwitcherModifier), KvSwitcherModifier);
         ExperimentalNewMenu = IOUtils.Read(token, nameof(ExperimentalNewMenu), false); // a profile without the key is off, never the previous profile's value
         UpdateChannel = IOUtils.Read(token, nameof(UpdateChannel), UpdateChannel);
         SkippedVersion = IOUtils.Read(token, nameof(SkippedVersion), SkippedVersion);

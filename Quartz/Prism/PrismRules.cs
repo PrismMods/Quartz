@@ -51,6 +51,14 @@ internal static class PrismRules {
         keyCode == 0 || keyCode >= 303 && keyCode <= 313 || keyCode >= 323 && keyCode <= 329
         || modifier == 2 && (keyCode == 100 || keyCode == 112 || keyCode == 116 || keyCode == 99);
     /// <summary>
+    /// A switcher hotkey Quartz won't take: anything the menu hotkey refuses, Escape (it closes the switcher, so the same press
+    /// would open it again), and a chord the menu hotkey or a Prism chord also fires on. A None modifier fires whatever is held,
+    /// so it shares its key with every chord on that key.
+    /// </summary>
+    public static bool SwitcherHotkeyRefused(int modifier, int keyCode, int menuModifier, int menuKey) =>
+        HotkeyRefused(modifier, keyCode) || modifier == 0 && HotkeyRefused(2, keyCode) || keyCode == 27
+        || keyCode == menuKey && (modifier == menuModifier || modifier == 0 || menuModifier == 0);
+    /// <summary>
     /// The English the bridge hands PrismLib for its Prism · Settings rows, and the Lang key that translates it. PrismLib.UI
     /// translates at draw time through Words, so the row text stays English in the registry.
     /// </summary>
