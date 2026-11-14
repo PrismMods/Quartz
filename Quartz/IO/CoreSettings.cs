@@ -132,6 +132,19 @@ public sealed class CoreSettings : ISettingsFile {
             [nameof(AccentB)] = AccentB
         };
     }
+    /// <summary>
+    /// Clears a layout switcher chord its own row would refuse now, with one log line: a hand-edited file, or a menu hotkey
+    /// moved onto it. Returns whether it cleared one.
+    /// </summary>
+    internal bool ClearRefusedSwitcherKey() {
+        if(KvSwitcherKey == 0) return false;
+        if(KvSwitcherModifier >= 0 && KvSwitcherModifier <= (int)Keybind.KeyModifier.Cmd && Enum.IsDefined(typeof(KeyCode), KvSwitcherKey)
+            && !Quartz.Prism.PrismRules.SwitcherHotkeyRefused(KvSwitcherModifier, KvSwitcherKey, ToggleModifier, ToggleKey)) return false;
+        MainCore.Runtime?.Logger?.Msg($"Layout switcher hotkey {KvSwitcherModifier}+{KvSwitcherKey} cleared: the menu hotkey or another chord fires on it");
+        KvSwitcherKey = 0;
+        KvSwitcherModifier = 0;
+        return true;
+    }
     public void Deserialize(JToken token) {
         Active = IOUtils.Read(token, nameof(Active), Active);
         Language = IOUtils.Read(token, nameof(Language), Language);
@@ -170,6 +183,7 @@ public sealed class CoreSettings : ISettingsFile {
         ToggleKey = IOUtils.Read(token, nameof(ToggleKey), ToggleKey);
         KvSwitcherKey = IOUtils.Read(token, nameof(KvSwitcherKey), KvSwitcherKey);
         KvSwitcherModifier = IOUtils.Read(token, nameof(KvSwitcherModifier), KvSwitcherModifier);
+        ClearRefusedSwitcherKey();
         ExperimentalNewMenu = IOUtils.Read(token, nameof(ExperimentalNewMenu), false); // a profile without the key is off, never the previous profile's value
         UpdateChannel = IOUtils.Read(token, nameof(UpdateChannel), UpdateChannel);
         SkippedVersion = IOUtils.Read(token, nameof(SkippedVersion), SkippedVersion);

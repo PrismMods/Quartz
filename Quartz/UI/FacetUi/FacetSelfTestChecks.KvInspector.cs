@@ -28,7 +28,7 @@ internal static partial class FacetSelfTestChecks {
             check($"{KvInspPage}: the layout editor is on the page", false, $"usable={KvEditorDoor.Usable} live={KvEditorDoor.Live}");
             yield break;
         }
-        KvParity(check, info);
+        yield return KvParity(check, info);
         KvScratchTabs();
         yield return KvBoxesSettle();
         yield return KvMixedRow(check);
@@ -38,6 +38,23 @@ internal static partial class FacetSelfTestChecks {
         yield return KvKeyCapture(check);
         yield return KvRebindOrder(check);
         yield return KvInspectorPerf(check, info);
+        KvKeyAfterRecreate(check);
+    }
+
+    // The edited tab deleted and made again under the same id: an old element's cached key must not name the new element.
+    private static void KvKeyAfterRecreate(Action<string, bool, string> check) {
+        KvLayoutModel model = KvEditorPage.Model;
+        KvDocument doc = KvStore.Current;
+        string tab = model.Editing, name = doc.TabName(tab);
+        KvElement old = doc.Elements(tab, KvElementKind.Key).FirstOrDefault();
+        string before = old == null ? null : model.Key(old);
+        bool removed = doc.RemoveTab(tab);
+        doc.EnsureTab(tab, name);
+        KvElement fresh = KvElement.Wrap(KvPresets.NewPosition(0, 0, 60, 60, KvPresets.NewElementStyle(false)), KvElementKind.Key, "");
+        doc.Add(tab, fresh);
+        string after = old == null ? null : model.Key(old);
+        check($"{KvInspPage}: after its tab is deleted and made again, an old element's key does not name the new element",
+            before != null && removed && model.Editing == tab && model.Find(after) != fresh, $"before={before} removed={removed} after={after}");
     }
 
     // ---- parity with classic, on a scratch document KvStore.Current never sees
@@ -47,8 +64,9 @@ internal static partial class FacetSelfTestChecks {
     private static readonly Regex KvRowId = new("^KVI_[A-Z0-9_]+$");
     private static readonly string[] KvClassicTabKeys = ["KVI_TAB_ELEMENT", "KVI_TAB_STYLE", "KVI_TAB_NOTE", "KVI_TAB_COUNTER", "KVI_TAB_SETTINGS"];
 
-    private static void KvParity(Action<string, bool, string> check, Action<string> info) {
-        KvDocument doc = KvDocument.Parse("");
+    // On a scratch tab of the live document (KvGuard puts it back), read from the live inspector's own tabs.
+    private static IEnumerator KvParity(Action<string, bool, string> check, Action<string> info) {
+        KvDocument doc = KvStore.Current;
         string tab = doc.NewTabId();
         doc.EnsureTab(tab, "Self Test Parity");
         KvElement Add(KvElementKind kind, float x, float y, float w, float h, string stat = null, KeyCode key = KeyCode.None) {
@@ -71,41 +89,34 @@ internal static partial class FacetSelfTestChecks {
             ("three keys", keys, KvChoices(rain: true, counter: true)),
             ("a key and a stat", [keys[0], kps], KvChoices(rain: true, counter: true)),
         ];
-        var ctx = new KvInspectorContext {
-            Selection = () => [], All = () => doc.AllElements(tab), Key = e => KvEditOps.Key(doc, tab, e), UndoDocument = () => doc, Tab = tab,
-        };
-        QuartzShell.Surface.Refresh();   // a pending rebuild of the live inspector would take the pages' context back mid-case
-        try {
-            foreach(var c in cases) {
-                KvElement[] sel = c.Sel;
-                ctx.Selection = () => sel;
-                Dictionary<string, HashSet<string>> classic = KvClassicIds(doc, tab, sel), now = KvNewIds(sel, ctx, out var choices, out var every);
-                if(c.Sel.Length == 1 && c.Sel[0].Kind == KvElementKind.Key) {
-                    List<string> off = [];
-                    foreach(KeyValuePair<string, HashSet<string>> t in every) {
-                        HashSet<string> named = [.. KvInspectorPages.RowIds(KvElementKind.Key, false, t.Key)];
-                        if(!named.SetEquals(t.Value))
-                            off.Add($"{t.Key}: unnamed [{string.Join(",", t.Value.Except(named))}] extra [{string.Join(",", named.Except(t.Value))}]");
-                    }
-                    check($"{KvInspPage}: the row ids the pages name for one key are the rows built", off.Count == 0 && every.Count > 0, string.Join("; ", off));
+        KvEditorPage.Model.Show(LayoutGroup.Hands, tab);
+        KvEditorPage.Editor.Refresh();
+        yield return KvBoxesSettle();
+        foreach(var c in cases) {
+            Dictionary<string, HashSet<string>> classic = KvClassicIds(doc, tab, c.Sel), now = [], choices = [], every = [];
+            yield return KvLiveIds(c.Sel, now, choices, every);
+            if(c.Sel.Length == 1 && c.Sel[0].Kind == KvElementKind.Key) {
+                List<string> off = [];
+                foreach(KeyValuePair<string, HashSet<string>> t in every) {
+                    HashSet<string> named = [.. KvInspectorPages.RowIds(KvElementKind.Key, false, t.Key)];
+                    if(!named.SetEquals(t.Value))
+                        off.Add($"{t.Key}: unnamed [{string.Join(",", t.Value.Except(named))}] extra [{string.Join(",", named.Except(t.Value))}]");
                 }
-                List<string> diffs = [];
-                foreach(string t in classic.Keys.Union(now.Keys)) {
-                    HashSet<string> a = classic.TryGetValue(t, out var x) ? x : null, b = now.TryGetValue(t, out var y) ? y : null;
-                    if(a == null || b == null) { diffs.Add($"{t}: tab only in {(a == null ? "new" : "classic")}"); continue; }
-                    var missing = a.Except(b).ToList();
-                    var extra = b.Except(a).ToList();
-                    if(missing.Count + extra.Count > 0) diffs.Add($"{t}: missing [{string.Join(",", missing)}] extra [{string.Join(",", extra)}]");
-                }
-                info($"{KvInspPage}: {c.Name}: " + string.Join(" ", classic.Select(kv => $"{kv.Key}={kv.Value.Count}")));
-                check($"{KvInspPage}: {c.Name}: every tab has the classic inspector's rows", diffs.Count == 0, string.Join("; ", diffs));
-                List<string> lost = [.. c.Choices.SelectMany(kv => kv.Value.Where(id => !(choices.TryGetValue(kv.Key, out var got) && got.Contains(id)))
-                    .Select(id => $"{kv.Key}/{id}"))];
-                check($"{KvInspPage}: {c.Name}: the classic segment rows are choice rows", lost.Count == 0, "missing " + string.Join(",", lost));
+                check($"{KvInspPage}: the row ids the pages name for one key are the rows built", off.Count == 0 && every.Count > 0, string.Join("; ", off));
             }
-        } finally {
-            KvEditorPage.Editor.Refresh();   // the live inspector takes its own context back on the rebuild
-            QuartzShell.Surface.Refresh();
+            List<string> diffs = [];
+            foreach(string t in classic.Keys.Union(now.Keys)) {
+                HashSet<string> a = classic.TryGetValue(t, out var x) ? x : null, b = now.TryGetValue(t, out var y) ? y : null;
+                if(a == null || b == null) { diffs.Add($"{t}: tab only in {(a == null ? "new" : "classic")}"); continue; }
+                var missing = a.Except(b).ToList();
+                var extra = b.Except(a).ToList();
+                if(missing.Count + extra.Count > 0) diffs.Add($"{t}: missing [{string.Join(",", missing)}] extra [{string.Join(",", extra)}]");
+            }
+            info($"{KvInspPage}: {c.Name}: " + string.Join(" ", classic.Select(kv => $"{kv.Key}={kv.Value.Count}")));
+            check($"{KvInspPage}: {c.Name}: every tab has the classic inspector's rows", diffs.Count == 0 && now.Count > 0, string.Join("; ", diffs));
+            List<string> lost = [.. c.Choices.SelectMany(kv => kv.Value.Where(id => !(choices.TryGetValue(kv.Key, out var got) && got.Contains(id)))
+                .Select(id => $"{kv.Key}/{id}"))];
+            check($"{KvInspPage}: {c.Name}: the classic segment rows are choice rows", lost.Count == 0, "missing " + string.Join(",", lost));
         }
     }
 
@@ -151,34 +162,27 @@ internal static partial class FacetSelfTestChecks {
 
     // The new pages built one at a time into a throwaway box on the editor: each tab's shown row ids, and every choice row's.
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-    private static Dictionary<string, HashSet<string>> KvNewIds(KvElement[] sel, KvInspectorContext ctx, out Dictionary<string, HashSet<string>> choices,
-        out Dictionary<string, HashSet<string>> every) {
-        Dictionary<string, HashSet<string>> ids = [];
-        choices = [];
-        every = [];
-        var host = new VisualElement { name = "kv-parity" };
-        host.style.position = Position.Absolute;
-        host.style.left = -100000f;
-        host.style.width = 400f;
-        KvEditorPage.Editor.Root.Add(host);
-        try {
-            foreach(global::Facet.NavItem page in KvInspectorPages.For(sel, ctx)) {
-                var box = new VisualElement();
-                host.Add(box);
-                page.Build(box);
-                QuartzShell.Surface.Refresh();
-                List<VisualElement> all = box.Query<VisualElement>().ToList();
-                ids[page.Title] = [.. all.Where(v => v.name != null && KvRowId.IsMatch(v.name) && !v.name.StartsWith("KVI_SEC_")
-                    && v.style.display.value != DisplayStyle.None).Select(v => v.name)];
-                choices[page.Title] = [.. all.Where(v => v.name != null && v.name.StartsWith("kv-") && !v.name.EndsWith("-input")).Select(v => v.name)];
-                every[page.Title] = [.. all.Where(v => v.name != null && (KvRowId.IsMatch(v.name) && !v.name.StartsWith("KVI_SEC_") || v.name.StartsWith("kv-"))
-                    && !v.name.EndsWith("-input")).Select(v => v.name)];
-                box.RemoveFromHierarchy();
-            }
-        } finally {
-            host.RemoveFromHierarchy();
+    // Selects sel on the live canvas, then shows each of the live inspector's tabs in turn and reads its rows.
+    private static IEnumerator KvLiveIds(KvElement[] sel, Dictionary<string, HashSet<string>> ids, Dictionary<string, HashSet<string>> choices,
+        Dictionary<string, HashSet<string>> every) {
+        yield return KvInspect(0, sel);
+        for(int i = 0; i < 8; i++) {
+            global::Facet.Tabs tabs = KvInspectorTabs();
+            if(tabs == null) yield break;
+            tabs.Select(i);
+            if(tabs.Selected != i) continue;   // past the last tab, or one hidden for this selection
+            QuartzShell.Surface.Refresh();
+            yield return Frames(1);
+            tabs = KvInspectorTabs();
+            if(tabs?.Content == null || tabs.Selected != i) continue;
+            string title = tabs.SelectedName;
+            List<VisualElement> all = tabs.Content.Query<VisualElement>().ToList();
+            ids[title] = [.. all.Where(v => v.name != null && KvRowId.IsMatch(v.name) && !v.name.StartsWith("KVI_SEC_")
+                && v.style.display.value != DisplayStyle.None).Select(v => v.name)];
+            choices[title] = [.. all.Where(v => v.name != null && v.name.StartsWith("kv-") && !v.name.EndsWith("-input")).Select(v => v.name)];
+            every[title] = [.. all.Where(v => v.name != null && (KvRowId.IsMatch(v.name) && !v.name.StartsWith("KVI_SEC_") || v.name.StartsWith("kv-"))
+                && !v.name.EndsWith("-input")).Select(v => v.name)];
         }
-        return ids;
     }
 
     // ---- shared by the row checks

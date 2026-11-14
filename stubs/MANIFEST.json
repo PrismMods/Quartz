@@ -3066,10 +3066,10 @@
           "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Changed()",
           "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Do(System.String,System.Action)",
           "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::MarkDirty()",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Pick(PrismLib.UI.Toolkit.KeyLayoutModel\u00601\u003CT\u003E,System.String,PrismLib.UI.Toolkit.LayoutGroup,System.String)",
           "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Refresh()",
           "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Say(System.String,Facet.Role)",
           "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Select(System.Collections.Generic.IEnumerable\u00601\u003CT\u003E)",
-          "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Step(PrismLib.UI.Toolkit.KeyLayoutModel\u00601\u003CT\u003E,System.String,System.Action)",
           "UnityEngine.UIElements.VisualElement PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Root()",
           "UnityEngine.UIElements.VisualElement PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::get_Root()"
         ]

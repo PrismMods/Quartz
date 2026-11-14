@@ -108,6 +108,21 @@ internal static partial class FacetSelfTestChecks {
         string want = KvInspectorPages.Title(sel);
         bool titled = KvInspectorRoot().Query<TextElement>().ToList().Any(t => t.text == want);
         check($"{KvPerfPage}: the refresh pass after the marquee's release shows the selection in the inspector", titled, $"want '{want}'");
+        // A pen holds the inspector's build too: the canvas captures whichever pointer pressed.
+        KvEditorPage.Editor.Canvas.Clear();
+        QuartzShell.Surface.Refresh();
+        int pen = PointerId.penPointerIdBase;
+        KvSend<PointerDownEvent>(KvPanel(lo), 0, pen);
+        bool held;
+        try {
+            KvSend<PointerMoveEvent>(KvPanel(hi), 0, pen);
+            QuartzShell.Surface.Refresh();
+            held = !KvInspectorRoot().Query<TextElement>().ToList().Any(t => t.text == want);
+        } finally {
+            KvSend<PointerUpEvent>(KvPanel(hi), 0, pen);
+        }
+        check($"{KvPerfPage}: a pen marquee also keeps the inspector's build until its release", held && KvSel().Count == els.Count,
+            $"held={held} selected={KvSel().Count}/{els.Count}");
         yield return Frames(1);
     }
 
@@ -163,17 +178,20 @@ internal static partial class FacetSelfTestChecks {
             undone && tabs >= 30 && doMs <= 50 && undoMs <= 50 && TableLength() == imageBytes, $"do={doMs:0.0} undo={undoMs:0.0} undone={undone} table={TableLength()}");
         yield return Frames(1);
 
-        global::Facet.History.Clear();
         var select = KvStripOptions(true).Select;
+        global::Facet.History.Clear();
         long mem0 = GC.GetTotalMemory(true);
         for(int i = 0; i < 100; i++) {
             select(i % 2 == 0 ? other : tab);
             if(i % 10 == 9) yield return null;
         }
-        long grew = GC.GetTotalMemory(true) - mem0;
-        info($"[perf] key viewer 100 tab clicks: retained memory grew {grew / 1048576.0:0.0} MB ({grew / 100 / 1024} KB a click)");
-        check($"{KvPerfPage}: a tab click keeps less memory than the image table (its steps leave the table out)",
-            model.Editing == tab && grew / 100 < imageBytes, $"grew={grew} editing={model.Editing}");
+        long mem1 = GC.GetTotalMemory(true), grew = mem1 - mem0;
+        // What the 100 steps themselves hold: other memory freed meanwhile (the step above's documents) can make grew negative.
+        global::Facet.History.Clear();
+        long held = mem1 - GC.GetTotalMemory(true);
+        info($"[perf] key viewer 100 tab clicks: retained memory grew {grew / 1048576.0:0.0} MB, their steps hold {held / 1024} KB ({held / 100} bytes a click)");
+        check($"{KvPerfPage}: a tab click keeps under 16 KB (its step records the tabs, not the document)",
+            model.Editing == tab && grew / 100 < 16 << 10 && held / 100 < 16 << 10, $"grew={grew} held={held} editing={model.Editing}");
 
         global::Facet.History.Clear();
         Func<bool> valid = global::Facet.History.BoundTo(model.UndoDocument);

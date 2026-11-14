@@ -138,8 +138,8 @@ internal sealed partial class KvLayoutModel {
         new() { Id = "KEYVIEWER_EDITOR_OPEN_FOLDER", Text = Tr("KEYVIEWER_EDITOR_OPEN_FOLDER"), Run = KvStore.RevealLibrary },
     ];
 
+    // The limit is ImportPath's to apply: a .qkv that only carries settings adds no layout.
     private void PickAndImport(string extension) {
-        if(AtLimit()) return;
         string picked;
         try {
             Directory.CreateDirectory(KvStore.LibraryDir);
@@ -170,24 +170,34 @@ internal sealed partial class KvLayoutModel {
 
     /// <summary>Imports a .json or .qkv file as one undo step, and says how it went (message).</summary>
     internal bool ImportPath(string path, out string message) {
-        message = LimitText();
-        if(AtLimit()) return false;
-        string error = null;
-        int settings = 0, tabs = KvStore.Current.Tabs.Count();
-        bool ok = false;
+        if(!KvStore.ReadImport(path, out KvDocument doc, out message)) {
+            Say(message, Role.Danger);
+            return false;
+        }
+        bool layout = KvStore.AddsLayout(doc);
+        // Refused only when it would add a layout; settings alone still apply at the limit.
+        if(layout && AtLimit()) {
+            message = LimitText();
+            return false;
+        }
+        // Nothing to bring in: no step either.
+        if(!layout && !KvStore.CarriesSettings(doc)) {
+            message = Tr("KEYVIEWER_EDITOR_IMPORT_NO_KEYS");
+            Say(message, Role.Danger);
+            return true;
+        }
+        int settings = 0;
         string label = string.Equals(Path.GetExtension(path), ".qkv", StringComparison.OrdinalIgnoreCase) ? "MENU_KVE_IMPORT_QKV" : "MENU_KVE_IMPORT_JSON";
         ImportStep(label, () => {
-            ok = KvStore.ImportFromPath(path, out error, out settings);
-            if(ok) Show(LayoutGroup.Hands, KvStore.Current.SelectedTab);
-            return ok;
+            settings = KvStore.ApplyImport(doc, path);
+            if(layout) Show(LayoutGroup.Hands, KvStore.Current.SelectedTab);
+            return true;
         });
-        bool added = KvStore.Current.Tabs.Count() > tabs;
-        message = !ok ? error
-            : settings > 0 ? string.Format(Tr("KEYVIEWER_EDITOR_IMPORTED_QKV"), settings)
-            : !added ? Tr("KEYVIEWER_EDITOR_IMPORT_NO_KEYS")
+        message = settings > 0 ? string.Format(Tr("KEYVIEWER_EDITOR_IMPORTED_QKV"), settings)
+            : !layout ? Tr("KEYVIEWER_EDITOR_IMPORT_NO_KEYS")
             : string.Format(Tr("MENU_KVE_IMPORTED"), KvStore.Current.TabName(KvStore.Current.SelectedTab));
-        Say(message, ok && added || settings > 0 ? Role.TextMuted : Role.Danger);
-        return ok;
+        Say(message, layout || settings > 0 ? Role.TextMuted : Role.Danger);
+        return true;
     }
 
     /// <summary>Writes the shown layout to path, and says how it went (message).</summary>

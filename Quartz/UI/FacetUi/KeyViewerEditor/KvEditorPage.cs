@@ -44,7 +44,7 @@ internal static class KvEditorPage {
         KvDocument doc = KvStore.Current;
         if(!doc.HasTab(layout)) return;
         LayoutGroup group = doc.IsFootTab(layout) ? LayoutGroup.Feet : LayoutGroup.Hands;
-        KeyLayoutEditor.Step(Model, KeyLayoutText.EditLayout, () => Model.Show(group, layout));
+        KeyLayoutEditor.Pick(Model, KeyLayoutText.EditLayout, group, layout);
         Model.Committed();
         if(!UICore.NewMenuWanted) UICore.OpenClassicAt(PageKey);
         else if(FacetBridge.NewMenuVisible()) QuartzShell.Go(PageKey);

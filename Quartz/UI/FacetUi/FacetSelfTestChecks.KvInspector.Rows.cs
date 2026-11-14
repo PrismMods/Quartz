@@ -208,6 +208,20 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(1);
         check($"{KvInspPage}: capturing Delete binds it and deletes nothing", released && KvEls().Count == n && model.Find(key)?.KeyCodeValue == KeyCode.Delete,
             $"released={released} count={KvEls().Count}/{n} key={model.Find(key)?.KeyCodeValue}");
+
+        KvElement g = model.Find(key);
+        g.BindGhostKey(KeyCode.G);
+        string ghost0 = g.GhostKey;
+        global::Facet.History.Clear();
+        yield return KvInspect(0, g);
+        Submit(KvRow<Button>("KVI_GHOST_CLEAR"));
+        yield return Frames(1);
+        string cleared = model.Find(key)?.GhostKey;
+        bool undone = global::Facet.History.Undo();
+        yield return Frames(1);
+        check($"{KvInspPage}: Clear Ghost Key unbinds the ghost key in exactly one step",
+            ghost0.Length > 0 && cleared == "" && undone && model.Find(key)?.GhostKey == ghost0 && !global::Facet.History.CanUndo,
+            $"was={ghost0} cleared='{cleared}' undone={undone} after={model.Find(key)?.GhostKey} more={(global::Facet.History.CanUndo)}");
     }
 
     private static bool KvBeginCapture(string id) {

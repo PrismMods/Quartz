@@ -152,6 +152,7 @@ public static partial class UICore {
         }
         MainCore.Conf.ToggleModifier = modifier;
         MainCore.Conf.ToggleKey = key;
+        MainCore.Conf.ClearRefusedSwitcherKey();   // the switcher may not keep a chord the menu hotkey now fires on
         MainCore.ConfMgr.RequestSave();
         Quartz.Prism.PrismBridge.RebindMenuKey();
     }

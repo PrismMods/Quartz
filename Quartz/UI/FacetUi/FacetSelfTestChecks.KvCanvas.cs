@@ -96,9 +96,10 @@ internal static partial class FacetSelfTestChecks {
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static void KvSend<T>(Vector2 panel, int button) where T : PointerEventBase<T>, new() {
+    private static void KvSend<T>(Vector2 panel, int button, int pointerId = 0) where T : PointerEventBase<T>, new() {
         VisualElement stage = KvEditorPage.Editor.Canvas.Stage;
         using T ev = Pooled<T>();
+        typeof(PointerEventBase<T>).GetProperty("pointerId").SetValue(ev, pointerId);
         typeof(PointerEventBase<T>).GetProperty("button").SetValue(ev, button);
         typeof(PointerEventBase<T>).GetProperty("position").SetValue(ev, (Vector3)panel);
         ev.target = stage;

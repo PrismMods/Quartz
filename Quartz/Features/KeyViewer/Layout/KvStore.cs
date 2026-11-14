@@ -188,8 +188,15 @@ internal static partial class KvStore {
         pending?.Cancel();
     }
     internal static bool ImportFromPath(string path, out string error, out int settingsApplied) {
-        error = null;
         settingsApplied = 0;
+        if(!ReadImport(path, out KvDocument doc, out error)) return false;
+        settingsApplied = ApplyImport(doc, path);
+        return true;
+    }
+    /// <summary>Reads and parses a preset file without changing anything; error says why it could not.</summary>
+    internal static bool ReadImport(string path, out KvDocument doc, out string error) {
+        error = null;
+        doc = null;
         if(string.IsNullOrWhiteSpace(path)) {
             error = "No file selected.";
             return false;
@@ -208,7 +215,6 @@ internal static partial class KvStore {
             Msg(error);
             return false;
         }
-        KvDocument doc;
         try {
             doc = KvDocument.Parse(json);
         } catch(FormatException e) {
@@ -220,16 +226,28 @@ internal static partial class KvStore {
             Msg(error);
             return false;
         }
+        return true;
+    }
+    /// <summary>Merges a read preset into the current document; returns how many Quartz settings it applied.</summary>
+    internal static int ApplyImport(KvDocument doc, string path) {
         string added = Current.MergeFrom(doc, out IReadOnlyList<KvEmbeddedImageWarning> imageWarnings);
         if(added != null) Current.SelectedTab = added;
         ApplyEmbeddedCss(doc);
-        settingsApplied = ApplyTransferSettings(doc.Root);
+        int settingsApplied = ApplyTransferSettings(doc.Root);
         Save();
         foreach(KvEmbeddedImageWarning warning in imageWarnings) Msg(warning.Message);
         Msg("Imported layout from " + path
             + (settingsApplied > 0 ? " with " + settingsApplied + " Quartz setting(s)" : "")
             + (imageWarnings.Count > 0 ? "; skipped " + imageWarnings.Count + " embedded image(s)" : ""));
-        return true;
+        return settingsApplied;
+    }
+    /// <summary>Whether importing doc adds a layout: a tab with elements.</summary>
+    internal static bool AddsLayout(KvDocument doc) => doc.Tabs.Any(t => doc.AllElements(t).Count > 0);
+    /// <summary>Whether importing doc changes anything besides layouts: Quartz settings, or DM Note CSS where none is set.</summary>
+    internal static bool CarriesSettings(KvDocument doc) {
+        if(doc.Root[SettingsKey] is JObject settings && TransferableSettings.Any(k => settings[k] is { Type: not JTokenType.Null })) return true;
+        KeyViewerSettings conf = KeyViewerOverlay.Conf;
+        return conf != null && string.IsNullOrWhiteSpace(conf.DmCssText) && !string.IsNullOrWhiteSpace(doc.EmbeddedCss().Content);
     }
     private static void ApplyEmbeddedCss(KvDocument doc) {
         KeyViewerSettings conf = KeyViewerOverlay.Conf;

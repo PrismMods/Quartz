@@ -265,6 +265,11 @@ internal static partial class FacetSelfTestChecks {
     private static string KvImages() => KvStore.Current.Root["embeddedLocalImages"]?.ToString(Newtonsoft.Json.Formatting.None) ?? "";
 
     private static IEnumerator KvImportExport(Action<string, bool, string> check, string dir) {
+        // The names an export writes and an import reads, for every mouse button: the enum parser alone shifts them by one.
+        string swapped = string.Join(", ", Enumerable.Range(0, 7).Select(b => KeyCode.Mouse0 + b)
+            .Select(k => (k, back: KeyViewerOverlay.ResolveGlobalKey(KvKeyNames.ToGlobalKey(k)))).Where(p => p.back != p.k)
+            .Select(p => $"{p.k}->{KvKeyNames.ToGlobalKey(p.k)}->{p.back}"));
+        check($"{KvFilesPage}: every mouse button's DM Note name reads back as the same button", swapped == "", swapped);
         KvLayoutModel model = KvM;
         KeyViewerSettings conf = KeyViewerOverlay.Conf;
         model.Show(LayoutGroup.Hands, kvHand);
@@ -332,11 +337,12 @@ internal static partial class FacetSelfTestChecks {
         string none = Path.Combine(dir, "none.json");
         File.WriteAllText(none, "{\"keys\":{}}");
         int count0 = KvStore.Current.Tabs.Count();
+        global::Facet.History.Clear();
         model.ImportPath(none, out said);
         yield return Frames(1);
-        check($"{KvFilesPage}: importing a preset with no keys adds no tab and says there was nothing to import",
-            KvStore.Current.Tabs.Count() == count0 && said == KvTr("KEYVIEWER_EDITOR_IMPORT_NO_KEYS") && KvStatusLabel()?.text == said,
-            $"tabs={count0}->{KvStore.Current.Tabs.Count()} said='{said}'");
+        check($"{KvFilesPage}: importing a preset with no keys adds no tab, records no step and says there was nothing to import",
+            KvStore.Current.Tabs.Count() == count0 && !global::Facet.History.CanUndo && said == KvTr("KEYVIEWER_EDITOR_IMPORT_NO_KEYS") && KvStatusLabel()?.text == said,
+            $"tabs={count0}->{KvStore.Current.Tabs.Count()} step={(global::Facet.History.CanUndo)} said='{said}'");
 
         // Not a preset: no step, and the store's own error in the danger colour.
         string x = Path.Combine(dir, "x.json");
@@ -437,6 +443,20 @@ internal static partial class FacetSelfTestChecks {
         check($"{KvFilesPage}: at the limit File ▸ Import adds nothing, records nothing and says the limit",
             wrote && !imported && doc.Tabs.Count() == tabs && !global::Facet.History.CanUndo && said == limit && KvStatusLabel()?.text == limit,
             $"wrote={wrote} imported={imported} tabs={tabs}->{doc.Tabs.Count()} step={(global::Facet.History.CanUndo)} said='{said}'");
+
+        // A .qkv that carries only Key Viewer settings adds no layout, so the limit does not refuse it.
+        string only = Path.Combine(Path.GetTempPath(), "quartz-selftest-kv-settings.qkv");
+        JObject carried = new() {
+            [nameof(KeyViewerSettings.DmNoteSpeed)] = KeyViewerOverlay.Conf.DmNoteSpeed,
+            [nameof(KeyViewerSettings.DmFootRelative)] = KeyViewerOverlay.Conf.DmFootRelative,   // a missing one is set false
+        };
+        File.WriteAllText(only, new JObject { ["keys"] = new JObject(), [KvStore.SettingsKey] = carried }.ToString());
+        bool applied = KvM.ImportPath(only, out said);
+        try { File.Delete(only); } catch(Exception e) { Diag.Ignore(e); }
+        yield return Frames(1);
+        check($"{KvFilesPage}: at the limit a .qkv with only Key Viewer settings still imports them and adds no tab",
+            applied && doc.Tabs.Count() == tabs && said == string.Format(KvTr("KEYVIEWER_EDITOR_IMPORTED_QKV"), 2),
+            $"imported={applied} tabs={tabs}->{doc.Tabs.Count()} said='{said}'");
 
         float until = Time.realtimeSinceStartup + 5.5f;
         while(Time.realtimeSinceStartup < until) yield return null;

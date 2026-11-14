@@ -65,6 +65,7 @@ List<(string Name, Action Run)> tests = [
     ("KeyViewer JS plugin content past the nesting limit fails safely", KvJsTests.TestPluginDepthLimits),
     ("KeyViewer layout round-trips data DM Note models but Quartz does not", KvDocumentTests.TestRoundTripPreservesUnmodelledData),
     ("KeyViewer layout keeps keys[] and keyPositions[] parallel", KvDocumentTests.TestRoundTripKeepsArraysParallel),
+    ("KeyViewer DM Note mouse names round-trip every button", KvMouseNamesTests.TestRoundTripKeepsEveryButton),
     ("KeyViewer import carries DM Note embedded preset images", KvDocumentTests.TestMergeCarriesDmNoteEmbeddedImages),
     ("KeyViewer authored elements carry DM Note's required fields", KvDocumentTests.TestAuthoredElementsCarryRequiredFields),
     ("KeyViewer layout rejects non-presets and normalizes legacy positions", KvDocumentTests.TestParseRejectsNonPresets),

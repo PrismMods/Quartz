@@ -83,10 +83,10 @@ namespace PrismLib.UI.Toolkit {
         public void Changed() => throw null;
         public void Do(string labelId, global::System.Action change) => throw null;
         public void MarkDirty() => throw null;
+        public static void Pick(global::PrismLib.UI.Toolkit.KeyLayoutModel<T> model, string labelId, global::PrismLib.UI.Toolkit.LayoutGroup group, string layout) => throw null;
         public void Refresh() => throw null;
         public void Say(string text, global::Facet.Role role = default) => throw null;
         public void Select(global::System.Collections.Generic.IEnumerable<T> items) => throw null;
-        public static void Step(global::PrismLib.UI.Toolkit.KeyLayoutModel<T> model, string labelId, global::System.Action change) => throw null;
         public bool Tick(global::System.Func<global::UnityEngine.KeyCode, bool> down, global::System.Func<global::UnityEngine.KeyCode, bool> held, bool ctrlOrCmd, bool shift, bool alt) => throw null;
         private KeyLayoutEditor() { }
     }

@@ -21,7 +21,6 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
     private bool done;
     private int pass, fail;
     private StringBuilder log;
-    // Checks that span frames are iterators; a yielded IEnumerator runs to completion first.
     private readonly Stack<IEnumerator> steps = new();
     public void Tick() {
         if(done || Time.realtimeSinceStartup < StartAfterSeconds) return;
@@ -30,6 +29,7 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
             if(!File.Exists(marker)) { done = true; return; }
             string[] others = [.. Markers.Where(m => m != name && File.Exists(Path.Combine(MainCore.Paths.RootPath, m)))];
             if(others.Length > 0) {
+                // The marker stays: every armed runner must see the conflict and refuse, not just the first to tick.
                 done = true;
                 File.WriteAllText(Path.Combine(MainCore.Paths.RootPath, name + ".log"),
                     $"FAIL one marker per launch - also armed: {string.Join(", ", others)}\nDONE pass=0 fail=1\n");
@@ -39,27 +39,53 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
             log = new StringBuilder();
             steps.Push(Powered(body != null ? body(Check, Info) : FeaturesOn(Run())));
         }
+        if(!Step(steps, Check)) return;
+        done = true;
+        End();
+        log.AppendLine($"DONE pass={pass} fail={fail}");
+        File.WriteAllText(Path.Combine(MainCore.Paths.RootPath, name + ".log"), log.ToString());
+        Application.Quit();
+    }
+    // Runs the stack until a check waits a frame (false) or none is left (true). Checks that span frames are iterators; a
+    // yielded IEnumerator runs to completion first.
+    internal static bool Step(Stack<IEnumerator> steps, Action<string, bool, string> check) {
         while(steps.Count > 0) {
             IEnumerator top = steps.Peek();
             bool more;
             try {
                 more = top.MoveNext();
             } catch(Exception e) {
-                Check("runner", false, e.ToString());
-                // Dispose top first so each iterator's finally (state restores) runs.
-                while(steps.Count > 0) {
-                    try { (steps.Pop() as IDisposable)?.Dispose(); } catch(Exception d) { Diag.Ignore(d); }
-                }
-                break;
+                // Only the iterator that threw ends (its finally restores what it changed); the one that yielded it goes on
+                // with its next check, so one throw costs one section, not the rest of the run.
+                check("runner", false, e.ToString());
+                try { (steps.Pop() as IDisposable)?.Dispose(); } catch(Exception d) { Diag.Ignore(d); }
+                continue;
             }
             if(!more) { steps.Pop(); continue; }
             if(top.Current is IEnumerator inner) { steps.Push(inner); continue; }
-            return; // wait a frame
+            return false; // wait a frame
         }
-        done = true;
-        log.AppendLine($"DONE pass={pass} fail={fail}");
-        File.WriteAllText(Path.Combine(MainCore.Paths.RootPath, name + ".log"), log.ToString());
-        Application.Quit();
+        return true;
+    }
+    private static bool RunnerSurvivesThrow(out string detail) {
+        List<string> seen = [];
+        var stack = new Stack<IEnumerator>();
+        stack.Push(ThrowThenCheck(seen));
+        bool ended = Step(stack, (c, ok, _) => seen.Add($"{c}:{ok}"));
+        detail = string.Join(" ", seen);
+        return ended && detail == "runner:False after:True";
+    }
+    private static IEnumerator ThrowThenCheck(List<string> seen) {
+        yield return Throws(seen);
+        seen.Add("after:True");
+    }
+    private static IEnumerator Throws(List<string> seen) {
+        if(seen != null) throw new InvalidOperationException("self-test throw");
+        yield break;
+    }
+    // A run ends by removing its marker, so a later launch does not run it again (or arm it beside another runner).
+    private void End() {
+        try { File.Delete(Path.Combine(MainCore.Paths.RootPath, name)); } catch(Exception e) { Diag.Ignore(e); }
     }
     // Powered off there are no overlays or layout targets to check, and the rig may have the power saved off. Power on
     // for the run only, never writing the player's stored switch, and put the runtime back after.
@@ -135,6 +161,7 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
         Check("unity 6 gate", FacetBridge.IsUnity6("6000.3.2f1") && !FacetBridge.IsUnity6("2022.3.62f1")
             && !FacetBridge.IsUnity6("") && !FacetBridge.IsUnity6(null) && FacetBridge.IsUnity6(Application.unityVersion),
             $"unity={Application.unityVersion}");
+        Check("a throwing section logs one runner FAIL and the run goes on with the next check", RunnerSurvivesThrow(out string runner), runner);
         string newLog = ReadQuartzLog();
         int unavailable = CountOccurrences(newLog, "Facet unavailable");
         if(facet) {

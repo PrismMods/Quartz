@@ -53,7 +53,9 @@ internal sealed partial class KvLayoutModel {
             keysTab = tab;
         }
         if(e == null) return null;
-        if(keys.TryGetValue(e, out var hit) && hit.index < hit.list.Count && ReferenceEquals(hit.list[hit.index], e)) return hit.key;
+        // The list too: a tab deleted and made again under the same id has new lists, and the old one still holds e.
+        if(keys.TryGetValue(e, out var hit) && ReferenceEquals(hit.list, doc.Elements(tab, e.Kind))
+            && hit.index < hit.list.Count && ReferenceEquals(hit.list[hit.index], e)) return hit.key;
         if(KvEditOps.Key(doc, tab, e) is { } key) {
             List<KvElement> list = doc.Elements(tab, e.Kind);
             keys[e] = (key, list, list.IndexOf(e));

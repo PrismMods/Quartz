@@ -82,6 +82,26 @@ internal static partial class FacetSelfTestChecks {
         check($"{KvSwitcherPage}: the hotkey does nothing while a level plays or a key row captures",
             playing && capturing && duringCapture, $"playing={playing} capturing={capturing} duringCapture={duringCapture}");
         FacetBridge.HideKvSwitcher();
+
+        // The other way round: the menu hotkey moved onto the switcher's key clears the switcher's chord, and so does a loaded
+        // chord the switcher's row would refuse.
+        (int menuMod, int menuKey) = (c.ToggleModifier, c.ToggleKey);
+        bool moved;
+        try {
+            UICore.TrySetMenuHotkey(menuMod, (int)KeyCode.F9);
+            moved = c.ToggleKey == (int)KeyCode.F9 && c.KvSwitcherKey == 0;
+        } finally {
+            // Written back directly: TrySetMenuHotkey would refuse a hand-edited chord and leave the player on F9.
+            (c.ToggleModifier, c.ToggleKey) = (menuMod, menuKey);
+            MainCore.ConfMgr.RequestSave();
+            Quartz.Prism.PrismBridge.RebindMenuKey();
+        }
+        (c.KvSwitcherModifier, c.KvSwitcherKey) = (0, (int)KeyCode.Escape);
+        bool loaded = c.ClearRefusedSwitcherKey() && c.KvSwitcherKey == 0;
+        KvSwitcherHotkey.TrySet(0, (int)KeyCode.F9);
+        bool kept = !c.ClearRefusedSwitcherKey() && c.KvSwitcherKey == (int)KeyCode.F9;
+        check($"{KvSwitcherPage}: a menu hotkey set onto the switcher's key clears the switcher's chord, a refused chord from the file is cleared, an accepted one stays",
+            moved && loaded && kept && c.ToggleModifier == menuMod && c.ToggleKey == menuKey, $"moved={moved} loaded={loaded} kept={kept} menu={c.ToggleModifier}+{c.ToggleKey}");
     }
 
     // ---- a door forced off: no switcher, no hub button, no rows

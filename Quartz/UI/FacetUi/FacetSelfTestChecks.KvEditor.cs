@@ -66,6 +66,7 @@ internal static partial class FacetSelfTestChecks {
             $"row={Body.Q(name: "MENU_KV_EDITOR") != null}");
         check($"{KeyViewerPage}: the editor's menu bar has File, Edit, Insert, Arrange and View, Layouts at its left, and undo, redo, Snap "
             + "and the zoom (100% after a reset) at its right; Edit, Arrange and View list their items in the spec's order", KvMenus(out string d), d);
+        check($"{KeyViewerPage}: View's Zoom In shortcut \"+\" parses to the = key with no modifier", KvZoomInKey(out d), d);
         check($"{KeyViewerPage}: every editor label id maps to a Lang key in en-US and ko-KR, and the model labels with it", KvLabelKeys(out d), d);
         check($"{KeyViewerPage}: the status line names the edited tab by its name", KvStatusNamesTab(out d), d);
         yield return Frames(2);
@@ -201,6 +202,16 @@ internal static partial class FacetSelfTestChecks {
         bool order = Ids(1) == edit && Ids(3) == arrange && Ids(4) == view;
         detail = $"titles={string.Join(",", texts)} named={named} layouts={layouts} tools={string.Join("|", tools)} edit={Ids(1)} arrange={Ids(3)} view={Ids(4)}";
         return named && layouts && toolsOk && order;
+    }
+
+    // A bare "+" is the = key; a parse that failed would show the row's text and run nothing.
+    private static bool KvZoomInKey(out string detail) {
+        global::Facet.MenuItem item = KvEditorPage.Editor.Menus[4].Items.FirstOrDefault(m => m?.Id == KeyLayoutText.ZoomIn);
+        const System.Reflection.BindingFlags Inner = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
+        object Field(string name) => item == null ? null : typeof(global::Facet.MenuItem).GetField(name, Inner)?.GetValue(item);
+        object key = Field("Key"), ctrl = Field("Ctrl"), shift = Field("Shift"), alt = Field("Alt");
+        detail = $"shortcut='{item?.Shortcut}' key={key} ctrl={ctrl} shift={shift} alt={alt}";
+        return item?.Shortcut == "+" && key is KeyCode.Equals && ctrl is false && shift is false && alt is false;
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
