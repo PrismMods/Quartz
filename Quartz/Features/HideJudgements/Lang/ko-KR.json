@@ -1,6 +1,8 @@
 {
   "ko-KR": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "HIDEJUDGEMENTS_DESC": "고른 판정 팝업을 숨겨요",
+    "HIDEJUDGEMENTS_TILES": "숨길 판정 팝업",
     "JPOP_AUTO": "자동플레이 타일",
     "JPOP_EARLYPERFECT": "빠름",
     "JPOP_LATEPERFECT": "느림",

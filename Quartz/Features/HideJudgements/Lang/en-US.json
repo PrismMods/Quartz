@@ -1,6 +1,8 @@
 {
   "en-US": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "HIDEJUDGEMENTS_DESC": "Hides the judgement popups you pick",
+    "HIDEJUDGEMENTS_TILES": "Popups to hide",
     "JPOP_AUTO": "Auto",
     "JPOP_EARLYPERFECT": "Early Perfect",
     "JPOP_LATEPERFECT": "Late Perfect",

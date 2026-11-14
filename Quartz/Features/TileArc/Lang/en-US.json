@@ -3,6 +3,7 @@
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "DESC_TILEARC_INTENSITY": "How far the rounded corner reaches, as a % of tile width. 100% is a full half-circle, 0% keeps the turn sharp.",
     "SECTION_TILE_ARC": "Tile Arc",
+    "TILEARC_DESC": "Rounds the corners where the path turns",
     "TILEARC_INTENSITY": "Arc Intensity"
   }
 }

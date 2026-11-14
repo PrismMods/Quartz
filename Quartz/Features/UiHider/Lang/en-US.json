@@ -3,6 +3,7 @@
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "DESC_UIH_RECMODE": "The profile in use right now. Off is Playing, on is Recording.",
     "SECTION_UI_HIDING": "UI Hiding",
+    "UIHIDER_DESC": "Hides parts of the game's HUD while playing or recording",
     "UIH_PLAY_ALL": "Hide Everything (No HUD)",
     "UIH_PLAY_BETA": "Hide Beta Build Text",
     "UIH_PLAY_DIFF": "Hide Difficulty Icon",

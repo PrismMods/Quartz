@@ -3,6 +3,7 @@
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "DESC_UIH_RECMODE": "지금 쓰는 프로필이에요. 끄면 플레이, 켜면 녹화예요.",
     "SECTION_UI_HIDING": "UI 숨기기",
+    "UIHIDER_DESC": "플레이하거나 녹화할 때 게임 HUD 일부를 숨겨요",
     "UIH_PLAY_ALL": "모두 숨기기 (HUD 없음)",
     "UIH_PLAY_BETA": "베타 빌드 텍스트 숨기기",
     "UIH_PLAY_DIFF": "난이도 아이콘 숨기기",

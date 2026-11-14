@@ -27,6 +27,12 @@ internal static partial class QuartzShell {
         ["overlay.songtitle"] = OverlayPages.SongTitle.Page,
         ["overlay.panels"] = OverlayPages.Panels.Page,
         ["overlay.calibration"] = OverlayPages.Calibration.Page,
+        ["visuals.hidejudgements"] = VisualsPages.HideJudgementsPage.Build,
+        ["visuals.tilearc"] = VisualsPages.TileArcPage.Build,
+        ["visuals.visualtweaks"] = VisualsPages.VisualTweaksPage.Build,
+        ["visuals.planetcolors"] = VisualsPages.PlanetColorsPage.Build,
+        ["visuals.ottoicon"] = VisualsPages.OttoIconPage.Build,
+        ["visuals.uihiding"] = VisualsPages.UiHiderPage.Build,
     };
     /// <summary>A Lang key, when English has it; else the title as given (an addon page's, which has no key).</summary>
     internal static string Label(string localeKey, string title) =>

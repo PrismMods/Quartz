@@ -18,6 +18,7 @@
     "TW_SBPM_SHOW_BOTH": "BPM + 배속",
     "TW_SBPM_SHOW_BPM": "BPM",
     "TW_SBPM_SHOW_LABEL": "속도 표시 내용",
-    "TW_SBPM_SHOW_MULT": "배속"
+    "TW_SBPM_SHOW_MULT": "배속",
+    "VISUALTWEAKS_DESC": "레벨이 보이는 방식을 조금씩 바꿔요"
   }
 }

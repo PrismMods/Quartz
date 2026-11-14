@@ -18,6 +18,7 @@
     "TW_SBPM_SHOW_BOTH": "BPM + Multiplier",
     "TW_SBPM_SHOW_BPM": "BPM",
     "TW_SBPM_SHOW_LABEL": "Speed Label Shows",
-    "TW_SBPM_SHOW_MULT": "Multiplier"
+    "TW_SBPM_SHOW_MULT": "Multiplier",
+    "VISUALTWEAKS_DESC": "Small changes to how levels look"
   }
 }

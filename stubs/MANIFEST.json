@@ -2032,6 +2032,7 @@
           "Facet.Control\u00601\u003CT\u003E Facet.Controls::Choice(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CT\u003E,System.Collections.Generic.IList\u00601\u003CT\u003E,System.Func\u00602\u003CT,System.String\u003E,System.Action\u00601\u003CFacet.ChoiceOptions\u00601\u003CT\u003E\u003E)",
           "Facet.Control\u00601\u003CT\u003E Facet.Controls::Dropdown(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CT\u003E,System.Collections.Generic.IList\u00601\u003CT\u003E,System.Func\u00602\u003CT,System.String\u003E,System.Action\u00601\u003CFacet.DropdownOptions\u00601\u003CT\u003E\u003E)",
           "Facet.Control\u00601\u003CUnityEngine.Color\u003E Facet.Controls::Colour(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CUnityEngine.Color\u003E,System.Action\u00601\u003CFacet.ColourOptions\u003E)",
+          "Facet.Control\u00601\u003CUnityEngine.Vector2\u003E Facet.Controls::Range(UnityEngine.UIElements.VisualElement,System.String,System.String,Facet.Bind\u00601\u003CUnityEngine.Vector2\u003E,System.Action\u00601\u003CFacet.RangeOptions\u003E)",
           "Facet.MaskTiles Facet.Controls::MaskTiles(UnityEngine.UIElements.VisualElement,Facet.Bind\u00601\u003CSystem.Int32\u003E,System.Collections.Generic.IList\u00601\u003CFacet.MaskTile\u003E,System.Action\u00601\u003CFacet.MaskTilesOptions\u003E)",
           "System.Single Facet.Controls::RowHeight",
           "System.Void Facet.Controls::AfterChange(UnityEngine.UIElements.VisualElement,System.Action)",
@@ -2045,7 +2046,8 @@
           "UnityEngine.UIElements.VisualElement Facet.Controls::Section(UnityEngine.UIElements.VisualElement,System.String,System.Action\u00601\u003CFacet.SectionOptions\u003E)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Section(UnityEngine.UIElements.VisualElement,System.String,System.Boolean)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Tiles(UnityEngine.UIElements.VisualElement,System.Action\u00601\u003CFacet.TilesOptions\u003E)",
-          "UnityEngine.UIElements.VisualElement Facet.Controls::ToggleGroup(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Boolean\u003E,System.Action\u00601\u003CFacet.Options\u00601\u003CSystem.Boolean\u003E\u003E)"
+          "UnityEngine.UIElements.VisualElement Facet.Controls::ToggleGroup(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Boolean\u003E,System.Action\u00601\u003CFacet.Options\u00601\u003CSystem.Boolean\u003E\u003E)",
+          "UnityEngine.UIElements.VisualElement Facet.Controls::When(UnityEngine.UIElements.VisualElement,System.Func\u00601\u003CSystem.Boolean\u003E)"
         ]
       },
       {
@@ -2280,6 +2282,19 @@
         ]
       },
       {
+        "type": "Facet.RangeOptions",
+        "members": [
+          "System.Single Facet.RangeOptions::Max()",
+          "System.Single Facet.RangeOptions::Min()",
+          "System.Single Facet.RangeOptions::Step()",
+          "System.String Facet.RangeOptions::Format()",
+          "System.Void Facet.RangeOptions::set_Format(System.String)",
+          "System.Void Facet.RangeOptions::set_Max(System.Single)",
+          "System.Void Facet.RangeOptions::set_Min(System.Single)",
+          "System.Void Facet.RangeOptions::set_Step(System.Single)"
+        ]
+      },
+      {
         "type": "Facet.Role",
         "members": [
           "Facet.Role Facet.Role::Accent",
@@ -2425,6 +2440,7 @@
       {
         "type": "Facet.Ui",
         "members": [
+          "System.IDisposable Facet.Ui::Every(UnityEngine.UIElements.VisualElement,System.Int32,System.Action)",
           "System.Void Facet.Ui::WhileAttached(UnityEngine.UIElements.VisualElement,System.Action,System.Action)",
           "UnityEngine.UIElements.Button Facet.Ui::Btn(UnityEngine.UIElements.VisualElement,System.String,System.Action,System.Boolean)",
           "UnityEngine.UIElements.Label Facet.Ui::Muted(UnityEngine.UIElements.VisualElement,System.String,System.Boolean)",

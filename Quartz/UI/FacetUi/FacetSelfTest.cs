@@ -5,6 +5,8 @@ using System.Text;
 using Quartz.Compat.Interface;
 using Quartz.Core;
 using Quartz.Features;
+using Quartz.IO;
+using Quartz.IO.Interface;
 using Quartz.Prism;
 using UnityEngine;
 namespace Quartz.UI.FacetUi;
@@ -40,7 +42,7 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
                 return;
             }
             log = new StringBuilder();
-            steps.Push(Powered(body == null ? FeaturesOn(Run()) : featuresOn ? FeaturesOn(body(Check, Info)) : body(Check, Info)));
+            steps.Push(Unmade(Powered(body == null ? FeaturesOn(Run()) : featuresOn ? FeaturesOn(body(Check, Info)) : body(Check, Info))));
         }
         if(!Step(steps, Check)) return;
         done = true;
@@ -89,6 +91,28 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
     // A run ends by removing its marker, so a later launch does not run it again (or arm it beside another runner).
     private void End() {
         try { File.Delete(Path.Combine(MainCore.Paths.RootPath, name)); } catch(Exception e) { Diag.Ignore(e); }
+    }
+    // A feature the run turns on loads its settings file, and quitting saves every loaded one: a file the run made (its feature
+    // never set by the player) goes, and its handle leaves the registry, or that save writes it again.
+    private IEnumerator Unmade(IEnumerator run) {
+        var files = new HashSet<string>(Directory.GetFiles(MainCore.Paths.RootPath, "*.json"));
+        try {
+            yield return run;
+        } finally {
+            var gone = new List<string>();
+            foreach(ISettingsHandle h in SettingsRegistry.Snapshot()) {
+                if(files.Contains(h.Path) || Path.GetDirectoryName(h.Path) != MainCore.Paths.RootPath.TrimEnd('/', '\\')) continue;
+                SettingsRegistry.Unregister(h);
+                try {
+                    if(File.Exists(h.Path)) File.Delete(h.Path);
+                } catch(Exception e) {
+                    Info($"could not remove {h.Path}: {e.Message}");
+                    Diag.Ignore(e);
+                }
+                gone.Add(Path.GetFileName(h.Path));
+            }
+            if(gone.Count > 0) Info($"settings files the run made, removed: {string.Join(", ", gone)}");
+        }
     }
     // Powered off there are no overlays or layout targets to check, and the rig may have the power saved off. Power on
     // for the run only, never writing the player's stored switch, and put the runtime back after.

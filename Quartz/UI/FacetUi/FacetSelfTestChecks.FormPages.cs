@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Reflection;
 using Facet;
+using Newtonsoft.Json.Linq;
 using Quartz.Core;
 using Quartz.Features;
 using Quartz.Features.KeyLimiter;
@@ -23,7 +24,8 @@ namespace Quartz.UI.FacetUi;
 /// </summary>
 internal static partial class FacetSelfTestChecks {
     // The form pages moved so far, by page key; each page's section adds its own. FormPage fails for a page not listed here.
-    private static readonly List<string> FormPageKeys = ["overlay.combo"];
+    private static readonly List<string> FormPageKeys = ["overlay.combo", "visuals.hidejudgements", "visuals.tilearc", "visuals.visualtweaks",
+        "visuals.planetcolors", "visuals.ottoicon", "visuals.uihiding"];
 
     internal static IEnumerator FormPages(Action<string, bool, string> check, Action<string> info) {
         // Every window opened here writes its geometry into the live settings: put the map back.
@@ -34,6 +36,7 @@ internal static partial class FacetSelfTestChecks {
             yield return ThrowawayBuilds(check, info);
             yield return FormPage("combo", "overlay.combo", () => { }, () => { },
                 () => HeaderHotkeyCheck(check, "overlay.combo", "SECTION_COMBO", "combo"));
+            yield return VisualsPages(check);
             IndexPerf(info);
         } finally {
             MainCore.Conf.FacetWindows.Clear();
@@ -77,6 +80,54 @@ internal static partial class FacetSelfTestChecks {
         else formCheck($"{pageKey}: the menu builds it from its moved builder", false, $"moved={build != null}");
     }
 
+    /// <summary>FormPage for a feature's settings page: its file's values are kept before show and put back after, saved at
+    /// once, then apply runs. The rows' keys are checked against the classic page; searched less its headers, cards and
+    /// sections.</summary>
+    private static IEnumerator FeatureFormPage<T>(Action<string, bool, string> check, string featureId, string pageKey, SettingsFile<T> file,
+        Action show, Action apply, string[] keys, string[] searched, Func<IEnumerator> more, string[] hidden = null) where T : class, ISettingsFile, new() {
+        JToken was = null;
+        yield return FormPage(featureId, pageKey, () => {
+            was = file.Data.Serialize();
+            show?.Invoke();
+        }, () => {
+            if(was != null) file.Data.Deserialize(was);
+            file.Save();   // drops a pending save too
+            apply?.Invoke();
+        }, () => Checks());
+        IEnumerator Checks() {
+            yield return Parity(check, pageKey, keys, hidden);
+            Covers(check, pageKey);
+            Searched(check, pageKey, searched);
+            Translated(check, pageKey, keys);
+            if(more != null) yield return more();
+        }
+    }
+
+    // The Key row whose input is button, from its surface's refresher, which holds every row's Refresh.
+    private static Control<string> KeyRow(VisualElement button) {
+        if(button == null) return null;
+        Type refresher = typeof(Controls).Assembly.GetType("Facet.Refresher");
+        object of = refresher?.GetMethod("Of", BindingFlags.Static | BindingFlags.NonPublic)?.Invoke(null, [button]);
+        var rows = refresher?.GetField("_controls", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(of) as IEnumerable<KeyValuePair<string, Action>>;
+        return rows?.Select(r => r.Value?.Target).OfType<Control<string>>().FirstOrDefault(c => c.Input == button);
+    }
+
+    // A value set on a slider's track as a player's keyboard step sets it: a whole change, committed at once.
+    private static bool SlideTo(string id, float min, float max, float v) {
+        Slider s = PageContent().Q<Slider>(id + "-input");
+        if(s != null) s.value = (v - min) / (max - min);
+        return s != null;
+    }
+
+    // A whole value 10 from v, kept inside 0 to 100.
+    private static float Away(float v) => Mathf.Round(v) >= 50f ? Mathf.Round(v) - 10f : Mathf.Round(v) + 10f;
+
+    private static bool ClickRow(string id) {
+        VisualElement track = PageContent().Q(name: id + "-input");
+        if(track != null) Click(track);
+        return track != null;
+    }
+
     // The run's INFO and check lines, for FormPage.
     private static Action<string> formInfo;
     private static Action<string, bool, string> formCheck;
@@ -95,7 +146,10 @@ internal static partial class FacetSelfTestChecks {
                 .Where(r => r.State == page.State && r.Key != null && r.Key != page.LocaleKey && (only == null || only.Contains(r.Key)))
                 .Select(r => r.Key).GroupBy(k => k)) {
                 if(omitted?.Contains(key.Key) == true) continue;
-                string id = renamed != null && renamed.TryGetValue(key.Key, out string to) ? to : key.Key;
+                // The classic page's "Use this feature" is the moved page's header switch: the input of the header named by the
+                // page's title key, so a header without its switch is missing.
+                string id = renamed != null && renamed.TryGetValue(key.Key, out string to) ? to
+                    : key.Key == "FEATURE_PAGE_ENABLE" ? page.LocaleKey + "-input" : key.Key;
                 int n = key.Count();
                 rows += n;
                 for(int i = 1; i <= n; i++)
@@ -112,15 +166,19 @@ internal static partial class FacetSelfTestChecks {
         NavPage page = NavRegistry.ByKey(pageKey);
         string title = page == null ? null : QuartzShell.Label(page.LocaleKey, page.Title);
         var missed = new List<string>();
+        string first = "";
         try {
             foreach(string key in keys) {
                 List<SearchIndex.Hit> hits = Find(MainCore.Tr.GetForLanguage(key, "en-US", key));
-                if(!hits.Any(h => h.PageRef is NavItem item && item.Title == title && Unnumbered(h.Key) == key)) missed.Add(key);
+                // A page in a category with tabs is a tab: its title is the hit's Tab, its category the NavItem.
+                if(!hits.Any(h => h.PageRef is NavItem item && (h.Tab ?? item.Title) == title && Unnumbered(h.Key) == key)) missed.Add(key);
+                if(missed.Count == 1 && first.Length == 0) first = " first: " + Hits(hits);
             }
         } finally {
             QuartzShell.Nav?.Filter("");
         }
-        check($"{pageKey}: search finds each of its rows on this page", title != null && missed.Count == 0, $"missed={string.Join(",", missed)}");
+        check($"{pageKey}: search finds each of its rows on this page", title != null && missed.Count == 0,
+            $"missed={string.Join(",", missed)}{first}");
     }
 
     private static string Unnumbered(string key) {

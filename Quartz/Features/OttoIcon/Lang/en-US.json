@@ -4,6 +4,7 @@
     "DESC_OTTO_HIGHBPM_ON": "On: Otto uses the color below when the level's top BPM is 300+ (where vanilla turns him red). Off: he always uses the normal color.",
     "DESC_OTTO_IMAGE": "Pick a PNG or JPG to use as Otto. Leave it empty to use the cat that comes with the mod.",
     "DESC_OTTO_TINT_IMAGE": "On: your image gets the colors below, like the built-in one. Off: it keeps its own colors and only dims while auto is off.",
+    "OTTOICON_DESC": "Changes the Otto icon's image, colour and place",
     "OTTO_COLOR": "Otto Color",
     "OTTO_IMAGE": "Custom Otto Image",
     "OTTO_IMAGE_CLEAR": "Use Built-in Image",

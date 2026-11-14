@@ -3,6 +3,7 @@
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "DESC_TILEARC_INTENSITY": "둥근 모서리가 타일 너비의 몇 %까지 닿을지 정해요. 100%는 완전한 반원, 0%는 날카로운 모서리예요.",
     "SECTION_TILE_ARC": "타일 곡선",
+    "TILEARC_DESC": "경로가 꺾이는 모서리를 둥글게 해요",
     "TILEARC_INTENSITY": "곡선 강도"
   }
 }

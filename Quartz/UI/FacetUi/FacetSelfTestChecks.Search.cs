@@ -160,6 +160,22 @@ internal static partial class FacetSelfTestChecks {
         Step(check, $"{what}: closing the classic menu brings the new one back", jumped && FacetBridge.NewMenuVisible() && !UICore.IsOpen);
     }
 
+    // A moved page's tab: its result opens the page in the new menu, nothing classic.
+    private static IEnumerator SearchMoved(Action<string, bool, string> check, string q, string tab, string pageKey) {
+        List<SearchIndex.Hit> hits = Find(q);
+        int at = hits.FindIndex(h => h.PageRef != null && h.Tab == tab && h.Key == tab);
+        check($"search finds a moved tab's hit for \"{q}\"", at >= 0, Hits(hits));
+        if(at < 0) yield break;
+        Click(Body[at]);
+        bool opened = false;
+        for(int i = 0; i < 3 && !opened; i++) {
+            yield return Frames(1);
+            opened = QuartzShell.CurrentPage == pageKey && !UICore.IsOpen && FacetBridge.NewMenuVisible();
+        }
+        Step(check, "a moved tab's hit opens its page in the new menu within 3 frames", opened,
+            $"page={QuartzShell.CurrentPage}/{pageKey} classic={UICore.IsOpen}");
+    }
+
     /// <summary>A row that is only a button, with no label, is found by its button's text on its moved page.</summary>
     private static void SearchButtonRow(Action<string, bool, string> check, string pageKey, string key) {
         try {
@@ -193,15 +209,15 @@ internal static partial class FacetSelfTestChecks {
         check(name, q != Hangul.Initials(english) && hits.Any(h => h.Key == key && h.Tab == tab && h.PageRef != null), $"q={q} {Hits(hits)}");
     }
 
-    // The index follows a feature switched off. On its tab the classic page's rows give way to the off
+    // The index follows a feature switched off. On its tab the moved page's rows give way to the off
     // page, whose header has the same title (the feature's Lang keys stay loaded). The switch lands on a later pump,
     // which a busy queue can push past a fixed frame count: wait for it.
     private static IEnumerator SearchFresh(Action<string, bool, string> check) {
         const string id = "ottoicon", q = "otto icon", stubKey = "feature-off." + id;
         bool was = FeatureService.IsEnabled(id), had = FeatureService.State.Features.TryGetValue(id, out bool stored);
         bool Has(string tab, string key) => Find(q).Any(h => h.PageRef != null && h.Tab == tab && h.Key == key);
-        // The classic page's own rows, which the search index takes from the classic menu.
-        bool Source(string page) => Find(q).Any(h => h.PageRef == null && h.Page == page);
+        // The moved page's own rows on its tab, other than its header.
+        bool Source(string tab) => Find(q).Any(h => h.PageRef != null && h.Tab == tab && h.Key != tab);
         try {
             if(!was) {
                 FeatureService.SetEnabled(id, true);
@@ -210,14 +226,14 @@ internal static partial class FacetSelfTestChecks {
             NavPage page = NavRegistry.ByState(FeaturePages.StateFor(id));
             string tab = page == null ? null : QuartzShell.Label(page.LocaleKey, page.Title);
             bool on = Source(tab);
-            if(page != null) yield return SearchClassic(check, q, h => h.PageRef != null && h.Tab == tab && h.Key == tab, page.Key, "a classic tab's hit");
+            if(page != null) yield return SearchMoved(check, q, tab, page.Key);
             FeatureService.SetEnabled(id, false);
             int frames = 0;
             for(; frames < 60 && NavRegistry.ByKey(stubKey) == null; frames++) yield return null;
             NavPage stub = NavRegistry.ByKey(stubKey);
             string offTab = stub == null ? null : QuartzShell.Label(stub.LocaleKey, stub.Title);
             bool header = Has(offTab, offTab), gone = !Source(tab) && !Source(offTab);
-            check("search follows a feature switched off: its classic rows give way to its off page's header", on && header && gone,
+            check("search follows a feature switched off: its moved rows give way to its off page's header", on && header && gone,
                 $"tab={tab} offTab={offTab} rows={on} header={header} rowsGone={gone} switched after {frames} frames {Hits(Find(q))}");
         } finally {
             RestoreFeature(id, was, had, stored);

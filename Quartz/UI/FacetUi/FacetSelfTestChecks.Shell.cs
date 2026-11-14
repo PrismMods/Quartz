@@ -252,8 +252,9 @@ internal static partial class FacetSelfTestChecks {
                 $"from={key} page={QuartzShell.CurrentPage} tab={tab} want={label} off={off} failed={failed}");
             FeatureService.SetEnabled(id, true);
             yield return Frames(3);
-            check("switching it back on brings its classic card back on the same tab",
-                QuartzShell.CurrentPage == key && Body.Q(name: "menu-classic") != null && !AnyFailed(), $"page={QuartzShell.CurrentPage} want={key}");
+            check("switching it back on brings its moved page back on the same tab",
+                QuartzShell.CurrentPage == key && Body.Q(name: "SECTION_OTTO_ICON") != null && Body.Q(name: "menu-classic") == null && !AnyFailed(),
+                $"page={QuartzShell.CurrentPage} want={key}");
         } finally {
             RestoreFeature(id, was, had, stored);
         }
