@@ -52,7 +52,7 @@ internal sealed class QuartzSuite : SuiteAdapter {
         else QuartzShell.Classic(panel, pg);
     }
 
-    public override IEnumerable<Facet.SearchIndex.Entry> SearchRows() => QuartzShell.ClassicRows();
+    public override IEnumerable<Facet.SearchIndex.Entry> SearchRows() => QuartzShell.ClassicRows().Concat(OverlayPages.PanelsList.SearchRows());
     public override string Key(string id, string english) => id switch {
         "suite.search" => "SEARCH",
         "suite.sidebar" => "MENU_SIDEBAR",

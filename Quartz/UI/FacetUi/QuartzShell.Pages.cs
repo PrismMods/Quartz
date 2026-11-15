@@ -75,7 +75,7 @@ internal static partial class QuartzShell {
     /// <summary>A category's icon as the classic sidebar picks it: an addon's registered asset wins over the built-in sprite.</summary>
     internal static Sprite CategoryIcon(NavCategory c) => c.IconAsset != null ? SpriteRegistry.Get(c.IconAsset) : MainCore.Spr.Get(c.Icon);
 
-    private static bool IsClassic(NavPage page) =>
+    internal static bool IsClassic(NavPage page) =>
         !Moved.ContainsKey(page.Key) && !AddonSettingsTabs.TryGet(page.Key, out _) && !FeaturePages.IsStub(page);
 
     /// <summary>The page's new-menu builder: its Moved builder, an addon settings tab's form under its header, or null (a stub or

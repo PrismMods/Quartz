@@ -1,7 +1,7 @@
 namespace Quartz.UI.FacetUi;
 /// <summary>
-/// The form pages' pure rules: which judgement restriction modes and auto-deafen modes a page offers, and how a written
-/// hotkey chord splits. BCL only, so the test project links it.
+/// The pages' pure rules: which judgement restriction modes and auto-deafen modes a page offers, how a written hotkey
+/// chord splits, and which pages stay classic. BCL only, so the test project links it.
 /// </summary>
 internal static class PageRules {
     /// <summary>Mode 2 (X-Perfect only) needs XPerfect.</summary>
@@ -28,5 +28,15 @@ internal static class PageRules {
         if(at < 0) key = text;
         else (modifier, key) = (text[..at], text[(at + 3)..]);
         return true;
+    }
+
+    /// <summary>Why a page stays in the classic menu, or null when the new menu draws it (spec "Calls made after review" ›
+    /// "Pages and order"). An addon page that is not a settings tab is custom UI only its addon can draw; a feature's page
+    /// is owned too, but is never an addon page.</summary>
+    internal static string StaysClassic(string key, bool addonPage, bool settingsTab) {
+        if(key == "credits.main") return "off the new menu's rail; its content is the Settings page's Credits card";
+        if(addonPage && !settingsTab)
+            return "a custom addon page keeps a card linking to the classic menu ('Calls made after review' › 'Pages and order')";
+        return null;
     }
 }

@@ -120,8 +120,9 @@ internal static partial class FacetSelfTestChecks {
 
     private const string ProfilesKey = "profiles.main";
 
-    // Profiles: nothing here creates, applies, imports, exports or deletes a profile, recalibrates or opens a dialog. Each of
-    // those buttons is checked through Do, and the profiles directory must read the same at the end.
+    // Profiles: nothing here creates, applies, imports, exports or deletes a player's profile, recalibrates or opens a dialog.
+    // Each of those buttons is checked through Do; the one profile acted on is an empty folder the run makes and removes, and
+    // the profiles directory must read the same at the end.
     private static IEnumerator Profiles(Action<string, bool, string> check, Action<string> info) {
         static string[] Dirs() => [.. Directory.GetDirectories(ProfileManager.ProfilesPath).OrderBy(d => d, StringComparer.Ordinal)];
         string[] before = Dirs();
@@ -180,21 +181,56 @@ internal static partial class FacetSelfTestChecks {
                     && field?.text == "" && said == "", $"recorded={string.Join(",", names)} field='{field?.text}' status='{said}'");
             }
 
+            // A throwaway second profile, an empty folder this run makes and removes, gives Select and Delete a row whatever the
+            // player has. For the failure paths its folder goes first: Apply and Delete then fail before they touch anything.
+            string spare = free + "-spare", spareDir = Path.Combine(ProfileManager.ProfilesPath, spare);
+            bool made = !Directory.Exists(spareDir);
+            try {
+                if(made) Directory.CreateDirectory(spareDir);
+                QuartzShell.Go(CorePages.HomePageKey);
+                yield return Frames(2);
+                QuartzShell.Go(ProfilesKey);
+                yield return Frames(2);
+                int other = Array.IndexOf(ProfileManager.List(), spare) + 1;
+                if(made && other > 0) {
+                    string id = "PROFILE_DELETE#" + other;
+                    var first = new List<string>();
+                    var second = new List<string>();
+                    yield return Recording(first, () => PressRow(id));
+                    string armed = PageContent().Q<Button>(id + "-input")?.text;
+                    yield return Recording(second, () => PressRow(id));
+                    check($"{ProfilesKey} PROFILE_DELETE#n: the first click arms, only the second reaches Delete",
+                        first.Count == 0 && armed == QuartzHost.Host.Translate("PROFILE_DELETE_CONFIRM") && second.SequenceEqual(["profiles.delete:" + spare]),
+                        $"first={string.Join(",", first)} armed='{armed}' second={string.Join(",", second)}");
+                    yield return Recorded(check, $"{ProfilesKey} PROFILE_SELECT#n: a click acts only through Do", () => PressRow("PROFILE_SELECT#" + other),
+                        "profiles.select:" + spare);
+
+                    // Still armed from above. Only this row's Delete and Select run for real; any other Do is held.
+                    Directory.Delete(spareDir, true);
+                    string activeBefore = ProfileManager.Active;
+                    Func<string, bool> was = QuartzShell.Doing;
+                    QuartzShell.Doing = n => n != "profiles.delete:" + spare && n != "profiles.select:" + spare;
+                    Button select = PageContent().Q<Button>("PROFILE_SELECT#" + other + "-input");
+                    try {
+                        PressRow(id);
+                        yield return Frames(3);
+                        string still = PageContent().Q<Button>(id + "-input")?.text;
+                        check($"{ProfilesKey} PROFILE_DELETE#n: a Delete that fails stays armed, so one more click retries",
+                            still == QuartzHost.Host.Translate("PROFILE_DELETE_CONFIRM") && ProfileManager.Active == activeBefore, $"label='{still}' active={ProfileManager.Active}");
+                        PressRow("PROFILE_SELECT#" + other);
+                        bool off = select != null && !select.enabledSelf;
+                        yield return Frames(3);
+                        check($"{ProfilesKey} PROFILE_SELECT#n: a Select that fails turns the button back on and keeps the active profile",
+                            off && select!.enabledSelf && ProfileManager.Active == activeBefore,
+                            $"button={select != null} off at click={off} on after={select?.enabledSelf} active={ProfileManager.Active}");
+                    } finally {
+                        QuartzShell.Doing = was;
+                    }
+                } else check($"{ProfilesKey}: the run's throwaway profile is listed", false, $"made={made} place={other}");
+            } finally {
+                if(made && Directory.Exists(spareDir)) Directory.Delete(spareDir, true);
+            }
             string[] list = ProfileManager.List();
-            int other = Array.FindIndex(list, n => n != ProfileManager.Active) + 1;
-            if(other > 0) {
-                string name = list[other - 1], id = "PROFILE_DELETE#" + other;
-                var first = new List<string>();
-                var second = new List<string>();
-                yield return Recording(first, () => PressRow(id));
-                string armed = PageContent().Q<Button>(id + "-input")?.text;
-                yield return Recording(second, () => PressRow(id));
-                check($"{ProfilesKey} PROFILE_DELETE#n: the first click arms, only the second reaches Delete",
-                    first.Count == 0 && armed == QuartzHost.Host.Translate("PROFILE_DELETE_CONFIRM") && second.SequenceEqual(["profiles.delete:" + name]),
-                    $"first={string.Join(",", first)} armed='{armed}' second={string.Join(",", second)}");
-                yield return Recorded(check, $"{ProfilesKey} PROFILE_SELECT#n: a click acts only through Do", () => PressRow("PROFILE_SELECT#" + other),
-                    "profiles.select:" + name);
-            } else info($"{ProfilesKey}: the player has one profile, so Delete and Select have no row to check");
             yield return Recorded(check, $"{ProfilesKey} PROFILE_EXPORT#n: a click acts only through Do", () => PressRow("PROFILE_EXPORT#1"),
                 "profiles.export:" + list[0]);
             yield return Recorded(check, $"{ProfilesKey} PROFILE_IMPORT: a click acts only through Do", () => PressRow("PROFILE_IMPORT"), "profiles.import");

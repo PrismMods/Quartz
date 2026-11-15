@@ -18,4 +18,11 @@ static class PageRulesTests {
         Assert(PageRules.SplitChord("Ctrl + Keypad +", out m, out k) && m == "Ctrl" && k == "Keypad +", "the first plus splits");
         Assert(!PageRules.SplitChord("", out _, out _) && !PageRules.SplitChord(null, out _, out _), "nothing to split");
     }
+    public static void TestStaysClassic() {
+        Assert(PageRules.StaysClassic("credits.main", false, false) != null, "credits stays classic");
+        Assert(PageRules.StaysClassic("addon.foo.BAR", true, false) != null, "a custom addon page stays classic");
+        Assert(PageRules.StaysClassic("addon.foo.SETTINGS", true, true) == null, "an addon settings tab does not");
+        Assert(PageRules.StaysClassic("profiles.main", false, false) == null, "a core page does not");
+        Assert(PageRules.StaysClassic("overlay.panels", false, false) == null, "a feature's page with no settings tab does not");
+    }
 }

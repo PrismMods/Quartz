@@ -3,6 +3,7 @@ using Facet;
 using Quartz.Core;
 using Quartz.Features.Panels;
 using Quartz.Overlay;
+using Quartz.UI.Nav;
 using UnityEngine;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi.OverlayPages;
@@ -37,6 +38,29 @@ internal static class PanelsList {
         });
     }
 
+    // Each panel's rows by their Lang keys (never a panel's name). The search index builds the page detached, where the list
+    // has no panel, so these stand in for them: each finds this page.
+    internal static readonly string[] RowKeys = ["PANEL_NAME", "PANEL_ADDSTAT", "PANEL_CLEARSTATS", "PANEL_SHOWSTAT", "PANEL_SHOWLABEL",
+        "PANEL_ANCHOR_LABEL", "PANEL_PREFIX", "PANEL_SEPARATOR", "PANEL_SEPARATORSPACING_LABEL", "PANEL_FONTSIZE", "PANEL_LINESPACING",
+        "PANEL_DECIMALS", "PANEL_TEXTCOLOR", "PANEL_BACKGROUND", "PANEL_BGCOLOR", "PANEL_LOCALIZESTATS", "PANEL_TEXTSHADOW", "PANEL_SHADOW_X",
+        "PANEL_SHADOW_Y", "PANEL_SHADOW_SOFTNESS", "PANEL_SHADOW_COLOR", "PANEL_RESETPOS", "PANEL_DELETE"];
+
+    /// <summary>The panels' rows as search entries on Overlay ▸ Panels; asked whenever the index builds.</summary>
+    internal static IEnumerable<Facet.SearchIndex.Entry> SearchRows() {
+        NavPage page = NavRegistry.ByKey(PageKey);
+        if(page == null) yield break;
+        string where = QuartzShell.Label(page.LocaleKey, page.Title);
+        foreach(string key in RowKeys)
+            yield return new Facet.SearchIndex.Entry {
+                Label = key,
+                Where = where,
+                Tip = MainCore.Tr.GetForLanguage(key, "en-US", key),   // an English query still finds the row in another language
+                Open = () => QuartzShell.Go(PageKey),
+            };
+    }
+
+    internal const string PageKey = "overlay.panels";
+
     /// <summary>A drop: the panel at from goes to to (remove at from, insert at to), as the classic page's drag commits.</summary>
     internal static void Move(int from, int to) {
         List<PanelConfig> before = [.. Panels];
@@ -53,7 +77,50 @@ internal static class PanelsList {
         PanelsOverlay.Save();
         PanelsOverlay.Rebuild();
         UICore.ClassicStale = true;   // the classic page lists the panels
+        FoldsFollow(Places(before));
         QuartzShell.Surface?.Refresh();
+    }
+
+    // The page's sections whose fold state is stored under an Id numbered by a panel's place, and SETTING_SHORT, numbered by a
+    // stat's place on the page; each with its open state before the reader first folds it.
+    private static readonly string[] PanelFolds = ["PANEL", "HEADING_STATS", "HEADING_APPEARANCE", "HEADING_SHADOW", "HEADING_ACTIONS"];
+    private const string StatFold = "SETTING_SHORT";
+
+    /// <summary>Each panel's place and each stat's number on the page (1-based), as the row Ids number them.</summary>
+    internal static Dictionary<object, int> Places(List<PanelConfig> panels) {
+        var at = new Dictionary<object, int>();   // neither type overrides Equals: by reference
+        int g = 0;
+        for(int i = 0; i < panels.Count; i++) {
+            at[panels[i]] = i + 1;
+            foreach(StatEntry s in panels[i].Stats) at[s] = ++g;
+        }
+        return at;
+    }
+
+    /// <summary>After panels or stats changed places: each stored fold state follows its panel or stat to its new number, and a
+    /// number left behind goes back to its default, so the next panel there does not open as the one that left.</summary>
+    internal static void FoldsFollow(Dictionary<object, int> before) {
+        NavPage page = NavRegistry.ByKey(PageKey);
+        if(page == null) return;
+        string prefix = "fold." + QuartzShell.Label(page.LocaleKey, page.Title) + "/";   // this page's folds only, as Facet keys them
+        Dictionary<object, int> after = Places(Panels);
+        var at = new Dictionary<(bool Stat, int N), object>();
+        foreach(var kv in before) at[(kv.Key is StatEntry, kv.Value)] = kv.Key;
+        var landed = new Dictionary<string, string>();
+        var left = new List<string>();
+        foreach(var kv in MainCore.Conf.FacetWindows) {
+            if(!kv.Key.StartsWith(prefix, StringComparison.Ordinal)) continue;
+            int slash = kv.Key.LastIndexOf('/'), hash = kv.Key.LastIndexOf('#');
+            if(slash < 0 || hash < slash || !int.TryParse(kv.Key[(hash + 1)..], out int n)) continue;
+            string id = kv.Key[(slash + 1)..hash];
+            bool stat = id == StatFold;
+            if(!stat && Array.IndexOf(PanelFolds, id) < 0) continue;
+            left.Add(kv.Key);
+            if(at.TryGetValue((stat, n), out object o) && after.TryGetValue(o, out int now)) landed[kv.Key[..(hash + 1)] + now] = kv.Value;
+        }
+        foreach(string key in left)
+            if(!landed.ContainsKey(key)) QuartzHost.Write(key, key.Contains("/HEADING_", StringComparison.Ordinal) ? "1" : "0");
+        foreach(var kv in landed) QuartzHost.Write(kv.Key, kv.Value);
     }
 
     /// <summary>Panel n's rows (n = its place + 1), in a shut section titled with its name; every row's steps go stale with the

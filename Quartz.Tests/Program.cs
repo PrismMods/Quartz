@@ -147,6 +147,7 @@ List<(string Name, Action Run)> tests = [
     ("Judgement restriction offers X-Perfect only with XPerfect, and shows mode 2 as 1 without it", PageRulesTests.TestRestrictModes),
     ("Auto deafen offers shortcut and Discord modes only where they work", PageRulesTests.TestDeafenModes),
     ("A hotkey chord splits at its first plus", PageRulesTests.TestSplitChord),
+    ("Only credits and custom addon pages stay in the classic menu, each for a reason", PageRulesTests.TestStaysClassic),
     ("Search words land across label, section, and page", SearchMatcherTests.TestWordsLandAcrossLabelSectionAndPage),
     ("Search tolerates typos only when nothing exact matches", SearchMatcherTests.TestTyposOnlyWhenNothingExactMatches),
     ("Search reads tooltips as a last resort", SearchMatcherTests.TestTooltipWordsAreALastResort),

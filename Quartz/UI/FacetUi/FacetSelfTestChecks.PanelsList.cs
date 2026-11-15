@@ -5,6 +5,7 @@ using TMPro;
 using Quartz.Core;
 using Quartz.Features.Panels;
 using Quartz.UI.Nav;
+using Facet;
 using UnityEngine;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi;
@@ -53,6 +54,7 @@ internal static partial class FacetSelfTestChecks {
         List<PanelConfig> list = PanelsOverlay.Conf.Panels;
         Covers(check, page);
         Searched(check, page, ["PANELS_CREATE"]);
+        PanelRowsSearched(check, page);
         Translated(check, page, ["HEADING_APPEARANCE", "PANEL_SHOWSTAT", "PANEL_SHOWLABEL"]);
         List<string> shown = [.. PageContent().Query<Label>(name: "PANELS_LIST-text").ToList().Select(l => l.text)];
         check($"{page}: the list shows every panel in order", shown.SequenceEqual(list.Select(p => p.Name)),
@@ -146,10 +148,23 @@ internal static partial class FacetSelfTestChecks {
         check($"{page}: a stat's X removes it", hit && created.Stats.Count == 1 && created.Stats[0] == s1,
             $"button={hit} stats={string.Join(",", created.Stats.Select(s => s.Id))}");
 
-        // The made panel to the top and back: the list, the overlay's drawing order and the file follow.
+        // The made panel's section opened, so its stored fold state can be followed through the moves and the delete.
         if(!Here("panel move")) yield break;
+        if(PageContent().Q(name: "PANEL#" + n) is { } head && Fold(n) != "1") Click(head);
+        yield return Frames(2);
+        string Fold(int at) => MainCore.Conf.FacetWindows.FirstOrDefault(kv => kv.Key.StartsWith("fold.", StringComparison.Ordinal)
+            && kv.Key.EndsWith("/PANEL#" + at, StringComparison.Ordinal)).Value;
+        // The player's first panel shut for the move, so the made panel's open state at place 1 can only have followed it.
+        string firstKey = n > 1 ? FoldKey(1) : null, firstWas = firstKey == null ? null : Fold(1);
+        if(firstWas == "1") QuartzHost.Write(firstKey, "0");
+        string FoldKey(int at) => MainCore.Conf.FacetWindows.Keys.FirstOrDefault(k => k.StartsWith("fold.", StringComparison.Ordinal)
+            && k.EndsWith("/PANEL#" + at, StringComparison.Ordinal));
+        string opened = Fold(n), firstFold = Fold(1) ?? "0";
+
+        // The made panel to the top and back: the list, the overlay's drawing order and the file follow.
         before = Bytes(file);
         OverlayPages.PanelsList.Move(n - 1, 0);
+        string foldTop = Fold(1), foldNext = n > 1 ? Fold(2) ?? "0" : firstFold;
         bool built = PanelsOverlay.Built;
         bool top = list[0] == created && list.Skip(1).SequenceEqual(players), overlay = !built || OverlayFirst() == created;
         if(!built) info($"{page}: the panels overlay is not built, so the drawing order after a move is not checked");
@@ -160,6 +175,10 @@ internal static partial class FacetSelfTestChecks {
         check($"{page}: dragging the new panel to the top moves it first in Conf.Panels and the overlay, saved, and back",
             top && overlay && saved && list.Take(n - 1).SequenceEqual(players),
             $"top={top} overlay={overlay} built={built} saved={saved} back={list.Take(n - 1).SequenceEqual(players)}");
+        check($"{page}: a panel's fold state follows the panel through a move and back",
+            opened == "1" && foldTop == "1" && foldNext == firstFold && Fold(n) == "1" && (Fold(1) ?? "0") == firstFold,
+            $"opened={opened} top={foldTop} next={foldNext} (was {firstFold}) back={Fold(n)} first={Fold(1)}");
+        if(firstWas == "1") QuartzHost.Write(firstKey, "1");
 
         // A name typed and committed: the section's title follows. That edit's step is the one undone after the removal: bound
         // to the panel, it goes stale with it, so neither the removed panel's name nor any other panel changes.
@@ -176,6 +195,8 @@ internal static partial class FacetSelfTestChecks {
         check($"{page} PANEL_DELETE#n: deletes the panel the test created, no confirm, as classic", gone,
             $"panels={list.Count}/{players.Count} created left={list.Contains(created)}");
         if(!gone) yield break;
+        check($"{page}: a deleted panel's fold state stays behind with it, not on the next panel at its place", (Fold(n) ?? "0") == "0",
+            $"fold={Fold(n)}");
 
         PanelsOverlay.ConfMgr.Save();
         string[] others = [.. list.Select(p => p.Serialize().ToString())];
@@ -187,6 +208,28 @@ internal static partial class FacetSelfTestChecks {
         bool same = list.Select(p => p.Serialize().ToString()).SequenceEqual(others) && !list.Contains(created);
         check($"{page}: undo after the removal never writes into another panel", same && SameBytes(Bytes(file), before) && created.Name == name,
             $"panels same={same} file same={SameBytes(Bytes(file), before)} name={created.Name == name}");
+    }
+
+    // The detached build lists no panel: each panel row's English text still finds this page, and no hit names a panel.
+    private static void PanelRowsSearched(Action<string, bool, string> check, string page) {
+        NavPage nav = NavRegistry.ByKey(page);
+        string title = QuartzShell.Label(nav.LocaleKey, nav.Title);
+        var missed = new List<string>();
+        var named = new List<string>();
+        List<SearchIndex.Hit> All(string q) {   // past the 40 the box shows: a common label is on many pages
+            QuartzShell.Nav.Filter(q);
+            return QuartzShell.Nav.Index?.Find(q, 1000) ?? [];
+        }
+        try {
+            foreach(string key in OverlayPages.PanelsList.RowKeys)
+                if(!All(MainCore.Tr.GetForLanguage(key, "en-US", key)).Any(h => h.Key == key && h.Page == title)) missed.Add(key);
+            foreach(PanelConfig p in PanelsOverlay.Conf.Panels)
+                if(p.Name.Length >= 2 && All(p.Name).Any(h => h.Page == title && (h.Label == p.Name || h.Key == p.Name))) named.Add(p.Name);
+        } finally {
+            QuartzShell.Nav?.Filter("");
+        }
+        check($"{page}: search finds each panel row on this page, by its Lang key only", missed.Count == 0 && named.Count == 0,
+            $"missed={string.Join(",", missed)} panel names found={named.Count}");
     }
 
     // The first panel the overlay draws, or null when the overlay is not built.

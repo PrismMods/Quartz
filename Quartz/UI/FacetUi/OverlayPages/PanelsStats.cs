@@ -40,10 +40,11 @@ internal static class PanelsStats {
             QuartzShell.Surface?.Refresh();
         }
         void Pick(string id) {
+            Dictionary<object, int> before = PanelsList.Places(Panels);
             if(replace != null) replace.Id = id;
             else panel.Stats.Add(new StatEntry(id) { ShowLabel = id is not ("text" or "image") });
             Close();
-            Changed();
+            Changed(before);
         }
 
         add = Controls.Action(box, "", "PANEL_ADDSTAT", () => {
@@ -57,9 +58,10 @@ internal static class PanelsStats {
             o.Tooltip = "DESC_PANEL_ADDSTAT";
         });
         Controls.Action(box, "", "PANEL_CLEARSTATS", () => {
+            Dictionary<object, int> before = PanelsList.Places(Panels);
             panel.Stats.Clear();
             Close();
-            Changed();
+            Changed(before);
         }, o => o.Id = "PANEL_CLEARSTATS#" + n);
         Controls.Repeat<string>(box, () => picks, k => k, (row, k) => PickRow(row, k, n, Pick));
         Controls.Info(box, "PANEL_NO_STATS", () => "", (InfoOptions o) => {
@@ -78,25 +80,28 @@ internal static class PanelsStats {
                 replace = s;
                 Open();
             }, () => {
+                Dictionary<object, int> before = PanelsList.Places(Panels);
                 panel.Stats.Remove(s);
                 if(replace == s) Close();   // a pick would swap the removed stat, and be lost
-                Changed();
+                Changed(before);
             });
         });
     }
 
     /// <summary>A drop in panel's stats: remove at from, insert at to, then save.</summary>
     internal static void Move(PanelConfig panel, int from, int to) {
+        Dictionary<object, int> before = PanelsList.Places(Panels);
         StatEntry s = panel.Stats[from];
         panel.Stats.RemoveAt(from);
         panel.Stats.Insert(to, s);
-        Changed();
+        Changed(before);
     }
 
-    // The classic page shows the stats too: it rebuilds before it next shows.
-    private static void Changed() {
+    // The classic page shows the stats too: it rebuilds before it next shows. Fold states follow the stats' new numbers.
+    private static void Changed(Dictionary<object, int> before = null) {
         PanelsOverlay.Save();
         UICore.ClassicStale = true;
+        if(before != null) PanelsList.FoldsFollow(before);
         QuartzShell.Surface?.Refresh();
     }
 

@@ -53,6 +53,7 @@ internal static partial class FacetSelfTestChecks {
             yield return OverlayPanelsList(check, info);
             yield return TufLevels(check, info);
             yield return TufPacks(check, info);
+            yield return Coverage(check, info);
             IndexPerf(info);
         } finally {
             MainCore.Conf.FacetWindows.Clear();
