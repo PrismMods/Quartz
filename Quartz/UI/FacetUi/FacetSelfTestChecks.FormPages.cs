@@ -347,13 +347,20 @@ internal static partial class FacetSelfTestChecks {
         int count = FormPageKeys.Count;
         CountScans();
         Dictionary<string, (string Memory, byte[] Disk)> before = SettingsReadings();
-        int[] listeners = Listeners();
+        int[] listeners = Listeners(), effects = SideEffectReadings(), door = DoorReadings();
         int scansBefore = scans;
-        foreach(string key in FormPageKeys)
-            for(int i = 0; i < 2; i++)
-                if(QuartzShell.Moved.TryGetValue(key, out Action<VisualElement> build)) build(new VisualElement());
+        var done = new List<string>();
+        Func<string, bool> doing = QuartzShell.Doing;
+        QuartzShell.Doing = n => { done.Add(n); return true; };
+        try {
+            foreach(string key in FormPageKeys)
+                for(int i = 0; i < 2; i++)
+                    if(QuartzShell.Moved.TryGetValue(key, out Action<VisualElement> build)) build(new VisualElement());
+        } finally {
+            QuartzShell.Doing = doing;
+        }
         Dictionary<string, (string Memory, byte[] Disk)> built = SettingsReadings();
-        int[] listenersAfter = Listeners();
+        int[] listenersAfter = Listeners(), effectsAfter = SideEffectReadings(), doorAfter = DoorReadings();
         int scanned = scans - scansBefore;
         for(float t0 = Time.realtimeSinceStartup; Time.realtimeSinceStartup - t0 < 1.5f;) yield return null;   // past the save debounce
         Dictionary<string, (string Memory, byte[] Disk)> settled = SettingsReadings();
@@ -370,7 +377,14 @@ internal static partial class FacetSelfTestChecks {
         check($"every form page builds detached without subscribing to an event ({count})", count > 0 && listeners.SequenceEqual(listenersAfter),
             $"listeners={string.Join("/", listeners)} -> {string.Join("/", listenersAfter)}");
         check($"every form page builds detached without measuring the TUF library ({count})", count > 0 && scanned == 0, $"scans={scanned}");
+        check($"every page builds detached without a thumbnail request or a side effect ({count})",
+            count > 0 && effects[2] >= 0 && effects.SequenceEqual(effectsAfter) && done.Count == 0,
+            $"packs/previews listeners, previews cached={string.Join("/", effects)} -> {string.Join("/", effectsAfter)} done={string.Join(",", done)}");
+        check($"every page builds detached without a request through the self-test door ({count})", count > 0 && door.SequenceEqual(doorAfter),
+            $"fetches/previews/update checks/network={string.Join("/", door)} -> {string.Join("/", doorAfter)}");
     }
+
+    private static int[] DoorReadings() => [SelfTestDoor.Fetches, SelfTestDoor.Previews, SelfTestDoor.UpdateChecks, SelfTestDoor.Network];
 
     // Timed once the menu has opened: before that there is no index to build.
     private static void IndexPerf(Action<string> info) {
@@ -406,6 +420,18 @@ internal static partial class FacetSelfTestChecks {
             Count(typeof(UpdateService), nameof(UpdateService.OnChanged)),
             Count(typeof(FontManager), nameof(FontManager.OnFontCatalogChanged)),
             TufService.Instance == null ? -1 : Count(typeof(TufService), nameof(TufService.Changed), TufService.Instance),
+        ];
+    }
+
+    // TufPackService's and TufPreviewCache's listeners, and the previews cached (no thumbnail asked for), each read by reflection.
+    private static int[] SideEffectReadings() {
+        const BindingFlags any = BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic;
+        static int Count(Type t, string field, object target = null) =>
+            (t.GetField(field, any)?.GetValue(target) as Delegate)?.GetInvocationList().Length ?? 0;
+        return [
+            TufPackService.Instance == null ? -1 : Count(typeof(TufPackService), nameof(TufPackService.Changed), TufPackService.Instance),
+            Count(typeof(TufPreviewCache), nameof(TufPreviewCache.Changed)),
+            (typeof(TufPreviewCache).GetField("entries", any)?.GetValue(null) as System.Collections.ICollection)?.Count ?? -1,
         ];
     }
 

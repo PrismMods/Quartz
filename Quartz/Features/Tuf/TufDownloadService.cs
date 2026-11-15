@@ -186,6 +186,9 @@ public sealed class TufDownloadService : IDisposable {
     }
     private async Task<Uri> DownloadToFileAsync(Uri start, string path, string root,
         Action<TufItemState, float> progress, CancellationToken token) {
+#if DEBUG
+        SelfTestDoor.Guard();
+#endif
         Uri current = start;
         for(int redirects = 0; redirects <= 5; redirects++) {
             await TufNetworkPolicy.EnsurePublicHostAsync(current, token).ConfigureAwait(false);

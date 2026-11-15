@@ -36,11 +36,14 @@ internal static partial class FacetSelfTestChecks {
             yield return SwitchOff(check);
             yield return SwitchOn(check);
             yield return OpenerOver(check);
+            yield return FacetSelfTestFixture.Register();   // the classic page both hand to
             yield return PingPong(check);
             yield return RebuildBehind(check);
+            yield return FacetSelfTestFixture.Unregister();
             yield return HeaderSwitch(check);
             yield return ProfileLoadSwitchesOff(check);
         } finally {
+            FacetSelfTestFixture.Forget();
             HandOff.ReturnTo = HandOff.Menu.None;
             QuartzShell.Hide();
             if(UICore.IsOpen) UICore.Close(true);
@@ -341,18 +344,18 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(2);
         Step(check, "ping-pong 2: Effect Remover's button swaps it for the new menu on that page",
             FacetBridge.NewMenuVisible() && QuartzShell.CurrentPage == FxPage && HandOff.ReturnTo == HandOff.Menu.Classic);
-        QuartzShell.Go("profiles.main");
+        QuartzShell.Go(FacetSelfTestFixture.PageKey);
         yield return Frames(2);
         Button open = Body.Q<Button>("menu-classic-input");
         if(open != null) Submit(open);
         yield return Frames(2);
-        int state = NavRegistry.StateFor("profiles.main");
-        Step(check, "ping-pong 3: Open swaps back to the classic menu on that page",
+        int state = NavRegistry.StateFor(FacetSelfTestFixture.PageKey);
+        Step(check, "ping-pong 3: Open swaps back to the classic menu on that page (fixture page)",
             open != null && UICore.IsOpen && UICore.CurrentMenuState == state && HandOff.ReturnTo == HandOff.Menu.New,
             $"button={open != null} state={UICore.CurrentMenuState}/{state}");
         UICore.Close();
         yield return Frames(2);
-        Step(check, "ping-pong 4: closing the classic menu brings the new one back",
+        Step(check, "ping-pong 4: closing the classic menu brings the new one back (fixture page)",
             FacetBridge.NewMenuVisible() && !UICore.IsOpen && HandOff.ReturnTo == HandOff.Menu.None);
         Button close = QuartzShell.Window.TitleBarRight.Query<Button>().ToList().LastOrDefault();
         if(close != null) Submit(close);
@@ -372,7 +375,7 @@ internal static partial class FacetSelfTestChecks {
         UICore.Rebuild();
         yield return Frames(2);
         Step(check, "a rebuild behind the new menu keeps it up and the classic menu shut", up && FacetBridge.NewMenuVisible() && !UICore.IsOpen, $"up={up}");
-        QuartzShell.Go("profiles.main");
+        QuartzShell.Go(FacetSelfTestFixture.PageKey);
         yield return Frames(2);
         Button open = Body.Q<Button>("menu-classic-input");
         if(open != null) Submit(open);
@@ -380,7 +383,7 @@ internal static partial class FacetSelfTestChecks {
         bool classic = UICore.IsOpen && !FacetBridge.NewMenuVisible();
         UICore.Rebuild();
         yield return Frames(2);
-        Step(check, "a rebuild behind a classic menu opened from the new one keeps it open, the new one hidden and the hand-back pending",
+        Step(check, "a rebuild behind a classic menu opened from the new one keeps it open, the new one hidden and the hand-back pending (fixture page)",
             classic && UICore.IsOpen && !FacetBridge.NewMenuVisible() && HandOff.ReturnTo == HandOff.Menu.New, $"classic={classic}");
         UICore.Close();
         yield return Frames(2);

@@ -55,6 +55,7 @@ internal static partial class FacetSelfTestChecks {
             yield return ShellWheelSpeed(check);
             yield return ShellClosedCost(check);
         } finally {
+            FacetSelfTestFixture.Forget();
             HandOff.ReturnTo = HandOff.Menu.None;
             QuartzShell.Hide();
             if(wasOpen && !UICore.IsOpen) UICore.Open(true);
@@ -140,11 +141,6 @@ internal static partial class FacetSelfTestChecks {
         }
         info($"new menu pages: moved={moved} classic={classic} stub={stub}");
         check("every page on the rail opens in the new menu without a failed card", failed.Count == 0, string.Join(", ", failed));
-        QuartzShell.Go("profiles.main");
-        yield return Frames(1);
-        string title = Body.Q(name: "menu-header")?.Q<Label>()?.text, profiles = MainCore.Tr.Get("PROFILES", "Profiles");
-        check("a classic page shows its title and the card that opens it",
-            Body.Q(name: "menu-classic") != null && title == profiles, $"title={title} want={profiles}");
         yield return ShellHiddenCategory(check);
     }
 
@@ -180,24 +176,32 @@ internal static partial class FacetSelfTestChecks {
             shownOn && hiddenOff && noGo && gone, $"shown={shownOn} hiddenOff={hiddenOff} page={page} removed={gone}");
     }
 
-    // "Open" on a classic card, then each way a user closes the classic menu, which brings the new one back.
+    // The fixture page, a classic card: its title, "Open", then each way a user closes the classic menu, which brings the new one back.
     private static IEnumerator ShellHandOff(Action<string, bool, string> check) {
-        int state = NavRegistry.StateFor("profiles.main");
+        const string page = FacetSelfTestFixture.PageKey;
+        yield return FacetSelfTestFixture.Register();
+        int state = NavRegistry.StateFor(page);
+        QuartzShell.Go(page);
+        yield return Frames(1);
+        string title = Body.Q(name: "menu-header")?.Q<Label>()?.text;
+        string want = QuartzHost.Host.Translate(QuartzShell.Label("ADDON_SELF_TEST", FacetSelfTestFixture.Title));
+        check("a classic page shows its title and the card that opens it (fixture page)",
+            QuartzShell.CurrentPage == page && Body.Q(name: "menu-classic") != null && title == want, $"page={QuartzShell.CurrentPage} title={title} want={want}");
         foreach(string way in new[] { "close", "escape", "hotkey" }) {
-            QuartzShell.Go("profiles.main");
+            QuartzShell.Go(page);
             Button open = Body.Q<Button>("menu-classic-input");
-            if(open == null) { check($"Open ({way})", false, "no menu-classic-input"); yield break; }
+            if(open == null) { check($"Open ({way}) (fixture page)", false, "no menu-classic-input"); yield break; }
             Submit(open);
             yield return Frames(2);
-            check($"Open hands the page to the classic menu ({way})",
+            check($"Open hands the page to the classic menu ({way}) (fixture page)",
                 !FacetBridge.NewMenuVisible() && UICore.IsOpen && !UICore.IsReorganizing && UICore.CurrentMenuState == state,
                 $"{Showing()} state={UICore.CurrentMenuState}/{state}");
             if(way == "close") UICore.Close();
             else if(way == "escape") UICore.EscapeDown();
             else UICore.Toggle();
             yield return Frames(way == "escape" ? 3 : 2);   // the classic Escape runs a pump later
-            check($"closing the classic menu ({way}) brings the new one back on its page",
-                FacetBridge.NewMenuVisible() && !UICore.IsOpen && QuartzShell.CurrentPage == "profiles.main" && HandOff.ReturnTo == HandOff.Menu.None,
+            check($"closing the classic menu ({way}) brings the new one back on its page (fixture page)",
+                FacetBridge.NewMenuVisible() && !UICore.IsOpen && QuartzShell.CurrentPage == page && HandOff.ReturnTo == HandOff.Menu.None,
                 Showing());
         }
         // Another mod's shared layout session over a classic menu opened from here: both shut, and its end reopens neither.
@@ -227,6 +231,7 @@ internal static partial class FacetSelfTestChecks {
             again && dismissed && !UICore.IsOpen && !FacetBridge.NewMenuVisible(), $"from={again} dismissed={dismissed} {Showing()}");
         FacetBridge.OpenNewMenu();
         yield return Frames(1);
+        yield return FacetSelfTestFixture.Unregister();
     }
 
     // A feature switched off and on under its open page keeps its tab.

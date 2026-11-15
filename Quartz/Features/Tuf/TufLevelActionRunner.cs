@@ -179,7 +179,7 @@ internal sealed class TufLevelActionRunner {
                 bool aborted = !success && string.IsNullOrEmpty(error);
                 if(!success) {
                     if(!aborted) MainCore.Log.Wrn("[TUF] automatic play failed: " + error);
-                    UICore.Open(true);
+                    UICore.Reopen();
                 }
                 FinishAction(level, success || aborted ? TufItemState.Load : TufItemState.Retry, error, false);
             }));

@@ -32,15 +32,19 @@ internal static partial class FacetSelfTestChecks {
             yield return SearchTyping(check);
             yield return SearchMovedRow(check);
             yield return SearchModeChange(check);
-            yield return SearchClassic(check, "profiles", h => h.PageRef != null && h.Key == "PROFILES", "profiles.main", "a classic page's hit");
-            // A row of a page still in the classic menu.
-            string recalibrate = QuartzHost.Host.Translate("PROFILE_RECALIBRATE");
-            yield return SearchClassic(check, "recalibrate", h => h.PageRef == null && h.Label == recalibrate, "profiles.main", "a classic row's hit");
+            // A page still in the classic menu, and a row of it: the fixture page, which stands in for a custom addon page.
+            yield return FacetSelfTestFixture.Register();
+            string title = QuartzShell.Label("ADDON_SELF_TEST", FacetSelfTestFixture.Title);
+            yield return SearchClassic(check, "self-test", h => h.PageRef != null && h.Key == title, FacetSelfTestFixture.PageKey, "a classic page's hit");
+            string row = QuartzHost.Host.Translate(QuartzShell.Label(FacetSelfTestFixture.RowKey, FacetSelfTestFixture.RowLabel));
+            yield return SearchClassic(check, "self-test row", h => h.PageRef == null && h.Label == row, FacetSelfTestFixture.PageKey, "a classic row's hit");
+            yield return FacetSelfTestFixture.Unregister();
             yield return SearchSettingsRow(check);
             SearchNoCardRows(check);
             yield return SearchKorean(check, "FXRM_ENABLE_SAVE", "SECTION_EFFECT_REMOVER", "Korean initials find a moved page's row");
             yield return SearchFresh(check);
         } finally {
+            FacetSelfTestFixture.Forget();
             C.Mode = mode;
             QuartzShell.Changed();
             QuartzShell.Nav?.Filter("");
@@ -156,11 +160,12 @@ internal static partial class FacetSelfTestChecks {
             inSimple && !hitSimple && inEnhanced && hitEnhanced, $"{simple}; {enhanced}");
     }
 
-    // A page or a row still in the classic menu: its result jumps there, on that page, and its close brings this window back.
+    // A page or a row still in the classic menu (the fixture page's): its result jumps there, on that page, and its close brings this window back.
     private static IEnumerator SearchClassic(Action<string, bool, string> check, string q, Func<SearchIndex.Hit, bool> match, string pageKey, string what) {
+        const string fixture = " (fixture page)";
         List<SearchIndex.Hit> hits = Find(q);
         int at = hits.FindIndex(h => match(h));
-        check($"search finds {what} for \"{q}\"", at >= 0, Hits(hits));
+        check($"search finds {what} for \"{q}\"{fixture}", at >= 0, Hits(hits));
         if(at < 0) yield break;
         int state = NavRegistry.StateFor(pageKey);
         Click(Body[at]);
@@ -169,10 +174,10 @@ internal static partial class FacetSelfTestChecks {
             yield return Frames(1);
             jumped = UICore.IsOpen && UICore.CurrentMenuState == state && !FacetBridge.NewMenuVisible();
         }
-        Step(check, $"{what}: within 3 frames the classic menu opens on its page, the new one hidden", jumped, $"state={UICore.CurrentMenuState}/{state}");
+        Step(check, $"{what}: within 3 frames the classic menu opens on its page, the new one hidden{fixture}", jumped, $"state={UICore.CurrentMenuState}/{state}");
         UICore.Close();
         yield return Frames(2);
-        Step(check, $"{what}: closing the classic menu brings the new one back", jumped && FacetBridge.NewMenuVisible() && !UICore.IsOpen);
+        Step(check, $"{what}: closing the classic menu brings the new one back{fixture}", jumped && FacetBridge.NewMenuVisible() && !UICore.IsOpen);
     }
 
     // A moved page's tab: its result opens the page in the new menu, nothing classic.

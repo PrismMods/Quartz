@@ -224,6 +224,7 @@ public static partial class UICore {
         };
     }
     public static void Open(bool noAnimate = false) {
+        dismissed = MenuHandOff.Menu.None;   // OpenAt comes through here too
         if(isOpen || Panel == null) return;
         FreshenClassic();   // every classic opener comes through here: pages the new menu left stale rebuild once first
         if(isOpen || Panel == null) return;   // that rebuild's show-on-startup open got there first
@@ -324,9 +325,22 @@ public static partial class UICore {
     }
     /// <summary>Closes the classic menu to get it out of the way (a level launch, an overlay): no hand-back to the new menu, which stays shut too.</summary>
     internal static void Dismiss() {
+        // With nothing showing (a second Dismiss after the quiz overlay's), the first one's menu stays the one to reopen.
+        MenuHandOff.Menu closing = FacetBridge.NewMenuVisible() ? MenuHandOff.Menu.New : isOpen ? MenuHandOff.Menu.Classic : dismissed;
         MenuHandOff.ReturnTo = MenuHandOff.Menu.None;
         FacetBridge.HideNewMenu();
         Close(true);
+        dismissed = closing;
+    }
+    // The menu the last Dismiss closed, for Reopen; an Open since clears it.
+    private static MenuHandOff.Menu dismissed;
+    /// <summary>After a failed launch: back to the menu Dismiss closed, the new one on its page. Nothing while a menu shows.</summary>
+    internal static void Reopen() {
+        MenuHandOff.Menu to = dismissed;
+        dismissed = MenuHandOff.Menu.None;
+        if(MenuShowing) return;   // no Dismiss ran: the menu the launch came from is still up
+        if(to == MenuHandOff.Menu.New && FacetBridge.MenuAvailable()) FacetBridge.OpenNewMenu();
+        else Open(true);
     }
     /// <summary>The classic menu on a page, opened from the new menu: a user's close goes back there.</summary>
     internal static void OpenAt(int state) {

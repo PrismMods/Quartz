@@ -42,7 +42,7 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
                 return;
             }
             log = new StringBuilder();
-            steps.Push(Unmade(Powered(body == null ? FeaturesOn(Run()) : featuresOn ? FeaturesOn(body(Check, Info)) : body(Check, Info))));
+            steps.Push(Doored(Unmade(Powered(body == null ? FeaturesOn(Run()) : featuresOn ? FeaturesOn(body(Check, Info)) : body(Check, Info)))));
         }
         if(!Step(steps, Check)) return;
         done = true;
@@ -91,6 +91,16 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
     // A run ends by removing its marker, so a later launch does not run it again (or arm it beside another runner).
     private void End() {
         try { File.Delete(Path.Combine(MainCore.Paths.RootPath, name)); } catch(Exception e) { Diag.Ignore(e); }
+    }
+    // The self-test door stands in for the network for the whole run, from before the first check to after the last.
+    private IEnumerator Doored(IEnumerator run) {
+        SelfTestDoor.Install();
+        try {
+            yield return run;
+        } finally {
+            Check("self-test run: no request left the machine", SelfTestDoor.Network == 0, $"network={SelfTestDoor.Network}");
+            SelfTestDoor.Reset();
+        }
     }
     // A feature the run turns on loads its settings file, and quitting saves every loaded one: a file the run made (its feature
     // never set by the player) goes, and its handle leaves the registry, or that save writes it again.

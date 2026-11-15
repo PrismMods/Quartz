@@ -26,6 +26,9 @@ public sealed class TufPackApiClient : IDisposable {
     }
     public async Task<TufPacksPage> FetchPacksAsync(string query, TufPackSort sort, bool ascending, int offset,
         int limit, CancellationToken token) {
+#if DEBUG
+        SelfTestDoor.Guard();
+#endif
         string order = sort switch { TufPackSort.Name => "NAME", TufPackSort.Levels => "LEVELS", _ => "RECENT" };
         string path = "v2/database/levels/packs?limit=" + Math.Clamp(limit, 1, 50)
             + "&offset=" + Math.Max(0, offset)
@@ -36,11 +39,17 @@ public sealed class TufPackApiClient : IDisposable {
         return ParsePacks(bytes);
     }
     public async Task<TufDifficultyDictionary> FetchDifficultiesAsync(CancellationToken token) {
+#if DEBUG
+        SelfTestDoor.Guard();
+#endif
         byte[] bytes = await GetAsync("v2/database/difficulties", MaxDifficultiesJsonBytes, token).ConfigureAwait(false);
         return ParseDifficulties(bytes);
     }
     public async Task<IReadOnlyList<TufPackItem>> FetchPackItemsAsync(string packId, TufDifficultyDictionary difficulties,
         CancellationToken token) {
+#if DEBUG
+        SelfTestDoor.Guard();
+#endif
         if(!IsValidPackId(packId)) throw new InvalidDataException("Invalid pack id.");
         byte[] bytes = await GetAsync("v2/database/levels/packs/" + Uri.EscapeDataString(packId) + "?tree=true",
             MaxTreeJsonBytes, token).ConfigureAwait(false);

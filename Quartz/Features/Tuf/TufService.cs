@@ -94,6 +94,24 @@ public sealed partial class TufService : IRuntimeService {
         if(HasMore && !LoadingMore
             && (State == TufListState.Ready || (State == TufListState.Error && appendFailed))) Fetch(true);
     }
+#if DEBUG
+    /// <summary>Self-tests only: back to a fresh session's list, with nothing fetched or saved.</summary>
+    internal void ForgetForTest() {
+        CancelDebounce();
+        InvalidateListRequest();
+        levels.Clear();
+        Query = "";
+        ShowInstalled = false;
+        HasMore = false;
+        LoadingMore = false;
+        nextOffset = 0;
+        appendFailed = false;
+        State = TufListState.Idle;
+        Error = "";
+        OfflineError = false;
+        Notify();
+    }
+#endif
     public void Act(TufLevel level) => actions?.Act(level);
     public void LaunchChart(TufLevel level, string chart) => actions?.LaunchChart(level, chart);
     private void Notify() {

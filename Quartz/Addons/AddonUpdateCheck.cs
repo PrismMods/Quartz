@@ -23,6 +23,12 @@ internal static class AddonUpdateCheck {
         }
     }
     internal static void Check(string repo, string currentVersion, Action<Result> onNewer) {
+#if DEBUG
+        if(SelfTestDoor.Installed) {
+            SelfTestDoor.UpdateChecks++;
+            return;
+        }
+#endif
         if(string.IsNullOrWhiteSpace(repo) || onNewer == null) return;
         repo = repo.Trim().TrimEnd('/');
         if(!Regex.IsMatch(repo, @"^[\w.-]+/[\w.-]+$")) return;

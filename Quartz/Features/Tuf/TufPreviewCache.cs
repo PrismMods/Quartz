@@ -65,6 +65,12 @@ public static class TufPreviewCache {
     }
     public static void Request(string key, TufPreviewSource source) {
         EnsurePump();
+#if DEBUG
+        if(SelfTestDoor.Preview is { } door) {
+            RequestFromDoor(key, door);
+            return;
+        }
+#endif
         int gen;
         lock(gate) {
             if(entries.ContainsKey(key)) return;
@@ -77,6 +83,22 @@ public static class TufPreviewCache {
         }
         _ = Task.Run(() => DownloadAndBlur(key, source, gen));
     }
+#if DEBUG
+    // A self-test's thumbnail: the door's bytes go through the real decode, blur, upload and eviction; the disk cache and
+    // the network are never touched.
+    private static void RequestFromDoor(string key, Func<string, byte[]?> door) {
+        int gen;
+        lock(gate) {
+            if(entries.ContainsKey(key)) return;
+            entries[key] = new Entry { Status = Status.Pending };
+            gen = generation;
+        }
+        SelfTestDoor.Previews++;
+        byte[]? bytes = door(key);
+        if(bytes == null) Fail(key, gen);
+        else mainQueue.Enqueue(() => DecodeOnMain(key, bytes, gen));
+    }
+#endif
     public static void Clear() {
         lock(gate) {
             generation++;
@@ -103,6 +125,9 @@ public static class TufPreviewCache {
         await network.WaitAsync().ConfigureAwait(false);
         byte[]? jpeg;
         try {
+#if DEBUG
+            SelfTestDoor.Guard();
+#endif
             jpeg = LoadJpeg(key, source);
         } catch(Exception e) {
             MainCore.Log.Msg("[TUF] preview download failed: " + e.Message);

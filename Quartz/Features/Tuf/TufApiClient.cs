@@ -21,6 +21,9 @@ public sealed class TufApiClient : IDisposable {
     }
     public async Task<TufPage> FetchAsync(string query, TufSort sort, bool ascending, int offset,
         TufDifficultyFilter filter, CancellationToken token) {
+#if DEBUG
+        SelfTestDoor.Guard();
+#endif
         staleRequest?.Cancel();
         staleRequest?.Dispose();
         staleRequest = CancellationTokenSource.CreateLinkedTokenSource(token);
@@ -37,6 +40,9 @@ public sealed class TufApiClient : IDisposable {
         return Parse(bytes);
     }
     public async Task<TufLevel> FetchLevelAsync(int id, CancellationToken token) {
+#if DEBUG
+        SelfTestDoor.Guard();
+#endif
         if(id <= 0) return null;
         using HttpResponseMessage response = await http.GetAsync("v2/database/levels/" + id,
             HttpCompletionOption.ResponseHeadersRead, token).ConfigureAwait(false);

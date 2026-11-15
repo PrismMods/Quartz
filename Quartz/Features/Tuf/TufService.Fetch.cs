@@ -26,7 +26,14 @@ public sealed partial class TufService : IRuntimeService {
         OfflineError = false;
         Notify();
         try {
-            TufPage page = await api.FetchAsync(query, sort, ascending, append ? nextOffset : 0, filter, token);
+            TufPage page;
+#if DEBUG
+            if(SelfTestDoor.Fetch is { } door) {
+                SelfTestDoor.Fetches++;
+                page = await door(query, sort, ascending, append ? nextOffset : 0, filter, token);
+            } else
+#endif
+            page = await api.FetchAsync(query, sort, ascending, append ? nextOffset : 0, filter, token);
             MainThread.Enqueue(() => ApplyPage(page, append, token, generation, query, sort, ascending, filter));
         } catch(OperationCanceledException e) when(token.IsCancellationRequested) { Diag.Ignore(e); }
         catch(Exception e) {

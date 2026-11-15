@@ -45,8 +45,10 @@ internal static partial class FacetSelfTestChecks {
             yield return HomeStatus(check);
             yield return HomeLayout(check);
             yield return PracticeLayoutLink(check);
+            yield return FacetSelfTestFixture.Unregister();
             yield return HomeLayoutNoTargets(check, info);
         } finally {
+            FacetSelfTestFixture.Forget();
             HomeRegistry.RemoveOwner("selftest");
             QuartzHost.Host.Write(Switches, stored);
             QuartzShell.Changed();
@@ -270,14 +272,15 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(3);
     }
 
-    // Practice puts an element on screen, and its moved page links to the layout editor under its preview; it is switched on
-    // for the check when it is off. A first switch-on leaves Practice.json behind (its teardown saves, and so does the quit
+    // Practice puts an element on screen, and its moved page links to the layout editor under its preview; a classic page (the
+    // fixture's) has no layout row. Practice is switched on for the check when it is off. A first switch-on leaves Practice.json behind (its teardown saves, and so does the quit
     // after it): that file and a profile copy of it are removed again, so the check leaves the settings folder as it found it.
     private static IEnumerator PracticeLayoutLink(Action<string, bool, string> check) {
         var saved = new[] { "overlay", "practice" }.Select(id => (id, was: FeatureService.IsEnabled(id), had: FeatureService.State.Features.TryGetValue(id, out bool v), value: v)).ToList();
         string[] files = [Path.Combine(MainCore.Paths.RootPath, "Practice.json"), Path.Combine(ProfileManager.ProfilesPath, ProfileManager.Active, "Practice.json")];
         bool[] existed = [.. files.Select(File.Exists)];
         bool first = !saved[1].was && !existed[0];
+        yield return FacetSelfTestFixture.Register();   // HomePage takes it out after this check
         try {
             if(!saved[1].was) FeatureService.SetEnabled("practice", true);
             yield return Frames(3);
@@ -288,11 +291,11 @@ internal static partial class FacetSelfTestChecks {
             string edit = QuartzHost.Host.Translate("MENU_EDIT_LAYOUT");
             Button link = pane?.Query<Button>().Where(b => b.text == edit).First();
             bool shown = page != null && pane != null && (link != null && Displayed(link)) == PrismBridge.UiAvailable;
-            QuartzShell.Go("profiles.main");
+            QuartzShell.Go(FacetSelfTestFixture.PageKey);
             yield return Frames(1);
-            bool none = Body.Q(name: "menu-classic-layout") == null;
-            check("Practice's moved page links to the layout editor from its preview, Profiles does not", shown && none,
-                $"page={page} switched={!saved[1].was} pane={pane != null} link={link != null} prism={PrismBridge.UiAvailable} profiles={!none}");
+            bool none = QuartzShell.CurrentPage == FacetSelfTestFixture.PageKey && Body.Q(name: "menu-classic") != null && Body.Q(name: "menu-classic-layout") == null;
+            check("Practice's moved page links to the layout editor from its preview, the fixture page does not (fixture page)", shown && none,
+                $"page={page} switched={!saved[1].was} pane={pane != null} link={link != null} prism={PrismBridge.UiAvailable} fixture={QuartzShell.CurrentPage}/{!none}");
         } finally {
             for(int i = saved.Count - 1; i >= 0; i--) RestoreFeature(saved[i].id, saved[i].was, saved[i].had, saved[i].value);
             // Queued behind the switch-off, whose teardown saves: then the settings it loaded are dropped, unsaved.
@@ -369,8 +372,9 @@ internal static partial class FacetSelfTestChecks {
     // "Open", then the new menu switched off in classic Settings: the classic menu's close has nothing to go back to.
     private static IEnumerator SwitchedOffClose(Action<string, bool, string> check) {
         bool was = MainCore.Conf.ExperimentalNewMenu;
+        yield return FacetSelfTestFixture.Register();
         try {
-            QuartzShell.Go("profiles.main");
+            QuartzShell.Go(FacetSelfTestFixture.PageKey);
             yield return Frames(2);
             Button open = Body.Q<Button>("menu-classic-input");
             if(open != null) Submit(open);
@@ -380,12 +384,14 @@ internal static partial class FacetSelfTestChecks {
             yield return Frames(3);   // the classic pages rebuild a pump later
             UICore.Close(true);
             yield return Frames(2);
-            check("a classic menu opened from the new one closes to nothing once the switch went off", handed && !FacetBridge.NewMenuVisible() && !UICore.IsOpen,
+            check("a classic menu opened from the new one closes to nothing once the switch went off (fixture page)", handed && !FacetBridge.NewMenuVisible() && !UICore.IsOpen,
                 $"handed={handed} {Showing()}");
         } finally {
             if(MainCore.Conf.ExperimentalNewMenu != was) UICore.SetNewMenuSwitch(was);
+            FacetSelfTestFixture.Forget();
         }
         yield return Frames(3);
+        yield return FacetSelfTestFixture.Unregister();
         FacetBridge.OpenNewMenu();
         yield return Frames(1);
     }

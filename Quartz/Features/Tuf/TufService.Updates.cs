@@ -25,6 +25,9 @@ public sealed partial class TufService : IRuntimeService {
         StartUpdateCheck(index.Data.Entries.Select(e => e.Id).ToList());
     }
     internal void AutoCheckUpdates() {
+#if DEBUG
+        if(SelfTestDoor.NoAutoCheck) return;
+#endif
         if(disposed || index == null || settings == null || index.Data.Count == 0 || CheckingUpdates) return;
         if(DateTime.UtcNow.Ticks - settings.Data.LastUpdateCheckUtc < AutoCheckInterval.Ticks) return;
         CheckUpdates();

@@ -117,7 +117,14 @@ public sealed class TufPackService : IRuntimeService {
         OfflineError = false;
         Notify();
         try {
-            TufPacksPage page = await api.FetchPacksAsync(query, sort, ascending, append ? nextOffset : 0, PageSize, token);
+            TufPacksPage page;
+#if DEBUG
+            if(SelfTestDoor.FetchPacks is { } door) {
+                SelfTestDoor.Fetches++;
+                page = await door(query, sort, ascending, append ? nextOffset : 0, PageSize, token);
+            } else
+#endif
+            page = await api.FetchPacksAsync(query, sort, ascending, append ? nextOffset : 0, PageSize, token);
             MainThread.Enqueue(() => ApplyPacks(page, append, token, generation, query, sort, ascending));
         } catch(OperationCanceledException e) when(token.IsCancellationRequested) { Diag.Ignore(e); }
         catch(Exception e) {
@@ -176,8 +183,17 @@ public sealed class TufPackService : IRuntimeService {
     }
     private async void LoadPackLevels(TufPack pack, CancellationToken token, int generation) {
         try {
-            difficulties ??= await api.FetchDifficultiesAsync(token);
-            IReadOnlyList<TufPackItem> items = await api.FetchPackItemsAsync(pack.Id, difficulties, token);
+            IReadOnlyList<TufPackItem> items;
+#if DEBUG
+            if(SelfTestDoor.FetchPackLevels is { } door) {
+                SelfTestDoor.Fetches++;
+                items = await door(pack, token);
+            } else
+#endif
+            {
+                difficulties ??= await api.FetchDifficultiesAsync(token);
+                items = await api.FetchPackItemsAsync(pack.Id, difficulties, token);
+            }
             MainThread.Enqueue(() => ApplyPackLevels(pack, items, token, generation));
         } catch(OperationCanceledException e) when(token.IsCancellationRequested) { Diag.Ignore(e); }
         catch(Exception e) {
@@ -232,6 +248,30 @@ public sealed class TufPackService : IRuntimeService {
     public void RetryPackLevels() {
         if(SelectedPack != null) OpenPack(SelectedPack);
     }
+#if DEBUG
+    /// <summary>Self-tests only: back to a fresh session's list and pack, with nothing fetched or saved.</summary>
+    internal void ForgetForTest() {
+        CancelDebounce();
+        InvalidateListRequest();
+        detailRequest?.Cancel();
+        detailGeneration++;
+        packs.Clear();
+        packItems.Clear();
+        packLevels.Clear();
+        SelectedPack = null;
+        Query = "";
+        HasMore = false;
+        LoadingMore = false;
+        nextOffset = 0;
+        appendFailed = false;
+        ListState = TufPackListState.Idle;
+        DetailState = TufPackListState.Idle;
+        ListError = "";
+        DetailError = "";
+        OfflineError = false;
+        Notify();
+    }
+#endif
     public void Act(TufLevel level) => actions?.Act(level);
     public void LaunchChart(TufLevel level, string chart) => actions?.LaunchChart(level, chart);
     private void InvalidateListRequest() {
