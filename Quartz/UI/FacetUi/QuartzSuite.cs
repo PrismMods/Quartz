@@ -47,7 +47,7 @@ internal sealed class QuartzSuite : SuiteAdapter {
     public override void BuildPage(VisualElement panel, SuitePage page) {
         NavPage pg = NavRegistry.ByKey(page.Key);
         if(pg == null) return;
-        if(QuartzShell.Moved.TryGetValue(pg.Key, out Action<VisualElement> build)) build(panel);
+        if(QuartzShell.BuilderFor(pg) is { } build) build(panel);
         else if(FeaturePages.IsStub(pg)) QuartzShell.Stub(panel, pg);
         else QuartzShell.Classic(panel, pg);
     }

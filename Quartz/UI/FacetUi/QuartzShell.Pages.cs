@@ -1,5 +1,6 @@
 #if !IL2CPP
 using Facet;
+using Quartz.Addons;
 using Quartz.Core;
 using Quartz.Features;
 using Quartz.Resource;
@@ -51,6 +52,8 @@ internal static partial class QuartzShell {
         ["tuf.settings"] = TufPages.TufSettingsPage.Build,
         ["developer.main"] = CoreMenuPages.DeveloperPage.Build,
         ["profiles.main"] = CoreMenuPages.ProfilesPage.Build,
+        ["import.main"] = CoreMenuPages.ImportPage.Build,
+        [CorePages.AddonsPageKey] = CoreMenuPages.AddonsPage.Build,
     };
 #if DEBUG
     /// <summary>Builds the key's moved page into the window's content, whether or not the rail shows it (a self-test on a build
@@ -70,7 +73,20 @@ internal static partial class QuartzShell {
     /// <summary>A category's icon as the classic sidebar picks it: an addon's registered asset wins over the built-in sprite.</summary>
     internal static Sprite CategoryIcon(NavCategory c) => c.IconAsset != null ? SpriteRegistry.Get(c.IconAsset) : MainCore.Spr.Get(c.Icon);
 
-    private static bool IsClassic(NavPage page) => !Moved.ContainsKey(page.Key) && !FeaturePages.IsStub(page);
+    private static bool IsClassic(NavPage page) =>
+        !Moved.ContainsKey(page.Key) && !AddonSettingsTabs.TryGet(page.Key, out _) && !FeaturePages.IsStub(page);
+
+    /// <summary>The page's new-menu builder: its Moved builder, an addon settings tab's form under its header, or null (a stub or
+    /// a classic card).</summary>
+    internal static Action<VisualElement> BuilderFor(NavPage page) {
+        if(page == null) return null;
+        if(Moved.TryGetValue(page.Key, out Action<VisualElement> build)) return build;
+        if(!AddonSettingsTabs.TryGet(page.Key, out AddonSettingsTabs.Tab tab)) return null;
+        return p => {
+            Header(p, Label(page.LocaleKey, page.Title), null);
+            CoreMenuPages.AddonForm.Build(p, tab);
+        };
+    }
 
     // A search result on a page still in the classic menu goes on to that menu; a moved or off page is the destination.
     internal static Action<SearchIndex.Hit> ClassicHit(NavPage page) => IsClassic(page) ? _ => OpenClassic(page.State) : null;
@@ -131,7 +147,7 @@ internal static partial class QuartzShell {
                 QuartzHost.Text(blocker.Info.NameKey, blocker.Name));
     }
 
-    // Addon pages and every page not moved yet.
+    // Custom addon pages and every page not moved yet.
     internal static void Classic(VisualElement p, NavPage page) {
         string feature = FeaturePages.FeatureOf(page);
         Header(p, Label(page.LocaleKey, page.Title), feature == null ? null : FeatureSwitch(feature));

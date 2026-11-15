@@ -2052,8 +2052,10 @@
           "UnityEngine.UIElements.VisualElement Facet.Controls::Advanced(UnityEngine.UIElements.VisualElement,System.String)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Card(UnityEngine.UIElements.VisualElement,System.String,System.Action\u00601\u003CFacet.CardOptions\u003E)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Live(UnityEngine.UIElements.VisualElement,System.Func\u00601\u003CSystem.Int32\u003E,System.Action\u00601\u003CUnityEngine.UIElements.VisualElement\u003E)",
+          "UnityEngine.UIElements.VisualElement Facet.Controls::Live(UnityEngine.UIElements.VisualElement,System.Func\u00601\u003CSystem.Object\u003E,System.Action\u00601\u003CUnityEngine.UIElements.VisualElement\u003E)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Preview(UnityEngine.UIElements.VisualElement,System.String,System.Action\u00601\u003CFacet.PreviewOptions\u003E)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Repeat(UnityEngine.UIElements.VisualElement,System.Func\u00601\u003CSystem.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E\u003E,System.Func\u00602\u003CT,System.String\u003E,System.Action\u00602\u003CUnityEngine.UIElements.VisualElement,T\u003E)",
+          "UnityEngine.UIElements.VisualElement Facet.Controls::Row(UnityEngine.UIElements.VisualElement,System.String,System.String)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Section(UnityEngine.UIElements.VisualElement,System.String,System.Action\u00601\u003CFacet.SectionOptions\u003E)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Section(UnityEngine.UIElements.VisualElement,System.String,System.Boolean)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Tiles(UnityEngine.UIElements.VisualElement,System.Action\u00601\u003CFacet.TilesOptions\u003E)",
@@ -2092,6 +2094,48 @@
         "members": [
           "System.Func\u00602\u003CT,UnityEngine.TextCore.Text.FontAsset\u003E Facet.DropdownOptions\u00601::ItemFace()",
           "System.Void Facet.DropdownOptions\u00601::set_ItemFace(System.Func\u00602\u003CT,UnityEngine.TextCore.Text.FontAsset\u003E)"
+        ]
+      },
+      {
+        "type": "Facet.Field",
+        "members": [
+          "Facet.FieldKind Facet.Field::Kind",
+          "System.Action Facet.Field::Committed",
+          "System.Action\u00601\u003CSystem.Object\u003E Facet.Field::Set",
+          "System.Func\u00601\u003CSystem.Object\u003E Facet.Field::Get",
+          "System.Func\u00601\u003CSystem.Object\u003E Facet.Field::UndoDocument",
+          "System.Object Facet.Field::Default",
+          "System.Single Facet.Field::Max",
+          "System.Single Facet.Field::Min",
+          "System.Single Facet.Field::Step",
+          "System.String Facet.Field::Id",
+          "System.String Facet.Field::Label",
+          "System.String Facet.Field::Tooltip",
+          "System.String[] Facet.Field::Options",
+          "System.Void Facet.Field::.ctor()"
+        ]
+      },
+      {
+        "type": "Facet.FieldKind",
+        "members": [
+          "Facet.FieldKind Facet.FieldKind::Action",
+          "Facet.FieldKind Facet.FieldKind::Bool",
+          "Facet.FieldKind Facet.FieldKind::Choice",
+          "Facet.FieldKind Facet.FieldKind::Colour",
+          "Facet.FieldKind Facet.FieldKind::Dropdown",
+          "Facet.FieldKind Facet.FieldKind::Float",
+          "Facet.FieldKind Facet.FieldKind::Info",
+          "Facet.FieldKind Facet.FieldKind::Int",
+          "Facet.FieldKind Facet.FieldKind::Key",
+          "Facet.FieldKind Facet.FieldKind::Number",
+          "Facet.FieldKind Facet.FieldKind::Text",
+          "System.Int32 Facet.FieldKind::value__"
+        ]
+      },
+      {
+        "type": "Facet.Form",
+        "members": [
+          "System.Void Facet.Form::Build(UnityEngine.UIElements.VisualElement,System.Collections.Generic.IEnumerable\u00601\u003CFacet.Field\u003E)"
         ]
       },
       {

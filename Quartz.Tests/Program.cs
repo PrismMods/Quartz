@@ -224,6 +224,7 @@ List<(string Name, Action Run)> tests = [
     ("The switcher hotkey refuses Escape and any chord the menu or a Prism chord also fires on", PrismRulesTests.TestSwitcherHotkeyRefusals),
     ("Every English label Quartz hands Prism has a Lang key in both languages", PrismRulesTests.TestPrismWordsMatchLang),
     ("Quartz keeps its newest thousand log lines for the debug window", QuartzLoggerTests.TestRecentKeepsTheNewestThousand),
+    ("Addon settings members map to classic rows", AddonFieldRulesTests.Run),
 ];
 if(args.Contains("--bench")) AllocationTests.ReportBaseline();
 int failed = 0;

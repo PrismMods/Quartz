@@ -3,6 +3,7 @@ using System.Collections;
 using System.Reflection;
 using Facet;
 using Newtonsoft.Json.Linq;
+using Quartz.Addons;
 using Quartz.Core;
 using Quartz.Features;
 using Quartz.Features.KeyLimiter;
@@ -27,7 +28,8 @@ internal static partial class FacetSelfTestChecks {
     private static readonly List<string> FormPageKeys = ["overlay.combo", "visuals.hidejudgements", "visuals.tilearc", "visuals.visualtweaks",
         "visuals.planetcolors", "visuals.ottoicon", "visuals.uihiding", "gameplay.chatter", "gameplay.countdown", "gameplay.death", "gameplay.autodeafen",
         "gameplay.keylimiter", "gameplay.judgement", "gameplay.practice", "tweaks.general", "tweaks.specialdays", "tweaks.optimizer", "tweaks.mainmenu",
-        "editor.tilereadout", "editor.bga", "editor.fliprotate", "editor.decopreview", "tuf.settings", CorePages.SettingsPageKey, "developer.main", "profiles.main"];
+        "editor.tilereadout", "editor.bga", "editor.fliprotate", "editor.decopreview", "tuf.settings", CorePages.SettingsPageKey, "developer.main", "profiles.main", "import.main",
+        CorePages.AddonsPageKey];
 
     internal static IEnumerator FormPages(Action<string, bool, string> check, Action<string> info) {
         // Every window opened here writes its geometry into the live settings: put the map back.
@@ -46,6 +48,8 @@ internal static partial class FacetSelfTestChecks {
             yield return SettingsUpdatesFont(check, info);
             yield return Developer(check, info);
             yield return Profiles(check, info);
+            yield return Import(check, info);
+            yield return Addons(check, info);
             IndexPerf(info);
         } finally {
             MainCore.Conf.FacetWindows.Clear();
@@ -344,21 +348,28 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(2);
     }
 
-    /// <summary>Each form page's builder, run twice into a detached element as the search index runs it, changes no setting in
-    /// memory or on disk, subscribes to no event and never measures the TUF library. With no page listed, each check fails.</summary>
+    /// <summary>Each form page's builder and each addon settings tab's, run twice into a detached element as the search index
+    /// runs it, changes no setting in memory or on disk, subscribes to no event and never measures the TUF library. With no page
+    /// listed, or a listed key without a builder, each check fails.</summary>
     private static IEnumerator ThrowawayBuilds(Action<string, bool, string> check, Action<string> info) {
-        int count = FormPageKeys.Count;
+        List<string> keys = [.. FormPageKeys, .. AddonSettingsTabs.Keys];
+        int count = keys.Count;
         CountScans();
         Dictionary<string, (string Memory, byte[] Disk)> before = SettingsReadings();
         int[] listeners = Listeners(), effects = SideEffectReadings(), door = DoorReadings();
         int scansBefore = scans;
         var done = new List<string>();
+        var missing = new List<string>();   // a listed key with no builder on this run is not covered: each check fails
         Func<string, bool> doing = QuartzShell.Doing;
         QuartzShell.Doing = n => { done.Add(n); return true; };
         try {
-            foreach(string key in FormPageKeys)
-                for(int i = 0; i < 2; i++)
-                    if(QuartzShell.Moved.TryGetValue(key, out Action<VisualElement> build)) build(new VisualElement());
+            foreach(string key in keys) {
+                // A form page's moved builder runs whether or not its page is registered on this run; an addon tab's needs its page.
+                Action<VisualElement> build = QuartzShell.Moved.TryGetValue(key, out Action<VisualElement> moved) ? moved
+                    : QuartzShell.BuilderFor(NavRegistry.ByKey(key));
+                if(build == null) missing.Add(key);
+                else for(int i = 0; i < 2; i++) build(new VisualElement());
+            }
         } finally {
             QuartzShell.Doing = doing;
         }
@@ -367,6 +378,8 @@ internal static partial class FacetSelfTestChecks {
         int scanned = scans - scansBefore;
         for(float t0 = Time.realtimeSinceStartup; Time.realtimeSinceStartup - t0 < 1.5f;) yield return null;   // past the save debounce
         Dictionary<string, (string Memory, byte[] Disk)> settled = SettingsReadings();
+        bool listed = count > 0 && missing.Count == 0;
+        string gaps = missing.Count == 0 ? "" : $" no builder={string.Join(",", missing)}";
         var changed = new List<string>();
         foreach(var (path, now) in built) {
             // A handle a first EnsureConf registered during the builds: its file is compared on disk, from then to now.
@@ -375,16 +388,16 @@ internal static partial class FacetSelfTestChecks {
             byte[] disk = settled.TryGetValue(path, out var later) ? later.Disk : null;
             if(!SameBytes(known ? was.Disk : now.Disk, disk)) changed.Add(Path.GetFileName(path) + " (disk)");
         }
-        check($"every form page builds detached without changing a setting in memory or on disk ({count})", count > 0 && changed.Count == 0,
-            $"changed={string.Join(",", changed)}");
-        check($"every form page builds detached without subscribing to an event ({count})", count > 0 && listeners.SequenceEqual(listenersAfter),
-            $"listeners={string.Join("/", listeners)} -> {string.Join("/", listenersAfter)}");
-        check($"every form page builds detached without measuring the TUF library ({count})", count > 0 && scanned == 0, $"scans={scanned}");
+        check($"every form page builds detached without changing a setting in memory or on disk ({count})", listed && changed.Count == 0,
+            $"changed={string.Join(",", changed)}{gaps}");
+        check($"every form page builds detached without subscribing to an event ({count})", listed && listeners.SequenceEqual(listenersAfter),
+            $"listeners={string.Join("/", listeners)} -> {string.Join("/", listenersAfter)}{gaps}");
+        check($"every form page builds detached without measuring the TUF library ({count})", listed && scanned == 0, $"scans={scanned}{gaps}");
         check($"every page builds detached without a thumbnail request or a side effect ({count})",
-            count > 0 && effects[2] >= 0 && effects.SequenceEqual(effectsAfter) && done.Count == 0,
-            $"packs/previews listeners, previews cached={string.Join("/", effects)} -> {string.Join("/", effectsAfter)} done={string.Join(",", done)}");
-        check($"every page builds detached without a request through the self-test door ({count})", count > 0 && door.SequenceEqual(doorAfter),
-            $"fetches/previews/update checks/network={string.Join("/", door)} -> {string.Join("/", doorAfter)}");
+            listed && effects[2] >= 0 && effects.SequenceEqual(effectsAfter) && done.Count == 0,
+            $"packs/previews listeners, previews cached={string.Join("/", effects)} -> {string.Join("/", effectsAfter)} done={string.Join(",", done)}{gaps}");
+        check($"every page builds detached without a request through the self-test door ({count})", listed && door.SequenceEqual(doorAfter),
+            $"fetches/previews/update checks/network={string.Join("/", door)} -> {string.Join("/", doorAfter)}{gaps}");
     }
 
     private static int[] DoorReadings() => [SelfTestDoor.Fetches, SelfTestDoor.Previews, SelfTestDoor.UpdateChecks, SelfTestDoor.Network];

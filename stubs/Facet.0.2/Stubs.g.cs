@@ -102,12 +102,14 @@ namespace Facet {
         public static global::Facet.Control<int> IntSlider(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<int> bind, global::System.Action<global::Facet.IntSliderOptions> configure = default) => throw null;
         public static global::Facet.Control<string> Key(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<string> bind, global::System.Action<global::Facet.KeyOptions> configure = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Live(global::UnityEngine.UIElements.VisualElement parent, global::System.Func<int> version, global::System.Action<global::UnityEngine.UIElements.VisualElement> build) => throw null;
+        public static global::UnityEngine.UIElements.VisualElement Live(global::UnityEngine.UIElements.VisualElement parent, global::System.Func<object> key, global::System.Action<global::UnityEngine.UIElements.VisualElement> build) => throw null;
         public static global::Facet.MaskTiles MaskTiles(global::UnityEngine.UIElements.VisualElement parent, global::Facet.Bind<int> mask, global::System.Collections.Generic.IList<global::Facet.MaskTile> tiles, global::System.Action<global::Facet.MaskTilesOptions> configure = default) => throw null;
         public static global::Facet.Control<float> Number(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<float> bind, global::System.Action<global::Facet.SliderOptions> configure = default) => throw null;
         public static global::Facet.Control<bool> PageHeader(global::UnityEngine.UIElements.VisualElement parent, string title, global::Facet.Bind<bool> on, global::System.Action<global::Facet.PageHeaderOptions> configure = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Preview(global::UnityEngine.UIElements.VisualElement parent, string label, global::System.Action<global::Facet.PreviewOptions> configure = default) => throw null;
         public static global::Facet.Control<global::UnityEngine.Vector2> Range(global::UnityEngine.UIElements.VisualElement parent, string lowLabel, string highLabel, global::Facet.Bind<global::UnityEngine.Vector2> range, global::System.Action<global::Facet.RangeOptions> configure = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Repeat<T>(global::UnityEngine.UIElements.VisualElement parent, global::System.Func<global::System.Collections.Generic.IReadOnlyList<T>> items, global::System.Func<T, string> key, global::System.Action<global::UnityEngine.UIElements.VisualElement, T> build) => throw null;
+        public static global::UnityEngine.UIElements.VisualElement Row(global::UnityEngine.UIElements.VisualElement parent, string label, string tooltip = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Section(global::UnityEngine.UIElements.VisualElement parent, string title, bool defaultOpen = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Section(global::UnityEngine.UIElements.VisualElement parent, string title, global::System.Action<global::Facet.SectionOptions> configure) => throw null;
         public static global::Facet.Control<float> Slider(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<float> bind, global::System.Action<global::Facet.SliderOptions> configure = default) => throw null;
@@ -138,6 +140,38 @@ namespace Facet {
     public sealed unsafe partial class DropdownOptions<T> : global::Facet.Options<T> {
         public global::System.Func<T, global::UnityEngine.TextCore.Text.FontAsset> ItemFace { get => throw null; set { } }
         private DropdownOptions() { }
+    }
+    public sealed unsafe partial class Field {
+        public global::System.Action Committed;
+        public object Default;
+        public global::System.Func<object> Get;
+        public string Id;
+        public global::Facet.FieldKind Kind;
+        public string Label;
+        public float Max;
+        public float Min;
+        public string[] Options;
+        public global::System.Action<object> Set;
+        public float Step;
+        public string Tooltip;
+        public global::System.Func<object> UndoDocument;
+        public Field() => throw null;
+    }
+    public enum FieldKind : int {
+        Bool = 0,
+        Int = 1,
+        Float = 2,
+        Choice = 3,
+        Text = 4,
+        Action = 5,
+        Colour = 6,
+        Key = 7,
+        Info = 8,
+        Dropdown = 9,
+        Number = 10,
+    }
+    public static unsafe partial class Form {
+        public static void Build(global::UnityEngine.UIElements.VisualElement parent, global::System.Collections.Generic.IEnumerable<global::Facet.Field> fields) => throw null;
     }
     public static unsafe partial class History {
         public const float CoalesceSeconds = 6f;

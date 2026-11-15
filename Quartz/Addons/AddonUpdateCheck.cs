@@ -10,7 +10,8 @@ internal static class AddonUpdateCheck {
         public string Url;
     }
     private static readonly Dictionary<string, Result> cache = new(StringComparer.OrdinalIgnoreCase);
-    private static readonly HashSet<string> pending = new(StringComparer.OrdinalIgnoreCase);
+    // Each repo in flight, with every caller waiting on it: a second page's check while the first's fetch runs still hears back.
+    private static readonly Dictionary<string, List<(string Version, Action<Result> OnNewer)>> pending = new(StringComparer.OrdinalIgnoreCase);
     private static HttpClient http;
     private static HttpClient Http {
         get {
@@ -36,10 +37,14 @@ internal static class AddonUpdateCheck {
             if(IsNewer(cached?.Tag, currentVersion)) onNewer(cached);
             return;
         }
-        if(!pending.Add(repo)) return;
-        Fetch(repo, currentVersion, onNewer);
+        if(pending.TryGetValue(repo, out var waiting)) {
+            waiting.Add((currentVersion, onNewer));
+            return;
+        }
+        pending[repo] = [(currentVersion, onNewer)];
+        Fetch(repo);
     }
-    private static async void Fetch(string repo, string currentVersion, Action<Result> onNewer) {
+    private static async void Fetch(string repo) {
         Result result = null;
         try {
             string json = await Http.GetStringAsync($"https://api.github.com/repos/{repo}/releases/latest");
@@ -53,8 +58,18 @@ internal static class AddonUpdateCheck {
         }
         MainThread.Enqueue(() => {
             cache[repo] = result;
+            if(!pending.TryGetValue(repo, out var waiting)) return;
             pending.Remove(repo);
-            if(result != null && IsNewer(result.Tag, currentVersion)) onNewer(result);
+            if(result == null) return;
+            foreach((string version, Action<Result> onNewer) in waiting) {
+                if(!IsNewer(result.Tag, version)) continue;
+                try {
+                    onNewer(result);
+                } catch(Exception e) {
+                    MainCore.Log.Err($"[{nameof(AddonUpdateCheck)}] a caller's result handler threw: {e}");   // the other callers still hear back
+                    Diag.Ignore(e);
+                }
+            }
         });
     }
     private static bool IsNewer(string tag, string current) {

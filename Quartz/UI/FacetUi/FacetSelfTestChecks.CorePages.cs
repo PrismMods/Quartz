@@ -3,6 +3,7 @@ using System.Collections;
 using System.Reflection;
 using Facet;
 using Quartz.Core;
+using Quartz.Features.Interop;
 using Quartz.IO;
 using Quartz.Localization;
 using Quartz.UI.Factory.Page;
@@ -252,6 +253,109 @@ internal static partial class FacetSelfTestChecks {
         check($"{ProfilesKey}: the list shows every profile in order, the active one marked without Select or Delete",
             list != null && list.childCount == names.Length && wrong.Count == 0,
             $"rows={list?.childCount}/{names.Length} active={ProfileManager.Active} wrong={string.Join(",", wrong)}");
+    }
+
+    private const string ImportKey = "import.main";
+
+    // Import: nothing here imports or switches a feature on; both buttons are checked through Do. Rescan runs for real (it
+    // only reads), and the KeyViewer mode and parts are put back as found.
+    private static IEnumerator Import(Action<string, bool, string> check, Action<string> info) {
+        bool wasOpen = UICore.IsOpen;
+        if(wasOpen) UICore.Close(true);
+        HandOff.ReturnTo = HandOff.Menu.None;
+        try {
+            FacetBridge.OpenNewMenu(CorePages.HomePageKey);
+            yield return Frames(3);
+            var clock = System.Diagnostics.Stopwatch.StartNew();
+            QuartzShell.Go(ImportKey);
+            info($"[perf] page {ImportKey} first build: {clock.Elapsed.TotalMilliseconds:0.0} ms");
+            yield return Frames(2);
+
+            // The classic page's heading is the page header, which the shell names menu-header.
+            Covers(check, ImportKey, renamed: new Dictionary<string, string> { ["IMPORT_HEADER"] = "menu-header" });
+            Searched(check, ImportKey, ["IMPORT_RESCAN"]);
+            Translated(check, ImportKey, ["IMPORT_HEADER"]);
+
+            bool rescanned = PressRow("IMPORT_RESCAN");
+            yield return Frames(2);
+            List<SettingsImportOption> options = SettingsImporter.GetAvailableOptions();
+            HashSet<string> ids = new(options.Select(o => o.Id), StringComparer.OrdinalIgnoreCase);
+            List<InstalledModInfo> others = [.. SettingsImporter.GetAllInstalledMods().Where(m => !ids.Contains(m.Id))];
+            options.Sort((a, b) => string.Compare(a.Label, b.Label, StringComparison.OrdinalIgnoreCase));
+            others.Sort((a, b) => string.Compare(a.Label, b.Label, StringComparison.OrdinalIgnoreCase));
+            string[] want = [.. options.Select(o => o.Label), .. others.Select(m => m.Label)];
+            string[] shown = [.. (PageContent().Q(name: "import-list")?.Query<Label>("import-name").ToList() ?? []).Select(l => l.text)];
+            bool none = Names(PageContent(), "IMPORT_NONE") == (want.Length == 0);
+            bool tagged = Enumerable.Range(1, others.Count).All(k => Names(PageContent(), "IMPORT_NOT_COMPATIBLE#" + k));
+            check($"{ImportKey}: the options match SettingsImporter's, compatible first, each sorted by label",
+                rescanned && shown.SequenceEqual(want) && none && tagged,
+                $"rescan={rescanned} want={string.Join("|", want)} shown={string.Join("|", shown)} none={none} tagged={tagged}");
+
+            // The KeyViewer rows are numbered among the options that carry them, so the first such option's are #1.
+            SettingsImportOption kv = options.Find(o => SettingsImporter.HasKeyViewerPayload(o.Source));
+            if(kv != null) yield return ImportParts(check, kv.OptionId, 1);
+            else info($"{ImportKey}: no option carries a KeyViewer payload, so the mode and part rows have nothing to check");
+
+            if(options.Count > 0) {
+                yield return Recorded(check, $"{ImportKey} IMPORT_DO#n: a click acts only through Do", () => PressRow("IMPORT_DO#1"),
+                    "import.run:" + options[0].OptionId);
+                yield return Recorded(check, $"{ImportKey} IMPORT_PROFILE#n: a click acts only through Do", () => PressRow("IMPORT_PROFILE#1"),
+                    "import.profile:" + options[0].OptionId);
+            } else info($"{ImportKey}: no supported mod is loaded, so Import has no row to check");
+        } finally {
+            HandOff.ReturnTo = HandOff.Menu.None;
+            QuartzShell.Hide();
+            if(UICore.IsOpen) UICore.Close(true);
+            if(wasOpen) UICore.Open(true);
+        }
+        yield return Frames(2);
+    }
+
+    // Option n's mode dropdown shows the part toggles under Replace certain only; they are drawn on at the start, and one
+    // cleared here is still drawn off, with its flag cleared, after a rescan. The option's mode and parts are put back as found.
+    private static IEnumerator ImportParts(Action<string, bool, string> check, string optionId, int n) {
+        const BindingFlags Static = BindingFlags.Static | BindingFlags.NonPublic;
+        var modes = typeof(CoreMenuPages.ImportPage).GetField("modes", Static)?.GetValue(null) as Dictionary<string, SettingsImportReplaceMode>;
+        var parts = typeof(CoreMenuPages.ImportPage).GetField("parts", Static)?.GetValue(null) as Dictionary<string, SettingsImportKeyViewerPart>;
+        if(modes == null || parts == null) {
+            check($"{ImportKey} IMPORT_KV_MODE#n: Replace certain shows the five part toggles, the others hide them", false, "page state not found");
+            yield break;
+        }
+        bool hadMode = modes.TryGetValue(optionId, out SettingsImportReplaceMode mode), hadParts = parts.TryGetValue(optionId, out SettingsImportKeyViewerPart flags);
+        string[] keys = ["IMPORT_PART_KEYS", "IMPORT_PART_LABELS", "IMPORT_PART_COLORS", "IMPORT_PART_RAIN", "IMPORT_PART_POSITION"];
+        string Shown() => string.Concat(keys.Select(k => ShownRow(k + "#" + n) ? "1" : "0"));
+        // Each toggle's drawn value from its switch's track: 1 on, 0 off, ? neither (or no toggle).
+        string Drawn() => string.Concat(keys.Select(k => PageContent().Q(name: k + "#" + n + "-input") is VisualElement t
+            ? Shows(t, true) ? "1" : Shows(t, false) ? "0" : "?" : "?"));
+        try {
+            parts.Remove(optionId);
+            var seen = new Dictionary<string, string>();
+            foreach(string item in new[] { "IMPORT_MODE_REPLACE_ALL", "IMPORT_MODE_KEEP_OLD", "IMPORT_MODE_REPLACE_CERTAIN" }) {
+                yield return PickItem("IMPORT_KV_MODE#" + n, QuartzHost.Host.Translate(item));
+                seen[item] = Shown();
+            }
+            check($"{ImportKey} IMPORT_KV_MODE#n: Replace certain shows the five part toggles, the others hide them",
+                seen["IMPORT_MODE_REPLACE_CERTAIN"] == "11111" && seen["IMPORT_MODE_REPLACE_ALL"] == "00000" && seen["IMPORT_MODE_KEEP_OLD"] == "00000",
+                string.Join(",", seen.Select(kv => $"{kv.Key}={kv.Value}")));
+
+            string start = Drawn();
+            bool clicked = ClickRow("IMPORT_PART_RAIN#" + n);
+            // The switch eases to off; wait for it before the rescan.
+            if(PageContent().Q(name: "IMPORT_PART_RAIN#" + n + "-input") is VisualElement rain) yield return Await(rain, false, new float[1]);
+            PressRow("IMPORT_RESCAN");
+            yield return Frames(2);
+            string drawn = Drawn();
+            SettingsImportKeyViewerPart kept = parts.TryGetValue(optionId, out var k2) ? k2 : SettingsImportKeyViewerPart.All;
+            check($"{ImportKey} IMPORT_KV_MODE#n: the part toggles start on and keep their flags across a rescan",
+                start == "11111" && clicked && drawn == "11101" && kept == (SettingsImportKeyViewerPart.All & ~SettingsImportKeyViewerPart.Rain)
+                && Shown() == "11111", $"start={start} clicked={clicked} drawn={drawn} kept={kept} shown={Shown()}");
+        } finally {
+            if(hadMode) modes[optionId] = mode;
+            else modes.Remove(optionId);
+            if(hadParts) parts[optionId] = flags;
+            else parts.Remove(optionId);
+            QuartzShell.Surface?.Refresh();
+        }
     }
 
     private static bool Close(Color a, Color b) => Mathf.Abs(a.r - b.r) < 0.01f && Mathf.Abs(a.g - b.g) < 0.01f && Mathf.Abs(a.b - b.b) < 0.01f;

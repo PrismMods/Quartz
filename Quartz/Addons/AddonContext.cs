@@ -159,10 +159,15 @@ public sealed class AddonContext {
         object data = settingsData;
         object defaults = settingsDefaults;
         RegisterTab(title ?? Id, content => AddonSettingsUI.Build(content, this, data, defaults, SaveSettings));
+        AddonSettingsTabs.Register(new AddonSettingsTabs.Tab(TabKey(title ?? Id), Id, data, defaults, SaveSettings, Wrn));
     }
-    public void RegisterTab(string title, Action<Transform> build) =>
+    private string TabKey(string title) => "addon." + Id + "." + GenerateUI.LocaleKeyFromText("", title);
+    private string TopTabKey(string title) => "addon." + Id + ".top." + GenerateUI.LocaleKeyFromText("", title);
+    public void RegisterTab(string title, Action<Transform> build) {
+        // A custom page under a settings tab's title replaces it: the new menu draws it as the custom page it is.
+        AddonSettingsTabs.Remove(TabKey(title));
         Quartz.UI.Nav.NavRegistry.AddPage(new Quartz.UI.Nav.NavPage {
-            Key = "addon." + Id + "." + Quartz.UI.Generator.GenerateUI.LocaleKeyFromText("", title),
+            Key = TabKey(title),
             CategoryKey = Quartz.UI.Nav.CorePages.AddonsCategoryKey,
             Order = 100 + tabCount++,
             Title = title,
@@ -171,6 +176,7 @@ public sealed class AddonContext {
             OwnScroll = false,
             Build = content => build(content),
         });
+    }
     public void BuildSettingsUI(Transform content) {
         if(settingsData == null)
             throw new InvalidOperationException($"addon '{Id}' must call GetSettings<T>() before BuildSettingsUI()");
@@ -182,9 +188,11 @@ public sealed class AddonContext {
         object data = settingsData;
         object defaults = settingsDefaults;
         RegisterTopLevelTab(title ?? Id, content => AddonSettingsUI.Build(content, this, data, defaults, SaveSettings), iconPng);
+        AddonSettingsTabs.Register(new AddonSettingsTabs.Tab(TopTabKey(title ?? Id), Id, data, defaults, SaveSettings, Wrn));
     }
     public void RegisterTopLevelTab(string title, Action<Transform> build, byte[] iconPng = null) {
-        string key = "addon." + Id + ".top." + GenerateUI.LocaleKeyFromText("", title);
+        string key = TopTabKey(title);
+        AddonSettingsTabs.Remove(key);
         string iconKey = null;
         if(iconPng != null) {
             iconKey = key + ".icon";
@@ -232,6 +240,7 @@ public sealed class AddonContext {
             mergedTranslations = false;
         }
         Quartz.UI.Nav.NavRegistry.RemoveOwner(Id);
+        AddonSettingsTabs.RemoveAddon(Id);
         foreach(string spriteKey in spriteKeys) Quartz.Resource.SpriteRegistry.Unregister(spriteKey);
         spriteKeys.Clear();
         if(settings is IO.ISettingsHandle handle) {
