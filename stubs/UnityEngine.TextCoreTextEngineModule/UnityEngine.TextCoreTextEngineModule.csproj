@@ -23,5 +23,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="../UnityEngine.CoreModule/UnityEngine.CoreModule.csproj" />
+		<ProjectReference Include="../UnityEngine.TextRenderingModule/UnityEngine.TextRenderingModule.csproj" />
 	</ItemGroup>
 </Project>

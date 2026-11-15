@@ -1980,6 +1980,10 @@
         ]
       },
       {
+        "type": "Facet.ConfirmOptions",
+        "members": []
+      },
+      {
         "type": "Facet.ControlOptions",
         "members": [
           "System.Boolean Facet.ControlOptions::Undoable()",
@@ -2038,6 +2042,7 @@
           "Facet.Control\u00601\u003CUnityEngine.Color\u003E Facet.Controls::Colour(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CUnityEngine.Color\u003E,System.Action\u00601\u003CFacet.ColourOptions\u003E)",
           "Facet.Control\u00601\u003CUnityEngine.Vector2\u003E Facet.Controls::Range(UnityEngine.UIElements.VisualElement,System.String,System.String,Facet.Bind\u00601\u003CUnityEngine.Vector2\u003E,System.Action\u00601\u003CFacet.RangeOptions\u003E)",
           "Facet.MaskTiles Facet.Controls::MaskTiles(UnityEngine.UIElements.VisualElement,Facet.Bind\u00601\u003CSystem.Int32\u003E,System.Collections.Generic.IList\u00601\u003CFacet.MaskTile\u003E,System.Action\u00601\u003CFacet.MaskTilesOptions\u003E)",
+          "Facet.StatusLine Facet.Controls::Status(UnityEngine.UIElements.VisualElement)",
           "System.Single Facet.Controls::RowHeight",
           "System.Void Facet.Controls::AfterChange(UnityEngine.UIElements.VisualElement,System.Action)",
           "System.Void Facet.Controls::Hook(UnityEngine.UIElements.VisualElement,System.Action\u00601\u003CFacet.ControlOptions\u003E)",
@@ -2084,7 +2089,10 @@
       },
       {
         "type": "Facet.DropdownOptions\u00601",
-        "members": []
+        "members": [
+          "System.Func\u00602\u003CT,UnityEngine.TextCore.Text.FontAsset\u003E Facet.DropdownOptions\u00601::ItemFace()",
+          "System.Void Facet.DropdownOptions\u00601::set_ItemFace(System.Func\u00602\u003CT,UnityEngine.TextCore.Text.FontAsset\u003E)"
+        ]
       },
       {
         "type": "Facet.History",
@@ -2264,6 +2272,7 @@
       {
         "type": "Facet.Popup",
         "members": [
+          "Facet.Popup Facet.Popup::Confirm(UnityEngine.UIElements.VisualElement,System.String,System.String,System.Action\u00601\u003CSystem.Boolean\u003E,System.Action\u00601\u003CFacet.ConfirmOptions\u003E)",
           "Facet.Popup Facet.Popup::Open(UnityEngine.UIElements.VisualElement,System.Action\u00601\u003CUnityEngine.UIElements.VisualElement\u003E,System.Action)",
           "System.Void Facet.Popup::Close()"
         ]
@@ -2381,6 +2390,7 @@
       {
         "type": "Facet.StatusLine",
         "members": [
+          "System.Void Facet.StatusLine::Clear()",
           "System.Void Facet.StatusLine::Show(System.Func\u00601\u003CSystem.String\u003E,Facet.Role,System.Single)"
         ]
       },
@@ -6029,7 +6039,9 @@
     "types": [
       {
         "type": "UnityEngine.TextCore.Text.FontAsset",
-        "members": []
+        "members": [
+          "UnityEngine.TextCore.Text.FontAsset UnityEngine.TextCore.Text.FontAsset::CreateFontAsset(UnityEngine.Font)"
+        ]
       },
       {
         "type": "UnityEngine.TextCore.Text.TextAsset",

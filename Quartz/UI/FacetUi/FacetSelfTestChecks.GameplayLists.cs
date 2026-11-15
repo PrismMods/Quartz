@@ -278,6 +278,13 @@ internal static partial class FacetSelfTestChecks {
             check($"{page}: undo after a removal never writes into another item, and the titles renumber", false, $"added={list.Count}");
             yield break;
         }
+        string word = MainCore.Tr.GetForLanguage(removeId, "en-US", removeId);
+        Find(word);   // rebuilds a stale index; a common word passes the hit limit, so the index is asked again without one
+        List<SearchIndex.Hit> hits = QuartzShell.Nav?.Index?.Find(word, int.MaxValue) ?? [];
+        QuartzShell.Nav?.Filter("");
+        yield return Frames(2);
+        // A hit's Key is the row's Lang key, unnumbered: each of the three items gives one.
+        check($"{page}: search finds an item added on the page", hits.Count(h => h.Key == removeId) == 3, Hits(hits));
         T second = list[1], last = list[2];
         mark(last);
         QuartzShell.Surface?.Refresh();

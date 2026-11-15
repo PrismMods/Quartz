@@ -12,9 +12,9 @@ using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi;
 /// <summary>
 /// The new menu's Settings page: the classic page's settings regrouped into cards, each row writing the field the classic
-/// row writes. Its updates and fonts stay on the classic page, one click away.
+/// row writes.
 /// </summary>
-internal static class ShellSettings {
+internal static partial class ShellSettings {
     private static CoreSettings C => MainCore.Conf;
     private static readonly string[] Credits = ["CREDITS_TEAM", "CREDITS_TESTERS", "CREDITS_PORTS", "CREDITS_DONORS"];
 
@@ -22,15 +22,15 @@ internal static class ShellSettings {
         Controls.PageHeader(p, "SETTINGS", null, o => o.Id = "menu-header");
         Menu(Card(p, "PRISM_GROUP_MENU"));
         Appearance(Card(p, "MENU_GROUP_APPEARANCE"));
+        FontCards(p);
         Animation(Card(p, "HEADING_ANIMATION", o => o.VisibleWhen = () => PrismBridge.Available));   // its switch is a PrismLib setting
         Behaviour(Card(p, "MENU_GROUP_BEHAVIOUR"));
         Language(Card(p, "LANGUAGE"));
         Maintenance(Card(p, "MENU_GROUP_MAINTENANCE"));
+        UpdatesCard(p);
         VisualElement experimental = Card(p, "PRISM_GROUP_EXPERIMENTAL");
         Switch(experimental, "PRISM_NEW_MENU", () => C.ExperimentalNewMenu, UICore.SetNewMenuSwitch, "PRISM_NEW_MENU_TIP");
         QuartzShell.ClassicMenuRow(experimental, () => QuartzShell.OpenClassic(-1));
-        Controls.Action(Controls.Card(p, null, o => o.Id = "menu-settings-classic"), "MENU_SETTINGS_CLASSIC", "MENU_CLASSIC_OPEN",
-            () => QuartzShell.OpenClassic(NavRegistry.StateFor(CorePages.SettingsPageKey)), o => o.Id = "MENU_SETTINGS_CLASSIC");
         VisualElement credits = Card(p, "CREDITS", o => o.Note = "CREDITS_LICENSE");
         foreach(string key in Credits) {
             string body = key + "_BODY";

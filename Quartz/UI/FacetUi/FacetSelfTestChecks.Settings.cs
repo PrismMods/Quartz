@@ -18,7 +18,8 @@ namespace Quartz.UI.FacetUi;
 /// </summary>
 internal static partial class FacetSelfTestChecks {
     private static readonly string[] SettingsCardKeys =
-        ["PRISM_GROUP_MENU", "MENU_GROUP_APPEARANCE", "HEADING_ANIMATION", "MENU_GROUP_BEHAVIOUR", "LANGUAGE", "MENU_GROUP_MAINTENANCE", "PRISM_GROUP_EXPERIMENTAL", "CREDITS"];
+        ["PRISM_GROUP_MENU", "MENU_GROUP_APPEARANCE", "FONT", "SETTINGS_FONT", "HEADING_ANIMATION", "MENU_GROUP_BEHAVIOUR", "LANGUAGE", "MENU_GROUP_MAINTENANCE",
+            "UPDATES", "PRISM_GROUP_EXPERIMENTAL", "CREDITS"];
     // Each switch row, the classic page's toggle for the same field, and the field.
     private static readonly (string row, string classic, Func<bool> get)[] SettingsSwitches = [
         ("SHOW_OVERLAYER_PANEL_AT_STARTUP", "show_on_startup", () => MainCore.Conf.ShowOnStartup),
@@ -287,7 +288,7 @@ internal static partial class FacetSelfTestChecks {
     }
 
     private static IEnumerator SettingsHandOffs(Action<string, bool, string> check) {
-        int profiles = NavRegistry.StateFor("profiles.main"), settings = NavRegistry.StateFor(CorePages.SettingsPageKey);
+        int profiles = NavRegistry.StateFor("profiles.main");
         QuartzShell.OpenClassic(profiles);   // the classic menu's current page is now Profiles
         yield return Frames(2);
         UICore.Close();
@@ -300,13 +301,7 @@ internal static partial class FacetSelfTestChecks {
         UICore.Close();
         yield return Frames(2);
         Step(check, "closing it brings the new menu back on Settings", FacetBridge.NewMenuVisible() && !UICore.IsOpen && QuartzShell.CurrentPage == CorePages.SettingsPageKey);
-        Button fonts = Body.Q<Button>("MENU_SETTINGS_CLASSIC-input");
-        if(fonts != null) Submit(fonts);
-        yield return Frames(2);
-        Step(check, "the updates-and-fonts row opens the classic menu on Settings",
-            fonts != null && UICore.IsOpen && UICore.CurrentMenuState == settings && !FacetBridge.NewMenuVisible(), $"state={UICore.CurrentMenuState}/{settings}");
-        UICore.Close();
-        yield return Frames(2);
+        check("no row on Settings opens the classic Settings page", Body.Q(name: "menu-settings-classic") == null && Body.Q(name: "MENU_SETTINGS_CLASSIC-input") == null, null);
     }
 
     private static void SettingsRest(Action<string, bool, string> check) {

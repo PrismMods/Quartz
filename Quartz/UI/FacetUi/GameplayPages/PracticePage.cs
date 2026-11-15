@@ -31,6 +31,7 @@ internal static class PracticePage {
             if(C.Bindings.Count >= 16) return;
             C.Bindings.Add(new PracticeBinding());
             save();
+            QuartzShell.Changed();   // the search index finds the new binding's rows
         }, o => {
             o.Id = "PRACTICE_ADD";
             o.Tooltip = "DESC_PRACTICE_ADD";
@@ -100,6 +101,7 @@ internal static class PracticePage {
         Controls.Action(body, "", "PRACTICE_REMOVE", () => {
             C.Bindings.Remove(b);
             save();
+            QuartzShell.Changed();
         }, o => o.Id = "PRACTICE_REMOVE#" + n);
     }
 }

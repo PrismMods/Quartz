@@ -65,20 +65,13 @@ internal static partial class QuartzShell {
     // A search result on a page still in the classic menu goes on to that menu; a moved or off page is the destination.
     internal static Action<SearchIndex.Hit> ClassicHit(NavPage page) => IsClassic(page) ? _ => OpenClassic(page.State) : null;
 
-    // The rows of the classic Settings page's Updates and Font sections, which the moved page leaves there.
-    private static readonly HashSet<string> LeftClassic = [
-        "UPDATES", "CHECK_FOR_UPDATES", "UPDATE_NOTES", "UPDATE_SKIP", "UPDATE_INSTALL", "UPDATE_UNDO", "UPDATE_RESTART",
-        "FONT", "FONT_SCALE", "FONT_LINE_SPACING", "FONT_RENAME", "FONT_DELETE", "SETTINGS_FONT",
-    ];
-
     // Pages moved in part: their editors stay in the classic menu, and so do those rows' hits. A row the moved page has is its own.
     private static readonly HashSet<string> PartlyMoved = ["overlay.panels"];
 
-    // A row its moved page leaves to the classic menu: the Settings page's Updates and Font rows, or a partly moved page's
-    // rows that the moved page has no row for. Its "Use this feature" is the moved page's header switch. ids holds each partly
-    // moved page's row Ids, from a throwaway build of it.
+    // A row its moved page leaves to the classic menu: a partly moved page's rows that the moved page has no row for. Its
+    // "Use this feature" is the moved page's header switch. ids holds each partly moved page's row Ids, from a throwaway
+    // build of it.
     private static bool LeftClassicOn(NavPage page, string key, Dictionary<string, HashSet<string>> ids) {
-        if(page.Key == CorePages.SettingsPageKey) return LeftClassic.Contains(key);
         if(!PartlyMoved.Contains(page.Key) || key == "FEATURE_PAGE_ENABLE" || !Moved.TryGetValue(page.Key, out Action<VisualElement> build)) return false;
         if(!ids.TryGetValue(page.Key, out HashSet<string> moved)) {
             var throwaway = new VisualElement();

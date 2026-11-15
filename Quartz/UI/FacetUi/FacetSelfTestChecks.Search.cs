@@ -36,10 +36,7 @@ internal static partial class FacetSelfTestChecks {
             // A row of a page still in the classic menu.
             string recalibrate = QuartzHost.Host.Translate("PROFILE_RECALIBRATE");
             yield return SearchClassic(check, "recalibrate", h => h.PageRef == null && h.Label == recalibrate, "profiles.main", "a classic row's hit");
-            // A row the moved Settings page leaves on the classic page.
-            string updates = QuartzHost.Host.Translate("CHECK_FOR_UPDATES");
-            yield return SearchClassic(check, "check for updates", h => h.PageRef == null && h.Label == updates, CorePages.SettingsPageKey,
-                "a row the moved Settings page leaves to the classic menu");
+            yield return SearchSettingsRow(check);
             SearchNoCardRows(check);
             yield return SearchKorean(check, "FXRM_ENABLE_SAVE", "SECTION_EFFECT_REMOVER", "Korean initials find a moved page's row");
             yield return SearchFresh(check);
@@ -105,6 +102,24 @@ internal static partial class FacetSelfTestChecks {
         QuartzShell.Nav.Filter("");
         check("clearing the search shows the page again", results && Body.Q(name: "FXRM_HEADER") != null && QuartzShell.CurrentPage == FxPage,
             $"results={results} page={QuartzShell.CurrentPage}");
+    }
+
+    // The Updates card's row on the moved Settings page: its result opens Settings with the row in view.
+    private static IEnumerator SearchSettingsRow(Action<string, bool, string> check) {
+        List<SearchIndex.Hit> hits = Find("check for updates");
+        int at = hits.FindIndex(h => h.PageRef != null && h.Key == "CHECK_FOR_UPDATES");
+        check("search finds the Updates card's row for \"check for updates\" on Settings", at >= 0, Hits(hits));
+        if(at < 0) yield break;
+        Click(Body[at]);
+        bool inView = false;
+        for(int i = 0; i < 30 && !inView; i++) {
+            yield return null;
+            VisualElement row = Body.Q(name: "CHECK_FOR_UPDATES") ?? Body.Q(name: "CHECK_FOR_UPDATES-input");
+            Rect vp = ContentScroll.contentViewport.worldBound, r = row?.worldBound ?? default;
+            inView = row != null && r.height > 0f && r.yMin >= vp.yMin - 1f && r.yMax <= vp.yMax + 1f;
+        }
+        check("its result opens Settings with Check for updates in view", QuartzShell.CurrentPage == CorePages.SettingsPageKey && !UICore.IsOpen && inView,
+            $"page={QuartzShell.CurrentPage} classic={UICore.IsOpen} inView={inView}");
     }
 
     // Picks a mode in Effect Remover's own dropdown (the page is open), as a click would.

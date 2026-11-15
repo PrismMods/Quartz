@@ -60,6 +60,9 @@ namespace Facet {
         public float StackBelow { get => throw null; set { } }
         private ColumnsOptions() { }
     }
+    public sealed unsafe partial class ConfirmOptions {
+        private ConfirmOptions() { }
+    }
     public unsafe partial class ControlOptions {
         public global::System.Collections.Generic.List<global::System.Collections.Generic.KeyValuePair<string, global::System.Action>> ContextMenu { get => throw null; set { } }
         public global::System.Func<bool> EnabledWhen { get => throw null; set { } }
@@ -108,6 +111,7 @@ namespace Facet {
         public static global::UnityEngine.UIElements.VisualElement Section(global::UnityEngine.UIElements.VisualElement parent, string title, bool defaultOpen = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Section(global::UnityEngine.UIElements.VisualElement parent, string title, global::System.Action<global::Facet.SectionOptions> configure) => throw null;
         public static global::Facet.Control<float> Slider(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<float> bind, global::System.Action<global::Facet.SliderOptions> configure = default) => throw null;
+        public static global::Facet.StatusLine Status(global::UnityEngine.UIElements.VisualElement parent) => throw null;
         public static global::Facet.Control<string> Text(global::UnityEngine.UIElements.VisualElement parent, string label, global::Facet.Bind<string> bind, global::System.Action<global::Facet.TextOptions> configure = default) => throw null;
         public static global::Facet.Control<bool> Tile(global::UnityEngine.UIElements.VisualElement grid, string label, global::Facet.Bind<bool> on, global::System.Action<global::Facet.TileOptions> configure = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Tiles(global::UnityEngine.UIElements.VisualElement parent, global::System.Action<global::Facet.TilesOptions> configure = default) => throw null;
@@ -132,6 +136,7 @@ namespace Facet {
         protected DropdownOptions() { }
     }
     public sealed unsafe partial class DropdownOptions<T> : global::Facet.Options<T> {
+        public global::System.Func<T, global::UnityEngine.TextCore.Text.FontAsset> ItemFace { get => throw null; set { } }
         private DropdownOptions() { }
     }
     public static unsafe partial class History {
@@ -246,6 +251,7 @@ namespace Facet {
     }
     public sealed unsafe partial class Popup {
         public void Close() => throw null;
+        public static global::Facet.Popup Confirm(global::UnityEngine.UIElements.VisualElement owner, string title, string body, global::System.Action<bool> done, global::System.Action<global::Facet.ConfirmOptions> configure = default) => throw null;
         public static global::Facet.Popup Open(global::UnityEngine.UIElements.VisualElement anchor, global::System.Action<global::UnityEngine.UIElements.VisualElement> build, global::System.Action onClose = default) => throw null;
         private Popup() { }
     }
@@ -321,6 +327,7 @@ namespace Facet {
         protected SliderOptions() { }
     }
     public sealed unsafe partial class StatusLine {
+        public void Clear() => throw null;
         public void Show(global::System.Func<string> text, global::Facet.Role role = default, float seconds = default) => throw null;
         private StatusLine() { }
     }

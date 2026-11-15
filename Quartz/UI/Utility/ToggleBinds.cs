@@ -55,7 +55,11 @@ public static class ToggleBinds {
     private static bool IsTyping() => Quartz.UI.Objects.UIInputBlocker.IsEditing;
     private static void Fire(string id) {
         if(!live.TryGetValue(id, out List<UIToggle> list)) {
-            Quartz.UI.Factory.PageFactory.EnsureAllBuilt();
+            // A feature's switch lives on the Features page: build that one, not every classic page.
+            if(id.StartsWith("feature_", StringComparison.Ordinal)
+               && Quartz.UI.Nav.NavRegistry.ByKey(Quartz.UI.Nav.CorePages.FeaturesPageKey) is { } features)
+                Quartz.UI.Factory.PageFactory.EnsureBuilt(features.State);
+            if(!live.TryGetValue(id, out list)) Quartz.UI.Factory.PageFactory.EnsureAllBuilt();
             if(!live.TryGetValue(id, out list)) return;
         }
         UIToggle primary = null;

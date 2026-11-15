@@ -92,6 +92,12 @@ internal static partial class FacetSelfTestChecks {
         string[] shortcut = ["AD_SHORTCUT_HINT", "AD_KB_CTRL", "AD_KB_SHIFT", "AD_KB_ALT", "AD_KB_META", "AD_KEY"];
         string[] keys = sc ? rows : [.. rows, "AD_SHORTCUT_WINDOWS_ONLY"];
         string[] hidden = [.. shortcut, "AD_DISCORD_HINT", .. sc ? ["AD_SHORTCUT_WINDOWS_ONLY"] : Array.Empty<string>()];
+        // The page is checked in bot mode. With a stored token, bot mode starts the feature's Discord link on its next tick,
+        // so a player whose effective mode is another one is left alone.
+        if(AutoDeafen.EffectiveMode != AutoDeafenSettings.ModeBot && !string.IsNullOrWhiteSpace(C().DiscordAccessToken)) {
+            formInfo($"{page}: not run, bot mode would start a Discord link from the stored token");
+            yield break;
+        }
         try {
             yield return FeatureFormPage(check, "autodeafen", page, AutoDeafen.ConfMgr, () => {
                 C().Mode = AutoDeafenSettings.ModeBot;

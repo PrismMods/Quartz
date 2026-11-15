@@ -186,12 +186,13 @@ internal static partial class FacetSelfTestChecks {
             if(i % 10 == 9) yield return null;
         }
         long mem1 = GC.GetTotalMemory(true), grew = mem1 - mem0;
-        // What the 100 steps themselves hold: other memory freed meanwhile (the step above's documents) can make grew negative.
+        // What the 100 steps themselves hold: other memory freed meanwhile (the step above's documents) can make grew negative,
+        // and collector noise can swing it by megabytes either way, so grew is logged only and held decides.
         global::Facet.History.Clear();
         long held = mem1 - GC.GetTotalMemory(true);
         info($"[perf] key viewer 100 tab clicks: retained memory grew {grew / 1048576.0:0.0} MB, their steps hold {held / 1024} KB ({held / 100} bytes a click)");
         check($"{KvPerfPage}: a tab click keeps under 16 KB (its step records the tabs, not the document)",
-            model.Editing == tab && grew / 100 < 16 << 10 && held / 100 < 16 << 10, $"grew={grew} held={held} editing={model.Editing}");
+            model.Editing == tab && held / 100 < 16 << 10, $"grew={grew} held={held} editing={model.Editing}");
 
         global::Facet.History.Clear();
         Func<bool> valid = global::Facet.History.BoundTo(model.UndoDocument);

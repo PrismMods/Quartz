@@ -487,6 +487,7 @@
     "UPDATE_AVAILABLE": "새 업데이트:",
     "UPDATE_CHANNEL_ALPHA": "알파",
     "UPDATE_CHANNEL_BETA": "베타",
+    "UPDATE_CHANNEL_LABEL": "업데이트 채널",
     "UPDATE_CHANNEL_STABLE": "안정판",
     "UPDATE_CHECK": "업데이트 확인",
     "UPDATE_CHECKING": "업데이트를 확인하고 있어요…",

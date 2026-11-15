@@ -71,6 +71,7 @@ internal static class RestrictionPage {
             if(C.JRestrictSections.Count >= RestrictionSettings.MaxSections) return;
             C.JRestrictSections.Add(new JudgementSection());
             save();
+            QuartzShell.Changed();   // the search index finds the new section's rows
         }, o => {
             o.Id = "JR_SECTIONS_ADD";
             o.Tooltip = "DESC_JR_SECTIONS_ADD";
@@ -107,6 +108,7 @@ internal static class RestrictionPage {
         Controls.Action(body, "", "JRSEC_REMOVE", () => {
             C.JRestrictSections.Remove(s);
             Restriction.Save();
+            QuartzShell.Changed();
         }, o => o.Id = "JRSEC_REMOVE#" + n);
     }
 
