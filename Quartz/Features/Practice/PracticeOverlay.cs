@@ -2,6 +2,7 @@ using Quartz.Compat.Game;
 using Quartz.Core;
 using Quartz.Game.Stats;
 using Quartz.Localization;
+using Quartz.Overlay;
 using Quartz.Resource;
 using Quartz.UI;
 using Quartz.UI.Utility;
@@ -20,9 +21,9 @@ public static class PracticeOverlay {
     private static TextMeshProUGUI text;
     private static GameObject dragObj;
     private static Updater updater;
-    private static bool ShouldShow() =>
+    internal static bool ShouldShow() =>
         (OverlaySwitch.Enabled && Conf.Enabled && Conf.ShowIndicator
-            && (!Conf.IndicatorOnlyInGame || GameStats.InGame)) || UICore.IsArranging;
+            && (!Conf.IndicatorOnlyInGame || GameStats.InGame)) || UICore.IsArranging || OverlayPreview.Is(FontKey);
     private static bool gateWant;
     // Roots start visible; keep the updater until it has hidden them once.
     private static bool updaterRan;
@@ -72,6 +73,10 @@ public static class PracticeOverlay {
         );
         ReorganizeHandle.SetRotationSource(dragObj, () => Conf.Rotation, v => { Conf.Rotation = v; Apply(); });
         updater = canvasObj.AddComponent<Updater>();
+        RectTransform[] frame = [root];
+        // The end hides the readout at once where it rests hidden, so it never flashes on the screen until the next Update.
+        OverlayPreview.Register(FontKey, () => canvasObj ? canvasObj.GetComponent<Canvas>() : null, () => frame,
+            end: () => { if(root) root.gameObject.SetActive(ShouldShow()); }, shown: () => root ? root.gameObject : null);
         gateWant = true;
         updaterRan = false;
         gateRunning = true;
@@ -107,6 +112,7 @@ public static class PracticeOverlay {
     }
     public static void Dispose() {
         if(canvasObj == null) return;
+        OverlayPreview.Unregister(FontKey);   // first: a borrowed canvas goes back before the settings are kept
         PracticeDifficulty.ConfMgr?.Save();
         Object.Destroy(canvasObj);
         canvasObj = null;

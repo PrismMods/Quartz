@@ -1982,7 +1982,9 @@
       {
         "type": "Facet.ControlOptions",
         "members": [
+          "System.Boolean Facet.ControlOptions::Undoable()",
           "System.Collections.Generic.List\u00601\u003CSystem.Collections.Generic.KeyValuePair\u00602\u003CSystem.String,System.Action\u003E\u003E Facet.ControlOptions::ContextMenu()",
+          "System.Func\u00601\u003CSystem.Boolean\u003E Facet.ControlOptions::EnabledWhen()",
           "System.Func\u00601\u003CSystem.Boolean\u003E Facet.ControlOptions::VisibleWhen()",
           "System.Func\u00601\u003CSystem.Boolean\u003E Facet.ControlOptions::get_VisibleWhen()",
           "System.Func\u00601\u003CSystem.Object\u003E Facet.ControlOptions::UndoDocument()",
@@ -1992,11 +1994,13 @@
           "System.String Facet.ControlOptions::Tooltip()",
           "System.String Facet.ControlOptions::get_Tooltip()",
           "System.Void Facet.ControlOptions::set_ContextMenu(System.Collections.Generic.List\u00601\u003CSystem.Collections.Generic.KeyValuePair\u00602\u003CSystem.String,System.Action\u003E\u003E)",
+          "System.Void Facet.ControlOptions::set_EnabledWhen(System.Func\u00601\u003CSystem.Boolean\u003E)",
           "System.Void Facet.ControlOptions::set_Help(System.String)",
           "System.Void Facet.ControlOptions::set_Id(System.String)",
           "System.Void Facet.ControlOptions::set_Tooltip(System.String)",
           "System.Void Facet.ControlOptions::set_TooltipText(System.Func\u00601\u003CSystem.String\u003E)",
           "System.Void Facet.ControlOptions::set_UndoDocument(System.Func\u00601\u003CSystem.Object\u003E)",
+          "System.Void Facet.ControlOptions::set_Undoable(System.Boolean)",
           "System.Void Facet.ControlOptions::set_VisibleWhen(System.Func\u00601\u003CSystem.Boolean\u003E)"
         ]
       },
@@ -2042,7 +2046,9 @@
           "UnityEngine.UIElements.Label Facet.Controls::Header(UnityEngine.UIElements.VisualElement,System.String)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Advanced(UnityEngine.UIElements.VisualElement,System.String)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Card(UnityEngine.UIElements.VisualElement,System.String,System.Action\u00601\u003CFacet.CardOptions\u003E)",
+          "UnityEngine.UIElements.VisualElement Facet.Controls::Live(UnityEngine.UIElements.VisualElement,System.Func\u00601\u003CSystem.Int32\u003E,System.Action\u00601\u003CUnityEngine.UIElements.VisualElement\u003E)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Preview(UnityEngine.UIElements.VisualElement,System.String,System.Action\u00601\u003CFacet.PreviewOptions\u003E)",
+          "UnityEngine.UIElements.VisualElement Facet.Controls::Repeat(UnityEngine.UIElements.VisualElement,System.Func\u00601\u003CSystem.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E\u003E,System.Func\u00602\u003CT,System.String\u003E,System.Action\u00602\u003CUnityEngine.UIElements.VisualElement,T\u003E)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Section(UnityEngine.UIElements.VisualElement,System.String,System.Action\u00601\u003CFacet.SectionOptions\u003E)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Section(UnityEngine.UIElements.VisualElement,System.String,System.Boolean)",
           "UnityEngine.UIElements.VisualElement Facet.Controls::Tiles(UnityEngine.UIElements.VisualElement,System.Action\u00601\u003CFacet.TilesOptions\u003E)",
@@ -2288,7 +2294,9 @@
           "System.Single Facet.RangeOptions::Min()",
           "System.Single Facet.RangeOptions::Step()",
           "System.String Facet.RangeOptions::Format()",
+          "System.String Facet.RangeOptions::HighId()",
           "System.Void Facet.RangeOptions::set_Format(System.String)",
+          "System.Void Facet.RangeOptions::set_HighId(System.String)",
           "System.Void Facet.RangeOptions::set_Max(System.Single)",
           "System.Void Facet.RangeOptions::set_Min(System.Single)",
           "System.Void Facet.RangeOptions::set_Step(System.Single)"

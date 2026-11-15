@@ -27,6 +27,8 @@
     "PRACTICE_DIFF_LENIENT": "Lenient",
     "PRACTICE_DIFF_NORMAL": "Normal",
     "PRACTICE_DIFF_STRICT": "Strict",
-    "PRACTICE_DIFF_UNKNOWN": "Difficulty ?"
+    "PRACTICE_DIFF_UNKNOWN": "Difficulty ?",
+    "PRACTICE_DESC": "Keys that set the difficulty and pitch between attempts",
+    "PRACTICE_DIFFICULTY_LABEL": "Difficulty"
   }
 }

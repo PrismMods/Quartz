@@ -49,9 +49,10 @@ internal static partial class ShellRows {
     }
 
     /// <summary>A button-only row, Id key, that starts the feature's own capture: start(done) begins it and calls done when it
-    /// ends. The button reads PRESS_A_KEY while capturing() holds, and a click then cancels.</summary>
+    /// ends. The button reads PRESS_A_KEY while pressing() holds (capturing() when null), and a click while capturing() cancels.</summary>
     internal static Button CaptureButton(VisualElement card, string key, Func<bool> capturing, Action<Action> start, Action cancel,
-        Action<ControlOptions> configure = null) {
+        Action<ControlOptions> configure = null, Func<bool> pressing = null) {
+        pressing ??= capturing;
         Button b = null;
         string face = key;
         b = Controls.Action(card, "", key, () => {
@@ -63,7 +64,7 @@ internal static partial class ShellRows {
             // The refresher asks VisibleWhen on every pass, so the face follows the capture there.
             Func<bool> visible = o.VisibleWhen;
             o.VisibleWhen = () => {
-                string want = capturing() ? "PRESS_A_KEY" : key;
+                string want = pressing() ? "PRESS_A_KEY" : key;
                 if(want != face && b != null) Words.Label(b, face = want);
                 return visible?.Invoke() ?? true;
             };

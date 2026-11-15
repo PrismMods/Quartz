@@ -30,6 +30,10 @@
     "SECTION_DECORATION_PREVIEW": "Decoration Preview",
     "EDITOR_DECO_PREVIEW": "Preview decoration images in the list",
     "DESC_EDITOR_DECO_PREVIEW": "Shows each decoration's own image next to its entry in the level editor's decoration list, so you can tell them apart without selecting them. Text and object entries keep the default icon, and so do particles with a missing image.",
-    "EDITOR_DECO_PREVIEW_CREDIT": "Ported from DecoPreview by rdzip, licensed under the GNU GPL v3."
+    "EDITOR_DECO_PREVIEW_CREDIT": "Ported from DecoPreview by rdzip, licensed under the GNU GPL v3.",
+    "EDITOR_TILEREADOUT_DESC": "Shows the selected tiles' angle, beats and length",
+    "EDITOR_BGA_DESC": "Hides tiles and planets to record a background",
+    "EDITOR_FLIPROTATE_DESC": "Keeps position tracks right when you flip or rotate tiles",
+    "EDITOR_DECOPREVIEW_DESC": "Shows each decoration's image in the editor's list"
   }
 }

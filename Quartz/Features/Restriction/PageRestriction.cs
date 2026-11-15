@@ -14,7 +14,7 @@ public static class PageRestriction {
         Restriction.EnsureConf();
         RestrictionSettings conf = Restriction.Conf;
         RestrictionSettings def = new();
-        if(conf.JRestrictMode == 2 && !XPerfectBridge.Installed) conf.JRestrictMode = 1;
+        int shown = conf.JRestrictMode == 2 && !XPerfectBridge.Installed ? 1 : conf.JRestrictMode;
         var sec = GenerateUI.FlatSection(content, "Judgement Restriction");
         RectTransform accuracyRow = null;
         RectTransform[] maskRows = null;
@@ -27,7 +27,7 @@ public static class PageRestriction {
         GenerateUI.DropDown(
             GenerateUI.Row(sec.Body),
             def.JRestrictMode,
-            conf.JRestrictMode,
+            shown,
             modes,
             ModeName,
             v => {

@@ -7,6 +7,7 @@
     "SPECIALDAY_APRILFOOLS_LABEL": "April Fools",
     "SPECIALDAY_AUTO": "By date",
     "SPECIALDAY_ON": "Always on",
-    "SPECIALDAY_OFF": "Always off"
+    "SPECIALDAY_OFF": "Always off",
+    "SPECIALDAYS_DESC": "Turns the game's seasonal events on or off"
   }
 }

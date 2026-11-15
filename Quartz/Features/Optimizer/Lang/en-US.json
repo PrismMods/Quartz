@@ -27,6 +27,7 @@
     "OPT_SKIPIDLEPARTICLES": "Skip Idle Particle Updates",
     "OPT_SKIPNOOPFILTERS": "Skip No-Op Screen Filters",
     "OPT_SMOOTHGC": "Smooth GC",
-    "SECTION_OPTIMIZER": "Optimizer"
+    "SECTION_OPTIMIZER": "Optimizer",
+    "OPTIMIZER_DESC": "Makes the game run smoother"
   }
 }

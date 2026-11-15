@@ -25,7 +25,9 @@ namespace Quartz.UI.FacetUi;
 internal static partial class FacetSelfTestChecks {
     // The form pages moved so far, by page key; each page's section adds its own. FormPage fails for a page not listed here.
     private static readonly List<string> FormPageKeys = ["overlay.combo", "visuals.hidejudgements", "visuals.tilearc", "visuals.visualtweaks",
-        "visuals.planetcolors", "visuals.ottoicon", "visuals.uihiding", "gameplay.chatter", "gameplay.countdown", "gameplay.death", "gameplay.autodeafen"];
+        "visuals.planetcolors", "visuals.ottoicon", "visuals.uihiding", "gameplay.chatter", "gameplay.countdown", "gameplay.death", "gameplay.autodeafen",
+        "gameplay.keylimiter", "gameplay.judgement", "gameplay.practice", "tweaks.general", "tweaks.specialdays", "tweaks.optimizer", "tweaks.mainmenu",
+        "editor.tilereadout", "editor.bga", "editor.fliprotate", "editor.decopreview", "tuf.settings"];
 
     internal static IEnumerator FormPages(Action<string, bool, string> check, Action<string> info) {
         // Every window opened here writes its geometry into the live settings: put the map back.
@@ -38,6 +40,9 @@ internal static partial class FacetSelfTestChecks {
                 () => HeaderHotkeyCheck(check, "overlay.combo", "SECTION_COMBO", "combo"));
             yield return VisualsPages(check);
             yield return GameplayForms(check);
+            yield return GameplayLists(check, info);
+            yield return TweaksEditor(check);
+            yield return TufSettings(check, info);
             IndexPerf(info);
         } finally {
             MainCore.Conf.FacetWindows.Clear();
@@ -47,9 +52,10 @@ internal static partial class FacetSelfTestChecks {
     }
 
     /// <summary>OnPage, with the page's category on for the run when the player has it off (in memory, put back exactly and
-    /// saved last), and the page's first build timed.</summary>
-    private static IEnumerator FormPage(string featureId, string pageKey, Action show, Action restore, Func<IEnumerator> checks) {
-        string category = NavRegistry.ByKey(pageKey)?.CategoryKey;
+    /// saved last), and the page's first build timed. category, when given, is the one that shows the page's own.</summary>
+    private static IEnumerator FormPage(string featureId, string pageKey, Action show, Action restore, Func<IEnumerator> checks,
+        string category = null) {
+        category ??= NavRegistry.ByKey(pageKey)?.CategoryKey;
         bool was = false, turned = false, had = category != null && FeatureService.State.Categories.TryGetValue(category, out was);
         Action<VisualElement> build = QuartzShell.Moved.TryGetValue(pageKey, out Action<VisualElement> b) ? b : null;
         float ms = -1f;
@@ -85,7 +91,8 @@ internal static partial class FacetSelfTestChecks {
     /// once, then apply runs. The rows' keys are checked against the classic page; searched less its headers, cards and
     /// sections.</summary>
     private static IEnumerator FeatureFormPage<T>(Action<string, bool, string> check, string featureId, string pageKey, SettingsFile<T> file,
-        Action show, Action apply, string[] keys, string[] searched, Func<IEnumerator> more, string[] hidden = null) where T : class, ISettingsFile, new() {
+        Action show, Action apply, string[] keys, string[] searched, Func<IEnumerator> more, string[] hidden = null, string category = null)
+        where T : class, ISettingsFile, new() {
         JToken was = null;
         yield return FormPage(featureId, pageKey, () => {
             was = file.Data.Serialize();
@@ -94,7 +101,7 @@ internal static partial class FacetSelfTestChecks {
             if(was != null) file.Data.Deserialize(was);
             file.Save();   // drops a pending save too
             apply?.Invoke();
-        }, () => Checks());
+        }, () => Checks(), category);
         IEnumerator Checks() {
             yield return Parity(check, pageKey, keys, hidden);
             Covers(check, pageKey);
@@ -195,16 +202,28 @@ internal static partial class FacetSelfTestChecks {
     /// <summary>write acts as a player would; within 2 s of real time the setting reads as written (wrote) and the file's
     /// bytes differ from before. The page's restore puts the value back and saves synchronously.</summary>
     private static IEnumerator Saved(Action<string, bool, string> check, string pageKey, string rowId, Func<bool> write, Func<bool> wrote, string file) {
+        bool did = false;
+        return Saved(check, pageKey, rowId, () => Act(), wrote, file, () => did);
+        IEnumerator Act() {
+            did = write();
+            yield break;
+        }
+    }
+
+    /// <summary>Saved for a write that takes frames, such as an item picked in a dropdown; did says it acted (default yes).</summary>
+    private static IEnumerator Saved(Action<string, bool, string> check, string pageKey, string rowId, Func<IEnumerator> write, Func<bool> wrote,
+        string file, Func<bool> did = null) {
         byte[] before = Bytes(file);
-        bool did = write(), set = false, changed = false;
+        yield return write();
+        bool acted = did?.Invoke() ?? true, set = false, changed = false;
         for(float t0 = Time.realtimeSinceStartup; Time.realtimeSinceStartup - t0 < 2f;) {
             yield return null;
             set = wrote();
             changed = !SameBytes(Bytes(file), before);
             if(set && changed) break;
         }
-        check($"{pageKey} {rowId}: a write here reaches the setting and its file", did && set && changed,
-            $"write={did} setting={set} file changed={changed} ({file})");
+        check($"{pageKey} {rowId}: a write here reaches the setting and its file", acted && set && changed,
+            $"write={acted} setting={set} file changed={changed} ({file})");
     }
 
     private static byte[] Bytes(string path) => path != null && File.Exists(path) ? File.ReadAllBytes(path) : null;
@@ -288,7 +307,16 @@ internal static partial class FacetSelfTestChecks {
             PressNextFrame(key);
             for(float t0 = Time.realtimeSinceStartup; !on && Time.realtimeSinceStartup - t0 < 1f;) {
                 yield return null;
-                on = FeatureService.IsEnabled(featureId) && QuartzShell.CurrentPage == pageKey && Body.Q(name: headerId) != null;
+                // Back on, the shell shows the feature's first page: pageKey itself unless the feature has several. A moved
+                // first page shows its header; a classic one (TUF's level browser) the classic card.
+                NavPage now = NavRegistry.ByKey(QuartzShell.CurrentPage);
+                on = FeatureService.IsEnabled(featureId) && !FeaturePages.IsStub(now) && FeaturePages.FeatureOf(now) == featureId
+                    && Body.Q(name: QuartzShell.Moved.ContainsKey(now.Key) ? now.LocaleKey : "menu-classic") != null;
+            }
+            string onPage = QuartzShell.CurrentPage;
+            if(on && onPage != pageKey) {
+                QuartzShell.Go(pageKey);
+                yield return Frames(2);
             }
             head = Body.Q(name: headerId);
             if(head != null) {
@@ -301,7 +329,7 @@ internal static partial class FacetSelfTestChecks {
             yield return Frames(1);
             bool cleared = !ToggleBinds.TryGet(id, out _, out _);
             check(tag, setRow != null && capturing && bound && off && on && clearRow != null && cleared,
-                $"set={setRow != null} capturing={capturing} bound={got}/{mod} off={off} offPage={offPage} on={on} clear={clearRow != null} cleared={cleared}");
+                $"set={setRow != null} capturing={capturing} bound={got}/{mod} off={off} offPage={offPage} on={on} onPage={onPage} clear={clearRow != null} cleared={cleared}");
         } finally {
             KeyCaptureService.Cancel();
             Popup.CloseAll();

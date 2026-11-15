@@ -7,6 +7,7 @@
     "TW_MENUBPM": "Custom Menu BPM",
     "TW_MENUHIGHBPM": "High BPM",
     "TW_MENUMUSIC": "Disable Menu Music",
-    "TW_MENUSLOWBPM": "Slow BPM"
+    "TW_MENUSLOWBPM": "Slow BPM",
+    "MAINMENU_DESC": "Changes the title screen's music and tempo"
   }
 }

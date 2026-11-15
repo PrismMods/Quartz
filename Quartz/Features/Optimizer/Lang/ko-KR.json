@@ -27,6 +27,7 @@
     "OPT_SKIPIDLEPARTICLES": "변화 없는 파티클 업데이트 건너뛰기",
     "OPT_SKIPNOOPFILTERS": "효과 없는 화면 필터 건너뛰기",
     "OPT_SMOOTHGC": "부드러운 GC",
-    "SECTION_OPTIMIZER": "최적화"
+    "SECTION_OPTIMIZER": "최적화",
+    "OPTIMIZER_DESC": "게임을 더 부드럽게 돌려요"
   }
 }

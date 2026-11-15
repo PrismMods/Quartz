@@ -30,6 +30,10 @@
     "SECTION_DECORATION_PREVIEW": "데코레이션 미리보기",
     "EDITOR_DECO_PREVIEW": "목록에서 데코레이션 이미지 미리보기",
     "DESC_EDITOR_DECO_PREVIEW": "레벨 에디터 데코레이션 목록의 기본 아이콘을 각 데코레이션의 실제 이미지로 바꿔 보여 줘요. 선택하지 않아도 항목을 구분할 수 있어요. 텍스트와 오브젝트 항목, 이미지를 찾지 못한 파티클은 기본 아이콘 그대로예요.",
-    "EDITOR_DECO_PREVIEW_CREDIT": "rdzip의 DecoPreview를 옮겨 왔어요. GNU GPL v3 라이선스를 따라요."
+    "EDITOR_DECO_PREVIEW_CREDIT": "rdzip의 DecoPreview를 옮겨 왔어요. GNU GPL v3 라이선스를 따라요.",
+    "EDITOR_TILEREADOUT_DESC": "선택한 타일의 각도와 박자, 길이를 보여줘요",
+    "EDITOR_BGA_DESC": "배경을 녹화할 수 있게 타일과 행성을 숨겨요",
+    "EDITOR_FLIPROTATE_DESC": "타일을 뒤집거나 돌릴 때 위치 트랙을 맞춰요",
+    "EDITOR_DECOPREVIEW_DESC": "에디터 목록에 장식 이미지를 보여줘요"
   }
 }

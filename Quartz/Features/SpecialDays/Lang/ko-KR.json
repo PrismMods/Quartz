@@ -7,6 +7,7 @@
     "SPECIALDAY_APRILFOOLS_LABEL": "만우절",
     "SPECIALDAY_AUTO": "날짜대로",
     "SPECIALDAY_ON": "항상 켜기",
-    "SPECIALDAY_OFF": "항상 끄기"
+    "SPECIALDAY_OFF": "항상 끄기",
+    "SPECIALDAYS_DESC": "게임의 계절 이벤트를 켜고 꺼요"
   }
 }

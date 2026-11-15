@@ -31,6 +31,8 @@
     "JR_SECTIONS": "Sections",
     "JR_SECTIONS_ADD": "Add Section",
     "JR_SECTIONS_ON": "Restrict Only In Sections",
-    "SECTION_JUDGEMENT_RESTRICTION": "Judgement Restriction"
+    "SECTION_JUDGEMENT_RESTRICTION": "Judgement Restriction",
+    "RESTRICTION_DESC": "Ends the run when you break a judgement rule",
+    "JR_MODE_LABEL": "Mode"
   }
 }

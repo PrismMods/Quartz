@@ -124,6 +124,7 @@
     "TUF_PLAY": "Play",
     "TUF_MAIN_LAUNCH_FAILED": "Couldn't open the base-game level.",
     "TUF_BUY_DLC": "Buy DLC",
-    "TUF_HOME_INSTALLED": "{0} levels installed"
+    "TUF_HOME_INSTALLED": "{0} levels installed",
+    "TUF_SETTINGS_DESC": "Where downloaded TUF levels go, and how the browser looks"
   }
 }

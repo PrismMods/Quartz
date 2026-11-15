@@ -5,6 +5,7 @@
     "DESC_TW_SCROLL": "Ignores the mouse wheel while you play, so a stray scroll can't change anything mid-run.",
     "TWEAKS_GENERAL": "General",
     "TW_NOPAUSE": "Disable Auto Pause",
-    "TW_SCROLL": "Block Scroll While Playing"
+    "TW_SCROLL": "Block Scroll While Playing",
+    "TWEAKS_DESC": "Small fixes to how the game behaves"
   }
 }

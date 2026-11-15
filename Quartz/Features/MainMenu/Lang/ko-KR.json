@@ -7,6 +7,7 @@
     "TW_MENUBPM": "메뉴 BPM 직접 설정",
     "TW_MENUHIGHBPM": "높은 BPM",
     "TW_MENUMUSIC": "메뉴 음악 끄기",
-    "TW_MENUSLOWBPM": "느린 BPM"
+    "TW_MENUSLOWBPM": "느린 BPM",
+    "MAINMENU_DESC": "타이틀 화면의 음악과 템포를 바꿔요"
   }
 }

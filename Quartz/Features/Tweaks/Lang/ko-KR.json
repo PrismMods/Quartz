@@ -5,6 +5,7 @@
     "DESC_TW_SCROLL": "레벨을 플레이하는 동안 마우스 휠을 무시해요. 실수로 스크롤해도 괜찮아요.",
     "TWEAKS_GENERAL": "일반",
     "TW_NOPAUSE": "자동 일시정지 끄기",
-    "TW_SCROLL": "플레이 중 스크롤 막기"
+    "TW_SCROLL": "플레이 중 스크롤 막기",
+    "TWEAKS_DESC": "게임 동작을 조금씩 고쳐요"
   }
 }

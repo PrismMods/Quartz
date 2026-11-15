@@ -27,6 +27,8 @@
     "PRACTICE_DIFF_LENIENT": "관대함",
     "PRACTICE_DIFF_NORMAL": "보통",
     "PRACTICE_DIFF_STRICT": "엄격함",
-    "PRACTICE_DIFF_UNKNOWN": "난이도 ?"
+    "PRACTICE_DIFF_UNKNOWN": "난이도 ?",
+    "PRACTICE_DESC": "시도 사이에 난이도와 피치를 바꾸는 키예요",
+    "PRACTICE_DIFFICULTY_LABEL": "난이도"
   }
 }

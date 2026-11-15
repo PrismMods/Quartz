@@ -124,6 +124,7 @@
     "TUF_PLAY": "플레이",
     "TUF_MAIN_LAUNCH_FAILED": "기본 게임 레벨을 열지 못했어요.",
     "TUF_BUY_DLC": "DLC 구매",
-    "TUF_HOME_INSTALLED": "레벨 {0}개가 설치돼 있어요"
+    "TUF_HOME_INSTALLED": "레벨 {0}개가 설치돼 있어요",
+    "TUF_SETTINGS_DESC": "받은 TUF 레벨을 둘 곳과 브라우저 모양을 정해요"
   }
 }

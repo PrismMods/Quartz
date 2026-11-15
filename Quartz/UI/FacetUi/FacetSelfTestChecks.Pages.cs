@@ -15,7 +15,7 @@ using HandOff = Quartz.UI.MenuHandOff;
 namespace Quartz.UI.FacetUi;
 /// <summary>
 /// The new menu's Home: its header line, the quick switches and their Edit… popup, the status rows against the classic
-/// Home, and Edit layout there and on a classic page with an on-screen element. Then how pages lay out: a tab row, the
+/// Home, and Edit layout there and under Practice's preview. Then how pages lay out: a tab row, the
 /// search results heading, the overlays under every Prism window, a close after the switch went off, and a switched-off
 /// feature's name after a language change.
 /// </summary>
@@ -44,7 +44,7 @@ internal static partial class FacetSelfTestChecks {
             yield return HomeEditSwitches(check);
             yield return HomeStatus(check);
             yield return HomeLayout(check);
-            yield return ClassicLayoutRow(check);
+            yield return PracticeLayoutLink(check);
             yield return HomeLayoutNoTargets(check, info);
         } finally {
             HomeRegistry.RemoveOwner("selftest");
@@ -270,10 +270,10 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(3);
     }
 
-    // Practice stays classic and puts an element on screen, so it is the page checked, switched on for the check when it is
-    // off. A first switch-on leaves Practice.json behind (its teardown saves, and so does the quit after it): that file and
-    // a profile copy of it are removed again, so the check leaves the settings folder as it found it.
-    private static IEnumerator ClassicLayoutRow(Action<string, bool, string> check) {
+    // Practice puts an element on screen, and its moved page links to the layout editor under its preview; it is switched on
+    // for the check when it is off. A first switch-on leaves Practice.json behind (its teardown saves, and so does the quit
+    // after it): that file and a profile copy of it are removed again, so the check leaves the settings folder as it found it.
+    private static IEnumerator PracticeLayoutLink(Action<string, bool, string> check) {
         var saved = new[] { "overlay", "practice" }.Select(id => (id, was: FeatureService.IsEnabled(id), had: FeatureService.State.Features.TryGetValue(id, out bool v), value: v)).ToList();
         string[] files = [Path.Combine(MainCore.Paths.RootPath, "Practice.json"), Path.Combine(ProfileManager.ProfilesPath, ProfileManager.Active, "Practice.json")];
         bool[] existed = [.. files.Select(File.Exists)];
@@ -284,13 +284,15 @@ internal static partial class FacetSelfTestChecks {
             string page = NavRegistry.KeyFor(FeaturePages.StateFor("practice"));
             if(page != null) QuartzShell.Go(page);
             yield return Frames(1);
-            VisualElement row = Body.Q(name: "menu-classic-layout");
-            bool shown = page != null && row != null && Displayed(row) == PrismBridge.UiAvailable;
+            VisualElement pane = Body.Q(name: PracticeOverlay.FontKey + "-preview-pane");
+            string edit = QuartzHost.Host.Translate("MENU_EDIT_LAYOUT");
+            Button link = pane?.Query<Button>().Where(b => b.text == edit).First();
+            bool shown = page != null && pane != null && (link != null && Displayed(link)) == PrismBridge.UiAvailable;
             QuartzShell.Go("profiles.main");
             yield return Frames(1);
             bool none = Body.Q(name: "menu-classic-layout") == null;
-            check("a classic page with an on-screen element (Practice) links to the layout editor, Profiles does not", shown && none,
-                $"page={page} switched={!saved[1].was} row={row != null} profiles={!none}");
+            check("Practice's moved page links to the layout editor from its preview, Profiles does not", shown && none,
+                $"page={page} switched={!saved[1].was} pane={pane != null} link={link != null} prism={PrismBridge.UiAvailable} profiles={!none}");
         } finally {
             for(int i = saved.Count - 1; i >= 0; i--) RestoreFeature(saved[i].id, saved[i].was, saved[i].had, saved[i].value);
             // Queued behind the switch-off, whose teardown saves: then the settings it loaded are dropped, unsaved.

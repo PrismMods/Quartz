@@ -31,6 +31,8 @@
     "JR_SECTIONS": "구간",
     "JR_SECTIONS_ADD": "구간 추가",
     "JR_SECTIONS_ON": "특정 구간에서만 제한",
-    "SECTION_JUDGEMENT_RESTRICTION": "판정 제한"
+    "SECTION_JUDGEMENT_RESTRICTION": "판정 제한",
+    "RESTRICTION_DESC": "판정 규칙을 어기면 플레이를 끝내요",
+    "JR_MODE_LABEL": "모드"
   }
 }
