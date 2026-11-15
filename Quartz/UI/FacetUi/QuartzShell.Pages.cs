@@ -50,6 +50,8 @@ internal static partial class QuartzShell {
         ["editor.fliprotate"] = EditorPages.EditorPage.FlipRotate,
         ["editor.decopreview"] = EditorPages.EditorPage.DecoPreview,
         ["tuf.settings"] = TufPages.TufSettingsPage.Build,
+        ["tuf.levels"] = TufPages.TufLevelsPage.Build,
+        ["tuf.packs"] = TufPages.TufPacksPage.Build,
         ["developer.main"] = CoreMenuPages.DeveloperPage.Build,
         ["profiles.main"] = CoreMenuPages.ProfilesPage.Build,
         ["import.main"] = CoreMenuPages.ImportPage.Build,

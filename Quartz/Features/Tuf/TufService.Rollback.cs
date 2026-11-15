@@ -3,8 +3,18 @@ using Quartz.Core;
 namespace Quartz.Features.Tuf;
 public sealed partial class TufService : IRuntimeService {
     private readonly Dictionary<int, int> snapshotCounts = [];
-    public int SnapshotCount(int id) => snapshotCounts.TryGetValue(id, out int count) ? count : 0;
-    public IReadOnlyList<TufSnapshot> Snapshots(int id) => TufRollback.List(RollbackRoot, id);
+    public int SnapshotCount(int id) {
+#if DEBUG
+        if(SelfTestDoor.SnapshotCount is { } door) return door(id);
+#endif
+        return snapshotCounts.TryGetValue(id, out int count) ? count : 0;
+    }
+    public IReadOnlyList<TufSnapshot> Snapshots(int id) {
+#if DEBUG
+        if(SelfTestDoor.Snapshots is { } door) return door(id);
+#endif
+        return TufRollback.List(RollbackRoot, id);
+    }
     private string RollbackRoot => downloads?.ActiveRoot().Path ?? MainCore.Paths.TufLevelsPath;
     internal void RefreshSnapshotCounts() {
         if(disposed) return;

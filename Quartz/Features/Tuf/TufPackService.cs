@@ -25,6 +25,8 @@ public sealed class TufPackService : IRuntimeService {
     public bool IsLaunching => actions?.IsLaunching ?? false;
     public int QueueCount => actions?.QueueCount ?? 0;
     public int QueuePosition(int id) => actions?.QueuePosition(id) ?? 0;
+    /// <summary>The runner that acts on, queues and launches this service's levels: the new menu's cards act through it.</summary>
+    internal TufLevelActionRunner Runner => actions;
     public event Action Changed = delegate { };
     private readonly List<TufPack> packs = [];
     private readonly List<TufPackItem> packItems = [];
@@ -271,6 +273,8 @@ public sealed class TufPackService : IRuntimeService {
         OfflineError = false;
         Notify();
     }
+    /// <summary>Self-tests only: raises Changed after a test set a pack level's state.</summary>
+    internal void NotifyForTest() => Notify();
 #endif
     public void Act(TufLevel level) => actions?.Act(level);
     public void LaunchChart(TufLevel level, string chart) => actions?.LaunchChart(level, chart);

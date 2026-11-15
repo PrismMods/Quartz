@@ -16,6 +16,12 @@ namespace UnityEngine {
         public Font(string name) => throw null;
         private Font() { }
     }
+    public enum FontStyle : int {
+        Normal = 0,
+        Bold = 1,
+        Italic = 2,
+        BoldAndItalic = 3,
+    }
     public enum TextAnchor : int {
         UpperLeft = 0,
         UpperCenter = 1,

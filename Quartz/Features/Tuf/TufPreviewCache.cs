@@ -111,7 +111,8 @@ public static class TufPreviewCache {
     }
     internal static void Pump() {
         if(mainQueue.IsEmpty) return;
-        if(Quartz.Game.Stats.GameStats.InGame && !Quartz.UI.UICore.IsOpen) return;
+        // In a level only while a menu shows the thumbnails: the classic menu or the new one.
+        if(Quartz.Game.Stats.GameStats.InGame && !Quartz.UI.UICore.IsOpen && !Quartz.UI.FacetUi.FacetBridge.NewMenuVisible()) return;
         long startedAt = Stopwatch.GetTimestamp();
         long budgetTicks = (long)(MaxMillisPerFrame * Stopwatch.Frequency / 1000.0);
         int ops = 0;

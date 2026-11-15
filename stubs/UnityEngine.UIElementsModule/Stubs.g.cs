@@ -77,6 +77,7 @@ namespace UnityEngine.UIElements {
     public unsafe partial interface IEventHandler {
     }
     public unsafe partial interface IExperimentalFeatures {
+        global::UnityEngine.UIElements.Experimental.ITransitionAnimations animation { get; }
     }
     public unsafe partial interface IMixedValueSupport {
     }
@@ -122,14 +123,20 @@ namespace UnityEngine.UIElements {
         global::UnityEngine.UIElements.StyleLength marginTop { get; set; }
         global::UnityEngine.UIElements.StyleLength minHeight { get; set; }
         global::UnityEngine.UIElements.StyleLength minWidth { get; set; }
+        global::UnityEngine.UIElements.StyleFloat opacity { get; set; }
+        global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.Overflow> overflow { get; set; }
         global::UnityEngine.UIElements.StyleLength paddingBottom { get; set; }
         global::UnityEngine.UIElements.StyleLength paddingLeft { get; set; }
         global::UnityEngine.UIElements.StyleLength paddingRight { get; set; }
         global::UnityEngine.UIElements.StyleLength paddingTop { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.Position> position { get; set; }
         global::UnityEngine.UIElements.StyleLength right { get; set; }
+        global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.TextOverflow> textOverflow { get; set; }
         global::UnityEngine.UIElements.StyleLength top { get; set; }
+        global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.FontStyle> unityFontStyleAndWeight { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.TextAnchor> unityTextAlign { get; set; }
+        global::UnityEngine.UIElements.StyleColor unityTextOutlineColor { get; set; }
+        global::UnityEngine.UIElements.StyleFloat unityTextOutlineWidth { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.WhiteSpace> whiteSpace { get; set; }
         global::UnityEngine.UIElements.StyleLength width { get; set; }
     }
@@ -142,6 +149,7 @@ namespace UnityEngine.UIElements {
     public unsafe partial interface ITextElement {
     }
     public unsafe partial interface ITextElementExperimentalFeatures : global::UnityEngine.UIElements.IExperimentalFeatures {
+        void SetRenderedText(string renderedText);
     }
     public unsafe partial interface ITextSelection {
     }
@@ -173,6 +181,10 @@ namespace UnityEngine.UIElements {
             None = 3,
         }
     }
+    public enum Overflow : int {
+        Visible = 0,
+        Hidden = 1,
+    }
     public enum PickingMode : int {
         Position = 0,
         Ignore = 1,
@@ -181,12 +193,32 @@ namespace UnityEngine.UIElements {
         Relative = 0,
         Absolute = 1,
     }
+    public unsafe partial class ScrollView : global::UnityEngine.UIElements.VisualElement {
+        public global::UnityEngine.UIElements.VisualElement contentViewport { get => throw null; }
+        public global::UnityEngine.Vector2 scrollOffset { get => throw null; set { } }
+        public global::UnityEngine.UIElements.Scroller verticalScroller { get => throw null; }
+        protected ScrollView() { }
+        public enum TouchScrollBehavior : int {
+            Unrestricted = 0,
+            Elastic = 1,
+            Clamped = 2,
+        }
+        public enum NestedInteractionKind : int {
+            Default = 0,
+            StopScrolling = 1,
+            ForwardScrolling = 2,
+        }
+    }
+    public unsafe partial class Scroller : global::UnityEngine.UIElements.VisualElement {
+        public event global::System.Action<float> valueChanged { add { } remove { } }
+        protected Scroller() { }
+    }
     public unsafe partial struct StyleBackground : global::System.IEquatable<global::UnityEngine.UIElements.StyleBackground> {
         private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
         private global::UnityEngine.UIElements.Background m_Value;
         public static implicit operator global::UnityEngine.UIElements.StyleBackground(global::UnityEngine.Texture2D v) => throw null;
-        public static implicit operator global::UnityEngine.UIElements.StyleBackground(global::UnityEngine.UIElements.Background v) => throw null;
         public static implicit operator global::UnityEngine.UIElements.StyleBackground(global::UnityEngine.UIElements.StyleKeyword keyword) => throw null;
+        public static implicit operator global::UnityEngine.UIElements.StyleBackground(global::UnityEngine.UIElements.Background v) => throw null;
         bool global::System.IEquatable<global::UnityEngine.UIElements.StyleBackground>.Equals(global::UnityEngine.UIElements.StyleBackground other) => throw null;
     }
     public unsafe partial struct StyleBackgroundSize : global::System.IEquatable<global::UnityEngine.UIElements.StyleBackgroundSize> {
@@ -227,10 +259,16 @@ namespace UnityEngine.UIElements {
         public static implicit operator global::UnityEngine.UIElements.StyleLength(float v) => throw null;
         bool global::System.IEquatable<global::UnityEngine.UIElements.StyleLength>.Equals(global::UnityEngine.UIElements.StyleLength other) => throw null;
     }
-    public unsafe partial class TextElement : global::UnityEngine.UIElements.BindableElement {
+    public unsafe partial class StyleValueCollection {
+        protected StyleValueCollection() { }
+    }
+    public unsafe partial class TextElement : global::UnityEngine.UIElements.BindableElement, global::UnityEngine.UIElements.ITextElementExperimentalFeatures {
         public bool enableRichText { get => throw null; set { } }
+        public global::UnityEngine.UIElements.ITextElementExperimentalFeatures experimental { get => throw null; }
         public virtual string text { get => throw null; set { } }
         protected TextElement() { }
+        void global::UnityEngine.UIElements.ITextElementExperimentalFeatures.SetRenderedText(string renderedText) => throw null;
+        global::UnityEngine.UIElements.Experimental.ITransitionAnimations global::UnityEngine.UIElements.IExperimentalFeatures.animation { get => throw null; }
     }
     public unsafe partial class TextField : global::UnityEngine.UIElements.TextInputBaseField<string> {
         public TextField() => throw null;
@@ -238,6 +276,10 @@ namespace UnityEngine.UIElements {
     public abstract unsafe partial class TextInputBaseField<TValueType> : global::UnityEngine.UIElements.BaseField<TValueType> {
         public int maxLength { get => throw null; set { } }
         protected TextInputBaseField() { }
+    }
+    public enum TextOverflow : int {
+        Clip = 0,
+        Ellipsis = 1,
     }
     public sealed unsafe partial class UIDocument : global::UnityEngine.MonoBehaviour {
         public global::UnityEngine.UIElements.VisualElement rootVisualElement { get => throw null; }
@@ -254,9 +296,12 @@ namespace UnityEngine.UIElements {
     public sealed unsafe partial class VectorImage : global::UnityEngine.ScriptableObject {
         private VectorImage() { }
     }
-    public unsafe partial class VisualElement : global::UnityEngine.UIElements.Focusable {
+    public unsafe partial class VisualElement : global::UnityEngine.UIElements.Focusable, global::UnityEngine.UIElements.Experimental.ITransitionAnimations, global::UnityEngine.UIElements.IExperimentalFeatures {
         public global::UnityEngine.UIElements.VisualElement this[int key] { get => throw null; }
         public int childCount { get => throw null; }
+        public virtual global::UnityEngine.UIElements.VisualElement contentContainer { get => throw null; }
+        public bool enabledSelf { get => throw null; set { } }
+        public global::UnityEngine.UIElements.IExperimentalFeatures experimental { get => throw null; }
         public global::UnityEngine.Rect layout { get => throw null; }
         public string name { get => throw null; set { } }
         public global::UnityEngine.UIElements.IPanel panel { get => throw null; }
@@ -267,14 +312,39 @@ namespace UnityEngine.UIElements {
         public VisualElement() => throw null;
         public void Add(global::UnityEngine.UIElements.VisualElement child) => throw null;
         public void Clear() => throw null;
+        public T GetFirstAncestorOfType<T>() where T : class => throw null;
         public int IndexOf(global::UnityEngine.UIElements.VisualElement element) => throw null;
         public void Insert(int index, global::UnityEngine.UIElements.VisualElement element) => throw null;
         public void SetEnabled(bool value) => throw null;
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Rect> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Layout(global::UnityEngine.Rect to, int durationMs) => throw null;
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Vector3> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Position(global::UnityEngine.Vector3 to, int duration) => throw null;
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Quaternion> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Rotation(global::UnityEngine.Quaternion to, int duration) => throw null;
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<float> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Scale(float to, int duration) => throw null;
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Vector2> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Size(global::UnityEngine.Vector2 to, int durationMs) => throw null;
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<float> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Start(global::System.Func<global::UnityEngine.UIElements.VisualElement, float> fromValueGetter, float to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, float> onValueChanged) => throw null;
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Color> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Start(global::System.Func<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Color> fromValueGetter, global::UnityEngine.Color to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Color> onValueChanged) => throw null;
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Quaternion> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Start(global::System.Func<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Quaternion> fromValueGetter, global::UnityEngine.Quaternion to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Quaternion> onValueChanged) => throw null;
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Rect> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Start(global::System.Func<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Rect> fromValueGetter, global::UnityEngine.Rect to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Rect> onValueChanged) => throw null;
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Vector2> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Start(global::System.Func<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Vector2> fromValueGetter, global::UnityEngine.Vector2 to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Vector2> onValueChanged) => throw null;
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Vector3> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Start(global::System.Func<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Vector3> fromValueGetter, global::UnityEngine.Vector3 to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Vector3> onValueChanged) => throw null;
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<float> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Start(float from, float to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, float> onValueChanged) => throw null;
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Color> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Start(global::UnityEngine.Color from, global::UnityEngine.Color to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Color> onValueChanged) => throw null;
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Quaternion> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Start(global::UnityEngine.Quaternion from, global::UnityEngine.Quaternion to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Quaternion> onValueChanged) => throw null;
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Rect> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Start(global::UnityEngine.Rect from, global::UnityEngine.Rect to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Rect> onValueChanged) => throw null;
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.UIElements.Experimental.StyleValues> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Start(global::UnityEngine.UIElements.Experimental.StyleValues to, int durationMs) => throw null;
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.UIElements.Experimental.StyleValues> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Start(global::UnityEngine.UIElements.Experimental.StyleValues from, global::UnityEngine.UIElements.Experimental.StyleValues to, int durationMs) => throw null;
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Vector2> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Start(global::UnityEngine.Vector2 from, global::UnityEngine.Vector2 to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Vector2> onValueChanged) => throw null;
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Vector3> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Start(global::UnityEngine.Vector3 from, global::UnityEngine.Vector3 to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Vector3> onValueChanged) => throw null;
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Vector2> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.TopLeft(global::UnityEngine.Vector2 to, int durationMs) => throw null;
+        global::UnityEngine.UIElements.Experimental.ITransitionAnimations global::UnityEngine.UIElements.IExperimentalFeatures.animation { get => throw null; }
         public enum MeasureMode : int {
             Undefined = 0,
             Exactly = 1,
             AtMost = 2,
         }
+    }
+    public static unsafe partial class VisualElementExtensions {
+        public static global::UnityEngine.Vector2 ChangeCoordinatesTo(this global::UnityEngine.UIElements.VisualElement src, global::UnityEngine.UIElements.VisualElement dest, global::UnityEngine.Vector2 point) => throw null;
     }
     public enum WhiteSpace : int {
         Normal = 0,
@@ -285,5 +355,35 @@ namespace UnityEngine.UIElements {
 }
 namespace UnityEngine.UIElements.Experimental {
     public unsafe partial interface ITransitionAnimations {
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Rect> Layout(global::UnityEngine.Rect to, int durationMs);
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Vector3> Position(global::UnityEngine.Vector3 to, int duration);
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Quaternion> Rotation(global::UnityEngine.Quaternion to, int duration);
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<float> Scale(float to, int duration);
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Vector2> Size(global::UnityEngine.Vector2 to, int durationMs);
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.UIElements.Experimental.StyleValues> Start(global::UnityEngine.UIElements.Experimental.StyleValues to, int durationMs);
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.UIElements.Experimental.StyleValues> Start(global::UnityEngine.UIElements.Experimental.StyleValues from, global::UnityEngine.UIElements.Experimental.StyleValues to, int durationMs);
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<float> Start(float from, float to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, float> onValueChanged);
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Rect> Start(global::UnityEngine.Rect from, global::UnityEngine.Rect to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Rect> onValueChanged);
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Color> Start(global::UnityEngine.Color from, global::UnityEngine.Color to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Color> onValueChanged);
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Vector3> Start(global::UnityEngine.Vector3 from, global::UnityEngine.Vector3 to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Vector3> onValueChanged);
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Vector2> Start(global::UnityEngine.Vector2 from, global::UnityEngine.Vector2 to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Vector2> onValueChanged);
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Quaternion> Start(global::UnityEngine.Quaternion from, global::UnityEngine.Quaternion to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Quaternion> onValueChanged);
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<float> Start(global::System.Func<global::UnityEngine.UIElements.VisualElement, float> fromValueGetter, float to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, float> onValueChanged);
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Rect> Start(global::System.Func<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Rect> fromValueGetter, global::UnityEngine.Rect to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Rect> onValueChanged);
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Color> Start(global::System.Func<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Color> fromValueGetter, global::UnityEngine.Color to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Color> onValueChanged);
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Vector3> Start(global::System.Func<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Vector3> fromValueGetter, global::UnityEngine.Vector3 to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Vector3> onValueChanged);
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Vector2> Start(global::System.Func<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Vector2> fromValueGetter, global::UnityEngine.Vector2 to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Vector2> onValueChanged);
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Quaternion> Start(global::System.Func<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Quaternion> fromValueGetter, global::UnityEngine.Quaternion to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Quaternion> onValueChanged);
+        global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Vector2> TopLeft(global::UnityEngine.Vector2 to, int durationMs);
+    }
+    public unsafe partial interface IValueAnimation {
+    }
+    public unsafe partial interface IValueAnimationUpdate {
+    }
+    public unsafe partial struct StyleValues {
+        private global::UnityEngine.UIElements.StyleValueCollection m_StyleValues;
+    }
+    public sealed unsafe partial class ValueAnimation<T> {
+        private ValueAnimation() { }
     }
 }

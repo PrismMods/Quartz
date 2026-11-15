@@ -12,6 +12,9 @@ internal static class SelfTestDoor {
     internal static Func<string, TufPackSort, bool, int, int, CancellationToken, Task<TufPacksPage>> FetchPacks;
     internal static Func<TufPack, CancellationToken, Task<IReadOnlyList<TufPackItem>>> FetchPackLevels;
     internal static Func<string, byte[]> Preview;
+    // A level's rollback copies, by level id, read before the disk's.
+    internal static Func<int, int> SnapshotCount;
+    internal static Func<int, IReadOnlyList<TufSnapshot>> Snapshots;
     internal static bool NoAutoCheck;
     internal static int Fetches, Previews, UpdateChecks;
 
@@ -27,6 +30,8 @@ internal static class SelfTestDoor {
         FetchPacks = (_, _, _, _, _, _) => Task.FromResult(new TufPacksPage([], 0));
         FetchPackLevels = (_, _) => Task.FromResult<IReadOnlyList<TufPackItem>>([]);
         Preview = _ => null;
+        SnapshotCount = null;
+        Snapshots = null;
     }
 
     internal static void Reset() {
@@ -35,6 +40,8 @@ internal static class SelfTestDoor {
         FetchPacks = null;
         FetchPackLevels = null;
         Preview = null;
+        SnapshotCount = null;
+        Snapshots = null;
         Network = Fetches = Previews = UpdateChecks = 0;
     }
 

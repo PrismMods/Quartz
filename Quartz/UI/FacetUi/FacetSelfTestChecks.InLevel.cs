@@ -46,6 +46,7 @@ internal static partial class FacetSelfTestChecks {
                 layerWas = c != null ? c.gameObject.layer : -1;
                 shownWas = OverlayPreview.ShownOf(id) is { } r && r.activeInHierarchy;
             }, () => { }, () => ComboInLevel(check, info, layerWas, shownWas));
+            yield return TufThumbnailInLevel(check, info);
 #if !QUARTZ_KEYVIEWER
             yield return KvGuard(check, () => KvSwitcherInEditor(check));
 #endif

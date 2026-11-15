@@ -19,6 +19,8 @@ public sealed partial class TufService : IRuntimeService {
     public bool IsLaunching => actions?.IsLaunching ?? false;
     public int QueueCount => actions?.QueueCount ?? 0;
     public int QueuePosition(int id) => actions?.QueuePosition(id) ?? 0;
+    /// <summary>The runner that acts on, queues and launches this service's levels: the new menu's cards act through it.</summary>
+    internal TufLevelActionRunner Runner => actions;
     public bool ShowInstalled { get; private set; }
     public int InstalledCount => index?.Data.Count ?? 0;
     public int InfoRevision { get; private set; }
@@ -111,6 +113,9 @@ public sealed partial class TufService : IRuntimeService {
         OfflineError = false;
         Notify();
     }
+
+    /// <summary>Self-tests only: raises Changed after a test set a level's state directly.</summary>
+    internal void NotifyForTest() => Notify();
 #endif
     public void Act(TufLevel level) => actions?.Act(level);
     public void LaunchChart(TufLevel level, string chart) => actions?.LaunchChart(level, chart);

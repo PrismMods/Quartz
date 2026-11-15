@@ -29,7 +29,7 @@ internal static partial class FacetSelfTestChecks {
         "visuals.planetcolors", "visuals.ottoicon", "visuals.uihiding", "gameplay.chatter", "gameplay.countdown", "gameplay.death", "gameplay.autodeafen",
         "gameplay.keylimiter", "gameplay.judgement", "gameplay.practice", "tweaks.general", "tweaks.specialdays", "tweaks.optimizer", "tweaks.mainmenu",
         "editor.tilereadout", "editor.bga", "editor.fliprotate", "editor.decopreview", "tuf.settings", CorePages.SettingsPageKey, "developer.main", "profiles.main", "import.main",
-        CorePages.AddonsPageKey, "overlay.panels"];
+        CorePages.AddonsPageKey, "overlay.panels", "tuf.levels", "tuf.packs"];
 
     internal static IEnumerator FormPages(Action<string, bool, string> check, Action<string> info) {
         // Every window opened here writes its geometry into the live settings: put the map back.
@@ -51,6 +51,8 @@ internal static partial class FacetSelfTestChecks {
             yield return Import(check, info);
             yield return Addons(check, info);
             yield return OverlayPanelsList(check, info);
+            yield return TufLevels(check, info);
+            yield return TufPacks(check, info);
             IndexPerf(info);
         } finally {
             MainCore.Conf.FacetWindows.Clear();
@@ -396,9 +398,10 @@ internal static partial class FacetSelfTestChecks {
         check($"every form page builds detached without measuring the TUF library ({count})", listed && scanned == 0, $"scans={scanned}{gaps}");
         check($"every page builds detached without a thumbnail request or a side effect ({count})",
             listed && effects[2] >= 0 && effects.SequenceEqual(effectsAfter) && done.Count == 0,
-            $"packs/previews listeners, previews cached={string.Join("/", effects)} -> {string.Join("/", effectsAfter)} done={string.Join(",", done)}{gaps}");
+            $"packs/previews listeners, previews cached, live textures={string.Join("/", effects)} -> {string.Join("/", effectsAfter)} done={string.Join(",", done)}{gaps}");
         check($"every page builds detached without a request through the self-test door ({count})", listed && door.SequenceEqual(doorAfter),
             $"fetches/previews/update checks/network={string.Join("/", door)} -> {string.Join("/", doorAfter)}{gaps}");
+        yield return TufOffBuilds(check);
     }
 
     private static int[] DoorReadings() => [SelfTestDoor.Fetches, SelfTestDoor.Previews, SelfTestDoor.UpdateChecks, SelfTestDoor.Network];
@@ -449,6 +452,7 @@ internal static partial class FacetSelfTestChecks {
             TufPackService.Instance == null ? -1 : Count(typeof(TufPackService), nameof(TufPackService.Changed), TufPackService.Instance),
             Count(typeof(TufPreviewCache), nameof(TufPreviewCache.Changed)),
             (typeof(TufPreviewCache).GetField("entries", any)?.GetValue(null) as System.Collections.ICollection)?.Count ?? -1,
+            Resources.FindObjectsOfTypeAll<Texture2D>().Length,   // live textures: a detached build makes none (the range gradients)
         ];
     }
 

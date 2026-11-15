@@ -13,13 +13,13 @@ using UnityEngine.UI;
 using Quartz.UI;
 namespace Quartz.Features.Tuf;
 internal sealed class TufDifficultyRangeBar : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler {
-    private static readonly Color[] QuantumStops = {
+    internal static readonly Color[] QuantumStops = {
         new Color32(255, 255, 255, 255), new Color32(241, 161, 5, 255), new Color32(235, 123, 41, 255),
         new Color32(227, 85, 74, 255), new Color32(192, 52, 94, 255), new Color32(214, 16, 136, 255),
         new Color32(113, 73, 164, 255), new Color32(63, 32, 103, 255), new Color32(47, 43, 54, 255),
         new Color32(126, 0, 0, 255), new Color32(255, 254, 254, 255)
     };
-    private static readonly Color[] PguStops = {
+    internal static readonly Color[] PguStops = {
         new Color32(0, 153, 255, 255), new Color32(0, 255, 136, 255), new Color32(242, 167, 0, 255),
         new Color32(225, 79, 79, 255), new Color32(210, 0, 151, 255), new Color32(45, 29, 65, 255),
         new Color32(0, 0, 0, 255)
@@ -232,7 +232,7 @@ internal sealed class TufDifficultyRangeBar : MonoBehaviour, IPointerDownHandler
         trackFade?.Kill();
         if(gradientTex != null) Destroy(gradientTex);
     }
-    private static string[] CompactNames(IReadOnlyList<string> names) {
+    internal static string[] CompactNames(IReadOnlyList<string> names) {
         string[] compact = new string[names.Count];
         for(int i = 0; i < names.Count; i++) {
             int space = names[i].IndexOf(' ');
@@ -248,7 +248,7 @@ internal sealed class TufDifficultyRangeBar : MonoBehaviour, IPointerDownHandler
         image.texture = texture;
         return image;
     }
-    private static Texture2D BuildGradientTexture(int width, Color[] stops) {
+    internal static Texture2D BuildGradientTexture(int width, Color[] stops) {
         Texture2D texture = new(width, 1, TextureFormat.RGBA32, false) {
             wrapMode = TextureWrapMode.Clamp,
             filterMode = FilterMode.Bilinear
