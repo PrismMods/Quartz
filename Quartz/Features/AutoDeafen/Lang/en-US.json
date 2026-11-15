@@ -13,6 +13,7 @@
     "AD_START": "Only When Starting From 0%",
     "AD_TUTORIAL": "Watch Tutorial",
     "AD_UNLINK": "Unlink",
+    "AUTODEAFEN_DESC": "Deafens you on Discord partway into a level",
     "SECTION_AUTO_DEAFEN_DISCORD": "Auto Deafen (Discord)"
   }
 }

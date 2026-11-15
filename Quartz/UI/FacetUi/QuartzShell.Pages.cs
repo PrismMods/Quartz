@@ -33,6 +33,10 @@ internal static partial class QuartzShell {
         ["visuals.planetcolors"] = VisualsPages.PlanetColorsPage.Build,
         ["visuals.ottoicon"] = VisualsPages.OttoIconPage.Build,
         ["visuals.uihiding"] = VisualsPages.UiHiderPage.Build,
+        ["gameplay.chatter"] = GameplayPages.ChatterPage.Build,
+        ["gameplay.countdown"] = GameplayPages.CountdownPage.Build,
+        ["gameplay.death"] = GameplayPages.DeathLimitPage.Build,
+        ["gameplay.autodeafen"] = GameplayPages.AutoDeafenPage.Build,
     };
     /// <summary>A Lang key, when English has it; else the title as given (an addon page's, which has no key).</summary>
     internal static string Label(string localeKey, string title) =>

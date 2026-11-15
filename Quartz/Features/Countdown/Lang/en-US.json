@@ -1,6 +1,7 @@
 {
   "en-US": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "COUNTDOWN_DESC": "Keeps the countdown's tempo between two limits",
     "COUNTDOWN_MAXBPM": "Maximum Countdown Tempo",
     "COUNTDOWN_MINBPM": "Minimum Countdown Tempo",
     "SECTION_COUNTDOWN": "Countdown"

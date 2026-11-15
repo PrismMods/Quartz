@@ -1,6 +1,7 @@
 {
   "en-US": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "DEATHLIMIT_DESC": "Ends the run after too many deaths, misses or overloads",
     "DESC_DL_MESSAGE": "Shows on the fail screen when a limit ends your run.",
     "DL_DEATHS_MAX": "Max Deaths",
     "DL_DEATHS_ON": "Limit Deaths (Miss + Overload)",

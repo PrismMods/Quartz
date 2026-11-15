@@ -25,7 +25,7 @@ namespace Quartz.UI.FacetUi;
 internal static partial class FacetSelfTestChecks {
     // The form pages moved so far, by page key; each page's section adds its own. FormPage fails for a page not listed here.
     private static readonly List<string> FormPageKeys = ["overlay.combo", "visuals.hidejudgements", "visuals.tilearc", "visuals.visualtweaks",
-        "visuals.planetcolors", "visuals.ottoicon", "visuals.uihiding"];
+        "visuals.planetcolors", "visuals.ottoicon", "visuals.uihiding", "gameplay.chatter", "gameplay.countdown", "gameplay.death", "gameplay.autodeafen"];
 
     internal static IEnumerator FormPages(Action<string, bool, string> check, Action<string> info) {
         // Every window opened here writes its geometry into the live settings: put the map back.
@@ -37,6 +37,7 @@ internal static partial class FacetSelfTestChecks {
             yield return FormPage("combo", "overlay.combo", () => { }, () => { },
                 () => HeaderHotkeyCheck(check, "overlay.combo", "SECTION_COMBO", "combo"));
             yield return VisualsPages(check);
+            yield return GameplayForms(check);
             IndexPerf(info);
         } finally {
             MainCore.Conf.FacetWindows.Clear();

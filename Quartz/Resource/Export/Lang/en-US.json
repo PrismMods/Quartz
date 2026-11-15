@@ -37,6 +37,7 @@
     "ANCHOR_TOP_LEFT": "Top Left",
     "ANCHOR_TOP_RIGHT": "Top Right",
     "BLOCK_INPUTS_WHILE_MENU_OPEN": "Block game inputs while menu is open",
+    "CHATTERBLOCKER_ENABLE": "Enable Keyboard Chatter Blocker",
     "CHECK_FOR_UPDATES": "Check for Updates",
     "CLOSE": "Close",
     "COLOR_PICKER_HORIZONTAL": "Wide color picker",

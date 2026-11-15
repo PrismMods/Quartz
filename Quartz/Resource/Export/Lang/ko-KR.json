@@ -37,6 +37,7 @@
     "ANCHOR_TOP_LEFT": "왼쪽 위",
     "ANCHOR_TOP_RIGHT": "오른쪽 위",
     "BLOCK_INPUTS_WHILE_MENU_OPEN": "메뉴가 열려 있을 때 게임 입력 막기",
+    "CHATTERBLOCKER_ENABLE": "키보드 채터 차단 켜기",
     "CHECK_FOR_UPDATES": "업데이트 확인",
     "CLOSE": "닫기",
     "COLOR_PICKER_HORIZONTAL": "넓은 색상 선택기",

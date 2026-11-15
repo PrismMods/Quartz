@@ -1,6 +1,7 @@
 {
   "ko-KR": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
+    "COUNTDOWN_DESC": "카운트다운 템포를 두 한계 사이로 맞춰요",
     "COUNTDOWN_MAXBPM": "카운트다운 템포 최댓값",
     "COUNTDOWN_MINBPM": "카운트다운 템포 최솟값",
     "SECTION_COUNTDOWN": "카운트다운"
