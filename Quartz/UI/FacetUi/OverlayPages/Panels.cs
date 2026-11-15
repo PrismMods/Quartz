@@ -1,12 +1,11 @@
 #if !IL2CPP
 using Facet;
 using Quartz.Features.Panels;
-using Quartz.UI.Nav;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi.OverlayPages;
 /// <summary>
-/// Overlay ▸ Panels in the new menu: the panels' font, a button that adds one and how many there are, beside a live preview
-/// of every panel. The panels themselves (their stats, looks and order) stay in the classic menu, which a card opens.
+/// Overlay ▸ Panels in the new menu: the panels' font, a button that adds one, how many there are and the panels themselves
+/// (their order, stats and looks), beside a live preview of every panel.
 /// </summary>
 internal static class Panels {
     internal static void Page(VisualElement p) {
@@ -29,9 +28,7 @@ internal static class Panels {
             o.Tooltip = "DESC_PANELS_CREATE";
         });
         ShellRows.Info(panels, "PANEL_COUNT", () => PanelsOverlay.Conf.Panels.Count, CountText);
-
-        int state = NavRegistry.StateFor("overlay.panels");
-        Controls.Action(Controls.Card(p, null), "MENU_PANELS_EDITOR", "MENU_CLASSIC_OPEN", () => QuartzShell.OpenClassic(state), o => o.Id = "MENU_PANELS_EDITOR");
+        PanelsList.List(panels);
     }
 
     /// <summary>How many panels there are; past the soft cap, a warning that so many may slow the game, as the classic page says.</summary>

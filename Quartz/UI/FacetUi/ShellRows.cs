@@ -142,7 +142,7 @@ internal static partial class ShellRows {
     /// <summary>Closest, then the nine anchors. Closest snaps every element to its nearest anchor; an anchor is the overlay's
     /// SetAnchor, which moves the element to that anchor's default spot, as the classic row does.</summary>
     internal static Control<int> Anchor(VisualElement card, string labelKey, Func<int> anchor, Func<bool> closest, Action<int> setAnchor,
-        Action<bool> setClosest) =>
+        Action<bool> setClosest, Action<DropdownOptions> configure = null) =>
         Controls.Dropdown(card, labelKey, QuartzShell.Writes(() => closest() ? 0 : anchor() + 1, v => {
             setClosest(v == 0);
             if(v == 0) Reorganizer.SnapAllAnchors();
@@ -151,6 +151,7 @@ internal static partial class ShellRows {
             o.Id = labelKey;
             o.Items = Anchors;
             o.Default = 0;
+            configure?.Invoke(o);
         });
 
     /// <summary>The overlay's font, or the global one. The page rebuilds when a font is added or the global one changes

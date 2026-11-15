@@ -83,6 +83,8 @@
     "PANEL_TOO_MANY": "패널이 {0}개예요. 너무 많으면 게임이 느려질 수 있어요.",
     "PANELS_DESC": "정확도와 BPM 같은 실시간 통계를 담은 텍스트 패널이에요",
     "MENU_PANELS_EDITOR": "패널과 통계, 순서는 기존 메뉴에서 편집해요",
-    "PANEL_COUNT": "패널: {0}개"
+    "PANEL_COUNT": "패널: {0}개",
+    "PANEL_SHOWSTAT": "스탯 표시",
+    "PANEL_SHOWLABEL": "라벨 표시"
   }
 }

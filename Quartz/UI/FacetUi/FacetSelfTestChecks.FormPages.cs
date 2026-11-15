@@ -29,7 +29,7 @@ internal static partial class FacetSelfTestChecks {
         "visuals.planetcolors", "visuals.ottoicon", "visuals.uihiding", "gameplay.chatter", "gameplay.countdown", "gameplay.death", "gameplay.autodeafen",
         "gameplay.keylimiter", "gameplay.judgement", "gameplay.practice", "tweaks.general", "tweaks.specialdays", "tweaks.optimizer", "tweaks.mainmenu",
         "editor.tilereadout", "editor.bga", "editor.fliprotate", "editor.decopreview", "tuf.settings", CorePages.SettingsPageKey, "developer.main", "profiles.main", "import.main",
-        CorePages.AddonsPageKey];
+        CorePages.AddonsPageKey, "overlay.panels"];
 
     internal static IEnumerator FormPages(Action<string, bool, string> check, Action<string> info) {
         // Every window opened here writes its geometry into the live settings: put the map back.
@@ -50,6 +50,7 @@ internal static partial class FacetSelfTestChecks {
             yield return Profiles(check, info);
             yield return Import(check, info);
             yield return Addons(check, info);
+            yield return OverlayPanelsList(check, info);
             IndexPerf(info);
         } finally {
             MainCore.Conf.FacetWindows.Clear();

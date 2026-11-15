@@ -108,6 +108,7 @@ namespace Facet {
         public static global::Facet.Control<bool> PageHeader(global::UnityEngine.UIElements.VisualElement parent, string title, global::Facet.Bind<bool> on, global::System.Action<global::Facet.PageHeaderOptions> configure = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Preview(global::UnityEngine.UIElements.VisualElement parent, string label, global::System.Action<global::Facet.PreviewOptions> configure = default) => throw null;
         public static global::Facet.Control<global::UnityEngine.Vector2> Range(global::UnityEngine.UIElements.VisualElement parent, string lowLabel, string highLabel, global::Facet.Bind<global::UnityEngine.Vector2> range, global::System.Action<global::Facet.RangeOptions> configure = default) => throw null;
+        public static global::Facet.Reorder<T> Reorder<T>(global::UnityEngine.UIElements.VisualElement parent, global::System.Action<global::Facet.ReorderOptions<T>> configure) where T : class => throw null;
         public static global::UnityEngine.UIElements.VisualElement Repeat<T>(global::UnityEngine.UIElements.VisualElement parent, global::System.Func<global::System.Collections.Generic.IReadOnlyList<T>> items, global::System.Func<T, string> key, global::System.Action<global::UnityEngine.UIElements.VisualElement, T> build) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Row(global::UnityEngine.UIElements.VisualElement parent, string label, string tooltip = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Section(global::UnityEngine.UIElements.VisualElement parent, string title, bool defaultOpen = default) => throw null;
@@ -315,6 +316,19 @@ namespace Facet {
         public float Min { get => throw null; set { } }
         public float Step { get => throw null; set { } }
         private RangeOptions() { }
+    }
+    public sealed unsafe partial class ReorderOptions<T> : global::Facet.ControlOptions where T : class {
+        public global::System.Action<global::UnityEngine.UIElements.VisualElement, T> Build { get => throw null; set { } }
+        public bool DragFromText { get => throw null; set { } }
+        public global::System.Func<global::System.Collections.Generic.IReadOnlyList<T>> Items { get => throw null; set { } }
+        public global::System.Func<T, string> Key { get => throw null; set { } }
+        public global::System.Action<int, int> Move { get => throw null; set { } }
+        public global::System.Func<T, string> Text { get => throw null; set { } }
+        public bool Vertical { get => throw null; set { } }
+        private ReorderOptions() { }
+    }
+    public sealed unsafe partial class Reorder<T> where T : class {
+        private Reorder() { }
     }
     public enum Role : int {
         Panel = 0,

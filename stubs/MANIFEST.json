@@ -2042,6 +2042,7 @@
           "Facet.Control\u00601\u003CUnityEngine.Color\u003E Facet.Controls::Colour(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CUnityEngine.Color\u003E,System.Action\u00601\u003CFacet.ColourOptions\u003E)",
           "Facet.Control\u00601\u003CUnityEngine.Vector2\u003E Facet.Controls::Range(UnityEngine.UIElements.VisualElement,System.String,System.String,Facet.Bind\u00601\u003CUnityEngine.Vector2\u003E,System.Action\u00601\u003CFacet.RangeOptions\u003E)",
           "Facet.MaskTiles Facet.Controls::MaskTiles(UnityEngine.UIElements.VisualElement,Facet.Bind\u00601\u003CSystem.Int32\u003E,System.Collections.Generic.IList\u00601\u003CFacet.MaskTile\u003E,System.Action\u00601\u003CFacet.MaskTilesOptions\u003E)",
+          "Facet.Reorder\u00601\u003CT\u003E Facet.Controls::Reorder(UnityEngine.UIElements.VisualElement,System.Action\u00601\u003CFacet.ReorderOptions\u00601\u003CT\u003E\u003E)",
           "Facet.StatusLine Facet.Controls::Status(UnityEngine.UIElements.VisualElement)",
           "System.Single Facet.Controls::RowHeight",
           "System.Void Facet.Controls::AfterChange(UnityEngine.UIElements.VisualElement,System.Action)",
@@ -2366,6 +2367,29 @@
           "System.Void Facet.RangeOptions::set_Min(System.Single)",
           "System.Void Facet.RangeOptions::set_Step(System.Single)"
         ]
+      },
+      {
+        "type": "Facet.ReorderOptions\u00601",
+        "members": [
+          "System.Action\u00602\u003CSystem.Int32,System.Int32\u003E Facet.ReorderOptions\u00601::Move()",
+          "System.Action\u00602\u003CUnityEngine.UIElements.VisualElement,T\u003E Facet.ReorderOptions\u00601::Build()",
+          "System.Boolean Facet.ReorderOptions\u00601::DragFromText()",
+          "System.Boolean Facet.ReorderOptions\u00601::Vertical()",
+          "System.Func\u00601\u003CSystem.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E\u003E Facet.ReorderOptions\u00601::Items()",
+          "System.Func\u00602\u003CT,System.String\u003E Facet.ReorderOptions\u00601::Key()",
+          "System.Func\u00602\u003CT,System.String\u003E Facet.ReorderOptions\u00601::Text()",
+          "System.Void Facet.ReorderOptions\u00601::set_Build(System.Action\u00602\u003CUnityEngine.UIElements.VisualElement,T\u003E)",
+          "System.Void Facet.ReorderOptions\u00601::set_DragFromText(System.Boolean)",
+          "System.Void Facet.ReorderOptions\u00601::set_Items(System.Func\u00601\u003CSystem.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E\u003E)",
+          "System.Void Facet.ReorderOptions\u00601::set_Key(System.Func\u00602\u003CT,System.String\u003E)",
+          "System.Void Facet.ReorderOptions\u00601::set_Move(System.Action\u00602\u003CSystem.Int32,System.Int32\u003E)",
+          "System.Void Facet.ReorderOptions\u00601::set_Text(System.Func\u00602\u003CT,System.String\u003E)",
+          "System.Void Facet.ReorderOptions\u00601::set_Vertical(System.Boolean)"
+        ]
+      },
+      {
+        "type": "Facet.Reorder\u00601",
+        "members": []
       },
       {
         "type": "Facet.Role",

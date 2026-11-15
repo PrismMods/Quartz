@@ -13,14 +13,14 @@ using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi;
 /// <summary>
 /// Overlay ▸ Panels in the new menu: its rows against the classic page's, its two columns' edges, a panel made here that the
-/// count and the preview follow and that goes again the classic way, the editor card's way to the classic menu and back, and
-/// the preview pane, a panel deleted while open at the classic page's end, and panels dragged into a new order, whose hotkeys
+/// count and the preview follow and that goes again the classic way, the panel list where the editor card was, and the
+/// preview pane; on the classic page, a panel deleted while open at its end, and panels dragged into a new order, whose hotkeys
 /// follow them. OverlayPanels.json and Settings.json are left byte for byte as they were.
 /// </summary>
 internal static partial class FacetSelfTestChecks {
     private const string PanelsPage = "overlay.panels";
-    // The classic page's own rows (the font and Create Panel), the count, and the card that opens the panels' editor.
-    private static readonly string[] PanelsRows = ["FONT_OVERLAY", "PANELS_CREATE", "PANEL_COUNT", "MENU_PANELS_EDITOR"];
+    // The classic page's own rows (the font and Create Panel) and the count; Covers pins the list's rows.
+    private static readonly string[] PanelsRows = ["FONT_OVERLAY", "PANELS_CREATE", "PANEL_COUNT"];
 
     private static IEnumerator OverlayPanels(Action<string, bool, string> check, Action<string> info) {
         PanelsOverlay.EnsureConf();
@@ -52,7 +52,7 @@ internal static partial class FacetSelfTestChecks {
         yield return Parity(check, PanelsPage, PanelsRows);
         yield return ColumnEdges(check, PanelsPage, PanelsOverlay.FontKey);
         yield return PanelsCreate(check, file, was);
-        yield return EditorLink(check, PanelsPage, "MENU_PANELS_EDITOR");
+        PanelsListStands(check);
         yield return PanelsDeleteKeepsPage(check);
         yield return PanelsDragKeepsBinds(check, info);
         // With no panel there is nothing to preview: one is made for the preview checks, and goes after them.
@@ -109,6 +109,14 @@ internal static partial class FacetSelfTestChecks {
             + $"stale={stale} {detail}");
     }
 
+    // The list of panels stands in the card the editor card followed, and nothing on the page opens the classic menu.
+    private static void PanelsListStands(Action<string, bool, string> check) {
+        VisualElement page = PageContent();
+        bool list = page.Q(name: "PANELS_LIST") != null, link = page.Q(name: "MENU_PANELS_EDITOR") != null || page.Q(name: "menu-classic") != null;
+        check($"{PanelsPage}: the panel list stands where the editor card was, with no link to the classic menu on the page", list && !link,
+            $"list={list} link={link} {Showing()}");
+    }
+
     // Deleting a panel open at the classic page's end leaves the page showing its rows: the offset follows the shorter content
     // within 2 frames, and the content after its glide. Before, the offset stayed past the new end and the page was blank,
     // its "Use this feature" switch too, until the next wheel notch. The panel deleted is a throwaway one, named so that no
@@ -125,8 +133,7 @@ internal static partial class FacetSelfTestChecks {
         float before = float.NaN, offset = float.NaN, max = float.NaN, at = float.NaN, end = float.NaN;
         try {
             UICore.ClassicStale = true;   // the classic page lists the new panel
-            Button open = Body.Q<Button>("MENU_PANELS_EDITOR-input");
-            if(open != null) Submit(open);
+            QuartzShell.OpenClassic(state);
             yield return Frames(2);
             opened = UICore.IsOpen && UICore.CurrentMenuState == state;
             RectTransform page = UICore.Pages.TryGetValue(state, out RectTransform p) ? p : null;
@@ -200,8 +207,7 @@ internal static partial class FacetSelfTestChecks {
         float before = float.NaN, after = float.NaN, at = float.NaN;
         try {
             UICore.ClassicStale = true;   // the classic page lists the new panels
-            Button open = Body.Q<Button>("MENU_PANELS_EDITOR-input");
-            if(open != null) Submit(open);
+            QuartzShell.OpenClassic(state);
             yield return Frames(2);
             opened = UICore.IsOpen && UICore.CurrentMenuState == state;
             RectTransform page = UICore.Pages.TryGetValue(state, out RectTransform p) ? p : null;

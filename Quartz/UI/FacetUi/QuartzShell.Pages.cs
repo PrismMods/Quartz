@@ -91,36 +91,13 @@ internal static partial class QuartzShell {
     // A search result on a page still in the classic menu goes on to that menu; a moved or off page is the destination.
     internal static Action<SearchIndex.Hit> ClassicHit(NavPage page) => IsClassic(page) ? _ => OpenClassic(page.State) : null;
 
-    // Pages moved in part: their editors stay in the classic menu, and so do those rows' hits. A row the moved page has is its own.
-    private static readonly HashSet<string> PartlyMoved = ["overlay.panels"];
-
-    // A row its moved page leaves to the classic menu: a partly moved page's rows that the moved page has no row for. Its
-    // "Use this feature" is the moved page's header switch. ids holds each partly moved page's row Ids, from a throwaway
-    // build of it.
-    private static bool LeftClassicOn(NavPage page, string key, Dictionary<string, HashSet<string>> ids) {
-        if(!PartlyMoved.Contains(page.Key) || key == "FEATURE_PAGE_ENABLE" || !Moved.TryGetValue(page.Key, out Action<VisualElement> build)) return false;
-        if(!ids.TryGetValue(page.Key, out HashSet<string> moved)) {
-            var throwaway = new VisualElement();
-            build(throwaway);
-            Names(throwaway, ids[page.Key] = moved = []);
-        }
-        return !moved.Contains(key);
-    }
-
-    private static void Names(VisualElement e, HashSet<string> into) {
-        if(!string.IsNullOrEmpty(e.name)) into.Add(e.name);
-        for(int i = 0; i < e.childCount; i++) Names(e[i], into);
-    }
-
     // The classic pages' rows, each jumping to its page in the classic menu. Asked whenever the index builds.
     internal static IEnumerable<SearchIndex.Entry> ClassicRows() {
-        // ponytail: a partly moved page is built once more per index build; cache its Ids if that ever shows in [perf]
-        var ids = new Dictionary<string, HashSet<string>>();
         foreach(var (key, english, state) in SettingsSearch.Rows()) {
             NavPage page = NavRegistry.ByState(state);
             // A row naming its own page is the page's title, which its header already indexes.
             if(page == null || key == page.LocaleKey) continue;
-            if(!IsClassic(page) && !LeftClassicOn(page, key, ids)) continue;
+            if(!IsClassic(page)) continue;
             yield return new SearchIndex.Entry {
                 Label = Label(key, english),
                 Where = Label(page.LocaleKey, page.Title),
