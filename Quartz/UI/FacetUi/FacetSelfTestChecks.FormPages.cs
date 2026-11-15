@@ -27,7 +27,7 @@ internal static partial class FacetSelfTestChecks {
     private static readonly List<string> FormPageKeys = ["overlay.combo", "visuals.hidejudgements", "visuals.tilearc", "visuals.visualtweaks",
         "visuals.planetcolors", "visuals.ottoicon", "visuals.uihiding", "gameplay.chatter", "gameplay.countdown", "gameplay.death", "gameplay.autodeafen",
         "gameplay.keylimiter", "gameplay.judgement", "gameplay.practice", "tweaks.general", "tweaks.specialdays", "tweaks.optimizer", "tweaks.mainmenu",
-        "editor.tilereadout", "editor.bga", "editor.fliprotate", "editor.decopreview", "tuf.settings", CorePages.SettingsPageKey];
+        "editor.tilereadout", "editor.bga", "editor.fliprotate", "editor.decopreview", "tuf.settings", CorePages.SettingsPageKey, "developer.main", "profiles.main"];
 
     internal static IEnumerator FormPages(Action<string, bool, string> check, Action<string> info) {
         // Every window opened here writes its geometry into the live settings: put the map back.
@@ -44,6 +44,8 @@ internal static partial class FacetSelfTestChecks {
             yield return TweaksEditor(check);
             yield return TufSettings(check, info);
             yield return SettingsUpdatesFont(check, info);
+            yield return Developer(check, info);
+            yield return Profiles(check, info);
             IndexPerf(info);
         } finally {
             MainCore.Conf.FacetWindows.Clear();
@@ -143,17 +145,18 @@ internal static partial class FacetSelfTestChecks {
 
     /// <summary>Every row the classic page indexes names an element of the open page: its key, its -input, or key#n for the
     /// n-th of a key the classic page lists more than once. renamed maps a classic key to the new Id; omitted keys are skipped
-    /// (each caller says why); only, when given, limits the keys.</summary>
+    /// (each caller says why); only, when given, limits the keys. classic, when given, is the classic page's keys from a build
+    /// of it off screen, for a page the classic menu leaves out on this build.</summary>
     private static void Covers(Action<string, bool, string> check, string pageKey, IReadOnlyDictionary<string, string> renamed = null,
-        IReadOnlyCollection<string> omitted = null, IReadOnlyCollection<string> only = null) {
+        IReadOnlyCollection<string> omitted = null, IReadOnlyCollection<string> only = null, IEnumerable<string> classic = null) {
         NavPage page = NavRegistry.ByKey(pageKey);
         VisualElement root = PageContent();
         var missing = new List<string>();
         int rows = 0;
         if(page != null)
-            foreach(IGrouping<string, string> key in SettingsSearch.Rows()
-                .Where(r => r.State == page.State && r.Key != null && r.Key != page.LocaleKey && (only == null || only.Contains(r.Key)))
-                .Select(r => r.Key).GroupBy(k => k)) {
+            foreach(IGrouping<string, string> key in (classic ?? SettingsSearch.Rows().Where(r => r.State == page.State).Select(r => r.Key))
+                .Where(k => k != null && k != page.LocaleKey && (only == null || only.Contains(k)))
+                .GroupBy(k => k)) {
                 if(omitted?.Contains(key.Key) == true) continue;
                 // The classic page's "Use this feature" is the moved page's header switch: the input of the header named by the
                 // page's title key, so a header without its switch is missing.

@@ -204,6 +204,13 @@ namespace Facet {
         Modal = 3,
         Tooltip = 4,
     }
+    public sealed unsafe partial class Look {
+        private Look() { }
+    }
+    public sealed unsafe partial class Looks {
+        public global::Facet.Look DangerButton;
+        private Looks() { }
+    }
     public sealed unsafe partial class MaskTile {
         public MaskTile(string label, int bit, global::System.Action<global::Facet.TileOptions> configure = default) => throw null;
         private MaskTile() { }
@@ -247,6 +254,8 @@ namespace Facet {
         private PageHeaderOptions() { }
     }
     public static unsafe partial class Paint {
+        public static void Fg(global::UnityEngine.UIElements.VisualElement e, global::Facet.Role r) => throw null;
+        public static void Look(global::UnityEngine.UIElements.VisualElement e, global::Facet.Look look) => throw null;
         public static void Select(global::UnityEngine.UIElements.VisualElement e, bool on) => throw null;
     }
     public sealed unsafe partial class Popup {
@@ -327,8 +336,10 @@ namespace Facet {
         protected SliderOptions() { }
     }
     public sealed unsafe partial class StatusLine {
+        public global::UnityEngine.UIElements.VisualElement Root { get => throw null; }
         public void Clear() => throw null;
         public void Show(global::System.Func<string> text, global::Facet.Role role = default, float seconds = default) => throw null;
+        public void Show(string key, global::Facet.Role role = default, float seconds = default) => throw null;
         private StatusLine() { }
     }
     public sealed unsafe partial class Surface : global::System.IDisposable {
@@ -345,12 +356,15 @@ namespace Facet {
         private Tabs() { }
     }
     public unsafe partial class TextOptions : global::Facet.Options<string> {
+        public global::System.Action<string> Live { get => throw null; set { } }
         public int MaxLength { get => throw null; set { } }
+        public string Placeholder { get => throw null; set { } }
         public float Width { get => throw null; set { } }
         protected TextOptions() { }
     }
     public sealed unsafe partial class Theme {
         public global::UnityEngine.Color this[global::Facet.Role r] { get => throw null; set { } }
+        public global::Facet.Looks Looks { get => throw null; }
         public global::Facet.Sizes Sizes { get => throw null; }
         public Theme() => throw null;
         public static global::Facet.Theme For(global::UnityEngine.UIElements.VisualElement e) => throw null;
@@ -389,5 +403,6 @@ namespace Facet {
     }
     public static unsafe partial class Words {
         public static void Label(global::UnityEngine.UIElements.TextElement e, string english, bool own = default) => throw null;
+        public static void Tip(global::UnityEngine.UIElements.VisualElement e, string english, bool own = default) => throw null;
     }
 }

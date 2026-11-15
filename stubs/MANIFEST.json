@@ -2195,6 +2195,16 @@
         ]
       },
       {
+        "type": "Facet.Look",
+        "members": []
+      },
+      {
+        "type": "Facet.Looks",
+        "members": [
+          "Facet.Look Facet.Looks::DangerButton"
+        ]
+      },
+      {
         "type": "Facet.MaskTile",
         "members": [
           "System.Void Facet.MaskTile::.ctor(System.String,System.Int32,System.Action\u00601\u003CFacet.TileOptions\u003E)"
@@ -2266,6 +2276,8 @@
       {
         "type": "Facet.Paint",
         "members": [
+          "System.Void Facet.Paint::Fg(UnityEngine.UIElements.VisualElement,Facet.Role)",
+          "System.Void Facet.Paint::Look(UnityEngine.UIElements.VisualElement,Facet.Look)",
           "System.Void Facet.Paint::Select(UnityEngine.UIElements.VisualElement,System.Boolean)"
         ]
       },
@@ -2391,7 +2403,10 @@
         "type": "Facet.StatusLine",
         "members": [
           "System.Void Facet.StatusLine::Clear()",
-          "System.Void Facet.StatusLine::Show(System.Func\u00601\u003CSystem.String\u003E,Facet.Role,System.Single)"
+          "System.Void Facet.StatusLine::Show(System.Func\u00601\u003CSystem.String\u003E,Facet.Role,System.Single)",
+          "System.Void Facet.StatusLine::Show(System.String,Facet.Role,System.Single)",
+          "UnityEngine.UIElements.VisualElement Facet.StatusLine::Root()",
+          "UnityEngine.UIElements.VisualElement Facet.StatusLine::get_Root()"
         ]
       },
       {
@@ -2416,15 +2431,21 @@
       {
         "type": "Facet.TextOptions",
         "members": [
+          "System.Action\u00601\u003CSystem.String\u003E Facet.TextOptions::Live()",
           "System.Int32 Facet.TextOptions::MaxLength()",
           "System.Single Facet.TextOptions::Width()",
+          "System.String Facet.TextOptions::Placeholder()",
+          "System.Void Facet.TextOptions::set_Live(System.Action\u00601\u003CSystem.String\u003E)",
           "System.Void Facet.TextOptions::set_MaxLength(System.Int32)",
+          "System.Void Facet.TextOptions::set_Placeholder(System.String)",
           "System.Void Facet.TextOptions::set_Width(System.Single)"
         ]
       },
       {
         "type": "Facet.Theme",
         "members": [
+          "Facet.Looks Facet.Theme::Looks()",
+          "Facet.Looks Facet.Theme::get_Looks()",
           "Facet.Sizes Facet.Theme::Sizes()",
           "Facet.Sizes Facet.Theme::get_Sizes()",
           "Facet.Theme Facet.Theme::For(UnityEngine.UIElements.VisualElement)",
@@ -2486,7 +2507,8 @@
       {
         "type": "Facet.Words",
         "members": [
-          "System.Void Facet.Words::Label(UnityEngine.UIElements.TextElement,System.String,System.Boolean)"
+          "System.Void Facet.Words::Label(UnityEngine.UIElements.TextElement,System.String,System.Boolean)",
+          "System.Void Facet.Words::Tip(UnityEngine.UIElements.VisualElement,System.String,System.Boolean)"
         ]
       }
     ]
@@ -7256,7 +7278,9 @@
         "type": "UnityEngine.UIElements.TextElement",
         "members": [
           "System.Boolean UnityEngine.UIElements.TextElement::enableRichText()",
-          "System.Void UnityEngine.UIElements.TextElement::set_enableRichText(System.Boolean)"
+          "System.String UnityEngine.UIElements.TextElement::text()",
+          "System.Void UnityEngine.UIElements.TextElement::set_enableRichText(System.Boolean)",
+          "System.Void UnityEngine.UIElements.TextElement::set_text(System.String)"
         ]
       },
       {
@@ -7290,6 +7314,7 @@
       {
         "type": "UnityEngine.UIElements.UQueryExtensions",
         "members": [
+          "T UnityEngine.UIElements.UQueryExtensions::Q(UnityEngine.UIElements.VisualElement,System.String,System.String)",
           "UnityEngine.UIElements.VisualElement UnityEngine.UIElements.UQueryExtensions::Q(UnityEngine.UIElements.VisualElement,System.String,System.String)"
         ]
       },
@@ -7309,6 +7334,7 @@
           "System.Void UnityEngine.UIElements.VisualElement::Add(UnityEngine.UIElements.VisualElement)",
           "System.Void UnityEngine.UIElements.VisualElement::Clear()",
           "System.Void UnityEngine.UIElements.VisualElement::Insert(System.Int32,UnityEngine.UIElements.VisualElement)",
+          "System.Void UnityEngine.UIElements.VisualElement::SetEnabled(System.Boolean)",
           "System.Void UnityEngine.UIElements.VisualElement::set_name(System.String)",
           "System.Void UnityEngine.UIElements.VisualElement::set_pickingMode(UnityEngine.UIElements.PickingMode)",
           "UnityEngine.Rect UnityEngine.UIElements.VisualElement::get_layout()",

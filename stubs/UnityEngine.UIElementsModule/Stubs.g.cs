@@ -229,6 +229,7 @@ namespace UnityEngine.UIElements {
     }
     public unsafe partial class TextElement : global::UnityEngine.UIElements.BindableElement {
         public bool enableRichText { get => throw null; set { } }
+        public virtual string text { get => throw null; set { } }
         protected TextElement() { }
     }
     public unsafe partial class TextField : global::UnityEngine.UIElements.TextInputBaseField<string> {
@@ -248,6 +249,7 @@ namespace UnityEngine.UIElements {
     }
     public static unsafe partial class UQueryExtensions {
         public static global::UnityEngine.UIElements.VisualElement Q(this global::UnityEngine.UIElements.VisualElement e, string name = default, string className = default) => throw null;
+        public static T Q<T>(this global::UnityEngine.UIElements.VisualElement e, string name = default, string className = default) where T : global::UnityEngine.UIElements.VisualElement => throw null;
     }
     public sealed unsafe partial class VectorImage : global::UnityEngine.ScriptableObject {
         private VectorImage() { }
@@ -267,6 +269,7 @@ namespace UnityEngine.UIElements {
         public void Clear() => throw null;
         public int IndexOf(global::UnityEngine.UIElements.VisualElement element) => throw null;
         public void Insert(int index, global::UnityEngine.UIElements.VisualElement element) => throw null;
+        public void SetEnabled(bool value) => throw null;
         public enum MeasureMode : int {
             Undefined = 0,
             Exactly = 1,

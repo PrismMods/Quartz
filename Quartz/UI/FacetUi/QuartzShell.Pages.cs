@@ -49,7 +49,17 @@ internal static partial class QuartzShell {
         ["editor.fliprotate"] = EditorPages.EditorPage.FlipRotate,
         ["editor.decopreview"] = EditorPages.EditorPage.DecoPreview,
         ["tuf.settings"] = TufPages.TufSettingsPage.Build,
+        ["developer.main"] = CoreMenuPages.DeveloperPage.Build,
+        ["profiles.main"] = CoreMenuPages.ProfilesPage.Build,
     };
+#if DEBUG
+    /// <summary>Builds the key's moved page into the window's content, whether or not the rail shows it (a self-test on a build
+    /// whose rail hides the page). Any Go leaves it.</summary>
+    internal static void ShowForTest(string key) {
+        NavPage page = NavRegistry.ByKey(key);
+        if(page != null && Moved.TryGetValue(key, out Action<VisualElement> build)) Nav?.Push(Label(page.LocaleKey, page.Title), build);
+    }
+#endif
     /// <summary>A Lang key, when English has it; else the title as given (an addon page's, which has no key).</summary>
     internal static string Label(string localeKey, string title) =>
         MainCore.Tr.HasKeyForLanguage(localeKey, "en-US") ? localeKey : title;
