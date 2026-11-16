@@ -137,7 +137,7 @@ internal static partial class FacetSelfTestChecks {
                 var got = parts[i].ink;
                 float max = want.Item2 - (i > 0 || byCard ? HeaderInset(parts[i].e) : 0f);
                 if(Mathf.Abs(got.Item1 - want.Item1) > 1f || Mathf.Abs(got.Item2 - max) > 1f)
-                    bad.Add($"{where}{i} {parts[i].e.name} {got.Item1:0.0}..{got.Item2:0.0} vs {want.Item1:0.0}..{max:0.0}");
+                    bad.Add($"{where}{i} {parts[i].e.name}[{string.Join(".", parts[i].e.GetClasses())}] paints={Paints(parts[i].e)} inset={HeaderInset(parts[i].e):0.0} first={parts[i].e.Q<Label>()?.text} {got.Item1:0.0}..{got.Item2:0.0} vs {want.Item1:0.0}..{max:0.0}");
             }
             return want;
         }
@@ -246,7 +246,7 @@ internal static partial class FacetSelfTestChecks {
         float tx = title != null ? TextX(title) : float.NaN, lx = label != null ? TextX(label) : float.NaN;
         if(!open) set?.Invoke(false, false);
         check("polish: a section's rows start under its title", Mathf.Abs(tx - lx) <= 1f,
-            $"title='{title?.text}' {tx:0.#} row={lx:0.#} fold={fold != null} {miss}");
+            $"title='{title?.text}' {tx:0.#} row={lx:0.#} fold={fold != null} {miss} | head x={title?.parent?.worldBound.x:0.#} pad={title?.parent?.resolvedStyle.paddingLeft:0.#} arrow={(title?.parent?.childCount > 0 ? title.parent[0].worldBound.width : -1):0.#} body x={body?.worldBound.x:0.#} pad={body?.resolvedStyle.paddingLeft:0.#} row x={orbit?.worldBound.x:0.#} pad={orbit?.resolvedStyle.paddingLeft:0.#}");
     }
 }
 #endif

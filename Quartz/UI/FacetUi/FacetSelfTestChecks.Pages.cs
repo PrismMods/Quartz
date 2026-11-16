@@ -271,7 +271,9 @@ internal static partial class FacetSelfTestChecks {
             bool shown = page != null && pane != null && (link != null && Displayed(link)) == PrismBridge.UiAvailable;
             QuartzShell.Go(FacetSelfTestFixture.PageKey);
             yield return Frames(1);
-            bool none = QuartzShell.CurrentPage == FacetSelfTestFixture.PageKey && Body.Q(name: "menu-classic") != null && Body.Q(name: "menu-classic-layout") == null;
+            // Without the classic menu the fixture page is its header and the note that it cannot be drawn: no layout link there.
+            bool none = QuartzShell.CurrentPage == FacetSelfTestFixture.PageKey && Body.Q(name: "menu-undrawable") != null
+                && Body.Query<Button>().Where(b => b.text == edit).First() == null;
             check("Practice's moved page links to the layout editor from its preview, the fixture page does not (fixture page)", shown && none,
                 $"page={page} switched={!saved[1].was} pane={pane != null} link={link != null} prism={PrismBridge.UiAvailable} fixture={QuartzShell.CurrentPage}/{!none}");
         } finally {

@@ -278,9 +278,11 @@ internal static partial class FacetSelfTestChecks {
     /// <summary>The page header's switch ends on the cards' control edge, over a row's switch (±1).</summary>
     internal static void HeaderSwitchEdge(Action<string, bool, string> check, string pageKey, string headerId, string rowId) {
         VisualElement head = Body.Q(name: headerId + "-input"), row = Body.Q(name: rowId + "-input");
+        float Scale = QuartzShell.Window?.Scale is float k && k > 0f ? k : 1f;
         check($"{pageKey}: the header's switch ends over the rows' switches (±1)",
-            head != null && row != null && Displayed(head) && Displayed(row) && Mathf.Abs(head.worldBound.xMax - row.worldBound.xMax) <= 1f,
-            $"header={head?.worldBound.xMax:0.0} row={row?.worldBound.xMax:0.0}");
+            // ±1 layout px: world px are layout px times the window's Scale.
+            head != null && row != null && Displayed(head) && Displayed(row) && Mathf.Abs(head.worldBound.xMax - row.worldBound.xMax) / Scale <= 1f,
+            $"header={head?.worldBound.xMax:0.0} row={row?.worldBound.xMax:0.0} scale={Scale:0.###}");
     }
 
     /// <summary>The open page's two columns: side by side, the page's parts share the header's edges, the settings cards their

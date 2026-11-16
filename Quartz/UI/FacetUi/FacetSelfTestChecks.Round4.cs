@@ -58,6 +58,12 @@ internal static partial class FacetSelfTestChecks {
             $"noLine={noLine} after={after} text={text?.text?.Length}/{full.Length} wrap={text?.resolvedStyle.whiteSpace} max={card?.resolvedStyle.maxWidth} "
             + $"card={card?.worldBound} win={win} raised={raised}");
         ShellRows.HideInfo(icon);
+        // Keyboard focus: a key first, or the focus ring takes this focus for a click's (the checks before clicked) and drops it.
+        if(icon?.panel?.visualTree is VisualElement tree)
+            using(KeyDownEvent key = Pooled<KeyDownEvent>()) {
+                key.target = tree;
+                tree.SendEvent(key);
+            }
         icon?.Focus();
         yield return Frames(1);
         bool focused = PageContent().panel?.visualTree.Q(name: "row-info-card") != null;

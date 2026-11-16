@@ -88,9 +88,9 @@ internal static partial class FacetSelfTestChecks {
         string key = KeyViewerOverlay.FontKey, was = FontManager.OverlayFontName(key) ?? FontManager.FollowGlobal;
         TMP_FontAsset now = FontManager.For(key);
         string font = OverlayFontPicker.Values().FirstOrDefault(f => f != FontManager.FollowGlobal && f != was
-            && FontManager.GetFont(f) is { } a && a != now && a.sourceFontFile != null);
+            && FontManager.GetFont(f) is { } a && a != now && ShellSettings.Face(a) != null);   // a face the menu can draw (the game's own has none)
         if(font == null) {
-            check(name, false, "no other font with a source file to pick");
+            check(name, false, "no other font with a drawable face to pick");
             yield break;
         }
         UnityEngine.TextCore.Text.FontAsset want = ShellSettings.Face(FontManager.GetFont(font)), got = null;
@@ -188,6 +188,10 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(3);
     }
 
+    private static IEnumerator SwapShown(VisualElement swap, bool shown) {
+        for(float t0 = Time.realtimeSinceStartup; Displayed(swap) != shown && Time.realtimeSinceStartup - t0 < 0.5f;) yield return null;
+    }
+
     // Selected elements put the inspector in the left column in place of the settings, the canvas keeps its height, and Back
     // brings the settings back where they were scrolled to.
     private static IEnumerator KvInspectorColumn(Action<string, bool, string> check) {
@@ -213,6 +217,7 @@ internal static partial class FacetSelfTestChecks {
             yield return Frames(3);
             y = sv.scrollOffset.y;
             KvSelect(items[0]);
+            yield return SwapShown(swap, true);   // the swap follows the selection on Facet's refresh pass (every 100 ms)
             yield return Frames(3);
             KvCanvasBounds(out _, out stage1);
             swapped = Displayed(swap) && !Displayed(settings) && left.Contains(Body.Q(name: "kle-inspector"));
@@ -229,6 +234,7 @@ internal static partial class FacetSelfTestChecks {
             yield return Frames(3);
             swapped &= Displayed(swap);
             Click(back);
+            yield return SwapShown(swap, false);
             yield return Frames(8);
             y1 = sv.scrollOffset.y;
             restored = KvSel().Count == 0 && !Displayed(swap) && Displayed(settings) && Mathf.Abs(y1 - y) <= 1f;

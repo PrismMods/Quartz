@@ -22,7 +22,7 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
     private const float StartAfterSeconds = 25f;
     // Every runner's marker. Two armed in one launch would run interleaved, and the first DONE quits before the other's
     // finally puts things back (1-1's attempt flushed into the player's PlayCount.json).
-    private static readonly string[] Markers = ["facet-selftest", "prism-selftest", "facet-level-selftest", "facet-pages-selftest"];
+    private static readonly string[] Markers = ["facet-selftest", "prism-selftest", "facet-level-selftest", "facet-pages-selftest", "facet-shots"];
     private bool done;
     private int pass, fail;
     private StringBuilder log;
@@ -247,6 +247,13 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
         if(FacetBridge.MenuAvailable()) yield return FacetSelfTestChecks.FormPages(check, info);
         else check("the new menu is available", false, null);
     }
+#if !QUARTZ_KEYVIEWER
+    /// <summary>The run under the marker facet-shots: pictures of the screens in the player's notes, for a look by eye.</summary>
+    internal static IEnumerator Shots(Action<string, bool, string> check, Action<string> info) {
+        if(FacetBridge.MenuAvailable()) yield return FacetSelfTestChecks.Shots(check, info);
+        else check("the new menu is available", false, null);
+    }
+#endif
     // MelonLoader's log; null-safe empty string elsewhere (UMM). The file is held open
     // by the loader, so open it shared.
     private static string ReadQuartzLog() {

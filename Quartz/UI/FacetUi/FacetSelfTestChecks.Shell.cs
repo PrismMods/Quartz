@@ -111,7 +111,7 @@ internal static partial class FacetSelfTestChecks {
                     expected.Add(QuartzHost.Host.Translate(QuartzShell.Label(c.LocaleKey, c.Title)));
         string[] shown = RailLabels().Select(l => l?.text).ToArray();
         int rules = RailScroll.contentContainer.Children().Count(e => e.name == "rule");
-        check("the rail lists the visible categories in their three groups", shown.SequenceEqual(expected),
+        check("the rail lists the visible categories in their three groups", expected.Count > 0 && shown.SequenceEqual(expected),
             $"shown={string.Join("|", shown)} want={string.Join("|", expected)}");
         check("the rail has two rules and no Credits", rules == 2 && !shown.Contains(QuartzHost.Host.Translate("CREDITS")), $"rules={rules}");
     }
@@ -134,7 +134,8 @@ internal static partial class FacetSelfTestChecks {
             else classic++;
         }
         info($"new menu pages: moved={moved} classic={classic} stub={stub}");
-        check("every page on the rail opens in the new menu without a failed card", failed.Count == 0, string.Join(", ", failed));
+        check("every page on the rail opens in the new menu without a failed card", moved > 0 && failed.Count == 0,
+            $"moved={moved} " + string.Join(", ", failed));
         yield return ShellHiddenCategory(check);
     }
 
@@ -366,7 +367,14 @@ internal static partial class FacetSelfTestChecks {
     // Screen px per panel px, and per px of the unit Scroll Speed counts in: a 1920-wide canvas scaled by UI scale (the old
     // classic menu's), see QuartzHost.WheelSpeed.
     private static float PanelPx(VisualElement e) => Screen.width / e.panel.visualTree.layout.width;
-    private static float ClassicPx => Screen.width * (MainCore.Conf.UIScale <= 0f ? 1f : MainCore.Conf.UIScale) / UICore.ReferenceResolution.x;
+    // Screen px per classic canvas px: the classic menu's CanvasScaler matched 1920x1080 / UI scale half by width, half by
+    // height (UICore.TryGetCanvasSize), so off 16:9 neither the width nor the height alone gives it.
+    private static float ClassicPx {
+        get {
+            float ui = MainCore.Conf.UIScale <= 0f ? 1f : MainCore.Conf.UIScale;
+            return Mathf.Sqrt(Screen.width * ui / UICore.ReferenceResolution.x * (Screen.height * ui / UICore.ReferenceResolution.y));
+        }
+    }
     private static Vector2 ScreenCentre(VisualElement e) {
         Vector2 centre = e.worldBound.center;
         float k = PanelPx(e);

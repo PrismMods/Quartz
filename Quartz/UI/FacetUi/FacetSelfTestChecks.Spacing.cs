@@ -103,6 +103,9 @@ internal static partial class FacetSelfTestChecks {
                 preset == DisplayStyle.None && custom == DisplayStyle.Flex, $"preset={preset} custom={custom}");
 
 #if !QUARTZ_KEYVIEWER
+            // The column is hidden until elements are selected, and a hidden element has no resolved padding: read its own.
+            static float Inset(VisualElement e) => e == null ? float.NaN
+                : e.resolvedStyle.display == DisplayStyle.None ? e.style.paddingLeft.value.value : e.resolvedStyle.paddingLeft;
             QuartzShell.Go("overlay.keyviewer");
             yield return Frames(3);
             if(KvEditorDoor.Live && KvEditorPage.Editor is { } ed) {
@@ -110,8 +113,8 @@ internal static partial class FacetSelfTestChecks {
                 float slack = column.worldBound.yMax - (status?.worldBound.yMax ?? 0f);
                 float pad = Theme.For(Body).Sizes.Pad;
                 check("kv editor: the preview fills its column to the bottom, and the inspector column takes the cards' row inset",
-                    slack <= pad + 2f && side != null && Near(side.resolvedStyle.paddingLeft, pad),
-                    $"left under the status line={slack:0.#} inset={side?.resolvedStyle.paddingLeft:0.#} pad={pad:0.#}");
+                    slack <= pad + 2f && side != null && Near(Inset(side), pad),
+                    $"left under the status line={slack:0.#} inset={Inset(side):0.#} pad={pad:0.#}");
                 check("kv editor: the grid and elements are on the stage once the inspector moves out", KvOnStage(ed, out string seen), seen);
 
                 // Layouts is a menu title like File: its text over the first tab's, its box centred with File's, no focus outline.

@@ -32,6 +32,8 @@ public static partial class UICore {
         UpdateToast.Initialize();
         if(started) return;
         started = true;
+        // The core categories and pages: the classic menu's factories registered them, and the new menu and its search read them.
+        Quartz.UI.Nav.CorePages.EnsureRegistered();
         // A pump later, once the runtime is up: the probes below need PrismLib registered.
         MainThread.Enqueue(() => {
             if(!FacetBridge.MenuAvailable()) {

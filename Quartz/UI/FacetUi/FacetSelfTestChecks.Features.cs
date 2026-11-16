@@ -112,10 +112,12 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(2);
         List<VisualElement> tiles = [.. FeatureCategories.In("overlay").Select(h => FeatureTileOf(h.Id))];
         bool laid = tiles.Count >= 6 && tiles.All(t => t != null);
-        bool row = laid && tiles.Take(5).All(t => Mathf.Abs(t.worldBound.y - tiles[0].worldBound.y) <= 1f && Mathf.Abs(t.worldBound.width - tiles[0].worldBound.width) <= 1f);
+        // Widths within two screen px: each edge snaps to the screen's pixel grid, which at the window's scale is not whole panel px.
+        float snap = laid ? Mathf.Max(1f, 2f / PanelPx(tiles[0])) : 1f;
+        bool row = laid && tiles.Take(5).All(t => Mathf.Abs(t.worldBound.y - tiles[0].worldBound.y) <= 1f && Mathf.Abs(t.worldBound.width - tiles[0].worldBound.width) <= snap);
         bool wraps = laid && tiles[5].worldBound.y > tiles[0].worldBound.y + 1f;
         check("Overlay's tiles run five to a row and the sixth wraps", row && wraps,
-            string.Join(" ", tiles.Select(t => t == null ? "null" : $"{t.worldBound.y:0}/{t.worldBound.width:0}")));
+            string.Join(" ", tiles.Select(t => t == null ? "null" : $"{t.worldBound.y:0.#}/{t.worldBound.width:0.##}")));
     }
 
     private static IEnumerator FeaturesTile(Action<string, bool, string> check) {
