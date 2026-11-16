@@ -85,5 +85,6 @@
     "PANEL_COUNT": "Panels: {0}",
     "PANEL_SHOWSTAT": "Show Stat",
     "PANEL_SHOWLABEL": "Show Label"
-  }
+  },
+    "PANEL_STAT_COMBO": "Combo"
 }

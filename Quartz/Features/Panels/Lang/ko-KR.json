@@ -85,5 +85,6 @@
     "PANEL_COUNT": "패널: {0}개",
     "PANEL_SHOWSTAT": "스탯 표시",
     "PANEL_SHOWLABEL": "라벨 표시"
-  }
+  },
+    "PANEL_STAT_COMBO": "콤보"
 }

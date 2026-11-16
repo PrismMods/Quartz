@@ -20,21 +20,41 @@ internal static class Combo {
     }
 
     // One card, its groups on tabs as the Key Viewer editor's inspector has them: one group shows at a time.
-    private static void Cards(VisualElement p) => ShellRows.CardTabs(Controls.Card(p, null), new List<NavItem> {
-        new("SECTION_COMBO", General), new("HEADING_LABEL", Label), new("HEADING_COUNT", Count),
-        new("HEADING_ANIMATION", Animation), new("HEADING_COLOR", Colour), new("MENU_LAYOUT", Layout),
-    });
+    private static void Cards(VisualElement p) {
+        ShellRows.CardTabs(Controls.Card(p, null), new List<NavItem> {
+            new("SECTION_COMBO", General), new("HEADING_LABEL", Label), new("HEADING_COUNT", Count),
+            new("HEADING_ANIMATION", Animation), new("HEADING_COLOR", Colour), new("MENU_LAYOUT", Layout),
+        });
+        // Custom break: the judgement bar over the judgements that keep the combo; the rest break it.
+        VisualElement keep = JudgementBar.Build(p, "COMBO_KEEP_TILES", Bind.To(() => C.KeepMask, v => C.KeepMask = v), ComboSettings.DefaultKeepMask,
+            VisualsPages.HideJudgementsPage.Bar(XPerfectBridge.Shown, XPerfectBridge.Native), VisualsPages.HideJudgementsPage.Extra,
+            ComboOverlay.Save).Root.parent;
+        void Show() => keep.style.display = C.CustomBreak ? DisplayStyle.Flex : DisplayStyle.None;
+        Show();
+        Ui.Every(p, 100, Show);
+    }
 
     private static void General(VisualElement combo) {
         Action apply = ComboOverlay.Apply, save = ComboOverlay.Save;
+        ShellRows.Toggle(combo, "COMBO_SHOW_COUNTER", "combo_show_counter", Bind.To(() => C.ShowCounter, v => C.ShowCounter = v), apply, save, o => {
+            o.Default = Def.ShowCounter;
+            o.Tooltip = "DESC_COMBO_SHOW_COUNTER";
+        });
+        ShellRows.Toggle(combo, "COMBO_CUSTOM_BREAK", "combo_custom_break", Bind.To(() => C.CustomBreak, v => C.CustomBreak = v), null, save, o => {
+            o.Default = Def.CustomBreak;
+            o.Tooltip = "DESC_COMBO_CUSTOM_BREAK";
+        });
+        Func<bool> classic = () => !C.CustomBreak;
         ShellRows.Toggle(combo, "COMBO_AUTO", "combo_auto", Bind.To(() => C.CountAuto, v => C.CountAuto = v), null, save, o => {
             o.Default = Def.CountAuto;
             o.Tooltip = "DESC_COMBO_AUTO";
+            o.VisibleWhen = classic;
         });
         if(XPerfectBridge.Installed)
             ShellRows.Toggle(combo, "COMBO_XPERFECT", "combo_xperfect", Bind.To(() => C.XPerfectComboEnabled, v => C.XPerfectComboEnabled = v), apply, save, o => {
                 o.Default = Def.XPerfectComboEnabled;
                 o.Tooltip = "DESC_COMBO_XPERFECT";
+                o.VisibleWhen = classic;
             });
         ShellRows.Slider(combo, "COMBO_FONTSIZE", Bind.To(() => C.FontSize, v => C.FontSize = v), 24f, 120f, 1f, "0 px", apply, save,
             o => o.Default = Def.FontSize);

@@ -38,5 +38,10 @@
     "DESC_COMBO_SOLIDCOLOR": "콤보 수에 따라 바꾸지 않고 한 가지 색상만 써요",
     "DESC_COMBO_PERFECTCOLOR_ENABLED": "최대 콤보에 이르면 퍼펙트 색상으로 바꿔요",
     "COMBO_DESC": "현재 콤보를 보여줘요"
-  }
+  },
+    "COMBO_SHOW_COUNTER": "콤보 카운터 보이기",
+    "DESC_COMBO_SHOW_COUNTER": "끄면 큰 카운터 없이 콤보만 세요. 패널 통계로 콤보를 보여줄 때 써요.",
+    "COMBO_CUSTOM_BREAK": "콤보 끊김 직접 설정",
+    "DESC_COMBO_CUSTOM_BREAK": "콤보를 이어갈 판정을 골라요. 나머지 판정은 콤보를 끊어요.",
+    "COMBO_KEEP_TILES": "콤보를 잇는 판정"
 }

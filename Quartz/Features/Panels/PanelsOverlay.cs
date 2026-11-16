@@ -64,6 +64,8 @@ public static partial class PanelsOverlay {
                 ? Pct(start, p) + " - " + Pct(GameStats.Best, p)
                 : Pct(GameStats.Best, p);
         } },
+        new() { Id = "combo", Category = "Accuracy", Label = "Combo", Value = _ =>
+            Quartz.Features.Combo.Combo.Count.ToString(CultureInfo.InvariantCulture) },
         new() { Id = "fps", Category = "Other", Label = "FPS", Value = _ =>
             GameStats.Fps.ToString(CultureInfo.InvariantCulture) },
         new() { Id = "text", Category = "Other", Label = "Text", Value = _ => null },

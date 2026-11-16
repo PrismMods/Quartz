@@ -38,5 +38,10 @@
     "DESC_COMBO_SOLIDCOLOR": "Use a single flat color instead of blending between Low and High Combo Color as the combo grows.",
     "DESC_COMBO_PERFECTCOLOR_ENABLED": "Switch to Perfect Color once the combo reaches Color Max Combo, instead of staying on High Combo Color.",
     "COMBO_DESC": "Shows your current combo"
-  }
+  },
+    "COMBO_SHOW_COUNTER": "Show Combo Counter",
+    "DESC_COMBO_SHOW_COUNTER": "Turn off to keep counting without the big counter, e.g. to show the combo as a panel stat.",
+    "COMBO_CUSTOM_BREAK": "Custom Combo Break",
+    "DESC_COMBO_CUSTOM_BREAK": "Pick which judgements keep the combo going; every other judgement breaks it.",
+    "COMBO_KEEP_TILES": "Judgements that keep the combo"
 }

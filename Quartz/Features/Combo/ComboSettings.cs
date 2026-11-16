@@ -8,6 +8,12 @@ public sealed class ComboSettings : ISettingsFile {
     public bool Enabled = true;
     public bool CountAuto = true;
     public bool XPerfectComboEnabled = false;
+    public bool ShowCounter = true;
+    // Custom break: the judgements in BreakMask keep the combo going, every other one breaks it. Bits are HitKind's,
+    // with X, + and − Perfect at 12-14 (JudgementPopupHider's bits) when XPerfect grades the Perfects.
+    public bool CustomBreak = false;
+    public int KeepMask = DefaultKeepMask;
+    public const int DefaultKeepMask = 1 << 3 | 1 << 10 | 1 << 12 | 1 << 13 | 1 << 14;
     public float FontSize = 56f;
     public float MasterSize = 1f;
     public float CaptionScale = 0.35f;
@@ -62,6 +68,9 @@ public sealed class ComboSettings : ISettingsFile {
             [nameof(Enabled)] = Enabled,
             [nameof(CountAuto)] = CountAuto,
             [nameof(XPerfectComboEnabled)] = XPerfectComboEnabled,
+            [nameof(ShowCounter)] = ShowCounter,
+            [nameof(CustomBreak)] = CustomBreak,
+            [nameof(KeepMask)] = KeepMask,
             [nameof(FontSize)] = FontSize,
             [nameof(MasterSize)] = MasterSize,
             [nameof(CaptionScale)] = CaptionScale,
@@ -115,6 +124,9 @@ public sealed class ComboSettings : ISettingsFile {
         Enabled = IOUtils.Read(token, nameof(Enabled), Enabled);
         CountAuto = IOUtils.Read(token, nameof(CountAuto), CountAuto);
         XPerfectComboEnabled = IOUtils.Read(token, nameof(XPerfectComboEnabled), XPerfectComboEnabled);
+        ShowCounter = IOUtils.Read(token, nameof(ShowCounter), ShowCounter);
+        CustomBreak = IOUtils.Read(token, nameof(CustomBreak), CustomBreak);
+        KeepMask = IOUtils.Read(token, nameof(KeepMask), KeepMask);
         FontSize = IOUtils.Read(token, nameof(FontSize), FontSize);
         MasterSize = IOUtils.Read(token, nameof(MasterSize), MasterSize);
         CaptionScale = IOUtils.Read(token, nameof(CaptionScale), CaptionScale);

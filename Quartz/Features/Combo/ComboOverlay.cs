@@ -25,7 +25,7 @@ public static class ComboOverlay {
     private static GameObject dragObj;
     private static Updater updater;
     private static bool ShouldShow() =>
-        (OverlaySwitch.Enabled && Conf.Enabled && GameStats.InGame) || UICore.IsArranging || OverlayPreview.Is(FontKey);
+        (OverlaySwitch.Enabled && Conf.Enabled && Conf.ShowCounter && GameStats.InGame) || UICore.IsArranging || OverlayPreview.Is(FontKey);
     private static bool gateWant;
     // Roots start visible; keep the updater until it has hidden them once.
     private static bool updaterRan;

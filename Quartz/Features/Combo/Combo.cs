@@ -67,18 +67,36 @@ internal static class Combo {
             ComboSettings conf = ComboOverlay.Conf;
             if(conf == null) return;
             HitKind kind = HitKinds.Of(hit);
+            if(conf.CustomBreak) {
+                if((conf.KeepMask & 1 << KeepBit(hit, kind)) != 0) Hit(conf);
+                else Break();
+                return;
+            }
             bool xpComboMode = conf.XPerfectComboEnabled && XPerfectBridge.Active;
             bool incPerfect = xpComboMode && kind == HitKind.Perfect
                 ? XPerfectBridge.JudgeFor(hit) == XPerfectBridge.Judge.X
                 : kind == HitKind.Perfect;
             bool incAuto = conf.CountAuto && kind == HitKind.Auto;
-            if(incPerfect || incAuto) {
-                Count++;
-                PulseStartTime = conf.NoPopAnim ? -1f : Time.realtimeSinceStartup;
-            } else if(conf.CountAuto || kind != HitKind.Auto) {
-                Count = 0;
-                PulseStartTime = -1f;
-            }
+            if(incPerfect || incAuto) Hit(conf);
+            else if(conf.CountAuto || kind != HitKind.Auto) Break();
+        }
+        private static void Hit(ComboSettings conf) {
+            Count++;
+            PulseStartTime = conf.NoPopAnim ? -1f : Time.realtimeSinceStartup;
+        }
+        private static void Break() {
+            Count = 0;
+            PulseStartTime = -1f;
+        }
+        // The tile a hit lands on in the Combo page's judgement bar: XPerfect's grade for a Perfect it grades, else the kind.
+        private static int KeepBit(HitMargin hit, HitKind kind) {
+            if(kind == HitKind.Perfect && XPerfectBridge.Active)
+                switch(XPerfectBridge.JudgeFor(hit)) {
+                    case XPerfectBridge.Judge.X: return HideJudgements.JudgementPopupHider.XPerfectPerfectBit;
+                    case XPerfectBridge.Judge.Plus: return HideJudgements.JudgementPopupHider.PlusPerfectBit;
+                    case XPerfectBridge.Judge.Minus: return HideJudgements.JudgementPopupHider.MinusPerfectBit;
+                }
+            return (int)kind;
         }
     }
 }
