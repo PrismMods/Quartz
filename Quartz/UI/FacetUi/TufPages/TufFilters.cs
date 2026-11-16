@@ -18,16 +18,7 @@ internal static class TufFilters {
 
         Control<TufSort> sort = Controls.Chips(card, Bind.To(() => s.Sort, s.SetSort), Sorts, SortKey, o => o.Id = "tuf-sort");
         for(int i = 0; i < Sorts.Length && i < sort.Root.childCount; i++) sort.Root[i].name = SortKey(Sorts[i]);
-        // The arrow alone says the direction: no tint, unlike classic's chip.
-        Button direction = Ui.Btn(sort.Root, "", s.ToggleAscending);
-        direction.name = "tuf-direction";
-        direction.style.marginLeft = Theme.For(direction).Sizes.Gap;
-        Words.Label(direction, "");
-        Controls.Hook(direction, o => o.VisibleWhen = () => {
-            string arrow = s.Ascending ? "↑" : "↓";
-            if(direction.text != arrow) direction.text = arrow;
-            return true;
-        });
+        TufPacksPage.Arrow(sort.Root, "tuf-direction", () => s.Ascending, s.ToggleAscending);
 
         View(card, "TUF_INSTALLED", "DESC_TUF_INSTALLED", () => s.ShowInstalled, _ => QuartzShell.Do("tuf.installed", () => {
             TufCards.Disarm();

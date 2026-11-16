@@ -267,10 +267,12 @@
 		<Reference Include="PrismLib.UI"><HintPath>$(LibDir)/PrismLib.UI.dll</HintPath></Reference>
 	</ItemGroup>
 
-	<!-- The Prism bootstrap is vendored verbatim from PrismLib (never edited here), outside
+	<!-- The Prism bootstrap, gate adapter and settings rows are vendored verbatim from PrismLib (never edited here), outside
 	     Quartz/ so the conventions check (500-line cap, no silent catch) does not scan it. -->
 	<ItemGroup Condition="!$(Configuration.Contains('IL2CPP')) And '$(Flavor)' != 'KeyViewer'">
 		<Compile Include="../vendor/PrismBootstrap.cs" Link="Prism/PrismBootstrap.cs" />
+		<Compile Include="../vendor/PrismGate.cs" Link="Prism/Vendor/PrismGate.cs" />
+		<Compile Include="../vendor/PrismSettingRows.cs" Link="Prism/Vendor/PrismSettingRows.cs" />
 	</ItemGroup>
 
 	<!-- The oldest PrismLib Quartz runs against, from tools/prismlib-floor.txt (the one source;

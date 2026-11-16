@@ -63,6 +63,7 @@ internal static partial class FacetSelfTestChecks {
         }));
         yield return ComboFontKeepsPreview(check);
         yield return ComboFontsFollow(check);
+        yield return ComboFontFaces(check);
         yield return ShadowResets(check);
         yield return CaptionCaps(check);
         // Through the row's own slider: font size up 10 (down where that would pass the top), read off the counter.
@@ -119,7 +120,7 @@ internal static partial class FacetSelfTestChecks {
             int frames = 0;
             for(; frames < 5 && ReferenceEquals(Body.Q(name: "FONT_OVERLAY-input"), row); frames++) yield return null;
             string item = OverlayFontPicker.Display(FontManager.FollowGlobal);
-            yield return FontMenuLists(item, v => listed = v);
+            yield return FontMenuRow(item, r => listed = r != null);
             check($"{ComboPage}: a new global font rebuilds the font row within 5 frames, and its first item names that font",
                 FontManager.CurrentName == other && row != null && frames < 5 && listed,
                 $"global={FontManager.CurrentName} want={other} frames={frames} item='{item}' listed={listed}");
@@ -130,7 +131,7 @@ internal static partial class FacetSelfTestChecks {
             frames = 0;
             for(; frames < 5 && ReferenceEquals(Body.Q(name: "FONT_OVERLAY-input"), row); frames++) yield return null;
             listed = false;
-            yield return FontMenuLists(found, v => listed = v);
+            yield return FontMenuRow(found, r => listed = r != null);
             check($"{ComboPage}: a font found rebuilds the font row within 5 frames, and the row lists it",
                 cache != null && shell != null && row != null && frames < 5 && listed, $"cache={cache != null} hooked={shell != null} frames={frames} listed={listed}");
         } finally {
@@ -142,15 +143,29 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(3);
     }
 
-    // Opens the font row's menu and says whether it lists the item; the menu is shut again.
-    private static IEnumerator FontMenuLists(string item, Action<bool> listed) {
+    // The font row's menu draws a font in its own face, and the follow-the-global item in the global font's face, as the classic
+    // picker does. A font other than the global one is picked where there is one, so a menu drawing every item in one face fails.
+    private static IEnumerator ComboFontFaces(Action<string, bool, string> check) {
+        var fonts = OverlayFontPicker.Values().Where(f => f != FontManager.FollowGlobal && FontManager.GetFont(f)?.sourceFontFile != null).ToList();
+        string font = fonts.FirstOrDefault(f => FontManager.GetFont(f) != FontManager.Current) ?? fonts.FirstOrDefault();
+        UnityEngine.TextCore.Text.FontAsset want = font == null ? null : ShellSettings.Face(FontManager.GetFont(font)), wantGlobal = ShellSettings.Face(FontManager.Current);
+        UnityEngine.TextCore.Text.FontAsset face = null, global = null;
+        if(font != null) yield return FontMenuRow(OverlayFontPicker.Display(font), r => face = r?.Q<Label>()?.style.unityFontDefinition.value.fontAsset);
+        yield return FontMenuRow(OverlayFontPicker.Display(FontManager.FollowGlobal), r => global = r?.Q<Label>()?.style.unityFontDefinition.value.fontAsset);
+        check($"{ComboPage}: the font row's menu draws a font in its own face, and the global item in the global font's face",
+            want != null && ReferenceEquals(face, want) && ReferenceEquals(global, wantGlobal),
+            $"font={font} own={ReferenceEquals(face, want)} other={want != wantGlobal} global={ReferenceEquals(global, wantGlobal)} globalFace={wantGlobal != null}");
+    }
+
+    // Opens the font row's menu and hands over the item's menu row (null when it is not listed); the menu is shut again.
+    private static IEnumerator FontMenuRow(string item, Action<VisualElement> found) {
         Button b = Body.Q<Button>("FONT_OVERLAY-input");
         if(b == null) yield break;
         ContentScroll.ScrollTo(b);
         yield return Frames(2);
         Submit(b);
         yield return Frames(2);
-        listed(MenuRow(item) != null);
+        found(MenuRow(item));
         Popup.CloseAll();
         yield return Frames(1);
     }

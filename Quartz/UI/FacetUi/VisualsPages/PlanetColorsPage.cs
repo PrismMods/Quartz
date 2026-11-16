@@ -104,13 +104,7 @@ internal static class PlanetColorsPage {
     }
 
     // The classic page's own picker, which is private to it.
-    private static string PickOverlayImage() {
-        try {
-            return FileDialog.PickFile("", "Image", ["png", "jpg", "jpeg"], "Select planet overlay image");
-        } catch(Exception e) {
-            MainCore.Log.Err($"[{nameof(PlanetColorsPage)}] overlay PickFile failed: {e}");
-            return null;
-        }
-    }
+    private static string PickOverlayImage() =>
+        FileDialog.PickFile("", "Image", ["png", "jpg", "jpeg"], "Select planet overlay image");
 }
 #endif

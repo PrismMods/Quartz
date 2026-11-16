@@ -50,9 +50,13 @@ internal static class TufLevelsPage {
 
         // ponytail: Facet's own scroll-end test mixes panel and local units, so on a scaled menu it never fires; this one
         // measures in the scroll content's own units. Drop it once Facet's ScrollEnd converts its units.
+        // The cards change in the frame a page lands and are laid out by the end of the next one; read before that, the
+        // old height puts the end in view and asks for another page.
         ScrollView scroll = null;
+        int drawnCount = -1, drawnFrame = -2;
         Action nearEnd = () => {
-            if(scroll == null || list.Body.panel == null || State(s) != ListState.Ready || More(s) != MoreState.None) return;
+            if(scroll == null || list.Body.panel == null || State(s) != ListState.Ready || More(s) != MoreState.None
+                || Time.frameCount - drawnFrame <= 1) return;
             float end = list.Body.ChangeCoordinatesTo(scroll.contentContainer, new Vector2(0f, list.Body.layout.height)).y;
             if(scroll.scrollOffset.y + scroll.contentViewport.layout.height >= end - 400f) s.LoadMore();
         };
@@ -69,6 +73,10 @@ internal static class TufLevelsPage {
 #endif
             list.Refresh();
             cards.Refresh();
+            if(s.Levels.Count != drawnCount) {
+                drawnCount = s.Levels.Count;
+                drawnFrame = Time.frameCount;
+            }
             var now = Global(s);
             bool all = !now.Equals(shown);
             if(all) {

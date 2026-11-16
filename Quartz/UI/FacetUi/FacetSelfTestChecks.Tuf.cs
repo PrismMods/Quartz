@@ -296,12 +296,12 @@ internal static partial class FacetSelfTestChecks {
             TufCountRange();
             Rect r = track.worldBound;
             float y = r.center.y, x0 = Mathf.Lerp(r.xMin, r.xMax, min / 59f);
-            PointerAt<PointerDownEvent>(track, new Vector2(x0, y));
+            Pointer<PointerDownEvent>(track, new Vector2(x0, y));
             for(int i = 1; i <= 3; i++) {
-                PointerAt<PointerMoveEvent>(track, new Vector2(Mathf.Lerp(x0, Mathf.Lerp(r.xMin, r.xMax, 0.3f), i / 3f), y));
+                Pointer<PointerMoveEvent>(track, new Vector2(Mathf.Lerp(x0, Mathf.Lerp(r.xMin, r.xMax, 0.3f), i / 3f), y));
                 yield return Frames(1);
             }
-            PointerAt<PointerUpEvent>(track, new Vector2(Mathf.Lerp(r.xMin, r.xMax, 0.3f), y));
+            Pointer<PointerUpEvent>(track, new Vector2(Mathf.Lerp(r.xMin, r.xMax, 0.3f), y));
             yield return Frames(2);
         }
         TufRangeCalls = null;
@@ -309,6 +309,9 @@ internal static partial class FacetSelfTestChecks {
             && calls[0] == (s.MinDifficultyIndex, s.MaxDifficultyIndex) && s.MinDifficultyIndex != min,
             $"track={track != null} calls={string.Join(";", calls)} now={s.MinDifficultyIndex}-{s.MaxDifficultyIndex} was={min}-{max}");
         s.SetDifficultyRange(min, max);
+        Texture gradient = PageContent().Q(name: "tuf-gradient")?.style.backgroundImage.value.texture;
+        check($"{TufLevelsKey}: the range's gradient texture is never saved or shown in the hierarchy",
+            gradient != null && gradient.hideFlags == HideFlags.HideAndDontSave, $"texture={gradient != null} flags={gradient?.hideFlags}");
 
         bool q0 = s.QuantumEnabled;
         ClickRow("TUF_QUANTUM");

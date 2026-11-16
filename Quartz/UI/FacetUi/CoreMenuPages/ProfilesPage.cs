@@ -195,27 +195,15 @@ internal static class ProfilesPage {
 
     // The classic page's import: null when the dialog was cancelled, "" when the file was no profile, else the new name.
     private static string Import() {
-        string path;
-        try {
-            path = FileDialog.PickFile(null, Info.DisplayName + " Profile", [.. ProfileManager.ImportExtensions, "json"],
-                QuartzHost.Text("PROFILE_IMPORT_TITLE", "Import Quartz Profile"));
-        } catch(Exception e) {
-            MainCore.Log.Err($"[{nameof(ProfilesPage)}] PickFile failed: {e}");
-            return null;
-        }
+        string path = FileDialog.PickFile(null, Info.DisplayName + " Profile", [.. ProfileManager.ImportExtensions, "json"],
+            QuartzHost.Text("PROFILE_IMPORT_TITLE", "Import Quartz Profile"));
         if(string.IsNullOrEmpty(path)) return null;
         return ProfileManager.Import(path) ?? "";
     }
 
     private static void Export(string name, Action<string> say) => QuartzShell.Do("profiles.export:" + name, () => {
-        string path;
-        try {
-            path = FileDialog.SaveFile(null, $"{name}.{ProfileManager.EXPORT_EXTENSION}", Info.DisplayName + " Profile",
-                [ProfileManager.EXPORT_EXTENSION], QuartzHost.Text("PROFILE_EXPORT_TITLE", "Export Quartz Profile"));
-        } catch(Exception e) {
-            MainCore.Log.Err($"[{nameof(ProfilesPage)}] SaveFile failed: {e}");
-            return;
-        }
+        string path = FileDialog.SaveFile(null, $"{name}.{ProfileManager.EXPORT_EXTENSION}", Info.DisplayName + " Profile",
+            [ProfileManager.EXPORT_EXTENSION], QuartzHost.Text("PROFILE_EXPORT_TITLE", "Export Quartz Profile"));
         if(string.IsNullOrEmpty(path)) return;
         if(!path.EndsWith($".{ProfileManager.EXPORT_EXTENSION}", StringComparison.OrdinalIgnoreCase)
             && !path.EndsWith($".{ProfileManager.LEGACY_EXTENSION}", StringComparison.OrdinalIgnoreCase)

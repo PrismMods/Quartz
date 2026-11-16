@@ -92,19 +92,16 @@ internal static partial class ShellRows {
             configure?.Invoke(o);
         });
 
-    /// <summary>A text field that holds limit characters, as the classic field does: typing stops there, and text written past
-    /// it another way (a paste, an undo) is cut as it is written. A limit of 0 or less is none, as on the classic inputs
-    /// that have none.</summary>
+    /// <summary>A text field that holds limit characters, as the classic field does: typing stops there, and a longer paste is
+    /// cut when it is committed (Facet's MaxLength). A limit of 0 or less is none, as on the classic inputs that have
+    /// none.</summary>
     internal static Control<string> Text(VisualElement card, string key, Bind<string> bind, int limit, Action apply, Action save,
-        Action<TextOptions> configure = null) {
-        Control<string> c = Controls.Text(card, key, Writes(Bind.To(bind.Get, v => bind.Set(limit > 0 && v != null && v.Length > limit ? v[..limit] : v)), null, apply, save),
-            o => {
-                o.Id = key;
-                configure?.Invoke(o);
-            });
-        if(limit > 0 && c.Input is TextField field) field.maxLength = limit;
-        return c;
-    }
+        Action<TextOptions> configure = null) =>
+        Controls.Text(card, key, Writes(bind, null, apply, save), o => {
+            o.Id = key;
+            o.MaxLength = limit;
+            configure?.Invoke(o);
+        });
 
     /// <summary>A read-only status line, Id id. Every refresh reads it, so its text is made again only when input or the
     /// language changes, or the language files load again. Nothing is kept while they load: the table is half there. tone,
@@ -155,17 +152,15 @@ internal static partial class ShellRows {
         });
 
     /// <summary>The overlay's font, or the global one. The page rebuilds when a font is added or the global one changes
-    /// (QuartzShell follows FontManager), so the list is read once here. Items are plain text: Facet wants a Unity Font for
-    /// an item's face, and these are TMP assets.</summary>
-    internal static Control<int> Font(VisualElement card, string overlayKey) {
-        List<string> values = [.. OverlayFontPicker.Values()];
-        return Controls.Dropdown(card, "FONT_OVERLAY", QuartzShell.Writes(() => values.IndexOf(OverlayFontPicker.Current(overlayKey)),
-            v => FontManager.SetOverlayFont(overlayKey, values[v])), o => {
+    /// (QuartzShell follows FontManager), so the list is read once here. Each item shows in its own face, as on the classic
+    /// picker; the global item in the global font.</summary>
+    internal static Control<string> Font(VisualElement card, string overlayKey) =>
+        Controls.Dropdown(card, "FONT_OVERLAY", QuartzShell.Writes(() => OverlayFontPicker.Current(overlayKey),
+            v => FontManager.SetOverlayFont(overlayKey, v)), [.. OverlayFontPicker.Values()], OverlayFontPicker.Display, o => {
             o.Id = "FONT_OVERLAY";
-            o.Items = [.. values.Select(OverlayFontPicker.Display)];
-            o.Default = 0;
+            o.Default = FontManager.FollowGlobal;
+            o.ItemFace = name => ShellSettings.Face(name == FontManager.FollowGlobal ? FontManager.Current : FontManager.GetFont(name));
         });
-    }
 
     internal static Button ResetPosition(VisualElement card, string key, Action reset) => Controls.Action(card, "", key, reset, o => o.Id = key);
 

@@ -84,19 +84,20 @@ public sealed class TufPackApiClient : IDisposable {
         if(root["packs"] is not JArray packs || packs.Count > 100)
             throw new InvalidDataException("TUF returned an invalid pack count.");
         List<TufPack> result = [];
-        foreach(JToken token in packs) {
+        foreach(JToken entry in packs) {
+            if(entry is not JObject token) continue;
             string? id = token.Value<string>("id");
             if(!IsValidPackId(id)) continue;
-            JToken? owner = token["packOwner"];
+            JObject? owner = token["packOwner"] as JObject;
             string ownerName = TufInput.CapDisplay(
                 owner?.Value<string>("nickname") ?? owner?.Value<string>("username"), "Unknown", 60);
             List<string> preview = [];
             int firstLevelId = 0;
             if(token["packItems"] is JArray items)
                 foreach(JToken item in items) {
-                    JToken? referenced = item["referencedLevel"];
+                    if((item as JObject)?["referencedLevel"] is not JObject referenced) continue;
                     if(firstLevelId <= 0) firstLevelId = Math.Max(0, SafeInt(referenced, "id"));
-                    string song = referenced?.Value<string>("song") ?? "";
+                    string song = referenced.Value<string>("song") ?? "";
                     if(!string.IsNullOrWhiteSpace(song)) preview.Add(TufInput.CapDisplay(song, "", 60));
                     if(preview.Count >= 3) break;
                 }
@@ -118,7 +119,8 @@ public sealed class TufPackApiClient : IDisposable {
     internal static TufDifficultyDictionary ParseDifficulties(byte[] bytes) {
         if(LoadJson(bytes) is not JArray array) return TufDifficultyDictionary.Empty;
         Dictionary<int, (string, string, int)> map = new();
-        foreach(JToken token in array) {
+        foreach(JToken entry in array) {
+            if(entry is not JObject token) continue;
             int id = SafeInt(token, "id");
             if(id <= 0) continue;
             string name = TufInput.CapDisplay(token.Value<string>("name"), "Unranked", 40);
@@ -128,8 +130,8 @@ public sealed class TufPackApiClient : IDisposable {
         return new TufDifficultyDictionary(map);
     }
     internal static IReadOnlyList<TufPackItem> ParsePackItems(byte[] bytes, TufDifficultyDictionary difficulties) {
-        JToken root = LoadJson(bytes);
-        JToken? items = root["items"] ?? (root["pack"]?["items"]);
+        if(LoadJson(bytes) is not JObject root) return Array.Empty<TufPackItem>();
+        JToken? items = root["items"] ?? (root["pack"] as JObject)?["items"];
         if(items is not JArray array) return Array.Empty<TufPackItem>();
         HashSet<int> seen = [];
         int total = 0;
@@ -150,7 +152,8 @@ public sealed class TufPackApiClient : IDisposable {
     private static IReadOnlyList<TufPackItem> BuildItems(JArray items, TufDifficultyDictionary difficulties,
         HashSet<int> seen, ref int total, ref long syntheticKey) {
         List<TufPackItem> result = [];
-        foreach(JToken item in items.OrderBy(t => SafeInt(t, "sortOrder"))) {
+        foreach(JToken entry in items.OrderBy(t => SafeInt(t, "sortOrder"))) {
+            if(entry is not JObject item) continue;
             if(total >= MaxPackLevels) break;
             long key = item.Value<long?>("id") ?? syntheticKey--;
             string type = item.Value<string>("type") ?? "";

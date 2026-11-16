@@ -180,6 +180,7 @@ List<(string Name, Action Run)> tests = [
     ("TUF only ever deletes rollback copies it owns", TufRollbackTests.TestSnapshotDeleteGuard),
     ("TUF pack list parses string ids and counts", TufPackParseTests.TestPackListParsing),
     ("TUF pack tree flattens, dedups, and credits charters", TufPackParseTests.TestPackTreeParsing),
+    ("TUF pack list survives null owners, items and levels", TufPackParseTests.TestNullOwnerAndLevel),
     ("TUF recognizes every YouTube link shape a charter might paste", TufThumbnailTests.TestYouTubeLinkShapes),
     ("TUF rejects non-YouTube and malformed video links", TufThumbnailTests.TestNonYouTubeAndMalformedLinks),
     ("TUF recognizes Bilibili BV links and rejects the rest", TufThumbnailTests.TestBilibiliLinkShapes),

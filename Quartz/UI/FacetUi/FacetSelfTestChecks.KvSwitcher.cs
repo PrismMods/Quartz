@@ -109,16 +109,8 @@ internal static partial class FacetSelfTestChecks {
     private static void KvSwClick(VisualElement card) {
         if(card == null) return;
         Vector2 at = card.worldBound.center;
-        KvSwPointer<PointerDownEvent>(card, at);
-        KvSwPointer<PointerUpEvent>(card, at);
-    }
-
-    private static void KvSwPointer<T>(VisualElement target, Vector2 at) where T : PointerEventBase<T>, new() {
-        using T ev = Pooled<T>();
-        typeof(PointerEventBase<T>).GetProperty("button").SetValue(ev, 0);
-        typeof(PointerEventBase<T>).GetProperty("position").SetValue(ev, (Vector3)at);
-        ev.target = target;
-        target.SendEvent(ev);
+        Pointer<PointerDownEvent>(card, at);
+        Pointer<PointerUpEvent>(card, at);
     }
 
     // The overlay's boxes drawn from this layout's elements.

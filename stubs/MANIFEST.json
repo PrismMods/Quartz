@@ -1908,6 +1908,7 @@
           "System.Int32 Facet.Anim::Instant",
           "System.Int32 Facet.Anim::Normal",
           "System.Int32 Facet.Anim::Slow",
+          "System.Void Facet.Anim::FadeIn(UnityEngine.UIElements.VisualElement,System.Int32)",
           "System.Void Facet.Anim::set_SmoothScroll(System.Boolean)"
         ]
       },
@@ -2623,9 +2624,8 @@
           "Facet.Theme Facet.Theme::For(UnityEngine.UIElements.VisualElement)",
           "Facet.Theme Facet.Theme::FromAccent(UnityEngine.Color,System.Single)",
           "System.Void Facet.Theme::.ctor()",
-          "System.Void Facet.Theme::Notify()",
           "System.Void Facet.Theme::Recolour(UnityEngine.Color,System.Single)",
-          "System.Void Facet.Theme::set_Item(Facet.Role,UnityEngine.Color)",
+          "System.Void Facet.Theme::SetAccent(UnityEngine.Color)",
           "UnityEngine.Color Facet.Theme::Item(Facet.Role)",
           "UnityEngine.Color Facet.Theme::get_Item(Facet.Role)"
         ]
@@ -7608,10 +7608,7 @@
       },
       {
         "type": "UnityEngine.UIElements.TextInputBaseField\u00601",
-        "members": [
-          "System.Int32 UnityEngine.UIElements.TextInputBaseField\u00601::maxLength()",
-          "System.Void UnityEngine.UIElements.TextInputBaseField\u00601::set_maxLength(System.Int32)"
-        ]
+        "members": []
       },
       {
         "type": "UnityEngine.UIElements.TextOverflow",
@@ -7669,8 +7666,6 @@
           "UnityEngine.Rect UnityEngine.UIElements.VisualElement::get_worldBound()",
           "UnityEngine.Rect UnityEngine.UIElements.VisualElement::layout()",
           "UnityEngine.Rect UnityEngine.UIElements.VisualElement::worldBound()",
-          "UnityEngine.UIElements.IExperimentalFeatures UnityEngine.UIElements.VisualElement::experimental()",
-          "UnityEngine.UIElements.IExperimentalFeatures UnityEngine.UIElements.VisualElement::get_experimental()",
           "UnityEngine.UIElements.IPanel UnityEngine.UIElements.VisualElement::get_panel()",
           "UnityEngine.UIElements.IPanel UnityEngine.UIElements.VisualElement::panel()",
           "UnityEngine.UIElements.IStyle UnityEngine.UIElements.VisualElement::get_style()",

@@ -234,6 +234,7 @@ internal static partial class FacetSelfTestChecks {
     private static IEnumerator TufSettle(Action<string, bool, string> check, Action<string> info, TufService s) {
         ScrollView sv = TufScroll();
         for(int i = 0; i < 4 && s.HasMore; i++) {
+            yield return Frames(2);   // the last page laid out, so the scroll reaches its end
             TufScrollToEnd();
             int want = s.Levels.Count + TufPageSize;
             yield return TufUntil(() => s.Levels.Count >= want, 60);

@@ -291,20 +291,12 @@ internal static partial class FacetSelfTestChecks {
     // slider set to v in between.
     private static bool SlideOnList(Slider s, float min, float max, float v) {
         Vector2 at = s.worldBound.center;
-        PointerAt<PointerDownEvent>(s, at);
-        PointerAt<PointerMoveEvent>(s, at + new Vector2(0f, -30f));
+        Pointer<PointerDownEvent>(s, at);
+        Pointer<PointerMoveEvent>(s, at + new Vector2(0f, -30f));
         s.value = (v - min) / (max - min);
-        PointerAt<PointerMoveEvent>(s, at + new Vector2(0f, -60f));
-        PointerAt<PointerUpEvent>(s, at + new Vector2(0f, -60f));
+        Pointer<PointerMoveEvent>(s, at + new Vector2(0f, -60f));
+        Pointer<PointerUpEvent>(s, at + new Vector2(0f, -60f));
         return true;
-    }
-
-    private static void PointerAt<T>(VisualElement target, Vector2 at) where T : PointerEventBase<T>, new() {
-        using T ev = Pooled<T>();
-        typeof(PointerEventBase<T>).GetProperty("button").SetValue(ev, 0);
-        typeof(PointerEventBase<T>).GetProperty("position").SetValue(ev, (Vector3)at);
-        ev.target = target;
-        target.SendEvent(ev);
     }
 }
 #endif

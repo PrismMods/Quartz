@@ -161,14 +161,8 @@ internal static class AddonsPage {
 
     // Classic's Add Addon: pick a .qaddon or .dll, then copy it in and reload.
     private static void AddAddon() {
-        string path;
-        try {
-            path = FileDialog.PickFile(null, Info.DisplayName + " Addon", AddonService.ImportExtensions,
-                QuartzHost.Text("ADDONS_ADD_TITLE", "Add Quartz Addon"));
-        } catch(Exception e) {
-            MainCore.Log.Err($"[{nameof(AddonsPage)}] PickFile failed: {e}");
-            return;
-        }
+        string path = FileDialog.PickFile(null, Info.DisplayName + " Addon", AddonService.ImportExtensions,
+            QuartzHost.Text("ADDONS_ADD_TITLE", "Add Quartz Addon"));
         if(string.IsNullOrEmpty(path)) return;
         AddonService.ImportAddon(path);
     }

@@ -165,7 +165,7 @@ Source: https://github.com/notofonts/noto-cjk
 ## PrismLib
 
 PrismLib, by PrismMods (https://github.com/PrismMods/PrismLib), MIT License.
-Quartz vendors `PrismBootstrap.cs` unchanged (`vendor/PrismBootstrap.cs`) and
+Quartz vendors `PrismBootstrap.cs`, `PrismGate.cs` and `PrismSettingRows.cs` unchanged (`vendor/`) and
 ships `PrismLib.dll` as `PrismLib.bundle` and `PrismLib.UI.dll` in its runtime
 store, unmodified.
 

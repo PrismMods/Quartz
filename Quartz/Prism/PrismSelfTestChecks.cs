@@ -283,6 +283,12 @@ internal static partial class PrismSelfTestChecks {
         PrismBridge.TogglePrismSettings();
         yield return Frames(2);
         check("windows: and closes", !Ui.AnyWindowOpen, null);
+        // A settings row's key capture holds Quartz's capture coordinator; with no window open it must not wait for the next key.
+        global::PrismLib.Bootstrap.PrismSettingRows.Capturer(() => "A", _ => { })(_ => { });
+        bool claimed = Keybind.Capturing;
+        yield return Frames(2);
+        check("windows: a settings-row key capture claims Quartz's coordinator and ends once no window is open",
+            claimed && !Keybind.Capturing && !global::PrismLib.Bootstrap.PrismSettingRows.Capturing, $"claimed={claimed} capturing={Keybind.Capturing}");
         // Another mod's window build re-points these shared statics at its own language and store, so only a Quartz-only session pins them.
         if(quartzOnly) {
             string want = QuartzHost.LanguageCode(MainCore.Tr.Language) == "ko" ? "ko" : "en";

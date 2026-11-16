@@ -34,6 +34,10 @@ if [[ "${DEV:-}" == 1 ]]; then
     cp "$A" lib/PrismLib.dll
     cp "$B" lib/PrismLib.UI.dll
     for f in PrismLib.dll PrismLib.UI.dll; do echo "lib/$f  md5 $(md5f "lib/$f")"; done
+    # vendor/ holds verbatim copies of PrismLib's bootstrap sources: a local build must match them.
+    if [[ -x "$ROOT/tools/check-vendored.sh" ]]; then
+        "$ROOT/tools/check-vendored.sh" vendor/*.cs || { echo "ERROR: copy $ROOT/bootstrap/ over the STALE vendor/ files" >&2; exit 1; }
+    fi
     exit 0
 fi
 

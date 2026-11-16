@@ -104,4 +104,19 @@ static class TufPackParseTests {
         Assert(folder.Children.Count == 1 && folder.Children[0].Level!.Id == 5644, "folder children preserved");
         Assert(folder.LevelCount == 1, "folder level count is recursive");
     }
+    public static void TestNullOwnerAndLevel() {
+        const string json = """
+        {"packs":[{"id":"qvfYqAyj","name":"A","packOwner":null,"packItems":[{"referencedLevel":null},null,
+        {"referencedLevel":{"id":5,"song":"S"}}]},{"id":"Bb","name":"B","packOwner":{"username":"u"}}],"total":2}
+        """;
+        TufPacksPage page = TufPackApiClient.ParsePacks(Encoding.UTF8.GetBytes(json));
+        Assert(page.Results.Count == 2, "both packs listed");
+        Assert(page.Results[0].Owner == "Unknown", "null owner falls back");
+        Assert(page.Results[0].Preview.Count == 1 && page.Results[0].Preview[0] == "S", "null items skipped in preview");
+        Assert(page.Results[0].FirstLevelId == 5, "first level id past null levels");
+        Assert(page.Results[1].Owner == "u", "username owner read");
+        TufDifficultyDictionary none = TufDifficultyDictionary.Empty;
+        Assert(TufPackApiClient.ParsePackItems(Encoding.UTF8.GetBytes("""{"pack":null}"""), none).Count == 0, "null pack is empty");
+        Assert(TufPackApiClient.ParsePackItems(Encoding.UTF8.GetBytes("[]"), none).Count == 0, "array root is empty");
+    }
 }

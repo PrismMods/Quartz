@@ -251,7 +251,8 @@ internal sealed class TufDifficultyRangeBar : MonoBehaviour, IPointerDownHandler
     internal static Texture2D BuildGradientTexture(int width, Color[] stops) {
         Texture2D texture = new(width, 1, TextureFormat.RGBA32, false) {
             wrapMode = TextureWrapMode.Clamp,
-            filterMode = FilterMode.Bilinear
+            filterMode = FilterMode.Bilinear,
+            hideFlags = HideFlags.HideAndDontSave
         };
         Color32[] pixels = new Color32[width];
         float span = 1f / (stops.Length - 1);

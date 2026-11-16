@@ -92,7 +92,7 @@ internal static partial class ShellSettings {
         name == FontManager.UiDefault ? "FONT_UI_DEFAULT" : name == FontManager.SameAsOverlay ? "FONT_SAME_AS_OVERLAY" : FontText(name);
 
     // null, the menu's own face, when the font has no source file to make one from.
-    private static FontAsset Face(TMP_FontAsset font) {
+    internal static FontAsset Face(TMP_FontAsset font) {
         if(font == null || font.sourceFontFile == null) return null;
         if(!Faces.TryGetValue(font, out FontAsset face)) Faces[font] = face = FontAsset.CreateFontAsset(font.sourceFontFile);
         return face;
@@ -114,13 +114,7 @@ internal static partial class ShellSettings {
     }
 
     private static void AddFont(StatusLine status) {
-        string path;
-        try {
-            path = FileDialog.PickFile(null, "Font", ["ttf", "otf", "ttc"], QuartzHost.Translate("FONT_PICK_TITLE"));
-        } catch(Exception e) {
-            MainCore.Log.Err($"[ShellSettings] font PickFile failed: {e}");
-            return;
-        }
+        string path = FileDialog.PickFile(null, "Font", ["ttf", "otf", "ttc"], QuartzHost.Translate("FONT_PICK_TITLE"));
         if(string.IsNullOrEmpty(path)) return;
         string name = FontManager.ImportFont(path);
         if(name == null) {

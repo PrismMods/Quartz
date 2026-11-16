@@ -19,6 +19,7 @@ namespace Facet {
         public const int Normal = 3;
         public const int Slow = 4;
         public static bool SmoothScroll { get => throw null; set { } }
+        public static void FadeIn(global::UnityEngine.UIElements.VisualElement e, int ms = default) => throw null;
     }
     public static unsafe partial class Bind {
         public static global::Facet.Bind<T> Many<TItem, T>(global::System.Func<global::System.Collections.Generic.IReadOnlyList<TItem>> items, global::System.Func<TItem, T> get, global::System.Action<TItem, T> set, global::System.Func<TItem, string> key = default, global::System.Func<global::System.Collections.Generic.IReadOnlyList<TItem>> all = default) => throw null;
@@ -480,8 +481,8 @@ namespace Facet {
         public Theme() => throw null;
         public static global::Facet.Theme For(global::UnityEngine.UIElements.VisualElement e) => throw null;
         public static global::Facet.Theme FromAccent(global::UnityEngine.Color accent, float tint = default) => throw null;
-        public void Notify() => throw null;
         public void Recolour(global::UnityEngine.Color accent, float tint = default) => throw null;
+        public void SetAccent(global::UnityEngine.Color c) => throw null;
     }
     public sealed unsafe partial class TileOptions : global::Facet.Options<bool> {
         public global::System.Nullable<global::UnityEngine.Color> Colour { get => throw null; set { } }

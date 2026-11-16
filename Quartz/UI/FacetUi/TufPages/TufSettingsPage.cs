@@ -71,13 +71,7 @@ internal static class TufSettingsPage {
         });
 
     private static void Pick(TufService service) {
-        string picked;
-        try {
-            picked = FileDialog.PickFolder(service.ActiveRootPath, null, null, QuartzHost.Translate("TUF_PICK_FOLDER_TITLE"));
-        } catch(Exception e) {
-            MainCore.Log.Err($"[TufSettingsPage] folder picker failed: {e}");
-            return;
-        }
+        string picked = FileDialog.PickFolder(service.ActiveRootPath, null, null, QuartzHost.Translate("TUF_PICK_FOLDER_TITLE"));
         if(string.IsNullOrEmpty(picked)) return;
         notice = "";
         if(!service.SetCustomLevelsRoot(picked, out string reason)) {

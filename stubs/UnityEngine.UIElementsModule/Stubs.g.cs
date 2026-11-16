@@ -275,7 +275,6 @@ namespace UnityEngine.UIElements {
         public TextField() => throw null;
     }
     public abstract unsafe partial class TextInputBaseField<TValueType> : global::UnityEngine.UIElements.BaseField<TValueType> {
-        public int maxLength { get => throw null; set { } }
         protected TextInputBaseField() { }
     }
     public enum TextOverflow : int {
@@ -302,7 +301,6 @@ namespace UnityEngine.UIElements {
         public int childCount { get => throw null; }
         public virtual global::UnityEngine.UIElements.VisualElement contentContainer { get => throw null; }
         public bool enabledSelf { get => throw null; set { } }
-        public global::UnityEngine.UIElements.IExperimentalFeatures experimental { get => throw null; }
         public global::UnityEngine.Rect layout { get => throw null; }
         public string name { get => throw null; set { } }
         public global::UnityEngine.UIElements.IPanel panel { get => throw null; }

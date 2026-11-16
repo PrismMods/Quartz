@@ -177,7 +177,7 @@ internal static class TufPacksPage {
                     restore = listY;
                     restoreUntil = Time.realtimeSinceStartup + 1f;
                 }
-                FadeIn(open ? opened : list);
+                Anim.FadeIn(open ? opened : list, 200);   // the view switch fades in over 0.2 s
             }
             packs.Refresh();
             packCards.Refresh();
@@ -254,7 +254,7 @@ internal static class TufPacksPage {
     }
 
     // The arrow alone says the direction: no tint, unlike classic's chip.
-    private static void Arrow(VisualElement bar, string name, Func<bool> ascending, Action toggle) {
+    internal static void Arrow(VisualElement bar, string name, Func<bool> ascending, Action toggle) {
         Button b = Ui.Btn(bar, "", toggle);
         b.name = name;
         b.style.marginLeft = Theme.For(b).Sizes.Gap;
@@ -359,12 +359,6 @@ internal static class TufPacksPage {
             ? string.Format(QuartzHost.Text("TUF_OFFLINE_SWITCH", "Switch to Installed ({0})"), installed)
             : QuartzHost.Text("TUF_OFFLINE_SWITCH_EMPTY", "Switch to Installed");
         if(installed > 0) Paint.Look(go, Theme.For(go).Looks.AccentButton);
-    }
-
-    // The view switch fades in over 0.2 s.
-    private static void FadeIn(VisualElement e) {
-        e.style.opacity = 0f;
-        e.experimental.animation.Start(0f, 1f, 200, (el, v) => el.style.opacity = v);
     }
 
     private static string LevelCount(int n) => string.Format(QuartzHost.Text("TUF_PACK_LEVEL_COUNT", "{0} levels"), n);

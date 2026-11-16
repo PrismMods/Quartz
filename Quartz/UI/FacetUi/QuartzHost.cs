@@ -47,7 +47,7 @@ internal static class QuartzHost {
     /// <summary>Re-tints every Quartz window. Before the host exists there is nothing to tint: it starts from the accent.</summary>
     internal static void Recolour(Color accent) {
         if(host == null) return;
-        if(Suited) Accent(host.Theme, accent);
+        if(Suited) host.Theme.SetAccent(accent);
         else host.Theme.Recolour(accent);
         QuartzShortcut.Recolour();
     }
@@ -55,14 +55,8 @@ internal static class QuartzHost {
         var t = new Theme();
         Suited = PrismBridge.WearSuite(t);
         if(!Suited) return Theme.FromAccent(accent);
-        Accent(t, accent);
+        t.SetAccent(accent);   // the suite leaves Accent, Focus and AccentText to the host
         return t;
-    }
-    // The suite leaves Accent, Focus and AccentText to the host; a derived scheme knows the text that reads on this accent.
-    private static void Accent(Theme t, Color accent) {
-        t[Role.Accent] = t[Role.Focus] = accent;
-        t[Role.AccentText] = Theme.FromAccent(accent)[Role.AccentText];
-        t.Notify();
     }
     /// <summary>A surface on this host that is relabelled when Quartz's language changes and disposed on shutdown.</summary>
     internal static Surface NewSurface(string name, Layer layer) {

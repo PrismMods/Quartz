@@ -323,13 +323,7 @@ internal static class PanelsStats {
         });
     }
 
-    private static string PickImage() {
-        try {
-            return FileDialog.PickFile(PanelsOverlay.EnsureImagesDir(), "Image", ["png", "jpg", "jpeg"], "Select panel image");
-        } catch(Exception e) {
-            MainCore.Log.Err($"[{nameof(PanelsStats)}] panel image PickFile failed: {e}");
-            return null;
-        }
-    }
+    private static string PickImage() =>
+        FileDialog.PickFile(PanelsOverlay.EnsureImagesDir(), "Image", ["png", "jpg", "jpeg"], "Select panel image");
 }
 #endif
