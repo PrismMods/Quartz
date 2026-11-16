@@ -49,6 +49,13 @@ public static class NativeCursor {
             else if(isMac) MacSet(NSCursorByName("IBeamCursor"));
         } catch(Exception e) { Diag.Ignore(e); }
     }
+    /// <summary>The OS's move cursor (Windows' four-way arrow, macOS's open hand), for an item the pointer can drag.</summary>
+    public static void Move() {
+        try {
+            if(isWindows) SetCursor(LoadWinCursor(IDC_SIZEALL));
+            else if(isMac) MacSet(NSCursorByName("openHandCursor"));
+        } catch(Exception e) { Diag.Ignore(e); }
+    }
 #if DEBUG
     /// <summary>macOS: the app's current cursor is the NSCursor that selName returns. False elsewhere. For the self-test.</summary>
     internal static bool MacShowing(string selName) {
@@ -63,6 +70,7 @@ public static class NativeCursor {
     private const int IDC_SIZENESW = 32643;
     private const int IDC_SIZEWE = 32644;
     private const int IDC_SIZENS = 32645;
+    private const int IDC_SIZEALL = 32646;
     [DllImport("user32.dll", EntryPoint = "LoadCursorW")]
     private static extern IntPtr LoadCursorW(IntPtr hInstance, IntPtr lpCursorName);
     [DllImport("user32.dll")]

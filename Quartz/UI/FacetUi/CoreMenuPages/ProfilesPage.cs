@@ -19,7 +19,8 @@ internal static class ProfilesPage {
     }
 
     internal static void Build(VisualElement p) {
-        QuartzShell.Header(p, "PROFILES", null);
+        QuartzShell.Header(p, "PROFILES", null, () => QuartzHost.Translate("PROFILE_HINT"));
+        ShellPage.Described(p, "menu-header", "PROFILE_HINT");
         Item[] profiles = [];
         ProfileManager.PresetInfo[] presets = [];
         string pending = "", armed = null;
@@ -43,9 +44,6 @@ internal static class ProfilesPage {
         Read();
 
         VisualElement card = Controls.Card(p, null);
-        Label hint = Ui.Muted(card, "PROFILE_HINT");
-        hint.name = "PROFILE_HINT";
-        hint.style.whiteSpace = WhiteSpace.Normal;
         Control<string> field = Controls.Text(card, "", Bind.To(() => pending, v => pending = v ?? ""), o => {
             o.Id = "PROFILE_NAME";
             o.Placeholder = "PROFILE_NAME";
@@ -74,31 +72,23 @@ internal static class ProfilesPage {
         add.style.marginLeft = Theme.For(add).Sizes.Gap;
         Words.Tip(add, "DESC_PROFILE_ADD");
 
-        Controls.Action(card, "", "PROFILE_IMPORT", () => QuartzShell.Do("profiles.import", () => {
+        ShellRows.Buttons(card, new ShellRows.Btn("PROFILE_IMPORT", () => QuartzShell.Do("profiles.import", () => {
             string name = Import();
             if(name == null) return;
             Say(name.Length == 0 ? "PROFILE_STATUS_IMPORT_FAILED"
                 : string.Format(QuartzHost.Text("PROFILE_STATUS_IMPORTED", "Imported as '{0}'."), name));
             if(name.Length > 0) Reread();
-        }), o => {
-            o.Id = "PROFILE_IMPORT";
-            o.Tooltip = "DESC_PROFILE_IMPORT";
-        });
-        Controls.Action(card, "", "PROFILE_OPEN_FOLDER", () => QuartzShell.Do("profiles.folder", () => {
+        }), "DESC_PROFILE_IMPORT"), new ShellRows.Btn("PROFILE_OPEN_FOLDER", () => QuartzShell.Do("profiles.folder", () => {
             try {
                 Directory.CreateDirectory(ProfileManager.ProfilesPath);
                 FileDialog.Reveal(ProfileManager.ProfilesPath);
             } catch(Exception e) {
                 MainCore.Log.Err($"[{nameof(ProfilesPage)}] Reveal failed: {e}");
             }
-        }), o => o.Id = "PROFILE_OPEN_FOLDER");
-        Controls.Action(card, "", "PROFILE_RECALIBRATE", () => QuartzShell.Do("profiles.recalibrate", () => {
+        })), new ShellRows.Btn("PROFILE_RECALIBRATE", () => QuartzShell.Do("profiles.recalibrate", () => {
             Recalibrate();
             Say("PROFILE_RECALIBRATED");
-        }), o => {
-            o.Id = "PROFILE_RECALIBRATE";
-            o.Tooltip = "DESC_PROFILE_RECALIBRATE";
-        });
+        }), "DESC_PROFILE_RECALIBRATE"));
 
         VisualElement presetCard = Controls.Card(p, "PRESETS", o => {
             o.Id = "PRESETS";

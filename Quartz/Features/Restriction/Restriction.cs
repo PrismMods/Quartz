@@ -5,6 +5,7 @@ using Quartz.Game.Stats;
 using Quartz.IO;
 using System.Reflection;
 using Quartz.Compat.Game;
+using Quartz.UI.FacetUi;
 namespace Quartz.Features.Restriction;
 public static class Restriction {
     public static SettingsFile<RestrictionSettings> ConfMgr { get; private set; }
@@ -65,21 +66,15 @@ public static class Restriction {
         int marginInt = (int)kind;
         switch(Conf.JRestrictMode) {
             case 1:
-                return kind != HitKind.Perfect;
+            case 3:
+            case 4:
+                return PageRules.Blocked(Conf.JRestrictMode, Conf.JRestrictAllowedMask, marginInt);
             case 2: {
                 if(kind != HitKind.Perfect) return true;
                 if(!XPerfectBridge.Active) return false;
                 XPerfectBridge.Judge xj = XPerfectBridge.JudgeFor(margin);
                 return xj != XPerfectBridge.Judge.None && xj != XPerfectBridge.Judge.X;
             }
-            case 3: {
-                int mask = Conf.JRestrictAllowedMask;
-                if(mask == 0) return false;
-                int bit = 1 << marginInt;
-                return (mask & bit) == 0;
-            }
-            case 4:
-                return kind == HitKind.TooEarly;
             case 0:
             default: {
                 try {

@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using Quartz.Core;
 using Quartz.Features.KeyViewer;
 using Quartz.Features.KeyViewer.Layout;
+using Quartz.Resource;
 using UnityEngine;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi.KeyViewerEditor;
@@ -73,6 +74,9 @@ internal static class KvElementView {
         l.style.fontSize = size;
         l.style.color = color;
         l.style.unityTextAlign = TextAnchor.MiddleCenter;
+        // The key viewer's own font, as the overlay draws it; a font with no source file keeps the menu's face.
+        UnityEngine.TextCore.Text.FontAsset face = ShellSettings.Face(FontManager.For(KeyViewerOverlay.FontKey));
+        if(face != null) l.style.unityFontDefinition = FontDefinition.FromSDFFont(face);
         l.style.whiteSpace = WhiteSpace.NoWrap;
         l.style.marginLeft = l.style.marginRight = l.style.marginTop = l.style.marginBottom = 0f;
         l.style.paddingLeft = l.style.paddingRight = l.style.paddingTop = l.style.paddingBottom = 0f;

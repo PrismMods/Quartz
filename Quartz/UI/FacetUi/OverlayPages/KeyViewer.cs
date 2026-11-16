@@ -6,6 +6,7 @@ using Quartz.Features.KeyViewer.Js;
 using Quartz.Overlay;
 using Quartz.UI.FacetUi.KeyViewerEditor;
 using Quartz.UI.Nav;
+using UnityEngine;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi.OverlayPages;
 /// <summary>
@@ -30,9 +31,12 @@ internal static class KeyViewer {
             o.Id = "SECTION_KEY_VIEWER";
             o.Description = "KEYVIEWER_DESC";
         });
-        Cards(cols.Left);
+        // While elements are selected the inspector takes the settings' place, so the preview keeps the column's full height.
+        // Back (or an empty selection) brings the settings back where they were scrolled to.
+        var (settings, inspector) = ShellRows.Swap(cols.Left, "kv-inspector-column", "KEYVIEWER_BACK", () => KvEditorDoor.Inspecting, KvEditorDoor.Deselect);
+        Cards(settings);
         int state = NavRegistry.StateFor("overlay.keyviewer");
-        if(!KvEditorDoor.Build(cols.Right))
+        if(!KvEditorDoor.Build(cols.Right, inspector))
             Controls.Action(Controls.Card(cols.Right, null), "MENU_KV_EDITOR", "MENU_CLASSIC_OPEN", () => QuartzShell.OpenClassic(state), o => o.Id = "MENU_KV_EDITOR");
     }
 
@@ -47,6 +51,9 @@ internal static class KeyViewer {
             o.VisibleWhen = () => KvKeyLimiterBridge.Available;
         });
         ShellRows.Font(kv, KeyViewerOverlay.FontKey);
+#if !QUARTZ_KEYVIEWER
+        Toggle(kv, "KEYVIEWER_INVERT_PAN", () => C.InvertPreviewPan, v => C.InvertPreviewPan = v, Def.InvertPreviewPan, null, "DESC_KEYVIEWER_INVERT_PAN");
+#endif
 #if !QUARTZ_KEYVIEWER
         SwitcherHotkey(kv);
 #endif

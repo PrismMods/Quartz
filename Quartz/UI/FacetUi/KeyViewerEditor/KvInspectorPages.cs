@@ -86,7 +86,25 @@ internal static partial class KvInspectorPages {
     private static bool IsRowId(string n) =>
         n != null && (n.StartsWith("KVI_") && n.IndexOf('-') < 0 && !n.StartsWith("KVI_SEC_") || n.StartsWith("kv-") && !n.EndsWith("-input"));
 
-    private static NavItem Page(string title, Action<VisualElement> build) => new(title, build);
+    // The tab rail's own gap is the only space above a tab's first row: a section opening the tab drops its top margin.
+    private static NavItem Page(string title, Action<VisualElement> build) => new(title, p => {
+        build(p);
+        if(p.childCount > 0) p[0].style.marginTop = 0f;
+    });
+
+    // Two rows side by side, each at its usual height: X beside Y, width beside height.
+    private static (VisualElement Left, VisualElement Right) Pair(VisualElement p) {
+        VisualElement row = Ui.Row(p);
+        row.style.alignItems = Align.FlexStart;
+        VisualElement a = Ui.Box(row), b = Ui.Box(row);
+        foreach(VisualElement half in new[] { a, b }) {
+            half.style.flexGrow = 1f;
+            half.style.flexBasis = 0f;
+            half.style.minWidth = 0f;
+        }
+        a.style.marginRight = Theme.For(row).Sizes.Gap;
+        return (a, b);
+    }
 
     // ---- the selection, whole or by kind; a filtered list is kept while the selection holds the same elements
 
@@ -136,7 +154,7 @@ internal static partial class KvInspectorPages {
         o.UndoDocument = Doc;
     }
 
-    private static VisualElement Section(VisualElement p, string key) => Controls.Section(p, key);
+    private static VisualElement Section(VisualElement p, string key) => ShellRows.Section(p, key);
 
     private static Control<bool> Flag(VisualElement p, string id, bool def, Func<IReadOnlyList<KvElement>> items,
         Func<KvElement, bool> get, Action<KvElement, bool> set, string tip = null, bool rebuild = false, Func<bool> visible = null) {

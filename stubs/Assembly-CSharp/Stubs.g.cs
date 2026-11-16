@@ -203,6 +203,13 @@ public abstract unsafe partial class FloorRenderer : global::ADOBase {
     public virtual global::UnityEngine.Color color { get => throw null; set { } }
     protected FloorRenderer() { }
 }
+public unsafe partial struct FontData {
+    public global::UnityEngine.Font font;
+    public float fontScale;
+    public global::TMPro.TMP_FontAsset fontTMP;
+    public float lineSpacing;
+    public float lineSpacingTMP;
+}
 public unsafe partial class GCS {
     public const float ALLOWED_KEYS_RESET_TIME = 1f;
     public const string AVIFileExtension = "AVIFileExtension";
@@ -486,6 +493,7 @@ public static unsafe partial class RDString {
     public const string StringsFilePrefix = "StringsFilePrefix";
     public const string StringsFolder = "StringsFolder";
     public static global::UnityEngine.SystemLanguage language;
+    public static global::FontData fontData { get => throw null; }
     public static string GetEnumValue<T>(T value) => throw null;
     public static string GetWithCheck(string key, out bool exists, global::System.Collections.Generic.Dictionary<string, object> parameters = default) => throw null;
 }

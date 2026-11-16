@@ -28,24 +28,35 @@ internal static class JudgementTiles {
         _ => null,
     };
 
-    /// <summary>A titled card of tiles over mask, four to a line, with All and None in its head (a card's actions are read once,
-    /// at build, and only a titled card has them). A write saves and shows on the classic toggles; defaultMask, from a fresh
-    /// settings object, gives each tile the default a middle-click restores.</summary>
+    /// <summary>A titled card of tiles over mask, four to a line, with All and None in its head. A write saves and shows on the
+    /// classic toggles; defaultMask, from a fresh settings object, gives each tile the default a middle-click restores.</summary>
     internal static MaskTiles Grid(VisualElement page, string titleKey, Bind<int> mask, int defaultMask, IReadOnlyList<Row> rows,
         Action save, Action<CardOptions> more = null) {
         MaskTiles grid = null;
-        VisualElement card = Controls.Card(page, titleKey, o => {
+        VisualElement card = Card(page, titleKey, on => grid?.SetAll(on), more);
+        return grid = Tiles(card, mask, defaultMask, rows, save, 4, Colour);
+    }
+
+    /// <summary>A titled card with All and None in its head (a card's actions are read once, at build, and only a titled card has
+    /// them).</summary>
+    internal static VisualElement Card(VisualElement page, string titleKey, Action<bool> setAll, Action<CardOptions> more) =>
+        Controls.Card(page, titleKey, o => {
             o.Id = titleKey;
-            o.Actions = [new("MENU_ALL", () => grid?.SetAll(true)), new("MENU_NONE", () => grid?.SetAll(false))];
+            if(titleKey != null) o.Actions = [new("MENU_ALL", () => setAll(true)), new("MENU_NONE", () => setAll(false))];   // an untitled card has no head for them
             more?.Invoke(o);
         });
+
+    /// <summary>One line of tiles over rows' bits, columns to a line, each tile tinted colour(bit).</summary>
+    internal static MaskTiles Tiles(VisualElement card, Bind<int> mask, int defaultMask, IReadOnlyList<Row> rows, Action save, int columns,
+        Func<int, Color?> colour) {
+        MaskTiles grid = null;
         var tiles = new List<MaskTile>(rows.Count);
         for(int i = 0; i < rows.Count; i++) {
             Row row = rows[i];
             int at = i;
             tiles.Add(new MaskTile(row.Key, row.Bit, o => {
                 o.Id = row.Key;
-                o.Colour = Colour(row.Bit);
+                o.Colour = colour(row.Bit);
                 o.Default = (defaultMask >> row.Bit & 1) != 0;
                 ShellRows.Hotkeys(o, row.ClassicId, () => grid!.Tiles[at].Root);
             }));
@@ -54,7 +65,7 @@ internal static class JudgementTiles {
             mask.Set(v);
             foreach(Row row in rows) ToggleBinds.Show(row.ClassicId, (v >> row.Bit & 1) != 0);
             save?.Invoke();
-        }), tiles, o => o.Columns = 4);
+        }), tiles, o => o.Columns = columns);
         return grid;
     }
 }

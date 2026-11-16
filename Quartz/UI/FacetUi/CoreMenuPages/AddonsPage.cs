@@ -21,27 +21,16 @@ internal static class AddonsPage {
     private static int serial;
 
     internal static void Build(VisualElement p) {
-        QuartzShell.Header(p, "ADDONS", null);
+        QuartzShell.Header(p, "ADDONS", null, () => QuartzHost.Translate("ADDONS_HINT"));
+        ShellPage.Described(p, "menu-header", "ADDONS_HINT");
         // This build's update results, by unit: one that lands after the page left only fills this dictionary.
         var updates = new Dictionary<string, AddonUpdateCheck.Result>();
 
         VisualElement card = Controls.Card(p, null);
-        Label hint = Ui.Muted(card, "ADDONS_HINT");
-        hint.name = "ADDONS_HINT";
-        hint.style.whiteSpace = WhiteSpace.Normal;
-        Controls.Action(card, "", "ADDONS_ADD", () => QuartzShell.Do("addons.add", AddAddon), o => {
-            o.Id = "ADDONS_ADD";
-            o.Tooltip = "DESC_ADDONS_ADD";
-        });
-        Controls.Action(card, "", "ADDONS_RELOAD", () => QuartzShell.Do("addons.reload", () => MainThread.Enqueue(AddonService.Reload)), o => {
-            o.Id = "ADDONS_RELOAD";
-            o.Tooltip = "DESC_ADDONS_RELOAD";
-        });
-        Controls.Action(card, "", "ADDONS_OPEN_FOLDER", () => QuartzShell.Do("addons.folder", AddonService.OpenAddonsFolder), o => {
-            o.Id = "ADDONS_OPEN_FOLDER";
-            o.Tooltip = "DESC_ADDONS_OPEN_FOLDER";
-        });
-        Label empty = Ui.Muted(card, "ADDONS_EMPTY");
+        ShellRows.Buttons(card, new ShellRows.Btn("ADDONS_ADD", () => QuartzShell.Do("addons.add", AddAddon), "DESC_ADDONS_ADD"),
+            new ShellRows.Btn("ADDONS_RELOAD", () => QuartzShell.Do("addons.reload", () => MainThread.Enqueue(AddonService.Reload)), "DESC_ADDONS_RELOAD"),
+            new ShellRows.Btn("ADDONS_OPEN_FOLDER", () => QuartzShell.Do("addons.folder", AddonService.OpenAddonsFolder), "DESC_ADDONS_OPEN_FOLDER"));
+        Label empty = ShellRows.Inset(Ui.Muted(card, "ADDONS_EMPTY"));
         empty.style.whiteSpace = WhiteSpace.Normal;
         Controls.Hook(empty, o => {
             o.Id = "ADDONS_EMPTY";

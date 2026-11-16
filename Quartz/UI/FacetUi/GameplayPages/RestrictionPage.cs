@@ -27,6 +27,24 @@ internal static class RestrictionPage {
         new("JR_ALLOW_OVERLOAD_FAIL", "jr_allow_overload_fail", 11),
     ];
 
+    /// <summary>The bar's tiles, early to late (PageRules.BarBits): X, + and − Perfect stand in for Perfect when x.</summary>
+    internal static JudgementTiles.Row[] Bar(bool x, bool minusEarly) =>
+        [.. PageRules.BarBits(x, minusEarly).Select(b => Rows.Concat(XRows).First(r => r.Bit == b))];
+
+    /// <summary>The judgements that are not timings: Multipress, Miss and the Overloads, a tile line under the bar.</summary>
+    internal static JudgementTiles.Row[] Extra => [.. Rows.Where(r => r.Bit > 6)];
+
+    // Shown in X-Perfect-only mode only, never written: no classic toggle, no hotkey.
+    private static readonly JudgementTiles.Row[] XRows = [
+        new("JR_ALLOW_XPERFECT", null, 12),
+        new("JR_ALLOW_PLUSPERFECT", null, 13),
+        new("JR_ALLOW_MINUSPERFECT", null, 14),
+    ];
+
+    /// <summary>The mode the page shows (PageRules.ShownMode) and whether its bar splits Perfect into X and ±.</summary>
+    internal static int Shown => PageRules.ShownMode(C.JRestrictMode, XPerfectBridge.Installed);
+    internal static bool Split => Shown == 2 && XPerfectBridge.Shown;
+
     internal static void Build(VisualElement p) {
         Restriction.EnsureConf();
         ShellPage.Feature(p, "restriction", "SECTION_JUDGEMENT_RESTRICTION", "RESTRICTION_DESC", null, Cards);
@@ -52,11 +70,20 @@ internal static class RestrictionPage {
             o.Default = Def.JRestrictAccuracy;
             o.VisibleWhen = () => C.JRestrictMode == 0;
         });
-        JudgementTiles.Grid(p, "JR_MODE_CUSTOM", Bind.To(() => C.JRestrictAllowedMask, v => C.JRestrictAllowedMask = v), Def.JRestrictAllowedMask, Rows,
-            save, o => o.VisibleWhen = () => C.JRestrictMode == 3);
+        // The bar: rebuilt per shown mode (its tiles and title change); custom mode edits the allowed mask, the others show what
+        // passes, locked. Hidden in accuracy mode.
+        Controls.Live(p, () => Shown * 2 + (Split ? 1 : 0), box => {
+            int mode = Shown;
+            bool custom = mode == 3, split = Split;
+            JudgementBar.Build(box, custom ? "JR_MODE_CUSTOM" : null, Bind.To(
+                    () => custom ? C.JRestrictAllowedMask : Allowed(mode, split),
+                    v => C.JRestrictAllowedMask = v),
+                Def.JRestrictAllowedMask, Bar(split, XPerfectBridge.Native), Extra, save,
+                b => PageRules.Blocked(Shown, C.JRestrictAllowedMask, b), o => o.VisibleWhen = () => C.JRestrictMode != 0, !custom);
+        });
 
         VisualElement card = Controls.Card(p, null);
-        Controls.Hook(Controls.Header(card, "JR_SECTIONS"), o => o.Id = "JR_SECTIONS");
+        Controls.Hook(ShellRows.Header(card, "JR_SECTIONS"), o => o.Id = "JR_SECTIONS");
         ShellRows.Toggle(card, "JR_SECTIONS_ON", "jr_sections_on", Bind.To(() => C.JRestrictSectionsEnabled, v => C.JRestrictSectionsEnabled = v), null, save, o => {
             o.Default = Def.JRestrictSectionsEnabled;
             o.Tooltip = "DESC_JR_SECTIONS_ON";
@@ -88,7 +115,7 @@ internal static class RestrictionPage {
     // One section, shut, titled and numbered by its place: its range, then Remove.
     private static void Section(VisualElement box, JudgementSection s) {
         int n = C.JRestrictSections.IndexOf(s) + 1;
-        VisualElement body = Controls.Section(box, string.Format(QuartzHost.Text("JR_SECTION", "Section {0}"), n), o => {
+        VisualElement body = ShellRows.Section(box, string.Format(QuartzHost.Text("JR_SECTION", "Section {0}"), n), o => {
             o.Open = false;
             o.Id = "JR_SECTION#" + n;
         });
@@ -111,6 +138,10 @@ internal static class RestrictionPage {
             QuartzShell.Changed();
         }, o => o.Id = "JRSEC_REMOVE#" + n);
     }
+
+    // The bits a fixed mode lets pass, over every bit the bar and the extra line show.
+    private static int Allowed(int mode, bool split) =>
+        Bar(split, XPerfectBridge.Native).Concat(Extra).Where(r => !PageRules.Blocked(mode, 0, r.Bit)).Aggregate(0, (m, r) => m | 1 << r.Bit);
 
     private static float Percent(float v) => Mathf.Clamp(Mathf.Round(v * 10f) / 10f, 0f, 100f);
 }

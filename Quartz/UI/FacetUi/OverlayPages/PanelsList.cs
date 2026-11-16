@@ -8,9 +8,9 @@ using UnityEngine;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi.OverlayPages;
 /// <summary>
-/// The panels in Overlay ▸ Panels, in their drawing order: a list dragged by a panel's name, each panel's rows in a shut
-/// section under it, as the classic page's sections. Every row's Id is its Lang key and #n, n the panel's place; a move
-/// renumbers them, so the moved panels' rows are built again. Panel names are the player's: the list is read only while the
+/// The panels in Overlay ▸ Panels: their drawing order as a list of names, dragged to reorder and clicked to pick, then the
+/// picked panel's rows. Every row's Id is its Lang key and #n, n the panel's place; a move renumbers them, so the rows are
+/// built again. Panel names are the player's: the list is read only while the
 /// page is on a panel, so the search index's detached build has none.
 /// </summary>
 internal static class PanelsList {
@@ -19,7 +19,8 @@ internal static class PanelsList {
     private static readonly IReadOnlyList<PanelConfig> NoPanels = [];
     private static readonly LabelSeparatorSpacing[] Spacings = [LabelSeparatorSpacing.Both, LabelSeparatorSpacing.After, LabelSeparatorSpacing.None];
 
-    /// <summary>"No panels" while there are none, then the list.</summary>
+    /// <summary>"No panels" while there are none, then the list (the one place a panel is picked), then the picked panel's rows.
+    /// The picked panel is the one the preview shows.</summary>
     internal static void List(VisualElement card) {
         Controls.Info(card, "PANEL_NO_PANELS", () => "", (InfoOptions o) => {
             o.Id = "PANEL_NO_PANELS";
@@ -28,14 +29,31 @@ internal static class PanelsList {
         Controls.Reorder<PanelConfig>(card, o => {
             o.Id = "PANELS_LIST";
             o.Vertical = true;
-            o.DragFromText = true;
             o.Tooltip = "DESC_PANEL_LAYER";
             o.Items = () => card.panel == null ? NoPanels : Panels;
             o.Key = p => ShellRows.ItemKey(p, Panels.IndexOf(p));
             o.Text = p => p.Name;
             o.Move = Move;
-            o.Build = (e, p) => Build(e, p, Panels.IndexOf(p) + 1);
+            o.Selected = p => p == Shown;
+            o.Select = p => {
+                Show(p);
+                QuartzShell.Surface?.Refresh();
+            };
         });
+        // Built again when another panel is picked or a panel comes, goes or moves; detached (the search index's build), with no panel.
+        Controls.Live(card, () => card.panel == null || Shown is not { } p ? "" : ShellRows.ItemKey(p, Panels.IndexOf(p)) + "|" + Panels.Count, box => {
+            if(card.panel == null || Shown is not { } p) return;
+            Build(box, p, Panels.IndexOf(p) + 1);
+        });
+    }
+
+    /// <summary>The panel picked: the one last picked while it is still there, else the first; null with no panels.</summary>
+    internal static PanelConfig Shown => Panels.Contains(PanelsOverlay.PreviewPanel) ? PanelsOverlay.PreviewPanel : Panels.Count > 0 ? Panels[0] : null;
+
+    /// <summary>Picks panel: its rows show under the list and the preview shows it. A stat inspected on another panel is let go.</summary>
+    internal static void Show(PanelConfig panel) {
+        PanelsOverlay.PreviewPanel = panel;
+        if(PanelsOverlay.PreviewStat != null && panel?.Stats.Contains(PanelsOverlay.PreviewStat) != true) PanelsOverlay.PreviewStat = null;
     }
 
     // Each panel's rows by their Lang keys (never a panel's name). The search index builds the page detached, where the list
@@ -55,7 +73,10 @@ internal static class PanelsList {
                 Label = key,
                 Where = where,
                 Tip = MainCore.Tr.GetForLanguage(key, "en-US", key),   // an English query still finds the row in another language
-                Open = () => QuartzShell.Go(PageKey),
+                Open = () => {
+                    if(key is "PANEL_SHOWSTAT" or "PANEL_SHOWLABEL") PanelsStats.InspectFirst();   // a stat's row: the first stat's inspector
+                    QuartzShell.Go(PageKey);
+                },
             };
     }
 
@@ -81,10 +102,9 @@ internal static class PanelsList {
         QuartzShell.Surface?.Refresh();
     }
 
-    // The page's sections whose fold state is stored under an Id numbered by a panel's place, and SETTING_SHORT, numbered by a
-    // stat's place on the page; each with its open state before the reader first folds it.
-    private static readonly string[] PanelFolds = ["PANEL", "HEADING_STATS", "HEADING_APPEARANCE", "HEADING_SHADOW", "HEADING_ACTIONS"];
-    private const string StatFold = "SETTING_SHORT";
+    // The page's sections whose fold state is stored under an Id numbered by a panel's place; each opens until the reader
+    // first folds it.
+    private static readonly string[] PanelFolds = ["HEADING_STATS", "HEADING_APPEARANCE", "HEADING_SHADOW", "HEADING_ACTIONS"];
 
     /// <summary>Each panel's place and each stat's number on the page (1-based), as the row Ids number them.</summary>
     internal static Dictionary<object, int> Places(List<PanelConfig> panels) {
@@ -113,18 +133,16 @@ internal static class PanelsList {
             int slash = kv.Key.LastIndexOf('/'), hash = kv.Key.LastIndexOf('#');
             if(slash < 0 || hash < slash || !int.TryParse(kv.Key[(hash + 1)..], out int n)) continue;
             string id = kv.Key[(slash + 1)..hash];
-            bool stat = id == StatFold;
-            if(!stat && Array.IndexOf(PanelFolds, id) < 0) continue;
+            if(Array.IndexOf(PanelFolds, id) < 0) continue;
             left.Add(kv.Key);
-            if(at.TryGetValue((stat, n), out object o) && after.TryGetValue(o, out int now)) landed[kv.Key[..(hash + 1)] + now] = kv.Value;
+            if(at.TryGetValue((false, n), out object o) && after.TryGetValue(o, out int now)) landed[kv.Key[..(hash + 1)] + now] = kv.Value;
         }
         foreach(string key in left)
-            if(!landed.ContainsKey(key)) QuartzHost.Write(key, key.Contains("/HEADING_", StringComparison.Ordinal) ? "1" : "0");
+            if(!landed.ContainsKey(key)) QuartzHost.Write(key, "1");
         foreach(var kv in landed) QuartzHost.Write(kv.Key, kv.Value);
     }
 
-    /// <summary>Panel n's rows (n = its place + 1), in a shut section titled with its name; every row's steps go stale with the
-    /// panel.</summary>
+    /// <summary>Panel n's rows (n = its place + 1); every row's steps go stale with the panel.</summary>
     internal static void Build(VisualElement box, PanelConfig panel, int n) {
         string classic = "panel" + (n - 1);   // the classic rows' ids, which their toggles' hotkeys are keyed by
         Action save = PanelsOverlay.Save, apply = PanelsOverlay.Apply;
@@ -133,22 +151,15 @@ internal static class PanelsList {
             o.Id = key + "#" + n;
             o.UndoDocument = document;
         }
-        VisualElement body = Controls.Section(box, panel.Name, o => {
-            o.Open = false;
-            o.Id = "PANEL#" + n;
-        });
-        Label title = Literal(box.Q(name: "PANEL#" + n), panel.Name);
-        ShellRows.Text(body, "PANEL_NAME", Bind.To(() => panel.Name, v => {
-            panel.Name = string.IsNullOrWhiteSpace(v) ? "Panel" : v;
-            if(title != null) title.text = panel.Name;
-        }), 24, null, save, o => {
+        VisualElement body = box;
+        ShellRows.Text(body, "PANEL_NAME", Bind.To(() => panel.Name, v => panel.Name = string.IsNullOrWhiteSpace(v) ? "Panel" : v), 24, null, save, o => {
             Row(o, "PANEL_NAME");
             o.Tooltip = "DESC_PANEL_NAME";
         });
 
-        PanelsStats.Build(Controls.Section(body, "HEADING_STATS", o => o.Id = "HEADING_STATS#" + n), panel, n);
+        PanelsStats.Build(ShellRows.Section(body, "HEADING_STATS", o => o.Id = "HEADING_STATS#" + n), panel, n);
 
-        VisualElement look = Controls.Section(body, "HEADING_APPEARANCE", o => o.Id = "HEADING_APPEARANCE#" + n);
+        VisualElement look = ShellRows.Section(body, "HEADING_APPEARANCE", o => o.Id = "HEADING_APPEARANCE#" + n);
         ShellRows.Anchor(look, "PANEL_ANCHOR_LABEL", () => (int)OverlayAnchors.Parse(panel.Anchor), () => panel.AnchorClosest,
             a => PanelsOverlay.SetAnchor(panel, (PanelAnchor)a), v => {
                 panel.AnchorClosest = v;
@@ -211,7 +222,7 @@ internal static class PanelsList {
                 o.Tooltip = "DESC_PANEL_LOCALIZESTATS";
             });
 
-        VisualElement shadow = Controls.Section(body, "HEADING_SHADOW", o => o.Id = "HEADING_SHADOW#" + n);
+        VisualElement shadow = ShellRows.Section(body, "HEADING_SHADOW", o => o.Id = "HEADING_SHADOW#" + n);
         ShellRows.Toggle(shadow, "PANEL_TEXTSHADOW", classic + "_textshadow", Bind.To(() => panel.TextShadowEnabled, v => panel.TextShadowEnabled = v), apply, save, o => {
             Row(o, "PANEL_TEXTSHADOW");
             o.Default = Def.TextShadowEnabled;
@@ -234,22 +245,13 @@ internal static class PanelsList {
             o.Default = Def.GetTextShadowColor();
         });
 
-        VisualElement actions = Controls.Section(body, "HEADING_ACTIONS", o => o.Id = "HEADING_ACTIONS#" + n);
-        Controls.Action(actions, "", "PANEL_RESETPOS", () => PanelsOverlay.ResetPosition(panel), o => o.Id = "PANEL_RESETPOS#" + n);
-        // No confirm, as the classic button.
-        Controls.Action(actions, "", "PANEL_DELETE", () => {
-            List<PanelConfig> before = [.. Panels];
-            if(Panels.Remove(panel)) Moved(before);
-        }, o => o.Id = "PANEL_DELETE#" + n);
-    }
-
-    /// <summary>The section header's title, drawn as the player typed it: not looked up as a Lang key, and left alone by a
-    /// relabel.</summary>
-    private static Label Literal(VisualElement head, string text) {
-        if(head == null || head.childCount < 2 || head[1] is not Label title) return null;
-        Words.Label(title, "");
-        title.text = text;
-        return title;
+        VisualElement actions = ShellRows.Section(body, "HEADING_ACTIONS", o => o.Id = "HEADING_ACTIONS#" + n);
+        // Delete has no confirm, as the classic button.
+        ShellRows.Buttons(actions, new ShellRows.Btn("PANEL_RESETPOS", () => PanelsOverlay.ResetPosition(panel), more: o => o.Id = "PANEL_RESETPOS#" + n),
+            new ShellRows.Btn("PANEL_DELETE", () => {
+                List<PanelConfig> before = [.. Panels];
+                if(Panels.Remove(panel)) Moved(before);
+            }, more: o => o.Id = "PANEL_DELETE#" + n));
     }
 }
 #endif

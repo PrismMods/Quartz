@@ -12,8 +12,9 @@ namespace Quartz.UI.FacetUi;
 /// </summary>
 internal static class FacetOverlayPreview {
     /// <summary>The pane, in the page's right column. Every Overlay feature's overlay id is its feature id. emptyKey says why
-    /// the stage is empty, asked while it is (null: the element is not loaded yet).</summary>
-    internal static VisualElement Pane(VisualElement right, string overlayId, Func<string> emptyKey = null) {
+    /// the stage is empty, asked while it is (null: the element is not loaded yet). click, when given, hears a left click on
+    /// the stage as the world point under it on the borrowed canvas.</summary>
+    internal static VisualElement Pane(VisualElement right, string overlayId, Func<string> emptyKey = null, Action<Vector3> click = null) {
         emptyKey ??= () => "MENU_PREVIEW_IN_LEVEL";
         OverlayPreview.Lease lease = null;
         Label note = null;
@@ -50,6 +51,17 @@ internal static class FacetOverlayPreview {
                 o.OnLink = QuartzShell.EditLayout;
             }
         });
+        if(click != null) {
+            // A left click (press and release on the stage); the press's local position is the point.
+            Clickable clickable = null;
+            clickable = new Clickable(() => {
+                Rect r = stage.layout;
+                Vector2 at = clickable!.lastMousePosition;
+                if(lease == null || lease.Released || r.width < 1f || r.height < 1f) return;
+                if(lease.WorldAt(new Vector2(at.x / r.width, at.y / r.height)) is Vector3 world) click(world);
+            });
+            stage.AddManipulator(clickable);
+        }
         // Under the stage, above the link; Facet's own Note is fixed text and cannot follow the lease.
         VisualElement pane = stage.parent;
         note = Ui.Muted(pane, noteKey);

@@ -223,6 +223,7 @@ internal static partial class FacetSelfTestChecks {
         }, null, keys, searched, () => More(), ["JR_ACC", "JR_MODE_CUSTOM", "JR_NO_SECTIONS"]);
         IEnumerator More() {
             yield return StoredMode(check, page, x);
+            yield return RestrictionDeath(check);
             int n = C().JRestrictSections.Count;
             yield return Parity(check, page, [$"JR_SECTION#{n}", $"JRSEC_START#{n}", $"JRSEC_END#{n}", $"JRSEC_REMOVE#{n}"]);
             Translated(check, page + " sections and tiles", ["JR_SECTION", "JRSEC_START", "JRSEC_END", "JRSEC_REMOVE", "JR_MODE_CUSTOM", .. tiles]);
@@ -234,6 +235,27 @@ internal static partial class FacetSelfTestChecks {
                 s => (s.Start, s.End) = (20f, 80f), () => TypeInto("JRSEC_START#2-input", "40"), s => s.Start == 40f);
             yield return HeaderHotkeyCheck(check, page, "SECTION_JUDGEMENT_RESTRICTION", "restriction");
         }
+    }
+
+    // Mode 4 fills Too Early's segment with the death colour and Very Early's with its own; mode 1 turns Very Early to death too.
+    // The bar rebuilds on a refresh pass, so each read waits up to a second for it. The mode is put back.
+    private static IEnumerator RestrictionDeath(Action<string, bool, string> check) {
+        static bool Near(Color a, Color b) => Mathf.Abs(a.r - b.r) <= 0.01f && Mathf.Abs(a.g - b.g) <= 0.01f && Mathf.Abs(a.b - b.b) <= 0.01f;
+        static Color Fill(string key) =>
+            PageContent().Q(name: key + "-input")?.parent?.Q(JudgementBar.FillName)?.resolvedStyle.backgroundColor ?? Color.clear;
+        int was = Restriction.Conf.JRestrictMode;
+        Color death = JudgementBar.Death, veryEarly = JudgementBar.SlotColour(1);
+        Restriction.Conf.JRestrictMode = 4;
+        for(float t0 = Time.realtimeSinceStartup; !(Near(Fill("JR_ALLOW_TOOEARLY"), death) && Near(Fill("JR_ALLOW_VERYEARLY"), veryEarly))
+            && Time.realtimeSinceStartup - t0 < 1f;) yield return null;
+        Color te4 = Fill("JR_ALLOW_TOOEARLY"), ve4 = Fill("JR_ALLOW_VERYEARLY");
+        Restriction.Conf.JRestrictMode = 1;
+        for(float t0 = Time.realtimeSinceStartup; !Near(Fill("JR_ALLOW_VERYEARLY"), death) && Time.realtimeSinceStartup - t0 < 1f;) yield return null;
+        Color ve1 = Fill("JR_ALLOW_VERYEARLY");
+        Restriction.Conf.JRestrictMode = was;
+        yield return Frames(3);
+        check("restriction: blocked judgements turn the death colour", Near(te4, death) && Near(ve4, veryEarly) && Near(ve1, death),
+            $"mode4 tooEarly={te4} veryEarly={ve4} mode1 veryEarly={ve1} death={death} slot1={veryEarly}");
     }
 
     // A stored 2 without XPerfect: the classic page built for the search index and the moved page shown leave it 2 in memory,

@@ -17,6 +17,10 @@ namespace TMPro {
         Dynamic = 1,
         DynamicOS = 2,
     }
+    public unsafe partial struct Extents {
+        public global::UnityEngine.Vector2 max;
+        public global::UnityEngine.Vector2 min;
+    }
     public enum FontStyles : int {
         Normal = 0,
         Bold = 1,
@@ -33,6 +37,14 @@ namespace TMPro {
     public unsafe partial struct HighlightState {
         public global::UnityEngine.Color32 color;
         public global::TMPro.TMP_Offset padding;
+    }
+    public enum HorizontalAlignmentOptions : int {
+        Left = 1,
+        Center = 2,
+        Right = 4,
+        Justified = 8,
+        Flush = 16,
+        Geometry = 32,
     }
     public static unsafe partial class ShaderUtilities {
         public static int ID_FaceColor;
@@ -179,6 +191,29 @@ namespace TMPro {
             Finish = 1,
         }
     }
+    public unsafe partial struct TMP_LineInfo {
+        public global::TMPro.HorizontalAlignmentOptions alignment;
+        public float ascender;
+        public float baseline;
+        public int characterCount;
+        private int controlCharacterCount;
+        public float descender;
+        public int firstCharacterIndex;
+        public int firstVisibleCharacterIndex;
+        public int lastCharacterIndex;
+        public int lastVisibleCharacterIndex;
+        public float length;
+        public global::TMPro.Extents lineExtents;
+        public float lineHeight;
+        public float marginLeft;
+        public float marginRight;
+        public float maxAdvance;
+        public int spaceCount;
+        public int visibleCharacterCount;
+        public int visibleSpaceCount;
+        public float width;
+        public int wordCount;
+    }
     public unsafe partial struct TMP_MeshInfo {
         public global::UnityEngine.Color32[] colors32;
         public global::UnityEngine.Material material;
@@ -272,6 +307,8 @@ namespace TMPro {
     public unsafe partial class TMP_TextInfo {
         public int characterCount;
         public global::TMPro.TMP_CharacterInfo[] characterInfo;
+        public int lineCount;
+        public global::TMPro.TMP_LineInfo[] lineInfo;
         public global::TMPro.TMP_MeshInfo[] meshInfo;
         protected TMP_TextInfo() { }
     }

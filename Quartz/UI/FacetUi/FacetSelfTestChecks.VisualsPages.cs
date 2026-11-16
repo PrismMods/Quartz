@@ -33,21 +33,56 @@ internal static partial class FacetSelfTestChecks {
     private static IEnumerator VisualsHideJudgements(Action<string, bool, string> check) {
         const string page = "visuals.hidejudgements";
         JudgementPopupHider.EnsureConf();
-        bool x = XPerfectBridge.Installed;
-        string[] tiles = [.. HideJudgementsPage.Rows(x).Select(r => r.Key)];
-        int[] shown = [.. HideJudgementsPage.Rows(x).Select(r => r.Bit)];
+        bool x = XPerfectBridge.Shown, minus = XPerfectBridge.Native;
+        string[] tiles = [.. HideJudgementsPage.Rows(x, minus).Select(r => r.Key)];
+        int[] shown = [.. HideJudgementsPage.Rows(x, minus).Select(r => r.Bit)];
         // A bit no tile shows: X Perfect's without XPerfect, Perfect's with it. All and None must keep it.
         int stray = x ? 3 : JudgementPopupHider.XPerfectPerfectBit;
         JudgementPopupHiderSettings C() => JudgementPopupHider.Conf;
         yield return FeatureFormPage(check, "hidejudgements", page, JudgementPopupHider.ConfMgr, () => C().HiddenMask |= 1 << stray, null,
             [.. tiles, "HIDEJUDGEMENTS_TILES"], tiles, () => More());
         IEnumerator More() {
+            JudgementBarLine(check, HideJudgementsPage.Bar(x, minus));
+            yield return NoXWithoutCompetitive(check);
             yield return MaskFlip(check, page, "JPOP_TOOEARLY", () => C().HiddenMask, 0, shown);
             yield return Hotkey(check, page, "JPOP_MISS", "jpop_miss", null, Bind.To(() => (C().HiddenMask >> 8 & 1) != 0, v => {
                 C().HiddenMask = v ? C().HiddenMask | 1 << 8 : C().HiddenMask & ~(1 << 8);
                 JudgementPopupHider.Save();
             }));
         }
+    }
+
+    // The bar's tiles share one line, left to right in BarBits order, each filled with its slot colour.
+    private static void JudgementBarLine(Action<string, bool, string> check, JudgementTiles.Row[] bar) {
+        VisualElement[] tiles = [.. bar.Select(r => PageContent().Q(name: r.Key + "-input")?.parent)];
+        bool found = tiles.All(t => t != null), line = found, coloured = found;
+        string why = "";
+        for(int i = 0; found && i < tiles.Length; i++) {
+            Rect b = tiles[i].worldBound;
+            if(i > 0 && (Mathf.Abs(b.y - tiles[0].worldBound.y) > 0.5f || b.x <= tiles[i - 1].worldBound.x)) line = false;
+            Color want = JudgementBar.SlotColour(bar[i].Bit), got = tiles[i].Q(JudgementBar.FillName)?.resolvedStyle.backgroundColor ?? Color.clear;
+            if(Mathf.Abs(got.r - want.r) > 0.01f || Mathf.Abs(got.g - want.g) > 0.01f || Mathf.Abs(got.b - want.b) > 0.01f) {
+                coloured = false;
+                why += $" {bar[i].Key}={got}/{want}";
+            }
+        }
+        check("hide judgements: the bar is one row, early to late", found && line && coloured,
+            $"found={found} line={line} coloured={coloured}{why} y=[{string.Join(",", tiles.Select(t => t?.worldBound.y))}] x=[{string.Join(",", tiles.Select(t => t?.worldBound.x))}]");
+    }
+
+    // With the game's competitive mode off, the rebuilt page shows no X Perfect (unless the XPerfect mod is on); the pref is put back.
+    private static IEnumerator NoXWithoutCompetitive(Action<string, bool, string> check) {
+        object was = XPerfectBridge.Competitive.Get(null);
+        bool exists = XPerfectBridge.Competitive.Exists;
+        if(exists) XPerfectBridge.Competitive.Set(null, false);
+        QuartzShell.Changed();
+        yield return Frames(3);
+        bool xTile = PageContent().Q(name: "JPOP_XPERFECT-input") != null, shown = XPerfectBridge.Shown;
+        if(exists && was is bool on) XPerfectBridge.Competitive.Set(null, on);
+        QuartzShell.Changed();
+        yield return Frames(3);
+        check("hide judgements: no X Perfect while competitive mode is off", xTile == shown && !(XPerfectBridge.Native && shown),
+            $"pref={exists} was={was} xTile={xTile} shown={shown} native={XPerfectBridge.Native}");
     }
 
     private static IEnumerator VisualsTileArc(Action<string, bool, string> check) {

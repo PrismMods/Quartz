@@ -103,6 +103,53 @@ internal static partial class PrismBridge {
         }
     }
 #endif
+    /// <summary>
+    /// Lets a pointer click on a surface's root (a VisualElement, as object) leave no focus ring: PrismLib.UI blurs the
+    /// clicked button or tab a tick later; text inputs keep their focus. A no-op without PrismLib.UI or on a copy that
+    /// predates it (one log line).
+    /// </summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    internal static void PointerBlurs(object root) {
+#if !IL2CPP && !QUARTZ_KEYVIEWER
+        if(root == null || !UiAvailable || blurGone) return;
+        try { PointerBlursImpl(root); } catch(Exception e) {
+            blurGone = true;
+            MainCore.Log.Wrn($"PrismLib.UI focus-ring fix unavailable, so a clicked button keeps its ring: {e.Message}");
+        }
+#endif
+    }
+    /// <summary>
+    /// Hands the key layout editor (a KeyLayoutEditor of KvElement, as object) the switch that flips its wheel pan. A no-op
+    /// without PrismLib.UI or on a copy that predates it (one log line): the preview pans the natural way.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    internal static void InvertPan(object editor, Func<bool> invert) {
+#if !IL2CPP && !QUARTZ_KEYVIEWER
+        if(editor == null || !UiAvailable || invertGone) return;
+        try { InvertPanImpl(editor, invert); } catch(Exception e) {
+            invertGone = true;
+            MainCore.Log.Wrn($"PrismLib.UI pan invert unavailable, so Invert scroll panning does nothing: {e.Message}");
+        }
+#endif
+    }
+    /// <summary>
+    /// Moves the key layout editor's inspector into host (both as object: a KeyLayoutEditor of KvElement and a VisualElement). False without PrismLib.UI or on a copy that
+    /// predates it (one log line): the inspector stays under the canvas.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    internal static bool InspectorIn(object editor, object host) {
+#if !IL2CPP && !QUARTZ_KEYVIEWER
+        if(editor == null || !UiAvailable || inspectorGone) return false;
+        try {
+            InspectorInImpl(editor, host);
+            return true;
+        } catch(Exception e) {
+            inspectorGone = true;
+            MainCore.Log.Wrn($"PrismLib.UI inspector move unavailable, so the key viewer inspector stays under the preview: {e.Message}");
+        }
+#endif
+        return false;
+    }
     /// <summary>Shows Prism · Settings, Quartz's own copy whoever holds the debug claim; one already showing stays.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
     internal static void OpenPrismSettings() {
@@ -114,7 +161,16 @@ internal static partial class PrismBridge {
 #endif
     }
 #if !IL2CPP && !QUARTZ_KEYVIEWER
-    private static bool suiteGone, hubLookGone;
+    private static bool suiteGone, hubLookGone, blurGone, invertGone, inspectorGone;
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void InspectorInImpl(object editor, object host) =>
+        ((PrismLib.UI.Toolkit.KeyLayoutEditor<Quartz.Features.KeyViewer.Layout.KvElement>)editor).InspectorIn((UnityEngine.UIElements.VisualElement)host);
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void InvertPanImpl(object editor, Func<bool> invert) =>
+        ((PrismLib.UI.Toolkit.KeyLayoutEditor<Quartz.Features.KeyViewer.Layout.KvElement>)editor).InvertPan = invert;
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void PointerBlursImpl(object root) =>
+        PrismLib.UI.Toolkit.FocusRing.PointerBlurs((UnityEngine.UIElements.VisualElement)root);
     private static void HubLookOff(string why) {
         hubLookGone = true;
         MainCore.Log.Wrn($"PrismLib.UI hotkey-menu look unavailable, so Quartz's shortcut menu keeps its card: {why}");

@@ -17,32 +17,32 @@ resources, and no types the mod never touches.
 | Assembly | Types | Members |
 |---|---:|---:|
 | `0Harmony` | 16 | 75 |
-| `Assembly-CSharp` | 129 | 1071 |
+| `Assembly-CSharp` | 130 | 1078 |
 | `Assembly-CSharp-firstpass` | 2 | 12 |
 | `DOTween` | 0 | 0 |
-| `Facet.0.2` | 70 | 447 |
+| `Facet.0.2` | 70 | 459 |
 | `MelonLoader` | 8 | 23 |
 | `Newtonsoft.Json` | 21 | 131 |
 | `PrismLib` | 17 | 120 |
-| `PrismLib.UI` | 29 | 354 |
+| `PrismLib.UI` | 30 | 358 |
 | `RDTools` | 2 | 0 |
 | `SkyHook.Unity` | 4 | 130 |
-| `Unity.TextMeshPro` | 36 | 350 |
+| `Unity.TextMeshPro` | 39 | 382 |
 | `UnityEngine` | 0 | 0 |
 | `UnityEngine.AudioModule` | 18 | 70 |
-| `UnityEngine.CoreModule` | 78 | 1089 |
+| `UnityEngine.CoreModule` | 78 | 1093 |
 | `UnityEngine.ImageConversionModule` | 1 | 1 |
 | `UnityEngine.InputLegacyModule` | 1 | 11 |
 | `UnityEngine.ParticleSystemModule` | 9 | 53 |
-| `UnityEngine.TextCoreFontEngineModule` | 4 | 54 |
+| `UnityEngine.TextCoreFontEngineModule` | 4 | 56 |
 | `UnityEngine.TextCoreTextEngineModule` | 2 | 1 |
 | `UnityEngine.TextRenderingModule` | 4 | 25 |
 | `UnityEngine.UI` | 94 | 354 |
-| `UnityEngine.UIElementsModule` | 66 | 285 |
+| `UnityEngine.UIElementsModule` | 74 | 320 |
 | `UnityEngine.UIModule` | 6 | 35 |
 | `UnityModManager` | 4 | 12 |
 
-**621 types, 4703 members.**
+**634 types, 4799 members.**
 
 ## How it is used
 

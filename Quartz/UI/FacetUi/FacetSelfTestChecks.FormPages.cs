@@ -156,7 +156,8 @@ internal static partial class FacetSelfTestChecks {
     /// (each caller says why); only, when given, limits the keys. classic, when given, is the classic page's keys from a build
     /// of it off screen, for a page the classic menu leaves out on this build.</summary>
     private static void Covers(Action<string, bool, string> check, string pageKey, IReadOnlyDictionary<string, string> renamed = null,
-        IReadOnlyCollection<string> omitted = null, IReadOnlyCollection<string> only = null, IEnumerable<string> classic = null) {
+        IReadOnlyCollection<string> omitted = null, IReadOnlyCollection<string> only = null, IEnumerable<string> classic = null,
+        ISet<string> names = null) {
         NavPage page = NavRegistry.ByKey(pageKey);
         VisualElement root = PageContent();
         var missing = new List<string>();
@@ -173,8 +174,10 @@ internal static partial class FacetSelfTestChecks {
                 int n = key.Count();
                 rows += n;
                 for(int i = 1; i <= n; i++)
-                    if(!Names(root, id + "#" + i) && !(i == 1 && Names(root, id))) missing.Add(i == 1 ? id : id + "#" + i);
+                    if(!Has(id + "#" + i) && !(i == 1 && Has(id))) missing.Add(i == 1 ? id : id + "#" + i);
             }
+        // names: every element name the page shows across its tabs, for a page that builds only the selected tab.
+        bool Has(string name) => names != null ? names.Contains(name) || names.Contains(name + "-input") : Names(root, name);
         check($"{pageKey}: has a row for every row the classic page indexes", page != null && rows > 0 && missing.Count == 0,
             $"page={page != null} rows={rows} missing={string.Join(",", missing)}");
     }

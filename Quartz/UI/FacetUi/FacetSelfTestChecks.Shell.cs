@@ -47,6 +47,8 @@ internal static partial class FacetSelfTestChecks {
             if(QuartzShell.Window == null) yield break;
             yield return ShellWindow(check, info);
             yield return ShellPages(check, info);
+            yield return ShellFocusRing(check);
+            yield return ShellFocusLate(check);
             yield return ShellHandOff(check);
             yield return ShellFeatureFlip(check);
             yield return ShellLastPage(check);
@@ -142,6 +144,58 @@ internal static partial class FacetSelfTestChecks {
         info($"new menu pages: moved={moved} classic={classic} stub={stub}");
         check("every page on the rail opens in the new menu without a failed card", failed.Count == 0, string.Join(", ", failed));
         yield return ShellHiddenCategory(check);
+    }
+
+    // A pointer click on a page tab leaves nothing in the tab row focused, so Facet's focus ring does not stay on it.
+    private static IEnumerator ShellFocusRing(Action<string, bool, string> check) {
+        QuartzShell.Go("overlay.general");
+        yield return Frames(1);
+        NavPage judgement = NavRegistry.ByKey("overlay.judgement");
+        string label = judgement == null ? null : QuartzHost.Host.Translate(QuartzShell.Label(judgement.LocaleKey, judgement.Title));
+        VisualElement row = QuartzShell.TabRow?.Element;
+        Button tab = row?.Query<Button>().ToList().FirstOrDefault(b => b.text == label);
+        if(tab != null) {
+            Vector2 at = tab.worldBound.center;
+            Pointer<PointerDownEvent>(tab, at);
+            if(row!.focusController?.focusedElement != tab) tab.Focus();   // as a real click would: the check is on the pointer-up
+            Pointer<PointerUpEvent>(tab, at);
+            yield return Frames(2);
+        }
+        var focused = QuartzShell.TabRow?.Element?.focusController?.focusedElement as VisualElement;
+        bool inRow = false;
+        for(VisualElement e = focused; e != null && !inRow; e = e.parent) inRow = e == QuartzShell.TabRow?.Element;
+        check("shell: a clicked page tab holds no focus after the click", tab != null && !inRow,
+            $"tab={label} found={tab != null} focused={focused?.name ?? focused?.GetType().Name ?? "none"}");
+    }
+
+    // Focus that lands after the release (the panel handing it back to its last element, a page rebuilt under the click) is
+    // dropped too while the pointer was the last input; after a key, focus stays and shows its ring.
+    private static IEnumerator ShellFocusLate(Action<string, bool, string> check) {
+        QuartzShell.Go("overlay.general");
+        yield return Frames(1);
+        VisualElement row = QuartzShell.TabRow?.Element;
+        Button tab = row?.Query<Button>().ToList().LastOrDefault();
+        bool late = false, kept = false;
+        if(tab != null) {
+            Vector2 at = tab.worldBound.center;
+            Pointer<PointerDownEvent>(tab, at);
+            Pointer<PointerUpEvent>(tab, at);
+            yield return Frames(2);
+            tab.Focus();
+            yield return Frames(2);
+            late = tab.focusController?.focusedElement != tab;
+            VisualElement tree = tab.panel.visualTree;
+            using(KeyDownEvent key = Pooled<KeyDownEvent>()) {
+                key.target = tree;
+                tree.SendEvent(key);
+            }
+            tab.Focus();
+            yield return Frames(2);
+            kept = tab.focusController?.focusedElement == tab;
+            tab.Blur();
+        }
+        check("shell: focus given after a click is dropped, and kept after a key", tab != null && late && kept,
+            $"found={tab != null} droppedAfterClick={late} keptAfterKey={kept}");
     }
 
     // Two run-scoped categories, one with a shown page and one whose only page is hidden: the second stays off the rail

@@ -49,7 +49,7 @@ internal static class UiHiderPage {
 
     // A profile's twelve switches in a shut section; the shortcut-hints one also redraws the hints and says so in its tooltip.
     private static void Profile(VisualElement card, string titleKey, string tag, Func<UiHiderProfile> profile, UiHiderProfile def) {
-        VisualElement body = Controls.Section(card, titleKey, o => {
+        VisualElement body = ShellRows.Section(card, titleKey, o => {
             o.Id = titleKey;
             o.Open = false;
         });

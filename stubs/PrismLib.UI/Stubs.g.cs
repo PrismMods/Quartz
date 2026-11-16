@@ -54,6 +54,9 @@ namespace PrismLib.UI.Toolkit {
         public global::System.Action<float> SetScale;
         public EditTarget() => throw null;
     }
+    public static unsafe partial class FocusRing {
+        public static void PointerBlurs(global::UnityEngine.UIElements.VisualElement root) => throw null;
+    }
     public static unsafe partial class FontFix {
         public static void EnsureInstalled(string owner, global::System.Action<global::System.Reflection.MethodBase, global::System.Reflection.MethodInfo, string> patch) => throw null;
         public static void Uninstalled(string owner) => throw null;
@@ -86,11 +89,13 @@ namespace PrismLib.UI.Toolkit {
     }
     public sealed unsafe partial class KeyLayoutEditor<T> where T : class {
         public global::Facet.Canvas<T> Canvas { get => throw null; }
+        public global::System.Func<bool> InvertPan { get => throw null; set { } }
         public global::UnityEngine.UIElements.VisualElement Root { get => throw null; }
         public global::Facet.StatusLine Status { get => throw null; }
         public static global::PrismLib.UI.Toolkit.KeyLayoutEditor<T> Build(global::UnityEngine.UIElements.VisualElement parent, global::PrismLib.UI.Toolkit.KeyLayoutModel<T> model, global::System.Action openSwitcher) => throw null;
         public void Changed() => throw null;
         public void Do(string labelId, global::System.Action change) => throw null;
+        public void InspectorIn(global::UnityEngine.UIElements.VisualElement host) => throw null;
         public void MarkDirty() => throw null;
         public static void Pick(global::PrismLib.UI.Toolkit.KeyLayoutModel<T> model, string labelId, global::PrismLib.UI.Toolkit.LayoutGroup group, string layout) => throw null;
         public void Refresh() => throw null;

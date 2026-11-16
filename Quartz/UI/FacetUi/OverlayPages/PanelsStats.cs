@@ -9,9 +9,10 @@ using UnityEngine;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi.OverlayPages;
 /// <summary>
-/// One panel's stats, as the classic page's: Add Stat opens the picker by category (Close shuts it), Clear All Stats, then
-/// the stats in their order, dragged by their label, each with its text or image field, Show, Label, Swap (the picker
-/// replaces it) and X, and its Setting rows folded under it. Ids of a stat's rows are numbered across the page, as the
+/// One panel's stats: Add Stat (the picker by category; Close shuts it) and Clear All Stats on one row, then the stats one
+/// line each in their order, dragged to reorder and clicked (here or on the preview) to inspect. The inspected stat's card
+/// takes the settings' place (ShellRows.Swap): its text or image field, Show, Label, Swap (back to the picker, which replaces
+/// it) and Delete on one tab, its Setting rows on another. Ids of a stat's rows are numbered across the page, as the
 /// classic page lists them: the stat's own label (PANEL_STAT_&lt;ID&gt;) counts that stat, the rest count every stat.
 /// </summary>
 internal static class PanelsStats {
@@ -19,74 +20,133 @@ internal static class PanelsStats {
     private static readonly string[] Categories = ["Accuracy", "Time", "BPM", "Map Stats", "Other"];
     private static readonly Color PerfectDefault = new(1f, 0.854902f, 0f, 1f);
 
-    /// <summary>Panel n's stat rows.</summary>
-    internal static void Build(VisualElement box, PanelConfig panel, int n) {
-        Func<object> document = ShellRows.ItemDocument(panel, () => Panels);
-        StatEntry replace = null;
-        bool open = false;
-        var picks = new List<string>();   // the picker's rows while open: "c:<category>", "s:<stat id>", or "none"
-        Button add = null;
+    // The picker, one for the page (one panel's rows show at a time): open, what a pick replaces (null: a pick adds), its rows
+    // ("c:<category>", "s:<stat id>", or "none") and the panel it picks for. add is the shown Add Stat button.
+    private static bool open;
+    private static StatEntry replace;
+    private static readonly List<string> picks = [];
+    private static PanelConfig pickFor;
+    private static Button add;
 
-        void Close() {
-            open = false;
-            replace = null;
-            picks.Clear();
-            if(add != null) Words.Label(add, "PANEL_ADDSTAT");
-        }
-        void Open() {
-            open = true;
-            Fill(panel, picks);
-            if(add != null) Words.Label(add, "CLOSE");
-            QuartzShell.Surface?.Refresh();
-        }
+    private static void Close() {
+        open = false;
+        replace = null;
+        picks.Clear();
+        if(add != null) Words.Label(add, "PANEL_ADDSTAT");
+    }
+
+    private static void Open(PanelConfig panel) {
+        open = true;
+        pickFor = panel;
+        Fill(panel, picks);
+        if(add != null) Words.Label(add, "CLOSE");
+        QuartzShell.Surface?.Refresh();
+    }
+
+    /// <summary>Panel n's stat rows: Add Stat and Clear All Stats, the picker while open, then the stats one line each.</summary>
+    internal static void Build(VisualElement box, PanelConfig panel, int n) {
+        if(pickFor != panel) Close();   // a picker opened for another panel
         void Pick(string id) {
             Dictionary<object, int> before = PanelsList.Places(Panels);
-            if(replace != null) replace.Id = id;
-            else panel.Stats.Add(new StatEntry(id) { ShowLabel = id is not ("text" or "image") });
+            if(replace != null && panel.Stats.Contains(replace)) replace.Id = id;
+            else if(replace == null) panel.Stats.Add(new StatEntry(id) { ShowLabel = id is not ("text" or "image") });
             Close();
             Changed(before);
         }
 
-        add = Controls.Action(box, "", "PANEL_ADDSTAT", () => {
+        add = ShellRows.Buttons(box, new ShellRows.Btn("PANEL_ADDSTAT", () => {
             if(open) Close();
             else {
                 replace = null;
-                Open();
+                Open(panel);
             }
-        }, o => {
-            o.Id = "PANEL_ADDSTAT#" + n;
-            o.Tooltip = "DESC_PANEL_ADDSTAT";
-        });
-        Controls.Action(box, "", "PANEL_CLEARSTATS", () => {
+        }, "DESC_PANEL_ADDSTAT", more: o => o.Id = "PANEL_ADDSTAT#" + n), new ShellRows.Btn("PANEL_CLEARSTATS", () => {
             Dictionary<object, int> before = PanelsList.Places(Panels);
             panel.Stats.Clear();
             Close();
             Changed(before);
-        }, o => o.Id = "PANEL_CLEARSTATS#" + n);
+        }, more: o => o.Id = "PANEL_CLEARSTATS#" + n))[0];
+        if(open) Words.Label(add, "CLOSE");
         Controls.Repeat<string>(box, () => picks, k => k, (row, k) => PickRow(row, k, n, Pick));
         Controls.Info(box, "PANEL_NO_STATS", () => "", (InfoOptions o) => {
             o.Id = "PANEL_NO_STATS#" + n;
             o.VisibleWhen = () => panel.Stats.Count == 0;
         });
+        // One line per stat: dragged into a new order, clicked to inspect it in the left column's place.
         Controls.Reorder<StatEntry>(box, o => {
             o.Id = "PANEL_STATS#" + n;
             o.Vertical = true;
-            o.DragFromText = true;
             o.Items = () => panel.Stats;
-            o.Key = s => ShellRows.ItemKey(s, Number(panel, s)) + "/" + s.Id + "/" + Count(panel, s);
+            o.Key = s => ItemKey(panel, s);
             o.Text = s => QuartzHost.Text(StatKey(s.Id), DefaultLabel(s.Id));
             o.Move = (from, to) => Move(panel, from, to);
-            o.Build = (e, s) => Stat(e, panel, s, n, document, () => {
+            o.Selected = s => s == Selected(panel);
+            o.Select = s => {
+                Select(panel, s);
+                QuartzShell.Surface?.Refresh();
+            };
+            // The stat's own label is its classic row (PANEL_STAT_<ID>), counted per stat.
+            o.Build = (e, s) => {
+                if(s.Id is not ("text" or "image") && e.Q<Label>("PANEL_STATS#" + n + "-text") is Label label) label.name = StatKey(s.Id) + "#" + Count(panel, s);
+            };
+        });
+    }
+
+    /// <summary>The inspector column: the inspected stat's card, built again when another stat is inspected or it moves.</summary>
+    internal static void InspectorColumn(VisualElement column) {
+        Controls.Live(column, () => column.panel != null && PanelsList.Shown is { } p && Selected(p) is { } s ? ItemKey(p, s) : "", e => {
+            if(column.panel == null || PanelsList.Shown is not { } panel || Selected(panel) is not { } s) return;
+            int n = Panels.IndexOf(panel) + 1;
+            Inspector(e, panel, s, n, ShellRows.ItemDocument(panel, () => Panels), () => {
+                Deselect();   // the picker is in the settings: back there, with the pick replacing this stat
                 replace = s;
-                Open();
+                Open(panel);
             }, () => {
                 Dictionary<object, int> before = PanelsList.Places(Panels);
                 panel.Stats.Remove(s);
                 if(replace == s) Close();   // a pick would swap the removed stat, and be lost
-                Changed(before);
+                Changed(before);   // the inspected stat is gone: the settings come back
             });
         });
     }
+
+    /// <summary>The stat inspected on panel (the one last clicked in the list or the preview), or null: the settings show.</summary>
+    internal static StatEntry Selected(PanelConfig panel) =>
+        PanelsOverlay.PreviewStat is { } s && panel != null && panel.Stats.Contains(s) ? s : null;
+
+    /// <summary>Inspects s on panel (picking panel): its rows take the settings' place and the preview marks its line.</summary>
+    internal static void Select(PanelConfig panel, StatEntry s) {
+        PanelsList.Show(panel);
+        PanelsOverlay.PreviewStat = s;
+    }
+
+    /// <summary>Whether a stat of the picked panel is inspected: the left column shows its inspector.</summary>
+    internal static bool Inspecting() => Selected(PanelsList.Shown) != null;
+
+    /// <summary>Back: the settings again.</summary>
+    internal static void Deselect() {
+        PanelsOverlay.PreviewStat = null;
+        QuartzShell.Surface?.Refresh();
+    }
+
+    /// <summary>A press on the preview: the stat whose line is under it is inspected.</summary>
+    internal static void ClickPreview(Vector3 world) {
+        if(PanelsList.Shown is not { } panel || PanelsOverlay.StatAt(world) is not { } s || !panel.Stats.Contains(s)) return;
+        Select(panel, s);
+        QuartzShell.Surface?.Refresh();
+    }
+
+    /// <summary>A search hit on a stat's row: the picked panel's first stat is inspected, on its Stat tab.</summary>
+    internal static void InspectFirst() {
+        WantTab = "PANEL_TAB_STAT";
+        if(PanelsList.Shown is { Stats.Count: > 0 } p && Selected(p) == null) Select(p, p.Stats[0]);
+    }
+
+    /// <summary>The inspector tab the next inspector opens on (a search hit's), then cleared; null: the tab last picked.</summary>
+    internal static string WantTab;
+
+    // A stat's list key: its place, id and count, so a move or swap builds its line and its inspector again, renumbered.
+    private static string ItemKey(PanelConfig panel, StatEntry s) => ShellRows.ItemKey(s, Number(panel, s)) + "/" + s.Id + "/" + Count(panel, s);
 
     /// <summary>A drop in panel's stats: remove at from, insert at to, then save.</summary>
     internal static void Move(PanelConfig panel, int from, int to) {
@@ -171,43 +231,50 @@ internal static class PanelsStats {
         return k;
     }
 
-    // One stat: under its label, its text or image field, Show and Label, Swap and X, then its Setting rows, folded.
-    private static void Stat(VisualElement e, PanelConfig panel, StatEntry s, int n, Func<object> panelDocument, Action swap, Action remove) {
+    // The selected stat's inspector: a card titled by the stat, its own rows on one tab and its Setting rows on another.
+    private static void Inspector(VisualElement box, PanelConfig panel, StatEntry s, int n, Func<object> panelDocument, Action swap, Action remove) {
         int g = Number(panel, s);
-        if(s.Id is not ("text" or "image") && e.Q<Label>("PANEL_STATS#" + n + "-text") is Label label) label.name = StatKey(s.Id) + "#" + Count(panel, s);
         Func<object> document = () => panelDocument() != null && panel.Stats.Contains(s) ? s : null;
-        Action save = PanelsOverlay.Save;
         void Row(ControlOptions o, string key) {
             o.Id = key + "#" + g;
             o.UndoDocument = document;
         }
+        VisualElement card = Controls.Card(box, QuartzShell.Label(StatKey(s.Id), DefaultLabel(s.Id)));
+        card.name = "PANEL_INSPECTOR#" + g;   // where the classic page's Setting fold (SETTING_SHORT#g) stood
+        int want = WantTab == null ? -1 : WantTab == "SETTING_SHORT" ? 1 : 0;
+        WantTab = null;
+        ShellRows.CardTabs(card, new List<NavItem> {
+            new("PANEL_TAB_STAT", e => StatRows(e, s, g, Row, swap, remove)),
+            new("SETTING_SHORT", e => Settings(e, s, n, g, Row)),
+        }, want);
+    }
+
+    // A stat's own rows: its text or image field, Show and Label, then Swap and Delete on one row.
+    private static void StatRows(VisualElement e, StatEntry s, int g, Action<ControlOptions, string> row, Action swap, Action remove) {
+        Action save = PanelsOverlay.Save;
         if(s.Id == "text")
             ShellRows.Text(e, "", Bind.To(() => s.Text, v => s.Text = v), 64, null, save, o => {
-                Row(o, "PANEL_TEXT");
+                row(o, "PANEL_TEXT");
                 o.Placeholder = "PANEL_TEXT_PLACEHOLDER";
             });
         else if(s.Id == "image")
             ShellRows.Text(e, "", Bind.To(() => s.Image, v => s.Image = v), 260, null, save, o => {
-                Row(o, "PANEL_IMAGE");
+                row(o, "PANEL_IMAGE");
                 o.Placeholder = "PANEL_IMAGE_PLACEHOLDER";
             });
         Controls.Toggle(e, "PANEL_SHOWSTAT", QuartzShell.Writes(() => s.Enabled, v => {
             s.Enabled = v;
             save();
         }), o => {
-            Row(o, "PANEL_SHOWSTAT");
+            row(o, "PANEL_SHOWSTAT");
             o.Default = true;
         });
         Controls.Toggle(e, "PANEL_SHOWLABEL", QuartzShell.Writes(() => s.ShowLabel, v => {
             s.ShowLabel = v;
             save();
-        }), o => Row(o, "PANEL_SHOWLABEL"));
-        Controls.Action(e, "", "SWAP", swap, o => o.Id = "SWAP#" + g);
-        Controls.Action(e, "", "DELETE_SHORT", remove, o => o.Id = "DELETE_SHORT#" + g);
-        Settings(Controls.Section(e, "SETTING_SHORT", o => {
-            o.Open = false;
-            o.Id = "SETTING_SHORT#" + g;
-        }), s, n, g, Row);
+        }), o => row(o, "PANEL_SHOWLABEL"));
+        ShellRows.Buttons(e, new ShellRows.Btn("SWAP", swap, more: o => o.Id = "SWAP#" + g),
+            new ShellRows.Btn("DELETE_BUTTON", remove, more: o => o.Id = "DELETE_BUTTON#" + g));
     }
 
     // The classic Setting rows: an image's pick, folder and size; the FPS interval; then the value's colours.
@@ -290,7 +357,7 @@ internal static class PanelsStats {
                 o.Default = Color.white;
                 o.UndoDocument = document;
             });
-            Controls.Action(box, "", "DELETE_SHORT", () => {
+            Controls.Action(box, "", "DELETE_BUTTON", () => {
                 Write().Points.Remove(p);
                 Changed();
             }, o => {

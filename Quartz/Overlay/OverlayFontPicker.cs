@@ -38,11 +38,13 @@ public static class OverlayFontPicker {
         return dropdown;
     }
     internal static string Current(string overlayKey) => FontManager.OverlayFontName(overlayKey) ?? FontManager.FollowGlobal;
-    internal static IReadOnlyList<string> Values() => [FontManager.FollowGlobal, .. FontManager.GetAvailableFonts()];
+    internal static IReadOnlyList<string> Values() => [FontManager.FollowGlobal, FontManager.GameDefault, .. FontManager.GetAvailableFonts()];
     internal static string Display(string name) =>
         name == FontManager.FollowGlobal
             ? string.Format(GenerateUI.Tr("FONT_OVERLAY_GLOBAL", "Global font ({0})"), FontName(FontManager.CurrentName))
-            : FontName(name);
+            : name == FontManager.GameDefault
+                ? string.Format(GenerateUI.Tr("FONT_GAME_DEFAULT", "Game default ({0})"), FontManager.GameDefaultFace ?? "-")
+                : FontName(name);
     private static string FontName(string name) =>
         name == FontManager.DefaultName
             ? string.Format(GenerateUI.Tr("FONT_DEFAULT_OF", "Default ({0})"), FontManager.DefaultFontFile)

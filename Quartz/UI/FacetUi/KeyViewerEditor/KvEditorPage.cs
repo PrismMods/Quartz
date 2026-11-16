@@ -1,5 +1,6 @@
 #if !IL2CPP && !QUARTZ_KEYVIEWER
 using Quartz.Features.KeyViewer.Layout;
+using Quartz.Resource;
 using UnityEngine;
 using UnityEngine.UIElements;
 using KeyLayoutEditor = PrismLib.UI.Toolkit.KeyLayoutEditor<Quartz.Features.KeyViewer.Layout.KvElement>;
@@ -31,6 +32,7 @@ internal static class KvEditorPage {
     }
 
     internal static void Shutdown() {
+        FontManager.OnFontChanged -= FontChanged;
         Switcher?.Dispose();
         Switcher = null;
         Editor = null;
@@ -52,10 +54,23 @@ internal static class KvEditorPage {
         else FacetBridge.OpenNewMenu(PageKey);
     }
 
-    internal static VisualElement Build(VisualElement right) {
-        Editor = KeyLayoutEditor.Build(right, Model, KvEditorDoor.OpenSwitcher);
+    internal static VisualElement Build(VisualElement right, VisualElement inspector) {
+        Editor = KeyLayoutEditor.Build(right, Model, KvEditorDoor.ToggleSwitcher);   // a second click on Layouts closes it
+        Quartz.Prism.PrismBridge.InvertPan(Editor, () => Quartz.Features.KeyViewer.KeyViewerOverlay.Conf?.InvertPreviewPan == true);
+        InspectorMoved = Quartz.Prism.PrismBridge.InspectorIn(Editor, inspector);
+        FontManager.OnFontChanged -= FontChanged;
+        FontManager.OnFontChanged += FontChanged;
         return Editor.Root;
     }
+
+    /// <summary>The editor's inspector sits in the page's settings column, not under the preview.</summary>
+    internal static bool InspectorMoved { get; private set; }
+
+    /// <summary>Elements are selected and the inspector shows them in the settings column.</summary>
+    internal static bool Inspecting => InspectorMoved && Editor?.Canvas.Selection.Count > 0;
+
+    // The preview draws in the key viewer's font: redraw when any font pick changes.
+    private static void FontChanged() => Editor?.Refresh();
 
 #if DEBUG
     /// <summary>How often Tick reached the editor; the self-test's proof that a hidden menu leaves it alone.</summary>

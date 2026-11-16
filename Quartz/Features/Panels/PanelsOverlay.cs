@@ -218,13 +218,39 @@ public static partial class PanelsOverlay {
         previewing = false;
         if(updater != null) updater.Update();
     }
-    // The last panel shown, alone at its true size: framing them all shrinks panels spread over the screen until the font the
-    // page edits can't be judged. None shown gives an empty frame, so the pane's note says why. Kept between calls: the pane
-    // frames it every frame.
+    /// <summary>The panel the menu's preview shows (the page's selected one) and the stat it marks (the one inspected), or null.
+    /// Read only while previewing: then the other panels hide, and the marked stat's line is highlighted.</summary>
+    internal static PanelConfig PreviewPanel;
+    internal static StatEntry PreviewStat;
+    // PreviewPanel while it is still a panel, else the first.
+    private static PanelConfig Focus => Conf.Panels.Contains(PreviewPanel) ? PreviewPanel : Conf.Panels.Count > 0 ? Conf.Panels[0] : null;
+    private static bool HiddenByPreview(LivePanel p) => previewing && Focus is { } f && p.Config != f;
+
+    /// <summary>The stat whose line in the previewed panel is nearest a world point inside that panel; null outside it, or on
+    /// its prefix or name. A preview pane's click maps to the world point through the lease's camera.</summary>
+    internal static StatEntry StatAt(Vector3 world) {
+        LivePanel p = panels.Find(x => x.Config == Focus);
+        if(p == null || !Shown(p) || p.Text == null || !p.Rect.rect.Contains(p.Rect.InverseTransformPoint(world))) return null;
+        float y = p.Text.rectTransform.InverseTransformPoint(world).y, best = float.MaxValue;
+        TMP_TextInfo info = p.Text.textInfo;
+        StatEntry at = null;
+        for(int i = 0; info != null && i < info.lineCount && i < p.Lines.Count; i++) {
+            TMP_LineInfo line = info.lineInfo[i];
+            float d = Mathf.Abs(y - (line.ascender + line.descender) * 0.5f);
+            if(d >= best) continue;
+            best = d;
+            at = p.Lines[i];
+        }
+        return at;
+    }
+
+    // The previewed panel alone at its true size: framing them all shrinks panels spread over the screen until the font the
+    // page edits can't be judged. Without it, the last panel shown. None shown gives an empty frame, so the pane's note says
+    // why. Kept between calls: the pane frames it every frame.
     private static readonly RectTransform[] previewFrame = new RectTransform[1];
     private static IEnumerable<RectTransform> PreviewFrame() {
         for(int i = panels.Count - 1; i >= 0; i--)
-            if(Shown(panels[i])) {
+            if(Shown(panels[i]) && !HiddenByPreview(panels[i])) {
                 previewFrame[0] = panels[i].Rect;
                 return previewFrame;
             }

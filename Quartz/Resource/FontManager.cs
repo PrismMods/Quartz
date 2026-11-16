@@ -318,6 +318,7 @@ public static partial class FontManager {
         TMP_FontAsset asset = name == UiDefault ? uiFont
             : name == DefaultName ? defaultFont
             : name == GameFontName ? gameFont
+            : name == GameDefault ? gameDefaultFont
             : cache.TryGetValue(name, out var c) ? c : null;
         if(asset == null) return;
         ApplyAdjust(asset, name);
@@ -420,6 +421,7 @@ public static partial class FontManager {
     private static TMP_FontAsset Resolve(string name) {
         if(string.IsNullOrEmpty(name) || name == DefaultName || name == AddSentinel) return DefaultFont;
         if(name == GameFontName) return GameFont();
+        if(name == GameDefault) return GameDefaultFont();
         if(cache.TryGetValue(name, out TMP_FontAsset cached)) return cached;
         EnsureScanned();
         if(!fontFiles.TryGetValue(name, out string path)) return null;

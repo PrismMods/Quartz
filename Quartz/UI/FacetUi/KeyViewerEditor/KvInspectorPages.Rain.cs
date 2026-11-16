@@ -14,7 +14,7 @@ internal static partial class KvInspectorPages {
     private static void BuildRain(VisualElement p, KvElement[] keys) {
         if(keys.Length == 0) return;
         bool single = keys.Length == 1;
-        VisualElement rain = Section(p, "KVI_SEC_NOTE");
+        VisualElement rain = p;   // the tab's own name: no section head repeating it
         Flag(rain, "KVI_NOTE_ENABLED", true, Keys, e => KvProps.Bool(e.Raw, "noteEffectEnabled", true), (e, v) => e.Raw["noteEffectEnabled"] = v);
         NoteColorRows(rain, keys, single, "noteColor", "KVI_NOTE_GRADIENT", "KVI_NOTE_COLOR", _ => "#FFFFFF");
         Num(rain, "KVI_NOTE_OPACITY", 80f, 0f, 100f, "0' %'", 1f, Keys, e => KvProps.Int(e.Raw, "noteOpacity", 80),

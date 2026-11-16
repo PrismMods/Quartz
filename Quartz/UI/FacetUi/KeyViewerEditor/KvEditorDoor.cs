@@ -50,14 +50,15 @@ internal static class KvEditorDoor {
     internal static bool Live => editorRoot?.panel != null;
 #endif
 
-    /// <summary>Builds the editor into right; false when PrismLib.UI is unusable or the build failed (right is then empty),
-    /// and the caller draws the fallback card.</summary>
+    /// <summary>Builds the editor into right and its inspector into inspector (under the preview instead on an older
+    /// PrismLib.UI); false when PrismLib.UI is unusable or the build failed (right is then empty), and the caller draws the
+    /// fallback card.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
-    internal static bool Build(VisualElement right) {
+    internal static bool Build(VisualElement right, VisualElement inspector) {
 #if !QUARTZ_KEYVIEWER
         if(!Usable) return false;
         try {
-            editorRoot = BuildImpl(right);
+            editorRoot = BuildImpl(right, inspector);
             return true;
         } catch(Exception e) {
             Failed(e);
@@ -66,6 +67,28 @@ internal static class KvEditorDoor {
         }
 #endif
         return false;
+    }
+
+    /// <summary>Elements are selected and the inspector shows in the settings column in place of the page's settings.
+    /// Asked on every refresh pass: no allocation.</summary>
+    internal static bool Inspecting {
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        get {
+#if !QUARTZ_KEYVIEWER
+            if(gone || !Live) return false;
+            try { return InspectingImpl(); } catch(Exception e) { Failed(e); }
+#endif
+            return false;
+        }
+    }
+
+    /// <summary>Clears the selection: the settings column shows the page's settings again.</summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    internal static void Deselect() {
+#if !QUARTZ_KEYVIEWER
+        if(gone || !Live) return;
+        try { DeselectImpl(); } catch(Exception e) { Failed(e); }
+#endif
     }
 
     /// <summary>Per frame, through FacetBridge.TickKvEditor: nothing unless an editor is live and the menu shows (a hidden
@@ -166,7 +189,13 @@ internal static class KvEditorDoor {
     private static void ProbeImpl() => _ = PrismLib.UI.Toolkit.KeyLayoutText.Ids.Count;
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static VisualElement BuildImpl(VisualElement right) => KvEditorPage.Build(right);
+    private static VisualElement BuildImpl(VisualElement right, VisualElement inspector) => KvEditorPage.Build(right, inspector);
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static bool InspectingImpl() => KvEditorPage.Inspecting;
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void DeselectImpl() => KvEditorPage.Editor?.Canvas.Clear();
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void OpenSwitcherImpl() => KvEditorPage.OpenSwitcher();

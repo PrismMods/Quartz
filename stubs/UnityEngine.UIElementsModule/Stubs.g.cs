@@ -55,6 +55,11 @@ namespace UnityEngine.UIElements {
     public abstract unsafe partial class CallbackEventHandler {
         protected CallbackEventHandler() { }
     }
+    public unsafe partial class Clickable : global::UnityEngine.UIElements.PointerManipulator {
+        public global::UnityEngine.Vector2 lastMousePosition { get => throw null; }
+        public Clickable(global::System.Action handler) => throw null;
+        protected Clickable() { }
+    }
     public enum DisplayStyle : int {
         Flex = 0,
         None = 1,
@@ -66,7 +71,14 @@ namespace UnityEngine.UIElements {
         RowReverse = 3,
     }
     public abstract unsafe partial class Focusable : global::UnityEngine.UIElements.CallbackEventHandler {
+        public virtual bool focusable { get => throw null; set { } }
         protected Focusable() { }
+    }
+    public unsafe partial struct FontDefinition : global::System.IEquatable<global::UnityEngine.UIElements.FontDefinition> {
+        private global::UnityEngine.Font m_Font;
+        private global::UnityEngine.TextCore.Text.FontAsset m_FontAsset;
+        public static global::UnityEngine.UIElements.FontDefinition FromSDFFont(global::UnityEngine.TextCore.Text.FontAsset f) => throw null;
+        bool global::System.IEquatable<global::UnityEngine.UIElements.FontDefinition>.Equals(global::UnityEngine.UIElements.FontDefinition other) => throw null;
     }
     public unsafe partial interface IBindable {
     }
@@ -78,6 +90,9 @@ namespace UnityEngine.UIElements {
     }
     public unsafe partial interface IExperimentalFeatures {
         global::UnityEngine.UIElements.Experimental.ITransitionAnimations animation { get; }
+    }
+    public unsafe partial interface IManipulator {
+        global::UnityEngine.UIElements.VisualElement target { get; set; }
     }
     public unsafe partial interface IMixedValueSupport {
     }
@@ -92,6 +107,7 @@ namespace UnityEngine.UIElements {
     }
     public unsafe partial interface IStyle {
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.Align> alignItems { get; set; }
+        global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.Align> alignSelf { get; set; }
         global::UnityEngine.UIElements.StyleColor backgroundColor { get; set; }
         global::UnityEngine.UIElements.StyleBackground backgroundImage { get; set; }
         global::UnityEngine.UIElements.StyleBackgroundSize backgroundSize { get; set; }
@@ -110,6 +126,7 @@ namespace UnityEngine.UIElements {
         global::UnityEngine.UIElements.StyleLength bottom { get; set; }
         global::UnityEngine.UIElements.StyleColor color { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.DisplayStyle> display { get; set; }
+        global::UnityEngine.UIElements.StyleLength flexBasis { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.FlexDirection> flexDirection { get; set; }
         global::UnityEngine.UIElements.StyleFloat flexGrow { get; set; }
         global::UnityEngine.UIElements.StyleFloat flexShrink { get; set; }
@@ -121,6 +138,7 @@ namespace UnityEngine.UIElements {
         global::UnityEngine.UIElements.StyleLength marginLeft { get; set; }
         global::UnityEngine.UIElements.StyleLength marginRight { get; set; }
         global::UnityEngine.UIElements.StyleLength marginTop { get; set; }
+        global::UnityEngine.UIElements.StyleLength maxWidth { get; set; }
         global::UnityEngine.UIElements.StyleLength minHeight { get; set; }
         global::UnityEngine.UIElements.StyleLength minWidth { get; set; }
         global::UnityEngine.UIElements.StyleFloat opacity { get; set; }
@@ -133,10 +151,12 @@ namespace UnityEngine.UIElements {
         global::UnityEngine.UIElements.StyleLength right { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.TextOverflow> textOverflow { get; set; }
         global::UnityEngine.UIElements.StyleLength top { get; set; }
+        global::UnityEngine.UIElements.StyleFontDefinition unityFontDefinition { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.FontStyle> unityFontStyleAndWeight { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.TextAnchor> unityTextAlign { get; set; }
         global::UnityEngine.UIElements.StyleColor unityTextOutlineColor { get; set; }
         global::UnityEngine.UIElements.StyleFloat unityTextOutlineWidth { get; set; }
+        global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.Visibility> visibility { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.WhiteSpace> whiteSpace { get; set; }
         global::UnityEngine.UIElements.StyleLength width { get; set; }
     }
@@ -181,6 +201,13 @@ namespace UnityEngine.UIElements {
             None = 3,
         }
     }
+    public abstract unsafe partial class Manipulator : global::UnityEngine.UIElements.IManipulator {
+        protected Manipulator() { }
+        global::UnityEngine.UIElements.VisualElement global::UnityEngine.UIElements.IManipulator.target { get => throw null; set { } }
+    }
+    public abstract unsafe partial class MouseManipulator : global::UnityEngine.UIElements.Manipulator {
+        protected MouseManipulator() { }
+    }
     public enum Overflow : int {
         Visible = 0,
         Hidden = 1,
@@ -188,6 +215,9 @@ namespace UnityEngine.UIElements {
     public enum PickingMode : int {
         Position = 0,
         Ignore = 1,
+    }
+    public abstract unsafe partial class PointerManipulator : global::UnityEngine.UIElements.MouseManipulator {
+        protected PointerManipulator() { }
     }
     public enum Position : int {
         Relative = 0,
@@ -246,6 +276,12 @@ namespace UnityEngine.UIElements {
         public static implicit operator global::UnityEngine.UIElements.StyleFloat(float v) => throw null;
         bool global::System.IEquatable<global::UnityEngine.UIElements.StyleFloat>.Equals(global::UnityEngine.UIElements.StyleFloat other) => throw null;
     }
+    public unsafe partial struct StyleFontDefinition : global::System.IEquatable<global::UnityEngine.UIElements.StyleFontDefinition> {
+        private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
+        private global::UnityEngine.UIElements.FontDefinition m_Value;
+        public static implicit operator global::UnityEngine.UIElements.StyleFontDefinition(global::UnityEngine.UIElements.FontDefinition f) => throw null;
+        bool global::System.IEquatable<global::UnityEngine.UIElements.StyleFontDefinition>.Equals(global::UnityEngine.UIElements.StyleFontDefinition other) => throw null;
+    }
     public enum StyleKeyword : int {
         Undefined = 0,
         Null = 1,
@@ -257,6 +293,7 @@ namespace UnityEngine.UIElements {
         private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
         private global::UnityEngine.UIElements.Length m_Value;
         public static implicit operator global::UnityEngine.UIElements.StyleLength(float v) => throw null;
+        public static implicit operator global::UnityEngine.UIElements.StyleLength(global::UnityEngine.UIElements.Length v) => throw null;
         public static implicit operator global::UnityEngine.UIElements.StyleLength(global::UnityEngine.UIElements.StyleKeyword keyword) => throw null;
         bool global::System.IEquatable<global::UnityEngine.UIElements.StyleLength>.Equals(global::UnityEngine.UIElements.StyleLength other) => throw null;
     }
@@ -296,6 +333,10 @@ namespace UnityEngine.UIElements {
     public sealed unsafe partial class VectorImage : global::UnityEngine.ScriptableObject {
         private VectorImage() { }
     }
+    public enum Visibility : int {
+        Visible = 0,
+        Hidden = 1,
+    }
     public unsafe partial class VisualElement : global::UnityEngine.UIElements.Focusable, global::UnityEngine.UIElements.Experimental.ITransitionAnimations, global::UnityEngine.UIElements.IExperimentalFeatures {
         public global::UnityEngine.UIElements.VisualElement this[int key] { get => throw null; }
         public int childCount { get => throw null; }
@@ -310,6 +351,7 @@ namespace UnityEngine.UIElements {
         public global::UnityEngine.Rect worldBound { get => throw null; }
         public VisualElement() => throw null;
         public void Add(global::UnityEngine.UIElements.VisualElement child) => throw null;
+        public global::System.Collections.Generic.IEnumerable<global::UnityEngine.UIElements.VisualElement> Children() => throw null;
         public void Clear() => throw null;
         public T GetFirstAncestorOfType<T>() where T : class => throw null;
         public int IndexOf(global::UnityEngine.UIElements.VisualElement element) => throw null;
@@ -343,6 +385,7 @@ namespace UnityEngine.UIElements {
         }
     }
     public static unsafe partial class VisualElementExtensions {
+        public static void AddManipulator(this global::UnityEngine.UIElements.VisualElement ele, global::UnityEngine.UIElements.IManipulator manipulator) => throw null;
         public static global::UnityEngine.Vector2 ChangeCoordinatesTo(this global::UnityEngine.UIElements.VisualElement src, global::UnityEngine.UIElements.VisualElement dest, global::UnityEngine.Vector2 point) => throw null;
     }
     public enum WhiteSpace : int {

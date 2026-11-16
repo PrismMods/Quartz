@@ -63,7 +63,7 @@ internal static class FacetEffectRemover {
             o.Tooltip = tip;
             o.VisibleWhen = visible;
         });
-    // The menu's bare "Toggle All" button: a row with no label. Off when any is on, otherwise all on.
+    // The menu's bare "Toggle All" button: a row with no label under its section's switches. Off when any is on, otherwise all on.
     private static void ToggleAll(VisualElement p, string key, Control<bool>[] rows) =>
         Controls.Action(p, "", key, () => {
             bool value = rows.All(r => !r.Value);
@@ -74,7 +74,7 @@ internal static class FacetEffectRemover {
         VisualElement excluded = Controls.ToggleGroup(p, "FXRM_S_FILTER",
             QuartzShell.Writes(() => C.SimpleFilter, v => { C.SimpleFilter = v; Save(); }),
             o => { o.Id = "FXRM_S_FILTER"; o.Default = Def.SimpleFilter; o.Tooltip = "DESC_FXRM_S_FILTER"; });
-        VisualElement filters = Controls.Section(excluded, "SECTION_EXCLUDED_FILTERS", false);
+        VisualElement filters = ShellRows.Section(excluded, "SECTION_EXCLUDED_FILTERS", false);
         foreach(Filter value in Enum.GetValues(typeof(Filter))) {
             Filter filter = value;
             // No Quartz key, so the label passes through untranslated.
@@ -126,27 +126,26 @@ internal static class FacetEffectRemover {
         Flag(events, "FXRM_REPEAT", c => c.RepeatEvents, (c, v) => c.RepeatEvents = v, Def.RepeatEvents);
         Flag(events, "FXRM_FRAMERATE", c => c.FrameRate, (c, v) => c.FrameRate = v, Def.FrameRate);
         Flag(events, "FXRM_HITSOUNDS", c => c.HitSounds, (c, v) => c.HitSounds = v, Def.HitSounds);
-        VisualElement planet = Controls.Section(events, "SECTION_PLANET_EVENTS", false);
+        VisualElement planet = ShellRows.Section(events, "SECTION_PLANET_EVENTS", false);
         var planetRows = new Control<bool>[3];
-        ToggleAll(planet, "FXRM_PLANET_ALL", planetRows);
         planetRows[0] = Flag(planet, "FXRM_PLANET_ORBIT", c => c.PlanetOrbit, (c, v) => c.PlanetOrbit = v, Def.PlanetOrbit);
         planetRows[1] = Flag(planet, "FXRM_PLANET_SCALE", c => c.PlanetScale, (c, v) => c.PlanetScale = v, Def.PlanetScale);
         planetRows[2] = Flag(planet, "FXRM_PLANET_RADIUS", c => c.PlanetRadius, (c, v) => c.PlanetRadius = v, Def.PlanetRadius);
-        VisualElement track = Controls.Section(events, "SECTION_TRACK_EVENTS", false);
+        ToggleAll(planet, "FXRM_PLANET_ALL", planetRows);
+        VisualElement track = ShellRows.Section(events, "SECTION_TRACK_EVENTS", false);
         var trackRows = new Control<bool>[4];
-        ToggleAll(track, "FXRM_TRACK_ALL", trackRows);
         trackRows[0] = Flag(track, "FXRM_TRACK_ANIMS", c => c.TrackAnimations, (c, v) => c.TrackAnimations = v, Def.TrackAnimations);
         trackRows[1] = Flag(track, "FXRM_TRACK_MOVES", c => c.TrackMoves, (c, v) => c.TrackMoves = v, Def.TrackMoves);
         trackRows[2] = Flag(track, "FXRM_TRACK_POSITIONS", c => c.TrackPositions, (c, v) => c.TrackPositions = v, Def.TrackPositions);
         trackRows[3] = Flag(track, "FXRM_TRACK_COLORS", c => c.TrackColors, (c, v) => c.TrackColors = v, Def.TrackColors);
+        ToggleAll(track, "FXRM_TRACK_ALL", trackRows);
         VisualElement dlc = Controls.Card(body, "HEADING_DLC_EVENTS");
         Flag(dlc, "FXRM_HOLDSOUNDS", c => c.HoldSounds, (c, v) => c.HoldSounds = v, Def.HoldSounds);
         Flag(dlc, "FXRM_HIDEICONS", c => c.HideIcons, (c, v) => c.HideIcons = v, Def.HideIcons);
         VisualElement misc = Controls.Card(body, "HEADING_MISC");
         VisualElement decoTypes = Ui.Box(misc);
-        VisualElement types = Controls.Section(decoTypes, "SECTION_DECORATION_TYPES", false);
+        VisualElement types = ShellRows.Section(decoTypes, "SECTION_DECORATION_TYPES", false);
         var typeRows = new Control<bool>[6];
-        ToggleAll(types, "FXRM_DECO_TYPES_ALL", typeRows);
         typeRows[0] = Flag(types, "FXRM_DECO_PLANET", c => c.DecoPlanet, (c, v) => c.DecoPlanet = v, Def.DecoPlanet);
         typeRows[1] = Flag(types, "FXRM_DECO_TILES", c => c.DecoTiles, (c, v) => c.DecoTiles = v, Def.DecoTiles);
         typeRows[2] = Flag(types, "FXRM_DECO_IMAGE", c => c.DecoImage, (c, v) => c.DecoImage = v, Def.DecoImage);
@@ -154,6 +153,7 @@ internal static class FacetEffectRemover {
         typeRows[4] = Flag(types, "FXRM_PARTICLES", c => c.Particles, (c, v) => c.Particles = v, Def.Particles);
         typeRows[5] = Flag(types, "FXRM_DECO_FAILHITBOX", c => c.DecoFailHitbox, (c, v) => c.DecoFailHitbox = v, Def.DecoFailHitbox,
             "DESC_FXRM_DECO_FAILHITBOX");
+        ToggleAll(types, "FXRM_DECO_TYPES_ALL", typeRows);
         Flag(misc, "FXRM_REMOVE_ALL_DECO", c => c.RemoveAllDecorations, (c, v) => c.RemoveAllDecorations = v, Def.RemoveAllDecorations,
             "DESC_FXRM_REMOVE_ALL_DECO", () => C.Decorations);
         Flag(misc, "FXRM_LIMIT_OPACITY", c => c.LimitTrackOpacity, (c, v) => c.LimitTrackOpacity = v, Def.LimitTrackOpacity);

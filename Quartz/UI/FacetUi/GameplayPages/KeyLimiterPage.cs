@@ -39,27 +39,21 @@ internal static class KeyLimiterPage {
             o.Tooltip = "DESC_KL_PROFILE_NAME";
             o.Undoable = false;
         });
-        Controls.Action(card, "", "KL_ADD_PROFILE", KeyLimiter.AddProfile, o => {
-            o.Id = "KL_ADD_PROFILE";
-            o.Undoable = false;
-        });
-        Controls.Action(card, "", "KL_REMOVE_PROFILE", KeyLimiter.RemoveActiveProfile, o => {
-            o.Id = "KL_REMOVE_PROFILE";
-            o.Undoable = false;
-            o.EnabledWhen = () => KeyLimiter.Profiles.Count > 1;
-        });
-        ShellRows.CaptureButton(card, "KL_CAPTURE", () => KeyLimiter.IsCapturing, done => KeyLimiter.StartCapture(k => KeyLimiter.ToggleAllowedKey(k), done),
+        ShellRows.Buttons(card, new ShellRows.Btn("KL_ADD_PROFILE", KeyLimiter.AddProfile, more: o => o.Undoable = false),
+            new ShellRows.Btn("KL_REMOVE_PROFILE", KeyLimiter.RemoveActiveProfile, enabled: () => KeyLimiter.Profiles.Count > 1,
+                more: o => o.Undoable = false));
+        Button capture = ShellRows.CaptureButton(card, "KL_CAPTURE", () => KeyLimiter.IsCapturing, done => KeyLimiter.StartCapture(k => KeyLimiter.ToggleAllowedKey(k), done),
             KeyLimiter.CancelCapture, o => {
                 o.Tooltip = "DESC_KL_CAPTURE";
                 o.EnabledWhen = Unlocked;
             }, () => KeyLimiter.IsCapturing && setting == KeyCode.None);
-        Controls.Action(card, "", "KL_CLEAR", KeyLimiter.ClearAllowedKeys, o => {
+        ShellRows.Inline(capture, Controls.Action(card, "", "KL_CLEAR", KeyLimiter.ClearAllowedKeys, o => {
             o.Id = "KL_CLEAR";
             o.EnabledWhen = Unlocked;
-        });
+        }));
         Hint(card, "KL_SYNC_LOCKED", Locked);
 
-        Label head = Controls.Header(card, "KL_ALLOWED_KEYS");
+        Label head = ShellRows.Header(card, "KL_ALLOWED_KEYS");
         Controls.Hook(head, o => {
             o.Id = "KL_ALLOWED_KEYS";
             o.VisibleWhen = () => Keys().Length > 0;

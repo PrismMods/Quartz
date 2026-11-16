@@ -22,9 +22,9 @@ internal static partial class FacetSelfTestChecks {
     private static string kvHand, kvFoot;
 
     private static IEnumerator KvCanvasChecks(Action<string, bool, string> check, Action<string> info) =>
-        OnPage("keyviewer", KeyViewerPage, () => { }, () => { }, () => KvGuard(check, () => KvCanvasOnPage(check)));
+        OnPage("keyviewer", KeyViewerPage, () => { }, () => { }, () => KvGuard(check, () => KvCanvasOnPage(check, info)));
 
-    private static IEnumerator KvCanvasOnPage(Action<string, bool, string> check) {
+    private static IEnumerator KvCanvasOnPage(Action<string, bool, string> check, Action<string> info) {
         if(!KvEditorDoor.Usable || !KvEditorDoor.Live) {
             check($"{KvCanvasPage}: the layout editor is on the page", false, $"usable={KvEditorDoor.Usable} live={KvEditorDoor.Live}");
             yield break;
@@ -33,6 +33,8 @@ internal static partial class FacetSelfTestChecks {
         yield return KvBoxesSettle();
         yield return KvCanvasDraw(check);
         yield return KvCanvasDrag(check);
+        yield return KvCursors(check, info);
+        yield return KvWheelPan(check);
         yield return KvStepsLive(check);
         yield return KvCommands(check);
         yield return KvInsert(check);
@@ -233,6 +235,77 @@ internal static partial class FacetSelfTestChecks {
             now != null && now.X == x0 && now.Y == y0 && KvLayoutModel.OverlayRebuildRequests == r0 + 1,
             $"at=({now?.X},{now?.Y}) want=({x0},{y0}) requests={KvLayoutModel.OverlayRebuildRequests - r0}");
         yield return Frames(1);
+    }
+
+    // ---- cursors
+
+    // Hovering a selected key's top handle, then a key, shows the OS's resize-up-down and move cursors through
+    // QuartzHost.OsCursor, not Facet's drawn ones. Only macOS can read the current cursor back.
+    private static IEnumerator KvCursors(Action<string, bool, string> check, Action<string> info) {
+        if(Application.platform != RuntimePlatform.OSXPlayer) {
+            info($"{KvCanvasPage}: OS cursors are read back on macOS only; skipped on {Application.platform}");
+            yield break;
+        }
+        var c = KvEditorPage.Editor.Canvas;
+        KvElement e = KvEls()[0];
+        KvSelect(e);
+        yield return Frames(2);
+        var handles = c.GetType().GetProperty("HandleRects", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            ?.GetValue(c) as IReadOnlyList<Rect>;
+        bool top = false;
+        if(handles?.Count == 8) {
+            KvSend<PointerMoveEvent>(c.Stage.LocalToWorld(handles[1].center), -1);
+            yield return Frames(2);
+            top = NativeCursor.MacShowing("resizeUpDownCursor");
+        }
+        KvSelect();
+        yield return Frames(1);
+        KvSend<PointerMoveEvent>(KvPanel(e.Bounds.center), -1);
+        yield return Frames(2);
+        bool move = NativeCursor.MacShowing("openHandCursor");
+        Leave(c.Stage);
+        yield return Frames(1);
+        check($"{KvCanvasPage}: hovering a key's top handle and a key show the OS's cursors",
+            top && move, $"handles={handles?.Count} updown={top} openhand={move}");
+    }
+
+    /* One swipe (Input.mouseScrollDelta -1 on an axis) reaches the canvas as the panel's WheelEvent (+3 InputForUI
+       units) or as the polled Input.TickWheel; both must pan the same way, 20 stage px against the swipe, and Invert
+       scroll panning flips both. The polled path reads x from Unity's input itself, which a check cannot fake: that
+       axis is pinned by Facet's offline test (CanvasMath.PolledNotch), y is driven here on both paths. */
+    private static IEnumerator KvWheelPan(Action<string, bool, string> check) {
+        var c = KvEditorPage.Editor.Canvas;
+        var conf = Quartz.Features.KeyViewer.KeyViewerOverlay.Conf;
+        Vector2 start = c.Pan;
+        bool was = conf.InvertPreviewPan;
+        Vector2[] moved = new Vector2[6];   // per invert: event x, event y, polled y
+        for(int i = 0; i < 6; i++) {
+            conf.InvertPreviewPan = i >= 3;
+            Vector2 before = c.Pan;
+            if(i % 3 == 2) FacetBridge.TickWheel(ScreenCentre(c.Stage), -1f);
+            else KvWheel(i % 3 == 0 ? new Vector3(3f, 0f) : new Vector3(0f, 3f));
+            yield return Frames(3);   // the polled path skips a frame within one of the event's
+            moved[i] = c.Pan - before;
+        }
+        conf.InvertPreviewPan = was;
+        c.Pan = start;
+        static bool Near(Vector2 a, float x, float y) => Mathf.Abs(a.x - x) < 0.5f && Mathf.Abs(a.y - y) < 0.5f;
+        check($"{KvCanvasPage}: the wheel event and the polled wheel pan the same way for the same swipe",
+            Near(moved[0], -20f, 0f) && Near(moved[1], 0f, -20f) && Near(moved[2], 0f, -20f),
+            $"event x={moved[0]} event y={moved[1]} polled y={moved[2]}");
+        check($"{KvCanvasPage}: Invert scroll panning flips both axes on both paths",
+            Near(moved[3], 20f, 0f) && Near(moved[4], 0f, 20f) && Near(moved[5], 0f, 20f),
+            $"event x={moved[3]} event y={moved[4]} polled y={moved[5]}");
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void KvWheel(Vector3 delta) {
+        VisualElement stage = KvEditorPage.Editor.Canvas.Stage;
+        using WheelEvent ev = Pooled<WheelEvent>();
+        typeof(WheelEvent).GetProperty("delta").SetValue(ev, delta);
+        typeof(MouseEventBase<WheelEvent>).GetProperty("mousePosition").SetValue(ev, (Vector2)stage.worldBound.center);
+        ev.target = stage;
+        stage.SendEvent(ev);
     }
 
     // ---- steps live as they are recorded

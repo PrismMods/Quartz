@@ -117,9 +117,36 @@ internal static partial class FacetSelfTestChecks {
         bool cards = HasCaps("HEADING_NON_DLC_EVENTS") && HasCaps("HEADING_DLC_EVENTS") && HasCaps("HEADING_MISC");
         check("Enhanced has a card headed by each of the three groups", cards,
             $"nonDlc={HasCaps("HEADING_NON_DLC_EVENTS")} dlc={HasCaps("HEADING_DLC_EVENTS")} misc={HasCaps("HEADING_MISC")}");
+        yield return ToggleAllLast(check);
         C.Mode = was;
         t0 = Time.realtimeSinceStartup;
         while(HasCaps("HEADING_MISC") != (was == EffectRemoverSettings.ModeEnhanced) && Time.realtimeSinceStartup - t0 < 1f) yield return null;
+    }
+    // Each Toggle All row comes after its section's switches; a pointer click on one leaves no focus (so no ring) on it.
+    // The settings it flips are put back by EffectRemoverWindow's restore.
+    private static IEnumerator ToggleAllLast(Action<string, bool, string> check) {
+        string[] last = [];
+        foreach((string all, string row) in new[] { ("FXRM_PLANET_ALL", "FXRM_PLANET_RADIUS"), ("FXRM_TRACK_ALL", "FXRM_TRACK_COLORS"),
+                     ("FXRM_DECO_TYPES_ALL", "FXRM_DECO_FAILHITBOX") }) {
+            VisualElement a = Body.Q(name: all), r = Body.Q(name: row);
+            if(a == null || r == null || a.parent != r.parent || a.parent.IndexOf(a) != a.parent.childCount - 1) last = [.. last, all];
+        }
+        check("effect remover: every Toggle All sits under its section's switches", last.Length == 0, "not last: " + string.Join(",", last));
+        VisualElement section = Body.Q(name: "FXRM_PLANET_ALL")?.parent;
+        Button b = Body.Q(name: "FXRM_PLANET_ALL")?.Q<Button>();
+        if(section == null || b == null) { check("effect remover: a clicked Toggle All holds no focus", false, "no FXRM_PLANET_ALL button"); yield break; }
+        StyleEnum<DisplayStyle> shown = section.style.display;
+        section.style.display = DisplayStyle.Flex;   // the section starts shut; a hidden button cannot take focus
+        yield return Frames(2);
+        Vector2 at = b.worldBound.center;
+        Pointer<PointerDownEvent>(b, at);
+        b.Focus();   // as a real press would
+        Pointer<PointerUpEvent>(b, at);
+        yield return Frames(3);
+        VisualElement focused = b.focusController?.focusedElement as VisualElement;
+        check("effect remover: a clicked Toggle All holds no focus", focused != b,
+            $"focused={focused?.name ?? focused?.GetType().Name ?? "none"}");
+        section.style.display = shown;
     }
     // The uGUI page built as the menu builds it; every GenerateUI.Toggle has one ToggleCircle.
     private static T WithMenuPage<T>(Func<RectTransform, T> read) {

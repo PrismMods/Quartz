@@ -237,6 +237,11 @@ internal static class OverlayPreview {
 #endif
         }
 
+        /// <summary>The world point under uv on the stage last rendered into (0,0 its top left, 1,1 its bottom right), on the
+        /// borrowed canvas's plane; null once released.</summary>
+        internal Vector3? WorldAt(Vector2 uv) =>
+            Released || cam == null ? null : cam.ViewportToWorldPoint(new Vector3(uv.x, 1f - uv.y, 100f));
+
         /// <summary>Gives everything back: render mode, layers, transform, and the camera and texture go. Safe to call twice,
         /// and after the canvas is destroyed.</summary>
         internal void Release() {

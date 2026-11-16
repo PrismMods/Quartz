@@ -287,6 +287,23 @@ internal static partial class FacetSelfTestChecks {
     }
 
     private static IEnumerator TufFilterChecks(Action<string, bool, string> check, Action<string> info, TufService s) {
+        // The filter card in four rows: measured with Quantum off (put back after) and Special shut, as the page builds it.
+        bool quantumWas = s.QuantumEnabled;
+        if(quantumWas) ClickRow("TUF_QUANTUM");
+        yield return Frames(3);
+        VisualElement filters = PageContent().Q(name: "tuf-sort")?.parent;
+        bool specialShut = !Displayed(PageContent().Q(name: "TUF_SPECIAL_" + TufDifficultyFilter.SpecialNames[0].ToUpperInvariant() + "-input"));
+        float rowH = filters != null ? Theme.For(filters).Sizes.RowHeight : 0f;
+        float pad = filters != null ? filters.resolvedStyle.paddingTop + filters.resolvedStyle.paddingBottom : 0f;
+        float h = filters?.layout.height ?? float.NaN;
+        check($"{TufLevelsKey}: the levels filter card is at most 4.5 rows tall with Special shut and Quantum off",
+            filters != null && specialShut && !s.QuantumEnabled && h <= 4.5f * rowH + pad,
+            $"card={filters != null} h={h} limit={4.5f * rowH + pad} special shut={specialShut} quantum={s.QuantumEnabled}");
+        if(quantumWas) {
+            ClickRow("TUF_QUANTUM");
+            yield return Frames(3);
+        }
+
         // A drag on the range's track: down near the low end, three moves, up.
         var calls = new List<(int, int)>();
         TufRangeCalls = calls;

@@ -23,7 +23,8 @@ internal static class ImportPage {
     ];
 
     internal static void Build(VisualElement p) {
-        QuartzShell.Header(p, "IMPORT_HEADER", null);
+        Control<bool> head = QuartzShell.Header(p, "IMPORT_HEADER", null, () => QuartzHost.Translate("IMPORT_HINT"));
+        ShellPage.Described(p, "menu-header", "IMPORT_HINT");
         SettingsImportOption[] options = [];
         InstalledModInfo[] incompatible = [];
         string read = null;   // the held lists' ids; null until the first read
@@ -42,14 +43,18 @@ internal static class ImportPage {
             QuartzShell.Surface?.Refresh();
         }
 
-        VisualElement card = Controls.Card(p, null);
-        Label hint = Ui.Muted(card, "IMPORT_HINT");
-        hint.name = "IMPORT_HINT";
-        hint.style.whiteSpace = WhiteSpace.Normal;
-        Controls.Action(card, "", "IMPORT_RESCAN", Rescan, o => {
+        Button rescan = Controls.Action(p, "", "IMPORT_RESCAN", Rescan, o => {
             o.Id = "IMPORT_RESCAN";
             o.Tooltip = "DESC_IMPORT_RESCAN";
         });
+        if(head != null) {   // on the header's right, where a feature's switch sits: no row of its own
+            VisualElement row = rescan.parent.parent;
+            head.Root.Add(row);
+            row.style.flexShrink = 0f;
+            row.style.marginBottom = 0f;
+            row[0].style.display = DisplayStyle.None;   // the empty label, which would grow
+            ShellRows.Unrow(row);
+        }
 
         StatusLine status = Controls.Status(p);
         status.Root.name = "import-status";
@@ -58,7 +63,7 @@ internal static class ImportPage {
         VisualElement rows = Controls.Live(list, () => read, box => {
             if(read == null) return;
             if(options.Length == 0 && incompatible.Length == 0) {
-                Label none = Ui.Muted(box, "IMPORT_NONE");
+                Label none = ShellRows.Inset(Ui.Muted(box, "IMPORT_NONE"));
                 none.name = "IMPORT_NONE";
                 none.style.whiteSpace = WhiteSpace.Normal;
                 return;
@@ -75,7 +80,7 @@ internal static class ImportPage {
         rows.name = "import-list";
 
         // Only while shown: the search index builds this page detached.
-        Ui.WhileAttached(card, Rescan, () => { });
+        Ui.WhileAttached(list, Rescan, () => { });
     }
 
     private static void Option(VisualElement box, SettingsImportOption option, int n, ref int kv, StatusLine status) {

@@ -19,9 +19,14 @@ internal static class Combo {
         ShellPage.Feature(p, "combo", "SECTION_COMBO", "COMBO_DESC", ComboOverlay.FontKey, Cards);
     }
 
-    private static void Cards(VisualElement p) {
+    // One card, its groups on tabs as the Key Viewer editor's inspector has them: one group shows at a time.
+    private static void Cards(VisualElement p) => ShellRows.CardTabs(Controls.Card(p, null), new List<NavItem> {
+        new("SECTION_COMBO", General), new("HEADING_LABEL", Label), new("HEADING_COUNT", Count),
+        new("HEADING_ANIMATION", Animation), new("HEADING_COLOR", Colour), new("MENU_LAYOUT", Layout),
+    });
+
+    private static void General(VisualElement combo) {
         Action apply = ComboOverlay.Apply, save = ComboOverlay.Save;
-        VisualElement combo = Controls.Card(p, "SECTION_COMBO");
         ShellRows.Toggle(combo, "COMBO_AUTO", "combo_auto", Bind.To(() => C.CountAuto, v => C.CountAuto = v), null, save, o => {
             o.Default = Def.CountAuto;
             o.Tooltip = "DESC_COMBO_AUTO";
@@ -36,8 +41,10 @@ internal static class Combo {
         ShellRows.Slider(combo, "COMBO_MASTER_SIZE", Bind.To(() => C.MasterSize, v => C.MasterSize = v), 0.25f, 3f, 0.01f, "0.00 x", apply, save,
             o => o.Default = Def.MasterSize);
         ShellRows.Font(combo, ComboOverlay.FontKey);
+    }
 
-        VisualElement label = Controls.Card(p, "HEADING_LABEL");
+    private static void Label(VisualElement label) {
+        Action apply = ComboOverlay.Apply, save = ComboOverlay.Save;
         ShellRows.Toggle(label, "COMBO_CAPTION", "combo_caption", Bind.To(() => C.ShowCaption, v => C.ShowCaption = v), apply, save,
             o => o.Default = Def.ShowCaption);
         Func<bool> caption = () => C.ShowCaption;
@@ -55,8 +62,10 @@ internal static class Combo {
             Bind.To(() => C.CaptionShadowSoftness, v => C.CaptionShadowSoftness = v), () => C.GetCaptionShadowColor(), c => C.SetCaptionShadowColor(c),
             (Def.CaptionShadowEnabled, Def.CaptionShadowX, Def.CaptionShadowY, Def.CaptionShadowSoftness, Def.GetCaptionShadowColor()), 10f,
             ComboOverlay.ApplyCaptionShadow, save);
+    }
 
-        VisualElement count = Controls.Card(p, "HEADING_COUNT");
+    private static void Count(VisualElement count) {
+        Action apply = ComboOverlay.Apply, save = ComboOverlay.Save;
         ShellRows.Slider(count, "COMBO_COUNT_THICKNESS", Bind.To(() => C.CountThickness, v => C.CountThickness = v), -0.5f, 0.5f, 0.01f, "0.00", apply, save,
             o => o.Default = Def.CountThickness);
         ShellRows.Shadow(count, "COMBO_COUNT_SHADOW_ENABLED", "COMBO_COUNT_SHADOW_X", "COMBO_COUNT_SHADOW_Y", "COMBO_COUNT_SHADOW_SOFTNESS",
@@ -65,8 +74,10 @@ internal static class Combo {
             Bind.To(() => C.CountShadowSoftness, v => C.CountShadowSoftness = v), () => C.GetCountShadowColor(), c => C.SetCountShadowColor(c),
             (Def.CountShadowEnabled, Def.CountShadowX, Def.CountShadowY, Def.CountShadowSoftness, Def.GetCountShadowColor()), 10f,
             ComboOverlay.ApplyCountShadow, save);
+    }
 
-        VisualElement anim = Controls.Card(p, "HEADING_ANIMATION");
+    private static void Animation(VisualElement anim) {
+        Action save = ComboOverlay.Save;
         ShellRows.Toggle(anim, "COMBO_NOPOP", "combo_nopop", Bind.To(() => C.NoPopAnim, v => C.NoPopAnim = v), null, save, o => o.Default = Def.NoPopAnim);
         VisualElement pulse = Controls.Advanced(anim);
         Func<bool> pops = () => !C.NoPopAnim;
@@ -76,8 +87,10 @@ internal static class Combo {
             o => { o.Default = Def.CountPulseScale; o.VisibleWhen = pops; });
         ShellRows.Slider(pulse, "COMBO_PULSE_LABEL_OFFSET", Bind.To(() => C.LabelPulseOffsetY, v => C.LabelPulseOffsetY = v), 0f, 60f, 1f, "0 px", null, save,
             o => { o.Default = Def.LabelPulseOffsetY; o.VisibleWhen = pops; });
+    }
 
-        VisualElement colour = Controls.Card(p, "HEADING_COLOR");
+    private static void Colour(VisualElement colour) {
+        Action save = ComboOverlay.Save;
         ShellRows.Toggle(colour, "COMBO_SOLIDCOLOR", "combo_solidcolor", Bind.To(() => C.SolidColor, v => C.SolidColor = v), null, save, o => {
             o.Default = Def.SolidColor;
             o.Tooltip = "DESC_COMBO_SOLIDCOLOR";
@@ -105,8 +118,10 @@ internal static class Combo {
             o.Max = 5000;
             o.Default = Def.ColorMax;
         });
+    }
 
-        VisualElement layout = Controls.Card(p, "MENU_LAYOUT");
+    private static void Layout(VisualElement layout) {
+        Action save = ComboOverlay.Save;
         ShellRows.Anchor(layout, "COMBO_ANCHOR_LABEL", () => (int)OverlayAnchors.Parse(C.Anchor), () => C.AnchorClosest,
             a => ComboOverlay.SetAnchor((OverlayAnchor)a), v => {
                 C.AnchorClosest = v;

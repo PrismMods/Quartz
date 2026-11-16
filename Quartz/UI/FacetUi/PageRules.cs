@@ -10,6 +10,26 @@ internal static class PageRules {
     /// <summary>A stored 2 without XPerfect shows as 1, as the classic page shows it; the stored value is left alone.</summary>
     internal static int ShownMode(int stored, bool xperfect) => stored == 2 && !xperfect ? 1 : stored;
 
+    /// <summary>The judgement bar's bits, early to late. With X, Perfect (3) gives way to early ±, X and late ± (JudgementPopupHider's
+    /// PlusPerfectBit 13, XPerfectPerfectBit 12, MinusPerfectBit 14; repeated here: this file is BCL). Early is − when minusEarly
+    /// (the game's own X, whose PerfectMinus comes first), else + (the XPerfect mod's).</summary>
+    internal static int[] BarBits(bool x, bool minusEarly) {
+        if(!x) return [0, 1, 2, 3, 4, 5, 6];
+        int early = minusEarly ? 14 : 13, late = minusEarly ? 13 : 14;
+        return [0, 1, 2, early, 12, late, 4, 5, 6];
+    }
+
+    /// <summary>Whether a judgement restriction mode fails a judgement bit. 1 (Pure Perfect): all but Perfect (3); 2 (X-Perfect
+    /// only, the bar's bits): all but Perfect and X (12); 3 (custom): the bits outside allowedMask, none when it is 0; 4 (No Too
+    /// Early): Too Early (0) only; 0 (accuracy): none. Mode 1 leaves 12 blocked: as a hit it is HitKind.FailedFloor.</summary>
+    internal static bool Blocked(int mode, int allowedMask, int bit) => mode switch {
+        1 => bit != 3,
+        2 => bit != 3 && bit != 12,
+        3 => allowedMask != 0 && (allowedMask & 1 << bit) == 0,
+        4 => bit == 0,
+        _ => false,
+    };
+
     /// <summary>AutoDeafenSettings' mode strings (repeated here: this file is BCL): shortcut where a shortcut can be sent,
     /// the bot always, Discord where voice control works.</summary>
     internal static string[] DeafenModes(bool shortcut, bool voice) {

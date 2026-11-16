@@ -145,6 +145,8 @@ List<(string Name, Action Run)> tests = [
     ("New menu switch list defaults, parses, and drops unknown or repeated ids", ShellModelTests.TestSwitches),
     ("New menu opens centred at 80% and offers layout on on-screen features", ShellModelTests.TestInitialRectAndLayout),
     ("Judgement restriction offers X-Perfect only with XPerfect, and shows mode 2 as 1 without it", PageRulesTests.TestRestrictModes),
+    ("judgement bar orders timings early to late", PageRulesTests.TestBarBits),
+    ("judgement restriction blocks per mode, a custom mask of 0 blocks nothing", PageRulesTests.TestRestrictionBlocked),
     ("Auto deafen offers shortcut and Discord modes only where they work", PageRulesTests.TestDeafenModes),
     ("A hotkey chord splits at its first plus", PageRulesTests.TestSplitChord),
     ("Only credits and custom addon pages stay in the classic menu, each for a reason", PageRulesTests.TestStaysClassic),

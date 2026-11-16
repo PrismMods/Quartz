@@ -39,15 +39,9 @@ internal static partial class ShellSettings {
             o.Undoable = false;
             o.VisibleWhen = custom;
         });
-        Controls.Action(card, "", "FONT_RENAME", () => Rename(status), o => {
-            o.Id = "FONT_RENAME";
-            o.VisibleWhen = custom;
-        });
         // Danger is the classic two-click "Sure?" already.
-        Controls.Danger(card, "", "FONT_DELETE", () => Delete(status), o => {
-            o.Id = "FONT_DELETE";
-            o.VisibleWhen = custom;
-        });
+        ShellRows.Buttons(card, new ShellRows.Btn("FONT_RENAME", () => Rename(status), visible: custom),
+            new ShellRows.Btn("FONT_DELETE", () => Delete(status), visible: custom, danger: true));
         status = Controls.Status(card);
         if(fontMessage.Text.Length > 0) Say(status, fontMessage.Text, fontMessage.Tone);
 

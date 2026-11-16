@@ -61,6 +61,7 @@ internal static class QuartzHost {
     /// <summary>A surface on this host that is relabelled when Quartz's language changes and disposed on shutdown.</summary>
     internal static Surface NewSurface(string name, Layer layer) {
         var surface = new Surface(Host, name, layer);
+        PrismBridge.PointerBlurs(surface.Root);   // a pointer click leaves no focus ring (Facet paints it on FocusIn)
         surfaces.Add(surface);
         return surface;
     }
@@ -70,9 +71,12 @@ internal static class QuartzHost {
         switch(kind) {
             case Cursors.Kind.ResizeHorizontal: NativeCursor.Apply(ResizeCursorShape.Horizontal); break;
             case Cursors.Kind.ResizeCorner: NativeCursor.Apply(ResizeCursorShape.DiagNWSE); break;
+            case Cursors.Kind.ResizeVertical: NativeCursor.Apply(ResizeCursorShape.Vertical); break;
+            case Cursors.Kind.ResizeCornerNESW: NativeCursor.Apply(ResizeCursorShape.DiagNESW); break;
+            case Cursors.Kind.Move: NativeCursor.Move(); break;
             case Cursors.Kind.Text: NativeCursor.IBeam(); break;
             case Cursors.Kind.Default: NativeCursor.Reset(); break;
-            default: return false;   // a canvas's move and other resize shapes: Facet draws them
+            default: return false;   // a kind Facet adds later: it draws its own
         }
         return true;
     }

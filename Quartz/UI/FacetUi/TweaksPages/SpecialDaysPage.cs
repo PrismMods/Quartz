@@ -10,12 +10,12 @@ internal static class SpecialDaysPage {
 
     internal static void Build(VisualElement p) {
         SpecialDays.EnsureConf();
-        ShellPage.Feature(p, "specialdays", "SECTION_SPECIAL_DAYS", "SPECIALDAYS_DESC", null, Cards);
+        ShellPage.Feature(p, "specialdays", "SECTION_SPECIAL_DAYS", "SPECIALDAY_HINT", null, Cards);
+        ShellPage.Described(p, "SECTION_SPECIAL_DAYS", "SPECIALDAY_HINT");
     }
 
     private static void Cards(VisualElement p) {
         VisualElement card = Controls.Card(p, null);
-        Controls.Info(card, "SPECIALDAY_HINT", () => "", (InfoOptions o) => o.Id = "SPECIALDAY_HINT");
         Mode(card, "SPECIALDAY_HALLOWEEN_LABEL", () => C.Halloween, v => C.Halloween = v, Def.Halloween);
         Mode(card, "SPECIALDAY_APRILFOOLS_LABEL", () => C.AprilFools, v => C.AprilFools = v, Def.AprilFools);
     }

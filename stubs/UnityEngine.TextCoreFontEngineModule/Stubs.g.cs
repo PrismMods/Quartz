@@ -36,6 +36,7 @@ namespace UnityEngine.TextCore {
         private int m_UnitsPerEM;
         public float ascentLine { get => throw null; set { } }
         public float capLine { get => throw null; set { } }
+        public string familyName { get => throw null; set { } }
         public float lineHeight { get => throw null; set { } }
         public float pointSize { get => throw null; set { } }
         public float scale { get => throw null; set { } }

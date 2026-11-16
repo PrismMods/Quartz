@@ -117,7 +117,7 @@ internal static class ShellFeatures {
     }
 
     private static string Line() => string.Format(CultureInfo.InvariantCulture,
-        QuartzHost.Text("MENU_FEATURES_LINE", "{0} of {1} on · a feature that's off is fully unloaded"),
+        QuartzHost.Text("MENU_FEATURES_LINE", "{0} of {1} on"),
         FeatureService.Features.Count(h => h.Enabled), FeatureService.Features.Count);
 
     // The query follows the field, its initials form the settings' language and the haystacks the translator's, which can land

@@ -59,11 +59,8 @@ internal static class AutoDeafenPage {
         VisualElement bot = Controls.When(card, () => AutoDeafen.EffectiveMode == AutoDeafenSettings.ModeBot);
         ShellRows.Text(bot, "AD_CLIENT_ID", Bind.To(() => C.DiscordClientId, v => C.DiscordClientId = v), 0, null, save,
             o => o.Default = Def.DiscordClientId);
-        Button("AD_AUTHORIZE", AutoDeafen.OpenAuthorizeUrl);
-        Button("AD_COPY_URL", AutoDeafen.CopyAuthorizeUrl);
-        Button("AD_TUTORIAL", AutoDeafen.OpenTutorial);
-        Button("AD_UNLINK", AutoDeafen.Unlink);
-        void Button(string key, Action click) => Controls.Action(bot, "", key, click, o => o.Id = key);
+        ShellRows.Buttons(bot, new("AD_AUTHORIZE", AutoDeafen.OpenAuthorizeUrl), new("AD_COPY_URL", AutoDeafen.CopyAuthorizeUrl),
+            new("AD_TUTORIAL", AutoDeafen.OpenTutorial), new("AD_UNLINK", AutoDeafen.Unlink));
 
         Control<string> status = ShellRows.Info(card, "AD_STATUS", () => AutoDeafen.Status,
             s => MainCore.Tr.Get("STATUS_PREFIX", "Status: ") + s);

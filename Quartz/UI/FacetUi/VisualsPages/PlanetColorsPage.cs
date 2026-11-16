@@ -35,7 +35,7 @@ internal static class PlanetColorsPage {
         for(int i = 0; i < PlanetColorsSettings.Slots; i++) {
             int s = i;
             string n = (s + 1).ToString();
-            Controls.Header(planets, "HEADING_PLANET_" + n).name = "HEADING_PLANET_" + n;
+            ShellRows.Header(planets, "HEADING_PLANET_" + n).name = "HEADING_PLANET_" + n;
             ShellRows.Colour(planets, "PCOL_BALL" + n, () => new Color(C.BallR[s], C.BallG[s], C.BallB[s]), c => C.SetBallRgb(s, c), apply, save, false,
                 o => o.Default = new Color(Def.BallR[s], Def.BallG[s], Def.BallB[s]));
             Opacity(planets, "PCOL_BALLOP" + n, () => C.BallOpacity[s], v => C.BallOpacity[s] = v, Def.BallOpacity[s]);
@@ -75,7 +75,7 @@ internal static class PlanetColorsPage {
             int s = i;
             string n = (s + 1).ToString();
             // The classic index lists each planet's header twice: here is the second.
-            Controls.Header(overlay, "HEADING_PLANET_" + n).name = "HEADING_PLANET_" + n + "#2";
+            ShellRows.Header(overlay, "HEADING_PLANET_" + n).name = "HEADING_PLANET_" + n + "#2";
             ShellRows.FilePick(overlay, "PCOL_OVERLAY_PICK" + n, "PCOL_OVERLAY_CLEAR" + n, () => {
                 string path = C.GetOverlayPath(s);
                 return string.IsNullOrWhiteSpace(path) ? MainCore.Tr.Get("PCOL_OVERLAY_NONE", "No image set") : Path.GetFileName(path);

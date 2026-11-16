@@ -41,6 +41,13 @@ internal static partial class FacetSelfTestChecks {
             bool was = service.GridView;
             yield return Saved(check, page, "TUF_GRID_VIEW", () => ClickRow("TUF_GRID_VIEW"), () => service.GridView != was, file.Path);
 
+            // Each button still has its own row (Id, search entry), the later two inside the first's.
+            VisualElement first = PageContent().Q(name: "TUF_OPEN_FOLDER");
+            Button[] folder = [.. new[] { "TUF_OPEN_FOLDER", "TUF_PICK_FOLDER", "TUF_RESET_FOLDER" }.Select(id => PageContent().Q(name: id)?.Q<Button>())];
+            bool oneRow = first != null && folder.All(b => b != null && first.Contains(b) && Mathf.Abs(b.worldBound.y - folder[0].worldBound.y) < 0.5f);
+            check($"{page}: the library's three folder buttons sit on one row", oneRow,
+                string.Join(",", folder.Select(b => b == null ? "missing" : b.worldBound.y.ToString("0.0"))));
+
             // The library is measured as the page shows, so the count and size may land a frame or more later.
             string want = null, got = null;
             for(float t0 = Time.realtimeSinceStartup; Time.realtimeSinceStartup - t0 < 1f;) {

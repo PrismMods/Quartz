@@ -4,6 +4,7 @@ using System.Reflection;
 using Facet;
 using Quartz.Core;
 using Quartz.Features;
+using Quartz.Features.Restriction;
 using Quartz.UI.Nav;
 using Quartz.UI.Utility;
 using UnityEngine;
@@ -45,6 +46,8 @@ internal static partial class FacetSelfTestChecks {
             }
             yield return FilterField(check);
             yield return SwitchesStill(check);
+            yield return Insets(check);
+            yield return Spacing(check);
         } finally {
             ShellFeatures.Query = query;
             MainCore.Conf.UIScale = scale;
@@ -210,6 +213,44 @@ internal static partial class FacetSelfTestChecks {
             RestoreFeature(id, was, had, stored);
         }
         yield return Frames(3);
+    }
+
+    // Where a label's text starts, in world px: its content box, after its own padding.
+    private static float TextX(VisualElement l) => l.LocalToWorld(l.contentRect).xMin;
+
+    // A card header and a section's rows take the card rows' text inset (Facet starts both elsewhere; ShellRows lines them up).
+    private static IEnumerator Insets(Action<string, bool, string> check) {
+        const string restriction = "restriction";
+        bool was = FeatureService.IsEnabled(restriction), had = FeatureService.State.Features.TryGetValue(restriction, out bool stored);
+        try {
+            if(!was) FeatureService.SetEnabled(restriction, true);
+            Restriction.EnsureConf();
+            QuartzShell.Go("gameplay.judgement");
+            yield return Frames(2);
+            Label head = PageContent().Q<Label>("JR_SECTIONS"), row = PageContent().Q(name: "JR_SECTIONS_ON")?.Q<Label>();
+            float hx = head != null ? TextX(head) : float.NaN, rx = row != null ? TextX(row) : float.NaN;
+            check("polish: a card header starts where its rows' labels start", Mathf.Abs(hx - rx) <= 1f, $"header={hx:0.#} row={rx:0.#}");
+        } finally {
+            RestoreFeature(restriction, was, had, stored);
+        }
+
+        QuartzShell.Go(FxPage);   // Polish turned the feature on
+        yield return Frames(2);
+        VisualElement orbit = PageContent().Q(name: "FXRM_PLANET_ORBIT"), body = orbit;
+        object fold = null;
+        if(Folds(out string miss))
+            for(; body != null && (fold = findFold.Invoke(null, [body])) == null; body = body.parent) { }
+        Action<bool, bool> set = fold != null ? (Action<bool, bool>)foldSet.GetValue(fold) : null;
+        bool open = fold != null && ((Func<bool>)foldIsOpen.GetValue(fold))();
+        set?.Invoke(true, false);
+        yield return Frames(1);
+        // The section's header row is built just before its body; its labels are the arrow, then the title.
+        int at = body?.parent?.IndexOf(body) ?? -1;
+        Label title = at > 0 ? body!.parent[at - 1].Query<Label>().AtIndex(1) : null, label = orbit?.Q<Label>();
+        float tx = title != null ? TextX(title) : float.NaN, lx = label != null ? TextX(label) : float.NaN;
+        if(!open) set?.Invoke(false, false);
+        check("polish: a section's rows start under its title", Mathf.Abs(tx - lx) <= 1f,
+            $"title='{title?.text}' {tx:0.#} row={lx:0.#} fold={fold != null} {miss}");
     }
 }
 #endif

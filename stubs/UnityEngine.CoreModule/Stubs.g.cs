@@ -64,6 +64,7 @@ namespace UnityEngine {
         public global::UnityEngine.RenderTexture targetTexture { get => throw null; set { } }
         public bool useOcclusionCulling { get => throw null; set { } }
         public void Render() => throw null;
+        public global::UnityEngine.Vector3 ViewportToWorldPoint(global::UnityEngine.Vector3 position) => throw null;
         private Camera() { }
         public enum GateFitMode : int {
             Vertical = 1,
@@ -105,6 +106,7 @@ namespace UnityEngine {
         public float this[int index] { get => throw null; set { } }
         public static global::UnityEngine.Color black { get => throw null; }
         public static global::UnityEngine.Color clear { get => throw null; }
+        public static global::UnityEngine.Color gray { get => throw null; }
         public static global::UnityEngine.Color magenta { get => throw null; }
         public static global::UnityEngine.Color red { get => throw null; }
         public static global::UnityEngine.Color white { get => throw null; }
@@ -679,6 +681,7 @@ namespace UnityEngine {
         public float yMax { get => throw null; set { } }
         public float yMin { get => throw null; set { } }
         public Rect(float x, float y, float width, float height) => throw null;
+        public bool Contains(global::UnityEngine.Vector3 point) => throw null;
         public static global::UnityEngine.Vector2 NormalizedToPoint(global::UnityEngine.Rect rectangle, global::UnityEngine.Vector2 normalizedRectCoordinates) => throw null;
         public static global::UnityEngine.Vector2 PointToNormalized(global::UnityEngine.Rect rectangle, global::UnityEngine.Vector2 point) => throw null;
         bool global::System.IEquatable<global::UnityEngine.Rect>.Equals(global::UnityEngine.Rect other) => throw null;

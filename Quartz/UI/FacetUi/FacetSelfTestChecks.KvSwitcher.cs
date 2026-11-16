@@ -42,6 +42,7 @@ internal static partial class FacetSelfTestChecks {
         OverlayPreview.Lease lease = OverlayPreview.Take(KeyViewerOverlay.FontKey);
         try {
             yield return KvSwitcherFirstOpen(check, info);   // first: it times the switcher's first open
+            yield return KvSwitcherLayoutsToggle(check);
             KvScratchTabs();
             kvHand2 = KvStore.Current.NewTabId();
             KvStore.Current.EnsureTab(kvHand2, "Self Test Hands 2");
@@ -124,7 +125,7 @@ internal static partial class FacetSelfTestChecks {
     }
 
     private static IEnumerator KvSwOpen() {
-        if(KvEditorPage.Editor?.Menu.Left.Q<Button>("kle-layouts") is { } b) Submit(b);
+        if(!KvSwShows && KvEditorPage.Editor?.Menu.Left.Q<Button>("kle-layouts") is { } b) Submit(b);   // Layouts toggles
         yield return Frames(2);
     }
 
@@ -166,6 +167,41 @@ internal static partial class FacetSelfTestChecks {
         global::Facet.History.Clear();
         KvEditorPage.Editor.Refresh();
         yield return Frames(2);
+    }
+
+    // ---- the Layouts button: opens over the editor and above the menu, a second click closes it, a third opens it on top again
+    // even after the menu was raised over it
+
+    private static IEnumerator KvSwitcherLayoutsToggle(Action<string, bool, string> check) {
+        Button b = KvEditorPage.Editor?.Menu.Left.Q<Button>("kle-layouts");
+        var stack = (IList)typeof(global::Facet.Ui).GetField("Stack", BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(null);
+        bool Above() => stack != null && KvSwField(KvSw, "_surface") is { } sw && QuartzShell.Surface is { } menu
+            && stack.IndexOf(sw) > stack.IndexOf(menu);
+        if(b == null) {
+            check($"{KvSwitcherPage}: the Layouts button toggles the switcher above the menu", false, "no kle-layouts");
+            yield break;
+        }
+        Submit(b);
+        yield return Frames(2);
+        bool open1 = KvSwShows, above1 = Above();
+        Vector2 at = (KvSwField(KvSw, "_window") as global::Facet.Window)?.Root.worldBound.center ?? Vector2.zero,
+            over = KvEditorPage.Editor?.Root.worldBound.center ?? Vector2.zero;
+        QuartzShell.Surface?.BringToFront();   // a press anywhere in the menu raises it over the switcher
+        Submit(b);
+        yield return Frames(2);
+        bool shut = !KvSwShows;
+        Submit(b);
+        yield return Frames(2);
+        bool open2 = KvSwShows, above2 = Above();
+        QuartzShell.Surface?.BringToFront();
+        FacetBridge.OpenKvSwitcher();   // the hub's and the hotkey's open: shown already, raised all the same
+        yield return Frames(1);
+        bool above3 = Above();
+        FacetBridge.HideKvSwitcher();
+        yield return Frames(1);
+        check($"{KvSwitcherPage}: the Layouts button toggles the switcher above the menu, centred over the editor",
+            open1 && above1 && shut && open2 && above2 && above3 && Vector2.Distance(at, over) <= 2f,
+            $"open1={open1} above1={above1} shut={shut} open2={open2} above2={above2} above3={above3} at={at} over={over}");
     }
 
     // ---- cards, marks and previews

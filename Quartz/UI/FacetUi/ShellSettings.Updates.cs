@@ -27,46 +27,48 @@ internal static partial class ShellSettings {
             o.Id = "UPDATE_CHANNEL_LABEL";
             o.Tooltip = "DESC_UPDATE_CHANNEL";
         });
-        Controls.Action(card, "", "CHECK_FOR_UPDATES", UpdateService.Check, o => {
+        Button check = Controls.Action(card, "", "CHECK_FOR_UPDATES", UpdateService.Check, o => {
             o.Id = "CHECK_FOR_UPDATES";
             o.EnabledWhen = () => UpdateService.Status is not (UpdateStatus.Checking or UpdateStatus.Installing);
         });
-        ShellRows.Info(card, "UPDATE_STATUS", () => (UpdateService.Status, UpdateService.Failure, UpdateService.Message, UpdateService.SkippedTag, RestartError()),
-            _ => StatusText(), () => UpdateService.Status != UpdateStatus.Idle, () => UpdateService.Status switch {
+        Control<string> status = ShellRows.Info(card, "UPDATE_STATUS",
+            () => (UpdateService.Status, UpdateService.Failure, UpdateService.Message, UpdateService.SkippedTag, RestartError()),
+            _ => StatusText(), null, () => UpdateService.Status switch {
                 UpdateStatus.Failed => Role.Danger,
                 UpdateStatus.Available or UpdateStatus.Installed => Role.Accent,
                 _ => Role.TextMuted,
             });
+        // One row: the status where a row's label sits (empty while idle), Check for Updates at its right.
+        if(status?.Input is { parent: { } value } && check != null) {
+            status.Root[0].style.display = DisplayStyle.None;   // Info's empty label
+            value.style.flexGrow = 1f;
+            value.style.maxWidth = StyleKeyword.None;
+            status.Input.style.unityTextAlign = TextAnchor.MiddleLeft;
+            ShellRows.Join(status.Root, check);
+        }
         ShellRows.Info(card, "UPDATE_PROGRESS", () => Mathf.RoundToInt(Mathf.Clamp01(UpdateService.Progress) * 100f), n => $"{n}%",
             () => UpdateService.Status == UpdateStatus.Installing && UpdateService.Progress >= 0f);
         ShellRows.Info(card, "UPDATE_VERSION", () => UpdateService.Available, VersionText, () => UpdateReady);
-        UpdateButton(card, "UPDATE_NOTES", () => {
+        Button restart = null;
+        restart = ShellRows.Buttons(card, new ShellRows.Btn("UPDATE_NOTES", () => {
             string url = UpdateService.Available?.Url;
             if(!string.IsNullOrEmpty(url)) Application.OpenURL(url);
-        }, () => UpdateReady, "DESC_UPDATE_NOTES");
-        UpdateButton(card, "UPDATE_SKIP", () => UpdateService.Skip(UpdateService.Available), () => UpdateReady, "DESC_UPDATE_SKIP");
-        UpdateButton(card, "UPDATE_INSTALL", () => UpdateService.Install(UpdateService.Available), () => UpdateReady);
-        UpdateButton(card, "UPDATE_UNDO", UpdateService.UndoSkip, () => UpdateService.Status == UpdateStatus.Skipped);
-        Button restart = null;
-        restart = UpdateButton(card, "UPDATE_RESTART", () => Popup.Confirm(restart, "UPDATE_RESTART", "UPDATE_RESTART_CONFIRM", yes => {
-            if(!yes) return;
-            restartError = null;
-            if(GameRestarter.Restart()) return;
-            restartError = QuartzHost.Translate("UPDATE_RESTART_FAILED");
-            QuartzShell.Surface?.Refresh();
-        }), () => UpdateService.Status == UpdateStatus.Installed && GameRestarter.Available, "DESC_UPDATE_RESTART");
+        }, "DESC_UPDATE_NOTES", () => UpdateReady),
+            new ShellRows.Btn("UPDATE_SKIP", () => UpdateService.Skip(UpdateService.Available), "DESC_UPDATE_SKIP", () => UpdateReady),
+            new ShellRows.Btn("UPDATE_INSTALL", () => UpdateService.Install(UpdateService.Available), visible: () => UpdateReady),
+            new ShellRows.Btn("UPDATE_UNDO", UpdateService.UndoSkip, visible: () => UpdateService.Status == UpdateStatus.Skipped),
+            new ShellRows.Btn("UPDATE_RESTART", () => Popup.Confirm(restart, "UPDATE_RESTART", "UPDATE_RESTART_CONFIRM", yes => {
+                if(!yes) return;
+                restartError = null;
+                if(GameRestarter.Restart()) return;
+                restartError = QuartzHost.Translate("UPDATE_RESTART_FAILED");
+                QuartzShell.Surface?.Refresh();
+            }), "DESC_UPDATE_RESTART", () => UpdateService.Status == UpdateStatus.Installed && GameRestarter.Available))[4];
         // Only while shown: the search index builds this page detached, and must not subscribe. With no shell there is no card,
         // and nothing to refresh.
         Action changed = () => QuartzShell.Surface?.Refresh();
         if(card != null) Ui.WhileAttached(card, () => UpdateService.OnChanged += changed, () => UpdateService.OnChanged -= changed);
     }
-
-    private static Button UpdateButton(VisualElement card, string key, Action click, Func<bool> visible, string tooltip = null) =>
-        Controls.Action(card, "", key, click, o => {
-            o.Id = key;
-            o.Tooltip = tooltip;
-            o.VisibleWhen = visible;
-        });
 
     private static string RestartError() => UpdateService.Status == UpdateStatus.Installed ? restartError : restartError = null;
 

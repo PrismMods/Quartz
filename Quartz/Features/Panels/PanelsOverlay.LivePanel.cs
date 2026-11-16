@@ -32,6 +32,8 @@ public static partial class PanelsOverlay {
         public int ImageSignature;
         public float ImageRetryAt;
         public readonly Dictionary<StatEntry, string> ImageTags = [];
+        /// <summary>The stat on each line of the text as last drawn (null: the prefix's lines); StatAt reads it.</summary>
+        public readonly List<StatEntry> Lines = [];
     }
     private sealed class Updater : MonoBehaviour {
         private const float TextRefreshInterval = 0.05f;
@@ -59,8 +61,9 @@ public static partial class PanelsOverlay {
         private void UpdatePanel(LivePanel p, bool show, bool isReorganizing, bool arranging, bool refreshText) {
             if(p?.Text == null || p.Rect == null) return;
             if(p.DragObj != null && p.DragObj.activeSelf != isReorganizing) p.DragObj.SetActive(isReorganizing);
-            if(!show) {
+            if(!show || HiddenByPreview(p)) {
                 if(p.Rect.gameObject.activeSelf) p.Rect.gameObject.SetActive(false);
+                p.Dirty = true;   // drawn at once when it shows again: the preview frames it the frame it is picked
                 return;
             }
             if(!refreshText) {
@@ -68,6 +71,7 @@ public static partial class PanelsOverlay {
                 return;
             }
             sb.Clear();
+            p.Lines.Clear();
             if(show) {
                 PanelConfig c = p.Config;
                 SyncPanelImages(p);
@@ -78,6 +82,7 @@ public static partial class PanelsOverlay {
                 }
                 string separator = p.Separator;
                 if(!string.IsNullOrEmpty(c.Prefix)) sb.AppendLine(c.Prefix);
+                LinesTo(p, null, 0);
                 for(int i = 0; i < c.Stats.Count; i++) {
                     StatEntry entry = c.Stats[i];
                     if(!entry.Enabled) continue;
@@ -95,6 +100,9 @@ public static partial class PanelsOverlay {
                         catch(Exception e) { Diag.Ignore(e); continue; }
                         if(value == null) continue;
                     }
+                    int start = sb.Length;
+                    bool mark = previewing && entry == PreviewStat && c == Focus;
+                    if(mark) sb.Append("<mark=#FFFFFF38>");
                     if(entry.ShowLabel) {
                         string label = c.LocalizeStatLabels
                             ? LocalizedStatLabel(stat)
@@ -109,10 +117,13 @@ public static partial class PanelsOverlay {
                         );
                         sb.Append("<color=#");
                         AppendHex(sb, tint);
-                        sb.Append('>').Append(value).AppendLine("</color>");
+                        sb.Append('>').Append(value).Append("</color>");
                     } else {
-                        sb.AppendLine(value);
+                        sb.Append(value);
                     }
+                    if(mark) sb.Append("</mark>");
+                    sb.AppendLine();
+                    LinesTo(p, entry, start);
                 }
             }
             int bodyLength = TrimmedBodyLength(sb);
@@ -147,6 +158,11 @@ public static partial class PanelsOverlay {
                 p.Dirty = false;
             }
             if(arranging) SyncPosition(p);
+        }
+        // Each line ended in sb since from is entry's (all of sb when from is 0 and entry null: the prefix).
+        private void LinesTo(LivePanel p, StatEntry entry, int from) {
+            for(int i = from; i < sb.Length; i++)
+                if(sb[i] == '\n') p.Lines.Add(entry);
         }
         private static StatDef FindStat(string id) => PanelsOverlay.FindStat(id);
         private static Func<string, string> MakeResolver(PanelConfig config) =>

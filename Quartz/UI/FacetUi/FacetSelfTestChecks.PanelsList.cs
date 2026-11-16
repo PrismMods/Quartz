@@ -52,13 +52,17 @@ internal static partial class FacetSelfTestChecks {
 
     private static IEnumerator PanelsListChecks(Action<string, bool, string> check, Action<string> info, string page, string file, PanelConfig[] made) {
         List<PanelConfig> list = PanelsOverlay.Conf.Panels;
-        Covers(check, page);
+        var names = new HashSet<string>();
+        yield return PanelNames(names);
+        Covers(check, page, new Dictionary<string, string> { ["SETTING_SHORT"] = "PANEL_INSPECTOR" }, names: names);
         Searched(check, page, ["PANELS_CREATE"]);
         PanelRowsSearched(check, page);
         Translated(check, page, ["HEADING_APPEARANCE", "PANEL_SHOWSTAT", "PANEL_SHOWLABEL"]);
         List<string> shown = [.. PageContent().Query<Label>(name: "PANELS_LIST-text").ToList().Select(l => l.text)];
         check($"{page}: the list shows every panel in order", shown.SequenceEqual(list.Select(p => p.Name)),
             $"shown={string.Join("|", shown)} panels={string.Join("|", list.Select(p => p.Name))}");
+        List<string> tabbed = [.. AllPageTabs().SelectMany(t => t.Element.Query<Button>().ToList()).Select(b => b.text).Where(t => list.Any(p => p.Name == t))];
+        check($"{page}: panels are picked in the list alone, never also in tabs", tabbed.Count == 0, "tabs named for panels: " + string.Join("|", tabbed));
         check($"{page}: no page is partly moved",
             typeof(QuartzShell).GetField("PartlyMoved", BindingFlags.Static | BindingFlags.NonPublic) == null
             && !QuartzShell.ClassicRows().Any(e => e.Where == QuartzShell.Label(NavRegistry.ByKey(page).LocaleKey, NavRegistry.ByKey(page).Title)),
@@ -120,9 +124,16 @@ internal static partial class FacetSelfTestChecks {
         check($"{page} PANEL_ADDSTAT#n: picking a stat adds it and saves, twice", picked && !SameBytes(Bytes(file), before),
             $"stats={string.Join(",", created.Stats.Select(s => s.Id))} first={first} saved={!SameBytes(Bytes(file), before)}");
         if(!picked) yield break;
+        int g0 = list.Take(n - 1).Sum(p => p.Stats.Count);   // the stats before the made panel's
+        yield return StatLines(check, page, n, g0);
+        yield return PreviewPick(check, info, page, created, n);
 
         // The image stat's pick and folder only ask Do.
-        int g = list.Take(n - 1).Sum(p => p.Stats.Count) + 2;   // the image stat's number on the page
+        int g = g0 + 2;   // the image stat's number on the page
+        OverlayPages.PanelsStats.Select(created, created.Stats[1]);
+        QuartzShell.Surface?.Refresh();
+        yield return Frames(2);
+        yield return ShowInspectorTab("SETTING_SHORT");
         yield return Recorded(check, $"{page}: an image stat's Choose Image asks only Do", () => Submit(PageContent().Q<Button>($"PANEL_IMAGE_CHOOSE#{g}-input")),
             "panels.imagepick:" + n);
         yield return Recorded(check, $"{page}: an image stat's Open Images Folder asks only Do", () => Submit(PageContent().Q<Button>($"PANEL_IMAGE_FOLDER#{g}-input")),
@@ -138,33 +149,32 @@ internal static partial class FacetSelfTestChecks {
             created.Stats.Count == 2 && created.Stats[0] == s2 && created.Stats[1] == s1 && list.SequenceEqual(order) && !SameBytes(Bytes(file), before),
             $"stats={string.Join(",", created.Stats.Select(s => s.Id))} panels same={list.SequenceEqual(order)} saved={!SameBytes(Bytes(file), before)}");
 
-        if(!Here("stat X")) yield break;
+        if(!Here("stat delete")) yield break;
         yield return Frames(2);   // the moved stats' rows are built again, renumbered
-        g = list.Take(n - 1).Sum(p => p.Stats.Count) + 1;
-        Button x = PageContent().Q<Button>($"DELETE_SHORT#{g}-input");
-        bool hit = x != null;
-        if(hit) Submit(x);
-        yield return Frames(2);
-        check($"{page}: a stat's X removes it", hit && created.Stats.Count == 1 && created.Stats[0] == s1,
-            $"button={hit} stats={string.Join(",", created.Stats.Select(s => s.Id))}");
+        g = g0 + 1;
+        yield return ShowInspectorTab("PANEL_TAB_STAT");   // the moved image stat is still the one inspected, now first
+        Button x = PageContent().Q<Button>($"DELETE_BUTTON#{g}-input");
+        bool hit = x != null && x.text == QuartzHost.Host.Translate("DELETE_BUTTON");
+        if(x != null) Submit(x);
+        yield return Frames(3);
+        bool back = !OverlayPages.PanelsStats.Inspecting() && Displayed(Q("PANEL_ADDSTAT"));
+        check($"{page}: a stat's Delete removes it and brings the panel's settings back", hit && created.Stats.Count == 1 && created.Stats[0] == s1 && back,
+            $"button={x != null} text={x?.text} stats={string.Join(",", created.Stats.Select(s => s.Id))} settings back={back}");
 
-        // The made panel's section opened, so its stored fold state can be followed through the moves and the delete.
+        // The made panel's Shadow section shut (sections start open), so its stored fold state can be followed through the
+        // moves and the delete; the player's first panel's, at place 1 before the move, must follow that panel instead.
         if(!Here("panel move")) yield break;
-        if(PageContent().Q(name: "PANEL#" + n) is { } head && Fold(n) != "1") Click(head);
+        string Fold(PanelConfig p, int at) => MainCore.Conf.FacetWindows.FirstOrDefault(kv => kv.Key.StartsWith("fold.", StringComparison.Ordinal)
+            && kv.Key.Contains("/" + p.Name + "/", StringComparison.Ordinal) && kv.Key.EndsWith("/HEADING_SHADOW#" + at, StringComparison.Ordinal)).Value;
+        if(Fold(created, n) != "0" && PageContent().Q(name: "HEADING_SHADOW#" + n) is { } head) Click(head);
         yield return Frames(2);
-        string Fold(int at) => MainCore.Conf.FacetWindows.FirstOrDefault(kv => kv.Key.StartsWith("fold.", StringComparison.Ordinal)
-            && kv.Key.EndsWith("/PANEL#" + at, StringComparison.Ordinal)).Value;
-        // The player's first panel shut for the move, so the made panel's open state at place 1 can only have followed it.
-        string firstKey = n > 1 ? FoldKey(1) : null, firstWas = firstKey == null ? null : Fold(1);
-        if(firstWas == "1") QuartzHost.Write(firstKey, "0");
-        string FoldKey(int at) => MainCore.Conf.FacetWindows.Keys.FirstOrDefault(k => k.StartsWith("fold.", StringComparison.Ordinal)
-            && k.EndsWith("/PANEL#" + at, StringComparison.Ordinal));
-        string opened = Fold(n), firstFold = Fold(1) ?? "0";
+        PanelConfig firstPanel = n > 1 ? list[0] : null;
+        string opened = Fold(created, n), firstFold = firstPanel == null ? "1" : Fold(firstPanel, 1) ?? "1";
 
         // The made panel to the top and back: the list, the overlay's drawing order and the file follow.
         before = Bytes(file);
         OverlayPages.PanelsList.Move(n - 1, 0);
-        string foldTop = Fold(1), foldNext = n > 1 ? Fold(2) ?? "0" : firstFold;
+        string foldTop = Fold(created, 1), foldNext = firstPanel == null ? firstFold : Fold(firstPanel, 2) ?? "1";
         bool built = PanelsOverlay.Built;
         bool top = list[0] == created && list.Skip(1).SequenceEqual(players), overlay = !built || OverlayFirst() == created;
         if(!built) info($"{page}: the panels overlay is not built, so the drawing order after a move is not checked");
@@ -176,17 +186,16 @@ internal static partial class FacetSelfTestChecks {
             top && overlay && saved && list.Take(n - 1).SequenceEqual(players),
             $"top={top} overlay={overlay} built={built} saved={saved} back={list.Take(n - 1).SequenceEqual(players)}");
         check($"{page}: a panel's fold state follows the panel through a move and back",
-            opened == "1" && foldTop == "1" && foldNext == firstFold && Fold(n) == "1" && (Fold(1) ?? "0") == firstFold,
-            $"opened={opened} top={foldTop} next={foldNext} (was {firstFold}) back={Fold(n)} first={Fold(1)}");
-        if(firstWas == "1") QuartzHost.Write(firstKey, "1");
+            opened == "0" && foldTop == "0" && foldNext == firstFold && Fold(created, n) == "0" && (firstPanel == null || (Fold(firstPanel, 1) ?? "1") == firstFold),
+            $"shut={opened} top={foldTop} next={foldNext} (was {firstFold}) back={Fold(created, n)} first={(firstPanel == null ? "-" : Fold(firstPanel, 1))}");
 
-        // A name typed and committed: the section's title follows. That edit's step is the one undone after the removal: bound
+        // A name typed and committed: the panel's line in the list follows. That edit's step is the one undone after the removal: bound
         // to the panel, it goes stale with it, so neither the removed panel's name nor any other panel changes.
         if(!Here("name")) yield break;
         string name = "Self-test " + Guid.NewGuid().ToString("N")[..8];
         global::Facet.History.Clear();
         yield return Saved(check, page, "PANEL_NAME#n", () => TypeInto("PANEL_NAME#" + n + "-input", name),
-            () => created.Name == name && PageContent().Q(name: "PANEL#" + n) is { } head && head.Children().OfType<Label>().Any(l => l.text == name), file);
+            () => created.Name == name && PageContent().Query<Label>(name: "PANELS_LIST-text").ToList().Any(l => l.text == name), file);
 
         if(!Here("delete")) yield break;
         if(Q("PANEL_DELETE") is Button delete) Submit(delete);
@@ -195,8 +204,8 @@ internal static partial class FacetSelfTestChecks {
         check($"{page} PANEL_DELETE#n: deletes the panel the test created, no confirm, as classic", gone,
             $"panels={list.Count}/{players.Count} created left={list.Contains(created)}");
         if(!gone) yield break;
-        check($"{page}: a deleted panel's fold state stays behind with it, not on the next panel at its place", (Fold(n) ?? "0") == "0",
-            $"fold={Fold(n)}");
+        check($"{page}: a deleted panel's fold state stays behind with it, not on the next panel at its place", (Fold(created, n) ?? "1") == "1",
+            $"fold={Fold(created, n)}");
 
         PanelsOverlay.ConfMgr.Save();
         string[] others = [.. list.Select(p => p.Serialize().ToString())];
@@ -208,6 +217,124 @@ internal static partial class FacetSelfTestChecks {
         bool same = list.Select(p => p.Serialize().ToString()).SequenceEqual(others) && !list.Contains(created);
         check($"{page}: undo after the removal never writes into another panel", same && SameBytes(Bytes(file), before) && created.Name == name,
             $"panels same={same} file same={SameBytes(Bytes(file), before)} name={created.Name == name}");
+    }
+
+    // Every element name the page shows: each panel picked in turn, and each of its stats inspected with both inspector tabs.
+    // The panel picked and the stat inspected are put back.
+    private static IEnumerator PanelNames(HashSet<string> names) {
+        void Add() {
+            foreach(VisualElement v in PageContent().Query<VisualElement>().ToList())
+                if(!string.IsNullOrEmpty(v.name)) names.Add(v.name);
+        }
+        Add();
+        PanelConfig was = OverlayPages.PanelsList.Shown;
+        StatEntry inspected = PanelsOverlay.PreviewStat;
+        foreach(PanelConfig p in PanelsOverlay.Conf.Panels.ToList()) {
+            OverlayPages.PanelsStats.Deselect();
+            OverlayPages.PanelsList.Show(p);
+            QuartzShell.Surface?.Refresh();
+            yield return Frames(2);
+            Add();
+            foreach(StatEntry st in p.Stats.ToList()) {
+                OverlayPages.PanelsStats.Select(p, st);
+                QuartzShell.Surface?.Refresh();
+                yield return Frames(2);
+                global::Facet.Tabs t = InspectorTabs();
+                for(int k = 0; t != null && k < 2; k++) {
+                    t.Select(k);
+                    Add();
+                }
+            }
+        }
+        OverlayPages.PanelsStats.Deselect();
+        if(was != null) OverlayPages.PanelsList.Show(was);
+        PanelsOverlay.PreviewStat = inspected;
+        QuartzShell.Surface?.Refresh();
+        yield return Frames(2);
+    }
+
+    // The selected stat's inspector tabs (Stat, Setting) on the open page.
+    private static global::Facet.Tabs InspectorTabs() => AllPageTabs().LastOrDefault(t => t.SelectedName is "PANEL_TAB_STAT" or "SETTING_SHORT");
+
+    private static IEnumerator ShowInspectorTab(string title) {
+        global::Facet.Tabs t = InspectorTabs();
+        for(int i = 0; t != null && t.SelectedName != title && i < 2; i++) t.Select(i);
+        yield return Frames(1);
+    }
+
+    // Panel n holds two stats, numbered g0 + 1 and g0 + 2 on the page. Each takes one line in the list, and a click on one
+    // shows its rows in the settings' place (Back between), not the other's; the list hides while one is inspected.
+    private static IEnumerator StatLines(Action<string, bool, string> check, string page, int n, int g0) {
+        OverlayPages.PanelsStats.Deselect();
+        yield return Frames(2);
+        List<VisualElement> items = PageContent().Query(name: "PANEL_STATS#" + n + "-item").ToList();
+        float row = items.Count > 0 ? Theme.For(items[0]).Sizes.RowHeight : 0f, tallest = items.Count == 0 ? 0f : items.Max(e => e.layout.height);
+        check($"{page}: a stat takes one line in the list", items.Count == 2 && tallest > 0f && tallest <= 1.5f * row,
+            $"items={items.Count} tallest={tallest:0.#} row={row:0.#}");
+        bool Shows(int g) => PageContent().Q(name: "PANEL_SHOWSTAT#" + g + "-input") is { } e && Displayed(e);
+        bool first = false, second = false, swapped = true;
+        for(int i = 0; i < 2 && items.Count == 2; i++) {
+            Vector2 at = items[i].worldBound.center;
+            Pointer<PointerDownEvent>(items[i], at);
+            Pointer<PointerUpEvent>(items[i], at);
+            yield return Frames(3);
+            yield return ShowInspectorTab("PANEL_TAB_STAT");
+            bool mine = Shows(g0 + 1 + i) && !Shows(g0 + 2 - i);
+            swapped &= Displayed(PageContent().Q(name: "panel-inspector-column")) && !Displayed(items[i]);
+            if(i == 0) {
+                first = mine;
+                if(PageContent().Q<Button>("PANEL_BACK") is { } back) Submit(back);
+                yield return Frames(3);
+                items = PageContent().Query(name: "PANEL_STATS#" + n + "-item").ToList();   // the list may have been built again
+            }
+            else second = mine;
+        }
+        check($"{page}: the inspector shows the selected stat", first && second, $"first={first} second={second}");
+        check($"{page}: an inspected stat's card takes the settings' place", swapped, $"items={items.Count}");
+    }
+
+    // The made panel picked: the preview frames it alone. A press on its first line in the preview inspects that stat in the
+    // settings' place and marks the line; Back lets it go and unmarks it. Skipped (info) while the preview shows no lease.
+    private static IEnumerator PreviewPick(Action<string, bool, string> check, Action<string> info, string page, PanelConfig created, int n) {
+        OverlayPages.PanelsStats.Deselect();
+        OverlayPages.PanelsList.Show(created);
+        QuartzShell.Surface?.Refresh();
+        yield return Frames(3);
+        TMP_Text text = LiveText(created);
+        if(!PanelsOverlay.Built || !Quartz.Overlay.OverlayPreview.Is(PanelsOverlay.FontKey) || Quartz.Overlay.OverlayPreview.Current is not { } lease || text == null) {
+            info($"{page}: the panels preview holds no lease, so picking on it is not checked");
+            yield break;
+        }
+        List<RectTransform> frame = Quartz.Overlay.OverlayPreview.FrameOf(PanelsOverlay.FontKey)?.ToList() ?? [];
+        bool others = PanelsOverlay.Conf.Panels.Where(p => p != created).All(p => LiveText(p) is not { } t || !t.transform.parent.gameObject.activeSelf);
+        check($"{page}: the picked panel is the one the preview shows, alone", frame.Count == 1 && frame[0] == text.transform.parent && others,
+            $"frame={frame.Count} framed={(frame.Count > 0 ? frame[0].name : "-")} others hidden={others}");
+        StatEntry first = created.Stats[0];
+        Camera cam = typeof(Quartz.Overlay.OverlayPreview.Lease).GetField("cam", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(lease) as Camera;
+        VisualElement note = PageContent().Q(name: PanelsOverlay.FontKey + "-preview-empty");
+        VisualElement stage = note?.parent is { } pane && pane.IndexOf(note) > 0 ? pane[pane.IndexOf(note) - 1] : null;
+        bool picked = false, marked = false;
+        if(cam != null && stage != null && text.textInfo.lineCount > 0) {
+            TMP_LineInfo line = text.textInfo.lineInfo[0];
+            Vector3 world = text.rectTransform.TransformPoint(new Vector3(text.rectTransform.rect.center.x, (line.ascender + line.descender) / 2f, 0f));
+            Vector3 vp = cam.WorldToViewportPoint(world);
+            Rect wb = stage.worldBound;
+            Vector2 at = new(wb.xMin + vp.x * wb.width, wb.yMin + (1f - vp.y) * wb.height);
+            Pointer<PointerDownEvent>(stage, at);
+            Pointer<PointerUpEvent>(stage, at);
+            for(float t0 = Time.realtimeSinceStartup; Time.realtimeSinceStartup - t0 < 0.5f && !text.text.Contains("<mark=");) yield return null;
+            yield return Frames(2);
+            picked = OverlayPages.PanelsStats.Selected(created) == first && Displayed(PageContent().Q(name: "panel-inspector-column"));
+            marked = text.text.Contains("<mark=");
+        }
+        check($"{page}: a press on a stat's line in the preview inspects it in the settings' place and marks the line", picked && marked,
+            $"cam={cam != null} stage={stage != null} lines={text.textInfo.lineCount} picked={picked} marked={marked} inspected={OverlayPages.PanelsStats.Selected(created)?.Id ?? "none"}");
+        if(PageContent().Q<Button>("PANEL_BACK") is { } back) Submit(back);
+        for(float t0 = Time.realtimeSinceStartup; Time.realtimeSinceStartup - t0 < 0.5f && text.text.Contains("<mark=");) yield return null;
+        yield return Frames(2);
+        bool settings = !OverlayPages.PanelsStats.Inspecting() && PageContent().Q(name: "PANEL_ADDSTAT#" + n + "-input") is { } add && Displayed(add);
+        check($"{page}: Back brings the panel's settings back and unmarks the line", settings && !text.text.Contains("<mark="),
+            $"settings={settings} marked={text.text.Contains("<mark=")}");
     }
 
     // The detached build lists no panel: each panel row's English text still finds this page, and no hit names a panel.

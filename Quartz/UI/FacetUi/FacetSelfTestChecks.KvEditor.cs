@@ -8,6 +8,9 @@ using Quartz.Features.KeyViewer.Layout;
 using Quartz.IO;
 using Quartz.UI.FacetUi.KeyViewerEditor;
 using Quartz.UI.Nav;
+using Quartz.Resource;
+using Quartz.Overlay;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
 using KeyLayoutText = PrismLib.UI.Toolkit.KeyLayoutText;
@@ -62,6 +65,7 @@ internal static partial class FacetSelfTestChecks {
             yield break;
         }
         yield return KvColumns(check);
+        yield return KvInspectorColumn(check);
         check($"{KeyViewerPage}: the page has no classic-editor row", Body.Q(name: "MENU_KV_EDITOR") == null && Body.Q(name: "MENU_KV_EDITOR-input") == null,
             $"row={Body.Q(name: "MENU_KV_EDITOR") != null}");
         check($"{KeyViewerPage}: the editor's menu bar has File, Edit, Insert, Arrange and View, Layouts at its left, and undo, redo, Snap "
@@ -73,8 +77,33 @@ internal static partial class FacetSelfTestChecks {
         check($"{KeyViewerPage}: after a replace that drops the edited tab, the editor edits the selected tab and the tab is not written back",
             KvPhantomTab(out d), d);
         yield return Frames(2);
+        yield return KvPreviewFont(check);
         yield return KvTickCost(check, info);
         yield return KvFallback(check);
+    }
+
+    // The preview's labels draw in the key viewer's own font, and follow a new pick without a page rebuild. Put back after.
+    private static IEnumerator KvPreviewFont(Action<string, bool, string> check) {
+        const string name = "kv editor: the preview draws in the key viewer's font, live";
+        string key = KeyViewerOverlay.FontKey, was = FontManager.OverlayFontName(key) ?? FontManager.FollowGlobal;
+        TMP_FontAsset now = FontManager.For(key);
+        string font = OverlayFontPicker.Values().FirstOrDefault(f => f != FontManager.FollowGlobal && f != was
+            && FontManager.GetFont(f) is { } a && a != now && a.sourceFontFile != null);
+        if(font == null) {
+            check(name, false, "no other font with a source file to pick");
+            yield break;
+        }
+        UnityEngine.TextCore.Text.FontAsset want = ShellSettings.Face(FontManager.GetFont(font)), got = null;
+        try {
+            FontManager.SetOverlayFont(key, font);
+            yield return Frames(2);
+            got = KvEditorPage.Editor?.Root?.Q<Label>("kv-label")?.style.unityFontDefinition.value.fontAsset;
+            check(name, want != null && ReferenceEquals(got, want),
+                $"font={font} want={want?.name} got={got?.name} label={KvEditorPage.Editor?.Root?.Q<Label>("kv-label") != null}");
+        } finally {
+            FontManager.SetOverlayFont(key, was);
+        }
+        yield return Frames(2);
     }
 
     // The editor's per-frame tick allocates nothing while the page shows, and does not run at all once the menu is hidden on it.
@@ -135,11 +164,14 @@ internal static partial class FacetSelfTestChecks {
         check($"{KeyViewerPage}: the editor's menu bar is in the right column, and the left column takes 36% (±2) of the two",
             bar != null && right.Contains(bar) && Mathf.Abs(share - 0.36f) <= 0.02f, $"bar={bar != null} left={lw:0} right={rw:0} share={share:0.000}");
 
+        KvEditorPage.Editor.Canvas.Clear();
+        yield return Frames(3);
         KvCanvasBounds(out Rect pane, out float stage);
-        Rect insp = Body.Q(name: "kle-inspector")?.worldBound ?? default, col = right.worldBound;
-        check($"{KeyViewerPage}: the inspector sits in the right column under the canvas, whose stage is at least 200 tall",
-            insp.width > 0f && insp.xMin >= col.xMin - 1f && insp.xMax <= col.xMax + 1f && insp.yMin >= pane.yMax - 1f && stage >= 199f,
-            $"inspector={insp} column={col} pane={pane} stage={stage:0}");
+        VisualElement insp = Body.Q(name: "kle-inspector");
+        Rect col = right.worldBound;
+        check($"{KeyViewerPage}: the inspector is in the left column, not under the canvas, whose stage is at least 200 tall",
+            insp != null && left.Contains(insp) && !right.Contains(insp) && stage >= 199f && pane.yMax <= col.yMax + 1f,
+            $"inspector={insp != null} inLeft={insp != null && left.Contains(insp)} column={col} pane={pane} stage={stage:0}");
 
         ScrollView sv = ContentScroll;
         Vector2 was = sv.scrollOffset;
@@ -171,6 +203,63 @@ internal static partial class FacetSelfTestChecks {
             QuartzShell.Window.Rect = rect;
         }
         yield return Frames(3);
+    }
+
+    // Selected elements put the inspector in the left column in place of the settings, the canvas keeps its height, and Back
+    // brings the settings back where they were scrolled to.
+    private static IEnumerator KvInspectorColumn(Action<string, bool, string> check) {
+        VisualElement root = Body.Q(name: "kle-root"), right = root?.parent, left = right?.parent?[0];
+        VisualElement swap = Body.Q(name: "kv-inspector-column"), settings = Body.Q(name: "KEYVIEWER_SHOWOUTSIDE");
+        Button back = Body.Q<Button>("KEYVIEWER_BACK");
+        List<KvElement> items = [.. KvEditorPage.Model.Elements() ?? []];
+        if(right == null || left == null || swap == null || settings == null || back == null || items.Count == 0) {
+            check($"{KeyViewerPage}: selecting elements swaps the settings for the inspector", false,
+                $"root={root != null} swap={swap != null} settings={settings != null} back={back != null} items={items.Count}");
+            yield break;
+        }
+        ScrollView sv = ContentScroll;
+        Vector2 was = sv.scrollOffset;
+        bool swapped = false, kept = false, restored = false, backShown = false, paired = false;
+        float stage0 = 0f, stage1 = 0f, y = 0f, y1 = 0f;
+        string detail = "", pairs = "";
+        try {
+            KvEditorPage.Editor.Canvas.Clear();
+            yield return Frames(3);
+            KvCanvasBounds(out _, out stage0);
+            sv.scrollOffset = new Vector2(0f, 300f);
+            yield return Frames(3);
+            y = sv.scrollOffset.y;
+            KvSelect(items[0]);
+            yield return Frames(3);
+            KvCanvasBounds(out _, out stage1);
+            swapped = Displayed(swap) && !Displayed(settings) && left.Contains(Body.Q(name: "kle-inspector"));
+            backShown = Displayed(back) && back.worldBound.yMin <= Body.Q(name: "kle-inspector").worldBound.yMin;
+            kept = Mathf.Abs(stage1 - stage0) <= 1f;
+            KvInspectorTabs()?.Select(0);   // Element
+            yield return Frames(2);
+            Rect x = KvInspectorRoot().Q("KVI_X")?.worldBound ?? default, w = KvInspectorRoot().Q("KVI_W")?.worldBound ?? default;
+            Rect yr = KvInspectorRoot().Q("KVI_Y")?.worldBound ?? default, h = KvInspectorRoot().Q("KVI_H")?.worldBound ?? default;
+            paired = x.width > 0f && w.width > 0f && Mathf.Abs(x.yMin - yr.yMin) <= 1f && x.xMax <= yr.xMin + 1f && Mathf.Abs(x.height - yr.height) <= 1f
+                && Mathf.Abs(w.yMin - h.yMin) <= 1f && w.xMax <= h.xMin + 1f && w.yMin >= x.yMax - 1f;
+            pairs = $"x={x} y={yr} w={w} h={h}";
+            KvSelect(items[0], items[items.Count - 1]);
+            yield return Frames(3);
+            swapped &= Displayed(swap);
+            Click(back);
+            yield return Frames(8);
+            y1 = sv.scrollOffset.y;
+            restored = KvSel().Count == 0 && !Displayed(swap) && Displayed(settings) && Mathf.Abs(y1 - y) <= 1f;
+            detail = $"swap={Displayed(swap)} settings={Displayed(settings)} sel={KvSel().Count} y={y:0}->{y1:0}";
+        } finally {
+            KvEditorPage.Editor.Canvas.Clear();
+            sv.scrollOffset = was;
+        }
+        check($"{KeyViewerPage}: selecting elements shows the inspector in the left column in place of the settings, Back on top",
+            swapped && backShown, $"swapped={swapped} back={backShown}");
+        check($"{KeyViewerPage}: the canvas keeps its height while the inspector shows (±1)", kept, $"stage={stage0:0}->{stage1:0}");
+        check($"{KeyViewerPage}: the inspector puts X beside Y and width beside height, one row each", paired, pairs);
+        check($"{KeyViewerPage}: Back clears the selection and brings the settings back at their scroll position (±1)", restored, detail);
+        yield return Frames(2);
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]

@@ -15,7 +15,7 @@ internal static partial class KvInspectorPages {
 
     private static void BuildCounter(VisualElement p, KvElement[] batch) {
         if(batch.Length == 0) return;
-        VisualElement counter = Section(p, "KVI_SEC_COUNTER");
+        VisualElement counter = p;   // the tab's own name: no section head repeating it
         Flag(counter, "KVI_COUNTER_ENABLED", true, Counted, e => KvProps.Bool(Read(e), "enabled", true),
             (e, v) => Counter(e)["enabled"] = v, "DESC_KVI_COUNTER_ENABLED");
         if(batch.Any(e => e.Kind == KvElementKind.Key)) {

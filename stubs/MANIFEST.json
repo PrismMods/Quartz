@@ -51,7 +51,7 @@
           "HarmonyLib.PatchProcessor HarmonyLib.Harmony::CreateProcessor(System.Reflection.MethodBase)",
           "HarmonyLib.Patches HarmonyLib.Harmony::GetPatchInfo(System.Reflection.MethodBase)",
           "System.Collections.Generic.IEnumerable\u00601\u003CSystem.Reflection.MethodBase\u003E HarmonyLib.Harmony::GetPatchedMethods()",
-          "System.Reflection.MethodInfo HarmonyLib.Harmony::Patch(System.Reflection.MethodBase,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod)",
+          "System.Reflection.MethodInfo HarmonyLib.Harmony::Patch(System.Reflection.MethodBase,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod)",
           "System.String HarmonyLib.Harmony::Id()",
           "System.String HarmonyLib.Harmony::get_Id()",
           "System.Void HarmonyLib.Harmony::.ctor(System.String)",
@@ -87,6 +87,7 @@
         "members": [
           "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::All",
           "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::Finalizer",
+          "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::ILManipulator",
           "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::Postfix",
           "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::Prefix",
           "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::ReversePatch",
@@ -97,7 +98,6 @@
       {
         "type": "HarmonyLib.MethodType",
         "members": [
-          "HarmonyLib.MethodType HarmonyLib.MethodType::Async",
           "HarmonyLib.MethodType HarmonyLib.MethodType::Constructor",
           "HarmonyLib.MethodType HarmonyLib.MethodType::Enumerator",
           "HarmonyLib.MethodType HarmonyLib.MethodType::Getter",
@@ -764,6 +764,16 @@
         ]
       },
       {
+        "type": "FontData",
+        "members": [
+          "System.Single FontData::fontScale",
+          "System.Single FontData::lineSpacing",
+          "System.Single FontData::lineSpacingTMP",
+          "TMPro.TMP_FontAsset FontData::fontTMP",
+          "UnityEngine.Font FontData::font"
+        ]
+      },
+      {
         "type": "GCS",
         "members": [
           "Difficulty GCS::difficulty",
@@ -1140,6 +1150,8 @@
       {
         "type": "RDString",
         "members": [
+          "FontData RDString::fontData()",
+          "FontData RDString::get_fontData()",
           "System.String RDString::BoothButtonKeySuffix",
           "System.String RDString::DivekickKeySuffix",
           "System.String RDString::GamepadKeySuffix",
@@ -1909,6 +1921,7 @@
           "System.Int32 Facet.Anim::Normal",
           "System.Int32 Facet.Anim::Slow",
           "System.Void Facet.Anim::FadeIn(UnityEngine.UIElements.VisualElement,System.Int32)",
+          "System.Void Facet.Anim::SlideIn(UnityEngine.UIElements.VisualElement,System.Single,System.Int32)",
           "System.Void Facet.Anim::set_SmoothScroll(System.Boolean)"
         ]
       },
@@ -1932,6 +1945,7 @@
         "members": [
           "System.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E Facet.Canvas\u00601::Selection()",
           "System.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E Facet.Canvas\u00601::get_Selection()",
+          "System.Void Facet.Canvas\u00601::Clear()",
           "UnityEngine.Vector2 Facet.Canvas\u00601::ViewCentre()",
           "UnityEngine.Vector2 Facet.Canvas\u00601::get_ViewCentre()"
         ]
@@ -2284,7 +2298,9 @@
       },
       {
         "type": "Facet.Look",
-        "members": []
+        "members": [
+          "System.Void Facet.Look::.ctor()"
+        ]
       },
       {
         "type": "Facet.Looks",
@@ -2306,7 +2322,9 @@
         "members": [
           "System.Collections.Generic.IReadOnlyList\u00601\u003CFacet.Control\u00601\u003CSystem.Boolean\u003E\u003E Facet.MaskTiles::Tiles()",
           "System.Collections.Generic.IReadOnlyList\u00601\u003CFacet.Control\u00601\u003CSystem.Boolean\u003E\u003E Facet.MaskTiles::get_Tiles()",
-          "System.Void Facet.MaskTiles::SetAll(System.Boolean)"
+          "System.Void Facet.MaskTiles::SetAll(System.Boolean)",
+          "UnityEngine.UIElements.VisualElement Facet.MaskTiles::Root()",
+          "UnityEngine.UIElements.VisualElement Facet.MaskTiles::get_Root()"
         ]
       },
       {
@@ -2433,18 +2451,20 @@
       {
         "type": "Facet.ReorderOptions\u00601",
         "members": [
+          "System.Action\u00601\u003CT\u003E Facet.ReorderOptions\u00601::Select()",
           "System.Action\u00602\u003CSystem.Int32,System.Int32\u003E Facet.ReorderOptions\u00601::Move()",
           "System.Action\u00602\u003CUnityEngine.UIElements.VisualElement,T\u003E Facet.ReorderOptions\u00601::Build()",
-          "System.Boolean Facet.ReorderOptions\u00601::DragFromText()",
           "System.Boolean Facet.ReorderOptions\u00601::Vertical()",
           "System.Func\u00601\u003CSystem.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E\u003E Facet.ReorderOptions\u00601::Items()",
+          "System.Func\u00602\u003CT,System.Boolean\u003E Facet.ReorderOptions\u00601::Selected()",
           "System.Func\u00602\u003CT,System.String\u003E Facet.ReorderOptions\u00601::Key()",
           "System.Func\u00602\u003CT,System.String\u003E Facet.ReorderOptions\u00601::Text()",
           "System.Void Facet.ReorderOptions\u00601::set_Build(System.Action\u00602\u003CUnityEngine.UIElements.VisualElement,T\u003E)",
-          "System.Void Facet.ReorderOptions\u00601::set_DragFromText(System.Boolean)",
           "System.Void Facet.ReorderOptions\u00601::set_Items(System.Func\u00601\u003CSystem.Collections.Generic.IReadOnlyList\u00601\u003CT\u003E\u003E)",
           "System.Void Facet.ReorderOptions\u00601::set_Key(System.Func\u00602\u003CT,System.String\u003E)",
           "System.Void Facet.ReorderOptions\u00601::set_Move(System.Action\u00602\u003CSystem.Int32,System.Int32\u003E)",
+          "System.Void Facet.ReorderOptions\u00601::set_Select(System.Action\u00601\u003CT\u003E)",
+          "System.Void Facet.ReorderOptions\u00601::set_Selected(System.Func\u00602\u003CT,System.Boolean\u003E)",
           "System.Void Facet.ReorderOptions\u00601::set_Text(System.Func\u00602\u003CT,System.String\u003E)",
           "System.Void Facet.ReorderOptions\u00601::set_Vertical(System.Boolean)"
         ]
@@ -2599,7 +2619,13 @@
       },
       {
         "type": "Facet.Tabs",
-        "members": []
+        "members": [
+          "Facet.Tabs Facet.Tabs::Pages(UnityEngine.UIElements.VisualElement,System.Collections.Generic.IList\u00601\u003CFacet.NavItem\u003E,System.Int32,System.Action\u00601\u003CSystem.Int32\u003E)",
+          "UnityEngine.UIElements.VisualElement Facet.Tabs::Content()",
+          "UnityEngine.UIElements.VisualElement Facet.Tabs::Element()",
+          "UnityEngine.UIElements.VisualElement Facet.Tabs::get_Content()",
+          "UnityEngine.UIElements.VisualElement Facet.Tabs::get_Element()"
+        ]
       },
       {
         "type": "Facet.TextOptions",
@@ -3259,6 +3285,12 @@
         ]
       },
       {
+        "type": "PrismLib.UI.Toolkit.FocusRing",
+        "members": [
+          "System.Void PrismLib.UI.Toolkit.FocusRing::PointerBlurs(UnityEngine.UIElements.VisualElement)"
+        ]
+      },
+      {
         "type": "PrismLib.UI.Toolkit.FontFix",
         "members": [
           "System.Void PrismLib.UI.Toolkit.FontFix::EnsureInstalled(System.String,System.Action\u00603\u003CSystem.Reflection.MethodBase,System.Reflection.MethodInfo,System.String\u003E)",
@@ -3312,13 +3344,16 @@
           "Facet.StatusLine PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::get_Status()",
           "PrismLib.UI.Toolkit.KeyLayoutEditor\u00601\u003CT\u003E PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Build(UnityEngine.UIElements.VisualElement,PrismLib.UI.Toolkit.KeyLayoutModel\u00601\u003CT\u003E,System.Action)",
           "System.Boolean PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Tick(System.Func\u00602\u003CUnityEngine.KeyCode,System.Boolean\u003E,System.Func\u00602\u003CUnityEngine.KeyCode,System.Boolean\u003E,System.Boolean,System.Boolean,System.Boolean)",
+          "System.Func\u00601\u003CSystem.Boolean\u003E PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::InvertPan()",
           "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Changed()",
           "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Do(System.String,System.Action)",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::InspectorIn(UnityEngine.UIElements.VisualElement)",
           "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::MarkDirty()",
           "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Pick(PrismLib.UI.Toolkit.KeyLayoutModel\u00601\u003CT\u003E,System.String,PrismLib.UI.Toolkit.LayoutGroup,System.String)",
           "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Refresh()",
           "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Say(System.String,Facet.Role)",
           "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Select(System.Collections.Generic.IEnumerable\u00601\u003CT\u003E)",
+          "System.Void PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::set_InvertPan(System.Func\u00601\u003CSystem.Boolean\u003E)",
           "UnityEngine.UIElements.VisualElement PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::Root()",
           "UnityEngine.UIElements.VisualElement PrismLib.UI.Toolkit.KeyLayoutEditor\u00601::get_Root()"
         ]
@@ -3885,6 +3920,13 @@
         ]
       },
       {
+        "type": "TMPro.Extents",
+        "members": [
+          "UnityEngine.Vector2 TMPro.Extents::max",
+          "UnityEngine.Vector2 TMPro.Extents::min"
+        ]
+      },
+      {
         "type": "TMPro.FontStyles",
         "members": [
           "System.Int32 TMPro.FontStyles::value__",
@@ -3906,6 +3948,18 @@
         "members": [
           "TMPro.TMP_Offset TMPro.HighlightState::padding",
           "UnityEngine.Color32 TMPro.HighlightState::color"
+        ]
+      },
+      {
+        "type": "TMPro.HorizontalAlignmentOptions",
+        "members": [
+          "System.Int32 TMPro.HorizontalAlignmentOptions::value__",
+          "TMPro.HorizontalAlignmentOptions TMPro.HorizontalAlignmentOptions::Center",
+          "TMPro.HorizontalAlignmentOptions TMPro.HorizontalAlignmentOptions::Flush",
+          "TMPro.HorizontalAlignmentOptions TMPro.HorizontalAlignmentOptions::Geometry",
+          "TMPro.HorizontalAlignmentOptions TMPro.HorizontalAlignmentOptions::Justified",
+          "TMPro.HorizontalAlignmentOptions TMPro.HorizontalAlignmentOptions::Left",
+          "TMPro.HorizontalAlignmentOptions TMPro.HorizontalAlignmentOptions::Right"
         ]
       },
       {
@@ -4121,6 +4175,32 @@
         "members": []
       },
       {
+        "type": "TMPro.TMP_LineInfo",
+        "members": [
+          "System.Int32 TMPro.TMP_LineInfo::characterCount",
+          "System.Int32 TMPro.TMP_LineInfo::controlCharacterCount",
+          "System.Int32 TMPro.TMP_LineInfo::firstCharacterIndex",
+          "System.Int32 TMPro.TMP_LineInfo::firstVisibleCharacterIndex",
+          "System.Int32 TMPro.TMP_LineInfo::lastCharacterIndex",
+          "System.Int32 TMPro.TMP_LineInfo::lastVisibleCharacterIndex",
+          "System.Int32 TMPro.TMP_LineInfo::spaceCount",
+          "System.Int32 TMPro.TMP_LineInfo::visibleCharacterCount",
+          "System.Int32 TMPro.TMP_LineInfo::visibleSpaceCount",
+          "System.Int32 TMPro.TMP_LineInfo::wordCount",
+          "System.Single TMPro.TMP_LineInfo::ascender",
+          "System.Single TMPro.TMP_LineInfo::baseline",
+          "System.Single TMPro.TMP_LineInfo::descender",
+          "System.Single TMPro.TMP_LineInfo::length",
+          "System.Single TMPro.TMP_LineInfo::lineHeight",
+          "System.Single TMPro.TMP_LineInfo::marginLeft",
+          "System.Single TMPro.TMP_LineInfo::marginRight",
+          "System.Single TMPro.TMP_LineInfo::maxAdvance",
+          "System.Single TMPro.TMP_LineInfo::width",
+          "TMPro.Extents TMPro.TMP_LineInfo::lineExtents",
+          "TMPro.HorizontalAlignmentOptions TMPro.TMP_LineInfo::alignment"
+        ]
+      },
+      {
         "type": "TMPro.TMP_MeshInfo",
         "members": [
           "System.Int32 TMPro.TMP_MeshInfo::vertexCount",
@@ -4288,7 +4368,9 @@
         "type": "TMPro.TMP_TextInfo",
         "members": [
           "System.Int32 TMPro.TMP_TextInfo::characterCount",
+          "System.Int32 TMPro.TMP_TextInfo::lineCount",
           "TMPro.TMP_CharacterInfo[] TMPro.TMP_TextInfo::characterInfo",
+          "TMPro.TMP_LineInfo[] TMPro.TMP_TextInfo::lineInfo",
           "TMPro.TMP_MeshInfo[] TMPro.TMP_TextInfo::meshInfo"
         ]
       },
@@ -4654,7 +4736,8 @@
           "UnityEngine.Camera[] UnityEngine.Camera::allCameras()",
           "UnityEngine.Camera[] UnityEngine.Camera::get_allCameras()",
           "UnityEngine.Color UnityEngine.Camera::backgroundColor()",
-          "UnityEngine.RenderTexture UnityEngine.Camera::targetTexture()"
+          "UnityEngine.RenderTexture UnityEngine.Camera::targetTexture()",
+          "UnityEngine.Vector3 UnityEngine.Camera::ViewportToWorldPoint(UnityEngine.Vector3)"
         ]
       },
       {
@@ -4733,9 +4816,11 @@
           "UnityEngine.Color UnityEngine.Color::clear()",
           "UnityEngine.Color UnityEngine.Color::get_black()",
           "UnityEngine.Color UnityEngine.Color::get_clear()",
+          "UnityEngine.Color UnityEngine.Color::get_gray()",
           "UnityEngine.Color UnityEngine.Color::get_magenta()",
           "UnityEngine.Color UnityEngine.Color::get_red()",
           "UnityEngine.Color UnityEngine.Color::get_white()",
+          "UnityEngine.Color UnityEngine.Color::gray()",
           "UnityEngine.Color UnityEngine.Color::magenta()",
           "UnityEngine.Color UnityEngine.Color::op_Addition(UnityEngine.Color,UnityEngine.Color)",
           "UnityEngine.Color UnityEngine.Color::op_Multiply(UnityEngine.Color,System.Single)",
@@ -5403,6 +5488,7 @@
       {
         "type": "UnityEngine.Rect",
         "members": [
+          "System.Boolean UnityEngine.Rect::Contains(UnityEngine.Vector3)",
           "System.Single UnityEngine.Rect::get_height()",
           "System.Single UnityEngine.Rect::get_width()",
           "System.Single UnityEngine.Rect::get_x()",
@@ -6209,6 +6295,8 @@
           "System.Single UnityEngine.TextCore.FaceInfo::m_UnderlineThickness",
           "System.Single UnityEngine.TextCore.FaceInfo::pointSize()",
           "System.Single UnityEngine.TextCore.FaceInfo::scale()",
+          "System.String UnityEngine.TextCore.FaceInfo::familyName()",
+          "System.String UnityEngine.TextCore.FaceInfo::get_familyName()",
           "System.String UnityEngine.TextCore.FaceInfo::m_FamilyName",
           "System.String UnityEngine.TextCore.FaceInfo::m_StyleName",
           "System.Void UnityEngine.TextCore.FaceInfo::set_lineHeight(System.Single)",
@@ -7176,6 +7264,14 @@
         "members": []
       },
       {
+        "type": "UnityEngine.UIElements.Clickable",
+        "members": [
+          "System.Void UnityEngine.UIElements.Clickable::.ctor(System.Action)",
+          "UnityEngine.Vector2 UnityEngine.UIElements.Clickable::get_lastMousePosition()",
+          "UnityEngine.Vector2 UnityEngine.UIElements.Clickable::lastMousePosition()"
+        ]
+      },
+      {
         "type": "UnityEngine.UIElements.DisplayStyle",
         "members": [
           "System.Int32 UnityEngine.UIElements.DisplayStyle::value__",
@@ -7238,7 +7334,18 @@
       },
       {
         "type": "UnityEngine.UIElements.Focusable",
-        "members": []
+        "members": [
+          "System.Boolean UnityEngine.UIElements.Focusable::focusable()",
+          "System.Void UnityEngine.UIElements.Focusable::set_focusable(System.Boolean)"
+        ]
+      },
+      {
+        "type": "UnityEngine.UIElements.FontDefinition",
+        "members": [
+          "UnityEngine.Font UnityEngine.UIElements.FontDefinition::m_Font",
+          "UnityEngine.TextCore.Text.FontAsset UnityEngine.UIElements.FontDefinition::m_FontAsset",
+          "UnityEngine.UIElements.FontDefinition UnityEngine.UIElements.FontDefinition::FromSDFFont(UnityEngine.TextCore.Text.FontAsset)"
+        ]
       },
       {
         "type": "UnityEngine.UIElements.IBindable",
@@ -7261,6 +7368,14 @@
         "members": [
           "UnityEngine.UIElements.Experimental.ITransitionAnimations UnityEngine.UIElements.IExperimentalFeatures::animation()",
           "UnityEngine.UIElements.Experimental.ITransitionAnimations UnityEngine.UIElements.IExperimentalFeatures::get_animation()"
+        ]
+      },
+      {
+        "type": "UnityEngine.UIElements.IManipulator",
+        "members": [
+          "System.Void UnityEngine.UIElements.IManipulator::set_target(UnityEngine.UIElements.VisualElement)",
+          "UnityEngine.UIElements.VisualElement UnityEngine.UIElements.IManipulator::get_target()",
+          "UnityEngine.UIElements.VisualElement UnityEngine.UIElements.IManipulator::target()"
         ]
       },
       {
@@ -7290,6 +7405,7 @@
         "type": "UnityEngine.UIElements.IStyle",
         "members": [
           "System.Void UnityEngine.UIElements.IStyle::set_alignItems(UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Align\u003E)",
+          "System.Void UnityEngine.UIElements.IStyle::set_alignSelf(UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Align\u003E)",
           "System.Void UnityEngine.UIElements.IStyle::set_backgroundColor(UnityEngine.UIElements.StyleColor)",
           "System.Void UnityEngine.UIElements.IStyle::set_backgroundImage(UnityEngine.UIElements.StyleBackground)",
           "System.Void UnityEngine.UIElements.IStyle::set_backgroundSize(UnityEngine.UIElements.StyleBackgroundSize)",
@@ -7308,6 +7424,7 @@
           "System.Void UnityEngine.UIElements.IStyle::set_bottom(UnityEngine.UIElements.StyleLength)",
           "System.Void UnityEngine.UIElements.IStyle::set_color(UnityEngine.UIElements.StyleColor)",
           "System.Void UnityEngine.UIElements.IStyle::set_display(UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.DisplayStyle\u003E)",
+          "System.Void UnityEngine.UIElements.IStyle::set_flexBasis(UnityEngine.UIElements.StyleLength)",
           "System.Void UnityEngine.UIElements.IStyle::set_flexDirection(UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.FlexDirection\u003E)",
           "System.Void UnityEngine.UIElements.IStyle::set_flexGrow(UnityEngine.UIElements.StyleFloat)",
           "System.Void UnityEngine.UIElements.IStyle::set_flexShrink(UnityEngine.UIElements.StyleFloat)",
@@ -7319,6 +7436,7 @@
           "System.Void UnityEngine.UIElements.IStyle::set_marginLeft(UnityEngine.UIElements.StyleLength)",
           "System.Void UnityEngine.UIElements.IStyle::set_marginRight(UnityEngine.UIElements.StyleLength)",
           "System.Void UnityEngine.UIElements.IStyle::set_marginTop(UnityEngine.UIElements.StyleLength)",
+          "System.Void UnityEngine.UIElements.IStyle::set_maxWidth(UnityEngine.UIElements.StyleLength)",
           "System.Void UnityEngine.UIElements.IStyle::set_minHeight(UnityEngine.UIElements.StyleLength)",
           "System.Void UnityEngine.UIElements.IStyle::set_minWidth(UnityEngine.UIElements.StyleLength)",
           "System.Void UnityEngine.UIElements.IStyle::set_opacity(UnityEngine.UIElements.StyleFloat)",
@@ -7331,10 +7449,12 @@
           "System.Void UnityEngine.UIElements.IStyle::set_right(UnityEngine.UIElements.StyleLength)",
           "System.Void UnityEngine.UIElements.IStyle::set_textOverflow(UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.TextOverflow\u003E)",
           "System.Void UnityEngine.UIElements.IStyle::set_top(UnityEngine.UIElements.StyleLength)",
+          "System.Void UnityEngine.UIElements.IStyle::set_unityFontDefinition(UnityEngine.UIElements.StyleFontDefinition)",
           "System.Void UnityEngine.UIElements.IStyle::set_unityFontStyleAndWeight(UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.FontStyle\u003E)",
           "System.Void UnityEngine.UIElements.IStyle::set_unityTextAlign(UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.TextAnchor\u003E)",
           "System.Void UnityEngine.UIElements.IStyle::set_unityTextOutlineColor(UnityEngine.UIElements.StyleColor)",
           "System.Void UnityEngine.UIElements.IStyle::set_unityTextOutlineWidth(UnityEngine.UIElements.StyleFloat)",
+          "System.Void UnityEngine.UIElements.IStyle::set_visibility(UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Visibility\u003E)",
           "System.Void UnityEngine.UIElements.IStyle::set_whiteSpace(UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.WhiteSpace\u003E)",
           "System.Void UnityEngine.UIElements.IStyle::set_width(UnityEngine.UIElements.StyleLength)",
           "UnityEngine.UIElements.StyleBackground UnityEngine.UIElements.IStyle::backgroundImage()",
@@ -7345,17 +7465,21 @@
           "UnityEngine.UIElements.StyleColor UnityEngine.UIElements.IStyle::borderRightColor()",
           "UnityEngine.UIElements.StyleColor UnityEngine.UIElements.IStyle::borderTopColor()",
           "UnityEngine.UIElements.StyleColor UnityEngine.UIElements.IStyle::color()",
+          "UnityEngine.UIElements.StyleColor UnityEngine.UIElements.IStyle::get_borderTopColor()",
           "UnityEngine.UIElements.StyleColor UnityEngine.UIElements.IStyle::unityTextOutlineColor()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.FontStyle\u003E UnityEngine.UIElements.IStyle::unityFontStyleAndWeight()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.TextAnchor\u003E UnityEngine.UIElements.IStyle::unityTextAlign()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Align\u003E UnityEngine.UIElements.IStyle::alignItems()",
+          "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Align\u003E UnityEngine.UIElements.IStyle::alignSelf()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.DisplayStyle\u003E UnityEngine.UIElements.IStyle::display()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.DisplayStyle\u003E UnityEngine.UIElements.IStyle::get_display()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.FlexDirection\u003E UnityEngine.UIElements.IStyle::flexDirection()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Justify\u003E UnityEngine.UIElements.IStyle::justifyContent()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Overflow\u003E UnityEngine.UIElements.IStyle::overflow()",
+          "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Position\u003E UnityEngine.UIElements.IStyle::get_position()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Position\u003E UnityEngine.UIElements.IStyle::position()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.TextOverflow\u003E UnityEngine.UIElements.IStyle::textOverflow()",
+          "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Visibility\u003E UnityEngine.UIElements.IStyle::visibility()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.WhiteSpace\u003E UnityEngine.UIElements.IStyle::whiteSpace()",
           "UnityEngine.UIElements.StyleFloat UnityEngine.UIElements.IStyle::borderBottomWidth()",
           "UnityEngine.UIElements.StyleFloat UnityEngine.UIElements.IStyle::borderLeftWidth()",
@@ -7363,20 +7487,26 @@
           "UnityEngine.UIElements.StyleFloat UnityEngine.UIElements.IStyle::borderTopWidth()",
           "UnityEngine.UIElements.StyleFloat UnityEngine.UIElements.IStyle::flexGrow()",
           "UnityEngine.UIElements.StyleFloat UnityEngine.UIElements.IStyle::flexShrink()",
+          "UnityEngine.UIElements.StyleFloat UnityEngine.UIElements.IStyle::get_borderTopWidth()",
           "UnityEngine.UIElements.StyleFloat UnityEngine.UIElements.IStyle::opacity()",
           "UnityEngine.UIElements.StyleFloat UnityEngine.UIElements.IStyle::unityTextOutlineWidth()",
+          "UnityEngine.UIElements.StyleFontDefinition UnityEngine.UIElements.IStyle::unityFontDefinition()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::borderBottomLeftRadius()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::borderBottomRightRadius()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::borderTopLeftRadius()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::borderTopRightRadius()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::bottom()",
+          "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::flexBasis()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::fontSize()",
+          "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::get_paddingLeft()",
+          "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::get_paddingRight()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::height()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::left()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::marginBottom()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::marginLeft()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::marginRight()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::marginTop()",
+          "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::maxWidth()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::minHeight()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::minWidth()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::paddingBottom()",
@@ -7459,6 +7589,14 @@
         ]
       },
       {
+        "type": "UnityEngine.UIElements.Manipulator",
+        "members": []
+      },
+      {
+        "type": "UnityEngine.UIElements.MouseManipulator",
+        "members": []
+      },
+      {
         "type": "UnityEngine.UIElements.Overflow",
         "members": [
           "System.Int32 UnityEngine.UIElements.Overflow::value__",
@@ -7473,6 +7611,10 @@
           "UnityEngine.UIElements.PickingMode UnityEngine.UIElements.PickingMode::Ignore",
           "UnityEngine.UIElements.PickingMode UnityEngine.UIElements.PickingMode::Position"
         ]
+      },
+      {
+        "type": "UnityEngine.UIElements.PointerManipulator",
+        "members": []
       },
       {
         "type": "UnityEngine.UIElements.Position",
@@ -7565,6 +7707,14 @@
         ]
       },
       {
+        "type": "UnityEngine.UIElements.StyleFontDefinition",
+        "members": [
+          "UnityEngine.UIElements.FontDefinition UnityEngine.UIElements.StyleFontDefinition::m_Value",
+          "UnityEngine.UIElements.StyleFontDefinition UnityEngine.UIElements.StyleFontDefinition::op_Implicit(UnityEngine.UIElements.FontDefinition)",
+          "UnityEngine.UIElements.StyleKeyword UnityEngine.UIElements.StyleFontDefinition::m_Keyword"
+        ]
+      },
+      {
         "type": "UnityEngine.UIElements.StyleKeyword",
         "members": [
           "System.Int32 UnityEngine.UIElements.StyleKeyword::value__",
@@ -7581,6 +7731,7 @@
           "UnityEngine.UIElements.Length UnityEngine.UIElements.StyleLength::m_Value",
           "UnityEngine.UIElements.StyleKeyword UnityEngine.UIElements.StyleLength::m_Keyword",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.StyleLength::op_Implicit(System.Single)",
+          "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.StyleLength::op_Implicit(UnityEngine.UIElements.Length)",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.StyleLength::op_Implicit(UnityEngine.UIElements.StyleKeyword)"
         ]
       },
@@ -7645,10 +7796,19 @@
         "members": []
       },
       {
+        "type": "UnityEngine.UIElements.Visibility",
+        "members": [
+          "System.Int32 UnityEngine.UIElements.Visibility::value__",
+          "UnityEngine.UIElements.Visibility UnityEngine.UIElements.Visibility::Hidden",
+          "UnityEngine.UIElements.Visibility UnityEngine.UIElements.Visibility::Visible"
+        ]
+      },
+      {
         "type": "UnityEngine.UIElements.VisualElement",
         "members": [
           "System.Boolean UnityEngine.UIElements.VisualElement::enabledSelf()",
           "System.Boolean UnityEngine.UIElements.VisualElement::get_enabledSelf()",
+          "System.Collections.Generic.IEnumerable\u00601\u003CUnityEngine.UIElements.VisualElement\u003E UnityEngine.UIElements.VisualElement::Children()",
           "System.Int32 UnityEngine.UIElements.VisualElement::IndexOf(UnityEngine.UIElements.VisualElement)",
           "System.Int32 UnityEngine.UIElements.VisualElement::childCount()",
           "System.Int32 UnityEngine.UIElements.VisualElement::get_childCount()",
@@ -7691,6 +7851,7 @@
       {
         "type": "UnityEngine.UIElements.VisualElementExtensions",
         "members": [
+          "System.Void UnityEngine.UIElements.VisualElementExtensions::AddManipulator(UnityEngine.UIElements.VisualElement,UnityEngine.UIElements.IManipulator)",
           "UnityEngine.Vector2 UnityEngine.UIElements.VisualElementExtensions::ChangeCoordinatesTo(UnityEngine.UIElements.VisualElement,UnityEngine.UIElements.VisualElement,UnityEngine.Vector2)"
         ]
       },

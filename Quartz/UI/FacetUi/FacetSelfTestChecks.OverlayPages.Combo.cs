@@ -48,24 +48,33 @@ internal static partial class FacetSelfTestChecks {
     }
 
     private static IEnumerator ComboChecks(Action<string, bool, string> check, Action<string> info, float size) {
+        // The groups sit on tabs, one built at a time: each check shows its row's tab first.
+        yield return ShowTab("SECTION_COMBO");
         yield return Parity(check, ComboPage, ComboRows());
+        yield return ComboTabs(check);
+        yield return ShowTab("SECTION_COMBO");
         yield return ColumnEdges(check, ComboPage, ComboOverlay.FontKey);
-        HeaderSwitchEdge(check, ComboPage, "SECTION_COMBO", "COMBO_CAPTION");
+        HeaderSwitchEdge(check, ComboPage, "SECTION_COMBO", "COMBO_AUTO");
+        yield return ShowTab("HEADING_LABEL");
         yield return OsCursor(check, info, Body.Q(name: "COMBO_CAPTIONTEXT-input"), "Combo's caption text field");
         yield return ClassicSees(check, ComboPage, "COMBO_CAPTION", Bind.To(() => ComboConf.ShowCaption, v => {
             ComboConf.ShowCaption = v;
             ComboOverlay.Apply();
             ComboOverlay.Save();
         }));
+        yield return ShowTab("HEADING_ANIMATION");
         yield return Hotkey(check, ComboPage, "COMBO_NOPOP", "combo_nopop", null, Bind.To(() => ComboConf.NoPopAnim, v => {
             ComboConf.NoPopAnim = v;
             ComboOverlay.Save();
         }));
+        yield return ShowTab("SECTION_COMBO");
         yield return ComboFontKeepsPreview(check);
         yield return ComboFontsFollow(check);
         yield return ComboFontFaces(check);
+        yield return ShowTab("HEADING_LABEL");
         yield return ShadowResets(check);
         yield return CaptionCaps(check);
+        yield return ShowTab("SECTION_COMBO");
         // Through the row's own slider: font size up 10 (down where that would pass the top), read off the counter.
         float want = size + 10f <= 120f ? size + 10f : size - 10f;
         yield return PreviewChecks(check, info, ComboPage, ComboOverlay.FontKey,
@@ -76,6 +85,33 @@ internal static partial class FacetSelfTestChecks {
             },
             () => OverlayPreview.ShownOf(ComboOverlay.FontKey)?.transform.Find("Value")?.GetComponent<TextMeshProUGUI>() is { } value
                 && Mathf.Abs(value.fontSize - want) < 0.5f);
+    }
+
+    // One tab's rows show at a time: the first tab's font size row, not the colour tab's Color Max. A search for Color Max
+    // opens its tab and shows the row.
+    private static IEnumerator ComboTabs(Action<string, bool, string> check) {
+        const string name = $"{ComboPage}: one tab's rows show at a time, and a search for a row on another tab opens it";
+        yield return ShowTab("SECTION_COMBO");
+        global::Facet.Tabs tabs = PageTabs();
+        bool one = tabs != null && Body.Q(name: "COMBO_FONTSIZE-input") is { } size && Displayed(size) && Body.Q(name: "COMBO_COLORMAX") == null;
+        List<SearchIndex.Hit> hits = [];
+        int at = -1;
+        try {
+            hits = Find(QuartzHost.Host.Translate("COMBO_COLORMAX"));
+            at = hits.FindIndex(h => h.PageRef != null && Unnumbered(h.Key) == "COMBO_COLORMAX");
+            if(at >= 0) Click(Body[at]);
+            bool shown = false;
+            for(int i = 0; i < 30 && at >= 0 && !shown; i++) {
+                yield return null;
+                shown = Body.Q(name: "COMBO_COLORMAX") is { } row && Displayed(row);
+            }
+            tabs = PageTabs();
+            check(name, one && at >= 0 && shown && QuartzShell.CurrentPage == ComboPage && tabs?.SelectedName == "HEADING_COLOR",
+                $"one={one} hit={at} shown={shown} page={QuartzShell.CurrentPage} tab={tabs?.SelectedName} {(at < 0 ? Hits(hits) : "")}");
+        } finally {
+            QuartzShell.Nav?.Filter("");
+        }
+        yield return Frames(2);
     }
 
     // A font picked for Combo through its row changes the counter's face only: the page is not rebuilt, so the preview keeps

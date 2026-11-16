@@ -7,6 +7,7 @@ using Quartz.UI.Generator;
 using Quartz.UI.Nav;
 using Quartz.UI.Utility;
 using TMPro;
+using Quartz.Resource;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
@@ -42,6 +43,24 @@ internal static partial class FacetSelfTestChecks {
             SameBytes(file, start), $"file={start?.Length.ToString() ?? "none"}/{(File.Exists(file) ? new FileInfo(file).Length.ToString() : "none")}");
     }
 
+    // The font row lists the game's own UI face; picked there, it is stored as the sentinel and the row shows it after the rebuild.
+    private static IEnumerator PanelsGameFont(Action<string, bool, string> check) {
+        string key = PanelsOverlay.FontKey, was = FontManager.OverlayFontName(key) ?? FontManager.FollowGlobal;
+        string item = OverlayFontPicker.Display(FontManager.GameDefault);
+        bool listed = OverlayFontPicker.Values().Contains(FontManager.GameDefault);
+        try {
+            yield return PickItem("FONT_OVERLAY", item);
+            yield return Frames(2);
+            string stored = FontManager.OverlayFontName(key), shown = Body.Q<Button>("FONT_OVERLAY-input")?.text;
+            check($"{PanelsPage}: the font menu offers the game's default font and it sticks",
+                listed && stored == FontManager.GameDefault && shown != null && shown.Contains(item) && FontManager.For(key) != null,
+                $"listed={listed} stored={stored} shown='{shown}' item='{item}' face={FontManager.GameDefaultFace}");
+        } finally {
+            FontManager.SetOverlayFont(key, was);
+        }
+        yield return Frames(2);
+    }
+
     private static void PutBackPanelsFile(string file, byte[] start) {
         PanelsOverlay.ConfMgr.CancelPendingSave();
         if(start == null) { if(File.Exists(file)) File.Delete(file); }
@@ -51,6 +70,7 @@ internal static partial class FacetSelfTestChecks {
     private static IEnumerator PanelsChecks(Action<string, bool, string> check, Action<string> info, string file, byte[] was, int had) {
         yield return Parity(check, PanelsPage, PanelsRows);
         yield return ColumnEdges(check, PanelsPage, PanelsOverlay.FontKey);
+        yield return PanelsGameFont(check);
         yield return PanelsCreate(check, file, was);
         PanelsListStands(check);
         yield return PanelsDeleteKeepsPage(check);

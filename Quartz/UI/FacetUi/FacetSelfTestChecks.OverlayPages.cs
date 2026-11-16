@@ -21,34 +21,68 @@ internal static partial class FacetSelfTestChecks {
     /// <summary>The open page is pageKey drawn in Facet, and each key names a shown row on it (its Id, or its input's): the row
     /// and everything around it up to the page display. A fold the rows sit in is opened first, as a player opens it, and shut
     /// again after; a switch's group is not, so the caller makes every row's switch and VisibleWhen hold first. hidden names
-    /// rows that must not show, their folds opened too: a row in a shut fold would not show whatever hides it.</summary>
+    /// rows that must not show, their folds opened too: a row in a shut fold would not show whatever hides it. A page with its
+    /// own tab row is read tab by tab (only the selected tab is built), and its tab is put back after.</summary>
     internal static IEnumerator Parity(Action<string, bool, string> check, string pageKey, string[] keys, string[] hidden = null) {
         VisualElement page = PageContent();
         VisualElement Row(string k) => page.Q(name: k) ?? page.Q(name: k + "-input");
-        List<Action<bool, bool>> opened = [];
-        if(Folds(out string miss)) {
-            foreach(string k in keys.Concat(hidden ?? []))
-                for(VisualElement e = Row(k)?.parent; e != null && e != page; e = e.parent)
-                    if(findFold.Invoke(null, [e]) is { } fold && !((Func<bool>)foldIsOpen.GetValue(fold))()) {
-                        var set = (Action<bool, bool>)foldSet.GetValue(fold);
-                        set(true, false);
-                        opened.Add(set);
-                    }
-        } else {
-            check($"{pageKey}: Facet's fold record is found, so the rows in folds are opened before they are read", false, miss);
-        }
-        yield return Frames(1);   // the resolved styles catch up
         bool Shown(string k) {
             VisualElement e = Row(k);
             for(; e != null && e != page; e = e.parent) if(e.resolvedStyle.display != DisplayStyle.Flex) return false;
             return e == page;
         }
-        List<string> missing = [.. keys.Where(k => !Shown(k))], shows = [.. (hidden ?? []).Where(Shown)];
-        foreach(Action<bool, bool> set in opened) set(false, false);
+        bool folds = Folds(out string miss);
+        if(!folds) check($"{pageKey}: Facet's fold record is found, so the rows in folds are opened before they are read", false, miss);
+        global::Facet.Tabs tabs = PageTabs();
+        int was = tabs?.Selected ?? -1, unfolded = 0;
+        HashSet<string> seen = [];
+        for(int t = 0; t < (tabs == null ? 1 : 16); t++) {
+            if(tabs != null) {
+                tabs.Select(t);
+                if(tabs.Selected != t) continue;   // past the last tab, or a hidden one
+            }
+            List<Action<bool, bool>> opened = [];
+            if(folds)
+                foreach(string k in keys.Concat(hidden ?? []))
+                    for(VisualElement e = Row(k)?.parent; e != null && e != page; e = e.parent)
+                        if(findFold.Invoke(null, [e]) is { } fold && !((Func<bool>)foldIsOpen.GetValue(fold))()) {
+                            var set = (Action<bool, bool>)foldSet.GetValue(fold);
+                            set(true, false);
+                            opened.Add(set);
+                        }
+            yield return Frames(1);   // the resolved styles catch up
+            seen.UnionWith(keys.Concat(hidden ?? []).Where(Shown));
+            foreach(Action<bool, bool> set in opened) set(false, false);
+            unfolded += opened.Count;
+        }
+        if(tabs != null && was >= 0) tabs.Select(was);
+        List<string> missing = [.. keys.Where(k => !seen.Contains(k))], shows = [.. (hidden ?? []).Where(seen.Contains)];
         bool moved = QuartzShell.CurrentPage == pageKey && page.Q(name: "menu-classic") == null;
         check($"{pageKey}: drawn in the new menu with every row of the classic page ({keys.Length})"
             + (hidden == null ? "" : $", and none of the {hidden.Length} it hides"), moved && missing.Count == 0 && shows.Count == 0,
-            $"page={QuartzShell.CurrentPage} classicCard={!moved} missing={string.Join(",", missing)} shown={string.Join(",", shows)} unfolded={opened.Count}");
+            $"page={QuartzShell.CurrentPage} classicCard={!moved} missing={string.Join(",", missing)} shown={string.Join(",", shows)} unfolded={unfolded}");
+    }
+
+    /// <summary>The open page's own tab row (Tabs.Pages on the page, not the shell's category tabs above it), found through the
+    /// Ref Facet keeps on its bar; null when the page has none.</summary>
+    internal static global::Facet.Tabs PageTabs() => AllPageTabs().FirstOrDefault();
+
+    /// <summary>Every tab row on the open page, in tree order (a row inside another row's tab after it).</summary>
+    internal static List<global::Facet.Tabs> AllPageTabs() {
+        Type refType = typeof(global::Facet.Tabs).GetNestedType("Ref", BindingFlags.NonPublic);
+        MethodInfo find = refType == null ? null : typeof(Data).GetMethod(nameof(Data.Find))?.MakeGenericMethod(refType);
+        List<global::Facet.Tabs> all = [];
+        if(find == null) return all;
+        foreach(VisualElement v in PageContent().Query<VisualElement>().ToList())
+            if(find.Invoke(null, [v]) is { } r) all.Add((global::Facet.Tabs)refType!.GetField("Tabs")!.GetValue(r));
+        return all;
+    }
+
+    /// <summary>Selects the open page's tab titled title (its key), as a click on it does, and lets the layout catch up.</summary>
+    internal static IEnumerator ShowTab(string title) {
+        global::Facet.Tabs tabs = PageTabs();
+        for(int i = 0; tabs != null && tabs.SelectedName != title && i < 16; i++) tabs.Select(i);
+        yield return Frames(1);
     }
 
     // Facet's record of a fold (an Advanced or a Section body), internal to it. Looked up on first use, so a rename in Facet

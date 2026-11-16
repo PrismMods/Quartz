@@ -56,6 +56,20 @@ public static class XPerfectBridge {
         xPerfectColourMember ??= new Refl.Member(scheme.GetType(), "colourXPerfect");
         return xPerfectColourMember.Get(scheme) is UnityEngine.Color c ? c : UnityEngine.Color.white;
     }
+    internal static readonly Refl.Member Competitive = new(typeof(Persistence), "enableCompetitiveMode");
+    /// <summary>Whether X Perfect is a judgement the player sees: the XPerfect mod is on, or the game has X and competitive mode is
+    /// on (off, the game's X/± settings read 0). The bars and Hide Judgements rows follow this; restriction modes keep Installed.</summary>
+    public static bool Shown {
+        get {
+            if(ModEnabled) return true;
+            try {
+                return GameHasX && Competitive.Get(null) is bool on && on;
+            } catch(Exception e) {
+                Diag.Ignore(e);
+                return false;
+            }
+        }
+    }
     public static bool Installed {
         get {
             EnsureResolved();

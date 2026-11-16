@@ -18,7 +18,7 @@ internal static class DeveloperPage {
             QuartzShell.Surface?.Refresh();
         }
 
-        VisualElement updater = Controls.Section(card, "SECTION_UPDATER", o => {
+        VisualElement updater = ShellRows.Section(card, "SECTION_UPDATER", o => {
             o.Id = "SECTION_UPDATER";   // a Section names its header only by Id
             o.Open = true;
         });
@@ -27,17 +27,16 @@ internal static class DeveloperPage {
             ToggleBinds.Show("dev_sim_update", v);
             UpdateService.SetDevSimulate(v);
         }));
-        Controls.Action(updater, "", "DEV_CHECK", () => QuartzShell.Do("developer.check", UpdateService.Check), o => o.Id = "DEV_CHECK");
-        Controls.Action(updater, "", "DEV_CLEAR_SKIP", () => {
-            QuartzShell.Do("developer.clearskip", () => {
-                MainCore.Conf.SkippedVersion = "";
-                MainCore.ConfMgr.RequestSave();
-            });
-            Refresh();
-        }, o => o.Id = "DEV_CLEAR_SKIP");
-        Controls.Action(updater, "", "DEV_REFRESH", Refresh, o => o.Id = "DEV_REFRESH");
+        ShellRows.Buttons(updater, new ShellRows.Btn("DEV_CHECK", () => QuartzShell.Do("developer.check", UpdateService.Check)),
+            new ShellRows.Btn("DEV_CLEAR_SKIP", () => {
+                QuartzShell.Do("developer.clearskip", () => {
+                    MainCore.Conf.SkippedVersion = "";
+                    MainCore.ConfMgr.RequestSave();
+                });
+                Refresh();
+            }), new ShellRows.Btn("DEV_REFRESH", Refresh));
 
-        VisualElement seasonal = Controls.Section(card, "SECTION_SEASONAL", o => {
+        VisualElement seasonal = ShellRows.Section(card, "SECTION_SEASONAL", o => {
             o.Id = "SECTION_SEASONAL";
             o.Open = true;
         });
@@ -50,7 +49,7 @@ internal static class DeveloperPage {
             MainThread.Enqueue(UICore.Rebuild);
         }));
 
-        VisualElement statusBody = Controls.Section(card, "SECTION_STATUS", o => {
+        VisualElement statusBody = ShellRows.Section(card, "SECTION_STATUS", o => {
             o.Id = "SECTION_STATUS";
             o.Open = true;
         });

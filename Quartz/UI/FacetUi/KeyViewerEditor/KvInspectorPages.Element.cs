@@ -39,14 +39,17 @@ internal static partial class KvInspectorPages {
 
         VisualElement geometry = Section(p, "KVI_SEC_GEOMETRY");
         if(single) {
-            Field(geometry, "KVI_X", e => e.X, (e, v) => e.X = v);
-            Field(geometry, "KVI_Y", e => e.Y, (e, v) => e.Y = v);
-            Field(geometry, "KVI_W", e => e.W, (e, v) => e.W = v);
-            Field(geometry, "KVI_H", e => e.H, (e, v) => e.H = v);
+            (VisualElement x, VisualElement y) = Pair(geometry);
+            Field(x, "KVI_X", e => e.X, (e, v) => e.X = v);
+            Field(y, "KVI_Y", e => e.Y, (e, v) => e.Y = v);
+            (VisualElement w, VisualElement h) = Pair(geometry);
+            Field(w, "KVI_W", e => e.W, (e, v) => e.W = v);
+            Field(h, "KVI_H", e => e.H, (e, v) => e.H = v);
         }
         else {
-            Num(geometry, "KVI_W", first.W, KvElement.MinSize, 500f, "0 px", 1f, Sel, e => e.W, (e, v) => e.W = v);
-            Num(geometry, "KVI_H", first.H, KvElement.MinSize, 500f, "0 px", 1f, Sel, e => e.H, (e, v) => e.H = v);
+            (VisualElement w, VisualElement h) = Pair(geometry);
+            Num(w, "KVI_W", first.W, KvElement.MinSize, 500f, "0 px", 1f, Sel, e => e.W, (e, v) => e.W = v);
+            Num(h, "KVI_H", first.H, KvElement.MinSize, 500f, "0 px", 1f, Sel, e => e.H, (e, v) => e.H = v);
         }
     }
 

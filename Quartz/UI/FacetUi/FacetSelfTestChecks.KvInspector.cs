@@ -199,7 +199,7 @@ internal static partial class FacetSelfTestChecks {
         typeof(global::Facet.Data).GetMethod("Find").MakeGenericMethod(t).Invoke(null, [e]);
 
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-    private static VisualElement KvInspectorRoot() => KvEditorPage.Editor.Root.Q("kle-inspector");
+    private static VisualElement KvInspectorRoot() => Body.Q("kle-inspector");   // in the page's left column
 
     // Select, let the inspector rebuild for it, then show tab `tab` (0 Element, 1 Style, 2 Rain, 3 Counter).
     private static IEnumerator KvInspect(int tab, params KvElement[] sel) {

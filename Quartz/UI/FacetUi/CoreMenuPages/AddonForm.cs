@@ -29,7 +29,7 @@ internal static class AddonForm {
                 if(m.GetCustomAttribute<SectionAttribute>() is { } section) {
                     Flush();
                     string sectionKey = GenerateUI.LocaleKeyFromId(id + "_section");
-                    into = Controls.Section(card, QuartzShell.Label(sectionKey, section.Title), o => {
+                    into = ShellRows.Section(card, QuartzShell.Label(sectionKey, section.Title), o => {
                         o.Id = sectionKey;
                         o.Open = true;
                     });
@@ -219,7 +219,7 @@ internal static class AddonForm {
                 o.Placeholder = "Value";
                 o.Undoable = false;
             });
-            Button remove = Ui.Btn(value.Input.parent, "×", () => {
+            Button remove = Ui.Btn(value.Input.parent, "DELETE_BUTTON", () => {
                 Sync();
                 if(i >= pairs.Count) return;
                 pairs.RemoveAt(i);

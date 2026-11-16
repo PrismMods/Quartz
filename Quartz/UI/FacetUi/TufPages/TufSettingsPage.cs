@@ -28,7 +28,7 @@ internal static class TufSettingsPage {
         ShellRows.Info(library, "TUF_LIBRARY_SUMMARY", () => (service.InstalledCount, service.LibraryBytes),
             t => string.Format(QuartzHost.Translate("TUF_LIBRARY_SUMMARY"), t.InstalledCount, TufDiskSpace.Describe(t.LibraryBytes)));
         ShellRows.Info(library, "TUF_LIBRARY_PATH", () => service.ActiveRootPath, s => s);
-        Button(library, "TUF_OPEN_FOLDER", () => {
+        ShellRows.Buttons(library, Btn("TUF_OPEN_FOLDER", () => {
             try {
                 string path = service.ActiveRootPath;
                 System.IO.Directory.CreateDirectory(path);
@@ -36,13 +36,11 @@ internal static class TufSettingsPage {
             } catch(Exception e) {
                 MainCore.Log.Err($"[TufSettingsPage] Reveal failed: {e}");
             }
-        });
-        Button(library, "TUF_PICK_FOLDER", () => Pick(service));
-        Button(library, "TUF_RESET_FOLDER", () => {
+        }), Btn("TUF_PICK_FOLDER", () => Pick(service)), Btn("TUF_RESET_FOLDER", () => {
             notice = "";
             if(!service.ClearCustomLevelsRoot(out string reason)) notice = Rejection(reason);
             QuartzShell.Surface?.Refresh();
-        });
+        }));
         if(helper)
             ShellRows.Info(library, "TUF_LIBRARY_LINK_OVERRIDE", () => true, _ => QuartzHost.Translate("TUF_LIBRARY_LINK_OVERRIDE"),
                 () => service.LinkTufHelperLite && !string.IsNullOrEmpty(service.CustomLevelsRoot), () => Role.Danger);
@@ -64,11 +62,8 @@ internal static class TufSettingsPage {
             o.Tooltip = "DESC_" + key;
         });
 
-    private static void Button(VisualElement card, string key, Action click) =>
-        Controls.Action(card, "", key, click, o => {
-            o.Id = key;
-            o.Tooltip = "DESC_" + key;
-        });
+    // The tooltip is DESC_<key>.
+    private static ShellRows.Btn Btn(string key, Action click) => new(key, click, "DESC_" + key);
 
     private static void Pick(TufService service) {
         string picked = FileDialog.PickFolder(service.ActiveRootPath, null, null, QuartzHost.Translate("TUF_PICK_FOLDER_TITLE"));

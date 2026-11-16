@@ -10,6 +10,8 @@ public sealed partial class KeyViewerSettings : ISettingsFile {
     public const string ModeEditor = "editor";
     public bool Enabled = true;
     public bool ShowOutsideGame = true;
+    /// <summary>The editor preview's wheel pans against the swipe on both axes.</summary>
+    public bool InvertPreviewPan = false;
     public string Mode = KvMigrationPlan.LegacyModeSimple;
     public int Style = 2;
     public const int MaxStyle = 5;

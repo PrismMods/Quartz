@@ -182,16 +182,12 @@ internal static partial class ShellRows {
         });
     }
 
-    /// <summary>A file's status line, Id pickKey + "_STATUS", then the Pick and Clear buttons as rows of their own; descKey is
+    /// <summary>A file's status line, Id pickKey + "_STATUS", then the Pick and Clear buttons on one row; descKey is
     /// the Pick row's tooltip.</summary>
     internal static void FilePick(VisualElement card, string pickKey, string clearKey, Func<string> status, Action pick, Action clear,
         string descKey = null) {
         Info(card, pickKey + "_STATUS", status, s => s);
-        Controls.Action(card, "", pickKey, pick, o => {
-            o.Id = pickKey;
-            o.Tooltip = descKey;
-        });
-        Controls.Action(card, "", clearKey, clear, o => o.Id = clearKey);
+        Buttons(card, new Btn(pickKey, pick, descKey), new Btn(clearKey, clear));
     }
 
     private static readonly ConditionalWeakTable<object, string> Serials = new();

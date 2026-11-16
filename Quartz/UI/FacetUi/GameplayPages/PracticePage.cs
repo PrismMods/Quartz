@@ -14,13 +14,13 @@ internal static class PracticePage {
 
     internal static void Build(VisualElement p) {
         PracticeDifficulty.EnsureConf();
-        ShellPage.Feature(p, "practice", "SECTION_PRACTICE_DIFFICULTY", "PRACTICE_DESC", PracticeOverlay.FontKey, Cards);
+        ShellPage.Feature(p, "practice", "SECTION_PRACTICE_DIFFICULTY", "PRACTICE_HINT", PracticeOverlay.FontKey, Cards);
+        ShellPage.Described(p, "SECTION_PRACTICE_DIFFICULTY", "PRACTICE_HINT");
     }
 
     private static void Cards(VisualElement p) {
         Action save = PracticeDifficulty.Save, apply = PracticeOverlay.Apply;
         VisualElement card = Controls.Card(p, null);
-        Controls.Info(card, "PRACTICE_HINT", () => "", (InfoOptions o) => o.Id = "PRACTICE_HINT");
         ShellRows.Font(card, PracticeOverlay.FontKey);
         Controls.Info(card, "PRACTICE_NO_BINDINGS", () => "", (InfoOptions o) => {
             o.Id = "PRACTICE_NO_BINDINGS";
@@ -60,7 +60,7 @@ internal static class PracticePage {
         int i = C.Bindings.IndexOf(b), n = i + 1;
         Action save = PracticeDifficulty.Save;
         Func<object> document = ShellRows.ItemDocument(b, () => C.Bindings);
-        VisualElement body = Controls.Section(box, string.Format(QuartzHost.Text("PRACTICE_BINDING", "Key {0}"), n), o => {
+        VisualElement body = ShellRows.Section(box, string.Format(QuartzHost.Text("PRACTICE_BINDING", "Key {0}"), n), o => {
             o.Open = false;
             o.Id = "PRACTICE_BINDING#" + n;
         });
