@@ -57,12 +57,31 @@ internal static class JudgementBar {
         }
         Recolour();
         if(blocked != null) Ui.Every(line.Root, 100, Recolour);   // a custom mask or a mode changes what is blocked
-        if(extra.Count > 0) rest = JudgementTiles.Tiles(card, mask, defaultMask, extra, save, extra.Count, JudgementTiles.Colour);
+        if(extra.Count > 0) {
+            rest = JudgementTiles.Tiles(card, mask, defaultMask, extra, save, extra.Count, JudgementTiles.Colour);
+            WrapLabels(rest);
+        }
         if(locked) {
             Labels(line);
             if(rest != null) Labels(rest);
         }
         return line;
+    }
+
+    // Facet workaround: a Facet tile is one fixed-height line that cuts its label short; on a narrow page the extra line's labels
+    // wrap (smaller) and the tile grows to hold them.
+    private static void WrapLabels(MaskTiles tiles) {
+        Sizes sz = Theme.For(tiles.Root).Sizes;
+        foreach(Control<bool> t in tiles.Tiles) {
+            t.Root.style.height = StyleKeyword.Auto;
+            t.Root.style.minHeight = sz.RowHeight;
+            t.Root.style.paddingTop = t.Root.style.paddingBottom = sz.Gap / 4f;
+            foreach(VisualElement child in t.Root.Children())
+                if(child is TextElement label) {
+                    label.style.whiteSpace = WhiteSpace.Normal;
+                    label.style.fontSize = sz.Small;
+                }
+        }
     }
 
     // A preset's bar: labels and fills only. No switch, no changed dot, and a tile takes no click (not dimmed: the fills are the point).
@@ -87,7 +106,10 @@ internal static class JudgementBar {
             VisualElement tile = line.Tiles[i].Root;
             tile.style.marginRight = 0f;
             tile.style.flexGrow = 1f;   // Facet sizes each tile for a gap after it; growing takes those gaps back
-            tile.style.height = sz.RowHeight * 2f;
+            // A narrow page (the Combo page beside its preview) wraps labels: let the tile grow instead of clipping them.
+            tile.style.height = StyleKeyword.Auto;
+            tile.style.minHeight = sz.RowHeight * 2f;
+            tile.style.paddingTop = tile.style.paddingBottom = sz.Gap / 2f;
             tile.style.flexDirection = FlexDirection.Column;
             tile.style.justifyContent = Justify.Center;
             tile.style.alignItems = Align.Center;
@@ -101,6 +123,7 @@ internal static class JudgementBar {
                     label.style.marginLeft = label.style.marginRight = 0f;
                     label.style.unityTextAlign = TextAnchor.MiddleCenter;
                     label.style.whiteSpace = WhiteSpace.Normal;
+                    label.style.fontSize = sz.Small;
                     // The changed dot hangs left of the label, out of the flow: label and switch stay put when it shows.
                     if(dot == null) continue;
                     var head = new VisualElement { pickingMode = PickingMode.Ignore };
