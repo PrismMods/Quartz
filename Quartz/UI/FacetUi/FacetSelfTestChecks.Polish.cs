@@ -9,7 +9,6 @@ using Quartz.UI.Nav;
 using Quartz.UI.Utility;
 using UnityEngine;
 using UnityEngine.UIElements;
-using HandOff = Quartz.UI.MenuHandOff;
 namespace Quartz.UI.FacetUi;
 /// <summary>
 /// The new menu's first look: its size at the classic default scale, the rail's icons, one right edge for a card's
@@ -19,12 +18,9 @@ internal static partial class FacetSelfTestChecks {
     private static readonly string[] EdgePages = [CorePages.HomePageKey, CorePages.FeaturesPageKey, CorePages.SettingsPageKey, FxPage];
 
     private static IEnumerator Polish(Action<string, bool, string> check, Action<string> info) {
-        bool wasOpen = UICore.IsOpen;
         float scale = MainCore.Conf.UIScale, speed = Anim.Speed;
         string query = ShellFeatures.Query;
         bool fxWas = FeatureService.IsEnabled(Fx), fxHad = FeatureService.State.Features.TryGetValue(Fx, out bool fxStored);
-        if(wasOpen) UICore.Close(true);
-        HandOff.ReturnTo = HandOff.Menu.None;
         try {
             MainCore.Conf.UIScale = 0.85f;   // the classic default; the open below applies it
             FacetBridge.OpenNewMenu(CorePages.HomePageKey);
@@ -56,10 +52,7 @@ internal static partial class FacetSelfTestChecks {
             Anim.Speed = speed;
             QuartzShell.ApplyLook();
             RestoreFeature(Fx, fxWas, fxHad, fxStored);
-            HandOff.ReturnTo = HandOff.Menu.None;
             QuartzShell.Hide();
-            if(UICore.IsOpen) UICore.Close(true);
-            if(wasOpen) UICore.Open(true);
         }
         yield return Frames(3);
     }

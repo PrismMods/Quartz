@@ -50,41 +50,8 @@ public static partial class GenerateUI {
         UnityUtils.AddEvent(EventTriggerType.PointerExit, e => button.OnHoverExit(), trigger);
         return button;
     }
-    public static void AddButton(GameObject obj, Action<InputButton> onClick, bool outline = true) {
-        EventTrigger trigger = obj.AddComponent<EventTrigger>();
-        AddClick(trigger, onClick);
-        if(outline) {
-            AddOutlineHover(obj, trigger);
-        }
-    }
-    private static void AddClick(EventTrigger trigger, Action<InputButton> onClick)
-        => UnityUtils.AddClickEvent(trigger, e => onClick?.Invoke(e.button));
-    internal static Image AddOutlineHover(GameObject obj, EventTrigger trigger) {
-        GTween hoverSeq = null;
-        GameObject hover = new("Hover");
-        hover.transform.SetParent(obj.transform, false);
-        hover.transform.SetAsFirstSibling();
-        RectTransform hoverRect = hover.AddComponent<RectTransform>();
-        hoverRect.anchorMin = Vector2.zero;
-        hoverRect.anchorMax = Vector2.one;
-        hoverRect.pivot = new Vector2(0.5f, 0.5f);
-        hoverRect.offsetMin = Vector2.zero;
-        hoverRect.offsetMax = Vector2.zero;
-        hover.AddComponent<LayoutElement>().ignoreLayout = true;
-        Image hoverImage = hover.AddComponent<Image>();
-        hoverImage.sprite = MainCore.Spr.Get(UISliceSprite.CircleOutline256P2048);
-        hoverImage.type = Image.Type.Sliced;
-        Color baseColor = UIColors.ObjectActive;
-        hoverImage.color = new Color(baseColor.r, baseColor.g, baseColor.b, 0f);
-        void FadeOutline(float target) {
-            hoverSeq?.Kill();
-            hoverSeq = hoverImage.GTAlpha(target, 0.1f).SetEasing(Easing.OutSine);
-            MainCore.TC.Play(hoverSeq);
-        }
-        UnityUtils.AddEvent(EventTriggerType.PointerEnter, e => FadeOutline(1f), trigger);
-        UnityUtils.AddEvent(EventTriggerType.PointerExit, e => FadeOutline(0f), trigger);
-        return hoverImage;
-    }
+    public static void AddButton(GameObject obj, Action<InputButton> onClick, bool outline = true) => UguiButton.Add(obj, onClick, outline);
+    internal static Image AddOutlineHover(GameObject obj, EventTrigger trigger) => UguiButton.OutlineHover(obj, trigger);
     public static void FixWidth(UIButton button, float width) {
         LayoutElement le = button.Rect.gameObject.AddComponent<LayoutElement>();
         le.preferredWidth = width;

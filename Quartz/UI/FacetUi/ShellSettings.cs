@@ -4,15 +4,14 @@ using Quartz.Async;
 using Quartz.Core;
 using Quartz.IO;
 using Quartz.Prism;
-using Quartz.UI.Factory.Page;
+using Quartz.Localization;
 using Quartz.UI.Nav;
 using Quartz.UI.Utility;
 using UnityEngine;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi;
 /// <summary>
-/// The new menu's Settings page: the classic page's settings regrouped into cards, each row writing the field the classic
-/// row writes.
+/// The menu's Settings page: Quartz's own settings in cards.
 /// </summary>
 internal static partial class ShellSettings {
     private static CoreSettings C => MainCore.Conf;
@@ -28,9 +27,6 @@ internal static partial class ShellSettings {
         Behaviour(Card(p, "MENU_GROUP_BEHAVIOUR"));
         Maintenance(Card(p, "MENU_GROUP_MAINTENANCE"));
         UpdatesCard(p);
-        VisualElement experimental = Card(p, "PRISM_GROUP_EXPERIMENTAL");
-        Switch(experimental, "PRISM_NEW_MENU", () => C.ExperimentalNewMenu, UICore.SetNewMenuSwitch, "PRISM_NEW_MENU_TIP");
-        QuartzShell.ClassicMenuRow(experimental, () => QuartzShell.OpenClassic(-1));
         VisualElement credits = Card(p, "CREDITS", o => o.Note = "CREDITS_LICENSE");
         foreach(string key in Credits) {
             string body = key + "_BODY";
@@ -78,7 +74,8 @@ internal static partial class ShellSettings {
 
     private static void Appearance(VisualElement card) {
         Controls.Colour(card, "ACCENT_COLOR", QuartzShell.Writes(() => C.GetAccentColor(), c => {
-            UICore.SetAccentColor(c, false);
+            C.SetAccentColor(c);
+            UIColors.ApplyAccent(C.GetAccentColor());   // every Facet and Prism window recolours
             Save();
         }), o => {
             o.Id = "ACCENT_COLOR";
@@ -98,7 +95,8 @@ internal static partial class ShellSettings {
         // At the end of a change, as the classic slider does: rescaling every step of a drag would move the track under the pointer.
         scale.Committed += v => { if(!History.Applying) ApplyScale(v); };   // an undo applied it as it wrote
         Controls.Slider(card, "WINDOW_OPACITY", QuartzShell.Writes(() => C.PanelOpacity * 100f, v => {
-            UICore.SetPanelOpacity(v / 100f, true);
+            C.PanelOpacity = Mathf.Clamp01(v / 100f);
+            Save();
             QuartzShell.ApplyLook();
         }), o => {
             o.Id = "WINDOW_OPACITY";
@@ -108,13 +106,7 @@ internal static partial class ShellSettings {
             o.Format = "0'%'";
             o.Tooltip = "DESC_WINDOW_OPACITY";
         });
-        // The new menu's own: the classic menu keeps its own rail.
         QuartzShell.SidebarRow(card);
-        Switch(card, "COLOR_PICKER_HORIZONTAL", () => C.ColorPickerHorizontal, v => {
-            C.ColorPickerHorizontal = v;
-            Save();
-            UICore.Rebuild();
-        }, "DESC_COLOR_PICKER_HORIZONTAL");
     }
 
     // PrismLib's Smooth scrolling, shared by every Prism window, then the animation duration Prism · Settings holds.
@@ -124,23 +116,14 @@ internal static partial class ShellSettings {
         QuartzShell.PrismLinkRow(card, PrismBridge.OpenPrismSettings, () => PrismBridge.Available && PrismBridge.UiAvailable);
     }
 
-    // Saved, and both menus rescaled.
+    // Saved, and the window rescaled.
     private static void ApplyScale(float v) {
-        UICore.ApplyUIScale(v, false);
+        C.UIScale = v;
+        Save();
         QuartzShell.ApplyLook();
     }
 
-    // Tooltips, middle-click and the scroll speed act on the classic menu, as they always have.
     private static void Behaviour(VisualElement card) {
-        Switch(card, "SHOW_TOOLTIP", () => C.Tooltip, v => {
-            Tooltip.Hide();
-            C.Tooltip = v;
-            Save();
-        }, "DESC_SHOW_TOOLTIP");
-        Switch(card, "MIDDLE_CLICK_TO_SET_AS_DEFAULT", () => C.MiddleClickToDefault, v => {
-            C.MiddleClickToDefault = v;
-            Save();
-        }, "DESC_MIDDLE_CLICK_TO_SET_AS_DEFAULT");
         QuartzShell.ScrollSpeedRow(card, QuartzShell.Writes(() => C.ScrollSpeed, v => {
             C.ScrollSpeed = v;
             Save();
@@ -148,12 +131,12 @@ internal static partial class ShellSettings {
     }
 
     private static void Language(VisualElement card) {
-        string[] langs = PageSettings.Languages();
+        string[] langs = LanguageActions.Languages();
         Controls.Dropdown(card, "LANGUAGE", QuartzShell.Writes(() => Array.IndexOf(langs, MainCore.Tr.Language), i => {
-            if(i >= 0 && i < langs.Length) PageSettings.ApplyLanguage(langs[i]);
+            if(i >= 0 && i < langs.Length) LanguageActions.Apply(langs[i]);
         }), o => {
             o.Id = "LANGUAGE";
-            o.Items = [.. langs.Select(PageSettings.LanguageName)];
+            o.Items = [.. langs.Select(LanguageActions.LanguageName)];
         });
     }
 
@@ -161,17 +144,15 @@ internal static partial class ShellSettings {
         Button reset = Controls.Danger(card, "HOME_RESET_ALL", "HOME_RESET", () => Reset(false), o => o.Id = "HOME_RESET_ALL");
         ShellRows.Describe(reset.parent.parent, "HOME_RESET_DESC");
         Controls.Danger(card, "HOME_RESET_CLEAN", "HOME_RESET_CLEAN", () => Reset(true), o => o.Id = "HOME_RESET_CLEAN");
-        Controls.Action(card, "MENU_RELOAD_LANG", "RELOAD", () => PageSettings.ReloadLanguages(null), o => o.Id = "MENU_RELOAD_LANG");
+        Controls.Action(card, "MENU_RELOAD_LANG", "RELOAD", () => LanguageActions.Reload(null), o => o.Id = "MENU_RELOAD_LANG");
     }
 
-    // As the classic Home's buttons: a pump later, and the classic menu rebuilds on what the reset left. This window, open
-    // over it, takes the reset scale, opacity and input block too.
+    // A pump later; this window takes the reset scale, opacity and input block.
     private static void Reset(bool clean) => MainThread.Enqueue(() => {
         if(!ProfileManager.ResetLive(clean)) {
             MainCore.Log.Wrn($"[Menu] {(clean ? "clean" : "reset")} of the settings failed; see the lines above");
             return;
         }
-        UICore.Rebuild(true);
         QuartzShell.ApplyLook();
         if(QuartzShell.Surface != null) QuartzShell.Surface.BlocksGameInput = C.BlockInputsWhileMenuOpen;
     });

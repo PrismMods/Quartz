@@ -1,6 +1,5 @@
 using HarmonyLib;
 using Quartz.Core;
-using Quartz.UI.Generator;
 using UnityEngine;
 namespace Quartz.Addons;
 public enum QuartzLoader {
@@ -158,11 +157,11 @@ public sealed class AddonContext {
             throw new InvalidOperationException($"addon '{Id}' must call GetSettings<T>() before RegisterSettingsTab()");
         object data = settingsData;
         object defaults = settingsDefaults;
-        RegisterTab(title ?? Id, content => AddonSettingsUI.Build(content, this, data, defaults, SaveSettings));
+        RegisterTab(title ?? Id, ClassicForm(data, defaults));
         AddonSettingsTabs.Register(new AddonSettingsTabs.Tab(TabKey(title ?? Id), Id, data, defaults, SaveSettings, Wrn));
     }
-    private string TabKey(string title) => "addon." + Id + "." + GenerateUI.LocaleKeyFromText("", title);
-    private string TopTabKey(string title) => "addon." + Id + ".top." + GenerateUI.LocaleKeyFromText("", title);
+    private string TabKey(string title) => "addon." + Id + "." + Quartz.Localization.LocaleKeys.FromText("", title);
+    private string TopTabKey(string title) => "addon." + Id + ".top." + Quartz.Localization.LocaleKeys.FromText("", title);
     public void RegisterTab(string title, Action<Transform> build) {
         // A custom page under a settings tab's title replaces it: the new menu draws it as the custom page it is.
         AddonSettingsTabs.Remove(TabKey(title));
@@ -171,23 +170,34 @@ public sealed class AddonContext {
             CategoryKey = Quartz.UI.Nav.CorePages.AddonsCategoryKey,
             Order = 100 + tabCount++,
             Title = title,
-            LocaleKey = GenerateUI.LocaleKeyFromText("ADDON_", title),
+            LocaleKey = Quartz.Localization.LocaleKeys.FromText("ADDON_", title),
             OwnerId = Id,
             OwnScroll = false,
-            Build = content => build(content),
+            Build = build == null ? null : content => build(content),
         });
     }
+    // The settings form in the classic menu; a build without that menu draws the tab in the new one only (AddonSettingsTabs).
+    private Action<Transform> ClassicForm(object data, object defaults) =>
+#if QUARTZ_CLASSIC_UI
+        content => AddonSettingsUI.Build(content, this, data, defaults, SaveSettings);
+#else
+        null;
+#endif
     public void BuildSettingsUI(Transform content) {
         if(settingsData == null)
             throw new InvalidOperationException($"addon '{Id}' must call GetSettings<T>() before BuildSettingsUI()");
+#if QUARTZ_CLASSIC_UI
         AddonSettingsUI.Build(content, this, settingsData, settingsDefaults, SaveSettings);
+#else
+        Wrn("BuildSettingsUI draws into the classic menu, which this build of Quartz does not have; use RegisterSettingsTab");
+#endif
     }
     public void RegisterTopLevelSettingsTab(string title = null, byte[] iconPng = null) {
         if(settingsData == null)
             throw new InvalidOperationException($"addon '{Id}' must call GetSettings<T>() before RegisterTopLevelSettingsTab()");
         object data = settingsData;
         object defaults = settingsDefaults;
-        RegisterTopLevelTab(title ?? Id, content => AddonSettingsUI.Build(content, this, data, defaults, SaveSettings), iconPng);
+        RegisterTopLevelTab(title ?? Id, ClassicForm(data, defaults), iconPng);
         AddonSettingsTabs.Register(new AddonSettingsTabs.Tab(TopTabKey(title ?? Id), Id, data, defaults, SaveSettings, Wrn));
     }
     public void RegisterTopLevelTab(string title, Action<Transform> build, byte[] iconPng = null) {
@@ -202,7 +212,7 @@ public sealed class AddonContext {
         Quartz.UI.Nav.NavRegistry.AddCategory(new Quartz.UI.Nav.NavCategory {
             Key = key,
             Title = title,
-            LocaleKey = GenerateUI.LocaleKeyFromText("ADDON_", title),
+            LocaleKey = Quartz.Localization.LocaleKeys.FromText("ADDON_", title),
             Icon = Quartz.Resource.UISprite.Layer128,
             IconAsset = iconKey,
             Order = 75 + topCount++,
@@ -214,10 +224,10 @@ public sealed class AddonContext {
             CategoryKey = key,
             Order = 0,
             Title = title,
-            LocaleKey = GenerateUI.LocaleKeyFromText("ADDON_", title),
+            LocaleKey = Quartz.Localization.LocaleKeys.FromText("ADDON_", title),
             OwnerId = Id,
             OwnScroll = false,
-            Build = content => build(content),
+            Build = build == null ? null : content => build(content),
         });
     }
     private int tabCount;

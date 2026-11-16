@@ -1,11 +1,13 @@
+#if QUARTZ_CLASSIC_UI
 using Quartz.Compat.Game;
 using Quartz.Core;
 using Quartz.Localization;
 using Quartz.UI;
 using Quartz.UI.Generator;
-using Quartz.UI.Nav;
 using TMPro;
 using UnityEngine;
+#endif
+using Quartz.UI.Nav;
 namespace Quartz.Features;
 // An unloaded feature keeps a stub tab where its pages would be, so it can be turned on from there.
 internal static class FeaturePages {
@@ -26,7 +28,9 @@ internal static class FeaturePages {
                 Title = handle.Name,
                 LocaleKey = handle.Info.NameKey,
                 OwnerId = StubOwner + handle.Id,
+#if QUARTZ_CLASSIC_UI
                 Build = content => Build(content, handle),
+#endif
             });
         }
     }
@@ -44,6 +48,7 @@ internal static class FeaturePages {
             if(FeatureOf(page) == id) return page.State;
         return -1;
     }
+#if QUARTZ_CLASSIC_UI
     public static void AddSwitch(RectTransform content, string id) =>
         GenerateUI.Toggle(GenerateUI.Row(content.transform), true, true, v => FeatureService.SetEnabled(id, v), "Use this feature", "feature_page_enable");
     private static void Build(RectTransform content, FeatureService.Handle handle) {
@@ -62,6 +67,7 @@ internal static class FeaturePages {
         error.color = UIColors.SoftRed;
         error.text = handle.Error.Length > 900 ? handle.Error[..900] + "…" : handle.Error;
     }
+#endif
     internal static FeatureService.Handle Blocker(FeatureService.Handle handle) {
         foreach(string dep in handle.Info.Deps)
             if(FeatureService.Find(dep) is { Loaded: false } off) return off;

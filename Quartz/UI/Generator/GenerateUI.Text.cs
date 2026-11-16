@@ -55,45 +55,8 @@ public static partial class GenerateUI {
         if(string.IsNullOrEmpty(key) || string.IsNullOrEmpty(defaultValue)) return text;
         return Localize(text, key, defaultValue);
     }
-    public static string LocaleKeyFromId(string id, string suffix = null) {
-        if(string.IsNullOrWhiteSpace(id)) return null;
-        string key = NormalizeLocaleKey(id);
-        key = StripIndexedPrefix(key, "PANEL");
-        key = StripIndexedPrefix(key, "PRACTICE");
-        key = StripIndexedPrefix(key, "JRSEC");
-        if(key.StartsWith("PANEL_PICK_")) {
-            key = "PANEL_STAT_" + key["PANEL_PICK_".Length..];
-        }
-        if(!string.IsNullOrEmpty(suffix)) key += "_" + NormalizeLocaleKey(suffix);
-        return key;
-    }
-    public static string LocaleKeyFromText(string prefix, string text) {
-        string key = NormalizeLocaleKey(text);
-        return string.IsNullOrEmpty(prefix) ? key : NormalizeLocaleKey(prefix) + "_" + key;
-    }
-    private static string StripIndexedPrefix(string key, string prefix) {
-        if(key == null || !key.StartsWith(prefix)) return key;
-        int i = prefix.Length;
-        while(i < key.Length && char.IsDigit(key[i])) i++;
-        return i > prefix.Length && i < key.Length && key[i] == '_' ? prefix + key[i..] : key;
-    }
-    private static string NormalizeLocaleKey(string value) {
-        if(string.IsNullOrWhiteSpace(value)) return null;
-        List<char> chars = [];
-        bool lastUnderscore = false;
-        foreach(char raw in value.Trim().ToUpperInvariant()) {
-            char c = char.IsLetterOrDigit(raw) ? raw : '_';
-            if(c == '_') {
-                if(lastUnderscore) continue;
-                lastUnderscore = true;
-            } else {
-                lastUnderscore = false;
-            }
-            chars.Add(c);
-        }
-        while(chars.Count > 0 && chars[^1] == '_') chars.RemoveAt(chars.Count - 1);
-        return chars.Count == 0 ? null : new string(chars.ToArray());
-    }
+    public static string LocaleKeyFromId(string id, string suffix = null) => LocaleKeys.FromId(id, suffix);
+    public static string LocaleKeyFromText(string prefix, string text) => LocaleKeys.FromText(prefix, text);
     private static TextMeshProUGUI CreateText(Transform parent, float size, bool bold, bool noPad) {
         GameObject obj = new("Text");
         obj.transform.SetParent(parent, false);
@@ -112,14 +75,7 @@ public static partial class GenerateUI {
         return tmp;
     }
     // One line in a fixed slot: shrink, then ellipsize, never wrap.
-    public static TMP_Text FitLine(TMP_Text text, float minSize = 16f) {
-        TextCompat.NoWrap(text);
-        text.fontSizeMax = text.fontSize;
-        text.fontSizeMin = Mathf.Min(minSize, text.fontSize);
-        text.enableAutoSizing = true;
-        text.overflowMode = TextOverflowModes.Ellipsis;
-        return text;
-    }
+    public static TMP_Text FitLine(TMP_Text text, float minSize = 16f) => UnityUtils.FitLine(text, minSize);
     // Wrapped text: the row grows to fit.
     public static T WrapGrow<T>(T text, float padding = 6f) where T : TMP_Text {
         TextCompat.Wrap(text);

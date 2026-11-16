@@ -174,6 +174,30 @@
 		<DefineConstants>$(DefineConstants);IL2CPP</DefineConstants>
 	</PropertyGroup>
 
+	<!-- The classic uGUI settings menu ships only where the new (Facet) menu cannot run: IL2CPP and
+	     the KeyViewer flavour. Every other build leaves its files out; QUARTZ_CLASSIC_UI gates the
+	     code in shared files. -->
+	<PropertyGroup Condition="$(Configuration.Contains('IL2CPP')) Or '$(Flavor)' == 'KeyViewer'">
+		<DefineConstants>$(DefineConstants);QUARTZ_CLASSIC_UI</DefineConstants>
+	</PropertyGroup>
+	<ItemGroup Condition="!$(DefineConstants.Contains('QUARTZ_CLASSIC_UI'))">
+		<Compile Remove="UI/Factory/**/*.cs" />
+		<Compile Remove="Features/**/Page*.cs" />
+		<Compile Remove="UI/UICore.cs;UI/UICore.Bands.cs;UI/UICore.FirstRun.cs;UI/UICore.Power.cs;UI/UICore.Reorganize.cs;UI/UICore.Shell.cs;UI/UICore.Theme.cs;UI/UICore.Visibility.cs;UI/MenuHandOff.cs" />
+		<Compile Remove="UI/Generator/**/*.cs" />
+		<Compile Remove="UI/Objects/Impl/**/*.cs" />
+		<Compile Remove="UI/Objects/UIObject.cs" />
+		<Compile Remove="UI/Panes/**/*.cs" />
+		<Compile Remove="UI/Transition/**/*.cs" />
+		<Compile Remove="UI/Search/**/*.cs" />
+		<Compile Remove="UI/Home/HomeUI.cs" />
+		<Compile Remove="UI/Utility/GrowRow.cs;UI/Utility/NonRaycastButton.cs;UI/Utility/PaneDivider.cs;UI/Utility/ResizeHandle.cs;UI/Utility/StripWheel.cs;UI/Utility/ThemeExempt.cs;UI/Utility/UISpinner.cs;UI/Utility/UIScrollController.cs" />
+		<Compile Remove="Features/KeyViewer/Editor/**/*.cs" />
+		<Compile Include="Features/KeyViewer/Editor/KvProps.cs" />
+		<Compile Remove="Features/Tuf/TufBrowserView*.cs;Features/Tuf/TufPacksView*.cs;Features/Tuf/TufSettingsUI.cs;Features/Tuf/TufBrowserUI.cs;Features/Tuf/TufPacksUI.cs;Features/Tuf/TufDifficultyRangeBar.cs" />
+		<Compile Remove="Addons/AddonSettingsUI.cs" />
+	</ItemGroup>
+
 	<!-- The DEBUG Facet and Prism self-tests name API the stubs lack (stubs/README.md), so a
 	     stubs build leaves them out; QUARTZ_STUBS drops their hooks in QuartzRuntime. -->
 	<PropertyGroup Condition="'$(UseStubs)' == 'true'">

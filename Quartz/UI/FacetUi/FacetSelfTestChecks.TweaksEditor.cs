@@ -64,7 +64,7 @@ internal static partial class FacetSelfTestChecks {
         IEnumerator More() {
             bool was = C().FastBloom;
             yield return Saved(check, page, "OPT_FASTBLOOM", () => ClickRow("OPT_FASTBLOOM"), () => C().FastBloom != was, Optimizer.ConfMgr.Path);
-            yield return ClassicSees(check, page, "OPT_SKIPIDLEPARTICLES", Bind.To(() => C().SkipIdleParticles, v => {
+            yield return Flips(check, page, "OPT_SKIPIDLEPARTICLES", Bind.To(() => C().SkipIdleParticles, v => {
                 C().SkipIdleParticles = v;
                 Optimizer.Apply();
                 Optimizer.Save();
@@ -96,7 +96,7 @@ internal static partial class FacetSelfTestChecks {
         string[] keys = ["EDITOR_BGA_MOD", "EDITOR_BGA_HIDE_TILE_DECO", "EDITOR_BGA_HIDE_PLANET_DECO"];
         yield return EditorFormPage(check, page, keys, keys, EditorFeature.Apply, () => More());
         IEnumerator More() {
-            yield return ClassicSees(check, page, "EDITOR_BGA_MOD", Bind.To(() => EditorFeature.Conf.BgaMod, v => {
+            yield return Flips(check, page, "EDITOR_BGA_MOD", Bind.To(() => EditorFeature.Conf.BgaMod, v => {
                 EditorFeature.Conf.BgaMod = v;
                 EditorFeature.Apply();
                 EditorFeature.Save();
@@ -117,10 +117,9 @@ internal static partial class FacetSelfTestChecks {
             bool was = C().AdjustOnFlip;
             yield return Saved(check, page, "EDITOR_FLIP_ADJUST", () => ClickRow("EDITOR_FLIP_ADJUST"), () => C().AdjustOnFlip != was,
                 EditorFeature.ConfMgr.Path);
-            // The header switch's check on editor.bga reloaded the feature, which drops its classic toggles; a bound key then
-            // builds every classic page once (~400 ms) before it fires. Built here first, as the classic menu leaves them, so
-            // the timing below is the row's alone.
-            Quartz.UI.Factory.PageFactory.EnsureAllBuilt();
+            // The header switch's check on editor.bga reloaded the feature, which drops its rows' hotkey flips; a bound key then
+            // builds every page once before it fires. Built here first, so the timing below is the row's alone.
+            FacetBridge.BuildAllPages();
             yield return Frames(1);
             yield return Hotkey(check, page, "EDITOR_FLIP_ADJUST", "editor_flip_adjust", "DESC_EDITOR_FLIP_ADJUST", Bind.To(() => C().AdjustOnFlip, v => {
                 C().AdjustOnFlip = v;

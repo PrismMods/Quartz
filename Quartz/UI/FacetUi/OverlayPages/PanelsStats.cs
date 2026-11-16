@@ -4,7 +4,6 @@ using Quartz.Compat.Game;
 using Quartz.Core;
 using Quartz.Features.Panels;
 using Quartz.Overlay;
-using Quartz.UI.Generator;
 using UnityEngine;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi.OverlayPages;
@@ -53,11 +52,11 @@ internal static class PanelsStats {
             var bodies = new List<(string Category, Button Head, VisualElement Body)>();
             void Say(Button head, string category, bool open) =>
                 // Text set by hand is not translated by Facet: Quartz translates it (QuartzShell.Label is a key, for Ui calls).
-                head.text = (open ? "▾ " : "▸ ") + QuartzHost.Text(GenerateUI.LocaleKeyFromText("PANEL_CATEGORY", category), category);
+                head.text = (open ? "▾ " : "▸ ") + QuartzHost.Text(Quartz.Localization.LocaleKeys.FromText("PANEL_CATEGORY", category), category);
             foreach(string category in categories) {
                 string c = category;
                 Button head = Ui.Btn(content, "", null);
-                head.name = GenerateUI.LocaleKeyFromText("PANEL_CATEGORY", c) + "#" + n;
+                head.name = Quartz.Localization.LocaleKeys.FromText("PANEL_CATEGORY", c) + "#" + n;
                 Paint.Look(head, Theme.For(head).Looks.Row);
                 head.style.unityTextAlign = TextAnchor.MiddleLeft;
                 head.style.marginRight = 0f;
@@ -72,7 +71,7 @@ internal static class PanelsStats {
                     if(stat.Category != c) continue;
                     string id = stat.Id;
                     Button b = Ui.Btn(body, QuartzShell.Label(StatKey(id), DefaultLabel(id)), () => Pick(id));
-                    b.name = GenerateUI.LocaleKeyFromText("PANEL_PICK", id) + "#" + n + "-input";
+                    b.name = Quartz.Localization.LocaleKeys.FromText("PANEL_PICK", id) + "#" + n + "-input";
                     b.style.marginRight = sz.Gap; b.style.marginBottom = sz.Gap;
                     b.SetEnabled(id is "text" or "image" || !panel.Stats.Exists(e => e.Id == id && e != replace));
                 }
@@ -187,15 +186,14 @@ internal static class PanelsStats {
         Changed(before);
     }
 
-    // The classic page shows the stats too: it rebuilds before it next shows. Fold states follow the stats' new numbers.
+    // Fold states follow the stats' new numbers.
     private static void Changed(Dictionary<object, int> before = null) {
         PanelsOverlay.Save();
-        UICore.ClassicStale = true;
         if(before != null) PanelsList.FoldsFollow(before);
         QuartzShell.Surface?.Refresh();
     }
 
-    private static string StatKey(string id) => GenerateUI.LocaleKeyFromText("PANEL_STAT", id);
+    private static string StatKey(string id) => Quartz.Localization.LocaleKeys.FromText("PANEL_STAT", id);
 
     private static string DefaultLabel(string id) {
         foreach(PanelsOverlay.StatDef stat in PanelsOverlay.AllStats)
@@ -282,7 +280,6 @@ internal static class PanelsStats {
                 if(string.IsNullOrEmpty(picked)) return;
                 s.Image = picked;
                 save();
-                UICore.ClassicStale = true;
             }), o => {
                 o.Id = "PANEL_IMAGE_CHOOSE#" + g;
                 o.Tooltip = "DESC_PANEL_IMAGE_CHOOSE";

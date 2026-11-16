@@ -134,24 +134,7 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(2);
     }
 
-    // Boehm refills small objects from partly used blocks first, which the heap size does not show; 2000 x 128 bytes read 0 here.
-    private const int KvProbeRuns = 20000;
-    // The heap is the whole process's, so another thread can add a block or two; one allocation per tick (16 bytes or more)
-    // would add over 300 KB.
-    private const long KvProbeSlack = 64 * 1024;
     private static object kvSink;
-    // Heap growth over body with the collector paused (the game's Boehm GC reports no per-thread allocation count).
-    private static long KvHeapGrowth(Action body) {
-        var mode = UnityEngine.Scripting.GarbageCollector.GCMode;
-        try {
-            UnityEngine.Scripting.GarbageCollector.GCMode = UnityEngine.Scripting.GarbageCollector.Mode.Disabled;
-            long a = GC.GetTotalMemory(false);
-            body();
-            return GC.GetTotalMemory(false) - a;
-        } finally {
-            UnityEngine.Scripting.GarbageCollector.GCMode = mode;
-        }
-    }
 
     // The two columns: the editor right, 36% left; pinned while the page scrolls; the inspector under the canvas; stacked when narrow.
     private static IEnumerator KvColumns(Action<string, bool, string> check) {
@@ -343,7 +326,7 @@ internal static partial class FacetSelfTestChecks {
         return before && !phantom && model.Editing == now.SelectedTab;
     }
 
-    // With the door forced off, a rebuilt page shows the card that opens the classic editor; back on, the editor returns.
+    // With the door forced off, a rebuilt page shows the card saying the editor is missing; back on, the editor returns.
     private static IEnumerator KvFallback(Action<string, bool, string> check) {
         KvEditorDoor.ForceGone = true;
         try {
@@ -351,9 +334,8 @@ internal static partial class FacetSelfTestChecks {
             yield return Frames(2);
             QuartzShell.Go(KeyViewerPage);
             yield return Frames(3);
-            check($"{KeyViewerPage}: with PrismLib.UI unusable the page has the classic-editor card and no editor",
-                Body.Q(name: "kle-root") == null && Body.Q<Button>("MENU_KV_EDITOR-input") != null, $"editor={Body.Q(name: "kle-root") != null}");
-            yield return EditorLink(check, KeyViewerPage, "MENU_KV_EDITOR");
+            check($"{KeyViewerPage}: with PrismLib.UI unusable the page says the editor is missing and has no editor",
+                Body.Q(name: "kle-root") == null && Body.Q(name: "MENU_KV_EDITOR") != null, $"editor={Body.Q(name: "kle-root") != null}");
         } finally {
             KvEditorDoor.ForceGone = false;
         }

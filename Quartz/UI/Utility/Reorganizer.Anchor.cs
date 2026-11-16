@@ -79,7 +79,9 @@ public static partial class Reorganizer {
     private static ReorganizeAnchorLine anchorLine;
     private static void BuildAnchorLine(ReorganizeHandle handle) {
         ClearAnchorLine();
+#if QUARTZ_CLASSIC_UI
         if(canvasObj != null && handle != null) anchorLine = ReorganizeAnchorLine.Create(canvasObj.transform, handle);
+#endif
     }
     private static void ClearAnchorLine() {
         if(anchorLine != null) Object.Destroy(anchorLine.gameObject);

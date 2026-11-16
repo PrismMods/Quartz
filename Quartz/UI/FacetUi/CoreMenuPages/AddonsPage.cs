@@ -4,7 +4,6 @@ using Quartz.Addons;
 using Quartz.Async;
 using Quartz.Compat.Game;
 using Quartz.Core;
-using Quartz.UI.Generator;
 using UnityEngine;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi.CoreMenuPages;
@@ -70,7 +69,7 @@ internal static class AddonsPage {
         string unit = h.UnitId;
         Control<bool> toggle = Controls.Toggle(box, "", Bind.To(() => h.Enabled,
             v => QuartzShell.Do("addons.enable:" + unit + ":" + v, () => AddonService.SetAddonEnabled(h, v))), o => {
-            o.Id = GenerateUI.LocaleKeyFromId("addon_" + unit);
+            o.Id = Quartz.Localization.LocaleKeys.FromId("addon_" + unit);
             o.Undoable = false;
         });
         if(toggle.Root.Q<Label>() is Label name) {

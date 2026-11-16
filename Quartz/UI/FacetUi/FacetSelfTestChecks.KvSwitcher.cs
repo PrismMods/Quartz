@@ -37,8 +37,6 @@ internal static partial class FacetSelfTestChecks {
             yield break;
         }
         CoreSettings c = MainCore.Conf;
-        bool newMenu = c.ExperimentalNewMenu;
-        c.ExperimentalNewMenu = true;   // Edit follows the player's menu choice: both are checked
         OverlayPreview.Lease lease = OverlayPreview.Take(KeyViewerOverlay.FontKey);
         try {
             yield return KvSwitcherFirstOpen(check, info);   // first: it times the switcher's first open
@@ -54,14 +52,12 @@ internal static partial class FacetSelfTestChecks {
             yield return KvSwitcherMenu(check);
             yield return KvSwitcherNew(check);
             yield return KvSwitcherEdit(check);
-            yield return KvSwitcherHub(check);
             yield return KvSwitcherHotkeyChecks(check);
             yield return KvSwitcherForcedOff(check);
             yield return KvSwitcherShutdown(check);
         } finally {
             KvEditorDoor.ForceGone = false;
             FacetBridge.HideKvSwitcher();
-            c.ExperimentalNewMenu = newMenu;
             KvSwitcherHotkey.TrySet(c.KvSwitcherModifier, c.KvSwitcherKey);   // clears the refused line; KvGuard puts the chord back
             lease?.Release();
             global::Facet.Popup.CloseAll();
@@ -134,8 +130,6 @@ internal static partial class FacetSelfTestChecks {
         float until = Time.realtimeSinceStartup + s;
         while(Time.realtimeSinceStartup < until) yield return null;
     }
-
-    private static Transform KvHub => UICore.CanvasObj.transform.Find("ReorganizeHub");
 
     // ---- the first open, at the layout limit with a 108-key layout
 
@@ -388,75 +382,13 @@ internal static partial class FacetSelfTestChecks {
             !KvSwShows && FacetBridge.NewMenuVisible() && QuartzShell.CurrentPage == KeyViewerPage && KvM.Editing == kvHand2,
             $"shows={KvSwShows} menu={FacetBridge.NewMenuVisible()} page={QuartzShell.CurrentPage} editing={KvM.Editing}");
 
-        CoreSettings c = MainCore.Conf;
-        c.ExperimentalNewMenu = false;
-        try {
-            FacetBridge.OpenKvSwitcher();
-            yield return Frames(2);
-            KvIn(KvSwMenu(true, kvHand), KeyLayoutText.EditLayout)?.Run?.Invoke();
-            yield return Frames(3);
-            int state = NavRegistry.StateFor(KeyViewerPage);
-            check($"{KvSwitcherPage}: with the new menu turned off, Edit opens the classic menu on the Key Viewer page with that layout shown",
-                !KvSwShows && UICore.IsOpen && UICore.CurrentMenuState == state && !FacetBridge.NewMenuVisible() && KvStore.Current.SelectedTab == kvHand,
-                $"open={UICore.IsOpen} state={UICore.CurrentMenuState}/{state} menu={FacetBridge.NewMenuVisible()} shown={KvStore.Current.SelectedTab}");
-        } finally {
-            c.ExperimentalNewMenu = true;
-            Quartz.UI.MenuHandOff.ReturnTo = Quartz.UI.MenuHandOff.Menu.None;
-            if(UICore.IsOpen) UICore.Close(true);
-        }
         yield return KvBackOnPage();
-    }
-
-    /// <summary>The menu-absent run's check, with the new-menu switch on but no suite shell: a card's Edit opens the classic
-    /// menu on the Key Viewer page, never the new menu.</summary>
-    internal static IEnumerator KvSwitcherEditClassic(Action<string, bool, string> check) => KvGuard(check, () => KvEditClassic(check));
-
-    private static IEnumerator KvEditClassic(Action<string, bool, string> check) {
-        if(UICore.IsOpen) UICore.Close(true);
-        yield return Frames(1);
-        typeof(KvEditorPage).GetMethod("Edit", BindingFlags.NonPublic | BindingFlags.Static)!.Invoke(null, [KvStore.Current.SelectedTab]);
-        yield return Frames(3);
-        int state = NavRegistry.StateFor(KeyViewerPage);
-        check("without the suite shell, the switcher's Edit opens the classic menu on the Key Viewer page",
-            UICore.IsOpen && UICore.CurrentMenuState == state && !FacetBridge.NewMenuVisible(),
-            $"open={UICore.IsOpen} state={UICore.CurrentMenuState}/{state} menu={FacetBridge.NewMenuVisible()}");
     }
 
     private static IEnumerator KvBackOnPage() {
-        Quartz.UI.MenuHandOff.ReturnTo = Quartz.UI.MenuHandOff.Menu.None;
-        Quartz.UI.MenuHandOff.FromHub = false;
-        if(UICore.IsOpen) UICore.Close(true);
         yield return Frames(2);
         FacetBridge.OpenNewMenu(KeyViewerPage);
         yield return Frames(3);
-    }
-
-    // ---- the hub's Layouts button
-
-    private static IEnumerator KvSwitcherHub(Action<string, bool, string> check) {
-        FacetBridge.HideKvSwitcher();
-        QuartzShell.Hide();
-        UICore.OpenToHub();
-        float until = Time.realtimeSinceStartup + 0.4f;   // the hub's fade in ends
-        while(Time.realtimeSinceStartup < until) yield return null;
-        Vector2 size = ((RectTransform)KvHub.transform).sizeDelta;
-        bool clicked = ClickLabel(KvHub, MainCore.Tr.Get("MENU_KVE_LAYOUTS", "Layouts"));
-        yield return Frames(2);
-        var group = KvHub.GetComponent<CanvasGroup>();
-        bool under = group.alpha == 0f && !group.blocksRaycasts;
-        VisualElement root = ((global::Facet.Surface)KvSwField(KvSw, "_surface"))?.Root;
-        VisualElement window = root?.Q(name: KeyLayoutText.Switcher) ?? root?.Children().FirstOrDefault();
-        VisualElement picked = window?.panel?.Pick(window.worldBound.center);
-        bool ours = picked != null && root!.Contains(picked);
-        check($"{KvSwitcherPage}: the hub has a Layouts button (260 x 364) that opens the switcher; the hub hides under it, and the switcher's centre picks the switcher",
-            clicked && size == new Vector2(260f, 364f) && KvSwShows && under && ours,
-            $"clicked={clicked} size={size} shows={KvSwShows} alpha={group.alpha} rays={group.blocksRaycasts} picked={picked?.name}");
-        FacetBridge.HideKvSwitcher();
-        yield return Frames(2);
-        check($"{KvSwitcherPage}: hiding the switcher leaves the hub, shown again",
-            AtHub() && group.alpha == 1f && group.blocksRaycasts, $"atHub={AtHub()} alpha={group.alpha} rays={group.blocksRaycasts}");
-        UICore.ExitReorganize();
-        yield return KvBackOnPage();
     }
 }
 #endif

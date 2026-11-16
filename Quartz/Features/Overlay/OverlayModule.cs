@@ -12,7 +12,9 @@ public sealed class OverlayModule : QuartzFeature {
             Order = 10,
             Title = "General",
             LocaleKey = "OVERLAY_GENERAL",
+#if QUARTZ_CLASSIC_UI
             Build = PageOverlayGeneral.Create,
+#endif
             OwnScroll = true,
             // The KeyViewer flavour has one page; its Reorganize button is on the key viewer page.
             Visible = static () => !Quartz.Core.Info.KeyViewerOnly,

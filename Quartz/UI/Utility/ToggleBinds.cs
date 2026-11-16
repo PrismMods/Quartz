@@ -1,18 +1,29 @@
 using Quartz.Core;
+#if QUARTZ_CLASSIC_UI
 using Quartz.UI.Objects.Impl;
+#endif
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 namespace Quartz.UI.Utility;
 public static class ToggleBinds {
-    private static readonly Dictionary<string, List<UIToggle>> live = [];
     private static readonly List<string> pending = [];
+#if QUARTZ_CLASSIC_UI
+    private static readonly Dictionary<string, List<UIToggle>> live = [];
     public static void Register(string id, UIToggle toggle) {
         if(string.IsNullOrEmpty(id) || toggle == null) return;
         if(!live.TryGetValue(id, out List<UIToggle> list)) live[id] = list = [];
         list.Add(toggle);
     }
     public static void ClearLive() => live.Clear();
+#else
+    // No classic toggles here: a hotkey flips the new menu's row through its own bind, which applies and saves.
+    // The latest build of a row wins; a bind holds no UI, so one from a detached build (the search index) works too.
+    private static readonly Dictionary<string, Action> flips = [];
+    internal static void Register(string id, Action flip) {
+        if(!string.IsNullOrEmpty(id) && flip != null) flips[id] = flip;
+    }
+#endif
     public static bool TryGet(string id, out Keybind.KeyModifier modifier, out KeyCode key) {
         modifier = Keybind.KeyModifier.None;
         key = KeyCode.None;
@@ -32,12 +43,14 @@ public static class ToggleBinds {
         if(!MainCore.Conf.ToggleKeybinds.Remove(id)) return;
         MainCore.ConfMgr.RequestSave();
     }
+#if QUARTZ_CLASSIC_UI
     /// <summary>A value written outside the classic menu: its toggles show it without acting on it, so a hotkey flips from it.</summary>
     public static void Show(string id, bool value) {
         if(string.IsNullOrEmpty(id) || !live.TryGetValue(id, out List<UIToggle> list)) return;
         foreach(UIToggle toggle in list)
             if(toggle != null && toggle.Rect != null) toggle.Set(value, invoke: false);
     }
+#endif
     public static void HandleUpdate() {
         var binds = MainCore.Conf.ToggleKeybinds;
         if(binds.Count == 0 || Keybind.Capturing || KeyCaptureCoordinator.ReleasedThisFrame || !MainCore.IsModEnabled) return;
@@ -53,6 +66,24 @@ public static class ToggleBinds {
         pending.Clear();
     }
     private static bool IsTyping() => Quartz.UI.Objects.UIInputBlocker.IsEditing;
+#if !QUARTZ_CLASSIC_UI
+    private static int builtAt = -1;
+    private static void Fire(string id) {
+        // A feature's own switch needs no page.
+        if(id.StartsWith("feature_", StringComparison.Ordinal)) {
+            string feature = id["feature_".Length..];
+            if(Quartz.Features.FeatureService.Find(feature) != null)
+                Quartz.Features.FeatureService.SetEnabled(feature, !Quartz.Features.FeatureService.IsEnabled(feature));
+            return;
+        }
+        // Once per page set: a bind left for a row that is gone does not rebuild every page on each press.
+        if(!flips.ContainsKey(id) && builtAt != Quartz.UI.Nav.NavRegistry.Version) {
+            builtAt = Quartz.UI.Nav.NavRegistry.Version;
+            Quartz.UI.FacetUi.FacetBridge.BuildAllPages();
+        }
+        if(flips.TryGetValue(id, out Action flip)) flip();
+    }
+#else
     private static void Fire(string id) {
         if(!live.TryGetValue(id, out List<UIToggle> list)) {
             // A feature's switch lives on the Features page: build that one, not every classic page.
@@ -76,4 +107,5 @@ public static class ToggleBinds {
         for(int i = 0; i < list.Count; i++)
             if(!ReferenceEquals(list[i], primary)) list[i].Set(primary.Value, false);
     }
+#endif
 }

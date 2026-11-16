@@ -23,7 +23,9 @@ public sealed class KeyViewerModule : QuartzFeature {
             Order = 20,
             Title = "Key Viewer",
             LocaleKey = "SECTION_KEY_VIEWER",
+#if QUARTZ_CLASSIC_UI
             Build = PageKeyViewer.Create,
+#endif
             OwnScroll = true,
         });
         Context.AddHomeCard(new Quartz.UI.Home.HomeCard {

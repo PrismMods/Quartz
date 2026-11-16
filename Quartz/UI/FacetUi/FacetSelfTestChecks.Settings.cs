@@ -6,41 +6,31 @@ using Quartz.Compat;
 using Quartz.Core;
 using Quartz.Prism;
 using Quartz.UI.Nav;
-using Quartz.UI.Objects.Impl;
 using Quartz.UI.Utility;
 using UnityEngine;
 using UnityEngine.UIElements;
-using HandOff = Quartz.UI.MenuHandOff;
 namespace Quartz.UI.FacetUi;
 /// <summary>
-/// The new menu's Settings page: its cards in order, each switch against the live classic Settings page, the sliders, the
-/// hotkey and its refusals, the hand-offs to the classic menu, the rows only looked at, and the language, last.
+/// The menu's Settings page: its cards in order, each switch, the sliders, the hotkey and its refusals, the rows only looked
+/// at, and the language, last.
 /// </summary>
 internal static partial class FacetSelfTestChecks {
     private static readonly string[] SettingsCardKeys =
         ["LANGUAGE", "PRISM_GROUP_MENU", "MENU_GROUP_APPEARANCE", "FONT", "SETTINGS_FONT", "HEADING_ANIMATION", "MENU_GROUP_BEHAVIOUR", "MENU_GROUP_MAINTENANCE",
-            "UPDATES", "PRISM_GROUP_EXPERIMENTAL", "CREDITS"];
-    // Each switch row, the classic page's toggle for the same field, and the field.
-    private static readonly (string row, string classic, Func<bool> get)[] SettingsSwitches = [
-        ("SHOW_OVERLAYER_PANEL_AT_STARTUP", "show_on_startup", () => MainCore.Conf.ShowOnStartup),
-        ("BLOCK_INPUTS_WHILE_MENU_OPEN", "block_inputs_while_menu_open", () => MainCore.Conf.BlockInputsWhileMenuOpen),
-        ("COLOR_PICKER_HORIZONTAL", "color_picker_horizontal", () => MainCore.Conf.ColorPickerHorizontal),
-        ("SHOW_TOOLTIP", "show_tooltip", () => MainCore.Conf.Tooltip),
-        ("MIDDLE_CLICK_TO_SET_AS_DEFAULT", "middle_click_default", () => MainCore.Conf.MiddleClickToDefault),
-        ("PRISM_NEW_MENU", "prism_new_menu", () => MainCore.Conf.ExperimentalNewMenu),
-        ("SMOOTH_SCROLL", "smooth_scroll", () => PrismBridge.SmoothScroll),   // PrismLib's: the page puts its settings file back
+            "UPDATES", "CREDITS"];
+    // Each switch row and its field.
+    private static readonly (string row, Func<bool> get)[] SettingsSwitches = [
+        ("SHOW_OVERLAYER_PANEL_AT_STARTUP", () => MainCore.Conf.ShowOnStartup),
+        ("BLOCK_INPUTS_WHILE_MENU_OPEN", () => MainCore.Conf.BlockInputsWhileMenuOpen),
+        ("SMOOTH_SCROLL", () => PrismBridge.SmoothScroll),   // PrismLib's: the page puts its settings file back
     ];
 
     private static IEnumerator SettingsPage(Action<string, bool, string> check) {
-        bool wasOpen = UICore.IsOpen;
         IO.CoreSettings c = MainCore.Conf;
-        var was = (c.ShowOnStartup, c.BlockInputsWhileMenuOpen, c.ColorPickerHorizontal, c.Tooltip, c.MiddleClickToDefault, c.UIScale, c.PanelOpacity,
-            c.ScrollSpeed, c.ToggleKey, c.ToggleModifier, c.Language, c.LanguageAutoDetected, c.PanelWidth, c.PanelHeight, UICore.LastPanelSize);
-        bool newMenu = c.ExperimentalNewMenu;
+        var was = (c.ShowOnStartup, c.BlockInputsWhileMenuOpen, c.UIScale, c.PanelOpacity, c.ScrollSpeed, c.ToggleKey, c.ToggleModifier, c.Language,
+            c.LanguageAutoDetected);
         string trLang = MainCore.Tr.Language;
         Action restore = PrismBridge.KeepPrismConfig();
-        if(wasOpen) UICore.Close(true);
-        HandOff.ReturnTo = HandOff.Menu.None;
         try {
             FacetBridge.OpenNewMenu(CorePages.SettingsPageKey);
             yield return Frames(3);
@@ -50,7 +40,6 @@ internal static partial class FacetSelfTestChecks {
             yield return SettingsSliders(check);
             yield return SettingsSidebar(check);
             yield return SettingsHotkey(check);
-            yield return SettingsHandOffs(check);
             SettingsRest(check);
             yield return SettingsSmooth(check);
             yield return SettingsLanguage(check);
@@ -59,19 +48,12 @@ internal static partial class FacetSelfTestChecks {
             PrismBridge.Tick();
             MainCore.Tr.Language = trLang;
             c = MainCore.Conf;
-            Vector2 size;
-            (c.ShowOnStartup, c.BlockInputsWhileMenuOpen, c.ColorPickerHorizontal, c.Tooltip, c.MiddleClickToDefault, c.UIScale, c.PanelOpacity,
-                c.ScrollSpeed, c.ToggleKey, c.ToggleModifier, c.Language, c.LanguageAutoDetected, c.PanelWidth, c.PanelHeight, size) = was;
-            UICore.LastPanelSize = size;
-            if(c.ExperimentalNewMenu != newMenu) UICore.SetNewMenuSwitch(newMenu);
+            (c.ShowOnStartup, c.BlockInputsWhileMenuOpen, c.UIScale, c.PanelOpacity, c.ScrollSpeed, c.ToggleKey, c.ToggleModifier, c.Language,
+                c.LanguageAutoDetected) = was;
             MainCore.ConfMgr.RequestSave();
             PrismBridge.RebindMenuKey();
             QuartzShell.ApplyLook();
-            HandOff.ReturnTo = HandOff.Menu.None;
             QuartzShell.Hide();
-            if(UICore.IsOpen) UICore.Close(true);
-            UICore.Rebuild();   // the classic panel takes the restored scale, size and values
-            if(wasOpen) UICore.Open(true);
         }
         yield return Frames(3);
     }
@@ -95,21 +77,9 @@ internal static partial class FacetSelfTestChecks {
         check($"Settings shows its cards in order{when}", ok, string.Join("|", shown));
     }
 
-    // The classic page's toggle for a field, on the live page (classic toggles are drawn once and never re-read).
-    private static UIToggle LiveToggle(string id, int state) {
-        if(!UICore.Pages.TryGetValue(state, out RectTransform page) || page == null) return null;
-        var live = (Dictionary<string, List<UIToggle>>)typeof(ToggleBinds).GetField("live", Static).GetValue(null);
-        return live.TryGetValue(id, out List<UIToggle> list) ? list.LastOrDefault(t => t.Rect != null && t.Rect.IsChildOf(page)) : null;
-    }
-
-    // Rows whose own writer rebuilds the classic menu (at once, or a pump later): it is fresh again when it opens.
-    private static readonly string[] SelfRebuilding = ["COLOR_PICKER_HORIZONTAL", "PRISM_NEW_MENU"];
-
-    // Switching menus never loses a setting: a switch flipped here shows on the classic page opened next, which rebuilds
-    // for it only when nothing has rebuilt it since (a rebuild makes a new canvas).
+    // Each switch: a click flips its setting, and a second click puts it back.
     private static IEnumerator SettingsSwitchRows(Action<string, bool, string> check) {
-        int state = NavRegistry.StateFor(CorePages.SettingsPageKey);
-        foreach(var (row, classic, get) in SettingsSwitches) {
+        foreach(var (row, get) in SettingsSwitches) {
             if(row == "SMOOTH_SCROLL" && !PrismBridge.Available) continue;   // that switch is PrismLib's
             bool before = get();
             VisualElement track = Body.Q(name: row + "-input");
@@ -117,48 +87,23 @@ internal static partial class FacetSelfTestChecks {
             Click(track);
             yield return Frames(2);
             bool flipped = get() == !before;
-            GameObject canvas = UICore.CanvasObj;
-            QuartzShell.OpenClassic(state);
-            bool rebuilt = !ReferenceEquals(canvas, UICore.CanvasObj), stale = !SelfRebuilding.Contains(row);
-            yield return Frames(2);
-            bool opened = UICore.IsOpen && UICore.CurrentMenuState == state && !FacetBridge.NewMenuVisible();
-            UIToggle live = LiveToggle(classic, state);
-            bool shows = live != null && live.Value == get();
-            UICore.Close();
-            yield return Frames(2);
             track = Body.Q(name: row + "-input");
             if(track != null) Click(track);
             yield return Frames(2);
-            Step(check, $"{row}: a click flips its setting, the classic Settings page opened next shows it (rebuilt {(stale ? "once" : "by the row, not again")}), and a second click puts it back",
-                flipped && opened && shows && rebuilt == stale && get() == before && FacetBridge.NewMenuVisible() && QuartzShell.CurrentPage == CorePages.SettingsPageKey,
-                $"before={before} flipped={flipped} opened={opened} rebuilt={rebuilt} classic={live?.Value.ToString() ?? "none"} now={get()}");
+            Step(check, $"{row}: a click flips its setting, and a second click puts it back",
+                flipped && get() == before && FacetBridge.NewMenuVisible() && QuartzShell.CurrentPage == CorePages.SettingsPageKey,
+                $"before={before} flipped={flipped} now={get()}");
         }
     }
 
-    // The update toast's link opens the classic Settings page itself: a switch flipped here shows there too.
+    // The update toast's link opens this page.
     private static IEnumerator SettingsFromToast(Action<string, bool, string> check) {
-        int state = NavRegistry.StateFor(CorePages.SettingsPageKey);
-        bool before = MainCore.Conf.Tooltip;
-        QuartzShell.OpenClassic(state);   // the classic page is built and current before the flip
-        yield return Frames(2);
-        UICore.Close();
-        yield return Frames(2);
-        VisualElement track = Body.Q(name: "SHOW_TOOLTIP-input");
-        if(track != null) Click(track);
+        QuartzShell.Go(CorePages.HomePageKey);
         yield return Frames(2);
         typeof(UpdateToast).GetMethod("OpenSettings", Static).Invoke(null, null);
         yield return Frames(2);
-        UIToggle live = LiveToggle("show_tooltip", state);
-        bool opened = UICore.IsOpen && UICore.CurrentMenuState == state && !FacetBridge.NewMenuVisible();
-        bool shows = MainCore.Conf.Tooltip != before && live != null && live.Value == MainCore.Conf.Tooltip;
-        UICore.Close();
-        yield return Frames(2);
-        track = Body.Q(name: "SHOW_TOOLTIP-input");
-        if(track != null) Click(track);
-        yield return Frames(2);
-        Step(check, "the update toast's link opens the classic Settings page showing a switch just flipped here",
-            opened && shows && MainCore.Conf.Tooltip == before && FacetBridge.NewMenuVisible(),
-            $"opened={opened} classic={live?.Value.ToString() ?? "none"} field={!before} now={MainCore.Conf.Tooltip}");
+        Step(check, "the update toast's link opens the Settings page",
+            FacetBridge.NewMenuVisible() && QuartzShell.CurrentPage == CorePages.SettingsPageKey, null);
     }
 
     // A slider's track runs 0..1 over its range; setting it is a whole change, as the arrow keys make.
@@ -172,18 +117,16 @@ internal static partial class FacetSelfTestChecks {
         float was = MainCore.Conf.UIScale;
         yield return SetSlider("UI_SCALE", 0.8f, 1.6f, 1.2f);
         float ui = MainCore.Conf.UIScale, scale = QuartzShell.Window.Scale;
-        check("UI scale at 1.2 is saved, and scales the new menu by 1.2 / 0.85 * 1.2 (its larger base) and the classic panel by 1.2",
-            Mathf.Abs(ui - 1.2f) < 0.001f && Mathf.Abs(scale - (1.2f / 0.85f * 1.2f)) < 0.001f && Mathf.Abs(UICore.PanelScale - 1.2f) < 0.001f,
-            $"UIScale={ui} window={scale} panel={UICore.PanelScale}");
+        check("UI scale at 1.2 is saved, and scales the menu by 1.2 / 0.85 * 1.2 (its larger base)",
+            Mathf.Abs(ui - 1.2f) < 0.001f && Mathf.Abs(scale - (1.2f / 0.85f * 1.2f)) < 0.001f, $"UIScale={ui} window={scale}");
         // An undo raises the slider's commit while it is on the panel; the setter applies the scale either way.
         string undid = History.NextUndo;
         History.Undo();
         yield return Frames(2);
         ui = MainCore.Conf.UIScale;
         scale = QuartzShell.Window.Scale;
-        check($"undoing the UI scale puts back {was} in the setting, the new menu ({was} / 0.85 * 1.2) and the classic panel",
-            was != 1.2f && Mathf.Abs(ui - was) < 0.001f && Mathf.Abs(scale - (was / 0.85f * 1.2f)) < 0.001f && Mathf.Abs(UICore.PanelScale - was) < 0.001f,
-            $"undid={undid} UIScale={ui} window={scale} panel={UICore.PanelScale}");
+        check($"undoing the UI scale puts back {was} in the setting and the menu ({was} / 0.85 * 1.2)",
+            was != 1.2f && Mathf.Abs(ui - was) < 0.001f && Mathf.Abs(scale - (was / 0.85f * 1.2f)) < 0.001f, $"undid={undid} UIScale={ui} window={scale}");
         // Undone with the page switched away: the row is off the panel and raises no commit, so the setter alone applies it.
         yield return SetSlider("UI_SCALE", 0.8f, 1.6f, 1.2f);
         QuartzShell.Go(CorePages.HomePageKey);
@@ -193,9 +136,8 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(2);
         ui = MainCore.Conf.UIScale;
         scale = QuartzShell.Window.Scale;
-        check($"undoing the UI scale from another page puts back {was} in the setting, the new menu and the classic panel",
-            undone && Mathf.Abs(ui - was) < 0.001f && Mathf.Abs(scale - (was / 0.85f * 1.2f)) < 0.001f && Mathf.Abs(UICore.PanelScale - was) < 0.001f,
-            $"undid={undid} undone={undone} UIScale={ui} window={scale} panel={UICore.PanelScale}");
+        check($"undoing the UI scale from another page puts back {was} in the setting and the menu",
+            undone && Mathf.Abs(ui - was) < 0.001f && Mathf.Abs(scale - (was / 0.85f * 1.2f)) < 0.001f, $"undid={undid} undone={undone} UIScale={ui} window={scale}");
         QuartzShell.Go(CorePages.SettingsPageKey);
         yield return Frames(3);
         yield return SetSlider("WINDOW_OPACITY", 20f, 100f, 70f);
@@ -285,23 +227,6 @@ internal static partial class FacetSelfTestChecks {
         if(__0 != probeKey || Time.frameCount != probeFrame) return true;
         __result = true;
         return false;
-    }
-
-    private static IEnumerator SettingsHandOffs(Action<string, bool, string> check) {
-        int profiles = NavRegistry.StateFor("profiles.main");
-        QuartzShell.OpenClassic(profiles);   // the classic menu's current page is now Profiles
-        yield return Frames(2);
-        UICore.Close();
-        yield return Frames(2);
-        Button classic = Body.Q<Button>("MENU_CLASSIC_MENU-input");
-        if(classic != null) Submit(classic);
-        yield return Frames(2);
-        Step(check, "Classic menu opens the classic menu on its current page, the new one hidden",
-            classic != null && UICore.IsOpen && UICore.CurrentMenuState == profiles && !FacetBridge.NewMenuVisible(), $"state={UICore.CurrentMenuState}/{profiles}");
-        UICore.Close();
-        yield return Frames(2);
-        Step(check, "closing it brings the new menu back on Settings", FacetBridge.NewMenuVisible() && !UICore.IsOpen && QuartzShell.CurrentPage == CorePages.SettingsPageKey);
-        check("no row on Settings opens the classic Settings page", Body.Q(name: "menu-settings-classic") == null && Body.Q(name: "MENU_SETTINGS_CLASSIC-input") == null, null);
     }
 
     private static void SettingsRest(Action<string, bool, string> check) {

@@ -67,13 +67,16 @@ public static partial class KeyViewerOverlay {
         handFrame[0] = dragRect;
         return handFrame;
     }
+    private static void ClearChildren(Transform t) {
+        for(int i = t.childCount - 1; i >= 0; i--) UnityEngine.Object.Destroy(t.GetChild(i).gameObject);
+    }
     public static void Rebuild() {
         if(root == null) return;
         CaptureCounts();
         rainManager?.Clear();
         footRainManager?.Clear();
-        Quartz.UI.Generator.GenerateUI.ClearChildren(root);
-        if(footRoot != null) Quartz.UI.Generator.GenerateUI.ClearChildren(footRoot);
+        ClearChildren(root);
+        if(footRoot != null) ClearChildren(footRoot);
         boxes.Clear();
         counterBounces.Clear();
         cssFx.Clear();

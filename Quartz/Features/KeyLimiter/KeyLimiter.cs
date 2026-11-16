@@ -31,7 +31,11 @@ public static partial class KeyLimiter {
     // Facet windows block by their own Surface.BlocksGameInput, whatever the menu setting says.
     public static bool IsMenuBlockActive() =>
         MainCore.IsModEnabled
+#if QUARTZ_CLASSIC_UI
         && ((Quartz.UI.UICore.IsOpen && MainCore.Conf.BlockInputsWhileMenuOpen) || Quartz.UI.FacetUi.FacetBridge.BlocksGameInput())
+#else
+        && Quartz.UI.FacetUi.FacetBridge.BlocksGameInput()
+#endif
         && !Autoplaying;
     private static bool Autoplaying {
         get { try { return RDC.auto; } catch(Exception e) { Diag.Ignore(e); return false; } }

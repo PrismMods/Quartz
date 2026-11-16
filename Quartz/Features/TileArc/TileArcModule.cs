@@ -9,7 +9,10 @@ public sealed class TileArcModule : QuartzFeature {
         FeatureMasters.Claim(TileArc.ConfMgr, TileArc.Conf.Enabled, static c => c.Enabled = true);
         Context.AddPage(new NavPage {
             Key = "visuals.tilearc", CategoryKey = "visuals", Order = 25,
-            Title = "Tile Arc", LocaleKey = "SECTION_TILE_ARC", Build = PageTileArc.Create,
+            Title = "Tile Arc", LocaleKey = "SECTION_TILE_ARC",
+#if QUARTZ_CLASSIC_UI
+            Build = PageTileArc.Create,
+#endif
             OwnScroll = true,
         });
         Context.PatchAll();

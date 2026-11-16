@@ -1,4 +1,7 @@
+using Quartz.Core;
+#if QUARTZ_CLASSIC_UI
 using Quartz.UI.Generator;
+#endif
 using TMPro;
 using UnityEngine;
 namespace Quartz.Overlay;
@@ -47,8 +50,9 @@ public static class OverlayAnchors {
     public const int Closest = -1;
     public static readonly int[] WithClosest = [Closest, 0, 1, 2, 3, 4, 5, 6, 7, 8];
     public static string ClosestName(int v) => v == Closest
-        ? GenerateUI.Tr("ANCHOR_CLOSEST", "Closest")
+        ? MainCore.Tr.Get("ANCHOR_CLOSEST", "Closest")
         : Name((OverlayAnchor)v);
+#if QUARTZ_CLASSIC_UI
     public static void Dropdown(Transform parent, OverlayAnchor current, bool closest,
         System.Action<OverlayAnchor> onChange, System.Action<bool> onClosest, string id) =>
         GenerateUI.DropDown(GenerateUI.Row(parent), Closest, closest ? Closest : (int)current, WithClosest, ClosestName, v => {
@@ -56,6 +60,7 @@ public static class OverlayAnchors {
             if(v != Closest) onChange((OverlayAnchor)v);
             else Quartz.UI.Utility.Reorganizer.SnapAllAnchors();
         }, id, 260f, "Anchor");
+#endif
     public static TextAlignmentOptions TextAlign(OverlayAnchor anchor) => anchor switch {
         OverlayAnchor.TopLeft => TextAlignmentOptions.TopLeft,
         OverlayAnchor.TopCenter => TextAlignmentOptions.Top,
@@ -74,17 +79,19 @@ public static class OverlayAnchors {
     };
     public static TextAnchor LayoutAlign(OverlayAnchor anchor) => (TextAnchor)(int)anchor;
     public static string Name(OverlayAnchor anchor) => anchor switch {
-        OverlayAnchor.TopLeft => GenerateUI.Tr("ANCHOR_TOP_LEFT", "Top Left"),
-        OverlayAnchor.TopCenter => GenerateUI.Tr("ANCHOR_TOP_CENTER", "Top Center"),
-        OverlayAnchor.TopRight => GenerateUI.Tr("ANCHOR_TOP_RIGHT", "Top Right"),
-        OverlayAnchor.MiddleLeft => GenerateUI.Tr("ANCHOR_MIDDLE_LEFT", "Middle Left"),
-        OverlayAnchor.MiddleCenter => GenerateUI.Tr("ANCHOR_MIDDLE_CENTER", "Middle Center"),
-        OverlayAnchor.MiddleRight => GenerateUI.Tr("ANCHOR_MIDDLE_RIGHT", "Middle Right"),
-        OverlayAnchor.BottomLeft => GenerateUI.Tr("ANCHOR_BOTTOM_LEFT", "Bottom Left"),
-        OverlayAnchor.BottomCenter => GenerateUI.Tr("ANCHOR_BOTTOM_CENTER", "Bottom Center"),
-        OverlayAnchor.BottomRight => GenerateUI.Tr("ANCHOR_BOTTOM_RIGHT", "Bottom Right"),
+        OverlayAnchor.TopLeft => MainCore.Tr.Get("ANCHOR_TOP_LEFT", "Top Left"),
+        OverlayAnchor.TopCenter => MainCore.Tr.Get("ANCHOR_TOP_CENTER", "Top Center"),
+        OverlayAnchor.TopRight => MainCore.Tr.Get("ANCHOR_TOP_RIGHT", "Top Right"),
+        OverlayAnchor.MiddleLeft => MainCore.Tr.Get("ANCHOR_MIDDLE_LEFT", "Middle Left"),
+        OverlayAnchor.MiddleCenter => MainCore.Tr.Get("ANCHOR_MIDDLE_CENTER", "Middle Center"),
+        OverlayAnchor.MiddleRight => MainCore.Tr.Get("ANCHOR_MIDDLE_RIGHT", "Middle Right"),
+        OverlayAnchor.BottomLeft => MainCore.Tr.Get("ANCHOR_BOTTOM_LEFT", "Bottom Left"),
+        OverlayAnchor.BottomCenter => MainCore.Tr.Get("ANCHOR_BOTTOM_CENTER", "Bottom Center"),
+        OverlayAnchor.BottomRight => MainCore.Tr.Get("ANCHOR_BOTTOM_RIGHT", "Bottom Right"),
         _ => anchor.ToString(),
     };
+#if QUARTZ_CLASSIC_UI
     public static void Dropdown(Transform parent, OverlayAnchor def, OverlayAnchor current, System.Action<OverlayAnchor> onChange, string id) =>
         GenerateUI.DropDown(GenerateUI.Row(parent), def, current, All, Name, onChange, id, 260f, "Anchor");
+#endif
 }

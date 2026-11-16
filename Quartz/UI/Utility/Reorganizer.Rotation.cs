@@ -1,15 +1,20 @@
 using Quartz.Core;
 using Quartz.Resource;
+#if QUARTZ_CLASSIC_UI
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
+#endif
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 namespace Quartz.UI.Utility;
 public static partial class Reorganizer {
+#if QUARTZ_CLASSIC_UI
     private static UISlider rotationSlider;
     private static RectTransform rotationRow;
+#endif
     private const float RotateGripSize = 20f;
+#if QUARTZ_CLASSIC_UI
     private static void BuildRotationRow() {
         rotationRow = GenerateUI.Row(panelObj.transform);
         rotationSlider = GenerateUI.Slider(
@@ -36,6 +41,7 @@ public static partial class Reorganizer {
         if(Selected == null || !Selected.CanRotate) return;
         Selected.SetRotation(degrees);
     }
+#endif
     // A knob above the outline's top edge; it rotates with the overlay, so it always sits "above" it.
     private static void BuildRotateGrip() {
         if(Selected == null || !Selected.CanRotate || outlineObj == null) return;

@@ -6,15 +6,13 @@ using Quartz.Core;
 using Quartz.Features;
 using Quartz.Overlay;
 using Quartz.UI.Nav;
-using Quartz.UI.Objects.Impl;
 using Quartz.UI.Utility;
 using UnityEngine;
 using UnityEngine.UIElements;
-using HandOff = Quartz.UI.MenuHandOff;
 namespace Quartz.UI.FacetUi;
 /// <summary>
-/// What every moved Overlay page is checked for against its classic page: the same rows, a switch flipped here that the
-/// classic page then shows, and a hotkey bound here that fires from the value written here. Each page's own checks are in
+/// What every Overlay page is checked for: its rows, a switch that flips and flips back, and a hotkey bound here that fires
+/// from the value written here. Each page's own checks are in
 /// FacetSelfTestChecks.OverlayPages.&lt;Page&gt;.cs.
 /// </summary>
 internal static partial class FacetSelfTestChecks {
@@ -58,7 +56,7 @@ internal static partial class FacetSelfTestChecks {
         if(tabs != null && was >= 0) tabs.Select(was);
         List<string> missing = [.. keys.Where(k => !seen.Contains(k))], shows = [.. (hidden ?? []).Where(seen.Contains)];
         bool moved = QuartzShell.CurrentPage == pageKey && page.Q(name: "menu-classic") == null;
-        check($"{pageKey}: drawn in the new menu with every row of the classic page ({keys.Length})"
+        check($"{pageKey}: drawn in the new menu with every row it should show ({keys.Length})"
             + (hidden == null ? "" : $", and none of the {hidden.Length} it hides"), moved && missing.Count == 0 && shows.Count == 0,
             $"page={QuartzShell.CurrentPage} classicCard={!moved} missing={string.Join(",", missing)} shown={string.Join(",", shows)} unfolded={unfolded}");
     }
@@ -104,84 +102,39 @@ internal static partial class FacetSelfTestChecks {
         return findFold != null;
     }
 
-    /// <summary>A switch flipped on the open moved page shows on the live classic page opened next; a second flip puts it back.
-    /// The classic toggle's id is the row's key in lower case. field writes the setting as its row does, for the restore.</summary>
-    internal static IEnumerator ClassicSees(Action<string, bool, string> check, string pageKey, string toggleKey, Bind<bool> field) {
-        string tag = $"{pageKey} {toggleKey}", classicId = toggleKey.ToLowerInvariant();
-        int state = NavRegistry.StateFor(pageKey);
+    /// <summary>A switch on the open page: a click flips its setting, a second puts it back. field writes the setting as its
+    /// row does, for the restore.</summary>
+    internal static IEnumerator Flips(Action<string, bool, string> check, string pageKey, string toggleKey, Bind<bool> field) {
+        string tag = $"{pageKey} {toggleKey}";
         bool before = field.Get();
         VisualElement track = Body.Q(name: toggleKey + "-input");
         if(track == null) {
-            check($"{tag}: the classic page shows a switch flipped here", false, "no " + toggleKey + "-input");
+            check($"{tag}: a click flips its setting", false, "no " + toggleKey + "-input");
             yield break;
         }
         try {
             Click(track);
             yield return Frames(2);
             bool flipped = field.Get() == !before;
-            QuartzShell.OpenClassic(state);
-            yield return Frames(2);
-            UIToggle live = LiveToggle(classicId, state);
-            bool shows = live != null && live.Value == field.Get();
-            UICore.Close();
-            yield return Frames(2);
             track = Body.Q(name: toggleKey + "-input");
             if(track != null) Click(track);
             yield return Frames(2);
-            Step(check, $"{tag}: a flip here shows on the classic page opened next, and a second flip puts it back",
-                flipped && shows && field.Get() == before && FacetBridge.NewMenuVisible() && QuartzShell.CurrentPage == pageKey,
-                $"before={before} flipped={flipped} classic={live?.Value.ToString() ?? "none"} now={field.Get()}");
+            Step(check, $"{tag}: a click flips its setting, and a second click puts it back",
+                flipped && field.Get() == before && FacetBridge.NewMenuVisible() && QuartzShell.CurrentPage == pageKey,
+                $"before={before} flipped={flipped} now={field.Get()}");
         } finally {
-            PutBack(field, before, classicId);
+            PutBack(field, before);
         }
     }
 
-    /// <summary>For a switch the classic page keeps out of the live toggle list (no hotkey): flipped here, it leaves the
-    /// classic menu stale, and the classic page opened next is rebuilt from the setting, which clears that; a second flip puts
-    /// it back. field writes the setting as its row does, for the restore.</summary>
-    internal static IEnumerator ClassicStale(Action<string, bool, string> check, string pageKey, string toggleKey, Bind<bool> field) {
-        string tag = $"{pageKey} {toggleKey}";
-        int state = NavRegistry.StateFor(pageKey);
-        bool before = field.Get();
-        VisualElement track = Body.Q(name: toggleKey + "-input");
-        if(track == null) {
-            check($"{tag}: a flip here leaves the classic page stale", false, "no " + toggleKey + "-input");
-            yield break;
-        }
-        try {
-            UICore.ClassicStale = false;
-            Click(track);
-            yield return Frames(2);
-            bool flipped = field.Get() == !before, stale = UICore.ClassicStale;
-            QuartzShell.OpenClassic(state);
-            yield return Frames(2);
-            bool rebuilt = UICore.IsOpen && UICore.CurrentMenuState == state && !UICore.ClassicStale;
-            UICore.Close();
-            yield return Frames(2);
-            track = Body.Q(name: toggleKey + "-input");
-            if(track != null) Click(track);
-            yield return Frames(2);
-            Step(check, $"{tag}: a flip here leaves the classic menu stale, the classic page opened next is rebuilt from the setting, "
-                + "and a second flip puts it back",
-                flipped && stale && rebuilt && field.Get() == before && FacetBridge.NewMenuVisible() && QuartzShell.CurrentPage == pageKey,
-                $"before={before} flipped={flipped} stale={stale} rebuilt={rebuilt} now={field.Get()} page={QuartzShell.CurrentPage}");
-        } finally {
-            PutBack(field, before, null);
-        }
-    }
-
-    // The player's value, written straight into the setting whatever the row or the menus show now, as a write from a row
-    // leaves it: the classic menu rebuilds before it next shows, and its live toggles show the value.
-    private static void PutBack(Bind<bool> field, bool before, string classicId) {
-        if(field.Get() == before) return;
-        field.Set(before);
-        UICore.ClassicStale = true;
-        ToggleBinds.Show(classicId, before);
+    // The player's value, written straight into the setting whatever the row shows now.
+    private static void PutBack(Bind<bool> field, bool before) {
+        if(field.Get() != before) field.Set(before);
     }
 
     /// <summary>The open moved page's switch toggleKey, written here first, then bound through its context menu: the key
     /// captured binds classicId, fires from the value written here, and the row follows within 150 ms; the menu then clears
-    /// it, and offers Clear again for a bind made in the classic menu. descKey is the row's description (null: none), which
+    /// it, and offers Clear again for a bind made elsewhere. descKey is the row's description (null: none), which
     /// its tooltip shows translated above the key. A bind of the player's and the setting are put back.</summary>
     internal static IEnumerator Hotkey(Action<string, bool, string> check, string pageKey, string toggleKey, string classicId, string descKey,
         Bind<bool> field) {
@@ -204,11 +157,10 @@ internal static partial class FacetSelfTestChecks {
         Hover(row);
         bool kept = described && (row.tooltip ?? "") == desc;
         try {
-            // A write from here first: the hotkey flips from it, not from what the classic toggle showed before it.
+            // A write from here first: the hotkey flips from it.
             Click(track);
             yield return Frames(2);
             bool wrote = field.Get() == !before;
-            UICore.ClassicStale = false;   // whether the bind marks the classic page stale is read below
             RightClick(row);
             yield return Frames(2);
             VisualElement setRow = MenuRow(set);
@@ -219,14 +171,14 @@ internal static partial class FacetSelfTestChecks {
             typeof(KeyCaptureService).GetMethod("End", Static).Invoke(null, [key]);   // as the capture runner ends it
             yield return Frames(2);
             bool bound = ToggleBinds.TryGet(classicId, out Keybind.KeyModifier mod, out KeyCode got) && got == key && mod == Keybind.KeyModifier.None;
-            bool prompted = prompt && Popped("menu-hotkey-press") == null, stale = UICore.ClassicStale;
+            bool prompted = prompt && Popped("menu-hotkey-press") == null;
             Hover(row);
             string tip = row.tooltip, want = desc.Length == 0 ? shown : desc + "\n" + shown;
             check($"{tag}: right-click offers Set hotkey and no Clear, a prompt shows while it captures, and the key captured binds {classicId}, "
-                + "marks the classic page stale and shows in the tooltip under the description",
-                kept && wrote && setRow != null && !offersClear && capturing && prompted && bound && stale && tip == want,
+                + "and shows in the tooltip under the description",
+                kept && wrote && setRow != null && !offersClear && capturing && prompted && bound && tip == want,
                 $"kept={kept} described={described} wrote={wrote} set={setRow != null} clear={offersClear} capturing={capturing} prompt={prompt} bound={got}/{mod} "
-                + $"stale={stale} tip='{tip}' want='{want}'");
+                + $"tip='{tip}' want='{want}'");
             float t0 = Time.realtimeSinceStartup, ms = -1f;
             PressNextFrame(key);
             while(Time.realtimeSinceStartup - t0 < 1f) {
@@ -246,7 +198,7 @@ internal static partial class FacetSelfTestChecks {
             Hover(row);
             check($"{tag}: once bound, right-click offers Clear hotkey, which removes the bind and its tooltip line",
                 clearRow != null && !ToggleBinds.TryGet(classicId, out _, out _) && row.tooltip == desc, $"clear={clearRow != null} tip='{row.tooltip}'");
-            // The menu is offered afresh as the pointer comes over the row: a bind the classic menu makes meanwhile shows there.
+            // The menu is offered afresh as the pointer comes over the row: a bind made elsewhere meanwhile shows there.
             ToggleBinds.Set(classicId, Keybind.KeyModifier.None, key);
             Hover(row);
             RightClick(row);
@@ -254,14 +206,14 @@ internal static partial class FacetSelfTestChecks {
             clearRow = MenuRow(clear);
             if(clearRow != null) Pick(clearRow);
             yield return Frames(1);
-            check($"{tag}: a bind made in the classic menu shows in the row's menu once the pointer comes over it, and clears from there",
+            check($"{tag}: a bind made elsewhere shows in the row's menu once the pointer comes over it, and clears from there",
                 clearRow != null && !ToggleBinds.TryGet(classicId, out _, out _), $"clear={clearRow != null}");
         } finally {
             KeyCaptureService.Cancel();
             Popup.CloseAll();
             if(had) ShellRows.SetHotkey(classicId, hadMod, hadKey);
             else if(ToggleBinds.TryGet(classicId, out _, out _)) ShellRows.ClearHotkey(classicId);
-            PutBack(field, before, classicId);
+            PutBack(field, before);
         }
     }
 
@@ -298,7 +250,7 @@ internal static partial class FacetSelfTestChecks {
             Popup.CloseAll();
             if(had) ShellRows.SetHotkey(classicId, hadMod, hadKey);
             else if(ToggleBinds.TryGet(classicId, out _, out _)) ShellRows.ClearHotkey(classicId);
-            PutBack(field, before, classicId);   // a bind that fired as it was made flipped it
+            PutBack(field, before);   // a bind that fired as it was made flipped it
         }
     }
 
@@ -306,11 +258,8 @@ internal static partial class FacetSelfTestChecks {
     /// every row a switch hides show; restore puts the player's values back, whatever happens. The features and the menu are
     /// put back as found.</summary>
     internal static IEnumerator OnPage(string featureId, string pageKey, Action show, Action restore, Func<IEnumerator> checks) {
-        bool wasOpen = UICore.IsOpen;
         // Every feature is read before any is flipped, and put back in reverse: "overlay" is the feature's dependency.
         var saved = FeatureService.Features.Select(h => (id: h.Id, was: h.Enabled, had: FeatureService.State.Features.TryGetValue(h.Id, out bool v), value: v)).ToList();
-        if(wasOpen) UICore.Close(true);
-        HandOff.ReturnTo = HandOff.Menu.None;
         try {
             foreach(string id in new[] { "overlay", featureId }) if(!FeatureService.IsEnabled(id)) FeatureService.SetEnabled(id, true);
             yield return Frames(3);
@@ -320,28 +269,10 @@ internal static partial class FacetSelfTestChecks {
             yield return checks();
         } finally {
             restore();
-            HandOff.ReturnTo = HandOff.Menu.None;
             QuartzShell.Hide();
-            if(UICore.IsOpen) UICore.Close(true);
             for(int i = saved.Count - 1; i >= 0; i--) RestoreFeature(saved[i].id, saved[i].was, saved[i].had, saved[i].value);
-            if(wasOpen) UICore.Open(true);
         }
         yield return Frames(3);
-    }
-
-    /// <summary>On a page moved in part, the card whose button is Id id opens the classic menu on the page, where the parts left
-    /// there are; closing it brings the new menu back on the page.</summary>
-    internal static IEnumerator EditorLink(Action<string, bool, string> check, string pageKey, string id) {
-        int state = NavRegistry.StateFor(pageKey);
-        Button open = Body.Q<Button>(id + "-input");
-        if(open != null) Submit(open);
-        yield return Frames(2);
-        bool classic = open != null && UICore.IsOpen && UICore.CurrentMenuState == state && !FacetBridge.NewMenuVisible();
-        UICore.Close();
-        yield return Frames(2);
-        Step(check, $"{pageKey}: the editor card opens the classic menu on this page, and closing it brings the new menu back there",
-            classic && FacetBridge.NewMenuVisible() && !UICore.IsOpen && QuartzShell.CurrentPage == pageKey,
-            $"button={open != null} classic={classic} state={UICore.CurrentMenuState}/{state} {Showing()}");
     }
 
     /// <summary>The page header's switch ends on the cards' control edge, over a row's switch (±1).</summary>

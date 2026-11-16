@@ -13,7 +13,9 @@ public sealed class RestrictionModule : QuartzFeature {
             Order = 30,
             Title = "Judgement Restriction",
             LocaleKey = "SECTION_JUDGEMENT_RESTRICTION",
+#if QUARTZ_CLASSIC_UI
             Build = PageRestriction.JudgementPage,
+#endif
             OwnScroll = true,
         });
         Context.RegisterImportHandler(new RestrictionImport());

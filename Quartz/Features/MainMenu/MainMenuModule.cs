@@ -12,7 +12,9 @@ public sealed class MainMenuModule : QuartzFeature {
             Order = 30,
             Title = "Main Menu",
             LocaleKey = "SECTION_MAIN_MENU",
+#if QUARTZ_CLASSIC_UI
             Build = PageMainMenu.Create,
+#endif
             OwnScroll = true,
         });
         Context.PatchAll();

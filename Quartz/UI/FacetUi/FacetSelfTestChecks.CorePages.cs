@@ -6,34 +6,21 @@ using Quartz.Core;
 using Quartz.Features.Interop;
 using Quartz.IO;
 using Quartz.Localization;
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
 using Quartz.Update;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
-using HandOff = Quartz.UI.MenuHandOff;
 namespace Quartz.UI.FacetUi;
 /// <summary>
-/// The core pages in the new menu against their classic pages: rows, Korean text, every button that acts going through Do,
-/// and what each page reads. A page the rail hides on this build is shown with ShowForTest; its classic page is built off
-/// screen.
+/// The core pages in the new menu: rows, Korean text, every button that acts going through Do, and what each page reads. A
+/// page the rail hides on this build is shown with ShowForTest.
 /// </summary>
 internal static partial class FacetSelfTestChecks {
     private const string DeveloperKey = "developer.main";
 
     private static IEnumerator Developer(Action<string, bool, string> check, Action<string> info) {
-        bool wasOpen = UICore.IsOpen;
-        if(wasOpen) UICore.Close(true);
-        HandOff.ReturnTo = HandOff.Menu.None;
-        // The classic page as the menu builds it, under the menu's panel: its keys, and its status for the compare.
-        var host = new GameObject("FacetSelfTestPage", typeof(RectTransform)).GetComponent<RectTransform>();
-        host.SetParent(UICore.Panel, false);
         try {
-            PageDeveloper.Create(host);
-            string[] classic = [.. host.GetComponentsInChildren<TextLocalization>(true).Select(l => l.Key)
-                .Where(k => !string.IsNullOrEmpty(k) && k != "DEVELOPER")];
-
             FacetBridge.OpenNewMenu(CorePages.HomePageKey);
             yield return Frames(3);
             QuartzShell.Go(DeveloperKey);
@@ -50,7 +37,6 @@ internal static partial class FacetSelfTestChecks {
             yield return Frames(2);
             int shown = UpdateListeners();
 
-            Covers(check, DeveloperKey, classic: classic);
             Translated(check, DeveloperKey, ["SECTION_SEASONAL"]);
             yield return Recorded(check, $"{DeveloperKey} DEV_SIM_UPDATE: a click acts only through Do", () => ClickRow("DEV_SIM_UPDATE"),
                 "developer.simulate:" + !UpdateService.DevSimulate);
@@ -66,26 +52,22 @@ internal static partial class FacetSelfTestChecks {
                 yield return Frames(2);
                 bool offered = MenuRow(QuartzHost.Host.Translate("MENU_SET_HOTKEY")) != null;
                 Popup.CloseAll();
-                check($"{DeveloperKey} {id}: right-click offers Set hotkey, shared with the classic toggle", offered, $"row={row != null}");
+                check($"{DeveloperKey} {id}: right-click offers Set hotkey", offered, $"row={row != null}");
             }
 
             // A value the status shows changes after the build, in memory only: Refresh must read it again.
-            string skipped = MainCore.Conf.SkippedVersion, marker = "selftest-" + Time.frameCount, want, got;
+            string skipped = MainCore.Conf.SkippedVersion, marker = "selftest-" + Time.frameCount, got;
             bool pressed;
             MainCore.Conf.SkippedVersion = marker;
             try {
                 pressed = PressRow("DEV_REFRESH");
                 yield return Frames(2);
-                PageDeveloper.RefreshStatus();
-                want = (typeof(PageDeveloper).GetField("statusText", BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(null) as TMP_Text)?.text;
                 got = PageContent().Q<Label>("developer-status-input")?.text;
             } finally {
                 MainCore.Conf.SkippedVersion = skipped;
             }
-            check($"{DeveloperKey} DEV_REFRESH: the status reads again, as the classic page's",
-                pressed && want != null && got == want && got.Contains(marker),
-                $"pressed={pressed} classic={want?.Length.ToString() ?? "none"} chars, new={got?.Length.ToString() ?? "none"} chars, "
-                + $"marker={got?.Contains(marker)}");
+            check($"{DeveloperKey} DEV_REFRESH: the status reads again", pressed && got != null && got.Contains(marker),
+                $"pressed={pressed} chars={got?.Length.ToString() ?? "none"} marker={got?.Contains(marker)}");
 
             if(Info.IsDev) Searched(check, DeveloperKey, ["DEV_CHECK"]);
             else info($"{DeveloperKey}: the search index follows the rail, so Searched needs a dev build");
@@ -96,13 +78,7 @@ internal static partial class FacetSelfTestChecks {
             check($"{DeveloperKey}: the status follows UpdateService.OnChanged only while attached", shown == listeners + 1 && left == listeners,
                 $"listeners={listeners} shown={shown} left={left}");
         } finally {
-            UnityEngine.Object.Destroy(host.gameObject);
-            // The classic page's status line now points at the page built here: a dev build's classic menu builds its own again.
-            if(Info.IsDev) UICore.ClassicStale = true;
-            HandOff.ReturnTo = HandOff.Menu.None;
             QuartzShell.Hide();
-            if(UICore.IsOpen) UICore.Close(true);
-            if(wasOpen) UICore.Open(true);
         }
         yield return Frames(2);
     }
@@ -126,9 +102,6 @@ internal static partial class FacetSelfTestChecks {
     private static IEnumerator Profiles(Action<string, bool, string> check, Action<string> info) {
         static string[] Dirs() => [.. Directory.GetDirectories(ProfileManager.ProfilesPath).OrderBy(d => d, StringComparer.Ordinal)];
         string[] before = Dirs();
-        bool wasOpen = UICore.IsOpen;
-        if(wasOpen) UICore.Close(true);
-        HandOff.ReturnTo = HandOff.Menu.None;
         try {
             FacetBridge.OpenNewMenu(CorePages.HomePageKey);
             yield return Frames(3);
@@ -137,9 +110,6 @@ internal static partial class FacetSelfTestChecks {
             info($"[perf] page {ProfilesKey} first build: {clock.Elapsed.TotalMilliseconds:0.0} ms");
             yield return Frames(2);
 
-            // Select and Delete are numbered by the row's place in the whole list, and the active row has neither, so the
-            // classic page's count of them is no Id range; the list check below holds them row by row.
-            Covers(check, ProfilesKey, omitted: ["PROFILE_SELECT", "PROFILE_DELETE"]);
             Searched(check, ProfilesKey, ["PROFILE_RECALIBRATE", "PROFILES"]);
             Translated(check, ProfilesKey, ["PROFILE_ADD"]);
             ProfilesList(check);
@@ -261,10 +231,7 @@ internal static partial class FacetSelfTestChecks {
             check("profiles carry KeyViewerLayout.json", Path.GetDirectoryName(layout) == MainCore.Paths.RootPath && excluded != null
                 && !excluded.Contains(Path.GetFileName(layout)), $"layout={layout} excluded={(excluded == null ? "none" : string.Join(",", excluded))}");
         } finally {
-            HandOff.ReturnTo = HandOff.Menu.None;
             QuartzShell.Hide();
-            if(UICore.IsOpen) UICore.Close(true);
-            if(wasOpen) UICore.Open(true);
         }
         yield return Frames(2);
         string[] after = Dirs();
@@ -296,9 +263,6 @@ internal static partial class FacetSelfTestChecks {
     // Import: nothing here imports or switches a feature on; both buttons are checked through Do. Rescan runs for real (it
     // only reads), and the KeyViewer mode and parts are put back as found.
     private static IEnumerator Import(Action<string, bool, string> check, Action<string> info) {
-        bool wasOpen = UICore.IsOpen;
-        if(wasOpen) UICore.Close(true);
-        HandOff.ReturnTo = HandOff.Menu.None;
         try {
             FacetBridge.OpenNewMenu(CorePages.HomePageKey);
             yield return Frames(3);
@@ -307,8 +271,6 @@ internal static partial class FacetSelfTestChecks {
             info($"[perf] page {ImportKey} first build: {clock.Elapsed.TotalMilliseconds:0.0} ms");
             yield return Frames(2);
 
-            // The classic page's heading is the page header, which the shell names menu-header.
-            Covers(check, ImportKey, renamed: new Dictionary<string, string> { ["IMPORT_HEADER"] = "menu-header" });
             Searched(check, ImportKey, ["IMPORT_RESCAN"]);
             Translated(check, ImportKey, ["IMPORT_HEADER"]);
 
@@ -345,10 +307,7 @@ internal static partial class FacetSelfTestChecks {
                     "import.profile:" + options[0].OptionId);
             } else info($"{ImportKey}: no supported mod is loaded, so Import has no row to check");
         } finally {
-            HandOff.ReturnTo = HandOff.Menu.None;
             QuartzShell.Hide();
-            if(UICore.IsOpen) UICore.Close(true);
-            if(wasOpen) UICore.Open(true);
         }
         yield return Frames(2);
     }

@@ -23,7 +23,6 @@ internal static class Panels {
         VisualElement panels = Controls.Card(settings, "SECTION_PANELS");
         ShellRows.Font(panels, PanelsOverlay.FontKey);
         Controls.Action(panels, "", "PANELS_CREATE", () => {
-            UICore.ClassicStale = true;   // the classic page lists the panels: it rebuilds before it next shows
             PanelsOverlay.CreatePanel();
             PanelsList.Show(PanelsOverlay.Conf.Panels[^1]);   // picked: its rows and the preview show it
             QuartzShell.Surface?.Refresh();   // the count follows at once

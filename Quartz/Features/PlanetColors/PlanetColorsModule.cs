@@ -13,7 +13,9 @@ public sealed class PlanetColorsModule : QuartzFeature {
             Order = 40,
             Title = "Planet Colors",
             LocaleKey = "SECTION_PLANET_COLORS",
+#if QUARTZ_CLASSIC_UI
             Build = PagePlanetColors.Create,
+#endif
             OwnScroll = true,
         });
         Context.RegisterImportHandler(new PlanetColorsImport());

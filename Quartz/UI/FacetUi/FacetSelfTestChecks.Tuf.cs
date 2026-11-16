@@ -105,10 +105,6 @@ internal static partial class FacetSelfTestChecks {
             check($"{TufLevelsKey}: the service lists the fixture first", s.Levels.Count > 0 && s.Levels[0].Id == TufId(1),
                 $"levels={s.Levels.Count} first={(s.Levels.Count > 0 ? s.Levels[0].Id : 0)}");
             yield return Frames(3);
-            // The classic browser lays out by hand, so the classic index notes none of its labels: its keys come from a build off
-            // screen. The search field's placeholder names no row, as in the classic index, and the tagline is the header's description line.
-            Covers(check, TufLevelsKey, renamed: new Dictionary<string, string> { ["TUF"] = "TUF_LEVELS" }, omitted: ["TUF_SEARCH_PLACEHOLDER", "TUF_TAGLINE"],
-                classic: TufClassicKeys());
             Searched(check, TufLevelsKey, ["TUF_REFRESH"]);
             Translated(check, TufLevelsKey, ["TUF_SPECIAL"]);
 
@@ -125,18 +121,6 @@ internal static partial class FacetSelfTestChecks {
             if(s.Levels.Count >= 2) yield return TufCardChecks(check, info, s);
             else check($"{TufLevelsKey}: the card checks have two fixture levels", false, $"levels={s.Levels.Count}");
             yield return TufSettle(check, info, s);
-        }
-    }
-
-    // The classic browser's label keys, from a build under the classic menu's panel that is destroyed at once.
-    private static string[] TufClassicKeys() {
-        var host = new GameObject("FacetSelfTestTuf", typeof(RectTransform)).GetComponent<RectTransform>();
-        host.SetParent(UICore.Panel, false);
-        try {
-            TufBrowserUI.Create(host);
-            return [.. host.GetComponentsInChildren<Quartz.Localization.TextLocalization>(true).Select(l => l.Key).Where(k => !string.IsNullOrEmpty(k))];
-        } finally {
-            UnityEngine.Object.Destroy(host.gameObject);
         }
     }
 

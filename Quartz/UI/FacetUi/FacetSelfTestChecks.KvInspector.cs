@@ -6,7 +6,6 @@ using System.Text.RegularExpressions;
 using Quartz.Features.KeyViewer.Editor;
 using Quartz.Features.KeyViewer.Layout;
 using Quartz.UI.FacetUi.KeyViewerEditor;
-using Quartz.UI.Generator;
 using Quartz.UI.Objects;
 using Quartz.UI.Utility;
 using UnityEngine;
@@ -14,8 +13,7 @@ using UnityEngine.UIElements;
 using LayoutGroup = PrismLib.UI.Toolkit.LayoutGroup;
 namespace Quartz.UI.FacetUi;
 /// <summary>
-/// The key viewer editor's inspector: the same rows as the classic inspector for five selections, the choice rows the
-/// classic id set cannot see, and the scaffolding the row checks in FacetSelfTestChecks.KvInspector.Rows.cs share.
+/// The key viewer editor's inspector: its rows for five selections, the choice rows, and the scaffolding the row checks in FacetSelfTestChecks.KvInspector.Rows.cs share.
 /// </summary>
 internal static partial class FacetSelfTestChecks {
     private const string KvInspPage = KeyViewerPage + ": inspector";
@@ -57,12 +55,10 @@ internal static partial class FacetSelfTestChecks {
             before != null && removed && model.Editing == tab && model.Find(after) != fresh, $"before={before} removed={removed} after={after}");
     }
 
-    // ---- parity with classic, on a scratch document KvStore.Current never sees
+    // ---- the rows per selection, on a scratch tab of the live document
 
     // The classic toolbar's buttons (now the menu bar's) and its multi-select Arrange rows (now Arrange ▸ Align/Spread).
-    private static readonly Regex KvMenuBarIds = new("^KVI_(UNDO|REDO|DUPLICATE|DELETE|COPY_STYLE|PASTE_STYLE|SNAP|SPREAD_H|SPREAD_V)$|^KVI_(Z|SNAP|ADD|ZOOM)_");
     private static readonly Regex KvRowId = new("^KVI_[A-Z0-9_]+$");
-    private static readonly string[] KvClassicTabKeys = ["KVI_TAB_ELEMENT", "KVI_TAB_STYLE", "KVI_TAB_NOTE", "KVI_TAB_COUNTER", "KVI_TAB_SETTINGS"];
 
     // On a scratch tab of the live document (KvGuard puts it back), read from the live inspector's own tabs.
     private static IEnumerator KvParity(Action<string, bool, string> check, Action<string> info) {
@@ -93,7 +89,7 @@ internal static partial class FacetSelfTestChecks {
         KvEditorPage.Editor.Refresh();
         yield return KvBoxesSettle();
         foreach(var c in cases) {
-            Dictionary<string, HashSet<string>> classic = KvClassicIds(doc, tab, c.Sel), now = [], choices = [], every = [];
+            Dictionary<string, HashSet<string>> now = [], choices = [], every = [];
             yield return KvLiveIds(c.Sel, now, choices, every);
             if(c.Sel.Length == 1 && c.Sel[0].Kind == KvElementKind.Key) {
                 List<string> off = [];
@@ -104,19 +100,10 @@ internal static partial class FacetSelfTestChecks {
                 }
                 check($"{KvInspPage}: the row ids the pages name for one key are the rows built", off.Count == 0 && every.Count > 0, string.Join("; ", off));
             }
-            List<string> diffs = [];
-            foreach(string t in classic.Keys.Union(now.Keys)) {
-                HashSet<string> a = classic.TryGetValue(t, out var x) ? x : null, b = now.TryGetValue(t, out var y) ? y : null;
-                if(a == null || b == null) { diffs.Add($"{t}: tab only in {(a == null ? "new" : "classic")}"); continue; }
-                var missing = a.Except(b).ToList();
-                var extra = b.Except(a).ToList();
-                if(missing.Count + extra.Count > 0) diffs.Add($"{t}: missing [{string.Join(",", missing)}] extra [{string.Join(",", extra)}]");
-            }
-            info($"{KvInspPage}: {c.Name}: " + string.Join(" ", classic.Select(kv => $"{kv.Key}={kv.Value.Count}")));
-            check($"{KvInspPage}: {c.Name}: every tab has the classic inspector's rows", diffs.Count == 0 && now.Count > 0, string.Join("; ", diffs));
+            info($"{KvInspPage}: {c.Name}: " + string.Join(" ", now.Select(kv => $"{kv.Key}={kv.Value.Count}")));
             List<string> lost = [.. c.Choices.SelectMany(kv => kv.Value.Where(id => !(choices.TryGetValue(kv.Key, out var got) && got.Contains(id)))
                 .Select(id => $"{kv.Key}/{id}"))];
-            check($"{KvInspPage}: {c.Name}: the classic segment rows are choice rows", lost.Count == 0, "missing " + string.Join(",", lost));
+            check($"{KvInspPage}: {c.Name}: the segment rows are choice rows", lost.Count == 0, "missing " + string.Join(",", lost));
         }
     }
 
@@ -125,39 +112,6 @@ internal static partial class FacetSelfTestChecks {
         if(rain) d["KVI_TAB_NOTE"] = ["kv-note-border-side", "kv-note-align"];
         if(counter) d["KVI_TAB_COUNTER"] = ["kv-counter-placement", "kv-counter-align", "kv-counter-mode"];
         return d;
-    }
-
-    // The classic inspector over a throwaway canvas under a hidden object on Quartz's canvas: each tab's tracked row ids.
-    private static Dictionary<string, HashSet<string>> KvClassicIds(KvDocument doc, string tab, KvElement[] sel) {
-        Dictionary<string, HashSet<string>> ids = [];
-        var hostObj = new GameObject("kv-parity", typeof(RectTransform));
-        hostObj.transform.SetParent(UICore.CanvasRect, false);
-        hostObj.SetActive(false);
-        var props = new GameObject("props", typeof(RectTransform));
-        props.transform.SetParent(hostObj.transform, false);
-        KvCanvas canvas = KvCanvas.Create(hostObj.transform);
-        KvInspector insp = KvInspector.Attach(canvas);
-        try {
-            insp.BindHost(null, props.GetComponent<RectTransform>(), null);
-            canvas.Bind(doc, tab);
-            canvas.SetSelection(sel);
-            const BindingFlags Any = BindingFlags.Instance | BindingFlags.NonPublic;
-            FieldInfo tabField = typeof(KvInspector).GetField("tab", Any), tracked = typeof(KvInspector).GetField("tracked", Any);
-            var tabs = (Array)typeof(KvInspector).GetMethod("TabsForSelection", Any).Invoke(insp, null);
-            foreach(object t in tabs) {
-                string name = KvClassicTabKeys[(int)t];
-                if(name == "KVI_TAB_SETTINGS") continue;   // not repeated: the page's own settings rows hold it
-                tabField.SetValue(insp, t);
-                insp.Push();
-                ids[name] = [.. ((List<UIObject>)tracked.GetValue(insp)).Select(o => GenerateUI.LocaleKeyFromId(o.Id))
-                    .Where(k => k != null && !KvMenuBarIds.IsMatch(k))];
-            }
-        } finally {
-            insp.Dispose();
-            canvas.Dispose();
-            UnityEngine.Object.Destroy(hostObj);
-        }
-        return ids;
     }
 
     // The new pages built one at a time into a throwaway box on the editor: each tab's shown row ids, and every choice row's.

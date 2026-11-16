@@ -88,9 +88,7 @@ internal static partial class FacetSelfTestChecks {
             }
             yield return TufUntil(() => s.ListState == TufPackListState.Ready && s.Packs.Count > 0, 120);
             yield return TufPass();
-            // As on the Levels page: the search field's placeholder names no row, the tagline is the header's description,
-            // and a chip is no search row, so search finds Refresh.
-            Covers(check, TufPacksKey, omitted: ["TUF_PACK_SEARCH_PLACEHOLDER", "TUF_PACKS_TAGLINE"], classic: TufPackClassicKeys());
+            // A chip is no search row, so search finds Refresh.
             Searched(check, TufPacksKey, ["TUF_REFRESH"]);
             Translated(check, TufPacksKey, ["TUF_PACKS_TAGLINE"]);
             check($"{TufPacksKey}: the first page fills the pack cards from the fixture",
@@ -108,18 +106,6 @@ internal static partial class FacetSelfTestChecks {
             yield return TufPackOpen(check, s);
             yield return TufPackTreeChecks(check, s);
             yield return TufPackStates(check, s);
-        }
-    }
-
-    // The classic pack browser's label keys, from a build under the classic menu's panel that is destroyed at once.
-    private static string[] TufPackClassicKeys() {
-        var host = new GameObject("FacetSelfTestTufPacks", typeof(RectTransform)).GetComponent<RectTransform>();
-        host.SetParent(UICore.Panel, false);
-        try {
-            TufPacksUI.Create(host);
-            return [.. host.GetComponentsInChildren<Quartz.Localization.TextLocalization>(true).Select(l => l.Key).Where(k => !string.IsNullOrEmpty(k))];
-        } finally {
-            UnityEngine.Object.Destroy(host.gameObject);
         }
     }
 

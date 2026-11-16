@@ -1,4 +1,3 @@
-using Quartz.UI.Generator;
 using Quartz.UI.Nav;
 namespace Quartz.Features.Tuf;
 [Feature("tuf", "others", 30, "TUF", "TUF", Tab = "tuf")]
@@ -19,8 +18,10 @@ public sealed class TufModule : QuartzFeature {
             Order = 10,
             Title = "Levels",
             LocaleKey = "TUF_LEVELS",
+#if QUARTZ_CLASSIC_UI
             Build = TufBrowserUI.Create,
-            SearchLabel = static () => GenerateUI.Tr("TUF", "TUF"),
+#endif
+            SearchLabel = static () => Quartz.Core.MainCore.Tr.Get("TUF", "TUF"),
             OwnScroll = true,
         });
         Context.AddPage(new NavPage {
@@ -29,8 +30,10 @@ public sealed class TufModule : QuartzFeature {
             Order = 20,
             Title = "Packs",
             LocaleKey = "TUF_PACKS",
+#if QUARTZ_CLASSIC_UI
             Build = TufPacksUI.Create,
-            SearchLabel = static () => GenerateUI.Tr("TUF", "TUF") + " · " + GenerateUI.Tr("TUF_PACKS", "Packs"),
+#endif
+            SearchLabel = static () => Quartz.Core.MainCore.Tr.Get("TUF", "TUF") + " · " + Quartz.Core.MainCore.Tr.Get("TUF_PACKS", "Packs"),
             OwnScroll = true,
         });
         Context.AddPage(new NavPage {
@@ -39,8 +42,10 @@ public sealed class TufModule : QuartzFeature {
             Order = 30,
             Title = "Settings",
             LocaleKey = "TUF_SETTINGS",
+#if QUARTZ_CLASSIC_UI
             Build = TufSettingsUI.Create,
-            SearchLabel = static () => GenerateUI.Tr("TUF", "TUF") + " · " + GenerateUI.Tr("TUF_SETTINGS", "Settings"),
+#endif
+            SearchLabel = static () => Quartz.Core.MainCore.Tr.Get("TUF", "TUF") + " · " + Quartz.Core.MainCore.Tr.Get("TUF_SETTINGS", "Settings"),
             OwnScroll = true,
         });
         Context.AddHomeCard(new Quartz.UI.Home.HomeCard {

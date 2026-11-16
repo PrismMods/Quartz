@@ -9,7 +9,10 @@ public sealed class PanelsModule : QuartzFeature {
         Context.RegisterRescalable("panels", PanelsOverlay.Rescale);
         Context.AddPage(new NavPage {
             Key = "overlay.panels", CategoryKey = "overlay", Order = 70,
-            Title = "Panels", LocaleKey = "SECTION_PANELS", Build = PagePanels.Create,
+            Title = "Panels", LocaleKey = "SECTION_PANELS",
+#if QUARTZ_CLASSIC_UI
+            Build = PagePanels.Create,
+#endif
             OwnScroll = true,
         });
         Context.PatchAll();

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Runtime.CompilerServices;
 using Facet;
 using Quartz.Core;
+using Quartz.Features;
 using Quartz.Features.KeyLimiter;
 using Quartz.UI.Objects;
 using UnityEngine;
@@ -14,6 +15,19 @@ namespace Quartz.UI.FacetUi;
 /// the same decision methods the real input poll calls, since a test cannot press a key.
 /// </summary>
 internal static partial class FacetSelfTestChecks {
+    private const string FxPage = "visuals.effectremover", Fx = "effectremover";
+
+    private static void Step(Action<string, bool, string> check, string name, bool ok, string detail = null) =>
+        check(name, ok, (detail == null ? "" : detail + " ") + Showing());
+
+    // SetEnabled records the value; a rig that never chose one keeps its fresh-install default, and Features.json its bytes.
+    private static void RestoreFeature(string id, bool was, bool had, bool stored) {
+        if(FeatureService.IsEnabled(id) != was) FeatureService.SetEnabled(id, was);
+        if(had) FeatureService.State.Features[id] = stored;
+        else FeatureService.State.Features.Remove(id);
+        FeatureService.State.Save();
+    }
+
     [MethodImpl(MethodImplOptions.NoInlining)]
     internal static IEnumerator Run(Action<string, bool, string> check, Action<string> info) {
         info($"facet assembly {typeof(Host).Assembly.Location} loaded={AppDomain.CurrentDomain.GetAssemblies().Count(a => a.GetName().Name == "Facet.0.2")}");
@@ -22,9 +36,7 @@ internal static partial class FacetSelfTestChecks {
         try {
             yield return Suite(check, info);
             yield return Shell(check, info);   // first: its open is the new menu's first of the session
-            yield return ClassicWheel(check);
             yield return EffectRemoverWindow(check, info);
-            yield return SwitchHandOff(check);
             yield return Shortcut(check, info);
             yield return AltK(check, info);
             yield return NonForm(check);
@@ -99,45 +111,15 @@ internal static partial class FacetSelfTestChecks {
         w = new Window(s.Root, name, name, new Rect(100, 100, 400, 300));
         return s;
     }
+    // Escape hides the top Facet window; another mod's call in the same frame took it already, and a later frame's is new.
     private static IEnumerator Escape(Action<string, bool, string> check) {
-        bool wasOpen = UICore.IsOpen;
-        Surface s = null;
+        Surface s = Window("QuartzSelfTestEsc", out _);
         try {
-            // Menu open: the first Escape is Facet's, the second (a later frame) is the menu's.
-            if(!UICore.IsOpen) UICore.Open(true);
-            s = Window("QuartzSelfTestEsc1", out _);
             yield return Frames(2);
-            UICore.EscapeDown();
-            yield return Frames(3); // the deferred menu Escape would have run by now
-            check("escape 1 with menu open: facet window hides", !s.Visible, null);
-            check("escape 1 with menu open: menu stays open", UICore.IsOpen, null);
-            UICore.EscapeDown();
-            yield return Frames(3);
-            check("escape 2 in a later frame closes the menu", !UICore.IsOpen, null);
-            s.Dispose();
-            // Another mod already took this frame's Escape (as a PrismLib mod polling first would).
-            if(!UICore.IsOpen) UICore.Open(true);
-            s = Window("QuartzSelfTestEscShared", out _);
-            yield return Frames(2);
-            bool otherTook = FacetBridge.HandleEscape();
-            UICore.EscapeDown(); // same frame: Facet's stamp answers true again
-            check("shared escape: other mod's call took it", otherTook, null);
-            check("shared escape: facet window hidden, menu open in the same frame", !s.Visible && UICore.IsOpen, null);
-            yield return Frames(3);
-            check("shared escape: no deferred close a frame later", UICore.IsOpen, null);
-            s.Dispose();
-            // Menu closed.
-            if(UICore.IsOpen) UICore.Close(true);
-            s = Window("QuartzSelfTestEsc2", out _);
-            yield return Frames(2);
-            UICore.EscapeDown();
-            yield return Frames(3);
-            check("escape with menu closed: facet window hides", !s.Visible, null);
-            check("escape with menu closed: menu stays closed", !UICore.IsOpen, null);
+            check("escape hides a facet window", FacetBridge.HandleEscape() && !s.Visible, null);
+            check("escape in the same frame: already taken", FacetBridge.HandleEscape(), null);
         } finally {
-            s?.Dispose();
-            if(wasOpen && !UICore.IsOpen) UICore.Open(true);
-            else if(!wasOpen && UICore.IsOpen) UICore.Close(true);
+            s.Dispose();
         }
     }
     private static IEnumerator TextFocus(Action<string, bool, string> check) {
@@ -172,8 +154,6 @@ internal static partial class FacetSelfTestChecks {
         }
     }
     private static IEnumerator BlockChecks(Action<string, bool, string> check) {
-        bool wasOpen = UICore.IsOpen;
-        if(wasOpen) UICore.Close(true);
         yield return Frames(2);
         check("no block with nothing open", !KeyLimiter.IsMenuBlockActive(), null);
         Surface s = Window("QuartzSelfTestBlock", out _);
@@ -184,7 +164,6 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(1);
         check("block inactive one frame later", !KeyLimiter.IsMenuBlockActive(), null);
         s.Dispose();
-        if(wasOpen) UICore.Open(true);
     }
     private static bool TranslateAndLanguage(out string detail) {
         string key = "FXRM_MODE_SIMPLE";

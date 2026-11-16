@@ -196,6 +196,7 @@ namespace Facet {
         public string Read(string key) => throw null;
         public void RelabelSurfaces() => throw null;
         public string Translate(string s) => throw null;
+        public static global::System.IDisposable Use(global::Facet.Host h) => throw null;
         public void Write(string key, string value) => throw null;
         private Host() { }
     }
@@ -400,9 +401,6 @@ namespace Facet {
     }
     public sealed unsafe partial class SearchIndex {
         private SearchIndex() { }
-        public sealed unsafe partial class Hit {
-            public Hit() { }
-        }
         public sealed unsafe partial class Entry {
             public string Label;
             public global::System.Action Open;

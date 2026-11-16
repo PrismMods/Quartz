@@ -5,7 +5,6 @@ using Quartz.Core;
 using Quartz.Features;
 using Quartz.Resource;
 using Quartz.UI.Nav;
-using Quartz.UI.Search;
 using UnityEngine;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi;
@@ -90,23 +89,18 @@ internal static partial class QuartzShell {
         };
     }
 
-    // A search result on a page still in the classic menu goes on to that menu; a moved or off page is the destination.
-    internal static Action<SearchIndex.Hit> ClassicHit(NavPage page) => IsClassic(page) ? _ => OpenClassic(page.State) : null;
-
-    // The classic pages' rows, each jumping to its page in the classic menu. Asked whenever the index builds.
-    internal static IEnumerable<SearchIndex.Entry> ClassicRows() {
-        foreach(var (key, english, state) in SettingsSearch.Rows()) {
-            NavPage page = NavRegistry.ByState(state);
-            // A row naming its own page is the page's title, which its header already indexes.
-            if(page == null || key == page.LocaleKey) continue;
-            if(!IsClassic(page)) continue;
-            yield return new SearchIndex.Entry {
-                Label = Label(key, english),
-                Where = Label(page.LocaleKey, page.Title),
-                Tip = english,   // an English query still finds the row in another language
-                Open = () => OpenClassic(state),
-            };
-        }
+    /// <summary>Every page built detached, as the search index builds them: each row registers its hotkey's flip.</summary>
+    internal static void BuildAll() {
+        Prebuild();
+        if(shell == null) return;
+        using(Host.Use(QuartzHost.Host))
+            foreach(KeyValuePair<string, Action<VisualElement>> page in Moved) {
+                try {
+                    page.Value(new VisualElement());
+                } catch(Exception e) {
+                    MainCore.Log.Wrn($"[Menu] page {page.Key} did not build for the hotkeys: {e.Message}");
+                }
+            }
     }
 
     internal static void Stub(VisualElement p, NavPage page) {
@@ -126,13 +120,13 @@ internal static partial class QuartzShell {
                 QuartzHost.Text(blocker.Info.NameKey, blocker.Name));
     }
 
-    // Custom addon pages and every page not moved yet.
-    internal static void Classic(VisualElement p, NavPage page) {
+    // A custom addon page (RegisterTab, RegisterTopLevelTab): its addon draws it with uGUI, which this menu cannot host.
+    internal static void Undrawable(VisualElement p, NavPage page) {
         string feature = FeaturePages.FeatureOf(page);
         Header(p, Label(page.LocaleKey, page.Title), feature == null ? null : FeatureSwitch(feature));
-        if(p.panel == null) return;   // the search index's throwaway build: the card is the same on every classic page
-        // A feature that puts an element on screen gets the Edit layout row: its elements move in the shared layout editor.
-        ClassicCard(p, () => OpenClassic(page.State), ShellModel.HasLayout(feature));
+        Controls.Info(Controls.Card(p, null), "", () => QuartzHost.Text("MENU_ADDON_PAGE_UNDRAWABLE",
+            "This addon draws its page with the old menu, which this version no longer has. Its author can move it to a settings tab."),
+            o => o.Id = "menu-undrawable");
     }
 }
 #endif

@@ -37,10 +37,6 @@ internal static partial class FacetSelfTestChecks {
             bool states = status is UpdateStatus.Available or UpdateStatus.Skipped or UpdateStatus.Installed;
             if(states) info($"{page}: the update-state buttons' hiding: not run, status={status}");
             yield return Parity(check, page, rows, states ? null : UpdateStateButtons);
-            Covers(check, page, new Dictionary<string, string> {
-                ["FONT"] = "menu-settings-FONT", ["UPDATES"] = "menu-settings-UPDATES", ["SETTINGS_FONT"] = "menu-settings-SETTINGS_FONT",
-            }, only: ["UPDATES", "CHECK_FOR_UPDATES", "UPDATE_NOTES", "UPDATE_SKIP", "UPDATE_INSTALL", "UPDATE_UNDO", "UPDATE_RESTART",
-                "FONT", "FONT_SCALE", "FONT_LINE_SPACING", "FONT_RENAME", "FONT_DELETE", "SETTINGS_FONT"]);
             Searched(check, page, ["UPDATE_CHANNEL_LABEL", "CHECK_FOR_UPDATES", "FONT_ADD", "FONT_SCALE", "FONT_LINE_SPACING"]);
             Translated(check, page, [.. rows.Where(k => !k.EndsWith("_DROPDOWN")), .. UpdateStateButtons, "FONT_NAME", "FONT_RENAME", "FONT_DELETE", "UPDATES", "FONT", "SETTINGS_FONT"]);
 

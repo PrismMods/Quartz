@@ -38,7 +38,6 @@ internal static class ProfilesPage {
         void Say(string text) => status!.Show(text);
         void Rebuilt() {
             Reread();
-            UICore.Rebuild(true);
             QuartzShell.Changed();
         }
         Read();

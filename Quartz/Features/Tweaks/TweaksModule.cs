@@ -12,7 +12,9 @@ public sealed class TweaksModule : QuartzFeature {
             Order = 10,
             Title = "General",
             LocaleKey = "TWEAKS_GENERAL",
+#if QUARTZ_CLASSIC_UI
             Build = PageTweaks.GeneralPage,
+#endif
             OwnScroll = true,
         });
         Context.RegisterImportHandler(new TweaksImport());

@@ -44,8 +44,7 @@ internal static class FacetEffectRemover {
             C.Mode = v == 0 ? EffectRemoverSettings.ModeSimple : EffectRemoverSettings.ModeEnhanced;
             Save();
             EffectRemover.RefreshEditorSaveButtons();
-            UICore.Rebuild();   // the menu's page is built per mode too
-            QuartzShell.Changed();   // and the new menu's search lists this mode's rows
+            QuartzShell.Changed();   // the search lists this mode's rows
         }), o => {
             o.Id = "FXRM_MODE";
             o.Items = ["FXRM_MODE_SIMPLE", "FXRM_MODE_ENHANCED"];

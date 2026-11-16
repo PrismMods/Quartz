@@ -98,7 +98,6 @@ internal static class PanelsList {
         if(PanelBinds.Moved(MainCore.Conf.ToggleKeybinds, [.. before.Select(p => Panels.IndexOf(p))])) MainCore.ConfMgr.RequestSave();
         PanelsOverlay.Save();
         PanelsOverlay.Rebuild();
-        UICore.ClassicStale = true;   // the classic page lists the panels
         FoldsFollow(Places(before));
         QuartzShell.Surface?.Refresh();
     }

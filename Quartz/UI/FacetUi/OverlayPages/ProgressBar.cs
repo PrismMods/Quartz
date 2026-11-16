@@ -32,7 +32,6 @@ internal static class ProgressBar {
             C.Style = (ProgressBarStyle)v;
             apply();
             save();
-            UICore.Rebuild();
             swap();
         }), o => {
             o.Id = "PROGRESSBAR_STYLE_LABEL";
@@ -138,7 +137,6 @@ internal static class ProgressBar {
         }
         // A stop added, removed or let go: the stops stay in order, and the classic page, which lists them as built, is stale.
         void Edit(Action change) {
-            UICore.ClassicStale = true;
             change();
             g.SortPoints();
             apply();

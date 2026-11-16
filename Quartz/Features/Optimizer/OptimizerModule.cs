@@ -14,7 +14,9 @@ public sealed class OptimizerModule : QuartzFeature {
             Title = "Optimizer",
             LocaleKey = "SECTION_OPTIMIZER",
             OwnScroll = true,
+#if QUARTZ_CLASSIC_UI
             Build = PageOptimizer.Create,
+#endif
         });
         Context.AddHomeCard(new Quartz.UI.Home.HomeCard {
             Key = "optimizer.home",

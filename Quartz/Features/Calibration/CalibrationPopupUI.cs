@@ -1,3 +1,4 @@
+using Quartz.Localization;
 using GTweens.Builders;
 using GTweens.Easings;
 using GTweens.Tweens;
@@ -5,7 +6,6 @@ using Quartz.Core;
 using Quartz.Overlay;
 using Quartz.Resource;
 using Quartz.Tween;
-using Quartz.UI.Generator;
 using Quartz.UI.Utility;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -146,7 +146,8 @@ public static class CalibrationPopupUI {
             titleRect.offsetMax = new(-18f, 0f);
             TextMeshProUGUI titleText = MenuText(title, 18f);
             titleText.alignment = TextAlignmentOptions.Left;
-            GenerateUI.Localize(titleText, "SECTION_CALIBRATION", "Calibration");
+            titleText.text = "Calibration";
+            titleText.gameObject.AddComponent<TextLocalization>().Init("SECTION_CALIBRATION", "Calibration");
         }
         {
             GameObject msg = new("Message");
@@ -249,8 +250,9 @@ public static class CalibrationPopupUI {
         labelRect.offsetMax = Vector2.zero;
         TextMeshProUGUI label = MenuText(labelObj, 18f);
         label.alignment = TextAlignmentOptions.Center;
-        GenerateUI.Localize(label, localeKey, defaultText);
-        GenerateUI.AddButton(obj, btn => {
+        label.text = defaultText;
+        label.gameObject.AddComponent<TextLocalization>().Init(localeKey, defaultText);
+        UguiButton.Add(obj, btn => {
             if(btn == InputButton.Left) onClick();
         });
         return img;

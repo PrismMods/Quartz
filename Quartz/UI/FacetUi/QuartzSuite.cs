@@ -35,13 +35,7 @@ internal sealed class QuartzSuite : SuiteAdapter {
             Label = QuartzShell.Label(pg.LocaleKey, pg.Title),
             Feature = FeaturePages.FeatureOf(pg),
             Visible = pg.Visible,
-            OnHit = QuartzShell.ClassicHit(pg),
         }).ToList(),
-        // A category without tabs is its one page, which can change under it: asked when the hit lands.
-        OnHit = h => {
-            IReadOnlyList<NavPage> pages = NavRegistry.PagesIn(c.Key);
-            if(!NavRegistry.ShowsSubmenu(c) && pages.Count > 0) QuartzShell.ClassicHit(pages[0])?.Invoke(h);
-        },
     }).ToList();
 
     public override void BuildPage(VisualElement panel, SuitePage page) {
@@ -49,10 +43,10 @@ internal sealed class QuartzSuite : SuiteAdapter {
         if(pg == null) return;
         if(QuartzShell.BuilderFor(pg) is { } build) build(panel);
         else if(FeaturePages.IsStub(pg)) QuartzShell.Stub(panel, pg);
-        else QuartzShell.Classic(panel, pg);
+        else QuartzShell.Undrawable(panel, pg);
     }
 
-    public override IEnumerable<Facet.SearchIndex.Entry> SearchRows() => QuartzShell.ClassicRows().Concat(OverlayPages.PanelsList.SearchRows());
+    public override IEnumerable<Facet.SearchIndex.Entry> SearchRows() => OverlayPages.PanelsList.SearchRows();
     public override string Key(string id, string english) => id switch {
         "suite.search" => "SEARCH",
         "suite.sidebar" => "MENU_SIDEBAR",
@@ -79,13 +73,7 @@ internal sealed class QuartzSuite : SuiteAdapter {
     public override bool KeepEscape => Keybind.Capturing;
     public override bool CanEditLayout => PrismBridge.UiAvailable;
 
-    public override void OnLeaving() => MenuHandOff.ReturnTo = MenuHandOff.Menu.None;   // a classic menu this came from stays shut under the editor
     public override void OpenLayoutEditor() => PrismBridge.OpenLayoutEditor();
     public override bool LayoutEditorShowing => UICore.IsArranging || LayoutEditorProbe.Shown();
-    public override bool ReturnFromLayout => !UICore.IsOpen;
-    // Back from a trip away that began at the hub: the menu's close still goes to the hub.
-    public override void OnReturning() {
-        if(MenuHandOff.FromHub) MenuHandOff.ReturnTo = MenuHandOff.Menu.Classic;
-    }
 }
 #endif

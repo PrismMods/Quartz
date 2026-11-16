@@ -5,7 +5,6 @@ using Quartz.Core;
 using UnityEngine;
 using Quartz.Prism;
 using UnityEngine.UIElements;
-using HandOff = Quartz.UI.MenuHandOff;
 namespace Quartz.UI.FacetUi;
 /// <summary>
 /// The shortcut menu the menu hotkey opens, opened here through the bridge: its logo and buttons, and where each button goes.
@@ -14,10 +13,7 @@ internal static partial class FacetSelfTestChecks {
     private static readonly string[] ShortcutButtons = ["quartz-shortcut-settings", "quartz-shortcut-layout", "quartz-shortcut-close"];
 
     private static IEnumerator Shortcut(Action<string, bool, string> check, Action<string> info) {
-        bool wasOpen = UICore.IsOpen;
-        if(wasOpen) UICore.Close(true);
         QuartzShell.Hide();
-        HandOff.ReturnTo = HandOff.Menu.None;
         try {
             FacetBridge.OpenShortcut();
             yield return Frames(3);
@@ -77,8 +73,6 @@ internal static partial class FacetSelfTestChecks {
             FacetBridge.HideShortcut();
             QuartzShell.Hide();
             if(LayoutEditorProbe.Shown()) FacetBridge.HandleEscape();
-            HandOff.ReturnTo = HandOff.Menu.None;
-            if(wasOpen) UICore.Open(true);
         }
         yield return Frames(3);
     }

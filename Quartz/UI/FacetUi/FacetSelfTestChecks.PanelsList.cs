@@ -47,14 +47,10 @@ internal static partial class FacetSelfTestChecks {
         if(made == null || !PanelsOverlay.Conf.Panels.Remove(made)) return;
         PanelsOverlay.Save();
         PanelsOverlay.Rebuild();
-        UICore.ClassicStale = true;
     }
 
     private static IEnumerator PanelsListChecks(Action<string, bool, string> check, Action<string> info, string page, string file, PanelConfig[] made) {
         List<PanelConfig> list = PanelsOverlay.Conf.Panels;
-        var names = new HashSet<string>();
-        yield return PanelNames(names);
-        Covers(check, page, new Dictionary<string, string> { ["SETTING_SHORT"] = "PANEL_INSPECTOR" }, names: names);
         Searched(check, page, ["PANELS_CREATE"]);
         PanelRowsSearched(check, page);
         Translated(check, page, ["HEADING_APPEARANCE", "PANEL_SHOWSTAT", "PANEL_SHOWLABEL"]);
@@ -64,8 +60,7 @@ internal static partial class FacetSelfTestChecks {
         List<string> tabbed = [.. AllPageTabs().SelectMany(t => t.Element.Query<Button>().ToList()).Select(b => b.text).Where(t => list.Any(p => p.Name == t))];
         check($"{page}: panels are picked in the list alone, never also in tabs", tabbed.Count == 0, "tabs named for panels: " + string.Join("|", tabbed));
         check($"{page}: no page is partly moved",
-            typeof(QuartzShell).GetField("PartlyMoved", BindingFlags.Static | BindingFlags.NonPublic) == null
-            && !QuartzShell.ClassicRows().Any(e => e.Where == QuartzShell.Label(NavRegistry.ByKey(page).LocaleKey, NavRegistry.ByKey(page).Title)),
+            typeof(QuartzShell).GetField("PartlyMoved", BindingFlags.Static | BindingFlags.NonPublic) == null,
             $"field={typeof(QuartzShell).GetField("PartlyMoved", BindingFlags.Static | BindingFlags.NonPublic) != null}");
 
         List<PanelConfig> players = [.. list];
@@ -219,40 +214,6 @@ internal static partial class FacetSelfTestChecks {
         bool same = list.Select(p => p.Serialize().ToString()).SequenceEqual(others) && !list.Contains(created);
         check($"{page}: undo after the removal never writes into another panel", same && SameBytes(Bytes(file), before) && created.Name == name,
             $"panels same={same} file same={SameBytes(Bytes(file), before)} name={created.Name == name}");
-    }
-
-    // Every element name the page shows: each panel picked in turn, and each of its stats inspected with both inspector tabs.
-    // The panel picked and the stat inspected are put back.
-    private static IEnumerator PanelNames(HashSet<string> names) {
-        void Add() {
-            foreach(VisualElement v in PageContent().Query<VisualElement>().ToList())
-                if(!string.IsNullOrEmpty(v.name)) names.Add(v.name);
-        }
-        Add();
-        PanelConfig was = OverlayPages.PanelsList.Shown;
-        StatEntry inspected = PanelsOverlay.PreviewStat;
-        foreach(PanelConfig p in PanelsOverlay.Conf.Panels.ToList()) {
-            OverlayPages.PanelsStats.Deselect();
-            OverlayPages.PanelsList.Show(p);
-            QuartzShell.Surface?.Refresh();
-            yield return Frames(2);
-            Add();
-            foreach(StatEntry st in p.Stats.ToList()) {
-                OverlayPages.PanelsStats.Select(p, st);
-                QuartzShell.Surface?.Refresh();
-                yield return Frames(2);
-                global::Facet.Tabs t = InspectorTabs();
-                for(int k = 0; t != null && k < 2; k++) {
-                    t.Select(k);
-                    Add();
-                }
-            }
-        }
-        OverlayPages.PanelsStats.Deselect();
-        if(was != null) OverlayPages.PanelsList.Show(was);
-        PanelsOverlay.PreviewStat = inspected;
-        QuartzShell.Surface?.Refresh();
-        yield return Frames(2);
     }
 
     // The selected stat's inspector tabs (Stat, Setting) on the open page.

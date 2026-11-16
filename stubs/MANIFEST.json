@@ -2178,6 +2178,7 @@
           "Facet.Host Facet.Host::Create(System.String,System.Action\u00601\u003CFacet.HostOptions\u003E)",
           "Facet.Theme Facet.Host::Theme()",
           "Facet.Theme Facet.Host::get_Theme()",
+          "System.IDisposable Facet.Host::Use(Facet.Host)",
           "System.String Facet.Host::Read(System.String)",
           "System.String Facet.Host::Translate(System.String)",
           "System.Void Facet.Host::RelabelSurfaces()",
@@ -2513,10 +2514,6 @@
           "System.String Facet.SearchIndex/Entry::Where",
           "System.Void Facet.SearchIndex/Entry::.ctor()"
         ]
-      },
-      {
-        "type": "Facet.SearchIndex/Hit",
-        "members": []
       },
       {
         "type": "Facet.SearchList",
@@ -3159,8 +3156,7 @@
           "System.Void PrismLib.ModHandle::AddFields(System.String,System.Func\u00601\u003CSystem.Collections.Generic.IEnumerable\u00601\u003CSystem.Collections.Generic.KeyValuePair\u00602\u003CSystem.String,System.String\u003E\u003E\u003E)",
           "System.Void PrismLib.ModHandle::AddLog(System.String,System.Func\u00601\u003CSystem.Collections.Generic.IEnumerable\u00601\u003CSystem.String\u003E\u003E,System.String,System.Action)",
           "System.Void PrismLib.ModHandle::DescribeLayout(System.Collections.Generic.IEnumerable\u00601\u003CPrismLib.LayoutTarget\u003E)",
-          "System.Void PrismLib.ModHandle::DescribeSettings(System.Collections.Generic.IEnumerable\u00601\u003CPrismLib.SettingEntry\u003E)",
-          "System.Void PrismLib.ModHandle::ReportPointerOverUi(System.Func\u00601\u003CSystem.Boolean\u003E)"
+          "System.Void PrismLib.ModHandle::DescribeSettings(System.Collections.Generic.IEnumerable\u00601\u003CPrismLib.SettingEntry\u003E)"
         ]
       },
       {
@@ -3585,12 +3581,10 @@
           "System.Boolean PrismLib.UI.Toolkit.SuiteAdapter::CanEditLayout()",
           "System.Boolean PrismLib.UI.Toolkit.SuiteAdapter::KeepEscape()",
           "System.Boolean PrismLib.UI.Toolkit.SuiteAdapter::LayoutEditorShowing()",
-          "System.Boolean PrismLib.UI.Toolkit.SuiteAdapter::ReturnFromLayout()",
           "System.Boolean PrismLib.UI.Toolkit.SuiteAdapter::get_BlockInput()",
           "System.Boolean PrismLib.UI.Toolkit.SuiteAdapter::get_CanEditLayout()",
           "System.Boolean PrismLib.UI.Toolkit.SuiteAdapter::get_KeepEscape()",
           "System.Boolean PrismLib.UI.Toolkit.SuiteAdapter::get_LayoutEditorShowing()",
-          "System.Boolean PrismLib.UI.Toolkit.SuiteAdapter::get_ReturnFromLayout()",
           "System.Collections.Generic.IEnumerable\u00601\u003CFacet.SearchIndex/Entry\u003E PrismLib.UI.Toolkit.SuiteAdapter::SearchRows()",
           "System.Collections.Generic.IList\u00601\u003CPrismLib.UI.Toolkit.SuiteCategory\u003E PrismLib.UI.Toolkit.SuiteAdapter::Categories()",
           "System.Int32 PrismLib.UI.Toolkit.SuiteAdapter::Revision()",
@@ -3612,15 +3606,12 @@
           "System.String PrismLib.UI.Toolkit.SuiteAdapter::get_WindowId()",
           "System.Void PrismLib.UI.Toolkit.SuiteAdapter::.ctor()",
           "System.Void PrismLib.UI.Toolkit.SuiteAdapter::BuildPage(UnityEngine.UIElements.VisualElement,PrismLib.UI.Toolkit.SuitePage)",
-          "System.Void PrismLib.UI.Toolkit.SuiteAdapter::OnLeaving()",
-          "System.Void PrismLib.UI.Toolkit.SuiteAdapter::OnReturning()",
           "System.Void PrismLib.UI.Toolkit.SuiteAdapter::OpenLayoutEditor()"
         ]
       },
       {
         "type": "PrismLib.UI.Toolkit.SuiteCategory",
         "members": [
-          "System.Action\u00601\u003CFacet.SearchIndex/Hit\u003E PrismLib.UI.Toolkit.SuiteCategory::OnHit()",
           "System.Boolean PrismLib.UI.Toolkit.SuiteCategory::Tabs()",
           "System.Func\u00601\u003CSystem.Boolean\u003E PrismLib.UI.Toolkit.SuiteCategory::Visible()",
           "System.Func\u00601\u003CSystem.Collections.Generic.IList\u00601\u003CPrismLib.UI.Toolkit.SuitePage\u003E\u003E PrismLib.UI.Toolkit.SuiteCategory::Pages()",
@@ -3632,7 +3623,6 @@
           "System.Void PrismLib.UI.Toolkit.SuiteCategory::set_Icon(UnityEngine.UIElements.Background)",
           "System.Void PrismLib.UI.Toolkit.SuiteCategory::set_Key(System.String)",
           "System.Void PrismLib.UI.Toolkit.SuiteCategory::set_Label(System.String)",
-          "System.Void PrismLib.UI.Toolkit.SuiteCategory::set_OnHit(System.Action\u00601\u003CFacet.SearchIndex/Hit\u003E)",
           "System.Void PrismLib.UI.Toolkit.SuiteCategory::set_Pages(System.Func\u00601\u003CSystem.Collections.Generic.IList\u00601\u003CPrismLib.UI.Toolkit.SuitePage\u003E\u003E)",
           "System.Void PrismLib.UI.Toolkit.SuiteCategory::set_Tabs(System.Boolean)",
           "System.Void PrismLib.UI.Toolkit.SuiteCategory::set_Visible(System.Func\u00601\u003CSystem.Boolean\u003E)",
@@ -3642,7 +3632,6 @@
       {
         "type": "PrismLib.UI.Toolkit.SuitePage",
         "members": [
-          "System.Action\u00601\u003CFacet.SearchIndex/Hit\u003E PrismLib.UI.Toolkit.SuitePage::OnHit()",
           "System.Func\u00601\u003CSystem.Boolean\u003E PrismLib.UI.Toolkit.SuitePage::Visible()",
           "System.String PrismLib.UI.Toolkit.SuitePage::Feature()",
           "System.String PrismLib.UI.Toolkit.SuitePage::Key()",
@@ -3652,7 +3641,6 @@
           "System.Void PrismLib.UI.Toolkit.SuitePage::set_Feature(System.String)",
           "System.Void PrismLib.UI.Toolkit.SuitePage::set_Key(System.String)",
           "System.Void PrismLib.UI.Toolkit.SuitePage::set_Label(System.String)",
-          "System.Void PrismLib.UI.Toolkit.SuitePage::set_OnHit(System.Action\u00601\u003CFacet.SearchIndex/Hit\u003E)",
           "System.Void PrismLib.UI.Toolkit.SuitePage::set_Visible(System.Func\u00601\u003CSystem.Boolean\u003E)"
         ]
       },
@@ -3671,12 +3659,9 @@
           "Facet.Tabs PrismLib.UI.Toolkit.SuiteShell::get_TabRow()",
           "Facet.Window PrismLib.UI.Toolkit.SuiteShell::Window()",
           "Facet.Window PrismLib.UI.Toolkit.SuiteShell::get_Window()",
-          "System.Action PrismLib.UI.Toolkit.SuiteShell::Hidden",
           "System.Boolean PrismLib.UI.Toolkit.SuiteShell::FreshGeometry()",
           "System.Boolean PrismLib.UI.Toolkit.SuiteShell::Hide()",
-          "System.Boolean PrismLib.UI.Toolkit.SuiteShell::WaitingForLayout()",
           "System.Boolean PrismLib.UI.Toolkit.SuiteShell::get_FreshGeometry()",
-          "System.Boolean PrismLib.UI.Toolkit.SuiteShell::get_WaitingForLayout()",
           "System.Int32 PrismLib.UI.Toolkit.SuiteShell::SidebarMode()",
           "System.Int32 PrismLib.UI.Toolkit.SuiteShell::get_SidebarMode()",
           "System.String PrismLib.UI.Toolkit.SuiteShell::CompactStore",
@@ -3688,8 +3673,6 @@
           "System.Void PrismLib.UI.Toolkit.SuiteShell::ApplyLook()",
           "System.Void PrismLib.UI.Toolkit.SuiteShell::ApplySidebar()",
           "System.Void PrismLib.UI.Toolkit.SuiteShell::Changed()",
-          "System.Void PrismLib.UI.Toolkit.SuiteShell::ClassicCard(UnityEngine.UIElements.VisualElement,System.Action,System.Boolean)",
-          "System.Void PrismLib.UI.Toolkit.SuiteShell::ClassicMenuRow(UnityEngine.UIElements.VisualElement,System.Action)",
           "System.Void PrismLib.UI.Toolkit.SuiteShell::Dispose()",
           "System.Void PrismLib.UI.Toolkit.SuiteShell::EditLayout()",
           "System.Void PrismLib.UI.Toolkit.SuiteShell::FeatureFrame(UnityEngine.UIElements.VisualElement,System.String,Facet.Bind\u00601\u003CSystem.Boolean\u003E,System.String,System.Action\u00601\u003CUnityEngine.UIElements.VisualElement\u003E,System.Action\u00601\u003CUnityEngine.UIElements.VisualElement\u003E)",
@@ -3700,8 +3683,6 @@
           "System.Void PrismLib.UI.Toolkit.SuiteShell::PrismLinkRow(UnityEngine.UIElements.VisualElement,System.Action,System.Func\u00601\u003CSystem.Boolean\u003E)",
           "System.Void PrismLib.UI.Toolkit.SuiteShell::RebuildRail()",
           "System.Void PrismLib.UI.Toolkit.SuiteShell::Tick()",
-          "System.Void PrismLib.UI.Toolkit.SuiteShell::add_Hidden(System.Action)",
-          "System.Void PrismLib.UI.Toolkit.SuiteShell::remove_Hidden(System.Action)",
           "System.Void PrismLib.UI.Toolkit.SuiteShell::set_SidebarMode(System.Int32)",
           "UnityEngine.UIElements.VisualElement PrismLib.UI.Toolkit.SuiteShell::SettingsCard(UnityEngine.UIElements.VisualElement,System.String,System.Action\u00601\u003CFacet.CardOptions\u003E)"
         ]

@@ -102,6 +102,7 @@ internal static partial class FacetSelfTestChecks {
             check("restriction: a preset mode's bar shows no switches, Custom shows them",
                 preset == DisplayStyle.None && custom == DisplayStyle.Flex, $"preset={preset} custom={custom}");
 
+#if !QUARTZ_KEYVIEWER
             QuartzShell.Go("overlay.keyviewer");
             yield return Frames(3);
             if(KvEditorDoor.Live && KvEditorPage.Editor is { } ed) {
@@ -134,6 +135,7 @@ internal static partial class FacetSelfTestChecks {
             yield return Frames(3);
             if(KvEditorDoor.Live && KvEditorPage.Editor is { } back)
                 check("kv editor: the grid and elements are on the stage after a page switch", KvOnStage(back, out string seen), seen);
+#endif
         } finally {
             if(mode >= 0) Restriction.Conf.JRestrictMode = mode;
             for(int i = on.Count - 1; i >= 0; i--) RestoreFeature(on[i].id, on[i].was, on[i].had, on[i].stored);
@@ -141,6 +143,7 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(2);
     }
 
+#if !QUARTZ_KEYVIEWER
     // The logical canvas (the grid) and at least one element box overlap the stage, each with a size.
     private static bool KvOnStage(PrismLib.UI.Toolkit.KeyLayoutEditor<Quartz.Features.KeyViewer.Layout.KvElement> ed, out string seen) {
         Rect stage = ed.Canvas.Stage.worldBound;
@@ -155,5 +158,6 @@ internal static partial class FacetSelfTestChecks {
         seen = $"stage={stage} content={content.worldBound} boxes on stage={on}/{boxes} zoom={ed.Canvas.Zoom:0.##} pan={ed.Canvas.Pan}";
         return stage.width > 0f && stage.height > 0f && grid && on > 0;
     }
+#endif
 }
 #endif

@@ -3,11 +3,9 @@ using System.Collections;
 using Facet;
 using Quartz.Core;
 using Quartz.Features;
-using Quartz.UI.Factory.Page;
 using Quartz.UI.Nav;
 using UnityEngine;
 using UnityEngine.UIElements;
-using HandOff = Quartz.UI.MenuHandOff;
 namespace Quartz.UI.FacetUi;
 /// <summary>
 /// The new menu's Features grid: the header counts, a card of tiles for each togglable category, a tile's switch and
@@ -17,14 +15,11 @@ internal static partial class FacetSelfTestChecks {
     private const string FeatureTile = "menu-feature-";
 
     private static IEnumerator FeaturesPage(Action<string, bool, string> check, Action<string> info) {
-        bool wasOpen = UICore.IsOpen;
         string query = ShellFeatures.Query, trLang = MainCore.Tr.Language, confLang = MainCore.Conf.Language;
         int chip = ShellFeatures.Chip;
         // Every id is read before any is flipped, and put back in reverse: "overlay" is the others' dependency.
         var saved = FeatureService.Features.Select(h => (id: h.Id, was: h.Enabled, had: FeatureService.State.Features.TryGetValue(h.Id, out bool v), value: v)).ToList();
         var cats = FeatureCategories.Togglable().Select(c => (key: c.Key, had: FeatureService.State.Categories.TryGetValue(c.Key, out bool v), value: v)).ToList();
-        if(wasOpen) UICore.Close(true);
-        HandOff.ReturnTo = HandOff.Menu.None;
         try {
             ShellFeatures.Query = "";
             ShellFeatures.Chip = 0;
@@ -43,9 +38,7 @@ internal static partial class FacetSelfTestChecks {
             ShellFeatures.Chip = chip;
             MainCore.Tr.Language = trLang;
             MainCore.Conf.Language = confLang;
-            HandOff.ReturnTo = HandOff.Menu.None;
             QuartzShell.Hide();
-            if(UICore.IsOpen) UICore.Close(true);
             for(int i = saved.Count - 1; i >= 0; i--) RestoreFeature(saved[i].id, saved[i].was, saved[i].had, saved[i].value);
             foreach(var (key, had, value) in cats) {
                 if(FeatureCategories.IsEnabled(key) != (!had || value)) FeatureCategories.SetEnabled(key, !had || value);
@@ -54,15 +47,14 @@ internal static partial class FacetSelfTestChecks {
             }
             FeatureService.State.Save();
             QuartzShell.Changed();
-            if(wasOpen) UICore.Open(true);
         }
         yield return Frames(3);
     }
 
     private static VisualElement FeatureCard(string key) => Body.Q(name: "menu-features-card-" + key);
     private static VisualElement FeatureTileOf(string id) => Body.Q(name: FeatureTile + id);
-    private static string FeatureHaystack(NavCategory c, FeatureService.Handle h) => PageFeatures.Norm(
-        MainCore.Tr.Get(c.LocaleKey, c.Title) + " " + MainCore.Tr.Get(h.Info.NameKey, h.Name) + " " + h.Id);
+    private static string FeatureHaystack(NavCategory c, FeatureService.Handle h) => Quartz.Utility.StringUtils.ForQuery(
+        MainCore.Tr.Get(c.LocaleKey, c.Title) + " " + MainCore.Tr.Get(h.Info.NameKey, h.Name) + " " + h.Id, MainCore.Conf.Language);
     private static List<NavCategory> WithFeatures() => [.. FeatureCategories.Togglable().Where(c => FeatureCategories.In(c.Key).Count > 0)];
     private static string Note(string key) => FeatureCard(key)?.Query<Label>().ToList().Select(l => l.text).FirstOrDefault(t => t.Contains(" / "));
 
@@ -159,7 +151,7 @@ internal static partial class FacetSelfTestChecks {
     private static string ShownFeatures() => string.Join(",", FeatureService.Features.Where(h => FeatureTileOf(h.Id) is { } t && Displayed(t)).Select(h => h.Id));
 
     private static IEnumerator FeaturesFilter(Action<string, bool, string> check) {
-        string q = PageFeatures.Norm("key");
+        string q = Quartz.Utility.StringUtils.ForQuery("key", MainCore.Conf.Language);
         ShellFeatures.Query = "key";
         float t0 = Time.realtimeSinceStartup;
         bool Settled() => FeatureTileOf("keyviewer") is { } t && Displayed(t) && FeatureService.Features.Where(h => FeatureTileOf(h.Id) is { } e && !Displayed(e)).Any();

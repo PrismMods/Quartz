@@ -12,7 +12,9 @@ public sealed class VisualTweaksModule : QuartzFeature {
             Order = 30,
             Title = "Visual Tweaks",
             LocaleKey = "SECTION_VISUAL_TWEAKS",
+#if QUARTZ_CLASSIC_UI
             Build = PageVisualTweaks.Create,
+#endif
             OwnScroll = true,
         });
         Context.RegisterImportHandler(new VisualTweaksImport());

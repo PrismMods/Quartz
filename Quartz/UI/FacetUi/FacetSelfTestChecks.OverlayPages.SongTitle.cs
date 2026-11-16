@@ -41,7 +41,7 @@ internal static partial class FacetSelfTestChecks {
     private static IEnumerator SongTitleChecks(Action<string, bool, string> check, Action<string> info, Color colour) {
         yield return Parity(check, SongTitlePage, SongTitleRows);
         yield return ColumnEdges(check, SongTitlePage, SongTitleOverlay.FontKey);
-        yield return ClassicSees(check, SongTitlePage, "SONGTITLE_STRIP", Bind.To(() => SongTitleConf.StripFormatting, v => {
+        yield return Flips(check, SongTitlePage, "SONGTITLE_STRIP", Bind.To(() => SongTitleConf.StripFormatting, v => {
             SongTitleConf.StripFormatting = v;
             SongTitleOverlay.Save();
         }));

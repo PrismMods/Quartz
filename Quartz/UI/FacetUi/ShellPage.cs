@@ -30,9 +30,9 @@ internal static class ShellPage {
 
     internal static void Feature(VisualElement p, string featureId, string titleKey, string descKey, string overlayId, Action<VisualElement> cards,
         Func<string> emptyKey = null, Action<Vector3> previewClick = null) {
-        // The switch shares the classic Features page's hotkey: a write shows on its toggle, and a right-click binds it.
+        // The switch's hotkey is the feature's own (feature_<id>, which ToggleBinds flips directly): a right-click binds it.
         string hotkey = "feature_" + featureId;
-        QuartzShell.FeatureFrame(p, titleKey, QuartzShell.FeatureSwitch(featureId).Then(v => ToggleBinds.Show(hotkey, v)), descKey, cards,
+        QuartzShell.FeatureFrame(p, titleKey, QuartzShell.FeatureSwitch(featureId), descKey, cards,
             overlayId == null ? null : r => FacetOverlayPreview.Pane(r, overlayId, emptyKey, previewClick));
         ShellRows.HeaderHotkey(p, titleKey, hotkey);
     }

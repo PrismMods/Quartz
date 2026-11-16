@@ -1,9 +1,19 @@
+using Quartz.Compat.Game;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 namespace Quartz.UI.Utility;
 public class UnityUtils {
+    // One line in a fixed slot: shrink, then ellipsize, never wrap.
+    public static TMP_Text FitLine(TMP_Text text, float minSize = 16f) {
+        TextCompat.NoWrap(text);
+        text.fontSizeMax = text.fontSize;
+        text.fontSizeMin = Mathf.Min(minSize, text.fontSize);
+        text.enableAutoSizing = true;
+        text.overflowMode = TextOverflowModes.Ellipsis;
+        return text;
+    }
     private static readonly char[] countBuf = new char[16];
     public static void SetCount(TextMeshProUGUI tmp, int value) {
         int pos = countBuf.Length;

@@ -93,12 +93,13 @@ internal static class FacetBridge {
         }
 #endif
     }
-    /// <summary>Opens the new menu, on pageKey when given. fromClassic: the classic menu hands off to it and comes back when it closes.</summary>
+    /// <summary>Opens the new menu, on pageKey when given. fromClassic is the classic menu's (IL2CPP and the KeyViewer flavour,
+    /// where the new menu never opens); it changes nothing.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static void OpenNewMenu(string pageKey = null, bool fromClassic = false) {
 #if !IL2CPP
         if(MenuAvailable()) {
-            try { OpenNewMenuImpl(pageKey, fromClassic); } catch(Exception e) { Fail(e); }
+            try { OpenNewMenuImpl(pageKey); } catch(Exception e) { Fail(e); }
         }
 #endif
     }
@@ -128,6 +129,15 @@ internal static class FacetBridge {
 #if !IL2CPP
         if(MenuAvailable()) {
             try { PrebuildNewMenuImpl(); } catch(Exception e) { Fail(e); }
+        }
+#endif
+    }
+    /// <summary>Builds every page of the new menu detached, as the search index does, so each row registers its hotkey.</summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void BuildAllPages() {
+#if !IL2CPP
+        if(MenuAvailable()) {
+            try { BuildAllPagesImpl(); } catch(Exception e) { Fail(e); }
         }
 #endif
     }
@@ -301,7 +311,7 @@ internal static class FacetBridge {
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void ConsumeEscapeImpl() => global::Facet.Input.ConsumeEscape();
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static void OpenNewMenuImpl(string pageKey, bool fromClassic) => QuartzShell.Open(pageKey, fromClassic);
+    private static void OpenNewMenuImpl(string pageKey) => QuartzShell.Open(pageKey);
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool HideNewMenuImpl() => QuartzShell.Hide();
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -317,11 +327,13 @@ internal static class FacetBridge {
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void TickNewMenuImpl() => QuartzShell.Tick();
     [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void BuildAllPagesImpl() => QuartzShell.BuildAll();
+    [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool HandleUndoImpl(bool ctrlOrCmd, bool shift, bool z, bool y) => global::Facet.Input.HandleUndo(ctrlOrCmd, shift, z, y);
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void WarmUpNow() {
         try { WarmUpImpl(); } catch(Exception e) { Fail(e); }
-        // With the switch on, the new menu is built a second later, so its first open only shows it (a cold build is ~70 ms).
+        // The new menu is built a second later, so its first open only shows it (a cold build is ~70 ms).
         _ = Task.Delay(1000).ContinueWith(_ => Quartz.Async.MainThread.Enqueue(() => {
             if(UICore.NewMenuWanted) PrebuildNewMenu();
         }));

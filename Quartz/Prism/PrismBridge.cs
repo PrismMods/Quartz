@@ -309,7 +309,6 @@ internal static partial class PrismBridge {
         me.BindKey("SettingsPanelPrism", (int)KeyCode.P, PrismLib.KeyMods.Alt, MainCore.Tr.Get("PRISM_KEY_SETTINGS", "Open the Prism settings panel"));
         BindMenuKey(me);
         me.DescribeSettings(SettingRows()); // once: it replaces whatever was described
-        me.ReportPointerOverUi(() => UICore.IsOpen);
     }
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void BindMenuKey(PrismLib.ModHandle me) =>
@@ -350,14 +349,6 @@ internal static partial class PrismBridge {
                 Set = SetMenuModifier,
             },
         ];
-        if(FacetBridge.MenuAvailable()) // no switch for a menu that cannot open
-            rows.Add(new PrismLib.SettingEntry {
-                Id = "quartz.experimental.newMenu", Kind = PrismLib.SettingKind.Bool, Page = "Quartz", Group = "Experimental", Order = 2,
-                Label = "Experimental: new menu", Tooltip = "The Settings button the menu hotkey shows opens the new menu. It is still being built; the classic menu stays available",
-                Keywords = ["facet", "preview", "beta"],
-                Get = () => MainCore.Conf.ExperimentalNewMenu,
-                Set = v => UICore.SetNewMenuSwitch(Convert.ToBoolean(v)),
-            });
         return rows;
     }
     // A name that is no key reads as none, which is refused.
@@ -368,9 +359,8 @@ internal static partial class PrismBridge {
         new("version", Info.DisplayVersion),
         new("loader", Loader),
         new("enabled", MainCore.IsModEnabled ? "on" : "off"),
-        new("menu", UICore.IsOpen ? "open" : "closed"),
-        new("arranging", UICore.IsArranging ? (UICore.SharedLayoutOpen ? "shared editor" : "reorganize") : "no"),
-        new("newMenu", MainCore.Conf.ExperimentalNewMenu ? "on" : "off"),
+        new("menu", UICore.MenuShowing ? "open" : "closed"),
+        new("arranging", UICore.IsArranging ? "shared editor" : "no"),
         new("hotkey", Keybind.Format((Keybind.KeyModifier)MainCore.Conf.ToggleModifier, (KeyCode)MainCore.Conf.ToggleKey)),
         new("facet", FacetBridge.Available() ? "loaded" : "unavailable"),
         new("prismlib.ui", UiAvailable ? "loaded" : "unavailable"),
@@ -413,7 +403,7 @@ internal static partial class PrismBridge {
         PrismLib.Diagnostics.ToggleRequested -= ToggleDebug;
     }
     private static bool MenuOpen() {
-        try { return UICore.IsOpen; } catch(Exception e) { Diag.Ignore(e); return false; }
+        return UICore.MenuShowing;
     }
     private static bool Autoplay() {
         try { return RDC.auto; } catch(Exception e) { Diag.Ignore(e); return false; }

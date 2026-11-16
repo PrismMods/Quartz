@@ -13,7 +13,9 @@ public sealed class DeathLimitModule : QuartzFeature {
             Order = 40,
             Title = "Death Limit",
             LocaleKey = "SECTION_DEATH_LIMIT",
+#if QUARTZ_CLASSIC_UI
             Build = PageDeathLimit.Create,
+#endif
             OwnScroll = true,
         });
         Context.RegisterImportHandler(new DeathLimitImport());

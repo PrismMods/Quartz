@@ -13,7 +13,9 @@ public sealed class PracticeModule : QuartzFeature {
             Order = 60,
             Title = "Practice Difficulty",
             LocaleKey = "SECTION_PRACTICE_DIFFICULTY",
+#if QUARTZ_CLASSIC_UI
             Build = PagePractice.Create,
+#endif
             OwnScroll = true,
         });
         Context.PatchAll();

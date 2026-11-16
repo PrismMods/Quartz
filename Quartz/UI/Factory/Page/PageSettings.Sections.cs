@@ -22,31 +22,10 @@ namespace Quartz.UI.Factory.Page;
 internal static partial class PageSettings {
     private static bool reopenAccentPicker;
     private static bool reopenAccentHsv;
-    // The language actions, shared with the new menu's Settings page.
-    internal static string[] Languages() => [.. MainCore.Tr.GetLanguages().OrderBy(x => x, StringComparer.OrdinalIgnoreCase)];
-    internal static string LanguageName(string lang) {
-        if(lang == Translator.FALLBACK_LANGUAGE) return "DEFAULT";
-        string native = MainCore.Tr.GetForLanguage("0NATIVELANG", lang, lang);
-        return $"{native} ({lang})";
-    }
-    internal static void ApplyLanguage(string lang) {
-        MainCore.Tr.Language = lang;
-        MainCore.Conf.Language = lang;
-        MainCore.Conf.LanguageAutoDetected = true;
-        MainCore.ConfMgr.RequestSave();
-        TextLocalization.RefreshAll();
-    }
-    /// <summary>Reads the language files again; <paramref name="done"/> runs on the main thread before the labels refresh.</summary>
-    internal static void ReloadLanguages(Action done) {
-        _ = Task.Run(async () => {
-            await MainCore.Tr.Load(MainCore.Paths.LangPath);
-            MainThread.Enqueue(() => {
-                done?.Invoke();
-                TextLocalization.RefreshAll();
-                RefreshUpdates();
-            });
-        });
-    }
+    internal static string[] Languages() => LanguageActions.Languages();
+    internal static string LanguageName(string lang) => LanguageActions.LanguageName(lang);
+    internal static void ApplyLanguage(string lang) => LanguageActions.Apply(lang);
+    internal static void ReloadLanguages(Action done) => LanguageActions.Reload(done, RefreshUpdates);
     private static void CreateLanguageSection(RectTransform content, CoreSettings defSet) {
         var langLabelRow = GenerateUI.Row(content.transform);
         var langText = GenerateUI.AddTextH1(langLabelRow);

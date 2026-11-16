@@ -1,6 +1,8 @@
 using Quartz.Core;
 using Quartz.Resource;
+#if QUARTZ_CLASSIC_UI
 using Quartz.UI.Factory.Page;
+#endif
 namespace Quartz.UI.Nav;
 internal static class CorePages {
     internal const string HomeCategoryKey = "home";
@@ -50,18 +52,32 @@ internal static class CorePages {
     private static void Visuals() {
     }
     private static void Standalone() {
-        Page(HomePageKey, HomeCategoryKey, 10, "Home", "HOME", PageHome.Create);
-        Page("profiles.main", "profiles", 10, "Profiles", "PROFILES", PageProfiles.Create);
-        Page("import.main", "import", 10, "Import", "IMPORT", PageImport.Create);
-        Page(FeaturesPageKey, FeaturesCategoryKey, 0, "Features", "FEATURES", PageFeatures.Create,
+        Page(HomePageKey, HomeCategoryKey, 10, "Home", "HOME");
+        Page("profiles.main", "profiles", 10, "Profiles", "PROFILES");
+        Page("import.main", "import", 10, "Import", "IMPORT");
+        Page(FeaturesPageKey, FeaturesCategoryKey, 0, "Features", "FEATURES",
             visible: static () => CoreNav);
-        Page(AddonsPageKey, AddonsCategoryKey, 90, "Addons", "ADDONS", PageAddons.Create, separatorBefore: true,
+        Page(AddonsPageKey, AddonsCategoryKey, 90, "Addons", "ADDONS", separatorBefore: true,
             visible: static () => CoreNav);
-        Page(SettingsPageKey, "settings", 10, "Settings", "SETTINGS", PageSettings.Create);
-        Page("credits.main", "credits", 10, "Credits", "CREDITS", PageCredits.Create);
-        Page("developer.main", "developer", 10, "Developer", "DEVELOPER", PageDeveloper.Create,
+        Page(SettingsPageKey, "settings", 10, "Settings", "SETTINGS");
+        Page("credits.main", "credits", 10, "Credits", "CREDITS");
+        Page("developer.main", "developer", 10, "Developer", "DEVELOPER",
             visible: static () => CoreNav && Info.IsDev);
     }
+#if QUARTZ_CLASSIC_UI
+    // The classic menu's page for each core page; a build without it draws them in the new menu only.
+    private static Action<UnityEngine.RectTransform> ClassicBuilder(string key) => key switch {
+        HomePageKey => PageHome.Create,
+        "profiles.main" => PageProfiles.Create,
+        "import.main" => PageImport.Create,
+        FeaturesPageKey => PageFeatures.Create,
+        AddonsPageKey => PageAddons.Create,
+        SettingsPageKey => PageSettings.Create,
+        "credits.main" => PageCredits.Create,
+        "developer.main" => PageDeveloper.Create,
+        _ => null,
+    };
+#endif
     private static void Category(
         string key, string title, string localeKey, UISprite icon, int order,
         bool alwaysSubmenu = false, Func<bool> visible = null, bool togglable = false, float iconScale = 1f
@@ -82,7 +98,7 @@ internal static class CorePages {
     });
     private static void Page(
         string key, string categoryKey, int order, string title, string localeKey,
-        Action<UnityEngine.RectTransform> build, Func<string> searchLabel = null, Func<bool> visible = null,
+        Func<string> searchLabel = null, Func<bool> visible = null,
         bool separatorBefore = false
     ) => NavRegistry.AddPage(new NavPage {
         Key = key,
@@ -90,7 +106,9 @@ internal static class CorePages {
         Order = order,
         Title = title,
         LocaleKey = localeKey,
-        Build = build,
+#if QUARTZ_CLASSIC_UI
+        Build = ClassicBuilder(key),
+#endif
         SearchLabel = searchLabel,
         Visible = visible,
         OwnScroll = true,

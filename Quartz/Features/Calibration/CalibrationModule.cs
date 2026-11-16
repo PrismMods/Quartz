@@ -19,7 +19,9 @@ public sealed class CalibrationModule : QuartzFeature {
             Order = 80,
             Title = "Calibration",
             LocaleKey = "SECTION_CALIBRATION",
+#if QUARTZ_CLASSIC_UI
             Build = PageCalibration.Create,
+#endif
             OwnScroll = true,
         });
         Context.PatchAll();
@@ -27,12 +29,16 @@ public sealed class CalibrationModule : QuartzFeature {
         Context.OnModEnable("CalibrationPopup", () => {
             CalibrationPopupUI.Initialize();
             UICore.OnArrangingChanged += reorganizeHandler;
+#if QUARTZ_CLASSIC_UI
             UICore.OnReorganizeChanged += dragHandler;
+#endif
             if(UICore.IsArranging) CalibrationPopupUI.BeginReorganize();
         });
         Context.OnModDisable("CalibrationPopup", () => {
             UICore.OnArrangingChanged -= reorganizeHandler;
+#if QUARTZ_CLASSIC_UI
             UICore.OnReorganizeChanged -= dragHandler;
+#endif
             CalibrationPopupUI.EndReorganize();
             CalibrationPopupUI.Dispose();
         });
@@ -43,7 +49,9 @@ public sealed class CalibrationModule : QuartzFeature {
             UICore.OnArrangingChanged -= reorganizeHandler;
             reorganizeHandler = null;
         }
+#if QUARTZ_CLASSIC_UI
         UICore.OnReorganizeChanged -= dragHandler;
+#endif
         CalibrationTimingLogger.FlushIfDirty();
         CalibrationPopupUI.Dispose();
     }

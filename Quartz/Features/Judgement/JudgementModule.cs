@@ -10,7 +10,10 @@ public sealed class JudgementModule : QuartzFeature {
         Context.RegisterRescalable("judgement", JudgementOverlay.Rescale);
         Context.AddPage(new NavPage {
             Key = "overlay.judgement", CategoryKey = "overlay", Order = 50,
-            Title = "Judgement", LocaleKey = "SECTION_JUDGEMENT", Build = PageJudgement.Create,
+            Title = "Judgement", LocaleKey = "SECTION_JUDGEMENT",
+#if QUARTZ_CLASSIC_UI
+            Build = PageJudgement.Create,
+#endif
             OwnScroll = true,
         });
         Context.RegisterImportHandler(new JudgementImport());

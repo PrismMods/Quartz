@@ -14,7 +14,9 @@ public sealed class CountdownModule : QuartzFeature {
             Title = "Countdown",
             LocaleKey = "SECTION_COUNTDOWN",
             OwnScroll = true,
+#if QUARTZ_CLASSIC_UI
             Build = PageCountdown.Create,
+#endif
         });
         Context.PatchAll();
         Context.OnModEnable("CountdownFeature", CountdownFeature.Initialize);

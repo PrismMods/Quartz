@@ -49,7 +49,7 @@ internal static class PrismWindows {
         // one poller acts on a press: the window host, and nobody while a shared layout editor is open (whoever draws it), which reads it itself.
         // Through Facet's chord: it stands down during a canvas drag, a key capture or typing.
         bool zDown = Input.GetKeyDown(KeyCode.Z), yDown = Input.GetKeyDown(KeyCode.Y);
-        if(own && (zDown || yDown) && !UICore.SharedLayoutOpen && !QuartzLayout.Visible && Ui.AnyWindowOpen && !UICore.IsOpen && !LayoutEditorProbe.Shown())
+        if(own && (zDown || yDown) && !UICore.SharedLayoutOpen && !QuartzLayout.Visible && Ui.AnyWindowOpen && !LayoutEditorProbe.Shown())
             FacetBridge.HandleUndo(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftCommand)
                 || Input.GetKey(KeyCode.RightCommand), Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift), zDown, yDown);
         // Not while one of Quartz's key captures owns the keyboard: its runner spends this Escape on the cancel.

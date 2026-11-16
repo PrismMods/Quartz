@@ -8,11 +8,10 @@ using UnityEngine;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi;
 /// <summary>
-/// The rows the Overlay pages share, each the classic row's twin: the same field, then the overlay's apply and save
-/// (save is a debounced request, so a save per change is fine). A row's Id is its label key.
+/// The rows the Overlay pages share: the field, then the overlay's apply and save (save is a debounced request, so a save
+/// per change is fine). A row's Id is its label key.
 /// </summary>
 internal static partial class ShellRows {
-    // Written through QuartzShell.Writes, so the classic menu rebuilds before it next shows.
     private static Bind<T> Writes<T>(Bind<T> bind, Action<T> after, Action apply, Action save) => QuartzShell.Writes(bind.Get, v => {
         bind.Set(v);
         after?.Invoke(v);
@@ -20,13 +19,14 @@ internal static partial class ShellRows {
         save?.Invoke();
     });
 
-    /// <summary>A switch. classicId is the classic toggle's id, whose hotkey this row shares: a right-click sets or clears it.
-    /// Null where the classic toggle has none.</summary>
+    /// <summary>A switch. classicId is its hotkey's id (the classic toggle's, so a bind made there carries over): a right-click
+    /// sets or clears it. Null where the row has none.</summary>
     internal static Control<bool> Toggle(VisualElement card, string key, string classicId, Bind<bool> bind, Action apply, Action save,
         Action<Options<bool>> configure = null) {
-        // The classic toggles show the value too: a hotkey fires one of them, and flips from what it shows.
+        Bind<bool> written = Writes(bind, null, apply, save);
+        Flips(classicId, written);
         Control<bool> c = null;
-        c = Controls.Toggle(card, key, Writes(bind, ShowOnClassic(classicId), apply, save), o => {
+        c = Controls.Toggle(card, key, written, o => {
             o.Id = key;
             configure?.Invoke(o);
             Hotkeys(o, classicId, () => c!.Root);   // picked from the built row
@@ -34,8 +34,19 @@ internal static partial class ShellRows {
         return c;
     }
 
-    // Built apart from Toggle so the bind, which History keeps, shares no closure with the row.
-    private static Action<bool> ShowOnClassic(string classicId) => v => ToggleBinds.Show(classicId, v);
+    /// <summary>
+    /// classicId's hotkey flips bind, page shut or not. The bind holds no UI, so the latest build's serves, the search index's
+    /// detached one too; the window shows the new value.
+    /// </summary>
+    internal static void Flips(string classicId, Bind<bool> bind) {
+#if !QUARTZ_CLASSIC_UI
+        if(classicId == null) return;
+        ToggleBinds.Register(classicId, () => {
+            bind.Set(!bind.Get());
+            QuartzShell.Surface?.Refresh();
+        });
+#endif
+    }
 
     // The description, and the bound key on a line of its own.
     private static string Tip(string descKey, string classicId) {
@@ -45,16 +56,10 @@ internal static partial class ShellRows {
         return desc.Length == 0 ? bound : desc + "\n" + bound;
     }
 
-    /// <summary>Binds a toggle's hotkey, shared with the classic menu, whose row shows it once it rebuilds.</summary>
-    internal static void SetHotkey(string classicId, Keybind.KeyModifier mod, KeyCode key) {
-        ToggleBinds.Set(classicId, mod, key);
-        UICore.ClassicStale = true;
-    }
+    /// <summary>Binds a toggle's hotkey.</summary>
+    internal static void SetHotkey(string classicId, Keybind.KeyModifier mod, KeyCode key) => ToggleBinds.Set(classicId, mod, key);
 
-    internal static void ClearHotkey(string classicId) {
-        ToggleBinds.Clear(classicId);
-        UICore.ClassicStale = true;
-    }
+    internal static void ClearHotkey(string classicId) => ToggleBinds.Clear(classicId);
 
     // The next key binds, with the modifier held as it goes down. A prompt shows under the row until the capture ends;
     // Escape or a click outside cancels it. Backspace or Delete clears the bind, as in the classic menu.

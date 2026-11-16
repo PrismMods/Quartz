@@ -286,7 +286,6 @@ namespace PrismLib.UI.Toolkit {
         public virtual global::System.Nullable<global::UnityEngine.UIElements.Background> Logo { get => throw null; }
         public virtual float Opacity { get => throw null; }
         public virtual float RailWidth { get => throw null; }
-        public virtual bool ReturnFromLayout { get => throw null; }
         public virtual int Revision { get => throw null; }
         public virtual float Scale { get => throw null; }
         public virtual string Title { get => throw null; }
@@ -295,8 +294,6 @@ namespace PrismLib.UI.Toolkit {
         public virtual void BuildPage(global::UnityEngine.UIElements.VisualElement panel, global::PrismLib.UI.Toolkit.SuitePage page) => throw null;
         public virtual global::System.Collections.Generic.IList<global::PrismLib.UI.Toolkit.SuiteCategory> Categories() => throw null;
         public virtual string Key(string id, string english) => throw null;
-        public virtual void OnLeaving() => throw null;
-        public virtual void OnReturning() => throw null;
         public virtual void OpenLayoutEditor() => throw null;
         public virtual global::System.Collections.Generic.IEnumerable<global::Facet.SearchIndex.Entry> SearchRows() => throw null;
     }
@@ -305,7 +302,6 @@ namespace PrismLib.UI.Toolkit {
         public global::UnityEngine.UIElements.Background Icon { get => throw null; set { } }
         public string Key { get => throw null; set { } }
         public string Label { get => throw null; set { } }
-        public global::System.Action<global::Facet.SearchIndex.Hit> OnHit { get => throw null; set { } }
         public global::System.Func<global::System.Collections.Generic.IList<global::PrismLib.UI.Toolkit.SuitePage>> Pages { get => throw null; set { } }
         public bool Tabs { get => throw null; set { } }
         public global::System.Func<bool> Visible { get => throw null; set { } }
@@ -315,7 +311,6 @@ namespace PrismLib.UI.Toolkit {
         public string Feature { get => throw null; set { } }
         public string Key { get => throw null; set { } }
         public string Label { get => throw null; set { } }
-        public global::System.Action<global::Facet.SearchIndex.Hit> OnHit { get => throw null; set { } }
         public global::System.Func<bool> Visible { get => throw null; set { } }
         public SuitePage() => throw null;
     }
@@ -329,15 +324,11 @@ namespace PrismLib.UI.Toolkit {
         public int SidebarMode { get => throw null; set { } }
         public global::Facet.Surface Surface { get => throw null; }
         public global::Facet.Tabs TabRow { get => throw null; }
-        public bool WaitingForLayout { get => throw null; }
         public global::Facet.Window Window { get => throw null; }
-        public event global::System.Action Hidden { add { } remove { } }
         public SuiteShell(global::PrismLib.UI.Toolkit.SuiteAdapter adapter) => throw null;
         public void ApplyLook() => throw null;
         public void ApplySidebar() => throw null;
         public void Changed() => throw null;
-        public void ClassicCard(global::UnityEngine.UIElements.VisualElement page, global::System.Action open, bool layout) => throw null;
-        public void ClassicMenuRow(global::UnityEngine.UIElements.VisualElement card, global::System.Action open) => throw null;
         public void Dispose() => throw null;
         public void EditLayout() => throw null;
         public void FeatureFrame(global::UnityEngine.UIElements.VisualElement page, string title, global::Facet.Bind<bool> on, string description, global::System.Action<global::UnityEngine.UIElements.VisualElement> cards, global::System.Action<global::UnityEngine.UIElements.VisualElement> preview = default) => throw null;

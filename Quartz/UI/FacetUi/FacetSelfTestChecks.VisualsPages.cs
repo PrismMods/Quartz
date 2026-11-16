@@ -105,7 +105,7 @@ internal static partial class FacetSelfTestChecks {
         IEnumerator More() {
             bool glow = VisualTweaks.Conf.DisableTileHitGlow;
             yield return Saved(check, page, "TW_GLOW", () => ClickRow("TW_GLOW"), () => VisualTweaks.Conf.DisableTileHitGlow != glow, VisualTweaks.ConfMgr.Path);
-            yield return ClassicSees(check, page, "TW_GLOW", Bind.To(() => VisualTweaks.Conf.DisableTileHitGlow, v => {
+            yield return Flips(check, page, "TW_GLOW", Bind.To(() => VisualTweaks.Conf.DisableTileHitGlow, v => {
                 VisualTweaks.Conf.DisableTileHitGlow = v;
                 VisualTweaks.RefreshTileHitGlowTweak();
                 VisualTweaks.Save();

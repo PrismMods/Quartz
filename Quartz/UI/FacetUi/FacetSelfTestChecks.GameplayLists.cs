@@ -194,13 +194,11 @@ internal static partial class FacetSelfTestChecks {
 
     private static IEnumerator KlCaptureSync(Action<string, bool, string> check, string page) {
         FieldInfo source = SyncSource;
-        var classic = typeof(PageKeyLimiter).GetField("syncLockChangedHandler", BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(null) as Action;
         var was = source?.GetValue(null) as Func<bool>;
         Button b = KlCaptureButton();
         if(b != null) Submit(b);
         yield return Frames(2);
         bool capturing = KeyLimiter.IsCapturing, ended = false;
-        if(classic != null) KeyBindSync.Changed -= classic;
         try {
             if(source != null) {
                 source.SetValue(null, (Func<bool>)(() => true));
@@ -209,7 +207,6 @@ internal static partial class FacetSelfTestChecks {
             }
         } finally {
             source?.SetValue(null, was);
-            if(classic != null) KeyBindSync.Changed += classic;
             KeyLimiter.CancelCapture();
             KeyBindSync.Raise();
         }

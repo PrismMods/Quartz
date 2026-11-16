@@ -49,13 +49,18 @@ MANAGED="$(resolve_managed "$GP")" || { echo "ERROR: Managed/ not found under $G
 # BOTH loader targets: LoaderUmm.cs only compiles under QUARTZ_UMM, so a stub set
 # derived from the MelonLoader build alone has no UnityModManager surface in it and
 # the UMM build then fails against the stubs.
-echo ">> building mod (ML + UMM) (Release) to derive the stub set from..."
+# The Key Viewer flavour too: it alone keeps the classic uGUI menu (QUARTZ_CLASSIC_UI), whose UnityEngine.UI and TMP
+# surface the full builds no longer reference.
+echo ">> building mod (ML + UMM + Key Viewer) (Release) to derive the stub set from..."
 dotnet build Quartz/Quartz.csproj -c Release -v quiet --nologo >/dev/null
 dotnet build Quartz/Quartz.csproj -c Release -p:LoaderTarget=UMM -v quiet --nologo >/dev/null
+dotnet build Quartz/Quartz.csproj -c Release -p:Flavor=KeyViewer -p:AutoInstall=false -v quiet --nologo >/dev/null
 
 INPUTS=(--input "Quartz/bin/Release/netstandard2.1/Quartz.dll")
 [[ -f Quartz/bin/umm/Release/netstandard2.1/QuartzUmm.dll ]] \
     && INPUTS+=(--input "Quartz/bin/umm/Release/netstandard2.1/QuartzUmm.dll")
+[[ -f Quartz/bin/kv/Release/netstandard2.1/QuartzKeyViewer.dll ]] \
+    && INPUTS+=(--input "Quartz/bin/kv/Release/netstandard2.1/QuartzKeyViewer.dll")
 # The bootstrap talks to the loaders directly (MelonMod, ModEntry.Info) and the
 # engine leans on Newtonsoft surface the payload never touched, so both loader
 # variants of each join the stub-deriving set.

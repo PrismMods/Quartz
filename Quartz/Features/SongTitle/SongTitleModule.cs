@@ -14,7 +14,9 @@ public sealed class SongTitleModule : QuartzFeature {
             Order = 60,
             Title = "Song Title",
             LocaleKey = "SECTION_SONG_TITLE",
+#if QUARTZ_CLASSIC_UI
             Build = PageSongTitle.Create,
+#endif
             OwnScroll = true,
         });
         Context.PatchAll();

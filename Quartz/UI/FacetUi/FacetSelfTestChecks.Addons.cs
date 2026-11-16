@@ -4,24 +4,18 @@ using System.Reflection;
 using Facet;
 using Quartz.Addons;
 using Quartz.Core;
-using Quartz.UI.Generator;
 using Quartz.UI.Nav;
-using Quartz.UI.Search;
 using UnityEngine;
 using UnityEngine.UIElements;
-using HandOff = Quartz.UI.MenuHandOff;
 using Fixture = Quartz.UI.FacetUi.FacetSelfTestFixture;
 namespace Quartz.UI.FacetUi;
 /// <summary>
-/// The Addons page against PageAddons, and an addon settings tab drawn by AddonForm against AddonSettingsUI, on the fixture tab.
+/// The Addons page, and an addon settings tab drawn by AddonForm, on the fixture tab.
 /// Nothing here adds, reloads, enables, disables or removes an addon: each of those buttons is checked through Do.
 /// </summary>
 internal static partial class FacetSelfTestChecks {
     private static IEnumerator Addons(Action<string, bool, string> check, Action<string> info) {
         const string key = CorePages.AddonsPageKey;
-        bool wasOpen = UICore.IsOpen;
-        if(wasOpen) UICore.Close(true);
-        HandOff.ReturnTo = HandOff.Menu.None;
         try {
             FacetBridge.OpenNewMenu(CorePages.HomePageKey);
             yield return Frames(3);
@@ -37,13 +31,12 @@ internal static partial class FacetSelfTestChecks {
                 QuartzShell.Doing = was;
             }
 
-            Covers(check, key);
             Searched(check, key, ["ADDONS_RELOAD"]);
             Translated(check, key, ["ADDONS_HINT"]);
 
             IReadOnlyList<AddonService.Handle> handles = AddonService.Addons;
             VisualElement root = PageContent();
-            string[] toggles = [.. handles.Select(h => GenerateUI.LocaleKeyFromId("addon_" + h.UnitId))];
+            string[] toggles = [.. handles.Select(h => Quartz.Localization.LocaleKeys.FromId("addon_" + h.UnitId))];
             List<VisualElement> order = root.Query<VisualElement>().ToList();
             int[] at = [.. toggles.Select(t => order.FindIndex(e => e.name == t))];
             VisualElement empty = root.Q(name: "ADDONS_EMPTY");
@@ -82,16 +75,13 @@ internal static partial class FacetSelfTestChecks {
 
             yield return AddonFixture(check);
         } finally {
-            HandOff.ReturnTo = HandOff.Menu.None;
             QuartzShell.Hide();
-            if(UICore.IsOpen) UICore.Close(true);
-            if(wasOpen) UICore.Open(true);
         }
         yield return Frames(2);
     }
 
-    // The fixture tab's rows, each by its classic key.
-    private static string FixtureKey(string member) => GenerateUI.LocaleKeyFromId("addon_" + Fixture.Owner + "_" + member);
+    // The fixture tab's rows, each by its key.
+    private static string FixtureKey(string member) => Quartz.Localization.LocaleKeys.FromId("addon_" + Fixture.Owner + "_" + member);
 
     private static IEnumerator AddonFixture(Action<string, bool, string> check) {
         const string tag = "addon fixture";
@@ -105,24 +95,23 @@ internal static partial class FacetSelfTestChecks {
             Fixture.TabSettings data = Fixture.Data;
 
             {
-                const BindingFlags any = BindingFlags.Static | BindingFlags.NonPublic;
-                MethodInfo split = typeof(AddonSettingsUI).GetMethod("SplitPascal", any);
-                var members = (IEnumerable<MemberInfo>)typeof(AddonSettingsUI).GetMethod("Members", any).Invoke(null, [typeof(Fixture.TabSettings)]);
+                const BindingFlags pub = BindingFlags.Public | BindingFlags.Instance;
+                IEnumerable<MemberInfo> members = typeof(Fixture.TabSettings).GetFields(pub).Cast<MemberInfo>()
+                    .Concat(typeof(Fixture.TabSettings).GetProperties(pub).Where(p => p.CanRead && p.CanWrite && p.GetIndexParameters().Length == 0))
+                    .Where(m => m.GetCustomAttribute<IgnoreAttribute>() == null);
                 var wrong = new List<string>();
                 int seen = 0;
                 foreach(MemberInfo m in members) {
                     seen++;
-                    string want = m.GetCustomAttribute<NameAttribute>()?.Label ?? (string)split.Invoke(null, [m.Name]);
+                    string want = AddonFieldRules.Label(m.Name, m.GetCustomAttribute<NameAttribute>()?.Label);
                     VisualElement row = root.Q(name: FixtureKey(m.Name));
                     // A colour row's first text is its fold arrow: the label is any of the row's texts.
                     List<Label> texts = row as Label is { } l ? [l] : row?.Query<Label>().ToList() ?? [];
                     if(!texts.Any(t => t.text == want)) wrong.Add($"{m.Name}='{string.Join("|", texts.Select(t => t.text))}'/'{want}'");
                 }
-                foreach(Fixture.TabMode v in Enum.GetValues(typeof(Fixture.TabMode)))
-                    if(AddonFieldRules.Label(v.ToString(), null) != (string)split.Invoke(null, [v.ToString()])) wrong.Add("option " + v);
                 string mode = string.Concat(root.Q(name: FixtureKey("Mode") + "-input")?.Query<TextElement>().ToList().Select(t => t.text) ?? []);
                 if(!mode.Contains("Fast Mode")) wrong.Add($"mode shows '{mode}'");
-                check($"{tag}: every row's Id is classic's key and its label classic's", seen == 12 && wrong.Count == 0,
+                check($"{tag}: every row has its key for an Id and its member's label", seen == 12 && wrong.Count == 0,
                     $"members={seen} wrong={string.Join(",", wrong)}");
             }
 
@@ -246,16 +235,16 @@ internal static partial class FacetSelfTestChecks {
                 // Each record names a page its addon still owns: a record left by an unload or a throwing RegisterTab is stale.
                 string[] stale = [.. AddonSettingsTabs.Keys.Where(k => !AddonSettingsTabs.TryGet(k, out AddonSettingsTabs.Tab t)
                     || NavRegistry.ByKey(k)?.OwnerId != t.AddonId)];
-                // A page with a record opens natively from search; one without opens the classic card.
-                string[] wrong = [.. pages.Where(pg => AddonSettingsTabs.TryGet(pg.Key, out _) == (QuartzShell.ClassicHit(pg) != null)).Select(pg => pg.Key)];
+                // A page with a record draws natively; one without is a custom uGUI tab, which shows its note.
+                string[] wrong = [.. pages.Where(pg => AddonSettingsTabs.TryGet(pg.Key, out _) == QuartzShell.IsClassic(pg)).Select(pg => pg.Key)];
                 bool both = pages.Any(pg => pg.Key == Fixture.TabKey) && pages.Any(pg => pg.Key == Fixture.PageKey);
                 QuartzShell.Go(Fixture.PageKey);
                 yield return Frames(3);
-                bool custom = Body.Q(name: "menu-classic") != null;
+                bool custom = Body.Q(name: "menu-undrawable") != null;
                 QuartzShell.Go(Fixture.TabKey);
                 yield return Frames(3);
-                bool native = Body.Q(name: "menu-classic") == null && Names(PageContent(), FixtureKey("Enabled"));
-                check("addon pages: every loaded addon's settings tab draws natively and every custom tab keeps the classic card",
+                bool native = Body.Q(name: "menu-undrawable") == null && Names(PageContent(), FixtureKey("Enabled"));
+                check("addon pages: every loaded addon's settings tab draws natively and every custom tab shows its note",
                     both && stale.Length == 0 && wrong.Length == 0 && custom && native,
                     $"pages={string.Join(",", pages.Select(pg => pg.Key))} stale={string.Join(",", stale)} wrong={string.Join(",", wrong)} custom={custom} native={native}");
             }
@@ -289,15 +278,13 @@ internal static partial class FacetSelfTestChecks {
                 yield return Frames(2);
                 QuartzShell.Go(Fixture.TabKey);
                 yield return Frames(3);
-                bool card = Body.Q(name: "menu-classic") != null;
+                bool card = Body.Q(name: "menu-undrawable") != null;
                 check($"{tag}: a custom RegisterTab with the settings tab's title drops its record", dropped && card, $"threw={threw} dropped={dropped} card={card}");
             }
         } finally {
             global::Facet.History.Clear();
             Fixture.UnregisterSettingsTab();
             Fixture.Forget();
-            // The registry changed: re-read the classic rows now, so the next index build is not charged for it.
-            SettingsSearch.Rows();
         }
         yield return Frames(2);
     }

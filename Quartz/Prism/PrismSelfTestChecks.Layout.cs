@@ -37,26 +37,17 @@ internal static partial class PrismSelfTestChecks {
         UICore.OnArrangingChanged += rec;
         try {
             check("arrange: the hotkey works outside a session", UICore.ToggleHotkeyAllowed(true, true), null);
-            UICore.EnterReorganize();
-            yield return Frames(3);
-            check("arrange: reorganize mode is unchanged", UICore.IsArranging && Reorganizer.LiveHandleCount > 0, $"handles={Reorganizer.LiveHandleCount}");
-            UICore.ExitReorganize();
-            yield return Frames(3);
             yield return Session(3);
             check("arrange: a shared session shows the overlays", UICore.SharedLayoutOpen && GameObject.Find("ComboRoot") != null, null);
             check("arrange: but leaves every drag surface off", Reorganizer.LiveHandleCount == 0, $"handles={Reorganizer.LiveHandleCount}");
             check("arrange: the hotkey is ignored during a session", !UICore.ToggleHotkeyAllowed(true, true), null);
-            UICore.EnterReorganize();
-            check("arrange: reorganize is refused during a session", !UICore.IsReorganizing, null);
             yield return Frames(4);
             check("arrange: the session ends Grace frames after the last read", !UICore.SharedLayoutOpen, null);
             check("arrange: overlays hide again outside gameplay", GameObject.Find("ComboRoot") == null, null);
-            UICore.EnterReorganize();
+            Quartz.UI.FacetUi.FacetBridge.OpenNewMenu();
             yield return Frames(2);
             yield return Session(3);
-            check("arrange: a session ends reorganize mode and closes the hub",
-                !UICore.IsReorganizing && !UICore.IsOpen && UICore.SharedLayoutOpen && Reorganizer.LiveHandleCount == 0,
-                $"reorg={UICore.IsReorganizing} open={UICore.IsOpen} shared={UICore.SharedLayoutOpen} handles={Reorganizer.LiveHandleCount}");
+            check("arrange: a session hides the menu", !UICore.MenuShowing && UICore.SharedLayoutOpen, $"menu={UICore.MenuShowing} shared={UICore.SharedLayoutOpen}");
             yield return Frames(4);
         } finally {
             UICore.OnArrangingChanged -= rec;
@@ -75,23 +66,19 @@ internal static partial class PrismSelfTestChecks {
             string[] required = [LayoutIds.KeyViewer, LayoutIds.Combo, LayoutIds.Judgement, LayoutIds.SongTitle, LayoutIds.Practice, LayoutIds.Calibration, LayoutIds.Panel(0)];
             yield return Session(3);
             string[] mine = [.. Mine().Select(t => t.Id)];
-            // What the reorganizer shows, from its own registry: each of those must be a target.
+            // Every overlay's layout handle, from its own registry: each of those must be a target.
             yield return Frames(4);
-            UICore.EnterReorganize();
-            yield return Frames(3);
-            string[] live = [.. Reorganizer.LiveHandles.Select(h => h.LayoutId ?? "untagged:" + (h.GetName?.Invoke() ?? h.name))];
-            UICore.ExitReorganize();
-            check("layout: every reorganizer element is a target", live.Length > 0 && live.All(mine.Contains),
-                $"reorganizer={string.Join(",", live)} targets={string.Join(",", mine)}");
+            string[] live = [.. ReorganizeHandle.LayoutHandles().Select(h => h.LayoutId)];
+            check("layout: every overlay's layout handle is a target", live.Length > 0 && live.All(mine.Contains),
+                $"handles={string.Join(",", live)} targets={string.Join(",", mine)}");
             string[] off = [.. required.Where(r => !live.Contains(r))];
-            if(off.Length > 0) info("layout: not shown by the reorganizer here (feature off): " + string.Join(",", off));
+            if(off.Length > 0) info("layout: no layout handle here (feature off): " + string.Join(",", off));
             info("layout: progressbar " + (mine.Contains(LayoutIds.ProgressBar) ? "present" : "absent") + "; targets " + string.Join(",", mine));
             foreach(string id in mine) yield return BothWays(id, check);
             yield return CalibrationPointer(check, info);
             yield return Edges(check, info, seen);
         } finally {
             Ui.Log = log;
-            if(UICore.IsReorganizing) UICore.ExitReorganize();
             foreach((Action Set, Action Finish) k in keep) k.Set?.Invoke();
             foreach((Action Set, Action Finish) k in keep) k.Finish?.Invoke();
         }
@@ -102,11 +89,8 @@ internal static partial class PrismSelfTestChecks {
         try {
             EditTarget t = MineById(id);
             yield return Frames(4);
-            UICore.EnterReorganize();
-            yield return Frames(3);
             ReorganizeHandle h = ReorganizeHandle.FindLayout(id);
-            bool shown = h != null && Reorganizer.LiveHandles.Contains(h); // the reorganizer offers it
-            UICore.ExitReorganize();
+            bool shown = h != null && h.Target.gameObject.activeInHierarchy; // the overlay shows
             yield return Session(4);
             float[] b0 = t?.GetBox();
             check($"layout {id}: shown in a session exactly when the reorganizer shows it", t != null && (b0 != null) == shown, $"reorganizer={shown} box={Fmt(b0)}");
@@ -136,15 +120,12 @@ internal static partial class PrismSelfTestChecks {
             if(b1 == null) b1 = b0;
             // reorganizer -> shared editor
             yield return Frames(4);
-            UICore.EnterReorganize();
-            yield return Frames(2);
             h = ReorganizeHandle.FindLayout(id);
             if(h != null) {
                 h.Target.position += new Vector3(-40f, -30f, 0f);
                 ReorganizeHistory.Moved(h);
             }
             yield return Frames(2);
-            UICore.ExitReorganize();
             yield return Session(2);
             Reapply(id);
             yield return Session(2);

@@ -40,7 +40,6 @@ internal static partial class FacetSelfTestChecks {
             c.SetBackColor(back);
             ProgressBarOverlay.Apply();
             ProgressBarOverlay.Save();
-            UICore.ClassicStale = true;   // the classic page was rebuilt for the styles picked here
         }, () => ProgressBarChecks(check, info, back));
     }
 
@@ -48,7 +47,7 @@ internal static partial class FacetSelfTestChecks {
         yield return PbStyle(check, ProgressBarStyle.Line, [.. PbBoth, .. PbLine], PbModern);
         yield return PbStyle(check, ProgressBarStyle.Modern, [.. PbBoth, .. PbModern], PbLine);
         yield return ColumnEdges(check, ProgressBarPage, ProgressBarOverlay.PreviewId);
-        yield return ClassicSees(check, ProgressBarPage, "PROGRESSBAR_PREFILLSTART", Bind.To(() => PbConf.PrefillStart, v => {
+        yield return Flips(check, ProgressBarPage, "PROGRESSBAR_PREFILLSTART", Bind.To(() => PbConf.PrefillStart, v => {
             PbConf.PrefillStart = v;
             ProgressBarOverlay.Save();
         }));

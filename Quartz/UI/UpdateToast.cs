@@ -5,9 +5,12 @@ using Quartz.Core;
 using Quartz.Localization;
 using Quartz.Resource;
 using Quartz.Tween;
+#if QUARTZ_CLASSIC_UI
 using Quartz.UI.Factory;
 using Quartz.UI.Factory.Page;
+#endif
 using Quartz.Update;
+using Quartz.UI.Utility;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -145,7 +148,7 @@ public static class UpdateToast {
             titleText.alignment = TextAlignmentOptions.Left;
             titleText.verticalAlignment = VerticalAlignmentOptions.Middle;
             titleText.characterSpacing = -3f;
-            Generator.GenerateUI.FitLine(titleText, 13f);
+            Quartz.UI.Utility.UnityUtils.FitLine(titleText, 13f);
             titleText.raycastTarget = false;
         }
         {
@@ -165,7 +168,7 @@ public static class UpdateToast {
             hintText.alignment = TextAlignmentOptions.Left;
             hintText.verticalAlignment = VerticalAlignmentOptions.Middle;
             hintText.characterSpacing = -3f;
-            Generator.GenerateUI.FitLine(hintText, 10f);
+            Quartz.UI.Utility.UnityUtils.FitLine(hintText, 10f);
             hintText.raycastTarget = false;
         }
         {
@@ -220,7 +223,7 @@ public static class UpdateToast {
         restartLabel.alignment = TextAlignmentOptions.Center;
         restartLabel.verticalAlignment = VerticalAlignmentOptions.Middle;
         restartLabel.characterSpacing = -3f;
-        Generator.GenerateUI.FitLine(restartLabel, 11f);
+        Quartz.UI.Utility.UnityUtils.FitLine(restartLabel, 11f);
         restartLabel.raycastTarget = false;
         var trigger = restartObj.AddComponent<EventTrigger>();
         Utility.UnityUtils.AddClickEvent(trigger, _ => OnRestartClicked());
@@ -312,12 +315,17 @@ public static class UpdateToast {
         Hide();
     }
     private static void OpenSettings() {
+#if !QUARTZ_CLASSIC_UI
+        Hide();
+        Quartz.UI.FacetUi.FacetBridge.OpenNewMenu(Quartz.UI.Nav.CorePages.SettingsPageKey);   // its Updates card
+#else
         UICore.FreshenClassic();   // first: a rebuild remakes this toast, which the Hide below then hides
         Hide();
         if(UICore.IsReorganizing) UICore.ExitReorganize();
         UICore.Open();
         MenuFactory.SetState(Quartz.UI.Nav.NavRegistry.StateFor(Quartz.UI.Nav.CorePages.SettingsPageKey));
         PageSettings.ScrollToUpdates();
+#endif
     }
     private static void RenderText() {
         if(titleText == null) return;

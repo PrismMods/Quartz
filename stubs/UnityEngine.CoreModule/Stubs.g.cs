@@ -118,8 +118,8 @@ namespace UnityEngine {
         public static global::UnityEngine.Color operator +(global::UnityEngine.Color a, global::UnityEngine.Color b) => throw null;
         public static bool operator ==(global::UnityEngine.Color lhs, global::UnityEngine.Color rhs) => throw null;
         public static bool operator !=(global::UnityEngine.Color lhs, global::UnityEngine.Color rhs) => throw null;
-        public static global::UnityEngine.Color operator *(global::UnityEngine.Color a, float b) => throw null;
         public static global::UnityEngine.Color operator *(global::UnityEngine.Color a, global::UnityEngine.Color b) => throw null;
+        public static global::UnityEngine.Color operator *(global::UnityEngine.Color a, float b) => throw null;
         public override bool Equals(object obj) => throw null;
         public override int GetHashCode() => throw null;
         bool global::System.IEquatable<global::UnityEngine.Color>.Equals(global::UnityEngine.Color other) => throw null;
@@ -573,8 +573,8 @@ namespace UnityEngine {
     public unsafe partial class Material : global::UnityEngine.Object {
         public global::UnityEngine.Texture mainTexture { get => throw null; set { } }
         public global::UnityEngine.Shader shader { get => throw null; set { } }
-        public Material(global::UnityEngine.Material source) => throw null;
         public Material(global::UnityEngine.Shader shader) => throw null;
+        public Material(global::UnityEngine.Material source) => throw null;
         public void DisableKeyword(string keyword) => throw null;
         public void EnableKeyword(string keyword) => throw null;
         public void SetColor(string name, global::UnityEngine.Color value) => throw null;

@@ -33,13 +33,17 @@ internal static partial class PrismBridge {
     // copy the same value), and a change from anywhere marks the classic Settings row stale, rebuilt on its next open. After a
     // failed read the "on" fallback is written too: a read fails only on a PrismLib older than Config, where every mod's read
     // fails alike, so no other mod writes the flag.
+#if QUARTZ_CLASSIC_UI
     private static int smoothSeen = -1;
+#endif
     private static void TickSmooth() {
         bool on = SmoothScroll;
         FacetBridge.SetSmoothScroll(on);
+#if QUARTZ_CLASSIC_UI
         int now = on ? 1 : 0;
         if(smoothSeen >= 0 && smoothSeen != now) UICore.ClassicStale = true;
         smoothSeen = now;
+#endif
     }
 #if !IL2CPP && !QUARTZ_KEYVIEWER
     private static bool smoothGone;

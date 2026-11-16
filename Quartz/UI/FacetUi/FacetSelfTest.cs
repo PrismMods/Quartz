@@ -182,21 +182,7 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
         // Why the new menu is absent: the first of Facet, PrismLib.UI and its suite shell that is missing.
         string reason = !FacetBridge.Available() ? "facet" : !PrismBridge.UiAvailable ? "prismlib-ui" : "shell";
         log.AppendLine(menu ? "MODE menu-present" : $"MODE menu-absent reason={reason}");
-        // Check 1: the page is registered, and its builder runs twice here, outside
-        // PageFactory.EnsureBuilt (which swallows build exceptions), so a failure reaches FAIL.
-        try {
-            int state = Quartz.UI.Nav.NavRegistry.StateFor("visuals.effectremover");
-            Check("effectremover page is registered", state >= 0);
-            for(int i = 0; i < 2; i++) {
-                var host = new GameObject("FacetSelfTestPage", typeof(RectTransform)).GetComponent<RectTransform>();
-                host.SetParent(UICore.Panel, false);
-                try { Quartz.Features.EffectRemover.PageEffectRemover.Create(host); }
-                finally { UnityEngine.Object.Destroy(host.gameObject); }
-            }
-            Check("effectremover page builds", true);
-        } catch(Exception e) {
-            Check("effectremover page builds", false, e.Message);
-        }
+        Check("effectremover page is registered", Quartz.UI.Nav.NavRegistry.StateFor("visuals.effectremover") >= 0);
         Check("unity 6 gate", FacetBridge.IsUnity6("6000.3.2f1") && !FacetBridge.IsUnity6("2022.3.62f1")
             && !FacetBridge.IsUnity6("") && !FacetBridge.IsUnity6(null) && FacetBridge.IsUnity6(Application.unityVersion),
             $"unity={Application.unityVersion}");
@@ -230,40 +216,27 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
                 Check("exactly one 'PrismLib.UI has no suite shell' log line", noShell == 1, $"count={noShell}");
                 Check("no 'Facet unavailable' logged", unavailable == 0, $"count={unavailable}");
             }
-            yield return ClassicFallback();
-        }
-    }
-    // Without the new menu the switch on changes nothing: the hotkey keeps the classic menu, and nothing offers the new one.
-    private IEnumerator ClassicFallback() {
-        bool was = MainCore.Conf.ExperimentalNewMenu, wasOpen = UICore.IsOpen;
-        MainCore.Conf.ExperimentalNewMenu = true;
-        try {
-            if(wasOpen) UICore.Close(true);
-            UICore.Toggle();
-            for(int f = Time.frameCount + 2; Time.frameCount < f;) yield return null;
-            Check("switch on without the new menu: the hotkey opens the classic menu", UICore.IsOpen && !FacetBridge.NewMenuVisible(), $"open={UICore.IsOpen}");
-            Check("no new-menu switch on the Settings page", !SwitchRowOnSettingsPage());
-            Check("no preview button on the menu page", !PreviewButtonOnPage());
-            // Shows nothing because the gate refused, not because a caught throw turned Facet off for the session.
-            bool open = UICore.IsOpen, facet = FacetBridge.Available();
-            int logged = CountOccurrences(ReadQuartzLog(), "Facet unavailable");
-            FacetBridge.OpenNewMenu();
-            for(int f = Time.frameCount + 2; Time.frameCount < f;) yield return null;
-            int loggedAfter = CountOccurrences(ReadQuartzLog(), "Facet unavailable");
-            Check("OpenNewMenu shows nothing",
-                !FacetBridge.NewMenuVisible() && UICore.IsOpen == open && FacetBridge.Available() == facet && loggedAfter == logged,
-                $"open={open}->{UICore.IsOpen} facet={facet}->{FacetBridge.Available()} 'Facet unavailable'={logged}->{loggedAfter}");
-#if !QUARTZ_KEYVIEWER
-            // A PrismLib.UI with the layout switcher but no suite shell: the switcher's Edit keeps to the classic menu.
-            if(FacetBridge.KvSwitcherUsable()) yield return FacetSelfTestChecks.KvSwitcherEditClassic(Check);
+#if !QUARTZ_CLASSIC_UI
+            yield return NoMenu();
 #endif
-        } finally {
-            MainCore.Conf.ExperimentalNewMenu = was;
-            MainCore.ConfMgr.RequestSave();   // a save while it was on would have written it
-            if(wasOpen && !UICore.IsOpen) UICore.Open(true);
-            else if(!wasOpen && UICore.IsOpen) UICore.Close(true);
         }
     }
+#if !QUARTZ_CLASSIC_UI
+    // Without the new menu there is no menu at all: the hotkey and OpenNewMenu show nothing, said once in the log.
+    private IEnumerator NoMenu() {
+        bool facet = FacetBridge.Available();
+        int logged = CountOccurrences(ReadQuartzLog(), "Facet unavailable");
+        UICore.Toggle();
+        FacetBridge.OpenNewMenu();
+        for(int f = Time.frameCount + 2; Time.frameCount < f;) yield return null;
+        string after = ReadQuartzLog();
+        int loggedAfter = CountOccurrences(after, "Facet unavailable");
+        Check("the hotkey and OpenNewMenu show nothing", !FacetBridge.NewMenuVisible() && !UICore.MenuShowing && FacetBridge.Available() == facet && loggedAfter == logged,
+            $"facet={facet}->{FacetBridge.Available()} 'Facet unavailable'={logged}->{loggedAfter}");
+        int none = CountOccurrences(after, "No Quartz menu this session");
+        Check("exactly one 'No Quartz menu' log line", none == 1, $"count={none}");
+    }
+#endif
     /// <summary>The run under the marker facet-level-selftest: checks made inside a level, which it enters itself.</summary>
     internal static IEnumerator Level(Action<string, bool, string> check, Action<string> info) {
         if(FacetBridge.MenuAvailable()) yield return FacetSelfTestChecks.InLevel(check, info);
@@ -274,32 +247,6 @@ public sealed class FacetSelfTest(string name = "facet-selftest", Func<Action<st
         if(FacetBridge.MenuAvailable()) yield return FacetSelfTestChecks.FormPages(check, info);
         else check("the new menu is available", false, null);
     }
-    // The menu page's "open in the new menu" button, found by its label on a freshly built page.
-    internal static bool PreviewButtonOnPage() {
-        var host = new GameObject("FacetSelfTestButton", typeof(RectTransform)).GetComponent<RectTransform>();
-        host.SetParent(UICore.Panel, false);
-        try {
-            Quartz.Features.EffectRemover.PageEffectRemover.Create(host);
-            return HasPreviewButton(host);
-        } finally { UnityEngine.Object.Destroy(host.gameObject); }
-    }
-    internal static bool HasPreviewButton(Transform page) =>
-        HasLabel(page, MainCore.Tr.Get("FXRM_OPEN_NEW_MENU", "Open in the new menu (preview)"));
-    // The classic Settings page's new-menu switch, found by its label on a page built into a throwaway host. Here, not
-    // with the Facet checks: the menu-absent run asks it too.
-    internal static bool SwitchRowOnSettingsPage() {
-        var host = new GameObject("FacetSelfTestSettings", typeof(RectTransform)).GetComponent<RectTransform>();
-        host.SetParent(UICore.Panel, false);
-        try {
-            Quartz.UI.Factory.Page.PageSettings.Create(host);
-            return HasLabel(host, MainCore.Tr.Get("PRISM_NEW_MENU", "Experimental: new menu"));
-        } finally {
-            UnityEngine.Object.Destroy(host.gameObject);
-            UICore.Rebuild();   // the build pointed the Settings page's static references at this host
-        }
-    }
-    private static bool HasLabel(Transform page, string text) =>
-        page.GetComponentsInChildren<TMPro.TextMeshProUGUI>(true).Any(t => t.text == text);
     // MelonLoader's log; null-safe empty string elsewhere (UMM). The file is held open
     // by the loader, so open it shared.
     private static string ReadQuartzLog() {

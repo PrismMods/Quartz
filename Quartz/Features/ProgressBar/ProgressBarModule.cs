@@ -11,7 +11,10 @@ public sealed class ProgressBarModule : QuartzFeature {
         Context.RegisterRescalable("progressbar", ProgressBarOverlay.Rescale);
         Context.AddPage(new NavPage {
             Key = "overlay.progressbar", CategoryKey = "overlay", Order = 30,
-            Title = "Progress Bar", LocaleKey = "SECTION_PROGRESS_BAR", Build = PageProgressBar.Create,
+            Title = "Progress Bar", LocaleKey = "SECTION_PROGRESS_BAR",
+#if QUARTZ_CLASSIC_UI
+            Build = PageProgressBar.Create,
+#endif
             OwnScroll = true,
         });
         Context.RegisterImportHandler(new ProgressBarImport());

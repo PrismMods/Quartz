@@ -1,20 +1,19 @@
 #if DEBUG && !IL2CPP
 using System.Collections;
 using Quartz.Addons;
-using Quartz.UI.Generator;
+using Quartz.Localization;
 using Quartz.UI.Nav;
-using Quartz.UI.Search;
 using UnityEngine;
 namespace Quartz.UI.FacetUi;
 /// <summary>
-/// A page that stays in the classic menu, for the hand-off and search checks: it stands in for a custom addon page (an
-/// addon's own tab, which the new menu shows as a card that opens it). Only the checks that use it register it.
+/// A page drawn for the old menu: it stands in for a custom addon page (an addon's own uGUI tab, which the menu shows as a
+/// note that it cannot be drawn). Only the checks that use it register it.
 /// </summary>
 internal static class FacetSelfTestFixture {
-    internal const string PageKey = "addon.selftest.classic", RowKey = "SELFTEST_CLASSIC_ROW";
-    internal const string Owner = "selftest", Title = "Self-test", RowLabel = "Self-test row";
+    internal const string PageKey = "addon.selftest.classic";
+    internal const string Owner = "selftest", Title = "Self-test";
 
-    /// <summary>Adds the page and rebuilds the classic menu, as an addon's registration does, then waits for its search row.</summary>
+    /// <summary>Adds the page, as an addon's registration does, then waits for it to be registered.</summary>
     internal static IEnumerator Register() {
         if(NavRegistry.ByKey(PageKey) == null)
             NavRegistry.AddPage(new NavPage {
@@ -24,31 +23,29 @@ internal static class FacetSelfTestFixture {
                 Title = Title,
                 LocaleKey = "ADDON_SELF_TEST",   // no Lang entry, like a real addon page's key
                 OwnerId = Owner,
-                Build = content => GenerateUI.Toggle(GenerateUI.Row(content), false, false, _ => { }, RowLabel, "selftest_classic_row"),
+                Build = _ => { },   // a uGUI builder, which the menu cannot draw
             });
-        UICore.Rebuild();
         for(int i = 0; i < 60 && !Ready(); i++) yield return null;
     }
 
-    /// <summary>Takes the page out again and rebuilds the classic menu without it.</summary>
+    /// <summary>Takes the page out again.</summary>
     internal static IEnumerator Unregister() {
         Forget();
         for(int i = 0; i < 60 && NavRegistry.StateFor(PageKey) >= 0; i++) yield return null;
     }
 
     /// <summary>
-    /// The page out of the registry and the classic menu rebuilt without it, also from a section's finally when its checks
+    /// The page out of the registry, also from a section's finally when its checks
     /// threw: a later section must not find the stale page there. Nothing when it is already gone.
     /// </summary>
     internal static void Forget() {
         if(NavRegistry.ByKey(PageKey) == null) return;
         NavRegistry.RemoveOwner(Owner);
-        UICore.Rebuild();
     }
 
     /// <summary>A settings tab, as an addon's RegisterSettingsTab("Settings") adds it: one member of every kind. Its save counts
     /// calls and writes no file.</summary>
-    internal static readonly string TabKey = "addon." + Owner + "." + GenerateUI.LocaleKeyFromText("", "Settings");
+    internal static readonly string TabKey = "addon." + Owner + "." + LocaleKeys.FromText("", "Settings");
     internal static int Saves;
     internal static AddonContext Context;
     internal static TabSettings Data;
@@ -84,11 +81,9 @@ internal static class FacetSelfTestFixture {
             CategoryKey = CorePages.AddonsCategoryKey,
             Order = 100,
             Title = "Settings",
-            LocaleKey = GenerateUI.LocaleKeyFromText("ADDON_", "Settings"),
+            LocaleKey = LocaleKeys.FromText("ADDON_", "Settings"),
             OwnerId = Owner,
-            Build = content => AddonSettingsUI.Build(content, ctx, data, defaults, () => Saves++),
         });
-        UICore.Rebuild();
         Tab = new AddonSettingsTabs.Tab(TabKey, Owner, data, defaults, () => Saves++, ctx.Wrn);
         AddonSettingsTabs.Register(Tab);
     }
@@ -96,10 +91,8 @@ internal static class FacetSelfTestFixture {
     internal static void UnregisterSettingsTab() {
         NavRegistry.RemoveOwner(Owner);
         AddonSettingsTabs.RemoveAddon(Owner);
-        UICore.Rebuild();
     }
 
-    private static bool Ready() =>
-        NavRegistry.StateFor(PageKey) is int state && state >= 0 && SettingsSearch.Rows().Any(r => r.Key == RowKey && r.State == state);
+    private static bool Ready() => NavRegistry.StateFor(PageKey) >= 0;
 }
 #endif

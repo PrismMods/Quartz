@@ -13,7 +13,9 @@ public sealed class UiHiderModule : QuartzFeature {
             Order = 60,
             Title = "UI Hiding",
             LocaleKey = "SECTION_UI_HIDING",
+#if QUARTZ_CLASSIC_UI
             Build = PageUiHider.Create,
+#endif
             OwnScroll = true,
         });
         Context.RegisterImportHandler(new UiHiderImport());

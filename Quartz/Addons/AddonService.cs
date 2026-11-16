@@ -160,11 +160,13 @@ public static class AddonService {
         AddonEvents.Clear();
         LoadAll();
         ApplyActive();
+#if QUARTZ_CLASSIC_UI
         if(UICore.Pages.Count > 0) {
             if(Quartz.UI.Nav.NavRegistry.ByState(UICore.CurrentMenuState) == null)
                 UICore.CurrentMenuState = Quartz.UI.Nav.NavRegistry.StateFor(Quartz.UI.Nav.CorePages.AddonsPageKey);
             UICore.Rebuild();
         }
+#endif
     }
     public static void OpenAddonsFolder() {
         string path = MainCore.Paths.AddonsPath;

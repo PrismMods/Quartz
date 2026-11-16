@@ -293,30 +293,27 @@ internal static partial class FacetSelfTestChecks {
     internal static IEnumerator TufThumbnailInLevel(Action<string, bool, string> check, Action<string> info) {
         const string name = "tuf.levels: thumbnails decode with only the new menu open in a level";
         bool wasOn = FeatureService.IsEnabled("tuf");
-        bool wasOpen = UICore.IsOpen;
         try {
             if(!wasOn) {
                 FeatureService.SetEnabledForRun("tuf", true);
                 yield return Frames(3);
             }
-            if(wasOpen) UICore.Close(true);
             FacetBridge.OpenNewMenu("tuf.settings");
             yield return Frames(3);
             tufJpeg ??= TufJpeg();
             SelfTestDoor.Preview = _ => tufJpeg;
             string key = "selftest-in-level";
-            bool setUp = GameStats.InGame && FacetBridge.NewMenuVisible() && !UICore.IsOpen;
+            bool setUp = GameStats.InGame && FacetBridge.NewMenuVisible();
             TufPreviewCache.Request(key, TufPreviewSource.Video(null));
             int frames = 0;
             for(; frames < 30 && !TufPreviewCache.TryGet(key, out _); frames++) yield return Frames(1);
             bool ready = TufPreviewCache.TryGet(key, out _);
             if(!setUp) info($"{name}: not in a level with only the new menu open (in game={GameStats.InGame})");
-            check(name, setUp && ready, $"in game={GameStats.InGame} new menu={FacetBridge.NewMenuVisible()} classic={UICore.IsOpen} ready={ready} frames={frames}");
+            check(name, setUp && ready, $"in game={GameStats.InGame} new menu={FacetBridge.NewMenuVisible()} ready={ready} frames={frames}");
         } finally {
             TufPreviewCache.Clear();
             SelfTestDoor.Defaults();
             QuartzShell.Hide();
-            if(wasOpen) UICore.Open(true);
             if(!wasOn) FeatureService.SetEnabledForRun("tuf", false);
         }
         yield return Frames(2);

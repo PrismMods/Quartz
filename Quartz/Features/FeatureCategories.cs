@@ -10,12 +10,14 @@ public static class FeatureCategories {
         if(string.IsNullOrEmpty(categoryKey) || IsEnabled(categoryKey) == enabled) return;
         FeatureService.State.Categories[categoryKey] = enabled;
         FeatureService.State.Save();
+#if QUARTZ_CLASSIC_UI
         MainThread.Enqueue(static () => {
             if(UICore.Pages.Count == 0) return;
             if(NavRegistry.ByState(UICore.CurrentMenuState) == null)
                 UICore.CurrentMenuState = NavRegistry.FirstVisibleState();
             UICore.Rebuild();
         });
+#endif
     }
     public static IReadOnlyList<NavCategory> Togglable() {
         List<NavCategory> found = [];

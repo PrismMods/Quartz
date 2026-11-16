@@ -5,27 +5,16 @@ using Quartz.UI.FacetUi;
 namespace Quartz.UI;
 /// <summary>
 /// The menu hotkey with the new menu on: it opens Quartz's shortcut menu, and the shared layout editor that menu's Edit
-/// layout opened brings the shortcut menu back once its session ends. With the new menu off, or without the layout filter,
-/// the hotkey opens the classic hub as before. ShortcutTrip decides; this is the glue to the game.
+/// layout opened brings the shortcut menu back once its session ends. Without the new menu or the layout filter the
+/// hotkey toggles the menu (the classic hub, in a build with the classic menu). ShortcutTrip decides; this is the glue to the game.
 /// </summary>
 internal static class LayoutHotkey {
     internal static readonly PrismRules.ShortcutTrip Trip = new();
-#if DEBUG
-    /// <summary>The hub self-tests: the hotkey keeps its old meaning while they run.</summary>
-    internal static bool ForceHub;
-#endif
     /// <summary>The session on screen is the one the shortcut menu's Edit layout opened.</summary>
     internal static bool Ours => Trip.Ours;
 
-    /// <summary>The hotkey opens the shortcut menu rather than the hub.</summary>
-    internal static bool Door {
-        get {
-#if DEBUG
-            if(ForceHub) return false;
-#endif
-            return UICore.NewMenuWanted && PrismBridge.FilterReady;
-        }
-    }
+    /// <summary>The hotkey opens the shortcut menu rather than toggling the menu.</summary>
+    internal static bool Door => UICore.NewMenuWanted && PrismBridge.FilterReady;
 
     /// <summary>What a press does now. With the door shut and no trip under way it is the old toggle, with no probe.</summary>
     internal static PrismRules.HotkeyRoute Route() {

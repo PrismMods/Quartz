@@ -21,7 +21,9 @@ public sealed class KeyLimiterModule : QuartzFeature {
             Order = 10,
             Title = "Key Limiter",
             LocaleKey = "SECTION_KEY_LIMITER",
+#if QUARTZ_CLASSIC_UI
             Build = PageKeyLimiter.KeyLimiterPage,
+#endif
             OwnScroll = true,
         });
         Context.AddPage(new NavPage {
@@ -30,7 +32,9 @@ public sealed class KeyLimiterModule : QuartzFeature {
             Order = 20,
             Title = "Keyboard Chatter Blocker",
             LocaleKey = "SECTION_KEYBOARD_CHATTER_BLOCKER",
+#if QUARTZ_CLASSIC_UI
             Build = PageKeyLimiter.ChatterBlockerPage,
+#endif
             OwnScroll = true,
         });
         Context.AddHomeCard(new Quartz.UI.Home.HomeCard {

@@ -11,7 +11,6 @@ using Quartz.UI.Nav;
 using Quartz.UI.Utility;
 using UnityEngine;
 using UnityEngine.UIElements;
-using HandOff = Quartz.UI.MenuHandOff;
 namespace Quartz.UI.FacetUi;
 /// <summary>
 /// The new menu's Home: its header line, the quick switches and their Edit… popup, the status rows against the classic
@@ -23,13 +22,10 @@ internal static partial class FacetSelfTestChecks {
     private const string Switches = "home.switches", FailedText = "This card failed to build — see the log.";
 
     private static IEnumerator HomePage(Action<string, bool, string> check, Action<string> info) {
-        bool wasOpen = UICore.IsOpen;
         string stored = QuartzHost.Host.Read(Switches);
         // Key Limiter's card is the status row checked, Combo an element Edit layout moves: both on for the duration, in memory
         // only. Neither they nor the dependency switching one on pulls in reach Features.json; the run's end puts that back.
         var flipped = new List<string>();
-        if(wasOpen) UICore.Close(true);
-        HandOff.ReturnTo = HandOff.Menu.None;
         try {
             foreach(string id in new[] { "keylimiter", "combo" }) {
                 if(FeatureService.IsEnabled(id)) continue;
@@ -52,11 +48,8 @@ internal static partial class FacetSelfTestChecks {
             HomeRegistry.RemoveOwner("selftest");
             QuartzHost.Host.Write(Switches, stored);
             QuartzShell.Changed();
-            HandOff.ReturnTo = HandOff.Menu.None;
             QuartzShell.Hide();
-            if(UICore.IsOpen) UICore.Close(true);
             for(int i = flipped.Count - 1; i >= 0; i--) FeatureService.SetEnabledForRun(flipped[i], false);
-            if(wasOpen) UICore.Open(true);
         }
         yield return Frames(3);
     }
@@ -144,14 +137,12 @@ internal static partial class FacetSelfTestChecks {
 
     private static TextElement StatusValue(string cardKey) => Body.Q<TextElement>("menu-status-" + cardKey + "-input");
 
-    // The same lines in both menus: one status row here, one line each on the classic Home.
+    // The Key Limiter card's lines in one status row; a card whose lines throw says so.
     private static IEnumerator HomeStatus(Action<string, bool, string> check) {
         HomeCard card = HomeRegistry.Visible().FirstOrDefault(c => c.Key == "keylimiter.home");
         string want = card?.Lines == null ? null : string.Join(" · ", card.Lines());
         string shown = StatusValue("keylimiter.home")?.text;
         check("the Key Limiter status row reads its card's lines", want != null && shown == want, $"shown={shown} want={want}");
-        bool classic = ClassicHomeShows(want);
-        check("the classic Home shows the same line", want != null && classic, $"line={want}");
         HomeRegistry.Add(new HomeCard { Key = "selftest.home", OwnerId = "selftest", Title = "Self-test", Order = 99, Lines = () => throw new InvalidOperationException("self-test") });
         QuartzShell.Changed();
         yield return Frames(3);
@@ -160,19 +151,6 @@ internal static partial class FacetSelfTestChecks {
         HomeRegistry.RemoveOwner("selftest");
         QuartzShell.Changed();
         yield return Frames(3);
-    }
-
-    // The classic Home built into a throwaway host: one of its lines reads `line`.
-    private static bool ClassicHomeShows(string line) {
-        var host = new GameObject("FacetSelfTestHome", typeof(RectTransform)).GetComponent<RectTransform>();
-        host.SetParent(UICore.Panel, false);
-        try {
-            Quartz.UI.Factory.Page.PageHome.Create(host);
-            return host.GetComponentsInChildren<TMPro.TextMeshProUGUI>(true).Any(t => t.text == line);
-        } finally {
-            UnityEngine.Object.Destroy(host.gameObject);
-            UICore.Rebuild();   // the build pointed Home's static banner references at this host
-        }
     }
 
     // Hidden by VisibleWhen on the element or on any element around it.
@@ -220,13 +198,13 @@ internal static partial class FacetSelfTestChecks {
         int back = 0;
         for(; back < 10 && !FacetBridge.NewMenuVisible(); back++) yield return null;
         check("closing the editor brings the new menu back within 10 frames",
-            took && FacetBridge.NewMenuVisible() && !UICore.SharedLayoutOpen && !UICore.IsOpen, $"took={took} frames={back} {Showing()}");
+            took && FacetBridge.NewMenuVisible() && !UICore.SharedLayoutOpen, $"took={took} frames={back} {Showing()}");
         // A session Edit layout did not start (another mod's) shuts the new menu, and its end leaves it shut.
         UICore.SetSharedLayout(true);
         bool shut = !FacetBridge.NewMenuVisible();
         UICore.SetSharedLayout(false);
         yield return Frames(3);
-        check("another mod's layout session leaves the new menu shut after it ends", shut && !FacetBridge.NewMenuVisible() && !UICore.IsOpen, Showing());
+        check("another mod's layout session leaves the new menu shut after it ends", shut && !FacetBridge.NewMenuVisible(), Showing());
         FacetBridge.OpenNewMenu();
         yield return Frames(1);
     }
@@ -320,25 +298,18 @@ internal static partial class FacetSelfTestChecks {
     }
 
     private static IEnumerator PageLayout(Action<string, bool, string> check) {
-        bool wasOpen = UICore.IsOpen;
-        if(wasOpen) UICore.Close(true);
-        HandOff.ReturnTo = HandOff.Menu.None;
         try {
             FacetBridge.OpenNewMenu("overlay.general");
             yield return Frames(2);
             TabRowFits(check);
             yield return ResultsHeading(check);
-            yield return SwitchedOffClose(check);
             List<Canvas> overlays = OverlayCanvases();
             check("every Quartz overlay canvas sorts under Facet's window bands (below 29000)", overlays.Count > 0 && overlays.All(c => c.sortingOrder < 29000),
                 OverlayOrders(overlays));
             yield return OffNameKorean(check);
         } finally {
             QuartzShell.Nav?.Filter("");
-            HandOff.ReturnTo = HandOff.Menu.None;
             QuartzShell.Hide();
-            if(UICore.IsOpen) UICore.Close(true);
-            if(wasOpen) UICore.Open(true);
         }
         yield return Frames(3);
     }
@@ -369,33 +340,6 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(1);
     }
 
-    // "Open", then the new menu switched off in classic Settings: the classic menu's close has nothing to go back to.
-    private static IEnumerator SwitchedOffClose(Action<string, bool, string> check) {
-        bool was = MainCore.Conf.ExperimentalNewMenu;
-        yield return FacetSelfTestFixture.Register();
-        try {
-            QuartzShell.Go(FacetSelfTestFixture.PageKey);
-            yield return Frames(2);
-            Button open = Body.Q<Button>("menu-classic-input");
-            if(open != null) Submit(open);
-            yield return Frames(2);
-            bool handed = UICore.IsOpen && HandOff.ReturnTo == HandOff.Menu.New;
-            UICore.SetNewMenuSwitch(false);
-            yield return Frames(3);   // the classic pages rebuild a pump later
-            UICore.Close(true);
-            yield return Frames(2);
-            check("a classic menu opened from the new one closes to nothing once the switch went off (fixture page)", handed && !FacetBridge.NewMenuVisible() && !UICore.IsOpen,
-                $"handed={handed} {Showing()}");
-        } finally {
-            if(MainCore.Conf.ExperimentalNewMenu != was) UICore.SetNewMenuSwitch(was);
-            FacetSelfTestFixture.Forget();
-        }
-        yield return Frames(3);
-        yield return FacetSelfTestFixture.Unregister();
-        FacetBridge.OpenNewMenu();
-        yield return Frames(1);
-    }
-
     // A switched-off feature keeps its name in the player's language: after a language change and a reload of the
     // language files, the Overlay tab row's Combo tab and the Combo stub's header read the Korean name.
     // Combo goes off for the run only: Features.json keeps its bytes.
@@ -415,7 +359,7 @@ internal static partial class FacetSelfTestChecks {
             QuartzShell.Go(stub);
             yield return Frames(2);
             MainCore.Tr.Language = "ko-KR";
-            Quartz.UI.Factory.Page.PageSettings.ReloadLanguages(() => loaded = true);
+            Quartz.Localization.LanguageActions.Reload(() => loaded = true);
             for(int i = 0; i < 600 && !loaded; i++) yield return null;
             for(; frames <= 3; frames++) {
                 global::Facet.Tabs row = QuartzShell.TabRow;

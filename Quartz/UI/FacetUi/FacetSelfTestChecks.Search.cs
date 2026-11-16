@@ -7,20 +7,15 @@ using Quartz.Features.EffectRemover;
 using Quartz.UI.Nav;
 using UnityEngine;
 using UnityEngine.UIElements;
-using HandOff = Quartz.UI.MenuHandOff;
 namespace Quartz.UI.FacetUi;
 /// <summary>
-/// The new menu's search: the box, a moved page's row, a page and a row still in the classic menu (both jump there),
-/// Korean initials, and an index that follows a feature switched off.
+/// The menu's search: the box, a moved page's row, a page drawn for the old menu (opens its note), Korean initials, and an index that follows a feature switched off.
 /// </summary>
 internal static partial class FacetSelfTestChecks {
     private static IEnumerator ShellSearch(Action<string, bool, string> check) {
         EffectRemover.EnsureConf();
         string mode = C.Mode;
-        bool wasOpen = UICore.IsOpen;
         bool fxWas = FeatureService.IsEnabled(Fx), fxHad = FeatureService.State.Features.TryGetValue(Fx, out bool fxStored);
-        if(wasOpen) UICore.Close(true);
-        HandOff.ReturnTo = HandOff.Menu.None;
         try {
             if(!fxWas) FeatureService.SetEnabled(Fx, true);
             // "Allow saving" is Enhanced's alone; a mode set outside the page is no revision, so the index is told.
@@ -32,12 +27,9 @@ internal static partial class FacetSelfTestChecks {
             yield return SearchTyping(check);
             yield return SearchMovedRow(check);
             yield return SearchModeChange(check);
-            // A page still in the classic menu, and a row of it: the fixture page, which stands in for a custom addon page.
+            // A page drawn for the old menu: the fixture page, which stands in for a custom addon page.
             yield return FacetSelfTestFixture.Register();
-            string title = QuartzShell.Label("ADDON_SELF_TEST", FacetSelfTestFixture.Title);
-            yield return SearchClassic(check, "self-test", h => h.PageRef != null && h.Key == title, FacetSelfTestFixture.PageKey, "a classic page's hit");
-            string row = QuartzHost.Host.Translate(QuartzShell.Label(FacetSelfTestFixture.RowKey, FacetSelfTestFixture.RowLabel));
-            yield return SearchClassic(check, "self-test row", h => h.PageRef == null && h.Label == row, FacetSelfTestFixture.PageKey, "a classic row's hit");
+            yield return SearchUndrawable(check);
             yield return FacetSelfTestFixture.Unregister();
             yield return SearchSettingsRow(check);
             SearchNoCardRows(check);
@@ -48,11 +40,8 @@ internal static partial class FacetSelfTestChecks {
             C.Mode = mode;
             QuartzShell.Changed();
             QuartzShell.Nav?.Filter("");
-            HandOff.ReturnTo = HandOff.Menu.None;
             QuartzShell.Hide();
-            if(UICore.IsOpen) UICore.Close(true);
             RestoreFeature(Fx, fxWas, fxHad, fxStored);
-            if(wasOpen) UICore.Open(true);
         }
         yield return Frames(3);
     }
@@ -122,8 +111,8 @@ internal static partial class FacetSelfTestChecks {
             Rect vp = ContentScroll.contentViewport.worldBound, r = row?.worldBound ?? default;
             inView = row != null && r.height > 0f && r.yMin >= vp.yMin - 1f && r.yMax <= vp.yMax + 1f;
         }
-        check("its result opens Settings with Check for updates in view", QuartzShell.CurrentPage == CorePages.SettingsPageKey && !UICore.IsOpen && inView,
-            $"page={QuartzShell.CurrentPage} classic={UICore.IsOpen} inView={inView}");
+        check("its result opens Settings with Check for updates in view", QuartzShell.CurrentPage == CorePages.SettingsPageKey && inView,
+            $"page={QuartzShell.CurrentPage} inView={inView}");
     }
 
     // Picks a mode in Effect Remover's own dropdown (the page is open), as a click would.
@@ -160,24 +149,17 @@ internal static partial class FacetSelfTestChecks {
             inSimple && !hitSimple && inEnhanced && hitEnhanced, $"{simple}; {enhanced}");
     }
 
-    // A page or a row still in the classic menu (the fixture page's): its result jumps there, on that page, and its close brings this window back.
-    private static IEnumerator SearchClassic(Action<string, bool, string> check, string q, Func<SearchIndex.Hit, bool> match, string pageKey, string what) {
-        const string fixture = " (fixture page)";
-        List<SearchIndex.Hit> hits = Find(q);
-        int at = hits.FindIndex(h => match(h));
-        check($"search finds {what} for \"{q}\"{fixture}", at >= 0, Hits(hits));
+    // The fixture page's hit opens it in the menu, on its note that it cannot be drawn.
+    private static IEnumerator SearchUndrawable(Action<string, bool, string> check) {
+        string title = QuartzShell.Label("ADDON_SELF_TEST", FacetSelfTestFixture.Title);
+        List<SearchIndex.Hit> hits = Find("self-test");
+        int at = hits.FindIndex(h => h.PageRef != null && h.Key == title);
+        check("search finds a page drawn for the old menu (fixture page)", at >= 0, Hits(hits));
         if(at < 0) yield break;
-        int state = NavRegistry.StateFor(pageKey);
         Click(Body[at]);
-        bool jumped = false;
-        for(int i = 0; i < 3 && !jumped; i++) {
-            yield return Frames(1);
-            jumped = UICore.IsOpen && UICore.CurrentMenuState == state && !FacetBridge.NewMenuVisible();
-        }
-        Step(check, $"{what}: within 3 frames the classic menu opens on its page, the new one hidden{fixture}", jumped, $"state={UICore.CurrentMenuState}/{state}");
-        UICore.Close();
         yield return Frames(2);
-        Step(check, $"{what}: closing the classic menu brings the new one back{fixture}", jumped && FacetBridge.NewMenuVisible() && !UICore.IsOpen);
+        Step(check, "its hit opens the page in the menu, on its note (fixture page)",
+            QuartzShell.CurrentPage == FacetSelfTestFixture.PageKey && Body.Q(name: "menu-undrawable") != null && FacetBridge.NewMenuVisible());
     }
 
     // A moved page's tab: its result opens the page in the new menu, nothing classic.
@@ -190,10 +172,10 @@ internal static partial class FacetSelfTestChecks {
         bool opened = false;
         for(int i = 0; i < 3 && !opened; i++) {
             yield return Frames(1);
-            opened = QuartzShell.CurrentPage == pageKey && !UICore.IsOpen && FacetBridge.NewMenuVisible();
+            opened = QuartzShell.CurrentPage == pageKey && FacetBridge.NewMenuVisible();
         }
         Step(check, "a moved tab's hit opens its page in the new menu within 3 frames", opened,
-            $"page={QuartzShell.CurrentPage}/{pageKey} classic={UICore.IsOpen}");
+            $"page={QuartzShell.CurrentPage}/{pageKey}");
     }
 
     /// <summary>A row that is only a button, with no label, is found by its button's text on its moved page.</summary>

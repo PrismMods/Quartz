@@ -28,8 +28,7 @@ internal static class JudgementTiles {
         _ => null,
     };
 
-    /// <summary>A titled card of tiles over mask, four to a line, with All and None in its head. A write saves and shows on the
-    /// classic toggles; defaultMask, from a fresh settings object, gives each tile the default a middle-click restores.</summary>
+    /// <summary>A titled card of tiles over mask, four to a line, with All and None in its head. A write saves; defaultMask, from a fresh settings object, gives each tile the default a middle-click restores.</summary>
     internal static MaskTiles Grid(VisualElement page, string titleKey, Bind<int> mask, int defaultMask, IReadOnlyList<Row> rows,
         Action save, Action<CardOptions> more = null) {
         MaskTiles grid = null;
@@ -61,11 +60,15 @@ internal static class JudgementTiles {
                 ShellRows.Hotkeys(o, row.ClassicId, () => grid!.Tiles[at].Root);
             }));
         }
-        grid = Controls.MaskTiles(card, QuartzShell.Writes(mask.Get, v => {
+        Bind<int> written = QuartzShell.Writes(mask.Get, v => {
             mask.Set(v);
-            foreach(Row row in rows) ToggleBinds.Show(row.ClassicId, (v >> row.Bit & 1) != 0);
             save?.Invoke();
-        }), tiles, o => o.Columns = columns);
+        });
+        foreach(Row row in rows) {
+            int bit = 1 << row.Bit;
+            ShellRows.Flips(row.ClassicId, Bind.To(() => (written.Get() & bit) != 0, on => written.Set(on ? written.Get() | bit : written.Get() & ~bit)));
+        }
+        grid = Controls.MaskTiles(card, written, tiles, o => o.Columns = columns);
         return grid;
     }
 }

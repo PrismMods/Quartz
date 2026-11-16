@@ -13,7 +13,9 @@ public sealed class OttoIconModule : QuartzFeature {
             Order = 50,
             Title = "Otto Icon",
             LocaleKey = "SECTION_OTTO_ICON",
+#if QUARTZ_CLASSIC_UI
             Build = PageOttoIcon.Create,
+#endif
             OwnScroll = true,
         });
         Context.RegisterImportHandler(new OttoIconImport());

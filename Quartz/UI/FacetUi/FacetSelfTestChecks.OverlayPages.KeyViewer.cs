@@ -5,7 +5,6 @@ using Facet;
 using Quartz.Features.KeyViewer;
 using Quartz.Overlay;
 using Quartz.UI.Nav;
-using Quartz.UI.Search;
 using UnityEngine;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi;
@@ -31,7 +30,7 @@ internal static partial class FacetSelfTestChecks {
         "KEYVIEWER_DM_CSS_STATUS", "KEYVIEWER_DM_CSS_ENABLED", "KEYVIEWER_DM_CSS_IMPORT", "KEYVIEWER_DM_CSS_CLEAR",
         "KEYVIEWER_JS_STATUS", "KEYVIEWER_JS_ENABLED", "KEYVIEWER_JS_IMPORT", "KEYVIEWER_JS_RELOAD", "KEYVIEWER_JS_CLEAR",
         "KEYVIEWER_ANCHOR_LABEL", "KEYVIEWER_RESETPOS", "KEYVIEWER_RESETCOUNTS",
-    }.Where(k => k != "KEYVIEWER_SYNCLIMITER" || KvKeyLimiterBridge.Available), .. KvConf.JsPlugins.Select(p => Quartz.UI.Generator.GenerateUI.LocaleKeyFromId("keyviewer_js_plugin_" + p.PluginId))];
+    }.Where(k => k != "KEYVIEWER_SYNCLIMITER" || KvKeyLimiterBridge.Available), .. KvConf.JsPlugins.Select(p => Quartz.Localization.LocaleKeys.FromId("keyviewer_js_plugin_" + p.PluginId))];
 
     private static IEnumerator OverlayKeyViewer(Action<string, bool, string> check, Action<string> info) {
         KeyViewerOverlay.EnsureConf();
@@ -57,7 +56,7 @@ internal static partial class FacetSelfTestChecks {
 #endif
         yield return Parity(check, KeyViewerPage, KeyViewerRows());
         yield return KeyViewerOffRows(check);
-        yield return ClassicStale(check, KeyViewerPage, "KEYVIEWER_DM_NOTE", Bind.To(() => KvConf.DmNoteEffect, v => {
+        yield return Flips(check, KeyViewerPage, "KEYVIEWER_DM_NOTE", Bind.To(() => KvConf.DmNoteEffect, v => {
             KvConf.DmNoteEffect = v;
             KeyViewerOverlay.Rebuild();
             KeyViewerOverlay.Save();

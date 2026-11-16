@@ -118,16 +118,8 @@ internal static partial class FacetSelfTestChecks {
             yield return KvSeconds(0.3f);
             VisualElement keyRow = Body.Q(name: "MENU_KVE_SWITCHER_KEY"), modRow = Body.Q(name: "MENU_KVE_SWITCHER_MODIFIER");
             bool rows = keyRow?.resolvedStyle.display == DisplayStyle.None && modRow?.resolvedStyle.display == DisplayStyle.None;
-            QuartzShell.Hide();
-            UICore.OpenToHub();
-            yield return Frames(2);
-            Vector2 size = ((RectTransform)KvHub.transform).sizeDelta;
-            bool button = KvHub.GetComponentsInChildren<TMPro.TextMeshProUGUI>(true)
-                .Any(t => t.text == MainCore.Tr.Get("MENU_KVE_LAYOUTS", "Layouts") && t.gameObject.activeInHierarchy);
-            check($"{KvSwitcherPage}: with the door forced off, the hotkey and OpenKvSwitcher open nothing, the hub has no Layouts button and is 260 x 300, and the hotkey rows hide",
-                hotkey && open && !button && size == new Vector2(260f, 300f) && rows,
-                $"hotkey={hotkey} open={open} button={button} size={size} rows={rows}");
-            UICore.ExitReorganize();
+            check($"{KvSwitcherPage}: with the door forced off, the hotkey and OpenKvSwitcher open nothing, and the hotkey rows hide",
+                hotkey && open && rows, $"hotkey={hotkey} open={open} rows={rows}");
         } finally {
             KvEditorDoor.ForceGone = false;
         }

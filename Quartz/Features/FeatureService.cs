@@ -154,11 +154,15 @@ public static class FeatureService {
             State.Features[other] = enabled;
         }
         State.Save();
+#if QUARTZ_CLASSIC_UI
         string follow = FeaturePages.FeatureOf(Quartz.UI.Nav.NavRegistry.ByState(UICore.CurrentMenuState));
         MainThread.Enqueue(() => {
             Sync();
             RebuildUI(follow);
         });
+#else
+        MainThread.Enqueue(Sync);
+#endif
     }
 #if DEBUG && !IL2CPP
     // Self-tests only: SetEnabled for this session, never written to FeatureState or Features.json, so a run can bring up
@@ -173,9 +177,13 @@ public static class FeatureService {
             target.Enabled = enabled;
             if(enabled) target.Error = null;
         }
+#if QUARTZ_CLASSIC_UI
         string follow = FeaturePages.FeatureOf(Quartz.UI.Nav.NavRegistry.ByState(UICore.CurrentMenuState));
         Sync();
         RebuildUI(follow);
+#else
+        Sync();
+#endif
     }
 #endif
     private static void Collect(Handle handle, bool enabled, HashSet<string> into) {
@@ -204,6 +212,7 @@ public static class FeatureService {
             if(Find(dep) is not { Loaded: true }) return false;
         return true;
     }
+#if QUARTZ_CLASSIC_UI
     // A page that vanished because its feature flipped hands over to that feature's other tab (real or stub).
     private static void RebuildUI(string follow) {
         if(UICore.Pages.Count == 0) return;
@@ -213,6 +222,7 @@ public static class FeatureService {
         }
         UICore.Rebuild();
     }
+#endif
     private static void Instantiate(Handle handle) {
         try {
             QuartzFeature instance = (QuartzFeature)Activator.CreateInstance(handle.Entry);

@@ -1,10 +1,14 @@
+using Quartz.Core;
 using Quartz.Resource;
+#if QUARTZ_CLASSIC_UI
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
 using UnityEngine;
+#endif
 namespace Quartz.Overlay;
 // Font row for an overlay page: the overlay's own font, or the global one from Settings.
 public static class OverlayFontPicker {
+#if QUARTZ_CLASSIC_UI
     public static UIDropDown<string> Dropdown(Transform parent, string overlayKey, string id) {
         UIDropDown<string> dropdown = GenerateUI.DropDown(
             GenerateUI.Row(parent),
@@ -17,7 +21,7 @@ public static class OverlayFontPicker {
             260f,
             "Font"
         );
-        dropdown.HeaderDisplay = v => $"{GenerateUI.Tr("FONT_OVERLAY", "Font")}: {Display(v)}";
+        dropdown.HeaderDisplay = v => $"{MainCore.Tr.Get("FONT_OVERLAY", "Font")}: {Display(v)}";
         dropdown.ItemFont = n => n == FontManager.FollowGlobal ? FontManager.Current : FontManager.GetFont(n);
         void Refresh() {
             if(dropdown.IsDisposed || dropdown.Rect == null) {
@@ -37,16 +41,17 @@ public static class OverlayFontPicker {
         dropdown.OnDisposed += Unhook;
         return dropdown;
     }
+#endif
     internal static string Current(string overlayKey) => FontManager.OverlayFontName(overlayKey) ?? FontManager.FollowGlobal;
     internal static IReadOnlyList<string> Values() => [FontManager.FollowGlobal, FontManager.GameDefault, .. FontManager.GetAvailableFonts()];
     internal static string Display(string name) =>
         name == FontManager.FollowGlobal
-            ? string.Format(GenerateUI.Tr("FONT_OVERLAY_GLOBAL", "Global font ({0})"), FontName(FontManager.CurrentName))
+            ? string.Format(MainCore.Tr.Get("FONT_OVERLAY_GLOBAL", "Global font ({0})"), FontName(FontManager.CurrentName))
             : name == FontManager.GameDefault
-                ? string.Format(GenerateUI.Tr("FONT_GAME_DEFAULT", "Game default ({0})"), FontManager.GameDefaultFace ?? "-")
+                ? string.Format(MainCore.Tr.Get("FONT_GAME_DEFAULT", "Game default ({0})"), FontManager.GameDefaultFace ?? "-")
                 : FontName(name);
     private static string FontName(string name) =>
         name == FontManager.DefaultName
-            ? string.Format(GenerateUI.Tr("FONT_DEFAULT_OF", "Default ({0})"), FontManager.DefaultFontFile)
+            ? string.Format(MainCore.Tr.Get("FONT_DEFAULT_OF", "Default ({0})"), FontManager.DefaultFontFile)
             : name;
 }

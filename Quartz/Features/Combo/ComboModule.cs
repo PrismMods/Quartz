@@ -10,7 +10,10 @@ public sealed class ComboModule : QuartzFeature {
         Context.RegisterRescalable("combo", ComboOverlay.Rescale);
         Context.AddPage(new NavPage {
             Key = "overlay.combo", CategoryKey = "overlay", Order = 40,
-            Title = "Combo", LocaleKey = "SECTION_COMBO", Build = PageCombo.Create,
+            Title = "Combo", LocaleKey = "SECTION_COMBO",
+#if QUARTZ_CLASSIC_UI
+            Build = PageCombo.Create,
+#endif
             OwnScroll = true,
         });
         Context.RegisterImportHandler(new ComboImport());

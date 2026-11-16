@@ -23,8 +23,6 @@ internal static class DeveloperPage {
             o.Open = true;
         });
         Toggle(updater, "DEV_SIM_UPDATE", "dev_sim_update", () => UpdateService.DevSimulate, v => QuartzShell.Do("developer.simulate:" + v, () => {
-            UICore.ClassicStale = true;
-            ToggleBinds.Show("dev_sim_update", v);
             UpdateService.SetDevSimulate(v);
         }));
         ShellRows.Buttons(updater, new ShellRows.Btn("DEV_CHECK", () => QuartzShell.Do("developer.check", UpdateService.Check)),
@@ -41,12 +39,9 @@ internal static class DeveloperPage {
             o.Open = true;
         });
         Toggle(seasonal, "DEV_APRIL_FOOLS", "dev_april_fools", () => AprilFools.DevForced, v => QuartzShell.Do("developer.aprilfools:" + v, () => {
-            UICore.ClassicStale = true;
-            ToggleBinds.Show("dev_april_fools", v);
             AprilFools.SetDevForced(v);
             MainCore.Conf.AprilFoolsForced = v;
             MainCore.ConfMgr.RequestSave();
-            MainThread.Enqueue(UICore.Rebuild);
         }));
 
         VisualElement statusBody = ShellRows.Section(card, "SECTION_STATUS", o => {
@@ -62,11 +57,12 @@ internal static class DeveloperPage {
         Ui.WhileAttached(card, () => UpdateService.OnChanged += changed, () => UpdateService.OnChanged -= changed);
     }
 
-    // The classic toggle's twin, sharing its hotkey (a right-click sets or clears it). set holds the whole write, the classic
-    // toggle's display included, inside Do.
+    // A switch with a hotkey (a right-click sets or clears it). set holds the whole write, inside Do.
     private static void Toggle(VisualElement parent, string key, string classicId, Func<bool> get, Action<bool> set) {
+        Bind<bool> bind = Bind.To(get, set);
+        ShellRows.Flips(classicId, bind);
         Control<bool> c = null;
-        c = Controls.Toggle(parent, key, Bind.To(get, set), o => {
+        c = Controls.Toggle(parent, key, bind, o => {
             o.Id = key;
             ShellRows.Hotkeys(o, classicId, () => c!.Root);
         });

@@ -3,7 +3,7 @@ using System.Globalization;
 using Facet;
 using Quartz.Core;
 using Quartz.Features;
-using Quartz.UI.Factory.Page;
+using Quartz.Utility;
 using Quartz.UI.Nav;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi;
@@ -128,9 +128,11 @@ internal static class ShellFeatures {
         if(now == lang && tr == trLang) return;
         lang = now;
         trLang = tr;
-        normQuery = PageFeatures.Norm(query);
+        normQuery = Norm(query);
         generation++;
     }
+
+    private static string Norm(string text) => StringUtils.ForQuery(text, MainCore.Conf.Language);
 
     private static bool Unfiltered() {
         Sync();
@@ -144,7 +146,7 @@ internal static class ShellFeatures {
         if(string.IsNullOrWhiteSpace(normQuery)) return true;
         if(e.Seen != generation) {
             // Translated now, not when the page was built: the language can change under a built page.
-            e.Haystack = PageFeatures.Norm(MainCore.Tr.Get(e.Category.LocaleKey, e.Category.Title) + " "
+            e.Haystack = Norm(MainCore.Tr.Get(e.Category.LocaleKey, e.Category.Title) + " "
                 + MainCore.Tr.Get(e.Handle.Info.NameKey, e.Handle.Name) + " " + e.Handle.Id);
             e.Seen = generation;
         }

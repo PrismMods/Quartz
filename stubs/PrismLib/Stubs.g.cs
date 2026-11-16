@@ -99,7 +99,6 @@ namespace PrismLib {
         public global::PrismLib.Claim ClaimState(global::PrismLib.StateKey key, string reason = default) => throw null;
         public void DescribeLayout(global::System.Collections.Generic.IEnumerable<global::PrismLib.LayoutTarget> targets) => throw null;
         public void DescribeSettings(global::System.Collections.Generic.IEnumerable<global::PrismLib.SettingEntry> entries) => throw null;
-        public void ReportPointerOverUi(global::System.Func<bool> probe) => throw null;
         private ModHandle() { }
     }
     public static unsafe partial class Prism {

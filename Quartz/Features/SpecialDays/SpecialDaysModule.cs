@@ -8,7 +8,10 @@ public sealed class SpecialDaysModule : QuartzFeature {
         SpecialDays.EnsureConf();
         Context.AddPage(new NavPage {
             Key = "tweaks.specialdays", CategoryKey = "tweaks", Order = 17,
-            Title = "Special Days", LocaleKey = "SECTION_SPECIAL_DAYS", Build = PageSpecialDays.Create,
+            Title = "Special Days", LocaleKey = "SECTION_SPECIAL_DAYS",
+#if QUARTZ_CLASSIC_UI
+            Build = PageSpecialDays.Create,
+#endif
             OwnScroll = true,
         });
         Context.PatchAll();

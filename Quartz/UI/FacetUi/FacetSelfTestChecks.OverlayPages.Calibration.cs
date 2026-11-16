@@ -34,9 +34,6 @@ internal static partial class FacetSelfTestChecks {
             () => {
                 (CalConf.SongUseMinimum, CalConf.SongMinimum, CalConf.FloatOffsetEnabled) = (use, min, dec);
                 Cal.Save();
-                UICore.ClassicStale = true;
-                ToggleBinds.Show("calibration_song_use_minimum", use);
-                ToggleBinds.Show("calibration_float_offset", dec);
             }, () => CalibrationChecks(check, info));
     }
 
@@ -44,7 +41,7 @@ internal static partial class FacetSelfTestChecks {
         CalibrationSource(check, info);   // first frame: the page's lists are still the logger's
         yield return Parity(check, CalibrationPage, CalibrationRows);
         yield return ColumnEdges(check, CalibrationPage, CalibrationPopupUI.PreviewId);
-        yield return ClassicSees(check, CalibrationPage, "CALIBRATION_POPUP_ON_DEATH", Bind.To(() => CalConf.ShowPopupOnDeath, v => {
+        yield return Flips(check, CalibrationPage, "CALIBRATION_POPUP_ON_DEATH", Bind.To(() => CalConf.ShowPopupOnDeath, v => {
             CalConf.ShowPopupOnDeath = v;
             Cal.Save();
         }));
@@ -161,8 +158,6 @@ internal static partial class FacetSelfTestChecks {
         } finally {
             (CalConf.SongUseMinimum, CalConf.SongMinimum) = (use, min);
             Cal.Save();
-            UICore.ClassicStale = true;
-            ToggleBinds.Show("calibration_song_use_minimum", use);
         }
         yield return Frames(2);
     }

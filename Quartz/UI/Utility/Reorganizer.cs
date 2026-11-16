@@ -1,7 +1,9 @@
 using Quartz.Core;
 using Quartz.Resource;
+#if QUARTZ_CLASSIC_UI
 using Quartz.UI.Generator;
 using Quartz.UI.Objects.Impl;
+#endif
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -192,13 +194,14 @@ public static partial class Reorganizer {
     internal static int LiveHandleCount => handles.Count;
     internal static IReadOnlyList<ReorganizeHandle> LiveHandles => handles;
     public static ReorganizeHandle Selected { get; private set; }
+#if QUARTZ_CLASSIC_UI
+    // The position panel beside a selection: reorganize mode's, which only the classic menu's hub enters.
     private static GameObject canvasObj;
     private static GameObject panelObj;
     private static TextMeshProUGUI nameLabel;
-    private static UISlider xSlider;
-    private static UISlider ySlider;
-    private static UISlider sizeSlider;
+    private static UISlider xSlider, ySlider, sizeSlider;
     private static RectTransform sizeRow;
+#endif
     private static GameObject outlineObj;
     internal static void Register(ReorganizeHandle handle) {
         if(!handles.Contains(handle)) handles.Add(handle);
@@ -220,34 +223,37 @@ public static partial class Reorganizer {
         ReorganizeHistory.Baseline(handle);
         handle.SetFrameSelected(true);
         BuildOutline(handle.MeasureRect);
+#if QUARTZ_CLASSIC_UI
         EnsurePanel();
+#endif
         BuildAnchorLine(handle);
+#if QUARTZ_CLASSIC_UI
         nameLabel.text = handle.GetName?.Invoke() ?? handle.Target.name;
         ApplySizeSlider(handle);
         ApplyRotationSlider(handle);
         SyncSelectedSliders();
         panelObj.SetActive(true);
         DragHandler.ClampToParent((RectTransform)panelObj.transform);
+#endif
     }
     public static void Deselect() {
         ClearOutline();
         if(Selected != null) Selected.SetFrameSelected(false);
         Selected = null;
+#if QUARTZ_CLASSIC_UI
         if(panelObj != null) panelObj.SetActive(false);
+#endif
     }
     public static void Dispose() {
         Deselect();
         handles.Clear();
+#if QUARTZ_CLASSIC_UI
         if(canvasObj != null) Object.Destroy(canvasObj);
-        canvasObj = null;
-        panelObj = null;
+        canvasObj = panelObj = null;
         nameLabel = null;
-        xSlider = null;
-        ySlider = null;
-        sizeSlider = null;
-        sizeRow = null;
-        rotationSlider = null;
-        rotationRow = null;
+        xSlider = ySlider = sizeSlider = rotationSlider = null;
+        sizeRow = rotationRow = null;
+#endif
     }
     private static void BuildOutline(RectTransform target) {
         outlineObj = new GameObject("ReorganizeOutline");
@@ -296,6 +302,7 @@ public static partial class Reorganizer {
         if(outlineObj != null) Object.Destroy(outlineObj);
         outlineObj = null;
     }
+#if QUARTZ_CLASSIC_UI
     private static void EnsurePanel() {
         if(panelObj != null) return;
         canvasObj = new GameObject("QuartzReorganizeCanvas");
@@ -403,13 +410,16 @@ public static partial class Reorganizer {
         if(Selected == null || !Selected.CanResize) return;
         Selected.SetSize(Mathf.Clamp(value, Selected.MinSize, Selected.MaxSize));
     }
+#endif
     internal static void SyncSelectedSliders() {
+#if QUARTZ_CLASSIC_UI
         if(Selected?.Target == null || xSlider == null) return;
         Vector2 center = ScreenToVirtual(ScreenCenter(Selected.MeasureRect));
         xSlider.SetOnlyValue(center.x, true);
         ySlider.SetOnlyValue(center.y, true);
         if(sizeSlider != null && Selected.CanResize) sizeSlider.SetOnlyValue(Selected.GetSize(), true);
         if(rotationSlider != null && Selected.CanRotate) rotationSlider.SetOnlyValue(Selected.GetRotation(), true);
+#endif
     }
     private static void MoveSelected(float? virtualX, float? virtualY) {
         if(Selected?.Target == null) return;

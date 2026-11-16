@@ -14,7 +14,9 @@ public sealed class AutoDeafenModule : QuartzFeature {
             Title = "Auto Deafen (Discord)",
             LocaleKey = "SECTION_AUTO_DEAFEN_DISCORD",
             OwnScroll = true,
+#if QUARTZ_CLASSIC_UI
             Build = PageAutoDeafen.Create,
+#endif
         });
         Context.RegisterInjectedKeySource(AutoDeafen.IsInjectedKey, () => AutoDeafen.InjectGuardActive);
         Context.PatchAll();

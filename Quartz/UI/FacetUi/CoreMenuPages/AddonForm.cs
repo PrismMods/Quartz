@@ -4,7 +4,6 @@ using System.Reflection;
 using Facet;
 using Quartz.Addons;
 using Quartz.Async;
-using Quartz.UI.Generator;
 using UnityEngine;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi.CoreMenuPages;
@@ -28,7 +27,7 @@ internal static class AddonForm {
                 string id = "addon_" + tab.AddonId + "_" + m.Name;
                 if(m.GetCustomAttribute<SectionAttribute>() is { } section) {
                     Flush();
-                    string sectionKey = GenerateUI.LocaleKeyFromId(id + "_section");
+                    string sectionKey = Quartz.Localization.LocaleKeys.FromId(id + "_section");
                     into = ShellRows.Section(card, QuartzShell.Label(sectionKey, section.Title), o => {
                         o.Id = sectionKey;
                         o.Open = true;
@@ -84,7 +83,7 @@ internal static class AddonForm {
     private static Field FieldOf(VisualElement into, AddonSettingsTabs.Tab tab, MemberInfo m, string id, AddonFieldKind kind) {
         object data = tab.Data, defaults = tab.Defaults;
         Type type = TypeOf(m);
-        string key = GenerateUI.LocaleKeyFromId(id), desc = m.GetCustomAttribute<DescAttribute>()?.Text;
+        string key = Quartz.Localization.LocaleKeys.FromId(id), desc = m.GetCustomAttribute<DescAttribute>()?.Text;
         Action commit = Commit(tab, m);
         var f = new Field {
             Id = key,
@@ -157,7 +156,7 @@ internal static class AddonForm {
     // commits the whole collection, as classic's DictRows does.
     private static void Pairs(VisualElement into, AddonSettingsTabs.Tab tab, MemberInfo m, string id, AddonFieldKind kind) {
         object data = tab.Data;
-        string key = GenerateUI.LocaleKeyFromId(id);
+        string key = Quartz.Localization.LocaleKeys.FromId(id);
         Label label = Ui.Muted(into, QuartzShell.Label(key, AddonFieldRules.Label(m.Name, m.GetCustomAttribute<NameAttribute>()?.Label)));
         label.name = key;
         // The collection the copy was taken from: when the addon or the classic menu puts a new one in the member, the copy is
@@ -205,7 +204,7 @@ internal static class AddonForm {
                 pairs[i] = new(v ?? "", pairs[i].Value);
                 Write();
             }), o => {
-                o.Id = GenerateUI.LocaleKeyFromId(id + "_key") + "#" + n;
+                o.Id = Quartz.Localization.LocaleKeys.FromId(id + "_key") + "#" + n;
                 o.Placeholder = "Key";
                 o.Undoable = false;
             });
@@ -215,7 +214,7 @@ internal static class AddonForm {
                 pairs[i] = new(pairs[i].Key, v ?? "");
                 Write();
             }), o => {
-                o.Id = GenerateUI.LocaleKeyFromId(id + "_value") + "#" + n;
+                o.Id = Quartz.Localization.LocaleKeys.FromId(id + "_value") + "#" + n;
                 o.Placeholder = "Value";
                 o.Undoable = false;
             });
@@ -226,10 +225,10 @@ internal static class AddonForm {
                 Write();
                 Reshape();
             });
-            remove.name = GenerateUI.LocaleKeyFromId(id + "_remove") + "#" + n + "-input";
+            remove.name = Quartz.Localization.LocaleKeys.FromId(id + "_remove") + "#" + n + "-input";
             remove.style.marginLeft = Theme.For(remove).Sizes.Gap;
         });
-        string add = GenerateUI.LocaleKeyFromId(id + "_add");
+        string add = Quartz.Localization.LocaleKeys.FromId(id + "_add");
         Controls.Action(into, "", QuartzShell.Label(add, "Add Row"), () => {
             Sync();
             pairs.Add(new("", ""));

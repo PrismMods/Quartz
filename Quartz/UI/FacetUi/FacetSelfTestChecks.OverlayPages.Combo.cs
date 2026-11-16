@@ -57,7 +57,7 @@ internal static partial class FacetSelfTestChecks {
         HeaderSwitchEdge(check, ComboPage, "SECTION_COMBO", "COMBO_AUTO");
         yield return ShowTab("HEADING_LABEL");
         yield return OsCursor(check, info, Body.Q(name: "COMBO_CAPTIONTEXT-input"), "Combo's caption text field");
-        yield return ClassicSees(check, ComboPage, "COMBO_CAPTION", Bind.To(() => ComboConf.ShowCaption, v => {
+        yield return Flips(check, ComboPage, "COMBO_CAPTION", Bind.To(() => ComboConf.ShowCaption, v => {
             ComboConf.ShowCaption = v;
             ComboOverlay.Apply();
             ComboOverlay.Save();

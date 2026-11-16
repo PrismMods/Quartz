@@ -13,7 +13,9 @@ public sealed class EffectRemoverModule : QuartzFeature {
             Order = 10,
             Title = "Effect Remover",
             LocaleKey = "SECTION_EFFECT_REMOVER",
+#if QUARTZ_CLASSIC_UI
             Build = PageEffectRemover.Create,
+#endif
             OwnScroll = true,
         });
         Context.RegisterImportHandler(new EffectRemoverImport());

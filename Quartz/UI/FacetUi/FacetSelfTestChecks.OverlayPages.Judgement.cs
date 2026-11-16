@@ -44,7 +44,7 @@ internal static partial class FacetSelfTestChecks {
     private static IEnumerator JudgementChecks(Action<string, bool, string> check, Action<string> info, float size) {
         yield return Parity(check, JudgementPage, JudgementRows());
         yield return ColumnEdges(check, JudgementPage, JudgementOverlay.FontKey);
-        yield return ClassicSees(check, JudgementPage, "JUDGEMENT_SHADOW_ENABLED", Bind.To(() => JudgementConf.TextShadowEnabled, v => {
+        yield return Flips(check, JudgementPage, "JUDGEMENT_SHADOW_ENABLED", Bind.To(() => JudgementConf.TextShadowEnabled, v => {
             JudgementConf.TextShadowEnabled = v;
             JudgementOverlay.Apply();
             JudgementOverlay.Save();

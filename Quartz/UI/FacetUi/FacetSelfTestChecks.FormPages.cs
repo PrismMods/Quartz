@@ -13,7 +13,6 @@ using Quartz.IO;
 using Quartz.IO.Interface;
 using Quartz.Resource;
 using Quartz.UI.Nav;
-using Quartz.UI.Search;
 using Quartz.UI.Utility;
 using Quartz.Update;
 using UnityEngine;
@@ -115,7 +114,6 @@ internal static partial class FacetSelfTestChecks {
         }, () => Checks(), category);
         IEnumerator Checks() {
             yield return Parity(check, pageKey, keys, hidden);
-            Covers(check, pageKey);
             Searched(check, pageKey, searched);
             Translated(check, pageKey, keys);
             if(more != null) yield return more();
@@ -150,37 +148,6 @@ internal static partial class FacetSelfTestChecks {
     // The run's INFO and check lines, for FormPage.
     private static Action<string> formInfo;
     private static Action<string, bool, string> formCheck;
-
-    /// <summary>Every row the classic page indexes names an element of the open page: its key, its -input, or key#n for the
-    /// n-th of a key the classic page lists more than once. renamed maps a classic key to the new Id; omitted keys are skipped
-    /// (each caller says why); only, when given, limits the keys. classic, when given, is the classic page's keys from a build
-    /// of it off screen, for a page the classic menu leaves out on this build.</summary>
-    private static void Covers(Action<string, bool, string> check, string pageKey, IReadOnlyDictionary<string, string> renamed = null,
-        IReadOnlyCollection<string> omitted = null, IReadOnlyCollection<string> only = null, IEnumerable<string> classic = null,
-        ISet<string> names = null) {
-        NavPage page = NavRegistry.ByKey(pageKey);
-        VisualElement root = PageContent();
-        var missing = new List<string>();
-        int rows = 0;
-        if(page != null)
-            foreach(IGrouping<string, string> key in (classic ?? SettingsSearch.Rows().Where(r => r.State == page.State).Select(r => r.Key))
-                .Where(k => k != null && k != page.LocaleKey && (only == null || only.Contains(k)))
-                .GroupBy(k => k)) {
-                if(omitted?.Contains(key.Key) == true) continue;
-                // The classic page's "Use this feature" is the moved page's header switch: the input of the header named by the
-                // page's title key, so a header without its switch is missing.
-                string id = renamed != null && renamed.TryGetValue(key.Key, out string to) ? to
-                    : key.Key == "FEATURE_PAGE_ENABLE" ? page.LocaleKey + "-input" : key.Key;
-                int n = key.Count();
-                rows += n;
-                for(int i = 1; i <= n; i++)
-                    if(!Has(id + "#" + i) && !(i == 1 && Has(id))) missing.Add(i == 1 ? id : id + "#" + i);
-            }
-        // names: every element name the page shows across its tabs, for a page that builds only the selected tab.
-        bool Has(string name) => names != null ? names.Contains(name) || names.Contains(name + "-input") : Names(root, name);
-        check($"{pageKey}: has a row for every row the classic page indexes", page != null && rows > 0 && missing.Count == 0,
-            $"page={page != null} rows={rows} missing={string.Join(",", missing)}");
-    }
 
     private static bool Names(VisualElement root, string name) => root.Q(name: name) != null || root.Q(name: name + "-input") != null;
 

@@ -8,7 +8,6 @@ using Quartz.Prism;
 using Quartz.UI.Nav;
 using UnityEngine;
 using UnityEngine.UIElements;
-using HandOff = Quartz.UI.MenuHandOff;
 namespace Quartz.UI.FacetUi;
 /// <summary>
 /// The new menu: its first open, the window and rail, its pages, the hand-off both ways, a feature switched under an
@@ -32,16 +31,13 @@ internal static partial class FacetSelfTestChecks {
         return Body.Query<Label>().ToList().Any(l => l.text != null && l.text.Contains(failed));
     }
     private static string Showing() =>
-        $"new={FacetBridge.NewMenuVisible()} classic={UICore.IsOpen} hub={UICore.IsReorganizing} page={QuartzShell.CurrentPage} returnTo={HandOff.ReturnTo}";
+        $"new={FacetBridge.NewMenuVisible()} page={QuartzShell.CurrentPage}";
 
     private static IEnumerator Shell(Action<string, bool, string> check, Action<string> info) {
         MainCore.Conf.FacetWindows.Remove("window." + QuartzShell.WindowId);   // Run's finally puts the map back
         float until = Time.realtimeSinceStartup + 10f;
         while(!WarmUp.Done && Time.realtimeSinceStartup < until) yield return null;
         check("facet warm-up done before the new menu's first open", WarmUp.Done, null);
-        bool wasOpen = UICore.IsOpen;
-        if(wasOpen) UICore.Close(true);
-        HandOff.ReturnTo = HandOff.Menu.None;
         try {
             yield return ShellFirstOpen(check, info);
             if(QuartzShell.Window == null) yield break;
@@ -49,7 +45,7 @@ internal static partial class FacetSelfTestChecks {
             yield return ShellPages(check, info);
             yield return ShellFocusRing(check);
             yield return ShellFocusLate(check);
-            yield return ShellHandOff(check);
+            yield return ShellUndrawable(check);
             yield return ShellFeatureFlip(check);
             yield return ShellLastPage(check);
             yield return ShellLanguage(check);
@@ -58,10 +54,7 @@ internal static partial class FacetSelfTestChecks {
             yield return ShellClosedCost(check);
         } finally {
             FacetSelfTestFixture.Forget();
-            HandOff.ReturnTo = HandOff.Menu.None;
             QuartzShell.Hide();
-            if(wasOpen && !UICore.IsOpen) UICore.Open(true);
-            else if(!wasOpen && UICore.IsOpen) UICore.Close(true);
         }
     }
 
@@ -92,8 +85,7 @@ internal static partial class FacetSelfTestChecks {
         yield return Frames(2);
         scroll.generateVisualContent = was;
         check("[perf] new menu first open is at most 50 ms", ms >= 0 && ms <= 50, $"ms={ms:0.0}");
-        check("the new menu shows as a menu, with the classic one shut",
-            FacetBridge.NewMenuVisible() && UICore.MenuShowing && !UICore.IsOpen, Showing());
+        check("the new menu shows as a menu", FacetBridge.NewMenuVisible() && UICore.MenuShowing, Showing());
     }
 
     private static IEnumerator ShellWindow(Action<string, bool, string> check, Action<string> info) {
@@ -230,61 +222,30 @@ internal static partial class FacetSelfTestChecks {
             shownOn && hiddenOff && noGo && gone, $"shown={shownOn} hiddenOff={hiddenOff} page={page} removed={gone}");
     }
 
-    // The fixture page, a classic card: its title, "Open", then each way a user closes the classic menu, which brings the new one back.
-    private static IEnumerator ShellHandOff(Action<string, bool, string> check) {
+    // The fixture page, drawn for the old menu: its title and a note that it cannot be drawn. Then another mod's shared layout
+    // session hides the menu and its end reopens nothing; a Dismiss (a level launch) hides it and Reopen brings it back.
+    private static IEnumerator ShellUndrawable(Action<string, bool, string> check) {
         const string page = FacetSelfTestFixture.PageKey;
         yield return FacetSelfTestFixture.Register();
-        int state = NavRegistry.StateFor(page);
         QuartzShell.Go(page);
         yield return Frames(1);
         string title = Body.Q(name: "menu-header")?.Q<Label>()?.text;
         string want = QuartzHost.Host.Translate(QuartzShell.Label("ADDON_SELF_TEST", FacetSelfTestFixture.Title));
-        check("a classic page shows its title and the card that opens it (fixture page)",
-            QuartzShell.CurrentPage == page && Body.Q(name: "menu-classic") != null && title == want, $"page={QuartzShell.CurrentPage} title={title} want={want}");
-        foreach(string way in new[] { "close", "escape", "hotkey" }) {
-            QuartzShell.Go(page);
-            Button open = Body.Q<Button>("menu-classic-input");
-            if(open == null) { check($"Open ({way}) (fixture page)", false, "no menu-classic-input"); yield break; }
-            Submit(open);
-            yield return Frames(2);
-            check($"Open hands the page to the classic menu ({way}) (fixture page)",
-                !FacetBridge.NewMenuVisible() && UICore.IsOpen && !UICore.IsReorganizing && UICore.CurrentMenuState == state,
-                $"{Showing()} state={UICore.CurrentMenuState}/{state}");
-            if(way == "close") UICore.Close();
-            else if(way == "escape") UICore.EscapeDown();
-            else UICore.Toggle();
-            yield return Frames(way == "escape" ? 3 : 2);   // the classic Escape runs a pump later
-            check($"closing the classic menu ({way}) brings the new one back on its page (fixture page)",
-                FacetBridge.NewMenuVisible() && !UICore.IsOpen && QuartzShell.CurrentPage == page && HandOff.ReturnTo == HandOff.Menu.None,
-                Showing());
-        }
-        // Another mod's shared layout session over a classic menu opened from here: both shut, and its end reopens neither.
-        Submit(Body.Q<Button>("menu-classic-input"));
-        yield return Frames(2);
-        bool fromShell = UICore.IsOpen && !FacetBridge.NewMenuVisible();
+        check("a page drawn for the old menu shows its title and the note that it cannot be drawn (fixture page)",
+            QuartzShell.CurrentPage == page && Body.Q(name: "menu-undrawable") != null && title == want, $"page={QuartzShell.CurrentPage} title={title} want={want}");
         UICore.SetSharedLayout(true);
-        bool shut = !UICore.IsOpen && !FacetBridge.NewMenuVisible();
+        bool shut = !FacetBridge.NewMenuVisible();
         UICore.SetSharedLayout(false);
         yield return Frames(2);
-        check("a shared layout session shuts both menus, and its end reopens neither",
-            fromShell && shut && !UICore.IsOpen && !FacetBridge.NewMenuVisible(), $"from={fromShell} shut={shut} {Showing()}");
+        check("a shared layout session hides the menu, and its end does not reopen it", shut && !FacetBridge.NewMenuVisible(), $"shut={shut} {Showing()}");
         FacetBridge.OpenNewMenu();
         yield return Frames(1);
-        // A feature that closes the classic menu to get it out of the way (a level launch): the new menu stays shut, now and after a later toggle.
-        Submit(Body.Q<Button>("menu-classic-input"));
-        yield return Frames(2);
-        bool again = UICore.IsOpen && !FacetBridge.NewMenuVisible();
         UICore.Dismiss();
-        yield return Frames(3);
-        bool dismissed = !UICore.IsOpen && !FacetBridge.NewMenuVisible();
-        UICore.Toggle(true);
         yield return Frames(2);
-        UICore.Toggle(true);
-        yield return Frames(3);
-        check("dismissing the classic menu opened from the new one leaves both shut, even after a toggle",
-            again && dismissed && !UICore.IsOpen && !FacetBridge.NewMenuVisible(), $"from={again} dismissed={dismissed} {Showing()}");
-        FacetBridge.OpenNewMenu();
-        yield return Frames(1);
+        bool dismissed = !FacetBridge.NewMenuVisible();
+        UICore.Reopen();
+        yield return Frames(2);
+        check("Dismiss hides the menu and Reopen brings it back", dismissed && FacetBridge.NewMenuVisible(), $"dismissed={dismissed} {Showing()}");
         yield return FacetSelfTestFixture.Unregister();
     }
 
@@ -402,9 +363,10 @@ internal static partial class FacetSelfTestChecks {
         }
     }
 
-    // Screen px per panel px, and per classic canvas px; both canvases scale with the screen from 1920x1080.
+    // Screen px per panel px, and per px of the unit Scroll Speed counts in: a 1920-wide canvas scaled by UI scale (the old
+    // classic menu's), see QuartzHost.WheelSpeed.
     private static float PanelPx(VisualElement e) => Screen.width / e.panel.visualTree.layout.width;
-    private static float ClassicPx => Screen.width / UICore.CanvasSize.x;
+    private static float ClassicPx => Screen.width * (MainCore.Conf.UIScale <= 0f ? 1f : MainCore.Conf.UIScale) / UICore.ReferenceResolution.x;
     private static Vector2 ScreenCentre(VisualElement e) {
         Vector2 centre = e.worldBound.center;
         float k = PanelPx(e);

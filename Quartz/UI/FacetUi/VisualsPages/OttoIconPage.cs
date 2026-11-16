@@ -20,10 +20,8 @@ internal static class OttoIconPage {
         VisualElement card = Controls.Card(p, null);
         ShellRows.FilePick(card, "OTTO_IMAGE", "OTTO_IMAGE_CLEAR",
             () => OttoIcon.HasCustomImage ? Path.GetFileName(C.ImagePath) : MainCore.Tr.Get("OTTO_IMAGE_DEFAULT", "Using the built-in cat"), () => {
-                UICore.ClassicStale = true;   // the classic page reads the file name at build
                 OttoIcon.ImportImage(out _);
             }, () => {
-                UICore.ClassicStale = true;
                 OttoIcon.ClearImage();
             }, "DESC_OTTO_IMAGE");
         ShellRows.Toggle(card, "OTTO_TINT_IMAGE", "otto_tint_image", Bind.To(() => C.TintImage, v => C.TintImage = v), apply, save,

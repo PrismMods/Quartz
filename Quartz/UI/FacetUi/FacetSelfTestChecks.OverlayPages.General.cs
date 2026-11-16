@@ -6,7 +6,6 @@ using Quartz.Features;
 using Quartz.Features.Overlay;
 using Quartz.UI.Nav;
 using UnityEngine.UIElements;
-using HandOff = Quartz.UI.MenuHandOff;
 namespace Quartz.UI.FacetUi;
 /// <summary>
 /// Overlay ▸ General in the new menu: its rows against the classic page, its edges, the master switch seen by the classic
@@ -18,12 +17,9 @@ internal static partial class FacetSelfTestChecks {
         ["OVERLAY_ENABLED", "SECTION_POP_IN_ANIMATION", "OVERLAY_POP_EDGE_LABEL", "OVERLAY_POP_EASE_LABEL", "OVERLAY_POP_SECONDS", "OVERLAY_POP_EXIT"];
 
     private static IEnumerator OverlayGeneral(Action<string, bool, string> check) {
-        bool wasOpen = UICore.IsOpen;
         OverlaySwitch.EnsureConf();
         OverlaySettings c = OverlaySwitch.Conf;
         bool popWas = c.PopEnabled;
-        if(wasOpen) UICore.Close(true);
-        HandOff.ReturnTo = HandOff.Menu.None;
         try {
             c.PopEnabled = true;   // the group the animation rows sit in shows
             FacetBridge.OpenNewMenu(GeneralPage);
@@ -37,7 +33,7 @@ internal static partial class FacetSelfTestChecks {
                 OverlaySwitch.Conf.PopExit = v;
                 OverlaySwitch.Save();
             });
-            yield return ClassicSees(check, GeneralPage, "OVERLAY_ENABLED", Bind.To(() => OverlaySwitch.Enabled, v => OverlaySwitch.Enabled = v));
+            yield return Flips(check, GeneralPage, "OVERLAY_ENABLED", Bind.To(() => OverlaySwitch.Enabled, v => OverlaySwitch.Enabled = v));
             yield return Hotkey(check, GeneralPage, "OVERLAY_POP_EXIT", "overlay_pop_exit", "DESC_OVERLAY_POP_EXIT", popExit);
             yield return OptionChord(check, GeneralPage, "OVERLAY_POP_EXIT", "overlay_pop_exit", popExit);
             yield return SearchKorean(check, "OVERLAY_POP_EXIT", "OVERLAY_GENERAL", "Korean initials find Overlay General's slide-out row on its page");
@@ -47,10 +43,7 @@ internal static partial class FacetSelfTestChecks {
             OverlaySwitch.Conf.PopEnabled = popWas;
             OverlaySwitch.Save();
             QuartzShell.Nav?.Filter("");
-            HandOff.ReturnTo = HandOff.Menu.None;
             QuartzShell.Hide();
-            if(UICore.IsOpen) UICore.Close(true);
-            if(wasOpen) UICore.Open(true);
         }
         yield return Frames(3);
     }

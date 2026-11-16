@@ -29,6 +29,11 @@ public static class StringUtils {
         char[] chars = [.. input.Where(char.IsLetterOrDigit).Select(char.ToLowerInvariant)];
         return new string(chars);
     }
+    /// <summary>Normalize, and in Korean the initial consonants, so a query typed in either form matches.</summary>
+    public static string ForQuery(string text, string language) {
+        string normalized = Normalize(text);
+        return language == "ko-KR" && normalized.Length > 0 ? NormalizeToHangulChosung(normalized) : normalized;
+    }
     private static readonly string[] ChosungTable = [
         "ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ", "ㅂ", "ㅃ", "ㅅ",
         "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"

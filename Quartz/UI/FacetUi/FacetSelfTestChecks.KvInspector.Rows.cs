@@ -100,13 +100,6 @@ internal static partial class FacetSelfTestChecks {
             $"during={during} after={after} radius={KvRadius(e)}");
     }
 
-    private static void KvPointerTo<T>(VisualElement target) where T : PointerEventBase<T>, new() {
-        using T ev = Pooled<T>();
-        typeof(PointerEventBase<T>).GetProperty("button").SetValue(ev, 0);
-        ev.target = target;
-        target.SendEvent(ev);
-    }
-
     // ---- a row's step after a replace finds its element by key; a row edit after a foreign replace lands in the live document
 
     private static IEnumerator KvRowKeys(Action<string, bool, string> check) {

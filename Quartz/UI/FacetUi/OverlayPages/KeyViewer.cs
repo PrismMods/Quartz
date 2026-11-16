@@ -35,9 +35,9 @@ internal static class KeyViewer {
         // Back (or an empty selection) brings the settings back where they were scrolled to.
         var (settings, inspector) = ShellRows.Swap(cols.Left, "kv-inspector-column", "KEYVIEWER_BACK", () => KvEditorDoor.Inspecting, KvEditorDoor.Deselect);
         Cards(settings);
-        int state = NavRegistry.StateFor("overlay.keyviewer");
         if(!KvEditorDoor.Build(cols.Right, inspector))
-            Controls.Action(Controls.Card(cols.Right, null), "MENU_KV_EDITOR", "MENU_CLASSIC_OPEN", () => QuartzShell.OpenClassic(state), o => o.Id = "MENU_KV_EDITOR");
+            Controls.Info(Controls.Card(cols.Right, null), "", () => QuartzHost.Text("MENU_KV_EDITOR_MISSING",
+                "The layout editor needs a newer PrismLib.UI than the one another mod loaded."), o => o.Id = "MENU_KV_EDITOR");
     }
 
     private static void Cards(VisualElement p) {
@@ -149,7 +149,7 @@ internal static class KeyViewer {
                 KvJsRuntime.Reload(c);
             }), null, KeyViewerOverlay.Save, o => {
                 // The classic toggle's id as its key: a plugin id's "-" becomes "_" there, and search drops the classic twin only on a match.
-                o.Id = Quartz.UI.Generator.GenerateUI.LocaleKeyFromId("keyviewer_js_plugin_" + plugin.PluginId);
+                o.Id = Quartz.Localization.LocaleKeys.FromId("keyviewer_js_plugin_" + plugin.PluginId);
                 o.Default = true;
             });
         }

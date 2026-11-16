@@ -6,16 +6,25 @@ public sealed class EditorModule : QuartzFeature {
         foreach(string lang in new[] { "en-US", "ko-KR", "zh-CN" })
             Context.RegisterTranslations(typeof(EditorModule), $"Quartz.Features.Editor.Lang.{lang}.json");
         EditorFeature.EnsureConf();
-        Page("editor.tilereadout", 10, "Selected Tile Readout", "SECTION_SELECTED_TILE_READOUT", PageEditor.TileReadoutPage);
-        Page("editor.bga", 20, "BGA Mod", "SECTION_BGA_MOD", PageEditor.BgaPage);
-        Page("editor.fliprotate", 30, "Flip & Rotate Tiles", "SECTION_FLIP_ROTATE_TILES", PageEditor.FlipRotatePage);
-        Page("editor.decopreview", 40, "Decoration Preview", "SECTION_DECORATION_PREVIEW", PageEditor.DecoPreviewPage);
+        Page("editor.tilereadout", 10, "Selected Tile Readout", "SECTION_SELECTED_TILE_READOUT");
+        Page("editor.bga", 20, "BGA Mod", "SECTION_BGA_MOD");
+        Page("editor.fliprotate", 30, "Flip & Rotate Tiles", "SECTION_FLIP_ROTATE_TILES");
+        Page("editor.decopreview", 40, "Decoration Preview", "SECTION_DECORATION_PREVIEW");
         Context.PatchAll();
         Context.OnModDisable("EditorFeature", EditorFeature.Restore);
     }
     public override void OnTick() => EditorFeature.Ticker.Tick();
     public override void OnUnload() => EditorFeature.Restore();
-    private void Page(string key, int order, string title, string localeKey, Action<UnityEngine.RectTransform> build) =>
+#if QUARTZ_CLASSIC_UI
+    private static Action<UnityEngine.RectTransform> ClassicBuilder(string key) => key switch {
+        "editor.tilereadout" => PageEditor.TileReadoutPage,
+        "editor.bga" => PageEditor.BgaPage,
+        "editor.fliprotate" => PageEditor.FlipRotatePage,
+        "editor.decopreview" => PageEditor.DecoPreviewPage,
+        _ => null,
+    };
+#endif
+    private void Page(string key, int order, string title, string localeKey) =>
         Context.AddPage(new NavPage {
             Key = key,
             CategoryKey = "editor",
@@ -23,6 +32,8 @@ public sealed class EditorModule : QuartzFeature {
             Title = title,
             LocaleKey = localeKey,
             OwnScroll = true,
-            Build = build,
+#if QUARTZ_CLASSIC_UI
+            Build = ClassicBuilder(key),
+#endif
         });
 }

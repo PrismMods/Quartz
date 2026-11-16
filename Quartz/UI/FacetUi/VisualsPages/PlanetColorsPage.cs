@@ -97,7 +97,6 @@ internal static class PlanetColorsPage {
             });
 
     private static void SetOverlay(int slot, string path) {
-        UICore.ClassicStale = true;   // the classic page reads the file name at build
         C.SetOverlayPath(slot, path);
         PlanetColors.ReloadOverlayImages();
         PlanetColors.Save();

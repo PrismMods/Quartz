@@ -12,18 +12,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Quartz.UI;
 namespace Quartz.Features.Tuf;
-internal sealed class TufDifficultyRangeBar : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler {
-    internal static readonly Color[] QuantumStops = {
-        new Color32(255, 255, 255, 255), new Color32(241, 161, 5, 255), new Color32(235, 123, 41, 255),
-        new Color32(227, 85, 74, 255), new Color32(192, 52, 94, 255), new Color32(214, 16, 136, 255),
-        new Color32(113, 73, 164, 255), new Color32(63, 32, 103, 255), new Color32(47, 43, 54, 255),
-        new Color32(126, 0, 0, 255), new Color32(255, 254, 254, 255)
-    };
-    internal static readonly Color[] PguStops = {
-        new Color32(0, 153, 255, 255), new Color32(0, 255, 136, 255), new Color32(242, 167, 0, 255),
-        new Color32(225, 79, 79, 255), new Color32(210, 0, 151, 255), new Color32(45, 29, 65, 255),
-        new Color32(0, 0, 0, 255)
-    };
+internal sealed partial class TufDifficultyRangeBar : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler {
     private RectTransform track;
     private RectTransform minHandle;
     private RectTransform maxHandle;
@@ -232,14 +221,6 @@ internal sealed class TufDifficultyRangeBar : MonoBehaviour, IPointerDownHandler
         trackFade?.Kill();
         if(gradientTex != null) Destroy(gradientTex);
     }
-    internal static string[] CompactNames(IReadOnlyList<string> names) {
-        string[] compact = new string[names.Count];
-        for(int i = 0; i < names.Count; i++) {
-            int space = names[i].IndexOf(' ');
-            compact[i] = space < 0 ? names[i] : names[i][..space];
-        }
-        return compact;
-    }
     private static RawImage AddGradient(RectTransform parent, Color[] stops, out Texture2D texture) {
         RectTransform rect = MakeRect("Gradient", parent, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
         RawImage image = rect.gameObject.AddComponent<RawImage>();
@@ -247,24 +228,6 @@ internal sealed class TufDifficultyRangeBar : MonoBehaviour, IPointerDownHandler
         texture = BuildGradientTexture(256, stops);
         image.texture = texture;
         return image;
-    }
-    internal static Texture2D BuildGradientTexture(int width, Color[] stops) {
-        Texture2D texture = new(width, 1, TextureFormat.RGBA32, false) {
-            wrapMode = TextureWrapMode.Clamp,
-            filterMode = FilterMode.Bilinear,
-            hideFlags = HideFlags.HideAndDontSave
-        };
-        Color32[] pixels = new Color32[width];
-        float span = 1f / (stops.Length - 1);
-        for(int x = 0; x < width; x++) {
-            float t = (float)x / (width - 1);
-            int index = Mathf.Min(Mathf.FloorToInt(t / span), stops.Length - 2);
-            float local = (t - index * span) / span;
-            pixels[x] = Color.Lerp(stops[index], stops[index + 1], local);
-        }
-        texture.SetPixels32(pixels);
-        texture.Apply(false, true);
-        return texture;
     }
     private static RectTransform AddHandle(RectTransform parent, string name, Color color) {
         RectTransform rect = MakeRect(name + " Handle", parent, new(0f, 0.5f), new(0f, 0.5f), Vector2.zero, Vector2.zero);

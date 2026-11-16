@@ -16,8 +16,10 @@ public static class NavRegistry {
     public static NavPage AddPage(NavPage page) {
         if(page == null || string.IsNullOrWhiteSpace(page.Key))
             throw new ArgumentException("a nav page needs a Key");
+#if QUARTZ_CLASSIC_UI
         if(page.Build == null)
             throw new ArgumentException($"nav page '{page.Key}' needs a Build delegate");
+#endif
         if(pages.Any(p => p.Key == page.Key))
             throw new InvalidOperationException($"nav page '{page.Key}' is already registered");
         page.State = nextState++;

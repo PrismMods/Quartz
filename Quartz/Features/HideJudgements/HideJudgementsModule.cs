@@ -9,7 +9,10 @@ public sealed class HideJudgementsModule : QuartzFeature {
         FeatureMasters.Claim(JudgementPopupHider.ConfMgr, JudgementPopupHider.Conf.Enabled, static c => c.Enabled = true);
         Context.AddPage(new NavPage {
             Key = "visuals.hidejudgements", CategoryKey = "visuals", Order = 20,
-            Title = "Hide Judgements", LocaleKey = "SECTION_HIDE_JUDGEMENTS", Build = PageHideJudgements.Create,
+            Title = "Hide Judgements", LocaleKey = "SECTION_HIDE_JUDGEMENTS",
+#if QUARTZ_CLASSIC_UI
+            Build = PageHideJudgements.Create,
+#endif
             OwnScroll = true,
         });
         Context.PatchAll();

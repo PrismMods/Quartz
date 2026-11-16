@@ -86,12 +86,10 @@ internal static class QuartzShortcut {
         return s;
     }
 
-    // A fresh open of the new menu on its last page; closing it does not come back here. If it cannot open, the classic menu does.
+    // A fresh open of the new menu on its last page; closing it does not come back here.
     private static void Settings() {
         Hide();
-        MenuHandOff.FromHub = false;
         QuartzShell.Open();
-        if(QuartzShell.Surface?.Visible != true) UICore.Open();
     }
 
     private static void EditLayout() {
