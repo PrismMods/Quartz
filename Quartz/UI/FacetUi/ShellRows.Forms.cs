@@ -52,7 +52,7 @@ internal static partial class ShellRows {
     private const float TrackFloor = 48f;
 
     /// <summary>A slider row whose label keeps its whole text. Facet's row gives a long label way (one line, ellipsis) before its
-    /// fixed-width track; here the track shrinks first (down to TrackFloor), then the track and number go under the label, and
+    /// fixed-width track; here the track takes half the row (down to TrackFloor), then the track and number go under the label, and
     /// a label too long for the row on its own wraps. Rows without a track are returned as they are.</summary>
     internal static Control<T> Fit<T>(Control<T> c) {
         VisualElement row = c.Root, right = null;
@@ -67,9 +67,12 @@ internal static partial class ShellRows {
         label.style.flexGrow = 0f;
         label.style.whiteSpace = WhiteSpace.Normal;
         label.style.textOverflow = TextOverflow.Clip;
-        // Based at its floor, the control column grows into what the label leaves; the row breaks only below the floor.
-        right.style.flexBasis = TrackFloor + sz.Gap + sz.NumberWidth + 8f;
-        right.style.flexGrow = 1f;
+        // The control column takes half the row, never less than its floor, so in a narrow panel the track shortens instead of
+        // running up to the label's last letter; the row breaks only below the floor.
+        right.style.flexBasis = Length.Percent(50f);
+        right.style.minWidth = TrackFloor + sz.Gap + sz.NumberWidth + 8f;
+        right.style.flexGrow = 0f;
+        right.style.marginLeft = sz.Gap;
         right.style.justifyContent = Justify.FlexEnd;
         foreach(VisualElement e in right.Children()) e.style.flexShrink = 0f;
         VisualElement track = c.Input;

@@ -39,6 +39,7 @@ internal static class TufLevelsPage {
         });
         // The list grows with its cards: a shrunk card would leave the cards past its end, where the scroll never reaches.
         results.style.flexShrink = list.Root.style.flexShrink = list.Body.style.flexShrink = 0f;
+        HoldWidthWhileResizing(results, list.Body);
         ImageCards<TufLevel> cards = Controls.ImageCards<TufLevel>(list.Body, o => {
             o.Items = () => s.Levels;
             o.Key = TufCards.Key;
@@ -118,6 +119,25 @@ internal static class TufLevelsPage {
         Ui.Every(results, 250, () => {
             if(TufCards.Armed != 0 && Time.unscaledTime >= TufCards.ArmedUntil) TufCards.Disarm();
             nearEnd();
+        });
+    }
+
+    // The sidebar opening or closing animates the page's width, and every card relaid out on every frame of it lagged. The cards
+    // keep their width while the page's keeps changing, then take the new one once it has been still for 150 ms.
+    private static void HoldWidthWhileResizing(VisualElement page, VisualElement cards) {
+        bool held = false;
+        IVisualElementScheduledItem release = null;
+        page.RegisterCallback<GeometryChangedEvent>(e => {
+            if(e.oldRect.width <= 0f || Mathf.Approximately(e.oldRect.width, e.newRect.width)) return;
+            if(!held) {
+                cards.style.width = cards.layout.width;
+                held = true;
+            }
+            release ??= cards.schedule.Execute(() => {
+                cards.style.width = StyleKeyword.Null;
+                held = false;
+            });
+            release.ExecuteLater(150);
         });
     }
 

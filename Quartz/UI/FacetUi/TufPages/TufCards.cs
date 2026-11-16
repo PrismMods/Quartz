@@ -91,7 +91,7 @@ internal static class TufCards {
         bar.style.width = 6f;
         bar.style.flexShrink = 0f;
         Ui.SetRadius(bar, 2f);
-        bar.style.backgroundColor = rail;   // the level's own colour, as classic's rail
+        bar.style.backgroundColor = new Color(hue.r, hue.g, hue.b, 1f);   // TUF's own colour, unlightened, as classic's rail
 
         VisualElement text = Ui.Box(box);
         text.style.flexGrow = 1f;
