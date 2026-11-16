@@ -29,7 +29,8 @@ internal static class Combo {
         var keep = new VisualElement();
         p.Add(keep);
         JudgementBar.Build(keep, "COMBO_KEEP_TILES", Bind.To(() => C.KeepMask, v => C.KeepMask = v), ComboSettings.DefaultKeepMask,
-            VisualsPages.HideJudgementsPage.Bar(XPerfectBridge.Shown, XPerfectBridge.Native), VisualsPages.HideJudgementsPage.Extra,
+            [.. VisualsPages.HideJudgementsPage.Bar(XPerfectBridge.Shown, XPerfectBridge.Native).Where(r => (ComboSettings.ChoosableMask >> r.Bit & 1) != 0)],
+            [.. VisualsPages.HideJudgementsPage.Extra.Where(r => (ComboSettings.ChoosableMask >> r.Bit & 1) != 0)],
             ComboOverlay.Save);
         void Show() => keep.style.display = C.CustomBreak ? DisplayStyle.Flex : DisplayStyle.None;
         Show();
@@ -50,7 +51,6 @@ internal static class Combo {
         ShellRows.Toggle(combo, "COMBO_AUTO", "combo_auto", Bind.To(() => C.CountAuto, v => C.CountAuto = v), null, save, o => {
             o.Default = Def.CountAuto;
             o.Tooltip = "DESC_COMBO_AUTO";
-            o.VisibleWhen = classic;
         });
         if(XPerfectBridge.Installed)
             ShellRows.Toggle(combo, "COMBO_XPERFECT", "combo_xperfect", Bind.To(() => C.XPerfectComboEnabled, v => C.XPerfectComboEnabled = v), apply, save, o => {

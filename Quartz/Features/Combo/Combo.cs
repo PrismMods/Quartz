@@ -68,7 +68,9 @@ internal static class Combo {
             if(conf == null) return;
             HitKind kind = HitKinds.Of(hit);
             if(conf.CustomBreak) {
-                if((conf.KeepMask & 1 << KeepBit(hit, kind)) != 0) Hit(conf);
+                if(kind == HitKind.Auto) {
+                    if(conf.CountAuto) Hit(conf);
+                } else if((conf.KeepMask & ComboSettings.ChoosableMask & 1 << KeepBit(hit, kind)) != 0) Hit(conf);
                 else Break();
                 return;
             }

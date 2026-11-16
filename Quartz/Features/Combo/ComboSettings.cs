@@ -9,11 +9,13 @@ public sealed class ComboSettings : ISettingsFile {
     public bool CountAuto = true;
     public bool XPerfectComboEnabled = false;
     public bool ShowCounter = true;
-    // Custom break: the judgements in BreakMask keep the combo going, every other one breaks it. Bits are HitKind's,
-    // with X, + and − Perfect at 12-14 (JudgementPopupHider's bits) when XPerfect grades the Perfects.
+    // Custom break: of the judgements a player can choose (Very Early to Very Late, X/+/− Perfect at 12-14 when XPerfect grades
+    // the Perfects, Multipress), those in KeepMask keep the combo; the rest break it. Too Early/Late, misses and overloads always
+    // break; auto hits follow CountAuto.
     public bool CustomBreak = false;
     public int KeepMask = DefaultKeepMask;
-    public const int DefaultKeepMask = 1 << 3 | 1 << 10 | 1 << 12 | 1 << 13 | 1 << 14;
+    public const int ChoosableMask = 0b111 << 12 | 1 << 7 | 0b11111 << 1;
+    public const int DefaultKeepMask = 1 << 3 | 1 << 12 | 1 << 13 | 1 << 14;
     public float FontSize = 56f;
     public float MasterSize = 1f;
     public float CaptionScale = 0.35f;
