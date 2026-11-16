@@ -38,11 +38,11 @@ resources, and no types the mod never touches.
 | `UnityEngine.TextCoreTextEngineModule` | 2 | 1 |
 | `UnityEngine.TextRenderingModule` | 4 | 25 |
 | `UnityEngine.UI` | 94 | 354 |
-| `UnityEngine.UIElementsModule` | 102 | 370 |
+| `UnityEngine.UIElementsModule` | 104 | 379 |
 | `UnityEngine.UIModule` | 6 | 35 |
 | `UnityModManager` | 4 | 12 |
 
-**661 types, 4866 members.**
+**663 types, 4875 members.**
 
 ## How it is used
 

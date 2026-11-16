@@ -105,6 +105,11 @@ namespace UnityEngine.UIElements {
         public static global::UnityEngine.UIElements.FontDefinition FromSDFFont(global::UnityEngine.TextCore.Text.FontAsset f) => throw null;
         bool global::System.IEquatable<global::UnityEngine.UIElements.FontDefinition>.Equals(global::UnityEngine.UIElements.FontDefinition other) => throw null;
     }
+    public unsafe partial class GeometryChangedEvent : global::UnityEngine.UIElements.EventBase<global::UnityEngine.UIElements.GeometryChangedEvent> {
+        public global::UnityEngine.Rect newRect { get => throw null; }
+        public global::UnityEngine.Rect oldRect { get => throw null; }
+        public GeometryChangedEvent() { }
+    }
     public unsafe partial interface IBindable {
     }
     public unsafe partial interface IDelayedField {
@@ -215,7 +220,12 @@ namespace UnityEngine.UIElements {
     }
     public unsafe partial interface IValueField<T> {
     }
+    public unsafe partial interface IVisualElementScheduledItem {
+        void ExecuteLater(long delayMs);
+    }
     public unsafe partial interface IVisualElementScheduler {
+        global::UnityEngine.UIElements.IVisualElementScheduledItem Execute(global::System.Action updateEvent);
+        global::UnityEngine.UIElements.IVisualElementScheduledItem Execute(global::System.Action<global::UnityEngine.UIElements.TimerState> timerUpdateEvent);
     }
     public enum Justify : int {
         FlexStart = 0,
@@ -443,7 +453,7 @@ namespace UnityEngine.UIElements {
         Visible = 0,
         Hidden = 1,
     }
-    public unsafe partial class VisualElement : global::UnityEngine.UIElements.Focusable, global::UnityEngine.UIElements.Experimental.ITransitionAnimations, global::UnityEngine.UIElements.IExperimentalFeatures {
+    public unsafe partial class VisualElement : global::UnityEngine.UIElements.Focusable, global::UnityEngine.UIElements.Experimental.ITransitionAnimations, global::UnityEngine.UIElements.IExperimentalFeatures, global::UnityEngine.UIElements.IVisualElementScheduler {
         public global::UnityEngine.UIElements.VisualElement this[int key] { get => throw null; }
         public int childCount { get => throw null; }
         public virtual global::UnityEngine.UIElements.VisualElement contentContainer { get => throw null; }
@@ -453,6 +463,7 @@ namespace UnityEngine.UIElements {
         public global::UnityEngine.UIElements.IPanel panel { get => throw null; }
         public global::UnityEngine.UIElements.VisualElement parent { get => throw null; }
         public global::UnityEngine.UIElements.PickingMode pickingMode { get => throw null; set { } }
+        public global::UnityEngine.UIElements.IVisualElementScheduler schedule { get => throw null; }
         public global::UnityEngine.UIElements.IStyle style { get => throw null; }
         public string tooltip { get => throw null; set { } }
         public global::UnityEngine.Rect worldBound { get => throw null; }
@@ -486,6 +497,8 @@ namespace UnityEngine.UIElements {
         global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Vector2> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Start(global::UnityEngine.Vector2 from, global::UnityEngine.Vector2 to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Vector2> onValueChanged) => throw null;
         global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Vector3> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Start(global::UnityEngine.Vector3 from, global::UnityEngine.Vector3 to, int durationMs, global::System.Action<global::UnityEngine.UIElements.VisualElement, global::UnityEngine.Vector3> onValueChanged) => throw null;
         global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Vector2> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.TopLeft(global::UnityEngine.Vector2 to, int durationMs) => throw null;
+        global::UnityEngine.UIElements.IVisualElementScheduledItem global::UnityEngine.UIElements.IVisualElementScheduler.Execute(global::System.Action updateEvent) => throw null;
+        global::UnityEngine.UIElements.IVisualElementScheduledItem global::UnityEngine.UIElements.IVisualElementScheduler.Execute(global::System.Action<global::UnityEngine.UIElements.TimerState> timerUpdateEvent) => throw null;
         global::UnityEngine.UIElements.Experimental.ITransitionAnimations global::UnityEngine.UIElements.IExperimentalFeatures.animation { get => throw null; }
         public enum MeasureMode : int {
             Undefined = 0,

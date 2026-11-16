@@ -7401,6 +7401,15 @@
         ]
       },
       {
+        "type": "UnityEngine.UIElements.GeometryChangedEvent",
+        "members": [
+          "UnityEngine.Rect UnityEngine.UIElements.GeometryChangedEvent::get_newRect()",
+          "UnityEngine.Rect UnityEngine.UIElements.GeometryChangedEvent::get_oldRect()",
+          "UnityEngine.Rect UnityEngine.UIElements.GeometryChangedEvent::newRect()",
+          "UnityEngine.Rect UnityEngine.UIElements.GeometryChangedEvent::oldRect()"
+        ]
+      },
+      {
         "type": "UnityEngine.UIElements.IBindable",
         "members": []
       },
@@ -7634,8 +7643,17 @@
         "members": []
       },
       {
+        "type": "UnityEngine.UIElements.IVisualElementScheduledItem",
+        "members": [
+          "System.Void UnityEngine.UIElements.IVisualElementScheduledItem::ExecuteLater(System.Int64)"
+        ]
+      },
+      {
         "type": "UnityEngine.UIElements.IVisualElementScheduler",
-        "members": []
+        "members": [
+          "UnityEngine.UIElements.IVisualElementScheduledItem UnityEngine.UIElements.IVisualElementScheduler::Execute(System.Action)",
+          "UnityEngine.UIElements.IVisualElementScheduledItem UnityEngine.UIElements.IVisualElementScheduler::Execute(System.Action\u00601\u003CUnityEngine.UIElements.TimerState\u003E)"
+        ]
       },
       {
         "type": "UnityEngine.UIElements.Justify",
@@ -8008,6 +8026,8 @@
           "UnityEngine.UIElements.IPanel UnityEngine.UIElements.VisualElement::panel()",
           "UnityEngine.UIElements.IStyle UnityEngine.UIElements.VisualElement::get_style()",
           "UnityEngine.UIElements.IStyle UnityEngine.UIElements.VisualElement::style()",
+          "UnityEngine.UIElements.IVisualElementScheduler UnityEngine.UIElements.VisualElement::get_schedule()",
+          "UnityEngine.UIElements.IVisualElementScheduler UnityEngine.UIElements.VisualElement::schedule()",
           "UnityEngine.UIElements.PickingMode UnityEngine.UIElements.VisualElement::pickingMode()",
           "UnityEngine.UIElements.VisualElement UnityEngine.UIElements.VisualElement::Item(System.Int32)",
           "UnityEngine.UIElements.VisualElement UnityEngine.UIElements.VisualElement::contentContainer()",
