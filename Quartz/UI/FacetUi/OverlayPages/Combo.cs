@@ -26,9 +26,11 @@ internal static class Combo {
             new("HEADING_ANIMATION", Animation), new("HEADING_COLOR", Colour), new("MENU_LAYOUT", Layout),
         });
         // Custom break: the judgement bar over the judgements that keep the combo; the rest break it.
-        VisualElement keep = JudgementBar.Build(p, "COMBO_KEEP_TILES", Bind.To(() => C.KeepMask, v => C.KeepMask = v), ComboSettings.DefaultKeepMask,
+        var keep = new VisualElement();
+        p.Add(keep);
+        JudgementBar.Build(keep, "COMBO_KEEP_TILES", Bind.To(() => C.KeepMask, v => C.KeepMask = v), ComboSettings.DefaultKeepMask,
             VisualsPages.HideJudgementsPage.Bar(XPerfectBridge.Shown, XPerfectBridge.Native), VisualsPages.HideJudgementsPage.Extra,
-            ComboOverlay.Save).Root.parent;
+            ComboOverlay.Save);
         void Show() => keep.style.display = C.CustomBreak ? DisplayStyle.Flex : DisplayStyle.None;
         Show();
         Ui.Every(p, 100, Show);

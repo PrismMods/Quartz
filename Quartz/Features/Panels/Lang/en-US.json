@@ -84,7 +84,7 @@
     "PANELS_DESC": "Text panels with live stats such as accuracy and BPM",
     "PANEL_COUNT": "Panels: {0}",
     "PANEL_SHOWSTAT": "Show Stat",
-    "PANEL_SHOWLABEL": "Show Label"
-  },
+    "PANEL_SHOWLABEL": "Show Label",
     "PANEL_STAT_COMBO": "Combo"
+  }
 }
