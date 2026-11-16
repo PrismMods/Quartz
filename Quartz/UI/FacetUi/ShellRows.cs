@@ -365,10 +365,16 @@ internal static partial class ShellRows {
         inspector = Controls.When(left, Now);
         inspector.name = name;
         Inset(inspector);   // the cards' row inset: Back and the inspector's title line up with the settings' labels
+        // Back is a text link: "← label" underlined, muted at rest and full text on hover, no box; the focus ring still shows.
         Button b = Ui.Btn(inspector, backKey, back);
         b.name = backKey;
         b.style.alignSelf = Align.FlexStart;
         b.style.marginBottom = Theme.For(b).Sizes.Gap;
+        b.style.paddingLeft = b.style.paddingRight = 0f;
+        Paint.Look(b, new Look { Text = Role.TextMuted, HoverText = Role.Text, FocusBorder = Role.Focus });
+        void Underline() => b.text = "<u>" + QuartzHost.Translate(backKey) + "</u>";
+        Underline();
+        Words.OnRelabel(b, Underline);
         return (settings, inspector);
     }
 

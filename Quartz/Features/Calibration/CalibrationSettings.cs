@@ -16,6 +16,7 @@ public sealed class CalibrationSettings : ISettingsFile {
     public int MaxTimingsPerMap = 5;
     public float PopupOffsetX;
     public float PopupOffsetY;
+    public float PopupScale = 1f;
     public JToken Serialize() {
         JObject offsets = new();
         foreach(KeyValuePair<string, float> kv in FloatOffsetByDevice) offsets[kv.Key] = kv.Value;
@@ -32,6 +33,7 @@ public sealed class CalibrationSettings : ISettingsFile {
             [nameof(MaxTimingsPerMap)] = MaxTimingsPerMap,
             [nameof(PopupOffsetX)] = PopupOffsetX,
             [nameof(PopupOffsetY)] = PopupOffsetY,
+            [nameof(PopupScale)] = PopupScale,
         };
     }
     public void Deserialize(JToken token) {
@@ -46,6 +48,7 @@ public sealed class CalibrationSettings : ISettingsFile {
         MaxTimingsPerMap = IOUtils.Read(token, nameof(MaxTimingsPerMap), MaxTimingsPerMap);
         PopupOffsetX = IOUtils.Read(token, nameof(PopupOffsetX), PopupOffsetX);
         PopupOffsetY = IOUtils.Read(token, nameof(PopupOffsetY), PopupOffsetY);
+        PopupScale = IOUtils.Read(token, nameof(PopupScale), PopupScale);
         FloatOffsetByDevice = new Dictionary<string, float>();
         if(token[nameof(FloatOffsetByDevice)] is JObject offsets) {
             foreach(JProperty prop in offsets.Properties()) {

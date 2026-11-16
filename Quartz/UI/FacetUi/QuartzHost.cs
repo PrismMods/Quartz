@@ -27,6 +27,7 @@ internal static class QuartzHost {
                 o.Theme = MakeTheme(MainCore.Conf.GetAccentColor());
                 o.Cursor = OsCursor;
                 o.WheelSpeed = WheelSpeed;
+                o.SansFonts = SuitFiles();
             });
             if(!hooked) {
                 hooked = true;
@@ -34,6 +35,26 @@ internal static class QuartzHost {
                 MainCore.Tr.OnLoadEnd += OnLoadEnd;
             }
             return host;
+        }
+    }
+    /// <summary>SUIT, Quartz's own UI face, as Facet's sans face (Medium standing in for bold): it has every Hangul syllable,
+    /// so Korean draws from one face instead of the OS Gothic sampled behind Arial, whose syllables came out uneven. The
+    /// files are the ones ResourceManager writes to Temp for TMP; null (Facet's own lists) when they cannot be written.</summary>
+    internal static string[][] SuitFiles() {
+        try {
+            string Write(string resource, string name) {
+                byte[] data = MainCore.Res?.Load(resource);
+                if(data == null || data.Length == 0) return null;
+                string path = System.IO.Path.Combine(MainCore.Paths.TempPath, name);
+                System.IO.Directory.CreateDirectory(MainCore.Paths.TempPath);
+                if(!System.IO.File.Exists(path) || new System.IO.FileInfo(path).Length != data.Length) System.IO.File.WriteAllBytes(path, data);
+                return path;
+            }
+            string regular = Write("Font.SUIT-Regular.otf", "SUIT_Regular.otf"), medium = Write("Font.SUIT-Medium.otf", "SUIT_Medium.otf");
+            return regular == null ? null : [medium == null ? [regular] : [regular, medium]];
+        } catch(Exception e) {
+            MainCore.Log.Err($"[{nameof(QuartzHost)}] SUIT for Facet: {e.Message}");
+            return null;
         }
     }
     // Labels are Lang keys; the DEFAULT language answers every Get with its fallback, so that is the English text.

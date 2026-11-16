@@ -87,6 +87,7 @@ internal static partial class PrismSelfTestChecks {
             if(off.Length > 0) info("layout: not shown by the reorganizer here (feature off): " + string.Join(",", off));
             info("layout: progressbar " + (mine.Contains(LayoutIds.ProgressBar) ? "present" : "absent") + "; targets " + string.Join(",", mine));
             foreach(string id in mine) yield return BothWays(id, check);
+            yield return CalibrationPointer(check, info);
             yield return Edges(check, info, seen);
         } finally {
             Ui.Log = log;
@@ -376,7 +377,7 @@ internal static partial class PrismSelfTestChecks {
             (c, v) => (c.OffsetX, c.TopOffset, c.Rotation, c.Anchor, c.AnchorClosest, c.Style) = v, ProgressBarOverlay.Apply),
         Keep(PracticeDifficulty.ConfMgr, c => (c.OffsetX, c.OffsetY, c.FontSize, c.Rotation),
             (c, v) => (c.OffsetX, c.OffsetY, c.FontSize, c.Rotation) = v, PracticeOverlay.Apply),
-        Keep(Calibration.ConfMgr, c => (c.PopupOffsetX, c.PopupOffsetY), (c, v) => (c.PopupOffsetX, c.PopupOffsetY) = v, null),
+        Keep(Calibration.ConfMgr, c => (c.PopupOffsetX, c.PopupOffsetY, c.PopupScale), (c, v) => (c.PopupOffsetX, c.PopupOffsetY, c.PopupScale) = v, null),
         Keep(KeyViewerOverlay.ConfMgr,
             c => (c.DmOffsetX, c.DmOffsetY, c.DmScale, c.DmRotation, c.DmAnchor, c.DmAnchorClosest, c.DmFootOffsetX, c.DmFootOffsetY,
                 c.DmFootScale, c.DmFootRotation, c.DmFootPlaced, c.TabubOffsetX, c.TabubOffsetY, c.TabubScale, c.TabubRotation, c.TabubEnabled),

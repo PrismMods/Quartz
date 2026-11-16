@@ -2196,7 +2196,8 @@
           "System.Func\u00601\u003CSystem.String\u003E Facet.HostOptions::Language",
           "System.Func\u00602\u003CFacet.Cursors/Kind,System.Boolean\u003E Facet.HostOptions::Cursor",
           "System.Func\u00602\u003CSystem.String,System.String\u003E Facet.HostOptions::Read",
-          "System.Func\u00602\u003CSystem.String,System.String\u003E Facet.HostOptions::Translate"
+          "System.Func\u00602\u003CSystem.String,System.String\u003E Facet.HostOptions::Translate",
+          "System.String[][] Facet.HostOptions::SansFonts"
         ]
       },
       {
@@ -2299,6 +2300,9 @@
       {
         "type": "Facet.Look",
         "members": [
+          "System.Nullable\u00601\u003CFacet.Role\u003E Facet.Look::FocusBorder",
+          "System.Nullable\u00601\u003CFacet.Role\u003E Facet.Look::HoverText",
+          "System.Nullable\u00601\u003CFacet.Role\u003E Facet.Look::Text",
           "System.Void Facet.Look::.ctor()"
         ]
       },
@@ -2712,6 +2716,7 @@
         "type": "Facet.Words",
         "members": [
           "System.Void Facet.Words::Label(UnityEngine.UIElements.TextElement,System.String,System.Boolean)",
+          "System.Void Facet.Words::OnRelabel(UnityEngine.UIElements.VisualElement,System.Action)",
           "System.Void Facet.Words::Tip(UnityEngine.UIElements.VisualElement,System.String,System.Boolean)"
         ]
       }

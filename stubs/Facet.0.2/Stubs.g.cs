@@ -205,6 +205,7 @@ namespace Facet {
         public global::System.Func<string> Language;
         public global::System.Action<string> Log;
         public global::System.Func<string, string> Read;
+        public string[][] SansFonts;
         public global::Facet.Theme Theme;
         public global::System.Func<string, string> Translate;
         public global::System.Func<float> WheelSpeed;
@@ -269,6 +270,9 @@ namespace Facet {
         Ready = 4,
     }
     public sealed unsafe partial class Look {
+        public global::System.Nullable<global::Facet.Role> FocusBorder;
+        public global::System.Nullable<global::Facet.Role> HoverText;
+        public global::System.Nullable<global::Facet.Role> Text;
         public Look() => throw null;
     }
     public sealed unsafe partial class Looks {
@@ -528,6 +532,7 @@ namespace Facet {
     }
     public static unsafe partial class Words {
         public static void Label(global::UnityEngine.UIElements.TextElement e, string english, bool own = default) => throw null;
+        public static void OnRelabel(global::UnityEngine.UIElements.VisualElement e, global::System.Action redo) => throw null;
         public static void Tip(global::UnityEngine.UIElements.VisualElement e, string english, bool own = default) => throw null;
     }
 }

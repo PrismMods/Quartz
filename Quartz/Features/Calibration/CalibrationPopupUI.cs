@@ -23,6 +23,7 @@ public static class CalibrationPopupUI {
     private const float WIDTH = 460f;
     private const float HEIGHT = 200f;
     private const float TITLE_HEIGHT = 44f;
+    internal const float MinScale = 0.5f, MaxScale = 2f;
     private static Vector2 ShownPos {
         get {
             Calibration.EnsureConf();
@@ -53,6 +54,9 @@ public static class CalibrationPopupUI {
 #if DEBUG
     /// <summary>The self-test's view: a real suggestion is up (after a death), which a preview's end leaves shown.</summary>
     internal static bool Suggesting => visible;
+    /// <summary>The self-test's view: whether the popup takes the pointer, and its scale on screen.</summary>
+    internal static bool TakesPointer => group != null && group.blocksRaycasts;
+    internal static float ShownScale => panelRect != null ? panelRect.localScale.x : 0f;
 #endif
     public static void Initialize() {
         SceneManager.sceneUnloaded += OnSceneUnloaded;
@@ -182,8 +186,28 @@ public static class CalibrationPopupUI {
             CaptureOffset
         );
         ReorganizeHandle.SetLayoutTarget(dragObj, LayoutIds.Calibration);
+        ReorganizeHandle.SetSizeSource(dragObj, () => Scale, v => {
+            Calibration.Conf.PopupScale = Mathf.Clamp(v, MinScale, MaxScale);
+            ApplyScale();
+        }, MinScale, MaxScale);
+        ApplyScale();
         ApplyTheme();
         panelObj.SetActive(false);
+    }
+    private static float Scale {
+        get {
+            Calibration.EnsureConf();
+            return Mathf.Clamp(Calibration.Conf.PopupScale, MinScale, MaxScale);
+        }
+    }
+    private static void ApplyScale() {
+        if(panelRect != null) panelRect.localScale = new Vector3(Scale, Scale, 1f);
+    }
+    // While a shared layout editor arranges the popup, its own graphics (body, buttons) sit on a canvas above the editor and
+    // would take the pointer, so the editor could neither drag nor resize it. They let it through then; the classic
+    // reorganizer drags it by its own drag surface, which needs the raycasts.
+    private static void Raycasts() {
+        if(group != null) group.blocksRaycasts = !reorganizing || UICore.IsReorganizing;
     }
     private static void ApplyTheme() {
         if(bgImage != null) bgImage.color = UIColors.PanelBG;
@@ -293,6 +317,8 @@ public static class CalibrationPopupUI {
         panelRect.anchoredPosition = ShownPos;
         group.alpha = 1f;
         dragObj.SetActive(UICore.IsReorganizing); // a shared editor moves it from its own surface
+        ApplyScale();
+        Raycasts();
     }
     private static string Suggestion(float from, float to) => string.Format(
         MainCore.Tr.Get("CALIBRATION_POPUP_CHANGE_OFFSET", "Change input offset from {0}ms to {1}ms?"), Calibration.FormatMs(from), Calibration.FormatMs(to));
@@ -332,12 +358,14 @@ public static class CalibrationPopupUI {
     // The drag surface is the reorganizer's: a shared editor arranging the popup moves it from its own surface.
     public static void SyncDragSurface() {
         if(reorganizing && dragObj != null) dragObj.SetActive(UICore.IsReorganizing);
+        Raycasts();
     }
     public static void EndReorganize() {
         if(!reorganizing) return;
         reorganizing = false;
         CaptureOffset();
         if(dragObj != null) dragObj.SetActive(false);
+        Raycasts();
         if(visible) return;
         ReleaseEventSystem();
         if(panelRect != null) panelRect.anchoredPosition = HiddenPos;
@@ -357,7 +385,9 @@ public static class CalibrationPopupUI {
         CalibrationSettings def = new();
         Calibration.Conf.PopupOffsetX = def.PopupOffsetX;
         Calibration.Conf.PopupOffsetY = def.PopupOffsetY;
+        Calibration.Conf.PopupScale = def.PopupScale;
         Calibration.Save();
+        ApplyScale();
         if(panelRect != null) panelRect.anchoredPosition = reorganizing || visible || previewing ? ShownPos : HiddenPos;
     }
 }
