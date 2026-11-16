@@ -257,6 +257,7 @@ namespace UnityEngine.UIElements {
         private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
         private global::UnityEngine.UIElements.Length m_Value;
         public static implicit operator global::UnityEngine.UIElements.StyleLength(float v) => throw null;
+        public static implicit operator global::UnityEngine.UIElements.StyleLength(global::UnityEngine.UIElements.StyleKeyword keyword) => throw null;
         bool global::System.IEquatable<global::UnityEngine.UIElements.StyleLength>.Equals(global::UnityEngine.UIElements.StyleLength other) => throw null;
     }
     public unsafe partial class StyleValueCollection {

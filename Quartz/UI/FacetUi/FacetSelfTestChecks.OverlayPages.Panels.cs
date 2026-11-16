@@ -131,6 +131,8 @@ internal static partial class FacetSelfTestChecks {
         int state = NavRegistry.StateFor(PanelsPage);
         bool opened = false, found = false, clicked = false, shows = false;
         float before = float.NaN, offset = float.NaN, max = float.NaN, at = float.NaN, end = float.NaN;
+        float lateMs = 0f;
+        int late = 0;
         try {
             UICore.ClassicStale = true;   // the classic page lists the new panel
             QuartzShell.OpenClassic(state);
@@ -153,6 +155,14 @@ internal static partial class FacetSelfTestChecks {
                 yield return WaitGlide();
                 max = Mathf.Max(0f, sc.content.rect.height - sc.viewport.rect.height);
                 at = sc.content.anchoredPosition.y;
+                // Under load the glide's first tick can land a few frames after the long rebuild frame, so it ends up to ~65 ms
+                // after the 0.2 s wait. Allow 100 ms more and no longer: a glide still moving after that fails the check.
+                float from = Time.realtimeSinceStartup, until = from + 0.1f;
+                for(; at > max + 0.5f && Time.realtimeSinceStartup < until; late++) {
+                    yield return null;
+                    at = sc.content.anchoredPosition.y;
+                }
+                lateMs = (Time.realtimeSinceStartup - from) * 1000f;
                 end = sc.content.rect.height;
                 shows = sc.content.Find("PanelsList") is RectTransform rows && VisibleHeight(rows, sc.viewport) > 1f;
             }
@@ -170,7 +180,7 @@ internal static partial class FacetSelfTestChecks {
         check($"{PanelsPage}: deleting a panel open at the classic page's end leaves the page showing its rows, the offset within the "
             + "shorter content in 2 frames and the content there after its glide, and only that panel goes; Settings.json ends as before",
             found && clicked && same && before > max + 0.5f && offset <= max + 0.5f && at <= max + 0.5f && shows && kept[0],
-            $"opened={opened} found={found} clicked={clicked} offset {before:0.#}->{offset:0.#} at={at:0.#} max={max:0.#} content={end:0.#} "
+            $"opened={opened} found={found} clicked={clicked} offset {before:0.#}->{offset:0.#} at={at:0.#} late={late}f/{lateMs:0}ms max={max:0.#} content={end:0.#} "
             + $"blank before the fix={before >= end} rows shown={shows} panels={list.Count}/{keep.Count} same={same} settings same={kept[0]} {Showing()}");
     }
 

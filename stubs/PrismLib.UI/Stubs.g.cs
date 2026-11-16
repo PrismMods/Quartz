@@ -64,7 +64,10 @@ namespace PrismLib.UI.Toolkit {
     public static unsafe partial class HubLook {
         public const int FadeMs = 4;
         public const string WashName = "WashName";
+        public const string WordmarkName = "WordmarkName";
+        public static void Buttons(global::UnityEngine.UIElements.VisualElement container, global::UnityEngine.Color fill, global::UnityEngine.Color neutral) => throw null;
         public static void FadeIn(global::Facet.Surface surface) => throw null;
+        public static global::UnityEngine.UIElements.Label Logo(global::UnityEngine.UIElements.VisualElement logo, string wordmark) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Wear(global::Facet.Surface surface, global::UnityEngine.UIElements.VisualElement window) => throw null;
     }
     public static unsafe partial class InputGate {
@@ -365,9 +368,9 @@ namespace PrismLib.UI.Toolkit {
         public static void TickWheel(global::UnityEngine.Vector2 pointerScreen, float delta) => throw null;
     }
     public sealed unsafe partial class Window {
-        public const float MinHeight = 59f;
-        public const float MinWidth = 60f;
-        public const float RailAlign = 61f;
+        public const float MinHeight = 60f;
+        public const float MinWidth = 61f;
+        public const float RailAlign = 62f;
         public static global::System.Func<string, string> Read;
         public static global::System.Action<string, string> Write;
         private Window() { }

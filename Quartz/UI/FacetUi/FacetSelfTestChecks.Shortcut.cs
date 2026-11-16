@@ -1,5 +1,7 @@
 #if DEBUG && !IL2CPP
 using System.Collections;
+using Facet;
+using Quartz.Core;
 using UnityEngine;
 using Quartz.Prism;
 using UnityEngine.UIElements;
@@ -33,6 +35,7 @@ internal static partial class FacetSelfTestChecks {
             }
             check("shortcut: Settings, Edit layout and Close follow, in Quartz's words", words, seen);
             ShortcutLook(check, info, card);
+            yield return ShortcutRecolour(check);
 
             SubmitShortcut(0);
             for(int i = 0; i < 30 && !(FacetBridge.NewMenuVisible() && !FacetBridge.ShortcutVisible()); i++) yield return Frames(1);
@@ -55,6 +58,7 @@ internal static partial class FacetSelfTestChecks {
             FacetBridge.HandleEscape();
             yield return Frames(3);
             check("shortcut: Escape closes it", !FacetBridge.ShortcutVisible(), null);
+            yield return ShortcutReopenCost(check, info);
 
             if(PrismBridge.FilterReady) {
                 FacetBridge.OpenShortcut();
@@ -105,6 +109,95 @@ internal static partial class FacetSelfTestChecks {
         foreach(string n in ShortcutButtons)
             if(card?.Q<Button>(n) is not Button b || b.resolvedStyle.unityTextAlign != TextAnchor.MiddleCenter) off += " " + n;
         check("shortcut: every button label is centred", off.Length == 0, off);
+        ShortcutHubButtons(check, info, card);
+    }
+
+    // The old hub's buttons, logo and wordmark, at PrismLib.UI's shared sizes (read through the bridge, never copied here).
+    private static void ShortcutHubButtons(Action<string, bool, string> check, Action<string> info, VisualElement card) {
+        var (z, markName) = PrismBridge.HubSizes;
+        if(!QuartzShortcut.HubButtons || z == null) {
+            info("shortcut: no shared hub buttons in this PrismLib.UI, its own buttons stay");
+            return;
+        }
+        float width = z[0], height = z[1], radius = z[2], text = z[3], logoSize = z[4], markSize = z[5];
+        string bad = "";
+        for(int i = 0; i < ShortcutButtons.Length; i++) {
+            Button b = card?.Q<Button>(ShortcutButtons[i]);
+            if(b == null) { bad += $" {ShortcutButtons[i]} missing"; continue; }
+            IResolvedStyle st = b.resolvedStyle;
+            Color want = i == ShortcutButtons.Length - 1 ? UIColors.ObjectBG : UIColors.ObjectButton;
+            Rect r = b.worldBound;
+            // Within a screen pixel: the panel snaps edges to whole pixels at its scale.
+            if(Mathf.Abs(r.width - width) > 1f || r.height < height - 1f || Mathf.Abs(st.borderTopLeftRadius - radius) > 0.1f
+               || Mathf.Abs(st.fontSize - text) > 0.5f || st.backgroundColor.a < 0.999f
+               || Mathf.Abs(st.backgroundColor.r - want.r) > 0.01f || Mathf.Abs(st.backgroundColor.g - want.g) > 0.01f || Mathf.Abs(st.backgroundColor.b - want.b) > 0.01f)
+                bad += $" {b.name} {r.size} r{st.borderTopLeftRadius} text {st.fontSize} fill {st.backgroundColor}";
+        }
+        check("shortcut: its buttons have the old hub's size, corners and text on its solid fills, Close neutral", bad.Length == 0, bad);
+
+        VisualElement logo = card?.Q("quartz-shortcut-logo");
+        Label mark = logo?.Q<Label>(markName);
+        Button first = card?.Q<Button>(ShortcutButtons[0]);
+        Rect l = logo?.worldBound ?? default, m = mark?.worldBound ?? default;
+        check("shortcut: it leads with the Quartz logo at the shared size and the QUARTZ wordmark under it",
+            logo != null && mark != null && first != null && Mathf.Abs(l.width - logoSize) <= 1f && Mathf.Abs(l.height - logoSize) <= 1f
+            && mark.text == Info.DisplayName.ToUpperInvariant() && Mathf.Abs(mark.resolvedStyle.fontSize - markSize) <= 0.5f
+            && m.y >= l.yMax - 0.5f && m.yMax <= first.worldBound.y + 0.5f && Mathf.Abs(m.center.x - l.center.x) <= 1f && Mathf.Abs(l.center.x - card!.worldBound.center.x) <= 1f,
+            $"logo {l} wordmark '{mark?.text}' {m} size {mark?.resolvedStyle.fontSize} first {first?.worldBound}");
+
+        // Korean is the longest of Quartz's words here: each label, measured at the button's text size, fits inside it.
+        string over = "";
+        for(int i = 0; i < ShortcutButtons.Length; i++) {
+            if(card?.Q<Button>(ShortcutButtons[i]) is not Button b) continue;
+            string ko = MainCore.Tr.GetForLanguage(PrismRules.ShortcutKeys[i], "ko-KR", b.text);
+            Vector2 need = b.MeasureTextSize(ko, 0f, VisualElement.MeasureMode.Undefined, 0f, VisualElement.MeasureMode.Undefined);
+            if(need.x > b.contentRect.width + 0.5f || need.y > b.contentRect.height + 0.5f) over += $" {b.name} '{ko}' needs {need} in {b.contentRect.size}";
+        }
+        check("shortcut: the Korean labels fit their buttons", over.Length == 0, over);
+    }
+
+    // The classic fills follow the accent: after a change, the reopened menu's buttons wear the new ones.
+    private static IEnumerator ShortcutRecolour(Action<string, bool, string> check) {
+        if(!QuartzShortcut.HubButtons) yield break;
+        Color accent = MainCore.Conf.GetAccentColor(), old = UIColors.ObjectButton;
+        FacetBridge.HideShortcut();
+        try {
+            UIColors.ApplyAccent(new Color(0.15f, 0.55f, 0.95f));
+            FacetBridge.OpenShortcut();
+            // The fill eases to its new colour: drawn, within a second.
+            string bad = "";
+            float t0 = Time.realtimeSinceStartup;
+            do {
+                yield return null;
+                bad = "";
+                for(int i = 0; i < ShortcutButtons.Length; i++) {
+                    Color want = i == ShortcutButtons.Length - 1 ? UIColors.ObjectBG : UIColors.ObjectButton;
+                    Color got = QuartzShortcut.Surface?.Root.Q<Button>(ShortcutButtons[i])?.resolvedStyle.backgroundColor ?? Color.clear;
+                    if(Mathf.Abs(got.r - want.r) > 0.01f || Mathf.Abs(got.g - want.g) > 0.01f || Mathf.Abs(got.b - want.b) > 0.01f)
+                        bad += $" {ShortcutButtons[i]} {got} want {want}";
+                }
+            } while(bad.Length > 0 && Time.realtimeSinceStartup - t0 < 1f);
+            check("shortcut: after an accent change its buttons wear the new accent's fills",
+                bad.Length == 0 && Mathf.Abs(UIColors.ObjectButton.r - old.r) + Mathf.Abs(UIColors.ObjectButton.g - old.g) + Mathf.Abs(UIColors.ObjectButton.b - old.b) > 0.1f, bad.Length == 0 ? $"was {old}" : bad);
+        } finally {
+            UIColors.ApplyAccent(accent);
+        }
+        yield return Frames(3);
+    }
+
+    // Reopening the built shortcut menu: Quartz's and the shared look's own steps (the input block, the fade-in) allocate
+    // nothing. They are measured on the shown menu, where Facet's show is a no-op, so Facet's own show and hide (which copy
+    // their event's subscriber list on each raise) stay out of the count; nor does the run show a surface thousands of times.
+    private static IEnumerator ShortcutReopenCost(Action<string, bool, string> check, Action<string> info) {
+        FacetBridge.OpenShortcut();
+        yield return Frames(2);
+        long own = KvHeapGrowth(() => {
+            for(int i = 0; i < KvProbeRuns; i++) FacetBridge.OpenShortcut();
+        });
+        FacetBridge.HideShortcut();
+        info($"[perf] shortcut menu reopen: its own steps grew the heap {own} bytes over {KvProbeRuns} opens");
+        check("shortcut: reopening it allocates nothing in its own steps or the shared look's", own < KvProbeSlack, $"{own} bytes");
+        yield return Frames(2);
     }
 
     // A missing button presses nothing, so the check after it fails instead of the whole run throwing.

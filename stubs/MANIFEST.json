@@ -3276,7 +3276,10 @@
         "members": [
           "System.Int32 PrismLib.UI.Toolkit.HubLook::FadeMs",
           "System.String PrismLib.UI.Toolkit.HubLook::WashName",
+          "System.String PrismLib.UI.Toolkit.HubLook::WordmarkName",
+          "System.Void PrismLib.UI.Toolkit.HubLook::Buttons(UnityEngine.UIElements.VisualElement,UnityEngine.Color,UnityEngine.Color)",
           "System.Void PrismLib.UI.Toolkit.HubLook::FadeIn(Facet.Surface)",
+          "UnityEngine.UIElements.Label PrismLib.UI.Toolkit.HubLook::Logo(UnityEngine.UIElements.VisualElement,System.String)",
           "UnityEngine.UIElements.VisualElement PrismLib.UI.Toolkit.HubLook::Wear(Facet.Surface,UnityEngine.UIElements.VisualElement)"
         ]
       },
@@ -7577,7 +7580,8 @@
         "members": [
           "UnityEngine.UIElements.Length UnityEngine.UIElements.StyleLength::m_Value",
           "UnityEngine.UIElements.StyleKeyword UnityEngine.UIElements.StyleLength::m_Keyword",
-          "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.StyleLength::op_Implicit(System.Single)"
+          "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.StyleLength::op_Implicit(System.Single)",
+          "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.StyleLength::op_Implicit(UnityEngine.UIElements.StyleKeyword)"
         ]
       },
       {

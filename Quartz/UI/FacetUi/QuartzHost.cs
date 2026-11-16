@@ -49,6 +49,7 @@ internal static class QuartzHost {
         if(host == null) return;
         if(Suited) Accent(host.Theme, accent);
         else host.Theme.Recolour(accent);
+        QuartzShortcut.Recolour();
     }
     private static Theme MakeTheme(Color accent) {
         var t = new Theme();
