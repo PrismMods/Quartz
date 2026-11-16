@@ -2315,6 +2315,7 @@
         "type": "Facet.Looks",
         "members": [
           "Facet.Look Facet.Looks::AccentButton",
+          "Facet.Look Facet.Looks::Button",
           "Facet.Look Facet.Looks::Card",
           "Facet.Look Facet.Looks::DangerButton",
           "Facet.Look Facet.Looks::FlatButton",
@@ -2576,7 +2577,9 @@
         "members": [
           "System.Single Facet.Sizes::Body",
           "System.Single Facet.Sizes::Caps",
+          "System.Single Facet.Sizes::ControlPad",
           "System.Single Facet.Sizes::Gap",
+          "System.Single Facet.Sizes::Icon",
           "System.Single Facet.Sizes::Line",
           "System.Single Facet.Sizes::NumberWidth",
           "System.Single Facet.Sizes::Pad",
@@ -3589,6 +3592,8 @@
       {
         "type": "PrismLib.UI.Toolkit.SuiteAdapter",
         "members": [
+          "Facet.Bind\u00601\u003CSystem.Boolean\u003E PrismLib.UI.Toolkit.SuiteAdapter::Master()",
+          "Facet.Bind\u00601\u003CSystem.Boolean\u003E PrismLib.UI.Toolkit.SuiteAdapter::get_Master()",
           "Facet.Host PrismLib.UI.Toolkit.SuiteAdapter::Host()",
           "Facet.Host PrismLib.UI.Toolkit.SuiteAdapter::get_Host()",
           "System.Boolean PrismLib.UI.Toolkit.SuiteAdapter::BlockInput()",
@@ -3604,7 +3609,9 @@
           "System.Int32 PrismLib.UI.Toolkit.SuiteAdapter::Revision()",
           "System.Int32 PrismLib.UI.Toolkit.SuiteAdapter::get_Revision()",
           "System.Nullable\u00601\u003CUnityEngine.UIElements.Background\u003E PrismLib.UI.Toolkit.SuiteAdapter::Logo()",
+          "System.Nullable\u00601\u003CUnityEngine.UIElements.Background\u003E PrismLib.UI.Toolkit.SuiteAdapter::MasterIcon()",
           "System.Nullable\u00601\u003CUnityEngine.UIElements.Background\u003E PrismLib.UI.Toolkit.SuiteAdapter::get_Logo()",
+          "System.Nullable\u00601\u003CUnityEngine.UIElements.Background\u003E PrismLib.UI.Toolkit.SuiteAdapter::get_MasterIcon()",
           "System.Single PrismLib.UI.Toolkit.SuiteAdapter::Opacity()",
           "System.Single PrismLib.UI.Toolkit.SuiteAdapter::RailWidth()",
           "System.Single PrismLib.UI.Toolkit.SuiteAdapter::Scale()",
@@ -3613,9 +3620,11 @@
           "System.Single PrismLib.UI.Toolkit.SuiteAdapter::get_Scale()",
           "System.String PrismLib.UI.Toolkit.SuiteAdapter::HomePage()",
           "System.String PrismLib.UI.Toolkit.SuiteAdapter::Key(System.String,System.String)",
+          "System.String PrismLib.UI.Toolkit.SuiteAdapter::MasterLabel()",
           "System.String PrismLib.UI.Toolkit.SuiteAdapter::Title()",
           "System.String PrismLib.UI.Toolkit.SuiteAdapter::WindowId()",
           "System.String PrismLib.UI.Toolkit.SuiteAdapter::get_HomePage()",
+          "System.String PrismLib.UI.Toolkit.SuiteAdapter::get_MasterLabel()",
           "System.String PrismLib.UI.Toolkit.SuiteAdapter::get_Title()",
           "System.String PrismLib.UI.Toolkit.SuiteAdapter::get_WindowId()",
           "System.Void PrismLib.UI.Toolkit.SuiteAdapter::.ctor()",

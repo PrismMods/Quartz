@@ -64,6 +64,10 @@ internal static partial class ShellSettings {
             Save();
             if(QuartzShell.Surface != null) QuartzShell.Surface.BlocksGameInput = v;   // this window too, now
         });
+        Switch(card, "EDIT_WHILE_POWERED_OFF", () => C.EditWhilePoweredOff, v => {
+            C.EditWhilePoweredOff = v;
+            Save();
+        });
     }
 
     // A capture cancelled (Escape, or another row took it) hands back no name: nothing to write.

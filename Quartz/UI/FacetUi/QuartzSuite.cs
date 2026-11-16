@@ -41,7 +41,8 @@ internal sealed class QuartzSuite : SuiteAdapter {
     public override void BuildPage(VisualElement panel, SuitePage page) {
         NavPage pg = NavRegistry.ByKey(page.Key);
         if(pg == null) return;
-        if(QuartzShell.BuilderFor(pg) is { } build) build(panel);
+        if(QuartzShell.PoweredOff && pg.Key != CorePages.SettingsPageKey) QuartzShell.Inactive(panel);
+        else if(QuartzShell.BuilderFor(pg) is { } build) build(panel);
         else if(FeaturePages.IsStub(pg)) QuartzShell.Stub(panel, pg);
         else QuartzShell.Undrawable(panel, pg);
     }
@@ -72,6 +73,9 @@ internal sealed class QuartzSuite : SuiteAdapter {
     public override bool BlockInput => MainCore.Conf.BlockInputsWhileMenuOpen;
     public override bool KeepEscape => Keybind.Capturing;
     public override bool CanEditLayout => PrismBridge.UiAvailable;
+    public override Facet.Bind<bool> Master => QuartzShell.Power;
+    public override string MasterLabel => "MENU_POWER";
+    public override Background? MasterIcon => Background.FromSprite(MainCore.Spr.Get(UISprite.Power128));
 
     public override void OpenLayoutEditor() => PrismBridge.OpenLayoutEditor();
     public override bool LayoutEditorShowing => UICore.IsArranging || LayoutEditorProbe.Shown();

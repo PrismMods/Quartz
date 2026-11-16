@@ -92,7 +92,11 @@ public static class FeatureService {
         RegisterBuiltinTranslations();
         if(FeatureMasters.Migrate(state, FeatureMasters.ReadFile)) state.Save();
         foreach(Handle handle in Features) handle.Enabled = state.IsEnabled(handle.Id);
-        modChangedHandler = (_, isDispose) => ApplyActive(!isDispose);
+        modChangedHandler = (_, isDispose) => {
+            if(!isDispose && SliceNext) sliceAt = 0;
+            else ApplyActive(!isDispose);
+            SliceNext = false;
+        };
         MainCore.OnModEnabledChanged += modChangedHandler;
         Sync();
     }
@@ -122,7 +126,23 @@ public static class FeatureService {
         state?.Save();
         state = null;
     }
+    /// <summary>Set by the menu's power button: the next power change applies the features a few per frame instead of
+    /// all in one (~0.8-1.5 s) frame.</summary>
+    internal static bool SliceNext;
+    // The next feature a sliced power change still has to apply; -1 when none is running.
+    private static int sliceAt = -1;
+    private const double SliceMs = 6;
+    private static void ApplySlice() {
+        var watch = System.Diagnostics.Stopwatch.StartNew();
+        IReadOnlyList<Handle> all = Features;
+        while(sliceAt < all.Count) {
+            ApplyOne(all[sliceAt++], true);
+            if(watch.Elapsed.TotalMilliseconds >= SliceMs) return;   // ponytail: one slow feature still costs its frame
+        }
+        sliceAt = -1;
+    }
     private static void Tick() {
+        if(sliceAt >= 0) ApplySlice();
         foreach(Handle handle in Features) {
             if(!handle.Active || !handle.Ticks) continue;
             try {
@@ -241,25 +261,27 @@ public static class FeatureService {
         }
     }
     private static void ApplyActive(bool unpatchOnDisable = true) {
-        foreach(Handle handle in Features) {
-            bool should = MainCore.IsModEnabled && handle.Enabled && handle.Loaded;
-            if(should == handle.Active) continue;
-            if(should) {
-                try {
-                    FeatureContext context = handle.Context;
-                    context?.ApplyPatches();
-                    // Mark active before OnEnable so a throwing enable still unwinds its patches.
-                    handle.Active = true;
-                    handle.Instance.OnEnable();
-                    context?.RunEnableSteps();
-                } catch(Exception e) {
-                    handle.Error = $"OnEnable threw: {e}";
-                    MainCore.Log.Err($"[Feature:{handle.Id}] OnEnable threw: {e}");
-                    SafeDisable(handle);
-                }
-            } else {
-                SafeDisable(handle, unpatchOnDisable);
+        sliceAt = -1;   // this full pass covers whatever a sliced one had left
+        foreach(Handle handle in Features) ApplyOne(handle, unpatchOnDisable);
+    }
+    private static void ApplyOne(Handle handle, bool unpatchOnDisable) {
+        bool should = MainCore.IsModEnabled && handle.Enabled && handle.Loaded;
+        if(should == handle.Active) return;
+        if(should) {
+            try {
+                FeatureContext context = handle.Context;
+                context?.ApplyPatches();
+                // Mark active before OnEnable so a throwing enable still unwinds its patches.
+                handle.Active = true;
+                handle.Instance.OnEnable();
+                context?.RunEnableSteps();
+            } catch(Exception e) {
+                handle.Error = $"OnEnable threw: {e}";
+                MainCore.Log.Err($"[Feature:{handle.Id}] OnEnable threw: {e}");
+                SafeDisable(handle);
             }
+        } else {
+            SafeDisable(handle, unpatchOnDisable);
         }
     }
     private static void SafeDisable(Handle handle, bool unpatch = true) {

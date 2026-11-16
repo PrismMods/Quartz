@@ -105,6 +105,9 @@ internal static class KeyLimiterPage {
         box.style.alignItems = Align.Center;
         box.style.marginRight = sz.Gap;
         box.style.marginTop = sz.Gap / 2f;
+        // One button-looking chip: the name and its cross both sit inside it.
+        Paint.Look(box, Theme.For(box).Looks.Button);
+        Ui.SetRadius(box, sz.Radius);
         string name = KeyName(k);
         Button set = Ui.Btn(box, name, () => {
             if(!Unlocked()) return;
@@ -116,9 +119,13 @@ internal static class KeyLimiterPage {
         });
         set.name = "SET#" + n + "-input";
         set.style.marginRight = 0f;
+        Paint.Look(set, Theme.For(set).Looks.FlatButton);
         Words.Tip(set, "DESC_KL_KEY");
         Button remove = Ui.IconButton(box, Background.FromSprite(MainCore.Spr.Get(UISprite.X128)), "REMOVE", () => KeyLimiter.ToggleAllowedKey(key));
         remove.name = "REMOVE#" + n;
+        remove.style.width = remove.style.height = sz.Icon;
+        remove.style.marginRight = sz.ControlPad / 2f;
+        remove[0].style.width = remove[0].style.height = sz.Icon * 0.6f;
         string face = name;
         Controls.Hook(set, o => o.VisibleWhen = () => {
             string want = KeyLimiter.IsCapturing && setting == key ? "PRESS_A_KEY" : name;

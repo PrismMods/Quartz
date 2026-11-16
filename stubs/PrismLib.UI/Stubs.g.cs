@@ -284,6 +284,9 @@ namespace PrismLib.UI.Toolkit {
         public virtual bool KeepEscape { get => throw null; }
         public virtual bool LayoutEditorShowing { get => throw null; }
         public virtual global::System.Nullable<global::UnityEngine.UIElements.Background> Logo { get => throw null; }
+        public virtual global::Facet.Bind<bool> Master { get => throw null; }
+        public virtual global::System.Nullable<global::UnityEngine.UIElements.Background> MasterIcon { get => throw null; }
+        public virtual string MasterLabel { get => throw null; }
         public virtual float Opacity { get => throw null; }
         public virtual float RailWidth { get => throw null; }
         public virtual int Revision { get => throw null; }

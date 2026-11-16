@@ -282,6 +282,7 @@ namespace Facet {
     }
     public sealed unsafe partial class Looks {
         public global::Facet.Look AccentButton;
+        public global::Facet.Look Button;
         public global::Facet.Look Card;
         public global::Facet.Look DangerButton;
         public global::Facet.Look FlatButton;
@@ -445,7 +446,9 @@ namespace Facet {
     public sealed unsafe partial class Sizes {
         public float Body;
         public float Caps;
+        public float ControlPad;
         public float Gap;
+        public float Icon;
         public float Line;
         public float NumberWidth;
         public float Pad;

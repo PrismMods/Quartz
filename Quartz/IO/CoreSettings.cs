@@ -12,6 +12,7 @@ public sealed class CoreSettings : ISettingsFile {
     public bool Tooltip = true;
     public bool MiddleClickToDefault = true;
     public bool BlockInputsWhileMenuOpen = true;
+    public bool EditWhilePoweredOff = false;
     public float UIScale = 1f;
     public string FontName = "";
     public bool FontJudgement = false;
