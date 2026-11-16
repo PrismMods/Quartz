@@ -178,6 +178,35 @@ internal static class FacetBridge {
 #endif
         return false;
     }
+    /// <summary>Opens Quartz's shortcut menu (the logo, Settings, Edit layout, Close), centred.</summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void OpenShortcut() {
+#if !IL2CPP
+        if(Available()) {
+            try { OpenShortcutImpl(); } catch(Exception e) { Fail(e); }
+        }
+#endif
+    }
+    /// <summary>Hides the shortcut menu; true when it was showing. Never probes.</summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static bool HideShortcut() {
+#if !IL2CPP
+        if(state == 1) {
+            try { return HideShortcutImpl(); } catch(Exception e) { Fail(e); }
+        }
+#endif
+        return false;
+    }
+    /// <summary>The shortcut menu shows. Never probes, so it is cheap per frame.</summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static bool ShortcutVisible() {
+#if !IL2CPP
+        if(state == 1) {
+            try { return ShortcutVisibleImpl(); } catch(Exception e) { Fail(e); }
+        }
+#endif
+        return false;
+    }
     /// <summary>The layout switcher can open: false under IL2CPP, in the KeyViewer flavour and without a usable PrismLib.UI, so
     /// the every-flavour hub can ask.</summary>
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -277,6 +306,12 @@ internal static class FacetBridge {
     private static bool HideNewMenuImpl() => QuartzShell.Hide();
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static bool NewMenuVisibleImpl() => QuartzShell.Surface?.Visible == true;
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void OpenShortcutImpl() => QuartzShortcut.Open();
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static bool HideShortcutImpl() => QuartzShortcut.Hide();
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static bool ShortcutVisibleImpl() => QuartzShortcut.Visible;
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void PrebuildNewMenuImpl() => QuartzShell.Prebuild();
     [MethodImpl(MethodImplOptions.NoInlining)]

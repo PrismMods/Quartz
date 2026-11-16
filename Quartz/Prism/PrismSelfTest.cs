@@ -19,6 +19,7 @@ internal static class PrismSelfTest {
         yield return PrismSelfTestChecks.NewMenu(check, info);
         yield return PrismSelfTestChecks.Arrange(check);
         yield return PrismSelfTestChecks.Layout(check, info);
+        yield return PrismSelfTestChecks.Filter(check, info);
         yield return PrismSelfTestChecks.UiOff(check);
         PrismSelfTestChecks.SmoothUiOff(check);
     }

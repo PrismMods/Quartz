@@ -57,10 +57,12 @@ namespace PrismLib {
         public static void Unregister(string owner) => throw null;
     }
     public static unsafe partial class Layout {
+        public static string RequestedOwner { get => throw null; }
         public static event global::System.Action Changed { add { } remove { } }
         public static event global::System.Action OpenRequested { add { } remove { } }
         public static global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, global::PrismLib.LayoutTarget>> All() => throw null;
         public static void RequestOpen() => throw null;
+        public static void RequestOpen(string owner) => throw null;
         public static void Unregister(string owner) => throw null;
     }
     public sealed unsafe partial class LayoutTarget {

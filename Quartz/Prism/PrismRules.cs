@@ -110,6 +110,55 @@ internal static class PrismRules {
         public void Touch(int frame) => last = frame;
         public bool Open(int frame) => last != int.MinValue && frame - last <= Grace;
     }
+    /// <summary>The shortcut menu's buttons, in order: their Lang keys.</summary>
+    public static readonly string[] ShortcutKeys = ["SETTINGS", "MENU_EDIT_LAYOUT", "CLOSE"];
+    public enum HotkeyRoute { Toggle, Shortcut, HideShortcut, CloseEditor, Ignore }
+    public enum TripStep { None, Back, BackLate }
+    /// <summary>
+    /// The menu hotkey with the new menu on: what a press does, and the way back from the editor the shortcut menu
+    /// opened. The way back waits for the whole session to end (its Grace frames included), not just the editor.
+    /// </summary>
+    public sealed class ShortcutTrip {
+        public const int WaitFrames = 120;
+        private int waited;
+        /// <summary>Edit layout asked for the editor; it is not on screen yet.</summary>
+        public bool Requested { get; private set; }
+        /// <summary>The session on screen is the one Edit layout opened.</summary>
+        public bool Ours { get; private set; }
+        public bool Busy => Requested || Ours;
+        /// <summary>What a press does; first match wins. Reads only.</summary>
+        public HotkeyRoute Route(bool door, bool shortcutShown, bool sessionOpen, bool editorShown, bool menuShowing) {
+            if(shortcutShown) return HotkeyRoute.HideShortcut;
+            if(sessionOpen || editorShown) return Ours && editorShown ? HotkeyRoute.CloseEditor : HotkeyRoute.Ignore;
+            if(Requested) return HotkeyRoute.Ignore;
+            return !door || menuShowing ? HotkeyRoute.Toggle : HotkeyRoute.Shortcut;
+        }
+        public void Request() {
+            Requested = true;
+            Ours = false;
+            waited = 0;
+        }
+        /// <summary>Nothing comes back: the hotkey or Close ended the trip.</summary>
+        public void Cancel() => Requested = Ours = false;
+        /// <summary>Once per frame; showing = a session is open or an editor shows.</summary>
+        public TripStep Step(bool showing) {
+            if(Requested) {
+                if(showing) {
+                    Requested = false;
+                    Ours = true;
+                } else if(++waited >= WaitFrames) {
+                    Requested = false;
+                    return TripStep.BackLate;
+                }
+                return TripStep.None;
+            }
+            if(Ours && !showing) {
+                Ours = false;
+                return TripStep.Back;
+            }
+            return TripStep.None;
+        }
+    }
     private static void AddStore(List<string> found, string owner) {
         foreach(string version in Dirs(Path.Combine(owner, "Runtime", "versions"))) Add(found, Path.Combine(version, Ui));
     }

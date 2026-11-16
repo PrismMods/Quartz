@@ -216,9 +216,9 @@ namespace UnityEngine.UIElements {
     public unsafe partial struct StyleBackground : global::System.IEquatable<global::UnityEngine.UIElements.StyleBackground> {
         private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
         private global::UnityEngine.UIElements.Background m_Value;
+        public static implicit operator global::UnityEngine.UIElements.StyleBackground(global::UnityEngine.UIElements.Background v) => throw null;
         public static implicit operator global::UnityEngine.UIElements.StyleBackground(global::UnityEngine.Texture2D v) => throw null;
         public static implicit operator global::UnityEngine.UIElements.StyleBackground(global::UnityEngine.UIElements.StyleKeyword keyword) => throw null;
-        public static implicit operator global::UnityEngine.UIElements.StyleBackground(global::UnityEngine.UIElements.Background v) => throw null;
         bool global::System.IEquatable<global::UnityEngine.UIElements.StyleBackground>.Equals(global::UnityEngine.UIElements.StyleBackground other) => throw null;
     }
     public unsafe partial struct StyleBackgroundSize : global::System.IEquatable<global::UnityEngine.UIElements.StyleBackgroundSize> {

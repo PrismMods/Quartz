@@ -270,6 +270,7 @@ namespace Facet {
     }
     public sealed unsafe partial class Looks {
         public global::Facet.Look AccentButton;
+        public global::Facet.Look Card;
         public global::Facet.Look DangerButton;
         public global::Facet.Look FlatButton;
         private Looks() { }
@@ -426,7 +427,9 @@ namespace Facet {
     public sealed unsafe partial class Sizes {
         public float Body;
         public float Gap;
+        public float Line;
         public float Pad;
+        public float Radius;
         public float RowHeight;
         public float Small;
         private Sizes() { }
@@ -451,6 +454,7 @@ namespace Facet {
     }
     public sealed unsafe partial class Surface : global::System.IDisposable {
         public bool BlocksGameInput { get => throw null; set { } }
+        public global::UnityEngine.UIElements.VisualElement Root { get => throw null; }
         public bool Visible { get => throw null; set { } }
         public event global::System.Action Hidden { add { } remove { } }
         public Surface(global::Facet.Host host, string name, global::Facet.Layer layer, global::UnityEngine.TextCore.Text.FontAsset font = default) => throw null;
@@ -496,6 +500,8 @@ namespace Facet {
         public static global::UnityEngine.UIElements.Button IconButton(global::UnityEngine.UIElements.VisualElement parent, global::UnityEngine.UIElements.Background icon, string tooltip, global::System.Action click) => throw null;
         public static global::UnityEngine.UIElements.Label Muted(global::UnityEngine.UIElements.VisualElement parent, string text, bool own = default) => throw null;
         public static global::UnityEngine.UIElements.VisualElement Row(global::UnityEngine.UIElements.VisualElement parent = default) => throw null;
+        public static void SetBorderWidth(global::UnityEngine.UIElements.VisualElement e, float v) => throw null;
+        public static void SetPadding(global::UnityEngine.UIElements.VisualElement e, float v) => throw null;
         public static void SetRadius(global::UnityEngine.UIElements.VisualElement e, float v) => throw null;
         public static global::UnityEngine.UIElements.Label Text(global::UnityEngine.UIElements.VisualElement parent, string text, global::System.Nullable<float> size = default, global::Facet.Role role = default, bool own = default) => throw null;
         public static void WhileAttached(global::UnityEngine.UIElements.VisualElement e, global::System.Action attached, global::System.Action detached) => throw null;

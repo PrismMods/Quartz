@@ -124,6 +124,7 @@ internal static class QuartzHost {
         }
         hooked = false;
         QuartzShell.Shutdown();
+        QuartzShortcut.Shutdown();
         foreach(Surface s in surfaces) s.Dispose();
         surfaces.Clear();
     }

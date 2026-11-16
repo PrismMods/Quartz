@@ -61,6 +61,12 @@ namespace PrismLib.UI.Toolkit {
     public static unsafe partial class FpsCounter {
         public static void Tick(bool show) => throw null;
     }
+    public static unsafe partial class HubLook {
+        public const int FadeMs = 4;
+        public const string WashName = "WashName";
+        public static void FadeIn(global::Facet.Surface surface) => throw null;
+        public static global::UnityEngine.UIElements.VisualElement Wear(global::Facet.Surface surface, global::UnityEngine.UIElements.VisualElement window) => throw null;
+    }
     public static unsafe partial class InputGate {
         public static void AddBypass(global::System.Func<bool> probe) => throw null;
         public static void AddMouseExemption(global::System.Func<bool> probe) => throw null;
@@ -204,6 +210,7 @@ namespace PrismLib.UI.Toolkit {
         public static global::System.Collections.Generic.IReadOnlyList<string> Ids { get => throw null; }
     }
     public sealed unsafe partial class LayoutEditor : global::System.IDisposable {
+        public string Filter { get => throw null; set { } }
         public bool Visible { get => throw null; set { } }
         public LayoutEditor(global::System.Func<global::System.Collections.Generic.IEnumerable<global::PrismLib.UI.Toolkit.EditTarget>> source, global::UnityEngine.TextCore.Text.FontAsset font = default) => throw null;
         public void Dispose() => throw null;
@@ -348,6 +355,8 @@ namespace PrismLib.UI.Toolkit {
         public void Recolour(global::UnityEngine.Color accent, float tint = default) => throw null;
         public static global::System.IDisposable Use(global::PrismLib.UI.Toolkit.Theme t) => throw null;
     }
+    public static unsafe partial class Tokens {
+    }
     public static unsafe partial class Ui {
         public static global::System.Action<string> Log;
         public static bool AnyWindowOpen { get => throw null; }
@@ -356,9 +365,9 @@ namespace PrismLib.UI.Toolkit {
         public static void TickWheel(global::UnityEngine.Vector2 pointerScreen, float delta) => throw null;
     }
     public sealed unsafe partial class Window {
-        public const float MinHeight = 57f;
-        public const float MinWidth = 58f;
-        public const float RailAlign = 59f;
+        public const float MinHeight = 59f;
+        public const float MinWidth = 60f;
+        public const float RailAlign = 61f;
         public static global::System.Func<string, string> Read;
         public static global::System.Action<string, string> Write;
         private Window() { }

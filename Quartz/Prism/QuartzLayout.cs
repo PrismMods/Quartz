@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using PrismLib.UI.Toolkit;
 using Quartz.Overlay;
+using Quartz.UI;
 using Quartz.UI.Utility;
 using UnityEngine;
 using PrismTheme = PrismLib.UI.Toolkit.Theme;
@@ -75,16 +76,25 @@ internal static class QuartzLayout {
         }
         return t;
     }
-    /// <summary>Opens the editor here: every mod's targets when PrismLib is there, Quartz's own when it is not.</summary>
-    internal static void Open(bool all) {
+    /// <summary>
+    /// Opens the editor here: every mod's targets when PrismLib is there, Quartz's own when it is not. It starts on
+    /// <paramref name="owner"/>'s tab (null: All) when the loaded PrismLib.UI has the filter.
+    /// </summary>
+    internal static void Open(bool all, string owner) {
         if(editor == null || editorAll != all) {
             editor?.Dispose();
             editorAll = all;
             PrismWindows.Wire();
             using(PrismTheme.Use(PrismWindows.Scheme())) editor = all ? new LayoutEditor(AllTargets) : new LayoutEditor(Targets);
+            LayoutEditorProbe.Forget(); // a new document the probe has not seen
+        }
+        if(PrismBridge.FilterUi) {
+            try { SetFilterImpl(editor, owner); } catch(Exception e) { PrismBridge.FilterOff("prismlib-ui", e.Message); }
         }
         editor.Visible = true;
     }
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void SetFilterImpl(LayoutEditor e, string owner) => e.Filter = owner;
     /// <summary>A mod's target list changed (PrismLib's Layout.Changed).</summary>
     internal static void Reload() {
         if(Visible) editor.Reload();
@@ -99,6 +109,12 @@ internal static class QuartzLayout {
             editor.Reload();
         }
         editor.Tick();
+    }
+    /// <summary>Hides the editor, as its Done does; false when it was not showing.</summary>
+    internal static bool Close() {
+        if(!Visible) return false;
+        editor.Visible = false;
+        return true;
     }
     internal static void Shutdown() {
         editor?.Dispose();

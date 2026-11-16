@@ -118,6 +118,7 @@ public static partial class UICore {
         FacetBridge.TickNewMenu();
         FacetBridge.TickKvEditor();
         KvSwitcherHotkey.Tick();
+        LayoutHotkey.Tick();
         TickHubUnderSwitcher();
         if(canvasObj == null) return;
         HandleResolutionChange();
@@ -128,10 +129,13 @@ public static partial class UICore {
         bool down = Keybind.KeyDown(key);
         bool held = Keybind.KeyHeld(key);
         bool pressed = !editing && modHeld && held;
-        if(ToggleHotkeyAllowed(modHeld, down)) {
-            // A press that hides the new menu toggles no classic panel: held on, it must not reset that panel's saved size.
-            holdingToggle = !FacetBridge.NewMenuVisible();
-            Toggle();
+        if(ToggleHotkeyAllowed(modHeld, down, LayoutHotkey.Ours)) {
+            var route = LayoutHotkey.Route();
+            // Only a press that opens something resets the classic panel's size when held: the route decides, because
+            // SharedLayoutOpen is inferred from Quartz's own box reads and misses an editor showing none of Quartz's targets.
+            holdingToggle = route == Quartz.Prism.PrismRules.HotkeyRoute.Shortcut
+                || (route == Quartz.Prism.PrismRules.HotkeyRoute.Toggle && !FacetBridge.NewMenuVisible());
+            LayoutHotkey.Press(route);
             holdStartTime = Time.unscaledTime;
         }
         if(holdingToggle && pressed && Time.unscaledTime - holdStartTime >= 0.4f) {
@@ -153,9 +157,10 @@ public static partial class UICore {
         UIObject.TickAll();
         Tooltip.Tick();
     }
-    // The menu hotkey fires only when nobody is typing (uGUI or Facet) or capturing a key, nor in the frame a capture took it.
-    internal static bool ToggleHotkeyAllowed(bool modHeld, bool down) =>
-        modHeld && down && !UIInputBlocker.IsEditing && !Keybind.Capturing && !KeyCaptureCoordinator.ReleasedThisFrame && !SharedLayoutOpen;
+    // The menu hotkey fires only when nobody is typing (uGUI or Facet) or capturing a key, nor in the frame a capture took it,
+    // nor during a layout session unless sessionOk (the session the shortcut menu opened, which the hotkey closes).
+    internal static bool ToggleHotkeyAllowed(bool modHeld, bool down, bool sessionOk = false) =>
+        modHeld && down && !UIInputBlocker.IsEditing && !Keybind.Capturing && !KeyCaptureCoordinator.ReleasedThisFrame && (sessionOk || !SharedLayoutOpen);
     // The one place an Escape press is decided, in the frame it goes down. A Facet window takes it
     // first and then nothing else happens; otherwise the open menu closes (deferred, see below).
     internal static void EscapeDown() {

@@ -95,6 +95,7 @@ internal static partial class PrismBridge {
             if(Available && ui == 1) { // a mod that holds a claim must draw what it claims
                 try { ClaimDebugImpl(); } catch(Exception e) { MainCore.Log.Wrn($"PrismLib debug claim failed: {e.Message}"); }
                 try { ClaimLayoutImpl(); } catch(Exception e) { LayoutOff(e); }
+                ProbeFilter(); // an older library says so at startup, once
             }
         }
 #endif
@@ -374,6 +375,7 @@ internal static partial class PrismBridge {
         new("facet", FacetBridge.Available() ? "loaded" : "unavailable"),
         new("prismlib.ui", UiAvailable ? "loaded" : "unavailable"),
         new("suite shell", ShellAvailable ? "loaded" : "unavailable"),
+        new("layout filter", FilterOffReason ?? "on"),
         new("scene", UnityEngine.SceneManagement.SceneManager.GetActiveScene().name),
     ];
     // Quartz's menu stays clickable under another mod's window; autoplay keeps its input; Prism windows speak

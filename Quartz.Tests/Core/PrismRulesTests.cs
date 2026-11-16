@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Quartz.Prism;
 using static Asserts;
+using static Quartz.Prism.PrismRules;
 static class PrismRulesTests {
     public static void TestModsRoot() {
         string g = Path.Combine(Path.GetTempPath(), "g");
@@ -106,5 +107,43 @@ static class PrismRulesTests {
             "only Quartz's own tabs are answered, not another mod's or a bare word");
         Assert(PrismRules.Translate("Menu hotkey", (k, d) => k) == "PRISM_MENU_HOTKEY" && PrismRules.Translate("Undo", (k, d) => k) == null,
             "known English maps to its key; anything else is not ours");
+    }
+    public static void TestShortcutRoute() {
+        var t = new PrismRules.ShortcutTrip();
+        Assert(t.Route(true, false, false, false, false) == HotkeyRoute.Shortcut, "door open, nothing showing: the shortcut menu");
+        Assert(t.Route(false, false, false, false, false) == HotkeyRoute.Toggle, "door shut: the hub, as before");
+        Assert(t.Route(true, false, false, false, true) == HotkeyRoute.Toggle, "a menu showing: the hotkey closes it, as before");
+        Assert(t.Route(true, true, false, false, false) == HotkeyRoute.HideShortcut && t.Route(false, true, false, false, false) == HotkeyRoute.HideShortcut,
+            "over the shortcut menu, door open or not: it closes");
+        Assert(t.Route(true, false, true, true, false) == HotkeyRoute.Ignore && t.Route(true, false, true, false, false) == HotkeyRoute.Ignore,
+            "a session the shortcut menu did not open: ignored");
+        t.Request();
+        Assert(t.Route(true, false, false, false, false) == HotkeyRoute.Ignore, "asked, not on screen yet: ignored");
+        t.Step(true);
+        Assert(t.Ours && t.Route(true, false, true, true, false) == HotkeyRoute.CloseEditor, "its own editor on screen: closed");
+        Assert(t.Route(true, false, true, false, false) == HotkeyRoute.Ignore, "its Grace frames with the editor already hidden: ignored");
+    }
+    public static void TestShortcutTrip() {
+        var t = new PrismRules.ShortcutTrip();
+        Assert(!t.Busy && t.Step(false) == TripStep.None, "idle: nothing");
+        t.Request();
+        Assert(t.Step(true) == TripStep.None && t.Ours && !t.Requested, "the editor shows: the session is its own");
+        Assert(t.Step(true) == TripStep.None, "still open (or in its Grace frames): no way back yet");
+        Assert(t.Step(false) == TripStep.Back && !t.Busy, "on the first frame nothing shows: back to the shortcut menu");
+        t.Request(); t.Step(true); t.Cancel();
+        Assert(t.Step(false) == TripStep.None && !t.Busy, "cancelled (the hotkey or Close): nothing comes back");
+        t.Request();
+        for(int i = 1; i < PrismRules.ShortcutTrip.WaitFrames; i++) Assert(t.Step(false) == TripStep.None, "asked: waits");
+        Assert(t.Step(false) == TripStep.BackLate && !t.Busy, "an editor that never shows: back late on the 120th frame");
+    }
+    public static void TestShortcutKeysInLang() {
+        string lang = Path.Combine(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../")), "Quartz", "Resource", "Export", "Lang");
+        using JsonDocument en = JsonDocument.Parse(File.ReadAllText(Path.Combine(lang, "en-US.json")));
+        using JsonDocument ko = JsonDocument.Parse(File.ReadAllText(Path.Combine(lang, "ko-KR.json")));
+        JsonElement enBlock = en.RootElement.GetProperty("en-US"), koBlock = ko.RootElement.GetProperty("ko-KR");
+        foreach(string key in PrismRules.ShortcutKeys) {
+            Assert(!string.IsNullOrEmpty(enBlock.GetProperty(key).GetString()), $"{key}: in en-US");
+            Assert(!string.IsNullOrEmpty(koBlock.GetProperty(key).GetString()), $"{key}: in ko-KR");
+        }
     }
 }

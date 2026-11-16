@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using Quartz.Core;
+using Quartz.UI;
 using Quartz.UI.Utility;
 namespace Quartz.Prism;
 // The layout half of the bridge: Quartz's elements in PrismLib's layout registry, and the shared layout editor when Quartz
@@ -12,6 +13,7 @@ internal static partial class PrismBridge {
     [MethodImpl(MethodImplOptions.NoInlining)]
     internal static void OpenLayoutEditor() {
 #if !IL2CPP && !QUARTZ_KEYVIEWER
+        LayoutEditorProbe.Forget(); // the host may build its document now, after the probe's last scan
         if(Available && layoutClaim == null) {
             try {
                 if(RequestLayoutImpl()) return;
@@ -22,11 +24,123 @@ internal static partial class PrismBridge {
             return;
         }
         hosted = true;
-        try { OpenEditorImpl(Available); } catch(Exception e) { LayoutOff(e); }
+        try { OpenEditorImpl(Available, Id); } catch(Exception e) { LayoutOff(e); }
 #endif
     }
+    /// <summary>
+    /// Closes the shared layout editor: Quartz's own when it shows, else the one on top through Facet's Escape (another mod's).
+    /// </summary>
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    internal static void CloseLayoutEditor() {
+#if !IL2CPP && !QUARTZ_KEYVIEWER
+        if(UiAvailable && !layoutOff) {
+            try {
+                if(CloseEditorImpl()) return;
+            } catch(Exception e) { LayoutOff(e); }
+        }
+#endif
+        Quartz.UI.FacetUi.FacetBridge.HandleEscape();
+    }
+    /// <summary>
+    /// The shared layout editor can start on the tab of the mod that opened it: the loaded PrismLib.UI has the filter, and
+    /// the editor is Quartz's (it hosts, or nobody does, or there is no PrismLib) or the loaded PrismLib passes Quartz's name
+    /// to the mod that hosts it.
+    /// </summary>
+    internal static bool FilterReady {
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        get {
+#if IL2CPP || QUARTZ_KEYVIEWER
+            return false;
+#else
+            if(!UiAvailable || layoutOff || !FilterUi) return false;
+            if(!Available) return true;
+            try { return HostFiltersImpl(); } catch(Exception e) {
+                FilterOff("prismlib", e.Message);
+                return false;
+            }
+#endif
+        }
+    }
+    /// <summary>The loaded PrismLib.UI has LayoutEditor.Filter (probed once).</summary>
+    internal static bool FilterUi {
+        get {
+#if IL2CPP || QUARTZ_KEYVIEWER
+            return false;
+#else
+            if(!UiAvailable) return false;
+            if(filterUi == 0) filterUi = Probe(FilterUiImpl, "prismlib-ui", "this PrismLib.UI has no LayoutEditor.Filter; the menu hotkey opens the hub") ? 1 : 2;
+            return filterUi == 1;
+#endif
+        }
+    }
+    /// <summary>The loaded PrismLib passes the opener's name with a layout request (probed once).</summary>
+    internal static bool RequestFor {
+        get {
+#if IL2CPP || QUARTZ_KEYVIEWER
+            return false;
+#else
+            if(!Available) return false;
+            if(requestFor == 0) requestFor = Probe(RequestForImpl, "prismlib", "this PrismLib has no Layout.RequestOpen(owner); with another host the menu hotkey opens the hub") ? 1 : 2;
+            return requestFor == 1;
+#endif
+        }
+    }
+    /// <summary>Why the filter is off: null, "prismlib-ui" or "prismlib", the first miss of the run.</summary>
+    internal static string FilterOffReason { get; private set; }
 #if !IL2CPP && !QUARTZ_KEYVIEWER
     private static object layoutClaim; // a PrismLib.Claim, as object
+    private static int filterUi, requestFor; // 0 not probed, 1 yes, 2 no (or turned off by a throw)
+    private static void ProbeFilter() {
+        _ = FilterUi;
+        if(Available) _ = RequestFor;
+    }
+    private static bool Probe(Func<bool> probe, string reason, string why) {
+        try {
+            if(probe()) return true;
+            FilterOff(reason, why);
+        } catch(Exception e) { FilterOff(reason, e.Message); }
+        return false;
+    }
+    /// <summary>
+    /// The library the reason names lacks a filter member or threw: the filter stays off for the run, with one line. The
+    /// editor still opens, on All.
+    /// </summary>
+    internal static void FilterOff(string reason, string why) {
+        if(reason == "prismlib-ui") filterUi = 2;
+        else requestFor = 2;
+        if(FilterOffReason != null) return;
+        FilterOffReason = reason;
+        MainCore.Log.Wrn($"Quartz's layout filter off ({reason}): {why}");
+    }
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static bool FilterUiImpl() => typeof(PrismLib.UI.Toolkit.LayoutEditor).GetProperty("Filter") != null;
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static bool RequestForImpl() => typeof(PrismLib.Layout).GetMethod("RequestOpen", [typeof(string)]) != null;
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void RequestOpenForImpl(string owner) => PrismLib.Layout.RequestOpen(owner);
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static string RequestedOwnerImpl() => PrismLib.Layout.RequestedOwner;
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static bool HostFiltersImpl() => LayoutClaimed || PrismLib.Claims.OwnerOf(PrismLib.StateKey.LayoutEditor) == null || RequestFor;
+    // A request that names Quartz, so the host starts on Quartz's tab; false when this PrismLib cannot carry a name.
+    private static bool RequestNamed() {
+        if(!RequestFor) return false;
+        try {
+            RequestOpenForImpl(Id);
+            return true;
+        } catch(Exception e) {
+            FilterOff("prismlib", e.Message);
+            return false;
+        }
+    }
+    // The mod a request named, for the tab Quartz's editor starts on; null (All) when this PrismLib cannot say.
+    private static string RequestedBy() {
+        if(!Available || !RequestFor) return null;
+        try { return RequestedOwnerImpl(); } catch(Exception e) {
+            FilterOff("prismlib", e.Message);
+            return null;
+        }
+    }
     /// <summary>Quartz holds PrismLib's shared layout editor claim: every mod's "Edit layout" opens Quartz's editor.</summary>
     internal static bool LayoutClaimed => layoutClaim != null;
     // The layout half (Quartz's targets in PrismLib's registry and the editor Quartz hosts) fails on its own: one log line,
@@ -60,8 +174,9 @@ internal static partial class PrismBridge {
         } catch(Exception e) { LayoutOff(e); }
     }
     // QuartzLayout holds a LayoutEditor field: named only in these Impls (see PrismBridge.cs).
-    [MethodImpl(MethodImplOptions.NoInlining)] private static void OpenEditorImpl(bool all) => QuartzLayout.Open(all);
+    [MethodImpl(MethodImplOptions.NoInlining)] private static void OpenEditorImpl(bool all, string owner) => QuartzLayout.Open(all, owner);
     [MethodImpl(MethodImplOptions.NoInlining)] private static void TickEditorImpl() => QuartzLayout.Tick();
+    [MethodImpl(MethodImplOptions.NoInlining)] private static bool CloseEditorImpl() => QuartzLayout.Close();
     [MethodImpl(MethodImplOptions.NoInlining)] private static void ReloadEditorImpl() => QuartzLayout.Reload();
     [MethodImpl(MethodImplOptions.NoInlining)] private static void ShutdownLayoutImpl() => QuartzLayout.Shutdown();
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -81,7 +196,7 @@ internal static partial class PrismBridge {
     private static bool RequestLayoutImpl() {
         if(PrismLib.Claims.OwnerOf(PrismLib.StateKey.LayoutEditor) == null && UiAvailable && !layoutOff) ClaimLayoutImpl();
         if(layoutClaim != null) return false;
-        PrismLib.Layout.RequestOpen();
+        if(!RequestNamed()) PrismLib.Layout.RequestOpen();
         return true;
     }
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -101,7 +216,9 @@ internal static partial class PrismBridge {
     private static void LayoutRequested() {
         if(layoutClaim == null || layoutOff) return;
         hosted = true;
-        try { OpenEditorImpl(true); } catch(Exception e) { LayoutOff(e); }
+        LayoutEditorProbe.Forget();
+        string owner = RequestedBy(); // read inside the event: the next request overwrites it
+        try { OpenEditorImpl(true, owner); } catch(Exception e) { LayoutOff(e); }
     }
     private static void LayoutChanged() {
         if(layoutOff) return;

@@ -29,6 +29,7 @@ internal static partial class FacetSelfTestChecks {
         QuartzShell.Hide();
         HandOff.ReturnTo = HandOff.Menu.None;
         try {
+            LayoutHotkey.ForceHub = true;   // the hub checks: the hotkey keeps its old meaning while they run
             if(!fxWas) {
                 FeatureService.SetEnabled(Fx, true);
                 yield return Frames(3);
@@ -43,6 +44,7 @@ internal static partial class FacetSelfTestChecks {
             yield return HeaderSwitch(check);
             yield return ProfileLoadSwitchesOff(check);
         } finally {
+            LayoutHotkey.ForceHub = false;
             FacetSelfTestFixture.Forget();
             HandOff.ReturnTo = HandOff.Menu.None;
             QuartzShell.Hide();
