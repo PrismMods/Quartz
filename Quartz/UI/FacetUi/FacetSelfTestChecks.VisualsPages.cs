@@ -42,6 +42,7 @@ internal static partial class FacetSelfTestChecks {
         yield return FeatureFormPage(check, "hidejudgements", page, JudgementPopupHider.ConfMgr, () => C().HiddenMask |= 1 << stray, null,
             [.. tiles, "HIDEJUDGEMENTS_TILES"], tiles, () => More());
         IEnumerator More() {
+            yield return Frames(2);   // laid out after the form checks' edits
             JudgementBarLine(check, HideJudgementsPage.Bar(x, minus));
             yield return NoXWithoutCompetitive(check);
             yield return MaskFlip(check, page, "JPOP_TOOEARLY", () => C().HiddenMask, 0, shown);
@@ -54,7 +55,8 @@ internal static partial class FacetSelfTestChecks {
 
     // The bar's tiles share one line, left to right in BarBits order, each filled with its slot colour.
     private static void JudgementBarLine(Action<string, bool, string> check, JudgementTiles.Row[] bar) {
-        VisualElement[] tiles = [.. bar.Select(r => PageContent().Q(name: r.Key + "-input")?.parent)];
+        // The shown tile of each key: a bar rebuilt for another mode can leave a hidden one first in the tree.
+        VisualElement[] tiles = [.. bar.Select(r => PageContent().Query(name: r.Key + "-input").Where(Displayed).First()?.parent)];
         bool found = tiles.All(t => t != null), line = found, coloured = found;
         string why = "";
         for(int i = 0; found && i < tiles.Length; i++) {

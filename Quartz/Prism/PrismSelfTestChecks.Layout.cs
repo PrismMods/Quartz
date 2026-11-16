@@ -90,8 +90,9 @@ internal static partial class PrismSelfTestChecks {
             EditTarget t = MineById(id);
             yield return Frames(4);
             ReorganizeHandle h = ReorganizeHandle.FindLayout(id);
-            bool shown = h != null && h.Target.gameObject.activeInHierarchy; // the overlay shows
             yield return Session(4);
+            // Read in the session: a session shows the overlays (outside a level they are hidden until it starts).
+            bool shown = h != null && h.Target.gameObject.activeInHierarchy;
             float[] b0 = t?.GetBox();
             check($"layout {id}: shown in a session exactly when the reorganizer shows it", t != null && (b0 != null) == shown, $"reorganizer={shown} box={Fmt(b0)}");
             if(t == null || b0 == null || h == null) yield break;

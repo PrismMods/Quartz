@@ -249,8 +249,12 @@ internal static partial class FacetSelfTestChecks {
             Translated(check, page + " sections and tiles", ["JR_SECTION", "JRSEC_START", "JRSEC_END", "JRSEC_REMOVE", "JR_MODE_CUSTOM", .. tiles]);
             yield return PickItem("JR_MODE_LABEL", QuartzHost.Host.Translate("JR_MODE_CUSTOM"));
             check($"{page} JR_MODE_LABEL: Custom Judgements picked in the dropdown reaches the setting", C().JRestrictMode == 3, $"mode={C().JRestrictMode}");
-            yield return Parity(check, page, ["JR_MODE_CUSTOM", .. tiles], ["JR_ACC"]);
-            yield return MaskFlip(check, page, "JR_ALLOW_MISS", () => C().JRestrictAllowedMask, 8, [.. RestrictionPage.Rows.Select(r => r.Bit)]);
+            // With XPerfect shown, Custom's bar puts X, + and - Perfect (bits 12-14) in Perfect's place; Perfect's bit 3 is stored with them.
+            bool split = RestrictionPage.Split;
+            string[] custom = split ? [.. RestrictionPage.Bar(true, false).Concat(RestrictionPage.Extra).Select(r => r.Key)] : tiles;
+            int[] bits = [.. RestrictionPage.Rows.Select(r => r.Bit), .. split ? new[] { 12, 13, 14 } : []];
+            yield return Parity(check, page, ["JR_MODE_CUSTOM", .. custom], ["JR_ACC"]);
+            yield return MaskFlip(check, page, "JR_ALLOW_MISS", () => C().JRestrictAllowedMask, 8, bits);
             yield return ListUndo(check, page, "JR_SECTIONS_ADD", "JRSEC_REMOVE", "JR_SECTION", C().JRestrictSections, s => (s.Start, s.End),
                 s => (s.Start, s.End) = (20f, 80f), () => TypeInto("JRSEC_START#2-input", "40"), s => s.Start == 40f);
             yield return HeaderHotkeyCheck(check, page, "SECTION_JUDGEMENT_RESTRICTION", "restriction");

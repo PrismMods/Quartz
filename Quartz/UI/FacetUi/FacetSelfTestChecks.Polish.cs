@@ -132,7 +132,11 @@ internal static partial class FacetSelfTestChecks {
         (float min, float max)? Off(VisualElement holder, bool byCard, string where) {
             var parts = holder.Children().Select(e => (e, ink: Ink(e) ?? (float.NaN, float.NaN))).Where(p => !float.IsNaN(p.ink.Item1)).ToList();
             if(parts.Count == 0) return null;
-            var want = parts[byCard ? Math.Max(0, parts.FindIndex(p => Paints(p.e))) : 0].ink;   // the first card, else the first part
+            // The first card (a part that paints, else the first that is not a page header: the header can head the left column,
+            // Panels'), else the first part.
+            int card = parts.FindIndex(p => Paints(p.e));
+            if(card < 0) card = parts.FindIndex(p => HeaderInset(p.e) == 0f);
+            var want = parts[byCard ? Math.Max(0, card) : 0].ink;
             for(int i = 0; i < parts.Count; i++) {
                 var got = parts[i].ink;
                 float max = want.Item2 - (i > 0 || byCard ? HeaderInset(parts[i].e) : 0f);
@@ -244,6 +248,8 @@ internal static partial class FacetSelfTestChecks {
         int at = body?.parent?.IndexOf(body) ?? -1;
         Label title = at > 0 ? body!.parent[at - 1].Query<Label>().AtIndex(1) : null, label = orbit?.Q<Label>();
         float tx = title != null ? TextX(title) : float.NaN, lx = label != null ? TextX(label) : float.NaN;
+        // A row off its default leads with Facet's changed dot: the row starts at the dot, its label after it.
+        if(orbit?.Q(name: "changed") is { } dot && Displayed(dot) && label != null) lx -= label.worldBound.xMin - dot.worldBound.xMin;
         if(!open) set?.Invoke(false, false);
         check("polish: a section's rows start under its title", Mathf.Abs(tx - lx) <= 1f,
             $"title='{title?.text}' {tx:0.#} row={lx:0.#} fold={fold != null} {miss} | head x={title?.parent?.worldBound.x:0.#} pad={title?.parent?.resolvedStyle.paddingLeft:0.#} arrow={(title?.parent?.childCount > 0 ? title.parent[0].worldBound.width : -1):0.#} body x={body?.worldBound.x:0.#} pad={body?.resolvedStyle.paddingLeft:0.#} row x={orbit?.worldBound.x:0.#} pad={orbit?.resolvedStyle.paddingLeft:0.#}");

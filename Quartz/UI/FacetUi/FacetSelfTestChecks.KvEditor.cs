@@ -96,10 +96,13 @@ internal static partial class FacetSelfTestChecks {
         UnityEngine.TextCore.Text.FontAsset want = ShellSettings.Face(FontManager.GetFont(font)), got = null;
         try {
             FontManager.SetOverlayFont(key, font);
-            yield return Frames(2);
+            // The preview redraws on the editor's refresh pass (Facet's, every 100 ms), its labels anew.
+            for(float t0 = Time.realtimeSinceStartup; Time.realtimeSinceStartup - t0 < 0.5f
+                && !ReferenceEquals(KvEditorPage.Editor?.Root?.Q<Label>("kv-label")?.style.unityFontDefinition.value.fontAsset, want);) yield return null;
             got = KvEditorPage.Editor?.Root?.Q<Label>("kv-label")?.style.unityFontDefinition.value.fontAsset;
             check(name, want != null && ReferenceEquals(got, want),
-                $"font={font} want={want?.name} got={got?.name} label={KvEditorPage.Editor?.Root?.Q<Label>("kv-label") != null}");
+                $"font={font} want={want?.name} got={got?.name} label={KvEditorPage.Editor?.Root?.Q<Label>("kv-label") != null} "
+                + $"editor={KvEditorPage.Editor != null} page={QuartzShell.CurrentPage} elements={KvEditorPage.Model?.Elements()?.Count()}");
         } finally {
             FontManager.SetOverlayFont(key, was);
         }
@@ -233,7 +236,7 @@ internal static partial class FacetSelfTestChecks {
             KvSelect(items[0], items[items.Count - 1]);
             yield return Frames(3);
             swapped &= Displayed(swap);
-            Click(back);
+            Submit(back);   // a Button runs clicked from its Clickable (pointer or submit), not from a bare ClickEvent
             yield return SwapShown(swap, false);
             yield return Frames(8);
             y1 = sv.scrollOffset.y;

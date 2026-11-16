@@ -60,7 +60,9 @@ internal static partial class PrismSelfTestChecks {
                 $"shown={LayoutEditorProbe.Shown()} quartz={QuartzLayout.Visible} documents={EditorDocuments(false)}");
         }
         List<string> tabs = FilterTabs();
-        string all = Words.T("All"); // the tab's label goes through the player's language, as the editor's Done does
+        // The editor builds its words as PrismLib (its own table, 전체 in Korean), in Words.Language: the language of the
+        // Prism mod that set that shared hook last, Sapphire's beside Quartz.
+        string all = Words.Language?.Invoke() == "ko" ? "전체" : "All";
         check($"filter ({host}): the bar lists All and Quartz", tabs.Count > 0 && tabs[0] == all && tabs.Contains(PrismBridge.Id), $"{string.Join("|", tabs)} all={all}");
         yield return CloseEditor();
         yield return Frames(5);
