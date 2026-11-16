@@ -50,6 +50,7 @@ internal static class TufPacksPage {
         for(int i = 0; i < Sorts.Length && i < sort.Root.childCount; i++) sort.Root[i].name = SortKey(Sorts[i]);
         Arrow(sort.Root, "tuf-packs-direction", () => s.Ascending, s.ToggleAscending);
         ShellRows.Join(sort.Root, refresh).style.marginLeft = StyleKeyword.Auto;
+        ShellRows.BarRow(sort.Root);
 
         VisualElement results = Controls.Card(list, null);
         Texts texts = new(s);

@@ -21,6 +21,7 @@ internal static class TufFilters {
         Button refresh = Controls.Action(card, "", "TUF_REFRESH", s.Refresh, o => o.Id = "TUF_REFRESH");
         VisualElement refreshRow = ShellRows.Join(sort.Root, refresh);
         refreshRow.style.marginLeft = StyleKeyword.Auto;
+        ShellRows.BarRow(sort.Root);
 
         // Row 2: Installed, Grid View and Quantum as one tile line over their three switches, Updates at its right.
         const int Installed = 0, Grid = 1, Quantum = 2;

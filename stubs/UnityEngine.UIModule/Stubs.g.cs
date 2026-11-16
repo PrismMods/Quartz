@@ -21,18 +21,18 @@ namespace UnityEngine {
         public global::UnityEngine.Camera worldCamera { get => throw null; set { } }
         public static void ForceUpdateCanvases() => throw null;
         public static global::UnityEngine.Material GetDefaultCanvasMaterial() => throw null;
-        private Canvas() { }
+        public Canvas() { }
     }
     public sealed unsafe partial class CanvasGroup : global::UnityEngine.Behaviour {
         public float alpha { get => throw null; set { } }
         public bool blocksRaycasts { get => throw null; set { } }
         public bool ignoreParentGroups { get => throw null; set { } }
         public bool interactable { get => throw null; set { } }
-        private CanvasGroup() { }
+        public CanvasGroup() { }
     }
     public sealed unsafe partial class CanvasRenderer : global::UnityEngine.Component {
         public bool cullTransparentMesh { get => throw null; set { } }
-        private CanvasRenderer() { }
+        public CanvasRenderer() { }
     }
     public unsafe partial interface ICanvasRaycastFilter {
     }

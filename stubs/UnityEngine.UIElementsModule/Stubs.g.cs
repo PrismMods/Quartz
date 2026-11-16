@@ -47,13 +47,14 @@ namespace UnityEngine.UIElements {
         protected BaseField() { }
     }
     public unsafe partial class BindableElement : global::UnityEngine.UIElements.VisualElement {
-        protected BindableElement() { }
+        public BindableElement() { }
     }
     public unsafe partial class Button : global::UnityEngine.UIElements.TextElement {
         public event global::System.Action clicked { add { } remove { } }
-        protected Button() { }
+        public Button() { }
     }
     public abstract unsafe partial class CallbackEventHandler {
+        public void RegisterCallback<TEventType>(global::UnityEngine.UIElements.EventCallback<TEventType> callback, global::UnityEngine.UIElements.TrickleDown useTrickleDown = default) where TEventType : global::UnityEngine.UIElements.EventBase<TEventType>, new() => throw null;
         protected CallbackEventHandler() { }
     }
     public unsafe partial class Clickable : global::UnityEngine.UIElements.PointerManipulator {
@@ -61,15 +62,35 @@ namespace UnityEngine.UIElements {
         public Clickable(global::System.Action handler) => throw null;
         protected Clickable() { }
     }
+    public unsafe partial class DetachFromPanelEvent : global::UnityEngine.UIElements.PanelChangedEventBase<global::UnityEngine.UIElements.DetachFromPanelEvent> {
+        public DetachFromPanelEvent() { }
+    }
     public enum DisplayStyle : int {
         Flex = 0,
         None = 1,
     }
+    public abstract unsafe partial class EventBase : global::System.IDisposable {
+        protected EventBase() { }
+        void global::System.IDisposable.Dispose() => throw null;
+    }
+    public abstract unsafe partial class EventBase<T> : global::UnityEngine.UIElements.EventBase where T : global::UnityEngine.UIElements.EventBase<T>, new() {
+        protected EventBase() { }
+    }
+    public unsafe delegate void EventCallback<TEventType>(TEventType evt);
     public enum FlexDirection : int {
         Column = 0,
         ColumnReverse = 1,
         Row = 2,
         RowReverse = 3,
+    }
+    public abstract unsafe partial class FocusEventBase<T> : global::UnityEngine.UIElements.EventBase<T> where T : global::UnityEngine.UIElements.FocusEventBase<T>, new() {
+        protected FocusEventBase() { }
+    }
+    public unsafe partial class FocusInEvent : global::UnityEngine.UIElements.FocusEventBase<global::UnityEngine.UIElements.FocusInEvent> {
+        public FocusInEvent() { }
+    }
+    public unsafe partial class FocusOutEvent : global::UnityEngine.UIElements.FocusEventBase<global::UnityEngine.UIElements.FocusOutEvent> {
+        public FocusOutEvent() { }
     }
     public abstract unsafe partial class Focusable : global::UnityEngine.UIElements.CallbackEventHandler {
         public virtual bool focusable { get => throw null; set { } }
@@ -92,6 +113,8 @@ namespace UnityEngine.UIElements {
     public unsafe partial interface IExperimentalFeatures {
         global::UnityEngine.UIElements.Experimental.ITransitionAnimations animation { get; }
     }
+    public unsafe partial interface IFocusEvent {
+    }
     public unsafe partial interface IManipulator {
         global::UnityEngine.UIElements.VisualElement target { get; set; }
     }
@@ -101,6 +124,15 @@ namespace UnityEngine.UIElements {
     }
     public unsafe partial interface IPanel : global::System.IDisposable {
         float scaledPixelsPerPoint { get; }
+        global::UnityEngine.UIElements.VisualElement visualTree { get; }
+    }
+    public unsafe partial interface IPanelChangedEvent {
+    }
+    public unsafe partial interface IPointerEvent {
+    }
+    public unsafe partial interface IPointerEventInternal {
+    }
+    public unsafe partial interface IPointerOrMouseEvent {
     }
     public unsafe partial interface IPrefixLabel {
     }
@@ -151,9 +183,11 @@ namespace UnityEngine.UIElements {
         global::UnityEngine.UIElements.StyleLength paddingTop { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.Position> position { get; set; }
         global::UnityEngine.UIElements.StyleLength right { get; set; }
+        global::UnityEngine.UIElements.StyleScale scale { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.TextOverflow> textOverflow { get; set; }
         global::UnityEngine.UIElements.StyleTextShadow textShadow { get; set; }
         global::UnityEngine.UIElements.StyleLength top { get; set; }
+        global::UnityEngine.UIElements.StyleTransformOrigin transformOrigin { get; set; }
         global::UnityEngine.UIElements.StyleFontDefinition unityFontDefinition { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.FontStyle> unityFontStyleAndWeight { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.TextAnchor> unityTextAlign { get; set; }
@@ -188,11 +222,12 @@ namespace UnityEngine.UIElements {
     }
     public unsafe partial class Label : global::UnityEngine.UIElements.TextElement {
         public Label(string text) => throw null;
-        protected Label() { }
+        public Label() { }
     }
     public unsafe partial struct Length : global::System.IEquatable<global::UnityEngine.UIElements.Length> {
         private global::UnityEngine.UIElements.Length.Unit m_Unit;
         private float m_Value;
+        public float value { get => throw null; set { } }
         public static global::UnityEngine.UIElements.Length Percent(float value) => throw null;
         bool global::System.IEquatable<global::UnityEngine.UIElements.Length>.Equals(global::UnityEngine.UIElements.Length other) => throw null;
         public enum Unit : int {
@@ -213,9 +248,21 @@ namespace UnityEngine.UIElements {
         Visible = 0,
         Hidden = 1,
     }
+    public abstract unsafe partial class PanelChangedEventBase<T> : global::UnityEngine.UIElements.EventBase<T> where T : global::UnityEngine.UIElements.PanelChangedEventBase<T>, new() {
+        protected PanelChangedEventBase() { }
+    }
     public enum PickingMode : int {
         Position = 0,
         Ignore = 1,
+    }
+    public sealed unsafe partial class PointerEnterEvent : global::UnityEngine.UIElements.PointerEventBase<global::UnityEngine.UIElements.PointerEnterEvent> {
+        public PointerEnterEvent() { }
+    }
+    public abstract unsafe partial class PointerEventBase<T> : global::UnityEngine.UIElements.EventBase<T> where T : global::UnityEngine.UIElements.PointerEventBase<T>, new() {
+        protected PointerEventBase() { }
+    }
+    public sealed unsafe partial class PointerLeaveEvent : global::UnityEngine.UIElements.PointerEventBase<global::UnityEngine.UIElements.PointerLeaveEvent> {
+        public PointerLeaveEvent() { }
     }
     public abstract unsafe partial class PointerManipulator : global::UnityEngine.UIElements.MouseManipulator {
         protected PointerManipulator() { }
@@ -224,11 +271,17 @@ namespace UnityEngine.UIElements {
         Relative = 0,
         Absolute = 1,
     }
+    public unsafe partial struct Scale : global::System.IEquatable<global::UnityEngine.UIElements.Scale> {
+        private bool m_IsNone;
+        private global::UnityEngine.Vector3 m_Scale;
+        public Scale(global::UnityEngine.Vector3 scale) => throw null;
+        bool global::System.IEquatable<global::UnityEngine.UIElements.Scale>.Equals(global::UnityEngine.UIElements.Scale other) => throw null;
+    }
     public unsafe partial class ScrollView : global::UnityEngine.UIElements.VisualElement {
         public global::UnityEngine.UIElements.VisualElement contentViewport { get => throw null; }
         public global::UnityEngine.Vector2 scrollOffset { get => throw null; set { } }
         public global::UnityEngine.UIElements.Scroller verticalScroller { get => throw null; }
-        protected ScrollView() { }
+        public ScrollView() { }
         public enum TouchScrollBehavior : int {
             Unrestricted = 0,
             Elastic = 1,
@@ -242,7 +295,7 @@ namespace UnityEngine.UIElements {
     }
     public unsafe partial class Scroller : global::UnityEngine.UIElements.VisualElement {
         public event global::System.Action<float> valueChanged { add { } remove { } }
-        protected Scroller() { }
+        public Scroller() { }
     }
     public unsafe partial struct StyleBackground : global::System.IEquatable<global::UnityEngine.UIElements.StyleBackground> {
         private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
@@ -278,6 +331,7 @@ namespace UnityEngine.UIElements {
     public unsafe partial struct StyleFloat : global::System.IEquatable<global::UnityEngine.UIElements.StyleFloat> {
         private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
         private float m_Value;
+        public float value { get => throw null; set { } }
         public static implicit operator global::UnityEngine.UIElements.StyleFloat(float v) => throw null;
         bool global::System.IEquatable<global::UnityEngine.UIElements.StyleFloat>.Equals(global::UnityEngine.UIElements.StyleFloat other) => throw null;
     }
@@ -297,10 +351,17 @@ namespace UnityEngine.UIElements {
     public unsafe partial struct StyleLength : global::System.IEquatable<global::UnityEngine.UIElements.StyleLength> {
         private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
         private global::UnityEngine.UIElements.Length m_Value;
+        public global::UnityEngine.UIElements.Length value { get => throw null; set { } }
         public static implicit operator global::UnityEngine.UIElements.StyleLength(float v) => throw null;
         public static implicit operator global::UnityEngine.UIElements.StyleLength(global::UnityEngine.UIElements.Length v) => throw null;
         public static implicit operator global::UnityEngine.UIElements.StyleLength(global::UnityEngine.UIElements.StyleKeyword keyword) => throw null;
         bool global::System.IEquatable<global::UnityEngine.UIElements.StyleLength>.Equals(global::UnityEngine.UIElements.StyleLength other) => throw null;
+    }
+    public unsafe partial struct StyleScale : global::System.IEquatable<global::UnityEngine.UIElements.StyleScale> {
+        private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
+        private global::UnityEngine.UIElements.Scale m_Value;
+        public static implicit operator global::UnityEngine.UIElements.StyleScale(global::UnityEngine.UIElements.Scale v) => throw null;
+        bool global::System.IEquatable<global::UnityEngine.UIElements.StyleScale>.Equals(global::UnityEngine.UIElements.StyleScale other) => throw null;
     }
     public unsafe partial struct StyleTextShadow : global::System.IEquatable<global::UnityEngine.UIElements.StyleTextShadow> {
         private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
@@ -308,14 +369,20 @@ namespace UnityEngine.UIElements {
         public static implicit operator global::UnityEngine.UIElements.StyleTextShadow(global::UnityEngine.UIElements.TextShadow v) => throw null;
         bool global::System.IEquatable<global::UnityEngine.UIElements.StyleTextShadow>.Equals(global::UnityEngine.UIElements.StyleTextShadow other) => throw null;
     }
+    public unsafe partial struct StyleTransformOrigin : global::System.IEquatable<global::UnityEngine.UIElements.StyleTransformOrigin> {
+        private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
+        private global::UnityEngine.UIElements.TransformOrigin m_Value;
+        public static implicit operator global::UnityEngine.UIElements.StyleTransformOrigin(global::UnityEngine.UIElements.TransformOrigin v) => throw null;
+        bool global::System.IEquatable<global::UnityEngine.UIElements.StyleTransformOrigin>.Equals(global::UnityEngine.UIElements.StyleTransformOrigin other) => throw null;
+    }
     public unsafe partial class StyleValueCollection {
-        protected StyleValueCollection() { }
+        public StyleValueCollection() { }
     }
     public unsafe partial class TextElement : global::UnityEngine.UIElements.BindableElement, global::UnityEngine.UIElements.ITextElementExperimentalFeatures {
         public bool enableRichText { get => throw null; set { } }
         public global::UnityEngine.UIElements.ITextElementExperimentalFeatures experimental { get => throw null; }
         public virtual string text { get => throw null; set { } }
-        protected TextElement() { }
+        public TextElement() { }
         void global::UnityEngine.UIElements.ITextElementExperimentalFeatures.SetRenderedText(string renderedText) => throw null;
         global::UnityEngine.UIElements.Experimental.ITransitionAnimations global::UnityEngine.UIElements.IExperimentalFeatures.animation { get => throw null; }
     }
@@ -335,6 +402,17 @@ namespace UnityEngine.UIElements {
         public global::UnityEngine.Vector2 offset;
         bool global::System.IEquatable<global::UnityEngine.UIElements.TextShadow>.Equals(global::UnityEngine.UIElements.TextShadow other) => throw null;
     }
+    public unsafe partial struct TransformOrigin : global::System.IEquatable<global::UnityEngine.UIElements.TransformOrigin> {
+        private global::UnityEngine.UIElements.Length m_X;
+        private global::UnityEngine.UIElements.Length m_Y;
+        private float m_Z;
+        public TransformOrigin(global::UnityEngine.UIElements.Length x, global::UnityEngine.UIElements.Length y) => throw null;
+        bool global::System.IEquatable<global::UnityEngine.UIElements.TransformOrigin>.Equals(global::UnityEngine.UIElements.TransformOrigin other) => throw null;
+    }
+    public enum TrickleDown : int {
+        NoTrickleDown = 0,
+        TrickleDown = 1,
+    }
     public sealed unsafe partial class UIDocument : global::UnityEngine.MonoBehaviour {
         public global::UnityEngine.UIElements.VisualElement rootVisualElement { get => throw null; }
         private UIDocument() { }
@@ -348,7 +426,7 @@ namespace UnityEngine.UIElements {
         public static T Q<T>(this global::UnityEngine.UIElements.VisualElement e, string name = default, string className = default) where T : global::UnityEngine.UIElements.VisualElement => throw null;
     }
     public sealed unsafe partial class VectorImage : global::UnityEngine.ScriptableObject {
-        private VectorImage() { }
+        public VectorImage() { }
     }
     public enum Visibility : int {
         Visible = 0,
@@ -365,14 +443,17 @@ namespace UnityEngine.UIElements {
         public global::UnityEngine.UIElements.VisualElement parent { get => throw null; }
         public global::UnityEngine.UIElements.PickingMode pickingMode { get => throw null; set { } }
         public global::UnityEngine.UIElements.IStyle style { get => throw null; }
+        public string tooltip { get => throw null; set { } }
         public global::UnityEngine.Rect worldBound { get => throw null; }
         public VisualElement() => throw null;
         public void Add(global::UnityEngine.UIElements.VisualElement child) => throw null;
+        public void BringToFront() => throw null;
         public global::System.Collections.Generic.IEnumerable<global::UnityEngine.UIElements.VisualElement> Children() => throw null;
         public void Clear() => throw null;
         public T GetFirstAncestorOfType<T>() where T : class => throw null;
         public int IndexOf(global::UnityEngine.UIElements.VisualElement element) => throw null;
         public void Insert(int index, global::UnityEngine.UIElements.VisualElement element) => throw null;
+        public void RemoveFromHierarchy() => throw null;
         public void SetEnabled(bool value) => throw null;
         global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Rect> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Layout(global::UnityEngine.Rect to, int durationMs) => throw null;
         global::UnityEngine.UIElements.Experimental.ValueAnimation<global::UnityEngine.Vector3> global::UnityEngine.UIElements.Experimental.ITransitionAnimations.Position(global::UnityEngine.Vector3 to, int duration) => throw null;
@@ -448,6 +529,6 @@ namespace UnityEngine.UIElements.Experimental {
         private global::UnityEngine.UIElements.StyleValueCollection m_StyleValues;
     }
     public sealed unsafe partial class ValueAnimation<T> {
-        private ValueAnimation() { }
+        public ValueAnimation() { }
     }
 }

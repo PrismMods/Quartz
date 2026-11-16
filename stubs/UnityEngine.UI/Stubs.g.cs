@@ -41,7 +41,7 @@ namespace UnityEngine.EventSystems {
         void global::UnityEngine.EventSystems.IPointerDownHandler.OnPointerDown(global::UnityEngine.EventSystems.PointerEventData eventData) => throw null;
         void global::UnityEngine.EventSystems.IPointerUpHandler.OnPointerUp(global::UnityEngine.EventSystems.PointerEventData eventData) => throw null;
         public unsafe partial class TriggerEvent : global::UnityEngine.Events.UnityEvent<global::UnityEngine.EventSystems.BaseEventData> {
-            protected TriggerEvent() { }
+            public TriggerEvent() { }
         }
         public unsafe partial class Entry {
             public global::UnityEngine.EventSystems.EventTrigger.TriggerEvent callback;
@@ -176,7 +176,7 @@ namespace UnityEngine.UI {
         protected Button() { }
         void global::UnityEngine.EventSystems.IPointerClickHandler.OnPointerClick(global::UnityEngine.EventSystems.PointerEventData eventData) => throw null;
         public unsafe partial class ButtonClickedEvent : global::UnityEngine.Events.UnityEvent {
-            protected ButtonClickedEvent() { }
+            public ButtonClickedEvent() { }
         }
     }
     public unsafe partial class CanvasScaler : global::UnityEngine.EventSystems.UIBehaviour {
@@ -374,7 +374,7 @@ namespace UnityEngine.UI {
     public unsafe partial class LayoutRebuilder {
         public static void ForceRebuildLayoutImmediate(global::UnityEngine.RectTransform layoutRoot) => throw null;
         public static void MarkLayoutForRebuild(global::UnityEngine.RectTransform rect) => throw null;
-        protected LayoutRebuilder() { }
+        public LayoutRebuilder() { }
     }
     public static unsafe partial class LayoutUtility {
         public static float GetMinHeight(global::UnityEngine.RectTransform rect) => throw null;
@@ -484,7 +484,7 @@ namespace UnityEngine.UI {
         public void AddVert(global::UnityEngine.UIVertex v) => throw null;
         public void AddVert(global::UnityEngine.Vector3 position, global::UnityEngine.Color32 color, global::UnityEngine.Vector4 uv0) => throw null;
         public void Clear() => throw null;
-        protected VertexHelper() { }
+        public VertexHelper() { }
         void global::System.IDisposable.Dispose() => throw null;
     }
     public unsafe partial class VerticalLayoutGroup : global::UnityEngine.UI.HorizontalOrVerticalLayoutGroup {

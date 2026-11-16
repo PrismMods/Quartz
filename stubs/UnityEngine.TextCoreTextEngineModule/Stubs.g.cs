@@ -14,7 +14,7 @@
 namespace UnityEngine.TextCore.Text {
     public unsafe partial class FontAsset : global::UnityEngine.TextCore.Text.TextAsset {
         public static global::UnityEngine.TextCore.Text.FontAsset CreateFontAsset(global::UnityEngine.Font font) => throw null;
-        protected FontAsset() { }
+        public FontAsset() { }
     }
     public abstract unsafe partial class TextAsset : global::UnityEngine.ScriptableObject {
         protected TextAsset() { }

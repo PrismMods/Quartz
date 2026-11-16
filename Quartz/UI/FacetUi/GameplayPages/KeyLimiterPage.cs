@@ -82,9 +82,10 @@ internal static class KeyLimiterPage {
         });
 
         VisualElement chart = Controls.Card(p, "KL_CHART_SECTION", o => o.Id = "KL_CHART_SECTION");
-        ShellRows.Toggle(chart, "CHARTKEYLIMITER_ENABLE", "chartkeylimiter_enable", Bind.To(() => ChartKeyLimiter.Conf.Enabled, v => ChartKeyLimiter.Conf.Enabled = v),
+        Control<bool> chartRow = ShellRows.Toggle(chart, "CHARTKEYLIMITER_ENABLE", "chartkeylimiter_enable",
+            Bind.To(() => ChartKeyLimiter.Conf.Enabled, v => ChartKeyLimiter.Conf.Enabled = v),
             ChartKeyLimiter.Apply, ChartKeyLimiter.Save, o => o.Default = new ChartKeyLimiterSettings().Enabled);
-        Hint(chart, "KL_CHART_NOTE", null);
+        ShellRows.Describe(chartRow.Root, "KL_CHART_NOTE");
     }
 
     private static int[] Keys() => KeyLimiter.Conf?.AllowedKeys ?? [];

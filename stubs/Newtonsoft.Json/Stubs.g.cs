@@ -37,7 +37,7 @@ namespace Newtonsoft.Json {
         public virtual void WriteJson(global::Newtonsoft.Json.JsonWriter writer, object value, global::Newtonsoft.Json.JsonSerializer serializer) => throw null;
     }
     public unsafe partial class JsonException : global::System.Exception {
-        protected JsonException() { }
+        public JsonException() { }
     }
     public abstract unsafe partial class JsonReader : global::System.IDisposable {
         public global::Newtonsoft.Json.DateParseHandling DateParseHandling { get => throw null; set { } }
@@ -50,7 +50,7 @@ namespace Newtonsoft.Json {
         void global::System.IDisposable.Dispose() => throw null;
     }
     public unsafe partial class JsonSerializer {
-        protected JsonSerializer() { }
+        public JsonSerializer() { }
     }
     public unsafe partial class JsonSerializerSettings {
         public global::System.Collections.Generic.IList<global::Newtonsoft.Json.JsonConverter> Converters { get => throw null; set { } }

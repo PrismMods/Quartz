@@ -41,6 +41,9 @@ internal static class PanelsStats {
             content.name = "panel-stat-picker";
             content.style.width = 320f;
             Sizes sz = Theme.For(content).Sizes;
+            // The card's standard inset (Facet's popup gives 4 px), every section a Gap apart.
+            content.style.paddingLeft = sz.Pad; content.style.paddingRight = sz.Pad;
+            content.style.paddingTop = sz.Gap; content.style.paddingBottom = sz.Gap;
             IReadOnlyList<PanelsOverlay.StatDef> all = PanelsOverlay.AllStats;
             List<string> categories = [.. Categories];
             foreach(PanelsOverlay.StatDef stat in all)
@@ -49,7 +52,8 @@ internal static class PanelsStats {
             string shown = categories.Contains(openCategory) ? openCategory : categories.FirstOrDefault();
             var bodies = new List<(string Category, Button Head, VisualElement Body)>();
             void Say(Button head, string category, bool open) =>
-                head.text = (open ? "▾ " : "▸ ") + QuartzShell.Label(GenerateUI.LocaleKeyFromText("PANEL_CATEGORY", category), category);
+                // Text set by hand is not translated by Facet: Quartz translates it (QuartzShell.Label is a key, for Ui calls).
+                head.text = (open ? "▾ " : "▸ ") + QuartzHost.Text(GenerateUI.LocaleKeyFromText("PANEL_CATEGORY", category), category);
             foreach(string category in categories) {
                 string c = category;
                 Button head = Ui.Btn(content, "", null);
@@ -57,18 +61,19 @@ internal static class PanelsStats {
                 Paint.Look(head, Theme.For(head).Looks.Row);
                 head.style.unityTextAlign = TextAnchor.MiddleLeft;
                 head.style.marginRight = 0f;
+                head.style.paddingLeft = 0f;
                 var body = new VisualElement { name = "panel-picker-items" };
                 body.style.flexDirection = FlexDirection.Row;
                 body.style.flexWrap = Wrap.Wrap;
                 body.style.paddingLeft = sz.Pad;
-                body.style.paddingBottom = sz.Gap / 2f;
+                body.style.paddingBottom = sz.Gap;
                 content.Add(body);
                 foreach(PanelsOverlay.StatDef stat in all) {
                     if(stat.Category != c) continue;
                     string id = stat.Id;
                     Button b = Ui.Btn(body, QuartzShell.Label(StatKey(id), DefaultLabel(id)), () => Pick(id));
                     b.name = GenerateUI.LocaleKeyFromText("PANEL_PICK", id) + "#" + n + "-input";
-                    b.style.marginTop = sz.Gap / 2f;
+                    b.style.marginRight = sz.Gap; b.style.marginBottom = sz.Gap;
                     b.SetEnabled(id is "text" or "image" || !panel.Stats.Exists(e => e.Id == id && e != replace));
                 }
                 bodies.Add((c, head, body));

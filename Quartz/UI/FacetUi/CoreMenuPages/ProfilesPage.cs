@@ -89,7 +89,7 @@ internal static class ProfilesPage {
             Recalibrate();
             Say("PROFILE_RECALIBRATED");
         }), "DESC_PROFILE_RECALIBRATE"));
-        // One row: the name field and Add Profile at the left, Import, Open Folder and Recalibrate at the right; it wraps only when
+        // One row: the name field and Create Profile at the left, Import, Open Folder and Recalibrate at the right; it wraps only when
         // the window is too narrow for both.
         if(field.Root != null && tools[0] != null) {
             field.Root[0].style.display = DisplayStyle.None;   // the field's empty label, which would grow

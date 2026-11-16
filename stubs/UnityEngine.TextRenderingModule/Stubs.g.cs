@@ -14,7 +14,7 @@
 namespace UnityEngine {
     public sealed unsafe partial class Font : global::UnityEngine.Object {
         public Font(string name) => throw null;
-        private Font() { }
+        public Font() { }
     }
     public enum FontStyle : int {
         Normal = 0,

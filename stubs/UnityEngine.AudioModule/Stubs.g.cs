@@ -26,7 +26,7 @@ namespace Unity.Audio {
 }
 namespace UnityEngine {
     public unsafe partial class AudioBehaviour : global::UnityEngine.Behaviour {
-        protected AudioBehaviour() { }
+        public AudioBehaviour() { }
     }
     public sealed unsafe partial class AudioClip : global::UnityEngine.Audio.AudioResource {
         public int channels { get => throw null; }
@@ -49,7 +49,7 @@ namespace UnityEngine {
     public sealed unsafe partial class AudioSettings {
         public static double dspTime { get => throw null; }
         public static int outputSampleRate { get => throw null; set { } }
-        private AudioSettings() { }
+        public AudioSettings() { }
     }
     public sealed unsafe partial class AudioSource : global::UnityEngine.AudioBehaviour {
         public global::UnityEngine.AudioClip clip { get => throw null; set { } }
@@ -64,7 +64,7 @@ namespace UnityEngine {
         public float volume { get => throw null; set { } }
         public void PlayScheduled(double time) => throw null;
         public void Stop() => throw null;
-        private AudioSource() { }
+        public AudioSource() { }
     }
 }
 namespace UnityEngine.Audio {

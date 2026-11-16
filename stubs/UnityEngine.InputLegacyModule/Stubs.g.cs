@@ -21,6 +21,6 @@ namespace UnityEngine {
         public static bool GetMouseButton(int button) => throw null;
         public static bool GetMouseButtonDown(int button) => throw null;
         public static bool GetMouseButtonUp(int button) => throw null;
-        protected Input() { }
+        public Input() { }
     }
 }

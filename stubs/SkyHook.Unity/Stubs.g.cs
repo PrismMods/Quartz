@@ -147,6 +147,6 @@ namespace SkyHook {
         public readonly global::SkyHook.EventType Type;
     }
     public unsafe partial class SkyHookManager : global::UnityEngine.MonoBehaviour {
-        protected SkyHookManager() { }
+        public SkyHookManager() { }
     }
 }

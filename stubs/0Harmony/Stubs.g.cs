@@ -51,14 +51,14 @@ namespace HarmonyLib {
         void global::System.IDisposable.Dispose() => throw null;
     }
     public unsafe partial class HarmonyAttribute : global::System.Attribute {
-        protected HarmonyAttribute() { }
+        public HarmonyAttribute() { }
     }
     public unsafe partial class HarmonyMethod {
         public string[] after;
         public string[] before;
         public int priority;
         public HarmonyMethod(global::System.Reflection.MethodInfo method) => throw null;
-        protected HarmonyMethod() { }
+        public HarmonyMethod() { }
     }
     public unsafe partial class HarmonyPatch : global::HarmonyLib.HarmonyAttribute {
         public HarmonyPatch() => throw null;

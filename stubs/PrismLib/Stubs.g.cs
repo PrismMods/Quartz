@@ -38,7 +38,7 @@ namespace PrismLib {
         public string Name;
         public string Owner;
         public global::System.Func<global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, string>>> Read;
-        private FieldGroup() { }
+        public FieldGroup() { }
     }
     public sealed unsafe partial class KeyBinding {
         private KeyBinding() { }
@@ -90,7 +90,7 @@ namespace PrismLib {
         public string Owner;
         public string Path;
         public global::System.Func<global::System.Collections.Generic.IEnumerable<string>> Tail;
-        private LogSource() { }
+        public LogSource() { }
     }
     public sealed unsafe partial class ModHandle {
         public void AddFields(string name, global::System.Func<global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.KeyValuePair<string, string>>> read) => throw null;

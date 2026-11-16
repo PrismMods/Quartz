@@ -143,9 +143,13 @@ sealed class Emitter {
 
         // Without an accessible parameterless constructor a derived stub cannot chain,
         // and any stub class may end up derived from. Kept non-public so it never widens
-        // what our own code is allowed to construct.
-        if(!isStatic && !def.IsValueType && !def.IsInterface && !hasParameterless)
-            Line($"{(def.IsSealed ? "private" : "protected")} {Naming.DeclName(def)}() {{ }}");
+        // what our own code is allowed to construct, unless the real one is public: a type
+        // that fills a new() constraint (UI Toolkit's EventBase<T>, so every event a
+        // RegisterCallback names) needs it public, or the stub assembly does not compile.
+        if(!isStatic && !def.IsValueType && !def.IsInterface && !hasParameterless) {
+            bool realPublic = def.Methods.Any(m => m.IsConstructor && !m.IsStatic && m.IsPublic && !m.HasParameters);
+            Line($"{(realPublic ? "public" : def.IsSealed ? "private" : "protected")} {Naming.DeclName(def)}() {{ }}");
+        }
 
         if(!def.IsInterface && interfaces.Count > 0) ExplicitImplementations(interfaces);
 

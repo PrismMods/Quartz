@@ -39,7 +39,7 @@ namespace MelonLoader {
         public static void Error(string txt) => throw null;
         public static void Msg(string txt) => throw null;
         public static void Warning(string txt) => throw null;
-        protected MelonLogger() { }
+        public MelonLogger() { }
     }
     public abstract unsafe partial class MelonMod : global::MelonLoader.MelonTypeBase<global::MelonLoader.MelonMod> {
         protected MelonMod() => throw null;

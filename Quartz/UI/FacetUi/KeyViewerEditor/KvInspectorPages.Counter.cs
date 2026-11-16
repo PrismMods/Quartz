@@ -28,7 +28,7 @@ internal static partial class KvInspectorPages {
         CounterPick(place, "kv-counter-placement", Placements, s => s == "outside" ? "KVI_PLACE_OUTSIDE" : "KVI_PLACE_INSIDE", "placement", "inside");
         CounterPick(place, "kv-counter-align", CounterAligns, CounterAlignKey, "align", "top");
         CounterPick(place, "kv-counter-mode", AlignModes, s => s == "between" ? "KVI_CMODE_BETWEEN" : "KVI_CMODE_CENTER", "alignMode", "center");
-        Ui.Text(place, "KVI_COUNTER_MODE_HINT", role: Role.TextMuted).style.whiteSpace = WhiteSpace.Normal;
+        if(place.Q(name: "kv-counter-mode") is VisualElement modeRow) ShellRows.Describe(modeRow, "KVI_COUNTER_MODE_HINT");
         Num(place, "KVI_COUNTER_GAP", 6f, 0f, 100f, "0 px", 1f, Counted, e => KvProps.Float(Read(e), "gap", 6f),
             (e, v) => KvProps.SetInt(Counter(e), "gap", v));
         Num(place, "KVI_COUNTER_FONT", 16f, 1f, 200f, "0 px", 1f, Counted, e => KvProps.Int(Read(e), "fontSize", 16),

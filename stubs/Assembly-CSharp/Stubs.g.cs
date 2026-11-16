@@ -28,10 +28,10 @@ public unsafe partial class ADOBase : global::RDTools.RDBaseDll {
     public static global::scrPlayerManager playerManager { get => throw null; }
     public static bool IsAprilFools() => throw null;
     public static bool IsHalloweenWeek() => throw null;
-    protected ADOBase() { }
+    public ADOBase() { }
 }
 public unsafe partial class ADOClass : global::RDTools.RDClassDll {
-    protected ADOClass() { }
+    public ADOClass() { }
 }
 public static unsafe partial class ADOStartup {
     public static void SetupLevelEventsInfo() => throw null;
@@ -43,7 +43,7 @@ public unsafe partial struct AnyKeyCode {
 }
 public unsafe partial class AsyncInputManager : global::UnityEngine.MonoBehaviour {
     public static bool isActive { get => throw null; }
-    protected AsyncInputManager() { }
+    public AsyncInputManager() { }
 }
 public unsafe partial struct AsyncKeyCode : global::System.IEquatable<global::AsyncKeyCode> {
     public readonly ushort key;
@@ -53,7 +53,7 @@ public unsafe partial struct AsyncKeyCode : global::System.IEquatable<global::As
 public unsafe partial class AudioManager : global::ADOBase {
     public static global::AudioManager Instance { get => throw null; }
     public void StopAllSounds() => throw null;
-    protected AudioManager() { }
+    public AudioManager() { }
 }
 public enum BGShapeType : int {
     Default = 0,
@@ -94,7 +94,7 @@ public enum DecPlacementType : int {
     LastPosition = 7,
 }
 public unsafe partial class DecorationsArray<T> : global::System.Collections.Generic.List<T> {
-    protected DecorationsArray() { }
+    public DecorationsArray() { }
 }
 public enum Difficulty : int {
     Lenient = 0,
@@ -103,10 +103,10 @@ public enum Difficulty : int {
 }
 public unsafe partial class DiscordController : global::ADOBase {
     public static bool shouldUpdatePresence;
-    protected DiscordController() { }
+    public DiscordController() { }
 }
 public unsafe partial class EditorDifficultySelector : global::ADOBase {
-    protected EditorDifficultySelector() { }
+    public EditorDifficultySelector() { }
 }
 public enum ErrorMeterSize : int {
     Off = 0,
@@ -116,7 +116,7 @@ public enum ErrorMeterSize : int {
     ExtraLarge = 4,
 }
 public unsafe partial class EventsArray<T> : global::System.Collections.Generic.List<T> {
-    protected EventsArray() { }
+    public EventsArray() { }
 }
 public enum Filter : int {
     Grayscale = 0,
@@ -191,9 +191,9 @@ public enum FloorIcon : int {
 public unsafe partial class FloorMesh : global::UnityEngine.MonoBehaviour {
     public static global::System.Collections.Generic.Dictionary<string, global::FloorMesh.MeshCache> cache;
     public void UpdateMesh() => throw null;
-    protected FloorMesh() { }
+    public FloorMesh() { }
     public unsafe partial class MeshCache {
-        protected MeshCache() { }
+        public MeshCache() { }
     }
 }
 public abstract unsafe partial class FloorRenderer : global::ADOBase {
@@ -277,7 +277,7 @@ public unsafe partial class GCS {
     public static string worldEntrance;
     public const string zipExtension = "zipExtension";
     public static int checkpointNum { get => throw null; set { } }
-    protected GCS() { }
+    public GCS() { }
 }
 public abstract unsafe partial class GeneralPauseButton : global::ADOBase {
     protected GeneralPauseButton() { }
@@ -342,7 +342,7 @@ public enum ObjectDecorationType : int {
 public unsafe partial class PauseMenu : global::ADOBase {
     public const float pauseButtonWidth = 51f;
     public void PlayMenuSfx(global::SfxSound sound, float volume = default) => throw null;
-    protected PauseMenu() { }
+    public PauseMenu() { }
     public enum ButtonType : int {
         Continue = 0,
         LevelEditor = 1,
@@ -371,7 +371,7 @@ public unsafe partial class PauseSettingButton : global::GeneralPauseButton {
     public string unit;
     public global::UnityEngine.UI.Text valueLabel;
     public void PlayArrowAnimation(bool isRight) => throw null;
-    protected PauseSettingButton() { }
+    public PauseSettingButton() { }
 }
 public unsafe partial class Persistence : global::RDTools.RDClassDll {
     public const float inputOffsetNotSet = 52f;
@@ -379,7 +379,7 @@ public unsafe partial class Persistence : global::RDTools.RDClassDll {
     public static global::HoldBehavior holdBehavior { get => throw null; set { } }
     public static bool GetHideCursorWhilePlaying() => throw null;
     public static void WriteSaveToDisk() => throw null;
-    protected Persistence() { }
+    public Persistence() { }
 }
 public unsafe partial class PlanetRenderer : global::ADOBase {
     public global::UnityEngine.ParticleSystem coreParticles;
@@ -397,19 +397,19 @@ public unsafe partial class PlanetRenderer : global::ADOBase {
     public void SetCoreColor(global::UnityEngine.Color color) => throw null;
     public void SetPlanetColor(global::UnityEngine.Color color) => throw null;
     public void SetTailColor(global::UnityEngine.Color color) => throw null;
-    protected PlanetRenderer() { }
+    public PlanetRenderer() { }
 }
 public unsafe partial class PlanetSprite : global::ADOBase {
     public global::UnityEngine.SpriteRenderer meshRenderer;
     public global::UnityEngine.Texture sprite { get => throw null; set { } }
-    protected PlanetSprite() { }
+    public PlanetSprite() { }
 }
 public unsafe partial class PlanetarySystem : global::ADOBase {
     public global::System.Collections.Generic.List<global::scrPlanet> allPlanets;
     public global::scrPlanet planetBlue;
     public global::System.Collections.Generic.List<global::scrPlanet> planetList;
     public global::scrPlanet planetRed;
-    protected PlanetarySystem() { }
+    public PlanetarySystem() { }
     public enum DeathAnimation : int {
         Explode = 0,
         CrumbleAndExplode = 1,
@@ -442,24 +442,24 @@ public enum Portal : int {
     FoolJoker = 22,
 }
 public unsafe partial class PostEffectsBase : global::UnityEngine.MonoBehaviour {
-    protected PostEffectsBase() { }
+    public PostEffectsBase() { }
 }
 public unsafe partial class PracticeTimeline : global::ADOBase {
     public global::UnityEngine.UI.RawImage waveRaw;
     public void Init() => throw null;
-    protected PracticeTimeline() { }
+    public PracticeTimeline() { }
 }
 public unsafe partial class RDC {
     public const bool force4PlayerCoop = false;
     public static bool auto { get => throw null; set { } }
     public static bool noHud { get => throw null; set { } }
-    protected RDC() { }
+    public RDC() { }
 }
 public unsafe partial class RDConstants : global::UnityEngine.ScriptableObject {
     public global::TMPro.TMP_FontAsset koreanFontTMPro;
     public global::UnityEngine.GameObject prefab_property;
     public global::UnityEngine.Texture2D tex_planetWhite;
-    protected RDConstants() { }
+    public RDConstants() { }
 }
 public static unsafe partial class RDEditorUtils {
     public static bool CheckModsDependency(object[] mods) => throw null;
@@ -512,17 +512,17 @@ public unsafe partial class SaveStateScope : global::System.IDisposable {
 public unsafe partial class ScreenScroll : global::UnityEngine.MonoBehaviour {
     public global::UnityEngine.Vector2 scrollOffset;
     public global::UnityEngine.Vector2 scrollSpeed;
-    protected ScreenScroll() { }
+    public ScreenScroll() { }
 }
 public unsafe partial class ScreenTile : global::UnityEngine.MonoBehaviour {
     public float tileX;
     public float tileY;
-    protected ScreenTile() { }
+    public ScreenTile() { }
 }
 public unsafe partial class SettingsMenu : global::ADOBase {
     public void Show() => throw null;
     public void UpdateSetting(global::PauseSettingButton setting, global::SettingsMenu.Interaction action) => throw null;
-    protected SettingsMenu() { }
+    public SettingsMenu() { }
     public enum Interaction : int {
         Refresh = 0,
         Activate = 1,
@@ -625,7 +625,7 @@ public unsafe partial class TextureManager {
     public global::System.Collections.Generic.Dictionary<string, global::TextureManager.CustomSprite> customSprites;
     public static global::UnityEngine.Texture2D LoadTexture(string filePath, out global::ADOFAI.LoadResult status, int maxSideSize = default) => throw null;
     public static void ShrinkImage(global::UnityEngine.Texture2D tex2D, int maxSideSize) => throw null;
-    protected TextureManager() { }
+    public TextureManager() { }
     public unsafe partial class CustomSprite : global::System.IDisposable {
         public readonly global::UnityEngine.Sprite sprite;
         protected CustomSprite() { }
@@ -662,7 +662,7 @@ public enum TrackStyle : int {
 }
 public unsafe partial class VideoBloom : global::PostEffectsBase {
     public bool HighQuality;
-    protected VideoBloom() { }
+    public VideoBloom() { }
     public enum TweakMode : int {
         Basic = 0,
         Advanced = 1,
@@ -680,38 +680,38 @@ public enum WipeDirection : int {
 }
 public unsafe partial class WorkshopLevelList : global::UnityEngine.MonoBehaviour {
     public global::UnityEngine.UI.Image thumbnail;
-    protected WorkshopLevelList() { }
+    public WorkshopLevelList() { }
 }
 public unsafe partial class ffxBloomPlus : global::ffxPlusBase {
     public override void StartEffect(global::scrPlanet planet) => throw null;
-    protected ffxBloomPlus() { }
+    public ffxBloomPlus() { }
 }
 public unsafe partial class ffxCheckpoint : global::ffxPlusBase {
     public virtual bool runOnHit { get => throw null; }
     public virtual void Awake() => throw null;
     public override void Decode(global::ADOFAI.LevelEvent evnt) => throw null;
     public override void StartEffect(global::scrPlanet planet) => throw null;
-    protected ffxCheckpoint() { }
+    public ffxCheckpoint() { }
 }
 public unsafe partial class ffxFlashPlus : global::ffxPlusBase {
     public global::UnityEngine.Color endColor;
     public global::UnityEngine.Color startColor;
     public override void StartEffect(global::scrPlanet planet) => throw null;
-    protected ffxFlashPlus() { }
+    public ffxFlashPlus() { }
 }
 public unsafe partial class ffxHallOfMirrorsPlus : global::ffxPlusBase {
     public override void StartEffect(global::scrPlanet planet) => throw null;
-    protected ffxHallOfMirrorsPlus() { }
+    public ffxHallOfMirrorsPlus() { }
 }
 public unsafe partial class ffxMenuPlanetSpeedChange : global::ffxPlusBase {
     public void Start() => throw null;
-    protected ffxMenuPlanetSpeedChange() { }
+    public ffxMenuPlanetSpeedChange() { }
 }
 public unsafe partial class ffxMoveFloorPlus : global::ffxPlusBase {
     public int end;
     public int start;
     public override void StartEffect(global::scrPlanet planet) => throw null;
-    protected ffxMoveFloorPlus() { }
+    public ffxMoveFloorPlus() { }
 }
 public abstract unsafe partial class ffxPlusBase : global::ADOBase {
     public global::scrCamera cam;
@@ -732,23 +732,23 @@ public abstract unsafe partial class ffxPlusBase : global::ADOBase {
 }
 public unsafe partial class ffxScreenScrollPlus : global::ffxPlusBase {
     public override void StartEffect(global::scrPlanet planet) => throw null;
-    protected ffxScreenScrollPlus() { }
+    public ffxScreenScrollPlus() { }
 }
 public unsafe partial class ffxScreenTilePlus : global::ffxPlusBase {
     public override void StartEffect(global::scrPlanet planet) => throw null;
-    protected ffxScreenTilePlus() { }
+    public ffxScreenTilePlus() { }
 }
 public unsafe partial class ffxSetFilterAdvancedPlus : global::ffxPlusBase {
     public override void StartEffect(global::scrPlanet planet) => throw null;
-    protected ffxSetFilterAdvancedPlus() { }
+    public ffxSetFilterAdvancedPlus() { }
 }
 public unsafe partial class ffxSetFilterPlus : global::ffxPlusBase {
     public global::Filter filter;
-    protected ffxSetFilterPlus() { }
+    public ffxSetFilterPlus() { }
 }
 public unsafe partial class ffxShakeScreenPlus : global::ffxPlusBase {
     public override void StartEffect(global::scrPlanet planet) => throw null;
-    protected ffxShakeScreenPlus() { }
+    public ffxShakeScreenPlus() { }
 }
 public unsafe partial class scnEditor : global::ADOBase {
     public const int MaxUndoSteps = 63;
@@ -786,7 +786,7 @@ public unsafe partial class scnEditor : global::ADOBase {
     public void SaveLevel() => throw null;
     public bool SelectionIsEmpty() => throw null;
     public void SwitchToEditMode(bool clsToEditor = default) => throw null;
-    protected scnEditor() { }
+    public scnEditor() { }
     public enum PopupType : int {
         SaveBeforeSongImport = 0,
         SaveBeforeImageImport = 1,
@@ -827,20 +827,20 @@ public unsafe partial class scnGame : global::ADOBase {
     public static void ApplyEventsToFloors(global::System.Collections.Generic.List<global::scrFloor> floors, global::ADOFAI.LevelData levelData, global::scrLevelMaker lm, global::System.Collections.Generic.List<global::ADOFAI.LevelEvent> events) => throw null;
     public bool Play(int seqID = default, bool remakeFloors = default) => throw null;
     public void RemakePath(bool applyEventsToFloors = default, bool remakeLevel = default) => throw null;
-    protected scnGame() { }
+    public scnGame() { }
 }
 public unsafe partial class scnLevelSelect : global::LevelSelectBase {
     public const int CrownEntrance = 65;
     public const int CrownExit = 66;
     public const int MuseDashEntrance = 67;
     public const int MuseDashExit = 68;
-    protected scnLevelSelect() { }
+    public scnLevelSelect() { }
 }
 public unsafe partial class scrCamera : global::ADOBase {
     public global::UnityEngine.Camera Bgcamstatic;
     public const float DefaultCameraOrthoSize = 69f;
     public void SetCustomFrameRate(bool enable, float frame = default) => throw null;
-    protected scrCamera() { }
+    public scrCamera() { }
 }
 public unsafe partial class scrConductor : global::ADOBase {
     public double addoffset;
@@ -863,7 +863,7 @@ public unsafe partial class scrConductor : global::ADOBase {
     public static void SaveCurrentPreset() => throw null;
     public void ScrubMusicToTime(double newTime) => throw null;
     public void SetupConductorWithLevelData(global::ADOFAI.LevelData levelData) => throw null;
-    protected scrConductor() { }
+    public scrConductor() { }
     public enum DuckState : int {
         None = 0,
         Starting = 1,
@@ -896,7 +896,7 @@ public unsafe partial class scrController : global::MonsterLove.StateMachine.Sta
     public void Start_Rewind(int _currentSeqID = default) => throw null;
     public bool TogglePauseGame() => throw null;
     public global::System.Collections.IEnumerator WaitForStartCo(int seqID = default, bool remakeFloors = default) => throw null;
-    protected scrController() { }
+    public scrController() { }
 }
 public abstract unsafe partial class scrDecoration : global::ADOBase {
     public const int HitboxLayer = 72;
@@ -911,7 +911,7 @@ public unsafe partial class scrDecorationManager : global::ADOBase {
     public global::TextureManager imageHolder;
     public static global::scrDecorationManager instance { get => throw null; }
     public static global::scrDecoration GetDecoration(global::ADOFAI.LevelEvent source) => throw null;
-    protected scrDecorationManager() { }
+    public scrDecorationManager() { }
 }
 public unsafe partial class scrFloor : global::ADOBase {
     public const int SortingOrderOffset = 73;
@@ -946,24 +946,24 @@ public unsafe partial class scrFloor : global::ADOBase {
     public void SetToRandomColor() => throw null;
     public void Start() => throw null;
     public void UpdateIconSprite(bool resetToDefault = default) => throw null;
-    protected scrFloor() { }
+    public scrFloor() { }
 }
 public unsafe partial class scrHUDText : global::UnityEngine.MonoBehaviour {
     public bool isTitle;
-    protected scrHUDText() { }
+    public scrHUDText() { }
 }
 public unsafe partial class scrHitTextMesh : global::ADOBase {
     public bool dead;
     public global::HitMargin hitMargin;
     public void Show(global::UnityEngine.Vector3 position, global::UnityEngine.Vector3 borderOffset = default, float missAngle = default, float scale = default, float angle = default, float fadeSpeed = default, string customText = default) => throw null;
-    protected scrHitTextMesh() { }
+    public scrHitTextMesh() { }
 }
 public unsafe partial class scrHoldRenderer : global::ADOBase {
     public global::UnityEngine.MeshRenderer m_meshRenderer;
-    protected scrHoldRenderer() { }
+    public scrHoldRenderer() { }
 }
 public unsafe partial class scrLetterPress : global::UnityEngine.MonoBehaviour {
-    protected scrLetterPress() { }
+    public scrLetterPress() { }
 }
 public unsafe partial class scrLevelMaker : global::ADOBase {
     public const double FloorAngleEpsilon = 76d;
@@ -975,20 +975,20 @@ public unsafe partial class scrLevelMaker : global::ADOBase {
     public static global::scrLevelMaker instance { get => throw null; }
     public void CalculateFloorEntryTimes() => throw null;
     public double CalculateSingleFloorAngleLength(global::scrFloor cf) => throw null;
-    protected scrLevelMaker() { }
+    public scrLevelMaker() { }
 }
 public unsafe partial class scrLogoText : global::UnityEngine.MonoBehaviour {
     public static global::scrLogoText instance;
     public void LateUpdate() => throw null;
     public void UpdateColors() => throw null;
-    protected scrLogoText() { }
+    public scrLogoText() { }
 }
 public static unsafe partial class scrMisc {
 }
 public unsafe partial class scrMistakesManager : global::ADOClass {
     public void MarkCheckpoint(int checkpointTileOffset) => throw null;
     public void RevertToLastCheckpoint() => throw null;
-    protected scrMistakesManager() { }
+    public scrMistakesManager() { }
 }
 public unsafe partial class scrParticleDecoration : global::scrDecoration {
     public global::UnityEngine.ParticleSystem particleSystem;
@@ -997,7 +997,7 @@ public unsafe partial class scrParticleDecoration : global::scrDecoration {
     public bool autoPlay { get => throw null; set { } }
     public float simulationSpeed { get => throw null; set { } }
     public void ResetParticle(global::ADOFAI.LevelEvent ev, bool restart) => throw null;
-    protected scrParticleDecoration() { }
+    public scrParticleDecoration() { }
 }
 public unsafe partial class scrPlanet : global::ADOBase {
     public const float basePlanetScale = 78f;
@@ -1006,21 +1006,21 @@ public unsafe partial class scrPlanet : global::ADOBase {
     public global::PlanetarySystem planetarySystem;
     public global::scrPlayer player;
     public global::scrPlanet SwitchChosen(global::System.Nullable<long> hitTick) => throw null;
-    protected scrPlanet() { }
+    public scrPlanet() { }
 }
 public unsafe partial class scrPlayer : global::ADOBase {
     public double lastHit;
     public int playerID;
     public void Die(bool overload = default, bool multipress = default, string failMessage = default, bool hitbox = default) => throw null;
-    protected scrPlayer() { }
+    public scrPlayer() { }
 }
 public unsafe partial class scrPlayerManager : global::ADOBase {
     public const int MaxPlayers = 79;
     public global::System.Collections.Generic.IEnumerator<global::scrPlayer> GetEnumerator() => throw null;
-    protected scrPlayerManager() { }
+    public scrPlayerManager() { }
 }
 public unsafe partial class scrShowIfDebug : global::ADOBase {
-    protected scrShowIfDebug() { }
+    public scrShowIfDebug() { }
 }
 public unsafe partial class scrUIController : global::ADOBase {
     public global::UnityEngine.UI.Button difficultyButtonLeft;
@@ -1033,17 +1033,17 @@ public unsafe partial class scrUIController : global::ADOBase {
     public static global::scrUIController instance { get => throw null; }
     public void DifficultyArrowPressed(bool rightPressed) => throw null;
     public void ShowDifficultyContainer(global::DifficultyUIMode mode) => throw null;
-    protected scrUIController() { }
+    public scrUIController() { }
 }
 public unsafe partial class scrVfxPlus : global::ADOBase {
     public static global::scrVfxPlus instance { get => throw null; }
-    protected scrVfxPlus() { }
+    public scrVfxPlus() { }
 }
 public unsafe partial class scrVisualDecoration : global::scrDecoration {
     public global::UnityEngine.RenderTexture spareRT1;
     public global::UnityEngine.RenderTexture spareRT2;
     public global::UnityEngine.SpriteRenderer spriteRenderer;
-    protected scrVisualDecoration() { }
+    public scrVisualDecoration() { }
 }
 namespace ADOFAI {
     public static unsafe partial class EditorConstants {
@@ -1150,7 +1150,7 @@ namespace ADOFAI {
         public void Init(global::System.Collections.Generic.Dictionary<string, global::ADOFAI.LevelEventInfo> levelEventsInfo, bool floorPanel) => throw null;
         public void ShowInspector(bool show, bool forceAction = default) => throw null;
         public void ShowPanel(global::ADOFAI.LevelEventType eventType, int eventIndex = default) => throw null;
-        protected InspectorPanel() { }
+        public InspectorPanel() { }
     }
     public unsafe partial class LevelData {
         public global::ADOFAI.LevelEvent backgroundSettings;
@@ -1288,7 +1288,7 @@ namespace ADOFAI {
         public global::UnityEngine.UI.Image itemTypeImage;
         public global::ADOFAI.LevelEvent sourceLevelEvent;
         public global::UnityEngine.UI.Image tagImage;
-        protected ListItem() { }
+        public ListItem() { }
     }
     public unsafe partial class ListItem_Decoration : global::ADOFAI.ListItem {
         public global::UnityEngine.Sprite objectSprite;
@@ -1296,7 +1296,7 @@ namespace ADOFAI {
         public global::UnityEngine.Sprite textSprite;
         public virtual void SetEvent(global::ADOFAI.LevelEvent ev) => throw null;
         protected virtual void ShowSelectionBackground(bool selected) => throw null;
-        protected ListItem_Decoration() { }
+        public ListItem_Decoration() { }
     }
     public enum LoadResult : int {
         Successful = 0,
@@ -1308,12 +1308,12 @@ namespace ADOFAI {
         MissingFile = 6,
     }
     public unsafe partial class PropertiesPanel : global::ADOBase {
-        protected PropertiesPanel() { }
+        public PropertiesPanel() { }
     }
     public unsafe partial class Property : global::UnityEngine.MonoBehaviour {
         public global::UnityEngine.RectTransform controlContainer;
         public global::TMPro.TMP_Text label;
-        protected Property() { }
+        public Property() { }
     }
     public unsafe partial class PropertyInfo {
         public object[] enumExceptions;
@@ -1331,7 +1331,7 @@ namespace ADOFAI.Editor.Actions {
     }
     public unsafe partial class SaveLevelEditorAction : global::ADOFAI.Editor.Actions.EditorAction {
         public virtual void Execute(global::scnEditor editor) => throw null;
-        protected SaveLevelEditorAction() { }
+        public SaveLevelEditorAction() { }
     }
 }
 namespace MonsterLove.StateMachine {
@@ -1339,11 +1339,11 @@ namespace MonsterLove.StateMachine {
         public global::MonsterLove.StateMachine.StateEngine stateMachine { get => throw null; }
         public virtual void ChangeState(global::System.Enum newState) => throw null;
         protected virtual void ChangeState(global::System.Enum newState, global::MonsterLove.StateMachine.StateTransition transition) => throw null;
-        protected StateBehaviour() { }
+        public StateBehaviour() { }
     }
     public unsafe partial class StateEngine : global::UnityEngine.MonoBehaviour {
         public global::System.Enum GetState() => throw null;
-        protected StateEngine() { }
+        public StateEngine() { }
     }
     public enum StateTransition : int {
         Overwrite = 0,

@@ -41,7 +41,7 @@ internal static class PageProfiles {
         );
         nameInput.Placeholder.gameObject.AddComponent<TextLocalization>().Init("PROFILE_NAME", "Profile Name");
         nameInput.InputField.characterLimit = 32;
-        UIButton addBtn = GenerateUI.Button(addRow, AddProfile, "Add Profile", "profile_add");
+        UIButton addBtn = GenerateUI.Button(addRow, AddProfile, "Create Profile", "profile_add");
         {
             var br = addBtn.Rect;
             br.pivot = new(1f, 1f);

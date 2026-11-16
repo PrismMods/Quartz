@@ -60,7 +60,7 @@ namespace TMPro {
         protected TMP_Asset() { }
     }
     public unsafe partial class TMP_Character : global::TMPro.TMP_TextElement {
-        protected TMP_Character() { }
+        public TMP_Character() { }
     }
     public unsafe partial struct TMP_CharacterInfo {
         private float adjustedAscender;
@@ -114,7 +114,7 @@ namespace TMPro {
         public global::UnityEngine.Font sourceFontFile { get => throw null; }
         public static global::TMPro.TMP_FontAsset CreateFontAsset(global::UnityEngine.Font font) => throw null;
         public bool HasCharacter(char character, bool searchFallbacks = default, bool tryAddCharacter = default) => throw null;
-        protected TMP_FontAsset() { }
+        public TMP_FontAsset() { }
     }
     public unsafe partial class TMP_InputField : global::UnityEngine.UI.Selectable, global::UnityEngine.EventSystems.IBeginDragHandler, global::UnityEngine.EventSystems.IDragHandler, global::UnityEngine.EventSystems.IEndDragHandler, global::UnityEngine.EventSystems.IPointerClickHandler {
         public float caretBlinkRate { get => throw null; set { } }
@@ -178,13 +178,13 @@ namespace TMPro {
             MultiLineNewline = 2,
         }
         public unsafe partial class SubmitEvent : global::UnityEngine.Events.UnityEvent<string> {
-            protected SubmitEvent() { }
+            public SubmitEvent() { }
         }
         public unsafe partial class OnChangeEvent : global::UnityEngine.Events.UnityEvent<string> {
-            protected OnChangeEvent() { }
+            public OnChangeEvent() { }
         }
         public unsafe partial class SelectionEvent : global::UnityEngine.Events.UnityEvent<string> {
-            protected SelectionEvent() { }
+            public SelectionEvent() { }
         }
         public enum EditState : int {
             Continue = 0,
@@ -235,10 +235,10 @@ namespace TMPro {
     public unsafe partial class TMP_Settings : global::UnityEngine.ScriptableObject {
         public static global::TMPro.TMP_SpriteAsset defaultSpriteAsset { get => throw null; set { } }
         public static global::TMPro.TMP_Settings instance { get => throw null; }
-        protected TMP_Settings() { }
+        public TMP_Settings() { }
     }
     public unsafe partial class TMP_Sprite : global::TMPro.TMP_TextElement_Legacy {
-        protected TMP_Sprite() { }
+        public TMP_Sprite() { }
     }
     public unsafe partial class TMP_SpriteAsset : global::TMPro.TMP_Asset {
         public global::System.Collections.Generic.List<global::TMPro.TMP_Sprite> spriteInfoList;
@@ -246,12 +246,12 @@ namespace TMPro {
         public global::System.Collections.Generic.List<global::TMPro.TMP_SpriteCharacter> spriteCharacterTable { get => throw null; }
         public global::System.Collections.Generic.List<global::TMPro.TMP_SpriteGlyph> spriteGlyphTable { get => throw null; }
         public void UpdateLookupTables() => throw null;
-        protected TMP_SpriteAsset() { }
+        public TMP_SpriteAsset() { }
     }
     public unsafe partial class TMP_SpriteCharacter : global::TMPro.TMP_TextElement {
         public string name { get => throw null; set { } }
         public TMP_SpriteCharacter(uint unicode, global::TMPro.TMP_SpriteGlyph glyph) => throw null;
-        protected TMP_SpriteCharacter() { }
+        public TMP_SpriteCharacter() { }
     }
     public unsafe partial class TMP_SpriteGlyph : global::UnityEngine.TextCore.Glyph {
         public TMP_SpriteGlyph() => throw null;
@@ -295,14 +295,14 @@ namespace TMPro {
     }
     public unsafe partial class TMP_TextElement {
         public float scale { get => throw null; set { } }
-        protected TMP_TextElement() { }
+        public TMP_TextElement() { }
     }
     public enum TMP_TextElementType : int {
         Character = 0,
         Sprite = 1,
     }
     public unsafe partial class TMP_TextElement_Legacy {
-        protected TMP_TextElement_Legacy() { }
+        public TMP_TextElement_Legacy() { }
     }
     public unsafe partial class TMP_TextInfo {
         public int characterCount;
@@ -310,7 +310,7 @@ namespace TMPro {
         public int lineCount;
         public global::TMPro.TMP_LineInfo[] lineInfo;
         public global::TMPro.TMP_MeshInfo[] meshInfo;
-        protected TMP_TextInfo() { }
+        public TMP_TextInfo() { }
     }
     public unsafe partial struct TMP_Vertex {
         public global::UnityEngine.Color32 color;
@@ -368,7 +368,7 @@ namespace TMPro {
     }
     public unsafe partial class TextMeshProUGUI : global::TMPro.TMP_Text {
         public global::UnityEngine.CanvasRenderer canvasRenderer { get => throw null; }
-        protected TextMeshProUGUI() { }
+        public TextMeshProUGUI() { }
     }
     public enum TextOverflowModes : int {
         Overflow = 0,

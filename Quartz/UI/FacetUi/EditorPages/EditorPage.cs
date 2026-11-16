@@ -37,8 +37,8 @@ internal static class EditorPage {
     });
 
     internal static void DecoPreview(VisualElement p) => Page(p, "SECTION_DECORATION_PREVIEW", "EDITOR_DECOPREVIEW_DESC", (card, _) => {
-        Row(card, "EDITOR_DECO_PREVIEW", () => C.DecoPreview, v => C.DecoPreview = v, Def.DecoPreview, EditorFeature.RefreshDecoPreview);
-        Controls.Info(card, "EDITOR_DECO_PREVIEW_CREDIT", () => "", (InfoOptions o) => o.Id = "EDITOR_DECO_PREVIEW_CREDIT");
+        ShellRows.Describe(Row(card, "EDITOR_DECO_PREVIEW", () => C.DecoPreview, v => C.DecoPreview = v, Def.DecoPreview,
+            EditorFeature.RefreshDecoPreview).Root, "EDITOR_DECO_PREVIEW_CREDIT");
     });
 
     // rows gets the page's first card and the element the cards go in.
@@ -48,7 +48,7 @@ internal static class EditorPage {
     }
 
     // The classic id is the key in lower case; the tooltip is DESC_<key>.
-    private static void Row(VisualElement card, string key, Func<bool> get, Action<bool> set, bool def, Action apply) =>
+    private static Control<bool> Row(VisualElement card, string key, Func<bool> get, Action<bool> set, bool def, Action apply) =>
         ShellRows.Toggle(card, key, key.ToLowerInvariant(), Bind.To(get, set), apply, EditorFeature.Save, o => {
             o.Default = def;
             o.Tooltip = "DESC_" + key;

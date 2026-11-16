@@ -17,7 +17,7 @@ namespace UnityEngine {
         public global::UnityEngine.ParticleSystem.MainModule main { get => throw null; }
         public void Clear(bool withChildren) => throw null;
         public void Stop(bool withChildren, global::UnityEngine.ParticleSystemStopBehavior stopBehavior) => throw null;
-        private ParticleSystem() { }
+        public ParticleSystem() { }
         public unsafe partial struct MainModule {
             private global::UnityEngine.ParticleSystem m_ParticleSystem;
             public global::UnityEngine.ParticleSystemCullingMode cullingMode { get => throw null; set { } }

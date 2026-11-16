@@ -13,7 +13,7 @@
 
 namespace UnityModManagerNet {
     public unsafe partial class UnityModManager {
-        protected UnityModManager() { }
+        public UnityModManager() { }
         public unsafe partial class ModEntry {
             public readonly global::UnityModManagerNet.UnityModManager.ModInfo Info;
             public readonly global::UnityModManagerNet.UnityModManager.ModEntry.ModLogger Logger;
@@ -33,7 +33,7 @@ namespace UnityModManagerNet {
             public string DisplayName;
             public string Id;
             public string Version;
-            protected ModInfo() { }
+            public ModInfo() { }
             bool global::System.IEquatable<global::UnityModManagerNet.UnityModManager.ModInfo>.Equals(global::UnityModManagerNet.UnityModManager.ModInfo other) => throw null;
         }
     }

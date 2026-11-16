@@ -47,7 +47,7 @@ namespace UnityEngine.TextCore {
         public uint index { get => throw null; set { } }
         public global::UnityEngine.TextCore.GlyphMetrics metrics { get => throw null; set { } }
         public float scale { get => throw null; set { } }
-        protected Glyph() { }
+        public Glyph() { }
     }
     public unsafe partial struct GlyphMetrics : global::System.IEquatable<global::UnityEngine.TextCore.GlyphMetrics> {
         private float m_Height;

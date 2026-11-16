@@ -158,10 +158,8 @@ internal static partial class ShellSettings {
     }
 
     private static void Maintenance(VisualElement card) {
-        Controls.Danger(card, "HOME_RESET_ALL", "HOME_RESET", () => Reset(false), o => {
-            o.Id = "HOME_RESET_ALL";
-            o.Help = "HOME_RESET_DESC";
-        });
+        Button reset = Controls.Danger(card, "HOME_RESET_ALL", "HOME_RESET", () => Reset(false), o => o.Id = "HOME_RESET_ALL");
+        ShellRows.Describe(reset.parent.parent, "HOME_RESET_DESC");
         Controls.Danger(card, "HOME_RESET_CLEAN", "HOME_RESET_CLEAN", () => Reset(true), o => o.Id = "HOME_RESET_CLEAN");
         Controls.Action(card, "MENU_RELOAD_LANG", "RELOAD", () => PageSettings.ReloadLanguages(null), o => o.Id = "MENU_RELOAD_LANG");
     }

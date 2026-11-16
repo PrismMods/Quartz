@@ -107,11 +107,11 @@ internal static class RestrictionPage {
             o.EnabledWhen = () => C.JRestrictSections.Count < RestrictionSettings.MaxSections;
         });
         Controls.AfterChange(region, save);
-        ShellRows.Text(card, "JR_MESSAGE", Bind.To(() => C.JRestrictMessage, v => C.JRestrictMessage = v), 0, null, save, o => {
+        Control<string> message = ShellRows.Text(card, "JR_MESSAGE", Bind.To(() => C.JRestrictMessage, v => C.JRestrictMessage = v), 0, null, save, o => {
             o.Default = Def.JRestrictMessage;
             o.Tooltip = "DESC_JR_MESSAGE";
         });
-        Controls.Info(card, "JR_MESSAGE_HINT", () => "", (InfoOptions o) => o.Id = "JR_MESSAGE_HINT");
+        ShellRows.Describe(message.Root, "JR_MESSAGE_HINT");
     }
 
     // One section, shut, titled and numbered by its place: its range, then Remove.

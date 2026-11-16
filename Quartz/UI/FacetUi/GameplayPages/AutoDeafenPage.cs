@@ -21,7 +21,7 @@ internal static class AutoDeafenPage {
     private static void Cards(VisualElement p) {
         Action save = AutoDeafen.Save;
         VisualElement card = Controls.Card(p, null);
-        Controls.Dropdown(card, "AD_MODE_LABEL", QuartzShell.Writes(() => AutoDeafen.EffectiveMode, v => {
+        var mode = Controls.Dropdown(card, "AD_MODE_LABEL", QuartzShell.Writes(() => AutoDeafen.EffectiveMode, v => {
             C.Mode = v;
             save();
         }), PageRules.DeafenModes(AutoDeafen.ShortcutSupported, VoiceDeafen.Registered), m => m switch {
@@ -32,6 +32,8 @@ internal static class AutoDeafenPage {
             o.Id = "AD_MODE_LABEL";
             o.Default = AutoDeafen.ShortcutSupported ? AutoDeafenSettings.ModeShortcut : AutoDeafenSettings.ModeBot;
         });
+        // The Discord mode's note is the mode row's info icon, shown in that mode only.
+        ShellRows.Describe(mode.Root, "AD_DISCORD_HINT", () => AutoDeafen.EffectiveMode == AutoDeafenSettings.ModeDiscord);
         Hint(Controls.When(card, () => !AutoDeafen.ShortcutSupported), "AD_SHORTCUT_WINDOWS_ONLY");
         ShellRows.ReleaseSlider(card, "AD_PCT", Bind.To(() => C.DeafenAtPercent, v => C.DeafenAtPercent = v), 0f, 100f, 1f, "0", null, save,
             o => o.Default = Def.DeafenAtPercent);
@@ -41,7 +43,6 @@ internal static class AutoDeafenPage {
             o => o.Default = Def.SkipWhenAuto);
 
         VisualElement shortcut = Controls.When(card, () => AutoDeafen.EffectiveMode == AutoDeafenSettings.ModeShortcut);
-        Hint(shortcut, "AD_SHORTCUT_HINT");
         ShellRows.Toggle(shortcut, "AD_KB_CTRL", "ad_kb_ctrl", Bind.To(() => C.ShortcutCtrl, v => C.ShortcutCtrl = v), null, save,
             o => o.Default = Def.ShortcutCtrl);
         ShellRows.Toggle(shortcut, "AD_KB_SHIFT", "ad_kb_shift", Bind.To(() => C.ShortcutShift, v => C.ShortcutShift = v), null, save,
@@ -51,10 +52,10 @@ internal static class AutoDeafenPage {
         ShellRows.Toggle(shortcut, "AD_KB_META", "ad_kb_meta", Bind.To(() => C.ShortcutMeta, v => C.ShortcutMeta = v), null, save,
             o => o.Default = Def.ShortcutMeta);
         // As the classic capture: no mouse or joystick button, no modifier; Escape cancels.
-        ShellRows.Key(shortcut, "AD_KEY", () => (KeyCode)C.ShortcutKey, k => C.ShortcutKey = (int)k, save,
+        Control<string> keyRow = ShellRows.Key(shortcut, "AD_KEY", () => (KeyCode)C.ShortcutKey, k => C.ShortcutKey = (int)k, save,
             accept: k => k != KeyCode.None && (int)k < (int)KeyCode.Mouse0 && !Keybind.IsModifier(k));
+        ShellRows.Describe(keyRow.Root, "AD_SHORTCUT_HINT");
 
-        Hint(Controls.When(card, () => AutoDeafen.EffectiveMode == AutoDeafenSettings.ModeDiscord), "AD_DISCORD_HINT");
 
         VisualElement bot = Controls.When(card, () => AutoDeafen.EffectiveMode == AutoDeafenSettings.ModeBot);
         ShellRows.Text(bot, "AD_CLIENT_ID", Bind.To(() => C.DiscordClientId, v => C.DiscordClientId = v), 0, null, save,

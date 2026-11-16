@@ -77,7 +77,10 @@ internal static class ImportPage {
                 if(name != null) Paint.Fg(name, Role.TextMuted);
                 Label tag = Ui.Muted(right, incompatible[i].Suite ? "IMPORT_PRISM_SUITE" : "IMPORT_NOT_COMPATIBLE");
                 tag.name = (incompatible[i].Suite ? "IMPORT_PRISM_SUITE#" : "IMPORT_NOT_COMPATIBLE#") + (i + 1);
-                if(incompatible[i].Suite) Paint.Fg(tag, Role.Accent);
+                if(incompatible[i].Suite) {   // green, Quartz's ok colour: a suite mod is fine alongside Quartz
+                    Paint.Forget(tag);
+                    tag.style.color = UIColors.ObjectActiveMathOk;
+                }
             }
         });
         rows.name = "import-list";

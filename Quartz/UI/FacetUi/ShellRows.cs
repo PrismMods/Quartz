@@ -225,6 +225,17 @@ internal static partial class ShellRows {
         return row;
     }
 
+    /// <summary>A bar of controls built straight into a card (Facet's Chips, with buttons Joined to it) laid out as a card row:
+    /// the rows' Pad at both ends, at least a row's height, a half Gap above and below, its controls centred.</summary>
+    internal static VisualElement BarRow(VisualElement bar) {
+        Sizes sz = Theme.For(bar).Sizes;
+        bar.style.paddingLeft = bar.style.paddingRight = sz.Pad;
+        bar.style.paddingTop = bar.style.paddingBottom = sz.Gap / 2f;
+        bar.style.minHeight = sz.RowHeight;
+        bar.style.alignItems = Align.Center;
+        return bar;
+    }
+
     /// <summary>Puts a note (a status or an empty-list text) at the left of first's button row, where a row's label sits, centred
     /// with the buttons; the buttons stay at the right.</summary>
     internal static T Lead<T>(Button first, T note) where T : VisualElement {
@@ -300,7 +311,16 @@ internal static partial class ShellRows {
         });
         t.Element.style.marginBottom = 0f;
         Flush(t);
+        AlignTabs(t.Element);
         return t;
+    }
+
+    /// <summary>Insets a tab rail so its first title's text starts where the card's row labels do (a Pad in), as the rows
+    /// under it: the bar takes the Pad less the tab button's own padding and border, read from its inline style.</summary>
+    internal static void AlignTabs(VisualElement bar) {
+        float pad = Theme.For(bar).Sizes.Pad;
+        if(bar.Q<Button>() is Button first) pad -= first.style.paddingLeft.value.value + first.style.borderLeftWidth.value;
+        bar.style.paddingLeft = Mathf.Max(0f, pad);
     }
 
     private static void Flush(Tabs t) {

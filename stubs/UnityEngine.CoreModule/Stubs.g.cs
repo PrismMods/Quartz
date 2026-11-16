@@ -13,7 +13,7 @@
 
 namespace UnityEngine {
     public unsafe partial class AnimationCurve : global::System.IEquatable<global::UnityEngine.AnimationCurve> {
-        protected AnimationCurve() { }
+        public AnimationCurve() { }
         bool global::System.IEquatable<global::UnityEngine.AnimationCurve>.Equals(global::UnityEngine.AnimationCurve other) => throw null;
     }
     public unsafe partial class Application {
@@ -25,12 +25,12 @@ namespace UnityEngine {
         public static string unityVersion { get => throw null; }
         public static void OpenURL(string url) => throw null;
         public static void Quit() => throw null;
-        protected Application() { }
+        public Application() { }
     }
     public unsafe partial class Behaviour : global::UnityEngine.Component {
         public bool enabled { get => throw null; set { } }
         public bool isActiveAndEnabled { get => throw null; }
-        protected Behaviour() { }
+        public Behaviour() { }
     }
     public unsafe partial struct Bounds : global::System.IEquatable<global::UnityEngine.Bounds> {
         private global::UnityEngine.Vector3 m_Center;
@@ -65,7 +65,7 @@ namespace UnityEngine {
         public bool useOcclusionCulling { get => throw null; set { } }
         public void Render() => throw null;
         public global::UnityEngine.Vector3 ViewportToWorldPoint(global::UnityEngine.Vector3 position) => throw null;
-        private Camera() { }
+        public Camera() { }
         public enum GateFitMode : int {
             Vertical = 1,
             Horizontal = 2,
@@ -139,7 +139,7 @@ namespace UnityEngine {
         public static string ToHtmlStringRGB(global::UnityEngine.Color color) => throw null;
         public static string ToHtmlStringRGBA(global::UnityEngine.Color color) => throw null;
         public static bool TryParseHtmlString(string htmlString, out global::UnityEngine.Color color) => throw null;
-        protected ColorUtility() { }
+        public ColorUtility() { }
     }
     public unsafe partial class Component : global::UnityEngine.Object {
         public global::UnityEngine.GameObject gameObject { get => throw null; }
@@ -154,7 +154,7 @@ namespace UnityEngine {
         public void GetComponentsInChildren<T>(bool includeInactive, global::System.Collections.Generic.List<T> result) => throw null;
         public T[] GetComponentsInParent<T>(bool includeInactive) => throw null;
         public bool TryGetComponent<T>(out T component) => throw null;
-        protected Component() { }
+        public Component() { }
     }
     public sealed unsafe partial class Coroutine : global::UnityEngine.YieldInstruction {
         private Coroutine() { }
@@ -163,7 +163,7 @@ namespace UnityEngine {
         public static global::UnityEngine.CursorLockMode lockState { get => throw null; set { } }
         public static bool visible { get => throw null; set { } }
         public static void SetCursor(global::UnityEngine.Texture2D texture, global::UnityEngine.Vector2 hotspot, global::UnityEngine.CursorMode cursorMode) => throw null;
-        protected Cursor() { }
+        public Cursor() { }
     }
     public enum CursorLockMode : int {
         None = 0,
@@ -201,15 +201,15 @@ namespace UnityEngine {
         public T GetComponentInParent<T>() => throw null;
         public T[] GetComponentsInChildren<T>(bool includeInactive) => throw null;
         public void SetActive(bool value) => throw null;
-        private GameObject() { }
+        public GameObject() { }
     }
     public unsafe partial class Gradient : global::System.IEquatable<global::UnityEngine.Gradient> {
-        protected Gradient() { }
+        public Gradient() { }
         bool global::System.IEquatable<global::UnityEngine.Gradient>.Equals(global::UnityEngine.Gradient other) => throw null;
     }
     public unsafe partial class Graphics {
         public static void Blit(global::UnityEngine.Texture source, global::UnityEngine.RenderTexture dest) => throw null;
-        protected Graphics() { }
+        public Graphics() { }
     }
     public enum HideFlags : int {
         None = 0,
@@ -568,7 +568,7 @@ namespace UnityEngine {
     public sealed unsafe partial class LineRenderer : global::UnityEngine.Renderer {
         public global::UnityEngine.Color endColor { get => throw null; set { } }
         public global::UnityEngine.Color startColor { get => throw null; set { } }
-        private LineRenderer() { }
+        public LineRenderer() { }
     }
     public unsafe partial class Material : global::UnityEngine.Object {
         public global::UnityEngine.Texture mainTexture { get => throw null; set { } }
@@ -619,10 +619,10 @@ namespace UnityEngine {
         public static float Sqrt(float f) => throw null;
     }
     public sealed unsafe partial class Mesh : global::UnityEngine.Object {
-        private Mesh() { }
+        public Mesh() { }
     }
     public unsafe partial class MeshRenderer : global::UnityEngine.Renderer {
-        protected MeshRenderer() { }
+        public MeshRenderer() { }
     }
     public unsafe partial class MonoBehaviour : global::UnityEngine.Behaviour {
         public MonoBehaviour() => throw null;
@@ -644,7 +644,7 @@ namespace UnityEngine {
         public static bool operator !=(global::UnityEngine.Object x, global::UnityEngine.Object y) => throw null;
         public override bool Equals(object obj) => throw null;
         public override int GetHashCode() => throw null;
-        protected Object() { }
+        public Object() { }
     }
     public unsafe partial struct Quaternion : global::System.IEquatable<global::UnityEngine.Quaternion> {
         public const float kEpsilon = 9f;
@@ -704,7 +704,7 @@ namespace UnityEngine {
         public global::UnityEngine.Rect rect { get => throw null; }
         public global::UnityEngine.Vector2 sizeDelta { get => throw null; set { } }
         public void GetWorldCorners(global::UnityEngine.Vector3[] fourCornersArray) => throw null;
-        private RectTransform() { }
+        public RectTransform() { }
         public enum Edge : int {
             Left = 0,
             Right = 1,
@@ -756,12 +756,12 @@ namespace UnityEngine {
         public global::UnityEngine.Material sharedMaterial { get => throw null; set { } }
         public int sortingLayerID { get => throw null; set { } }
         public int sortingOrder { get => throw null; set { } }
-        protected Renderer() { }
+        public Renderer() { }
     }
     public sealed unsafe partial class Resources {
         public static T[] FindObjectsOfTypeAll<T>() where T : global::UnityEngine.Object => throw null;
         public static global::UnityEngine.Object[] FindObjectsOfTypeAll(global::System.Type type) => throw null;
-        private Resources() { }
+        public Resources() { }
     }
     public enum RuntimePlatform : int {
         OSXEditor = 0,
@@ -824,11 +824,11 @@ namespace UnityEngine {
     public sealed unsafe partial class Screen {
         public static int height { get => throw null; }
         public static int width { get => throw null; }
-        private Screen() { }
+        public Screen() { }
     }
     public unsafe partial class ScriptableObject : global::UnityEngine.Object {
         public static T CreateInstance<T>() where T : global::UnityEngine.ScriptableObject => throw null;
-        protected ScriptableObject() { }
+        public ScriptableObject() { }
     }
     public sealed unsafe partial class Shader : global::UnityEngine.Object {
         public static global::UnityEngine.Shader Find(string name) => throw null;
@@ -850,7 +850,7 @@ namespace UnityEngine {
     public sealed unsafe partial class SpriteRenderer : global::UnityEngine.Renderer {
         public global::UnityEngine.Color color { get => throw null; set { } }
         public global::UnityEngine.Sprite sprite { get => throw null; set { } }
-        private SpriteRenderer() { }
+        public SpriteRenderer() { }
     }
     public enum SystemLanguage : int {
         Afrikaans = 0,
@@ -1005,7 +1005,7 @@ namespace UnityEngine {
         public static float time { get => throw null; }
         public static float unscaledDeltaTime { get => throw null; }
         public static float unscaledTime { get => throw null; }
-        protected Time() { }
+        public Time() { }
     }
     public unsafe partial class Transform : global::UnityEngine.Component, global::System.Collections.IEnumerable {
         public int childCount { get => throw null; }
@@ -1099,7 +1099,7 @@ namespace UnityEngine {
         bool global::System.IEquatable<global::UnityEngine.Vector4>.Equals(global::UnityEngine.Vector4 other) => throw null;
     }
     public unsafe partial class YieldInstruction {
-        protected YieldInstruction() { }
+        public YieldInstruction() { }
     }
 }
 namespace UnityEngine.Events {
@@ -1108,14 +1108,14 @@ namespace UnityEngine.Events {
     public unsafe delegate void UnityAction<T0, T1>(T0 arg0, T1 arg1);
     public unsafe partial class UnityEvent : global::UnityEngine.Events.UnityEventBase {
         public void AddListener(global::UnityEngine.Events.UnityAction call) => throw null;
-        protected UnityEvent() { }
+        public UnityEvent() { }
     }
     public abstract unsafe partial class UnityEventBase {
         protected UnityEventBase() { }
     }
     public unsafe partial class UnityEvent<T0> : global::UnityEngine.Events.UnityEventBase {
         public void AddListener(global::UnityEngine.Events.UnityAction<T0> call) => throw null;
-        protected UnityEvent() { }
+        public UnityEvent() { }
     }
 }
 namespace UnityEngine.Internal {
@@ -1141,7 +1141,7 @@ namespace UnityEngine.SceneManagement {
         public static event global::UnityEngine.Events.UnityAction<global::UnityEngine.SceneManagement.Scene> sceneUnloaded { add { } remove { } }
         public static global::UnityEngine.SceneManagement.Scene GetActiveScene() => throw null;
         public static void LoadScene(string sceneName) => throw null;
-        protected SceneManager() { }
+        public SceneManager() { }
     }
 }
 namespace UnityEngine.Scripting {

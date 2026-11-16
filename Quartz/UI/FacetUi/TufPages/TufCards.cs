@@ -83,7 +83,10 @@ internal static class TufCards {
         box.style.alignItems = Align.Stretch;
         box.style.flexGrow = 1f;
 
-        Color rail = ColorUtility.TryParseHtmlString(l.DifficultyColor, out Color c) ? c : Color.white;
+        Color hue = ColorUtility.TryParseHtmlString(l.DifficultyColor, out Color c) ? c : Color.white;
+        // Readable on dark thumbnails too (TufContrast): a dark colour lightened to 3:1 with a light glow, a light one a dark shadow.
+        ((float R, float G, float B) shown, bool glow) = TufContrast.Readable(hue.r, hue.g, hue.b);
+        Color rail = new(shown.R, shown.G, shown.B, 1f);
         VisualElement bar = Ui.Box(box);
         bar.style.width = 6f;
         bar.style.flexShrink = 0f;
@@ -103,9 +106,12 @@ internal static class TufCards {
         diff.name = "tuf-difficulty";
         Paint.Forget(diff);
         diff.style.color = rail;
-        // Bold (the face's real weight) over a soft dark shadow: the colour reads on light and dark thumbnails alike. Set once here.
+        // Bold (the face's real weight) over a soft shadow, light for a dark colour and dark for a light one. Set once here.
         diff.style.unityFontStyleAndWeight = FontStyle.Bold;
-        diff.style.textShadow = new TextShadow { offset = new Vector2(1f, 1f), blurRadius = 3f, color = new Color(0f, 0f, 0f, 0.6f) };
+        diff.style.textShadow = new TextShadow {
+            offset = glow ? Vector2.zero : new Vector2(1f, 1f), blurRadius = 3f,
+            color = glow ? new Color(1f, 1f, 1f, TufContrast.GlowAlpha) : new Color(0f, 0f, 0f, TufContrast.ShadowAlpha),
+        };
         diff.style.marginRight = 12f;
         if(installed && o.Badge) Badge(head, l, s);
 

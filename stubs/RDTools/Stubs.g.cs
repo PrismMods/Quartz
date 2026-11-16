@@ -13,9 +13,9 @@
 
 namespace RDTools {
     public unsafe partial class RDBaseDll : global::UnityEngine.MonoBehaviour {
-        protected RDBaseDll() { }
+        public RDBaseDll() { }
     }
     public unsafe partial class RDClassDll {
-        protected RDClassDll() { }
+        public RDClassDll() { }
     }
 }
