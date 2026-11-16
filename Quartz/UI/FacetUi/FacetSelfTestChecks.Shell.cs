@@ -431,6 +431,8 @@ internal static partial class FacetSelfTestChecks {
 
     private static IEnumerator ShellClosedCost(Action<string, bool, string> check) {
         QuartzShell.Hide();
+        // The search index prebuild steps in the hidden menu's tick until it ends; the closed cost is the one after it.
+        for(float t0 = Time.realtimeSinceStartup; !QuartzShell.SearchPrebuilt && Time.realtimeSinceStartup - t0 < 10f;) yield return null;
         yield return Frames(1);
         const int n = 600;
         var clock = System.Diagnostics.Stopwatch.StartNew();

@@ -135,9 +135,12 @@ internal static partial class QuartzShell {
         if(shell != null) RebuildImpl();
     }
 
-    /// <summary>Per frame. Nothing while hidden, unless Edit layout is waiting to bring it back.</summary>
+    /// <summary>Per frame. Nothing while hidden, unless Edit layout is waiting to bring it back, or the search index is still
+    /// being built ahead of the first search.</summary>
     internal static void Tick() {
-        if(shell != null) TickImpl();
+        if(shell == null) return;
+        TickImpl();
+        if(!SearchWarm.Done) SearchWarm.Step();
     }
 
     /// <summary>Before QuartzHost disposes its own surfaces.</summary>

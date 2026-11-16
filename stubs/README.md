@@ -20,7 +20,7 @@ resources, and no types the mod never touches.
 | `Assembly-CSharp` | 130 | 1078 |
 | `Assembly-CSharp-firstpass` | 2 | 12 |
 | `DOTween` | 0 | 0 |
-| `Facet.0.2` | 69 | 470 |
+| `Facet.0.2` | 69 | 483 |
 | `MelonLoader` | 8 | 23 |
 | `Newtonsoft.Json` | 21 | 131 |
 | `PrismLib` | 17 | 119 |
@@ -38,11 +38,11 @@ resources, and no types the mod never touches.
 | `UnityEngine.TextCoreTextEngineModule` | 2 | 1 |
 | `UnityEngine.TextRenderingModule` | 4 | 25 |
 | `UnityEngine.UI` | 94 | 354 |
-| `UnityEngine.UIElementsModule` | 98 | 370 |
+| `UnityEngine.UIElementsModule` | 102 | 370 |
 | `UnityEngine.UIModule` | 6 | 35 |
 | `UnityModManager` | 4 | 12 |
 
-**657 types, 4844 members.**
+**661 types, 4857 members.**
 
 ## How it is used
 

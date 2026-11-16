@@ -2176,11 +2176,15 @@
         "type": "Facet.Host",
         "members": [
           "Facet.Host Facet.Host::Create(System.String,System.Action\u00601\u003CFacet.HostOptions\u003E)",
+          "Facet.Host Facet.Host::For(UnityEngine.UIElements.VisualElement)",
           "Facet.Theme Facet.Host::Theme()",
           "Facet.Theme Facet.Host::get_Theme()",
           "System.IDisposable Facet.Host::Use(Facet.Host)",
+          "System.String Facet.Host::Language()",
           "System.String Facet.Host::Read(System.String)",
           "System.String Facet.Host::Translate(System.String)",
+          "System.String Facet.Host::get_Language()",
+          "System.Void Facet.Host::Log(System.String)",
           "System.Void Facet.Host::RelabelSurfaces()",
           "System.Void Facet.Host::Write(System.String,System.String)"
         ]
@@ -2299,6 +2303,7 @@
       {
         "type": "Facet.Look",
         "members": [
+          "Facet.Look Facet.Look::Copy()",
           "System.Nullable\u00601\u003CFacet.Role\u003E Facet.Look::Border",
           "System.Nullable\u00601\u003CFacet.Role\u003E Facet.Look::FocusBorder",
           "System.Nullable\u00601\u003CFacet.Role\u003E Facet.Look::HoverText",
@@ -2377,6 +2382,11 @@
         "type": "Facet.NavItem",
         "members": [
           "System.Action\u00601\u003CUnityEngine.UIElements.VisualElement\u003E Facet.NavItem::Build",
+          "System.Boolean Facet.NavItem::IsBranch()",
+          "System.Boolean Facet.NavItem::get_IsBranch()",
+          "System.Collections.Generic.List\u00601\u003CFacet.NavItem\u003E Facet.NavItem::Children",
+          "System.Func\u00601\u003CSystem.Boolean\u003E Facet.NavItem::VisibleWhen",
+          "System.Func\u00601\u003CSystem.Int32\u003E Facet.NavItem::Revision",
           "System.String Facet.NavItem::Title",
           "System.Void Facet.NavItem::.ctor(System.String,System.Action\u00601\u003CUnityEngine.UIElements.VisualElement\u003E)"
         ]
@@ -2503,7 +2513,9 @@
       },
       {
         "type": "Facet.SearchIndex",
-        "members": []
+        "members": [
+          "System.Void Facet.SearchIndex::.ctor(System.Func\u00602\u003CSystem.String,System.String\u003E)"
+        ]
       },
       {
         "type": "Facet.SearchIndex/Entry",
@@ -2566,9 +2578,11 @@
           "System.Single Facet.Sizes::Caps",
           "System.Single Facet.Sizes::Gap",
           "System.Single Facet.Sizes::Line",
+          "System.Single Facet.Sizes::NumberWidth",
           "System.Single Facet.Sizes::Pad",
           "System.Single Facet.Sizes::Radius",
           "System.Single Facet.Sizes::RowHeight",
+          "System.Single Facet.Sizes::SliderWidth",
           "System.Single Facet.Sizes::Small"
         ]
       },
@@ -7243,6 +7257,10 @@
         ]
       },
       {
+        "type": "UnityEngine.UIElements.BaseSlider\u00601",
+        "members": []
+      },
+      {
         "type": "UnityEngine.UIElements.BindableElement",
         "members": []
       },
@@ -7603,6 +7621,10 @@
         "members": []
       },
       {
+        "type": "UnityEngine.UIElements.IValueField\u00601",
+        "members": []
+      },
+      {
         "type": "UnityEngine.UIElements.IVisualElementScheduler",
         "members": []
       },
@@ -7741,6 +7763,14 @@
           "System.Void UnityEngine.UIElements.Scroller::add_valueChanged(System.Action\u00601\u003CSystem.Single\u003E)",
           "System.Void UnityEngine.UIElements.Scroller::remove_valueChanged(System.Action\u00601\u003CSystem.Single\u003E)"
         ]
+      },
+      {
+        "type": "UnityEngine.UIElements.Slider",
+        "members": []
+      },
+      {
+        "type": "UnityEngine.UIElements.SliderInt",
+        "members": []
       },
       {
         "type": "UnityEngine.UIElements.StyleBackground",

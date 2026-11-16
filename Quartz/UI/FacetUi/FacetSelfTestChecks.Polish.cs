@@ -46,6 +46,7 @@ internal static partial class FacetSelfTestChecks {
             yield return Spacing(check);
             yield return Round3(check);
             yield return Round4(check);
+            yield return Round5(check);
         } finally {
             ShellFeatures.Query = query;
             MainCore.Conf.UIScale = scale;

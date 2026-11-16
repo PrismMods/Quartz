@@ -48,6 +48,39 @@ internal static partial class ShellRows {
         return c;
     }
 
+    // The narrowest a slider's track gets before its row breaks in two.
+    private const float TrackFloor = 48f;
+
+    /// <summary>A slider row whose label keeps its whole text. Facet's row gives a long label way (one line, ellipsis) before its
+    /// fixed-width track; here the track shrinks first (down to TrackFloor), then the track and number go under the label, and
+    /// a label too long for the row on its own wraps. Rows without a track are returned as they are.</summary>
+    internal static Control<T> Fit<T>(Control<T> c) {
+        VisualElement row = c.Root, right = null;
+        Label label = null;
+        foreach(VisualElement e in row.Children()) {
+            if(label == null && e is Label l) label = l;
+            else if(e.name == "control") right = e;
+        }
+        if(label == null || right == null || c.Input is not (UnityEngine.UIElements.Slider or SliderInt)) return c;
+        Sizes sz = Theme.For(row).Sizes;
+        row.style.flexWrap = Wrap.Wrap;
+        label.style.flexGrow = 0f;
+        label.style.whiteSpace = WhiteSpace.Normal;
+        label.style.textOverflow = TextOverflow.Clip;
+        // Based at its floor, the control column grows into what the label leaves; the row breaks only below the floor.
+        right.style.flexBasis = TrackFloor + sz.Gap + sz.NumberWidth + 8f;
+        right.style.flexGrow = 1f;
+        right.style.justifyContent = Justify.FlexEnd;
+        foreach(VisualElement e in right.Children()) e.style.flexShrink = 0f;
+        VisualElement track = c.Input;
+        track.style.width = StyleKeyword.Auto;
+        track.style.flexGrow = 1f;
+        track.style.flexShrink = 1f;
+        track.style.minWidth = TrackFloor;
+        track.style.maxWidth = sz.SliderWidth;
+        return c;
+    }
+
     /// <summary>A button-only row, Id key, that starts the feature's own capture: start(done) begins it and calls done when it
     /// ends. The button reads PRESS_A_KEY while pressing() holds (capturing() when null), and a click while capturing() cancels.</summary>
     internal static Button CaptureButton(VisualElement card, string key, Func<bool> capturing, Action<Action> start, Action cancel,

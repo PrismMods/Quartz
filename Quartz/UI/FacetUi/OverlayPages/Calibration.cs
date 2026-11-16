@@ -48,7 +48,7 @@ internal static class Calibration {
         VisualElement song = Controls.Card(p, "HEADING_CALIBRATION_SONG");
         ShellRows.Slider(song, "CALIBRATION_SONG_PITCH", Bind.To(() => C.SongPitch, v => C.SongPitch = v), 1f, 500f, 0.5f, "0.#' %'", null, save,
             o => o.Default = Def.SongPitch);
-        Controls.IntSlider(song, "CALIBRATION_SONG_REPEAT", QuartzShell.Writes(() => C.SongRepeat, v => {
+        ShellRows.Fit(Controls.IntSlider(song, "CALIBRATION_SONG_REPEAT", QuartzShell.Writes(() => C.SongRepeat, v => {
             C.SongRepeat = v;
             save();
         }), o => {
@@ -56,7 +56,7 @@ internal static class Calibration {
             o.Min = 0;
             o.Max = 20;
             o.Default = Def.SongRepeat;
-        });
+        }));
         // Off clears the minimum, as the classic switch does; undoing the off brings the cleared minimum back, which History
         // never recorded. The minimum's row follows at once: Facet re-reads rows every 100 ms.
         ShellRows.Toggle(song, "CALIBRATION_SONG_USE_MINIMUM", "calibration_song_use_minimum", Bind.To(() => C.SongUseMinimum, v => {

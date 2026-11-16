@@ -109,7 +109,7 @@ internal static class Combo {
             o.Default = Def.GetPerfectColor();
             o.VisibleWhen = () => C.PerfectColorEnabled;
         });
-        Controls.IntSlider(colour, "COMBO_COLORMAX", QuartzShell.Writes(() => C.ColorMax, v => {
+        ShellRows.Fit(Controls.IntSlider(colour, "COMBO_COLORMAX", QuartzShell.Writes(() => C.ColorMax, v => {
             C.ColorMax = v;
             save();
         }), o => {
@@ -117,7 +117,7 @@ internal static class Combo {
             o.Min = 1;
             o.Max = 5000;
             o.Default = Def.ColorMax;
-        });
+        }));
     }
 
     private static void Layout(VisualElement layout) {

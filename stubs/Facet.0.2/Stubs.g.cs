@@ -191,8 +191,11 @@ namespace Facet {
         public static global::System.IDisposable Step(string label, string key = default, global::System.Func<bool> valid = default, global::System.Func<string, string> translate = default) => throw null;
     }
     public sealed unsafe partial class Host {
+        public string Language { get => throw null; }
         public global::Facet.Theme Theme { get => throw null; }
         public static global::Facet.Host Create(string name, global::System.Action<global::Facet.HostOptions> configure = default) => throw null;
+        public static global::Facet.Host For(global::UnityEngine.UIElements.VisualElement e) => throw null;
+        public void Log(string m) => throw null;
         public string Read(string key) => throw null;
         public void RelabelSurfaces() => throw null;
         public string Translate(string s) => throw null;
@@ -275,6 +278,7 @@ namespace Facet {
         public global::System.Nullable<global::Facet.Role> HoverText;
         public global::System.Nullable<global::Facet.Role> Text;
         public Look() => throw null;
+        public global::Facet.Look Copy() => throw null;
     }
     public sealed unsafe partial class Looks {
         public global::Facet.Look AccentButton;
@@ -320,7 +324,11 @@ namespace Facet {
     }
     public sealed unsafe partial class NavItem {
         public global::System.Action<global::UnityEngine.UIElements.VisualElement> Build;
+        public global::System.Collections.Generic.List<global::Facet.NavItem> Children;
+        public global::System.Func<int> Revision;
         public string Title;
+        public global::System.Func<bool> VisibleWhen;
+        public bool IsBranch { get => throw null; }
         public NavItem(string title, global::System.Action<global::UnityEngine.UIElements.VisualElement> build = default) => throw null;
         private NavItem() { }
     }
@@ -400,6 +408,7 @@ namespace Facet {
         Guide = 15,
     }
     public sealed unsafe partial class SearchIndex {
+        public SearchIndex(global::System.Func<string, string> translate = default) => throw null;
         private SearchIndex() { }
         public sealed unsafe partial class Entry {
             public string Label;
@@ -438,9 +447,11 @@ namespace Facet {
         public float Caps;
         public float Gap;
         public float Line;
+        public float NumberWidth;
         public float Pad;
         public float Radius;
         public float RowHeight;
+        public float SliderWidth;
         public float Small;
         public Sizes() { }
     }

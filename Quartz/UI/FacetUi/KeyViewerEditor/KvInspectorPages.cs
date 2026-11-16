@@ -167,14 +167,14 @@ internal static partial class KvInspectorPages {
 
     private static Control<float> Num(VisualElement p, string id, float def, float min, float max, string format, float step,
         Func<IReadOnlyList<KvElement>> items, Func<KvElement, float> get, Action<KvElement, float> set) =>
-        Controls.Slider(p, id, Many(items, get, set), o => {
+        ShellRows.Fit(Controls.Slider(p, id, Many(items, get, set), o => {
             Opt(o, id, null, null);
             o.Default = def;
             o.Min = min;
             o.Max = max;
             o.Format = format;
             o.Step = step;
-        });
+        }));
 
     // A typed number with no range, as the classic single-element fields.
     private static Control<float> Field(VisualElement p, string id, Func<KvElement, float> get, Action<KvElement, float> set) =>

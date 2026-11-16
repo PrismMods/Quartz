@@ -88,14 +88,14 @@ internal static partial class ShellRows {
 
     internal static Control<float> Slider(VisualElement card, string key, Bind<float> bind, float min, float max, float step, string format,
         Action apply, Action save, Action<SliderOptions> configure = null) =>
-        Controls.Slider(card, key, Writes(bind, null, apply, save), o => {
+        Fit(Controls.Slider(card, key, Writes(bind, null, apply, save), o => {
             o.Id = key;
             o.Min = min;
             o.Max = max;
             o.Step = step;
             o.Format = format;
             configure?.Invoke(o);
-        });
+        }));
 
     /// <summary>A text field that holds limit characters, as the classic field does: typing stops there, and a longer paste is
     /// cut when it is committed (Facet's MaxLength). A limit of 0 or less is none, as on the classic inputs that have

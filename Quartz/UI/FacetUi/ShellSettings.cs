@@ -81,7 +81,7 @@ internal static partial class ShellSettings {
             o.Id = "ACCENT_COLOR";
             o.Tooltip = "DESC_ACCENT_COLOR";
         });
-        Control<float> scale = Controls.Slider(card, "UI_SCALE", QuartzShell.Writes(() => C.UIScale, v => {
+        Control<float> scale = ShellRows.Fit(Controls.Slider(card, "UI_SCALE", QuartzShell.Writes(() => C.UIScale, v => {
             C.UIScale = v;
             // An undo or redo applies here: it raises the slider's commit only while the row is on a panel, not with its page switched away.
             if(History.Applying) ApplyScale(v);
@@ -91,10 +91,10 @@ internal static partial class ShellSettings {
             o.Max = 1.6f;
             o.Step = 0.01f;
             o.Format = "0.00x";
-        });
+        }));
         // At the end of a change, as the classic slider does: rescaling every step of a drag would move the track under the pointer.
         scale.Committed += v => { if(!History.Applying) ApplyScale(v); };   // an undo applied it as it wrote
-        Controls.Slider(card, "WINDOW_OPACITY", QuartzShell.Writes(() => C.PanelOpacity * 100f, v => {
+        ShellRows.Fit(Controls.Slider(card, "WINDOW_OPACITY", QuartzShell.Writes(() => C.PanelOpacity * 100f, v => {
             C.PanelOpacity = Mathf.Clamp01(v / 100f);
             Save();
             QuartzShell.ApplyLook();
@@ -105,7 +105,7 @@ internal static partial class ShellSettings {
             o.Step = 1f;
             o.Format = "0'%'";
             o.Tooltip = "DESC_WINDOW_OPACITY";
-        });
+        }));
         QuartzShell.SidebarRow(card);
     }
 

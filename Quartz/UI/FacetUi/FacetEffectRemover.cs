@@ -89,7 +89,7 @@ internal static class FacetEffectRemover {
         Flag(p, "FXRM_S_HOM", c => c.SimpleHallOfMirrors, (c, v) => c.SimpleHallOfMirrors = v, Def.SimpleHallOfMirrors, "DESC_FXRM_S_HOM");
         Flag(p, "FXRM_S_SHAKE", c => c.SimpleScreenShake, (c, v) => c.SimpleScreenShake = v, Def.SimpleScreenShake, "DESC_FXRM_S_SHAKE");
         Flag(p, "FXRM_S_SCREENTILE", c => c.SimpleScreenTile, (c, v) => c.SimpleScreenTile = v, Def.SimpleScreenTile, "DESC_FXRM_S_SCREENTILE");
-        Controls.Slider(p, "FXRM_S_MOVEMAX", QuartzShell.Writes(() => (float)C.SimpleMoveTrackMax, v => { C.SimpleMoveTrackMax = Mathf.RoundToInt(v); Save(); }), o => {
+        ShellRows.Fit(Controls.Slider(p, "FXRM_S_MOVEMAX", QuartzShell.Writes(() => (float)C.SimpleMoveTrackMax, v => { C.SimpleMoveTrackMax = Mathf.RoundToInt(v); Save(); }), o => {
             o.Id = "FXRM_S_MOVEMAX";
             o.Min = 5f;
             o.Max = EffectRemoverSettings.MoveTrackUpperBound + 5f;
@@ -97,7 +97,7 @@ internal static class FacetEffectRemover {
             o.Format = "0";
             o.Default = Def.SimpleMoveTrackMax;
             o.Tooltip = "DESC_FXRM_S_MOVEMAX";
-        });
+        }));
         return null;
     }
     // The game names filters in its own language, which Facet can draw when it is English, or when its script
@@ -157,7 +157,7 @@ internal static class FacetEffectRemover {
             "DESC_FXRM_REMOVE_ALL_DECO", () => C.Decorations);
         Flag(misc, "FXRM_LIMIT_OPACITY", c => c.LimitTrackOpacity, (c, v) => c.LimitTrackOpacity = v, Def.LimitTrackOpacity);
         Flag(misc, "FXRM_SET_ZOOM", c => c.SetCameraZoom, (c, v) => c.SetCameraZoom = v, Def.SetCameraZoom, null, () => C.Cameras);
-        Controls.Slider(misc, "FXRM_ZOOM_SCALE", QuartzShell.Writes(() => C.CameraZoomScale, v => { C.CameraZoomScale = v; Save(); }), o => {
+        ShellRows.Fit(Controls.Slider(misc, "FXRM_ZOOM_SCALE", QuartzShell.Writes(() => C.CameraZoomScale, v => { C.CameraZoomScale = v; Save(); }), o => {
             o.Id = "FXRM_ZOOM_SCALE";
             o.Min = 100f;
             o.Max = 1000f;
@@ -165,7 +165,7 @@ internal static class FacetEffectRemover {
             o.Format = "0' %'";
             o.Default = Def.CameraZoomScale;
             o.VisibleWhen = () => C.Cameras && C.SetCameraZoom;
-        });
+        }));
         Flag(misc, "FXRM_RESET_ANIM", c => c.ResetTrackAnimation, (c, v) => c.ResetTrackAnimation = v, Def.ResetTrackAnimation,
             null, () => C.TrackAnimations);
         Flag(misc, "FXRM_RESET_COLOR", c => c.ResetTrackColor, (c, v) => c.ResetTrackColor = v, Def.ResetTrackColor,

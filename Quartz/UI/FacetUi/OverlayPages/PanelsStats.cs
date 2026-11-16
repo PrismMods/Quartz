@@ -57,7 +57,10 @@ internal static class PanelsStats {
                 string c = category;
                 Button head = Ui.Btn(content, "", null);
                 head.name = Quartz.Localization.LocaleKeys.FromText("PANEL_CATEGORY", c) + "#" + n;
-                Paint.Look(head, Theme.For(head).Looks.Row);
+                // Facet's Row look paints no text: on a Button that left Unity's default near-black title and arrow.
+                Look look = Theme.For(head).Looks.Row.Copy();
+                look.Text = Role.Text;
+                Paint.Look(head, look);
                 head.style.unityTextAlign = TextAnchor.MiddleLeft;
                 head.style.marginRight = 0f;
                 head.style.paddingLeft = 0f;

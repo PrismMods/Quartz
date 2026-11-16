@@ -46,6 +46,9 @@ namespace UnityEngine.UIElements {
         public virtual void SetValueWithoutNotify(TValueType newValue) => throw null;
         protected BaseField() { }
     }
+    public abstract unsafe partial class BaseSlider<TValueType> : global::UnityEngine.UIElements.BaseField<TValueType> where TValueType : global::System.IComparable<TValueType> {
+        protected BaseSlider() { }
+    }
     public unsafe partial class BindableElement : global::UnityEngine.UIElements.VisualElement {
         public BindableElement() { }
     }
@@ -210,6 +213,8 @@ namespace UnityEngine.UIElements {
     }
     public unsafe partial interface ITransform {
     }
+    public unsafe partial interface IValueField<T> {
+    }
     public unsafe partial interface IVisualElementScheduler {
     }
     public enum Justify : int {
@@ -296,6 +301,12 @@ namespace UnityEngine.UIElements {
     public unsafe partial class Scroller : global::UnityEngine.UIElements.VisualElement {
         public event global::System.Action<float> valueChanged { add { } remove { } }
         public Scroller() { }
+    }
+    public unsafe partial class Slider : global::UnityEngine.UIElements.BaseSlider<float> {
+        public Slider() { }
+    }
+    public unsafe partial class SliderInt : global::UnityEngine.UIElements.BaseSlider<int> {
+        public SliderInt() { }
     }
     public unsafe partial struct StyleBackground : global::System.IEquatable<global::UnityEngine.UIElements.StyleBackground> {
         private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
