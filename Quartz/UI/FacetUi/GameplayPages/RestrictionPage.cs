@@ -34,7 +34,7 @@ internal static class RestrictionPage {
     /// <summary>The judgements that are not timings: Multipress, Miss and the Overloads, a tile line under the bar.</summary>
     internal static JudgementTiles.Row[] Extra => [.. Rows.Where(r => r.Bit > 6)];
 
-    // Shown in X-Perfect-only mode only, never written: no classic toggle, no hotkey.
+    // Shown in X-Perfect-only mode, and as Custom's switches while XPerfect is shown: no classic toggle, no hotkey.
     private static readonly JudgementTiles.Row[] XRows = [
         new("JR_ALLOW_XPERFECT", null, 12),
         new("JR_ALLOW_PLUSPERFECT", null, 13),
@@ -43,7 +43,7 @@ internal static class RestrictionPage {
 
     /// <summary>The mode the page shows (PageRules.ShownMode) and whether its bar splits Perfect into X and ±.</summary>
     internal static int Shown => PageRules.ShownMode(C.JRestrictMode, XPerfectBridge.Installed);
-    internal static bool Split => Shown == 2 && XPerfectBridge.Shown;
+    internal static bool Split => Shown is 2 or 3 && XPerfectBridge.Shown;
 
     internal static void Build(VisualElement p) {
         Restriction.EnsureConf();
@@ -75,11 +75,13 @@ internal static class RestrictionPage {
         Controls.Live(p, () => Shown * 2 + (Split ? 1 : 0), box => {
             int mode = Shown;
             bool custom = mode == 3, split = Split;
+            // Custom with XPerfect shown: X, + and − Perfect are switches of their own in Perfect's place (PageRules.SplitShown).
+            Func<int> mask = () => custom && split ? PageRules.SplitShown(C.JRestrictAllowedMask) : C.JRestrictAllowedMask;
             JudgementBar.Build(box, custom ? "JR_MODE_CUSTOM" : null, Bind.To(
-                    () => custom ? C.JRestrictAllowedMask : Allowed(mode, split),
-                    v => C.JRestrictAllowedMask = v),
+                    () => custom ? mask() : Allowed(mode, split),
+                    v => C.JRestrictAllowedMask = custom && split ? PageRules.SplitStored(v) : v),
                 Def.JRestrictAllowedMask, Bar(split, XPerfectBridge.Native), Extra, save,
-                b => PageRules.Blocked(Shown, C.JRestrictAllowedMask, b), o => o.VisibleWhen = () => C.JRestrictMode != 0, !custom);
+                b => PageRules.Blocked(Shown, mask(), b), o => o.VisibleWhen = () => C.JRestrictMode != 0, !custom);
         });
 
         VisualElement card = Controls.Card(p, null);

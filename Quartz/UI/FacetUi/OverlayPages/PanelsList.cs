@@ -33,6 +33,7 @@ internal static class PanelsList {
             o.Items = () => card.panel == null ? NoPanels : Panels;
             o.Key = p => ShellRows.ItemKey(p, Panels.IndexOf(p));
             o.Text = p => p.Name;
+            o.Build = (e, _) => ShellRows.Grip(e);
             o.Move = Move;
             o.Selected = p => p == Shown;
             o.Select = p => {
@@ -104,7 +105,7 @@ internal static class PanelsList {
 
     // The page's sections whose fold state is stored under an Id numbered by a panel's place; each opens until the reader
     // first folds it.
-    private static readonly string[] PanelFolds = ["HEADING_STATS", "HEADING_APPEARANCE", "HEADING_SHADOW", "HEADING_ACTIONS"];
+    private static readonly string[] PanelFolds = ["HEADING_STATS", "HEADING_APPEARANCE", "HEADING_SHADOW"];
 
     /// <summary>Each panel's place and each stat's number on the page (1-based), as the row Ids number them.</summary>
     internal static Dictionary<object, int> Places(List<PanelConfig> panels) {
@@ -245,13 +246,12 @@ internal static class PanelsList {
             o.Default = Def.GetTextShadowColor();
         });
 
-        VisualElement actions = ShellRows.Section(body, "HEADING_ACTIONS", o => o.Id = "HEADING_ACTIONS#" + n);
-        // Delete has no confirm, as the classic button.
-        ShellRows.Buttons(actions, new ShellRows.Btn("PANEL_RESETPOS", () => PanelsOverlay.ResetPosition(panel), more: o => o.Id = "PANEL_RESETPOS#" + n),
+        // The panel's actions on one row of their own, never folded away. Delete has no confirm, as the classic button.
+        ShellRows.Buttons(body, new ShellRows.Btn("PANEL_RESETPOS", () => PanelsOverlay.ResetPosition(panel), more: o => o.Id = "PANEL_RESETPOS#" + n),
             new ShellRows.Btn("PANEL_DELETE", () => {
                 List<PanelConfig> before = [.. Panels];
                 if(Panels.Remove(panel)) Moved(before);
-            }, more: o => o.Id = "PANEL_DELETE#" + n));
+            }, danger: true, more: o => o.Id = "PANEL_DELETE#" + n));
     }
 }
 #endif

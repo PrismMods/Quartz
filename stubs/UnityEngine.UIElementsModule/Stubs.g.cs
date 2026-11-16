@@ -50,6 +50,7 @@ namespace UnityEngine.UIElements {
         protected BindableElement() { }
     }
     public unsafe partial class Button : global::UnityEngine.UIElements.TextElement {
+        public event global::System.Action clicked { add { } remove { } }
         protected Button() { }
     }
     public abstract unsafe partial class CallbackEventHandler {
@@ -130,6 +131,7 @@ namespace UnityEngine.UIElements {
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.FlexDirection> flexDirection { get; set; }
         global::UnityEngine.UIElements.StyleFloat flexGrow { get; set; }
         global::UnityEngine.UIElements.StyleFloat flexShrink { get; set; }
+        global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.Wrap> flexWrap { get; set; }
         global::UnityEngine.UIElements.StyleLength fontSize { get; set; }
         global::UnityEngine.UIElements.StyleLength height { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.Justify> justifyContent { get; set; }
@@ -150,12 +152,11 @@ namespace UnityEngine.UIElements {
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.Position> position { get; set; }
         global::UnityEngine.UIElements.StyleLength right { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.TextOverflow> textOverflow { get; set; }
+        global::UnityEngine.UIElements.StyleTextShadow textShadow { get; set; }
         global::UnityEngine.UIElements.StyleLength top { get; set; }
         global::UnityEngine.UIElements.StyleFontDefinition unityFontDefinition { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.FontStyle> unityFontStyleAndWeight { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.TextAnchor> unityTextAlign { get; set; }
-        global::UnityEngine.UIElements.StyleColor unityTextOutlineColor { get; set; }
-        global::UnityEngine.UIElements.StyleFloat unityTextOutlineWidth { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.Visibility> visibility { get; set; }
         global::UnityEngine.UIElements.StyleEnum<global::UnityEngine.UIElements.WhiteSpace> whiteSpace { get; set; }
         global::UnityEngine.UIElements.StyleLength width { get; set; }
@@ -267,7 +268,11 @@ namespace UnityEngine.UIElements {
         private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
         private T m_Value;
         public T value { get => throw null; set { } }
+        public static bool operator ==(global::UnityEngine.UIElements.StyleEnum<T> lhs, global::UnityEngine.UIElements.StyleEnum<T> rhs) => throw null;
         public static implicit operator global::UnityEngine.UIElements.StyleEnum<T>(T v) => throw null;
+        public static bool operator !=(global::UnityEngine.UIElements.StyleEnum<T> lhs, global::UnityEngine.UIElements.StyleEnum<T> rhs) => throw null;
+        public override bool Equals(object obj) => throw null;
+        public override int GetHashCode() => throw null;
         bool global::System.IEquatable<global::UnityEngine.UIElements.StyleEnum<T>>.Equals(global::UnityEngine.UIElements.StyleEnum<T> other) => throw null;
     }
     public unsafe partial struct StyleFloat : global::System.IEquatable<global::UnityEngine.UIElements.StyleFloat> {
@@ -297,6 +302,12 @@ namespace UnityEngine.UIElements {
         public static implicit operator global::UnityEngine.UIElements.StyleLength(global::UnityEngine.UIElements.StyleKeyword keyword) => throw null;
         bool global::System.IEquatable<global::UnityEngine.UIElements.StyleLength>.Equals(global::UnityEngine.UIElements.StyleLength other) => throw null;
     }
+    public unsafe partial struct StyleTextShadow : global::System.IEquatable<global::UnityEngine.UIElements.StyleTextShadow> {
+        private global::UnityEngine.UIElements.StyleKeyword m_Keyword;
+        private global::UnityEngine.UIElements.TextShadow m_Value;
+        public static implicit operator global::UnityEngine.UIElements.StyleTextShadow(global::UnityEngine.UIElements.TextShadow v) => throw null;
+        bool global::System.IEquatable<global::UnityEngine.UIElements.StyleTextShadow>.Equals(global::UnityEngine.UIElements.StyleTextShadow other) => throw null;
+    }
     public unsafe partial class StyleValueCollection {
         protected StyleValueCollection() { }
     }
@@ -317,6 +328,12 @@ namespace UnityEngine.UIElements {
     public enum TextOverflow : int {
         Clip = 0,
         Ellipsis = 1,
+    }
+    public unsafe partial struct TextShadow : global::System.IEquatable<global::UnityEngine.UIElements.TextShadow> {
+        public float blurRadius;
+        public global::UnityEngine.Color color;
+        public global::UnityEngine.Vector2 offset;
+        bool global::System.IEquatable<global::UnityEngine.UIElements.TextShadow>.Equals(global::UnityEngine.UIElements.TextShadow other) => throw null;
     }
     public sealed unsafe partial class UIDocument : global::UnityEngine.MonoBehaviour {
         public global::UnityEngine.UIElements.VisualElement rootVisualElement { get => throw null; }
@@ -393,6 +410,11 @@ namespace UnityEngine.UIElements {
         NoWrap = 1,
         Pre = 2,
         PreWrap = 3,
+    }
+    public enum Wrap : int {
+        NoWrap = 0,
+        Wrap = 1,
+        WrapReverse = 2,
     }
 }
 namespace UnityEngine.UIElements.Experimental {

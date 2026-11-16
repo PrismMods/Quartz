@@ -227,6 +227,7 @@
     "IMPORT_MODE_REPLACE_CERTAIN": "Replace certain",
     "IMPORT_NONE": "No supported mods found. Load one through Unity Mod Manager (KorenResourcePack (v1), JipperResourcePack, JipperKeyViewer, ADOFAI Tweaks, KeyboardChatterBlocker or Enhanced Effect Remover), then press Rescan.",
     "IMPORT_NOT_COMPATIBLE": "Not Compatible",
+    "IMPORT_PRISM_SUITE": "Prism suite · works alongside Quartz",
     "IMPORT_OK": "Imported {0} settings from {1}.",
     "IMPORT_OK_NONE": "Nothing to import from {0}.",
     "IMPORT_PART_COLORS": "Colors",

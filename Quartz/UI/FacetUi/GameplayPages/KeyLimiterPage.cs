@@ -3,6 +3,7 @@ using Facet;
 using Quartz.Core;
 using Quartz.Features.KeyLimiter;
 using Quartz.Game;
+using Quartz.Resource;
 using Quartz.UI.Utility;
 using Quartz.Utility;
 using UnityEngine;
@@ -58,7 +59,12 @@ internal static class KeyLimiterPage {
             o.Id = "KL_ALLOWED_KEYS";
             o.VisibleWhen = () => Keys().Length > 0;
         });
-        Controls.Repeat<int>(card, Keys, k => KeyName(k) + ":" + Array.IndexOf(Keys(), k), KeyRow);
+        // The keys as chips on one wrapping line, each name unbroken.
+        VisualElement chips = Controls.Repeat<int>(card, Keys, k => KeyName(k) + ":" + Array.IndexOf(Keys(), k), KeyChip);
+        chips.name = "kl-keys";
+        chips.style.flexDirection = FlexDirection.Row;
+        chips.style.flexWrap = Wrap.Wrap;
+        ShellRows.Inset(chips).style.paddingBottom = Theme.For(chips).Sizes.Gap;
         Hint(card, "KL_NO_ALLOWED_KEYS", () => Keys().Length == 0);
 
         // Subscribed only while shown: the search index builds this page detached.
@@ -88,26 +94,36 @@ internal static class KeyLimiterPage {
     // The allowed key a row's Set is capturing for; None while no row's capture runs.
     private static KeyCode setting = KeyCode.None;
 
-    // An allowed key's name with Set and Remove, both absent while the key viewer owns the keys. Set reads PRESS_A_KEY while
-    // its own capture runs.
-    private static void KeyRow(VisualElement box, int k) {
+    // An allowed key as a chip: its name, which replaces the key with the next one pressed (PRESS_A_KEY while that capture
+    // runs), and a remove cross. While the key viewer owns the keys the chip is the name alone, not clickable.
+    private static void KeyChip(VisualElement box, int k) {
         int n = Array.IndexOf(Keys(), k) + 1;
         KeyCode key = KeyCodes.Normalize((KeyCode)k);
-        Button set = Controls.Action(box, KeyName(k), "SET", () => {
+        Sizes sz = Theme.For(box).Sizes;
+        box.style.flexDirection = FlexDirection.Row;
+        box.style.alignItems = Align.Center;
+        box.style.marginRight = sz.Gap;
+        box.style.marginTop = sz.Gap / 2f;
+        string name = KeyName(k);
+        Button set = Ui.Btn(box, name, () => {
+            if(!Unlocked()) return;
             if(KeyLimiter.IsCapturing) KeyLimiter.CancelCapture();
             else {
                 setting = key;
                 KeyLimiter.StartCapture(nk => KeyLimiter.ReplaceAllowedKey(key, nk), () => setting = KeyCode.None);
             }
-        }, o => o.Id = "SET#" + n);
-        string face = "SET";
-        Button remove = Ui.Btn(set.parent, "REMOVE", () => KeyLimiter.ToggleAllowedKey(key));
+        });
+        set.name = "SET#" + n + "-input";
+        set.style.marginRight = 0f;
+        Words.Tip(set, "DESC_KL_KEY");
+        Button remove = Ui.IconButton(box, Background.FromSprite(MainCore.Spr.Get(UISprite.X128)), "REMOVE", () => KeyLimiter.ToggleAllowedKey(key));
         remove.name = "REMOVE#" + n;
-        remove.style.marginLeft = Theme.For(remove).Sizes.Gap;
+        string face = name;
         Controls.Hook(set, o => o.VisibleWhen = () => {
-            string want = KeyLimiter.IsCapturing && setting == key ? "PRESS_A_KEY" : "SET";
+            string want = KeyLimiter.IsCapturing && setting == key ? "PRESS_A_KEY" : name;
             if(want != face) Words.Label(set, face = want);
-            return Unlocked();
+            set.pickingMode = Unlocked() ? PickingMode.Position : PickingMode.Ignore;
+            return true;
         });
         Controls.Hook(remove, o => o.VisibleWhen = Unlocked);
     }

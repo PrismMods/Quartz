@@ -43,11 +43,13 @@ internal static class TufPacksPage {
 
         VisualElement list = Controls.When(p, () => s.SelectedPack == null);
         VisualElement tools = Controls.Card(list, null);
-        // A search finds Refresh here: rows are what the index notes, and a toolbar button is no row.
-        Controls.Action(tools, "", "TUF_REFRESH", s.RefreshPacks, o => o.Id = "TUF_REFRESH");
+        // One row, as on Levels: sort chips, direction, and Refresh at the right end. A search finds Refresh: rows are what the
+        // index notes, so Refresh stays its own unlabeled row, moved into the chips' bar.
+        Button refresh = Controls.Action(tools, "", "TUF_REFRESH", s.RefreshPacks, o => o.Id = "TUF_REFRESH");
         Control<TufPackSort> sort = Controls.Chips(tools, Bind.To(() => s.Sort, s.SetSort), Sorts, SortKey, o => o.Id = "tuf-packs-sort");
         for(int i = 0; i < Sorts.Length && i < sort.Root.childCount; i++) sort.Root[i].name = SortKey(Sorts[i]);
         Arrow(sort.Root, "tuf-packs-direction", () => s.Ascending, s.ToggleAscending);
+        ShellRows.Join(sort.Root, refresh).style.marginLeft = StyleKeyword.Auto;
 
         VisualElement results = Controls.Card(list, null);
         Texts texts = new(s);

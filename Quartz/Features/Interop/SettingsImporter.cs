@@ -45,6 +45,8 @@ public sealed class SettingsImportResult {
 public sealed class InstalledModInfo {
     public string Id;
     public string Label;
+    // A Prism suite mod (Sapphire, Topaz, CamDisplay, the suite's dev tools): it runs beside Quartz, there is nothing to import.
+    public bool Suite;
 }
 public static class SettingsImporter {
     private sealed class ImportSpec {
@@ -113,9 +115,22 @@ public static class SettingsImporter {
             mods.Add(new InstalledModInfo {
                 Id = id,
                 Label = string.IsNullOrEmpty(display) ? id : display,
+                Suite = IsPrismSuite(id, UmmInterop.GetModAssembly(id)),
             });
         }
         return mods;
+    }
+    private static readonly string[] SuiteIds = ["Sapphire", "Topaz", "CamDisplay", "Facet", "LayoutProbe"];
+    /// <summary>A known suite id, or a mod built on PrismLib or Facet.</summary>
+    internal static bool IsPrismSuite(string id, System.Reflection.Assembly assembly) {
+        if(SuiteIds.Contains(id, StringComparer.OrdinalIgnoreCase)) return true;
+        try {
+            return assembly != null && assembly.GetReferencedAssemblies().Any(n =>
+                n.Name is "PrismLib" or "PrismLib.UI" || n.Name.StartsWith("Facet", StringComparison.Ordinal));
+        } catch(Exception e) {
+            Diag.Ignore(e);
+            return false;
+        }
     }
     private static SettingsImportOption ScanDiskForKorenV1() {
         ImportSpec spec = Array.Find(Specs, s => s.Source == SettingsImportSource.KorenResourcePackV1);

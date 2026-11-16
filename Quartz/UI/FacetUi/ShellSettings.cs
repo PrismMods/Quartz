@@ -20,12 +20,12 @@ internal static partial class ShellSettings {
 
     internal static void Build(VisualElement p) {
         Controls.PageHeader(p, "SETTINGS", null, o => o.Id = "menu-header");
+        Language(Card(p, "LANGUAGE"));   // first: a player who cannot read the rest finds it at once
         Menu(Card(p, "PRISM_GROUP_MENU"));
         Appearance(Card(p, "MENU_GROUP_APPEARANCE"));
         FontCards(p);
         Animation(Card(p, "HEADING_ANIMATION", o => o.VisibleWhen = () => PrismBridge.Available));   // its switch is a PrismLib setting
         Behaviour(Card(p, "MENU_GROUP_BEHAVIOUR"));
-        Language(Card(p, "LANGUAGE"));
         Maintenance(Card(p, "MENU_GROUP_MAINTENANCE"));
         UpdatesCard(p);
         VisualElement experimental = Card(p, "PRISM_GROUP_EXPERIMENTAL");

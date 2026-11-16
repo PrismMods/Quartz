@@ -23,6 +23,7 @@
     "DESC_CHARTKEYLIMITER_ENABLE": "레벨에 키 제한 이벤트를 넣을 수 있고, 플레이할 때 적용돼요.",
     "CHARTKEYLIMITER_ENABLE": "채보 키 제한",
     "CHATTER_DESC": "한 번 누를 때 키가 두 번 튀는 입력을 무시해요",
-    "KEYLIMITER_DESC": "허용한 키만 입력으로 인정해요"
+    "KEYLIMITER_DESC": "허용한 키만 입력으로 인정해요",
+    "DESC_KL_KEY": "누르면 다음에 누르는 키로 이 키를 바꿔요."
   }
 }

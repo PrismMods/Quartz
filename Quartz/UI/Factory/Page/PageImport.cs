@@ -81,7 +81,7 @@ internal static class PageImport {
             return;
         }
         options.Sort((a, b) => string.Compare(a.Label, b.Label, StringComparison.OrdinalIgnoreCase));
-        incompatible.Sort((a, b) => string.Compare(a.Label, b.Label, StringComparison.OrdinalIgnoreCase));
+        incompatible.Sort((a, b) => a.Suite != b.Suite ? a.Suite.CompareTo(b.Suite) : string.Compare(a.Label, b.Label, StringComparison.OrdinalIgnoreCase));
         foreach(SettingsImportOption option in options) CreateOptionCard(option);
         foreach(InstalledModInfo mod in incompatible) CreateIncompatibleCard(mod);
     }
@@ -99,7 +99,8 @@ internal static class PageImport {
         tagLe.preferredWidth = 170f;
         tagLe.minWidth = 170f;
         tagLe.flexibleWidth = 0f;
-        GenerateUI.Localize(tag, "IMPORT_NOT_COMPATIBLE", "Not Compatible");
+        if(mod.Suite) GenerateUI.Localize(tag, "IMPORT_PRISM_SUITE", "Prism suite · works alongside Quartz");
+        else GenerateUI.Localize(tag, "IMPORT_NOT_COMPATIBLE", "Not Compatible");
     }
     private static void CreateOptionCard(SettingsImportOption option) {
         var row = GenerateUI.Row(listContainer, 50f);

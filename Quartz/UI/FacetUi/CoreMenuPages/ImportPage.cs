@@ -33,7 +33,8 @@ internal static class ImportPage {
             HashSet<string> ids = new(found.Select(o => o.Id), StringComparer.OrdinalIgnoreCase);
             List<InstalledModInfo> others = [.. SettingsImporter.GetAllInstalledMods().Where(m => !ids.Contains(m.Id))];
             found.Sort((a, b) => string.Compare(a.Label, b.Label, StringComparison.OrdinalIgnoreCase));
-            others.Sort((a, b) => string.Compare(a.Label, b.Label, StringComparison.OrdinalIgnoreCase));
+            // Other mods by name, then the Prism suite's own mods as a group of their own.
+            others.Sort((a, b) => a.Suite != b.Suite ? a.Suite.CompareTo(b.Suite) : string.Compare(a.Label, b.Label, StringComparison.OrdinalIgnoreCase));
             options = [.. found];
             incompatible = [.. others];
             read = string.Join("|", options.Select(o => o.OptionId)) + "/" + string.Join("|", incompatible.Select(m => m.Id));
@@ -74,7 +75,9 @@ internal static class ImportPage {
                 VisualElement right = Controls.Row(box, "");
                 Label name = Named(right.parent.Q<Label>(), incompatible[i].Label);
                 if(name != null) Paint.Fg(name, Role.TextMuted);
-                Ui.Muted(right, "IMPORT_NOT_COMPATIBLE").name = "IMPORT_NOT_COMPATIBLE#" + (i + 1);
+                Label tag = Ui.Muted(right, incompatible[i].Suite ? "IMPORT_PRISM_SUITE" : "IMPORT_NOT_COMPATIBLE");
+                tag.name = (incompatible[i].Suite ? "IMPORT_PRISM_SUITE#" : "IMPORT_NOT_COMPATIBLE#") + (i + 1);
+                if(incompatible[i].Suite) Paint.Fg(tag, Role.Accent);
             }
         });
         rows.name = "import-list";

@@ -100,10 +100,12 @@ internal static class TufCards {
         Label id = Literal(head, "#" + l.Id, Role.TextMuted);
         id.style.marginRight = 12f;
         Label diff = Literal(head, l.Difficulty ?? "", Role.Text);
+        diff.name = "tuf-difficulty";
         Paint.Forget(diff);
         diff.style.color = rail;
-        diff.style.unityTextOutlineColor = Color.white;
-        diff.style.unityTextOutlineWidth = 0.2f;
+        // Bold (the face's real weight) over a soft dark shadow: the colour reads on light and dark thumbnails alike. Set once here.
+        diff.style.unityFontStyleAndWeight = FontStyle.Bold;
+        diff.style.textShadow = new TextShadow { offset = new Vector2(1f, 1f), blurRadius = 3f, color = new Color(0f, 0f, 0f, 0.6f) };
         diff.style.marginRight = 12f;
         if(installed && o.Badge) Badge(head, l, s);
 

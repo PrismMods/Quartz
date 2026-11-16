@@ -318,11 +318,17 @@ internal static partial class FacetSelfTestChecks {
             HashSet<string> ids = new(options.Select(o => o.Id), StringComparer.OrdinalIgnoreCase);
             List<InstalledModInfo> others = [.. SettingsImporter.GetAllInstalledMods().Where(m => !ids.Contains(m.Id))];
             options.Sort((a, b) => string.Compare(a.Label, b.Label, StringComparison.OrdinalIgnoreCase));
-            others.Sort((a, b) => string.Compare(a.Label, b.Label, StringComparison.OrdinalIgnoreCase));
+            others.Sort((a, b) => a.Suite != b.Suite ? a.Suite.CompareTo(b.Suite) : string.Compare(a.Label, b.Label, StringComparison.OrdinalIgnoreCase));
             string[] want = [.. options.Select(o => o.Label), .. others.Select(m => m.Label)];
             string[] shown = [.. (PageContent().Q(name: "import-list")?.Query<Label>("import-name").ToList() ?? []).Select(l => l.text)];
             bool none = Names(PageContent(), "IMPORT_NONE") == (want.Length == 0);
-            bool tagged = Enumerable.Range(1, others.Count).All(k => Names(PageContent(), "IMPORT_NOT_COMPATIBLE#" + k));
+            bool tagged = Enumerable.Range(1, others.Count).All(k =>
+                Names(PageContent(), (others[k - 1].Suite ? "IMPORT_PRISM_SUITE#" : "IMPORT_NOT_COMPATIBLE#") + k));
+            string[] suite = [.. others.Where(m => m.Suite).Select(m => m.Id)];
+            bool known = new[] { "Sapphire", "Topaz", "CamDisplay", "Facet", "LayoutProbe" }.All(id =>
+                others.Find(m => string.Equals(m.Id, id, StringComparison.OrdinalIgnoreCase)) is not { } m || m.Suite);
+            check($"{ImportKey}: Prism suite mods are marked Prism suite, not Not Compatible, listed last as their own group",
+                tagged && known && others.SkipWhile(m => !m.Suite).All(m => m.Suite), $"suite={string.Join("|", suite)} tagged={tagged} known={known}");
             check($"{ImportKey}: the options match SettingsImporter's, compatible first, each sorted by label",
                 rescanned && shown.SequenceEqual(want) && none && tagged,
                 $"rescan={rescanned} want={string.Join("|", want)} shown={string.Join("|", shown)} none={none} tagged={tagged}");

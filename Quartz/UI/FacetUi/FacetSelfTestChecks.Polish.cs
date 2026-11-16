@@ -101,12 +101,12 @@ internal static partial class FacetSelfTestChecks {
         check($"over {what} Facet's drawn text cursor shows, and is cleared after it leaves", field != null && overDrawn && !leftDrawn, detail);
     }
 
-    // The Settings page's first card holds the hotkey, its modifier and two switches: every control ends on one right edge.
+    // The Settings page's menu card holds the hotkey, its modifier and two switches: every control ends on one right edge.
     private static void ControlEdges(Action<string, bool, string> check) {
-        List<VisualElement> inputs = SettingsCard(SettingsCardKeys[0])?.Query<VisualElement>().ToList()
+        List<VisualElement> inputs = SettingsCard("PRISM_GROUP_MENU")?.Query<VisualElement>().ToList()
             .Where(e => e.name != null && e.name.EndsWith("-input") && Displayed(e)).ToList() ?? [];
         float lo = inputs.Count == 0 ? 0f : inputs.Min(e => e.worldBound.xMax), hi = inputs.Count == 0 ? 0f : inputs.Max(e => e.worldBound.xMax);
-        check("the Settings page's first card ends every control on one right edge (±1)", inputs.Count >= 4 && hi - lo <= 1f,
+        check("the Settings page's menu card ends every control on one right edge (±1)", inputs.Count >= 4 && hi - lo <= 1f,
             string.Join(", ", inputs.Select(e => $"{e.name} {e.worldBound.xMax:0.0}")));
     }
 

@@ -15,6 +15,7 @@ using Quartz.IO;
 using Quartz.Overlay;
 using Quartz.UI.FacetUi.GameplayPages;
 using Quartz.UI.Utility;
+using Quartz.Utility;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -46,9 +47,10 @@ internal static partial class FacetSelfTestChecks {
             if(KeyLimiter.Conf.AllowedKeys.Length == 0) KeyLimiter.Conf.AllowedKeys = [(int)KeyCode.F15];
         }, null, keys, searched, () => More(), hidden);
         IEnumerator More() {
-            // A key's Set and Remove are absent while the key viewer owns the keys.
+            // A key's chip always shows its name; its remove cross is absent while the key viewer owns the keys.
             string[] buttons = ["SET#1-input", "REMOVE#1"];
-            yield return Parity(check, page, locked ? [] : buttons, locked ? buttons : null);
+            yield return Parity(check, page, locked ? ["SET#1-input"] : buttons, locked ? ["REMOVE#1"] : null);
+            yield return KlChips(check, page);
             // The captures need the keys unlocked. Where the key viewer owns them, its sync source reads off for these checks,
             // set by reflection: SetSyncing goes to the key viewer, which may rewrite the player's keys.
             FieldInfo source = SyncSource;
@@ -92,9 +94,30 @@ internal static partial class FacetSelfTestChecks {
         KeyLimiter.CancelCapture();
     }
 
-    // A key row's Set reads PRESS_A_KEY while its own capture runs; the capture button above keeps its label.
+    // The allowed keys are chips on one wrapping line: every chip in the one kl-keys row, each name on a single line.
+    private static IEnumerator KlChips(Action<string, bool, string> check, string page) {
+        int[] was = KeyLimiter.Conf.AllowedKeys;
+        KeyLimiter.Conf.AllowedKeys = [.. Enumerable.Range((int)KeyCode.A, 26)];
+        QuartzShell.Surface?.Refresh();
+        yield return Frames(3);
+        VisualElement line = PageContent().Q(name: "kl-keys");
+        List<Button> chips = line?.Query<Button>().Where(b => b.name.StartsWith("SET#", StringComparison.Ordinal)).ToList() ?? [];
+        float h = chips.Count > 0 ? chips[0].worldBound.height : 0f;
+        int rows = chips.Select(b => Mathf.RoundToInt(b.worldBound.yMin)).Distinct().Count();
+        bool unbroken = chips.All(b => b.worldBound.height <= h + 1f);
+        check($"{page}: the allowed keys are chips on one wrapping line, each name unbroken",
+            line != null && line.resolvedStyle.flexDirection == FlexDirection.Row && chips.Count == 26 && rows < 26 && unbroken,
+            $"line={line != null} chips={chips.Count} lines={rows} unbroken={unbroken}");
+        KeyLimiter.Conf.AllowedKeys = was;
+        QuartzShell.Surface?.Refresh();
+        yield return Frames(2);
+    }
+
+    // A key chip reads PRESS_A_KEY while its own capture runs and its key's name after; the capture button above keeps its label.
     private static IEnumerator KlRowCaptureFace(Action<string, bool, string> check, string page) {
-        string idle = QuartzHost.Host.Translate("KL_CAPTURE"), set = QuartzHost.Host.Translate("SET"), pressing = QuartzHost.Host.Translate("PRESS_A_KEY");
+        string idle = QuartzHost.Host.Translate("KL_CAPTURE"), pressing = QuartzHost.Host.Translate("PRESS_A_KEY");
+        int[] allowed = KeyLimiter.Conf.AllowedKeys;
+        string set = allowed.Length > 0 ? Keybind.KeyName(KeyCodes.Normalize((KeyCode)allowed[0])) : "";
         Button row = PageContent().Q<Button>("SET#1-input");
         if(row != null) Submit(row);
         yield return Frames(2);
@@ -102,7 +125,7 @@ internal static partial class FacetSelfTestChecks {
         string during = row?.text, top = KlCaptureButton()?.text;
         if(row != null) Submit(row);
         yield return Frames(2);
-        check($"{page} SET#1: the row's Set reads PRESS_A_KEY while it captures, and KL_CAPTURE keeps its label",
+        check($"{page} SET#1: the key's chip reads PRESS_A_KEY while it captures, its name after, and KL_CAPTURE keeps its label",
             row != null && capturing && !KeyLimiter.IsCapturing && during == pressing && top == idle && row.text == set,
             $"button={row != null} capturing={capturing} after={KeyLimiter.IsCapturing} set='{during}'/'{row?.text}' capture='{top}'");
         KeyLimiter.CancelCapture();

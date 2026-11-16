@@ -27,10 +27,10 @@ internal static class AddonsPage {
         var updates = new Dictionary<string, AddonUpdateCheck.Result>();
 
         VisualElement card = Controls.Card(p, null);
-        ShellRows.Buttons(card, new ShellRows.Btn("ADDONS_ADD", () => QuartzShell.Do("addons.add", AddAddon), "DESC_ADDONS_ADD"),
+        Button[] buttons = ShellRows.Buttons(card, new ShellRows.Btn("ADDONS_ADD", () => QuartzShell.Do("addons.add", AddAddon), "DESC_ADDONS_ADD"),
             new ShellRows.Btn("ADDONS_RELOAD", () => QuartzShell.Do("addons.reload", () => MainThread.Enqueue(AddonService.Reload)), "DESC_ADDONS_RELOAD"),
             new ShellRows.Btn("ADDONS_OPEN_FOLDER", () => QuartzShell.Do("addons.folder", AddonService.OpenAddonsFolder), "DESC_ADDONS_OPEN_FOLDER"));
-        Label empty = ShellRows.Inset(Ui.Muted(card, "ADDONS_EMPTY"));
+        Label empty = ShellRows.Lead(buttons[0], Ui.Muted(card, "ADDONS_EMPTY"));   // on the buttons' row, at its left
         empty.style.whiteSpace = WhiteSpace.Normal;
         Controls.Hook(empty, o => {
             o.Id = "ADDONS_EMPTY";

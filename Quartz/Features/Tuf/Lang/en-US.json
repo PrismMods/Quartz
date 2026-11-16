@@ -84,7 +84,7 @@
     "TUF_UPDATE_CURRENT": "Up to date",
     "TUF_UPDATE_RUNNING": "Updating…",
     "DESC_TUF_UPDATE_BADGE": "Click to check if TUF has a newer upload of this level. If there's an update, click again to download it over your copy.",
-    "TUF_CHECK_UPDATES": "Updates",
+    "TUF_CHECK_UPDATES": "Check Level Updates",
     "DESC_TUF_CHECK_UPDATES": "Checks TUF for newer uploads of every level in your library. It sends one request per level, so big libraries take a moment. Quartz checks once a day by itself. When updates are ready, click to queue them all.",
     "TUF_CHECKING_UPDATES": "{0}/{1}",
     "TUF_UPDATES_COUNT": "Updates ({0})",

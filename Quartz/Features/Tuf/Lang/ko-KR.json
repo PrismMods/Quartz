@@ -84,7 +84,7 @@
     "TUF_UPDATE_CURRENT": "최신",
     "TUF_UPDATE_RUNNING": "업데이트 중…",
     "DESC_TUF_UPDATE_BADGE": "받은 뒤 이 레벨이 다시 올라왔는지 TUF에서 확인해요. 업데이트가 있으면 눌러서 지금 사본 위에 받아요.",
-    "TUF_CHECK_UPDATES": "업데이트",
+    "TUF_CHECK_UPDATES": "레벨 업데이트 확인",
     "DESC_TUF_CHECK_UPDATES": "라이브러리 레벨이 받은 뒤 다시 올라왔는지 TUF에서 확인해요. 레벨마다 한 번씩 요청해서 라이브러리가 크면 시간이 걸려요. Quartz가 하루에 한 번 알아서 확인해요. 업데이트가 있을 때 누르면 모두 대기열에 넣어요.",
     "TUF_CHECKING_UPDATES": "{0}/{1}",
     "TUF_UPDATES_COUNT": "업데이트 ({0})",

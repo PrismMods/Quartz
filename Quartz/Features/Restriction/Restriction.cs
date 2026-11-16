@@ -66,9 +66,20 @@ public static class Restriction {
         int marginInt = (int)kind;
         switch(Conf.JRestrictMode) {
             case 1:
-            case 3:
             case 4:
                 return PageRules.Blocked(Conf.JRestrictMode, Conf.JRestrictAllowedMask, marginInt);
+            case 3: {
+                // With XPerfect, a Perfect is judged by its grade (X, + or −) once the custom mask has grades.
+                int mask = Conf.JRestrictAllowedMask, bit = marginInt;
+                if(kind == HitKind.Perfect && (mask & PageRules.XPerfectBits) != 0 && XPerfectBridge.Active)
+                    bit = PageRules.CustomBit(mask, bit, XPerfectBridge.JudgeFor(margin) switch {
+                        XPerfectBridge.Judge.X => 12,
+                        XPerfectBridge.Judge.Plus => 13,
+                        XPerfectBridge.Judge.Minus => 14,
+                        _ => -1,
+                    });
+                return PageRules.Blocked(3, mask, bit);
+            }
             case 2: {
                 if(kind != HitKind.Perfect) return true;
                 if(!XPerfectBridge.Active) return false;

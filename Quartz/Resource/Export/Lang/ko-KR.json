@@ -227,6 +227,7 @@
     "IMPORT_MODE_REPLACE_CERTAIN": "선택 교체",
     "IMPORT_NONE": "지원하는 모드가 없어요. Unity Mod Manager로 KorenResourcePack (v1), JipperResourcePack, JipperKeyViewer, ADOFAI Tweaks, KeyboardChatterBlocker, Enhanced Effect Remover 중 하나를 불러온 뒤 다시 검색하면 돼요.",
     "IMPORT_NOT_COMPATIBLE": "호환 안 됨",
+    "IMPORT_PRISM_SUITE": "Prism 제품군 · Quartz와 함께 작동해요",
     "IMPORT_OK": "{1}에서 설정 {0}개를 가져왔어요.",
     "IMPORT_OK_NONE": "{0}에서 가져올 설정이 없어요.",
     "IMPORT_PART_COLORS": "색상",

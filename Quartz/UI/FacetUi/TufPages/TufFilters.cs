@@ -115,7 +115,7 @@ internal static class TufFilters {
     private static string UpdatesText(TufService s) =>
         s.CheckingUpdates ? string.Format(QuartzHost.Text("TUF_CHECKING_UPDATES", "{0}/{1}"), s.UpdateCheckDone, s.UpdateCheckTotal)
         : s.UpdatesAvailable > 0 ? string.Format(QuartzHost.Text("TUF_UPDATE_ALL", "Update all ({0})"), s.UpdatesAvailable)
-        : QuartzHost.Text("TUF_CHECK_UPDATES", "Updates");
+        : QuartzHost.Text("TUF_CHECK_UPDATES", "Check Level Updates");
 
     // Facet workaround: a tile grid fills its card row. The grid and b's row go into one line that takes the grid's card-row
     // inset and rule; the grid shrinks to what b leaves (its tiles size from its own width).

@@ -24,6 +24,18 @@ static class PageRulesTests {
         Assert(Enumerable.Range(0, 14).All(b => !PageRules.Blocked(3, 0, b)), "custom with mask 0 blocks nothing");
         Assert(PageRules.Blocked(4, 0, 0) && Enumerable.Range(1, 13).All(b => !PageRules.Blocked(4, 0, b)), "no too early: Too Early only");
     }
+    public static void TestCustomXPerfect() {
+        int old = 1 << 3 | 1 << 8, x = 1 << 12, plus = 1 << 13, minus = 1 << 14;
+        Assert(PageRules.SplitShown(old) == (old | x | plus | minus) && PageRules.SplitShown(1 << 8) == 1 << 8,
+            "a mask saved before the split shows X, + and − as its Perfect");
+        Assert(PageRules.SplitStored(1 << 8 | x | plus) == (1 << 3 | 1 << 8 | x | plus) && PageRules.SplitStored(1 << 3 | 1 << 8) == 1 << 8,
+            "Perfect is stored on while any grade is, off with none");
+        int split = PageRules.SplitStored(1 << 8 | x);
+        Assert(PageRules.CustomBit(split, 3, 12) == 12 && PageRules.CustomBit(split, 3, 14) == 14 && PageRules.CustomBit(split, 3, -1) == 3
+            && PageRules.CustomBit(old, 3, 13) == 3 && PageRules.CustomBit(split, 2, 12) == 2, "a graded Perfect is judged by its grade once the mask has grades");
+        Assert(!PageRules.Blocked(3, split, PageRules.CustomBit(split, 3, 12)) && PageRules.Blocked(3, split, PageRules.CustomBit(split, 3, 13))
+            && !PageRules.Blocked(3, split, 3), "X passes, + fails, an ungraded Perfect passes");
+    }
     public static void TestDeafenModes() {
         Assert(PageRules.DeafenModes(true, true).SequenceEqual(new[] { "shortcut", "bot", "discord" }), "all three");
         Assert(PageRules.DeafenModes(false, false).SequenceEqual(new[] { "bot" }) && PageRules.DeafenModes(false, true).SequenceEqual(new[] { "bot", "discord" }),

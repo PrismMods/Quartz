@@ -25,8 +25,18 @@ internal static class TufSettingsPage {
         Row(card, "TUF_GRID_VIEW", () => service.GridView, service.SetGridView, false);
 
         VisualElement library = Controls.Card(p, "TUF_LIBRARY", o => o.Id = "TUF_LIBRARY");
-        ShellRows.Info(library, "TUF_LIBRARY_SUMMARY", () => (service.InstalledCount, service.LibraryBytes),
+        Control<string> summary = ShellRows.Info(library, "TUF_LIBRARY_SUMMARY", () => (service.InstalledCount, service.LibraryBytes),
             t => string.Format(QuartzHost.Translate("TUF_LIBRARY_SUMMARY"), t.InstalledCount, TufDiskSpace.Describe(t.LibraryBytes)));
+        // The count goes on the card's title row, at its right: the row keeps its id, so a search still finds it.
+        if(summary?.Root is { } count && library is { childCount: > 0 }) {
+            library[0].Add(count);
+            count.style.paddingLeft = count.style.paddingRight = 0f;
+            count.style.borderTopWidth = 0f;
+            count.style.marginBottom = 0f;
+            count.style.flexShrink = 1f;
+            count[0].style.display = DisplayStyle.None;   // Info's empty label
+            ShellRows.Unrow(count);
+        }
         ShellRows.Info(library, "TUF_LIBRARY_PATH", () => service.ActiveRootPath, s => s);
         ShellRows.Buttons(library, Btn("TUF_OPEN_FOLDER", () => {
             try {

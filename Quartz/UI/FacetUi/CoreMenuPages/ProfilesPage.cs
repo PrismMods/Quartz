@@ -72,7 +72,7 @@ internal static class ProfilesPage {
         add.style.marginLeft = Theme.For(add).Sizes.Gap;
         Words.Tip(add, "DESC_PROFILE_ADD");
 
-        ShellRows.Buttons(card, new ShellRows.Btn("PROFILE_IMPORT", () => QuartzShell.Do("profiles.import", () => {
+        Button[] tools = ShellRows.Buttons(card, new ShellRows.Btn("PROFILE_IMPORT", () => QuartzShell.Do("profiles.import", () => {
             string name = Import();
             if(name == null) return;
             Say(name.Length == 0 ? "PROFILE_STATUS_IMPORT_FAILED"
@@ -89,6 +89,16 @@ internal static class ProfilesPage {
             Recalibrate();
             Say("PROFILE_RECALIBRATED");
         }), "DESC_PROFILE_RECALIBRATE"));
+        // One row: the name field and Add Profile at the left, Import, Open Folder and Recalibrate at the right; it wraps only when
+        // the window is too narrow for both.
+        if(field.Root != null && tools[0] != null) {
+            field.Root[0].style.display = DisplayStyle.None;   // the field's empty label, which would grow
+            field.Root.style.flexWrap = Wrap.Wrap;
+            field.Input.style.flexShrink = 1f;
+            field.Input.style.minWidth = 120f;
+            field.Input.parent.style.flexShrink = 1f;
+            ShellRows.Join(field.Root, tools[0]).style.marginLeft = StyleKeyword.Auto;
+        }
 
         VisualElement presetCard = Controls.Card(p, "PRESETS", o => {
             o.Id = "PRESETS";

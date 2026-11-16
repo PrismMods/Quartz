@@ -147,6 +147,7 @@ List<(string Name, Action Run)> tests = [
     ("Judgement restriction offers X-Perfect only with XPerfect, and shows mode 2 as 1 without it", PageRulesTests.TestRestrictModes),
     ("judgement bar orders timings early to late", PageRulesTests.TestBarBits),
     ("judgement restriction blocks per mode, a custom mask of 0 blocks nothing", PageRulesTests.TestRestrictionBlocked),
+    ("custom judgement restriction splits Perfect into X, + and − and judges a graded Perfect by its grade", PageRulesTests.TestCustomXPerfect),
     ("Auto deafen offers shortcut and Discord modes only where they work", PageRulesTests.TestDeafenModes),
     ("A hotkey chord splits at its first plus", PageRulesTests.TestSplitChord),
     ("Only credits and custom addon pages stay in the classic menu, each for a reason", PageRulesTests.TestStaysClassic),

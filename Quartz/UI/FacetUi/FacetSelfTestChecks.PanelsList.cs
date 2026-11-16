@@ -113,8 +113,10 @@ internal static partial class FacetSelfTestChecks {
         for(int i = 0; i < 2; i++) {
             if(Q("PANEL_ADDSTAT") is Button add) Submit(add);
             yield return Frames(2);
-            Button pick = i == 1 ? PageContent().Q<Button>("PANEL_PICK_IMAGE#" + n + "-input")
-                : PageContent().Query<Button>().ToList().FirstOrDefault(b => b.name.StartsWith("PANEL_PICK_") && b.name.EndsWith("#" + n + "-input"));
+            // The picker is a popup on Facet's popup surface: its first enabled stat, then the image.
+            VisualElement picker = Popped("panel-stat-picker");
+            Button pick = i == 1 ? picker?.Q<Button>("PANEL_PICK_IMAGE#" + n + "-input")
+                : picker?.Query<Button>().ToList().FirstOrDefault(b => b.name.StartsWith("PANEL_PICK_") && b.name.EndsWith("#" + n + "-input") && b.enabledSelf);
             if(i == 0) first = pick?.name;
             if(pick != null) Submit(pick);
             yield return Frames(2);

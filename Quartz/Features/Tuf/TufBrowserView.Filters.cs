@@ -249,7 +249,7 @@ internal sealed partial class TufBrowserView : MonoBehaviour {
                 ? string.Format(Tr("TUF_CHECKING_UPDATES", "{0}/{1}"), service.UpdateCheckDone, service.UpdateCheckTotal)
                 : service.UpdatesAvailable > 0
                     ? string.Format(Tr("TUF_UPDATE_ALL", "Update all ({0})"), service.UpdatesAvailable)
-                    : Tr("TUF_CHECK_UPDATES", "Updates");
+                    : Tr("TUF_CHECK_UPDATES", "Check Level Updates");
             updatesChip.color = service.UpdatesAvailable > 0 ? UIColors.ObjectActive : UIColors.ObjectBG;
         }
         directionChip.color = service.Ascending ? UIColors.ObjectActive : UIColors.ObjectBG;

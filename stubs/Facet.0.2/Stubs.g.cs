@@ -276,6 +276,7 @@ namespace Facet {
         public global::Facet.Look Card;
         public global::Facet.Look DangerButton;
         public global::Facet.Look FlatButton;
+        public global::Facet.Look Row;
         private Looks() { }
     }
     public sealed unsafe partial class MaskTile {
@@ -328,6 +329,7 @@ namespace Facet {
         private PageHeaderOptions() { }
     }
     public static unsafe partial class Paint {
+        public static void Bg(global::UnityEngine.UIElements.VisualElement e, global::Facet.Role r) => throw null;
         public static void Enable(global::UnityEngine.UIElements.VisualElement e, bool on) => throw null;
         public static void Fg(global::UnityEngine.UIElements.VisualElement e, global::Facet.Role r) => throw null;
         public static void Forget(global::UnityEngine.UIElements.VisualElement e) => throw null;

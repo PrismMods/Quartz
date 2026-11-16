@@ -2308,7 +2308,8 @@
           "Facet.Look Facet.Looks::AccentButton",
           "Facet.Look Facet.Looks::Card",
           "Facet.Look Facet.Looks::DangerButton",
-          "Facet.Look Facet.Looks::FlatButton"
+          "Facet.Look Facet.Looks::FlatButton",
+          "Facet.Look Facet.Looks::Row"
         ]
       },
       {
@@ -2395,6 +2396,7 @@
       {
         "type": "Facet.Paint",
         "members": [
+          "System.Void Facet.Paint::Bg(UnityEngine.UIElements.VisualElement,Facet.Role)",
           "System.Void Facet.Paint::Enable(UnityEngine.UIElements.VisualElement,System.Boolean)",
           "System.Void Facet.Paint::Fg(UnityEngine.UIElements.VisualElement,Facet.Role)",
           "System.Void Facet.Paint::Forget(UnityEngine.UIElements.VisualElement)",
@@ -7257,7 +7259,10 @@
       },
       {
         "type": "UnityEngine.UIElements.Button",
-        "members": []
+        "members": [
+          "System.Action UnityEngine.UIElements.Button::clicked",
+          "System.Void UnityEngine.UIElements.Button::add_clicked(System.Action)"
+        ]
       },
       {
         "type": "UnityEngine.UIElements.CallbackEventHandler",
@@ -7428,6 +7433,7 @@
           "System.Void UnityEngine.UIElements.IStyle::set_flexDirection(UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.FlexDirection\u003E)",
           "System.Void UnityEngine.UIElements.IStyle::set_flexGrow(UnityEngine.UIElements.StyleFloat)",
           "System.Void UnityEngine.UIElements.IStyle::set_flexShrink(UnityEngine.UIElements.StyleFloat)",
+          "System.Void UnityEngine.UIElements.IStyle::set_flexWrap(UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Wrap\u003E)",
           "System.Void UnityEngine.UIElements.IStyle::set_fontSize(UnityEngine.UIElements.StyleLength)",
           "System.Void UnityEngine.UIElements.IStyle::set_height(UnityEngine.UIElements.StyleLength)",
           "System.Void UnityEngine.UIElements.IStyle::set_justifyContent(UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Justify\u003E)",
@@ -7448,12 +7454,11 @@
           "System.Void UnityEngine.UIElements.IStyle::set_position(UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Position\u003E)",
           "System.Void UnityEngine.UIElements.IStyle::set_right(UnityEngine.UIElements.StyleLength)",
           "System.Void UnityEngine.UIElements.IStyle::set_textOverflow(UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.TextOverflow\u003E)",
+          "System.Void UnityEngine.UIElements.IStyle::set_textShadow(UnityEngine.UIElements.StyleTextShadow)",
           "System.Void UnityEngine.UIElements.IStyle::set_top(UnityEngine.UIElements.StyleLength)",
           "System.Void UnityEngine.UIElements.IStyle::set_unityFontDefinition(UnityEngine.UIElements.StyleFontDefinition)",
           "System.Void UnityEngine.UIElements.IStyle::set_unityFontStyleAndWeight(UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.FontStyle\u003E)",
           "System.Void UnityEngine.UIElements.IStyle::set_unityTextAlign(UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.TextAnchor\u003E)",
-          "System.Void UnityEngine.UIElements.IStyle::set_unityTextOutlineColor(UnityEngine.UIElements.StyleColor)",
-          "System.Void UnityEngine.UIElements.IStyle::set_unityTextOutlineWidth(UnityEngine.UIElements.StyleFloat)",
           "System.Void UnityEngine.UIElements.IStyle::set_visibility(UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Visibility\u003E)",
           "System.Void UnityEngine.UIElements.IStyle::set_whiteSpace(UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.WhiteSpace\u003E)",
           "System.Void UnityEngine.UIElements.IStyle::set_width(UnityEngine.UIElements.StyleLength)",
@@ -7466,7 +7471,6 @@
           "UnityEngine.UIElements.StyleColor UnityEngine.UIElements.IStyle::borderTopColor()",
           "UnityEngine.UIElements.StyleColor UnityEngine.UIElements.IStyle::color()",
           "UnityEngine.UIElements.StyleColor UnityEngine.UIElements.IStyle::get_borderTopColor()",
-          "UnityEngine.UIElements.StyleColor UnityEngine.UIElements.IStyle::unityTextOutlineColor()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.FontStyle\u003E UnityEngine.UIElements.IStyle::unityFontStyleAndWeight()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.TextAnchor\u003E UnityEngine.UIElements.IStyle::unityTextAlign()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Align\u003E UnityEngine.UIElements.IStyle::alignItems()",
@@ -7481,6 +7485,7 @@
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.TextOverflow\u003E UnityEngine.UIElements.IStyle::textOverflow()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Visibility\u003E UnityEngine.UIElements.IStyle::visibility()",
           "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.WhiteSpace\u003E UnityEngine.UIElements.IStyle::whiteSpace()",
+          "UnityEngine.UIElements.StyleEnum\u00601\u003CUnityEngine.UIElements.Wrap\u003E UnityEngine.UIElements.IStyle::flexWrap()",
           "UnityEngine.UIElements.StyleFloat UnityEngine.UIElements.IStyle::borderBottomWidth()",
           "UnityEngine.UIElements.StyleFloat UnityEngine.UIElements.IStyle::borderLeftWidth()",
           "UnityEngine.UIElements.StyleFloat UnityEngine.UIElements.IStyle::borderRightWidth()",
@@ -7489,7 +7494,6 @@
           "UnityEngine.UIElements.StyleFloat UnityEngine.UIElements.IStyle::flexShrink()",
           "UnityEngine.UIElements.StyleFloat UnityEngine.UIElements.IStyle::get_borderTopWidth()",
           "UnityEngine.UIElements.StyleFloat UnityEngine.UIElements.IStyle::opacity()",
-          "UnityEngine.UIElements.StyleFloat UnityEngine.UIElements.IStyle::unityTextOutlineWidth()",
           "UnityEngine.UIElements.StyleFontDefinition UnityEngine.UIElements.IStyle::unityFontDefinition()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::borderBottomLeftRadius()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::borderBottomRightRadius()",
@@ -7515,7 +7519,8 @@
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::paddingTop()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::right()",
           "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::top()",
-          "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::width()"
+          "UnityEngine.UIElements.StyleLength UnityEngine.UIElements.IStyle::width()",
+          "UnityEngine.UIElements.StyleTextShadow UnityEngine.UIElements.IStyle::textShadow()"
         ]
       },
       {
@@ -7691,6 +7696,8 @@
       {
         "type": "UnityEngine.UIElements.StyleEnum\u00601",
         "members": [
+          "System.Boolean UnityEngine.UIElements.StyleEnum\u00601::op_Equality(UnityEngine.UIElements.StyleEnum\u00601\u003CT\u003E,UnityEngine.UIElements.StyleEnum\u00601\u003CT\u003E)",
+          "System.Boolean UnityEngine.UIElements.StyleEnum\u00601::op_Inequality(UnityEngine.UIElements.StyleEnum\u00601\u003CT\u003E,UnityEngine.UIElements.StyleEnum\u00601\u003CT\u003E)",
           "T UnityEngine.UIElements.StyleEnum\u00601::get_value()",
           "T UnityEngine.UIElements.StyleEnum\u00601::m_Value",
           "T UnityEngine.UIElements.StyleEnum\u00601::value()",
@@ -7736,6 +7743,14 @@
         ]
       },
       {
+        "type": "UnityEngine.UIElements.StyleTextShadow",
+        "members": [
+          "UnityEngine.UIElements.StyleKeyword UnityEngine.UIElements.StyleTextShadow::m_Keyword",
+          "UnityEngine.UIElements.StyleTextShadow UnityEngine.UIElements.StyleTextShadow::op_Implicit(UnityEngine.UIElements.TextShadow)",
+          "UnityEngine.UIElements.TextShadow UnityEngine.UIElements.StyleTextShadow::m_Value"
+        ]
+      },
+      {
         "type": "UnityEngine.UIElements.StyleValueCollection",
         "members": []
       },
@@ -7767,6 +7782,14 @@
           "System.Int32 UnityEngine.UIElements.TextOverflow::value__",
           "UnityEngine.UIElements.TextOverflow UnityEngine.UIElements.TextOverflow::Clip",
           "UnityEngine.UIElements.TextOverflow UnityEngine.UIElements.TextOverflow::Ellipsis"
+        ]
+      },
+      {
+        "type": "UnityEngine.UIElements.TextShadow",
+        "members": [
+          "System.Single UnityEngine.UIElements.TextShadow::blurRadius",
+          "UnityEngine.Color UnityEngine.UIElements.TextShadow::color",
+          "UnityEngine.Vector2 UnityEngine.UIElements.TextShadow::offset"
         ]
       },
       {
@@ -7863,6 +7886,15 @@
           "UnityEngine.UIElements.WhiteSpace UnityEngine.UIElements.WhiteSpace::Normal",
           "UnityEngine.UIElements.WhiteSpace UnityEngine.UIElements.WhiteSpace::Pre",
           "UnityEngine.UIElements.WhiteSpace UnityEngine.UIElements.WhiteSpace::PreWrap"
+        ]
+      },
+      {
+        "type": "UnityEngine.UIElements.Wrap",
+        "members": [
+          "System.Int32 UnityEngine.UIElements.Wrap::value__",
+          "UnityEngine.UIElements.Wrap UnityEngine.UIElements.Wrap::NoWrap",
+          "UnityEngine.UIElements.Wrap UnityEngine.UIElements.Wrap::Wrap",
+          "UnityEngine.UIElements.Wrap UnityEngine.UIElements.Wrap::WrapReverse"
         ]
       }
     ]

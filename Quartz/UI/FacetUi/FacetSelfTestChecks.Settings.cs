@@ -18,7 +18,7 @@ namespace Quartz.UI.FacetUi;
 /// </summary>
 internal static partial class FacetSelfTestChecks {
     private static readonly string[] SettingsCardKeys =
-        ["PRISM_GROUP_MENU", "MENU_GROUP_APPEARANCE", "FONT", "SETTINGS_FONT", "HEADING_ANIMATION", "MENU_GROUP_BEHAVIOUR", "LANGUAGE", "MENU_GROUP_MAINTENANCE",
+        ["LANGUAGE", "PRISM_GROUP_MENU", "MENU_GROUP_APPEARANCE", "FONT", "SETTINGS_FONT", "HEADING_ANIMATION", "MENU_GROUP_BEHAVIOUR", "MENU_GROUP_MAINTENANCE",
             "UPDATES", "PRISM_GROUP_EXPERIMENTAL", "CREDITS"];
     // Each switch row, the classic page's toggle for the same field, and the field.
     private static readonly (string row, string classic, Func<bool> get)[] SettingsSwitches = [

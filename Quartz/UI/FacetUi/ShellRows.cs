@@ -225,6 +225,45 @@ internal static partial class ShellRows {
         return row;
     }
 
+    /// <summary>Puts a note (a status or an empty-list text) at the left of first's button row, where a row's label sits, centred
+    /// with the buttons; the buttons stay at the right.</summary>
+    internal static T Lead<T>(Button first, T note) where T : VisualElement {
+        VisualElement row = first?.parent?.parent;
+        if(row == null || note == null) return note;
+        row.Insert(0, note);
+        note.style.paddingLeft = note.style.paddingRight = 0f;
+        note.style.flexShrink = 1f;
+        note.style.minWidth = 0f;
+        note.style.alignSelf = Align.Center;
+        return note;
+    }
+
+    /// <summary>A drag grip (two columns of three dots) at the left of a reorderable list item, with the move cursor over it. A
+    /// press on it reaches the item, so it starts the list's own drag.</summary>
+    internal static VisualElement Grip(VisualElement item) {
+        var grip = new VisualElement { name = "grip" };
+        grip.style.flexDirection = FlexDirection.Row;
+        grip.style.alignSelf = Align.Center;
+        grip.style.flexShrink = 0f;
+        grip.style.marginRight = Theme.For(item).Sizes.Gap;
+        for(int c = 0; c < 2; c++) {
+            var column = new VisualElement { pickingMode = PickingMode.Ignore };
+            column.style.marginRight = c == 0 ? 2f : 0f;
+            for(int r = 0; r < 3; r++) {
+                var dot = new VisualElement { pickingMode = PickingMode.Ignore };
+                dot.style.width = dot.style.height = 3f;
+                dot.style.marginTop = r == 0 ? 0f : 2f;
+                Ui.SetRadius(dot, 1.5f);
+                Paint.Bg(dot, Role.TextMuted);
+                column.Add(dot);
+            }
+            grip.Add(column);
+        }
+        item.Insert(0, grip);
+        Cursors.Set(grip, Cursors.Kind.Move);
+        return grip;
+    }
+
     /// <summary>A moved row stops lighting on hover: inside another row it would light a box around its button over the
     /// host row's own hover. Only the button under the pointer shows hover.</summary>
     internal static void Unrow(VisualElement row) => Paint.Look(row, new Look());

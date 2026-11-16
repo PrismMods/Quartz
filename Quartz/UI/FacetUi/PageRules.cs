@@ -30,6 +30,20 @@ internal static class PageRules {
         _ => false,
     };
 
+    /// <summary>X, + and − Perfect (bits 12, 13, 14): Custom's switches for Perfect while XPerfect is shown.</summary>
+    internal const int XPerfectBits = 1 << 12 | 1 << 13 | 1 << 14;
+
+    /// <summary>A custom mask as the split bar shows it: a mask saved without X bits shows X, + and − as its Perfect.</summary>
+    internal static int SplitShown(int mask) => (mask & XPerfectBits) != 0 || (mask & 1 << 3) == 0 ? mask : mask | XPerfectBits;
+
+    /// <summary>A mask the split bar wrote: Perfect (3) is on while any of X, + and − is, so Perfect passes as before once
+    /// XPerfect is gone; with none of them on, no X bits are kept.</summary>
+    internal static int SplitStored(int shown) => (shown & XPerfectBits) != 0 ? shown | 1 << 3 : shown & ~(1 << 3);
+
+    /// <summary>The bit Custom judges a hit by: a Perfect with an X grade (xBit 12, 13 or 14; -1 for none) is judged by its grade
+    /// once the mask has X bits, otherwise by Perfect.</summary>
+    internal static int CustomBit(int mask, int bit, int xBit) => bit == 3 && xBit >= 12 && (mask & XPerfectBits) != 0 ? xBit : bit;
+
     /// <summary>AutoDeafenSettings' mode strings (repeated here: this file is BCL): shortcut where a shortcut can be sent,
     /// the bot always, Discord where voice control works.</summary>
     internal static string[] DeafenModes(bool shortcut, bool voice) {

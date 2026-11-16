@@ -84,7 +84,7 @@
     "TUF_UPDATE_CURRENT": "已是最新",
     "TUF_UPDATE_RUNNING": "更新中…",
     "DESC_TUF_UPDATE_BADGE": "向 TUF 查询这张谱面在你下载后有没有重新上传。有更新时，点击即可覆盖下载。",
-    "TUF_CHECK_UPDATES": "更新",
+    "TUF_CHECK_UPDATES": "检查谱面更新",
     "DESC_TUF_CHECK_UPDATES": "向 TUF 查询库里的谱面在你下载后是否重新上传过。每张一次请求，库大时要稍等。",
     "TUF_CHECKING_UPDATES": "{0}/{1}",
     "TUF_UPDATES_COUNT": "更新 ({0})",
