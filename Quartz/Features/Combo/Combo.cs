@@ -66,6 +66,10 @@ internal static class Combo {
             if(!MainCore.IsModEnabled) return;
             ComboSettings conf = ComboOverlay.Conf;
             if(conf == null) return;
+            // Since 3.4.0 the game reports a midspin as its own judgement and no longer counts it as a perfect; HitKinds files it
+            // under auto hits, which Count Auto Hits would add. A midspin neither adds to the combo nor breaks it. (Older games
+            // have no Midspin margin and report a perfect, which counts as their perfect count does.)
+            if(HitKinds.IsMidspin(hit)) return;
             HitKind kind = HitKinds.Of(hit);
             bool xpComboMode = conf.XPerfectComboEnabled && XPerfectBridge.Active;
             bool incPerfect = xpComboMode && kind == HitKind.Perfect
