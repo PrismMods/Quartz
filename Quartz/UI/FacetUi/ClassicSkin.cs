@@ -17,13 +17,13 @@ internal static class ClassicSkin {
     }
     private static void Shape(Theme t) {
         var s = t.Sizes;
-        s.Radius = 10f; s.Line = 2f;
+        s.Radius = 5f; s.Line = 2f;
         s.Pad = 14f; s.Gap = 6f;
         s.ControlPad = 6f; s.FieldPad = 6f;
         s.RowHeight = 44f; s.ListRowHeight = 30f; s.NavRowHeight = 36f; s.TitleBarHeight = 44f; s.ItemHeight = 44f;
         s.Title = 22f; s.Body = 16f; s.Small = 13f; s.Caps = 13f; s.CapsSpacing = 0.5f;
         // The classic toggle: a ring when off, a filled dot when on. A round track with no knob drawn.
-        s.SwitchWidth = 22f; s.SwitchHeight = 22f; s.SwitchRadius = 11f; s.KnobRadius = 9f;
+        s.SwitchWidth = 16f; s.SwitchHeight = 16f; s.SwitchRadius = 8f; s.KnobRadius = 6f;
         s.Track = 6f; s.ThumbWidth = 16f; s.ThumbHeight = 16f;
         s.SliderWidth = 180f; s.NumberWidth = 64f; s.DropdownWidth = 160f;
         s.Indicator = 3f; s.Icon = 18f;
@@ -33,9 +33,9 @@ internal static class ClassicSkin {
         s.DialogMinWidth = 280f; s.DialogMaxWidth = 420f;
         s.CardWidth = 168f;
         var k = t.Looks;
-        k.Button = new Look { Bg = Role.Row, Text = Role.Text, HoverBg = Role.RowHover, PressedBg = Role.Panel,
+        k.Button = new Look { Bg = Role.RowHover, Text = Role.Text, Border = Role.Line, HoverBg = Role.Off, PressedBg = Role.Panel,
             SelectedBg = Role.Accent, SelectedText = Role.AccentText, FocusBorder = Role.Focus };
-        k.DangerButton = new Look { Bg = Role.Row, Text = Role.Danger, HoverBg = Role.RowHover, PressedBg = Role.Panel,
+        k.DangerButton = new Look { Bg = Role.RowHover, Text = Role.Danger, Border = Role.Line, HoverBg = Role.Off, PressedBg = Role.Panel,
             SelectedBg = Role.Danger, SelectedText = Role.AccentText, FocusBorder = Role.Focus };
         k.FlatButton = new Look { Text = Role.Text, FocusBorder = Role.Focus };
         k.AccentButton = new Look { Bg = Role.Accent, Text = Role.AccentText, FocusBorder = Role.Focus };

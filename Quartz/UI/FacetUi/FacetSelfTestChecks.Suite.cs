@@ -13,7 +13,7 @@ internal static partial class FacetSelfTestChecks {
         Sizes z = th.Sizes;
         Color accent = MainCore.Conf.GetAccentColor();
         Color Text(Color a) => Theme.FromAccent(a)[Role.AccentText];
-        check("suite: classic sizes", z.Radius == 10 && z.Body == 16 && z.Title == 22 && z.SwitchWidth == 22,
+        check("suite: classic sizes", z.Radius == 5 && z.Body == 16 && z.Title == 22 && z.SwitchWidth == 16,
             $"radius={z.Radius} body={z.Body} title={z.Title} switch={z.SwitchWidth}");
         check("suite: classic roles", Near(th[Role.Panel], UIColors.MenuBG) && Near(th[Role.TitleBar], UIColors.TopBar),
             $"panel={th[Role.Panel]} titlebar={th[Role.TitleBar]}");
@@ -24,7 +24,7 @@ internal static partial class FacetSelfTestChecks {
             yield return Frames(2);
             Color bg = w.Root.resolvedStyle.backgroundColor;
             float radius = w.Root.resolvedStyle.borderTopLeftRadius;
-            check("suite: a window wears it", radius == 10 && Near(bg, UIColors.MenuBG), $"radius={radius} bg={bg}");
+            check("suite: a window wears it", radius == 5 && Near(bg, UIColors.MenuBG), $"radius={radius} bg={bg}");
         } finally {
             s.Dispose();
         }
