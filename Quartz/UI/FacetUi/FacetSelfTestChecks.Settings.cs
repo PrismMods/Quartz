@@ -117,16 +117,16 @@ internal static partial class FacetSelfTestChecks {
         float was = MainCore.Conf.UIScale;
         yield return SetSlider("UI_SCALE", 0.8f, 1.6f, 1.2f);
         float ui = MainCore.Conf.UIScale, scale = QuartzShell.Window.Scale;
-        check("UI scale at 1.2 is saved, and scales the menu by 1.2 / 0.85 * 1.2 (its larger base)",
-            Mathf.Abs(ui - 1.2f) < 0.001f && Mathf.Abs(scale - (1.2f / 0.85f * 1.2f)) < 0.001f, $"UIScale={ui} window={scale}");
+        check($"UI scale at 1.2 is saved, and scales the menu by 1.2 / 0.85 * {QuartzShell.BaseScale} (its base)",
+            Mathf.Abs(ui - 1.2f) < 0.001f && Mathf.Abs(scale - (1.2f / 0.85f * QuartzShell.BaseScale)) < 0.001f, $"UIScale={ui} window={scale}");
         // An undo raises the slider's commit while it is on the panel; the setter applies the scale either way.
         string undid = History.NextUndo;
         History.Undo();
         yield return Frames(2);
         ui = MainCore.Conf.UIScale;
         scale = QuartzShell.Window.Scale;
-        check($"undoing the UI scale puts back {was} in the setting and the menu ({was} / 0.85 * 1.2)",
-            was != 1.2f && Mathf.Abs(ui - was) < 0.001f && Mathf.Abs(scale - (was / 0.85f * 1.2f)) < 0.001f, $"undid={undid} UIScale={ui} window={scale}");
+        check($"undoing the UI scale puts back {was} in the setting and the menu ({was} / 0.85 * {QuartzShell.BaseScale})",
+            was != 1.2f && Mathf.Abs(ui - was) < 0.001f && Mathf.Abs(scale - (was / 0.85f * QuartzShell.BaseScale)) < 0.001f, $"undid={undid} UIScale={ui} window={scale}");
         // Undone with the page switched away: the row is off the panel and raises no commit, so the setter alone applies it.
         yield return SetSlider("UI_SCALE", 0.8f, 1.6f, 1.2f);
         QuartzShell.Go(CorePages.HomePageKey);
@@ -137,7 +137,7 @@ internal static partial class FacetSelfTestChecks {
         ui = MainCore.Conf.UIScale;
         scale = QuartzShell.Window.Scale;
         check($"undoing the UI scale from another page puts back {was} in the setting and the menu",
-            undone && Mathf.Abs(ui - was) < 0.001f && Mathf.Abs(scale - (was / 0.85f * 1.2f)) < 0.001f, $"undid={undid} undone={undone} UIScale={ui} window={scale}");
+            undone && Mathf.Abs(ui - was) < 0.001f && Mathf.Abs(scale - (was / 0.85f * QuartzShell.BaseScale)) < 0.001f, $"undid={undid} undone={undone} UIScale={ui} window={scale}");
         QuartzShell.Go(CorePages.SettingsPageKey);
         yield return Frames(3);
         yield return SetSlider("WINDOW_OPACITY", 20f, 100f, 70f);

@@ -25,7 +25,7 @@ internal static partial class FacetSelfTestChecks {
             MainCore.Conf.UIScale = 0.85f;   // the classic default; the open below applies it
             FacetBridge.OpenNewMenu(CorePages.HomePageKey);
             yield return Frames(2);
-            check("at the classic default UI scale, 0.85, the new menu shows at 1.2x", Mathf.Abs(QuartzShell.Window.Scale - 1.2f) <= 0.001f,
+            check($"at the classic default UI scale, 0.85, the new menu shows at its base, {QuartzShell.BaseScale}x", Mathf.Abs(QuartzShell.Window.Scale - QuartzShell.BaseScale) <= 0.001f,
                 $"window={QuartzShell.Window.Scale}");
             VisualElement last = PageContent().Children().LastOrDefault(e => Ink(e) != null);
             info($"Home at the default scale: its last part ends at {last?.worldBound.yMax:0} on a viewport ending at {ContentScroll.contentViewport.worldBound.yMax:0}");
@@ -221,20 +221,35 @@ internal static partial class FacetSelfTestChecks {
     // A card header and a section's rows take the card rows' text inset (Facet starts both elsewhere; ShellRows lines them up).
     private static IEnumerator Insets(Action<string, bool, string> check) {
         const string restriction = "restriction";
-        bool was = FeatureService.IsEnabled(restriction), had = FeatureService.State.Features.TryGetValue(restriction, out bool stored);
+        bool was = FeatureService.IsEnabled(restriction);
+        // The page shows only with its category on: on for the run when the player has it off, put back after (as FormPage).
+        string category = NavRegistry.ByKey("gameplay.judgement")?.CategoryKey;
+        bool catWas = false, turned = false, had = category != null && FeatureService.State.Categories.TryGetValue(category, out catWas);
         try {
-            if(!was) FeatureService.SetEnabled(restriction, true);
+            if(!was) FeatureService.SetEnabledForRun(restriction, true);
+            if(category != null && !FeatureCategories.IsEnabled(category)) {
+                FeatureService.State.Categories[category] = true;
+                turned = true;
+                QuartzShell.Changed();
+            }
             Restriction.EnsureConf();
-            QuartzShell.Go("gameplay.judgement");
-            // The feature switching on syncs a frame later: wait for the page, then a frame for layout.
-            for(float t0 = Time.realtimeSinceStartup; (QuartzShell.CurrentPage != "gameplay.judgement" || PageContent().Q(name: "JR_SECTIONS_ON") == null) && Time.realtimeSinceStartup - t0 < 1f;)
+            // The shell may take the feature's pages a frame later: go again until the page shows, then a frame for layout.
+            for(float t0 = Time.realtimeSinceStartup; (QuartzShell.CurrentPage != "gameplay.judgement" || PageContent().Q(name: "JR_SECTIONS_ON") == null) && Time.realtimeSinceStartup - t0 < 1f;) {
+                QuartzShell.Go("gameplay.judgement");
                 yield return null;
+            }
             yield return Frames(1);
             Label head = PageContent().Q<Label>("JR_SECTIONS"), row = PageContent().Q(name: "JR_SECTIONS_ON")?.Q<Label>();
             float hx = head != null ? TextX(head) : float.NaN, rx = row != null ? TextX(row) : float.NaN;
             check("polish: a card header starts where its rows' labels start", Mathf.Abs(hx - rx) <= 1f, $"header={hx:0.#} row={rx:0.#} page={QuartzShell.CurrentPage}");
         } finally {
-            RestoreFeature(restriction, was, had, stored);
+            if(!was) FeatureService.SetEnabledForRun(restriction, false);
+            if(turned) {
+                if(had) FeatureService.State.Categories[category] = catWas;
+                else FeatureService.State.Categories.Remove(category);
+                FeatureService.State.Save();
+                QuartzShell.Changed();
+            }
         }
 
         QuartzShell.Go(FxPage);   // Polish turned the feature on
