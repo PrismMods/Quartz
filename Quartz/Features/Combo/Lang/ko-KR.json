@@ -33,16 +33,16 @@
     "COMBO_XPERFECT": "XPerfect 콤보 (X만)",
     "SECTION_COMBO": "콤보",
     "COMBO_RESETPOS": "위치 초기화",
-    "DESC_COMBO_AUTO": "자동 판정(홀드, 반복 등)도 콤보에 세어요",
-    "DESC_COMBO_XPERFECT": "XPerfect 모드에서 X 판정만 콤보로 세고, 캡션이 \"XCombo\"가 돼요",
-    "DESC_COMBO_SOLIDCOLOR": "콤보 수에 따라 바꾸지 않고 한 가지 색상만 써요",
-    "DESC_COMBO_PERFECTCOLOR_ENABLED": "최대 콤보에 이르면 퍼펙트 색상으로 바꿔요",
-    "COMBO_DESC": "현재 콤보를 보여줘요",
+    "DESC_COMBO_AUTO": "자동 판정(홀드, 반복 등)도 콤보에 포함",
+    "DESC_COMBO_XPERFECT": "XPerfect 모드에서 X 판정만 콤보로 세고, 캡션을 \"XCombo\"로 표시",
+    "DESC_COMBO_SOLIDCOLOR": "콤보 수에 따라 바꾸지 않고 한 가지 색상만 사용",
+    "DESC_COMBO_PERFECTCOLOR_ENABLED": "최대 콤보에 이르면 퍼펙트 색상으로 변경",
+    "COMBO_DESC": "현재 콤보 표시",
     "COMBO_SHOW_COUNTER": "콤보 카운터 보이기",
-    "DESC_COMBO_SHOW_COUNTER": "끄면 큰 카운터 없이 콤보만 세요. 패널 통계로 콤보를 보여줄 때 써요.",
+    "DESC_COMBO_SHOW_COUNTER": "끄면 큰 카운터 없이 콤보만 셉니다. 패널 통계로 콤보를 보여줄 때 사용합니다.",
     "COMBO_CUSTOM_BREAK": "콤보 끊김 직접 설정",
-    "DESC_COMBO_CUSTOM_BREAK": "콤보를 이어갈 판정을 골라요. 나머지 판정은 콤보를 끊어요.",
+    "DESC_COMBO_CUSTOM_BREAK": "콤보를 이어갈 판정을 고릅니다. 나머지 판정은 콤보를 끊습니다.",
     "COMBO_KEEP_TILES": "콤보 끊김 설정",
-    "COMBO_KEEP_INFO": "켜면 콤보를 이어가고, 끄면 콤보가 끊겨요"
+    "COMBO_KEEP_INFO": "켜짐: 콤보 유지, 꺼짐: 콤보 끊기"
   }
 }

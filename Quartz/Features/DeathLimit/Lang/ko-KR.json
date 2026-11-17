@@ -1,8 +1,8 @@
 {
   "ko-KR": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
-    "DEATHLIMIT_DESC": "죽음, 미스, 과부하가 너무 많으면 플레이를 끝내요",
-    "DESC_DL_MESSAGE": "제한에 걸려 실패하면 실패 화면에 보여줘요.",
+    "DEATHLIMIT_DESC": "죽음, 미스, 과부하가 너무 많으면 플레이 종료",
+    "DESC_DL_MESSAGE": "제한에 걸려 실패하면 실패 화면에 표시합니다.",
     "DL_DEATHS_MAX": "최대 죽음 수",
     "DL_DEATHS_ON": "죽음 제한 (Miss + Overload)",
     "DL_MESSAGE": "제한 도달 메시지",

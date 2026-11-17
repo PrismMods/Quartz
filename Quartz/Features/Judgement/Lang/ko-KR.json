@@ -3,7 +3,7 @@
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "JUDGEMENT_ANCHOR_LABEL": "기준점",
     "SECTION_JUDGEMENT": "판정",
-    "JUDGEMENT_DESC": "플레이 중 판정별 횟수를 세어요",
+    "JUDGEMENT_DESC": "플레이 중 판정별 횟수 집계",
     "JUDGEMENT_RESETPOS": "위치 초기화"
   }
 }
