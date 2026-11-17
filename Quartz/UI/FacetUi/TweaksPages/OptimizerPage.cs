@@ -23,7 +23,9 @@ internal static class OptimizerPage {
         Row(card, "OPT_RUNINBG", () => C.RunInBackground, v => C.RunInBackground = v, Def.RunInBackground);
         Row(card, "OPT_LOSSYTEXTURE", () => C.LossyTextureCompression, v => C.LossyTextureCompression = v, Def.LossyTextureCompression, false);
         Row(card, "OPT_PARALLELDECO", () => C.ParallelDecorationLoading, v => C.ParallelDecorationLoading = v, Def.ParallelDecorationLoading);
-        Row(card, "OPT_DECOPROGRESS", () => C.ShowDecorationLoadProgress, v => C.ShowDecorationLoadProgress = v, Def.ShowDecorationLoadProgress, false);
+        // Only the parallel preload can show progress: the game's own load runs in one frame, which draws nothing until it ends.
+        Row(card, "OPT_DECOPROGRESS", () => C.ShowDecorationLoadProgress, v => C.ShowDecorationLoadProgress = v, Def.ShowDecorationLoadProgress, false,
+            () => C.ParallelDecorationLoading);
         Row(card, "OPT_FASTBLOOM", () => C.FastBloom, v => C.FastBloom = v, Def.FastBloom);
         Row(card, "OPT_SKIPNOOPFILTERS", () => C.SkipNoOpScreenFilters, v => C.SkipNoOpScreenFilters = v, Def.SkipNoOpScreenFilters);
         Row(card, "OPT_CACHESCREENSCALE", () => C.CacheScreenScale, v => C.CacheScreenScale = v, Def.CacheScreenScale);
@@ -33,10 +35,12 @@ internal static class OptimizerPage {
     }
 
     // The classic id is the key in lower case; the tooltip is DESC_<key>.
-    private static void Row(VisualElement card, string key, Func<bool> get, Action<bool> set, bool def, bool apply = true) =>
+    private static void Row(VisualElement card, string key, Func<bool> get, Action<bool> set, bool def, bool apply = true,
+        Func<bool> visible = null) =>
         ShellRows.Toggle(card, key, key.ToLowerInvariant(), Bind.To(get, set), apply ? Optimizer.Apply : null, Optimizer.Save, o => {
             o.Default = def;
             o.Tooltip = "DESC_" + key;
+            if(visible != null) o.VisibleWhen = visible;
         });
 }
 #endif
