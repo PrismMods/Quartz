@@ -4,7 +4,7 @@ using Quartz.Features.Optimizer;
 using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi.TweaksPages;
 /// <summary>Tweaks ▸ Optimizer in the new menu, row for row as PageOptimizer: every switch applies then saves, except lossy
-/// texture compression, which only saves (it takes effect as textures load).</summary>
+/// texture compression and the decoration load progress, which only save (read as textures and levels load).</summary>
 internal static class OptimizerPage {
     private static OptimizerSettings C => Optimizer.Conf;
     private static readonly OptimizerSettings Def = new();
@@ -22,6 +22,8 @@ internal static class OptimizerPage {
         Row(card, "OPT_PRIORITY", () => C.BoostProcessPriority, v => C.BoostProcessPriority = v, Def.BoostProcessPriority);
         Row(card, "OPT_RUNINBG", () => C.RunInBackground, v => C.RunInBackground = v, Def.RunInBackground);
         Row(card, "OPT_LOSSYTEXTURE", () => C.LossyTextureCompression, v => C.LossyTextureCompression = v, Def.LossyTextureCompression, false);
+        Row(card, "OPT_PARALLELDECO", () => C.ParallelDecorationLoading, v => C.ParallelDecorationLoading = v, Def.ParallelDecorationLoading);
+        Row(card, "OPT_DECOPROGRESS", () => C.ShowDecorationLoadProgress, v => C.ShowDecorationLoadProgress = v, Def.ShowDecorationLoadProgress, false);
         Row(card, "OPT_FASTBLOOM", () => C.FastBloom, v => C.FastBloom = v, Def.FastBloom);
         Row(card, "OPT_SKIPNOOPFILTERS", () => C.SkipNoOpScreenFilters, v => C.SkipNoOpScreenFilters = v, Def.SkipNoOpScreenFilters);
         Row(card, "OPT_CACHESCREENSCALE", () => C.CacheScreenScale, v => C.CacheScreenScale = v, Def.CacheScreenScale);

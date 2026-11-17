@@ -3,9 +3,11 @@
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "DESC_OPT_CACHESCREENSCALE": "The game rescales its four full-screen flash quads every frame, even when the camera's size and aspect haven't changed. This skips that work when both match the last frame and runs normally as soon as either changes.",
     "DESC_OPT_COLLECTONLOAD": "Runs garbage collection each time a scene loads, so every run starts with a clean heap. Loading already stutters, so this costs you nothing.",
+    "DESC_OPT_DECOPROGRESS": "Shows a progress bar at the bottom of the screen while Parallel Decoration Loading is decoding a level's images.",
     "DESC_OPT_FASTBLOOM": "Makes ADOFAI's bloom use its cheaper low-quality path while bloom is on. This cuts real GPU work and can raise FPS on bloom-heavy levels. Bloom looks a bit softer.",
     "DESC_OPT_LEAKGUARD": "Fixes known memory leaks in the game: decoration render textures and materials left after a level unloads, frame-rate effect screen buffers, workshop thumbnails, practice-mode waveforms, and caches that only grow. Keeps RAM from creeping up in long sessions.",
     "DESC_OPT_LOSSYTEXTURE": "Compresses custom textures loaded from disk (DXT) to use about 4-8x less memory, with a small quality loss. Applies to textures loaded after you turn it on.",
+    "DESC_OPT_PARALLELDECO": "Decodes a custom level's decoration images on worker threads, many at once, before the level loads, instead of one by one on the main thread while it loads. Cuts the load hitch on decoration-heavy levels. Any image it can't handle is loaded the normal way.",
     "DESC_OPT_PAUSEOFFSCREENPARTICLES": "Stops particle decorations from simulating on the CPU while they're off camera, instead of letting the game decide per system. Saves CPU on particle-heavy levels. A system that comes back into view resumes where it paused instead of catching up, so its timing can differ. Off by default.",
     "DESC_OPT_PRIORITY": "Asks the OS to give the game steadier CPU time (Above Normal priority). Works on Windows. Ignored where the system doesn't allow it (usually macOS/Linux).",
     "DESC_OPT_RENDERHITSOUNDS": "At very high note density (Hz / high-KPS charts), the game can't play every hit sound, so overlapping hits get dropped. This mixes all of a level's hit sounds into one audio track and plays that instead, so none are lost. It replaces the game's hit sounds while on and uses a little CPU and memory. Off by default.",
@@ -15,10 +17,13 @@
     "DESC_OPT_SMOOTHGC": "Holds off garbage collection during a level and runs it when the run ends, so a GC pause can't hit mid-run and throw off your timing. Memory grows during the run (very long levels get a safety collect). Works best with Clean Heap On Load.",
     "OPT_CACHESCREENSCALE": "Skip Redundant Screen Rescales",
     "OPT_COLLECTONLOAD": "Clean Heap On Load",
+    "OPT_DECOPROGRESS": "Show Decoration Load Progress",
+    "OPT_DECO_LOADING": "Loading decorations… {0} / {1}",
     "OPT_FASTBLOOM": "Fast Bloom",
     "OPT_HOME_NONE": "No optimizations on.",
     "OPT_LEAKGUARD": "Fix Game Memory Leaks",
     "OPT_LOSSYTEXTURE": "Lossy Texture Compression",
+    "OPT_PARALLELDECO": "Parallel Decoration Loading",
     "OPT_PAUSEOFFSCREENPARTICLES": "Pause Off-Screen Particles",
     "OPT_PRIORITY": "Boost Process Priority",
     "OPT_RENDERHITSOUNDS": "Render All Hit Sounds",
@@ -28,11 +33,6 @@
     "OPT_SKIPNOOPFILTERS": "Skip No-Op Screen Filters",
     "OPT_SMOOTHGC": "Smooth GC",
     "SECTION_OPTIMIZER": "Optimizer",
-    "OPTIMIZER_DESC": "Makes the game run smoother",
-    "OPT_PARALLELDECO": "Parallel Decoration Loading",
-    "DESC_OPT_PARALLELDECO": "Decodes a custom level's decoration images on worker threads, many at once, before the level loads, instead of one by one on the main thread while it loads. Cuts the load hitch on decoration-heavy levels. Any image it can't handle is loaded the normal way.",
-    "OPT_DECOPROGRESS": "Show Decoration Load Progress",
-    "DESC_OPT_DECOPROGRESS": "Shows a progress bar at the bottom of the screen while Parallel Decoration Loading is decoding a level's images.",
-    "OPT_DECO_LOADING": "Loading decorations… {0} / {1}"
+    "OPTIMIZER_DESC": "Makes the game run smoother"
   }
 }
