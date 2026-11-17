@@ -32,15 +32,15 @@ internal static partial class FacetSelfTestChecks {
     private static IEnumerator OverlayCombo(Action<string, bool, string> check, Action<string> info) {
         ComboOverlay.EnsureConf();
         ComboSettings c = ComboConf;
-        var shown = (c.ShowCaption, c.CaptionShadowEnabled, c.CountShadowEnabled, c.NoPopAnim, c.SolidColor, c.PerfectColorEnabled);
+        var shown = (c.ShowCaption, c.CaptionShadowEnabled, c.CountShadowEnabled, c.NoPopAnim, c.SolidColor, c.PerfectColorEnabled, c.CustomBreak);
         float size = c.FontSize;
         yield return OnPage("combo", ComboPage, () => {
-            // Every row a switch hides shows for the parity check.
-            (c.ShowCaption, c.CaptionShadowEnabled, c.CountShadowEnabled, c.NoPopAnim, c.SolidColor, c.PerfectColorEnabled) = (true, true, true, false, false, true);
+            // Every row a switch hides shows for the parity check; the XPerfect row hides under Custom Break.
+            (c.ShowCaption, c.CaptionShadowEnabled, c.CountShadowEnabled, c.NoPopAnim, c.SolidColor, c.PerfectColorEnabled, c.CustomBreak) = (true, true, true, false, false, true, false);
             ComboOverlay.Apply();
         }, () => {
             c = ComboConf;
-            (c.ShowCaption, c.CaptionShadowEnabled, c.CountShadowEnabled, c.NoPopAnim, c.SolidColor, c.PerfectColorEnabled) = shown;
+            (c.ShowCaption, c.CaptionShadowEnabled, c.CountShadowEnabled, c.NoPopAnim, c.SolidColor, c.PerfectColorEnabled, c.CustomBreak) = shown;
             c.FontSize = size;
             ComboOverlay.Apply();
             ComboOverlay.Save();

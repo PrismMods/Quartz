@@ -228,11 +228,23 @@ internal static partial class FacetSelfTestChecks {
             kept = Mathf.Abs(stage1 - stage0) <= 1f;
             KvInspectorTabs()?.Select(0);   // Element
             yield return Frames(2);
+            // A fold the player closed above the rows hides them: open it for the measure, then close it again.
+            List<Action<bool, bool>> opened = [];
+            VisualElement insp = KvInspectorRoot();
+            if(Folds(out _))
+                for(VisualElement e = insp.Q("KVI_X")?.parent; e != null && e != insp; e = e.parent)
+                    if(findFold.Invoke(null, [e]) is { } fold && !((Func<bool>)foldIsOpen.GetValue(fold))()) {
+                        var set = (Action<bool, bool>)foldSet.GetValue(fold);
+                        set(true, false);
+                        opened.Add(set);
+                    }
+            yield return Frames(1);   // the opened body lays out
             Rect x = KvInspectorRoot().Q("KVI_X")?.worldBound ?? default, w = KvInspectorRoot().Q("KVI_W")?.worldBound ?? default;
             Rect yr = KvInspectorRoot().Q("KVI_Y")?.worldBound ?? default, h = KvInspectorRoot().Q("KVI_H")?.worldBound ?? default;
             paired = x.width > 0f && w.width > 0f && Mathf.Abs(x.yMin - yr.yMin) <= 1f && x.xMax <= yr.xMin + 1f && Mathf.Abs(x.height - yr.height) <= 1f
                 && Mathf.Abs(w.yMin - h.yMin) <= 1f && w.xMax <= h.xMin + 1f && w.yMin >= x.yMax - 1f;
             pairs = $"x={x} y={yr} w={w} h={h}";
+            foreach(Action<bool, bool> set in opened) set(false, false);
             KvSelect(items[0], items[items.Count - 1]);
             yield return Frames(3);
             swapped &= Displayed(swap);

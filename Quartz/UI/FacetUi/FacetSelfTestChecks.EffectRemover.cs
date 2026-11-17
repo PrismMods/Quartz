@@ -210,9 +210,13 @@ internal static partial class FacetSelfTestChecks {
         EffectRemover.Save();
         yield return Frames(1);
     }
-    // A switch's track: Accent on, Off off (Facet's Looks.Switch).
+    // A switch's track as the worn Looks.Switch paints it: SelectedBg on, Bg off (none under the classic ring).
     private static bool Shows(VisualElement track, bool on) {
-        Color want = QuartzShell.Surface.Theme[on ? Role.Accent : Role.Off], got = track.style.backgroundColor.value;
+        Theme t = QuartzShell.Surface.Theme;
+        Role? r = on ? t.Looks.Switch.SelectedBg : t.Looks.Switch.Bg;
+        StyleColor bg = track.style.backgroundColor;
+        if(r == null) return bg.keyword == StyleKeyword.Null || bg.value.a < 0.01f;
+        Color want = t[r.Value], got = bg.value;
         return Mathf.Abs(want.r - got.r) < 0.01f && Mathf.Abs(want.g - got.g) < 0.01f && Mathf.Abs(want.b - got.b) < 0.01f && Mathf.Abs(want.a - got.a) < 0.01f;
     }
     // Waits for track to show `on`; the elapsed ms, or -1 when it never did within a second.

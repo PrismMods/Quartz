@@ -226,10 +226,13 @@ internal static partial class FacetSelfTestChecks {
             if(!was) FeatureService.SetEnabled(restriction, true);
             Restriction.EnsureConf();
             QuartzShell.Go("gameplay.judgement");
-            yield return Frames(2);
+            // The feature switching on syncs a frame later: wait for the page, then a frame for layout.
+            for(float t0 = Time.realtimeSinceStartup; (QuartzShell.CurrentPage != "gameplay.judgement" || PageContent().Q(name: "JR_SECTIONS_ON") == null) && Time.realtimeSinceStartup - t0 < 1f;)
+                yield return null;
+            yield return Frames(1);
             Label head = PageContent().Q<Label>("JR_SECTIONS"), row = PageContent().Q(name: "JR_SECTIONS_ON")?.Q<Label>();
             float hx = head != null ? TextX(head) : float.NaN, rx = row != null ? TextX(row) : float.NaN;
-            check("polish: a card header starts where its rows' labels start", Mathf.Abs(hx - rx) <= 1f, $"header={hx:0.#} row={rx:0.#}");
+            check("polish: a card header starts where its rows' labels start", Mathf.Abs(hx - rx) <= 1f, $"header={hx:0.#} row={rx:0.#} page={QuartzShell.CurrentPage}");
         } finally {
             RestoreFeature(restriction, was, had, stored);
         }

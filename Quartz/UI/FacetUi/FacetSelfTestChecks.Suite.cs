@@ -6,8 +6,6 @@ using UnityEngine;
 namespace Quartz.UI.FacetUi;
 /// <summary>The suite look on Quartz's Facet theme: sizes, neutral roles, the accent, and what a window wears.</summary>
 internal static partial class FacetSelfTestChecks {
-    private static bool Hex(Color c, uint rgb) =>
-        Near(c, new Color32((byte)(rgb >> 16), (byte)(rgb >> 8), (byte)rgb, 255));
     private static IEnumerator Suite(Action<string, bool, string> check, Action<string> info) {
         Theme th = QuartzHost.Host.Theme;
         Sizes z = th.Sizes;
@@ -30,8 +28,8 @@ internal static partial class FacetSelfTestChecks {
         }
         Color test = Near(accent, Color.red) ? Color.cyan : Color.red;
         QuartzHost.Recolour(test);
-        bool mid = Near(th[Role.Accent], test) && Near(th[Role.Focus], test) && Near(th[Role.AccentText], Text(test)) && Hex(th[Role.TitleBar], 0x141418);
-        string midDetail = $"accent={th[Role.Accent]} focus={th[Role.Focus]} text={th[Role.AccentText]} titlebar={th[Role.TitleBar]}";
+        bool mid = Near(th[Role.Accent], test) && Near(th[Role.Focus], test) && Near(th[Role.AccentText], Text(test)) && Near(th[Role.TitleBar], UIColors.TopBar) && Near(th[Role.Panel], UIColors.MenuBG);
+        string midDetail = $"accent={th[Role.Accent]} focus={th[Role.Focus]} text={th[Role.AccentText]} titlebar={th[Role.TitleBar]} panel={th[Role.Panel]}";
         QuartzHost.Recolour(accent);
         check("suite: Recolour sets the accent in the same frame and keeps the neutrals", mid, midDetail);
         // The accent text is picked by contrast: light on a dark accent, dark on a light one.
