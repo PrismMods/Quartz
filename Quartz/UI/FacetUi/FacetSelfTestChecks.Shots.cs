@@ -1,7 +1,9 @@
 #if DEBUG && !IL2CPP && !QUARTZ_KEYVIEWER
 using System.Collections;
 using System.Reflection;
+using Quartz.Features;
 using Quartz.Prism;
+using Quartz.UI.FacetUi.KeyViewerEditor;
 using Quartz.UI.Nav;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -46,6 +48,7 @@ internal static partial class FacetSelfTestChecks {
         }
         if(ummOpen) Umm(false);
         try {
+            yield return Showcase(check, Shot, Page);
             yield return Page("01-restriction", "gameplay.judgement");
             yield return Page("02-panels", "overlay.panels");
             yield return Page("03-tuf-levels", "tuf.levels");
@@ -79,5 +82,107 @@ internal static partial class FacetSelfTestChecks {
         // 11: the hotkey's shortcut menu (the hub look), as built and on Facet's look in Korean.
         yield return ShortcutShots(info);
     }
+
+    // 00: the menu's main screens, for a look at the new layout. A page whose feature is off is turned on for the run only;
+    // every switch, the selection, the rail's fold and every popup are put back after.
+    private static IEnumerator Showcase(Action<string, bool, string> check, Func<string, IEnumerator> shot,
+        Func<string, string, string, IEnumerator> page) {
+        var was = FeatureService.Features.ToDictionary(h => h.Id, h => h.Enabled);
+        IEnumerator On(string key) {
+            string id = FeaturePages.FeatureOf(NavRegistry.ByKey(key));
+            if(id != null && !FeatureService.IsEnabled(id)) {
+                FeatureService.SetEnabledForRun(id, true);
+                yield return Frames(3);
+            }
+        }
+        IEnumerator Shown(string name, string key) {
+            yield return On(key);
+            yield return page(name, key, null);
+        }
+        try {
+            yield return Shown("00a-home", CorePages.HomePageKey);
+            yield return Shown("00b-features", CorePages.FeaturesPageKey);
+            yield return Shown("00c-settings", CorePages.SettingsPageKey);
+
+            yield return On(KvEditorPage.PageKey);
+            QuartzShell.Open(KvEditorPage.PageKey);
+            yield return Frames(5);
+            if(!KvEditorDoor.Usable || !KvEditorDoor.Live) {
+                check("shots: the key viewer editor is on its page", false, $"usable={KvEditorDoor.Usable} live={KvEditorDoor.Live}");
+            } else {
+                ScrollView sv = ContentScroll;
+                sv.scrollOffset = Vector2.zero;
+                yield return shot("00d-keyviewer");
+                try {
+                    if(KvShowcaseSelect()) yield return shot("00e-keyviewer-key-selected");
+                } finally { KvShowcaseClear(); }
+                yield return Frames(3);
+                try {
+                    KvShowcaseMenu(1);   // Edit
+                    yield return shot("00f-keyviewer-menu-bar");
+                } finally { global::Facet.Popup.CloseAll(); }
+                float end = sv.contentContainer.layout.height - sv.contentViewport.layout.height;
+                if(end > 1f) {
+                    sv.scrollOffset = new Vector2(0f, end / 2f);
+                    yield return shot("00g-keyviewer-settings-mid");
+                    sv.scrollOffset = new Vector2(0f, end);
+                    yield return shot("00h-keyviewer-settings-end");
+                    sv.scrollOffset = Vector2.zero;
+                }
+                QuartzShell.Hide();
+                yield return Frames(3);
+                try {
+                    FacetBridge.OpenKvSwitcher();
+                    yield return shot("00i-layouts-switcher");
+                } finally { FacetBridge.HideKvSwitcher(); }
+            }
+            QuartzShell.Hide();
+            yield return Frames(3);
+
+            try {
+                FacetBridge.OpenShortcut();
+                yield return shot("00j-shortcut-menu");
+            } finally { FacetBridge.HideShortcut(); }
+            yield return Frames(3);
+
+            // The rail folded to its icon strip, set on the Nav itself: the player's kept fold is never written.
+            QuartzShell.Open(CorePages.HomePageKey);
+            yield return Frames(3);
+            global::Facet.Nav nav = QuartzShell.Nav;
+            bool folded = nav?.Compact ?? true;
+            try {
+                if(nav != null) nav.Compact = true;
+                yield return shot("00k-sidebar-folded");
+            } finally { if(nav != null) nav.Compact = folded; }
+            yield return Frames(3);
+
+            yield return Shown("00l-overlay-general", "overlay.general");
+            yield return Shown("00m-overlay-judgement", "overlay.judgement");
+            yield return Shown("00n-overlay-progressbar", "overlay.progressbar");
+            yield return Shown("00o-gameplay-practice", "gameplay.practice");
+            yield return Shown("00p-visuals-planetcolors", "visuals.planetcolors");
+        } finally {
+            global::Facet.Popup.CloseAll();
+            QuartzShell.Hide();
+            foreach(FeatureService.Handle h in FeatureService.Features)   // a dependency turned on with a feature goes back too
+                if(was.TryGetValue(h.Id, out bool on) && h.Enabled != on) FeatureService.SetEnabledForRun(h.Id, on);
+        }
+        yield return Frames(3);
+    }
+
+    // The editor's own selection, as the key viewer checks make it: the first element, so the inspector shows its settings.
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    private static bool KvShowcaseSelect() {
+        var items = KvEditorPage.Model.Elements();
+        if(items == null || items.Count == 0) return false;
+        KvSelect(items[0]);
+        return true;
+    }
+
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    private static void KvShowcaseClear() => KvEditorPage.Editor?.Canvas.Clear();
+
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    private static void KvShowcaseMenu(int menu) => KvEditorPage.Editor?.Menu.Open(menu);
 }
 #endif
