@@ -29,6 +29,7 @@ public static class Optimizer {
     private static bool skipIdleParticlesActive;
     private static bool pauseOffscreenParticlesActive;
     private static bool renderAllHitSoundsActive;
+    private static bool parallelDecorationLoadingActive;
     public static void EnsureConf() => ConfMgr ??= SettingsFile<OptimizerSettings>.Loaded("Optimizer.json");
     public static void Save() => ConfMgr?.RequestSave();
     public static void Initialize() {
@@ -65,6 +66,7 @@ public static class Optimizer {
         TMPTextShadow.UnderlayOffsetScale = Conf.ShadowUnderlayOffsetScale;
         TMPTextShadow.UseMaterialUnderlay = on && Conf.LightTextShadows;
         if(!renderAllHitSoundsActive) HitSoundRenderer.StopAll("disabled");
+        if(!parallelDecorationLoadingActive) DecorationPreloader.DiscardPending();
         IridiumPatches.InvalidateScreenScale();
         IridiumPatches.ApplyParticleCulling();
     }
@@ -80,6 +82,7 @@ public static class Optimizer {
     internal static bool SkipIdleParticlesActive => skipIdleParticlesActive;
     internal static bool PauseOffscreenParticlesActive => pauseOffscreenParticlesActive;
     internal static bool RenderAllHitSoundsActive => renderAllHitSoundsActive;
+    internal static bool ParallelDecorationLoadingActive => parallelDecorationLoadingActive;
     private static void CacheRuntimeFlags(bool on) {
         optimizerActive = on;
         smoothGcActive = on && Conf != null && Conf.SmoothGC;
@@ -91,6 +94,7 @@ public static class Optimizer {
         skipIdleParticlesActive = on && Conf != null && Conf.SkipIdleParticles;
         pauseOffscreenParticlesActive = on && Conf != null && Conf.PauseOffscreenParticles;
         renderAllHitSoundsActive = on && Conf != null && Conf.RenderAllHitSounds;
+        parallelDecorationLoadingActive = on && Conf != null && Conf.ParallelDecorationLoading;
     }
     private static void SetPriority(ProcessPriorityClass priority) {
         try {
@@ -104,13 +108,18 @@ public static class Optimizer {
         if(leakGuardActive) LeakGuardPatches.SweepStaticCaches();
         if(collectOnLevelLoadActive) GC.Collect();
     }
-    public static void Unhook() => SceneManager.sceneLoaded -= OnSceneLoaded;
+    public static void Unhook() {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        DecorationPreloader.DiscardPending();
+        DecorationLoadProgress.Dispose();
+    }
     private static void Tick() {
         bool wantDefer = smoothGcActive && GameStats.InGame;
         if(wantDefer != gcDeferred) {
             if(wantDefer) DeferGC(); else ResumeGC();
         }
         HitSoundRenderer.Pump();
+        DecorationPreloader.Tick();
     }
     private static void DeferGC() {
         if(GarbageCollector.isIncremental) {

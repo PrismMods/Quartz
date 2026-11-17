@@ -276,6 +276,8 @@
 		<Reference Include="UnityEngine.TextCoreFontEngineModule" Condition="Exists('$(ManagedDir)/UnityEngine.TextCoreFontEngineModule.dll') Or Exists('$(LibDir)/UnityEngine.TextCoreFontEngineModule.dll')"><HintPath>$(ManagedDir)/UnityEngine.TextCoreFontEngineModule.dll</HintPath></Reference>
 		<Reference Include="UnityEngine.UI"><HintPath>$(ManagedDir)/UnityEngine.UI.dll</HintPath></Reference>
 		<Reference Include="UnityEngine.UIModule"><HintPath>$(ManagedDir)/UnityEngine.UIModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.UnityWebRequestModule"><HintPath>$(ManagedDir)/UnityEngine.UnityWebRequestModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.UnityWebRequestTextureModule"><HintPath>$(ManagedDir)/UnityEngine.UnityWebRequestTextureModule.dll</HintPath></Reference>
 		<Reference Include="UnityEngine.UIElementsModule"><HintPath>$(ManagedDir)/UnityEngine.UIElementsModule.dll</HintPath></Reference>
 		<Reference Include="UnityEngine.TextCoreTextEngineModule"><HintPath>$(ManagedDir)/UnityEngine.TextCoreTextEngineModule.dll</HintPath></Reference>
 		<!-- Facet (UI Toolkit engine; tools/update-facet.sh drops it into lib/). Ships
@@ -360,6 +362,8 @@
 		<Reference Include="UnityEngine.TextCoreFontEngineModule"><HintPath>$(Il2CppPath)/UnityEngine.TextCoreFontEngineModule.dll</HintPath></Reference>
 		<Reference Include="UnityEngine.UI"><HintPath>$(Il2CppPath)/UnityEngine.UI.dll</HintPath></Reference>
 		<Reference Include="UnityEngine.UIModule"><HintPath>$(Il2CppPath)/UnityEngine.UIModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.UnityWebRequestModule"><HintPath>$(Il2CppPath)/UnityEngine.UnityWebRequestModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.UnityWebRequestTextureModule"><HintPath>$(Il2CppPath)/UnityEngine.UnityWebRequestTextureModule.dll</HintPath></Reference>
 	</ItemGroup>
 
 	<ItemGroup>

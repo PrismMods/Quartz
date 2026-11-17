@@ -17,6 +17,8 @@ public sealed class OptimizerSettings : ISettingsFile {
     public bool CacheScreenScale = true;
     public bool SkipIdleParticles = true;
     public bool PauseOffscreenParticles = false;
+    public bool ParallelDecorationLoading = true;
+    public bool ShowDecorationLoadProgress = true;
     public JToken Serialize() => new JObject {
         [nameof(SmoothGC)] = SmoothGC,
         [nameof(LeakGuard)] = LeakGuard,
@@ -32,6 +34,8 @@ public sealed class OptimizerSettings : ISettingsFile {
         [nameof(CacheScreenScale)] = CacheScreenScale,
         [nameof(SkipIdleParticles)] = SkipIdleParticles,
         [nameof(PauseOffscreenParticles)] = PauseOffscreenParticles,
+        [nameof(ParallelDecorationLoading)] = ParallelDecorationLoading,
+        [nameof(ShowDecorationLoadProgress)] = ShowDecorationLoadProgress,
     };
     public void Deserialize(JToken token) {
         SmoothGC = IOUtils.Read(token, nameof(SmoothGC), SmoothGC);
@@ -48,5 +52,7 @@ public sealed class OptimizerSettings : ISettingsFile {
         CacheScreenScale = IOUtils.Read(token, nameof(CacheScreenScale), CacheScreenScale);
         SkipIdleParticles = IOUtils.Read(token, nameof(SkipIdleParticles), SkipIdleParticles);
         PauseOffscreenParticles = IOUtils.Read(token, nameof(PauseOffscreenParticles), PauseOffscreenParticles);
+        ParallelDecorationLoading = IOUtils.Read(token, nameof(ParallelDecorationLoading), ParallelDecorationLoading);
+        ShowDecorationLoadProgress = IOUtils.Read(token, nameof(ShowDecorationLoadProgress), ShowDecorationLoadProgress);
     }
 }

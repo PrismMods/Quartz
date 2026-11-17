@@ -86,6 +86,7 @@ UMM_FORCE=()
 GAMEDIR="${GP:-}"
 if [[ -z "$GAMEDIR" && -f Directory.Build.props ]]; then
     GAMEDIR="$(sed -n 's:.*<GamePath>\(.*\)</GamePath>.*:\1:p' Directory.Build.props | head -1)"
+    GAMEDIR="${GAMEDIR//\$(HOME)/$HOME}"
 fi
 if [[ -n "$GAMEDIR" ]] && [[ -f "$GAMEDIR/Mods/Quartz/Info.json" || -f "$GAMEDIR/UMMMods/Quartz/Info.json" ]]; then
     UMM_FORCE=(-p:UmmAutoInstall=true)
