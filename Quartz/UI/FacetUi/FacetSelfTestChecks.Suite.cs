@@ -4,7 +4,7 @@ using Facet;
 using Quartz.Core;
 using UnityEngine;
 namespace Quartz.UI.FacetUi;
-/// <summary>The suite look on Quartz's Facet theme: sizes, neutral roles, the accent, and what a window wears.</summary>
+/// <summary>Quartz's classic skin on its Facet theme: sizes, neutral roles, the accent, and what a window wears.</summary>
 internal static partial class FacetSelfTestChecks {
     private static IEnumerator Suite(Action<string, bool, string> check, Action<string> info) {
         Theme th = QuartzHost.Host.Theme;

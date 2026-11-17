@@ -6,21 +6,6 @@ namespace Quartz.Prism;
 // never in a field; wrappers exist in every flavour, with gated bodies.
 internal static partial class PrismBridge {
     /// <summary>
-    /// Dresses a Facet theme (passed as object so no Facet type shows here) in the Prism suite look. False without
-    /// PrismLib.UI, for a null theme, or when this PrismLib.UI predates the skin: the caller keeps Facet's own look.
-    /// </summary>
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    internal static bool WearSuite(object facetTheme) {
-#if !IL2CPP && !QUARTZ_KEYVIEWER
-        if(facetTheme == null || !UiAvailable || suiteGone) return false;
-        try { return WearSuiteImpl(facetTheme); } catch(Exception e) {
-            suiteGone = true;
-            MainCore.Log.Wrn($"PrismLib.UI suite skin unavailable: {e}");
-        }
-#endif
-        return false;
-    }
-    /// <summary>
     /// Gives a hotkey window (its Facet surface and window element, as objects) the hotkey-menu look every Prism mod
     /// shares: the wash behind it, no chrome, centred labels; and, where the loaded copy has them, the shared hub buttons
     /// for the window's buttons (in <paramref name="fill"/>, the last in <paramref name="neutral"/>) and the shared logo size
@@ -161,7 +146,7 @@ internal static partial class PrismBridge {
 #endif
     }
 #if !IL2CPP && !QUARTZ_KEYVIEWER
-    private static bool suiteGone, hubLookGone, blurGone, invertGone, inspectorGone;
+    private static bool hubLookGone, blurGone, invertGone, inspectorGone;
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void InspectorInImpl(object editor, object host) =>
         ((PrismLib.UI.Toolkit.KeyLayoutEditor<Quartz.Features.KeyViewer.Layout.KvElement>)editor).InspectorIn((UnityEngine.UIElements.VisualElement)host);
@@ -206,11 +191,5 @@ internal static partial class PrismBridge {
     private static void RefillHubButtonsImpl(object window, Color fill, Color neutral) =>
         PrismLib.UI.Toolkit.HubLook.Buttons((UnityEngine.UIElements.VisualElement)window, fill, neutral);
     [MethodImpl(MethodImplOptions.NoInlining)] private static void ShowSettingsImpl() => PrismWindows.ShowSettings();   // see PrismBridge.cs: never name PrismWindows outside an Impl
-    // The one place outside FacetUi that names Facet types: reached only past UiAvailable, which means Facet loaded.
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    private static bool WearSuiteImpl(object theme) {
-        PrismLib.UI.Toolkit.Suite.Wear((Facet.Theme)theme);
-        return true;
-    }
 #endif
 }

@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi;
 /// <summary>
 /// The small menu the menu hotkey opens while the new menu is on: the Quartz logo, then Settings, Edit layout and Close.
-/// Centred on its own surface, so it wears the suite look whenever the new menu does; it keeps no geometry. With
+/// Centred on its own surface, so it wears the new menu's theme; it keeps no geometry. With
 /// the shared UI library it wears the hotkey-menu look every Prism mod shares (a wash behind it, no card, centred labels,
 /// and, where the library has them, the old hub's large buttons, logo and wordmark); without it, a card.
 /// </summary>
