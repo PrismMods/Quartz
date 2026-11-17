@@ -44,6 +44,8 @@ internal static class ClassicSkin {
         Paint.Bg(strip, Role.Row);
         Ui.SetRadius(strip, sz.Radius);
         strip.style.paddingLeft = strip.style.paddingRight = sz.ControlPad;
+        // Layouts' text over the first tab's, which the strip's padding moved right: its box reaches back only its border.
+        if(page.Q("kle-layouts") is { } layouts) layouts.style.marginLeft = -sz.Line;
     }
     private static void Shape(Theme t) {
         var s = t.Sizes;
