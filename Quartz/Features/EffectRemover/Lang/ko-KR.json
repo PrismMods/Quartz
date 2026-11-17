@@ -2,7 +2,7 @@
   "ko-KR": {
     "0KTL": "DO_NOT_TRANSLATE_THIS_KEY!",
     "DESC_FXRM_DECO_FAILHITBOX": "위 유형 설정과 상관없이, 닿으면 실패(Kill)하는 히트박스가 있는 장식을 없앱니다.",
-    "DESC_FXRM_ENABLE_SAVE": "에디터에는 효과를 뺀 채보가 열려 있어서, 저장하면 파일을 덮어써 효과가 영영 사라집니다. 끄면 고급 모드가 켜져 있는 동안 저장 버튼이 잠깁니다.",
+    "DESC_FXRM_ENABLE_SAVE": "에디터에는 효과를 뺀 채보가 열려 있어서, 저장하면 파일을 덮어써 효과가 영구적으로 복구불가합니다. 끄면 고급 모드가 켜져 있는 동안 저장 버튼이 잠깁니다.",
     "DESC_FXRM_REMOVE_ALL_DECO": "끄면 판정에 반응하는 장식(히트/미스 피드백)만 남기고 나머지는 없앱니다.",
     "DESC_FXRM_TUTORIAL_PATTERNS": "기본 배경의 타일 패턴도 숨깁니다. 배경이 켜져 있으면 움직이는 도형은 항상 사라집니다.",
     "FXRM_ADVFILTERS": "고급 필터",
