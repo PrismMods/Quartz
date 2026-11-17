@@ -109,7 +109,7 @@ internal static partial class QuartzShell {
     }
 
     /// <summary>The window's scale at the classic menu's default, 0.85: larger than that menu, whose text it would otherwise match.</summary>
-    internal const float BaseScale = 1.2f;
+    internal const float BaseScale = 1.0f;
 
     /// <summary>The classic menu's scale and opacity, and its input blocking: its default scale, 0.85, is BaseScale here.</summary>
     internal static void ApplyLook() {

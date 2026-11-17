@@ -562,7 +562,6 @@
     "MENU_LAYOUT": "레이아웃",
     "MENU_LAYOUT_HINT": "Quartz와 다른 Prism 모드의 화면 요소를 옮깁니다",
     "MENU_EDIT_LAYOUT": "레이아웃 편집",
-    "unbound": "없음",
     "MENU_POWER": "전원",
     "MENU_FEATURES_LINE": "{1}개 중 {0}개 켜짐",
     "MENU_CHIP_ALL": "전체",

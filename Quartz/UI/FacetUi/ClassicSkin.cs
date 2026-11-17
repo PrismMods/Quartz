@@ -23,6 +23,22 @@ internal static class ClassicSkin {
         page.Query("menu-header").ForEach(h => {
             if(h.childCount > 1) h[h.childCount - 1].style.marginLeft = sz.Pad;
         });
+        // A run of filled rows reads as one container: round its first row's top corners and its last row's bottom ones.
+        // Rows are found by their fill and height, the two things the skin sets on every row.
+        Theme t = Theme.For(page);
+        Color fill = t[Role.Row];
+        var runs = new Dictionary<VisualElement, List<VisualElement>>();
+        page.Query<VisualElement>().ForEach(e => {
+            if(e.parent == null || e.style.minHeight.value.value != sz.RowHeight) return;
+            if(e.style.backgroundColor.keyword != StyleKeyword.Undefined || e.style.backgroundColor.value != fill) return;
+            if(!runs.TryGetValue(e.parent, out var list)) runs[e.parent] = list = [];
+            list.Add(e);
+        });
+        foreach(var list in runs.Values) {
+            float r = sz.Radius;
+            list[0].style.borderTopLeftRadius = list[0].style.borderTopRightRadius = r;
+            list[^1].style.borderBottomLeftRadius = list[^1].style.borderBottomRightRadius = r;
+        }
         VisualElement strip = page.Q("kle-strip");
         if(strip == null) return;
         Paint.Bg(strip, Role.Row);
@@ -38,7 +54,7 @@ internal static class ClassicSkin {
         s.Title = 22f; s.Body = 16f; s.Small = 13f; s.Caps = 13f; s.CapsSpacing = 0.5f;
         // The classic toggle: a ring when off, a filled dot when on. A round track with no knob drawn.
         s.SwitchWidth = 16f; s.SwitchHeight = 16f; s.SwitchRadius = 8f; s.KnobRadius = 6f;
-        s.Track = 6f; s.ThumbWidth = 16f; s.ThumbHeight = 16f;
+        s.Track = 4f; s.ThumbWidth = 10f; s.ThumbHeight = 10f;
         s.SliderWidth = 180f; s.NumberWidth = 64f; s.DropdownWidth = 160f;
         s.Indicator = 3f; s.Icon = 18f;
         s.RowPadY = 6f;
@@ -53,8 +69,8 @@ internal static class ClassicSkin {
             SelectedBg = Role.Danger, SelectedText = Role.AccentText, FocusBorder = Role.Focus };
         k.FlatButton = new Look { Text = Role.Text, FocusBorder = Role.Focus };
         k.AccentButton = new Look { Bg = Role.Accent, Text = Role.AccentText, FocusBorder = Role.Focus };
-        // The card carries the row fill, so its corners round; a row adds only its hover.
-        k.Row = new Look { HoverBg = Role.RowHover };
+        // Rows carry the fill (a fold's rows sit in no card); Polish rounds each run of rows' outer corners.
+        k.Row = new Look { Bg = Role.Row, HoverBg = Role.RowHover };
         // The selected page: an accent outline, as the classic sidebar draws it.
         k.RailItem = new Look { Text = Role.Text, HoverBg = Role.Row, SelectedBg = Role.Row, SelectedText = Role.Text,
             SelectedBorder = Role.Accent };
