@@ -132,16 +132,16 @@ public static partial class PageKeyLimiter {
                     GenerateUI.Row(list.transform), "KL_NO_ALLOWED_KEYS", "No allowed keys.", 19f);
                 return;
             }
-            bool locked = Quartz.Game.KeyBindSync.IsSyncing;
+            bool locked = Quartz.Game.KeyBindSync.Locks;
             GenerateUI.Localize(GenerateUI.AddTextH1(GenerateUI.Row(list.transform)), "KL_ALLOWED_KEYS", "Allowed Keys");
             for(int i = 0; i < keys.Length; i++) {
                 CreateKeyRow(list.transform, KeyCodes.Normalize((KeyCode)keys[i]), locked);
             }
         }
         void ApplySyncLock() {
-            bool locked = Quartz.Game.KeyBindSync.IsSyncing;
+            bool locked = Quartz.Game.KeyBindSync.Locks;
             if(locked && KeyLimiter.IsCapturing) KeyLimiter.CancelCapture();
-            syncToggle.Set(locked, false);
+            syncToggle.Set(Quartz.Game.KeyBindSync.IsSyncing, false);
             captureBtn.SetBlocked(locked, true);
             clearBtn.SetBlocked(locked, true);
             syncNote.gameObject.SetActive(locked);

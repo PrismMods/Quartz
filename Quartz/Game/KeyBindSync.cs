@@ -34,6 +34,9 @@ public static class KeyBindSync {
             }
         }
     }
+    /// <summary>Whether the source owns the keys now: syncing and its feature (the owner id) switched on. Key Viewer off leaves
+    /// Key Limiter's keys editable even with the sync option kept.</summary>
+    public static bool Locks => IsSyncing && Quartz.Features.FeatureService.IsEnabled(ownerId);
     public static void SetSyncing(bool value) {
         try {
             setSyncing?.Invoke(value);

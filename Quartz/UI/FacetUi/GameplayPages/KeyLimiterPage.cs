@@ -18,8 +18,8 @@ internal static class KeyLimiterPage {
         ShellPage.Feature(p, "keylimiter", "SECTION_KEY_LIMITER", "KEYLIMITER_DESC", null, Cards);
     }
 
-    private static bool Locked() => KeyBindSync.IsSyncing;
-    private static bool Unlocked() => !KeyBindSync.IsSyncing;
+    private static bool Locked() => KeyBindSync.Locks;
+    private static bool Unlocked() => !KeyBindSync.Locks;
 
     private static void Cards(VisualElement p) {
         VisualElement card = Controls.Card(p, null);
@@ -70,7 +70,7 @@ internal static class KeyLimiterPage {
         // Subscribed only while shown: the search index builds this page detached.
         Action changed = () => QuartzShell.Surface?.Refresh();
         Action sync = () => {
-            if(KeyBindSync.IsSyncing && KeyLimiter.IsCapturing) KeyLimiter.CancelCapture();
+            if(KeyBindSync.Locks && KeyLimiter.IsCapturing) KeyLimiter.CancelCapture();
             QuartzShell.Surface?.Refresh();
         };
         Ui.WhileAttached(card, () => {

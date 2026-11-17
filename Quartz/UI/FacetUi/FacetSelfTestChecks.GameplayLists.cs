@@ -36,7 +36,7 @@ internal static partial class FacetSelfTestChecks {
         const string page = "gameplay.keylimiter";
         KeyLimiter.EnsureConf();
         ChartKeyLimiter.EnsureConf();
-        bool locked = KeyBindSync.IsSyncing;
+        bool locked = KeyBindSync.Locks;
         string[] keys = ["KEYVIEWER_SYNCLIMITER", "KL_PROFILE_LABEL", "KL_PROFILE_NAME", "KL_ADD_PROFILE", "KL_REMOVE_PROFILE", "KL_CAPTURE", "KL_CLEAR",
             "KL_ALLOWED_KEYS", "KL_CHART_SECTION", "CHARTKEYLIMITER_ENABLE", "KL_CHART_NOTE", .. locked ? ["KL_SYNC_LOCKED"] : Array.Empty<string>()];
         string[] hidden = ["KL_NO_ALLOWED_KEYS", .. locked ? Array.Empty<string>() : ["KL_SYNC_LOCKED"]];
