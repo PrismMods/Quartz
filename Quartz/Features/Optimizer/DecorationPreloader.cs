@@ -45,6 +45,8 @@ public static class DecorationPreloader {
     internal static bool ShouldPreload(string levelPath) {
         if(!Active || string.IsNullOrEmpty(levelPath)) return false;
         if(GCS.internalLevelName != null || GameApi.IsBundleLevel()) return false;
+        // UpdateDecorationObjects loads no decorations at Low quality with forced visual settings: nothing to preload.
+        if(ADOBase.controller is { } c && c.visualQuality == VisualQuality.Low && Persistence.forceVisualSettings) return false;
         try {
             if(!string.Equals(Path.GetExtension(levelPath), ".adofai", StringComparison.OrdinalIgnoreCase)) return false;
             return File.Exists(levelPath);
@@ -69,6 +71,7 @@ public static class DecorationPreloader {
         }
         Task<List<string>> scan = Task.Run(() => DecorationImageScanner.Scan(File.ReadAllText(levelPath)));
         while(!scan.IsCompleted) yield return null;
+        if(id != runId) yield break;   // discarded meanwhile (power off, toggle off, another load): no card, no batch
         if(scan.IsFaulted) {
             Diag.Warn(scan.Exception?.GetBaseException(), "Optimizer/DecoPreload scan");
             yield break;
@@ -164,9 +167,9 @@ public static class DecorationPreloader {
             if(req.result != UnityWebRequest.Result.Success) return null;
             Texture2D tex = DownloadHandlerTexture.GetContent(req);
             if(tex == null) return null;
-            if(tex.width <= 8 && tex.height <= 8 && new FileInfo(file).Length > 1024) {
-                // Unity hands back a tiny placeholder for data it couldn't decode;
-                // let vanilla load it and report the error itself.
+            if(tex.width <= 8 && tex.height <= 8) {
+                // Unity hands back a tiny placeholder for data it couldn't decode, whatever the file's size; a real image
+                // this small just loads the vanilla way, which also reports a broken one itself.
                 Object.Destroy(tex);
                 return null;
             }
@@ -224,7 +227,7 @@ public static class DecorationPreloader {
                 }
                 if(holder.customSprites.ContainsKey(kv.Key)) holder.UnloadSprite(kv.Key);
                 holder.customSprites[kv.Key] = new TextureManager.CustomSprite(
-                    kv.Value.Texture, kv.Value.LastWrite, isInternal, fromBundle) { inUse = true };
+                    kv.Value.Texture, kv.Value.LastWrite, isInternal, fromBundle) { inUse = false };   // vanilla's cache hit marks the used ones
                 added++;
             } catch(Exception e) {
                 Diag.Warn(e, "Optimizer/DecoPreload claim");
