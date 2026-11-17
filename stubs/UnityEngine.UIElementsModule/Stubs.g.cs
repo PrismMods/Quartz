@@ -374,8 +374,8 @@ namespace UnityEngine.UIElements {
         private global::UnityEngine.UIElements.Length m_Value;
         public global::UnityEngine.UIElements.Length value { get => throw null; set { } }
         public static implicit operator global::UnityEngine.UIElements.StyleLength(float v) => throw null;
-        public static implicit operator global::UnityEngine.UIElements.StyleLength(global::UnityEngine.UIElements.Length v) => throw null;
         public static implicit operator global::UnityEngine.UIElements.StyleLength(global::UnityEngine.UIElements.StyleKeyword keyword) => throw null;
+        public static implicit operator global::UnityEngine.UIElements.StyleLength(global::UnityEngine.UIElements.Length v) => throw null;
         bool global::System.IEquatable<global::UnityEngine.UIElements.StyleLength>.Equals(global::UnityEngine.UIElements.StyleLength other) => throw null;
     }
     public unsafe partial struct StyleScale : global::System.IEquatable<global::UnityEngine.UIElements.StyleScale> {
