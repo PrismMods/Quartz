@@ -21,8 +21,8 @@ public static class DecorationImageScanner {
             if(i >= text.Length || text[i] != '"') continue;
             if(!TryReadString(text, i + 1, out string value, out int end)) continue;
             at = end;
-            value = value.Trim();
-            if(value.Length == 0) continue;
+            // Raw, as vanilla's GetOrAddSprite key: a trimmed name would be cached under a key it never looks up.
+            if(string.IsNullOrWhiteSpace(value)) continue;
             if(value.StartsWith("prefab:", StringComparison.OrdinalIgnoreCase)) continue;
             if(seen.Add(value)) found.Add(value);
         }

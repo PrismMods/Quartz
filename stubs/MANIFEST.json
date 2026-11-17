@@ -992,6 +992,8 @@
           "HoldBehavior Persistence::get_holdBehavior()",
           "HoldBehavior Persistence::holdBehavior()",
           "System.Boolean Persistence::GetHideCursorWhilePlaying()",
+          "System.Boolean Persistence::forceVisualSettings()",
+          "System.Boolean Persistence::get_forceVisualSettings()",
           "System.Single Persistence::inputOffsetNotSet",
           "System.Void Persistence::WriteSaveToDisk()"
         ]
@@ -1383,6 +1385,14 @@
         ]
       },
       {
+        "type": "VisualQuality",
+        "members": [
+          "System.Int32 VisualQuality::value__",
+          "VisualQuality VisualQuality::High",
+          "VisualQuality VisualQuality::Low"
+        ]
+      },
+      {
         "type": "WipeDirection",
         "members": [
           "System.Int32 WipeDirection::value__",
@@ -1672,6 +1682,7 @@
           "System.Void scrController::StartLoadingScene(WipeDirection)",
           "System.Void scrController::Start_Rewind(System.Int32)",
           "UnityEngine.UI.Text scrController::txtLevelName",
+          "VisualQuality scrController::visualQuality",
           "scrController scrController::get_instance()",
           "scrController scrController::instance()",
           "scrFloor scrController::currFloor()",

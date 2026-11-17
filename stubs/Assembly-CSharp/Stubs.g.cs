@@ -369,6 +369,7 @@ public unsafe partial class PauseSettingButton : global::GeneralPauseButton {
 }
 public unsafe partial class Persistence : global::RDTools.RDClassDll {
     public const float inputOffsetNotSet = 52f;
+    public static bool forceVisualSettings { get => throw null; set { } }
     public static global::ErrorMeterSize hitErrorMeterSize { get => throw null; set { } }
     public static global::HoldBehavior holdBehavior { get => throw null; set { } }
     public static bool GetHideCursorWhilePlaying() => throw null;
@@ -670,6 +671,10 @@ public unsafe partial class VideoBloom : global::PostEffectsBase {
         Screen = 1,
     }
 }
+public enum VisualQuality : int {
+    Low = 10,
+    High = 20,
+}
 public enum WipeDirection : int {
     StartsFromLeft = 0,
     StartsFromRight = 1,
@@ -883,6 +888,7 @@ public unsafe partial class scrController : global::MonsterLove.StateMachine.Sta
     public bool gameworld;
     public global::PauseMenu pauseMenu;
     public global::UnityEngine.UI.Text txtLevelName;
+    public global::VisualQuality visualQuality;
     public global::scrFloor currFloor { get => throw null; }
     public static global::scrController instance { get => throw null; }
     public bool paused { get => throw null; set { } }
