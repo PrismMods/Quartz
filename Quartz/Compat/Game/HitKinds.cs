@@ -56,6 +56,10 @@ public static class HitKinds {
         int i = (int)margin;
         return i >= 0 && i < ByGame.Length ? ByGame[i] : HitKind.Unknown;
     }
+    /// <summary>The game's Midspin margin (3.4.0+), found by name: older games have none.</summary>
+    public static bool IsMidspin(HitMargin margin) => (int)margin == MidspinValue;
+    private static readonly int MidspinValue = Enum.IsDefined(typeof(HitMargin), "Midspin")
+        ? Convert.ToInt32(Enum.Parse(typeof(HitMargin), "Midspin")) : -1;
     public static HitMargin ToGame(HitKind kind) => ToGameMap[(int)kind];
     public static int Count(int[] gameCounts, HitKind kind) {
         if(gameCounts == null) return 0;
