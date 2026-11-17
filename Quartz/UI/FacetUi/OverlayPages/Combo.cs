@@ -28,6 +28,7 @@ internal static class Combo {
         // Custom break: the judgement bar over the judgements that keep the combo; the rest break it.
         var keep = new VisualElement();
         p.Add(keep);
+        Controls.Info(Controls.Card(keep, null), "", () => QuartzHost.Text("COMBO_KEEP_INFO", "On = keep the combo, off = break it"));
         JudgementBar.Build(keep, "COMBO_KEEP_TILES", Bind.To(() => C.KeepMask, v => C.KeepMask = v), ComboSettings.DefaultKeepMask,
             [.. VisualsPages.HideJudgementsPage.Bar(XPerfectBridge.Shown, XPerfectBridge.Native).Where(r => (ComboSettings.ChoosableMask >> r.Bit & 1) != 0)],
             [.. VisualsPages.HideJudgementsPage.Extra.Where(r => (ComboSettings.ChoosableMask >> r.Bit & 1) != 0)],

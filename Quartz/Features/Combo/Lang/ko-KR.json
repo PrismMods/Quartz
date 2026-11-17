@@ -42,6 +42,7 @@
     "DESC_COMBO_SHOW_COUNTER": "끄면 큰 카운터 없이 콤보만 세요. 패널 통계로 콤보를 보여줄 때 써요.",
     "COMBO_CUSTOM_BREAK": "콤보 끊김 직접 설정",
     "DESC_COMBO_CUSTOM_BREAK": "콤보를 이어갈 판정을 골라요. 나머지 판정은 콤보를 끊어요.",
-    "COMBO_KEEP_TILES": "콤보를 잇는 판정"
+    "COMBO_KEEP_TILES": "콤보 끊김 설정",
+    "COMBO_KEEP_INFO": "켜면 콤보를 이어가고, 끄면 콤보가 끊겨요"
   }
 }

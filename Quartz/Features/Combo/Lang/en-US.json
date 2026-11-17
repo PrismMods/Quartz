@@ -42,6 +42,7 @@
     "DESC_COMBO_SHOW_COUNTER": "Turn off to keep counting without the big counter, e.g. to show the combo as a panel stat.",
     "COMBO_CUSTOM_BREAK": "Custom Combo Break",
     "DESC_COMBO_CUSTOM_BREAK": "Pick which judgements keep the combo going; every other judgement breaks it.",
-    "COMBO_KEEP_TILES": "Judgements that keep the combo"
+    "COMBO_KEEP_TILES": "Combo Break Settings",
+    "COMBO_KEEP_INFO": "On = keep the combo, off = break it"
   }
 }
