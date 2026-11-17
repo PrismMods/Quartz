@@ -45,6 +45,7 @@ internal sealed class QuartzSuite : SuiteAdapter {
         else if(QuartzShell.BuilderFor(pg) is { } build) build(panel);
         else if(FeaturePages.IsStub(pg)) QuartzShell.Stub(panel, pg);
         else QuartzShell.Undrawable(panel, pg);
+        ClassicSkin.Polish(panel);
     }
 
     public override IEnumerable<Facet.SearchIndex.Entry> SearchRows() => OverlayPages.PanelsList.SearchRows();

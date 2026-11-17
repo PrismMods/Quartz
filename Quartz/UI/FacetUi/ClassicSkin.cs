@@ -1,6 +1,7 @@
 #if !IL2CPP
 using Facet;
 using UnityEngine;
+using UnityEngine.UIElements;
 namespace Quartz.UI.FacetUi;
 /// <summary>
 /// Quartz's own design system on the new menu: the classic menu's palette (<see cref="UIColors"/>, read when worn, so it
@@ -15,10 +16,23 @@ internal static class ClassicSkin {
         Shape(t);
         return t;
     }
+    /// <summary>Touches the classic skin needs on parts other assemblies build: a gap before a page header's switch,
+    /// and a filled Hand/Foot strip in the key viewer editor so it reads as a tab rail.</summary>
+    internal static void Polish(VisualElement page) {
+        var sz = Theme.For(page).Sizes;
+        page.Query("menu-header").ForEach(h => {
+            if(h.childCount > 1) h[h.childCount - 1].style.marginLeft = sz.Pad;
+        });
+        VisualElement strip = page.Q("kle-strip");
+        if(strip == null) return;
+        Paint.Bg(strip, Role.Row);
+        Ui.SetRadius(strip, sz.Radius);
+        strip.style.paddingLeft = strip.style.paddingRight = sz.ControlPad;
+    }
     private static void Shape(Theme t) {
         var s = t.Sizes;
         s.Radius = 5f; s.Line = 2f;
-        s.Pad = 14f; s.Gap = 6f;
+        s.Pad = 18f; s.Gap = 6f;
         s.ControlPad = 6f; s.FieldPad = 6f;
         s.RowHeight = 44f; s.ListRowHeight = 30f; s.NavRowHeight = 36f; s.TitleBarHeight = 44f; s.ItemHeight = 44f;
         s.Title = 22f; s.Body = 16f; s.Small = 13f; s.Caps = 13f; s.CapsSpacing = 0.5f;
@@ -39,8 +53,8 @@ internal static class ClassicSkin {
             SelectedBg = Role.Danger, SelectedText = Role.AccentText, FocusBorder = Role.Focus };
         k.FlatButton = new Look { Text = Role.Text, FocusBorder = Role.Focus };
         k.AccentButton = new Look { Bg = Role.Accent, Text = Role.AccentText, FocusBorder = Role.Focus };
-        // Classic rows are each a filled rounded bar; the card around them stays bare.
-        k.Row = new Look { Bg = Role.Row, HoverBg = Role.RowHover };
+        // The card carries the row fill, so its corners round; a row adds only its hover.
+        k.Row = new Look { HoverBg = Role.RowHover };
         // The selected page: an accent outline, as the classic sidebar draws it.
         k.RailItem = new Look { Text = Role.Text, HoverBg = Role.Row, SelectedBg = Role.Row, SelectedText = Role.Text,
             SelectedBorder = Role.Accent };
@@ -48,7 +62,7 @@ internal static class ClassicSkin {
         k.Ring = new Look { FocusBorder = Role.Focus };
         k.Chrome = new Look { Bg = Role.TitleBar };
         k.Card = new Look { Bg = Role.Panel, Border = Role.PanelBorder };
-        k.Group = new Look();
+        k.Group = new Look { Bg = Role.Row, Border = Role.Line };
         k.Stage = new Look { Bg = Role.Rail, Border = Role.Line };
         k.Switch = new Look { Border = Role.Off, SelectedBg = Role.Accent, SelectedBorder = Role.Accent, FocusBorder = Role.Focus };
         k.Knob = new Look();

@@ -562,6 +562,7 @@
     "MENU_LAYOUT": "Layout",
     "MENU_LAYOUT_HINT": "Move the on-screen elements of Quartz and other Prism mods",
     "MENU_EDIT_LAYOUT": "Edit layout",
+    "unbound": "Unbound",
     "MENU_POWER": "Power",
     "MENU_FEATURES_LINE": "{0} of {1} on",
     "MENU_CHIP_ALL": "All",
