@@ -14,8 +14,6 @@ internal static class QuartzHost {
     private static Host host;
     private static bool hooked;
     private static readonly List<Surface> surfaces = [];
-    /// <summary>The theme wears the Prism suite look (PrismLib.UI's skin), or Facet's own look without it.</summary>
-    internal static bool Suited { get; private set; }
     internal static Host Host {
         get {
             host ??= Host.Create("Quartz", o => {
@@ -68,15 +66,20 @@ internal static class QuartzHost {
     /// <summary>Re-tints every Quartz window. Before the host exists there is nothing to tint: it starts from the accent.</summary>
     internal static void Recolour(Color accent) {
         if(host == null) return;
-        if(Suited) host.Theme.SetAccent(accent);
-        else host.Theme.Recolour(accent);
+        ClassicSkin.Wear(host.Theme);   // UIColors already follow the new accent
+        host.Theme.SetAccent(accent);
         QuartzShortcut.Recolour();
     }
+    /// <summary>Puts Quartz's classic skin back on the host theme, over whatever dressed it since.</summary>
+    internal static void Reskin() {
+        if(host == null) return;
+        ClassicSkin.Wear(host.Theme);
+        host.Theme.SetAccent(MainCore.Conf.GetAccentColor());   // redraws what wears it
+    }
     private static Theme MakeTheme(Color accent) {
-        var t = new Theme();
-        Suited = PrismBridge.WearSuite(t);
-        if(!Suited) return Theme.FromAccent(accent);
-        t.SetAccent(accent);   // the suite leaves Accent, Focus and AccentText to the host
+        // Quartz's own design system (the team's call): the classic palette and shapes on the new layout.
+        var t = ClassicSkin.Wear(new Theme());
+        t.SetAccent(accent);
         return t;
     }
     /// <summary>A surface on this host that is relabelled when Quartz's language changes and disposed on shutdown.</summary>

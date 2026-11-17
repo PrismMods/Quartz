@@ -13,9 +13,9 @@ internal static partial class FacetSelfTestChecks {
         Sizes z = th.Sizes;
         Color accent = MainCore.Conf.GetAccentColor();
         Color Text(Color a) => Theme.FromAccent(a)[Role.AccentText];
-        check("suite: sizes", z.Radius == 2 && z.Body == 13 && z.Title == 17 && z.SwitchWidth == 30,
+        check("suite: classic sizes", z.Radius == 10 && z.Body == 16 && z.Title == 22 && z.SwitchWidth == 22,
             $"radius={z.Radius} body={z.Body} title={z.Title} switch={z.SwitchWidth}");
-        check("suite: neutral roles", Hex(th[Role.Panel], 0x1A1A1F) && Hex(th[Role.TitleBar], 0x141418),
+        check("suite: classic roles", Near(th[Role.Panel], UIColors.MenuBG) && Near(th[Role.TitleBar], UIColors.TopBar),
             $"panel={th[Role.Panel]} titlebar={th[Role.TitleBar]}");
         check("suite: the accent", Near(th[Role.Accent], accent) && Near(th[Role.Focus], accent) && Near(th[Role.AccentText], Text(accent)),
             $"accent={th[Role.Accent]} focus={th[Role.Focus]} text={th[Role.AccentText]}");
@@ -24,7 +24,7 @@ internal static partial class FacetSelfTestChecks {
             yield return Frames(2);
             Color bg = w.Root.resolvedStyle.backgroundColor;
             float radius = w.Root.resolvedStyle.borderTopLeftRadius;
-            check("suite: a window wears it", radius == 2 && Hex(bg, 0x1A1A1F), $"radius={radius} bg={bg}");
+            check("suite: a window wears it", radius == 10 && Near(bg, UIColors.MenuBG), $"radius={radius} bg={bg}");
         } finally {
             s.Dispose();
         }

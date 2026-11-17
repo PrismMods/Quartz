@@ -157,6 +157,7 @@ internal static partial class QuartzShell {
     private static void BuildImpl() {
 #if !QUARTZ_KEYVIEWER
         var s = new SuiteShell(new QuartzSuite());
+        QuartzHost.Reskin();   // the shell dresses the host in the suite look; Quartz wears its own
         shell = s;   // first: the page Prebuild builds reaches the shell through this facade
         try {
             s.Prebuild();

@@ -154,7 +154,7 @@ internal static partial class FacetSelfTestChecks {
             if(File.Exists(file)) File.Delete(file);
             capture.Invoke(null, [file]);
             yield return Frames(3);
-            info($"shortcut shot ({name}, suited={QuartzHost.Suited}): {file}");
+            info($"shortcut shot ({name}): {file}");
         }
         yield return Shot("as-built");
         Surface built = QuartzShortcut.Surface;
