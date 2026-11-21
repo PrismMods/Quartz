@@ -28,6 +28,7 @@ public unsafe partial class ADOBase : global::RDTools.RDBaseDll {
     public static global::scrPlayerManager playerManager { get => throw null; }
     public static bool IsAprilFools() => throw null;
     public static bool IsHalloweenWeek() => throw null;
+    public static bool IsNotAMikoSkipMandatorySprite(string filename) => throw null;
     protected ADOBase() { }
 }
 public unsafe partial class ADOClass : global::RDTools.RDClassDll {
@@ -617,9 +618,14 @@ public unsafe partial class TextureManager {
     public global::System.Collections.Generic.Dictionary<string, global::TextureManager.CustomSprite> customSprites;
     public static global::UnityEngine.Texture2D LoadTexture(string filePath, out global::ADOFAI.LoadResult status, int maxSideSize = default) => throw null;
     public static void ShrinkImage(global::UnityEngine.Texture2D tex2D, int maxSideSize) => throw null;
+    public void UnloadSprite(string key) => throw null;
     protected TextureManager() { }
     public unsafe partial class CustomSprite : global::System.IDisposable {
+        public global::System.DateTime fileLastModified;
+        public bool inUse;
         public readonly global::UnityEngine.Sprite sprite;
+        public readonly global::UnityEngine.Texture2D texture;
+        public CustomSprite(global::UnityEngine.Texture2D texture, global::System.DateTime fileLastModified, bool isInternal, bool isFromBundle, float pixelsPerUnit = default, global::UnityEngine.SpriteMeshType spriteType = default) => throw null;
         protected CustomSprite() { }
         void global::System.IDisposable.Dispose() => throw null;
     }
@@ -812,13 +818,17 @@ public unsafe partial class scnGame : global::ADOBase {
     public const string NoTag = "NoTag";
     public int checkpointsUsed;
     public float highestBPM;
+    public global::TextureManager imgHolder;
     public static global::scnGame instance;
     public global::ADOFAI.LevelData levelData;
     public static global::ffxPlusBase ApplyEvent(global::ADOFAI.LevelEvent evnt, float bpm, float pitch, global::System.Collections.Generic.List<global::scrFloor> floors, float offset = default, global::System.Nullable<int> customFloorID = default) => throw null;
     public void ApplyEventsToFloors(global::System.Collections.Generic.List<global::scrFloor> floors) => throw null;
     public static void ApplyEventsToFloors(global::System.Collections.Generic.List<global::scrFloor> floors, global::ADOFAI.LevelData levelData, global::scrLevelMaker lm, global::System.Collections.Generic.List<global::ADOFAI.LevelEvent> events) => throw null;
+    public bool LoadAndPlayLevel(string levelPath) => throw null;
+    public bool LoadLevel(string levelPath, out global::ADOFAI.LoadResult status) => throw null;
     public bool Play(int seqID = default, bool remakeFloors = default) => throw null;
     public void RemakePath(bool applyEventsToFloors = default, bool remakeLevel = default) => throw null;
+    public void UpdateDecorationObjects(bool reloadDecorations = default) => throw null;
     protected scnGame() { }
 }
 public unsafe partial class scnLevelSelect : global::LevelSelectBase {

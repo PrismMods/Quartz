@@ -17,7 +17,7 @@ resources, and no types the mod never touches.
 | Assembly | Types | Members |
 |---|---:|---:|
 | `0Harmony` | 16 | 72 |
-| `Assembly-CSharp` | 129 | 1071 |
+| `Assembly-CSharp` | 129 | 1081 |
 | `Assembly-CSharp-firstpass` | 2 | 12 |
 | `DOTween` | 0 | 0 |
 | `MelonLoader` | 8 | 23 |
@@ -27,7 +27,7 @@ resources, and no types the mod never touches.
 | `Unity.TextMeshPro` | 36 | 348 |
 | `UnityEngine` | 0 | 0 |
 | `UnityEngine.AudioModule` | 18 | 70 |
-| `UnityEngine.CoreModule` | 77 | 1016 |
+| `UnityEngine.CoreModule` | 79 | 1019 |
 | `UnityEngine.ImageConversionModule` | 1 | 1 |
 | `UnityEngine.InputLegacyModule` | 1 | 11 |
 | `UnityEngine.ParticleSystemModule` | 9 | 53 |
@@ -36,9 +36,11 @@ resources, and no types the mod never touches.
 | `UnityEngine.UI` | 94 | 354 |
 | `UnityEngine.UIElementsModule` | 13 | 7 |
 | `UnityEngine.UIModule` | 6 | 34 |
+| `UnityEngine.UnityWebRequestModule` | 4 | 19 |
+| `UnityEngine.UnityWebRequestTextureModule` | 4 | 9 |
 | `UnityModManager` | 4 | 12 |
 
-**448 types, 3415 members.**
+**458 types, 3456 members.**
 
 ## How it is used
 

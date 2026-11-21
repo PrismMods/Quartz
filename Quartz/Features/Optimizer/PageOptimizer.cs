@@ -66,6 +66,24 @@ public static class PageOptimizer {
         );
         GenerateUI.ToggleTip(
             optimizerSec.Body,
+            optDef.ParallelDecorationLoading,
+            opt.ParallelDecorationLoading,
+            v => { opt.ParallelDecorationLoading = v; Optimizer.Apply(); Optimizer.Save(); },
+            "Parallel Decoration Loading",
+            "opt_paralleldeco",
+            "Decodes a custom level's decoration images on worker threads, many at once, before the level loads, instead of one by one on the main thread while it loads. Cuts the load hitch on decoration-heavy levels. Any image it can't handle is loaded the normal way."
+        );
+        GenerateUI.ToggleTip(
+            optimizerSec.Body,
+            optDef.ShowDecorationLoadProgress,
+            opt.ShowDecorationLoadProgress,
+            v => { opt.ShowDecorationLoadProgress = v; Optimizer.Save(); },
+            "Show Decoration Load Progress",
+            "opt_decoprogress",
+            "Shows a progress bar at the bottom of the screen while Parallel Decoration Loading is decoding a level's images."
+        );
+        GenerateUI.ToggleTip(
+            optimizerSec.Body,
             optDef.FastBloom,
             opt.FastBloom,
             v => { opt.FastBloom = v; Optimizer.Apply(); Optimizer.Save(); },

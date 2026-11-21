@@ -232,6 +232,8 @@
 		<Reference Include="UnityEngine.TextCoreFontEngineModule" Condition="Exists('$(ManagedDir)/UnityEngine.TextCoreFontEngineModule.dll') Or Exists('$(LibDir)/UnityEngine.TextCoreFontEngineModule.dll')"><HintPath>$(ManagedDir)/UnityEngine.TextCoreFontEngineModule.dll</HintPath></Reference>
 		<Reference Include="UnityEngine.UI"><HintPath>$(ManagedDir)/UnityEngine.UI.dll</HintPath></Reference>
 		<Reference Include="UnityEngine.UIModule"><HintPath>$(ManagedDir)/UnityEngine.UIModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.UnityWebRequestModule"><HintPath>$(ManagedDir)/UnityEngine.UnityWebRequestModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.UnityWebRequestTextureModule"><HintPath>$(ManagedDir)/UnityEngine.UnityWebRequestTextureModule.dll</HintPath></Reference>
 	</ItemGroup>
 
 	<!-- lib/ fallback. RAR tries each reference's HintPath (the game install) first
@@ -263,6 +265,8 @@
 		<Reference Include="UnityEngine.TextRenderingModule"><HintPath>$(Il2CppPath)/UnityEngine.TextRenderingModule.dll</HintPath></Reference>
 		<Reference Include="UnityEngine.UI"><HintPath>$(Il2CppPath)/UnityEngine.UI.dll</HintPath></Reference>
 		<Reference Include="UnityEngine.UIModule"><HintPath>$(Il2CppPath)/UnityEngine.UIModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.UnityWebRequestModule"><HintPath>$(Il2CppPath)/UnityEngine.UnityWebRequestModule.dll</HintPath></Reference>
+		<Reference Include="UnityEngine.UnityWebRequestTextureModule"><HintPath>$(Il2CppPath)/UnityEngine.UnityWebRequestTextureModule.dll</HintPath></Reference>
 	</ItemGroup>
 
 	<ItemGroup>
