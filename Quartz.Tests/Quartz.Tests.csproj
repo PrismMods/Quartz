@@ -128,6 +128,7 @@
 		<Compile Include="../Quartz/Features/Tuf/TufPackApiClient.cs" Link="Source/TufPackApiClient.cs" />
 		<Compile Include="../Quartz/Features/PlayCount/LevelAngleSignature.cs" Link="Source/LevelAngleSignature.cs" />
 		<Compile Include="../Quartz/Addons/UnityColorJsonConverter.cs" Link="Source/UnityColorJsonConverter.cs" />
+		<Compile Include="../Quartz/Features/Panels/PanelBinds.cs" Link="Source/PanelBinds.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
