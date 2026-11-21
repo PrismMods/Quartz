@@ -51,7 +51,7 @@
           "HarmonyLib.PatchProcessor HarmonyLib.Harmony::CreateProcessor(System.Reflection.MethodBase)",
           "HarmonyLib.Patches HarmonyLib.Harmony::GetPatchInfo(System.Reflection.MethodBase)",
           "System.Collections.Generic.IEnumerable\u00601\u003CSystem.Reflection.MethodBase\u003E HarmonyLib.Harmony::GetPatchedMethods()",
-          "System.Reflection.MethodInfo HarmonyLib.Harmony::Patch(System.Reflection.MethodBase,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod)",
+          "System.Reflection.MethodInfo HarmonyLib.Harmony::Patch(System.Reflection.MethodBase,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod,HarmonyLib.HarmonyMethod)",
           "System.String HarmonyLib.Harmony::Id()",
           "System.String HarmonyLib.Harmony::get_Id()",
           "System.Void HarmonyLib.Harmony::.ctor(System.String)",
@@ -87,6 +87,7 @@
         "members": [
           "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::All",
           "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::Finalizer",
+          "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::ILManipulator",
           "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::Postfix",
           "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::Prefix",
           "HarmonyLib.HarmonyPatchType HarmonyLib.HarmonyPatchType::ReversePatch",
@@ -97,7 +98,6 @@
       {
         "type": "HarmonyLib.MethodType",
         "members": [
-          "HarmonyLib.MethodType HarmonyLib.MethodType::Async",
           "HarmonyLib.MethodType HarmonyLib.MethodType::Constructor",
           "HarmonyLib.MethodType HarmonyLib.MethodType::Enumerator",
           "HarmonyLib.MethodType HarmonyLib.MethodType::Getter",

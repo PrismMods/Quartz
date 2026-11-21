@@ -17,7 +17,7 @@ resources, and no types the mod never touches.
 | Assembly | Types | Members |
 |---|---:|---:|
 | `0Harmony` | 16 | 72 |
-| `Assembly-CSharp` | 129 | 1081 |
+| `Assembly-CSharp` | 130 | 1087 |
 | `Assembly-CSharp-firstpass` | 2 | 12 |
 | `DOTween` | 0 | 0 |
 | `MelonLoader` | 8 | 23 |
@@ -40,7 +40,7 @@ resources, and no types the mod never touches.
 | `UnityEngine.UnityWebRequestTextureModule` | 4 | 9 |
 | `UnityModManager` | 4 | 12 |
 
-**458 types, 3456 members.**
+**459 types, 3462 members.**
 
 ## How it is used
 
