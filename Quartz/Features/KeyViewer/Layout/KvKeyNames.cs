@@ -11,6 +11,7 @@ internal static class KvKeyNames {
         if(key >= KeyCode.Alpha0 && key <= KeyCode.Alpha9) return ((char)('0' + (key - KeyCode.Alpha0))).ToString();
         if(key >= KeyCode.F1 && key <= KeyCode.F12) return "F" + (key - KeyCode.F1 + 1);
         if(key >= KeyCode.Keypad0 && key <= KeyCode.Keypad9) return "NUMPAD " + (key - KeyCode.Keypad0);
+        if(key >= KeyCode.Mouse0 && key <= KeyCode.Mouse6) return KvMouseNames.Name(key - KeyCode.Mouse0);
         return key switch {
             KeyCode.KeypadMultiply => "NUMPAD MULTIPLY",
             KeyCode.KeypadPlus => "NUMPAD PLUS",
@@ -57,11 +58,6 @@ internal static class KvKeyNames {
             KeyCode.End => "END",
             KeyCode.PageDown => "PAGE DOWN",
             KeyCode.Menu => "CONTEXT MENU",
-            KeyCode.Mouse0 => "MOUSE1",
-            KeyCode.Mouse1 => "MOUSE2",
-            KeyCode.Mouse2 => "MOUSE3",
-            KeyCode.Mouse3 => "MOUSE4",
-            KeyCode.Mouse4 => "MOUSE5",
             _ => "",
         };
     }

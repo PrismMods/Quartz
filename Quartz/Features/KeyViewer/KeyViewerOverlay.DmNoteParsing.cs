@@ -337,6 +337,7 @@ public static partial class KeyViewerOverlay {
             };
             if(npk != KeyCode.None) return npk;
         }
+        if(KvMouseNames.TryButton(normalized, out int button)) return KeyCode.Mouse0 + button;
         if(!char.IsDigit(normalized[0]) && Enum.TryParse(normalized, true, out KeyCode parsed)) return KeyCodes.Normalize(parsed);
         switch(normalized.ToUpperInvariant()) {
             case "DOT":
